@@ -3080,3 +3080,26 @@ extension Strings {
     public static let recentSearchScannerDescriptionBody = NSLocalizedString("RecentSearchScannerDescriptionBody", bundle: .braveShared, value: "To search by QR Code, align the QR Code in the center of the frame.", comment: "Scanning a QR Code for searching body")
     public static let recentSearchClearAlertButton = NSLocalizedString("RecentSearchClearAlertButton", bundle: .braveShared, value: "Clear Recent", comment: "The button title that shows when you clear all recent searches")
 }
+
+// MARK: - Widgets
+extension Strings {
+    public struct Widgets {
+        public static let noFavoritesFound = NSLocalizedString(
+            "widgets.noFavoritesFound",
+            bundle: .braveShared,
+            value: "Please open Brave to view your favorites here",
+            comment: "This shows when you add a widget but have no favorites added in your app")
+        
+        public static let favoritesWidgetTitle = NSLocalizedString(
+            "widgets.favoritesWidgetTitle",
+            bundle: .braveShared,
+            value: "Favorites",
+            comment: "Title for favorites widget on 'add widget' screen.")
+        
+        public static let favoritesWidgetDescription = NSLocalizedString(
+            "widgets.favoritesWidgetDescription",
+            bundle: .braveShared,
+            value: "Your favorite sites",
+            comment: "Description for favorites widget on 'add widget' screen.")
+    }
+}

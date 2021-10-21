@@ -8,28 +8,39 @@ import SwiftUI
 import Shared
 import BraveShared
 
-struct FavoriteEntry: TimelineEntry {
-    var date: Date
-    var favorites: [WidgetFavorite]?
+struct FavoritesWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "FavoritesWidget", provider: FavoritesProvider()) { entry in
+            FavoritesView(entry: entry)
+        }
+        .configurationDisplayName(Strings.Widgets.favoritesWidgetTitle)
+        .description(Strings.Widgets.favoritesWidgetDescription)
+        .supportedFamilies([.systemMedium, .systemLarge])
+    }
 }
 
-struct FavoritesProvider: TimelineProvider {
+private struct FavoriteEntry: TimelineEntry {
+    var date: Date
+    var favorites: [WidgetFavorite]
+}
+
+private struct FavoritesProvider: TimelineProvider {
     typealias Entry = FavoriteEntry
     
     func placeholder(in context: Context) -> Entry {
         Entry(date: Date(), favorites: [])
     }
     func getSnapshot(in context: Context, completion: @escaping (Entry) -> Void) {
-        let favorites = FavoritesWidgetData.loadWidgetData()
+        let favorites = FavoritesWidgetData.loadWidgetData() ?? []
         completion(Entry(date: Date(), favorites: favorites))
     }
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
-        let favorites = FavoritesWidgetData.loadWidgetData()
+        let favorites = FavoritesWidgetData.loadWidgetData() ?? []
         completion(Timeline(entries: [Entry(date: Date(), favorites: favorites)], policy: .never))
     }
 }
 
-struct FaviconImage: View {
+private struct FaviconImage: View {
     var image: UIImage
     var contentMode: UIView.ContentMode
     
@@ -46,12 +57,12 @@ struct FaviconImage: View {
     }
 }
 
-struct NoFavoritesFoundView: View {
+private struct NoFavoritesFoundView: View {
     var body: some View {
         VStack {
             Image("brave-icon")
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            Text("Please open Brave to view your favorites here")
+            Text(Strings.Widgets.noFavoritesFound)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.white)
         }
@@ -59,23 +70,23 @@ struct NoFavoritesFoundView: View {
     }
 }
 
-struct FavoritesView: View {
+private struct FavoritesView: View {
     var entry: FavoriteEntry
     
     var body: some View {
         Group {
-            if entry.favorites == nil {
+            if entry.favorites.isEmpty {
                 NoFavoritesFoundView()
             } else {
                 FavoritesGridView(entry: entry)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(UIColor(red: 59.0/255.0, green: 62.0/255.0, blue: 79.0/255.0, alpha: 1.0)))
+        .background(Color(UIColor.secondaryBraveBackground))
     }
 }
 
-struct FavoritesGridView: View {
+private struct FavoritesGridView: View {
     var entry: FavoriteEntry
     @Environment(\.widgetFamily) var widgetFamily
     
@@ -85,8 +96,8 @@ struct FavoritesGridView: View {
             return 2
         case .systemLarge:
             return 4
-        case .systemSmall:
-            assertionFailure("systemSmall widget family isn't supported")
+        case .systemSmall, .systemExtraLarge:
+            assertionFailure("widget family isn't supported")
             return 0
         @unknown default:
             return 0
@@ -99,8 +110,8 @@ struct FavoritesGridView: View {
             return 8
         case .systemLarge:
             return 22
-        case .systemSmall:
-            assertionFailure("systemSmall widget family isn't supported")
+        case .systemSmall, .systemExtraLarge:
+            assertionFailure("widget family isn't supported")
             return 0
         @unknown default:
             return 0
@@ -113,8 +124,8 @@ struct FavoritesGridView: View {
             return 18
         case .systemLarge:
             return 18
-        case .systemSmall:
-            assertionFailure("systemSmall widget family isn't supported")
+        case .systemSmall, .systemExtraLarge:
+            assertionFailure("widget family isn't supported")
             return 0
         @unknown default:
             return 0
@@ -126,10 +137,10 @@ struct FavoritesGridView: View {
     }
     
     func favorite(atRow row: Int, column: Int) -> WidgetFavorite? {
-        guard let favorites = entry.favorites else { return nil }
+        let favorites = entry.favorites
         let index = (row * 4) + column
         if index < favorites.count {
-            return favorites[index]
+            return favorites[safe: index]
         }
         return nil
     }
@@ -157,49 +168,34 @@ struct FavoritesGridView: View {
                                     }
                                 }
                                 .clipShape(itemShape)
-                                .background(Color.black.opacity(0.05).clipShape(itemShape))
+                                .background(Color(UIColor.braveBackground).opacity(0.05).clipShape(itemShape))
                                 .overlay(
                                     itemShape
-                                        .strokeBorder(Color.black.opacity(0.1), lineWidth: pixelLength)
+                                        .strokeBorder(Color(UIColor.braveBackground).opacity(0.1), lineWidth: pixelLength)
                                 )
                             })
                         } else {
                             itemShape
-                                .fill(Color.black.opacity(0.05))
-                                .overlay(
-                                    itemShape
-                                        .strokeBorder(Color.black.opacity(0.2), lineWidth: pixelLength)
-                                )
+                                .fill(.clear)
                                 .aspectRatio(1.0, contentMode: .fit)
                         }
                     }
                 }
             }
         }
-//        .border(Color.red)
         .padding(8)
         .padding(widgetFamily == .systemLarge ? 4 : 0)
-//        .border(Color.black)
     }
 }
 
-struct FavoritesWidget: Widget {
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "FavoritesWidget", provider: FavoritesProvider()) { entry in
-            FavoritesView(entry: entry)
-        }
-        .configurationDisplayName("Favorites")
-        .description("Your favorite sites")
-        .supportedFamilies([.systemMedium, .systemLarge])
-    }
-}
+// MARK: - Preview
 
 struct FavoritesView_Previews: PreviewProvider {
     static var previews: some View {
-        FavoritesView(entry: .init(date: Date(), favorites: nil))
+        FavoritesView(entry: .init(date: Date(), favorites: []))
         .previewContext(WidgetPreviewContext(family: .systemMedium))
         FavoritesView(entry: .init(date: Date(), favorites: [
-//            .init(url: URL(string: "https://brave.com")!, faviconAttributes: <#T##FaviconAttributes?#>)
+            // TODO: Fill with favorites.
         ]))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
         FavoritesView(entry: .init(date: Date(), favorites: []))
