@@ -31,7 +31,7 @@ struct BuyTokenView: View {
             .padding(.bottom, -16) // Get it a bit closer
         ) {
         }
-        if buyTokenStore.isMainnet {
+        if networkStore.selectedChain.chainId == BraveWallet.MainnetChainId {
           Section(
             header: WalletListHeaderView(title: Text(Strings.Wallet.buy))
           ) {
@@ -83,7 +83,7 @@ struct BuyTokenView: View {
             VStack(alignment: .leading, spacing: 4.0) {
               Text(Strings.Wallet.buyTestTitle)
                 .font(.headline)
-              Text(String.localizedStringWithFormat(Strings.Wallet.buyTestDescription, buyTokenStore.networkName))
+              Text(String.localizedStringWithFormat(Strings.Wallet.buyTestDescription, networkStore.selectedChain.chainName))
                 .font(.subheadline)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }
@@ -123,7 +123,7 @@ struct BuyTokenView: View {
         }
       }
       .onAppear {
-        buyTokenStore.prepareScreen()
+        buyTokenStore.fetchBuyTokens()
       }
     }
   }
