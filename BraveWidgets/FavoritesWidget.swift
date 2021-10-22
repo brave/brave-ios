@@ -89,6 +89,8 @@ private struct FavoritesView: View {
 private struct FavoritesGridView: View {
     var entry: FavoriteEntry
     @Environment(\.widgetFamily) var widgetFamily
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.pixelLength) var pixelLength
     
     var numberOfRows: Int {
         switch widgetFamily {
@@ -145,8 +147,6 @@ private struct FavoritesGridView: View {
         return nil
     }
     
-    @Environment(\.pixelLength) var pixelLength
-    
     var body: some View {
         VStack(spacing: verticalSpacing) {
             ForEach(0..<numberOfRows) { row in
@@ -164,7 +164,8 @@ private struct FavoritesGridView: View {
                                         Text(verbatim: favorite.url.baseDomain?.first?.uppercased() ?? "")
                                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                                             .font(.system(size: 36))
-                                            .background(Color.white)
+                                            .background(Color(UIColor.braveBackground))
+                                            .foregroundColor(Color(UIColor.braveLabel))
                                     }
                                 }
                                 .clipShape(itemShape)
@@ -177,6 +178,10 @@ private struct FavoritesGridView: View {
                         } else {
                             itemShape
                                 .fill(.clear)
+                                .overlay(
+                                    itemShape
+                                        .strokeBorder(Color(UIColor.braveLabel).opacity(0.2), lineWidth: pixelLength)
+                                )
                                 .aspectRatio(1.0, contentMode: .fit)
                         }
                     }
