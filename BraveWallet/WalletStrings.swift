@@ -894,7 +894,7 @@ extension Strings {
       "wallet.sendCryptoFromTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "From", // TODO: Get real copy
+      value: "From",
       comment: "A title above the cryptocurrency token/asset you are sending from. For example this would appear over a cell that has the 'BAT' token selected"
     )
     public static let sendCryptoAmountTitle = NSLocalizedString(
@@ -915,14 +915,14 @@ extension Strings {
       "wallet.sendCryptoToTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "To", // TODO: Get real copy
-      comment: "A title above the address you want to send to."
+      value: "To",
+      comment: "A title above the address you want to send to. For example this would appear over a cell that has the 'OxFCdf***DDee' with a clipboard icon and a qr-code icon on the right hand side"
     )
     public static let sendCryptoAddressPlaceholder = NSLocalizedString(
       "wallet.sendCryptoAddressPlaceholder",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Enter address or url", // TODO: Get real copy
+      value: "Enter address or url",
       comment: "A placeholder of the address text field."
     )
     public static let sendCryptoPreviewButtonTitle = NSLocalizedString(

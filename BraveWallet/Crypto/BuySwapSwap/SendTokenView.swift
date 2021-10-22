@@ -15,13 +15,6 @@ struct SendTokenView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   @State private var amountInput = ""
-  @State private var quickAmount: ShortcutAmountGrid.Amount? {
-    didSet {
-      if let _ = quickAmount {
-        // TODO: compute using `sendTokenStore.selectedSendTokenBalance` and `quickAmount` if there is one and update `amountInput`
-      }
-    }
-  }
   @State private var sendAddress = ""
   
   @ScaledMetric var length: CGFloat = 16.0
@@ -63,36 +56,41 @@ struct SendTokenView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: WalletListHeaderView(title: Text(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountTitle, sendTokenStore.selectedSendToken?.symbol ?? ""))),
+          header:
+            WalletListHeaderView(
+              title: Text(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountTitle,
+                                                          sendTokenStore.selectedSendToken?.symbol ?? "")
+                        )
+            ),
           footer: ShortcutAmountGrid(action: { amount in
-            quickAmount = amount
+            // TODO: compute using `sendTokenStore.selectedSendTokenBalance` and `amount` if there is one and update `amountInput`
           })
           .listRowInsets(.zero)
           .padding(.bottom, 8)
         ) {
-          TextField(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountPlaceholder, sendTokenStore.selectedSendToken?.symbol ?? ""), text: $amountInput)
+          TextField(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountPlaceholder,
+                                                     sendTokenStore.selectedSendToken?.symbol ?? ""),
+                    text: $amountInput
+          )
             .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoToTitle))
         ) {
-          HStack(spacing: 24.0) {
+          HStack(spacing: 14.0) {
             TextField(Strings.Wallet.sendCryptoAddressPlaceholder, text: $sendAddress)
             Button(action: {}) {
               Image("brave.clipboard")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: length, height: length)
+                .renderingMode(.template)
                 .foregroundColor(Color(.primaryButtonTint))
+                .font(.body)
             }
             Button(action: {}) {
-              Image("qr_code_button")
+              Image("brave.qr-code")
                 .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: length, height: length)
                 .foregroundColor(Color(.primaryButtonTint))
+                .font(.body)
             }
           }
         }
@@ -123,13 +121,12 @@ struct SendTokenView: View {
         .listRowBackground(Color(.clear))
         */
         Section(
-          header: HStack {
+          header:
             Button(action: {}) {
               Text(Strings.Wallet.sendCryptoPreviewButtonTitle)
             }
-              .buttonStyle(BraveFilledButtonStyle(size: .normal))
-              .frame(maxWidth: .infinity)
-          }
+            .buttonStyle(BraveFilledButtonStyle(size: .normal))
+            .frame(maxWidth: .infinity)
             .resetListHeaderStyle()
             .listRowBackground(Color(.clear))
         ) {

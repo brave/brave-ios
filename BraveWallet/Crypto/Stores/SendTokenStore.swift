@@ -17,7 +17,11 @@ public class SendTokenStore: ObservableObject {
     }
   }
   /// The current selected token balance. Default with nil value.
-  @Published var selectedSendTokenBalance: String? // TODO: Convert to Fiat Ref: https://github.com/brave/brave-ios/issues/4370
+  @Published var selectedSendTokenBalance: String? {
+    didSet {
+      // TODO: convert from wei Ref: https://github.com/brave/brave-ios/issues/4370
+    }
+  }
   
   private let keyringController: BraveWalletKeyringController
   private let rpcController: BraveWalletEthJsonRpcController
@@ -44,8 +48,8 @@ public class SendTokenStore: ObservableObject {
         if let selectedToken = selectedSendToken {
           if tokens.isEmpty {
             selectedSendToken = nil
-          } else if let index = tokens.firstIndex(where: { $0.id == selectedToken.id && $0.contractAddress != selectedToken.contractAddress }) {
-            selectedSendToken = tokens[index]
+          } else if let token = tokens.first(where: { $0.id == selectedToken.id }) {
+            selectedSendToken = token
           }
         } else {
           selectedSendToken = tokens.first
@@ -66,12 +70,12 @@ public class SendTokenStore: ObservableObject {
           self.selectedSendTokenBalance = nil
           return
         }
-        self.balance(for: tokens[index])
+        self.fetchBalance(for: tokens[index])
       }
     }
   }
   
-  private func balance(for token: BraveWallet.ERCToken) {
+  private func fetchBalance(for token: BraveWallet.ERCToken) {
     keyringController.selectedAccount { [self] accountAddress in
       guard let accountAddress = accountAddress else {
         self.selectedSendTokenBalance = nil
@@ -131,7 +135,6 @@ extension SendTokenStore: BraveWalletKeyringControllerObserver {
   }
   
   public func accountsChanged() {
-    fetchAssetBalance()
   }
   
   public func autoLockMinutesChanged() {
