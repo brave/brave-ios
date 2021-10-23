@@ -25,15 +25,10 @@ class BrowserNavigationHelper {
         // All menu views should be opened in portrait on iPhones.
         UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
         
-        if #available(iOS 13.0, *) {
-            nav.isModalInPresentation = !allowSwipeToDismiss
-            
-            nav.modalPresentationStyle =
-                UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-        } else {
-            nav.modalPresentationStyle =
-                UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
-        }
+        nav.isModalInPresentation = !allowSwipeToDismiss
+        
+        nav.modalPresentationStyle =
+            UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
         
         let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
         
@@ -44,44 +39,6 @@ class BrowserNavigationHelper {
         
         dismissView()
         bvc?.present(nav, animated: true)
-    }
-    
-    func toggleVPN() {
-        guard let bvc = bvc else { return }
-        
-        let vpnState = BraveVPN.vpnState
-        let enabled = !BraveVPN.isConnected
-        
-        if !VPNProductInfo.isComplete {
-            let alert =
-                UIAlertController(title: Strings.VPN.errorCantGetPricesTitle,
-                                  message: Strings.VPN.errorCantGetPricesBody,
-                                  preferredStyle: .alert)
-            alert.addAction(.init(title: Strings.OKString, style: .default))
-            dismissView()
-            bvc.present(alert, animated: true)
-            // Reattempt to connect to the App Store to get VPN prices.
-            bvc.vpnProductInfo.load()
-            return
-        }
-        
-        switch BraveVPN.vpnState {
-        case .notPurchased, .purchased, .expired:
-            guard let vc = vpnState.enableVPNDestinationVC else { return }
-            open(vc, doneButton: DoneButton(style: .cancel, position: .left), allowSwipeToDismiss: true)
-        case .installed:
-            // Do not modify UISwitch state here, update it based on vpn status observer.
-            if enabled {
-                BraveVPN.reconnect()
-                
-                /// Donate Enable VPN Activity for suggestions
-                let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
-                bvc.userActivity = enableVPNActivity
-                enableVPNActivity.becomeCurrent()
-            } else {
-                BraveVPN.disconnect()
-            }
-        }
     }
     
     func openBookmarks() {

@@ -7,7 +7,6 @@ import XCTest
 import Storage
 @testable import Client
 import Shared
-import BraveShared
 
 class TestFavicons: ProfileTest {
     
