@@ -507,6 +507,7 @@
 		3BE7275D1CCFE8B60099189F /* CustomSearchHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE7275C1CCFE8B60099189F /* CustomSearchHandler.swift */; };
 		3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */; };
 		440982A526658EAA00BB37FE /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440982A426658EAA00BB37FE /* BraveSearchManager.swift */; };
+		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
 		4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */; };
 		4422D42B21BFCF8900BF1855 /* RecentlyUsedCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4422D42521BFCF8800BF1855 /* RecentlyUsedCache.h */; };
 		4422D42C21BFCF8900BF1855 /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42621BFCF8800BF1855 /* HttpsEverywhere.cpp */; };
@@ -2161,6 +2162,7 @@
 		3BE7275C1CCFE8B60099189F /* CustomSearchHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomSearchHandler.swift; sourceTree = "<group>"; };
 		3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleToast.swift; sourceTree = "<group>"; };
 		440982A426658EAA00BB37FE /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
+		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
 		4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpsEverywhereStats.swift; sourceTree = "<group>"; };
 		4422D42521BFCF8800BF1855 /* RecentlyUsedCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentlyUsedCache.h; sourceTree = "<group>"; };
 		4422D42621BFCF8800BF1855 /* HttpsEverywhere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpsEverywhere.cpp; sourceTree = "<group>"; };
@@ -5275,6 +5277,7 @@
 				CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */,
 				CA0391F6271E143F000EB13C /* StatsWidget.swift */,
 				CA0391F7271E143F000EB13C /* StatWidget.swift */,
+				441A635F272444DE001492C3 /* StatDataModel.swift */,
 				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
 				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
 				CA0391BB271E1026000EB13C /* Assets.xcassets */,
@@ -7491,6 +7494,7 @@
 				CA0391FC271E143F000EB13C /* StatWidget.swift in Sources */,
 				CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */,
 				CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */,
+				441A6360272445F9001492C3 /* StatDataModel.swift in Sources */,
 				CA0391B9271E1023000EB13C /* BraveWidgets.swift in Sources */,
 				CA0391E3271E1382000EB13C /* BraveWidgets.intentdefinition in Sources */,
 				CA0391F9271E143F000EB13C /* FavoritesWidget.swift in Sources */,

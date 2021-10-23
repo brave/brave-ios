@@ -197,6 +197,8 @@ private struct ShortcutsView: View {
     }
 }
 
+// MARK: - Previews
+
 struct ShortcutsWidget_Previews: PreviewProvider {
     static var previews: some View {
         ShortcutsView(slots: [.newTab, .newPrivateTab, .bookmarks])

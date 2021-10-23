@@ -10,56 +10,22 @@ import Shared
 import BraveShared
 import BraveUI
 
+struct StatWidget: Widget {
+    let kind: String = "StatWidget"
+    
+    var body: some WidgetConfiguration {
+        IntentConfiguration(kind: kind, intent: StatsConfigurationIntent.self, provider: StatProvider()) { entry in
+            StatView(entry: entry)
+        }
+        .supportedFamilies([.systemSmall])
+        .configurationDisplayName("Privacy Stat")
+        .description("Displays a single privacy stat")
+    }
+}
+
 struct StatEntry: TimelineEntry {
     var date: Date
     var statData: StatData
-}
-
-struct StatData {
-    var name: String
-    var value: String
-    var color: UIColor = .white
-}
-
-extension StatKind {
-    var valueColor: UIColor {
-        switch self {
-        case .adsBlocked:
-            return UIColor(rgb: 0xFB542B)
-        case .dataSaved:
-            return UIColor(rgb: 0xA0A5EB)
-        case .timeSaved:
-            return .white
-        case .unknown:
-            return .white
-        }
-    }
-    
-    var name: String {
-        switch self {
-        case .adsBlocked:
-            return Strings.shieldsAdAndTrackerStats
-        case .dataSaved:
-            return Strings.dataSavedStat
-        case .timeSaved:
-            return Strings.shieldsTimeStats
-        case .unknown:
-            return ""
-        }
-    }
-    
-    var displayString: String {
-        switch self {
-        case .adsBlocked:
-            return BraveGlobalShieldStats.shared.adblock.kFormattedNumber
-        case .dataSaved:
-            return BraveGlobalShieldStats.shared.dataSaved
-        case .timeSaved:
-            return BraveGlobalShieldStats.shared.dataSaved
-        case .unknown:
-            return ""
-        }
-    }
 }
 
 struct StatProvider: IntentTimelineProvider {
@@ -121,18 +87,7 @@ struct StatView: View {
     }
 }
 
-struct StatWidget: Widget {
-    let kind: String = "StatWidget"
-    
-    var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: StatsConfigurationIntent.self, provider: StatProvider()) { entry in
-            StatView(entry: entry)
-        }
-        .supportedFamilies([.systemSmall])
-        .configurationDisplayName("Privacy Stat")
-        .description("Displays a single privacy stat")
-    }
-}
+// MARK: - Previews
 
 struct StatWidget_Previews: PreviewProvider {
     static var previews: some View {

@@ -8,12 +8,23 @@ import SwiftUI
 import Shared
 import BraveShared
 
-struct StatsEntry: TimelineEntry {
+struct StatsWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "StatsWidget", provider: StatsProvider()) { entry in
+            StatsView(entry: entry)
+        }
+        .supportedFamilies([.systemMedium])
+        .configurationDisplayName(Strings.Widgets.shieldStatsTitle)
+        .description(Strings.Widgets.shieldStatsDescription)
+    }
+}
+
+private struct StatsEntry: TimelineEntry {
     var date: Date
     var statData: [StatData]
 }
 
-struct StatsProvider: TimelineProvider {
+private struct StatsProvider: TimelineProvider {
     typealias Entry = StatsEntry
     
     var stats: [StatData] {
@@ -35,7 +46,7 @@ struct StatsProvider: TimelineProvider {
     }
 }
 
-struct PlaceholderStatsView: View {
+private struct PlaceholderStatsView: View {
     var entry: StatsEntry
     
     var body: some View {
@@ -44,16 +55,16 @@ struct PlaceholderStatsView: View {
     }
 }
 
-struct StatsView: View {
+private struct StatsView: View {
     var entry: StatsEntry
-    @ScaledMetric private var fontSize: CGFloat = 32
+    @ScaledMetric private var fontSize = 32.0
     
     var body: some View {
         VStack {
             HStack {
                 Image("brave.shields.done")
-                Text("Privacy Stats")
-                    .foregroundColor(.white)
+                Text(Strings.Widgets.shieldStatsWidgetTitle)
+                    .foregroundColor(Color(UIColor.braveLabel))
                     .font(.system(size: 13, weight: .semibold))
                 Spacer()
                 Image("brave-icon-no-bg")
@@ -72,6 +83,7 @@ struct StatsView: View {
                                     .font(.system(size: fontSize))
                                     .foregroundColor(Color(data.color))
                                     .multilineTextAlignment(.center)
+                                    .minimumScaleFactor(0.5)
                                 Text(verbatim: data.name)
                                     .font(.system(size: 10, weight: .semibold))
                                     .multilineTextAlignment(.center)
@@ -79,7 +91,7 @@ struct StatsView: View {
                             }
                         )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(6)
+                    .padding(4)
                 }
             }
             Spacer()
@@ -87,24 +99,12 @@ struct StatsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
-        .background(Color(red: 0.133, green: 0.145, blue: 0.161))
-        .foregroundColor(Color(red: 0.761, green: 0.769, blue: 0.808))
+        .background(Color(UIColor.secondaryBraveBackground))
+        .foregroundColor(Color(UIColor.braveLabel))
     }
 }
 
-struct StatsWidget: Widget {
-    let kind: String = "StatsWidget"
-    
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: StatsProvider()) { entry in
-            StatsView(entry: entry)
-        }
-        .supportedFamilies([.systemMedium])
-        .configurationDisplayName("Privacy Stats")
-        .description("Displays all privacy stats")
-    }
-}
-
+// MARK: - Previews
 struct StatsWidget_Previews: PreviewProvider {
     static var stats: [StatData] {
         let kinds: [StatKind] = [.adsBlocked, .dataSaved, .timeSaved]

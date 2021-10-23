@@ -3137,5 +3137,23 @@ extension Strings {
             bundle: .braveShared,
             value: "Search or type a URL",
             comment: "Button to the browser and enter URL or make a search query there.")
+        
+        public static let shieldStatsTitle = NSLocalizedString(
+            "widgets.shieldStatsTitle",
+            bundle: .braveShared,
+            value: "Privacy Stats",
+            comment: "Title for Brave Shields widget on 'add widget' screen.")
+        
+        public static let shieldStatsDescription = NSLocalizedString(
+            "widgets.shieldStatsDescription",
+            bundle: .braveShared,
+            value: "Displays all privacy stats",
+            comment: "Description for Brave Shields widget on 'add widget' screen.")
+        
+        public static let shieldStatsWidgetTitle = NSLocalizedString(
+            "widgets.shieldStatsWidgetTitle",
+            bundle: .braveShared,
+            value: "Privacy Stats",
+            comment: "Title of Brave Shields widget shown above stat numbers.")
     }
 }
