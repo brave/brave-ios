@@ -118,9 +118,10 @@ enum NavigationPath: Equatable {
             bvc.navigationHelper.openHistory()
         case .downloads:
             bvc.navigationHelper.openDownloads()
-        case .toggleVPN:
-            bvc.navigationHelper.toggleVPN()
-        case .braveToday:
+        case .playlist:
+            bvc.navigationHelper.openPlaylist()
+        @unknown default:
+            assertionFailure()
             break
         }
     }

@@ -160,6 +160,10 @@ class BrowserNavigationHelper {
         }
     }
     
+    func openPlaylist() {
+        bvc?.openPlaylist(item: nil, playbackOffset: 0.0)
+    }
+    
     @objc private func dismissView() {
         guard let bvc = bvc else { return }
         bvc.presentedViewController?.dismiss(animated: true)

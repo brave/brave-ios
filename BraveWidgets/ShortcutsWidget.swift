@@ -5,18 +5,32 @@
 
 import SwiftUI
 import WidgetKit
+import Shared
 import BraveShared
 import Intents
 
-struct ShortcutEntry: TimelineEntry {
+struct ShortcutsWidget: Widget {
+    var body: some WidgetConfiguration {
+        IntentConfiguration(kind: "ShortcutsWidget", intent: ShortcutsConfigurationIntent.self,
+                            provider: ShortcutProvider()) { entry in
+            ShortcutsView(slots: entry.shortcutSlots)
+        }
+        .configurationDisplayName(Strings.Widgets.shortcutsWidgetTitle)
+        .description(Strings.Widgets.shortcutsWidgetDescription)
+        .supportedFamilies([.systemMedium])
+    }
+}
+
+private struct ShortcutEntry: TimelineEntry {
     var date: Date
     var shortcutSlots: [WidgetShortcut]
 }
 
-struct ShortcutProvider: IntentTimelineProvider {
+private struct ShortcutProvider: IntentTimelineProvider {
     typealias Intent = ShortcutsConfigurationIntent
     typealias Entry = ShortcutEntry
-    func getSnapshot(for configuration: Intent, in context: Context, completion: @escaping (ShortcutEntry) -> Void) {
+    func getSnapshot(for configuration: Intent, in context: Context,
+                     completion: @escaping (ShortcutEntry) -> Void) {
         let entry = ShortcutEntry(
             date: Date(),
             shortcutSlots: [
@@ -27,10 +41,13 @@ struct ShortcutProvider: IntentTimelineProvider {
         )
         completion(entry)
     }
+    
     func placeholder(in context: Context) -> ShortcutEntry {
-        .init(date: Date(), shortcutSlots: [.newTab, .newPrivateTab, .bookmarks])
+        .init(date: Date(), shortcutSlots: [.playlist, .newPrivateTab, .bookmarks])
     }
-    func getTimeline(for configuration: Intent, in context: Context, completion: @escaping (Timeline<ShortcutEntry>) -> Void) {
+    
+    func getTimeline(for configuration: Intent, in context: Context,
+                     completion: @escaping (Timeline<ShortcutEntry>) -> Void) {
         let entry = ShortcutEntry(
             date: Date(),
             shortcutSlots: [
@@ -40,17 +57,6 @@ struct ShortcutProvider: IntentTimelineProvider {
             ]
         )
         completion(.init(entries: [entry], policy: .never))
-    }
-}
-
-struct ShortcutsWidget: Widget {
-    var body: some WidgetConfiguration {
-        IntentConfiguration(kind: "ShortcutsWidget", intent: ShortcutsConfigurationIntent.self, provider: ShortcutProvider()) { entry in
-            ShortcutsView(slots: entry.shortcutSlots)
-        }
-        .configurationDisplayName("Shortcuts")
-        .description("")
-        .supportedFamilies([.systemMedium])
     }
 }
 
@@ -66,86 +72,114 @@ private struct ShortcutLink<Content: View>: View {
     }
     
     var body: some View {
-        Link(destination: URL(string: url)!, label: {
-            VStack(spacing: 8) {
-                image
-                    .imageScale(.large)
-                    .font(Font.system(.body).bold())
-                    .frame(height: 24)
-                Text(verbatim: text)
-                    .font(.system(size: 13, weight: .medium))
-                    .multilineTextAlignment(.center)
-            }
-            .padding(8)
-            .foregroundColor(Color(UIColor.braveLabel))
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                Color(UIColor.braveBackground)
-                    .clipShape(ContainerRelativeShape())
-            )
-        })
+        if let url = URL(string: url) {
+            Link(destination: url, label: {
+                VStack(spacing: 8) {
+                    image
+                        .imageScale(.large)
+                        .font(Font.system(.body).bold())
+                        .frame(height: 24)
+                    Text(verbatim: text)
+                        .font(.system(size: 13, weight: .medium))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(8)
+                .foregroundColor(Color(UIColor.braveLabel))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(
+                    Color(UIColor.braveBackground)
+                        .clipShape(ContainerRelativeShape())
+                )
+            })
+        } else {
+            EmptyView()
+        }
     }
 }
 
-extension WidgetShortcut {
+private extension WidgetShortcut {
     var displayString: String {
         switch self {
         case .unknown:
-            fatalError()
+            assertionFailure()
+            return ""
         case .newTab:
-            return "New Tab"
+            return Strings.Widgets.shortcutsNewTabButton
         case .newPrivateTab:
-            return "Private Tab"
+            return Strings.Widgets.shortcutsPrivateTabButton
+        // Reusing localized strings for few items here.
         case .bookmarks:
-            return "Bookmarks"
+            return Strings.bookmarksMenuItem
         case .history:
-            return "History"
+            return Strings.historyMenuItem
         case .downloads:
-            return "Downloads"
-        case .toggleVPN:
-            return "Toggle VPN"
-        case .braveToday:
-            return "Brave Today"
+            return Strings.downloadsMenuItem
+        case .playlist:
+            // We usually use `Brave Playlist` to describe this feature.
+            // Here we try to be more concise and use 'Playlist' word only.
+            return Strings.Widgets.shortcutsPlaylistButton
+        @unknown default:
+            assertionFailure()
+            return ""
         }
     }
+    
     var image: Image {
         switch self {
         case .unknown:
-            fatalError()
+            assertionFailure()
+            return Image(systemName: "xmark.octagon")
         case .newTab:
-            return Image(uiImage: UIImage(named: "brave.plus")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
+            return shortcutsImage(with: "brave.plus")
         case .newPrivateTab:
-            return Image(uiImage: UIImage(named: "brave.shades")!.template)
-//            return Image(uiImage: UIImage(named: "brave.shades")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
+            return shortcutsImage(with: "brave.shades")
         case .bookmarks:
-            return Image(uiImage: UIImage(named: "menu_bookmarks")!.template)
+            return shortcutsImage(with: "menu_bookmarks")
         case .history:
-            return Image(uiImage: UIImage(named: "brave.history")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
+            return shortcutsImage(with: "brave.history")
         case .downloads:
-            return Image(uiImage: UIImage(named: "brave.downloads")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
-        case .toggleVPN:
-            return Image(uiImage: UIImage(named: "brave.vpn")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
-        case .braveToday:
-            return Image(uiImage: UIImage(named: "brave.today")!.applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))!.template)
+            return shortcutsImage(with: "brave.downloads")
+        case .playlist:
+            return shortcutsImage(with: "brave.playlist")
+        @unknown default:
+            assertionFailure()
+            return Image(systemName: "xmark.octagon")
         }
+    }
+    
+    private func shortcutsImage(with name: String) -> Image {
+        let fallbackImage = Image(systemName: "xmark.octagon")
+        
+        guard let image = UIImage(named: name)?
+                .applyingSymbolConfiguration(.init(font: .systemFont(ofSize: 20)))?
+                .template else {
+            return fallbackImage
+        }
+        
+        return Image(uiImage: image)
     }
 }
 
-struct ShortcutsView: View {
+private struct ShortcutsView: View {
     var slots: [WidgetShortcut]
     
     var body: some View {
         VStack(spacing: 8) {
-            Link(destination: URL(string: "brave://shortcut?path=0")!, label: {
-                Label("Search or enter address", uiImage: UIImage(named: "brave-logo-no-bg-small")!)
-                    .foregroundColor(Color(UIColor.braveLabel))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(
-                        Color(UIColor.braveBackground)
-                            .clipShape(ContainerRelativeShape())
-                    )
-            })
+            // TODO: Would be nice to export handling this url to `BraveShared`.
+            // Now it's hardcoded here and in `NavigationRouter`.
+            if let url = URL(string: "brave://shortcut?path=0"),
+                let image = UIImage(named: "brave-logo-no-bg-small") {
+                Link(destination: url, label: {
+                    Label(Strings.Widgets.shortcutsEnterURLButton, uiImage: image)
+                        .foregroundColor(Color(UIColor.braveLabel))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .background(
+                            Color(UIColor.braveBackground)
+                                .clipShape(ContainerRelativeShape())
+                        )
+                })
+            }
             HStack(spacing: 8) {
                 ForEach(slots, id: \.self) { shortcut in
                     ShortcutLink(
@@ -167,9 +201,9 @@ struct ShortcutsWidget_Previews: PreviewProvider {
     static var previews: some View {
         ShortcutsView(slots: [.newTab, .newPrivateTab, .bookmarks])
             .previewContext(WidgetPreviewContext(family: .systemMedium))
-        ShortcutsView(slots: [.downloads, .history, .toggleVPN])
+        ShortcutsView(slots: [.downloads, .history, .newPrivateTab])
             .previewContext(WidgetPreviewContext(family: .systemMedium))
-        ShortcutsView(slots: [.braveToday])
+        ShortcutsView(slots: [.newTab])
             .previewContext(WidgetPreviewContext(family: .systemMedium))
     }
 }

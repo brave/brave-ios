@@ -3101,5 +3101,41 @@ extension Strings {
             bundle: .braveShared,
             value: "Your favorite sites",
             comment: "Description for favorites widget on 'add widget' screen.")
+        
+        public static let shortcutsWidgetTitle = NSLocalizedString(
+            "widgets.shortcutsWidgetTitle",
+            bundle: .braveShared,
+            value: "Shortcuts",
+            comment: "Title for shortcuts widget on 'add widget' screen.")
+        
+        public static let shortcutsWidgetDescription = NSLocalizedString(
+            "widgets.shortcutsWidgetDescription",
+            bundle: .braveShared,
+            value: "TBA",
+            comment: "Description for shortcuts widget on 'add widget' screen.")
+        
+        public static let shortcutsNewTabButton = NSLocalizedString(
+            "widgets.shortcutsNewTabButton",
+            bundle: .braveShared,
+            value: "New Tab",
+            comment: "Button to open new browser tab.")
+        
+        public static let shortcutsPrivateTabButton = NSLocalizedString(
+            "widgets.shortcutsPrivateTabButton",
+            bundle: .braveShared,
+            value: "Private Tab",
+            comment: "Button to open new private browser tab.")
+        
+        public static let shortcutsPlaylistButton = NSLocalizedString(
+            "widgets.shortcutsPlaylistButton",
+            bundle: .braveShared,
+            value: "Playlist",
+            comment: "Button to open video playlist window.")
+        
+        public static let shortcutsEnterURLButton = NSLocalizedString(
+            "widgets.shortcutsEnterURLButton",
+            bundle: .braveShared,
+            value: "Search or type a URL",
+            comment: "Button to the browser and enter URL or make a search query there.")
     }
 }
