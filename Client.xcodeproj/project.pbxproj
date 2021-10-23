@@ -891,7 +891,7 @@
 		CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */; };
 		CA0391F9271E143F000EB13C /* FavoritesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F4271E143F000EB13C /* FavoritesWidget.swift */; };
 		CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F6271E143F000EB13C /* StatsWidget.swift */; };
-		CA0391FC271E143F000EB13C /* StatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F7271E143F000EB13C /* StatWidget.swift */; };
+		CA0391FC271E143F000EB13C /* SingleStatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F7271E143F000EB13C /* SingleStatWidget.swift */; };
 		CA039200271E151A000EB13C /* WebpagePreviewWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */; };
 		CA039201271E151A000EB13C /* FavoritesWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */; };
 		CA039231271E238D000EB13C /* FaviconAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039230271E238D000EB13C /* FaviconAttributes.swift */; };
@@ -2711,7 +2711,7 @@
 		CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShortcutsWidget.swift; sourceTree = "<group>"; };
 		CA0391F4271E143F000EB13C /* FavoritesWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidget.swift; sourceTree = "<group>"; };
 		CA0391F6271E143F000EB13C /* StatsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsWidget.swift; sourceTree = "<group>"; };
-		CA0391F7271E143F000EB13C /* StatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatWidget.swift; sourceTree = "<group>"; };
+		CA0391F7271E143F000EB13C /* SingleStatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleStatWidget.swift; sourceTree = "<group>"; };
 		CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpagePreviewWidgetData.swift; sourceTree = "<group>"; };
 		CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidgetData.swift; sourceTree = "<group>"; };
 		CA039230271E238D000EB13C /* FaviconAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconAttributes.swift; sourceTree = "<group>"; };
@@ -5276,7 +5276,7 @@
 				CA0391F4271E143F000EB13C /* FavoritesWidget.swift */,
 				CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */,
 				CA0391F6271E143F000EB13C /* StatsWidget.swift */,
-				CA0391F7271E143F000EB13C /* StatWidget.swift */,
+				CA0391F7271E143F000EB13C /* SingleStatWidget.swift */,
 				441A635F272444DE001492C3 /* StatDataModel.swift */,
 				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
 				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
@@ -7491,7 +7491,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CA0391FC271E143F000EB13C /* StatWidget.swift in Sources */,
+				CA0391FC271E143F000EB13C /* SingleStatWidget.swift in Sources */,
 				CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */,
 				CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */,
 				441A6360272445F9001492C3 /* StatDataModel.swift in Sources */,

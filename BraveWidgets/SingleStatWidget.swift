@@ -10,25 +10,24 @@ import Shared
 import BraveShared
 import BraveUI
 
-struct StatWidget: Widget {
-    let kind: String = "StatWidget"
+struct SingleStatWidget: Widget {
     
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: StatsConfigurationIntent.self, provider: StatProvider()) { entry in
+        IntentConfiguration(kind: "SingleStatWidget", intent: StatsConfigurationIntent.self, provider: StatProvider()) { entry in
             StatView(entry: entry)
         }
         .supportedFamilies([.systemSmall])
-        .configurationDisplayName("Privacy Stat")
-        .description("Displays a single privacy stat")
+        .configurationDisplayName(Strings.Widgets.singleStatTitle)
+        .description(Strings.Widgets.singleStatDescription)
     }
 }
 
-struct StatEntry: TimelineEntry {
+private struct StatEntry: TimelineEntry {
     var date: Date
     var statData: StatData
 }
 
-struct StatProvider: IntentTimelineProvider {
+private struct StatProvider: IntentTimelineProvider {
     typealias Intent = StatsConfigurationIntent
     typealias Entry = StatEntry
     
@@ -48,7 +47,7 @@ struct StatProvider: IntentTimelineProvider {
     }
 }
 
-struct PlaceholderStatView: View {
+private struct PlaceholderStatView: View {
     var entry: StatEntry
     
     var body: some View {
@@ -57,10 +56,10 @@ struct PlaceholderStatView: View {
     }
 }
 
-struct StatView: View {
+private struct StatView: View {
     var entry: StatEntry
     
-    @ScaledMetric private var fontSize: CGFloat = 40
+    @ScaledMetric private var fontSize = 40.0
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -82,14 +81,14 @@ struct StatView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color(red: 0.133, green: 0.145, blue: 0.161))
-        .foregroundColor(Color(red: 0.761, green: 0.769, blue: 0.808))
+        .background(Color(UIColor.secondaryBraveBackground))
+        .foregroundColor(Color(UIColor.braveLabel))
     }
 }
 
 // MARK: - Previews
 
-struct StatWidget_Previews: PreviewProvider {
+struct SingleStatWidget_Previews: PreviewProvider {
     static var previews: some View {
         StatView(entry: StatEntry(date: Date(), statData: .init(name: "Ads & Trackers Blocked", value: "100k", color: UIColor.braveOrange)))
             .previewContext(WidgetPreviewContext(family: .systemSmall))

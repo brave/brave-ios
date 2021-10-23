@@ -3155,5 +3155,17 @@ extension Strings {
             bundle: .braveShared,
             value: "Privacy Stats",
             comment: "Title of Brave Shields widget shown above stat numbers.")
+        
+        public static let singleStatTitle = NSLocalizedString(
+            "widgets.singleStatTitle",
+            bundle: .braveShared,
+            value: "Privacy Stat",
+            comment: "Title for Brave Shields single stat widget on 'add widget' screen.")
+        
+        public static let singleStatDescription = NSLocalizedString(
+            "widgets.singleStatDescription",
+            bundle: .braveShared,
+            value: "Privacy Stat",
+            comment: "Description for Brave Shields single stat widget on 'add widget' screen.")
     }
 }

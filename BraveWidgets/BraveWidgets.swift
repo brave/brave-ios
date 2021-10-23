@@ -11,7 +11,7 @@ struct BraveWidgets: WidgetBundle {
     var body: some Widget {
         ShortcutsWidget()
         FavoritesWidget()
-        StatWidget()
+        SingleStatWidget()
         StatsWidget()
     }
 }

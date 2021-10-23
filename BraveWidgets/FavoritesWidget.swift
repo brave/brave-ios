@@ -64,7 +64,7 @@ private struct NoFavoritesFoundView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             Text(Strings.Widgets.noFavoritesFound)
                 .multilineTextAlignment(.center)
-                .foregroundColor(.white)
+                .foregroundColor(Color(UIColor.braveLabel))
         }
         .padding()
     }
