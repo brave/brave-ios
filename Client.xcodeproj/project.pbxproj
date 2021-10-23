@@ -892,7 +892,6 @@
 		CA0391F9271E143F000EB13C /* FavoritesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F4271E143F000EB13C /* FavoritesWidget.swift */; };
 		CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F6271E143F000EB13C /* StatsWidget.swift */; };
 		CA0391FC271E143F000EB13C /* SingleStatWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391F7271E143F000EB13C /* SingleStatWidget.swift */; };
-		CA039200271E151A000EB13C /* WebpagePreviewWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */; };
 		CA039201271E151A000EB13C /* FavoritesWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */; };
 		CA039231271E238D000EB13C /* FaviconAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039230271E238D000EB13C /* FaviconAttributes.swift */; };
 		CA039238271E2B11000EB13C /* BrowserNavigationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */; };
@@ -2728,7 +2727,6 @@
 		CA0391F4271E143F000EB13C /* FavoritesWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidget.swift; sourceTree = "<group>"; };
 		CA0391F6271E143F000EB13C /* StatsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatsWidget.swift; sourceTree = "<group>"; };
 		CA0391F7271E143F000EB13C /* SingleStatWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleStatWidget.swift; sourceTree = "<group>"; };
-		CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebpagePreviewWidgetData.swift; sourceTree = "<group>"; };
 		CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesWidgetData.swift; sourceTree = "<group>"; };
 		CA039230271E238D000EB13C /* FaviconAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconAttributes.swift; sourceTree = "<group>"; };
 		CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigationHelper.swift; sourceTree = "<group>"; };
@@ -5319,7 +5317,6 @@
 			isa = PBXGroup;
 			children = (
 				CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */,
-				CA0391FE271E1519000EB13C /* WebpagePreviewWidgetData.swift */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -7459,7 +7456,6 @@
 				0A917388231D11960069A08B /* AppReview.swift in Sources */,
 				5D6DDEF3214003A6001FF0AE /* DAU.swift in Sources */,
 				0AD4FEEC223A9C1300E00C05 /* BrowserifiedJS.swift in Sources */,
-				CA039200271E151A000EB13C /* WebpagePreviewWidgetData.swift in Sources */,
 				278C467C23EE2B450083347F /* UIStackViewExtensions.swift in Sources */,
 				0A4214FF21AC0D6C006B8E39 /* TimeExtensions.swift in Sources */,
 				2765826A2171266900754B2F /* UrpService.swift in Sources */,

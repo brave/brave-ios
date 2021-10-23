@@ -21,7 +21,6 @@ public struct WidgetFavorite: Codable {
     }
 }
 
-@available(iOS 14.0, *)
 public class FavoritesWidgetData {
     private static var widgetDataRoot: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("widget_data")
