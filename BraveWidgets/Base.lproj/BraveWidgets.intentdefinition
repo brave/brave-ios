@@ -172,7 +172,7 @@
 					<key>INIntentParameterConfigurable</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Stat Kind</string>
+					<string>Type</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>7JYzOv</string>
 					<key>INIntentParameterDisplayPriority</key>
@@ -273,7 +273,7 @@
 					<key>INIntentParameterConfigurable</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Slot 1</string>
+					<string>#1</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>9E2oRR</string>
 					<key>INIntentParameterDisplayPriority</key>
@@ -285,7 +285,7 @@
 					<key>INIntentParameterMetadata</key>
 					<dict>
 						<key>INIntentParameterMetadataDefaultValue</key>
-						<string>playlist</string>
+						<string>newTab</string>
 					</dict>
 					<key>INIntentParameterName</key>
 					<string>slot1</string>
@@ -333,7 +333,7 @@
 					<key>INIntentParameterConfigurable</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Slot 2</string>
+					<string>#2</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>joEZJM</string>
 					<key>INIntentParameterDisplayPriority</key>
@@ -393,7 +393,7 @@
 					<key>INIntentParameterConfigurable</key>
 					<true/>
 					<key>INIntentParameterDisplayName</key>
-					<string>Slot 3</string>
+					<string>#3</string>
 					<key>INIntentParameterDisplayNameID</key>
 					<string>8vyYRy</string>
 					<key>INIntentParameterDisplayPriority</key>
