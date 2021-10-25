@@ -33,6 +33,10 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     var isHistoryRefreshing = false
     
+    private var searchHistoryTimer: Timer?
+    private var isHistoryBeingSearched: Bool = false
+    private let searchController = UISearchController(searchResultsController: nil)
+    
     init(isPrivateBrowsing: Bool, historyAPI: BraveHistoryAPI) {
         self.isPrivateBrowsing = isPrivateBrowsing
         self.historyAPI = historyAPI
@@ -49,13 +53,27 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.accessibilityIdentifier = "History List"
-        title = Strings.historyScreenTitle
-                
-        if !Preferences.Privacy.privateBrowsingOnly.value {
-            navigationItem.rightBarButtonItem =
-                UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_delete_item").template, style: .done, target: self, action: #selector(performDeleteAll))
+        applyTheme()
+        
+        tableView.do {
+            $0.accessibilityIdentifier = "History List"
+            #if swift(>=5.5)
+            if #available(iOS 15.0, *) {
+                $0.sectionHeaderTopPadding = 5
+            }
+            #endif
         }
+            
+        navigationItem.do {
+            if !Preferences.Privacy.privateBrowsingOnly.value {
+                $0.searchController = searchController
+                $0.hidesSearchBarWhenScrolling = false
+                $0.rightBarButtonItem =
+                    UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_delete_item").template, style: .done, target: self, action: #selector(performDeleteAll))
+            }
+        }
+        
+        definesPresentationContext = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -64,7 +82,24 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         refreshHistory()
     }
     
+    private func applyTheme() {
+        title = Strings.historyScreenTitle
+
+        searchController.do {
+            $0.searchBar.autocapitalizationType = .none
+            $0.searchResultsUpdater = self
+            $0.obscuresBackgroundDuringPresentation = false
+            $0.searchBar.placeholder = "Search History"
+            $0.delegate = self
+            $0.hidesNavigationBarDuringPresentation = true
+        }
+    }
+    
     private func refreshHistory() {
+        guard !isHistoryBeingSearched else {
+            return
+        }
+        
         if Preferences.Privacy.privateBrowsingOnly.value {
             showEmptyPanelState()
         } else {
@@ -89,14 +124,14 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
     }
     
-    private func reloadData(_ completion: @escaping () -> Void) {
+    private func reloadData(with query: String = "", _ completion: @escaping () -> Void) {
         // Recreate the frc if it was previously removed
         if historyFRC == nil {
             historyFRC = historyAPI.frc()
             historyFRC?.delegate = self
         }
         
-        historyFRC?.performFetch { [weak self] in
+        historyFRC?.performFetch(withQuery: query) { [weak self] in
             guard let self = self else { return }
             
             self.tableView.reloadData()
@@ -285,6 +320,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
 }
 
 // MARK: - HistoryV2FetchResultsDelegate
+
 extension HistoryViewController: HistoryV2FetchResultsDelegate {
     
     func controllerWillChangeContent(_ controller: HistoryV2FetchResultsController) {
@@ -337,5 +373,55 @@ extension HistoryViewController: HistoryV2FetchResultsDelegate {
     
     func controllerDidReloadContents(_ controller: HistoryV2FetchResultsController) {
         refreshHistory()
+    }
+}
+
+// MARK: UISearchResultUpdating
+
+extension HistoryViewController: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text else { return }
+
+        if searchHistoryTimer != nil {
+            searchHistoryTimer?.invalidate()
+            searchHistoryTimer = nil
+        }
+        
+        searchHistoryTimer =
+            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    }
+    
+    @objc private func fetchSearchResults(timer: Timer) {
+        guard let query = timer.userInfo as? String else {
+            return
+        }
+        
+        view.addSubview(spinner)
+        spinner.snp.makeConstraints {
+            $0.center.equalTo(view.snp.center)
+        }
+        spinner.startAnimating()
+        
+        reloadData(with: query) {
+            self.spinner.stopAnimating()
+            self.spinner.removeFromSuperview()
+        }
+    }
+}
+
+// MARK: UISearchControllerDelegate
+
+extension HistoryViewController: UISearchControllerDelegate {
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        isHistoryBeingSearched = true
+        tableView.setEditing(false, animated: true)
+        tableView.reloadData()
+    }
+    
+    func willDismissSearchController(_ searchController: UISearchController) {
+        isHistoryBeingSearched = false
+        tableView.reloadData()
     }
 }
