@@ -918,6 +918,7 @@
 		7D758917271A182800B643C3 /* TokenList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D758916271A182800B643C3 /* TokenList.swift */; };
 		7D758919271A184D00B643C3 /* BuyTokenSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D758918271A184D00B643C3 /* BuyTokenSearchView.swift */; };
 		7D758921271F07B800B643C3 /* SendTokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D758920271F07B800B643C3 /* SendTokenView.swift */; };
+		7DAC597B2726524E00E735A2 /* WalletScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DAC597A2726524E00E735A2 /* WalletScannerView.swift */; };
 		A104E199210A384400D2323E /* ShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104E198210A384400D2323E /* ShieldsViewController.swift */; };
 		A134B88A20DA98BB00A581D0 /* ClientPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134B88920DA98BB00A581D0 /* ClientPreferences.swift */; };
 		A13AC72520EC12360040D4BB /* Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13AC72420EC12360040D4BB /* Migration.swift */; };
@@ -2762,6 +2763,7 @@
 		7D758916271A182800B643C3 /* TokenList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenList.swift; sourceTree = "<group>"; };
 		7D758918271A184D00B643C3 /* BuyTokenSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyTokenSearchView.swift; sourceTree = "<group>"; };
 		7D758920271F07B800B643C3 /* SendTokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendTokenView.swift; sourceTree = "<group>"; };
+		7DAC597A2726524E00E735A2 /* WalletScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletScannerView.swift; sourceTree = "<group>"; };
 		A104E198210A384400D2323E /* ShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsViewController.swift; sourceTree = "<group>"; };
 		A134B88920DA98BB00A581D0 /* ClientPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPreferences.swift; sourceTree = "<group>"; };
 		A13AC72420EC12360040D4BB /* Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migration.swift; sourceTree = "<group>"; };
@@ -3664,6 +3666,7 @@
 		271F685626EBD27C00AA2A50 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				7DAC596627235B0A00E735A2 /* Scanner */,
 				271F685726EBD27D00AA2A50 /* BuySwapSwap */,
 				271F685926EBD27D00AA2A50 /* CryptoPagesView.swift */,
 				271F685A26EBD27D00AA2A50 /* Stores */,
@@ -5443,6 +5446,14 @@
 				CA9A233326B97B4300923D70 /* PlaylistMenuButton.swift */,
 			);
 			path = Menu;
+			sourceTree = "<group>";
+		};
+		7DAC596627235B0A00E735A2 /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				7DAC597A2726524E00E735A2 /* WalletScannerView.swift */,
+			);
+			path = Scanner;
 			sourceTree = "<group>";
 		};
 		A104E190210A380E00D2323E /* Shields */ = {
@@ -7462,6 +7473,7 @@
 				27DDE88626FD2BC400A70C3A /* PortfolioStore.swift in Sources */,
 				271F68B126EBD27E00AA2A50 /* EnableBiometricsView.swift in Sources */,
 				271F68BF26EBD27E00AA2A50 /* DateRangeView.swift in Sources */,
+				7DAC597B2726524E00E735A2 /* WalletScannerView.swift in Sources */,
 				271F68B226EBD27E00AA2A50 /* RestoreWalletView.swift in Sources */,
 				27DDE88A26FE1A7700A70C3A /* TestBraveWalletService.swift in Sources */,
 				271F68F826EBE92900AA2A50 /* WalletHostingViewController.swift in Sources */,

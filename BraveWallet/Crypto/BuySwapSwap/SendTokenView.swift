@@ -16,6 +16,7 @@ struct SendTokenView: View {
   
   @State private var amountInput = ""
   @State private var sendAddress = ""
+  @State private var isShowingScanner = false
   
   @ScaledMetric var length: CGFloat = 16.0
   @ScaledMetric var recentCircleLength: CGFloat = 24.0
@@ -86,7 +87,9 @@ struct SendTokenView: View {
                 .foregroundColor(Color(.primaryButtonTint))
                 .font(.body)
             }
-            Button(action: {}) {
+            Button(action: {
+              isShowingScanner = true
+            }) {
               Image("brave.qr-code")
                 .renderingMode(.template)
                 .foregroundColor(Color(.primaryButtonTint))
@@ -132,6 +135,18 @@ struct SendTokenView: View {
         ) {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      }
+      .sheet(isPresented: $isShowingScanner) {
+        WalletScannerView() { result in
+          isShowingScanner = false
+          switch result {
+          case .success(let address):
+            sendAddress = address
+          case .failure(let error):
+            return
+          }
+        }
+        .ignoresSafeArea()
       }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)
