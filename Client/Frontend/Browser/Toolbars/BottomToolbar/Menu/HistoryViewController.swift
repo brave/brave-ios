@@ -274,6 +274,10 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let historyItem = historyFRC?.object(at: indexPath) else { return }
         
+        if isHistoryBeingSearched {
+            searchController.isActive = false
+        }
+            
         if let url = URL(string: historyItem.url.absoluteString) {
             dismiss(animated: true) {
                 self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
