@@ -50,7 +50,7 @@ class LoginAuthViewController: UITableViewController {
     
     @discardableResult
     func askForAuthentication() -> Bool {
-        guard let windowProtection = (UIApplication.shared.delegate as? AppDelegate)?.windowProtection else {
+        guard let windowProtection = self.currentScene?.windowProtection else {
             return false
         }
 
