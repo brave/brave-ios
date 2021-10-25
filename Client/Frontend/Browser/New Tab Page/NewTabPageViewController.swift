@@ -146,10 +146,12 @@ class NewTabPageViewController: UIViewController {
         }
         #endif
         
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.dragDelegate = self
-        collectionView.dropDelegate = self
+        collectionView.do {
+            $0.delegate = self
+            $0.dataSource = self
+            $0.dragDelegate = self
+            $0.dropDelegate = self
+        }
         
         background.changed = { [weak self] in
             self?.setupBackgroundImage()
@@ -870,9 +872,6 @@ extension NewTabPageViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         sections[indexPath.section].collectionView?(collectionView, didEndDisplaying: cell, forItemAt: indexPath)
     }
-    func collectionView(_ collectionView: UICollectionView, targetIndexPathForMoveFromItemAt currentIndexPath: IndexPath, toProposedIndexPath proposedIndexPath: IndexPath) -> IndexPath {
-        currentIndexPath.section == proposedIndexPath.section ? proposedIndexPath : currentIndexPath
-    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -917,24 +916,28 @@ extension NewTabPageViewController: UICollectionViewDataSource {
 extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-
-        // TODO: Check If the action is in right section
+        // Check If the item that is dragged is a favourite item
+        guard sections[indexPath.section] is FavoritesSectionProvider else {
+            return []
+        }
         
-            let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
-            let dragItem = UIDragItem(itemProvider: itemProvider)
-            dragItem.previewProvider = { () -> UIDragPreview? in
+        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider).then {
+            $0.previewProvider = { () -> UIDragPreview? in
                 guard let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell else {
-                        return nil
+                    return nil
                 }
                 return UIDragPreview(view: cell.imageView)
             }
-        // TODO: Grab DragItem from Favourites
-            return [dragItem]
+        }
+        
+        return [dragItem]
     }
     
     func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
         guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
         let destinationIndexPath: IndexPath
+        
         if let indexPath = coordinator.destinationIndexPath {
             destinationIndexPath = indexPath
         } else {
@@ -943,52 +946,53 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
             destinationIndexPath = IndexPath(row: max(row - 1, 0), section: section)
         }
         
-        if sourceIndexPath.section != destinationIndexPath.section {
-            return
-        }
+        guard sourceIndexPath.section == destinationIndexPath.section else { return }
         
-        switch coordinator.proposal.operation {
-        case .move:
+        if coordinator.proposal.operation == .move {
             guard let item = coordinator.items.first else { return }
-            _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+            
             Favorite.reorder(
                 sourceIndexPath: sourceIndexPath,
                 destinationIndexPath: destinationIndexPath,
                 isInteractiveDragReorder: true
             )
-        case .copy:
-            break
-        default: return
+            _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
-
-        // TODO: Can not drag cell drag if there is only one favourite
+        guard let destinationIndexSection = destinationIndexPath?.section,
+              let favouriteSection = sections[destinationIndexSection] as? FavoritesSectionProvider,
+              favouriteSection.hasMoreThanOneFavouriteItems else {
+            return .init(operation: .cancel)
+        }
         
         return .init(operation: .move, intent: .insertAtDestinationIndexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-        let params = UIDragPreviewParameters()
-        params.backgroundColor = .clear
-        if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
-            params.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
-        }
-        return params
+        fetchInteractionPreviewParameters(at: indexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView, dropPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-        let params = UIDragPreviewParameters()
-        params.backgroundColor = .clear
-        if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
-            params.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
-        }
-        return params
+        fetchInteractionPreviewParameters(at: indexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
         return true
+    }
+    
+    private func fetchInteractionPreviewParameters(at indexPath: IndexPath) -> UIDragPreviewParameters {
+        let previewParameters = UIDragPreviewParameters().then {
+            $0.backgroundColor = .clear
+            
+            if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
+                $0.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
+            }
+        }
+        
+        return previewParameters
     }
 }
 
