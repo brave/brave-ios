@@ -354,7 +354,7 @@ class PlaylistWebLoader: UIView {
         }
         
         var alteredSource = source
-        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        let token = UserScriptManager.securityTokenString
         
         let replacements = [
             "$<PlaylistDetector>": "PlaylistDetector_\(token)",
@@ -605,7 +605,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
             return
         }
 
-        if !navigationAction.isAllowed && navigationAction.navigationType != .backForward {
+        if navigationAction.isInternalUnprivileged && navigationAction.navigationType != .backForward {
             decisionHandler(.cancel)
             return
         }
@@ -669,7 +669,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
             if
                 let mainDocumentURL = navigationAction.request.mainDocumentURL,
                 mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
-                !url.isSessionRestoreURL,
+                !(InternalURL(url)?.isSessionRestore ?? false),
                 navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
                 
                 // Identify specific block lists that need to be applied to the requesting domain
@@ -715,7 +715,9 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         let response = navigationResponse.response
         let responseURL = response.url
         
-        if responseURL?.isSessionRestoreURL == true {
+        if let responseURL = responseURL,
+            let internalURL = InternalURL(responseURL),
+            internalURL.isSessionRestore {
             tab.shouldClassifyLoadsForAds = false
         }
         
