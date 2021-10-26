@@ -383,8 +383,8 @@ class NSURLExtensionsTests: XCTestCase {
     func testIsLocalUtility() {
         let goodurls = [
             "http://localhost:6571/reader-mode/page",
-            "http://LOCALhost:6571/about/sessionrestore.html",
-            "http://127.0.0.1:6571/errors/error.html"
+            "http://LOCALhost:6571/\(InternalURL.Path.sessionrestore)/sessionrestore.html",
+            "http://127.0.0.1:6571/\(InternalURL.Path.errorpage)/error.html"
         ]
         let badurls = [
             "http://google.com",
