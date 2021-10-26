@@ -99,7 +99,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     }
     
     private func applyTheme() {
-        title = Strings.historyScreenTitle
+        title = Strings.History.historySearchBarTitle
 
         searchController.do {
             $0.searchBar.autocapitalizationType = .none
