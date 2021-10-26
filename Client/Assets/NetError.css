@@ -13,17 +13,17 @@ body {
     background-color: white;
     padding: 0 65px;
     color: #333;
-    -webkit-text-size-adjust: none;
-    font: -apple-system-body, sans-serif;
     font-size: 16px;
+    -webkit-text-size-adjust: none;
+    font: -apple-system-body;
 }
 
 h1 {
     color: #333;
-    -webkit-text-size-adjust: none;
-    font: -apple-system-body, sans-serif;
-    font-weight: 300;
     font-size: 16px;
+    -webkit-text-size-adjust: none;
+    font: -apple-system-body;
+    font-weight: 300;
 }
 
 /* Add a set of stripes at the top of pages */
@@ -54,7 +54,7 @@ button {
     width: 100%;
     border: none;
     padding: 1rem;
-    font: -apple-system-body, sans-serif;
+    font: -apple-system-body;
     background-color: rgb(76, 158, 255);
     color: white;
     font-size: 16px;
@@ -100,7 +100,7 @@ button {
 }
 
 #errorLongContent {
-    font: -apple-system-body, sans-serif;
+    font: -apple-system-body;
     color: #ccc;
     font-size: 12px;
 }

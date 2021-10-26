@@ -886,6 +886,7 @@
 		CA10BE7C2704BA7900A265A6 /* GlobalSignRootCA_R5.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F23126CBD27900658EAC /* GlobalSignRootCA_R5.cer */; };
 		CA10BE7D2704BA7900A265A6 /* SFSRootCAG2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22C26CBD1C600658EAC /* SFSRootCAG2.cer */; };
 		CA10BE7F2704BCAE00A265A6 /* leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = CA10BE7E2704BCAE00A265A6 /* leaf.cer */; };
+		CA220258271881E3002D3582 /* InternalSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA220257271881E3002D3582 /* InternalSchemeHandler.swift */; };
 		CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */; };
 		CA439A7625E8054A00FE9150 /* VideoPlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */; };
 		CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */; };
@@ -2603,6 +2604,7 @@
 		CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+FindInPageDelegate.swift"; sourceTree = "<group>"; };
 		CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTests.swift; sourceTree = "<group>"; };
 		CA10BE7E2704BCAE00A265A6 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
+		CA220257271881E3002D3582 /* InternalSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSchemeHandler.swift; sourceTree = "<group>"; };
 		CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerInfoBar.swift; sourceTree = "<group>"; };
 		CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerControlsView.swift; sourceTree = "<group>"; };
 		CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerTrackbar.swift; sourceTree = "<group>"; };
@@ -5066,6 +5068,14 @@
 			path = BrowserViewController;
 			sourceTree = "<group>";
 		};
+		CA22024B271881CE002D3582 /* InternalSchemeHandler */ = {
+			isa = PBXGroup;
+			children = (
+				CA220257271881E3002D3582 /* InternalSchemeHandler.swift */,
+			);
+			path = InternalSchemeHandler;
+			sourceTree = "<group>";
+		};
 		CA8D5C0A26D7CD46009BF13D /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -5725,6 +5735,7 @@
 		F84B21F11A0910F600AAB793 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				CA22024B271881CE002D3582 /* InternalSchemeHandler */,
 				0A4B012320D0321A004D4011 /* UX.swift */,
 				2816EFFF1B33E05400522243 /* UIConstants.swift */,
 				392ED7D51D0AEEEE009D9B62 /* Accessors */,
@@ -7329,6 +7340,7 @@
 				278C700224F6F33E00A246C8 /* SiteReportedView.swift in Sources */,
 				EB2A63341F3B49A7004EF8B0 /* ContentBlockerHelper.swift in Sources */,
 				0A4BEFD1221E115B0005551A /* NetworkSessionMock.swift in Sources */,
+				CA220258271881E3002D3582 /* InternalSchemeHandler.swift in Sources */,
 				CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */,
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,

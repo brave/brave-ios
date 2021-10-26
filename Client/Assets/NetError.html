@@ -1,23 +1,23 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
-<!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>%error_title%</title>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="NetError.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="internal://local/errorpage-resource/NetError.css" type="text/css" media="all" />
 
     <script type="application/javascript">
-      const SECURITY_TOKEN = "%security_token%"
       // If the user swipes back and forth to this tab, we want to make sure we make an attempt to reload the original page.
       var fresh = true;
       window.addEventListener('popstate', function () {
         if (fresh)
           fresh = false;
         else
-          webkit.messageHandlers.localRequestHelper.postMessage({"securitytoken": SECURITY_TOKEN, "type": "reload" });
+          webkit.messageHandlers.localRequestHelper.postMessage({ securitytoken: "%security_token%", type: "reload" });
       });
+
     </script>
   </head>
 
@@ -46,6 +46,5 @@
     </div>
   </div>
   <div id="decoration"></div>
-
   </body>
 </html>
