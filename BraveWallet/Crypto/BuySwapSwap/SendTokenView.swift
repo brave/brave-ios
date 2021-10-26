@@ -137,16 +137,7 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       .sheet(isPresented: $isShowingScanner) {
-        WalletScannerView() { result in
-          isShowingScanner = false
-          switch result {
-          case .success(let address):
-            sendAddress = address
-          case .failure(let error):
-            return
-          }
-        }
-        .ignoresSafeArea()
+        WalletScannerView(toAddress: $sendAddress)
       }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)

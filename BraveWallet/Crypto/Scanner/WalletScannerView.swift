@@ -6,140 +6,210 @@
 import SwiftUI
 import AVFoundation
 import Shared
+import SnapKit
 
-struct WalletScannerView: UIViewControllerRepresentable {
+struct WalletScannerView: View {
+  @Binding var toAddress: String
+  @State private var isErrorPresented: Bool = false
+  @State private var permissionDenied: Bool = false
+  @Environment(\.presentationMode) @Binding private var presentationMode
   
-  enum ScanError: Error {
-    case badInput, badOutput, permissionDenied, others
+  var body: some View {
+    #if targetEnvironment(simulator)
+    NavigationView {
+      ZStack {
+        Color.black.ignoresSafeArea()
+        Button(action: {
+          toAddress = "0xaa32"
+          presentationMode.dismiss()
+        }) {
+          Text("Click here to simulate scan")
+            .foregroundColor(.white)
+        }
+      }
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItemGroup(placement: .cancellationAction) {
+          Button(action: {
+            presentationMode.dismiss()
+          }) {
+            Text(Strings.CancelString)
+              .foregroundColor(Color(.braveOrange))
+          }
+        }
+      }
+      .ignoresSafeArea()
+    }
+    #else
+    NavigationView {
+      _WalletScannerView(toAddress: $toAddress,
+                         isErrorPresented: $isErrorPresented,
+                         isPermissionDenied: $permissionDenied,
+                         dismiss: { presentationMode.dismiss() }
+      )
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItemGroup(placement: .cancellationAction) {
+            Button(action: {
+              presentationMode.dismiss()
+            }) {
+              Text(Strings.CancelString)
+                .foregroundColor(Color(.braveOrange))
+            }
+          }
+        }
+        .ignoresSafeArea()
+        .background(
+          Color.clear
+            .alert(isPresented: $isErrorPresented) {
+              Alert(
+                title: Text(""),
+                message: Text(Strings.scanQRCodeInvalidDataErrorMessage),
+                dismissButton: .default(Text( Strings.scanQRCodeErrorOKButton), action: {
+                  presentationMode.dismiss()
+                })
+              )
+            }
+        )
+        .background(
+          Color.clear
+            .alert(isPresented: $permissionDenied) {
+              Alert(
+                title: Text(""),
+                message: Text(Strings.scanQRCodePermissionErrorMessage),
+                dismissButton: .default(Text(Strings.openPhoneSettingsActionTitle), action: {
+                  UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                })
+              )
+            }
+        )
+    }
+    #endif
+  }
+}
+
+struct _WalletScannerView: UIViewControllerRepresentable {
+  typealias UIViewControllerType = WalletScannerViewController
+  @Binding var toAddress: String
+  @Binding var isErrorPresented: Bool
+  @Binding var isPermissionDenied: Bool
+  var dismiss: (() -> Void)
+  
+  func makeUIViewController(context: Context) -> UIViewControllerType {
+    WalletScannerViewController(toAddress: _toAddress,
+                                isErrorPresented: _isErrorPresented,
+                                isPermissionDenied: _isPermissionDenied,
+                                dismiss: self.dismiss
+    )
   }
   
-  var completion: (Result<String, ScanError>) -> Void
-  
-  init(completion: @escaping (Result<String, ScanError>) -> Void) {
-    self.completion = completion
-  }
-  
-  func makeCoordinator() -> WalletScannerCoordinator {
-    return WalletScannerCoordinator(parent: self)
-  }
-  
-  func makeUIViewController(context: Context) -> some UIViewController {
-    let viewController = WalletScannerViewController()
-    viewController.delegate = context.coordinator
-    return viewController
-  }
   func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
   }
 }
 
-#if targetEnvironment(simulator)
 class WalletScannerViewController: UIViewController {
-  var delegate: WalletScannerCoordinator?
+  @Binding private var toAddress: String
+  @Binding private var isErrorPresented: Bool
+  @Binding private var isPermissionDenied: Bool
+  
+  private let captureDevice = AVCaptureDevice.default(for: .video)
+  private let captureSession = AVCaptureSession().then {
+    $0.sessionPreset = .high
+  }
+  
+  private var previewLayer: AVCaptureVideoPreviewLayer?
+  private var isFinishScanning = false
+  
+  var dismiss: (() -> Void)
+  
+  init(
+    toAddress: Binding<String>,
+    isErrorPresented: Binding<Bool>,
+    isPermissionDenied: Binding<Bool>,
+    dismiss: @escaping (() -> Void)
+  ) {
+    self._toAddress = toAddress
+    self._isErrorPresented = isErrorPresented
+    self._isPermissionDenied = isPermissionDenied
+    self.dismiss = dismiss
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    let label = UILabel().then {
-      $0.text = "Click here to simulate scan"
-      $0.textColor = .white
-      $0.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
+
     view.backgroundColor = .black
-    view.addSubview(label)
-    NSLayoutConstraint.activate([
-      label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-    ])
-    
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onClick))
-    view.addGestureRecognizer(tapGesture)
-  }
-  
-  @objc
-  private func onClick() {
-    delegate?.found(code: "0xasdkgasd")
-  }
-}
-#else
-class WalletScannerViewController: UIViewController {
-  
-  private lazy var captureSession: AVCaptureSession = {
-    let session = AVCaptureSession()
-    session.sessionPreset = AVCaptureSession.Preset.high
-    return session
-  }()
-  let captureDevice = AVCaptureDevice.default(for: .video)
-  
-  var previewLayer: AVCaptureVideoPreviewLayer?
-  var delegate: WalletScannerCoordinator?
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    view.backgroundColor = .black
-    
+
     let getAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     if getAuthorizationStatus != .denied {
       setupCamera()
     } else {
-      delegate?.didFail(reason: .permissionDenied)
+      isPermissionDenied = true
     }
-    
+
     let imageView = UIImageView().then {
       $0.image = UIImage(named: "camera-overlay")
       $0.contentMode = .center
       $0.translatesAutoresizingMaskIntoConstraints = false
+      $0.isAccessibilityElement = false
     }
     view.addSubview(imageView)
-    NSLayoutConstraint.activate([
-      imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      imageView.widthAnchor.constraint(equalToConstant: 200),
-      imageView.heightAnchor.constraint(equalToConstant: 200),
-    ])
+    imageView.snp.makeConstraints {
+      $0.center.equalToSuperview()
+      $0.width.equalTo(200)
+      $0.height.equalTo(200)
+    }
   }
-  
+
   override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    
     previewLayer?.frame = view.layer.bounds
   }
-  
+
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+
+    resetCamera()
     
     if !captureSession.isRunning {
       captureSession.startRunning()
     }
   }
-  
+
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    
+
     captureSession.stopRunning()
   }
-  
+
   private func setupCamera() {
     guard let captureDevice = captureDevice else {
-      delegate?.didFail(reason: .others)
+      dismiss()
       return
     }
 
     guard let videoInput = try? AVCaptureDeviceInput(device: captureDevice) else {
-      delegate?.didFail(reason: .others)
+      isErrorPresented = true
       return
     }
     captureSession.addInput(videoInput)
-    
+
     let metadataOutput = AVCaptureMetadataOutput()
     if captureSession.canAddOutput(metadataOutput) {
       captureSession.addOutput(metadataOutput)
-      metadataOutput.setMetadataObjectsDelegate(delegate, queue: DispatchQueue.main)
+      metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
       metadataOutput.metadataObjectTypes = [AVMetadataObject.ObjectType.qr]
     } else {
-      delegate?.didFail(reason: .badOutput)
+      isErrorPresented = true
       return
     }
-    
+
     let videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
     videoPreviewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
     videoPreviewLayer.frame = view.bounds
@@ -148,37 +218,38 @@ class WalletScannerViewController: UIViewController {
     captureSession.startRunning()
   }
 }
-#endif
 
-class WalletScannerCoordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
-  private var parent: WalletScannerView
-  
-  init(parent: WalletScannerView) {
-    self.parent = parent
-  }
-  
+extension WalletScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
   func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
     if let metadataObject = metadataObjects.first {
-      guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
-      guard let stringValue = readableObject.stringValue else { return }
-
-      found(code: stringValue)
-    }
-  }
-  
-  func found(code: String) {
-    parent.completion(.success(code))
-  }
-  
-  func didFail(reason: WalletScannerView.ScanError) {
-    parent.completion(.failure(reason))
-  }
-}
-
-struct QrCodeScannerView_Previews: PreviewProvider {
-    static var previews: some View {
-      WalletScannerView() { result in
-        // preview
+      guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else {
+        isFinishScanning = true
+        isErrorPresented = true
+        return
       }
+      guard let stringValue = readableObject.stringValue else {
+        isFinishScanning = true
+        isErrorPresented = true
+        return
+      }
+      guard isFinishScanning == false else { return }
+
+      guard stringValue.isAddress else {
+        isFinishScanning = true
+        isErrorPresented = true
+        return
+      }
+      
+      toAddress = stringValue
+      isFinishScanning = true
+      dismiss()
+    } else {
+      isFinishScanning = true
+      isErrorPresented = true
     }
+  }
+  
+  func resetCamera() {
+    isFinishScanning = false
+  }
 }
