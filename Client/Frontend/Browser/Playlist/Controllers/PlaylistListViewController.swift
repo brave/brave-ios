@@ -512,7 +512,8 @@ extension PlaylistListViewController: PlaylistManagerDelegate {
         }
          
         let indexPath = IndexPath(row: index, section: 0)
-        guard let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell else {
+        guard let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PlaylistCell,
+                  cell.durationFetcher == nil else {
             return
         }
         

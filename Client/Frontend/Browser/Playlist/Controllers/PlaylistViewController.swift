@@ -774,9 +774,10 @@ extension PlaylistViewController: VideoViewDelegate {
 
         // If the item is cached, load it from the cache and play it.
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
-        if cacheState == .downloaded {
+        if cacheState != .invalid {
             if let index = PlaylistManager.shared.index(of: item.pageSrc),
-               let asset = PlaylistManager.shared.assetAtIndex(index) {
+               let asset = PlaylistManager.shared.assetAtIndex(index),
+               asset.isPlayable {
                 load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)
                 .handleEvents(receiveCancel: {
                     PlaylistMediaStreamer.clearNowPlayingInfo()
