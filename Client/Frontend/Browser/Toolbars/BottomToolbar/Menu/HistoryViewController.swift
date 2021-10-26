@@ -23,6 +23,21 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.hidesWhenStopped = true
         $0.isHidden = true
     }
+    
+    private var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                self.view.addSubview(spinner)
+                self.spinner.snp.makeConstraints {
+                    $0.center.equalTo(view.snp.center)
+                }
+                self.spinner.startAnimating()
+            } else {
+                self.spinner.stopAnimating()
+                self.spinner.removeFromSuperview()
+            }
+        }
+    }
 
     private let historyAPI: BraveHistoryAPI
     
@@ -36,6 +51,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     private var searchHistoryTimer: Timer?
     private var isHistoryBeingSearched: Bool = false
     private let searchController = UISearchController(searchResultsController: nil)
+    private var searchQuery = ""
     
     init(isPrivateBrowsing: Bool, historyAPI: BraveHistoryAPI) {
         self.isPrivateBrowsing = isPrivateBrowsing
@@ -104,11 +120,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             showEmptyPanelState()
         } else {
             if !isHistoryRefreshing {
-                view.addSubview(spinner)
-                spinner.snp.makeConstraints {
-                    $0.center.equalTo(view.snp.center)
-                }
-                spinner.startAnimating()
+                isLoading = true
                 isHistoryRefreshing = true
 
                 historyAPI.waitForHistoryServiceLoaded { [weak self] in
@@ -116,8 +128,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
                     
                     self.reloadData() {
                         self.isHistoryRefreshing = false
-                        self.spinner.stopAnimating()
-                        self.spinner.removeFromSuperview()
+                        self.isLoading = false
                     }
                 }
             }
@@ -138,6 +149,13 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             self.updateEmptyPanelState()
             
             completion()
+        }
+    }
+    
+    private func reloadDataAndShowLoading(with query: String) {
+        isLoading = true
+        reloadData(with: query) { [weak self] in
+            self?.isLoading = false
         }
     }
     
@@ -316,7 +334,11 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
                 guard let historyItem = historyFRC?.object(at: indexPath) else { return }
                 historyAPI.removeHistory(historyItem)
                 
-                refreshHistory()
+                if isHistoryBeingSearched {
+                    reloadDataAndShowLoading(with: searchQuery)
+                } else {
+                    refreshHistory()
+                }
             default:
                 break
         }
@@ -398,19 +420,12 @@ extension HistoryViewController: UISearchResultsUpdating {
     
     @objc private func fetchSearchResults(timer: Timer) {
         guard let query = timer.userInfo as? String else {
+            searchQuery = ""
             return
         }
         
-        view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(view.snp.center)
-        }
-        spinner.startAnimating()
-        
-        reloadData(with: query) {
-            self.spinner.stopAnimating()
-            self.spinner.removeFromSuperview()
-        }
+        searchQuery = query
+        reloadDataAndShowLoading(with: searchQuery)
     }
 }
 
@@ -420,6 +435,7 @@ extension HistoryViewController: UISearchControllerDelegate {
     
     func willPresentSearchController(_ searchController: UISearchController) {
         isHistoryBeingSearched = true
+        searchQuery = ""
         tableView.setEditing(false, animated: true)
         tableView.reloadData()
     }
