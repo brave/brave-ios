@@ -186,7 +186,7 @@ class PlaylistViewController: UIViewController {
             if UIDevice.current.orientation.isLandscape {
                 splitController.preferredDisplayMode = .secondaryOnly
             } else {
-                splitController.preferredDisplayMode = .primaryOverlay
+                splitController.preferredDisplayMode = .oneOverSecondary
             }
         }
     }
@@ -774,7 +774,7 @@ extension PlaylistViewController: VideoViewDelegate {
 
         // If the item is cached, load it from the cache and play it.
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
-        if cacheState != .invalid {
+        if cacheState == .downloaded {
             if let index = PlaylistManager.shared.index(of: item.pageSrc),
                let asset = PlaylistManager.shared.assetAtIndex(index) {
                 load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)

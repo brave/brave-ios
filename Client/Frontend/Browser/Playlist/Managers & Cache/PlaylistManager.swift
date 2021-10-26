@@ -192,8 +192,12 @@ class PlaylistManager: NSObject {
     }
     
     func restoreSession() {
-        downloadManager.restoreSession() { [weak self] in
-            self?.reloadData()
+        if !didRestoreSession {
+            didRestoreSession = true
+            
+            downloadManager.restoreSession() { [weak self] in
+                self?.reloadData()
+            }
         }
     }
     
