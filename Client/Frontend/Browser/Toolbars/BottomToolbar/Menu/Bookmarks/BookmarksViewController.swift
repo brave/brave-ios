@@ -62,6 +62,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private let importExportUtility = BraveCoreImportExportUtility()
     private var documentInteractionController: UIDocumentInteractionController?
     
+    private var searchBookmarksTimer: Timer?
+    private var isBookmarksBeingSearched: Bool = false
+    private let bookmarksSearchController = UISearchController(searchResultsController: nil)
+    private var bookmarksSearchQuery = ""
+    
     init(folder: Bookmarkv2?, bookmarkManager: BookmarkManager, isPrivateBrowsing: Bool) {
         self.isPrivateBrowsing = isPrivateBrowsing
         self.bookmarkManager = bookmarkManager
@@ -80,15 +85,35 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
-        
-        tableView.allowsSelectionDuringEditing = true
-        tableView.register(BookmarkTableViewCell.self,
-                           forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
-        
+        applyTheme()
         setUpToolbar()
         updateEditBookmarksButtonStatus()
         updatedFolderHierarchy()
+    }
+    
+    private func applyTheme() {
+        bookmarksSearchController.do {
+            $0.searchBar.autocapitalizationType = .none
+            $0.searchResultsUpdater = self
+            $0.obscuresBackgroundDuringPresentation = false
+            $0.searchBar.placeholder = "Search Bookmarks"
+            $0.delegate = self
+            $0.hidesNavigationBarDuringPresentation = true
+        }
+        
+        navigationItem.do {
+            $0.searchController = bookmarksSearchController
+            $0.hidesSearchBarWhenScrolling = false
+            $0.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+        }
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+        
+        tableView.do {
+            $0.allowsSelectionDuringEditing = true
+            $0.register(BookmarkTableViewCell.self,
+                           forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
+        }
     }
     
     @objc private func tappedDone() {
@@ -710,5 +735,54 @@ extension BookmarksViewController {
             guard let importExportButton = self.importExportButton else { return }
             vc.presentOptionsMenu(from: importExportButton, animated: true)
         }
+    }
+}
+
+// MARK: UISearchResultUpdating
+
+extension BookmarksViewController: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text else { return }
+
+        if searchBookmarksTimer != nil {
+            searchBookmarksTimer?.invalidate()
+            searchBookmarksTimer = nil
+        }
+        
+        searchBookmarksTimer =
+            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    }
+    
+    @objc private func fetchSearchResults(timer: Timer) {
+        guard let query = timer.userInfo as? String else {
+            bookmarksSearchQuery = ""
+            return
+        }
+        
+        bookmarksSearchQuery = query
+    }
+}
+
+// MARK: UISearchControllerDelegate
+
+extension BookmarksViewController: UISearchControllerDelegate {
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        isBookmarksBeingSearched = true
+        bookmarksSearchQuery = ""
+        tableView.setEditing(false, animated: true)
+        tableView.reloadData()
+        
+        // Bottom toolbar needs to be hidden when searching for bookmarks
+        navigationController?.setToolbarHidden(true, animated: true)
+    }
+    
+    func willDismissSearchController(_ searchController: UISearchController) {
+        isBookmarksBeingSearched = false
+        tableView.reloadData()
+        
+        // Re-enable bottom var options when search is done
+        navigationController?.setToolbarHidden(false, animated: true)
     }
 }
