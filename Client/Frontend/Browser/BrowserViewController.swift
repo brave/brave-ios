@@ -975,6 +975,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             show(toast: toast, afterWaiting: ButtonToastUX.toastDelay)
         }
         showQueuedAlertIfAvailable()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.present(WelcomeViewController(), animated: true, completion: nil)
+        }
     }
     
     private func presentVPNCallout() {

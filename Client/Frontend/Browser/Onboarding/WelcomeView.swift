@@ -15,19 +15,38 @@ enum WelcomeViewState {
 
 struct WelcomeView: View {
     var body: some View {
-        VStack {
+        VStack(alignment: .center) {
             Image(uiImage: #imageLiteral(resourceName: "Launch_Leaves_Top"))
-            .aspectRatio(contentMode: .fit)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+            Spacer(minLength: 20.0)
+            
             ZStack(alignment: .center) {
                 WelcomViewCallout()
                     .offset(x: 0.0, y: -30.0)
+
                 Image(uiImage: #imageLiteral(resourceName: "welcome-view-icon"))
-                .aspectRatio(contentMode: .fit)
-                .offset(x: 0.0, y: 130.0)
-            }
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .offset(x: 0.0, y: 130.0)
+            }.frame(maxWidth: .infinity)
+            
+            Spacer(minLength: 20.0)
             Image(uiImage: #imageLiteral(resourceName: "Launch_Leaves_Bottom"))
-            .aspectRatio(contentMode: .fit)
-        }.background(Image(uiImage: #imageLiteral(resourceName: "LaunchBackground")))
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+        }
+        .edgesIgnoringSafeArea(.all)
+        .background(
+            Image(uiImage: #imageLiteral(resourceName: "LaunchBackground"))
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+        )
+        .frame(maxWidth: .infinity,
+               maxHeight: .infinity,
+               alignment: .center)
     }
 }
 
@@ -72,7 +91,7 @@ struct WelcomeView_Previews: PreviewProvider {
         Group {
             WelcomeView()
             WelcomeView()
-                .previewDevice("iPhone 12 mini")
+                .previewDevice("iPad Pro (12.9-inch) (5th generation)")
         }
     }
 }
