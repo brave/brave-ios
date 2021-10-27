@@ -552,19 +552,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
         
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return nil
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return super.tableView(tableView, heightForRowAt: indexPath)
+        nil
     }
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        return indexPath
+        indexPath
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -634,7 +630,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let item = bookmarksFRC?.object(at: indexPath) else { return false }
+        var fetchedBookmarkItem: Bookmarkv2?
+        if isBookmarksBeingSearched {
+            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
+        } else {
+            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+        }
+    
+        guard let item = fetchedBookmarkItem else { return false }
+        
         return item.canBeDeleted
     }
 }
@@ -648,12 +652,18 @@ extension BookmarksViewController {
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
+        .delete
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let item = bookmarksFRC?.object(at: indexPath),
-              item.canBeDeleted else { return nil }
+        var fetchedBookmarkItem: Bookmarkv2?
+        if isBookmarksBeingSearched {
+            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
+        } else {
+            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+        }
+    
+        guard let item = fetchedBookmarkItem, item.canBeDeleted else { return nil }
 
         let deleteAction = UIContextualAction(style: .destructive, title: Strings.delete) { [weak self] _, _, completion in
             guard let self = self else {
