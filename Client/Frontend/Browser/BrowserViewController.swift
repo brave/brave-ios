@@ -476,9 +476,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         widgetBookmarksFRC?.delegate = self
         try? widgetBookmarksFRC?.performFetch()
         
-        if !FavoritesWidgetData.dataExists {
-            updateWidgetFavoritesData()
-        }
+        updateWidgetFavoritesData()
     }
     
     private func setupAdsNotificationHandler() {

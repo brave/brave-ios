@@ -46,18 +46,10 @@ private struct StatsProvider: TimelineProvider {
     }
 }
 
-private struct PlaceholderStatsView: View {
-    var entry: StatsEntry
-    
-    var body: some View {
-        StatsView(entry: entry)
-            .redacted(reason: .placeholder)
-    }
-}
-
 private struct StatsView: View {
     var entry: StatsEntry
     @ScaledMetric private var fontSize = 32.0
+    @Environment(\.redactionReasons) var redactionReasons
     
     var body: some View {
         VStack {
@@ -79,11 +71,12 @@ private struct StatsView: View {
                     Color.clear
                         .overlay(
                             VStack(spacing: 4) {
-                                Text(verbatim: data.value)
+                                Text(verbatim: redactionReasons == .placeholder ? "-" : data.value)
                                     .font(.system(size: fontSize))
                                     .foregroundColor(Color(data.color))
                                     .multilineTextAlignment(.center)
                                     .minimumScaleFactor(0.5)
+                                    .unredacted()
                                 Text(verbatim: data.name)
                                     .font(.system(size: 10, weight: .semibold))
                                     .multilineTextAlignment(.center)

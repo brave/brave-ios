@@ -44,16 +44,24 @@ private struct FaviconImage: View {
     var image: UIImage
     var contentMode: UIView.ContentMode
     
-    var body: some View {
+    var usePadding: Bool {
         switch contentMode {
         case .scaleToFill, .scaleAspectFit, .scaleAspectFill:
-            Image(uiImage: image)
-                .resizable()
+            return false
         default:
+            return true
+        }
+    }
+    
+    var body: some View {
+        GeometryReader {
             Image(uiImage: image)
                 .resizable()
-                .frame(width: 44, height: 44)
+                .frame(height: $0.size.width)
         }
+        .clipped()
+        .aspectRatio(1, contentMode: .fit)
+        .padding(usePadding ? 8 : 0)
     }
 }
 
@@ -67,6 +75,7 @@ private struct NoFavoritesFoundView: View {
                 .foregroundColor(Color(UIColor.braveLabel))
         }
         .padding()
+        .unredacted()
     }
 }
 
@@ -91,41 +100,14 @@ private struct FavoritesGridView: View {
     @Environment(\.widgetFamily) var widgetFamily
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.pixelLength) var pixelLength
+    @Environment(\.redactionReasons) var redactionReasons
     
-    var numberOfRows: Int {
-        switch widgetFamily {
-        case .systemMedium:
-            return 2
-        case .systemLarge:
-            return 4
-        case .systemSmall, .systemExtraLarge:
-            assertionFailure("widget family isn't supported")
-            return 0
-        @unknown default:
-            return 0
-        }
-    }
-    
-    var verticalSpacing: CGFloat {
+    var itemsCount: Int {
         switch widgetFamily {
         case .systemMedium:
             return 8
         case .systemLarge:
-            return 22
-        case .systemSmall, .systemExtraLarge:
-            assertionFailure("widget family isn't supported")
-            return 0
-        @unknown default:
-            return 0
-        }
-    }
-    
-    var horizontalSpacing: CGFloat {
-        switch widgetFamily {
-        case .systemMedium:
-            return 18
-        case .systemLarge:
-            return 18
+            return 16
         case .systemSmall, .systemExtraLarge:
             assertionFailure("widget family isn't supported")
             return 0
@@ -138,58 +120,51 @@ private struct FavoritesGridView: View {
         RoundedRectangle(cornerRadius: widgetFamily == .systemMedium ? 16 : 12, style: .continuous)
     }
     
-    func favorite(atRow row: Int, column: Int) -> WidgetFavorite? {
-        let favorites = entry.favorites
-        let index = (row * 4) + column
-        if index < favorites.count {
-            return favorites[safe: index]
-        }
-        return nil
+    var favorites: [WidgetFavorite] {
+        entry.favorites.sorted { $0.order < $1.order }
+    }
+    
+    var emptyField: some View {
+        itemShape
+            .fill(.clear)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(
+                itemShape
+                    .strokeBorder(Color(UIColor.braveLabel).opacity(0.2), lineWidth: pixelLength)
+            )
+            .aspectRatio(1.0, contentMode: .fit)
     }
     
     var body: some View {
-        VStack(spacing: verticalSpacing) {
-            ForEach(0..<numberOfRows) { row in
-                HStack(spacing: horizontalSpacing) {
-                    ForEach(0..<4) { column in
-                        if let favorite = favorite(atRow: row, column: column) {
-                            Link(destination: favorite.url, label: {
-                                Group {
-                                    if let attributes = favorite.favicon, let image = attributes.image {
-                                        FaviconImage(image: image, contentMode: attributes.contentMode)
-                                            .padding(attributes.includePadding ? 4 : 0)
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .background(Color(attributes.backgroundColor ?? .clear))
-                                    } else {
-                                        Text(verbatim: favorite.url.baseDomain?.first?.uppercased() ?? "")
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .font(.system(size: 36))
-                                            .background(Color(UIColor.braveBackground))
-                                            .foregroundColor(Color(UIColor.braveLabel))
-                                    }
-                                }
-                                .clipShape(itemShape)
-                                .background(Color(UIColor.braveBackground).opacity(0.05).clipShape(itemShape))
-                                .overlay(
-                                    itemShape
-                                        .strokeBorder(Color(UIColor.braveBackground).opacity(0.1), lineWidth: pixelLength)
-                                )
-                            })
-                        } else {
-                            itemShape
-                                .fill(.clear)
-                                .overlay(
-                                    itemShape
-                                        .strokeBorder(Color(UIColor.braveLabel).opacity(0.2), lineWidth: pixelLength)
-                                )
-                                .aspectRatio(1.0, contentMode: .fit)
+        LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4), spacing: 8) {
+            ForEach((0..<itemsCount)) {
+                if let favorite = favorites[safe: $0], redactionReasons != .placeholder {
+                    Link(destination: favorite.url, label: {
+                        Group {
+                            if let attributes = favorite.favicon, let image = attributes.image {
+                                FaviconImage(image: image, contentMode: attributes.contentMode)
+                                    .background(Color(attributes.backgroundColor ?? .clear))
+                            } else {
+                                Text(verbatim: favorite.url.baseDomain?.first?.uppercased() ?? "")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .font(.system(size: 36))
+                                    .background(Color(UIColor.braveBackground))
+                                    .foregroundColor(Color(UIColor.braveLabel))
+                            }
                         }
-                    }
+                        .clipShape(itemShape)
+                        .background(Color(UIColor.braveBackground).opacity(0.05).clipShape(itemShape))
+                        .overlay(
+                            itemShape
+                                .strokeBorder(Color(UIColor.braveSeparator).opacity(0.1), lineWidth: pixelLength)
+                        )
+                    })
+                } else {
+                    emptyField
                 }
             }
         }
-        .padding(8)
-        .padding(widgetFamily == .systemLarge ? 4 : 0)
+        .padding()
     }
 }
 

@@ -14,6 +14,7 @@ struct ShortcutsWidget: Widget {
         IntentConfiguration(kind: "ShortcutsWidget", intent: ShortcutsConfigurationIntent.self,
                             provider: ShortcutProvider()) { entry in
             ShortcutsView(slots: entry.shortcutSlots)
+                .unredacted()
         }
         .configurationDisplayName(Strings.Widgets.shortcutsWidgetTitle)
         .description(Strings.Widgets.shortcutsWidgetDescription)

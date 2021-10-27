@@ -882,6 +882,7 @@
 		C8611C8E1F71904C00C3DE7D /* DiskImageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BF8CBC1B7472FA0007AFE6 /* DiskImageStoreTests.swift */; };
 		C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */; };
 		C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F457A91F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift */; };
+		CA02B512271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */; };
 		CA0391B4271E1023000EB13C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA0391B3271E1023000EB13C /* WidgetKit.framework */; };
 		CA0391B6271E1023000EB13C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA0391B5271E1023000EB13C /* SwiftUI.framework */; };
 		CA0391B9271E1023000EB13C /* BraveWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0391B8271E1023000EB13C /* BraveWidgets.swift */; };
@@ -897,7 +898,6 @@
 		CA039238271E2B11000EB13C /* BrowserNavigationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */; };
 		CA03923A271E2CB2000EB13C /* BrowserViewController+Widgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */; };
 		CA03923B271E3238000EB13C /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */; };
-		CA02B512271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */; };
 		CA04E8A627022D9D00BFBB4D /* PlaylistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */; };
 		CA10BE702704BA7900A265A6 /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		CA10BE712704BA7900A265A6 /* GlobalSignRootCA_R1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24226CBD42C00658EAC /* GlobalSignRootCA_R1.cer */; };
@@ -2710,6 +2710,7 @@
 		C817B34C1FC609500086018E /* UIScrollViewSwizzled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScrollViewSwizzled.swift; sourceTree = "<group>"; };
 		C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+WKNavigationDelegate.swift"; sourceTree = "<group>"; };
 		C8F457A91F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+KeyCommands.swift"; sourceTree = "<group>"; };
+		CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+FindInPageDelegate.swift"; sourceTree = "<group>"; };
 		CA0391B2271E1023000EB13C /* BraveWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0391B3271E1023000EB13C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		CA0391B5271E1023000EB13C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -2731,7 +2732,6 @@
 		CA039230271E238D000EB13C /* FaviconAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconAttributes.swift; sourceTree = "<group>"; };
 		CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigationHelper.swift; sourceTree = "<group>"; };
 		CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Widgets.swift"; sourceTree = "<group>"; };
-		CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+FindInPageDelegate.swift"; sourceTree = "<group>"; };
 		CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTests.swift; sourceTree = "<group>"; };
 		CA10BE7E2704BCAE00A265A6 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
 		CA220257271881E3002D3582 /* InternalSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSchemeHandler.swift; sourceTree = "<group>"; };
@@ -5220,6 +5220,52 @@
 			path = BrowserViewController;
 			sourceTree = "<group>";
 		};
+		CA0391B7271E1023000EB13C /* BraveWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				CA0391DA271E12D9000EB13C /* Entitlements */,
+				CA0391F4271E143F000EB13C /* FavoritesWidget.swift */,
+				CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */,
+				CA0391F6271E143F000EB13C /* StatsWidget.swift */,
+				CA0391F7271E143F000EB13C /* SingleStatWidget.swift */,
+				441A635F272444DE001492C3 /* StatDataModel.swift */,
+				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
+				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
+				CA0391BB271E1026000EB13C /* Assets.xcassets */,
+				CA0391BD271E1026000EB13C /* Info.plist */,
+				CA0391BE271E1026000EB13C /* BraveWidgets.entitlements */,
+			);
+			path = BraveWidgets;
+			sourceTree = "<group>";
+		};
+		CA0391DA271E12D9000EB13C /* Entitlements */ = {
+			isa = PBXGroup;
+			children = (
+				CA0391DD271E12F7000EB13C /* WidgetBeta.entitlements */,
+				CA0391DE271E12F8000EB13C /* WidgetDebug.entitlements */,
+				CA0391DB271E12F7000EB13C /* WidgetDev.entitlements */,
+				CA0391DF271E12F8000EB13C /* WidgetEnterprise.entitlements */,
+				CA0391DC271E12F7000EB13C /* WidgetRelease.entitlements */,
+			);
+			path = Entitlements;
+			sourceTree = "<group>";
+		};
+		CA0391FD271E14FD000EB13C /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		CA03922F271E237C000EB13C /* Favicons */ = {
+			isa = PBXGroup;
+			children = (
+				CA039230271E238D000EB13C /* FaviconAttributes.swift */,
+			);
+			path = Favicons;
+			sourceTree = "<group>";
+		};
 		CA22024B271881CE002D3582 /* InternalSchemeHandler */ = {
 			isa = PBXGroup;
 			children = (
@@ -5281,52 +5327,6 @@
 				CA2202AD27192E77002D3582 /* NetworkErrorPageHandler.swift */,
 			);
 			path = "Interstitial Pages";
-			sourceTree = "<group>";
-		};
-		CA0391B7271E1023000EB13C /* BraveWidgets */ = {
-			isa = PBXGroup;
-			children = (
-				CA0391DA271E12D9000EB13C /* Entitlements */,
-				CA0391F4271E143F000EB13C /* FavoritesWidget.swift */,
-				CA0391F3271E143F000EB13C /* ShortcutsWidget.swift */,
-				CA0391F6271E143F000EB13C /* StatsWidget.swift */,
-				CA0391F7271E143F000EB13C /* SingleStatWidget.swift */,
-				441A635F272444DE001492C3 /* StatDataModel.swift */,
-				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
-				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
-				CA0391BB271E1026000EB13C /* Assets.xcassets */,
-				CA0391BD271E1026000EB13C /* Info.plist */,
-				CA0391BE271E1026000EB13C /* BraveWidgets.entitlements */,
-			);
-			path = BraveWidgets;
-			sourceTree = "<group>";
-		};
-		CA0391DA271E12D9000EB13C /* Entitlements */ = {
-			isa = PBXGroup;
-			children = (
-				CA0391DD271E12F7000EB13C /* WidgetBeta.entitlements */,
-				CA0391DE271E12F8000EB13C /* WidgetDebug.entitlements */,
-				CA0391DB271E12F7000EB13C /* WidgetDev.entitlements */,
-				CA0391DF271E12F8000EB13C /* WidgetEnterprise.entitlements */,
-				CA0391DC271E12F7000EB13C /* WidgetRelease.entitlements */,
-			);
-			path = Entitlements;
-			sourceTree = "<group>";
-		};
-		CA0391FD271E14FD000EB13C /* Widgets */ = {
-			isa = PBXGroup;
-			children = (
-				CA0391FF271E151A000EB13C /* FavoritesWidgetData.swift */,
-			);
-			path = Widgets;
-			sourceTree = "<group>";
-		};
-		CA03922F271E237C000EB13C /* Favicons */ = {
-			isa = PBXGroup;
-			children = (
-				CA039230271E238D000EB13C /* FaviconAttributes.swift */,
-			);
-			path = Favicons;
 			sourceTree = "<group>";
 		};
 		CA8D5C0A26D7CD46009BF13D /* Controllers */ = {

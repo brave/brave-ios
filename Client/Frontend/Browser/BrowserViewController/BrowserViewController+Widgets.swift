@@ -24,11 +24,12 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
                     let fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
                     widgetFaviconFetchers.append(fetcher)
                     fetcher.load { _, attributes in
-                        favData.append(.init(url: url, favicon: attributes))
+                        favData.append(.init(url: url, favicon: attributes, order: Int(fav.order)))
                         group.leave()
                     }
                 }
             }
+            
             group.notify(queue: .main) { [self] in
                 widgetFaviconFetchers.removeAll()
                 FavoritesWidgetData.updateWidgetData(favData)

@@ -13,10 +13,12 @@ private let log = Logger.browserLogger
 public struct WidgetFavorite: Codable {
     public var url: URL
     public var favicon: FaviconAttributes?
+    public var order: Int
     
-    public init(url: URL, favicon: FaviconAttributes) {
+    public init(url: URL, favicon: FaviconAttributes, order: Int) {
         self.url = url
         self.favicon = favicon
+        self.order = order
     }
 }
 

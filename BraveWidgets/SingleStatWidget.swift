@@ -47,15 +47,6 @@ private struct StatProvider: IntentTimelineProvider {
     }
 }
 
-private struct PlaceholderStatView: View {
-    var entry: StatEntry
-    
-    var body: some View {
-        StatView(entry: entry)
-            .redacted(reason: .placeholder)
-    }
-}
-
 private struct StatView: View {
     var entry: StatEntry
     
@@ -78,6 +69,8 @@ private struct StatView: View {
             Text(verbatim: entry.statData.name)
                 .font(.caption)
                 .bold()
+                .fixedSize(horizontal: false, vertical: true)
+                .unredacted()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
