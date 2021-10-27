@@ -95,11 +95,12 @@ class PlaylistViewController: UIViewController {
         
         // Simulator cannot "detect" if Car-Play is enabled, therefore we need to STOP playback
         // When this controller deallocates. The user can still manually resume playback in CarPlay.
-        #if targetEnvironment(simulator)
-        // Stop media playback
-        stop(playerView)
-        PlaylistCarplayManager.shared.currentPlaylistItem = nil
-        #endif
+        if !PlaylistCarplayManager.shared.isCarPlayAvailable {
+            // Stop media playback
+            stop(playerView)
+            PlaylistCarplayManager.shared.currentPlaylistItem = nil
+            PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
+        }
         
         // Cancel all loading.
         assetLoadingStateObservers.removeAll()
@@ -505,6 +506,8 @@ extension PlaylistViewController: VideoViewDelegate {
                 }
                 
                 PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
+                PlaylistCarplayManager.shared.currentPlaylistItem = item
+                
                 self.playItem(item: item) { [weak self] error in
                     PlaylistCarplayManager.shared.currentPlaylistItem = nil
                     
@@ -570,6 +573,8 @@ extension PlaylistViewController: VideoViewDelegate {
                 }
                 
                 PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
+                PlaylistCarplayManager.shared.currentPlaylistItem = item
+                
                 self.playItem(item: item) { [weak self] error in
                     PlaylistCarplayManager.shared.currentPlaylistItem = nil
                     guard let self = self else { return }
