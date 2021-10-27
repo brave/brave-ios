@@ -137,7 +137,7 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       .sheet(isPresented: $isShowingScanner) {
-        WalletScannerView(toAddress: $sendAddress)
+        AddressQRCodeScannerView(address: $sendAddress)
       }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)

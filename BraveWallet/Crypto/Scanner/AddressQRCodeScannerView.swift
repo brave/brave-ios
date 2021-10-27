@@ -8,19 +8,19 @@ import AVFoundation
 import Shared
 import SnapKit
 
-struct WalletScannerView: View {
-  @Binding var toAddress: String
+struct AddressQRCodeScannerView: View {
+  @Binding var address: String
   @State private var isErrorPresented: Bool = false
   @State private var permissionDenied: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   var body: some View {
-    #if targetEnvironment(simulator)
     NavigationView {
+      #if targetEnvironment(simulator)
       ZStack {
         Color.black.ignoresSafeArea()
         Button(action: {
-          toAddress = "0xaa32"
+          address = "0xaa32"
           presentationMode.dismiss()
         }) {
           Text("Click here to simulate scan")
@@ -39,13 +39,11 @@ struct WalletScannerView: View {
         }
       }
       .ignoresSafeArea()
-    }
-    #else
-    NavigationView {
-      _WalletScannerView(toAddress: $toAddress,
-                         isErrorPresented: $isErrorPresented,
-                         isPermissionDenied: $permissionDenied,
-                         dismiss: { presentationMode.dismiss() }
+      #else
+      _AddressQRCodeScannerView(address: $address,
+                                isErrorPresented: $isErrorPresented,
+                                isPermissionDenied: $permissionDenied,
+                                dismiss: { presentationMode.dismiss() }
       )
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -83,20 +81,20 @@ struct WalletScannerView: View {
               )
             }
         )
+      #endif
     }
-    #endif
   }
 }
 
-struct _WalletScannerView: UIViewControllerRepresentable {
-  typealias UIViewControllerType = WalletScannerViewController
-  @Binding var toAddress: String
+private struct _AddressQRCodeScannerView: UIViewControllerRepresentable {
+  typealias UIViewControllerType = AddressQRCodeScannerViewController
+  @Binding var address: String
   @Binding var isErrorPresented: Bool
   @Binding var isPermissionDenied: Bool
-  var dismiss: (() -> Void)
+  var dismiss: () -> Void
   
   func makeUIViewController(context: Context) -> UIViewControllerType {
-    WalletScannerViewController(toAddress: _toAddress,
+    AddressQRCodeScannerViewController(address: _address,
                                 isErrorPresented: _isErrorPresented,
                                 isPermissionDenied: _isPermissionDenied,
                                 dismiss: self.dismiss
@@ -107,8 +105,8 @@ struct _WalletScannerView: UIViewControllerRepresentable {
   }
 }
 
-class WalletScannerViewController: UIViewController {
-  @Binding private var toAddress: String
+private class AddressQRCodeScannerViewController: UIViewController {
+  @Binding private var address: String
   @Binding private var isErrorPresented: Bool
   @Binding private var isPermissionDenied: Bool
   
@@ -120,15 +118,15 @@ class WalletScannerViewController: UIViewController {
   private var previewLayer: AVCaptureVideoPreviewLayer?
   private var isFinishScanning = false
   
-  var dismiss: (() -> Void)
+  var dismiss: () -> Void
   
   init(
-    toAddress: Binding<String>,
+    address: Binding<String>,
     isErrorPresented: Binding<Bool>,
     isPermissionDenied: Binding<Bool>,
-    dismiss: @escaping (() -> Void)
+    dismiss: @escaping () -> Void
   ) {
-    self._toAddress = toAddress
+    self._address = address
     self._isErrorPresented = isErrorPresented
     self._isPermissionDenied = isPermissionDenied
     self.dismiss = dismiss
@@ -190,7 +188,7 @@ class WalletScannerViewController: UIViewController {
 
   private func setupCamera() {
     guard let captureDevice = captureDevice else {
-      dismiss()
+      isErrorPresented = true
       return
     }
 
@@ -219,34 +217,15 @@ class WalletScannerViewController: UIViewController {
   }
 }
 
-extension WalletScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
+extension AddressQRCodeScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
   func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-    if let metadataObject = metadataObjects.first {
-      guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else {
-        isFinishScanning = true
-        isErrorPresented = true
-        return
-      }
-      guard let stringValue = readableObject.stringValue else {
-        isFinishScanning = true
-        isErrorPresented = true
-        return
-      }
-      guard isFinishScanning == false else { return }
-
-      guard stringValue.isAddress else {
-        isFinishScanning = true
-        isErrorPresented = true
-        return
-      }
-      
-      toAddress = stringValue
-      isFinishScanning = true
+    if let stringValue = (metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue, stringValue.isAddress {
+      address = stringValue
       dismiss()
     } else {
-      isFinishScanning = true
       isErrorPresented = true
     }
+    isFinishScanning = true
   }
   
   func resetCamera() {

@@ -23,7 +23,6 @@ extension String {
     // An address has to start with `0x`
     guard starts(with: "0x") else { return false }
     // Check the rest of the char is a hex digit
-    let clean = dropFirst(2)
-    return clean.filter(\.isHexDigit).count == clean.count
+    return dropFirst(2).allSatisfy(\.isHexDigit)
   }
 }
