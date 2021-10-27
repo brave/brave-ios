@@ -49,7 +49,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     var isHistoryRefreshing = false
     
     private var searchHistoryTimer: Timer?
-    private var isHistoryBeingSearched: Bool = false
+    private var isHistoryBeingSearched = false
     private let searchController = UISearchController(searchResultsController: nil)
     private var searchQuery = ""
     
@@ -99,20 +99,20 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     }
     
     private func applyTheme() {
-        title = Strings.History.historySearchBarTitle
+        title = Strings.historyScreenTitle
 
         searchController.do {
             $0.searchBar.autocapitalizationType = .none
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
-            $0.searchBar.placeholder = "Search History"
+            $0.searchBar.placeholder = Strings.History.historySearchBarTitle
             $0.delegate = self
             $0.hidesNavigationBarDuringPresentation = true
         }
     }
     
     private func refreshHistory() {
-        guard !isHistoryBeingSearched else {
+        if isHistoryBeingSearched {
             return
         }
         
@@ -216,6 +216,13 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             emptyStateOverlayView.snp.makeConstraints { make -> Void in
                 make.edges.equalTo(tableView)
             }
+        }
+    }
+    
+    private func invalidateSearchTimer() {
+        if searchHistoryTimer != nil {
+            searchHistoryTimer?.invalidate()
+            searchHistoryTimer = nil
         }
     }
     
@@ -409,10 +416,7 @@ extension HistoryViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let query = searchController.searchBar.text else { return }
 
-        if searchHistoryTimer != nil {
-            searchHistoryTimer?.invalidate()
-            searchHistoryTimer = nil
-        }
+        invalidateSearchTimer()
         
         searchHistoryTimer =
             Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
@@ -441,6 +445,8 @@ extension HistoryViewController: UISearchControllerDelegate {
     }
     
     func willDismissSearchController(_ searchController: UISearchController) {
+        invalidateSearchTimer()
+        
         isHistoryBeingSearched = false
         tableView.reloadData()
     }
