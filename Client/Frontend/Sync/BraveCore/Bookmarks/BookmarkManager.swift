@@ -184,6 +184,21 @@ class BookmarkManager {
         })
     }
     
+    public func fetchBookmarks(with query: String = "", completion: @escaping ([Bookmarkv2]) -> Void) {
+        guard let bookmarksAPI = bookmarksAPI else {
+            completion([])
+            return
+        }
+        
+        bookmarksAPI.search(withQuery: query, maxCount: 200, completion: { nodes in
+            var fetchedBookmarks: [Bookmarkv2] = []
+
+            fetchedBookmarks = nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
+            
+            completion(fetchedBookmarks)
+        })
+    }
+    
     public func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath, destinationIndexPath: IndexPath) {
         guard let frc = frc, let bookmarksAPI = bookmarksAPI else {
             return

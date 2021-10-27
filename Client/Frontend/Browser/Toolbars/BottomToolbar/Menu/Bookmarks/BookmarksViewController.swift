@@ -47,6 +47,23 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         $0.isHidden = true
     }
     
+    private var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                view.addSubview(spinner)
+                spinner.snp.makeConstraints {
+                    $0.center.equalTo(view.snp.center)
+                }
+                
+                spinner.startAnimating()
+                spinner.isHidden = false
+            } else {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+    
     weak var addBookmarksFolderOkAction: UIAlertAction?
     
     var isEditingIndividualBookmark: Bool = false
@@ -66,7 +83,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private var isBookmarksBeingSearched: Bool = false
     private let bookmarksSearchController = UISearchController(searchResultsController: nil)
     private var bookmarksSearchQuery = ""
-    
+    private var searchBookmarkList: [Bookmarkv2] = []
+    private lazy var noSearchResultOverlayView: UIView = createNoSearchResultOverlayView()
+
     init(folder: Bookmarkv2?, bookmarkManager: BookmarkManager, isPrivateBrowsing: Bool) {
         self.isPrivateBrowsing = isPrivateBrowsing
         self.bookmarkManager = bookmarkManager
@@ -178,6 +197,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     override func reloadData() {
+        performBookmarkFetch()
+        super.reloadData()
+    }
+    
+    private func performBookmarkFetch() {
+        if isBookmarksBeingSearched {
+            return
+        }
+        
         do {
             // Recreate the frc if it was previously removed
             // (when user navigated into a nested folder for example)
@@ -189,8 +217,31 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         } catch let error as NSError {
             log.error(error.description)
         }
+    }
+    
+    private func refreshBookmarkSearchResult(with query: String = "") {
+        guard isBookmarksBeingSearched else {
+            return
+        }
         
-        super.reloadData()
+        isLoading = true
+        
+        fetchBookmarks(with: query) { [weak self] in
+            self?.isLoading = false
+        }
+    }
+    
+    private func fetchBookmarks(with query: String, _ completion: @escaping () -> Void) {
+        bookmarkManager.fetchBookmarks(with: query) { [weak self] bookmarks in
+            guard let self = self else { return }
+            
+            self.searchBookmarkList = bookmarks
+            
+            self.tableView.reloadData()
+            self.updateEmptyPanelState()
+            
+            completion()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -222,6 +273,66 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Otherwise, it may result in crash if a user is in a nested folder and
         // sync changes happen.
         bookmarksFRC = nil
+    }
+    
+    private func createNoSearchResultOverlayView() -> UIView {
+        let overlayView = UIView().then {
+            $0.backgroundColor = .secondaryBraveBackground
+        }
+        
+        let logoImageView = UIImageView(image: #imageLiteral(resourceName: "emptyHistory").template).then {
+            $0.tintColor = .braveLabel
+        }
+        
+        let welcomeLabel = UILabel().then {
+            $0.text = Preferences.Privacy.privateBrowsingOnly.value
+                ? Strings.History.historyPrivateModeOnlyStateTitle
+                : Strings.History.historyEmptyStateTitle
+            $0.textAlignment = .center
+            $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+            $0.textColor = .braveLabel
+            $0.numberOfLines = 0
+            $0.adjustsFontSizeToFitWidth = true
+        }
+                
+        overlayView.addSubview(logoImageView)
+        
+        logoImageView.snp.makeConstraints { make in
+            make.centerX.equalTo(overlayView)
+            make.size.equalTo(60)
+            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+            make.centerY.equalTo(overlayView).offset(-180).priority(100)
+            // Sets proper top constraint for iPhone 4, 5 in portrait.
+            make.top.greaterThanOrEqualTo(overlayView).offset(50)
+        }
+        
+        overlayView.addSubview(welcomeLabel)
+        
+        welcomeLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(overlayView)
+            make.top.equalTo(logoImageView.snp.bottom).offset(15)
+            make.width.equalTo(170)
+        }
+        
+        return overlayView
+    }
+    
+    private func updateEmptyPanelState() {
+        if isBookmarksBeingSearched, searchBookmarkList.count == 0 {
+            showEmptyPanelState()
+        } else {
+            noSearchResultOverlayView.removeFromSuperview()
+        }
+    }
+    
+    private func showEmptyPanelState() {
+        if noSearchResultOverlayView.superview == nil {
+            view.addSubview(noSearchResultOverlayView)
+            view.bringSubviewToFront(noSearchResultOverlayView)
+            noSearchResultOverlayView.snp.makeConstraints { make -> Void in
+                make.edges.equalTo(tableView)
+            }
+        }
     }
     
     func disableTableEditingMode() {
@@ -648,7 +759,10 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
     }
 }
 
+// MARK: UIDocumentPickerDelegate - UIDocumentInteractionControllerDelegate
+
 extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate {
+    
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let url = urls.first, urls.count == 1 else {
             return
@@ -686,21 +800,17 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
     }
 }
 
+// MARK: Export-Import Bookmarks
+
 extension BookmarksViewController {
+    
     func importBookmarks(from url: URL) {
-        self.view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(self.view.snp.center)
-        }
-        
-        spinner.startAnimating()
-        spinner.isHidden = false
+        isLoading = true
         
         self.importExportUtility.importBookmarks(from: url) { [weak self] success in
             guard let self = self else { return }
             
-            self.spinner.stopAnimating()
-            self.spinner.removeFromSuperview()
+            self.isLoading = false
             
             let alert = UIAlertController(title: Strings.Sync.bookmarksImportPopupErrorTitle,
                                           message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
@@ -711,19 +821,12 @@ extension BookmarksViewController {
     }
     
     func exportBookmarks(to url: URL) {
-        self.view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(self.view.snp.center)
-        }
-        
-        spinner.startAnimating()
-        spinner.isHidden = false
+        isLoading = true
         
         self.importExportUtility.exportBookmarks(to: url) { [weak self] success in
             guard let self = self else { return }
             
-            self.spinner.stopAnimating()
-            self.spinner.removeFromSuperview()
+            self.isLoading = false
             
             // Controller must be retained otherwise `AirDrop` and other sharing options will fail!
             self.documentInteractionController = UIDocumentInteractionController(url: url)
@@ -761,6 +864,7 @@ extension BookmarksViewController: UISearchResultsUpdating {
         }
         
         bookmarksSearchQuery = query
+        refreshBookmarkSearchResult(with: bookmarksSearchQuery)
     }
 }
 
@@ -780,6 +884,7 @@ extension BookmarksViewController: UISearchControllerDelegate {
     
     func willDismissSearchController(_ searchController: UISearchController) {
         isBookmarksBeingSearched = false
+        updateEmptyPanelState()
         tableView.reloadData()
         
         // Re-enable bottom var options when search is done
