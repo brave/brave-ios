@@ -778,7 +778,18 @@ extension PlaylistCarplayController {
                         if !isPlaying {
                             PlaylistMediaStreamer.clearNowPlayingInfo()
                         }
-                        completion?(.other(error))
+                        
+                        switch error as? MediaPlaybackError {
+                        case .cancelled:
+                            if !isPlaying {
+                                PlaylistMediaStreamer.clearNowPlayingInfo()
+                            }
+                            completion?(.cancelled)
+                        case .other(let err):
+                            completion?(.other(err))
+                        default:
+                            completion?(.other(error))
+                        }
                     case .finished:
                         break
                     }

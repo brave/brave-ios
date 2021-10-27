@@ -101,6 +101,10 @@ class PlaylistViewController: UIViewController {
         PlaylistCarplayManager.shared.currentPlaylistItem = nil
         #endif
         
+        // Cancel all loading.
+        assetLoadingStateObservers.removeAll()
+        assetStateObservers.removeAll()
+        
         // If this controller is retained in app-delegate for Picture-In-Picture support
         // then we need to re-attach the player layer
         // and deallocate it.
@@ -422,7 +426,7 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     func deleteItem(item: PlaylistInfo, at index: Int) {
         PlaylistManager.shared.delete(item: item)
         
-        if PlaylistCarplayManager.shared.currentlyPlayingItemIndex == index {
+        if PlaylistCarplayManager.shared.currentlyPlayingItemIndex == index || PlaylistManager.shared.numberOfAssets == 0 {
             PlaylistMediaStreamer.clearNowPlayingInfo()
             
             PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
@@ -695,17 +699,18 @@ extension PlaylistViewController: VideoViewDelegate {
         player.toggleRepeatMode()
     }
     
-    func load(_ videoView: VideoView, url: URL, autoPlayEnabled: Bool) -> AnyPublisher<Void, Error> {
+    func load(_ videoView: VideoView, url: URL, autoPlayEnabled: Bool) -> AnyPublisher<Void, MediaPlaybackError> {
         load(videoView, asset: AVURLAsset(url: url), autoPlayEnabled: autoPlayEnabled)
     }
     
-    func load(_ videoView: VideoView, asset: AVURLAsset, autoPlayEnabled: Bool) -> AnyPublisher<Void, Error> {
+    func load(_ videoView: VideoView, asset: AVURLAsset, autoPlayEnabled: Bool) -> AnyPublisher<Void, MediaPlaybackError> {
         assetLoadingStateObservers.removeAll()
         player.stop()
         
         return Future { [weak self] resolver in
             guard let self = self else {
-                resolver(.failure("User Cancelled Playback"))
+                log.debug("User Cancelled Playback")
+                resolver(.failure(.cancelled))
                 return
             }
             
@@ -714,18 +719,25 @@ extension PlaylistViewController: VideoViewDelegate {
             .sink(receiveCompletion: { status in
                 switch status {
                 case .failure(let error):
-                    resolver(.failure(error))
+                    switch error {
+                    case .cancelled:
+                        resolver(.failure(.cancelled))
+                    case .other(let err):
+                        resolver(.failure(.other(err)))
+                    }
                 case .finished:
                     break
                 }
             }, receiveValue: { [weak self] isNewItem in
                 guard let self = self else {
-                    resolver(.failure("User Cancelled Playback"))
+                    log.debug("User Cancelled Playback")
+                    resolver(.failure(.cancelled))
                     return
                 }
                 
                 guard let item = self.player.currentItem else {
-                    resolver(.failure("Couldn't load playlist item"))
+                    log.debug("User Cancelled Playback")
+                    resolver(.failure(.other("Couldn't load playlist item")))
                     return
                 }
                 
@@ -776,8 +788,7 @@ extension PlaylistViewController: VideoViewDelegate {
         let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
         if cacheState != .invalid {
             if let index = PlaylistManager.shared.index(of: item.pageSrc),
-               let asset = PlaylistManager.shared.assetAtIndex(index),
-               asset.isPlayable {
+               let asset = PlaylistManager.shared.assetAtIndex(index) {
                 load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)
                 .handleEvents(receiveCancel: {
                     PlaylistMediaStreamer.clearNowPlayingInfo()
@@ -787,7 +798,14 @@ extension PlaylistViewController: VideoViewDelegate {
                     switch status {
                     case .failure(let error):
                         PlaylistMediaStreamer.clearNowPlayingInfo()
-                        completion?(.other(error))
+                        
+                        switch error {
+                        case .cancelled:
+                            completion?(.cancelled)
+                        case .other(let err):
+                            completion?(.other(err))
+                        }
+                        
                     case .finished:
                         break
                     }
@@ -856,7 +874,13 @@ extension PlaylistViewController: VideoViewDelegate {
                     switch status {
                     case .failure(let error):
                         PlaylistMediaStreamer.clearNowPlayingInfo()
-                        completion?(.other(error))
+                        
+                        switch error {
+                        case .cancelled:
+                            completion?(.cancelled)
+                        case .other(let err):
+                            completion?(.other(err))
+                        }
                     case .finished:
                         break
                     }
