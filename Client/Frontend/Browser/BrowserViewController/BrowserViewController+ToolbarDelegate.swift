@@ -44,7 +44,8 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func topToolbarDidLongPressReloadButton(_ topToolbar: TopToolbarView, from button: UIButton) {
-        guard let tab = tabManager.selectedTab else { return }
+        guard let tab = tabManager.selectedTab, let url = tab.url, !url.isLocal, !url.isReaderModeURL else { return }
+       
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
         
@@ -517,7 +518,10 @@ extension BrowserViewController: ToolbarDelegate {
     
     func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol) {
         let selectedTabURL: URL? = {
-            guard let url = tabManager.selectedTab?.url, !url.isLocal || url.isReaderModeURL else { return nil }
+            guard let url = tabManager.selectedTab?.url else { return nil}
+            
+            if (InternalURL.isValid(url: url) || url.isLocal) && !url.isReaderModeURL { return nil }
+            
             return url
         }()
         var activities: [UIActivity] = []
