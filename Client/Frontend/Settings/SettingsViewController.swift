@@ -114,6 +114,7 @@ class SettingsViewController: TableViewController {
     
     private var sections: [Static.Section] {
         var list = [
+            defaultBrowserSection,
             featuresSection,
             generalSection,
             displaySection,
@@ -167,6 +168,21 @@ class SettingsViewController: TableViewController {
         header.bounds = CGRect(size: calculatedSize)
         
         return Static.Section(header: .view(header))
+    }()
+    
+    private lazy var defaultBrowserSection: Static.Section = {
+        var section = Static.Section(
+            rows: [
+                .init(text: Strings.setDefaultBrowserSettingsCell, selection: { [unowned self] in
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                        return
+                    }
+                    UIApplication.shared.open(settingsUrl)
+                }, cellClass: MultilineButtonCell.self)
+            ]
+        )
+        
+        return section
     }()
     
     private lazy var featuresSection: Static.Section = {
@@ -273,15 +289,6 @@ class SettingsViewController: TableViewController {
                      option: Preferences.General.mediaAutoPlays,
                      image: #imageLiteral(resourceName: "settings-autoplay").template)
         ])
-        
-        if AppConstants.iOSVersionGreaterThanOrEqual(to: 14) && AppConstants.buildChannel == .release {
-            general.rows.append(.init(text: Strings.setDefaultBrowserSettingsCell, selection: { [unowned self] in
-                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                    return
-                }
-                UIApplication.shared.open(settingsUrl)
-            }, cellClass: MultilineButtonCell.self))
-        }
 
         return general
     }()
