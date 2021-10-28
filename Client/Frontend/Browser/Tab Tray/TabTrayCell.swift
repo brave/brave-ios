@@ -47,7 +47,11 @@ class TabCell: UICollectionViewCell {
         if !tab.displayTitle.isEmpty {
             accessibilityLabel = tab.displayTitle
         } else {
-            accessibilityLabel = tab.url?.aboutComponent ?? "" // If there is no title we are most likely on a home panel.
+            if let url = tab.url {
+                accessibilityLabel = InternalURL(url)?.aboutComponent ?? ""
+            } else {
+                accessibilityLabel = ""
+            }
         }
         isAccessibilityElement = true
         accessibilityHint = Strings.tabTrayCellCloseAccessibilityHint
