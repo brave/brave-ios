@@ -18,9 +18,7 @@ struct SendTokenView: View {
   @State private var sendAddress = ""
   @State private var isShowingScanner = false
   
-  @ScaledMetric var length: CGFloat = 16.0
-  @ScaledMetric var recentCircleLength: CGFloat = 24.0
-  @ScaledMetric var recentIconLength: CGFloat = 14.0
+  @ScaledMetric private var length: CGFloat = 16.0
   
   var body: some View {
     NavigationView {
@@ -81,12 +79,17 @@ struct SendTokenView: View {
         ) {
           HStack(spacing: 14.0) {
             TextField(Strings.Wallet.sendCryptoAddressPlaceholder, text: $sendAddress)
-            Button(action: {}) {
+            Button(action: {
+              if let string = UIPasteboard.general.string {
+                sendAddress = string
+              }
+            }) {
               Image("brave.clipboard")
                 .renderingMode(.template)
                 .foregroundColor(Color(.primaryButtonTint))
                 .font(.body)
             }
+            .buttonStyle(PlainButtonStyle())
             Button(action: {
               isShowingScanner = true
             }) {
@@ -95,34 +98,10 @@ struct SendTokenView: View {
                 .foregroundColor(Color(.primaryButtonTint))
                 .font(.body)
             }
+            .buttonStyle(PlainButtonStyle())
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        /*
-         * TODO: Will bring this section back when we know what to do with `recent`
-         *
-        Section(
-          header: WalletListHeaderView(title: Text("Recent"))
-        ) {
-          HStack {
-            ZStack {
-              Circle()
-                .frame(width: recentCircleLength, height: recentCircleLength)
-                .foregroundColor(Color(.secondaryButtonTint))
-              Image("menu-crypto")
-                .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: recentIconLength, height: recentIconLength)
-                .foregroundColor(Color(.primaryButtonTint))
-            }
-            Text("bc1qaq...mafs4e")
-              .font(.body)
-              .foregroundColor(Color(.braveLabel))
-          }
-        }
-        .listRowBackground(Color(.clear))
-        */
         Section(
           header:
             Button(action: {}) {
