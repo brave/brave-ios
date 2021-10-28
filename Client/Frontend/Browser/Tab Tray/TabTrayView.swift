@@ -106,6 +106,7 @@ extension TabTrayController2 {
                 $0.addStackViewItems(
                     .view(privateModeInfo),
                     .view(collectionView),
+                    .customSpace(4),
                     .view(buttonsStackView))
                 $0.isAccessibilityElement = false
             }

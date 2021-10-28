@@ -85,6 +85,24 @@ class TabTrayController2: UIViewController {
         }
     }
     
+    private var initialScrollCompleted = false
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // When user opens the tray for the first time, we scroll the collection view to selected tab.
+        if initialScrollCompleted { return }
+        
+        if let selectedTab = tabManager.selectedTab,
+            let selectedIndexPath = dataSource.indexPath(for: selectedTab) {
+            DispatchQueue.main.async {
+                self.tabTrayView.collectionView.scrollToItem(at: selectedIndexPath, at: .centeredVertically, animated: false)
+            }
+            
+            initialScrollCompleted = true
+        }
+    }
+    
     // MARK: Snapshot handling
     
     private func applySnapshot() {
