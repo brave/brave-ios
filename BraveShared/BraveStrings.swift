@@ -763,6 +763,7 @@ extension Strings {
     public static let downloadsMenuItem = NSLocalizedString("DownloadsMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloads", comment: "Title for downloads menu item")
     public static let downloadsPanelEmptyStateTitle = NSLocalizedString("DownloadsPanelEmptyStateTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloaded files will show up here.", comment: "Title for when a user has nothing downloaded onto their device, and the list is empty.")
     public static let playlistMenuItem = NSLocalizedString("PlaylistMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Playlist", comment: "Playlist menu item")
+    public static let privacyFeaturesMenuSectionTitle = NSLocalizedString("PrivacyFeaturesMenuSectionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Privacy Features", comment: "Privacy Features Section title")
     
     // MARK: - Themes
     

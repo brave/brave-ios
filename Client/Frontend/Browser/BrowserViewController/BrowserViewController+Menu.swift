@@ -29,24 +29,44 @@ extension BrowserViewController {
         }
     }
     
-    func destinationMenuSection(_ menuController: MenuViewController) -> some View {
-        VStack(spacing: 0) {
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
-                let vc = BookmarksViewController(folder: self.bookmarkManager.lastVisitedFolder(), bookmarkManager: self.bookmarkManager, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-                vc.toolbarUrlActionsDelegate = self
-                menuController.presentInnerMenu(vc)
-            }
+    func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Spacer(minLength: 15.0)
+            
+            Text(verbatim: Strings.privacyFeaturesMenuSectionTitle.uppercased())
+                .font(.body)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .foregroundColor(Color(.braveLabel)
+            ).padding(.horizontal, 14)
+                        
+            VPNMenuButton(
+                vpnProductInfo: self.vpnProductInfo,
+                displayVPNDestination: { [unowned self] vc in
+                    (self.presentedViewController as? MenuViewController)?
+                        .pushInnerMenu(vc)
+                },
+                enableInstalledVPN: { [unowned menuController] in
+                    /// Donate Enable VPN Activity for suggestions
+                    let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+                    menuController.userActivity = enableVPNActivity
+                    enableVPNActivity.becomeCurrent()
+                }
+            )
+            
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-brave-talk").template, title: "Brave Talk") { [weak self] in
+                guard let self = self else { return }
 
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: historyAPI)
-                vc.toolbarUrlActionsDelegate = self
-                menuController.pushInnerMenu(vc)
+                // TODO: Open Brave Talk
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned self, unowned menuController] in
-                let vc = DownloadsPanel(profile: self.profile)
-                menuController.pushInnerMenu(vc)
+            
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu_brave_news").template, title: "Brave News") { [weak self] in
+                guard let self = self else { return }
+
+                // TODO: Scroll Brave News
             }
-            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) { [weak self] in
+            
+            MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: "Brave Playlist") { [weak self] in
                 guard let self = self else { return }
 
                 // Present existing playlist controller
@@ -64,6 +84,50 @@ extension BrowserViewController {
                         
                         self.dismiss(animated: true) {
                             self.present(playlistController, animated: true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {
+        VStack(spacing: 0) {
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
+                let vc = BookmarksViewController(folder: self.bookmarkManager.lastVisitedFolder(), bookmarkManager: self.bookmarkManager, isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                vc.toolbarUrlActionsDelegate = self
+                menuController.presentInnerMenu(vc)
+            }
+
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
+                let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: historyAPI)
+                vc.toolbarUrlActionsDelegate = self
+                menuController.pushInnerMenu(vc)
+            }
+            MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned self, unowned menuController] in
+                let vc = DownloadsPanel(profile: self.profile)
+                menuController.pushInnerMenu(vc)
+            }
+            if isShownOnWebPage {
+                MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) { [weak self] in
+                    guard let self = self else { return }
+
+                    // Present existing playlist controller
+                    if let playlistController = PlaylistCarplayManager.shared.playlistController {
+                        self.dismiss(animated: true) {
+                            self.present(playlistController, animated: true)
+                        }
+                    } else {
+                        // Retrieve the item and offset-time from the current tab's webview.
+                        let tab = self.tabManager.selectedTab
+                        PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
+                            guard let self = self else { return }
+                            
+                            playlistController.modalPresentationStyle = .fullScreen
+                            
+                            self.dismiss(animated: true) {
+                                self.present(playlistController, animated: true)
+                            }
                         }
                     }
                 }
