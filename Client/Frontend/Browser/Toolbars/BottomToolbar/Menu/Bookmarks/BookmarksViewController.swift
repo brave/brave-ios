@@ -65,7 +65,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         return items
     }
     
-    private var isLoading: Bool = false {
+    private var isLoading = false {
         didSet {
             if isLoading {
                 view.addSubview(spinner)
@@ -84,7 +84,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     
     private weak var addBookmarksFolderOkAction: UIAlertAction?
     
-    private var isEditingIndividualBookmark: Bool = false
+    private var isEditingIndividualBookmark = false
     
     private var currentFolder: Bookmarkv2?
     
@@ -99,11 +99,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private var documentInteractionController: UIDocumentInteractionController?
     
     private var searchBookmarksTimer: Timer?
-    private var isBookmarksBeingSearched: Bool = false
+    private var isBookmarksBeingSearched = false
     private let bookmarksSearchController = UISearchController(searchResultsController: nil)
     private var bookmarksSearchQuery = ""
     private var searchBookmarkList: [Bookmarkv2] = []
-    private lazy var noSearchResultOverlayView: UIView = createNoSearchResultOverlayView()
+    private lazy var noSearchResultOverlayView = createNoSearchResultOverlayView()
 
     // MARK: Lifecycle
     
@@ -169,7 +169,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             $0.searchBar.autocapitalizationType = .none
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
-            $0.searchBar.placeholder = "Search Bookmarks"
+            $0.searchBar.placeholder = Strings.searchBookmarksTitle
             $0.delegate = self
             $0.hidesNavigationBarDuringPresentation = true
         }
@@ -240,7 +240,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         let welcomeLabel = UILabel().then {
-            $0.text = "No search results found."
+            $0.text = Strings.noSearchResultsfound
             $0.textAlignment = .center
             $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
             $0.textColor = .braveLabel
