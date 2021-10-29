@@ -6,6 +6,7 @@
 import Foundation
 import SwiftUI
 import BraveUI
+import BraveShared
 import Shared
 import Data
 
@@ -34,7 +35,7 @@ extension BrowserViewController {
             Spacer(minLength: 15.0)
             
             Text(verbatim: Strings.privacyFeaturesMenuSectionTitle.uppercased())
-                .font(.body)
+                .font(.callout)
                 .fontWeight(.semibold)
                 .lineLimit(1)
                 .foregroundColor(Color(.braveLabel)
@@ -54,16 +55,26 @@ extension BrowserViewController {
                 }
             )
             
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu-brave-talk").template, title: "Brave Talk") { [weak self] in
-                guard let self = self else { return }
+            // Add Brave Talk and News options only in normal browsing
+            if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+                MenuItemButton(icon: #imageLiteral(resourceName: "menu-brave-talk").template, title: "Brave Talk") { [weak self] in
+                    guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
+                    
+                    self.popToBVC()
+                    self.finishEditingAndSubmit(url, visitType: .typed)
+                }
+                
+                // Show Brave News if it is first launch and after first launch If the new is enabled
+                if Preferences.General.isFirstLaunch.value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
+                    MenuItemButton(icon: #imageLiteral(resourceName: "menu_brave_news").template, title: "Brave News") { [weak self] in
+                        guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController  else {
+                            return
+                        }
 
-                // TODO: Open Brave Talk
-            }
-            
-            MenuItemButton(icon: #imageLiteral(resourceName: "menu_brave_news").template, title: "Brave News") { [weak self] in
-                guard let self = self else { return }
-
-                // TODO: Scroll Brave News
+                        self.popToBVC()
+                        newTabPageController.scrollToBraveNews()
+                    }
+                }
             }
             
             MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: "Brave Playlist") { [weak self] in
