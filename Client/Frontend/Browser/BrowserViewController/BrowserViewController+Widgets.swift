@@ -17,14 +17,14 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
         try? frc.performFetch()
         if let favs = frc.fetchedObjects {
             let group = DispatchGroup()
-            var favData: [WidgetFavorite] = []
-            favs.prefix(16).forEach { fav in
+            var favData: [Int: WidgetFavorite] = [:]
+            for (index, fav) in favs.prefix(16).enumerated() {
                 if let url = fav.url?.asURL {
                     group.enter()
                     let fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon)
                     widgetFaviconFetchers.append(fetcher)
                     fetcher.load { _, attributes in
-                        favData.append(.init(url: url, favicon: attributes, order: Int(fav.order)))
+                        favData[index] = .init(url: url, favicon: attributes)
                         group.leave()
                     }
                 }
@@ -32,7 +32,15 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
             
             group.notify(queue: .main) { [self] in
                 widgetFaviconFetchers.removeAll()
-                FavoritesWidgetData.updateWidgetData(favData)
+                // While we get favorites from the database in correct order,
+                // filling it with favicon data is an async operation.
+                // To preserve favorites order
+                // we add index number to each item then use it to sort it back.
+                let sortedData = favData
+                    .sorted { $0.key < $1.key }
+                    .map { $0.value }
+                
+                FavoritesWidgetData.updateWidgetData(sortedData)
             }
         }
     }

@@ -54,14 +54,12 @@ private struct FaviconImage: View {
     }
     
     var body: some View {
-        GeometryReader {
-            Image(uiImage: image)
-                .resizable()
-                .frame(height: $0.size.width)
-        }
-        .clipped()
-        .aspectRatio(1, contentMode: .fit)
-        .padding(usePadding ? 8 : 0)
+        Image(uiImage: image)
+            .resizable()
+            .aspectRatio(1, contentMode: .fit)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+            .padding(usePadding ? 8 : 0)
     }
 }
 
@@ -120,10 +118,6 @@ private struct FavoritesGridView: View {
         RoundedRectangle(cornerRadius: widgetFamily == .systemMedium ? 16 : 12, style: .continuous)
     }
     
-    var favorites: [WidgetFavorite] {
-        entry.favorites.sorted { $0.order < $1.order }
-    }
-    
     var emptyField: some View {
         itemShape
             .fill(.clear)
@@ -135,10 +129,18 @@ private struct FavoritesGridView: View {
             .aspectRatio(1.0, contentMode: .fit)
     }
     
+    private var placeholderOrPrivacyRedaction: Bool {
+        if #available(iOS 15, *) {
+            return redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
+        } else {
+            return redactionReasons.contains(.placeholder)
+        }
+    }
+    
     var body: some View {
         LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4), spacing: 8) {
             ForEach((0..<itemsCount)) {
-                if let favorite = favorites[safe: $0], redactionReasons != .placeholder {
+                if let favorite = entry.favorites[safe: $0], !placeholderOrPrivacyRedaction {
                     Link(destination: favorite.url, label: {
                         Group {
                             if let attributes = favorite.favicon, let image = attributes.image {

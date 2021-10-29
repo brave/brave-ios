@@ -51,6 +51,14 @@ private struct StatsView: View {
     @ScaledMetric private var fontSize = 32.0
     @Environment(\.redactionReasons) var redactionReasons
     
+    private var placeholderOrPrivacyRedaction: Bool {
+        if #available(iOS 15, *) {
+            return redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
+        } else {
+            return redactionReasons.contains(.placeholder)
+        }
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -71,7 +79,7 @@ private struct StatsView: View {
                     Color.clear
                         .overlay(
                             VStack(spacing: 4) {
-                                Text(verbatim: redactionReasons == .placeholder ? "-" : data.value)
+                                Text(verbatim: placeholderOrPrivacyRedaction ? "-" : data.value)
                                     .font(.system(size: fontSize))
                                     .foregroundColor(Color(data.color))
                                     .multilineTextAlignment(.center)
