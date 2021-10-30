@@ -7,7 +7,7 @@ import Foundation
 import Shared
 import BraveShared
 
-extension TabTrayController2 {
+extension TabTrayController {
     class TabTrayPrivateModeInfoView: UIView {
         private struct UX {
             static let titleColor = UIColor.braveLabel

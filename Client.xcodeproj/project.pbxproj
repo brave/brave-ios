@@ -674,7 +674,7 @@
 		44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */; };
 		4433E15526B996C20023A134 /* BraveTalkRewardsOptInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4433E15426B996C20023A134 /* BraveTalkRewardsOptInViewController.swift */; };
 		4433E15726B999B40023A134 /* BraveTalkRewardsOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4433E15626B999B40023A134 /* BraveTalkRewardsOptInView.swift */; };
-		44514A5F269745FD004CBF73 /* TabTrayController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A5E269745FD004CBF73 /* TabTrayController2.swift */; };
+		44514A5F269745FD004CBF73 /* TabTrayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A5E269745FD004CBF73 /* TabTrayController.swift */; };
 		44514A6C26974917004CBF73 /* TabTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A6B26974917004CBF73 /* TabTrayView.swift */; };
 		4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */; };
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
@@ -2251,7 +2251,7 @@
 		44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsDelegate.swift; sourceTree = "<group>"; };
 		4433E15426B996C20023A134 /* BraveTalkRewardsOptInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkRewardsOptInViewController.swift; sourceTree = "<group>"; };
 		4433E15626B999B40023A134 /* BraveTalkRewardsOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkRewardsOptInView.swift; sourceTree = "<group>"; };
-		44514A5E269745FD004CBF73 /* TabTrayController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayController2.swift; sourceTree = "<group>"; };
+		44514A5E269745FD004CBF73 /* TabTrayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayController.swift; sourceTree = "<group>"; };
 		44514A6B26974917004CBF73 /* TabTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayView.swift; sourceTree = "<group>"; };
 		4452CA392552FC7F0053EFE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4452CA3A2552FD360053EFE6 /* build_in_core.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_in_core.sh; sourceTree = "<group>"; };
@@ -4068,7 +4068,7 @@
 			children = (
 				396CDB54203C5B870034A3A3 /* TabTrayController+KeyCommands.swift */,
 				27DCB9EB263764EF0067EF4A /* TabTrayCell.swift */,
-				44514A5E269745FD004CBF73 /* TabTrayController2.swift */,
+				44514A5E269745FD004CBF73 /* TabTrayController.swift */,
 				44514A6B26974917004CBF73 /* TabTrayView.swift */,
 				44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */,
 			);
@@ -7503,7 +7503,7 @@
 				44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */,
 				0A1E84422190A57F0042F782 /* SyncPairCameraViewController.swift in Sources */,
 				27C647A62551F082006D72FC /* RewardsDebugSettingsViewController.swift in Sources */,
-				44514A5F269745FD004CBF73 /* TabTrayController2.swift in Sources */,
+				44514A5F269745FD004CBF73 /* TabTrayController.swift in Sources */,
 				27829E752549FF13007CF0B2 /* WalletTransferViewController.swift in Sources */,
 				2760056625D1FFF500D47A75 /* AddFeedToBraveNewsActivity.swift in Sources */,
 				44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */,

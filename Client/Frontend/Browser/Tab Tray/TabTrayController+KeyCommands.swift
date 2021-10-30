@@ -5,7 +5,7 @@
 import Shared
 import UIKit
 
-extension TabTrayController2 {
+extension TabTrayController {
     override var keyCommands: [UIKeyCommand]? {
         let toggleText = privateMode ? Strings.switchToNonPBMKeyCodeTitle: Strings.switchToPBMKeyCodeTitle
         

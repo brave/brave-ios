@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import BraveUI
 
-extension TabTrayController2 {
+extension TabTrayController {
     
     class View: UIView {
         private struct UX {
