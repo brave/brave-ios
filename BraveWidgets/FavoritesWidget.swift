@@ -150,6 +150,7 @@ private struct FavoritesGridView: View {
                                 Text(verbatim: favorite.url.baseDomain?.first?.uppercased() ?? "")
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .font(.system(size: 36))
+                                    .aspectRatio(1.0, contentMode: .fit)
                                     .background(Color(UIColor.braveBackground))
                                     .foregroundColor(Color(UIColor.braveLabel))
                             }
