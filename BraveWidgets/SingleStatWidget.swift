@@ -32,7 +32,7 @@ private struct StatProvider: IntentTimelineProvider {
     typealias Entry = StatEntry
     
     func placeholder(in context: Context) -> Entry {
-        StatEntry(date: Date(), statData: .init(name: "Placeholder Count", value: "100k"))
+        StatEntry(date: Date(), statData: .init(name: Strings.shieldsAdAndTrackerStats, value: "100k"))
     }
     func getSnapshot(for configuration: Intent, in context: Context, completion: @escaping (Entry) -> Void) {
         let stat = configuration.statKind

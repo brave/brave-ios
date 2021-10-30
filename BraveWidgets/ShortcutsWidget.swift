@@ -44,7 +44,8 @@ private struct ShortcutProvider: IntentTimelineProvider {
     }
     
     func placeholder(in context: Context) -> ShortcutEntry {
-        .init(date: Date(), shortcutSlots: [.playlist, .newPrivateTab, .bookmarks])
+        .init(date: Date(),
+              shortcutSlots: context.isPreview ? [] : [.playlist, .newPrivateTab, .bookmarks])
     }
     
     func getTimeline(for configuration: Intent, in context: Context,
