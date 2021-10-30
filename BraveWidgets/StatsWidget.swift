@@ -48,7 +48,6 @@ private struct StatsProvider: TimelineProvider {
 
 private struct StatsView: View {
     var entry: StatsEntry
-    @ScaledMetric private var fontSize = 32.0
     @Environment(\.redactionReasons) var redactionReasons
     
     private var placeholderOrPrivacyRedaction: Bool {
@@ -80,7 +79,7 @@ private struct StatsView: View {
                         .overlay(
                             VStack(spacing: 4) {
                                 Text(verbatim: placeholderOrPrivacyRedaction ? "-" : data.value)
-                                    .font(.system(size: fontSize))
+                                    .font(.system(size: 32.0))
                                     .foregroundColor(Color(data.color))
                                     .multilineTextAlignment(.center)
                                     .minimumScaleFactor(0.5)

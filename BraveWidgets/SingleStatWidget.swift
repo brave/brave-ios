@@ -50,8 +50,6 @@ private struct StatProvider: IntentTimelineProvider {
 private struct StatView: View {
     var entry: StatEntry
     
-    @ScaledMetric private var fontSize = 40.0
-    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -64,10 +62,10 @@ private struct StatView: View {
             }
             Spacer()
             Text(verbatim: entry.statData.value)
-                .font(.system(size: fontSize))
+                .font(.system(size: 40))
                 .foregroundColor(Color(entry.statData.color))
             Text(verbatim: entry.statData.name)
-                .font(.caption)
+                .font(.system(size: 17))
                 .bold()
                 .fixedSize(horizontal: false, vertical: true)
                 .unredacted()

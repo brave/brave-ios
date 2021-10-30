@@ -151,6 +151,7 @@ private struct FavoritesGridView: View {
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .font(.system(size: 36))
                                     .aspectRatio(1.0, contentMode: .fit)
+                                    .clipped()
                                     .background(Color(UIColor.braveBackground))
                                     .foregroundColor(Color(UIColor.braveLabel))
                             }
@@ -161,6 +162,7 @@ private struct FavoritesGridView: View {
                             itemShape
                                 .strokeBorder(Color(UIColor.braveSeparator).opacity(0.1), lineWidth: pixelLength)
                         )
+                        .padding(widgetFamily == .systemMedium ? 4 : 0)
                     })
                 } else {
                     emptyField
