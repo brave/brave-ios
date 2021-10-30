@@ -80,7 +80,12 @@ class BrowserNavigationHelper {
     
     func openSettings() {
         guard let bvc = bvc else { return }
-        let vc = SettingsViewController(profile: bvc.profile, tabManager: bvc.tabManager, feedDataSource: bvc.feedDataSource, rewards: bvc.rewards, historyAPI: bvc.historyAPI)
+        let vc = SettingsViewController(profile: bvc.profile,
+                                        tabManager: bvc.tabManager,
+                                        feedDataSource: bvc.feedDataSource,
+                                        rewards: bvc.rewards,
+                                        historyAPI: bvc.historyAPI,
+                                        windowProtection: bvc.windowProtection)
         vc.settingsDelegate = bvc
         open(vc, doneButton: DoneButton(style: .done, position: .right),
              allowSwipeToDismiss: false)
