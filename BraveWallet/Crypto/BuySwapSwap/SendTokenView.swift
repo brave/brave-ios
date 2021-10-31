@@ -17,8 +17,17 @@ struct SendTokenView: View {
   @State private var amountInput = ""
   @State private var sendAddress = ""
   @State private var isShowingScanner = false
+  @State private var isShowingError = false
   
   @ScaledMetric private var length: CGFloat = 16.0
+  
+  private var disableSend: Bool {
+    guard let sendAmount = Double(amountInput), let balance = sendTokenStore.selectedSendTokenBalance else {
+      return true
+    }
+    
+    return sendAmount > balance || sendAddress.isEmpty
+  }
   
   var body: some View {
     NavigationView {
@@ -46,7 +55,7 @@ struct SendTokenView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Spacer()
-              Text(sendTokenStore.selectedSendTokenBalance ?? "")
+              Text(String(format: "%.04f", sendTokenStore.selectedSendTokenBalance ?? 0))
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
             }
@@ -62,7 +71,7 @@ struct SendTokenView: View {
                         )
             ),
           footer: ShortcutAmountGrid(action: { amount in
-            // TODO: compute using `sendTokenStore.selectedSendTokenBalance` and `amount` if there is one and update `amountInput`
+            amountInput = "\((sendTokenStore.selectedSendTokenBalance ?? 0) * amount.rawValue)"
           })
           .listRowInsets(.zero)
           .padding(.bottom, 8)
@@ -71,6 +80,15 @@ struct SendTokenView: View {
                                                      sendTokenStore.selectedSendToken?.symbol ?? ""),
                     text: $amountInput
           )
+            .onChange(of: amountInput, perform: { value in
+              guard let token = sendTokenStore.selectedSendToken else { return }
+              // will ignore if input is not a decimal number
+              if let decimal = Decimal(string: value), -decimal.exponent > 0 {
+                if -decimal.exponent > Int(token.decimals) {
+                  self.amountInput = String(value.prefix(Int(token.decimals) + 2))
+                }
+              }
+            })
             .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -104,16 +122,30 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header:
-            Button(action: {}) {
-              Text(Strings.Wallet.sendCryptoPreviewButtonTitle)
+            Button(action: {
+              sendTokenStore.sendToken(account: keyringStore.selectedAccount,
+                                       to: sendAddress,
+                                       amount: amountInput) { success in
+                isShowingError = !success
+              }
+            }) {
+              Text(Strings.Wallet.sendCryptoSendButtonTitle)
             }
             .buttonStyle(BraveFilledButtonStyle(size: .normal))
+            .disabled(disableSend)
             .frame(maxWidth: .infinity)
             .resetListHeaderStyle()
             .listRowBackground(Color(.clear))
         ) {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      }
+      .alert(isPresented: $isShowingError) {
+        Alert(
+          title: Text(""),
+          message: Text(Strings.Wallet.sendCryptoSendError),
+          dismissButton: .cancel(Text( Strings.OKString))
+        )
       }
       .sheet(isPresented: $isShowingScanner) {
         AddressQRCodeScannerView(address: $sendAddress)
