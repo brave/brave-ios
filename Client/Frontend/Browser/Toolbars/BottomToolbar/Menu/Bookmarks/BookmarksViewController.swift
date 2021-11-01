@@ -326,10 +326,17 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began,
               let cell = gesture.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: cell),
-              let bookmark = bookmarksFRC?.object(at: indexPath) else {
+              let indexPath = tableView.indexPath(for: cell) else {
             return
         }
+                
+        var fetchedBookmarkItem: Bookmarkv2?
+        if isBookmarksBeingSearched {
+            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
+        } else {
+            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+        }
+        guard let bookmark = fetchedBookmarkItem else { return }
         
         presentLongPressActions(gesture, urlString: bookmark.url, isPrivateBrowsing: isPrivateBrowsing,
                                 customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
@@ -920,7 +927,7 @@ extension BookmarksViewController: UISearchControllerDelegate {
     func willDismissSearchController(_ searchController: UISearchController) {
         isBookmarksBeingSearched = false
         updateEmptyPanelState()
-        tableView.reloadData()
+        reloadData()
         
         // Re-enable bottom var options when search is done
         navigationController?.setToolbarHidden(false, animated: true)
