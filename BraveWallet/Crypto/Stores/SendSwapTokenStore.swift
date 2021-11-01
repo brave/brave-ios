@@ -6,12 +6,12 @@
 import Foundation
 import BraveCore
 
-/// A store contains data for buying tokens
-public class SendTokenStore: ObservableObject {
+/// A store contains data for sending/swapping tokens
+public class SendSwapTokenStore: ObservableObject {
   /// User's asset with selected account and chain
   @Published var userAssets: [BraveWallet.ERCToken] = []
   /// The current selected token to send. Default with nil value.
-  @Published var selectedSendToken: BraveWallet.ERCToken? {
+  @Published var selectedFromToken: BraveWallet.ERCToken? {
     didSet {
       fetchAssetBalance()
     }
@@ -44,21 +44,21 @@ public class SendTokenStore: ObservableObject {
       walletService.userAssets(chainId) { tokens in
         userAssets = tokens
         
-        if let selectedToken = selectedSendToken {
+        if let selectedToken = selectedFromToken {
           if tokens.isEmpty {
-            selectedSendToken = nil
+            selectedFromToken = nil
           } else if let token = tokens.first(where: { $0.id == selectedToken.id }) {
-            selectedSendToken = token
+            selectedFromToken = token
           }
         } else {
-          selectedSendToken = tokens.first
+          selectedFromToken = tokens.first
         }
       }
     }
   }
   
   private func fetchAssetBalance() {
-    guard let token = selectedSendToken else {
+    guard let token = selectedFromToken else {
       selectedSendTokenBalance = nil
       return
     }
@@ -160,7 +160,7 @@ public class SendTokenStore: ObservableObject {
   }
 }
 
-extension SendTokenStore: BraveWalletKeyringControllerObserver {
+extension SendSwapTokenStore: BraveWalletKeyringControllerObserver {
   public func keyringCreated() {
   }
   
@@ -187,7 +187,7 @@ extension SendTokenStore: BraveWalletKeyringControllerObserver {
   }
 }
 
-extension SendTokenStore: BraveWalletEthJsonRpcControllerObserver {
+extension SendSwapTokenStore: BraveWalletEthJsonRpcControllerObserver {
   public func chainChangedEvent(_ chainId: String) {
     fetchAssets()
   }

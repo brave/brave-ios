@@ -62,6 +62,32 @@ struct ShortcutAmountGrid: View {
   }
 }
 
+struct MarketPriceView: View {
+  @Binding var marketPrice: Double
+  
+  var refresh: () -> Void
+  
+  var body: some View {
+    HStack {
+      VStack(alignment: .leading) {
+        Text("Market Price in ETH")
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .font(.subheadline)
+        Text("0.0005841")
+          .font(.title3.weight(.semibold))
+      }
+      Spacer()
+      Button(action: { refresh() }) {
+        Image("wallet-refresh")
+          .renderingMode(.template)
+          .foregroundColor(Color(.braveLighterBlurple))
+          .font(.title3)
+      }
+      .buttonStyle(.plain)
+    }
+  }
+}
+
 struct SwapCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var ethNetworkStore: NetworkStore
@@ -153,10 +179,65 @@ struct SwapCryptoView: View {
           }
             .pickerStyle(SegmentedPickerStyle())
             .resetListHeaderStyle()
+            .padding(.bottom, 15)
             .listRowBackground(Color(.clear))
         ) {
+          VStack(alignment: .leading) {
+            if orderType == .market {
+              MarketPriceView(marketPrice: Binding(projectedValue: .constant(0.0005841)), refresh: {
+                // refresh
+              })
+                .listRowBackground(Color.clear)
+                .padding(.leading, -16)
+                .padding(.trailing, -10)
+                .padding(.bottom, 10)
+            } else {
+              TextField("Limit price in ETH", text: .constant(""))
+                .padding(.vertical, 12)
+                .background(
+                  RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color(.secondaryBraveGroupedBackground))
+                    .padding(.horizontal, -20)
+                )
+                .padding(.bottom, 10)
+            }
+            NavigationLink(destination: EmptyView()) {
+              if orderType == .market {
+                HStack {
+                  Text("Slippage tolerance")
+                  Spacer()
+                  Text("2%")
+                    .foregroundColor(Color(.secondaryBraveLabel))
+                    .fontWeight(.semibold)
+                }
+              } else {
+                HStack {
+                  Text("Expires in")
+                  Spacer()
+                  Text("7 days")
+                    .foregroundColor(Color(.secondaryBraveLabel))
+                }
+              }
+            }
+            .padding(.vertical, 12)
+            .background(
+              RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(.secondaryBraveGroupedBackground))
+                .padding(.horizontal, -20)
+            )
+          }
         }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+        .listRowBackground(Color.clear)
+        Section(
+          header:
+            Button(action: {}) {
+              Text("Swap")
+            }
+            .buttonStyle(BraveFilledButtonStyle(size: .normal))
+            .frame(maxWidth: .infinity)
+            .resetListHeaderStyle()
+        ) {
+        }
       }
       .navigationTitle(Strings.Wallet.swap)
       .navigationBarTitleDisplayMode(.inline)

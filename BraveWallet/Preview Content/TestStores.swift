@@ -50,8 +50,8 @@ extension BuyTokenStore {
   }
 }
 
-extension SendTokenStore {
-  static var previewStore: SendTokenStore {
+extension SendSwapTokenStore {
+  static var previewStore: SendSwapTokenStore {
     .init(
       keyringController: TestKeyringController(),
       rpcController: TestEthJsonRpcController(),
