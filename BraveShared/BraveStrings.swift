@@ -3099,7 +3099,7 @@ extension Strings {
         public static let favoritesWidgetDescription = NSLocalizedString(
             "widgets.favoritesWidgetDescription",
             bundle: .braveShared,
-            value: "Your favorite sites",
+            value: "Quickly access your favorite websites.",
             comment: "Description for favorites widget on 'add widget' screen.")
         
         public static let shortcutsWidgetTitle = NSLocalizedString(
@@ -3111,7 +3111,7 @@ extension Strings {
         public static let shortcutsWidgetDescription = NSLocalizedString(
             "widgets.shortcutsWidgetDescription",
             bundle: .braveShared,
-            value: "TBA",
+            value: "Quick access to search the web or open web pages in Brave.",
             comment: "Description for shortcuts widget on 'add widget' screen.")
         
         public static let shortcutsNewTabButton = NSLocalizedString(
@@ -3147,7 +3147,7 @@ extension Strings {
         public static let shieldStatsDescription = NSLocalizedString(
             "widgets.shieldStatsDescription",
             bundle: .braveShared,
-            value: "Displays all privacy stats",
+            value: "A summary of how Brave saves you time and protects you online.",
             comment: "Description for Brave Shields widget on 'add widget' screen.")
         
         public static let shieldStatsWidgetTitle = NSLocalizedString(
@@ -3165,7 +3165,7 @@ extension Strings {
         public static let singleStatDescription = NSLocalizedString(
             "widgets.singleStatDescription",
             bundle: .braveShared,
-            value: "Privacy Stat",
+            value: "A summary of how Brave has protected you online.",
             comment: "Description for Brave Shields single stat widget on 'add widget' screen.")
     }
 }
