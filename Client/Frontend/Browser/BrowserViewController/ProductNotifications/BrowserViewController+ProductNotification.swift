@@ -100,12 +100,10 @@ extension BrowserViewController {
         }
         
         // Step 2: Share Brave Benchmark Tiers
-        // Benchmark Tier Pop-Over only exist in JP locale
-        if Locale.current.regionCode == "JP" {
-            let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-            guard numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 else { return }
-                
-            let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.value})
+        let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+        if numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 {
+            let existingTierList = BenchmarkTrackerCountTier.allCases.filter {
+                Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.value}
             
             if !existingTierList.isEmpty {
                 guard let firstExistingTier = existingTierList.first else { return }
