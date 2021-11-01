@@ -14,7 +14,6 @@ import Shared
 enum TrackingType: Equatable {
     case trackerCountShare(count: Int, description: String)
     case videoAdBlock
-    case trackerAdCountBlock(count: Int)
     case domainSpecificDataSaved(dataSaved: String)
     
     var title: String {
@@ -23,8 +22,6 @@ enum TrackingType: Equatable {
                 return String(format: Strings.ShieldEducation.trackerCountShareTitle, count)
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockTitle
-            case .trackerAdCountBlock(let count):
-                return String(format: Strings.ShieldEducation.trackerAdCountBlockTitle, count)
             case .domainSpecificDataSaved:
                 return Strings.ShieldEducation.domainSpecificDataSavedTitle
         }
@@ -36,8 +33,6 @@ enum TrackingType: Equatable {
                 return description
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockSubtitle
-            case .trackerAdCountBlock:
-                return Strings.ShieldEducation.trackerAdCountBlockSubtitle
             case .domainSpecificDataSaved(let dataSaved):
                 return String(format: Strings.ShieldEducation.domainSpecificDataSavedSubtitle, dataSaved)
         }

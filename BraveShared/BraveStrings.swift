@@ -976,12 +976,6 @@ extension Strings {
                               value: "Ads are blocked while watching videos on this website.",
                               comment: "Title for Shield Education Tracker Video Ad Block")
         
-        public static let trackerAdCountBlockTitle =
-            NSLocalizedString("shieldEducation.trackerAdCountBlockTitle",
-                              bundle: .braveShared,
-                              value: "%ld+ trackers & ads blocked on this page.",
-                              comment: "Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page")
-        
         public static let trackerCountShareSubtitle =
             NSLocalizedString("shieldEducation.trackerCountShareSubtitle",
                               bundle: .braveShared,
@@ -999,12 +993,6 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Videos without ads use less data.",
                               comment: "Subtitle for Shield Education Tracker Video Ad Block")
-        
-        public static let trackerAdCountBlockSubtitle =
-            NSLocalizedString("shieldEducation.trackerAdCountBlockSubtitle",
-                              bundle: .braveShared,
-                              value: "Brave Shields protects your online privacy on every site.",
-                              comment: "Subtitle for Shield Education Tracker Ad Count Block")
         
         public static let shareTheNewsTitle =
             NSLocalizedString("shieldEducation.shareTheNewsTitle",

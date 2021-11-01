@@ -99,17 +99,7 @@ extension BrowserViewController {
             return
         }
         
-        // Step 2: Pre-determined # of Trackers and Ads Blocked
-        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
-           selectedTab.contentBlocker.stats.total > benchmarkNumberOfTrackers {
-            
-            notifyPrivacyProtectBlock()
-            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
-
-            return
-        }
-        
-        // Step 3: Share Brave Benchmark Tiers
+        // Step 2: Share Brave Benchmark Tiers
         // Benchmark Tier Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
             let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
@@ -128,7 +118,7 @@ extension BrowserViewController {
             }
         }
         
-        // Step 4: Domain Specific Data Saved
+        // Step 3: Domain Specific Data Saved
         // Data Saved Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
             if !benchmarkNotificationPresented,
@@ -151,12 +141,6 @@ extension BrowserViewController {
     private func notifyVideoAdsBlocked() {
         let shareTrackersViewController = ShareTrackersController(trackingType: .videoAdBlock)
         
-        dismiss(animated: true)
-        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
-    }
-    
-    private func notifyPrivacyProtectBlock() {
-        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }

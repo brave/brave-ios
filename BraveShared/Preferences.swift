@@ -83,7 +83,6 @@ extension Preferences {
     }
     
     public final class ProductNotificationBenchmarks {
-        public static let privacyProtectionBlockShown = Option<Bool>(key: "product-benchmark.privacyProtectionBlockShown", default: false)
         public static let videoAdBlockShown = Option<Bool>(key: "product-benchmark.videoAdBlockShown", default: false)
         public static let trackerTierCount = Option<Int>(key: "product-benchmark.trackerTierCount", default: 0)
         public static let showingSpecificDataSavedEnabled = Option<Bool>(key: "product-benchmark.showingSpecificDataSavedEnabled", default: false)
