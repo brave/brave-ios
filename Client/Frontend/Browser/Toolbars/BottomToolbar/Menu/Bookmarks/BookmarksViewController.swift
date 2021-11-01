@@ -639,14 +639,12 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         var fetchedBookmarkItem: Bookmarkv2?
         if isBookmarksBeingSearched {
-            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
+            return true
         } else {
             fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+            return fetchedBookmarkItem?.canBeDeleted ?? false
+
         }
-    
-        guard let item = fetchedBookmarkItem else { return false }
-        
-        return item.canBeDeleted
     }
 }
 
@@ -782,6 +780,11 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
     }
     
     func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController) {
+        if isBookmarksBeingSearched {
+            refreshBookmarkSearchResult(with: bookmarksSearchQuery)
+            return
+        }
+        
         // We're in some sort of invalid state in sync..
         // Somehow this folder was deleted but the user is currently viewing it..
         // Might be a good idea to let the user know in the future that the folder they are currently viewing
