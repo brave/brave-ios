@@ -120,7 +120,7 @@ private struct FavoritesGridView: View {
     
     var emptyField: some View {
         itemShape
-            .fill(.clear)
+            .fill(Color.black.opacity(0.05))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(
                 itemShape
@@ -166,6 +166,7 @@ private struct FavoritesGridView: View {
                     })
                 } else {
                     emptyField
+                        .padding(widgetFamily == .systemMedium ? 4 : 0)
                 }
             }
         }
