@@ -24,6 +24,10 @@ class BookmarkManager {
     // MARK: Internal
     
     public static var rootNodeId: String?
+    
+    public var fetchedSearchObjectsCount: Int {
+        searchBookmarkList.count
+    }
 
     // Returns the last visited folder
     // If no folder was visited, returns the mobile bookmarks folder
@@ -184,18 +188,19 @@ class BookmarkManager {
         })
     }
     
-    public func fetchBookmarks(with query: String = "", completion: @escaping ([Bookmarkv2]) -> Void) {
+    public func fetchBookmarks(with query: String = "", _ completion: @escaping () -> Void) {
         guard let bookmarksAPI = bookmarksAPI else {
-            completion([])
+            self.searchBookmarkList = []
+            completion()
             return
         }
         
-        bookmarksAPI.search(withQuery: query, maxCount: 200, completion: { nodes in
-            var fetchedBookmarks: [Bookmarkv2] = []
-
-            fetchedBookmarks = nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
+        bookmarksAPI.search(withQuery: query, maxCount: 200, completion: { [weak self] nodes in
+            guard let self = self else { return }
             
-            completion(fetchedBookmarks)
+            self.searchBookmarkList = nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
+
+            completion()
         })
     }
     
@@ -278,10 +283,16 @@ class BookmarkManager {
         bookmarkItem.bookmarkFavIconObserver = bookmarksAPI.add(observer)
     }
     
+    public func searchObject(at indexPath: IndexPath) -> Bookmarkv2? {
+        searchBookmarkList[safe: indexPath.row]
+    }
+    
     // MARK: Private
     
     private var observer: BookmarkModelListener?
     private let bookmarksAPI: BraveBookmarksAPI?
+    // The list of bookmarks that are listed in search result
+    private var searchBookmarkList: [Bookmarkv2] = []
     
     private func removeFavIconObserver(_ bookmarkItem: Bookmarkv2) {
         bookmarkItem.bookmarkFavIconObserver = nil

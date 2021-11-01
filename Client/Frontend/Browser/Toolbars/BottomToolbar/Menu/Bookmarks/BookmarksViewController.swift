@@ -102,7 +102,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     private var isBookmarksBeingSearched = false
     private let bookmarksSearchController = UISearchController(searchResultsController: nil)
     private var bookmarksSearchQuery = ""
-    private var searchBookmarkList: [Bookmarkv2] = []
     private lazy var noSearchResultOverlayView = createNoSearchResultOverlayView()
 
     // MARK: Lifecycle
@@ -263,7 +262,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     private func updateEmptyPanelState() {
-        if isBookmarksBeingSearched, searchBookmarkList.count == 0 {
+        if isBookmarksBeingSearched, bookmarkManager.fetchedSearchObjectsCount == 0 {
             showEmptyPanelState()
         } else {
             noSearchResultOverlayView.removeFromSuperview()
@@ -326,18 +325,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began,
               let cell = gesture.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: cell) else {
+              let indexPath = tableView.indexPath(for: cell),
+              let bookmark = fetchBookmarkItem(at: indexPath) else {
             return
         }
-                
-        var fetchedBookmarkItem: Bookmarkv2?
-        if isBookmarksBeingSearched {
-            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
-        } else {
-            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
-        }
-        guard let bookmark = fetchedBookmarkItem else { return }
-        
+                        
         presentLongPressActions(gesture, urlString: bookmark.url, isPrivateBrowsing: isPrivateBrowsing,
                                 customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
     }
@@ -400,15 +392,21 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     private func fetchBookmarks(with query: String, _ completion: @escaping () -> Void) {
-        bookmarkManager.fetchBookmarks(with: query) { [weak self] bookmarks in
+        bookmarkManager.fetchBookmarks(with: query) { [weak self] in
             guard let self = self else { return }
-            
-            self.searchBookmarkList = bookmarks
-            
+                    
             self.tableView.reloadData()
             self.updateEmptyPanelState()
             
             completion()
+        }
+    }
+    
+    private func fetchBookmarkItem(at indexPath: IndexPath) -> Bookmarkv2? {
+        if isBookmarksBeingSearched {
+            return bookmarkManager.searchObject(at: indexPath)
+        } else {
+            return bookmarksFRC?.object(at: indexPath)
         }
     }
     
@@ -452,7 +450,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         var fetchedBookmarkItem: Bookmarkv2?
         
         if isBookmarksBeingSearched {
-            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
+            fetchedBookmarkItem = bookmarkManager.searchObject(at: indexPath)
         } else {
             // Make sure Bookmark at index path exists,
             // `frc.object(at:)` crashes otherwise, doesn't fail safely with nil
@@ -573,15 +571,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         
-        var fetchedBookmarkItem: Bookmarkv2?
-        
-        if isBookmarksBeingSearched {
-            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
-        } else {
-            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
-        }
-        
-        guard let bookmark = fetchedBookmarkItem else { return }
+        guard let bookmark = fetchBookmarkItem(at: indexPath) else { return }
         
         if !bookmark.isFolder {
             if tableView.isEditing {
@@ -622,7 +612,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        isBookmarksBeingSearched ? searchBookmarkList.count : bookmarksFRC?.fetchedObjectsCount ?? 0
+        isBookmarksBeingSearched ? bookmarkManager.fetchedSearchObjectsCount : bookmarksFRC?.fetchedObjectsCount ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -661,14 +651,7 @@ extension BookmarksViewController {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        var fetchedBookmarkItem: Bookmarkv2?
-        if isBookmarksBeingSearched {
-            fetchedBookmarkItem = searchBookmarkList[safe: indexPath.row]
-        } else {
-            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
-        }
-    
-        guard let item = fetchedBookmarkItem, item.canBeDeleted else { return nil }
+        guard let item = fetchBookmarkItem(at: indexPath), item.canBeDeleted else { return nil }
 
         let deleteAction = UIContextualAction(style: .destructive, title: Strings.delete) { [weak self] _, _, completion in
             guard let self = self else {
