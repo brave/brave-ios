@@ -13,7 +13,6 @@ import Shared
  
 enum TrackingType: Equatable {
     case trackerCountShare(count: Int, description: String)
-    case trackerAdWarning
     case videoAdBlock
     case trackerAdCountBlock(count: Int)
     case domainSpecificDataSaved(dataSaved: String)
@@ -22,8 +21,6 @@ enum TrackingType: Equatable {
         switch self {
             case .trackerCountShare(let count, _):
                 return String(format: Strings.ShieldEducation.trackerCountShareTitle, count)
-            case .trackerAdWarning:
-                return Strings.ShieldEducation.trackerAdWarningTitle
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockTitle
             case .trackerAdCountBlock(let count):
@@ -37,8 +34,6 @@ enum TrackingType: Equatable {
         switch self {
             case .trackerCountShare(_, let description):
                 return description
-            case .trackerAdWarning:
-                return Strings.ShieldEducation.trackerAdWarningSubtitle
             case .videoAdBlock:
                 return Strings.ShieldEducation.videoAdBlockSubtitle
             case .trackerAdCountBlock:
@@ -56,7 +51,6 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
     // MARK: Action
     
     enum Action {
-        case takeALookTapped
         case shareTheNewsTapped
         case dontShowAgainTapped
     }
@@ -98,8 +92,6 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
             switch action {
                 case .didShareTheNewsTapped:
                     self.actionHandler?(.shareTheNewsTapped)
-                case .didTakeALookTapped:
-                    self.actionHandler?(.takeALookTapped)
                 case .didDontShowAgainTapped:
                     self.actionHandler?(.dontShowAgainTapped)
             }
@@ -119,14 +111,6 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
         shareTrackersView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
-        if case .trackerAdWarning = trackingType {
-            shareTrackersView.insertSubview(gradientView, at: 0)
-            
-            gradientView.snp.makeConstraints { make in
-                make.edges.equalToSuperview()
-            }
-        }
     }
 }
 
@@ -145,7 +129,6 @@ private class ShareTrackersView: UIView {
     
     enum Action {
         case didShareTheNewsTapped
-        case didTakeALookTapped
         case didDontShowAgainTapped
     }
     
@@ -236,7 +219,7 @@ private class ShareTrackersView: UIView {
         )
         
         switch trackingType {
-            case .trackerCountShare, .trackerAdWarning, .domainSpecificDataSaved:
+            case .trackerCountShare, .domainSpecificDataSaved:
                 stackView.addArrangedSubview(actionButton)
             default:
                 return
@@ -266,8 +249,6 @@ private class ShareTrackersView: UIView {
         subtitleLabel.attributedText = NSAttributedString(string: trackingType.subTitle).withLineSpacing(2)
         
         switch trackingType {
-            case .trackerAdWarning:
-                actionButton.setTitle(Strings.ShieldEducation.educationInspectTitle, for: .normal)
             case .trackerCountShare:
                 actionButton.setTitle(Strings.ShieldEducation.shareTheNewsTitle, for: .normal)
                 actionButton.addTrailingImageIcon(image: #imageLiteral(resourceName: "shields-share"))
@@ -281,8 +262,6 @@ private class ShareTrackersView: UIView {
     // MARK: Action
     @objc func tappedActionButton() {
         switch trackingType {
-            case .trackerAdWarning:
-                actionHandler?(.didTakeALookTapped)
             case .trackerCountShare:
                 actionHandler?(.didShareTheNewsTapped)
             case .domainSpecificDataSaved:
