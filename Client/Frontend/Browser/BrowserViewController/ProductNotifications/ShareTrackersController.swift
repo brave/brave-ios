@@ -55,9 +55,7 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
     private let trackingType: TrackingType
     
     private let shareTrackersView: ShareTrackersView
-    
-    private lazy var gradientView = BraveGradientView.gradient03
-    
+        
     var actionHandler: ((Action) -> Void)?
 
     // MARK: Lifecycle
@@ -79,7 +77,7 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .braveInfoLabel
+        view.backgroundColor = .braveBackground
         
         shareTrackersView.actionHandler = { [weak self] action in
             guard let self = self else { return }
@@ -142,25 +140,24 @@ private class ShareTrackersView: UIView {
         $0.backgroundColor = .clear
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         $0.numberOfLines = 0
-        $0.textColor = .white
+        $0.textColor = .bravePrimary
     }
     
     private let subtitleLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
         $0.numberOfLines = 0
-        $0.textColor = .white
+        $0.textColor = .bravePrimary
     }
     
     private lazy var actionButton: InsetButton = {
         let actionButton = InsetButton().then {
             $0.addTarget(self, action: #selector(tappedActionButton), for: .touchUpInside)
-
+            
+            $0.backgroundColor = .braveDarkerBlurple
             $0.contentEdgeInsets = UX.actionButtonInsets
             $0.layer.cornerRadius = 20
             $0.layer.cornerCurve = .continuous
             $0.clipsToBounds = true
-            $0.layer.borderWidth = 1
-            $0.layer.borderColor = UIColor.white.cgColor
             $0.titleLabel?.adjustsFontSizeToFitWidth = true
             $0.titleLabel?.allowsDefaultTighteningForTruncation = true
             $0.setTitleColor(.white, for: .normal)

@@ -186,7 +186,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     var shouldShowNTPEducation = false
 
     /// Data Source object used to determine blocking stats
-    //let benchmarkBlockingDataSource = BlockingSummaryDataSource()
     var benchmarkBlockingDataSource: BlockingSummaryDataSource?
     
     private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
