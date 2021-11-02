@@ -31,15 +31,12 @@ extension BrowserViewController {
     }
     
     func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Spacer(minLength: 15.0)
-            
-            Text(verbatim: Strings.PrivacyFeature.menuSectionTitle.uppercased())
-                .font(.callout)
-                .fontWeight(.semibold)
-                .lineLimit(1)
-                .foregroundColor(Color(.braveLabel)
-            ).padding(.horizontal, 14)
+        VStack(alignment: .leading, spacing: 5) {
+            Text(Strings.PrivacyFeature.menuSectionTitle.uppercased())
+                .font(.callout.weight(.semibold))
+                .foregroundColor(Color(.braveLabel))
+                .padding(.horizontal, 14)
+                .padding(.bottom, 5)
                         
             VPNMenuButton(
                 vpnProductInfo: self.vpnProductInfo,
@@ -61,7 +58,7 @@ extension BrowserViewController {
                 MenuItemButton(
                     icon: #imageLiteral(resourceName: "menu-brave-talk").template,
                     title: Strings.BraveTalk.braveTalkTitle,
-                    subTitle: Strings.PrivacyFeature.braveTalkItemDescription) { [weak self] in
+                    subtitle: Strings.PrivacyFeature.braveTalkItemDescription) { [weak self] in
                     guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
                     
                     self.popToBVC()
@@ -73,7 +70,7 @@ extension BrowserViewController {
                     MenuItemButton(
                         icon: #imageLiteral(resourceName: "menu_brave_news").template,
                         title: Strings.BraveNews.braveNews,
-                        subTitle: Strings.PrivacyFeature.braveNewsItemDescription) { [weak self] in
+                        subtitle: Strings.PrivacyFeature.braveNewsItemDescription) { [weak self] in
                         guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController  else {
                             return
                         }
@@ -87,12 +84,14 @@ extension BrowserViewController {
             MenuItemButton(
                 icon: #imageLiteral(resourceName: "playlist_menu").template,
                 title: Strings.PlayList.playlistCarplayTitle,
-                subTitle: Strings.PrivacyFeature.bravePlaylistItemDescription) { [weak self] in
+                subtitle: Strings.PrivacyFeature.bravePlaylistItemDescription) { [weak self] in
                 guard let self = self else { return }
 
                 self.presentPlaylistController()
             }
         }
+        .padding(.top, 10)
+        .padding(.bottom, 5)
     }
     
     func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {

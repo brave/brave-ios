@@ -74,7 +74,7 @@ struct VPNMenuButton: View {
             MenuItemHeaderView(
                 icon: #imageLiteral(resourceName: "vpn_menu_icon").template,
                 title: "Brave VPN",
-                subTitle: description)
+                subtitle: description)
             Spacer()
             if isVPNStatusChanging {
                 ActivityIndicatorView(isAnimating: true)

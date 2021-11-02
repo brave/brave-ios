@@ -14,7 +14,7 @@ struct MenuItemHeaderView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     var icon: UIImage
     var title: String
-    var subTitle: String?
+    var subtitle: String?
     
     var body: some View {
         HStack(spacing: 14) {
@@ -28,16 +28,15 @@ struct MenuItemHeaderView: View {
                         .padding(6)
                 )
                 .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(verbatim: title)
-                    .padding(.top, subTitle != nil ? 5.0 : 0)
-                if let subTitle = subTitle {
+                if let subTitle = subtitle {
                     Text(subTitle)
                         .font(.subheadline)
-                        .foregroundColor(Color(.braveLabel))
-                        .padding(.bottom, 5.0)
+                        .foregroundColor(Color(.secondaryBraveLabel))
                 }
             }
+            .padding(.vertical, subtitle != nil ? 5 : 0)
         }
         .foregroundColor(Color(.braveLabel))
     }
@@ -60,12 +59,12 @@ struct MenuItemButton: View {
     
     var icon: UIImage
     var title: String
-    var subTitle: String?
+    var subtitle: String?
     var action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            MenuItemHeaderView(icon: icon, title: title, subTitle: subTitle)
+            MenuItemHeaderView(icon: icon, title: title, subtitle: subtitle)
                 .padding(.horizontal, 14)
                 .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         }
