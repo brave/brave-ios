@@ -666,6 +666,7 @@
 		4422D57421BFFB7F00BF1855 /* prog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4422D54221BFFB7E00BF1855 /* prog.cc */; };
 		4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */; };
 		442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */; };
+		442E7FA92731E5AA00412A36 /* GCDWebservers.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; };
 		44331DD222551AFE007E3E93 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD122551AFE007E3E93 /* ToolbarButton.swift */; };
 		44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD322551CC0007E3E93 /* ToolbarHelper.swift */; };
 		44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD522551E15007E3E93 /* ToolbarProtocols.swift */; };
@@ -680,8 +681,6 @@
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
 		4457123F26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */; };
 		4457A9C0272070240056388A /* LabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457A9BF272070240056388A /* LabelExtensions.swift */; };
-		445ABC8F2731DD030089710D /* GCDWebServers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 445ABC8D2731DCEF0089710D /* GCDWebServers.framework */; platformFilter = ios; };
-		445ABC902731DD030089710D /* GCDWebServers.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 445ABC8D2731DCEF0089710D /* GCDWebServers.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		445ABC952731DDFF0089710D /* NewYorkMedium-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 445ABC912731DDFF0089710D /* NewYorkMedium-Regular.otf */; };
 		445ABC962731DDFF0089710D /* NewYorkMedium-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 445ABC922731DDFF0089710D /* NewYorkMedium-Bold.otf */; };
 		445ABC972731DDFF0089710D /* NewYorkMedium-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 445ABC932731DDFF0089710D /* NewYorkMedium-RegularItalic.otf */; };
@@ -1465,7 +1464,6 @@
 				278655BA25C227E1009FFE80 /* OnePasswordExtension.framework in Copy Frameworks */,
 				2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */,
 				277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */,
-				445ABC902731DD030089710D /* GCDWebServers.framework in Copy Frameworks */,
 				278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
 			);
@@ -2278,6 +2276,7 @@
 		4422D54221BFFB7E00BF1855 /* prog.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prog.cc; sourceTree = "<group>"; };
 		4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = httpse.leveldb.tgz; sourceTree = "<group>"; };
 		442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuDetail.swift; sourceTree = "<group>"; tabWidth = 2; };
+		442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GCDWebservers.xcframework; sourceTree = "<group>"; };
 		44331DD122551AFE007E3E93 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		44331DD322551CC0007E3E93 /* ToolbarHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarHelper.swift; sourceTree = "<group>"; };
 		44331DD522551E15007E3E93 /* ToolbarProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarProtocols.swift; sourceTree = "<group>"; };
@@ -2311,7 +2310,6 @@
 		445ABC2127319C260089710D /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC2327319C270089710D /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC2527319C290089710D /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
-		445ABC8D2731DCEF0089710D /* GCDWebServers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GCDWebServers.framework; sourceTree = "<group>"; };
 		445ABC912731DDFF0089710D /* NewYorkMedium-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NewYorkMedium-Regular.otf"; sourceTree = "<group>"; };
 		445ABC922731DDFF0089710D /* NewYorkMedium-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NewYorkMedium-Bold.otf"; sourceTree = "<group>"; };
 		445ABC932731DDFF0089710D /* NewYorkMedium-RegularItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NewYorkMedium-RegularItalic.otf"; sourceTree = "<group>"; };
@@ -3011,8 +3009,8 @@
 			files = (
 				27B68DF025C48F39002D0826 /* MaterialComponents.xcframework in Frameworks */,
 				2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */,
+				442E7FA92731E5AA00412A36 /* GCDWebservers.xcframework in Frameworks */,
 				27756C8A25AD153700C129AF /* Static.framework in Frameworks */,
-				445ABC8F2731DD030089710D /* GCDWebServers.framework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */,
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
@@ -4833,7 +4831,7 @@
 		445ABC8C2731DCE00089710D /* GCDWebServers */ = {
 			isa = PBXGroup;
 			children = (
-				445ABC8D2731DCEF0089710D /* GCDWebServers.framework */,
+				442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */,
 			);
 			path = GCDWebServers;
 			sourceTree = "<group>";
