@@ -402,31 +402,31 @@ extension Strings {
         public static let menuSectionTitle = NSLocalizedString(
             "optionsMenu.menuSectionTitle",
             tableName: "BraveShared",
-            bundle: Bundle.braveShared,
+            bundle: .braveShared,
             value: "Privacy Features",
             comment: "Privacy Features Section title")
         public static let braveVPNItemDescription = NSLocalizedString(
             "optionsMenu.braveVPNItemDescription",
             tableName: "BraveShared",
-            bundle: Bundle.braveShared,
+            bundle: .braveShared,
             value: "Get around censorship and increase your privacy protection.",
             comment: "The subtitle description of menu item Brave VPN")
         public static let braveTalkItemDescription = NSLocalizedString(
             "optionsMenu.braveTalkItemDescription",
             tableName: "BraveShared",
-            bundle: Bundle.braveShared,
+            bundle: .braveShared,
             value: "Unlimited private video calls with your friends and colleagues.",
             comment: "The subtitle description of menu item Brave Talk")
         public static let braveNewsItemDescription = NSLocalizedString(
             "optionsMenu.braveNewsItemDescription",
             tableName: "BraveShared",
-            bundle: Bundle.braveShared,
+            bundle: .braveShared,
             value: "Today’s top stories in a completely private feed, just for you.",
             comment: "The subtitle description of menu item Brave News")
         public static let bravePlaylistItemDescription = NSLocalizedString(
             "optionsMenu.bravePlaylistItemDescription",
             tableName: "BraveShared",
-            bundle: Bundle.braveShared,
+            bundle: .braveShared,
             value: "Create a playlist of your favorite audio and video streams, straight in your browser. ",
             comment: "The subtitle description of menu item Brave Playlist")
     }
