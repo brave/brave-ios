@@ -6,6 +6,7 @@
 import SwiftUI
 import struct Shared.Strings
 import BraveUI
+import BigNumber
 
 struct SendTokenView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -22,11 +23,18 @@ struct SendTokenView: View {
   @ScaledMetric private var length: CGFloat = 16.0
   
   private var isSendDisabled: Bool {
-    guard let sendAmount = Double(amountInput), let balance = sendTokenStore.selectedSendTokenBalance else {
+    guard let sendAmount = BDouble(amountInput),
+          let balance = sendTokenStore.selectedSendTokenBalance,
+          let token = sendTokenStore.selectedSendToken else {
       return true
     }
     
-    return sendAmount > balance || sendAddress.isEmpty
+    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
+    if weiFormatter.weiString(from: amountInput, radix: .decimal, decimals: Int(token.decimals)) == nil {
+      return true
+    }
+    
+    return sendAmount > balance || amountInput.isEmpty || !sendAddress.isAddress
   }
   
   var body: some View {
@@ -80,15 +88,6 @@ struct SendTokenView: View {
                                                      sendTokenStore.selectedSendToken?.symbol ?? ""),
                     text: $amountInput
           )
-            .onChange(of: amountInput, perform: { value in
-              guard let token = sendTokenStore.selectedSendToken else { return }
-              let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
-              
-              guard weiFormatter.weiString(from: value, radix: .decimal, decimals: Int(token.decimals)) != nil else {
-                self.amountInput = String(value.dropLast())
-                return
-              }
-            })
             .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))

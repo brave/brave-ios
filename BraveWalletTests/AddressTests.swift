@@ -32,5 +32,11 @@ class AddressTests: XCTestCase {
         
         let isAddressFalseWrongPrefix = "0c84cD05f2Bc2AfD7f29d4E71346d17697C353b7"
         XCTAssertFalse(isAddressFalseWrongPrefix.isAddress)
+        
+        let isAddressFalseTooShort = "0x84cD05f2"
+        XCTAssertFalse(isAddressFalseTooShort.isAddress)
+        
+        let isAddressFalseNoHexDigits = "0x"
+        XCTAssertFalse(isAddressFalseNoHexDigits.isAddress)
     }
 }

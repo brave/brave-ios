@@ -22,7 +22,14 @@ extension String {
   var isAddress: Bool {
     // An address has to start with `0x`
     guard starts(with: "0x") else { return false }
-    // Check the rest of the char is a hex digit
-    return dropFirst(2).allSatisfy(\.isHexDigit)
+    
+    // removing `0x`
+    let hex = removingHexPrefix
+    if hex.count >= 40 {
+      // Check the rest of the char is a hex digit
+      return hex.allSatisfy(\.isHexDigit)
+    } else {
+      return false
+    }
   }
 }
