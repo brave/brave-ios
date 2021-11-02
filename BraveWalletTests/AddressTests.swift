@@ -23,20 +23,20 @@ class AddressTests: XCTestCase {
         XCTAssertEqual(prefixlessAddress.removingHexPrefix, "abcdef0123456789")
     }
     
-    func testIsAddress() {
+    func testIsETHAddress() {
         let isAddressTrue = "0x0c84cD05f2Bc2AfD7f29d4E71346d17697C353b7"
-        XCTAssertTrue(isAddressTrue.isAddress)
+        XCTAssertTrue(isAddressTrue.isETHAddress)
         
         let isAddressFalseNotHex = "0x0csadgasg"
-        XCTAssertFalse(isAddressFalseNotHex.isAddress)
+        XCTAssertFalse(isAddressFalseNotHex.isETHAddress)
         
         let isAddressFalseWrongPrefix = "0c84cD05f2Bc2AfD7f29d4E71346d17697C353b7"
-        XCTAssertFalse(isAddressFalseWrongPrefix.isAddress)
+        XCTAssertFalse(isAddressFalseWrongPrefix.isETHAddress)
         
         let isAddressFalseTooShort = "0x84cD05f2"
-        XCTAssertFalse(isAddressFalseTooShort.isAddress)
+        XCTAssertFalse(isAddressFalseTooShort.isETHAddress)
         
         let isAddressFalseNoHexDigits = "0x"
-        XCTAssertFalse(isAddressFalseNoHexDigits.isAddress)
+        XCTAssertFalse(isAddressFalseNoHexDigits.isETHAddress)
     }
 }

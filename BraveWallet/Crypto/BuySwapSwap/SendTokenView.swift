@@ -34,7 +34,7 @@ struct SendTokenView: View {
       return true
     }
     
-    return sendAmount > balance || amountInput.isEmpty || !sendAddress.isAddress
+    return sendAmount > balance || amountInput.isEmpty || !sendAddress.isETHAddress
   }
   
   var body: some View {

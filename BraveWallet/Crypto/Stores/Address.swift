@@ -18,18 +18,14 @@ extension String {
     hasPrefix("0x") ? String(dropFirst(2)) : self
   }
   
-  /// Check if the string is a valid address
-  var isAddress: Bool {
+  /// Check if the string is a valid ETH address
+  var isETHAddress: Bool {
     // An address has to start with `0x`
     guard starts(with: "0x") else { return false }
     
     // removing `0x`
     let hex = removingHexPrefix
-    if hex.count >= 40 {
-      // Check the rest of the char is a hex digit
-      return hex.allSatisfy(\.isHexDigit)
-    } else {
-      return false
-    }
+    // Check the length and the rest of the char is a hex digit
+    return hex.count == 40 && hex.allSatisfy(\.isHexDigit)
   }
 }
