@@ -11,7 +11,7 @@ import BigNumber
 struct SendTokenView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
-  @ObservedObject var sendSwapTokenStore: SendSwapTokenStore
+  @ObservedObject var sendTokenStore: SendTokenStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
@@ -54,12 +54,12 @@ struct SendTokenView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoFromTitle))
         ) {
-          NavigationLink(destination: SendTokenSearchView(sendSwapTokenStore: sendSwapTokenStore)) {
+          NavigationLink(destination: SendTokenSearchView(sendTokenStore: sendTokenStore)) {
             HStack {
-              if let token = sendSwapTokenStore.selectedFromToken {
+              if let token = sendTokenStore.selectedFromToken {
                 AssetIconView(token: token, length: 26)
               }
-              Text(sendSwapTokenStore.selectedFromToken?.symbol ?? "")
+              Text(sendTokenStore.selectedFromToken?.symbol ?? "")
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Spacer()
@@ -75,7 +75,7 @@ struct SendTokenView: View {
           header:
             WalletListHeaderView(
               title: Text(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountTitle,
-                                                           sendSwapTokenStore.selectedFromToken?.symbol ?? "")
+                                                           sendTokenStore.selectedFromToken?.symbol ?? "")
                         )
             ),
           footer: ShortcutAmountGrid(action: { amount in
@@ -85,7 +85,7 @@ struct SendTokenView: View {
           .padding(.bottom, 8)
         ) {
           TextField(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountPlaceholder,
-                                                     sendSwapTokenStore.selectedFromToken?.symbol ?? ""),
+                                                     sendTokenStore.selectedFromToken?.symbol ?? ""),
                     text: $amountInput
           )
             .keyboardType(.decimalPad)
@@ -165,7 +165,7 @@ struct SendTokenView: View {
       }
     }
     .onAppear {
-      sendSwapTokenStore.fetchAssets()
+      sendTokenStore.fetchAssets()
     }
   }
 }
@@ -175,7 +175,7 @@ struct SendTokenView_Previews: PreviewProvider {
       SendTokenView(
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
-        sendSwapTokenStore: .previewStore
+        sendTokenStore: .previewStore
       )
         .previewColorSchemes()
     }

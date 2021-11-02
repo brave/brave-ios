@@ -7,7 +7,7 @@ import Foundation
 import BraveCore
 
 /// A store contains data for sending/swapping tokens
-public class SendSwapTokenStore: ObservableObject {
+public class SendTokenStore: ObservableObject {
   /// User's asset with selected account and chain
   @Published var userAssets: [BraveWallet.ERCToken] = []
   /// The current selected token to send. Default with nil value.
@@ -160,7 +160,7 @@ public class SendSwapTokenStore: ObservableObject {
   }
 }
 
-extension SendSwapTokenStore: BraveWalletKeyringControllerObserver {
+extension SendTokenStore: BraveWalletKeyringControllerObserver {
   public func keyringCreated() {
   }
   
@@ -187,7 +187,7 @@ extension SendSwapTokenStore: BraveWalletKeyringControllerObserver {
   }
 }
 
-extension SendSwapTokenStore: BraveWalletEthJsonRpcControllerObserver {
+extension SendTokenStore: BraveWalletEthJsonRpcControllerObserver {
   public func chainChangedEvent(_ chainId: String) {
     fetchAssets()
   }

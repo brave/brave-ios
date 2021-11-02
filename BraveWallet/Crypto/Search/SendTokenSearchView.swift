@@ -27,14 +27,14 @@ private struct TokenView: View {
 }
 
 struct SendTokenSearchView: View {
-  @ObservedObject var sendSwapTokenStore: SendSwapTokenStore
+  @ObservedObject var sendTokenStore: SendTokenStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   var body: some View {
-    TokenList(tokens: sendSwapTokenStore.userAssets) { token in
+    TokenList(tokens: sendTokenStore.userAssets) { token in
       Button(action: {
-        sendSwapTokenStore.selectedFromToken = token
+        sendTokenStore.selectedFromToken = token
         presentationMode.dismiss()
       }) {
         TokenView(token: token)

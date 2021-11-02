@@ -13,7 +13,7 @@ public class WalletStore {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
   public let buyTokenStore: BuyTokenStore
-  public let sendSwapTokenStore: SendSwapTokenStore
+  public let sendTokenStore: SendTokenStore
   
   // MARK: -
   
@@ -55,7 +55,7 @@ public class WalletStore {
       tokenRegistry: tokenRegistry,
       rpcController: rpcController
     )
-    self.sendSwapTokenStore = .init(
+    self.sendTokenStore = .init(
       keyringController: keyringController,
       rpcController: rpcController,
       walletService: walletService,
