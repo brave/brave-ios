@@ -292,7 +292,6 @@
 		27756A8325ACFFEB00C129AF /* pop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277569AE25ACFC1C00C129AF /* pop.framework */; };
 		27756A8425ACFFEB00C129AF /* pop.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 277569AE25ACFC1C00C129AF /* pop.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		27756B0F25AD08FA00C129AF /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 27756B0E25AD08FA00C129AF /* SDWebImage */; };
-		27756BEA25AD14B600C129AF /* GCDWebServers in Frameworks */ = {isa = PBXBuildFile; productRef = 27756BE925AD14B600C129AF /* GCDWebServers */; };
 		27756C8A25AD153700C129AF /* Static.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27756C8525AD153000C129AF /* Static.framework */; };
 		27756C8B25AD153700C129AF /* Static.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27756C8525AD153000C129AF /* Static.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		27756D9B25AE417E00C129AF /* pop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277569AE25ACFC1C00C129AF /* pop.framework */; };
@@ -681,6 +680,8 @@
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
 		4457123F26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */; };
 		4457A9C0272070240056388A /* LabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457A9BF272070240056388A /* LabelExtensions.swift */; };
+		445ABC8F2731DD030089710D /* GCDWebServers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 445ABC8D2731DCEF0089710D /* GCDWebServers.framework */; platformFilter = ios; };
+		445ABC902731DD030089710D /* GCDWebServers.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 445ABC8D2731DCEF0089710D /* GCDWebServers.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4481F22D26CBD1C600658EAC /* AmazonRootCA3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */; };
 		4481F22E26CBD1C600658EAC /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */; };
@@ -1464,6 +1465,7 @@
 				278655BA25C227E1009FFE80 /* OnePasswordExtension.framework in Copy Frameworks */,
 				2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */,
 				277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */,
+				445ABC902731DD030089710D /* GCDWebServers.framework in Copy Frameworks */,
 				278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */,
 				E60138651C89EB7600DF9756 /* Shared.framework in Copy Frameworks */,
 			);
@@ -2309,6 +2311,7 @@
 		445ABC2127319C260089710D /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC2327319C270089710D /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC2527319C290089710D /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
+		445ABC8D2731DCEF0089710D /* GCDWebServers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GCDWebServers.framework; sourceTree = "<group>"; };
 		4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA3.cer; sourceTree = "<group>"; };
 		4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA4.cer; sourceTree = "<group>"; };
 		4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA2.cer; sourceTree = "<group>"; };
@@ -2958,7 +2961,6 @@
 				27B68E5D25C88CA7002D0826 /* FeedKit in Frameworks */,
 				277568ED25ACF92400C129AF /* SnapKit in Frameworks */,
 				277568EF25ACF92400C129AF /* ObjcExceptionBridging in Frameworks */,
-				27756BEA25AD14B600C129AF /* GCDWebServers in Frameworks */,
 				277568F125ACF92400C129AF /* XCGLogger in Frameworks */,
 				27756B0F25AD08FA00C129AF /* SDWebImage in Frameworks */,
 				277568F925ACF92400C129AF /* SwiftKeychainWrapper in Frameworks */,
@@ -3010,6 +3012,7 @@
 				27B68DF025C48F39002D0826 /* MaterialComponents.xcframework in Frameworks */,
 				2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */,
 				27756C8A25AD153700C129AF /* Static.framework in Frameworks */,
+				445ABC8F2731DD030089710D /* GCDWebServers.framework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */,
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
@@ -4202,6 +4205,7 @@
 		28CE83EF1A1D246900576538 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				445ABC8C2731DCE00089710D /* GCDWebServers */,
 				27756C5825AD152F00C129AF /* Static */,
 				277569ED25ACFCF000C129AF /* onepassword-app-extension */,
 				A1FEEE1F20BF28D900298DA2 /* Then.swift */,
@@ -4824,6 +4828,14 @@
 				4452CA3A2552FD360053EFE6 /* build_in_core.sh */,
 			);
 			path = BraveCore;
+			sourceTree = "<group>";
+		};
+		445ABC8C2731DCE00089710D /* GCDWebServers */ = {
+			isa = PBXGroup;
+			children = (
+				445ABC8D2731DCEF0089710D /* GCDWebServers.framework */,
+			);
+			path = GCDWebServers;
 			sourceTree = "<group>";
 		};
 		44A58CDD269470AD005C0879 /* Preview Content */ = {
@@ -6232,7 +6244,6 @@
 				277568F625ACF92400C129AF /* Lottie */,
 				277568F825ACF92400C129AF /* SwiftKeychainWrapper */,
 				27756B0E25AD08FA00C129AF /* SDWebImage */,
-				27756BE925AD14B600C129AF /* GCDWebServers */,
 				27F4798B25AF94B0004922E4 /* YubiKit */,
 				27B68E5C25C88CA7002D0826 /* FeedKit */,
 				277046C12684CD2A001CB097 /* PanModal */,
@@ -6686,7 +6697,6 @@
 				2775688525ACF76100C129AF /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */,
-				27756BE825AD14B600C129AF /* XCRemoteSwiftPackageReference "GCDWebServer" */,
 				27F4798A25AF94B0004922E4 /* XCRemoteSwiftPackageReference "yubikit-ios" */,
 				27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */,
 				277046C02684CD1E001CB097 /* XCRemoteSwiftPackageReference "PanModal" */,
@@ -9330,6 +9340,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -10007,6 +10019,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -12581,6 +12595,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -12818,6 +12834,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -13121,6 +13139,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -13376,6 +13396,8 @@
 					"$(inherited)",
 					"$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"$(PROJECT_DIR)/node_modules/brave-core-ios",
+					"$(PROJECT_DIR)/ThirdParty",
+					"$(PROJECT_DIR)/ThirdParty/GCDWebServers",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -13751,14 +13773,6 @@
 				minimumVersion = 5.10.2;
 			};
 		};
-		27756BE825AD14B600C129AF /* XCRemoteSwiftPackageReference "GCDWebServer" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nostradani/GCDWebServer";
-			requirement = {
-				kind = revision;
-				revision = 14f9eedb296c5b71fec971d8256ef3bfc20a2245;
-			};
-		};
 		27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nmdias/FeedKit.git";
@@ -13835,11 +13849,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
-		};
-		27756BE925AD14B600C129AF /* GCDWebServers */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 27756BE825AD14B600C129AF /* XCRemoteSwiftPackageReference "GCDWebServer" */;
-			productName = GCDWebServers;
 		};
 		27B68E5C25C88CA7002D0826 /* FeedKit */ = {
 			isa = XCSwiftPackageProductDependency;
