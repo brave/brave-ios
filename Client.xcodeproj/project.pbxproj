@@ -700,10 +700,7 @@
 		449AC16F26D9008D00A53F33 /* BraveTalkHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */; };
 		44A58CC82693A309005C0879 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CC72693A309005C0879 /* ActivityView.swift */; };
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
-		44B5DA6A2721A49B00BB0334 /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; platformFilter = ios; };
-		44B5DA6D2721A4D600BB0334 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; platformFilter = ios; };
 		44B5DA6F2721A4D800BB0334 /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; platformFilter = ios; };
-		44B5DA712721A50400BB0334 /* SPMLibraries.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; platformFilter = ios; };
 		44C2364526A05714005A573D /* TabTrayPrivateModeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C42CF7268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
@@ -1317,13 +1314,6 @@
 			remoteGlobalIDString = 278C468523F1E6270083347F;
 			remoteInfo = BraveUI;
 		};
-		4457A9BD27205C0C0056388A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 288A2D851AB8B3260023ABC3;
-			remoteInfo = Shared;
-		};
 		5D1DC51D20AC9AFB00905E5A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -1393,20 +1383,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = CA0391B1271E1023000EB13C;
 			remoteInfo = BraveWidgetsExtension;
-		};
-		CA0391D7271E1086000EB13C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 277568CF25ACF91500C129AF;
-			remoteInfo = SPMLibraries;
-		};
-		CA039234271E2517000EB13C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5DE7688320B3456C00FF5533;
-			remoteInfo = BraveShared;
 		};
 		E63CD1B11B31B66400A63AFF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3118,12 +3094,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44B5DA6D2721A4D600BB0334 /* Shared.framework in Frameworks */,
 				CA0391B6271E1023000EB13C /* SwiftUI.framework in Frameworks */,
 				44B5DA6F2721A4D800BB0334 /* BraveUI.framework in Frameworks */,
-				44B5DA712721A50400BB0334 /* SPMLibraries.framework in Frameworks */,
 				CA0391B4271E1023000EB13C /* WidgetKit.framework in Frameworks */,
-				44B5DA6A2721A49B00BB0334 /* BraveShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6493,10 +6466,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				CA0391D8271E1086000EB13C /* PBXTargetDependency */,
-				CA039235271E2517000EB13C /* PBXTargetDependency */,
 				4457A9AE272057D70056388A /* PBXTargetDependency */,
-				4457A9BE27205C0C0056388A /* PBXTargetDependency */,
 			);
 			name = BraveWidgetsExtension;
 			productName = BraveWidgetsExtension;
@@ -8183,12 +8153,6 @@
 			target = 278C468523F1E6270083347F /* BraveUI */;
 			targetProxy = 4457A9AD272057D70056388A /* PBXContainerItemProxy */;
 		};
-		4457A9BE27205C0C0056388A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = 288A2D851AB8B3260023ABC3 /* Shared */;
-			targetProxy = 4457A9BD27205C0C0056388A /* PBXContainerItemProxy */;
-		};
 		5D1DC51E20AC9AFB00905E5A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5D1DC51220AC9AF900905E5A /* Data */;
@@ -8238,18 +8202,6 @@
 			isa = PBXTargetDependency;
 			target = CA0391B1271E1023000EB13C /* BraveWidgetsExtension */;
 			targetProxy = CA0391D2271E1037000EB13C /* PBXContainerItemProxy */;
-		};
-		CA0391D8271E1086000EB13C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = 277568CF25ACF91500C129AF /* SPMLibraries */;
-			targetProxy = CA0391D7271E1086000EB13C /* PBXContainerItemProxy */;
-		};
-		CA039235271E2517000EB13C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = 5DE7688320B3456C00FF5533 /* BraveShared */;
-			targetProxy = CA039234271E2517000EB13C /* PBXContainerItemProxy */;
 		};
 		E6F965141B2F1CF20034B023 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
