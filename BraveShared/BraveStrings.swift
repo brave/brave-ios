@@ -395,6 +395,43 @@ extension Strings {
     }
 }
 
+// MARK: - OptionsMenu
+
+extension Strings {
+    public struct PrivacyFeature {
+        public static let menuSectionTitle = NSLocalizedString(
+            "optionsMenu.menuSectionTitle",
+            tableName: "BraveShared",
+            bundle: Bundle.braveShared,
+            value: "Privacy Features",
+            comment: "Privacy Features Section title")
+        public static let braveVPNItemDescription = NSLocalizedString(
+            "optionsMenu.braveVPNItemDescription",
+            tableName: "BraveShared",
+            bundle: Bundle.braveShared,
+            value: "Get around censorship and increase your privacy protection.",
+            comment: "The subtitle description of menu item Brave VPN")
+        public static let braveTalkItemDescription = NSLocalizedString(
+            "optionsMenu.braveTalkItemDescription",
+            tableName: "BraveShared",
+            bundle: Bundle.braveShared,
+            value: "Unlimited private video calls with your friends and colleagues.",
+            comment: "The subtitle description of menu item Brave Talk")
+        public static let braveNewsItemDescription = NSLocalizedString(
+            "optionsMenu.braveNewsItemDescription",
+            tableName: "BraveShared",
+            bundle: Bundle.braveShared,
+            value: "Today’s top stories in a completely private feed, just for you.",
+            comment: "The subtitle description of menu item Brave News")
+        public static let bravePlaylistItemDescription = NSLocalizedString(
+            "optionsMenu.bravePlaylistItemDescription",
+            tableName: "BraveShared",
+            bundle: Bundle.braveShared,
+            value: "Create a playlist of your favorite audio and video streams, straight in your browser. ",
+            comment: "The subtitle description of menu item Brave Playlist")
+    }
+}
+
 // MARK:-  SettingsContentViewController.swift
 extension Strings {
     public static let settingsContentLoadErrorMessage = NSLocalizedString("SettingsContentLoadErrorMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
@@ -763,7 +800,6 @@ extension Strings {
     public static let downloadsMenuItem = NSLocalizedString("DownloadsMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloads", comment: "Title for downloads menu item")
     public static let downloadsPanelEmptyStateTitle = NSLocalizedString("DownloadsPanelEmptyStateTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloaded files will show up here.", comment: "Title for when a user has nothing downloaded onto their device, and the list is empty.")
     public static let playlistMenuItem = NSLocalizedString("PlaylistMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Playlist", comment: "Playlist menu item")
-    public static let privacyFeaturesMenuSectionTitle = NSLocalizedString("PrivacyFeaturesMenuSectionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Privacy Features", comment: "Privacy Features Section title")
     
     // MARK: - Themes
     

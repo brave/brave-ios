@@ -34,7 +34,7 @@ extension BrowserViewController {
         VStack(alignment: .leading, spacing: 0) {
             Spacer(minLength: 15.0)
             
-            Text(verbatim: Strings.privacyFeaturesMenuSectionTitle.uppercased())
+            Text(verbatim: Strings.PrivacyFeature.menuSectionTitle.uppercased())
                 .font(.callout)
                 .fontWeight(.semibold)
                 .lineLimit(1)
@@ -43,7 +43,7 @@ extension BrowserViewController {
                         
             VPNMenuButton(
                 vpnProductInfo: self.vpnProductInfo,
-                description: "Get around censorship and increase your privacy protection.",
+                description: Strings.PrivacyFeature.braveVPNItemDescription,
                 displayVPNDestination: { [unowned self] vc in
                     (self.presentedViewController as? MenuViewController)?
                         .pushInnerMenu(vc)
@@ -61,7 +61,7 @@ extension BrowserViewController {
                 MenuItemButton(
                     icon: #imageLiteral(resourceName: "menu-brave-talk").template,
                     title: "Brave Talk",
-                    subTitle: "Unlimited private video calls with your friends and colleagues.") { [weak self] in
+                    subTitle: Strings.PrivacyFeature.braveTalkItemDescription) { [weak self] in
                     guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
                     
                     self.popToBVC()
@@ -73,7 +73,7 @@ extension BrowserViewController {
                     MenuItemButton(
                         icon: #imageLiteral(resourceName: "menu_brave_news").template,
                         title: "Brave News",
-                        subTitle: "Today’s top stories in a completely private feed, just for you.") { [weak self] in
+                        subTitle: Strings.PrivacyFeature.braveNewsItemDescription) { [weak self] in
                         guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController  else {
                             return
                         }
@@ -87,7 +87,7 @@ extension BrowserViewController {
             MenuItemButton(
                 icon: #imageLiteral(resourceName: "playlist_menu").template,
                 title: "Brave Playlist",
-                subTitle: "Create a playlist of your favorite audio and video streams, straight in your browser. ") { [weak self] in
+                subTitle: Strings.PrivacyFeature.bravePlaylistItemDescription) { [weak self] in
                 guard let self = self else { return }
 
                 // Present existing playlist controller
