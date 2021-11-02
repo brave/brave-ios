@@ -129,12 +129,17 @@ public class SendTokenStore: ObservableObject {
     }
   }
   
-  func sendToken(account: BraveWallet.AccountInfo, to: String, amount: String, completion: @escaping (_ success: Bool) -> Void) {
+  func sendToken(
+    from account: BraveWallet.AccountInfo,
+    to address: String,
+    amount: String,
+    completion: @escaping (_ success: Bool) -> Void
+  ) {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     guard let token = selectedSendToken, let weiHexString = weiFormatter.weiString(from: amount, radix: .hex, decimals: 18) else { return }
     
     if token.isETH {
-      let data = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: to, value: "0x\(weiHexString)", data: [NSNumber]())
+      let data = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: address, value: "0x\(weiHexString)", data: .init())
       transactionController.addUnapprovedTransaction(data, from: account.address) { success, txMetaId, errorMessage in
         completion(success)
       }
@@ -146,7 +151,7 @@ public class SendTokenStore: ObservableObject {
         }
         rpcController.chainId { [self] chainId in
           let txData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: token.contractAddress, value: "0x0", data: data)
-          self.transactionController.addUnapprovedTransaction(txData, from: account.address) { success, txMetaId, errorMessage in
+          transactionController.addUnapprovedTransaction(txData, from: account.address) { success, txMetaId, errorMessage in
             completion(success)
           }
         }

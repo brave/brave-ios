@@ -21,7 +21,7 @@ struct SendTokenView: View {
   
   @ScaledMetric private var length: CGFloat = 16.0
   
-  private var disableSend: Bool {
+  private var isSendDisabled: Bool {
     guard let sendAmount = Double(amountInput), let balance = sendTokenStore.selectedSendTokenBalance else {
       return true
     }
@@ -82,11 +82,11 @@ struct SendTokenView: View {
           )
             .onChange(of: amountInput, perform: { value in
               guard let token = sendTokenStore.selectedSendToken else { return }
-              // will ignore if input is not a decimal number
-              if let decimal = Decimal(string: value), -decimal.exponent > 0 {
-                if -decimal.exponent > Int(token.decimals) {
-                  self.amountInput = String(value.prefix(Int(token.decimals) + 2))
-                }
+              let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
+              
+              guard weiFormatter.weiString(from: value, radix: .decimal, decimals: Int(token.decimals)) != nil else {
+                self.amountInput = String(value.dropLast())
+                return
               }
             })
             .keyboardType(.decimalPad)
@@ -123,16 +123,18 @@ struct SendTokenView: View {
         Section(
           header:
             Button(action: {
-              sendTokenStore.sendToken(account: keyringStore.selectedAccount,
-                                       to: sendAddress,
-                                       amount: amountInput) { success in
+              sendTokenStore.sendToken(
+                from: keyringStore.selectedAccount,
+                to: sendAddress,
+                amount: amountInput
+              ) { success in
                 isShowingError = !success
               }
             }) {
               Text(Strings.Wallet.sendCryptoSendButtonTitle)
             }
             .buttonStyle(BraveFilledButtonStyle(size: .normal))
-            .disabled(disableSend)
+            .disabled(isSendDisabled)
             .frame(maxWidth: .infinity)
             .resetListHeaderStyle()
             .listRowBackground(Color(.clear))
@@ -144,7 +146,7 @@ struct SendTokenView: View {
         Alert(
           title: Text(""),
           message: Text(Strings.Wallet.sendCryptoSendError),
-          dismissButton: .cancel(Text( Strings.OKString))
+          dismissButton: .cancel(Text(Strings.OKString))
         )
       }
       .sheet(isPresented: $isShowingScanner) {
