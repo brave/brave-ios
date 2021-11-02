@@ -34,7 +34,7 @@ struct SendTokenSearchView: View {
   var body: some View {
     TokenList(tokens: sendTokenStore.userAssets) { token in
       Button(action: {
-        sendTokenStore.selectedFromToken = token
+        sendTokenStore.selectedSendToken = token
         presentationMode.dismiss()
       }) {
         TokenView(token: token)

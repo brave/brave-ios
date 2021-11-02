@@ -11,7 +11,7 @@ public class SendTokenStore: ObservableObject {
   /// User's asset with selected account and chain
   @Published var userAssets: [BraveWallet.ERCToken] = []
   /// The current selected token to send. Default with nil value.
-  @Published var selectedFromToken: BraveWallet.ERCToken? {
+  @Published var selectedSendToken: BraveWallet.ERCToken? {
     didSet {
       fetchAssetBalance()
     }
@@ -44,21 +44,21 @@ public class SendTokenStore: ObservableObject {
       walletService.userAssets(chainId) { tokens in
         userAssets = tokens
         
-        if let selectedToken = selectedFromToken {
+        if let selectedToken = selectedSendToken {
           if tokens.isEmpty {
-            selectedFromToken = nil
+            selectedSendToken = nil
           } else if let token = tokens.first(where: { $0.id == selectedToken.id }) {
-            selectedFromToken = token
+            selectedSendToken = token
           }
         } else {
-          selectedFromToken = tokens.first
+          selectedSendToken = tokens.first
         }
       }
     }
   }
   
   private func fetchAssetBalance() {
-    guard let token = selectedFromToken else {
+    guard let token = selectedSendToken else {
       selectedSendTokenBalance = nil
       return
     }

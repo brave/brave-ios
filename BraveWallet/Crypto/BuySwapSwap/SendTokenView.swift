@@ -56,10 +56,10 @@ struct SendTokenView: View {
         ) {
           NavigationLink(destination: SendTokenSearchView(sendTokenStore: sendTokenStore)) {
             HStack {
-              if let token = sendTokenStore.selectedFromToken {
+              if let token = sendTokenStore.selectedSendToken {
                 AssetIconView(token: token, length: 26)
               }
-              Text(sendTokenStore.selectedFromToken?.symbol ?? "")
+              Text(sendTokenStore.selectedSendToken?.symbol ?? "")
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Spacer()
@@ -75,7 +75,7 @@ struct SendTokenView: View {
           header:
             WalletListHeaderView(
               title: Text(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountTitle,
-                                                           sendTokenStore.selectedFromToken?.symbol ?? "")
+                                                           sendTokenStore.selectedSendToken?.symbol ?? "")
                         )
             ),
           footer: ShortcutAmountGrid(action: { amount in
@@ -85,7 +85,7 @@ struct SendTokenView: View {
           .padding(.bottom, 8)
         ) {
           TextField(String.localizedStringWithFormat(Strings.Wallet.sendCryptoAmountPlaceholder,
-                                                     sendTokenStore.selectedFromToken?.symbol ?? ""),
+                                                     sendTokenStore.selectedSendToken?.symbol ?? ""),
                     text: $amountInput
           )
             .keyboardType(.decimalPad)
