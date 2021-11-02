@@ -60,7 +60,7 @@ extension BrowserViewController {
             if !PrivateBrowsingManager.shared.isPrivateBrowsing {
                 MenuItemButton(
                     icon: #imageLiteral(resourceName: "menu-brave-talk").template,
-                    title: "Brave Talk",
+                    title: Strings.BraveTalk.braveTalkTitle,
                     subTitle: Strings.PrivacyFeature.braveTalkItemDescription) { [weak self] in
                     guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
                     
@@ -72,7 +72,7 @@ extension BrowserViewController {
                 if Preferences.General.isFirstLaunch.value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
                     MenuItemButton(
                         icon: #imageLiteral(resourceName: "menu_brave_news").template,
-                        title: "Brave News",
+                        title: Strings.BraveNews.braveNews,
                         subTitle: Strings.PrivacyFeature.braveNewsItemDescription) { [weak self] in
                         guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController  else {
                             return
@@ -86,28 +86,11 @@ extension BrowserViewController {
             
             MenuItemButton(
                 icon: #imageLiteral(resourceName: "playlist_menu").template,
-                title: "Brave Playlist",
+                title: Strings.PlayList.playlistCarplayTitle,
                 subTitle: Strings.PrivacyFeature.bravePlaylistItemDescription) { [weak self] in
                 guard let self = self else { return }
 
-                // Present existing playlist controller
-                if let playlistController = PlaylistCarplayManager.shared.playlistController {
-                    self.dismiss(animated: true) {
-                        self.present(playlistController, animated: true)
-                    }
-                } else {
-                    // Retrieve the item and offset-time from the current tab's webview.
-                    let tab = self.tabManager.selectedTab
-                    PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
-                        guard let self = self else { return }
-                        
-                        playlistController.modalPresentationStyle = .fullScreen
-                        
-                        self.dismiss(animated: true) {
-                            self.present(playlistController, animated: true)
-                        }
-                    }
-                }
+                self.presentPlaylistController()
             }
         }
     }
@@ -133,24 +116,7 @@ extension BrowserViewController {
                 MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) { [weak self] in
                     guard let self = self else { return }
 
-                    // Present existing playlist controller
-                    if let playlistController = PlaylistCarplayManager.shared.playlistController {
-                        self.dismiss(animated: true) {
-                            self.present(playlistController, animated: true)
-                        }
-                    } else {
-                        // Retrieve the item and offset-time from the current tab's webview.
-                        let tab = self.tabManager.selectedTab
-                        PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
-                            guard let self = self else { return }
-                            
-                            playlistController.modalPresentationStyle = .fullScreen
-                            
-                            self.dismiss(animated: true) {
-                                self.present(playlistController, animated: true)
-                            }
-                        }
-                    }
+                    self.presentPlaylistController()
                 }
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
@@ -163,6 +129,27 @@ extension BrowserViewController {
                                                 windowProtection: self.windowProtection)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
+            }
+        }
+    }
+    
+    private func presentPlaylistController() {
+        // Present existing playlist controller
+        if let playlistController = PlaylistCarplayManager.shared.playlistController {
+            dismiss(animated: true) {
+                self.present(playlistController, animated: true)
+            }
+        } else {
+            // Retrieve the item and offset-time from the current tab's webview.
+            let tab = self.tabManager.selectedTab
+            PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
+                guard let self = self else { return }
+                
+                playlistController.modalPresentationStyle = .fullScreen
+                
+                self.dismiss(animated: true) {
+                    self.present(playlistController, animated: true)
+                }
             }
         }
     }

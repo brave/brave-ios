@@ -3070,6 +3070,17 @@ extension Strings {
     }
 }
 
+// MARK: - Talk
+extension Strings {
+    public struct BraveTalk {
+        public static let braveTalkTitle = NSLocalizedString(
+            "bravetalk.braveTalkTitle",
+            bundle: .braveShared,
+            value: "Brave Talk",
+            comment: "The name of the feature")
+    }
+}
+
 // MARK: - Ads
 extension Strings {
     public struct Ads {
