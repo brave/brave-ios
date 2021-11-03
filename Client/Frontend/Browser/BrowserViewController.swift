@@ -749,6 +749,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             }
         }
         
+        profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
+
         LegacyBookmarksHelper.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }
@@ -931,33 +933,22 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
-            let controller = UIHostingController(rootView: PasscodeMigrationContainerView())
-            controller.rootView.dismiss = { [unowned controller] enableBrowserLock in
-                KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(nil)
-                Preferences.Privacy.lockWithPasscode.value = enableBrowserLock
-                controller.dismiss(animated: true)
-            }
-            controller.modalPresentationStyle = .fullScreen
-            // No animation to ensure we don't leak the users tabs
-            present(controller, animated: false)
-        }
+        // Passcode Migration has highest priority, it should be presented over everything else
+        presentPassCodeMigration()
         
-        presentOnboardingIntro() { [weak self] in
-            self?.shouldShowNTPEducation = true
-        }
+        // Present Onboarding to new users, existing users will not see the onboarding
+        //presentOnboardingIntro()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.presentVPNCallout()
-        }
+        //presentVPNAlertCallout()
         
-        if #available(*, iOS 14) {
-            presentDefaultBrowserIntroScreen()
-        }
+        presentSyncAlertCallout()
+        
+        //presentBraveRewardsScreenCallout()
+
+        //presentDefaultBrowserScreenCallout()
         
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
-        profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
 
         super.viewDidAppear(animated)
         
@@ -968,69 +959,11 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         showQueuedAlertIfAvailable()
     }
     
-    private func presentVPNCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
-        
-        let onboardingNotCompleted =
-            Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue
-        let notEnoughAppLaunches = Preferences.VPN.appLaunchCountForVPNPopup.value < BraveVPN.appLaunchesToShowVPNPopup
-        let showedPopup = Preferences.VPN.popupShowed
-
-        if onboardingNotCompleted
-            || notEnoughAppLaunches
-            || showedPopup.value
-            || !VPNProductInfo.isComplete {
-            return
-        }
-        
-        let popup = EnableVPNPopupViewController().then {
-            $0.isModalInPresentation = true
-            $0.modalPresentationStyle = .overFullScreen
-        }
-        
-        popup.enableVPNTapped = { [weak self] in
-            self?.presentCorrespondingVPNViewController()
-        }
-        
-        present(popup, animated: false)
-        
-        showedPopup.value = true
-    }
-    
-    /// Shows a vpn screen based on vpn state.
-    func presentCorrespondingVPNViewController() {
-        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
-        let nav = SettingsNavigationController(rootViewController: vc)
-        nav.navigationBar.topItem?.leftBarButtonItem =
-            .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
-        let idiom = UIDevice.current.userInterfaceIdiom
-        
-        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-        
-        nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-        present(nav, animated: true)
-    }
-    
     /// Whether or not to show the Default Browser intro callout. It's set at app launch in AppDelegate
     var shouldShowIntroScreen = false
     
     /// Whether or not to show the playlist onboarding callout this session
     var shouldShowPlaylistOnboardingThisSession = true
-
-    private func presentDefaultBrowserIntroScreen() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
-        
-        if !shouldShowIntroScreen {
-            return
-        }
-        
-        shouldShowIntroScreen = false
-        
-        let vc = DefaultBrowserIntroCalloutViewController() 
-        let idiom = UIDevice.current.userInterfaceIdiom
-        vc.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-        present(vc, animated: true)
-    }
 
     fileprivate func showQueuedAlertIfAvailable() {
         if let queuedAlertInfo = tabManager.selectedTab?.dequeueJavascriptAlertPrompt() {

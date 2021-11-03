@@ -201,7 +201,6 @@ extension Preferences {
     
     final class VPN {
         static let popupShowed = Option<Bool>(key: "vpn.popup-showed", default: false)
-        static let appLaunchCountForVPNPopup = Option<Int>(key: "vpn.popup-launch-count", default: 0)
         /// We get it from Guardian's servers.
         static let lastPurchaseProductId = Option<String?>(key: "vpn.last-purchase-id", default: nil)
         /// When the current subscription plan expires. It is nil if the user has not bought any vpn plan yet.

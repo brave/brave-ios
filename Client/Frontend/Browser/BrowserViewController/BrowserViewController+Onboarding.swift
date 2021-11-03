@@ -12,17 +12,8 @@ import BraveCore
 
 extension BrowserViewController {
     
-    func presentOnboardingIntro(_ completion: @escaping () -> Void) {
+    func presentOnboardingIntro() {
         if Preferences.DebugFlag.skipOnboardingIntro == true { return }
-        
-        if BraveRewards.isAvailable {
-            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
-            controller.onOnboardingStateChanged = { [weak self] controller, state in
-                self?.dismissOnboarding(controller, state: state)
-            }
-            self.present(controller, animated: true)
-        }
-        return
         
         // 1. Existing user.
         // 2. User already completed onboarding.
@@ -37,7 +28,7 @@ extension BrowserViewController {
                                                              rewards: rewards)
             onboardingController.modalPresentationStyle = .fullScreen
             self.present(onboardingController, animated: false)
-            completion()
+            self.shouldShowNTPEducation = true
             return
         }
     }
@@ -65,8 +56,8 @@ extension BrowserViewController {
         }
     }
     
-    private func dismissOnboarding(_ controller: OnboardingRewardsAgreementViewController,
-                                   state: OnboardingRewardsState) {
+    func dismissOnboarding(_ controller: OnboardingRewardsAgreementViewController,
+                           state: OnboardingRewardsState) {
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
         
         // Present NTP Education If Locale is JP and onboading is finished or skipped

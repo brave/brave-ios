@@ -416,6 +416,7 @@
 		289A4C131C4EB90600A460E3 /* StorageTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289A4C121C4EB90600A460E3 /* StorageTestUtils.swift */; };
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
 		2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */; };
+		2F13B801273311CB00253A4D /* BrowserViewController+Callout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
 		2F198EE82603FDD900945AB3 /* AddSearchEngineActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */; };
 		2F26C438267B9F0D00E5AD60 /* BlockSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */; };
@@ -671,7 +672,6 @@
 		4433E15726B999B40023A134 /* BraveTalkRewardsOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4433E15626B999B40023A134 /* BraveTalkRewardsOptInView.swift */; };
 		44514A5F269745FD004CBF73 /* TabTrayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A5E269745FD004CBF73 /* TabTrayController.swift */; };
 		44514A6C26974917004CBF73 /* TabTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A6B26974917004CBF73 /* TabTrayView.swift */; };
-		4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */; };
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
 		4457123F26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */; };
 		4457A9C0272070240056388A /* LabelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457A9BF272070240056388A /* LabelExtensions.swift */; };
@@ -2008,6 +2008,7 @@
 		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Client-Bridging-Header.h"; sourceTree = "<group>"; };
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
 		2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
+		2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Callout.swift"; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
 		2F198EE72603FDD900945AB3 /* AddSearchEngineActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSearchEngineActivity.swift; sourceTree = "<group>"; };
 		2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockSummaryTests.swift; sourceTree = "<group>"; };
@@ -2281,7 +2282,6 @@
 		44514A6B26974917004CBF73 /* TabTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayView.swift; sourceTree = "<group>"; };
 		4452CA392552FC7F0053EFE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4452CA3A2552FD360053EFE6 /* build_in_core.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build_in_core.sh; sourceTree = "<group>"; };
-		4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserIntroCalloutViewController.swift; sourceTree = "<group>"; };
 		4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkOptInSuccessViewController.swift; sourceTree = "<group>"; };
 		4457123E26BAB20000B60C1A /* BraveTalkOptInSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkOptInSuccessView.swift; sourceTree = "<group>"; };
 		4457A9BF272070240056388A /* LabelExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelExtensions.swift; sourceTree = "<group>"; };
@@ -5158,14 +5158,15 @@
 				C8F457A71F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift */,
 				2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */,
 				2F45B409263AF1C20033A594 /* BrowserViewController+ToolbarDelegate.swift */,
-				2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */,
 				279CC2D7260CF37C009B3895 /* BrowserViewController+Menu.swift */,
+				2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */,
+				2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */,
+				CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */,
+				CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */,
 				0A91598822B834CE00CCC119 /* BVC+Rewards.swift */,
 				2FFD2012260B914200E552A5 /* ProductNotifications */,
 				2F55443025913BAA000E4689 /* OpenSearch */,
 				2FBCB15C262783FD00F512D8 /* Sync */,
-				CA02B511271F246E002DE506 /* BrowserViewController+FindInPageDelegate.swift */,
-				CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */,
 			);
 			path = BrowserViewController;
 			sourceTree = "<group>";
@@ -5571,7 +5572,6 @@
 				0A19365323508756002E2B81 /* LinkPreviewViewController.swift */,
 				0A66550923E9D9750047EF2A /* UserAgent.swift */,
 				0A8A6224257905E300B035F4 /* UniversalLinkManager.swift */,
-				4452CAEF255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift */,
 				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
 				0AE50869261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift */,
 				449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */,
@@ -7549,6 +7549,7 @@
 				4422D57421BFFB7F00BF1855 /* prog.cc in Sources */,
 				4422D42F21BFCF8900BF1855 /* HttpsEverywhereObjC.mm in Sources */,
 				4422D56B21BFFB7F00BF1855 /* prefilter_tree.cc in Sources */,
+				2F13B801273311CB00253A4D /* BrowserViewController+Callout.swift in Sources */,
 				4422D4FC21BFFB7600BF1855 /* version_set.cc in Sources */,
 				4422D4C821BFFB7600BF1855 /* env.cc in Sources */,
 				27D67CED24D07EB800066D83 /* BraveNewsSettingsViewController.swift in Sources */,
@@ -7657,7 +7658,6 @@
 				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
-				4452CAF0255412800053EFE6 /* DefaultBrowserIntroCalloutViewController.swift in Sources */,
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
 				CA9A234126B97B8400923D70 /* MenuButton.swift in Sources */,
 				27A1AC0224855C1700344503 /* FeedItemView.swift in Sources */,

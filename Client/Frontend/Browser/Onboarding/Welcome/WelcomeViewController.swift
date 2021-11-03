@@ -33,7 +33,7 @@ class WelcomeViewController: UIViewController {
                   state: .welcome(title: "Welcome to Brave!"))
     }
     
-    private init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
+    init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
         self.profile = profile
         self.rewards = rewards
         self.state = state

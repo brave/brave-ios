@@ -252,10 +252,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Preferences.Review.launchCount.value += 1
         
-        if !Preferences.VPN.popupShowed.value {
-            Preferences.VPN.appLaunchCountForVPNPopup.value += 1
-        }
-        
         let isFirstLaunch = Preferences.General.isFirstLaunch.value
         if Preferences.General.basicOnboardingCompleted.value == OnboardingState.undetermined.rawValue {
             Preferences.General.basicOnboardingCompleted.value =
