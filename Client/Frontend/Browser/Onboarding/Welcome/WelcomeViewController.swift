@@ -91,7 +91,7 @@ class WelcomeViewController: UIViewController {
     private let skipButton = UIButton(type: .custom).then {
         $0.setTitle("Skip", for: .normal)
         $0.setTitleColor(.white, for: .normal)
-        $0.isHidden = true
+        $0.alpha = 0.0
     }
     
     private var searchEngines: SearchEngines? {
@@ -291,6 +291,7 @@ class WelcomeViewController: UIViewController {
             
             [$0.iconView, $0.calloutView, $0.searchEnginesView].forEach {
                 nextController.contentContainer.addArrangedSubview($0)
+                $0.isHidden = false
             }
             
             $0.contentContainer.spacing = 0
@@ -344,13 +345,7 @@ class WelcomeViewController: UIViewController {
     }
     
     private func close() {
-        UIView.animate(withDuration: 0.5, delay: 0.0, options: .curveEaseInOut) {
-            self.view.alpha = 0.0
-        } completion: { finished in
-            self.willMove(toParent: nil)
-            self.removeFromParent()
-            self.view.removeFromSuperview()
-        }
+        self.dismiss(animated: true)
     }
 }
 
