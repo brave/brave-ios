@@ -23,7 +23,7 @@ private enum WelcomeViewID: Int {
 class WelcomeViewController: UIViewController {
     private let profile: Profile?
     private let rewards: BraveRewards?
-    private let state: WelcomeViewCalloutState
+    private var state: WelcomeViewCalloutState?
     
     var onOnboardingComplete: (() -> Void)?
     
@@ -33,7 +33,7 @@ class WelcomeViewController: UIViewController {
                   state: .welcome(title: "Welcome to Brave!"))
     }
     
-    private init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState) {
+    private init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
         self.profile = profile
         self.rewards = rewards
         self.state = state
@@ -162,15 +162,18 @@ class WelcomeViewController: UIViewController {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
-        calloutView.setState(state: state, animated: false)
+        if let state = state {
+            calloutView.setState(state: state, animated: false)
+        }
     }
     
     private func animateToPrivacyState() {
         let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards)
+                                                   rewards: rewards,
+                                                   state: nil)
         nextController.modalPresentationStyle = .fullScreen
         
-        let state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
+        nextController.state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
                              details: "You're just a step away from the best privacy online. Ready?",
                              buttonTitle: "Let's go",
                              action: {
@@ -196,7 +199,10 @@ class WelcomeViewController: UIViewController {
             $0.topImageView.transform = topTransform
             $0.bottomImageView.transform = bottomTransform
             $0.skipButton.alpha = 1.0
-            $0.calloutView.setState(state: state, animated: false)
+            
+            if let state = $0.state {
+                $0.calloutView.setState(state: state, animated: false)
+            }
         }
         
         self.present(nextController, animated: true, completion: nil)
@@ -207,7 +213,7 @@ class WelcomeViewController: UIViewController {
                                                    rewards: rewards)
         nextController.modalPresentationStyle = .fullScreen
         
-        let state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
+        nextController.state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
                                     details: "With Brave as default, every link you click opens with Brave's privacy protections.",
                                     primaryButtonTitle: "Set as default",
                                     secondaryButtonTitle: "Not now",
@@ -242,7 +248,9 @@ class WelcomeViewController: UIViewController {
                 $0.centerY.equalToSuperview().offset(60.0)
             }
             
-            $0.calloutView.setState(state: state, animated: false)
+            if let state = $0.state {
+                $0.calloutView.setState(state: state, animated: false)
+            }
         }
         
         self.present(nextController, animated: true, completion: nil)
@@ -253,7 +261,7 @@ class WelcomeViewController: UIViewController {
                                                    rewards: rewards)
         nextController.modalPresentationStyle = .fullScreen
         
-        let state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
+        nextController.state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
                                       details: "Select a popular site below or enter your own...",
                                       moreDetails: "...and watch those trackers & ads disappear.")
         
@@ -307,7 +315,9 @@ class WelcomeViewController: UIViewController {
                 $0.height.greaterThanOrEqualTo(240.0)
             }
             
-            $0.calloutView.setState(state: state, animated: false)
+            if let state = $0.state {
+                $0.calloutView.setState(state: state, animated: false)
+            }
         }
         
         self.present(nextController, animated: true, completion: nil)
