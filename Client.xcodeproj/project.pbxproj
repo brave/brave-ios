@@ -964,7 +964,6 @@
 		CAB127632639F37C00BBFC75 /* RecentSearches.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB127622639F37C00BBFC75 /* RecentSearches.swift */; };
 		CAB127652639FB7000BBFC75 /* RecentSearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB127642639FB7000BBFC75 /* RecentSearchCell.swift */; };
 		CAB54B8626A5BFA800F08BF3 /* PlaylistURLBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB54B8526A5BFA800F08BF3 /* PlaylistURLBarButton.swift */; };
-		CABFA8DC2727219900B73E97 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABFA8DB2727219900B73E97 /* WelcomeView.swift */; };
 		CABFA8F62728651C00B73E97 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */; };
 		CAC2CB402644488600BB8D36 /* RecentSearchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */; };
 		CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */; };
@@ -2759,7 +2758,6 @@
 		CAB127622639F37C00BBFC75 /* RecentSearches.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearches.swift; sourceTree = "<group>"; };
 		CAB127642639FB7000BBFC75 /* RecentSearchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchCell.swift; sourceTree = "<group>"; };
 		CAB54B8526A5BFA800F08BF3 /* PlaylistURLBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistURLBarButton.swift; sourceTree = "<group>"; };
-		CABFA8DB2727219900B73E97 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchHeaderView.swift; sourceTree = "<group>"; };
 		CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchClipboardHeaderView.swift; sourceTree = "<group>"; };
@@ -3277,7 +3275,6 @@
 			isa = PBXGroup;
 			children = (
 				CA1B698327303D5800F7CAC0 /* Welcome */,
-				CABFA8DB2727219900B73E97 /* WelcomeView.swift */,
 				0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */,
 				0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */,
 				0AE5C69024F0059D004CBC9B /* OnboardingPrivacyConsentViewController.swift */,
@@ -5202,18 +5199,6 @@
 			path = BrowserViewController;
 			sourceTree = "<group>";
 		};
-		CA1B698327303D5800F7CAC0 /* Welcome */ = {
-			isa = PBXGroup;
-			children = (
-				CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */,
-				CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */,
-				CA7C5CAC2731928F003366F7 /* WelcomeViewSearchEnginesView.swift */,
-				CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */,
-				CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */,
-			);
-			path = Welcome;
-			sourceTree = "<group>";
-		};
 		CA0391B7271E1023000EB13C /* BraveWidgets */ = {
 			isa = PBXGroup;
 			children = (
@@ -5258,6 +5243,18 @@
 				CA039230271E238D000EB13C /* FaviconAttributes.swift */,
 			);
 			path = Favicons;
+			sourceTree = "<group>";
+		};
+		CA1B698327303D5800F7CAC0 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */,
+				CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */,
+				CA7C5CAC2731928F003366F7 /* WelcomeViewSearchEnginesView.swift */,
+				CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */,
+				CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */,
+			);
+			path = Welcome;
 			sourceTree = "<group>";
 		};
 		CA22024B271881CE002D3582 /* InternalSchemeHandler */ = {
@@ -7822,7 +7819,6 @@
 				CAADEFE026E2707F0020DC4C /* SceneDelegate.swift in Sources */,
 				0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */,
 				F930CDD12270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift in Sources */,
-				CABFA8DC2727219900B73E97 /* WelcomeView.swift in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
 				0A55E53224349FE70069F06A /* EnableVPNSettingHeader.swift in Sources */,
 				4422D43621BFD29E00BF1855 /* NSFileManager+Tar.m in Sources */,
