@@ -13,99 +13,22 @@ import BraveCore
 extension BrowserViewController {
     
     func presentOnboardingIntro(_ completion: @escaping () -> Void) {
-        if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+        //if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
         // 1. Existing user.
         // 2. User already completed onboarding.
         if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
-            // The user doesn't have ads in their region and they've completed rewards.
-            if !BraveAds.isCurrentLocaleSupported()
-                &&
-                Preferences.General.basicOnboardingProgress.value == OnboardingProgress.rewards.rawValue {
-                return
-            }
-        }
-        
-        // The user either skipped or didn't complete onboarding.
-        let isRewardsEnabled = rewards.isEnabled
-        let currentProgress = OnboardingProgress(rawValue: Preferences.General.basicOnboardingProgress.value) ?? .none
-        
-        // 1. Existing user.
-        // 2. The user skipped onboarding before.
-        // 3. 60 days have passed since they last saw onboarding.
-        if Preferences.General.basicOnboardingCompleted.value == OnboardingState.skipped.rawValue {
-
-            guard let daysUntilNextPrompt = Preferences.General.basicOnboardingNextOnboardingPrompt.value else {
-                return
-            }
-            
-            // 60 days has passed since the user last saw the onboarding.. it's time to show the onboarding again..
-            if daysUntilNextPrompt <= Date() && !isRewardsEnabled {
-                guard let onboarding = OnboardingNavigationController(
-                    profile: profile,
-                    rewards: rewards,
-                    onboardingType: .existingUserRewardsOff(currentProgress)
-                    ) else { return }
-                
-                onboarding.onboardingDelegate = self
-                present(onboarding, animated: true)
-                
-                Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
-            }
-            
-            return
-        }
-        
-        // 1. Rewards are on/off (existing user)
-        // 2. User hasn't seen the rewards part of the onboarding yet.
-        if (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
-            &&
-            (Preferences.General.basicOnboardingProgress.value == OnboardingProgress.searchEngine.rawValue) {
-            
-            guard !isRewardsEnabled, let onboarding = OnboardingNavigationController(
-                profile: profile,
-                rewards: rewards,
-                onboardingType: .existingUserRewardsOff(currentProgress)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
-            return
-        }
-        
-        // 1. Rewards are on/off (existing user)
-        // 2. User hasn't seen the rewards part of the onboarding yet because their version of the app is insanely OLD and somehow the progress value doesn't exist.
-        if (Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue)
-            &&
-            (Preferences.General.basicOnboardingProgress.value == OnboardingProgress.none.rawValue) {
-            
-            guard !isRewardsEnabled, let onboarding = OnboardingNavigationController(
-                profile: profile,
-                rewards: rewards,
-                onboardingType: .existingUserRewardsOff(currentProgress)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
             return
         }
         
         // 1. User is brand new
         // 2. User hasn't completed onboarding
-        // 3. We don't care how much progress they made. Onboarding is only complete when ALL of it is complete.
         if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
-            // The user has never completed the onboarding..
-            
-            guard let onboarding = OnboardingNavigationController(
-                profile: profile,
-                rewards: rewards,
-                onboardingType: .newUser(currentProgress)
-                ) else { return }
-            
-            onboarding.onboardingDelegate = self
-            present(onboarding, animated: true)
+            let onboardingController = WelcomeViewController(profile: profile,
+                                                             rewards: rewards)
+            onboardingController.modalPresentationStyle = .fullScreen
+            self.present(onboardingController, animated: false)
             completion()
-            
             return
         }
     }

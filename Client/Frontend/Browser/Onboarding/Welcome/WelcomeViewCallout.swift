@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import SnapKit
 import BraveUI
+import pop
 
 enum WelcomeViewCalloutState {
     case welcome(title: String)
@@ -21,6 +22,8 @@ class WelcomeViewCallout: UIView {
         static let contentPadding = 30.0
         static let cornerRadius = 16.0
     }
+    
+    private let backgroundView = RoundedBackgroundView(cornerRadius: DesignUX.cornerRadius)
     
     private let arrowView = CalloutArrowView().then {
         $0.backgroundColor = .secondaryBraveBackground
@@ -98,34 +101,6 @@ class WelcomeViewCallout: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let roundedLayerName = "rounded.layer"
-        
-        let layers = contentView.layer.sublayers
-        layers?.filter({ $0.name == roundedLayerName }).forEach {
-            $0.removeFromSuperlayer()
-        }
-        
-        let maskBounds = contentView.bounds
-        let path = UIBezierPath(roundedRect: maskBounds,
-                                byRoundingCorners: .allCorners,
-                                cornerRadii: CGSize(width: DesignUX.cornerRadius,
-                                                    height: DesignUX.cornerRadius))
-
-        // Create the shape layer and set its path
-        let maskLayer = CAShapeLayer().then {
-            $0.frame = maskBounds
-            $0.path = path.cgPath
-        }
-
-        let roundedLayer = CALayer().then {
-            $0.backgroundColor = UIColor.secondaryBraveBackground.cgColor
-            $0.frame = maskBounds
-            $0.mask = maskLayer
-            $0.name = roundedLayerName
-        }
-
-        contentView.layer.insertSublayer(roundedLayer, at: 0)
-        
         layer.shadowColor = #colorLiteral(red: 0.4633028507, green: 0.4875121117, blue: 0.5066562891, alpha: 1).cgColor
         layer.shadowOpacity = 0.36
         layer.shadowOffset = CGSize(width: 5, height: 5)
@@ -137,6 +112,7 @@ class WelcomeViewCallout: UIView {
         contentView.removeFromSuperview()
         
         if pointsUp {
+            addSubview(backgroundView)
             addSubview(arrowView)
             addSubview(contentView)
             arrowView.transform = .identity
@@ -154,6 +130,7 @@ class WelcomeViewCallout: UIView {
                 $0.bottom.equalToSuperview()
             }
         } else {
+            addSubview(backgroundView)
             addSubview(contentView)
             addSubview(arrowView)
             arrowView.transform = CGAffineTransform.identity.rotated(by: .pi)
@@ -171,6 +148,25 @@ class WelcomeViewCallout: UIView {
                 $0.height.equalTo(13.0)
             }
         }
+        
+        backgroundView.snp.makeConstraints {
+            $0.edges.equalTo(contentView.snp.edges)
+        }
+    }
+    
+    func animateFromCopy(view: WelcomeViewCallout, duration: TimeInterval, delay: TimeInterval) {
+        let views = [backgroundView, contentView, arrowView]
+        let otherViews = [view.backgroundView, view.contentView, view.arrowView]
+        
+        for e in views.enumerated() {
+            POPBasicAnimation(propertyNamed: kPOPViewFrame)?.do {
+                $0.fromValue = e.element.frame
+                $0.toValue = otherViews[e.offset].frame
+                $0.duration = duration
+                $0.beginTime = CACurrentMediaTime() + delay
+                e.element.layer.pop_add($0, forKey: "frame")
+            }
+        }
     }
     
     func setState(state: WelcomeViewCalloutState, animated: Bool) {
@@ -180,20 +176,6 @@ class WelcomeViewCallout: UIView {
             doLayout(pointsUp: true)
         }
         
-        if animated {
-            self.layoutIfNeeded()
-            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveEaseIn, .layoutSubviews]) {
-                self.updateState(state: state)
-                self.layoutIfNeeded()
-            } completion: { finished in
-                
-            }
-        } else {
-            updateState(state: state)
-        }
-    }
-    
-    private func updateState(state: WelcomeViewCalloutState) {
         primaryButton.removeAction(identifiedBy: .init(rawValue: "primary.action"), for: .primaryActionTriggered)
         secondaryButton.removeAction(identifiedBy: .init(rawValue: "secondary.action"), for: .primaryActionTriggered)
         
@@ -362,5 +344,22 @@ private class CalloutArrowView: UIView {
         // Middle Top
         path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
         return path
+    }
+}
+
+private class RoundedBackgroundView: UIView {
+    private let cornerRadius: CGFloat
+    
+    init(cornerRadius: CGFloat) {
+        self.cornerRadius = cornerRadius
+        super.init(frame: .zero)
+        
+        layer.cornerRadius = cornerRadius
+        layer.masksToBounds = true
+        layer.backgroundColor = UIColor.secondaryBraveBackground.cgColor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
