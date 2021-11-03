@@ -28,7 +28,7 @@ extension BrowserViewController {
     }
     
     func presentSyncAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
+        //if Preferences.DebugFlag.skipNTPCallouts == true { return }
         
         let hostingController = UIHostingController(rootView: PrivacyEverywhereView())
         hostingController.modalPresentationStyle = .popover
