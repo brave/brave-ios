@@ -13,7 +13,16 @@ import BraveCore
 extension BrowserViewController {
     
     func presentOnboardingIntro(_ completion: @escaping () -> Void) {
-        //if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+        if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+        
+        if BraveRewards.isAvailable {
+            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+            controller.onOnboardingStateChanged = { [weak self] controller, state in
+                self?.dismissOnboarding(controller, state: state)
+            }
+            self.present(controller, animated: true)
+        }
+        return
         
         // 1. Existing user.
         // 2. User already completed onboarding.
@@ -46,40 +55,7 @@ extension BrowserViewController {
 
 // MARK: OnboardingControllerDelegate
 
-extension BrowserViewController: OnboardingControllerDelegate {
-    
-    func onboardingCompleted(_ onboardingController: OnboardingNavigationController) {
-        Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
-        Preferences.General.basicOnboardingNextOnboardingPrompt.value = nil
-        
-        if BraveRewards.isAvailable {
-            switch onboardingController.onboardingType {
-            case .newUser:
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-            default:
-                break
-            }
-        } else {
-            switch onboardingController.onboardingType {
-            case .newUser:
-                Preferences.General.basicOnboardingProgress.value = OnboardingProgress.searchEngine.rawValue
-            case .existingUserRewardsOff:
-                break
-            default:
-                break
-            }
-        }
-        
-        dismissOnboarding(onboardingController)
-    }
-    
-    func onboardingSkipped(_ onboardingController: OnboardingNavigationController) {
-        Preferences.General.basicOnboardingCompleted.value = OnboardingState.skipped.rawValue
-        Preferences.General.basicOnboardingNextOnboardingPrompt.value = Date(timeIntervalSinceNow: BrowserViewController.onboardingDaysInterval)
-        
-        dismissOnboarding(onboardingController)
-    }
-    
+extension BrowserViewController {
     private func presentEducationNTPIfNeeded() {
         // NTP Education Load after onboarding screen
         if shouldShowNTPEducation,
@@ -89,10 +65,13 @@ extension BrowserViewController: OnboardingControllerDelegate {
         }
     }
     
-    private func dismissOnboarding(_ onboardingController: OnboardingNavigationController) {
+    private func dismissOnboarding(_ controller: OnboardingRewardsAgreementViewController,
+                                   state: OnboardingRewardsState) {
+        Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+        
         // Present NTP Education If Locale is JP and onboading is finished or skipped
         // Present private browsing prompt if necessary when onboarding has been skipped
-        onboardingController.dismiss(animated: true) { [weak self] in
+        controller.dismiss(animated: true) { [weak self] in
             guard let self = self else { return }
             
             self.presentEducationNTPIfNeeded()
