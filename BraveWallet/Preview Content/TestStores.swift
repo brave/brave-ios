@@ -72,6 +72,15 @@ extension AssetDetailStore {
   }
 }
 
+extension SwapTokenStore {
+  static var previewStore: SwapTokenStore {
+    .init(
+      tokenRegistry: TestTokenRegistry(),
+      rpcController: TestEthJsonRpcController()
+    )
+  }
+}
+
 class TestAssetRatioController: BraveWalletAssetRatioController {
   private let assets: [String: BraveWallet.AssetPrice] = [
     "eth": .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23"),

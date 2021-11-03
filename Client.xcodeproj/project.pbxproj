@@ -916,6 +916,8 @@
 		7BA8D1C71BA037F500C8AE9E /* OpenInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8D1C61BA037F500C8AE9E /* OpenInHelper.swift */; };
 		7BBFEE741BB405D900A305AA /* TabManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBFEE731BB405D900A305AA /* TabManagerTests.swift */; };
 		7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEFC67F1BFF68C30059C952 /* QuickActions.swift */; };
+		7D2D6EDD2731B7FF000650EA /* SwapTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */; };
+		7D2D6EEB2731D6BA000650EA /* SwapTokenSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */; };
 		7D49CDDD271FA8B5008AB67E /* SendTokenSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D49CDDC271FA8B5008AB67E /* SendTokenSearchView.swift */; };
 		7D49CDDF271FB359008AB67E /* SendTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D49CDDE271FB359008AB67E /* SendTokenStore.swift */; };
 		7D758908271A172C00B643C3 /* BuyTokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D758907271A172C00B643C3 /* BuyTokenView.swift */; };
@@ -2766,6 +2768,8 @@
 		7BA8D1C61BA037F500C8AE9E /* OpenInHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInHelper.swift; sourceTree = "<group>"; };
 		7BBFEE731BB405D900A305AA /* TabManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabManagerTests.swift; sourceTree = "<group>"; };
 		7BEFC67F1BFF68C30059C952 /* QuickActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
+		7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenStore.swift; sourceTree = "<group>"; };
+		7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenSearchView.swift; sourceTree = "<group>"; };
 		7D49CDDC271FA8B5008AB67E /* SendTokenSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendTokenSearchView.swift; sourceTree = "<group>"; };
 		7D49CDDE271FB359008AB67E /* SendTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendTokenStore.swift; sourceTree = "<group>"; };
 		7D758907271A172C00B643C3 /* BuyTokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyTokenView.swift; sourceTree = "<group>"; };
@@ -3720,6 +3724,7 @@
 				7D758914271A17AF00B643C3 /* BuyTokenStore.swift */,
 				2718018D272C7DBB0047EB15 /* AssetDetailStore.swift */,
 				7D49CDDE271FB359008AB67E /* SendTokenStore.swift */,
+				7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -3731,6 +3736,7 @@
 				7D758916271A182800B643C3 /* TokenList.swift */,
 				7D758918271A184D00B643C3 /* BuyTokenSearchView.swift */,
 				7D49CDDC271FA8B5008AB67E /* SendTokenSearchView.swift */,
+				7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -7477,6 +7483,7 @@
 				271F689B26EBD27E00AA2A50 /* CryptoView.swift in Sources */,
 				271F689826EBD27E00AA2A50 /* NetworkStore.swift in Sources */,
 				271F68AD26EBD27E00AA2A50 /* VerifyRecoveryPhraseView.swift in Sources */,
+				7D2D6EEB2731D6BA000650EA /* SwapTokenSearchView.swift in Sources */,
 				271F689626EBD27E00AA2A50 /* SwapCryptoView.swift in Sources */,
 				276684AE270F6F6000DF45C5 /* WalletStrings.swift in Sources */,
 				271F689426EBD27E00AA2A50 /* PreviewModifiers.swift in Sources */,
@@ -7511,6 +7518,7 @@
 				2729E7D326F502AC00200648 /* AccountPicker.swift in Sources */,
 				27F3AEF4271DDE0C00F75B7F /* OpenWalletURLAction.swift in Sources */,
 				2762FF32271A2448001EF41D /* BuySendSwapDestination.swift in Sources */,
+				7D2D6EDD2731B7FF000650EA /* SwapTokenStore.swift in Sources */,
 				271F68A426EBD27E00AA2A50 /* AccountsView.swift in Sources */,
 				275C6FBF2731D1A500AB2FC7 /* RpcControllerExtensions.swift in Sources */,
 				2766848B270CDA3500DF45C5 /* UserAssetsStore.swift in Sources */,

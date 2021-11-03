@@ -91,6 +91,7 @@ struct MarketPriceView: View {
 struct SwapCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var ethNetworkStore: NetworkStore
+  @ObservedObject var swapTokensStore: SwapTokenStore
   
   @State private var fromQuantity: String = ""
   @State private var toQuantity: String = ""
@@ -120,11 +121,12 @@ struct SwapCryptoView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.swapCryptoFromTitle))
         ) {
-          NavigationLink(destination: EmptyView()) {
+          NavigationLink(destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .fromToken)) {
             HStack {
-              Circle() // TODO: Replace with AssetIconView when we have a selected token
-                .frame(width: 26, height: 26)
-              Text(verbatim: "BAT")
+              if let token = swapTokensStore.selectedFromToken {
+                AssetIconView(token: token, length: 26)
+              }
+              Text(swapTokensStore.selectedFromToken?.symbol ?? "")
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Spacer()
@@ -137,24 +139,35 @@ struct SwapCryptoView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.swapCryptoAmountTitle)),
+          header: WalletListHeaderView(
+            title: Text(String.localizedStringWithFormat(
+              Strings.Wallet.swapCryptoAmountTitle,
+              swapTokensStore.selectedFromToken?.symbol ?? ""))
+          ),
           footer: ShortcutAmountGrid(action: { amount in
             
           })
           .listRowInsets(.zero)
           .padding(.bottom, 8)
         ) {
-          TextField(Strings.Wallet.swapCryptoAmountPlaceholder, text: .constant(""))
+          TextField(
+            String.localizedStringWithFormat(
+              Strings.Wallet.swapCryptoAmountPlaceholder,
+              swapTokensStore.selectedFromToken?.symbol ?? ""),
+            text: $fromQuantity
+          )
+            .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.swapCryptoToTitle))
         ) {
-          NavigationLink(destination: EmptyView()) {
+          NavigationLink(destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .toToken)) {
             HStack {
-              Circle()
-                .frame(width: 26, height: 26)
-              Text(verbatim: "ETH")
+              if let token = swapTokensStore.selectedToToken {
+                AssetIconView(token: token, length: 26)
+              }
+              Text(swapTokensStore.selectedToToken?.symbol ?? "")
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Spacer()
@@ -167,67 +180,53 @@ struct SwapCryptoView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.swapCryptoAmountReceivingTitle))
+          header: WalletListHeaderView(
+            title: Text(String.localizedStringWithFormat(
+              Strings.Wallet.swapCryptoAmountReceivingTitle,
+              swapTokensStore.selectedToToken?.symbol ?? ""))
+          )
         ) {
-          TextField(Strings.Wallet.swapCryptoAmountPlaceholder, text: .constant(""))
+          TextField(
+            String.localizedStringWithFormat(
+              Strings.Wallet.swapCryptoAmountPlaceholder,
+              swapTokensStore.selectedToToken?.symbol ?? ""),
+            text: $toQuantity
+          )
+            .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: Picker(Strings.Wallet.swapOrderTypeLabel, selection: $orderType) {
+          /*
+           MVP only supports market price swap. Ref: https://github.com/brave/brave-browser/issues/18307
+           */
+          /*header: Picker(Strings.Wallet.swapOrderTypeLabel, selection: $orderType) {
             Text(Strings.Wallet.swapMarketOrderType).tag(OrderType.market)
             Text(Strings.Wallet.swapLimitOrderType).tag(OrderType.limit)
           }
             .pickerStyle(SegmentedPickerStyle())
             .resetListHeaderStyle()
             .padding(.bottom, 15)
-            .listRowBackground(Color(.clear))
+            .listRowBackground(Color(.clear))*/
+          header: MarketPriceView(marketPrice: Binding(projectedValue: .constant(0.0005841)), refresh: {
+            // refresh
+            })
+            .listRowBackground(Color.clear)
+            .resetListHeaderStyle()
+            .padding(.trailing, 10)
+            .padding(.bottom, 15)
         ) {
-          VStack(alignment: .leading) {
-            if orderType == .market {
-              MarketPriceView(marketPrice: Binding(projectedValue: .constant(0.0005841)), refresh: {
-                // refresh
-              })
-                .listRowBackground(Color.clear)
-                .padding(.leading, -16)
-                .padding(.trailing, -10)
-                .padding(.bottom, 10)
-            } else {
-              TextField("Limit price in ETH", text: .constant(""))
-                .padding(.vertical, 12)
-                .background(
-                  RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(.secondaryBraveGroupedBackground))
-                    .padding(.horizontal, -20)
-                )
-                .padding(.bottom, 10)
+          NavigationLink(destination: EmptyView()) {
+            HStack {
+              Text("Slippage tolerance")
+                .font(.subheadline)
+              Spacer()
+              Text("2%")
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .font(.subheadline.weight(.semibold))
             }
-            NavigationLink(destination: EmptyView()) {
-              if orderType == .market {
-                HStack {
-                  Text("Slippage tolerance")
-                  Spacer()
-                  Text("2%")
-                    .foregroundColor(Color(.secondaryBraveLabel))
-                    .fontWeight(.semibold)
-                }
-              } else {
-                HStack {
-                  Text("Expires in")
-                  Spacer()
-                  Text("7 days")
-                    .foregroundColor(Color(.secondaryBraveLabel))
-                }
-              }
-            }
-            .padding(.vertical, 12)
-            .background(
-              RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(.secondaryBraveGroupedBackground))
-                .padding(.horizontal, -20)
-            )
           }
         }
-        .listRowBackground(Color.clear)
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header:
             Button(action: {}) {
@@ -251,6 +250,9 @@ struct SwapCryptoView: View {
           }
         }
       }
+      .onAppear {
+        swapTokensStore.fetchAllTokens()
+      }
     }
   }
 }
@@ -260,7 +262,8 @@ struct SwapCryptoView_Previews: PreviewProvider {
   static var previews: some View {
     SwapCryptoView(
       keyringStore: .previewStoreWithWalletCreated,
-      ethNetworkStore: .previewStore
+      ethNetworkStore: .previewStore,
+      swapTokensStore: .previewStore
     )
     .previewColorSchemes()
   }
