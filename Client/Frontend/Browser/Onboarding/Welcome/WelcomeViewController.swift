@@ -109,7 +109,7 @@ class WelcomeViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        //Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+        Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
         
         if case .welcome = self.state {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -156,6 +156,7 @@ class WelcomeViewController: UIViewController {
         skipButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(30.0)
+            $0.height.equalTo(48.0)
         }
         
         bottomImageView.snp.makeConstraints {
@@ -345,7 +346,27 @@ class WelcomeViewController: UIViewController {
     }
     
     private func close() {
-        self.dismiss(animated: true)
+        var presenting: UIViewController = self
+        while true {
+            if let presentingController = presenting.presentingViewController {
+                presenting = presentingController
+                if presenting.isKind(of: BrowserViewController.self) {
+                    break
+                }
+                continue
+            }
+            
+            if let presentingController = presenting as? UINavigationController,
+               let topController = presentingController.topViewController {
+                presenting = topController
+                if presenting.isKind(of: BrowserViewController.self) {
+                    break
+                }
+            }
+            
+            break
+        }
+        presenting.dismiss(animated: true, completion: nil)
     }
 }
 
