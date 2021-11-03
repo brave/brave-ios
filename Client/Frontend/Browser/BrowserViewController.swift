@@ -957,18 +957,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
+        profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
 
         super.viewDidAppear(animated)
-
-        if shouldShowWhatsNewTab() {
-            // Only display if the SUMO topic has been configured in the Info.plist (present and not empty)
-            if let whatsNewTopic = AppInfo.whatsNewTopic, whatsNewTopic != "" {
-                if let whatsNewURL = SupportUtils.URLForTopic(whatsNewTopic) {
-                    self.openURLInNewTab(whatsNewURL, isPrivileged: false)
-                    profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
-                }
-            }
-        }
         
         if let toast = self.pendingToast {
             self.pendingToast = nil
@@ -1039,19 +1030,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         let idiom = UIDevice.current.userInterfaceIdiom
         vc.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
         present(vc, animated: true)
-    }
-
-    // THe logic for shouldShowWhatsNewTab is as follows: If we do not have the LatestAppVersionProfileKey in
-    // the profile, that means that this is a fresh install and we do not show the What's New. If we do have
-    // that value, we compare it to the major version of the running app. If it is different then this is an
-    // upgrade, downgrades are not possible, so we can show the What's New page.
-
-    fileprivate func shouldShowWhatsNewTab() -> Bool {
-        guard let latestMajorAppVersion = profile.prefs.stringForKey(LatestAppVersionProfileKey)?.components(separatedBy: ".").first else {
-            return false // Clean install, never show What's New
-        }
-
-        return latestMajorAppVersion != AppInfo.majorAppVersion && DeviceInfo.hasConnectivity()
     }
 
     fileprivate func showQueuedAlertIfAvailable() {

@@ -1077,7 +1077,6 @@
 		E65075B81E37F7AB006961AC /* NotificationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65075891E37F7AB006961AC /* NotificationConstants.swift */; };
 		E65075BA1E37F7AB006961AC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650758B1E37F7AB006961AC /* Prefs.swift */; };
 		E65075BB1E37F7AB006961AC /* RollingFileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650758C1E37F7AB006961AC /* RollingFileLogger.swift */; };
-		E65075BC1E37F7AB006961AC /* SupportUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650758D1E37F7AB006961AC /* SupportUtils.swift */; };
 		E65075BD1E37F7AB006961AC /* SystemUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650758E1E37F7AB006961AC /* SystemUtils.swift */; };
 		E65075BE1E37F7AB006961AC /* TimeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E650758F1E37F7AB006961AC /* TimeConstants.swift */; };
 		E65075C01E37F7AB006961AC /* WeakList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65075911E37F7AB006961AC /* WeakList.swift */; };
@@ -2876,7 +2875,6 @@
 		E65075891E37F7AB006961AC /* NotificationConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
 		E650758B1E37F7AB006961AC /* Prefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		E650758C1E37F7AB006961AC /* RollingFileLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RollingFileLogger.swift; sourceTree = "<group>"; };
-		E650758D1E37F7AB006961AC /* SupportUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupportUtils.swift; sourceTree = "<group>"; };
 		E650758E1E37F7AB006961AC /* SystemUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemUtils.swift; sourceTree = "<group>"; };
 		E650758F1E37F7AB006961AC /* TimeConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeConstants.swift; sourceTree = "<group>"; };
 		E65075911E37F7AB006961AC /* WeakList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeakList.swift; sourceTree = "<group>"; };
@@ -5619,7 +5617,6 @@
 				E650758B1E37F7AB006961AC /* Prefs.swift */,
 				CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */,
 				E650758C1E37F7AB006961AC /* RollingFileLogger.swift */,
-				E650758D1E37F7AB006961AC /* SupportUtils.swift */,
 				E650758E1E37F7AB006961AC /* SystemUtils.swift */,
 				E650758F1E37F7AB006961AC /* TimeConstants.swift */,
 				0ADCD4512319640F0078CC67 /* UserAgentBuilder.swift */,
@@ -7295,7 +7292,6 @@
 				F91785DB255F38D6002976F2 /* WKWebViewExtensions.swift in Sources */,
 				0A5EBA5B24DD8CD900D605FC /* Deferred.swift in Sources */,
 				EB7FFFC820A9D38D003E1E34 /* AlertController.swift in Sources */,
-				E65075BC1E37F7AB006961AC /* SupportUtils.swift in Sources */,
 				E65075B61E37F7AB006961AC /* Loader.swift in Sources */,
 				E65075C01E37F7AB006961AC /* WeakList.swift in Sources */,
 				E65075AE1E37F7AB006961AC /* UIImageExtensions.swift in Sources */,
