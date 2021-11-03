@@ -1,0 +1,366 @@
+// Copyright 2021 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import Foundation
+import UIKit
+import SnapKit
+import BraveUI
+
+enum WelcomeViewCalloutState {
+    case welcome(title: String)
+    case privacy(title: String, details: String, buttonTitle: String, action: () -> Void)
+    case defaultBrowser(title: String, details: String, primaryButtonTitle: String, secondaryButtonTitle: String, primaryAction: () -> Void, secondaryAction: () -> Void)
+    case ready(title: String, details: String, moreDetails: String)
+}
+
+class WelcomeViewCallout: UIView {
+    private struct DesignUX {
+        static let padding = 20.0
+        static let contentPadding = 30.0
+        static let cornerRadius = 16.0
+    }
+    
+    private let arrowView = CalloutArrowView().then {
+        $0.backgroundColor = .secondaryBraveBackground
+    }
+    
+    private let contentView = UIStackView().then {
+        $0.axis = .vertical
+        $0.layoutMargins = UIEdgeInsets(equalInset: DesignUX.contentPadding)
+        $0.isLayoutMarginsRelativeArrangement = true
+    }
+    
+    // MARK: - Content
+    private let titleLabel = UILabel().then {
+        $0.textColor = .bravePrimary
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+        $0.setContentHuggingPriority(.required, for: .vertical)
+        $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    }
+    
+    private let detailsLabel = UILabel().then {
+        $0.textColor = .bravePrimary
+        $0.textAlignment = .left
+        $0.numberOfLines = 0
+        $0.setContentHuggingPriority(.required, for: .vertical)
+        $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    }
+    
+    private let primaryButton = RoundInterfaceButton(type: .custom).then {
+        $0.setTitleColor(.secondaryBraveBackground, for: .normal)
+        $0.backgroundColor = .braveBlurple
+        $0.setTitle(" ", for: .normal)
+    }
+    
+    private let secondaryButton = RoundInterfaceButton(type: .custom).then {
+        $0.setTitleColor(.braveBlurple, for: .normal)
+        $0.backgroundColor = .clear
+        $0.setTitle(" ", for: .normal)
+    }
+    
+    // MARK: - State
+    private(set) var state: WelcomeViewCalloutState?
+    
+    init(pointsUp: Bool) {
+        super.init(frame: .zero)
+        doLayout(pointsUp: pointsUp)
+        
+        [titleLabel, detailsLabel, primaryButton, secondaryButton].forEach {
+            contentView.addArrangedSubview($0)
+            
+            $0.alpha = 0.0
+            $0.isHidden = true
+        }
+        
+        [primaryButton, secondaryButton].forEach {
+            $0.contentMode = pointsUp ? .bottom : .top
+            $0.snp.makeConstraints {
+                $0.height.equalTo(44.0)
+            }
+        }
+        
+        [titleLabel, detailsLabel].forEach {
+            $0.contentMode = pointsUp ? .bottom : .top
+            
+            $0.snp.makeConstraints {
+                $0.height.greaterThanOrEqualTo(17.0)
+            }
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let roundedLayerName = "rounded.layer"
+        
+        let layers = contentView.layer.sublayers
+        layers?.filter({ $0.name == roundedLayerName }).forEach {
+            $0.removeFromSuperlayer()
+        }
+        
+        let maskBounds = contentView.bounds
+        let path = UIBezierPath(roundedRect: maskBounds,
+                                byRoundingCorners: .allCorners,
+                                cornerRadii: CGSize(width: DesignUX.cornerRadius,
+                                                    height: DesignUX.cornerRadius))
+
+        // Create the shape layer and set its path
+        let maskLayer = CAShapeLayer().then {
+            $0.frame = maskBounds
+            $0.path = path.cgPath
+        }
+
+        let roundedLayer = CALayer().then {
+            $0.backgroundColor = UIColor.secondaryBraveBackground.cgColor
+            $0.frame = maskBounds
+            $0.mask = maskLayer
+            $0.name = roundedLayerName
+        }
+
+        contentView.layer.insertSublayer(roundedLayer, at: 0)
+        
+        layer.shadowColor = #colorLiteral(red: 0.4633028507, green: 0.4875121117, blue: 0.5066562891, alpha: 1).cgColor
+        layer.shadowOpacity = 0.36
+        layer.shadowOffset = CGSize(width: 5, height: 5)
+        layer.shadowRadius = DesignUX.cornerRadius
+    }
+    
+    private func doLayout(pointsUp: Bool) {
+        arrowView.removeFromSuperview()
+        contentView.removeFromSuperview()
+        
+        if pointsUp {
+            addSubview(arrowView)
+            addSubview(contentView)
+            arrowView.transform = .identity
+            
+            arrowView.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.top.equalToSuperview()
+                $0.width.equalTo(20.0)
+                $0.height.equalTo(13.0)
+            }
+            
+            contentView.snp.makeConstraints {
+                $0.top.equalTo(arrowView.snp.bottom)
+                $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                $0.bottom.equalToSuperview()
+            }
+        } else {
+            addSubview(contentView)
+            addSubview(arrowView)
+            arrowView.transform = CGAffineTransform.identity.rotated(by: .pi)
+            
+            contentView.snp.makeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                $0.top.equalToSuperview()
+            }
+            
+            arrowView.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.top.equalTo(contentView.snp.bottom)
+                $0.bottom.equalToSuperview()
+                $0.width.equalTo(20.0)
+                $0.height.equalTo(13.0)
+            }
+        }
+    }
+    
+    func setState(state: WelcomeViewCalloutState, animated: Bool) {
+        self.state = state
+        
+        if case .ready = state {
+            doLayout(pointsUp: true)
+        }
+        
+        if animated {
+            self.layoutIfNeeded()
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveEaseIn, .layoutSubviews]) {
+                self.updateState(state: state)
+                self.layoutIfNeeded()
+            } completion: { finished in
+                
+            }
+        } else {
+            updateState(state: state)
+        }
+    }
+    
+    private func updateState(state: WelcomeViewCalloutState) {
+        primaryButton.removeAction(identifiedBy: .init(rawValue: "primary.action"), for: .primaryActionTriggered)
+        secondaryButton.removeAction(identifiedBy: .init(rawValue: "secondary.action"), for: .primaryActionTriggered)
+        
+        switch state {
+        case .welcome(let title):
+            titleLabel.do {
+                $0.text = title
+                $0.textAlignment = .center
+                $0.font = .systemFont(ofSize: 28.0)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            detailsLabel.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            primaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+        case .privacy(let title, let details, let buttonTitle, let action):
+            titleLabel.do {
+                $0.text = title
+                $0.textAlignment = .left
+                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            detailsLabel.do {
+                $0.text = details
+                $0.font = .systemFont(ofSize: 17.0)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            primaryButton.do {
+                $0.setTitle(buttonTitle, for: .normal)
+                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
+                    action()
+                }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            contentView.setCustomSpacing(8.0, after: titleLabel)
+            contentView.setCustomSpacing(24.0, after: detailsLabel)
+            
+        case .defaultBrowser(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
+            titleLabel.do {
+                $0.text = title
+                $0.textAlignment = .left
+                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            detailsLabel.do {
+                $0.text = details
+                $0.font = .systemFont(ofSize: 17.0)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            primaryButton.do {
+                $0.setTitle(primaryButtonTitle, for: .normal)
+                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
+                    primaryAction()
+                }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButton.do {
+                $0.setTitle(secondaryButtonTitle, for: .normal)
+                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
+                    secondaryAction()
+                }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            contentView.setCustomSpacing(8.0, after: titleLabel)
+            contentView.setCustomSpacing(24.0, after: detailsLabel)
+            contentView.setCustomSpacing(24.0, after: primaryButton)
+            
+        case .ready(let title, let details, let moreDetails):
+            titleLabel.do {
+                $0.text = title
+                $0.textAlignment = .left
+                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            detailsLabel.do {
+                $0.text = "\(details)\n\(moreDetails)"
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            primaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            contentView.setCustomSpacing(8.0, after: titleLabel)
+            contentView.setCustomSpacing(0.0, after: detailsLabel)
+            contentView.setCustomSpacing(0.0, after: primaryButton)
+        }
+    }
+}
+
+private class CalloutArrowView: UIView {
+    private let maskLayer = CAShapeLayer()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        maskLayer.frame = bounds
+        maskLayer.path = createTrianglePath(rect: bounds).cgPath
+        layer.mask = maskLayer
+    }
+    
+    private func createTrianglePath(rect: CGRect) -> UIBezierPath {
+        let path = UIBezierPath()
+        
+        // Middle Top
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        
+        // Bottom Left
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        
+        // Bottom Right
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        
+        // Middle Top
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
+        return path
+    }
+}

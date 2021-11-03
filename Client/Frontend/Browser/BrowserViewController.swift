@@ -977,7 +977,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         showQueuedAlertIfAvailable()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.present(WelcomeViewController().then {
+            self.present(WelcomeViewController(profile: self.profile, rewards: self.rewards).then {
                 $0.modalPresentationStyle = .fullScreen
             }, animated: true, completion: nil)
         }

@@ -910,6 +910,7 @@
 		CA10BE7C2704BA7900A265A6 /* GlobalSignRootCA_R5.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F23126CBD27900658EAC /* GlobalSignRootCA_R5.cer */; };
 		CA10BE7D2704BA7900A265A6 /* SFSRootCAG2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22C26CBD1C600658EAC /* SFSRootCAG2.cer */; };
 		CA10BE7F2704BCAE00A265A6 /* leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = CA10BE7E2704BCAE00A265A6 /* leaf.cer */; };
+		CA1B699027303D6B00F7CAC0 /* WelcomeViewCallout.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */; };
 		CA220258271881E3002D3582 /* InternalSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA220257271881E3002D3582 /* InternalSchemeHandler.swift */; };
 		CA22028D2719283F002D3582 /* GenericError.html in Resources */ = {isa = PBXBuildFile; fileRef = CA22028C2719283F002D3582 /* GenericError.html */; };
 		CA22028F27192875002D3582 /* Generic.svg in Resources */ = {isa = PBXBuildFile; fileRef = CA22028E27192875002D3582 /* Generic.svg */; };
@@ -934,6 +935,9 @@
 		CA550490269DED8F00C19917 /* MediaBackgrounding.js in Resources */ = {isa = PBXBuildFile; fileRef = CA55048F269DED8F00C19917 /* MediaBackgrounding.js */; };
 		CA752EA526CEABF8009356EF /* PlaylistToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA752EA426CEABF8009356EF /* PlaylistToast.swift */; };
 		CA752EB126CEBE52009356EF /* FontScaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A22FF26A7370C00923D70 /* FontScaling.swift */; };
+		CA7C5CAD2731928F003366F7 /* WelcomeViewSearchEnginesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAC2731928F003366F7 /* WelcomeViewSearchEnginesView.swift */; };
+		CA7C5CAF2731D022003366F7 /* PrivacyEverywhereView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */; };
+		CA7C5CB12731D9A4003366F7 /* BraveVPNAd.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */; };
 		CA8D5C0E26D7CD8A009BF13D /* PlaylistDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */; };
 		CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */; };
 		CA8D5C1226D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */; };
@@ -2701,6 +2705,7 @@
 		CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Widgets.swift"; sourceTree = "<group>"; };
 		CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTests.swift; sourceTree = "<group>"; };
 		CA10BE7E2704BCAE00A265A6 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
+		CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewCallout.swift; sourceTree = "<group>"; };
 		CA220257271881E3002D3582 /* InternalSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSchemeHandler.swift; sourceTree = "<group>"; };
 		CA22028C2719283F002D3582 /* GenericError.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = GenericError.html; sourceTree = "<group>"; };
 		CA22028E27192875002D3582 /* Generic.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = Generic.svg; sourceTree = "<group>"; };
@@ -2724,6 +2729,9 @@
 		CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerTrackbar.swift; sourceTree = "<group>"; };
 		CA55048F269DED8F00C19917 /* MediaBackgrounding.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MediaBackgrounding.js; sourceTree = "<group>"; };
 		CA752EA426CEABF8009356EF /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
+		CA7C5CAC2731928F003366F7 /* WelcomeViewSearchEnginesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewSearchEnginesView.swift; sourceTree = "<group>"; };
+		CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyEverywhereView.swift; sourceTree = "<group>"; };
+		CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveVPNAd.swift; sourceTree = "<group>"; };
 		CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailViewController.swift; sourceTree = "<group>"; };
 		CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+DragDropDelegate.swift"; sourceTree = "<group>"; };
 		CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+TableViewDataSource.swift"; sourceTree = "<group>"; };
@@ -3268,8 +3276,8 @@
 		0A3C789423055AC80022F6D8 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
+				CA1B698327303D5800F7CAC0 /* Welcome */,
 				CABFA8DB2727219900B73E97 /* WelcomeView.swift */,
-				CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */,
 				0A6112BC230B4306001BBC45 /* OnboardingViewController.swift */,
 				0A6112AB230B00E7001BBC45 /* OnboardingNavigationController.swift */,
 				0AE5C69024F0059D004CBC9B /* OnboardingPrivacyConsentViewController.swift */,
@@ -5192,6 +5200,18 @@
 				CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */,
 			);
 			path = BrowserViewController;
+			sourceTree = "<group>";
+		};
+		CA1B698327303D5800F7CAC0 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */,
+				CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */,
+				CA7C5CAC2731928F003366F7 /* WelcomeViewSearchEnginesView.swift */,
+				CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */,
+				CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */,
+			);
+			path = Welcome;
 			sourceTree = "<group>";
 		};
 		CA0391B7271E1023000EB13C /* BraveWidgets */ = {
@@ -7889,6 +7909,7 @@
 				0A1E84452190A57F0042F782 /* SyncPairWordsViewController.swift in Sources */,
 				2746D27524A2A9FE00E38852 /* RewardsInternalsContributionPublishersListController.swift in Sources */,
 				CAADEFE226E2857F0020DC4C /* PlaylistCarplayController.swift in Sources */,
+				CA1B699027303D6B00F7CAC0 /* WelcomeViewCallout.swift in Sources */,
 				270A0F392605267D0091D880 /* LegacyWalletTransferStatusButton.swift in Sources */,
 				4422D4DF21BFFB7600BF1855 /* table_builder.cc in Sources */,
 				27448536245B608E001920B5 /* QRCodePopupView.swift in Sources */,
@@ -7937,6 +7958,7 @@
 				D3968F251A38FE8500CEFD3B /* TabManager.swift in Sources */,
 				5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
+				CA7C5CB12731D9A4003366F7 /* BraveVPNAd.swift in Sources */,
 				CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
 				277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */,
@@ -8031,6 +8053,7 @@
 				5EC594ED232C2C8F00922111 /* OnboardingWebViewController.swift in Sources */,
 				0A4B012420D0321A004D4011 /* UX.swift in Sources */,
 				2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */,
+				CA7C5CAF2731D022003366F7 /* PrivacyEverywhereView.swift in Sources */,
 				5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */,
 				4422D55521BFFB7E00BF1855 /* nfa.cc in Sources */,
 				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
@@ -8042,6 +8065,7 @@
 				2727369B24A65F650096DCB9 /* UIActionExtensions.swift in Sources */,
 				4433E15526B996C20023A134 /* BraveTalkRewardsOptInViewController.swift in Sources */,
 				2746D28124A4F8DA00E38852 /* RewardsInternalsShareController.swift in Sources */,
+				CA7C5CAD2731928F003366F7 /* WelcomeViewSearchEnginesView.swift in Sources */,
 				4422D54821BFFB7E00BF1855 /* pcre.cc in Sources */,
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
