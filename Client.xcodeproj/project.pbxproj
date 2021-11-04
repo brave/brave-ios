@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A0A07CE247518B100591DFB /* BraveVPNContactFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0A07CD247518B100591DFB /* BraveVPNContactFormViewController.swift */; };
-		0A0A5ED125B1F080007B3E74 /* DefaultBrowserIntroManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */; };
+		0A0A5ED125B1F080007B3E74 /* FullScreenCalloutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0A5ED025B1F080007B3E74 /* FullScreenCalloutManager.swift */; };
 		0A0D3D3921A4BD0600BEE65B /* SafeBrowsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3821A4BD0600BEE65B /* SafeBrowsing.swift */; };
 		0A0D3D3C21A4BE6400BEE65B /* adblock-list.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3B21A4BE6400BEE65B /* adblock-list.txt */; };
 		0A0D3D3E21A4BE6C00BEE65B /* simple_malware.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A0D3D3D21A4BE6C00BEE65B /* simple_malware.txt */; };
@@ -53,7 +53,6 @@
 		0A4214FF21AC0D6C006B8E39 /* TimeExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4214F621AC0AFF006B8E39 /* TimeExtensions.swift */; };
 		0A42150121AC0E8E006B8E39 /* TimeExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A42150021AC0E8E006B8E39 /* TimeExtensionTests.swift */; };
 		0A42BC43260CEDA3007EBBF3 /* VPNLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */; };
-		0A42F3BD25B5CFAE00BD370B /* DefaultBrowserIntroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A42F3BC25B5CFAE00BD370B /* DefaultBrowserIntroTests.swift */; };
 		0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43292F21B1C7F50041625B /* AdBlockStats.swift */; };
 		0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43293A21B1C8D10041625B /* FifoDict.swift */; };
 		0A47389E25D2DD6F0048201A /* NSPredicate+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A47389C25D2DD6E0048201A /* NSPredicate+Additions.m */; };
@@ -1486,7 +1485,7 @@
 
 /* Begin PBXFileReference section */
 		0A0A07CD247518B100591DFB /* BraveVPNContactFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveVPNContactFormViewController.swift; sourceTree = "<group>"; };
-		0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserIntroManager.swift; sourceTree = "<group>"; };
+		0A0A5ED025B1F080007B3E74 /* FullScreenCalloutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenCalloutManager.swift; sourceTree = "<group>"; };
 		0A0D3D3821A4BD0600BEE65B /* SafeBrowsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeBrowsing.swift; sourceTree = "<group>"; };
 		0A0D3D3B21A4BE6400BEE65B /* adblock-list.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "adblock-list.txt"; sourceTree = "<group>"; };
 		0A0D3D3D21A4BE6C00BEE65B /* simple_malware.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = simple_malware.txt; sourceTree = "<group>"; };
@@ -1551,7 +1550,6 @@
 		0A4214F621AC0AFF006B8E39 /* TimeExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeExtensions.swift; sourceTree = "<group>"; };
 		0A42150021AC0E8E006B8E39 /* TimeExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeExtensionTests.swift; sourceTree = "<group>"; };
 		0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLogs.swift; sourceTree = "<group>"; };
-		0A42F3BC25B5CFAE00BD370B /* DefaultBrowserIntroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserIntroTests.swift; sourceTree = "<group>"; };
 		0A43292F21B1C7F50041625B /* AdBlockStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBlockStats.swift; sourceTree = "<group>"; };
 		0A43293A21B1C8D10041625B /* FifoDict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FifoDict.swift; sourceTree = "<group>"; };
 		0A47389C25D2DD6E0048201A /* NSPredicate+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPredicate+Additions.m"; sourceTree = "<group>"; };
@@ -5572,7 +5570,7 @@
 				0A19365323508756002E2B81 /* LinkPreviewViewController.swift */,
 				0A66550923E9D9750047EF2A /* UserAgent.swift */,
 				0A8A6224257905E300B035F4 /* UniversalLinkManager.swift */,
-				0A0A5ED025B1F080007B3E74 /* DefaultBrowserIntroManager.swift */,
+				0A0A5ED025B1F080007B3E74 /* FullScreenCalloutManager.swift */,
 				0AE50869261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift */,
 				449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */,
 				CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */,
@@ -5880,7 +5878,6 @@
 				275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */,
 				2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */,
 				0A8A622F25790D0900B035F4 /* UniversalLinkManagerTests.swift */,
-				0A42F3BC25B5CFAE00BD370B /* DefaultBrowserIntroTests.swift */,
 				F9488F12258D6B9800A72C84 /* WKWebViewExtensionsTest.swift */,
 				F95ED17D25A95426001A432D /* UserScriptManagerTest.swift */,
 				0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */,
@@ -7582,7 +7579,7 @@
 				4422D55121BFFB7E00BF1855 /* set.cc in Sources */,
 				27A1AC0124855C1700344503 /* FeedCardBackgroundView.swift in Sources */,
 				0AEF99A922E22C5E00294C76 /* DownloadsViewController.swift in Sources */,
-				0A0A5ED125B1F080007B3E74 /* DefaultBrowserIntroManager.swift in Sources */,
+				0A0A5ED125B1F080007B3E74 /* FullScreenCalloutManager.swift in Sources */,
 				CA2202AC27192E6D002D3582 /* GenericErrorPageHandler.swift in Sources */,
 				442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */,
 				27AD20CC26851DD100889AA7 /* BraveRewards.swift in Sources */,
@@ -8046,7 +8043,6 @@
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
 				281B2BEA1ADF4D90002917DC /* MockProfile.swift in Sources */,
 				2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */,
-				0A42F3BD25B5CFAE00BD370B /* DefaultBrowserIntroTests.swift in Sources */,
 				27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */,
 				2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */,
 				D3BA41681BD82F2200DA5457 /* XCTestCaseExtensions.swift in Sources */,

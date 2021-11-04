@@ -188,6 +188,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     /// Data Source object used to determine blocking stats
     var benchmarkBlockingDataSource: BlockingSummaryDataSource?
     
+    /// Boolean which is tracking If a full screen callout is presented
+    /// in order to not to try to present another callout  over existing one
+    var fullScreenCalloutPresented = false
+    
     private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
     var widgetFaviconFetchers: [FaviconFetcher] = []
     let deviceCheckClient: DeviceCheckClient?
@@ -937,16 +941,17 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         presentPassCodeMigration()
         
         // Present Onboarding to new users, existing users will not see the onboarding
-        //presentOnboardingIntro()
+        presentOnboardingIntro()
         
-        //presentVPNAlertCallout()
-        
-        presentSyncAlertCallout()
-        
-        //presentBraveRewardsScreenCallout()
-
-        //presentDefaultBrowserScreenCallout()
-        
+        // Full Screen Callout Presantation
+        // Priority: VPN - Default Browser - Rewards - Sync
+        if false {
+            presentVPNAlertCallout()
+            presentDefaultBrowserScreenCallout()
+            presentBraveRewardsScreenCallout()
+            presentSyncAlertCallout()
+        }
+                
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
@@ -958,9 +963,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         }
         showQueuedAlertIfAvailable()
     }
-    
-    /// Whether or not to show the Default Browser intro callout. It's set at app launch in AppDelegate
-    var shouldShowIntroScreen = false
     
     /// Whether or not to show the playlist onboarding callout this session
     var shouldShowPlaylistOnboardingThisSession = true

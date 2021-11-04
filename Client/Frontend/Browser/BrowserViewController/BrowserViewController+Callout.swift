@@ -27,41 +27,13 @@ extension BrowserViewController {
         }
     }
     
-    func presentSyncAlertCallout() {
-        //if Preferences.DebugFlag.skipNTPCallouts == true { return }
-        
-        let hostingController = UIHostingController(rootView: PrivacyEverywhereView())
-        hostingController.modalPresentationStyle = .popover
-        
-        let popover = hostingController.popoverPresentationController
-        hostingController.preferredContentSize = hostingController.view.systemLayoutSizeFitting(view.bounds.size)
-        
-        popover?.sourceView = self.view
-        popover?.sourceRect = CGRect(x: view.center.x, y: view.center.y, width: 0, height: 0)
-        popover?.permittedArrowDirections = UIPopoverArrowDirection(rawValue: 0)
-
-        self.present(hostingController, animated: true, completion: nil)
-
-
-//        let hostingController = UIHostingController(rootView: PrivacyEverywhereView())
-//        hostingController.modalPresentationStyle = .popover
-//        hostingController.rootView.dismiss = { [unowned hostingController] in
-//            hostingController.dismiss(animated: true)
-//        }
-//
-//        let popover = hostingController.popoverPresentationController
-//        hostingController.preferredContentSize = hostingController.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-//
-//        popover?.sourceView = self.view
-//        popover?.sourceRect = CGRect(x: view.center.x, y: view.center.y, width: 0, height: 0)
-//        popover?.permittedArrowDirections = UIPopoverArrowDirection(rawValue: 0)
-//
-//        self.present(hostingController, animated: true, completion: nil)
-    }
-    
     func presentVPNAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
 
+        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .vpn) {
+            return
+        }
+        
         let onboardingNotCompleted =
             Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue
 
@@ -82,45 +54,17 @@ extension BrowserViewController {
             self?.presentCorrespondingVPNViewController()
         }
         
+        fullScreenCalloutPresented = true
         present(popup, animated: false)
         showedPopup.value = true
     }
     
-    /// Shows a vpn screen based on vpn state.
-    func presentCorrespondingVPNViewController() {
-        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
-        let nav = SettingsNavigationController(rootViewController: vc)
-        nav.navigationBar.topItem?.leftBarButtonItem =
-            .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
-        let idiom = UIDevice.current.userInterfaceIdiom
-        
-        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-        
-        nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-        present(nav, animated: true)
-    }
-    
-    func presentBraveRewardsScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
-
-        if BraveRewards.isAvailable {
-            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
-            controller.onOnboardingStateChanged = { [weak self] controller, state in
-                self?.dismissOnboarding(controller, state: state)
-            }
-            self.present(controller, animated: true)
-        }
-        return
-    }
-    
     func presentDefaultBrowserScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
         
-//        if !shouldShowIntroScreen {
-//            return
-//        }
-//
-//        shouldShowIntroScreen = false
+        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .defaultBrowser) {
+            return
+        }
         
         let onboardingController = WelcomeViewController(
             profile: nil,
@@ -141,6 +85,59 @@ extension BrowserViewController {
         present(onboardingController, animated: false)
     }
     
-    // 60 days until the next time the user sees the onboarding..
-    //static let onboardingDaysInterval = TimeInterval(60.days)
+    /// Shows a vpn screen based on vpn state.
+    func presentCorrespondingVPNViewController() {
+        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+        let nav = SettingsNavigationController(rootViewController: vc)
+        nav.navigationBar.topItem?.leftBarButtonItem =
+            .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
+        let idiom = UIDevice.current.userInterfaceIdiom
+        
+        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+        
+        nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
+        present(nav, animated: true)
+    }
+    
+    func presentSyncAlertCallout() {
+        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
+        
+        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .sync) {
+            return
+        }
+
+        let hostingController = UIHostingController(rootView: PrivacyEverywhereView())
+        hostingController.modalPresentationStyle = .popover
+        hostingController.rootView.dismiss = { [unowned hostingController] in
+            hostingController.dismiss(animated: true)
+        }
+        
+        let popover = hostingController.popoverPresentationController
+        hostingController.preferredContentSize = hostingController.view.systemLayoutSizeFitting(view.bounds.size)
+        
+        popover?.sourceView = view
+        popover?.sourceRect = CGRect(x: view.center.x, y: view.center.y, width: 0, height: 0)
+        popover?.permittedArrowDirections = UIPopoverArrowDirection(rawValue: 0)
+
+        fullScreenCalloutPresented = true
+        present(hostingController, animated: true, completion: nil)
+    }
+    
+    func presentBraveRewardsScreenCallout() {
+        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
+
+        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .rewards) {
+            return
+        }
+        
+        if BraveRewards.isAvailable {
+            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+            controller.onOnboardingStateChanged = { [weak self] controller, state in
+                self?.dismissOnboarding(controller, state: state)
+            }
+            fullScreenCalloutPresented = true
+            present(controller, animated: true)
+        }
+        return
+    }
 }

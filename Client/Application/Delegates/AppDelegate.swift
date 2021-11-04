@@ -259,8 +259,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Preferences.General.isFirstLaunch.value = false
-        SceneDelegate.shouldShowIntroScreen =
-            DefaultBrowserIntroManager.prepareAndShowIfNeeded(isNewUser: isFirstLaunch)
         
         // Search engine setup must be checked outside of 'firstLaunch' loop because of #2770.
         // There was a bug that when you skipped onboarding, default search engine preference
