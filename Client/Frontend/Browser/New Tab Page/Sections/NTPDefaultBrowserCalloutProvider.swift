@@ -10,6 +10,9 @@ import BraveShared
 
 class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     var sectionDidChange: (() -> Void)?
+    private lazy var defaultCalloutView: DefaultBrowserCalloutView? = {
+        NTPDefaultBrowserCalloutProvider.shouldShowCallout ? DefaultBrowserCalloutView() : nil
+    }()
     
     private typealias DefaultBrowserCalloutCell = NewTabCenteredCollectionViewCell<DefaultBrowserCalloutView>
     
@@ -44,7 +47,9 @@ class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
-        size.height = 54
+        if let extraSize = defaultCalloutView?.systemLayoutSizeFitting(size) {
+            size.height = extraSize.height
+        }
         
         return size
     }
