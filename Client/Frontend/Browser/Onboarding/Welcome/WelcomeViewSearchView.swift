@@ -8,7 +8,7 @@ import UIKit
 import SnapKit
 import BraveUI
 
-class WelcomeViewSearchEnginesView: UIView {
+class WelcomeViewSearchView: UIView {
     private struct DesignUX {
         static let padding = 16.0
         static let contentPadding = 30.0

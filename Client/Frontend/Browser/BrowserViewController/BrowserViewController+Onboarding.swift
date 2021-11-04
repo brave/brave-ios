@@ -13,7 +13,7 @@ import BraveCore
 extension BrowserViewController {
     
     func presentOnboardingIntro() {
-        if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+        //if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
         // 1. Existing user.
         // 2. User already completed onboarding.

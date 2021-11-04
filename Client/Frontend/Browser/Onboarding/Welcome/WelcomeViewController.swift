@@ -15,7 +15,7 @@ private enum WelcomeViewID: Int {
     case contents = 3
     case callout = 4
     case iconView = 5
-    case searchEngine = 6
+    case searchView = 6
     case bottomImage = 7
     case skipButton = 8
 }
@@ -25,6 +25,7 @@ class WelcomeViewController: UIViewController {
     private let rewards: BraveRewards?
     private var state: WelcomeViewCalloutState?
     
+    var onAdsWebsiteSelected: ((URL?) -> Void)?
     var onOnboardingComplete: (() -> Void)?
     
     convenience init(profile: Profile?, rewards: BraveRewards?) {
@@ -75,7 +76,7 @@ class WelcomeViewController: UIViewController {
         $0.contentMode = .scaleAspectFit
     }
     
-    private let searchEnginesView = WelcomeViewSearchEnginesView().then {
+    private let searchView = WelcomeViewSearchView().then {
         $0.isHidden = true
     }
     
@@ -93,14 +94,6 @@ class WelcomeViewController: UIViewController {
         $0.setTitleColor(.white, for: .normal)
         $0.alpha = 0.0
     }
-    
-    private var searchEngines: SearchEngines? {
-        profile?.searchEngines
-    }
-    
-    private lazy var availableEngines: [OpenSearchEngine] = {
-        SearchEngines.getUnorderedBundledEngines(isOnboarding: true, locale: .current)
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -124,7 +117,7 @@ class WelcomeViewController: UIViewController {
         contentContainer.tag = WelcomeViewID.contents.rawValue
         calloutView.tag = WelcomeViewID.callout.rawValue
         iconView.tag = WelcomeViewID.iconView.rawValue
-        searchEnginesView.tag = WelcomeViewID.searchEngine.rawValue
+        searchView.tag = WelcomeViewID.searchView.rawValue
         bottomImageView.tag = WelcomeViewID.bottomImage.rawValue
         skipButton.tag = WelcomeViewID.skipButton.rawValue
         
@@ -134,7 +127,7 @@ class WelcomeViewController: UIViewController {
             view.addSubview($0)
         }
         
-        [calloutView, iconView, searchEnginesView].forEach {
+        [calloutView, iconView, searchView].forEach {
             contentContainer.addArrangedSubview($0)
         }
         
@@ -219,7 +212,7 @@ class WelcomeViewController: UIViewController {
                                     primaryButtonTitle: "Set as default",
                                     secondaryButtonTitle: "Not now",
                                     primaryAction: {
-                                        print("Let's go")
+                                        nextController.onSetDefaultBrowser()
                                     }, secondaryAction: {
                                         nextController.animateToReadyState()
                                     }
@@ -290,7 +283,7 @@ class WelcomeViewController: UIViewController {
                 $0.removeFromSuperview()
             }
             
-            [$0.iconView, $0.calloutView, $0.searchEnginesView].forEach {
+            [$0.iconView, $0.calloutView, $0.searchView].forEach {
                 nextController.contentContainer.addArrangedSubview($0)
                 $0.isHidden = false
             }
@@ -303,17 +296,17 @@ class WelcomeViewController: UIViewController {
             $0.contentContainer.setCustomSpacing(-40.0, after: iconView)
             $0.contentContainer.setCustomSpacing(15.0, after: calloutView)
             
-            $0.availableEngines.forEach { engine in
-                nextController.searchEnginesView.addButton(icon: engine.image, title: engine.displayName) { [weak nextController] in
-                    nextController?.onSearchEngineSelected(engine)
+            $0.websitesForRegion().forEach { item in
+                nextController.searchView.addButton(icon: item.icon, title: item.title) { [weak nextController] in
+                    nextController?.onWebsiteSelected(item)
                 }
             }
             
-            $0.searchEnginesView.addButton(icon: UIImage(), title: "Enter a website") {
-                
+            $0.searchView.addButton(icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"), title: "Enter a website") {
+                nextController.onEnterCustomWebsite()
             }
             
-            $0.searchEnginesView.snp.makeConstraints {
+            $0.searchView.snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(240.0)
             }
             
@@ -327,22 +320,26 @@ class WelcomeViewController: UIViewController {
     
     @objc
     private func onSkipButtonPressed(_ button: UIButton) {
-        // Set the default search engine
-        onSearchEngineSelected(nil)
         close()
     }
     
-    private func onSearchEngineSelected(_ engine: OpenSearchEngine?) {
-        if let engine = engine {
-            searchEngines?.setInitialDefaultEngine(engine.shortName)
-        } else {
-            let defaultEngine = searchEngines?.defaultEngine().shortName
-            if let engine = availableEngines.first(where: { $0.shortName == defaultEngine }) {
-                searchEngines?.setInitialDefaultEngine(engine.shortName)
-            }
+    private func onWebsiteSelected(_ item: WebsiteRegion) {
+        if let url = URL(string: item.domain) {
+            self.onAdsWebsiteSelected?(url)
         }
-        
         close()
+    }
+    
+    private func onEnterCustomWebsite() {
+        self.onAdsWebsiteSelected?(nil)
+    }
+    
+    private func onSetDefaultBrowser() {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        UIApplication.shared.open(settingsUrl)
+        animateToReadyState()
     }
     
     private func close() {
@@ -367,6 +364,98 @@ class WelcomeViewController: UIViewController {
             break
         }
         presenting.dismiss(animated: true, completion: nil)
+    }
+    
+    private struct WebsiteRegion {
+        let icon: UIImage
+        let title: String
+        let domain: String
+    }
+    
+    private func websitesForRegion() -> [WebsiteRegion] {
+        var siteList = [WebsiteRegion]()
+        
+        switch Locale.current.regionCode {
+            // Canada
+        case "CA":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-environment-canada"), title: "Environment Canada", domain: "https://weather.gc.ca/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cdn-tire"), title: "Canadian Tire", domain: "https://canadiantire.ca/")
+            ]
+            
+            // United Kingdom
+        case "GB":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-bbc"), title: "BBC", domain: "https://bbc.co.uk/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-sky"), title: "Sky", domain: "https://sky.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/")
+            ]
+            
+            // Germany
+        case "DE":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gmx"), title: "GMX", domain: "https://gmx.net/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-mobilede"), title: "Mobile", domain: "https://mobile.de/")
+            ]
+            
+            // France
+        case "FR":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-jdf"), title: "Les Journal des Femmes", domain: "https://journaldesfemmes.fr/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-programme-tv"), title: "Programme TV", domain: "https://programme-tv.net/")
+            ]
+            
+            // India
+        case "IN":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-hotstar"), title: "Hot Star", domain: "https://hotstar.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cricketbuzz"), title: "Cricket Buzz", domain: "https://cricbuzz.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-flipkart"), title: "Flipkart", domain: "https://flipkart.com/")
+            ]
+            
+            // Australia
+        case "AU":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-news-au"), title: "News", domain: "https://news.com.au/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gumtree"), title: "Gumtree", domain: "https://gumtree.com.au/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-realestate-au"), title: "Real Estate", domain: "https://realestate.com.au/")
+            ]
+            
+            // Ireland
+        case "IE":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-rte"), title: "RTÉ", domain: "https://rte.ie/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-independent"), title: "Independent", domain: "https://independent.ie/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-donedeal"), title: "DoneDeal", domain: "https://donedeal.ie/")
+            ]
+            
+            // Japan
+        case "JP":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://m.yahoo.co.jp/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.jp/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-number-bunshin"), title: "Number Web", domain: "https://number.bunshun.jp/")
+            ]
+            
+            // United States
+        case "US":
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/")
+            ]
+            
+        default:
+            siteList = [
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
+                WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/")
+            ]
+        }
+        return siteList
     }
 }
 
@@ -431,7 +520,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                   let contentContainer = view.subview(with: WelcomeViewID.contents.rawValue),
                   let calloutView = view.subview(with: WelcomeViewID.callout.rawValue),
                   let iconView = view.subview(with: WelcomeViewID.iconView.rawValue),
-                  let searchEnginesView = view.subview(with: WelcomeViewID.searchEngine.rawValue),
+                  let searchEnginesView = view.subview(with: WelcomeViewID.searchView.rawValue),
                   let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue),
                   let skipButton = view.subview(with: WelcomeViewID.skipButton.rawValue) else {
                 return nil
