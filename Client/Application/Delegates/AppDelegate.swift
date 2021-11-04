@@ -258,6 +258,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 isFirstLaunch ? OnboardingState.unseen.rawValue : OnboardingState.completed.rawValue
         }
         
+        // Check if user has launched the application before and determine if it is a new retention user
+        if  Preferences.General.isFirstLaunch.value, Preferences.General.isNewRetentionUser.value == nil {
+            Preferences.General.isNewRetentionUser.value = true
+        }
+        
         Preferences.General.isFirstLaunch.value = false
         
         // Search engine setup must be checked outside of 'firstLaunch' loop because of #2770.

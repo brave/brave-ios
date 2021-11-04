@@ -35,8 +35,8 @@ struct FullScreenCalloutManager {
     
     /// It determines whether we should show show the designated callout or not and sets corresponding preferences accordingly.
     /// Returns true if the callout should be shown.
-    static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType, isNewUser: Bool = true, launchDate: Date = Date()) -> Bool {
-        guard isNewUser, !calloutType.preferenceValue.value else {
+    static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType, launchDate: Date = Date()) -> Bool {
+        guard Preferences.General.isNewRetentionUser.value == true, !calloutType.preferenceValue.value else {
             return false
         }
         

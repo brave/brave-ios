@@ -54,6 +54,8 @@ extension Preferences {
     final class General {
         /// Whether this is the first time user has ever launched Brave after intalling. *Should never be set to `true` manually!*
         static let isFirstLaunch = Option<Bool>(key: "general.first-launch", default: true)
+        /// Whether this is a new user who installed the application after onboarding retention updates
+        static let isNewRetentionUser = Option<Bool?>(key: "general.new-retention", default: nil)
         /// Whether or not to save logins in Brave
         static let saveLogins = Option<Bool>(key: "general.save-logins", default: true)
         /// Whether or not to block popups from websites automaticaly
@@ -130,7 +132,6 @@ extension Preferences {
         static let defaultBrowserNotificationScheduled =
             Option<Bool>(key: "general.default-browser-notification-scheduled", default: false)
     }
-    
     
     final class Search {
         /// Whether or not to show suggestions while the user types
