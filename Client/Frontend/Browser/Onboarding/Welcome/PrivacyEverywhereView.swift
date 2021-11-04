@@ -66,8 +66,8 @@ struct PrivacyEverywhereView_Previews: PreviewProvider {
 
 class PrivacyEverywhereController: UIHostingController<PrivacyEverywhereView> & PopupContentComponent {
     
-    init(dismiss: (() -> Void)?) {
-        super.init(rootView: PrivacyEverywhereView(dismiss: dismiss))
+    init() {
+        super.init(rootView: PrivacyEverywhereView())
         view.backgroundColor = .clear
     }
     

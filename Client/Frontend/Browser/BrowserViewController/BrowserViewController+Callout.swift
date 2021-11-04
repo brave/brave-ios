@@ -106,21 +106,13 @@ extension BrowserViewController {
             return
         }
 
-        let hostingController = UIHostingController(rootView: PrivacyEverywhereView())
-        hostingController.modalPresentationStyle = .popover
-        hostingController.rootView.dismiss = { [unowned hostingController] in
-            hostingController.dismiss(animated: true)
+        let controller = PrivacyEverywhereController()
+        controller.rootView.dismiss = { [unowned controller] in
+            controller.dismiss(animated: true)
         }
-        
-        let popover = hostingController.popoverPresentationController
-        hostingController.preferredContentSize = hostingController.view.systemLayoutSizeFitting(view.bounds.size)
-        
-        popover?.sourceView = view
-        popover?.sourceRect = CGRect(x: view.center.x, y: view.center.y, width: 0, height: 0)
-        popover?.permittedArrowDirections = UIPopoverArrowDirection(rawValue: 0)
 
         fullScreenCalloutPresented = true
-        present(hostingController, animated: true, completion: nil)
+        present(PopupViewController(contentController: controller), animated: true, completion: nil)
     }
     
     func presentBraveRewardsScreenCallout() {
