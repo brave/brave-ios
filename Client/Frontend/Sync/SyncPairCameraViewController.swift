@@ -46,6 +46,17 @@ class SyncPairCameraViewController: SyncViewController {
         cameraView.layer.masksToBounds = true
         cameraView.scanCallback = { [weak self] data in
             guard let self = self else { return }
+            
+            // TODO: Functional, but needs some cleanup
+            struct Scanner { static var lock = false }
+            
+            if Scanner.lock {
+                // Have internal, so camera error does not show
+                return
+            }
+            
+            Scanner.lock = true
+            
             let alert = UIAlertController(title: Strings.syncJoinChainWarningTitle,
                                           message: Strings.syncJoinChainCameraWarning,
                                           preferredStyle: .alert)
@@ -55,16 +66,6 @@ class SyncPairCameraViewController: SyncViewController {
                     self.present(SyncAlerts.noConnection, animated: true)
                     return
                 }
-                
-                // TODO: Functional, but needs some cleanup
-                struct Scanner { static var lock = false }
-                
-                if Scanner.lock {
-                    // Have internal, so camera error does not show
-                    return
-                }
-                
-                Scanner.lock = true
                 self.cameraView.cameraOverlaySucess()
                 // Freezing the camera frame after QR has been scanned.
                 self.cameraView.captureSession?.stopRunning()
@@ -88,7 +89,9 @@ class SyncPairCameraViewController: SyncViewController {
                 }
             })
             
-            let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel)
+            let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel) { _ in
+                Scanner.lock = false
+            }
             
             alert.addAction(okAction)
             alert.addAction(cancelAction)
