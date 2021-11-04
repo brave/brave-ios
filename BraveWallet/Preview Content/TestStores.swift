@@ -76,7 +76,9 @@ extension SwapTokenStore {
   static var previewStore: SwapTokenStore {
     .init(
       tokenRegistry: TestTokenRegistry(),
-      rpcController: TestEthJsonRpcController()
+      rpcController: TestEthJsonRpcController(),
+      assetRatioController: TestAssetRatioController(),
+      swapController: TestSwapController()
     )
   }
 }
