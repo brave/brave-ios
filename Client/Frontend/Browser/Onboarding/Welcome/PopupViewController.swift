@@ -188,14 +188,7 @@ extension PopupViewController: BasicAnimationControllerDelegate {
         }
         
         view.layoutIfNeeded()
-        
-        let translationDelta = CGPoint(
-            x: view.frame.center.x - containerView.frame.midX,
-            y: -containerView.frame.height / 2.0
-        )
-        containerView.transform = CGAffineTransform(translationX: translationDelta.x, y: translationDelta.y)
-            .scaledBy(x: 0.001, y: 0.001)
-            .translatedBy(x: -translationDelta.x, y: -translationDelta.y)
+        containerView.transform = CGAffineTransform.identity.scaledBy(x: 0.001, y: 0.001)
         
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [.beginFromCurrentState, .allowUserInteraction], animations: {
             self.containerView.transform = .identity
@@ -218,20 +211,11 @@ extension PopupViewController: BasicAnimationControllerDelegate {
         }
 
         let oldTransform = containerView.transform
-        let rotationAngle = atan2(oldTransform.b, oldTransform.a)
-
         containerView.transform = .identity // Reset to get unaltered frame
-        let translationDelta = CGPoint(
-            x: view.frame.center.x - containerView.frame.midX,
-            y: -containerView.frame.height / 2.0
-        )
         containerView.transform = oldTransform // Make sure to animate transform from a possibly altered transform
 
         UIView.animate(withDuration: 0.15, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction], animations: {
-            self.containerView.transform = CGAffineTransform(translationX: translationDelta.x, y: translationDelta.y)
-                .scaledBy(x: 0.001, y: 0.001)
-                .rotated(by: rotationAngle)
-                .translatedBy(x: -translationDelta.x, y: -translationDelta.y)
+            self.containerView.transform = CGAffineTransform.identity.scaledBy(x: 0.001, y: 0.001)
         }, completion: { finished in
             self.view.removeFromSuperview()
             context.completeTransition(finished && !context.transitionWasCancelled)
