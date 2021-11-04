@@ -27,8 +27,11 @@ extension BrowserViewController {
             let onboardingController = WelcomeViewController(profile: profile,
                                                              rewards: rewards)
             onboardingController.modalPresentationStyle = .fullScreen
-            self.present(onboardingController, animated: false)
-            self.shouldShowNTPEducation = true
+            
+            present(onboardingController, animated: false)
+            isfullScreenCalloutPresented = true
+            shouldShowNTPEducation = true
+            
             return
         }
     }

@@ -158,6 +158,39 @@ class WelcomeViewController: UIViewController {
         
         if let state = state {
             calloutView.setState(state: state, animated: false)
+            
+            if case .defaultBrowserWarning = self.state {
+                let topTransform = { () -> CGAffineTransform in
+                    var transformation = CGAffineTransform.identity
+                    transformation = transformation.scaledBy(x: 1.5, y: 1.5)
+                    transformation = transformation.translatedBy(x: 0.0, y: -70.0)
+                    return transformation
+                }()
+    
+                let bottomTransform = { () -> CGAffineTransform in
+                    var transformation = CGAffineTransform.identity
+                    transformation = transformation.scaledBy(x: 2.0, y: 2.0)
+                    transformation = transformation.translatedBy(x: 0.0, y: 40.0)
+                    return transformation
+                }()
+    
+                let imageViewTransform = { () -> CGAffineTransform in
+                    var transformation = CGAffineTransform.identity
+                    transformation = transformation.translatedBy(x: 0.0, y: 40.0)
+                    return transformation
+                }()
+    
+                topImageView.transform = topTransform
+                bottomImageView.transform = bottomTransform
+                iconView.do {
+                    $0.image = #imageLiteral(resourceName: "welcome-view-phone")
+                    $0.transform = imageViewTransform
+                }
+                contentContainer.spacing = -260.0
+                contentContainer.snp.updateConstraints {
+                    $0.centerY.equalToSuperview().offset(60.0)
+                }
+            }
         }
     }
     

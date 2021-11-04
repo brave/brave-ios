@@ -8,6 +8,8 @@ import BraveUI
 
 struct PrivacyEverywhereView: View {
     var dismiss: (() -> Void)?
+    var syncNow: (() -> Void)?
+
     var body: some View {
         VStack {
             HStack {
@@ -26,7 +28,7 @@ struct PrivacyEverywhereView: View {
             Text("Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.")
                 .multilineTextAlignment(.center)
             Button(action: {
-                dismiss?()
+                syncNow?()
             }) {
                 Text("Sync now")
                     .frame(maxWidth: .infinity)

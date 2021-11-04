@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import BraveShared
+import BraveCore
 import BraveUI
 import Shared
 import SwiftKeychainWrapper
@@ -28,7 +29,7 @@ extension BrowserViewController {
     }
     
     func presentVPNAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .vpn) {
             return
@@ -54,82 +55,88 @@ extension BrowserViewController {
             self?.presentCorrespondingVPNViewController()
         }
         
-        fullScreenCalloutPresented = true
         present(popup, animated: false)
+        isfullScreenCalloutPresented = true
         showedPopup.value = true
     }
     
     func presentDefaultBrowserScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
-        
+        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .defaultBrowser) {
             return
         }
-        
+                
         let onboardingController = WelcomeViewController(
             profile: nil,
             rewards: nil,
-            state: WelcomeViewCalloutState.defaultBrowser(
+            state: WelcomeViewCalloutState.defaultBrowserWarning(
                 title: "Make Brave your default browser",
                 details: "With Brave as default, every link you click opens with Brave's privacy protections.",
                 primaryButtonTitle: "Set as default",
-                secondaryButtonTitle: "Not now",
+                secondaryButtonTitle: "Skip this",
                 primaryAction: {
-                    print("Let's go")
-                }, secondaryAction: {
-                    //nextController.animateToReadyState()
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                        return
+                    }
+                    
+                    Preferences.General.defaultBrowserCalloutDismissed.value = true
+                    UIApplication.shared.open(settingsUrl)
+                }, secondaryAction: { [weak self] in
+                    self?.dismiss(animated: false)
                 })
         )
 
         onboardingController.modalPresentationStyle = .fullScreen
         present(onboardingController, animated: false)
-    }
-    
-    /// Shows a vpn screen based on vpn state.
-    func presentCorrespondingVPNViewController() {
-        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
-        let nav = SettingsNavigationController(rootViewController: vc)
-        nav.navigationBar.topItem?.leftBarButtonItem =
-            .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
-        let idiom = UIDevice.current.userInterfaceIdiom
-        
-        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-        
-        nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-        present(nav, animated: true)
-    }
-    
-    func presentSyncAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
-        
-        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .sync) {
-            return
-        }
-
-        let controller = PrivacyEverywhereController()
-        controller.rootView.dismiss = { [unowned controller] in
-            controller.dismiss(animated: true)
-        }
-
-        fullScreenCalloutPresented = true
-        present(PopupViewController(contentController: controller), animated: true, completion: nil)
+        isfullScreenCalloutPresented = true
     }
     
     func presentBraveRewardsScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, fullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .rewards) {
             return
         }
+        
+        if isfullScreenCalloutPresented { return }
         
         if BraveRewards.isAvailable {
             let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
             controller.onOnboardingStateChanged = { [weak self] controller, state in
                 self?.dismissOnboarding(controller, state: state)
             }
-            fullScreenCalloutPresented = true
             present(controller, animated: true)
+            isfullScreenCalloutPresented = true
+
         }
+        return
+    }
+    
+    func presentSyncAlertCallout() {
+        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+
+        if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .sync) {
+            return
+        }
+                
+        if !BraveSyncAPI.shared.isInSyncGroup {
+
+            let controller = PrivacyEverywhereController()
+            controller.rootView.dismiss = { [unowned controller] in
+                controller.dismiss(animated: true)
+            }
+            controller.rootView.syncNow = { [unowned controller] in
+                controller.dismiss(animated: true) { [weak self] in
+                    guard let self = self else { return }
+                    self.openInsideSettingsNavigation(with: SyncWelcomeViewController())
+                }
+            }
+            
+            present(PopupViewController(contentController: controller), animated: true, completion: nil)
+            isfullScreenCalloutPresented = true
+        }
+        
         return
     }
 }

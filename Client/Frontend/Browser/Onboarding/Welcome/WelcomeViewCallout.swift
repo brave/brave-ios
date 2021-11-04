@@ -13,6 +13,7 @@ enum WelcomeViewCalloutState {
     case welcome(title: String)
     case privacy(title: String, details: String, buttonTitle: String, action: () -> Void)
     case defaultBrowser(title: String, details: String, primaryButtonTitle: String, secondaryButtonTitle: String, primaryAction: () -> Void, secondaryAction: () -> Void)
+    case defaultBrowserWarning(title: String, details: String, primaryButtonTitle: String, secondaryButtonTitle: String, primaryAction: () -> Void, secondaryAction: () -> Void)
     case ready(title: String, details: String, moreDetails: String)
 }
 
@@ -58,6 +59,18 @@ class WelcomeViewCallout: UIView {
         $0.setTitle(" ", for: .normal)
     }
     
+    private let secondaryButtonContentView = UIStackView().then {
+        $0.axis = .horizontal
+    }
+    
+    private let secondaryLabel = UILabel().then {
+        $0.textColor = .bravePrimary
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+        $0.setContentHuggingPriority(.required, for: .vertical)
+        $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    }
+    
     private let secondaryButton = RoundInterfaceButton(type: .custom).then {
         $0.setTitleColor(.braveBlurple, for: .normal)
         $0.backgroundColor = .clear
@@ -71,7 +84,7 @@ class WelcomeViewCallout: UIView {
         super.init(frame: .zero)
         doLayout(pointsUp: pointsUp)
         
-        [titleLabel, detailsLabel, primaryButton, secondaryButton].forEach {
+        [titleLabel, detailsLabel, primaryButton, secondaryButtonContentView].forEach {
             contentView.addArrangedSubview($0)
             
             $0.alpha = 0.0
@@ -84,6 +97,9 @@ class WelcomeViewCallout: UIView {
                 $0.height.equalTo(44.0)
             }
         }
+        
+        secondaryButtonContentView.addArrangedSubview(secondaryLabel)
+        secondaryButtonContentView.addArrangedSubview(secondaryButton)
         
         [titleLabel, detailsLabel].forEach {
             $0.contentMode = pointsUp ? .bottom : .top
@@ -207,8 +223,8 @@ class WelcomeViewCallout: UIView {
         case .privacy(let title, let details, let buttonTitle, let action):
             titleLabel.do {
                 $0.text = title
-                $0.textAlignment = .left
-                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.textAlignment = .right
+                $0.font = .systemFont(ofSize: 14.0, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
@@ -277,7 +293,62 @@ class WelcomeViewCallout: UIView {
             contentView.setCustomSpacing(8.0, after: titleLabel)
             contentView.setCustomSpacing(24.0, after: detailsLabel)
             contentView.setCustomSpacing(24.0, after: primaryButton)
+        case .defaultBrowserWarning(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
+            contentView.do {
+                $0.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 10, right: 20)
+            }
+                
+            titleLabel.do {
+                $0.text = title
+                $0.textAlignment = .left
+                $0.font = .systemFont(ofSize: 17.0, weight: .semibold)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
             
+            detailsLabel.do {
+                $0.text = details
+                $0.font = .systemFont(ofSize: 17.0)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            primaryButton.do {
+                $0.setTitle(primaryButtonTitle, for: .normal)
+                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
+                    primaryAction()
+                }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButtonContentView.do {
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+                
+            secondaryLabel.do {
+                $0.text = "Already default?"
+                $0.textAlignment = .left
+                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButton.do {
+                $0.setTitle(secondaryButtonTitle, for: .normal)
+                    $0.titleLabel?.font = .systemFont(ofSize: 15.0, weight: .bold)
+                $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
+                    secondaryAction()
+                }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            contentView.setCustomSpacing(8.0, after: titleLabel)
+            contentView.setCustomSpacing(24.0, after: detailsLabel)
+            contentView.setCustomSpacing(10.0, after: primaryButton)
         case .ready(let title, let details, let moreDetails):
             titleLabel.do {
                 $0.text = title

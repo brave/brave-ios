@@ -190,7 +190,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     
     /// Boolean which is tracking If a full screen callout is presented
     /// in order to not to try to present another callout  over existing one
-    var fullScreenCalloutPresented = false
+    var isfullScreenCalloutPresented = false
     
     private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
     var widgetFaviconFetchers: [FaviconFetcher] = []
@@ -945,12 +945,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         
         // Full Screen Callout Presantation
         // Priority: VPN - Default Browser - Rewards - Sync
-        if false {
-            presentVPNAlertCallout()
-            presentDefaultBrowserScreenCallout()
-            presentBraveRewardsScreenCallout()
-            presentSyncAlertCallout()
-        }
+        presentVPNAlertCallout()
+        presentDefaultBrowserScreenCallout()
+        presentBraveRewardsScreenCallout()
+        presentSyncAlertCallout()
                 
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
@@ -1125,6 +1123,20 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                 self.updatePlaylistURLBar(tab: tab, state: tab.playlistItemState, item: tab.playlistItem)
             }
         })
+    }
+    
+    /// Shows a vpn screen based on vpn state.
+    func presentCorrespondingVPNViewController() {
+        guard let vc = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+        let nav = SettingsNavigationController(rootViewController: vc)
+        nav.navigationBar.topItem?.leftBarButtonItem =
+            .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
+        let idiom = UIDevice.current.userInterfaceIdiom
+        
+        UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+        
+        nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
+        present(nav, animated: true)
     }
 
     func updateInContentHomePanel(_ url: URL?) {
