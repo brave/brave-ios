@@ -943,7 +943,7 @@ extension Strings {
       "wallet.swapCryptoUnsupportNetworkTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Unsupported Chain",
+      value: "Unsupported chain",
       comment: "The title below account picker when user has selected a test network to swap cryptos"
     )
     public static let swapCryptoUnsupportNetworkDescription = NSLocalizedString(

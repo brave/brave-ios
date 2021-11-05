@@ -14,8 +14,8 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedFromToken: BraveWallet.ERCToken? {
     didSet {
       if let token = selectedFromToken {
-        fetchTokenBalance(for: token) { [self] balance in
-          selectedFromTokenBalance = balance
+        fetchTokenBalance(for: token) { [weak self] balance in
+          self?.selectedFromTokenBalance = balance
         }
         fetchTokenMarketPrice(for: token)
       }
@@ -25,8 +25,8 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedToToken: BraveWallet.ERCToken? {
     didSet {
       if let token = selectedToToken {
-        fetchTokenBalance(for: token) { [self] balance in
-          selectedToTokenBalance = balance
+        fetchTokenBalance(for: token) { [weak self] balance in
+          self?.selectedToTokenBalance = balance
         }
       }
     }
