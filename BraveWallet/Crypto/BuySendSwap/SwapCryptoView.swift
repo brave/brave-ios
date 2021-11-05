@@ -7,36 +7,6 @@ import SwiftUI
 import BraveCore
 import BraveUI
 import struct Shared.Strings
-import Storage
-
-struct RoundedBackground: View {
-  @Environment(\.sizeCategory) private var sizeCategory
-  
-  var backgroundColor: Color = Color(.secondaryBraveGroupedBackground)
-  
-  private var backgroundShape: some InsettableShape {
-    RoundedRectangle(cornerRadius: 10, style: .continuous)
-  }
-  
-  var body: some View {
-    EmptyView()
-      .background(
-        backgroundShape
-          .fill(backgroundColor)
-          .overlay(
-            // When using an accessibility font size, inset grouped tables automatically change to
-            // grouped tables with separators. So we will match this change and add a border around
-            // the buttons to make them appear more uniform with the table
-            Group {
-              if sizeCategory.isAccessibilityCategory {
-                backgroundShape
-                  .strokeBorder(Color(.separator))
-              }
-            }
-          )
-      )
-  }
-}
 
 struct ShortcutAmountGrid: View {
   enum Amount: Double, CaseIterable {
@@ -66,7 +36,7 @@ struct ShortcutAmountGrid: View {
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
             .foregroundColor(Color(.secondaryBraveLabel))
-            .background(RoundedBackground())
+            .background(BuySendSwapGridBackgroundView())
             .padding(.top, 8)
         }
       }
@@ -118,13 +88,17 @@ struct SlippageGrid: View {
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
             .foregroundColor(Color(isPredefinedOptionSelected(option.id) ? .white : .secondaryBraveLabel))
-            .background(RoundedBackground(backgroundColor: Color(isPredefinedOptionSelected(option.id) ? .braveBlurple : .secondaryBraveGroupedBackground)))
+            .background(BuySendSwapGridBackgroundView(backgroundColor: Color(isPredefinedOptionSelected(option.id) ? .braveBlurple : .secondaryBraveGroupedBackground)))
             .padding(.top, 8)
         }
       }
       TextField("%", text: $input)
         .onChange(of: input) { value in
-          customSlippage = Int(value)
+          guard let intValue = Int(value) else {
+            customSlippage = nil
+            return
+          }
+          customSlippage = min((max(intValue, 0)), 100)
         }
         .keyboardType(.numberPad)
         .multilineTextAlignment(.center)
@@ -132,8 +106,9 @@ struct SlippageGrid: View {
         .minimumScaleFactor(0.75)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
+        .accentColor(customSlippage != nil ? .white : nil)
         .foregroundColor(Color(customSlippage != nil ? .white : .secondaryBraveLabel))
-        .background(RoundedBackground(backgroundColor: Color(customSlippage != nil ? .braveBlurple : .secondaryBraveGroupedBackground)))
+        .background(BuySendSwapGridBackgroundView(backgroundColor: Color(customSlippage != nil ? .braveBlurple : .secondaryBraveGroupedBackground)))
         .padding(.top, 8)
     }
   }
@@ -407,7 +382,7 @@ struct SwapCryptoView_Previews: PreviewProvider {
       ethNetworkStore: .previewStore,
       swapTokensStore: .previewStore
     )
-    .previewColorSchemes()
+      .previewSizeCategories([.large, .accessibilityLarge])
   }
 }
 #endif
