@@ -35,6 +35,21 @@ extension BrowserViewController {
     }
     
     func showBraveRewardsPanel() {
+        if !Preferences.FullScreenCallout.rewardsCalloutCompleted.value,
+            Preferences.General.isNewRetentionUser.value == true {
+            
+            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+            controller.onOnboardingStateChanged = { [weak self] controller, state in
+                self?.dismissOnboarding(controller, state: state)
+            }
+            
+            Preferences.FullScreenCallout.rewardsCalloutCompleted.value = true
+            present(controller, animated: true)
+            topToolbar.locationView.rewardsButton.iconState =
+                (rewards.isEnabled || rewards.isCreatingWallet) ? .enabled : .disabled
+            return
+        }
+        
         updateRewardsButtonState()
         
         UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)

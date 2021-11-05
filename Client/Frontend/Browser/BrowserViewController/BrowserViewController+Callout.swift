@@ -98,10 +98,8 @@ extension BrowserViewController {
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .rewards) {
             return
         }
-        
-        if isfullScreenCalloutPresented { return }
-        
-        if BraveRewards.isAvailable {
+                
+        if BraveRewards.isAvailable, !Preferences.Rewards.rewardsToggledOnce.value {
             let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
             controller.onOnboardingStateChanged = { [weak self] controller, state in
                 self?.dismissOnboarding(controller, state: state)
