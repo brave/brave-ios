@@ -223,7 +223,7 @@ class WelcomeViewCallout: UIView {
         case .privacy(let title, let details, let buttonTitle, let action):
             titleLabel.do {
                 $0.text = title
-                $0.textAlignment = .right
+                $0.textAlignment = .left
                 $0.font = .systemFont(ofSize: 14.0, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -280,6 +280,11 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = false
             }
             
+            secondaryButtonContentView.do {
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+                
             secondaryButton.do {
                 $0.setTitle(secondaryButtonTitle, for: .normal)
                 $0.titleLabel?.font = .systemFont(ofSize: 17.0)
