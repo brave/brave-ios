@@ -40,7 +40,7 @@ class WelcomeViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .fullScreen
-        self.doLayout()
+        self.loadViewIfNeeded()
     }
     
     required init?(coder: NSCoder) {
@@ -98,8 +98,10 @@ class WelcomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if case .defaultBrowserWarning = state, let state = state {
-            self.setLayoutState(state: state)
+        doLayout()
+        
+        if let state = state {
+            setLayoutState(state: state)
         }
     }
     
@@ -107,10 +109,6 @@ class WelcomeViewController: UIViewController {
         super.viewDidAppear(animated)
         
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
-        
-        if let state = state {
-            setLayoutState(state: state)
-        }
         
         if case .welcome = self.state {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
