@@ -11,7 +11,7 @@ import BraveCore
 // MARK: - Onboarding
 
 extension BrowserViewController {
-    
+
     func presentOnboardingIntro() {
         //if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
@@ -27,11 +27,19 @@ extension BrowserViewController {
             let onboardingController = WelcomeViewController(profile: profile,
                                                              rewards: rewards)
             onboardingController.modalPresentationStyle = .fullScreen
+            onboardingController.onAdsWebsiteSelected = { [weak self] url in
+                guard let self = self else { return }
+                
+                if let url = url {
+                    self.openInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                } else {
+                    self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                }
+            }
             
             present(onboardingController, animated: false)
             isfullScreenCalloutPresented = true
             shouldShowNTPEducation = true
-            
             return
         }
     }

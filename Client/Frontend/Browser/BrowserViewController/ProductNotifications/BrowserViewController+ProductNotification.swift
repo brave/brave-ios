@@ -8,6 +8,8 @@ import BraveUI
 import Shared
 import Data
 
+private let log = Logger.browserLogger
+
 // MARK: - ProductNotification
 
 extension BrowserViewController {
@@ -65,7 +67,53 @@ extension BrowserViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
             
+            self.presentOnboardingAdblockNotifications()
             self.presentEducationalProductNotifications()
+        }
+    }
+    
+    private func presentOnboardingAdblockNotifications() {
+        var isAboutHomeUrl = false
+        if let selectedTab = tabManager.selectedTab,
+           let url = selectedTab.url,
+           let internalURL = InternalURL(url) {
+            isAboutHomeUrl = internalURL.isAboutHomeURL
+        }
+        
+        guard let selectedTab = tabManager.selectedTab,
+              !Preferences.General.onboardingAdblockPopoverShown.value,
+              !benchmarkNotificationPresented,
+              !Preferences.AppState.backgroundedCleanly.value,
+              !topToolbar.inOverlayMode,
+              !isTabTrayActive,
+              selectedTab.webView?.scrollView.isDragging == false,
+              isAboutHomeUrl == false else {
+            return
+        }
+        
+        guard let onboardingList = OnboardingDisconnectList.loadFromFile() else {
+            log.error("CANNOT LOAD ONBOARDING DISCONNECT LIST")
+            return
+        }
+        
+        var trackers = [String: [String]]()
+        let urls = selectedTab.contentBlocker.blockedRequests
+        
+        for entity in onboardingList.entities {
+            for url in urls {
+                let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
+                let resources = entity.value.resources.filter({ $0 == domain })
+                
+                if !resources.isEmpty {
+                    trackers[entity.key] = resources
+                }
+            }
+        }
+        
+        if !trackers.isEmpty {
+            Preferences.General.onboardingAdblockPopoverShown.value = true
+            
+            //TODO: Show callout for `Brave Blocked Ads`
         }
     }
     
@@ -80,6 +128,7 @@ extension BrowserViewController {
         }
         
         guard let selectedTab = tabManager.selectedTab,
+              Preferences.General.onboardingAdblockPopoverShown.value,
               !benchmarkNotificationPresented,
               !Preferences.AppState.backgroundedCleanly.value,
               !topToolbar.inOverlayMode,

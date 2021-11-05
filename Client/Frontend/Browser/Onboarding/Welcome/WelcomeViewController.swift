@@ -26,7 +26,6 @@ class WelcomeViewController: UIViewController {
     private var state: WelcomeViewCalloutState?
     
     var onAdsWebsiteSelected: ((URL?) -> Void)?
-    var onOnboardingComplete: (() -> Void)?
     
     convenience init(profile: Profile?, rewards: BraveRewards?) {
         self.init(profile: profile,
@@ -199,7 +198,7 @@ class WelcomeViewController: UIViewController {
                                                    rewards: rewards,
                                                    state: nil)
         nextController.modalPresentationStyle = .fullScreen
-        
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
         nextController.state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
                              details: "You're just a step away from the best privacy online. Ready?",
                              buttonTitle: "Let's go",
@@ -239,7 +238,7 @@ class WelcomeViewController: UIViewController {
         let nextController = WelcomeViewController(profile: profile,
                                                    rewards: rewards)
         nextController.modalPresentationStyle = .fullScreen
-        
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
         nextController.state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
                                     details: "With Brave as default, every link you click opens with Brave's privacy protections.",
                                     primaryButtonTitle: "Set as default",
@@ -287,7 +286,7 @@ class WelcomeViewController: UIViewController {
         let nextController = WelcomeViewController(profile: profile,
                                                    rewards: rewards)
         nextController.modalPresentationStyle = .fullScreen
-        
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
         nextController.state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
                                       details: "Select a popular site below or enter your own...",
                                       moreDetails: "...and watch those trackers & ads disappear.")
@@ -357,13 +356,14 @@ class WelcomeViewController: UIViewController {
     }
     
     private func onWebsiteSelected(_ item: WebsiteRegion) {
+        close()
         if let url = URL(string: item.domain) {
             self.onAdsWebsiteSelected?(url)
         }
-        close()
     }
     
     private func onEnterCustomWebsite() {
+        close()
         self.onAdsWebsiteSelected?(nil)
     }
     
