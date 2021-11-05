@@ -185,7 +185,7 @@ class WelcomeViewCallout: UIView {
         }
     }
     
-    func setState(state: WelcomeViewCalloutState, animated: Bool) {
+    func setState(state: WelcomeViewCalloutState) {
         self.state = state
         
         if case .ready = state {

@@ -80,17 +80,20 @@ private class SearchEngineButton: RoundInterfaceButton {
     
     private let iconView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
+        $0.isUserInteractionEnabled = false
     }
     
     private let titleView = UILabel().then {
         $0.textAlignment = .left
         $0.textColor = .bravePrimary
         $0.font = .systemFont(ofSize: 17.0)
+        $0.isUserInteractionEnabled = false
     }
     
     private let accessoryView = UIImageView().then {
         $0.contentMode = .center
         $0.image = #imageLiteral(resourceName: "welcome-view-search-engine-arrow")
+        $0.isUserInteractionEnabled = false
     }
     
     init(icon: UIImage, title: String) {

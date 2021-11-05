@@ -39,6 +39,7 @@ class WelcomeViewController: UIViewController {
         self.state = state
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
+        self.modalPresentationStyle = .fullScreen
         self.doLayout()
     }
     
@@ -96,12 +97,20 @@ class WelcomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if case .defaultBrowserWarning = state, let state = state {
+            self.setLayoutState(state: state)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+        
+        if let state = state {
+            setLayoutState(state: state)
+        }
         
         if case .welcome = self.state {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -142,7 +151,7 @@ class WelcomeViewController: UIViewController {
             $0.centerY.equalToSuperview()
             $0.leading.trailing.equalToSuperview()
             $0.top.greaterThanOrEqualToSuperview()
-            $0.bottom.lessThanOrEqualTo(skipButton.snp.top).inset(30.0)
+            $0.bottom.lessThanOrEqualTo(skipButton.snp.top).offset(-30.0)
         }
         
         skipButton.snp.makeConstraints {
@@ -154,60 +163,24 @@ class WelcomeViewController: UIViewController {
         bottomImageView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
         }
-        
-        if let state = state {
-            calloutView.setState(state: state, animated: false)
-            
-            if case .defaultBrowserWarning = self.state {
-                let topTransform = { () -> CGAffineTransform in
-                    var transformation = CGAffineTransform.identity
-                    transformation = transformation.scaledBy(x: 1.5, y: 1.5)
-                    transformation = transformation.translatedBy(x: 0.0, y: -70.0)
-                    return transformation
-                }()
-    
-                let bottomTransform = { () -> CGAffineTransform in
-                    var transformation = CGAffineTransform.identity
-                    transformation = transformation.scaledBy(x: 2.0, y: 2.0)
-                    transformation = transformation.translatedBy(x: 0.0, y: 40.0)
-                    return transformation
-                }()
-    
-                let imageViewTransform = { () -> CGAffineTransform in
-                    var transformation = CGAffineTransform.identity
-                    transformation = transformation.translatedBy(x: 0.0, y: 40.0)
-                    return transformation
-                }()
-    
-                topImageView.transform = topTransform
-                bottomImageView.transform = bottomTransform
-                iconView.do {
-                    $0.image = #imageLiteral(resourceName: "welcome-view-phone")
-                    $0.transform = imageViewTransform
-                }
-                contentContainer.spacing = -260.0
-                contentContainer.snp.updateConstraints {
-                    $0.centerY.equalToSuperview().offset(60.0)
-                }
-            }
-        }
     }
     
-    private func animateToPrivacyState() {
-        let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards,
-                                                   state: nil)
-        nextController.modalPresentationStyle = .fullScreen
-        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        nextController.state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
-                             details: "You're just a step away from the best privacy online. Ready?",
-                             buttonTitle: "Let's go",
-                             action: {
-                                nextController.animateToDefaultBrowserState()
-                             }
-        )
+    private func setLayoutState(state: WelcomeViewCalloutState) {
+        self.state = state
         
-        nextController.do {
+        switch state {
+        case .welcome:
+            topImageView.transform = .identity
+            bottomImageView.transform = .identity
+            iconView.transform = .identity
+            contentContainer.spacing = -95.0
+            contentContainer.snp.updateConstraints {
+                $0.centerY.equalToSuperview()
+                $0.bottom.lessThanOrEqualTo(skipButton.snp.top).offset(-30.0)
+            }
+            calloutView.setState(state: state)
+            
+        case .privacy:
             let topTransform = { () -> CGAffineTransform in
                 var transformation = CGAffineTransform.identity
                 transformation = transformation.scaledBy(x: 1.3, y: 1.3)
@@ -222,35 +195,12 @@ class WelcomeViewController: UIViewController {
                 return transformation
             }()
             
-            $0.topImageView.transform = topTransform
-            $0.bottomImageView.transform = bottomTransform
-            $0.skipButton.alpha = 1.0
+            topImageView.transform = topTransform
+            bottomImageView.transform = bottomTransform
+            skipButton.alpha = 1.0
+            calloutView.setState(state: state)
             
-            if let state = $0.state {
-                $0.calloutView.setState(state: state, animated: false)
-            }
-        }
-        
-        self.present(nextController, animated: true, completion: nil)
-    }
-    
-    private func animateToDefaultBrowserState() {
-        let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards)
-        nextController.modalPresentationStyle = .fullScreen
-        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        nextController.state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
-                                    details: "With Brave as default, every link you click opens with Brave's privacy protections.",
-                                    primaryButtonTitle: "Set as default",
-                                    secondaryButtonTitle: "Not now",
-                                    primaryAction: {
-                                        nextController.onSetDefaultBrowser()
-                                    }, secondaryAction: {
-                                        nextController.animateToReadyState()
-                                    }
-        )
-        
-        nextController.do {
+        case .defaultBrowser:
             let topTransform = { () -> CGAffineTransform in
                 var transformation = CGAffineTransform.identity
                 transformation = transformation.scaledBy(x: 1.5, y: 1.5)
@@ -265,33 +215,52 @@ class WelcomeViewController: UIViewController {
                 return transformation
             }()
             
-            $0.topImageView.transform = topTransform
-            $0.bottomImageView.transform = bottomTransform
-            $0.iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
-            $0.skipButton.alpha = 1.0
-            $0.contentContainer.spacing = -260.0
-            $0.contentContainer.snp.updateConstraints {
+            topImageView.transform = topTransform
+            bottomImageView.transform = bottomTransform
+            iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
+            skipButton.alpha = 1.0
+            contentContainer.spacing = -260.0
+            contentContainer.snp.updateConstraints {
                 $0.centerY.equalToSuperview().offset(60.0)
+                $0.bottom.lessThanOrEqualTo(skipButton.snp.top).inset(30.0)
             }
+            calloutView.setState(state: state)
             
-            if let state = $0.state {
-                $0.calloutView.setState(state: state, animated: false)
+        case .defaultBrowserWarning:
+            let topTransform = { () -> CGAffineTransform in
+                var transformation = CGAffineTransform.identity
+                transformation = transformation.scaledBy(x: 1.5, y: 1.5)
+                transformation = transformation.translatedBy(x: 0.0, y: -70.0)
+                return transformation
+            }()
+
+            let bottomTransform = { () -> CGAffineTransform in
+                var transformation = CGAffineTransform.identity
+                transformation = transformation.scaledBy(x: 2.0, y: 2.0)
+                transformation = transformation.translatedBy(x: 0.0, y: 40.0)
+                return transformation
+            }()
+
+            let imageViewTransform = { () -> CGAffineTransform in
+                var transformation = CGAffineTransform.identity
+                transformation = transformation.translatedBy(x: 0.0, y: 40.0)
+                return transformation
+            }()
+
+            topImageView.transform = topTransform
+            bottomImageView.transform = bottomTransform
+            iconView.do {
+                $0.image = #imageLiteral(resourceName: "welcome-view-phone")
+                $0.transform = imageViewTransform
             }
-        }
-        
-        self.present(nextController, animated: true, completion: nil)
-    }
-    
-    private func animateToReadyState() {
-        let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards)
-        nextController.modalPresentationStyle = .fullScreen
-        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        nextController.state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
-                                      details: "Select a popular site below or enter your own...",
-                                      moreDetails: "...and watch those trackers & ads disappear.")
-        
-        nextController.do {
+            contentContainer.spacing = -260.0
+            contentContainer.snp.updateConstraints {
+                $0.centerY.equalToSuperview().offset(60.0)
+                $0.bottom.lessThanOrEqualTo(skipButton.snp.top).inset(30.0)
+            }
+            calloutView.setState(state: state)
+            
+        case .ready:
             let topTransform = { () -> CGAffineTransform in
                 var transformation = CGAffineTransform.identity
                 transformation = transformation.scaledBy(x: 2.0, y: 2.0)
@@ -306,47 +275,88 @@ class WelcomeViewController: UIViewController {
                 return transformation
             }()
             
-            $0.topImageView.transform = topTransform
-            $0.bottomImageView.transform = bottomTransform
-            $0.iconView.image = #imageLiteral(resourceName: "welcome-view-ready-icon")
-            $0.skipButton.alpha = 1.0
+            topImageView.transform = topTransform
+            bottomImageView.transform = bottomTransform
+            iconView.image = #imageLiteral(resourceName: "welcome-view-ready-icon")
+            skipButton.alpha = 1.0
             
-            $0.contentContainer.arrangedSubviews.forEach {
+            contentContainer.arrangedSubviews.forEach {
                 $0.removeFromSuperview()
             }
             
-            [$0.iconView, $0.calloutView, $0.searchView].forEach {
-                nextController.contentContainer.addArrangedSubview($0)
+            [iconView, calloutView, searchView].forEach {
+                self.contentContainer.addArrangedSubview($0)
                 $0.isHidden = false
             }
             
-            $0.contentContainer.spacing = 0
-            $0.contentContainer.snp.updateConstraints {
+            contentContainer.spacing = 0.0
+            contentContainer.snp.updateConstraints {
                 $0.centerY.equalToSuperview()
+                $0.bottom.lessThanOrEqualTo(self.skipButton.snp.top).offset(-30.0)
             }
             
-            $0.contentContainer.setCustomSpacing(-40.0, after: iconView)
-            $0.contentContainer.setCustomSpacing(15.0, after: calloutView)
+            contentContainer.setCustomSpacing(-40.0, after: iconView)
+            contentContainer.setCustomSpacing(15.0, after: calloutView)
             
-            $0.websitesForRegion().forEach { item in
-                nextController.searchView.addButton(icon: item.icon, title: item.title) { [weak nextController] in
-                    nextController?.onWebsiteSelected(item)
+            websitesForRegion().forEach { item in
+                self.searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
+                    self.onWebsiteSelected(item)
                 }
             }
             
-            $0.searchView.addButton(icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"), title: "Enter a website") {
-                nextController.onEnterCustomWebsite()
+            searchView.addButton(icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"), title: "Enter a website") { [unowned self] in
+                self.onEnterCustomWebsite()
             }
             
-            $0.searchView.snp.makeConstraints {
+            searchView.snp.makeConstraints {
                 $0.height.greaterThanOrEqualTo(240.0)
             }
-            
-            if let state = $0.state {
-                $0.calloutView.setState(state: state, animated: false)
-            }
+            calloutView.setState(state: state)
         }
-        
+    }
+    
+    private func animateToPrivacyState() {
+        let nextController = WelcomeViewController(profile: profile,
+                                                   rewards: rewards,
+                                                   state: nil)
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
+        let state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
+                             details: "You're just a step away from the best privacy online. Ready?",
+                             buttonTitle: "Let's go",
+                             action: {
+                                nextController.animateToDefaultBrowserState()
+                             }
+        )
+        nextController.setLayoutState(state: state)
+        self.present(nextController, animated: true, completion: nil)
+    }
+    
+    private func animateToDefaultBrowserState() {
+        let nextController = WelcomeViewController(profile: profile,
+                                                   rewards: rewards)
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
+        let state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
+                                    details: "With Brave as default, every link you click opens with Brave's privacy protections.",
+                                    primaryButtonTitle: "Set as default",
+                                    secondaryButtonTitle: "Not now",
+                                    primaryAction: {
+                                        nextController.onSetDefaultBrowser()
+                                    }, secondaryAction: {
+                                        nextController.animateToReadyState()
+                                    }
+        )
+        nextController.setLayoutState(state: state)
+        self.present(nextController, animated: true, completion: nil)
+    }
+    
+    private func animateToReadyState() {
+        let nextController = WelcomeViewController(profile: profile,
+                                                   rewards: rewards)
+        nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
+        let state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
+                                      details: "Select a popular site below or enter your own...",
+                                      moreDetails: "...and watch those trackers & ads disappear.")
+        nextController.setLayoutState(state: state)
         self.present(nextController, animated: true, completion: nil)
     }
     
