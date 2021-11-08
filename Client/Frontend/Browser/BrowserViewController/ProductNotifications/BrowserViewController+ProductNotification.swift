@@ -235,6 +235,11 @@ extension BrowserViewController {
                 ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController()
             globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
     
+            globalShieldsActivityController.popoverPresentationController?.sourceRect = self.view.convert(
+                self.topToolbar.locationView.shieldsButton.frame,
+                from: self.topToolbar.locationView.shieldsButton.superview)
+            globalShieldsActivityController.popoverPresentationController?.permittedArrowDirections = [.up]
+            
             self.present(globalShieldsActivityController, animated: true, completion: nil)
         }
     }
