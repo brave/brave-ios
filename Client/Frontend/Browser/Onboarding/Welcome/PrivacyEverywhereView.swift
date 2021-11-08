@@ -7,6 +7,7 @@ import SwiftUI
 import BraveUI
 
 struct PrivacyEverywhereView: View {
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     var dismiss: (() -> Void)?
     var syncNow: (() -> Void)?
 
@@ -21,26 +22,33 @@ struct PrivacyEverywhereView: View {
                 }
             }
             Text("Privacy. Everywhere.")
+                .padding(.vertical, 5)
+                .font(.title3.weight(.medium))
+                .foregroundColor(Color(.bravePrimary))
             Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-image"))
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                //.layoutPriority(1)
+                .padding(.vertical, 5)
             Text("Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.")
                 .multilineTextAlignment(.center)
+                .font(.body)
+                .foregroundColor(Color(.bravePrimary))
+                .padding(.vertical, 5)
             Button(action: {
                 syncNow?()
             }) {
                 Text("Sync now")
                     .frame(maxWidth: .infinity)
                     .font(.title3.weight(.medium))
-                    .foregroundColor(.white)
                     .padding()
             }
             .buttonStyle(BraveFilledButtonStyle(size: .small))
-            .foregroundColor(Color(UIColor.braveBlurple))
-        }.padding(.all)
-            .background(Color.white)
-            .cornerRadius(20.0)
+            .foregroundColor(Color(.braveBlurple))
+        }
+        .frame(maxWidth: 450)
+        .padding(.all)
+        .background(Color(.braveBackground))
+        .cornerRadius(20.0)
     }
 }
 
