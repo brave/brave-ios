@@ -238,6 +238,11 @@ class Tab: NSObject {
             configuration!.ignoresViewportScaleLimits = true
             configuration!.mediaTypesRequiringUserActionForPlayback = Preferences.General.mediaAutoPlays.value ? [] : .all
             
+            // TODO: Downgrade to 14.5 once api becomes available.
+            if #available(iOS 15.0, *) {
+                configuration!.upgradeKnownHostsToHTTPS = Preferences.Shields.httpsEverywhere.value
+            }
+            
             if configuration!.urlSchemeHandler(forURLScheme: InternalURL.scheme) == nil {
                 configuration!.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
             }
