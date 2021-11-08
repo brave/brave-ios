@@ -200,7 +200,7 @@ class WelcomeViewCallout: UIView {
             titleLabel.do {
                 $0.text = title
                 $0.textAlignment = .center
-                $0.font = .systemFont(ofSize: 28.0)
+                $0.font = .preferredFont(for: .title1, weight: .semibold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
@@ -224,21 +224,21 @@ class WelcomeViewCallout: UIView {
             titleLabel.do {
                 $0.text = title
                 $0.textAlignment = .left
-                $0.font = .systemFont(ofSize: 14.0, weight: .bold)
+                $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = details
-                $0.font = .systemFont(ofSize: 17.0)
+                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
                 $0.setTitle(buttonTitle, for: .normal)
-                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
                     action()
                 }), for: .touchUpInside)
@@ -255,24 +255,27 @@ class WelcomeViewCallout: UIView {
             contentView.setCustomSpacing(24.0, after: detailsLabel)
             
         case .defaultBrowser(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
+            contentView.do {
+                $0.layoutMargins = UIEdgeInsets(top: 30, left: 30, bottom: 15, right: 30)
+            }
             titleLabel.do {
                 $0.text = title
                 $0.textAlignment = .left
-                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = details
-                $0.font = .systemFont(ofSize: 17.0)
+                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
                 $0.setTitle(primaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
                     primaryAction()
                 }), for: .touchUpInside)
@@ -287,7 +290,7 @@ class WelcomeViewCallout: UIView {
                 
             secondaryButton.do {
                 $0.setTitle(secondaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .systemFont(ofSize: 17.0)
+                $0.titleLabel?.font = .preferredFont(for: .body, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     secondaryAction()
                 }), for: .touchUpInside)
@@ -297,7 +300,7 @@ class WelcomeViewCallout: UIView {
             
             contentView.setCustomSpacing(8.0, after: titleLabel)
             contentView.setCustomSpacing(24.0, after: detailsLabel)
-            contentView.setCustomSpacing(24.0, after: primaryButton)
+            contentView.setCustomSpacing(10.0, after: primaryButton)
         case .defaultBrowserWarning(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
             contentView.do {
                 $0.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 10, right: 20)
