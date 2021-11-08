@@ -11,12 +11,12 @@
       "scale" : "2x"
     },
     {
-      "filename" : "image 1@3x.png",
+      "filename" : "image 1@2x-1.png",
       "idiom" : "iphone",
       "scale" : "3x"
     },
     {
-      "filename" : "image 1@2x-1.png",
+      "filename" : "image 1@3x.png",
       "idiom" : "ipad",
       "scale" : "1x"
     },

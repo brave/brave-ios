@@ -282,15 +282,16 @@ class WelcomeViewController: UIViewController {
                 return transformation
             }()
             
-//            let imageViewTransform = { () -> CGAffineTransform in
-//                var transformation = CGAffineTransform.identity
-//                transformation = transformation.translatedBy(x: 0.0, y: -100.0)
-//                return transformation
-//            }()
+            let imageViewTransform = { () -> CGAffineTransform in
+                var transformation = CGAffineTransform.identity
+                transformation = transformation.scaledBy(x: 0.75, y: 0.75)
+                transformation = transformation.translatedBy(x: 0.0, y: 95.0)
+                return transformation
+            }()
                 
             let contentViewTransform = { () -> CGAffineTransform in
                 var transformation = CGAffineTransform.identity
-                transformation = transformation.translatedBy(x: 0.0, y: -160.0)
+                transformation = transformation.translatedBy(x: 0.0, y: -145.0)
                 return transformation
             }()
             
@@ -298,7 +299,11 @@ class WelcomeViewController: UIViewController {
             bottomImageView.transform = bottomTransform
             iconView.do {
                 $0.image = #imageLiteral(resourceName: "welcome-view-ready-icon")
-                //$0.transform = imageViewTransform
+                $0.transform = imageViewTransform
+            }
+                
+            skipButton.snp.makeConstraints {
+                $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(30.0)
             }
             skipButton.alpha = 1.0
             
@@ -315,17 +320,11 @@ class WelcomeViewController: UIViewController {
                 $0.spacing = 0.0
                 $0.transform = contentViewTransform
             }
-            contentContainer.snp.updateConstraints {
-                $0.centerY.equalToSuperview()
-                $0.bottom.lessThanOrEqualTo(self.skipButton.snp.top).offset(-30.0)
-            }
                 
-//                [calloutView, iconView, searchView].forEach {
-//                    contentContainer.addArrangedSubview($0)
-//                }
-            
-            //contentContainer.setCustomSpacing(-40.0, after: iconView)
-            //contentContainer.setCustomSpacing(15.0, after: calloutView)
+            contentContainer.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.bottom.greaterThanOrEqualTo(skipButton.snp.top).offset(200.0)
+            }
             
             websitesForRegion().forEach { item in
                 self.searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
@@ -338,7 +337,7 @@ class WelcomeViewController: UIViewController {
             }
             
             searchView.snp.makeConstraints {
-                $0.height.greaterThanOrEqualTo(50.0)
+                $0.height.greaterThanOrEqualTo(240.0)
             }
             calloutView.setState(state: state)
         }
