@@ -32,7 +32,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // We have to wait until pre1.12 migration is done until we proceed with database
         // initialization. This is because Database container may change. See bugs #3416, #3377.
+        Preferences.cdError.value.append("Pre initialize once")
         DataController.shared.initializeOnce()
+        Preferences.cdError.value.append("Post initialize once")
         Migration.postCoreDataInitMigrations()
         
         Preferences.General.themeNormalMode.objectWillChange
@@ -154,6 +156,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
+        Preferences.cdError.value.append("Clean background")
         Preferences.AppState.backgroundedCleanly.value = true
     }
 

@@ -515,7 +515,7 @@ class SettingsViewController: TableViewController {
     }()
     
     private lazy var debugSection: Static.Section? = {
-        if AppConstants.buildChannel.isPublic { return nil }
+        
         
         return Static.Section(
             rows: [

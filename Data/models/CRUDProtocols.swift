@@ -5,6 +5,7 @@
 import Foundation
 import CoreData
 import Shared
+import BraveShared
 import XCGLogger
 
 private let log = Logger.browserLogger
@@ -37,7 +38,7 @@ extension Deletable {
     static func deleteAll(predicate: NSPredicate? = nil,
                           context: WriteContext = .new(inMemory: false),
                           includesPropertyValues: Bool = true) {
-        
+        Preferences.cdError.value.append("Delete all")
         DataController.perform(context: context) { context in
             guard let request = getFetchRequest() as? NSFetchRequest<NSFetchRequestResult> else { return }
             request.predicate = predicate
