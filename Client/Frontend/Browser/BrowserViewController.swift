@@ -1804,6 +1804,34 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     updateDisplayedPopoverProperties = nil
   }
 
+    private func openPDFInIBooks(_ url: URL) {
+        let iBooksURL = "itms-books://\(url.absoluteString)"
+
+        guard let url = URL(string: iBooksURL) else { return }
+        
+        UIApplication.shared.open(url, options: [:])
+    }
+    
+    func showPageZoom() {
+        let pageZoom = PageZoomView(currentValue: .init(get: {
+            self.tabManager.selectedTab?.webView?.value(forKey: "viewScale") as? Double ?? 1.0
+        }, set: { value in
+            self.tabManager.selectedTab?.webView?.setValue(value, forKey: "viewScale")
+        }), defaultValue: 1.0)
+        // self?.tabManager.selectedTab?.webView?.setValue(value, forKey: "viewScale")
+        
+        let vc = UIHostingController(rootView: pageZoom)
+        
+        alertStackView.addArrangedSubview(vc.view)
+        
+        vc.view.snp.makeConstraints {
+            $0.height.equalTo(UIConstants.toolbarHeight)
+            $0.edges.equalTo(alertStackView)
+        }
+        
+        updateViewConstraints()
+    }
+
   func updateFindInPageVisibility(visible: Bool, tab: Tab? = nil) {
     if visible {
       if findInPageBar == nil {

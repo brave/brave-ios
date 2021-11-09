@@ -294,6 +294,12 @@ extension BrowserViewController {
               browserViewController.openAddBookmark()
             }
           }
+                    MenuItemButton(icon: #imageLiteral(resourceName: "menu-add-bookmark").template,
+                                   title: "Page Zoom") {
+                        browserViewController.dismiss(animated: true) {
+                            browserViewController.showPageZoom()
+                        }
+                    }
           ForEach(activities, id: \.activityTitle) { activity in
             MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") {
               browserViewController.dismiss(animated: true)

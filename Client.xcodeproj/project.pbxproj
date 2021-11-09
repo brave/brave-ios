@@ -588,6 +588,7 @@
 		3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */; };
 		440982A526658EAA00BB37FE /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440982A426658EAA00BB37FE /* BraveSearchManager.swift */; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
+		441E56A6273A89E2006DEF10 /* PageZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441E56A5273A89E2006DEF10 /* PageZoomView.swift */; };
 		4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */; };
 		4422D42B21BFCF8900BF1855 /* RecentlyUsedCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4422D42521BFCF8800BF1855 /* RecentlyUsedCache.h */; };
 		4422D42C21BFCF8900BF1855 /* HttpsEverywhere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42621BFCF8800BF1855 /* HttpsEverywhere.cpp */; };
@@ -2379,6 +2380,7 @@
 		3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleToast.swift; sourceTree = "<group>"; };
 		440982A426658EAA00BB37FE /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
+		441E56A5273A89E2006DEF10 /* PageZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageZoomView.swift; sourceTree = "<group>"; };
 		4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpsEverywhereStats.swift; sourceTree = "<group>"; };
 		4422D42521BFCF8800BF1855 /* RecentlyUsedCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentlyUsedCache.h; sourceTree = "<group>"; };
 		4422D42621BFCF8800BF1855 /* HttpsEverywhere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpsEverywhere.cpp; sourceTree = "<group>"; };
@@ -6338,6 +6340,10 @@
 				0A66550923E9D9750047EF2A /* UserAgent.swift */,
 				0A8A6224257905E300B035F4 /* UniversalLinkManager.swift */,
 				0A0A5ED025B1F080007B3E74 /* FullScreenCalloutManager.swift */,
+				0AE50869261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift */,
+				449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */,
+				CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */,
+				441E56A5273A89E2006DEF10 /* PageZoomView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -8892,6 +8898,7 @@
 				392ED7E41D0AEF56009D9B62 /* NewTabAccessors.swift in Sources */,
 				276E7A3C22F21DBE00939424 /* RewardsReporting.swift in Sources */,
 				4422D50421BFFB7600BF1855 /* memtable.cc in Sources */,
+				441E56A6273A89E2006DEF10 /* PageZoomView.swift in Sources */,
 				D3A9949D1A3686BD008AD1AC /* Tab.swift in Sources */,
 				2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */,
 				0A4BEFD8221EE78E0005551A /* CachedNetworkResource.swift in Sources */,
