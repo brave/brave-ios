@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
 import BraveUI
 
 struct PrivacyEverywhereView: View {
@@ -21,7 +22,7 @@ struct PrivacyEverywhereView: View {
                     Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
                 }
             }
-            Text("Privacy. Everywhere.")
+            Text(Strings.Callout.privacyEverywhereCalloutTitle)
                 .padding(.vertical, 5)
                 .font(.title3.weight(.medium))
                 .foregroundColor(Color(.bravePrimary))
@@ -29,7 +30,7 @@ struct PrivacyEverywhereView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .padding(.vertical, 5)
-            Text("Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.")
+            Text(Strings.Callout.privacyEverywhereCalloutDescription)
                 .multilineTextAlignment(.center)
                 .font(.body)
                 .foregroundColor(Color(.bravePrimary))
@@ -37,7 +38,7 @@ struct PrivacyEverywhereView: View {
             Button(action: {
                 syncNow?()
             }) {
-                Text("Sync now")
+                Text(Strings.Callout.privacyEverywhereCalloutPrimaryButtonTitle)
                     .frame(maxWidth: .infinity)
                     .font(.title3.weight(.medium))
                     .padding()

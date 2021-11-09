@@ -161,6 +161,95 @@ extension Strings {
     }
 }
 
+// MARK:  Callouts
+
+extension Strings {
+    public struct Callout {
+        public static let defaultBrowserCalloutTitle =
+            NSLocalizedString("callout.defaultBrowserTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Make Brave your default browser",
+                              comment: "Title for Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutDescription =
+            NSLocalizedString("callout.defaultBrowserCalloutDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "With Brave as default, every link you click opens with Brave's privacy protections.",
+                              comment: "Subtitle - Description for Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutPrimaryButtonTitle =
+            NSLocalizedString("callout.defaultBrowserCalloutPrimaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Set as default",
+                              comment: "Title for main button in Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutSecondaryButtonTitle =
+            NSLocalizedString("callout.defaultBrowserCalloutSecondaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Skip this",
+                              comment: "Title for secondary button in Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutSecondaryButtonDescription =
+            NSLocalizedString("callout.defaultBrowserCalloutSecondaryButtonDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Already default?",
+                              comment: "Description for secondary button in Default Browser Full Screen Callout")
+        public static let privacyEverywhereCalloutTitle =
+            NSLocalizedString("callout.privacyEverywhereCalloutTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Privacy. Everywhere.",
+                              comment: "Title for Privacy Everywhere Full Screen Callout")
+        public static let privacyEverywhereCalloutDescription =
+            NSLocalizedString("callout.privacyEverywhereCalloutDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.",
+                              comment: "Subtitle - Description for Privacy Everywhere Full Screen Callout")
+        public static let privacyEverywhereCalloutPrimaryButtonTitle =
+            NSLocalizedString("callout.privacyEverywhereCalloutPrimaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Sync now",
+                              comment: "Title for button in Default Browser Full Screen Callout")
+    }
+}
+
+// MARK:  Onboarding
+
+extension Strings {
+    public struct Onboarding {
+        public static let welcomeScreenTitle =
+            NSLocalizedString("onboarding.welcomeScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Welcome to Brave!",
+                              comment: "Title for Welcome Screen in Onboarding")
+        public static let privacyScreenTitle =
+            NSLocalizedString("onboarding.privacyScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Privacy, simplified",
+                              comment: "Title for Privacy Screen in Onboarding")
+        public static let privacyScreenDescription =
+            NSLocalizedString("onboarding.privacyScreenDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "You're just a step away from the best privacy online. Ready?",
+                              comment: "Description for Privacy Screen in Onboarding")
+        public static let privacyScreenButtonTitle =
+            NSLocalizedString("onboarding.privacyScreenButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Let's go",
+                              comment: "Button Title for Privacy Screen in Onboarding")
+        public static let readyScreenTitle =
+            NSLocalizedString("onboarding.readyScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "You're ready to browse!",
+                              comment: "Title for Ready Screen in Onboarding")
+        public static let readyScreenDescription =
+            NSLocalizedString("onboarding.readyScreenDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Select a popular site below or enter your own...",
+                              comment: "Description for Ready Screen in Onboarding")
+        public static let readyScreenAdditionalDescription =
+            NSLocalizedString("onboarding.readyScreenAdditionalDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "...and watch those trackers & ads disappear.",
+                              comment: "Additional Description for Ready Screen in Onboarding")
+    }
+}
+
 // MARK:-  ErrorPageHelper.swift
 extension Strings {
     public static let errorPageReloadButtonTitle = NSLocalizedString("ErrorPageReloadButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Reload", comment: "Shown in error pages on a button that will try to load the page again")

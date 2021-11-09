@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import SnapKit
 import BraveUI
+import Shared
 import pop
 
 enum WelcomeViewCalloutState {
@@ -348,7 +349,7 @@ class WelcomeViewCallout: UIView {
             }
                 
             secondaryLabel.do {
-                $0.text = "Already default?"
+                $0.text = Strings.Callout.defaultBrowserCalloutSecondaryButtonDescription
                 $0.textAlignment = .right
                 $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0

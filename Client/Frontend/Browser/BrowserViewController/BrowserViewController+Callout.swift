@@ -71,10 +71,10 @@ extension BrowserViewController {
             profile: nil,
             rewards: nil,
             state: WelcomeViewCalloutState.defaultBrowserWarning(
-                title: "Make Brave your default browser",
-                details: "With Brave as default, every link you click opens with Brave's privacy protections.",
-                primaryButtonTitle: "Set as default",
-                secondaryButtonTitle: "Skip this",
+                title: Strings.Callout.defaultBrowserCalloutTitle,
+                details: Strings.Callout.defaultBrowserCalloutDescription,
+                primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
+                secondaryButtonTitle: Strings.Callout.defaultBrowserCalloutSecondaryButtonTitle,
                 primaryAction: {
                     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                         return

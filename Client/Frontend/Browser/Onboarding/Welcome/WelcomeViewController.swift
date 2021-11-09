@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import SnapKit
 import BraveShared
+import Shared
 import pop
 
 private enum WelcomeViewID: Int {
@@ -30,7 +31,7 @@ class WelcomeViewController: UIViewController {
     convenience init(profile: Profile?, rewards: BraveRewards?) {
         self.init(profile: profile,
                   rewards: rewards,
-                  state: .welcome(title: "Welcome to Brave!"))
+                  state: .welcome(title: Strings.Onboarding.welcomeScreenTitle))
     }
     
     init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
@@ -90,7 +91,7 @@ class WelcomeViewController: UIViewController {
     }
     
     private let skipButton = UIButton(type: .custom).then {
-        $0.setTitle("Skip", for: .normal)
+        $0.setTitle(Strings.OBSkipButton, for: .normal)
         $0.setTitleColor(.white, for: .normal)
         $0.alpha = 0.0
     }
@@ -348,12 +349,13 @@ class WelcomeViewController: UIViewController {
                                                    rewards: rewards,
                                                    state: nil)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        let state = WelcomeViewCalloutState.privacy(title: "Privacy, simplified",
-                             details: "You're just a step away from the best privacy online. Ready?",
-                             buttonTitle: "Let's go",
-                             action: {
-                                nextController.animateToDefaultBrowserState()
-                             }
+        let state = WelcomeViewCalloutState.privacy(
+            title: Strings.Onboarding.privacyScreenTitle,
+            details: Strings.Onboarding.privacyScreenDescription,
+            buttonTitle: Strings.Onboarding.privacyScreenButtonTitle,
+            action: {
+                nextController.animateToDefaultBrowserState()
+            }
         )
         nextController.setLayoutState(state: state)
         self.present(nextController, animated: true, completion: nil)
@@ -363,27 +365,30 @@ class WelcomeViewController: UIViewController {
         let nextController = WelcomeViewController(profile: profile,
                                                    rewards: rewards)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        let state = WelcomeViewCalloutState.defaultBrowser(title: "Make Brave your default browser",
-                                    details: "With Brave as default, every link you click opens with Brave's privacy protections.",
-                                    primaryButtonTitle: "Set as default",
-                                    secondaryButtonTitle: "Not now",
-                                    primaryAction: {
-                                        nextController.onSetDefaultBrowser()
-                                    }, secondaryAction: {
-                                        nextController.animateToReadyState()
-                                    }
+        let state = WelcomeViewCalloutState.defaultBrowser(
+            title: Strings.Callout.defaultBrowserCalloutTitle,
+            details: Strings.Callout.defaultBrowserCalloutDescription,
+            primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
+            secondaryButtonTitle: Strings.DefaultBrowserCallout.introSkipButtonText,
+            primaryAction: {
+                nextController.onSetDefaultBrowser()
+            }, secondaryAction: {
+                nextController.animateToReadyState()
+            }
         )
         nextController.setLayoutState(state: state)
         self.present(nextController, animated: true, completion: nil)
     }
     
     private func animateToReadyState() {
-        let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards)
+        let nextController = WelcomeViewController(
+            profile: profile,
+            rewards: rewards)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        let state = WelcomeViewCalloutState.ready(title: "You're ready to browse!",
-                                      details: "Select a popular site below or enter your own...",
-                                      moreDetails: "...and watch those trackers & ads disappear.")
+        let state = WelcomeViewCalloutState.ready(
+            title: Strings.Onboarding.readyScreenTitle,
+            details: Strings.Onboarding.readyScreenDescription,
+            moreDetails: Strings.Onboarding.readyScreenAdditionalDescription)
         nextController.setLayoutState(state: state)
         self.present(nextController, animated: true, completion: nil)
     }
