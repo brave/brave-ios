@@ -54,7 +54,7 @@ class WelcomeViewCallout: UIView {
     }
     
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
-        $0.setTitleColor(.secondaryBraveBackground, for: .normal)
+        $0.setTitleColor(.white, for: .normal)
         $0.backgroundColor = .braveBlurple
         $0.setTitle(" ", for: .normal)
     }
@@ -349,15 +349,15 @@ class WelcomeViewCallout: UIView {
                 
             secondaryLabel.do {
                 $0.text = "Already default?"
-                $0.textAlignment = .left
-                $0.font = .systemFont(ofSize: 17.0, weight: .medium)
+                $0.textAlignment = .right
+                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             secondaryButton.do {
                 $0.setTitle(secondaryButtonTitle, for: .normal)
-                    $0.titleLabel?.font = .systemFont(ofSize: 15.0, weight: .bold)
+                    $0.titleLabel?.font = .preferredFont(for: .title3, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     secondaryAction()
                 }), for: .touchUpInside)
