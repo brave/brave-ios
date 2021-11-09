@@ -23,6 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private var cancellables: Set<AnyCancellable> = []
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+//        Preferences.cdError.value = []
+        
+        
+        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         sceneInfo = (UIApplication.shared.delegate as? AppDelegate)?.sceneInfo(for: session)
@@ -30,11 +34,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         
+        Preferences.cdError.value.append("willConnectTo")
+//        Preferences.cdError.value.append("options source: \(connectionOptions.sourceApplication)")
+//        Preferences.cdError.value.append("options userActivities: \(connectionOptions.userActivities.map { $0 })")
+//        Preferences.cdError.value.append("options contexts: \(connectionOptions.urlContexts.map { $0.url.absoluteString })")
+//        Preferences.cdError.value.append("options handoffUserActivityType: \(connectionOptions.handoffUserActivityType)")
+//        Preferences.cdError.value.append("options notificationResponse: \(connectionOptions.notificationResponse)")
+//        Preferences.cdError.value.append("options shortcutItem: \(connectionOptions.shortcutItem)")
+        
+        Preferences.cdError.value.append("connected scenes: \(UIApplication.shared.connectedScenes.count)")
+        
+        
         // We have to wait until pre1.12 migration is done until we proceed with database
         // initialization. This is because Database container may change. See bugs #3416, #3377.
-        Preferences.cdError.value.append("Pre initialize once")
+        
         DataController.shared.initializeOnce()
-        Preferences.cdError.value.append("Post initialize once")
+        
         Migration.postCoreDataInitMigrations()
         
         Preferences.General.themeNormalMode.objectWillChange
@@ -113,10 +128,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        
+        Preferences.cdError.value.append("sceneDidDisconnect")
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
+        Preferences.cdError.value.append("sceneDidBecomeActive")
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
               let scene = scene as? UIWindowScene,
               let profile = sceneInfo?.profile else {
@@ -156,11 +172,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
-        Preferences.cdError.value.append("Clean background")
+        Preferences.cdError.value.append("sceneWillResignActive")
         Preferences.AppState.backgroundedCleanly.value = true
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
+        Preferences.cdError.value.append("sceneWillEnterForeground")
         // The reason we need to call this method here instead of `applicationDidBecomeActive`
         // is that this method is only invoked whenever the application is entering the foreground where as
         // `applicationDidBecomeActive` will get called whenever the Touch ID authentication overlay disappears.
@@ -173,6 +190,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
+        Preferences.cdError.value.append("sceneDidEnterBackground")
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
@@ -310,10 +328,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             completionHandler(false)
         }
-    }
-    
-    func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
-        return nil
     }
 }
 

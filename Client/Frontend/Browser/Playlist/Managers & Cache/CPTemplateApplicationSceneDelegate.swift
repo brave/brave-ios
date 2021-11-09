@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import CarPlay
 import Shared
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -16,6 +17,7 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
     // MARK: UISceneDelegate
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        Preferences.cdError.value.append("CPT willConnectTo")
         if scene is CPTemplateApplicationScene,
             session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene will connect.")
@@ -23,6 +25,7 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
+        Preferences.cdError.value.append("CPT sceneDidDisconnect")
         if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene did disconnect.")
         }
@@ -35,6 +38,7 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
+        Preferences.cdError.value.append("CPT sceneWillResignActive")
         if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
             log.debug("Template application scene will resign active.")
         }

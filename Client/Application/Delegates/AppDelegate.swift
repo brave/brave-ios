@@ -54,6 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     @discardableResult
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Preferences.cdError.value.append("-------------------- NEW LAUNCH -------------------")
         // Hold references to willFinishLaunching parameters for delayed app launch
         self.application = application
         self.launchOptions = launchOptions
@@ -149,6 +150,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return nil
         }()
         
+        Preferences.cdError.value.append("APP withLaunchOptions")
         // Setup Scene Info
         sceneInfo = SceneInfoModel(profile: profile,
                                    diskImageStore: diskImageStore)
@@ -310,12 +312,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         // We have only five seconds here, so let's hope this doesn't take too long.
+        Preferences.cdError.value.append("APP applicationWillTerminate")
         sceneInfo?.profile.shutdown()
         
         SKPaymentQueue.default().remove(iapObserver)
         
         // Clean up BraveCore
         BraveSyncAPI.removeAllObservers()
+        Preferences.AppState.backgroundedCleanly.value = true
     }
     
     func updateShortcutItems(_ application: UIApplication) {
@@ -436,6 +440,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func sceneInfo(for sceneSession: UISceneSession) -> SceneInfoModel? {
+        Preferences.cdError.value.append("APP sceneInfo")
         return sceneInfo
     }
 }
@@ -452,6 +457,7 @@ extension AppDelegate {
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        Preferences.cdError.value.append("APP configurationForConnecting")
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
         return UISceneConfiguration(name: connectingSceneSession.configuration.name,
@@ -462,6 +468,7 @@ extension AppDelegate {
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+        Preferences.cdError.value.append("APP didDiscardSceneSessions")
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
