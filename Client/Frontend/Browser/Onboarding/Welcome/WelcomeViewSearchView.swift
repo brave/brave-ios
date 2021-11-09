@@ -14,6 +14,7 @@ class WelcomeViewSearchView: UIView {
         static let contentPadding = 30.0
         static let cornerRadius = 16.0
         static let buttonHeight = 48.0
+        static let scrollViewWidth = 450.0
     }
     
     private let scrollView = UIScrollView()
@@ -32,7 +33,13 @@ class WelcomeViewSearchView: UIView {
         scrollView.addSubview(contentView)
         
         scrollView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            if UIDevice.isIpad {
+                $0.top.bottom.equalToSuperview()
+                $0.centerX.equalToSuperview()
+                $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)
+            } else {
+                $0.edges.equalToSuperview()
+            }
         }
         
         scrollView.contentLayoutGuide.snp.makeConstraints {

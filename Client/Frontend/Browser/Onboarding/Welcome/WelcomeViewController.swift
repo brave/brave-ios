@@ -336,7 +336,7 @@ class WelcomeViewController: UIViewController {
                 self.onEnterCustomWebsite()
             }
             
-            searchView.snp.makeConstraints {
+            searchView.snp.remakeConstraints {
                 $0.height.greaterThanOrEqualTo(240.0)
             }
             calloutView.setState(state: state)

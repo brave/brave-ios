@@ -98,8 +98,9 @@ class WelcomeViewCallout: UIView {
             }
         }
         
-        secondaryButtonContentView.addArrangedSubview(secondaryLabel)
-        secondaryButtonContentView.addArrangedSubview(secondaryButton)
+        [secondaryLabel, secondaryButton].forEach {
+            secondaryButtonContentView.addArrangedSubview($0)
+        }
         
         [titleLabel, detailsLabel].forEach {
             $0.contentMode = pointsUp ? .bottom : .top
@@ -142,7 +143,12 @@ class WelcomeViewCallout: UIView {
             
             contentView.snp.makeConstraints {
                 $0.top.equalTo(arrowView.snp.bottom)
-                $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                if UIDevice.isIpad {
+                    $0.width.lessThanOrEqualTo(450)
+                    $0.centerX.equalToSuperview()
+                } else {
+                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                }
                 $0.bottom.equalToSuperview()
             }
         } else {
@@ -152,7 +158,12 @@ class WelcomeViewCallout: UIView {
             arrowView.transform = CGAffineTransform.identity.rotated(by: .pi)
             
             contentView.snp.makeConstraints {
-                $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                if UIDevice.isIpad {
+                    $0.width.lessThanOrEqualTo(450)
+                    $0.centerX.equalToSuperview()
+                } else {
+                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                }
                 $0.top.equalToSuperview()
             }
             
