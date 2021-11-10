@@ -31,7 +31,12 @@ extension BrowserViewController {
                 guard let self = self else { return }
                 
                 if let url = url {
-                    self.openInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                    let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+                    self.topToolbar.leaveOverlayMode()
+                    let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                                     afterTab: self.tabManager.selectedTab,
+                                                     isPrivate: isPrivate)
+                    self.tabManager.selectTab(tab)
                 } else {
                     self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
                 }
@@ -41,6 +46,32 @@ extension BrowserViewController {
             isfullScreenCalloutPresented = true
             shouldShowNTPEducation = true
             return
+        }
+    }
+    
+    func notifyTrackersBlocked(domain: String, trackers: [String: [String]]) {
+        let controller = WelcomeBraveBlockedAdsController().then {
+            var trackers = trackers
+            let first = trackers.popFirst()
+            let tracker = first?.key
+            let trackerCount = ((first?.value.count ?? 0) - 1) + trackers.reduce(0, { res, values in
+                res + values.value.count
+            })
+            
+            $0.setData(domain: domain, trackerBlocked: tracker ?? "", trackerCount: trackerCount)
+        }
+        
+        let popover = PopoverController(contentController: controller)
+        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+        
+        let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
+        pulseAnimation.present(icon: topToolbar.locationView.shieldsButton.imageView?.image,
+                               from: topToolbar.locationView.shieldsButton,
+                               on: popover,
+                               browser: self)
+        
+        popover.popoverDidDismiss = { _ in
+            pulseAnimation.removeFromSuperview()
         }
     }
     

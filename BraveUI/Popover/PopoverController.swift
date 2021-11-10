@@ -215,7 +215,7 @@ public class PopoverController: UIViewController {
     
     private let containerView = ContainerView()
     
-    private let backgroundOverlayView = UIView()
+    public let backgroundOverlayView = UIView()
     
     override public func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         if case .preferredContentSize = contentSizeBehavior {

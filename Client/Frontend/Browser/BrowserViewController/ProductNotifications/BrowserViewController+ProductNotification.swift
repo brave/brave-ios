@@ -110,10 +110,10 @@ extension BrowserViewController {
             }
         }
         
-        if !trackers.isEmpty {
+        if !trackers.isEmpty, let url = selectedTab.url {
+            let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
+            notifyTrackersBlocked(domain: domain, trackers: trackers)
             Preferences.General.onboardingAdblockPopoverShown.value = true
-            
-            //TODO: Show callout for `Brave Blocked Ads`
         }
     }
     
@@ -225,7 +225,17 @@ extension BrowserViewController {
 
         let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
         popover.addsConvenientDismissalMargins = false
-        popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+        
+        let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
+        pulseAnimation.present(icon: topToolbar.locationView.shieldsButton.imageView?.image,
+                               from: topToolbar.locationView.shieldsButton,
+                               on: popover,
+                               browser: self)
+        
+        popover.popoverDidDismiss = { _ in
+            pulseAnimation.removeFromSuperview()
+        }
     }
     
     // MARK: Actions

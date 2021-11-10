@@ -886,6 +886,8 @@
 		CA03923A271E2CB2000EB13C /* BrowserViewController+Widgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */; };
 		CA03923B271E3238000EB13C /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */; };
 		CA04E8A627022D9D00BFBB4D /* PlaylistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */; };
+		CA0EE168273C220800F269DA /* WelcomeBraveBlockedAdsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */; };
+		CA0EE175273C248C00F269DA /* OnboardingPulseAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */; };
 		CA10BE702704BA7900A265A6 /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		CA10BE712704BA7900A265A6 /* GlobalSignRootCA_R1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24226CBD42C00658EAC /* GlobalSignRootCA_R1.cer */; };
 		CA10BE722704BA7900A265A6 /* GlobalSignRootCA_R3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24126CBD42B00658EAC /* GlobalSignRootCA_R3.cer */; };
@@ -2685,6 +2687,8 @@
 		CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserNavigationHelper.swift; sourceTree = "<group>"; };
 		CA039239271E2CB2000EB13C /* BrowserViewController+Widgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Widgets.swift"; sourceTree = "<group>"; };
 		CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTests.swift; sourceTree = "<group>"; };
+		CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeBraveBlockedAdsController.swift; sourceTree = "<group>"; };
+		CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPulseAnimationView.swift; sourceTree = "<group>"; };
 		CA10BE7E2704BCAE00A265A6 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
 		CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewCallout.swift; sourceTree = "<group>"; };
 		CA220257271881E3002D3582 /* InternalSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSchemeHandler.swift; sourceTree = "<group>"; };
@@ -5232,6 +5236,8 @@
 				CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */,
 				CA2EE06027334E4F0089C75F /* PopupViewController.swift */,
 				CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */,
+				CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */,
+				CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */,
 			);
 			path = Welcome;
 			sourceTree = "<group>";
@@ -7768,6 +7774,7 @@
 				CA8D5C2026D7D04C009BF13D /* PlaylistMediaStreamer.swift in Sources */,
 				0AF6B1EA24A0EE19005417FC /* InstallVPNView.swift in Sources */,
 				27201F0424589B9800C19DD1 /* NewTabPageNotifications.swift in Sources */,
+				CA0EE168273C220800F269DA /* WelcomeBraveBlockedAdsController.swift in Sources */,
 				E698FFDA1B4AADF40001F623 /* TabScrollController.swift in Sources */,
 				27448534245B5EC2001920B5 /* NTPModels.swift in Sources */,
 				2F59562826D427B400FEE43B /* LoginAuthViewController.swift in Sources */,
@@ -7832,6 +7839,7 @@
 				2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
 				4422D4B721BFFB7600BF1855 /* filter_policy.cc in Sources */,
+				CA0EE175273C248C00F269DA /* OnboardingPulseAnimationView.swift in Sources */,
 				27036EA325671817004EF6B6 /* FeedCardFooterButton.swift in Sources */,
 				0AADC4D520D2A6A200FDE368 /* PreloadedFavorites.swift in Sources */,
 				0AC77602242A6AE000139377 /* BuyVPNView.swift in Sources */,
