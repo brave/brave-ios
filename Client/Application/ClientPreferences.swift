@@ -123,6 +123,10 @@ extension Preferences {
         /// Whether the rewards callout is shown.
         static let rewardsCalloutCompleted =
             Option<Bool>(key: "general.full-screen-rewards-callout-completed", default: false)
+        
+        /// Whether the whats new callout should be shown.
+        static let whatsNewCalloutOptIn =
+            Option<Bool>(key: "general.full-screen-rewards-callout-completed", default: false)
     }
     
     final class DefaultBrowserIntro {

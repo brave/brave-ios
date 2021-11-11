@@ -49,7 +49,6 @@ struct PrivacyEverywhereView: View {
         .frame(maxWidth: 450)
         .padding(.all)
         .background(Color(.braveBackground))
-        .cornerRadius(20.0)
     }
 }
 
@@ -72,17 +71,5 @@ struct PrivacyEverywhereView_Previews: PreviewProvider {
             }
             .previewDevice("iPad Pro (9.7-inch)")
         }
-    }
-}
-
-class PrivacyEverywhereController: UIHostingController<PrivacyEverywhereView> & PopupContentComponent {
-    
-    init() {
-        super.init(rootView: PrivacyEverywhereView())
-        view.backgroundColor = .clear
-    }
-    
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

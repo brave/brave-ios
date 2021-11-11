@@ -119,22 +119,42 @@ extension BrowserViewController {
         }
                 
         if !BraveSyncAPI.shared.isInSyncGroup {
-
-            let controller = PrivacyEverywhereController()
-            controller.rootView.dismiss = { [unowned controller] in
+            var privacyEverywhereView = PrivacyEverywhereView()
+            let controller = PopupViewController(rootView: privacyEverywhereView)
+            
+            privacyEverywhereView.dismiss = { [unowned controller] in
                 controller.dismiss(animated: true)
             }
-            controller.rootView.syncNow = { [unowned controller] in
+            
+            privacyEverywhereView.syncNow = { [unowned controller] in
                 controller.dismiss(animated: true) { [weak self] in
                     guard let self = self else { return }
                     self.openInsideSettingsNavigation(with: SyncWelcomeViewController())
                 }
             }
             
-            present(PopupViewController(contentController: controller), animated: true, completion: nil)
+            present(controller, animated: true, completion: nil)
             isfullScreenCalloutPresented = true
         }
         
+        return
+    }
+    
+    func presentReleaseNotesCallout() {
+        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+
+        guard Preferences.FullScreenCallout.whatsNewCalloutOptIn.value else {
+            return
+        }
+
+        var releaseNotesView = ReleaseNotesView()
+        let controller = PopupViewController(rootView: releaseNotesView)
+        releaseNotesView.dismiss = { [unowned controller] in
+            controller.dismiss(animated: true)
+        }
+
+        present(controller, animated: true, completion: nil)
+        isfullScreenCalloutPresented = true
         return
     }
 }

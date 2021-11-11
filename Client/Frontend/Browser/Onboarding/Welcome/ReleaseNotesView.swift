@@ -4,27 +4,43 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import BraveShared
 
-struct BraveVPNAd: View {
+struct ReleaseNotesView: View {
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
+    var dismiss: (() -> Void)?
+
     var body: some View {
         VStack {
             Image(uiImage: #imageLiteral(resourceName: "brave-vpn-ad-top-shimmer"))
+            .resizable()
+            .aspectRatio(contentMode: .fit)
             HStack {
                 Spacer()
-                Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
-            }.offset(y: 10.0)
+                Button {
+                    dismiss?()
+                } label: {
+                    Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
+                }
+                .padding(.trailing, 10)
+                .padding(.top, 10)
+            }
             Text("Brave new releases")
             Image(uiImage: #imageLiteral(resourceName: "brave-vpn-ad-background"))
             .resizable()
             .aspectRatio(contentMode: .fit)
             .overlay(imageOverlay, alignment: .center)
-            
+            .padding()
             VStack {
                 Text("• One line of release notes\n• Another line of release notes")
-            }.frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-        }.padding()
-         .frame(width: 374.0)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+        }
+        .frame(maxWidth: 450)
+        .background(Color(.braveBackground))
+        .cornerRadius(5.0)
     }
     
     private var imageOverlay: some View {
@@ -53,9 +69,25 @@ struct BraveVPNAd: View {
     }
 }
 
-struct BraveVPNAd_Previews: PreviewProvider {
+struct ReleaseNotesView_Previews: PreviewProvider {
     static var previews: some View {
-        BraveVPNAd()
-            .previewLayout(PreviewLayout.sizeThatFits)
+        Group {
+            ZStack {
+                Rectangle()
+                    .foregroundColor(.black)
+                    .edgesIgnoringSafeArea(.all)
+                ReleaseNotesView()
+            }
+            .previewDevice("iPhone 12 Pro")
+            
+            ZStack {
+                Rectangle()
+                    .foregroundColor(.black)
+                    .edgesIgnoringSafeArea(.all)
+                ReleaseNotesView()
+            }
+            .previewDevice("iPad Pro (9.7-inch)")
+        }
     }
 }
+

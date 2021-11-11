@@ -921,7 +921,6 @@
 		CA2202B027194D26002D3582 /* InterstitialPageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2202AF27194D26002D3582 /* InterstitialPageHandler.swift */; };
 		CA2202B227199123002D3582 /* DarkWarning.svg in Resources */ = {isa = PBXBuildFile; fileRef = CA2202B127199123002D3582 /* DarkWarning.svg */; };
 		CA2202B4271993BD002D3582 /* CertificateError.css in Resources */ = {isa = PBXBuildFile; fileRef = CA2202B3271993BD002D3582 /* CertificateError.css */; };
-		CA2EE06127334E4F0089C75F /* PopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2EE06027334E4F0089C75F /* PopupViewController.swift */; };
 		CA2EE0A527349E970089C75F /* disconnect-entitylist.json in Resources */ = {isa = PBXBuildFile; fileRef = CA2EE09927349E970089C75F /* disconnect-entitylist.json */; };
 		CA2EE0A727349F760089C75F /* OnboardingAdblockDisconnect.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */; };
 		CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */; };
@@ -932,7 +931,7 @@
 		CA752EB126CEBE52009356EF /* FontScaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A22FF26A7370C00923D70 /* FontScaling.swift */; };
 		CA7C5CAD2731928F003366F7 /* WelcomeViewSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */; };
 		CA7C5CAF2731D022003366F7 /* PrivacyEverywhereView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */; };
-		CA7C5CB12731D9A4003366F7 /* BraveVPNAd.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */; };
+		CA7C5CB12731D9A4003366F7 /* ReleaseNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */; };
 		CA8D5C0E26D7CD8A009BF13D /* PlaylistDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */; };
 		CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */; };
 		CA8D5C1226D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */; };
@@ -2709,7 +2708,6 @@
 		CA2202AF27194D26002D3582 /* InterstitialPageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstitialPageHandler.swift; sourceTree = "<group>"; };
 		CA2202B127199123002D3582 /* DarkWarning.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = DarkWarning.svg; sourceTree = "<group>"; };
 		CA2202B3271993BD002D3582 /* CertificateError.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = CertificateError.css; sourceTree = "<group>"; };
-		CA2EE06027334E4F0089C75F /* PopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupViewController.swift; sourceTree = "<group>"; };
 		CA2EE09927349E970089C75F /* disconnect-entitylist.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "disconnect-entitylist.json"; sourceTree = "<group>"; };
 		CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAdblockDisconnect.swift; sourceTree = "<group>"; };
 		CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerInfoBar.swift; sourceTree = "<group>"; };
@@ -2719,7 +2717,7 @@
 		CA752EA426CEABF8009356EF /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
 		CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewSearchView.swift; sourceTree = "<group>"; };
 		CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyEverywhereView.swift; sourceTree = "<group>"; };
-		CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveVPNAd.swift; sourceTree = "<group>"; };
+		CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesView.swift; sourceTree = "<group>"; };
 		CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailViewController.swift; sourceTree = "<group>"; };
 		CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+DragDropDelegate.swift"; sourceTree = "<group>"; };
 		CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+TableViewDataSource.swift"; sourceTree = "<group>"; };
@@ -5233,8 +5231,7 @@
 				CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */,
 				CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */,
 				CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */,
-				CA7C5CB02731D9A4003366F7 /* BraveVPNAd.swift */,
-				CA2EE06027334E4F0089C75F /* PopupViewController.swift */,
+				CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */,
 				CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */,
 				CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */,
 				CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */,
@@ -7795,7 +7792,6 @@
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,
 				F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */,
 				CAADEFE026E2707F0020DC4C /* SceneDelegate.swift in Sources */,
-				CA2EE06127334E4F0089C75F /* PopupViewController.swift in Sources */,
 				0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */,
 				F930CDD12270F09000A23FE1 /* WebAuthnAuthenticateRequest.swift in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
@@ -7932,7 +7928,7 @@
 				D3968F251A38FE8500CEFD3B /* TabManager.swift in Sources */,
 				5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
-				CA7C5CB12731D9A4003366F7 /* BraveVPNAd.swift in Sources */,
+				CA7C5CB12731D9A4003366F7 /* ReleaseNotesView.swift in Sources */,
 				CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
 				277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */,
