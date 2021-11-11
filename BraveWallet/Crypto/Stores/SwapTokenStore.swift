@@ -246,7 +246,6 @@ public class SwapTokenStore: ObservableObject {
     case .perSellAsset:
       sellAmountInWei = weiFormatter.weiString(from: sellAmount, radix: .decimal, decimals: Int(sellToken.decimals)) ?? "0"
       buyAmountInWei = ""
-      
     case .perBuyAsset:
       sellAmountInWei = ""
       buyAmountInWei = weiFormatter.weiString(from: buyAmount, radix: .decimal, decimals: Int(buyToken.decimals)) ?? "0"
@@ -295,6 +294,9 @@ public class SwapTokenStore: ObservableObject {
     }
     
     if let bv = BDouble(respnose.price) {
+      // will need to invert price if price quote is based on buyAmount
+      // ref from slack:
+      // https://bravesoftware.slack.com/archives/C023VS4HJ6Q/p1636579425364500?thread_ts=1636570735.354500&cid=C023VS4HJ6Q
       let price = base == .perSellAsset ? bv : 1 / bv
       selectedFromTokenPrice = price.decimalDescription
     }
