@@ -142,7 +142,7 @@ struct MarketPriceView: View {
         swapTokenStore.fetchPriceQuote(base: .perSellAsset)
       }) {
         Image("wallet-refresh")
-          .foregroundColor(Color(.braveLighterBlurple))
+          .foregroundColor(Color(.braveBlurpleTint))
           .font(.title3)
       }
       .buttonStyle(.plain)
@@ -189,7 +189,7 @@ struct SwapCryptoView: View {
     switch swapTokensStore.state {
     case .error, .idle:
       return true
-    case .activateAllowance, .swap:
+    case .lowAllowance, .swap:
       return false
     }
   }
@@ -198,8 +198,8 @@ struct SwapCryptoView: View {
     switch swapTokensStore.state {
     case .error(let error):
       return error
-    case .activateAllowance:
-      return "Activate Token \(swapTokensStore.selectedFromToken?.symbol ?? "")"
+    case .lowAllowance:
+      return String.localizedStringWithFormat(Strings.Wallet.activateToken, swapTokensStore.selectedFromToken?.symbol ?? "")
     case .swap, .idle:
       return Strings.Wallet.swapCryptoSwapButtonTitle
     }
@@ -342,7 +342,7 @@ struct SwapCryptoView: View {
     Section(
       header:
         Button(action: {
-          swapTokensStore.onSwapBtnClicked()
+          swapTokensStore.prepareSwap()
         }) {
           Text(swapButtonTitle)
         }

@@ -115,8 +115,10 @@ public class SwapTokenStore: ObservableObject {
   enum SwapState {
     // when there is an error occurs. associated with an error message
     case error(String)
-    // when need to activate bigger allowance. associated with a spender address
-    case activateAllowance(String)
+    // when erc20 token's allowance is less then sell amount. associated with a spender address
+    // the future of this state would get erc20 token apporve data then create
+    // an unapproved transaction
+    case lowAllowance(String)
     // when able to swap
     case swap
     // has not passed validation
@@ -158,39 +160,22 @@ public class SwapTokenStore: ObservableObject {
     }
   }
   
-  private func stringToBytes(_ string: String) -> [NSNumber] {
-    let clean = string.removingHexPrefix
-    
-    var result = [NSNumber](repeating: 0, count: string.count / 2)
-    for i in stride(from: 0, to: clean.count, by: 2) {
-        let start = clean.index(clean.startIndex, offsetBy: i)
-        let end = clean.index(clean.startIndex, offsetBy: i+2)
-        let range = start..<end
-        let mysubstring = clean[range]
-        if let value = UInt8(mysubstring, radix: 16) {
-            result[i/2] = NSNumber(value: value)
-        }
-    }
-    
-    return result
-  }
-  
-  func onSwapBtnClicked() {
+  func prepareSwap() {
     switch state {
     case .error(_), .idle:
       // will never come here
       break
-    case .activateAllowance(let spenderAddress):
-      activeErc20Allowance(spenderAddress)
+    case .lowAllowance(let spenderAddress):
+      createERC20SwapTransaction(spenderAddress)
     case .swap:
-      swapCrypto()
+      createETHSwapTransaction()
     }
   }
   
-  func swapCrypto() {
+  private func createETHSwapTransaction() {
     guard
       let accountInfo = accountInfo,
-      let swapParams = generateSwapParams(.perSellAsset)
+      let swapParams = swapParameters(for: .perSellAsset)
     else { return }
     swapController.transactionPayload(swapParams) { [weak self] success, swapResponse, error in
       guard success, let self = self else {
@@ -198,39 +183,44 @@ public class SwapTokenStore: ObservableObject {
         return
       }
       guard let response = swapResponse else { return }
-      let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 16))
-      let gasPrice = "0x\(weiFormatter.weiString(from: response.gasPrice, radix: .hex, decimals: 16) ?? "0")"
-      let gasLimit = "0x\(weiFormatter.weiString(from: response.estimatedGas, radix: .decimal, decimals: 16) ?? "0")"
-      let value = "0x\(weiFormatter.weiString(from: response.value, radix: .decimal, decimals: 16) ?? "0")"
+      let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+      let gasPrice = "0x\(weiFormatter.weiString(from: response.gasPrice, radix: .hex, decimals: 18) ?? "0")"
+      let gasLimit = "0x\(weiFormatter.weiString(from: response.estimatedGas, radix: .hex, decimals: 18) ?? "0")"
+      let value = "0x\(weiFormatter.weiString(from: response.value, radix: .hex, decimals: 18) ?? "0")"
+      let data: [NSNumber] = .init(hexString: response.data) ?? .init()
       let txData: BraveWallet.TxData = .init(
         nonce: "",
         gasPrice: gasPrice,
         gasLimit: gasLimit,
         to: response.to,
         value: value,
-        data: self.stringToBytes(response.data))
+        data: data
+      )
       self.transactionController.addUnapprovedTransaction(txData, from: accountInfo.address) { success, txMetaId, error in
         // should be observed
+        print("success")
       }
     }
   }
   
   func fetchPriceQuote(base: SwapParamsBase) {
-    guard let swapParams = generateSwapParams(base) else { return }
+    guard let swapParams = swapParameters(for: base) else { return }
     
     updatingPriceQuote = true
-    swapController.priceQuote(swapParams) { [weak self] success, swapResponse, error in
+    swapController.priceQuote(swapParams) { [weak self] success, response, error in
       guard success else {
         self?.clearAllAmount()
         self?.updatingPriceQuote = false
         return
       }
-      self?.updateSwapControls(swapResponse: swapResponse, base: base)
+      if let response = response {
+        self?.handlePriceQuoteResponse(response, base: base)
+      }
       self?.updatingPriceQuote = false
     }
   }
   
-  private func generateSwapParams(_ base: SwapParamsBase) -> BraveWallet.SwapParams? {
+  private func swapParameters(for base: SwapParamsBase) -> BraveWallet.SwapParams? {
     guard
       let accountInfo = accountInfo,
       let sellToken = selectedFromToken,
@@ -269,8 +259,8 @@ public class SwapTokenStore: ObservableObject {
     selectedFromTokenPrice = "0"
   }
   
-  private func updateSwapControls(swapResponse: BraveWallet.SwapResponse?, base: SwapParamsBase) {
-    guard let respnose = swapResponse else { return }
+  /// Update price market and sell/buy amount fields based on `SwapParamsBase`
+  private func handlePriceQuoteResponse(_ response: BraveWallet.SwapResponse, base: SwapParamsBase) {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     switch base {
     case .perSellAsset:
@@ -278,7 +268,7 @@ public class SwapTokenStore: ObservableObject {
       if let fromToken = selectedFromToken {
         decimal = Int(fromToken.decimals)
       }
-      let decimalString = weiFormatter.decimalString(for: respnose.buyAmount, decimals: decimal) ?? ""
+      let decimalString = weiFormatter.decimalString(for: response.buyAmount, decimals: decimal) ?? ""
       if let bv = BDouble(decimalString) {
         buyAmount = bv.decimalDescription
       }
@@ -287,13 +277,13 @@ public class SwapTokenStore: ObservableObject {
       if let toToken = selectedToToken {
         decimal = Int(toToken.decimals)
       }
-      let decimalString = weiFormatter.decimalString(for: respnose.sellAmount, decimals: decimal) ?? ""
+      let decimalString = weiFormatter.decimalString(for: response.sellAmount, decimals: decimal) ?? ""
       if let bv = BDouble(decimalString) {
         sellAmount = bv.decimalDescription
       }
     }
     
-    if let bv = BDouble(respnose.price) {
+    if let bv = BDouble(response.price) {
       // will need to invert price if price quote is based on buyAmount
       // ref from slack:
       // https://bravesoftware.slack.com/archives/C023VS4HJ6Q/p1636579425364500?thread_ts=1636570735.354500&cid=C023VS4HJ6Q
@@ -301,10 +291,10 @@ public class SwapTokenStore: ObservableObject {
       selectedFromTokenPrice = price.decimalDescription
     }
     
-    checkBalanceShowError(swapResponse: respnose)
+    checkBalanceShowError(swapResponse: response)
   }
   
-  private func activeErc20Allowance(_ spenderAddress: String) {
+  private func createERC20SwapTransaction(_ spenderAddress: String) {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     guard
       let fromToken = selectedFromToken,
@@ -338,25 +328,19 @@ public class SwapTokenStore: ObservableObject {
     }
   }
   
-  private func gweiStringToDecimal(_ value: String) -> BDouble? {
-    guard !value.isEmpty, let bv = BDouble(value) else {
-      return nil
-    }
-    return bv / (BDouble(10) ** 9)
-  }
-  
   private func checkBalanceShowError(swapResponse: BraveWallet.SwapResponse) {
     guard
       let accountInfo = accountInfo,
       let sellAmountValue = BDouble(sellAmount),
-      let gasLimit = gweiStringToDecimal(swapResponse.estimatedGas),
-      let gasPrice = gweiStringToDecimal(swapResponse.gasPrice),
-      let fromToken = selectedFromToken
+      let gasLimit = BDouble(swapResponse.estimatedGas),
+      let gasPrice = BDouble(swapResponse.gasPrice, over: "1000000000000000000"),
+      let fromToken = selectedFromToken,
+      let fromTokenBalance = selectedFromTokenBalance
     else { return }
     
     // Check if balance is insufficient
-    if sellAmountValue > (selectedFromTokenBalance ?? 0) {
-      state = .error(Strings.Wallet.InsufficientBalance)
+    if sellAmountValue > fromTokenBalance {
+      state = .error(Strings.Wallet.insufficientBalance)
     }
     
     // Get ETH balance for this account because gas can only be paid in ETH
@@ -368,12 +352,12 @@ public class SwapTokenStore: ObservableObject {
         let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
         if fromToken.isETH {
           if currentBalance < fee + sellAmountValue {
-            self.state = .error(Strings.Wallet.InsufficientFundsForGas)
+            self.state = .error(Strings.Wallet.insufficientFundsForGas)
             return
           }
         } else {
           if currentBalance < fee {
-            self.state = .error(Strings.Wallet.InsufficientFundsForGas)
+            self.state = .error(Strings.Wallet.insufficientFundsForGas)
             return
           }
         }
@@ -405,8 +389,8 @@ public class SwapTokenStore: ObservableObject {
     ) { [weak self] success, allowance in
       let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
       let allowanceValue = BDouble(weiFormatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(fromToken.decimals)) ?? "") ?? 0
-      guard success, amountToSend > allowanceValue else { return } // no need to activate allowance
-      self?.state = .activateAllowance(spenderAddress)
+      guard success, amountToSend > allowanceValue else { return } // no problem with its allowance
+      self?.state = .lowAllowance(spenderAddress)
     }
   }
   
