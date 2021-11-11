@@ -888,6 +888,7 @@
 		CA04E8A627022D9D00BFBB4D /* PlaylistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */; };
 		CA0EE168273C220800F269DA /* WelcomeBraveBlockedAdsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */; };
 		CA0EE175273C248C00F269DA /* OnboardingPulseAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */; };
+		CA0EE177273C402900F269DA /* WelcomeNTPOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0EE176273C402900F269DA /* WelcomeNTPOnboardingView.swift */; };
 		CA10BE702704BA7900A265A6 /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		CA10BE712704BA7900A265A6 /* GlobalSignRootCA_R1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24226CBD42C00658EAC /* GlobalSignRootCA_R1.cer */; };
 		CA10BE722704BA7900A265A6 /* GlobalSignRootCA_R3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24126CBD42B00658EAC /* GlobalSignRootCA_R3.cer */; };
@@ -2688,6 +2689,7 @@
 		CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTests.swift; sourceTree = "<group>"; };
 		CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeBraveBlockedAdsController.swift; sourceTree = "<group>"; };
 		CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPulseAnimationView.swift; sourceTree = "<group>"; };
+		CA0EE176273C402900F269DA /* WelcomeNTPOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeNTPOnboardingView.swift; sourceTree = "<group>"; };
 		CA10BE7E2704BCAE00A265A6 /* leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = leaf.cer; sourceTree = "<group>"; };
 		CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewCallout.swift; sourceTree = "<group>"; };
 		CA220257271881E3002D3582 /* InternalSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalSchemeHandler.swift; sourceTree = "<group>"; };
@@ -5235,6 +5237,7 @@
 				CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */,
 				CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */,
 				CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */,
+				CA0EE176273C402900F269DA /* WelcomeNTPOnboardingView.swift */,
 			);
 			path = Welcome;
 			sourceTree = "<group>";
@@ -8040,6 +8043,7 @@
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
 				4422D54C21BFFB7E00BF1855 /* strutil.cc in Sources */,
 				CA039238271E2B11000EB13C /* BrowserNavigationHelper.swift in Sources */,
+				CA0EE177273C402900F269DA /* WelcomeNTPOnboardingView.swift in Sources */,
 				CA8D5C1C26D7CF04009BF13D /* PlaylistCarplayManager.swift in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				C6D267522136800100465DFA /* PrivateBrowsingManager.swift in Sources */,

@@ -13,6 +13,8 @@ import BraveCore
 extension BrowserViewController {
 
     func presentOnboardingIntro() {
+        presentNTPStatsOnboarding()
+        
         if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
         // 1. Existing user.
@@ -46,6 +48,87 @@ extension BrowserViewController {
             isfullScreenCalloutPresented = true
             shouldShowNTPEducation = true
             return
+        }
+    }
+    
+    func presentNTPStatsOnboarding() {
+        guard let ntpController = tabManager.selectedTab?.newTabPageViewController,
+            let statsFrame = ntpController.ntpStatsOnboardingFrame else {
+            return
+        }
+        
+        // Project the statsFrame to the current frame
+        let frame = view.convert(statsFrame, from: ntpController.view).offsetBy(dx: 15.0, dy: 15.0)
+        
+        // Create a border view
+        let borderView = UIView().then {
+            let borderLayer = CAShapeLayer().then {
+                let frame = frame.with { $0.origin = .zero }
+                $0.strokeColor = UIColor.white.cgColor
+                $0.fillColor = UIColor.clear.cgColor
+                $0.lineWidth = 2.0
+                $0.strokeEnd = 1.0
+                $0.path = UIBezierPath(roundedRect: frame, cornerRadius: 12.0).cgPath
+            }
+            $0.layer.addSublayer(borderLayer)
+        }
+        
+        view.addSubview(borderView)
+        borderView.frame = frame
+        
+        // Present the popover
+        let controller = WelcomeNTPOnboardingController()
+        controller.setText(title: nil,
+                           details: "By blocking trackers & ads, websites use less data and load way faster.")
+        
+        let popover = PopoverController(contentController: controller)
+        popover.arrowDistance = 10.0
+        popover.present(from: borderView, on: self)
+        
+        // Mask the shadow
+        let maskFrame = view.convert(frame, to: popover.backgroundOverlayView)
+        let maskShape = CAShapeLayer().then {
+            $0.fillRule = .evenOdd
+            $0.fillColor = UIColor.white.cgColor
+            $0.strokeColor = UIColor.clear.cgColor
+            
+            $0.path = {
+                let path = CGMutablePath()
+                path.addRect(popover.backgroundOverlayView.bounds)
+                path.addRect(maskFrame)
+                return path
+            }()
+        }
+        
+        popover.backgroundOverlayView.layer.mask = maskShape
+        popover.popoverDidDismiss = { [weak self] _ in
+            maskShape.removeFromSuperlayer()
+            borderView.removeFromSuperview()
+            self?.presentNTPMenuOnboarding()
+        }
+    }
+    
+    func presentNTPMenuOnboarding() {
+        guard let menuButton = toolbar?.menuButton else { return }
+        let controller = WelcomeNTPOnboardingController()
+        controller.setText(title: "All set!",
+                           details: "Check the menu for settings and more great privacy features!")
+        
+        let popover = PopoverController(contentController: controller)
+        popover.arrowDistance = 7.0
+        popover.present(from: menuButton, on: self)
+        
+        if let icon = menuButton.imageView?.image {
+            let maskedView = controller.maskedPointerView(icon: icon,
+                                                          tint: menuButton.imageView?.tintColor)
+            popover.view.insertSubview(maskedView, aboveSubview: popover.backgroundOverlayView)
+            maskedView.frame = CGRect(width: 45.0, height: 45.0)
+            maskedView.center = view.convert(menuButton.center, from: menuButton.superview)
+            maskedView.layer.cornerRadius = max(maskedView.bounds.width, maskedView.bounds.height) / 2.0
+            
+            popover.popoverDidDismiss = { _ in
+                maskedView.removeFromSuperview()
+            }
         }
     }
     

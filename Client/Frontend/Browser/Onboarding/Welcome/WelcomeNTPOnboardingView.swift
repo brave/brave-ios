@@ -1,0 +1,78 @@
+// Copyright 2021 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import Foundation
+import UIKit
+import SnapKit
+import BraveUI
+
+class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent {
+    private let stackView = UIStackView().then {
+        $0.spacing = 8.0
+        $0.alignment = .top
+        $0.layoutMargins = UIEdgeInsets(equalInset: 20.0)
+        $0.isLayoutMarginsRelativeArrangement = true
+    }
+    
+    private let iconView = UIImageView().then {
+        $0.contentMode = .scaleAspectFit
+        $0.image = #imageLiteral(resourceName: "welcome-view-ntp-logo")
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+    
+    private let textLabel = UILabel().then {
+        $0.numberOfLines = 0
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.addSubview(stackView)
+        stackView.addArrangedSubview(iconView)
+        stackView.addArrangedSubview(textLabel)
+        stackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    
+    func setText(title: String?, details: String) {
+        let attributedString = NSMutableAttributedString()
+        if let title = title {
+            attributedString.append(NSAttributedString(string: "\(title)\n\n", attributes: [
+                .font: UIFont.systemFont(ofSize: 17.0, weight: .medium)
+            ]))
+        }
+        
+        attributedString.append(NSAttributedString(string: details, attributes: [
+            .font: UIFont.systemFont(ofSize: 17.0)
+        ]))
+        
+        textLabel.attributedText = attributedString
+    }
+    
+    func maskedPointerView(icon: UIImage, tint: UIColor?) -> UIView {
+        let view = UIView().then {
+            $0.backgroundColor = .white
+            $0.layer.masksToBounds = true
+            $0.layer.cornerCurve = .continuous
+        }
+        
+        let imageView = UIImageView().then {
+            $0.image = icon
+            $0.contentMode = .center
+            $0.tintColor = tint
+        }
+        
+        view.addSubview(imageView)
+        imageView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.equalTo(view.bounds.size.width)
+            $0.height.equalTo(view.bounds.size.height)
+        }
+        
+        return view
+    }
+}

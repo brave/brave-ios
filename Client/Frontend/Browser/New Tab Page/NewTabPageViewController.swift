@@ -83,6 +83,17 @@ protocol NewTabPageDelegate: AnyObject {
 class NewTabPageViewController: UIViewController {
     weak var delegate: NewTabPageDelegate?
     
+    var ntpStatsOnboardingFrame: CGRect? {
+        guard let section = sections.firstIndex(where: { $0 is StatsSectionProvider }) else {
+            return nil
+        }
+        
+        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: section)) as? NewTabCollectionViewCell<BraveShieldStatsView> {
+            return collectionView.convert(cell.contentView.frame, to: view)
+        }
+        return nil
+    }
+    
     /// The modules to show on the new tab page
     private var sections: [NTPSectionProvider] = []
     
