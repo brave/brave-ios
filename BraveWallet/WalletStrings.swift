@@ -1163,5 +1163,19 @@ extension Strings {
       value: "Max Priority Fee",
       comment: "The title of the edit gas fee screen"
     )
+    public static let InsufficientBalance = NSLocalizedString(
+      "wallet.InsufficientBalance",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Insufficient balance",
+      comment: "An error message when there is no insufficient balance for swapping. It will be displayed as the title of the disabled swap button at the bottom in the Swap Screen."
+    )
+    public static let InsufficientFundsForGas = NSLocalizedString(
+      "wallet.InsufficientFundsForGas",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Insufficient funds for gas",
+      comment: "An error message when there is no insufficient funds for gas fee. It will be displayed as the title of the disabled swap button at the bottom in the Swap Screen."
+    )
   }
 }

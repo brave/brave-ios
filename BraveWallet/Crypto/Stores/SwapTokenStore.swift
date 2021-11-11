@@ -6,10 +6,11 @@
 import Foundation
 import BraveCore
 import BigNumber
+import Shared
 
 /// A store contains data for swap tokens
 public class SwapTokenStore: ObservableObject {
-  /// All  tokens
+  /// All  tokens for searching use
   @Published var allTokens: [BraveWallet.ERCToken] = []
   /// The current selected token to swap from. Default with nil value.
   @Published var selectedFromToken: BraveWallet.ERCToken? {
@@ -54,7 +55,7 @@ public class SwapTokenStore: ObservableObject {
       }
     }
   }
-  /// The buy aount in this swap
+  /// The buy amount in this swap
   @Published var buyAmount = "" {
     didSet {
       guard !buyAmount.isEmpty else {
@@ -69,16 +70,19 @@ public class SwapTokenStore: ObservableObject {
       }
     }
   }
-  /// The slippage percentage in this swap
+  /// The latest slippage option that user selected
   @Published var slippageOption = SlippageGrid.Option.halfPercent {
     didSet {
       slippage = slippageOption.value
     }
   }
+  /// The custom user input slippage percentage value which will override `slippageOption` if it is not nil
   @Published var overrideSlippage: Int? {
     didSet {
       if let overrideSlippage = overrideSlippage {
         slippage = Double(overrideSlippage) / 100.0
+      } else {
+        slippage = slippageOption.value
       }
     }
   }
@@ -102,7 +106,9 @@ public class SwapTokenStore: ObservableObject {
   private var timer: Timer?
   
   enum SwapParamsBase {
+    // calculating based on sell asset amount
     case perSellAsset
+    // calculating based on buy asset amount
     case perBuyAsset
   }
   
@@ -348,7 +354,7 @@ public class SwapTokenStore: ObservableObject {
     
     // Check if balance is insufficient
     if sellAmountValue > (selectedFromTokenBalance ?? 0) {
-      state = .error("Insufficient balance")
+      state = .error(Strings.Wallet.InsufficientBalance)
     }
     
     // Get ETH balance for this account because gas can only be paid in ETH
@@ -360,12 +366,12 @@ public class SwapTokenStore: ObservableObject {
         let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
         if fromToken.isETH {
           if currentBalance < fee + sellAmountValue {
-            self.state = .error("Insufficient funds for gas")
+            self.state = .error(Strings.Wallet.InsufficientFundsForGas)
             return
           }
         } else {
           if currentBalance < fee {
-            self.state = .error("Insufficient funds for gas")
+            self.state = .error(Strings.Wallet.InsufficientFundsForGas)
             return
           }
         }
@@ -397,7 +403,7 @@ public class SwapTokenStore: ObservableObject {
     ) { [weak self] success, allowance in
       let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
       let allowanceValue = BDouble(weiFormatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(fromToken.decimals)) ?? "") ?? 0
-      guard success, amountToSend > allowanceValue else { return } // no need to bump allowance
+      guard success, amountToSend > allowanceValue else { return } // no need to activate allowance
       self?.state = .activateAllowance(spenderAddress)
     }
   }
