@@ -91,13 +91,6 @@ extension BrowserViewController {
             $0.fillRule = .evenOdd
             $0.fillColor = UIColor.white.cgColor
             $0.strokeColor = UIColor.clear.cgColor
-            
-            $0.path = {
-                let path = CGMutablePath()
-                path.addRect(popover.backgroundOverlayView.bounds)
-                path.addRect(maskFrame)
-                return path
-            }()
         }
         
         popover.backgroundOverlayView.layer.mask = maskShape
@@ -105,6 +98,17 @@ extension BrowserViewController {
             maskShape.removeFromSuperlayer()
             borderView.removeFromSuperview()
             self?.presentNTPMenuOnboarding()
+        }
+        
+        DispatchQueue.main.async {
+            maskShape.path = {
+                let path = CGMutablePath()
+                path.addRect(popover.backgroundOverlayView.bounds)
+                path.addRoundedRect(in: maskFrame,
+                                    cornerWidth: 12.0,
+                                    cornerHeight: 12.0)
+                return path
+            }()
         }
     }
     
