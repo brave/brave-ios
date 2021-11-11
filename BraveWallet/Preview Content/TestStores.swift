@@ -78,7 +78,8 @@ extension SwapTokenStore {
       tokenRegistry: TestTokenRegistry(),
       rpcController: TestEthJsonRpcController(),
       assetRatioController: TestAssetRatioController(),
-      swapController: TestSwapController()
+      swapController: TestSwapController(),
+      transactionController: TestEthTxController()
     )
   }
 }

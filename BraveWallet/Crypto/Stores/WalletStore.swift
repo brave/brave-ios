@@ -66,7 +66,8 @@ public class WalletStore {
       tokenRegistry: tokenRegistry,
       rpcController: rpcController,
       assetRatioController: assetRatioController,
-      swapController: swapController
+      swapController: swapController,
+      transactionController: transactionController
     )
   }
   
