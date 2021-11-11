@@ -67,6 +67,7 @@ class RadialPulsingAnimation: UIView {
         if let icon = icon {
             let imageView = UIImageView().then {
                 $0.image = icon
+                $0.contentMode = .scaleAspectFit
             }
             
             addSubview(imageView)

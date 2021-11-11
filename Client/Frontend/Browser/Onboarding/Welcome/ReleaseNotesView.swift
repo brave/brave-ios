@@ -32,8 +32,9 @@ struct ReleaseNotesView: View {
             .aspectRatio(contentMode: .fit)
             .overlay(imageOverlay, alignment: .center)
             .padding()
-            VStack {
-                Text("• One line of release notes\n• Another line of release notes")
+            VStack(alignment: .leading, spacing: 8.0) {
+                Text("• One line of release notes")
+                Text("• Another line of release notes")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
