@@ -186,6 +186,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             $0.register(BookmarkTableViewCell.self,
                            forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
         }
+        
+        definesPresentationContext = true
     }
     
     override func accessibilityPerformEscape() -> Bool {

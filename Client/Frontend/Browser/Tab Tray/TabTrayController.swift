@@ -49,6 +49,8 @@ class TabTrayController: UIViewController {
         }
     }
     
+    private let searchController = UISearchController(searchResultsController: nil)
+
     init(tabManager: TabManager) {
         self.tabManager = tabManager
         super.init(nibName: nil, bundle: nil)
@@ -68,6 +70,24 @@ class TabTrayController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        definesPresentationContext = true
+
+        searchController.do {
+            $0.searchBar.autocapitalizationType = .none
+            //$0.searchResultsUpdater = self
+            $0.obscuresBackgroundDuringPresentation = false
+            $0.searchBar.placeholder = "Search"
+            //$0.delegate = self
+            // Don't hide the navigation bar because the search bar is in it.
+            $0.hidesNavigationBarDuringPresentation = false
+        }
+        
+        navigationItem.do {
+            // Place the search bar in the navigation item's title view.
+            $0.titleView = searchController.searchBar
+            $0.hidesSearchBarWhenScrolling = true
+        }
         
         tabManager.addDelegate(self)
         
