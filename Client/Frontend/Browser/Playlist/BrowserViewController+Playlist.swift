@@ -270,6 +270,25 @@ extension BrowserViewController: PlaylistHelperDelegate {
             
             shouldShowPlaylistOnboardingThisSession = false
         }
+        
+        topToolbar.layoutIfNeeded()
+        view.layoutIfNeeded()
+        
+        DispatchQueue.main.async {
+            let popover = PopoverController(contentController: PlaylistOnboardingViewController())
+            popover.present(from: self.topToolbar.locationView.playlistButton, on: self)
+            
+            let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
+            pulseAnimation.present(icon: #imageLiteral(resourceName: "welcome-view-playlist-button-icon"),
+                                   from: self.topToolbar.locationView.playlistButton,
+                                   on: popover,
+                                   browser: self)
+            pulseAnimation.frame = pulseAnimation.frame.insetBy(dx: 10.0, dy: 12.0)
+            
+            popover.popoverDidDismiss = { _ in
+                pulseAnimation.removeFromSuperview()
+            }
+        }
     }
     
     func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double) {

@@ -48,15 +48,40 @@ class RadialPulsingAnimation: UIView {
     }
     
     func animate() {
-        let animation = CABasicAnimation(keyPath: "transform.scale")
-        animation.toValue = 1.2
-        animation.duration = 1.0
-        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        animation.autoreverses = true
-        animation.repeatCount = .infinity
+        let isBreathing = false
         
-        for i in 0..<pulseLayers.count {
-            pulseLayers[i].add(animation, forKey: "pulse")
+        if isBreathing {
+            let animation = CABasicAnimation(keyPath: "transform.scale")
+            animation.toValue = 1.2
+            animation.duration = 1.0
+            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            animation.autoreverses = true
+            animation.repeatCount = .infinity
+            
+            for i in 0..<pulseLayers.count {
+                self.pulseLayers[i].add(animation, forKey: "pulse")
+            }
+        } else {
+            let animation = CABasicAnimation(keyPath: "transform.scale")
+            animation.toValue = 1.2
+            animation.duration = 1.0
+            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            animation.autoreverses = false
+            animation.repeatCount = .infinity
+            
+            let fadeAnimation = CABasicAnimation(keyPath: "opacity")
+            fadeAnimation.toValue = 0.0
+            fadeAnimation.duration = 1.0
+            fadeAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            fadeAnimation.autoreverses = false
+            fadeAnimation.repeatCount = .infinity
+            
+            for i in 0..<pulseLayers.count {
+                DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(i * i)) {
+                    self.pulseLayers[i].add(animation, forKey: "pulse")
+                    self.pulseLayers[i].add(fadeAnimation, forKey: "fade")
+                }
+            }
         }
     }
     
