@@ -75,6 +75,7 @@ extension AssetDetailStore {
 extension SwapTokenStore {
   static var previewStore: SwapTokenStore {
     .init(
+      keyringController: TestKeyringController(),
       tokenRegistry: TestTokenRegistry(),
       rpcController: TestEthJsonRpcController(),
       assetRatioController: TestAssetRatioController(),

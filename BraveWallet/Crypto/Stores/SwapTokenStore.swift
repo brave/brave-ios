@@ -83,6 +83,7 @@ public class SwapTokenStore: ObservableObject {
     }
   }
   
+  private let keyringController: BraveWalletKeyringController
   private let tokenRegistry: BraveWalletERCTokenRegistry
   private let rpcController: BraveWalletEthJsonRpcController
   private let assetRatioController: BraveWalletAssetRatioController
@@ -117,18 +118,21 @@ public class SwapTokenStore: ObservableObject {
   }
   
   public init(
+    keyringController: BraveWalletKeyringController,
     tokenRegistry: BraveWalletERCTokenRegistry,
     rpcController: BraveWalletEthJsonRpcController,
     assetRatioController: BraveWalletAssetRatioController,
     swapController: BraveWalletSwapController,
     transactionController: BraveWalletEthTxController
   ) {
+    self.keyringController = keyringController
     self.tokenRegistry = tokenRegistry
     self.rpcController = rpcController
     self.assetRatioController = assetRatioController
     self.swapController = swapController
     self.transactionController = transactionController
     
+    self.keyringController.add(self)
     self.rpcController.add(self)
   }
   
@@ -427,6 +431,43 @@ public class SwapTokenStore: ObservableObject {
             selectedToToken = allTokens.first(where: { $0.symbol == "BAT" })
           } else if chainId == BraveWallet.RopstenChainId {
             selectedToToken = allTokens.first(where: { $0.symbol == "DAI" })
+          }
+        }
+      }
+    }
+  }
+}
+
+extension SwapTokenStore: BraveWalletKeyringControllerObserver {
+  public func keyringCreated() {
+  }
+  
+  public func keyringRestored() {
+  }
+  
+  public func locked() {
+  }
+  
+  public func unlocked() {
+  }
+  
+  public func backedUp() {
+  }
+  
+  public func accountsChanged() {
+  }
+  
+  public func autoLockMinutesChanged() {
+  }
+  
+  public func selectedAccountChanged() {
+    keyringController.defaultKeyringInfo { [self] keyringInfo in
+      if !keyringInfo.accountInfos.isEmpty {
+        keyringController.selectedAccount { accountAddress in
+          let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ??
+            keyringInfo.accountInfos.first!
+          prepare(with: selectedAccountInfo) {
+            fetchPriceQuote(base: .perSellAsset)
           }
         }
       }
