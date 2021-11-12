@@ -99,7 +99,13 @@ struct SlippageGrid: View {
             customSlippage = nil
             return
           }
-          customSlippage = min((max(intValue, 0)), 100)
+          if intValue >= 0, intValue <= 100, customSlippage != intValue {
+            customSlippage = intValue
+          } else {
+            let acceptedValue = min((max(intValue, 0)), 100)
+            customSlippage = acceptedValue
+            input = String(acceptedValue)
+          }
         }
         .keyboardType(.numberPad)
         .multilineTextAlignment(.center)
@@ -303,7 +309,7 @@ struct SwapCryptoView: View {
       header: MarketPriceView(swapTokenStore: swapTokensStore)
         .listRowBackground(Color.clear)
         .resetListHeaderStyle()
-        .padding(.trailing, 10)
+        .padding(.horizontal)
         .padding(.bottom, 15),
       footer: Group {
         if !hideSlippage {
@@ -312,12 +318,14 @@ struct SwapCryptoView: View {
             customSlippage: $swapTokensStore.overrideSlippage
           )
             .listRowInsets(.zero)
-            .transition(.opacity.animation(.default))
+            .transition(.opacity)
         }
       }
     ) {
       Button(action: {
-        hideSlippage.toggle()
+        withAnimation(.easeInOut(duration: 0.25)) {
+          hideSlippage.toggle()
+        }
       }) {
         HStack {
           Text(Strings.Wallet.swapCryptoSlippageTitle)
