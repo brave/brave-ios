@@ -87,8 +87,7 @@ extension BrowserViewController {
                 })
         )
 
-        onboardingController.modalPresentationStyle = .fullScreen
-        present(onboardingController, animated: false)
+        present(onboardingController, animated: true)
         isfullScreenCalloutPresented = true
     }
     

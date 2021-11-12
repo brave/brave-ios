@@ -58,7 +58,7 @@ extension BrowserViewController {
         }
         
         // Project the statsFrame to the current frame
-        let frame = view.convert(statsFrame, from: ntpController.view).offsetBy(dx: 15.0, dy: 15.0)
+        let frame = view.convert(statsFrame, from: ntpController.view).insetBy(dx: 15.0, dy: 15.0).offsetBy(dx: 15.0, dy: 5.0)
         
         // Create a border view
         let borderView = UIView().then {

@@ -617,7 +617,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         self.isPresenting = isPresenting
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    func performDefaultAnimation(using transitionContext: UIViewControllerContextTransitioning) {
         let container = transitionContext.containerView
         
         guard let fromView = transitionContext.view(forKey: UITransitionContextViewKey.from) else {
@@ -630,10 +630,43 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             return
         }
         
+        // Setup
+        fromView.frame = container.bounds
+        toView.frame = container.bounds
+        container.addSubview(toView)
+        fromView.setNeedsLayout()
+        fromView.layoutIfNeeded()
+        toView.setNeedsLayout()
+        toView.layoutIfNeeded()
+        
+        // Setup animation
+        let totalAnimationTime = self.transitionDuration(using: transitionContext)
+        
+        toView.alpha = 0.0
+        UIView.animate(withDuration: totalAnimationTime, delay: 0.0, options: .curveEaseInOut) {
+            toView.alpha = 1.0
+        } completion: { finished in
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled && finished)
+        }
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        let container = transitionContext.containerView
+        
+        guard let fromView = transitionContext.view(forKey: UITransitionContextViewKey.from) else {
+            performDefaultAnimation(using: transitionContext)
+            return
+        }
+        
+        guard let toView = transitionContext.view(forKey: UITransitionContextViewKey.to) else {
+            performDefaultAnimation(using: transitionContext)
+            return
+        }
+        
         // Get animatable views
         guard let fromWelcomeView = WelcomeViewInfo(view: fromView),
               let toWelcomeView = WelcomeViewInfo(view: toView) else {
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            performDefaultAnimation(using: transitionContext)
             return
         }
         

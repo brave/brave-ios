@@ -63,6 +63,8 @@ class WelcomeViewCallout: UIView {
     private let secondaryButtonContentView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 15.0
+        $0.isHidden = true
+        $0.alpha = 0.0
         $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
         $0.isLayoutMarginsRelativeArrangement = true
     }
@@ -106,8 +108,15 @@ class WelcomeViewCallout: UIView {
             }
         }
         
-        [secondaryLabel, secondaryButton].forEach {
+        let leftSpacer = UIView()
+        let rightSpacer = UIView()
+
+        [leftSpacer, secondaryLabel, secondaryButton, rightSpacer].forEach {
             secondaryButtonContentView.addArrangedSubview($0)
+        }
+        
+        leftSpacer.snp.makeConstraints {
+            $0.width.equalTo(rightSpacer.snp.width)
         }
         
         [titleLabel, detailsLabel].forEach {
@@ -265,6 +274,11 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = false
             }
             
+            secondaryButtonContentView.do {
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+                
             secondaryButton.do {
                 $0.alpha = 0.0
                 $0.isHidden = true
