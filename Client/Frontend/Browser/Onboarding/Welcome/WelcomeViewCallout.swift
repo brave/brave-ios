@@ -62,12 +62,17 @@ class WelcomeViewCallout: UIView {
     
     private let secondaryButtonContentView = UIStackView().then {
         $0.axis = .horizontal
+        $0.spacing = 15.0
+        $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
+        $0.isLayoutMarginsRelativeArrangement = true
     }
     
     private let secondaryLabel = UILabel().then {
         $0.textColor = .bravePrimary
         $0.textAlignment = .center
         $0.numberOfLines = 0
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         $0.setContentHuggingPriority(.required, for: .vertical)
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
@@ -76,6 +81,8 @@ class WelcomeViewCallout: UIView {
         $0.setTitleColor(.braveBlurple, for: .normal)
         $0.backgroundColor = .clear
         $0.setTitle(" ", for: .normal)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     // MARK: - State
