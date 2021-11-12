@@ -127,6 +127,10 @@ extension Preferences {
         /// Whether the whats new callout should be shown.
         static let whatsNewCalloutOptIn =
             Option<Bool>(key: "general.full-screen-rewards-callout-completed", default: false)
+        
+        /// Whether the ntp callout is shown.
+        static let ntpCalloutCompleted =
+            Option<Bool>(key: "general.full-screen-ntp-callout-completed", default: false)
     }
     
     final class DefaultBrowserIntro {

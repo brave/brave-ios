@@ -76,6 +76,7 @@ protocol NewTabPageDelegate: AnyObject {
     func handleFavoriteAction(favorite: Favorite, action: BookmarksAction)
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState)
     func tappedQRCodeButton(url: URL)
+    func showNTPOnboarding()
 }
 
 /// The new tab page. Shows users a variety of information, including stats and
@@ -225,6 +226,10 @@ class NewTabPageViewController: UIViewController {
                     }
                 }
             }
+        }
+        
+        if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+            delegate?.showNTPOnboarding()
         }
     }
     

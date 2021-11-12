@@ -12,9 +12,7 @@ import BraveCore
 
 extension BrowserViewController {
 
-    func presentOnboardingIntro() {
-        presentNTPStatsOnboarding()
-        
+    func presentOnboardingIntro() {        
         if Preferences.DebugFlag.skipOnboardingIntro == true { return }
         
         // 1. Existing user.

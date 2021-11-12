@@ -2824,6 +2824,12 @@ extension BrowserViewController: NewTabPageDelegate {
                                                arrowDirection: .any)
         }
     }
+    
+    func showNTPOnboarding() {
+        if Preferences.General.isNewRetentionUser.value == true {
+            presentNTPStatsOnboarding()
+        }
+    }
 }
 
 extension BrowserViewController: PreferencesObserver {
