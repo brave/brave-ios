@@ -1189,14 +1189,14 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Insufficient liquidity",
-      comment: "This error is checked for price quote api call. This copy will be displayed as the title of the button at the bottom of Swap Screen."
+      comment: "An error message displayed when the user doesn't have enough liquidity to proceed with a transaction."
     )
     public static let unknownError = NSLocalizedString(
       "wallet.unknownError",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Unknown error",
-      comment: "Unknown error will be the error other than `Insufficient balance`, `Insufficient funds for gas` and `Insufficient liquidity"
+      comment: "An error message displayed when an unspecified problem occurs."
     )
   }
 }

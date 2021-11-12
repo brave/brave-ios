@@ -392,7 +392,7 @@ public class SwapTokenStore: ObservableObject {
     }
   }
   
-  // MARK: Public 
+  // MARK: Public
   
   func prepareSwap() {
     switch state {
@@ -412,19 +412,16 @@ public class SwapTokenStore: ObservableObject {
     updatingPriceQuote = true
     swapController.priceQuote(swapParams) { [weak self] success, response, error in
       guard let self = self else { return }
-      if success {
-        if let response = response {
-          self.handlePriceQuoteResponse(response, base: base)
-        }
-        self.updatingPriceQuote = false
+      defer { self.updatingPriceQuote = false}
+      if success, let response = response {
+        self.handlePriceQuoteResponse(response, base: base)
       } else {
-        self.state = .error(Strings.Wallet.unknownError)
+        self.clearAllAmount()
         // check if priceQuote fails due to insufficient liquidity
         if let error = error, self.isLiquidityError(error) {
           self.state = .error(Strings.Wallet.insufficientLiquidity)
         }
-        self.clearAllAmount()
-        self.updatingPriceQuote = false
+        self.state = .error(Strings.Wallet.unknownError)
       }
     }
   }
