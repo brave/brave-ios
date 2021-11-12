@@ -80,8 +80,7 @@ extension BrowserViewController {
         
         // Present the popover
         let controller = WelcomeNTPOnboardingController()
-        controller.setText(title: nil,
-                           details: "By blocking trackers & ads, websites use less data and load way faster.")
+        controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
         
         let popover = PopoverController(contentController: controller)
         popover.arrowDistance = 10.0
@@ -117,8 +116,9 @@ extension BrowserViewController {
     func presentNTPMenuOnboarding() {
         guard let menuButton = toolbar?.menuButton else { return }
         let controller = WelcomeNTPOnboardingController()
-        controller.setText(title: "All set!",
-                           details: "Check the menu for settings and more great privacy features!")
+        controller.setText(
+            title: Strings.Onboarding.ntpOnboardingPopoverDoneTitle,
+            details: Strings.Onboarding.ntpOnboardingPopoverDoneDescription)
         
         let popover = PopoverController(contentController: controller)
         popover.arrowDistance = 7.0

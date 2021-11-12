@@ -247,6 +247,21 @@ extension Strings {
                               tableName: "BraveShared", bundle: .braveShared,
                               value: "...and watch those trackers & ads disappear.",
                               comment: "Additional Description for Ready Screen in Onboarding")
+        public static let ntpOnboardingPopOverTrackerDescription =
+            NSLocalizedString("onboarding.ntpOnboardingPopOverTrackerDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "By blocking trackers & ads, websites use less data and load way faster.",
+                              comment: "Description for the NTP pop-over that describes the tracking information on NTP")
+        public static let ntpOnboardingPopoverDoneTitle =
+            NSLocalizedString("onboarding.ntpOnboardingPopoverDoneTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "All set!",
+                              comment: "Title for the NTP pop-over that describes the onboarding is done")
+        public static let ntpOnboardingPopoverDoneDescription =
+            NSLocalizedString("onboarding.ntpOnboardingPopoverDoneDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Check the menu for settings and more great privacy features!",
+                              comment: "DEscription for the NTP pop-over that describes the onboarding is done")
     }
 }
 

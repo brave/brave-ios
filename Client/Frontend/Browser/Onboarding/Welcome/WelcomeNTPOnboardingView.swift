@@ -38,16 +38,16 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
         }
     }
     
-    func setText(title: String?, details: String) {
+    func setText(title: String? = nil, details: String) {
         let attributedString = NSMutableAttributedString()
         if let title = title {
             attributedString.append(NSAttributedString(string: "\(title)\n\n", attributes: [
-                .font: UIFont.systemFont(ofSize: 17.0, weight: .medium)
+                .font: UIFont.preferredFont(forTextStyle: .headline)
             ]))
         }
         
         attributedString.append(NSAttributedString(string: details, attributes: [
-            .font: UIFont.systemFont(ofSize: 17.0)
+            .font: UIFont.preferredFont(forTextStyle: .body)
         ]))
         
         textLabel.attributedText = attributedString
