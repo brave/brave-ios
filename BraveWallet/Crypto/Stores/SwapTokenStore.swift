@@ -420,6 +420,7 @@ public class SwapTokenStore: ObservableObject {
         // check if priceQuote fails due to insufficient liquidity
         if let error = error, self.isLiquidityError(error) {
           self.state = .error(Strings.Wallet.insufficientLiquidity)
+          return
         }
         self.state = .error(Strings.Wallet.unknownError)
       }
