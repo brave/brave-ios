@@ -40,7 +40,9 @@ extension BrowserViewController {
                                                      isPrivate: isPrivate)
                     self.tabManager.selectTab(tab)
                 } else {
-                    self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
+                    }
                 }
             }
             
