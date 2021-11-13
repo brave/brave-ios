@@ -12,7 +12,7 @@ class TabCell: UICollectionViewCell {
     static let borderWidth: CGFloat = 3
     
     let backgroundHolder = UIView()
-    let screenshotView = UIImageViewAligned()
+    let screenshotView = UIImageView()
     let titleBackgroundView = GradientView(
         colors: [UIColor(white: 1.0, alpha: 0.98), UIColor(white: 1.0, alpha: 0.9), UIColor(white: 1.0, alpha: 0.0)],
         positions: [0, 0.5, 1],
@@ -39,8 +39,6 @@ class TabCell: UICollectionViewCell {
         self.screenshotView.contentMode = .scaleAspectFill
         self.screenshotView.clipsToBounds = true
         self.screenshotView.isUserInteractionEnabled = false
-        self.screenshotView.alignLeft = true
-        self.screenshotView.alignTop = true
         self.screenshotView.backgroundColor = .braveBackground
         
         self.favicon.backgroundColor = .clear

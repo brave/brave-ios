@@ -6,7 +6,7 @@
 
 #import "Try.h"
 
-#import "ThirdParty/UIImageViewAligned/UIImageViewAligned.h"
+#import <UIKit/UIKit.h>
 
 #import "Shared-Bridging-Header.h"
 #import "Storage-Bridging-Header.h"
