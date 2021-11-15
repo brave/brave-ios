@@ -13,6 +13,10 @@ private let log = Logger.browserLogger
 
 extension BrowserViewController: PlaylistHelperDelegate {
     
+    private struct DesignUX {
+        static let bravePlaylistOnboardingURL = "https://brave.com/playlist"
+    }
+    
     private func createPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) -> PopoverController {
         return PopoverController(contentController: PlaylistPopoverViewController(state: state).then {
             $0.rootView.onPrimaryButtonPressed = { [weak self, weak tab] in
@@ -252,7 +256,8 @@ extension BrowserViewController: PlaylistHelperDelegate {
                 view.layoutIfNeeded()
                 
                 DispatchQueue.main.async {
-                    let popover = PopoverController(contentController: PlaylistOnboardingViewController())
+                    let onboardingController = PlaylistOnboardingViewController()
+                    let popover = PopoverController(contentController: onboardingController)
                     popover.present(from: self.topToolbar.locationView.playlistButton, on: self)
                     
                     let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
@@ -264,6 +269,27 @@ extension BrowserViewController: PlaylistHelperDelegate {
                     
                     popover.popoverDidDismiss = { _ in
                         pulseAnimation.removeFromSuperview()
+                    }
+                    
+                    onboardingController.rootView.onButtonPressed = { [weak self, unowned popover] in
+                        guard let self = self,
+                              let url = URL(string: DesignUX.bravePlaylistOnboardingURL) else {
+                            popover.dismiss(animated: true) {
+                                pulseAnimation.removeFromSuperview()
+                            }
+                            return
+                        }
+                        
+                        let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+                        self.topToolbar.leaveOverlayMode()
+                        let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                                                         afterTab: self.tabManager.selectedTab,
+                                                         isPrivate: isPrivate)
+                        self.tabManager.selectTab(tab)
+                        
+                        popover.dismiss(animated: true) {
+                            pulseAnimation.removeFromSuperview()
+                        }
                     }
                 }
             }

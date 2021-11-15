@@ -7,6 +7,8 @@ import SwiftUI
 import BraveUI
 
 struct PlaylistOnboardingView: View {
+    var onButtonPressed: (() -> Void)?
+    
     var body: some View {
         HStack(alignment: .top, spacing: 14.0) {
             Image("welcome-view-playlist-brave-logo")
@@ -24,7 +26,7 @@ struct PlaylistOnboardingView: View {
                 }
                 .accessibilityElement(children: .combine)
                 
-                Button(action: {}) {
+                Button(action: { onButtonPressed?() }) {
                     HStack {
                         Image("welcome-view-playlist-play-icon")
                         Text("Watch the video")
