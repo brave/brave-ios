@@ -49,7 +49,10 @@ class TabTrayController: UIViewController {
         }
     }
     
-    private let searchController = UISearchController(searchResultsController: nil)
+    private var searchTabTrayTimer: Timer?
+    private var isTabTrayBeingSearched = false
+    private let tabTraySearchController = UISearchController(searchResultsController: nil)
+    private var tabTraySearchQuery = ""
 
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -73,19 +76,19 @@ class TabTrayController: UIViewController {
         
         definesPresentationContext = true
 
-        searchController.do {
+        tabTraySearchController.do {
             $0.searchBar.autocapitalizationType = .none
-            //$0.searchResultsUpdater = self
+            $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
             $0.searchBar.placeholder = "Search"
-            //$0.delegate = self
+            $0.delegate = self
             // Don't hide the navigation bar because the search bar is in it.
             $0.hidesNavigationBarDuringPresentation = false
         }
         
         navigationItem.do {
             // Place the search bar in the navigation item's title view.
-            $0.titleView = searchController.searchBar
+            $0.titleView = tabTraySearchController.searchBar
             $0.hidesSearchBarWhenScrolling = true
         }
         
@@ -130,10 +133,10 @@ class TabTrayController: UIViewController {
     
     // MARK: Snapshot handling
     
-    private func applySnapshot() {
+    private func applySnapshot(for query: String? = nil) {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
-        snapshot.appendItems(tabManager.tabsForCurrentMode)
+        snapshot.appendItems(tabManager.tabsForCurrentMode(for: query))
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     
@@ -340,5 +343,54 @@ extension TabTrayController: UIScrollViewAccessibilityDelegate {
         } else {
             return String(format: Strings.tabTrayMultiTabPositionFormatVoiceOverText, NSNumber(value: firstTabRow as Int), NSNumber(value: lastTabRow), NSNumber(value: tabCount))
         }
+    }
+}
+
+// MARK: UISearchResultUpdating
+
+extension TabTrayController: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text else { return }
+
+        invalidateSearchTimer()
+        
+        searchTabTrayTimer =
+            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    }
+    
+    @objc private func fetchSearchResults(timer: Timer) {
+        guard let query = timer.userInfo as? String else {
+            tabTraySearchQuery = ""
+            return
+        }
+        
+        tabTraySearchQuery = query
+
+        // TODO: Reload And show loading
+    }
+    
+    private func invalidateSearchTimer() {
+        if searchTabTrayTimer != nil {
+            searchTabTrayTimer?.invalidate()
+            searchTabTrayTimer = nil
+        }
+    }
+}
+
+// MARK: UISearchControllerDelegate
+
+extension TabTrayController: UISearchControllerDelegate {
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        isTabTrayBeingSearched = true
+        tabTraySearchQuery = ""
+        tabTrayView.collectionView.reloadData()
+    }
+    
+    func willDismissSearchController(_ searchController: UISearchController) {
+        invalidateSearchTimer()
+        isTabTrayBeingSearched = false
+        tabTrayView.collectionView.reloadData()
     }
 }

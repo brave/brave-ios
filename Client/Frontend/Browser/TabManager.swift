@@ -163,10 +163,27 @@ class TabManager: NSObject {
             return false
         }.count
     }
+    
+    func tabsForCurrentMode(for query: String? = nil) -> [Tab] {
+        if let query = query {
+            let tabType: TabType = PrivateBrowsingManager.shared.isPrivateBrowsing ? .private : .regular
+            return tabs(withType: tabType, query: query)
+        } else {
+            return tabsForCurrentMode
+        }
+    }
 
-    private func tabs(withType type: TabType) -> [Tab] {
+    private func tabs(withType type: TabType, query: String? = nil) -> [Tab] {
         assert(Thread.isMainThread)
-        return allTabs.filter { $0.type == type }
+        
+        let allTabs = allTabs.filter { $0.type == type }
+        
+        if let query = query {
+            return allTabs.filter { $0.type == type &&
+                (($0.lastTitle?.contains(query) != nil) || (($0.canonicalURL?.absoluteString.contains(query)) != nil)) }
+        } else {
+            return allTabs.filter { $0.type == type }
+        }
     }
     
     private class func getNewConfiguration() -> WKWebViewConfiguration {

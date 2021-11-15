@@ -85,7 +85,7 @@ extension TabTrayController {
         override init(frame: CGRect) {
             super.init(frame: frame)
             
-            backgroundColor = .secondaryBraveBackground
+            backgroundColor = .braveBackground
             accessibilityLabel = Strings.tabTrayAccessibilityLabel
             
             let buttonsStackView = UIStackView().then {
@@ -106,7 +106,7 @@ extension TabTrayController {
                 $0.addStackViewItems(
                     .view(privateModeInfo),
                     .view(collectionView),
-                    .customSpace(4),
+                    .customSpace(10),
                     .view(buttonsStackView))
                 $0.isAccessibilityElement = false
             }
@@ -117,7 +117,8 @@ extension TabTrayController {
             
             addSubview(stackView)
             stackView.snp.makeConstraints {
-                $0.edges.equalTo(self.safeArea.edges).inset(8)
+                $0.top.left.right.equalToSuperview()//.offset(8)
+                $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             }
             
             privateModeInfo.isHidden = true
