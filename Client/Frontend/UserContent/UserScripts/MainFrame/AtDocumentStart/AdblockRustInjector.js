@@ -16,35 +16,39 @@ function inject(json) {
     const injected_script = obj.injected_script;
     
     window.hide_selectors = hide_selectors;
+    window.style_selectors = style_selectors;
+    
+    var rules = "";
+
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
     
     // array
     for (const selector of hide_selectors) {
-        for (const e of document.querySelectorAll(selector)) {
-            e.style.setProperty('display', 'none', 'important');
-        }
+        rules += selector + "{display: none !important}"
     }
     
-    var observer = new MutationObserver(function(mutations) {
-        for (const selector of hide_selectors) {
-            for (const e of document.querySelectorAll(selector)) {
-                e.style.setProperty('display', 'none', 'important');
-            }
+    for (const key of Object.keys(style_selectors)) {
+        const value = style_selectors[key];
+        
+        var subRules = "";
+        
+        for(const subRule of value) {
+            subRules += subRule + ";"
         }
-    });
+        
+        rules += key + "{" + subRules + "}"
+    };
 
-    observer.observe(document, {
-        attributes: true,
-        childList: true,
-        characterData: true,
-        subtree: true
-    });
+    style.type = 'text/css';
+    if (style.styleSheet) {
+      style.styleSheet.cssText = rules;
+    } else {
+      style.appendChild(document.createTextNode(rules));
+    }
+
+    head.appendChild(style);
     
-//    // dictionary
-//    for (selector of style_selectors) {
-//        for (e of document.querySelectorAll(selector)) {
-//            console.log(e);
-//        }
-//    }
 //
 //    //string
 //    for (script of injected_script) {
