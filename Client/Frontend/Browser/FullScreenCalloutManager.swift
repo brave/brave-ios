@@ -36,7 +36,8 @@ struct FullScreenCalloutManager {
     /// It determines whether we should show show the designated callout or not and sets corresponding preferences accordingly.
     /// Returns true if the callout should be shown.
     static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType) -> Bool {
-        guard let appRetentionLaunchDate = Preferences.DAU.appRetentionLaunchDate.value,
+        guard Preferences.General.isNewRetentionUser.value == true,
+              let appRetentionLaunchDate = Preferences.DAU.appRetentionLaunchDate.value,
                 !calloutType.preferenceValue.value else {
             return false
         }
