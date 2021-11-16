@@ -20,14 +20,14 @@ function inject(json) {
     // array
     for (const selector of hide_selectors) {
         for (const e of document.querySelectorAll(selector)) {
-            e.style.display = 'none';
+            e.style.setProperty('display', 'none', 'important');
         }
     }
     
     var observer = new MutationObserver(function(mutations) {
         for (const selector of hide_selectors) {
             for (const e of document.querySelectorAll(selector)) {
-                e.style.display = 'none';
+                e.style.setProperty('display', 'none', 'important');
             }
         }
     });
