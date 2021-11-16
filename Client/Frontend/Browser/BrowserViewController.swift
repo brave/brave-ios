@@ -188,9 +188,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     /// Data Source object used to determine blocking stats
     var benchmarkBlockingDataSource: BlockingSummaryDataSource?
     
-    /// Boolean which is tracking If a full screen callout is presented
+    /// Boolean which is tracking If a full screen callout or onboarding is presented
     /// in order to not to try to present another callout  over existing one
-    var isfullScreenCalloutPresented = false
+    var isOnboardingOrFullScreenCalloutPresented = false
     
     private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
     var widgetFaviconFetchers: [FaviconFetcher] = []
@@ -943,7 +943,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         // Present Onboarding to new users, existing users will not see the onboarding
         presentOnboardingIntro()
         
-        // Full Screen Callout Presantation
+        // Full Screen Callout Presentation
         // Priority: VPN - Default Browser - Rewards - Sync
         presentVPNAlertCallout()
         presentDefaultBrowserScreenCallout()

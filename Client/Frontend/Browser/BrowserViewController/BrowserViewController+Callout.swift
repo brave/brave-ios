@@ -29,7 +29,7 @@ extension BrowserViewController {
     }
     
     func presentVPNAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .vpn) {
             return
@@ -56,12 +56,12 @@ extension BrowserViewController {
         }
         
         present(popup, animated: false)
-        isfullScreenCalloutPresented = true
+        isOnboardingOrFullScreenCalloutPresented = true
         showedPopup.value = true
     }
     
     func presentDefaultBrowserScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .defaultBrowser) {
             return
@@ -88,11 +88,11 @@ extension BrowserViewController {
         )
 
         present(onboardingController, animated: true)
-        isfullScreenCalloutPresented = true
+        isOnboardingOrFullScreenCalloutPresented = true
     }
     
     func presentBraveRewardsScreenCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .rewards) {
             return
@@ -104,14 +104,14 @@ extension BrowserViewController {
                 self?.dismissOnboarding(controller, state: state)
             }
             present(controller, animated: true)
-            isfullScreenCalloutPresented = true
+            isOnboardingOrFullScreenCalloutPresented = true
 
         }
         return
     }
     
     func presentSyncAlertCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
 
         if !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .sync) {
             return
@@ -133,14 +133,14 @@ extension BrowserViewController {
             }
             
             present(controller, animated: true, completion: nil)
-            isfullScreenCalloutPresented = true
+            isOnboardingOrFullScreenCalloutPresented = true
         }
         
         return
     }
     
     func presentReleaseNotesCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isfullScreenCalloutPresented { return }
+        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
 
         guard Preferences.FullScreenCallout.whatsNewCalloutOptIn.value else {
             return
@@ -153,7 +153,7 @@ extension BrowserViewController {
         }
 
         present(controller, animated: true, completion: nil)
-        isfullScreenCalloutPresented = true
+        isOnboardingOrFullScreenCalloutPresented = true
         return
     }
 }

@@ -35,15 +35,19 @@ struct FullScreenCalloutManager {
     
     /// It determines whether we should show show the designated callout or not and sets corresponding preferences accordingly.
     /// Returns true if the callout should be shown.
-    static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType, launchDate: Date = Date()) -> Bool {
-        guard Preferences.General.isNewRetentionUser.value == true, !calloutType.preferenceValue.value else {
+    static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType) -> Bool {
+        guard let appRetentionLaunchDate = Preferences.DAU.appRetentionLaunchDate.value,
+                !calloutType.preferenceValue.value else {
             return false
         }
         
-        let nextShowDate = Date(timeIntervalSinceNow: AppConstants.buildChannel.isPublic ?
-                                calloutType.period.days : calloutType.period.minutes)
-                
-        if launchDate > nextShowDate {
+        let rightNow = Date()
+        
+        let nextShowDate = appRetentionLaunchDate.addingTimeInterval(AppConstants.buildChannel.isPublic ?
+                                                                    calloutType.period.days :
+                                                                    calloutType.period.minutes)
+
+        if rightNow > nextShowDate {
             calloutType.preferenceValue.value = true
             return true
         }

@@ -114,34 +114,34 @@ extension Preferences {
     final class FullScreenCallout {
         /// Whether the vpn callout is shown.
         static let vpnCalloutCompleted =
-            Option<Bool>(key: "general.full-screen-vpn-callout-completed", default: false)
+            Option<Bool>(key: "fullScreenCallout.full-screen-vpn-callout-completed", default: false)
         
         /// Whether the sync callout is shown.
         static let syncCalloutCompleted =
-            Option<Bool>(key: "general.full-screen-sync-callout-completed", default: false)
+            Option<Bool>(key: "fullScreenCallout.full-screen-sync-callout-completed", default: false)
         
         /// Whether the rewards callout is shown.
         static let rewardsCalloutCompleted =
-            Option<Bool>(key: "general.full-screen-rewards-callout-completed", default: false)
+            Option<Bool>(key: "fullScreenCallout.full-screen-rewards-callout-completed", default: false)
         
         /// Whether the whats new callout should be shown.
         static let whatsNewCalloutOptIn =
-            Option<Bool>(key: "general.full-screen-rewards-callout-completed", default: false)
+            Option<Bool>(key: "fullScreenCallout.full-screen-whats-new-callout-completed", default: false)
         
         /// Whether the ntp callout is shown.
         static let ntpCalloutCompleted =
-            Option<Bool>(key: "general.full-screen-ntp-callout-completed", default: false)
+            Option<Bool>(key: "fullScreenCallout.full-screen-ntp-callout-completed", default: false)
     }
     
     final class DefaultBrowserIntro {
         /// Whether the default browser onboarding completed. This can happen by opening app settings or after the user
         /// dismissed the intro screen enough amount of times.
         static let completed =
-            Option<Bool>(key: "general.default-browser-intro-completed", default: false)
+            Option<Bool>(key: "defaultBrowserIntro.intro-completed", default: false)
         
         /// Whether system notification showed or not
         static let defaultBrowserNotificationScheduled =
-            Option<Bool>(key: "general.default-browser-notification-scheduled", default: false)
+            Option<Bool>(key: "defaultBrowserIntro.notification-scheduled", default: false)
     }
     
     final class Search {

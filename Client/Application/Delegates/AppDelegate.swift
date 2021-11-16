@@ -263,6 +263,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Preferences.General.isNewRetentionUser.value = true
         }
         
+        if Preferences.DAU.appRetentionLaunchDate.value == nil {
+            Preferences.DAU.appRetentionLaunchDate.value = Date()
+        }
+        
         Preferences.General.isFirstLaunch.value = false
         
         // Search engine setup must be checked outside of 'firstLaunch' loop because of #2770.
@@ -286,7 +290,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             BraveVPN.clearCredentials()
         }
         
-        if let urp = UserReferralProgram.shared {
+        if UserReferralProgram.shared != nil {
             if Preferences.URP.referralLookupOutstanding.value == nil {
                 // This preference has never been set, and this means it is a new or upgraded user.
                 // That distinction must be made to know if a network request for ref-code look up should be made.
@@ -315,7 +319,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Clean up BraveCore
         BraveSyncAPI.removeAllObservers()
+       
         Preferences.AppState.backgroundedCleanly.value = true
+        Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
     }
     
     func updateShortcutItems(_ application: UIApplication) {

@@ -45,7 +45,7 @@ extension BrowserViewController {
             }
             
             present(onboardingController, animated: false)
-            isfullScreenCalloutPresented = true
+            isOnboardingOrFullScreenCalloutPresented = true
             shouldShowNTPEducation = true
             return
         }
