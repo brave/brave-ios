@@ -205,6 +205,21 @@ extension Strings {
                               tableName: "BraveShared", bundle: .braveShared,
                               value: "Sync now",
                               comment: "Title for button in Default Browser Full Screen Callout")
+        public static let playlistOnboardingViewTitle =
+            NSLocalizedString("callout.playlistOnboardingViewTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Ad block is just the beginning",
+                              comment: "Title for Playlist Onboarding View")
+        public static let playlistOnboardingViewDescription =
+            NSLocalizedString("callout.playlistOnboardingViewDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "With Brave Playlist, you can play videos in the background, picture-in-picture, or even offline. And, of course, ad-free.",
+                              comment: "Description for Playlist Onboarding View")
+        public static let playlistOnboardingViewButtonTitle =
+            NSLocalizedString("callout.playlistOnboardingViewButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Watch the video",
+                              comment: "Button title for Playlist Onboarding View")
     }
 }
 

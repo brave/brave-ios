@@ -46,9 +46,7 @@ class OnboardingRewardsAgreementViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = #colorLiteral(red: 0.1176470588, green: 0.1254901961, blue: 0.1607843137, alpha: 1)
-        
+            
         contentView.turnOnButton.addTarget(self, action: #selector(turnOnTapped), for: .touchUpInside)
         contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
         
@@ -88,6 +86,9 @@ extension OnboardingRewardsAgreementViewController {
         static let linkColor: UIColor = .braveBlurple
         static let animationContentInset = 50.0
         static let checkboxInsets = -44.0
+        
+        static let contentBackgroundColor = UIColor(rgb: 0x1E2029)
+        static let secondaryButtonTextColor = UIColor(rgb: 0x84889C)
     }
     
     private struct Views {
@@ -104,7 +105,7 @@ extension OnboardingRewardsAgreementViewController {
         static func secondaryButton(text: String = Strings.OBSkipButton) -> UIButton {
             let button = UIButton().then {
                 $0.setTitle(text, for: .normal)
-                let titleColor = #colorLiteral(red: 0.5176470588, green: 0.5333333333, blue: 0.6117647059, alpha: 1)
+                let titleColor = UX.secondaryButtonTextColor
                 $0.setTitleColor(titleColor, for: .normal)
             }
             

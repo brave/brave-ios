@@ -5,6 +5,8 @@
 
 import SwiftUI
 import BraveUI
+import Shared
+
 
 struct PlaylistOnboardingView: View {
     var onButtonPressed: (() -> Void)?
@@ -15,11 +17,11 @@ struct PlaylistOnboardingView: View {
             
             VStack(alignment: .leading, spacing: 16.0) {
                 VStack(alignment: .leading, spacing: 4.0) {
-                    Text("Ad block is just the beginning")
+                    Text(Strings.Callout.playlistOnboardingViewTitle)
                         .font(.title3.weight(.medium))
                         .foregroundColor(Color(.bravePrimary))
                     
-                    Text("With Brave Playlist, you can play videos in the background, picture-in-picture, or even offline. And, of course, ad-free.")
+                    Text(Strings.Callout.playlistOnboardingViewDescription)
                         .multilineTextAlignment(.leading)
                         .font(.body)
                         .foregroundColor(Color(.bravePrimary))
@@ -29,7 +31,7 @@ struct PlaylistOnboardingView: View {
                 Button(action: { onButtonPressed?() }) {
                     HStack {
                         Image("welcome-view-playlist-play-icon")
-                        Text("Watch the video")
+                        Text(Strings.Callout.playlistOnboardingViewButtonTitle)
                             .font(.title3.weight(.medium))
                             .foregroundColor(Color(.braveBlurple))
                     }
