@@ -51,7 +51,6 @@ struct PlaylistOnboardingView_Previews: PreviewProvider {
                     .edgesIgnoringSafeArea(.all)
                 PlaylistOnboardingView()
             }
-            .previewDevice("iPhone 12 Pro")
         }
     }
 }

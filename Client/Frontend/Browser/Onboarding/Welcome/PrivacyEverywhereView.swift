@@ -8,7 +8,7 @@ import Shared
 import BraveUI
 
 struct PrivacyEverywhereView: View {
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     var dismiss: (() -> Void)?
     var syncNow: (() -> Void)?
 

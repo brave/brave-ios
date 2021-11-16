@@ -17,11 +17,6 @@ struct OnboardingDisconnectItem: Codable {
         properties = try container.decode([String].self, forKey: .properties)
         resources = try container.decode([String].self, forKey: .resources)
     }
-    
-    private enum CodingKeys: String, CodingKey {
-        case properties
-        case resources
-    }
 }
 
 struct OnboardingDisconnectList: Decodable {

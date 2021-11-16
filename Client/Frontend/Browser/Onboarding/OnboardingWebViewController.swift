@@ -2,6 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import BraveShared
 import Foundation
 import WebKit
 import Shared
@@ -14,8 +15,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     }
     
     private let urlType: URLType
-    private let tosURL = URL(string: "https://brave.com/terms-of-use/")
-    private let ppURL = URL(string: "https://brave.com/privacy/browser/")
     private var helpers = [String: TabContentScript]()
     private var profile: Profile
     
@@ -82,11 +81,9 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         
         switch urlType {
         case .termsOfService:
-            guard let tosURL = tosURL else { return }
-            webView.load(PrivilegedRequest(url: tosURL) as URLRequest)
+            webView.load(PrivilegedRequest(url: BraveUX.braveTermsOfUseURL) as URLRequest)
         case .privacyPolicy:
-            guard let ppURL = ppURL else { return }
-            webView.load(PrivilegedRequest(url: ppURL) as URLRequest)
+            webView.load(PrivilegedRequest(url: BraveUX.bravePrivacyURL) as URLRequest)
         }
         
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
@@ -108,11 +105,11 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         case .URL:
             switch urlType {
             case .termsOfService:
-                if tosURL?.origin == webView.url?.origin {
+                    if BraveUX.braveTermsOfUseURL.origin == webView.url?.origin {
                     toolbar.urlLabel.text = webView.url?.host
                 }
             case .privacyPolicy:
-                if ppURL?.origin == webView.url?.origin {
+                if BraveUX.bravePrivacyURL.origin == webView.url?.origin {
                     toolbar.urlLabel.text = webView.url?.host
                 }
             }
