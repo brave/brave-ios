@@ -10,7 +10,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     static let shared = AdBlockStats()
     
     /// File name of bundled general blocklist.
-    private let bundledGeneralBlocklist = "ABPFilterParserData"
+    private let bundledGeneralBlocklist = "rs-ABPFilterParserData"
     
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     
@@ -51,6 +51,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     }
     
     private func loadDownloadedDatFiles() {
+        return
         let fm = FileManager.default
         
         guard let folderUrl = fm.getOrCreateFolder(name: AdblockResourceDownloader.folderName) else {

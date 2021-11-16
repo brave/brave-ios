@@ -46,8 +46,8 @@ class AdblockResourceDownloader {
         if now.timeIntervalSince(lastFetchDate) >= fetchInterval {
             lastFetchDate = now
             
-            AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
-            AdblockResourceDownloader.shared.generalAdblockResourcesSetup()
+            //AdblockResourceDownloader.shared.regionalAdblockResourcesSetup()
+            //AdblockResourceDownloader.shared.generalAdblockResourcesSetup()
         }
     }
     

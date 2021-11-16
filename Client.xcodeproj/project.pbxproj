@@ -693,6 +693,7 @@
 		4481F24326CBD42C00658EAC /* GlobalSignRootCA_R3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24126CBD42B00658EAC /* GlobalSignRootCA_R3.cer */; };
 		4481F24426CBD42C00658EAC /* GlobalSignRootCA_R1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24226CBD42C00658EAC /* GlobalSignRootCA_R1.cer */; };
 		448B28D92743D67500633EAC /* AdblockRustInjector.js in Resources */ = {isa = PBXBuildFile; fileRef = 448B28D82743D67500633EAC /* AdblockRustInjector.js */; };
+		448B28E62743D8D900633EAC /* rs-ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = 448B28E52743D8D900633EAC /* rs-ABPFilterParserData.dat */; };
 		448DC7D6268A5C3E00F4795C /* BraveSearchDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */; };
 		448DC7E4268A6A2200F4795C /* BraveSearchLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */; };
 		449AC16226D8FE5B00A53F33 /* BraveTalkScriptHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */; };
@@ -2328,6 +2329,7 @@
 		4484BAF02654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4484BAF12654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		448B28D82743D67500633EAC /* AdblockRustInjector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdblockRustInjector.js; sourceTree = "<group>"; };
+		448B28E52743D8D900633EAC /* rs-ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rs-ABPFilterParserData.dat"; sourceTree = "<group>"; };
 		448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenu.swift; sourceTree = "<group>"; };
 		448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchLogEntry.swift; sourceTree = "<group>"; };
 		449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkScriptHandler.swift; sourceTree = "<group>"; };
@@ -3449,6 +3451,7 @@
 			isa = PBXGroup;
 			children = (
 				0AA4AA98231849440009AAEF /* ABPFilterParserData.dat */,
+				448B28E52743D8D900633EAC /* rs-ABPFilterParserData.dat */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -6962,6 +6965,7 @@
 				CA2202A227192A9B002D3582 /* NetworkError.css in Resources */,
 				4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */,
 				F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */,
+				448B28E62743D8D900633EAC /* rs-ABPFilterParserData.dat in Resources */,
 				F979BE3125BCC54E009B6ACF /* AllFramesAtDocumentStartSandboxed.js in Resources */,
 				F979BE3225BCC54E009B6ACF /* AllFramesAtDocumentEndSandboxed.js in Resources */,
 				5E0FCD212342526700AC831E /* FullscreenHelper.js in Resources */,
