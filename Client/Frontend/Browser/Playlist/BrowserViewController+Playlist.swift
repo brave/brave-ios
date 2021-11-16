@@ -13,10 +13,6 @@ private let log = Logger.browserLogger
 
 extension BrowserViewController: PlaylistHelperDelegate {
     
-    private struct DesignUX {
-        static let bravePlaylistOnboardingURL = "https://brave.com/playlist"
-    }
-    
     private func createPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) -> PopoverController {
         return PopoverController(contentController: PlaylistPopoverViewController(state: state).then {
             $0.rootView.onPrimaryButtonPressed = { [weak self, weak tab] in
@@ -272,8 +268,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
                     }
                     
                     onboardingController.rootView.onButtonPressed = { [weak self, unowned popover] in
-                        guard let self = self,
-                              let url = URL(string: DesignUX.bravePlaylistOnboardingURL) else {
+                        guard let self = self else {
                             popover.dismiss(animated: true) {
                                 pulseAnimation.removeFromSuperview()
                             }
@@ -282,7 +277,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
                         
                         let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
                         self.topToolbar.leaveOverlayMode()
-                        let tab = self.tabManager.addTab(PrivilegedRequest(url: url) as URLRequest,
+                        let tab = self.tabManager.addTab(PrivilegedRequest(url: BraveUX.bravePlaylistOnboardingURL) as URLRequest,
                                                          afterTab: self.tabManager.selectedTab,
                                                          isPrivate: isPrivate)
                         self.tabManager.selectTab(tab)

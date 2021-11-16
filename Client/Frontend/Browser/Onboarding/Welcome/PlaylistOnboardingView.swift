@@ -7,7 +7,6 @@ import SwiftUI
 import BraveUI
 import Shared
 
-
 struct PlaylistOnboardingView: View {
     var onButtonPressed: (() -> Void)?
     
