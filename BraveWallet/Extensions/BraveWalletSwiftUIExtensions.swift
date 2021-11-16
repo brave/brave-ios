@@ -37,7 +37,7 @@ extension BraveWallet.ERCToken: Identifiable {
   
   public func swapAddress(in chainId: String) -> String {
     if chainId == BraveWallet.RopstenChainId {
-      switch symbol {
+      switch symbol.uppercased() {
       case "ETH": return BraveWallet.ethSwapAddress
       case "DAI" : return BraveWallet.daiSwapAddress
       case "USDC": return BraveWallet.usdcSwapAddress

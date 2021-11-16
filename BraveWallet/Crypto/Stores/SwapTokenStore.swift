@@ -467,9 +467,9 @@ public class SwapTokenStore: ObservableObject {
         }
       } else {
         if chainId == BraveWallet.MainnetChainId {
-          selectedToToken = allTokens.first(where: { $0.symbol == "BAT" })
+          selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "BAT" })
         } else if chainId == BraveWallet.RopstenChainId {
-          selectedToToken = allTokens.first(where: { $0.symbol == "DAI" })
+          selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "DAI" })
         }
         completion?()
       }
