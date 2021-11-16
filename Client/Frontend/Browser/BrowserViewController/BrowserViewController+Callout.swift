@@ -138,22 +138,4 @@ extension BrowserViewController {
         
         return
     }
-    
-    func presentReleaseNotesCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true, isOnboardingOrFullScreenCalloutPresented { return }
-
-        guard Preferences.FullScreenCallout.whatsNewCalloutOptIn.value else {
-            return
-        }
-
-        var releaseNotesView = ReleaseNotesView()
-        let controller = PopupViewController(rootView: releaseNotesView)
-        releaseNotesView.dismiss = { [unowned controller] in
-            controller.dismiss(animated: true)
-        }
-
-        present(controller, animated: true, completion: nil)
-        isOnboardingOrFullScreenCalloutPresented = true
-        return
-    }
 }

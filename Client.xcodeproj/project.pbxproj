@@ -933,7 +933,6 @@
 		CA752EB126CEBE52009356EF /* FontScaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A22FF26A7370C00923D70 /* FontScaling.swift */; };
 		CA7C5CAD2731928F003366F7 /* WelcomeViewSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */; };
 		CA7C5CAF2731D022003366F7 /* PrivacyEverywhereView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */; };
-		CA7C5CB12731D9A4003366F7 /* ReleaseNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */; };
 		CA8D5C0E26D7CD8A009BF13D /* PlaylistDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */; };
 		CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */; };
 		CA8D5C1226D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */; };
@@ -2721,7 +2720,6 @@
 		CA752EA426CEABF8009356EF /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
 		CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewSearchView.swift; sourceTree = "<group>"; };
 		CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyEverywhereView.swift; sourceTree = "<group>"; };
-		CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesView.swift; sourceTree = "<group>"; };
 		CA8D5C0D26D7CD8A009BF13D /* PlaylistDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailViewController.swift; sourceTree = "<group>"; };
 		CA8D5C0F26D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+DragDropDelegate.swift"; sourceTree = "<group>"; };
 		CA8D5C1126D7CDCD009BF13D /* PlaylistListViewController+TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistListViewController+TableViewDataSource.swift"; sourceTree = "<group>"; };
@@ -5235,7 +5233,6 @@
 				CA1B698F27303D6B00F7CAC0 /* WelcomeViewCallout.swift */,
 				CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */,
 				CA7C5CAE2731D022003366F7 /* PrivacyEverywhereView.swift */,
-				CA7C5CB02731D9A4003366F7 /* ReleaseNotesView.swift */,
 				CA2EE0A627349F760089C75F /* OnboardingAdblockDisconnect.swift */,
 				CA0EE167273C220800F269DA /* WelcomeBraveBlockedAdsController.swift */,
 				CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */,
@@ -7935,7 +7932,6 @@
 				D3968F251A38FE8500CEFD3B /* TabManager.swift in Sources */,
 				5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
-				CA7C5CB12731D9A4003366F7 /* ReleaseNotesView.swift in Sources */,
 				CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
 				277223722469B4FB0059A7EB /* FaviconFetcher.swift in Sources */,
