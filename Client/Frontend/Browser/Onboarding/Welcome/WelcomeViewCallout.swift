@@ -23,6 +23,7 @@ class WelcomeViewCallout: UIView {
         static let padding = 20.0
         static let contentPadding = 30.0
         static let cornerRadius = 16.0
+        static let shadowColor = UIColor(rgb: 0x767C81)
     }
     
     private let backgroundView = RoundedBackgroundView(cornerRadius: DesignUX.cornerRadius)
@@ -135,10 +136,12 @@ class WelcomeViewCallout: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        layer.shadowColor = #colorLiteral(red: 0.4633028507, green: 0.4875121117, blue: 0.5066562891, alpha: 1).cgColor
+        layer.shadowColor = DesignUX.shadowColor.cgColor
         layer.shadowOpacity = 0.36
         layer.shadowOffset = CGSize(width: 5, height: 5)
         layer.shadowRadius = DesignUX.cornerRadius
+        layer.shadowPath = UIBezierPath(roundedRect: bounds,
+                                        cornerRadius: DesignUX.cornerRadius).cgPath
     }
     
     private func doLayout(pointsUp: Bool) {
@@ -172,7 +175,7 @@ class WelcomeViewCallout: UIView {
             addSubview(backgroundView)
             addSubview(contentView)
             addSubview(arrowView)
-            arrowView.transform = CGAffineTransform.identity.rotated(by: .pi)
+            arrowView.transform = CGAffineTransform(rotationAngle: .pi)
             
             contentView.snp.makeConstraints {
                 if UIDevice.isIpad {
@@ -461,13 +464,11 @@ private class CalloutArrowView: UIView {
 }
 
 private class RoundedBackgroundView: UIView {
-    private let cornerRadius: CGFloat
-    
     init(cornerRadius: CGFloat) {
-        self.cornerRadius = cornerRadius
         super.init(frame: .zero)
         
         layer.cornerRadius = cornerRadius
+        layer.cornerCurve = .continuous
         layer.masksToBounds = true
         layer.backgroundColor = UIColor.secondaryBraveBackground.cgColor
     }

@@ -69,8 +69,8 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
         view.addSubview(imageView)
         imageView.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.width.equalTo(view.bounds.size.width)
-            $0.height.equalTo(view.bounds.size.height)
+            $0.width.equalTo(view)
+            $0.height.equalTo(view)
         }
         
         return view
