@@ -107,7 +107,6 @@ extension BrowserViewController {
             isOnboardingOrFullScreenCalloutPresented = true
 
         }
-        return
     }
     
     func presentSyncAlertCallout() {
@@ -135,7 +134,5 @@ extension BrowserViewController {
             present(controller, animated: true, completion: nil)
             isOnboardingOrFullScreenCalloutPresented = true
         }
-        
-        return
     }
 }

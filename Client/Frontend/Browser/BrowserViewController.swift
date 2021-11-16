@@ -753,8 +753,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             }
         }
         
-        profile.prefs.setString(AppInfo.appVersion, forKey: LatestAppVersionProfileKey)
-
         LegacyBookmarksHelper.restore_1_12_Bookmarks() {
             log.info("Bookmarks from old database were successfully restored")
         }

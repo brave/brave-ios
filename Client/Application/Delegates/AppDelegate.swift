@@ -20,7 +20,6 @@ import Combine
 
 private let log = Logger.browserLogger
 
-let LatestAppVersionProfileKey = "latestAppVersion"
 private let InitialPingSentKey = "initialPingSent"
 
 extension AppDelegate {
