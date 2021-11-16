@@ -12,10 +12,11 @@ import struct Shared.Strings
 struct AccountActivityView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var activityStore: AccountActivityStore
-  var networkStore: NetworkStore
+  @ObservedObject var networkStore: NetworkStore
   
   @State private var detailsPresentation: DetailsPresentation?
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.openWalletURLAction) private var openWalletURL
   
   private struct DetailsPresentation: Identifiable {
     var inEditMode: Bool
@@ -92,6 +93,15 @@ struct AccountActivityView: View {
                 $0[$1.token.symbol.lowercased()] = Double($1.price)
               })
             )
+            .contextMenu {
+              Button(action: {
+                if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)), let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
+                  openWalletURL?(url)
+                }
+              }) {
+                Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
+              }
+            }
           }
         }
       }

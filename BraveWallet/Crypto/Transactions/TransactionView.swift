@@ -76,7 +76,17 @@ struct TransactionView: View {
       } else {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, amount, networkStore.selectedChain.symbol, fiat))
       }
-    case .erc20Transfer, .erc721TransferFrom, .erc721SafeTransferFrom:
+    case .erc20Transfer:
+      if let token = visibleTokens.first(where: {
+        $0.contractAddress.caseInsensitiveCompare(info.txData.baseData.to) == .orderedSame
+      }) {
+        let amount = formatter.decimalString(for: info.txData.baseData.value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+        let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[token.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
+        Text(String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, amount, token.symbol, fiat))
+      } else {
+        Text(Strings.Wallet.send)
+      }
+    case .erc721TransferFrom, .erc721SafeTransferFrom:
       if let token = visibleTokens.first(where: {
         $0.contractAddress.caseInsensitiveCompare(info.txData.baseData.to) == .orderedSame
       }) {

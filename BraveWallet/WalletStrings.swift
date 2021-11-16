@@ -1240,5 +1240,12 @@ extension Strings {
       value: "Sent %@",
       comment: "A title shown for a erc 20 transfer, or erc 721 transaction. The first '%@' becomes the symbol for the cryptocurrency For example: \"Sent ETH\""
     )
+    public static let viewOnBlockExplorer = NSLocalizedString(
+      "wallet.viewOnBlockExplorer",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "View on block explorer",
+      comment: "A button title to view a given transaction on the block explorer for the current network/chain."
+    )
   }
 }

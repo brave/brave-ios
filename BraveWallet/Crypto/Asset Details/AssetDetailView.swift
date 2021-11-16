@@ -20,6 +20,8 @@ struct AssetDetailView: View {
   
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
+  
+  @Environment(\.openWalletURLAction) private var openWalletURL
 
   var body: some View {
     List {
@@ -94,6 +96,15 @@ struct AssetDetailView: View {
               displayAccountCreator: true,
               assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue]
             )
+            .contextMenu {
+              Button(action: {
+                if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)), let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
+                  openWalletURL?(url)
+                }
+              }) {
+                Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
+              }
+            }
           }
         }
       }
