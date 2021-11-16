@@ -1198,5 +1198,47 @@ extension Strings {
       value: "Unknown error",
       comment: "An error message displayed when an unspecified problem occurs."
     )
+    public static let transactionSummaryFee = NSLocalizedString(
+      "wallet.transactionSummaryFee",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Fee: %@ %@ (%@)",
+      comment: "A transactions gas fee. The first '%@' becomes the fee amount, the second '%@' becomes the symbol for the fee's currency and the last '%@' becomes the fiat amount. For example: \"Fee: 0.0054 ETH ($22.44)\""
+    )
+    public static let transactionApproveSymbolTitle = NSLocalizedString(
+      "wallet.transactionApproveSymbolTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Approved %@ %@",
+      comment: "The title shown for ERC20 approvals. The first '%@' becomes the  amount, the second '%@' becomes the symbol for the cryptocurrency. For example: \"Approved 150.0 BAT\""
+    )
+    public static let transactionUnknownApprovalTitle = NSLocalizedString(
+      "wallet.transactionUnknownApprovalTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Approved",
+      comment: "The title shown for ERC20 approvals when the user doesn't have the visible asset added"
+    )
+    public static let transactionSwapTitle = NSLocalizedString(
+      "wallet.transactionSwapTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Swapped %@ %@ (%@)",
+      comment: "A title shown for a swap transaction. The first '%@' becomes the  amount, the second '%@' becomes the symbol for the cryptocurrency and the last '%@' becomes the fiat amount. For example: \"Swapped 0.0054 ETH ($22.44)\""
+    )
+    public static let transactionSendTitle = NSLocalizedString(
+      "wallet.transactionSendTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Sent %@ %@ (%@)",
+      comment: "A title shown for a send transaction. The first '%@' becomes the  amount, the second '%@' becomes the symbol for the cryptocurrency and the last '%@' becomes the fiat amount. For example: \"Sent 0.0054 ETH ($22.44)\""
+    )
+    public static let transactionUnknownSendTitle = NSLocalizedString(
+      "wallet.transactionUnknownSendTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Sent %@",
+      comment: "A title shown for a erc 20 transfer, or erc 721 transaction. The first '%@' becomes the symbol for the cryptocurrency For example: \"Sent ETH\""
+    )
   }
 }

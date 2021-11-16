@@ -81,8 +81,21 @@ struct AssetDetailView: View {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.transactionsTitle))
       ) {
-        Text(Strings.Wallet.noTransactions)
-          .font(.footnote)
+        if assetDetailStore.transactions.isEmpty {
+          Text(Strings.Wallet.noTransactions)
+            .font(.footnote)
+        } else {
+          ForEach(assetDetailStore.transactions, id: \.id) { tx in
+            TransactionView(
+              info: tx,
+              keyringStore: keyringStore,
+              networkStore: networkStore,
+              visibleTokens: [],
+              displayAccountCreator: true,
+              assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue]
+            )
+          }
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
