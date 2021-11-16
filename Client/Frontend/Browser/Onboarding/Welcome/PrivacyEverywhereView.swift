@@ -47,7 +47,7 @@ struct PrivacyEverywhereView: View {
             .foregroundColor(Color(.braveBlurple))
         }
         .frame(maxWidth: 450)
-        .padding(.all)
+        .padding()
         .background(Color(.braveBackground))
     }
 }

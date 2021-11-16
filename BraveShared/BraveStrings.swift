@@ -277,6 +277,11 @@ extension Strings {
                               tableName: "BraveShared", bundle: .braveShared,
                               value: "Check the menu for settings and more great privacy features!",
                               comment: "DEscription for the NTP pop-over that describes the onboarding is done")
+        public static let searchViewEnterWebsiteRowTitle =
+            NSLocalizedString("onboarding.searchViewEnterWebsiteRowTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Enter a website",
+                              comment: "The title of the row asking user to enter a website url")
     }
 }
 

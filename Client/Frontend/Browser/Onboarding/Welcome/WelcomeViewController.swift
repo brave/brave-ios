@@ -333,7 +333,9 @@ class WelcomeViewController: UIViewController {
                 }
             }
             
-            searchView.addButton(icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"), title: "Enter a website") { [unowned self] in
+            searchView.addButton(
+                icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"),
+                title: Strings.Onboarding.searchViewEnterWebsiteRowTitle) { [unowned self] in
                 self.onEnterCustomWebsite()
             }
             

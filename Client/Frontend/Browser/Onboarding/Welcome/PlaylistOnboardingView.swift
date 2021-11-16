@@ -39,7 +39,7 @@ struct PlaylistOnboardingView: View {
             }
         }
         .frame(maxWidth: 450)
-        .padding(.all)
+        .padding()
         .background(Color(.braveBackground))
     }
 }
