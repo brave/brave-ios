@@ -26,6 +26,10 @@ public class AdblockRustEngine {
   public static func setDomainResolver(_ resolver: @escaping C_DomainResolverCallback) {
     set_domain_resolver(resolver)
   }
+    
+    func cssRules(for url: URL) -> String? {
+        String(cString: engine_url_cosmetic_resources(engine, url.absoluteString))
+    }
   
   public func shouldBlock(requestUrl: String, requestHost: String, sourceHost: String) -> Bool {
     if deserializationPending {

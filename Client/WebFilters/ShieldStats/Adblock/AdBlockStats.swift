@@ -70,6 +70,10 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         }
     }
     
+    func cssRules(for url: URL) -> String? {
+        generalAdblockEngine.cssRules(for: url)
+    }
+    
     func shouldBlock(_ request: URLRequest, currentTabUrl: URL?) -> Bool {
         guard let url = request.url, let requestHost = url.host else {
             return false

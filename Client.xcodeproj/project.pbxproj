@@ -692,6 +692,7 @@
 		4481F24026CBD3DC00658EAC /* ISRGRootCA_X2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F23E26CBD3DB00658EAC /* ISRGRootCA_X2.cer */; };
 		4481F24326CBD42C00658EAC /* GlobalSignRootCA_R3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24126CBD42B00658EAC /* GlobalSignRootCA_R3.cer */; };
 		4481F24426CBD42C00658EAC /* GlobalSignRootCA_R1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F24226CBD42C00658EAC /* GlobalSignRootCA_R1.cer */; };
+		448B28D92743D67500633EAC /* AdblockRustInjector.js in Resources */ = {isa = PBXBuildFile; fileRef = 448B28D82743D67500633EAC /* AdblockRustInjector.js */; };
 		448DC7D6268A5C3E00F4795C /* BraveSearchDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */; };
 		448DC7E4268A6A2200F4795C /* BraveSearchLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */; };
 		449AC16226D8FE5B00A53F33 /* BraveTalkScriptHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */; };
@@ -2326,6 +2327,7 @@
 		4484BAEE265422790099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4484BAF02654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4484BAF12654227A0099A205 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		448B28D82743D67500633EAC /* AdblockRustInjector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdblockRustInjector.js; sourceTree = "<group>"; };
 		448DC7D5268A5C3E00F4795C /* BraveSearchDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenu.swift; sourceTree = "<group>"; };
 		448DC7E3268A6A2200F4795C /* BraveSearchLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchLogEntry.swift; sourceTree = "<group>"; };
 		449AC16126D8FE5B00A53F33 /* BraveTalkScriptHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkScriptHandler.swift; sourceTree = "<group>"; };
@@ -5442,6 +5444,7 @@
 				D0C95DF9200EAE5E00E4E51C /* NoImageModeHelper.js */,
 				F9E0F38A25772E57003A6A30 /* ReaderMode.js */,
 				F9E0F3A7257739B1003A6A30 /* TrackingProtectionStats.js */,
+				448B28D82743D67500633EAC /* AdblockRustInjector.js */,
 			);
 			path = AtDocumentStart;
 			sourceTree = "<group>";
@@ -6984,6 +6987,7 @@
 				0AE50854261C63D70099C6A3 /* BraveSearchHelper.js in Resources */,
 				445ABC972731DDFF0089710D /* NewYorkMedium-RegularItalic.otf in Resources */,
 				5DB474F1237F4CC9007B7652 /* ntp-data.json in Resources */,
+				448B28D92743D67500633EAC /* AdblockRustInjector.js in Resources */,
 				595E0EDB21CAD97C00813D49 /* CookieControl.js in Resources */,
 				0A0D3D3C21A4BE6400BEE65B /* adblock-list.txt in Resources */,
 				0A5E04FB23FEB53700E5A3E9 /* LaunchScreen.xcassets in Resources */,

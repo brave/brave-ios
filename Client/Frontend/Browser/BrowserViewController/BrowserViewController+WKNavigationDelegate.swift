@@ -495,6 +495,14 @@ extension BrowserViewController: WKNavigationDelegate {
             
             tabsBar.reloadDataAndRestoreSelectedTab()
         }
+        
+        
+        if let url = webView.url, let rules = AdBlockStats.shared.cssRules(for: url) {
+            //swiftlint:disable:next safe_javascript
+            webView.evaluateJavaScript("window.__firefox__.AdblockRustInjector.inject('\(rules.toBase64())')", completionHandler: { _, error in
+                log.warning("AdblockRustInjector error: \(String(describing: error))")
+            })
+        }
     }
     
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
