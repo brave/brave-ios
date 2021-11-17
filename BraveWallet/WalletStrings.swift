@@ -1247,5 +1247,54 @@ extension Strings {
       value: "View on block explorer",
       comment: "A button title to view a given transaction on the block explorer for the current network/chain."
     )
+    public static let transactionStatusConfirmed = NSLocalizedString(
+      "wallet.transactionStatusConfirmed",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Confirmed",
+      comment: "A status that explains that the transaction has been completed/confirmed"
+    )
+    public static let transactionStatusApproved = NSLocalizedString(
+      "wallet.transactionStatusApproved",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Approved",
+      comment: "A status that explains that the transaction has been approved by the user"
+    )
+    public static let transactionStatusRejected = NSLocalizedString(
+      "wallet.transactionStatusRejected",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Rejected",
+      comment: "A status that explains that the transaction has been rejected by the user"
+    )
+    public static let transactionStatusUnapproved = NSLocalizedString(
+      "wallet.transactionStatusUnapproved",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Unapproved",
+      comment: "A status that explains that previous approval of the transaction has been revoked"
+    )
+    public static let transactionStatusSubmitted = NSLocalizedString(
+      "wallet.transactionStatusSubmitted",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Submitted",
+      comment: "A status that explains that the transaction has been submitted to the blockchain"
+    )
+    public static let transactionStatusError = NSLocalizedString(
+      "wallet.transactionStatusError",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Error",
+      comment: "A status that explains that the transaction failed due to some error"
+    )
+    public static let transactionStatusUnknown = NSLocalizedString(
+      "wallet.transactionStatusUnknown",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Unknown",
+      comment: "A transaction status that the app currently does not support displaying"
+    )
   }
 }

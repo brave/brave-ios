@@ -165,19 +165,19 @@ extension BraveWallet.TransactionStatus {
   var localizedDescription: String {
     switch self {
     case .confirmed:
-      return "Confirmed"
+      return Strings.Wallet.transactionStatusConfirmed
     case .approved:
-      return "Approved"
+      return Strings.Wallet.transactionStatusApproved
     case .rejected:
-      return "Rejected"
+      return Strings.Wallet.transactionStatusRejected
     case .unapproved:
-      return "Unapproved"
+      return Strings.Wallet.transactionStatusUnapproved
     case .submitted:
-      return "Submitted"
+      return Strings.Wallet.transactionStatusSubmitted
     case .error:
-      return "Error"
+      return Strings.Wallet.transactionStatusError
     @unknown default:
-      return "Unknown"
+      return Strings.Wallet.transactionStatusUnknown
     }
   }
   var color: Color {
