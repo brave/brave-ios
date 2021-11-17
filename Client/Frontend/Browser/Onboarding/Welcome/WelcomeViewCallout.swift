@@ -162,11 +162,11 @@ class WelcomeViewCallout: UIView {
             
             contentView.snp.makeConstraints {
                 $0.top.equalTo(arrowView.snp.bottom)
-                if UIDevice.isIpad {
+                if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                } else {
                     $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
-                } else {
-                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
                 }
                 $0.bottom.equalToSuperview()
             }
@@ -177,11 +177,11 @@ class WelcomeViewCallout: UIView {
             arrowView.transform = CGAffineTransform(rotationAngle: .pi)
             
             contentView.snp.makeConstraints {
-                if UIDevice.isIpad {
+                if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
+                } else {
                     $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
-                } else {
-                    $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
                 }
                 $0.top.equalToSuperview()
             }

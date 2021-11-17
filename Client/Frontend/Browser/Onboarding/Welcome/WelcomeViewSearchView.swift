@@ -34,13 +34,12 @@ class WelcomeViewSearchView: UIView {
         scrollView.addSubview(contentView)
         
         scrollView.snp.makeConstraints {
-            if UIDevice.isIpad {
+            if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+                $0.edges.equalToSuperview()
+            } else {
                 $0.top.bottom.equalToSuperview()
                 $0.centerX.equalToSuperview()
-                $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)
-            } else {
-                $0.edges.equalToSuperview()
-            }
+                $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)            }
         }
         
         scrollView.contentLayoutGuide.snp.makeConstraints {

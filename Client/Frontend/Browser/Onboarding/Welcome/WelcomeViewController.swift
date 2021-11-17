@@ -64,7 +64,6 @@ class WelcomeViewController: UIViewController {
     
     private let contentContainer = UIStackView().then {
         $0.axis = .vertical
-        //$0.distribution = .fillProportionally
         $0.spacing = 10.0
         $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
         $0.isLayoutMarginsRelativeArrangement = true
