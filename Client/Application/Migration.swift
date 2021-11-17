@@ -176,7 +176,8 @@ fileprivate extension Preferences {
         static let removeLargeFaviconsMigrationCompleted =
             Option<Bool>(key: "migration.remove-large-favicons", default: false)
         
-        static let coreDataCompleted = Option<Bool>(key: "migration.cd-completed", default: false)
+        static let coreDataCompleted = Option<Bool>(key: "migration.cd-completed",
+                                                    default: Preferences.Migration.completed.value)
     }
     
     /// Migrate the users preferences from prior versions of the app (<2.0)
