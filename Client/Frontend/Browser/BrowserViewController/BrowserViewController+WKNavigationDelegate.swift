@@ -497,9 +497,11 @@ extension BrowserViewController: WKNavigationDelegate {
         }
         
         if let url = webView.url,
+           !InternalURL.isValid(url: url),
            Domain.getOrCreate(forUrl: url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
             .isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
             let rules = AdBlockStats.shared.cssRules(for: url) {
+            
             // swiftlint:disable:next safe_javascript
             webView.evaluateJavaScript("window.__firefox__.AdblockRustInjector.inject('\(rules.toBase64())')", completionHandler: { _, error in
                 log.warning("AdblockRustInjector error: \(String(describing: error))")
