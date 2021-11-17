@@ -90,32 +90,23 @@ body {
     display: none;
 }
 
-i {
-    border: solid #5E6175;
-    border-width: 0 2px 2px 0;
-    display: inline-block;
-    padding: 5px;
-    margin-left: 7px;
-}
-
 .arrow {
-  border: solid black;
-  border-width: 0 3px 3px 0;
   display: inline-block;
-  padding: 3px;
-  margin-left: 15px;
+  float: right;
+  width: 18px;
+  height: 10px;
+  margin-left: 6px;
+  margin-top: 4px;
 }
 
 .up {
-    transform: rotate(-135deg);
+    transform: rotate(-180deg);
     transition: 0.3s;
-    -webkit-transform: rotate(-135deg);
-    margin-top: 4px;
+    -webkit-transform: rotate(-180deg);
 }
 
 .down {
-    transform: rotate(45deg);
+    transform: rotate(0deg);
     transition: 0.3s;
-    -webkit-transform: rotate(45deg);
-    margin-bottom: 2px;
+    -webkit-transform: rotate(0deg);
 }
