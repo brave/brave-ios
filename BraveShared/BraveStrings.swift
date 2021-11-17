@@ -282,6 +282,21 @@ extension Strings {
                               tableName: "BraveShared", bundle: .braveShared,
                               value: "Enter a website",
                               comment: "The title of the row asking user to enter a website url")
+        public static let blockedAdsOnboardingPopoverDescription =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Brave blocked %@ and %d other trackers on: %@.",
+                              comment: "The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
+        public static let blockedAdsOnboardingPopoverDescriptionTwo =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverDescriptionTwo",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Brave blocked %@ on: %@.",
+                              comment: "The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
+        public static let blockedAdsOnboardingPopoverDescriptionThree =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverDescriptionThree",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Tap the Shield from any site to see all the stuff we blocked.",
+                              comment: "The description of the popover showing trackers that were blocked.")
     }
 }
 

@@ -7,6 +7,8 @@ import Foundation
 import UIKit
 import SnapKit
 import BraveUI
+import BraveShared
+import Shared
 
 class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponent {
     private let label = UILabel().then {
@@ -24,28 +26,38 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
     
     func setData(domain: String, trackerBlocked: String, trackerCount: Int) {
         let text = NSMutableAttributedString()
-        text.append(NSAttributedString(string: "Brave blocked", attributes: [
-            .foregroundColor: UIColor.braveLabel,
-            .font: UIFont.systemFont(ofSize: 17.0)
-        ]))
-        
-        text.append(NSAttributedString(string: " \(trackerBlocked) ", attributes: [
-            .foregroundColor: UIColor.braveLabel,
-            .font: UIFont.systemFont(ofSize: 17.0, weight: .bold)
-        ]))
         
         if trackerCount > 0 {
-            text.append(NSAttributedString(string: "and \(trackerCount) other trackers on: \(domain).\n\nTap the Shield from any site to see all the stuff we blocked.", attributes: [
+            let uuid = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+            let string = String(format: Strings.Onboarding.blockedAdsOnboardingPopoverDescription, "[\(uuid)]", trackerCount, domain)
+            let strings = string.separatedBy("[\(uuid)]")
+            guard strings.count == 2 else {
+                label.text = string
+                return
+            }
+            
+            text.append(NSAttributedString(string: strings[0], attributes: [
+                .foregroundColor: UIColor.braveLabel,
+                .font: UIFont.systemFont(ofSize: 17.0)
+            ]))
+            
+            text.append(NSAttributedString(string: " \(trackerBlocked) ", attributes: [
+                .foregroundColor: UIColor.braveLabel,
+                .font: UIFont.systemFont(ofSize: 17.0, weight: .bold)
+            ]))
+            
+            text.append(NSAttributedString(string: "\(strings[1])\n\n\(Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionThree)", attributes: [
                 .foregroundColor: UIColor.braveLabel,
                 .font: UIFont.systemFont(ofSize: 17.0)
             ]))
         } else {
-            text.append(NSAttributedString(string: "on: \(domain).\n\nTap the Shield from any site to see all the stuff we blocked.", attributes: [
+            let string = String(format: Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionTwo, trackerBlocked, domain)
+            
+            text.append(NSAttributedString(string: "\(string)\n\n\(Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionThree)", attributes: [
                 .foregroundColor: UIColor.braveLabel,
                 .font: UIFont.systemFont(ofSize: 17.0)
             ]))
         }
-        
         label.attributedText = text
     }
 }
