@@ -93,7 +93,7 @@ private class SearchEngineButton: RoundInterfaceButton {
     private let titleView = UILabel().then {
         $0.textAlignment = .left
         $0.textColor = .bravePrimary
-        $0.font = .systemFont(ofSize: 17.0)
+        $0.font = .preferredFont(forTextStyle: .body)
         $0.isUserInteractionEnabled = false
     }
     
@@ -175,5 +175,7 @@ private class SearchEngineButton: RoundInterfaceButton {
         layer.shadowOpacity = 0.36
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shadowRadius = DesignUX.cornerRadius
+        layer.shadowPath = UIBezierPath(roundedRect: bounds,
+                                        cornerRadius: DesignUX.cornerRadius).cgPath
     }
 }

@@ -21,20 +21,19 @@ struct PrivacyEverywhereView: View {
                 } label: {
                     Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
                 }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            Text(Strings.Callout.privacyEverywhereCalloutTitle)
-                .padding(.vertical, 5)
-                .font(.title3.weight(.medium))
-                .foregroundColor(Color(.bravePrimary))
-            Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-image"))
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .padding(.vertical, 5)
-            Text(Strings.Callout.privacyEverywhereCalloutDescription)
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(Color(.bravePrimary))
-                .padding(.vertical, 5)
+            VStack(spacing: 10) {
+                Text(Strings.Callout.privacyEverywhereCalloutTitle)
+                    .font(.title3.weight(.medium))
+                    .foregroundColor(Color(.bravePrimary))
+                Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-image"))
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                Text(Strings.Callout.privacyEverywhereCalloutDescription)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color(.bravePrimary))
+            }
             Button(action: {
                 syncNow?()
             }) {
