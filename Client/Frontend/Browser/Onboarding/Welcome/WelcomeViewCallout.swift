@@ -246,7 +246,17 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = true
             }
             
+            secondaryLabel.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
             secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            secondaryButtonContentView.do {
                 $0.alpha = 0.0
                 $0.isHidden = true
             }
@@ -277,12 +287,17 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = false
             }
             
-            secondaryButtonContentView.do {
-                $0.alpha = 1.0
-                $0.isHidden = false
+            secondaryLabel.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
             }
                 
             secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            secondaryButtonContentView.do {
                 $0.alpha = 0.0
                 $0.isHidden = true
             }
@@ -319,9 +334,9 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = false
             }
             
-            secondaryButtonContentView.do {
-                $0.alpha = 1.0
-                $0.isHidden = false
+            secondaryLabel.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
             }
                 
             secondaryButton.do {
@@ -330,6 +345,11 @@ class WelcomeViewCallout: UIView {
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     secondaryAction()
                 }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButtonContentView.do {
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
@@ -366,11 +386,6 @@ class WelcomeViewCallout: UIView {
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
-            
-            secondaryButtonContentView.do {
-                $0.alpha = 1.0
-                $0.isHidden = false
-            }
                 
             secondaryLabel.do {
                 $0.text = Strings.Callout.defaultBrowserCalloutSecondaryButtonDescription
@@ -386,6 +401,11 @@ class WelcomeViewCallout: UIView {
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     secondaryAction()
                 }), for: .touchUpInside)
+                $0.alpha = 1.0
+                $0.isHidden = false
+            }
+            
+            secondaryButtonContentView.do {
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
@@ -414,7 +434,17 @@ class WelcomeViewCallout: UIView {
                 $0.isHidden = true
             }
             
+            secondaryLabel.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
             secondaryButton.do {
+                $0.alpha = 0.0
+                $0.isHidden = true
+            }
+            
+            secondaryButtonContentView.do {
                 $0.alpha = 0.0
                 $0.isHidden = true
             }
