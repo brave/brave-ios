@@ -9,6 +9,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+body {
+    background-color: rgb(255, 252, 240) !important;
+}
+
 .navigationButtons {
     display: flex;
 }
@@ -48,7 +52,7 @@
 }
 
 .rightNavButton {
-    background: rgb(251, 84, 43);
+    background: rgb(76, 84, 210);
     border-radius: 100px;
     background-repeat: no-repeat;
     border: none;
