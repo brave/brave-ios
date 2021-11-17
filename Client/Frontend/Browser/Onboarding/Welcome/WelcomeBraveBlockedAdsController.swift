@@ -38,12 +38,12 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
             
             text.append(NSAttributedString(string: strings[0], attributes: [
                 .foregroundColor: UIColor.braveLabel,
-                .font: UIFont.preferredFont(forTextStyle: .body)
+                .font: UIFont.systemFont(ofSize: 17.0)
             ]))
             
             text.append(NSAttributedString(string: " \(trackerBlocked) ", attributes: [
                 .foregroundColor: UIColor.braveLabel,
-                .font: UIFont.preferredFont(for: .body, weight: .bold)
+                .font: UIFont.systemFont(ofSize: 17.0, weight: .bold)
             ]))
             
             text.append(NSAttributedString(string: "\(strings[1])\n\n\(Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionThree)", attributes: [

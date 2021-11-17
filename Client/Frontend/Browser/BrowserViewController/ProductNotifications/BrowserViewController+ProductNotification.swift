@@ -81,8 +81,8 @@ extension BrowserViewController {
         }
         
         guard let selectedTab = tabManager.selectedTab,
-              !Preferences.General.onboardingAdblockPopoverShown.value,
-              !benchmarkNotificationPresented,
+//              !Preferences.General.onboardingAdblockPopoverShown.value,
+//              !benchmarkNotificationPresented,
               !Preferences.AppState.backgroundedCleanly.value,
               !topToolbar.inOverlayMode,
               !isTabTrayActive,
