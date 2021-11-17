@@ -12,10 +12,19 @@ import BraveShared
 import pop
 
 enum WelcomeViewCalloutState {
+    struct WelcomeViewDefaultBrowserDetails {
+        var title: String
+        var details: String
+        var primaryButtonTitle: String
+        var secondaryButtonTitle: String
+        var primaryAction: (() -> Void)
+        var secondaryAction: (() -> Void)
+    }
+    
     case welcome(title: String)
-    case privacy(title: String, details: String, buttonTitle: String, action: () -> Void)
-    case defaultBrowser(title: String, details: String, primaryButtonTitle: String, secondaryButtonTitle: String, primaryAction: () -> Void, secondaryAction: () -> Void)
-    case defaultBrowserWarning(title: String, details: String, primaryButtonTitle: String, secondaryButtonTitle: String, primaryAction: () -> Void, secondaryAction: () -> Void)
+    case privacy(title: String, details: String, primaryButtonTitle: String, primaryAction: () -> Void)
+    case defaultBrowser(info: WelcomeViewDefaultBrowserDetails)
+    case defaultBrowserCallout(info: WelcomeViewDefaultBrowserDetails)
     case ready(title: String, details: String, moreDetails: String)
 }
 
@@ -303,13 +312,12 @@ class WelcomeViewCallout: UIView {
             
             contentView.setCustomSpacing(8.0, after: titleLabel)
             contentView.setCustomSpacing(24.0, after: detailsLabel)
-            
-        case .defaultBrowser(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
+        case .defaultBrowser(let info):
             contentView.do {
                 $0.layoutMargins = UIEdgeInsets(top: 30, left: 30, bottom: 15, right: 30)
             }
             titleLabel.do {
-                $0.text = title
+                $0.text = info.title
                 $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
@@ -317,17 +325,17 @@ class WelcomeViewCallout: UIView {
             }
             
             detailsLabel.do {
-                $0.text = details
+                $0.text = info.details
                 $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
-                $0.setTitle(primaryButtonTitle, for: .normal)
+                $0.setTitle(info.primaryButtonTitle, for: .normal)
                 $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
-                    primaryAction()
+                    info.primaryAction()
                 }), for: .touchUpInside)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -339,10 +347,10 @@ class WelcomeViewCallout: UIView {
             }
                 
             secondaryButton.do {
-                $0.setTitle(secondaryButtonTitle, for: .normal)
+                $0.setTitle(info.secondaryButtonTitle, for: .normal)
                 $0.titleLabel?.font = .preferredFont(for: .body, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
-                    secondaryAction()
+                    info.secondaryAction()
                 }), for: .touchUpInside)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -356,13 +364,13 @@ class WelcomeViewCallout: UIView {
             contentView.setCustomSpacing(8.0, after: titleLabel)
             contentView.setCustomSpacing(24.0, after: detailsLabel)
             contentView.setCustomSpacing(10.0, after: primaryButton)
-        case .defaultBrowserWarning(let title, let details, let primaryButtonTitle, let secondaryButtonTitle, let primaryAction, let secondaryAction):
+        case .defaultBrowserCallout(let info):
             contentView.do {
                 $0.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 10, right: 20)
             }
                 
             titleLabel.do {
-                $0.text = title
+                $0.text = info.title
                 $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
@@ -370,17 +378,17 @@ class WelcomeViewCallout: UIView {
             }
             
             detailsLabel.do {
-                $0.text = details
+                $0.text = info.details
                 $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
-                $0.setTitle(primaryButtonTitle, for: .normal)
+                $0.setTitle(info.primaryButtonTitle, for: .normal)
                 $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
-                    primaryAction()
+                    info.primaryAction()
                 }), for: .touchUpInside)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -395,10 +403,10 @@ class WelcomeViewCallout: UIView {
             }
             
             secondaryButton.do {
-                $0.setTitle(secondaryButtonTitle, for: .normal)
+                $0.setTitle(info.secondaryButtonTitle, for: .normal)
                     $0.titleLabel?.font = .preferredFont(for: .title3, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
-                    secondaryAction()
+                    info.secondaryAction()
                 }), for: .touchUpInside)
                 $0.alpha = 1.0
                 $0.isHidden = false

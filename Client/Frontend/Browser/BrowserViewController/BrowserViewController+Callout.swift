@@ -70,21 +70,24 @@ extension BrowserViewController {
         let onboardingController = WelcomeViewController(
             profile: nil,
             rewards: nil,
-            state: WelcomeViewCalloutState.defaultBrowserWarning(
-                title: Strings.Callout.defaultBrowserCalloutTitle,
-                details: Strings.Callout.defaultBrowserCalloutDescription,
-                primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
-                secondaryButtonTitle: Strings.Callout.defaultBrowserCalloutSecondaryButtonTitle,
-                primaryAction: {
-                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                        return
-                    }
+            state: WelcomeViewCalloutState.defaultBrowserCallout(
+                info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+                    title: Strings.Callout.defaultBrowserCalloutTitle,
+                    details: Strings.Callout.defaultBrowserCalloutDescription,
+                    primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
+                    secondaryButtonTitle: Strings.Callout.defaultBrowserCalloutSecondaryButtonTitle,
+                    primaryAction: {
+                        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                            return
+                        }
                     
-                    Preferences.General.defaultBrowserCalloutDismissed.value = true
-                    UIApplication.shared.open(settingsUrl)
-                }, secondaryAction: { [weak self] in
-                    self?.dismiss(animated: false)
-                })
+                        Preferences.General.defaultBrowserCalloutDismissed.value = true
+                        UIApplication.shared.open(settingsUrl)
+                    }, secondaryAction: { [weak self] in
+                        self?.dismiss(animated: false)
+                    }
+                )
+            )
         )
 
         present(onboardingController, animated: true)

@@ -242,7 +242,7 @@ class WelcomeViewController: UIViewController {
             }
             calloutView.setState(state: state)
             
-        case .defaultBrowserWarning:
+        case .defaultBrowserCallout:
             let topTransform = { () -> CGAffineTransform in
                 var transformation = CGAffineTransform.identity
                 transformation = transformation.scaledBy(x: 1.5, y: 1.5)
@@ -328,8 +328,8 @@ class WelcomeViewController: UIViewController {
         let state = WelcomeViewCalloutState.privacy(
             title: Strings.Onboarding.privacyScreenTitle,
             details: Strings.Onboarding.privacyScreenDescription,
-            buttonTitle: Strings.Onboarding.privacyScreenButtonTitle,
-            action: {
+            primaryButtonTitle: Strings.Onboarding.privacyScreenButtonTitle,
+            primaryAction: {
                 nextController.animateToDefaultBrowserState()
             }
         )
@@ -341,16 +341,18 @@ class WelcomeViewController: UIViewController {
         let nextController = WelcomeViewController(profile: profile,
                                                    rewards: rewards)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        let state = WelcomeViewCalloutState.defaultBrowser(
-            title: Strings.Callout.defaultBrowserCalloutTitle,
-            details: Strings.Callout.defaultBrowserCalloutDescription,
-            primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
-            secondaryButtonTitle: Strings.DefaultBrowserCallout.introSkipButtonText,
-            primaryAction: {
-                nextController.onSetDefaultBrowser()
-            }, secondaryAction: {
-                nextController.animateToReadyState()
-            }
+        let state = WelcomeViewCalloutState.defaultBrowserCallout(
+            info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+                title: Strings.Callout.defaultBrowserCalloutTitle,
+                details: Strings.Callout.defaultBrowserCalloutDescription,
+                primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
+                secondaryButtonTitle: Strings.DefaultBrowserCallout.introSkipButtonText,
+                primaryAction: {
+                    nextController.onSetDefaultBrowser()
+                }, secondaryAction: {
+                    nextController.animateToReadyState()
+                }
+            )
         )
         nextController.setLayoutState(state: state)
         self.present(nextController, animated: true, completion: nil)
