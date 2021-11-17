@@ -201,10 +201,6 @@ public class DataController {
     
     static func perform(context: WriteContext = .new(inMemory: false), save: Bool = true,
                         task: @escaping (NSManagedObjectContext) -> Void) {
-        if !DataController.shared.initializationCompleted && !AppConstants.isRunningTest {
-            assertionFailure("Performing on context before database initialized")
-            return
-        }
         
         switch context {
         case .existing(let existingContext):
