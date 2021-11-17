@@ -19,7 +19,7 @@ struct OnboardingDisconnectItem: Codable {
     }
 }
 
-struct OnboardingDisconnectList: Decodable {
+struct OnboardingDisconnectList: Codable {
     let license: String
     let entities: [String: OnboardingDisconnectItem]
     
@@ -33,44 +33,5 @@ struct OnboardingDisconnectList: Decodable {
             log.error("Error Decoding OnboardingDisconectList: \(error)")
         }
         return nil
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let childContainer = try container.nestedContainer(keyedBy: AnyCodingKey.self, forKey: .entities)
-
-        license = try container.decode(String.self, forKey: .license)
-        var entities = [String: OnboardingDisconnectItem]()
-
-        for key in childContainer.allKeys {
-            guard let codingKey = AnyCodingKey(stringValue: key.stringValue) else {
-                throw NSError()
-            }
-
-            let entity = try childContainer.decode(OnboardingDisconnectItem.self, forKey: codingKey)
-            entities[key.stringValue] = entity
-        }
-
-        self.entities = entities
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case license
-        case entities
-    }
-    
-    private struct AnyCodingKey: CodingKey {
-        var stringValue: String
-        var intValue: Int?
-        
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-            self.intValue = Int(stringValue)
-        }
-        
-        init?(intValue: Int) {
-            self.intValue = intValue
-            self.stringValue = String(intValue)
-        }
     }
 }
