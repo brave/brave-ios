@@ -6,6 +6,7 @@
 import SwiftUI
 import Shared
 import BraveUI
+import BraveShared
 
 struct PrivacyEverywhereView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
@@ -45,7 +46,7 @@ struct PrivacyEverywhereView: View {
             .buttonStyle(BraveFilledButtonStyle(size: .small))
             .foregroundColor(Color(.braveBlurple))
         }
-        .frame(maxWidth: 450)
+        .frame(maxWidth: BraveUX.baseDimensionValue)
         .padding()
         .background(Color(.braveBackground))
     }

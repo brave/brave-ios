@@ -27,28 +27,26 @@ struct PlaylistPopoverView: View {
                 addedToPlaylistView
             }
         }
-        .frame(maxWidth: 450)   
+        .frame(maxWidth: BraveUX.baseDimensionValue)   
     }
     
     private var addToPlaylistView: some View {
         VStack(alignment: .leading) {
-            if #available(iOS 14.0, *) {
-                Text(Strings.PlayList.playlistPopoverAddTitle)
-                    .foregroundColor(Color(UIColor.primaryButtonTint))
-                    .font(.title2.weight(.medium))
-                    .padding(.bottom, 20.0)
-            } else {
-                Text(Strings.PlayList.playlistPopoverAddTitle)
-                    .foregroundColor(Color(UIColor.primaryButtonTint))
-                    .font(.headline.weight(.medium))
-                    .padding(.bottom, 20.0)
+            VStack(spacing: 20) {
+                if #available(iOS 14.0, *) {
+                    Text(Strings.PlayList.playlistPopoverAddTitle)
+                        .foregroundColor(Color(UIColor.primaryButtonTint))
+                        .font(.title2.weight(.medium))
+                } else {
+                    Text(Strings.PlayList.playlistPopoverAddTitle)
+                        .foregroundColor(Color(UIColor.primaryButtonTint))
+                        .font(.headline.weight(.medium))
+                }
+                
+                Text(Strings.PlayList.playlistPopoverAddBody)
+                    .foregroundColor(Color(UIColor.braveLabel))
+                    .font(.body)
             }
-            
-            Text(Strings.PlayList.playlistPopoverAddBody)
-                .foregroundColor(Color(UIColor.braveLabel))
-                .font(.body)
-                .padding(.bottom, 20.0)
-
             Button(action: {
                 onPrimaryButtonPressed?()
             }) {

@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import SnapKit
 import BraveUI
+import BraveShared
 
 class WelcomeViewSearchView: UIView {
     private struct DesignUX {
@@ -14,7 +15,7 @@ class WelcomeViewSearchView: UIView {
         static let contentPadding = 30.0
         static let cornerRadius = 16.0
         static let buttonHeight = 48.0
-        static let scrollViewWidth = 450.0
+        static let scrollViewWidth = BraveUX.baseDimensionValue
     }
     
     private let scrollView = UIScrollView()
@@ -73,6 +74,7 @@ private class SearchEngineButton: RoundInterfaceButton {
         static let contentPaddingX = 15.0
         static let contentPaddingY = 10.0
         static let iconSize = 24.0
+        static let shadowColor = UIColor(rgb: 0x767C81)
     }
     
     private let contentView = UIStackView().then {
@@ -171,7 +173,7 @@ private class SearchEngineButton: RoundInterfaceButton {
 
         contentView.layer.insertSublayer(roundedLayer, at: 0)
         
-        layer.shadowColor = #colorLiteral(red: 0.4633028507, green: 0.4875121117, blue: 0.5066562891, alpha: 1).cgColor
+        layer.shadowColor = DesignUX.shadowColor.cgColor
         layer.shadowOpacity = 0.36
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shadowRadius = DesignUX.cornerRadius

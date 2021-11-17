@@ -18,5 +18,6 @@ public struct BraveUX {
     
     public static let faviconBorderColor = UIColor(white: 0, alpha: 0.2)
     public static let faviconBorderWidth = 1.0 / UIScreen.main.scale
+    public static let baseDimensionValue = 450.0
 }
 

@@ -8,6 +8,7 @@ import UIKit
 import SnapKit
 import BraveUI
 import Shared
+import BraveShared
 import pop
 
 enum WelcomeViewCalloutState {
@@ -58,7 +59,6 @@ class WelcomeViewCallout: UIView {
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
         $0.setTitleColor(.white, for: .normal)
         $0.backgroundColor = .braveBlurple
-        $0.setTitle(" ", for: .normal)
     }
     
     private let secondaryButtonContentView = UIStackView().then {
@@ -83,7 +83,6 @@ class WelcomeViewCallout: UIView {
     private let secondaryButton = RoundInterfaceButton(type: .custom).then {
         $0.setTitleColor(.braveBlurple, for: .normal)
         $0.backgroundColor = .clear
-        $0.setTitle(" ", for: .normal)
         $0.setContentHuggingPriority(.required, for: .horizontal)
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
@@ -164,7 +163,7 @@ class WelcomeViewCallout: UIView {
             contentView.snp.makeConstraints {
                 $0.top.equalTo(arrowView.snp.bottom)
                 if UIDevice.isIpad {
-                    $0.width.lessThanOrEqualTo(450)
+                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
                 } else {
                     $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
@@ -179,7 +178,7 @@ class WelcomeViewCallout: UIView {
             
             contentView.snp.makeConstraints {
                 if UIDevice.isIpad {
-                    $0.width.lessThanOrEqualTo(450)
+                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
                 } else {
                     $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)

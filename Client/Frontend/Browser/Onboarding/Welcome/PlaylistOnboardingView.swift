@@ -6,6 +6,7 @@
 import SwiftUI
 import BraveUI
 import Shared
+import BraveShared
 
 struct PlaylistOnboardingView: View {
     var onButtonPressed: (() -> Void)?
@@ -37,7 +38,7 @@ struct PlaylistOnboardingView: View {
                 }
             }
         }
-        .frame(maxWidth: 450)
+        .frame(maxWidth: BraveUX.baseDimensionValue)
         .padding()
         .background(Color(.braveBackground))
     }
