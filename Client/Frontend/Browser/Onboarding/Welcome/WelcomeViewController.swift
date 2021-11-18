@@ -72,7 +72,7 @@ class WelcomeViewController: UIViewController {
     private let calloutView = WelcomeViewCallout(pointsUp: false)
     
     private let iconView = UIImageView().then {
-        $0.image = #imageLiteral(resourceName: "browser_lock_popup")
+        $0.image = #imageLiteral(resourceName: "welcome-view-icon")
         $0.contentMode = .scaleAspectFit
         
         $0.setContentCompressionResistancePriority(.init(rawValue: 100), for: .vertical)
@@ -282,7 +282,7 @@ class WelcomeViewController: UIViewController {
             
             topImageView.transform = topTransform
             bottomImageView.transform = bottomTransform
-            iconView.image = #imageLiteral(resourceName: "browser_lock_popup")
+            iconView.image = #imageLiteral(resourceName: "welcome-view-icon")
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(traitCollection.horizontalSizeClass == .regular ? 250 : 150)
             }
@@ -298,9 +298,6 @@ class WelcomeViewController: UIViewController {
             }
             
             contentContainer.spacing = 0.0
-//            iconView.snp.remakeConstraints {
-//                $0.height.equalTo(100.0)
-//            }
             
             websitesForRegion().forEach { item in
                 searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
