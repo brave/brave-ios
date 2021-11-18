@@ -261,6 +261,7 @@ class WelcomeViewCallout: UIView {
         case .privacy(let title, let details, let buttonTitle, let action):
             titleLabel.do {
                 $0.text = title
+                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -306,6 +307,7 @@ class WelcomeViewCallout: UIView {
             }
             titleLabel.do {
                 $0.text = info.title
+                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -335,7 +337,7 @@ class WelcomeViewCallout: UIView {
                 
             secondaryButton.do {
                 $0.setTitle(info.secondaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .preferredFont(for: .body, weight: .bold)
+                $0.titleLabel?.font = .preferredFont(for: .title3, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     info.secondaryAction()
                 }), for: .touchUpInside)
@@ -358,6 +360,7 @@ class WelcomeViewCallout: UIView {
                 
             titleLabel.do {
                 $0.text = info.title
+                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -412,6 +415,7 @@ class WelcomeViewCallout: UIView {
         case .ready(let title, let details, let moreDetails):
             titleLabel.do {
                 $0.text = title
+                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
