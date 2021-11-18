@@ -136,8 +136,8 @@ struct EditUserAssetsView: View {
       }
       .alert(isPresented: $isPresentingAssetRemovalError) {
         Alert(
-          title: Text(""),
-          message: Text(Strings.Wallet.removeCustomTokenError),
+          title: Text(Strings.Wallet.removeCustomTokenErrorTitle),
+          message: Text(Strings.Wallet.removeCustomTokenErrorMessage),
           dismissButton: .default(Text(Strings.OKString))
         )
       }

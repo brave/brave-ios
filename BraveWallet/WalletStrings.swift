@@ -1352,19 +1352,33 @@ extension Strings {
       value: "Decimals of precision",
       comment: "A title that will be displayed on top of the text field for users to input the custom token's decimals of precision"
     )
-    public static let addCustomTokenError = NSLocalizedString(
-      "wallet.addCustomTokenError",
+    public static let addCustomTokenErrorTitle = NSLocalizedString(
+      "wallet.addCustomTokenErrorTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Cannot add your custom token right now",
-      comment: "The message in the pop up when there is an error occurs during the process of adding a custom token."
+      value: "Cannot add custom token",
+      comment: "The title of the error pop up when there is an error occurs during the process of adding a custom token."
     )
-    public static let removeCustomTokenError = NSLocalizedString(
-      "wallet.removeCustomTokenError",
+    public static let addCustomTokenErrorMessage = NSLocalizedString(
+      "wallet.addCustomTokenErrorMessage",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Cannot remove your custom token right now",
-      comment: "The message in the pop up when there is an error occurs during the process of removing a custom token."
+      value: "Please verify the custom token information, check your internet connection, and try again.",
+      comment: "The message of the error pop up when there is an error occurs during the process of adding a custom token."
+    )
+    public static let removeCustomTokenErrorTitle = NSLocalizedString(
+      "wallet.removeCustomTokenErrorTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Cannot remove custom token",
+      comment: "The title of the error pop up when there is an error occurs during the process of removing a custom token."
+    )
+    public static let removeCustomTokenErrorMessage = NSLocalizedString(
+      "wallet.removeCustomTokenErrorMessage",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Please verify this is a new custom asset, check your internet connection, and try again.",
+      comment: "The message in the error pop up when there is an error occurs during the process of removing a custom token."
     )
     public static let addCustomAsset = NSLocalizedString(
       "wallet.addCustomAsset",

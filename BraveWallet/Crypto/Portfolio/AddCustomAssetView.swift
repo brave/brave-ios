@@ -71,8 +71,8 @@ struct AddCustomAssetView: View {
         }
         .alert(isPresented: $showError) {
           Alert(
-            title: Text(""),
-            message: Text(Strings.Wallet.addCustomTokenError),
+            title: Text(Strings.Wallet.addCustomTokenErrorTitle),
+            message: Text(Strings.Wallet.addCustomTokenErrorMessage),
             dismissButton: .default(Text(Strings.OKString))
           )
         }
