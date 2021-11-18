@@ -14,7 +14,7 @@ struct PrivacyEverywhereView: View {
     var syncNow: (() -> Void)?
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             HStack {
                 Spacer()
                 Button {
@@ -39,16 +39,19 @@ struct PrivacyEverywhereView: View {
                 syncNow?()
             }) {
                 Text(Strings.Callout.privacyEverywhereCalloutPrimaryButtonTitle)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .font(.title3.weight(.medium))
                     .padding()
             }
-            .buttonStyle(BraveFilledButtonStyle(size: .small))
-            .foregroundColor(Color(.braveBlurple))
+            .frame(height: 44)
+            .background(Color(.braveBlurple))
+            .accentColor(Color(.white))
+            .clipShape(Capsule())
         }
         .frame(maxWidth: BraveUX.baseDimensionValue)
         .padding()
         .background(Color(.braveBackground))
+        .cornerRadius(16)
     }
 }
 
