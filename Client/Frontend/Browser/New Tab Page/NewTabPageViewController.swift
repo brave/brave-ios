@@ -252,9 +252,7 @@ class NewTabPageViewController: UIViewController {
         presentNotification()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
-            if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
-                self.delegate?.showNTPOnboarding()
-            }
+            self.delegate?.showNTPOnboarding()
         }
     }
     
