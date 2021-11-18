@@ -19,6 +19,7 @@ private enum WelcomeViewID: Int {
     case searchView = 6
     case bottomImage = 7
     case skipButton = 8
+    case iconBackground = 9
 }
 
 class WelcomeViewController: UIViewController {
@@ -74,8 +75,12 @@ class WelcomeViewController: UIViewController {
     private let iconView = UIImageView().then {
         $0.image = #imageLiteral(resourceName: "welcome-view-icon")
         $0.contentMode = .scaleAspectFit
-        
         $0.setContentCompressionResistancePriority(.init(rawValue: 100), for: .vertical)
+    }
+    
+    private let iconBackgroundView = UIImageView().then {
+        $0.image = #imageLiteral(resourceName: "welcome-view-icon-background")
+        $0.contentMode = .scaleAspectFit
     }
     
     private let searchView = WelcomeViewSearchView().then {
@@ -132,6 +137,7 @@ class WelcomeViewController: UIViewController {
         searchView.tag = WelcomeViewID.searchView.rawValue
         bottomImageView.tag = WelcomeViewID.bottomImage.rawValue
         skipButton.tag = WelcomeViewID.skipButton.rawValue
+        iconBackgroundView.tag = WelcomeViewID.iconBackground.rawValue
         
         skipButton.addTarget(self, action: #selector(onSkipButtonPressed(_:)), for: .touchUpInside)
         
@@ -146,6 +152,8 @@ class WelcomeViewController: UIViewController {
         [backgroundImageView, topImageView, bottomImageView, scrollView, skipButton].forEach {
             view.addSubview($0)
         }
+        
+        view.insertSubview(iconBackgroundView, belowSubview: scrollView)
         
         scrollView.addSubview(stack)
         scrollView.snp.makeConstraints {
@@ -169,6 +177,12 @@ class WelcomeViewController: UIViewController {
         
         [calloutView, iconView, searchView].forEach {
             contentContainer.addArrangedSubview($0)
+        }
+        
+        iconBackgroundView.snp.makeConstraints {
+            $0.center.equalTo(iconView.snp.center)
+            $0.width.equalTo(iconView.snp.width).multipliedBy(2.25)
+            $0.height.equalTo(iconView.snp.height).multipliedBy(2.25)
         }
         
         backgroundImageView.snp.makeConstraints {
@@ -199,6 +213,7 @@ class WelcomeViewController: UIViewController {
             bottomImageView.transform = .identity
             iconView.transform = .identity
             contentContainer.spacing = 25.0
+            iconBackgroundView.alpha = 1.0
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(150.0)
             }
@@ -223,6 +238,7 @@ class WelcomeViewController: UIViewController {
             bottomImageView.transform = bottomTransform
             skipButton.alpha = 1.0
             contentContainer.spacing = 25.0
+            iconBackgroundView.alpha = 1.0
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(150.0)
             }
@@ -248,6 +264,7 @@ class WelcomeViewController: UIViewController {
             iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
             skipButton.alpha = 1.0
             contentContainer.spacing = 0.0
+            iconBackgroundView.alpha = 0.0
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(200.0)
             }
@@ -272,6 +289,7 @@ class WelcomeViewController: UIViewController {
             bottomImageView.transform = bottomTransform
             iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
             contentContainer.spacing = 0.0
+            iconBackgroundView.alpha = 0.0
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(200.0)
             }
@@ -295,6 +313,8 @@ class WelcomeViewController: UIViewController {
             topImageView.transform = topTransform
             bottomImageView.transform = bottomTransform
             iconView.image = #imageLiteral(resourceName: "welcome-view-icon")
+            contentContainer.spacing = 0.0
+            iconBackgroundView.alpha = 1.0
             iconView.snp.remakeConstraints {
                 $0.height.equalTo(traitCollection.horizontalSizeClass == .regular ? 250 : 150)
             }
@@ -309,7 +329,11 @@ class WelcomeViewController: UIViewController {
                 $0.isHidden = false
             }
             
-            contentContainer.spacing = 0.0
+            iconBackgroundView.snp.makeConstraints {
+                $0.center.equalTo(iconView.snp.center)
+                $0.width.equalTo(iconView.snp.width).multipliedBy(2.25)
+                $0.height.equalTo(iconView.snp.height).multipliedBy(2.25)
+            }
             
             websitesForRegion().forEach { item in
                 searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
@@ -346,7 +370,8 @@ class WelcomeViewController: UIViewController {
     
     private func animateToDefaultBrowserState() {
         let nextController = WelcomeViewController(profile: profile,
-                                                   rewards: rewards)
+                                                   rewards: rewards,
+                                                   state: nil)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
         let state = WelcomeViewCalloutState.defaultBrowser(
             info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
@@ -366,9 +391,9 @@ class WelcomeViewController: UIViewController {
     }
     
     private func animateToReadyState() {
-        let nextController = WelcomeViewController(
-            profile: profile,
-            rewards: rewards)
+        let nextController = WelcomeViewController(profile: profile,
+                                                   rewards: rewards,
+                                                   state: nil)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
         let state = WelcomeViewCalloutState.ready(
             title: Strings.Onboarding.readyScreenTitle,
@@ -558,6 +583,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         let contentContainer: UIView
         let calloutView: UIView
         let iconView: UIView
+        let iconBackgroundView: UIView
         let searchEnginesView: UIView
         let bottomImageView: UIView
         let skipButton: UIView
@@ -569,6 +595,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                 contentContainer,
                 calloutView,
                 iconView,
+                iconBackgroundView,
                 searchEnginesView,
                 bottomImageView,
                 skipButton
@@ -581,6 +608,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                   let contentContainer = view.subview(with: WelcomeViewID.contents.rawValue),
                   let calloutView = view.subview(with: WelcomeViewID.callout.rawValue),
                   let iconView = view.subview(with: WelcomeViewID.iconView.rawValue),
+                  let iconBackgroundView = view.subview(with: WelcomeViewID.iconBackground.rawValue),
                   let searchEnginesView = view.subview(with: WelcomeViewID.searchView.rawValue),
                   let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue),
                   let skipButton = view.subview(with: WelcomeViewID.skipButton.rawValue) else {
@@ -592,6 +620,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             self.contentContainer = contentContainer
             self.calloutView = calloutView
             self.iconView = iconView
+            self.iconBackgroundView = iconBackgroundView
             self.searchEnginesView = searchEnginesView
             self.bottomImageView = bottomImageView
             self.skipButton = skipButton
@@ -675,7 +704,9 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         // Do animations
         for e in fromViews.enumerated() {
             let fromView = e.element
+            var toAlpha = 0.0
             let toView = toViews[e.offset].then {
+                toAlpha = $0.alpha
                 $0.alpha = 0.0
             }
             
@@ -688,7 +719,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                 UIView.animate(withDuration: totalAnimationTime, delay: 0.0, options: .curveEaseInOut) {
                     fromView.transform = toView.transform
                 } completion: { finished in
-                    
+                    toView.alpha = toAlpha
                 }
             } else {
                 POPBasicAnimation(propertyNamed: kPOPViewFrame)?.do {
@@ -703,7 +734,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                                delay: 0.0,
                                options: [.curveEaseInOut]) {
                     fromView.alpha = 0.0
-                    toView.alpha = 1.0
+                    toView.alpha = toAlpha
                 } completion: { finished in
                     
                 }
@@ -716,9 +747,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + totalAnimationTime) {
-            for view in toViews {
-                view.alpha = 1.0
-            }
+            toWelcomeView.backgroundImageView.alpha = 1.0
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
         }
     }
