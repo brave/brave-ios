@@ -43,7 +43,7 @@ struct AddCustomAssetView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.decimalsPrecision))
         ) {
-          TextField(Strings.Wallet.decimalsPrecisionPlaceholder, text: $decimalsInput)
+          TextField(NumberFormatter().string(from: NSNumber(value: 0)) ?? "0", text: $decimalsInput)
             .keyboardType(.numberPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -64,7 +64,7 @@ struct AddCustomAssetView: View {
               resignFirstResponder()
               addCustomToken()
             }) {
-              Text(Strings.Wallet.customTokenAdd)
+              Text(Strings.Wallet.add)
                 .foregroundColor(Color(.braveOrange))
             }
           }

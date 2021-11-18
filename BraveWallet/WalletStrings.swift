@@ -197,12 +197,12 @@ extension Strings {
       value: "Add Account",
       comment: "The title of the add account screen"
     )
-    public static let addAccountAddButton = NSLocalizedString(
+    public static let add = NSLocalizedString(
       "wallet.addAccountAddButton",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Add",
-      comment: "The title of the button which when tapped will add a new account to the users list of crypto accounts"
+      comment: "The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree."
     )
     public static let failedToImportAccountErrorTitle = NSLocalizedString(
       "wallet.failedToImportAccountErrorTitle",
@@ -1351,20 +1351,6 @@ extension Strings {
       bundle: .braveWallet,
       value: "Decimals of precision",
       comment: "A title that will be displayed on top of the text field for users to input the custom token's decimals of precision"
-    )
-    public static let decimalsPrecisionPlaceholder = NSLocalizedString(
-      "wallet.decimalsPrecisionPlaceholder",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "0",
-      comment: "A placeholder for the text field that users will input the custom token's decimals of precision"
-    )
-    public static let customTokenAdd = NSLocalizedString(
-      "wallet.customTokenAdd",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "Add",
-      comment: "The title of the navigation bar item button on the top right of the add custom token screen"
     )
     public static let addCustomTokenError = NSLocalizedString(
       "wallet.addCustomTokenError",

@@ -7,6 +7,7 @@ import Foundation
 import SwiftUI
 import struct Shared.Strings
 import BraveShared
+import BraveCore
 
 private struct EditTokenView: View {
   @ObservedObject var assetStore: AssetStore
@@ -40,8 +41,8 @@ struct EditUserAssetsView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var query = ""
-  @State private var showCustomAsset = false
-  @State private var showError = false
+  @State private var isAddingCustomAsset = false
+  @State private var isPresentingAssetRemovalError = false
   
   private var tokenStores: [AssetStore] {
     let query = query.lowercased()
@@ -67,7 +68,7 @@ struct EditUserAssetsView: View {
             )
             Spacer()
             Button(action: {
-              showCustomAsset = true
+              isAddingCustomAsset = true
             }) {
               Text(Strings.Wallet.addCustomAsset)
                 .font(.footnote.weight(.bold))
@@ -85,18 +86,14 @@ struct EditUserAssetsView: View {
             }
         ) {
           ForEach(tokenStores, id: \.token.id) { store in
-            EditTokenView(assetStore: store)
-              .osAvailabilityModifiers { content in
-                if !store.isCustomToken {
-                  content
-                } else {
+            if store.isCustomToken {
+              EditTokenView(assetStore: store)
+                .osAvailabilityModifiers { content in
                   if #available(iOS 15.0, *) {
                     content
                       .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
-                          userAssetsStore.removeUserAsset(token: store.token) { [self] success in
-                            showError = !success
-                          }
+                          removeCustomToken(store.token)
                         } label: {
                           Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
                         }
@@ -105,16 +102,16 @@ struct EditUserAssetsView: View {
                     content
                       .contextMenu {
                         Button {
-                          userAssetsStore.removeUserAsset(token: store.token) { [self] success in
-                            showError = !success
-                          }
+                          removeCustomToken(store.token)
                         } label: {
                           Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
                         }
                       }
                   }
                 }
-              }
+            } else {
+              EditTokenView(assetStore: store)
+            }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -134,10 +131,10 @@ struct EditUserAssetsView: View {
           }
         }
       }
-      .sheet(isPresented: $showCustomAsset) {
+      .sheet(isPresented: $isAddingCustomAsset) {
         AddCustomAssetView(userAssetStore: userAssetsStore)
       }
-      .alert(isPresented: $showError) {
+      .alert(isPresented: $isPresentingAssetRemovalError) {
         Alert(
           title: Text(""),
           message: Text(Strings.Wallet.removeCustomTokenError),
@@ -146,6 +143,12 @@ struct EditUserAssetsView: View {
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
+  }
+  
+  private func removeCustomToken(_ token: BraveWallet.ERCToken) {
+    userAssetsStore.removeUserAsset(token: token) { [self] success in
+      isPresentingAssetRemovalError = !success
+    }
   }
 }
 
