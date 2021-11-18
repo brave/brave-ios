@@ -85,7 +85,6 @@ class WelcomeViewCallout: UIView {
         $0.textAlignment = .center
         $0.numberOfLines = 0
         $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         $0.setContentHuggingPriority(.required, for: .vertical)
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
@@ -118,15 +117,8 @@ class WelcomeViewCallout: UIView {
             }
         }
         
-        let leftSpacer = UIView()
-        let rightSpacer = UIView()
-
-        [leftSpacer, secondaryLabel, secondaryButton, rightSpacer].forEach {
+        [secondaryLabel, secondaryButton].forEach {
             secondaryButtonContentView.addArrangedSubview($0)
-        }
-        
-        leftSpacer.snp.makeConstraints {
-            $0.width.equalTo(rightSpacer.snp.width)
         }
         
         [titleLabel, detailsLabel].forEach {
@@ -269,7 +261,6 @@ class WelcomeViewCallout: UIView {
         case .privacy(let title, let details, let buttonTitle, let action):
             titleLabel.do {
                 $0.text = title
-                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -315,7 +306,6 @@ class WelcomeViewCallout: UIView {
             }
             titleLabel.do {
                 $0.text = info.title
-                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -368,7 +358,6 @@ class WelcomeViewCallout: UIView {
                 
             titleLabel.do {
                 $0.text = info.title
-                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
@@ -397,6 +386,9 @@ class WelcomeViewCallout: UIView {
                 $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
+                $0.numberOfLines = 1
+                $0.minimumScaleFactor = 0.7
+                $0.adjustsFontSizeToFitWidth = true
             }
             
             secondaryButton.do {
@@ -420,7 +412,6 @@ class WelcomeViewCallout: UIView {
         case .ready(let title, let details, let moreDetails):
             titleLabel.do {
                 $0.text = title
-                $0.textAlignment = .left
                 $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
