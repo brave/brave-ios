@@ -341,7 +341,7 @@ class WelcomeViewController: UIViewController {
         let nextController = WelcomeViewController(profile: profile,
                                                    rewards: rewards)
         nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-        let state = WelcomeViewCalloutState.defaultBrowserCallout(
+        let state = WelcomeViewCalloutState.defaultBrowser(
             info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
                 title: Strings.Callout.defaultBrowserCalloutTitle,
                 details: Strings.Callout.defaultBrowserCalloutDescription,
