@@ -148,19 +148,18 @@ class WelcomeViewController: UIViewController {
         }
         
         scrollView.addSubview(stack)
-        
-        scrollView.contentLayoutGuide.snp.makeConstraints {
-            $0.top.bottom.equalTo(stack)
-            $0.width.equalToSuperview()
-        }
-        
         scrollView.snp.makeConstraints {
             $0.leading.trailing.top.equalToSuperview()
             $0.bottom.equalTo(skipButton).inset(16)
         }
+        
+        scrollView.contentLayoutGuide.snp.makeConstraints {
+            $0.width.equalTo(scrollView.frameLayoutGuide.snp.width)
+            $0.height.greaterThanOrEqualTo(scrollView.frameLayoutGuide.snp.height)
+        }
 
         stack.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.edges.equalTo(scrollView.contentLayoutGuide.snp.edges)
         }
         
         stack.addStackViewItems(
