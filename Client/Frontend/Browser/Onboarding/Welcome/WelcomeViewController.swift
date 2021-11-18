@@ -150,7 +150,7 @@ class WelcomeViewController: UIViewController {
             .view(contentContainer),
             .view(UIView.spacer(.vertical, amount: 1)))
         
-        [calloutView, iconView].forEach {
+        [calloutView, iconView, searchView].forEach {
             contentContainer.addArrangedSubview($0)
         }
         
