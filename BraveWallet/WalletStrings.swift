@@ -1296,5 +1296,103 @@ extension Strings {
       value: "Unknown",
       comment: "A transaction status that the app currently does not support displaying"
     )
+    public static let customTokenTitle = NSLocalizedString(
+      "wallet.customTokenTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Custom",
+      comment: "The title displayed on the add custom token screen"
+    )
+    public static let tokenName = NSLocalizedString(
+      "wallet.tokenName",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Token name",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token name"
+    )
+    public static let enterTokenName = NSLocalizedString(
+      "wallet.enterTokenName",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Enter token name",
+      comment: "A placeholder for the text field that users will input the custom token name"
+    )
+    public static let tokenContractAddress = NSLocalizedString(
+      "wallet.tokenContractAddress",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Token contract address",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token contract address"
+    )
+    public static let enterContractAddress = NSLocalizedString(
+      "wallet.enterContractAddress",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Enter contract address",
+      comment: "A placeholder for the text field that users will input the custom token contract address"
+    )
+    public static let tokenSymbol = NSLocalizedString(
+      "wallet.tokenSymbol",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Token symbol",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token symbol"
+    )
+    public static let enterTokenSymbol = NSLocalizedString(
+      "wallet.enterTokenSymbol",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Enter token symbol",
+      comment: "A placeholder for the text field that users will input the custom token symbol"
+    )
+    public static let decimalsPrecision = NSLocalizedString(
+      "wallet.decimalsPrecision",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Decimals of precision",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token's decimals of precision"
+    )
+    public static let decimalsPrecisionPlaceholder = NSLocalizedString(
+      "wallet.decimalsPrecisionPlaceholder",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "0",
+      comment: "A placeholder for the text field that users will input the custom token's decimals of precision"
+    )
+    public static let customTokenAdd = NSLocalizedString(
+      "wallet.customTokenAdd",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Add",
+      comment: "The title of the navigation bar item button on the top right of the add custom token screen"
+    )
+    public static let addCustomTokenError = NSLocalizedString(
+      "wallet.addCustomTokenError",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Cannot add your custom token right now",
+      comment: "The message in the pop up when there is an error occurs during the process of adding a custom token."
+    )
+    public static let removeCustomTokenError = NSLocalizedString(
+      "wallet.removeCustomTokenError",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Cannot remove your custom token right now",
+      comment: "The message in the pop up when there is an error occurs during the process of removing a custom token."
+    )
+    public static let addCustomAsset = NSLocalizedString(
+      "wallet.addCustomAsset",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Add custom asset",
+      comment: "The title of the button that is located in the same area of the assets list header but on the right side. Users will click it and go to add custom asset screen."
+    )
+    public static let deleteCustomToken = NSLocalizedString(
+      "wallet.deleteCustomToken",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Delete",
+      comment: "The title of the option inside the context menu for custom asset row in edit user asset screen."
+    )
   }
 }

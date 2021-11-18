@@ -40,6 +40,8 @@ struct EditUserAssetsView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var query = ""
+  @State private var showCustomAsset = false
+  @State private var showError = false
   
   private var tokenStores: [AssetStore] {
     let query = query.lowercased()
@@ -59,9 +61,20 @@ struct EditUserAssetsView: View {
     NavigationView {
       List {
         Section(
-          header: WalletListHeaderView(
-            title: Text(Strings.Wallet.assetsTitle)
-          )
+          header: HStack {
+            WalletListHeaderView(
+              title: Text(Strings.Wallet.assetsTitle)
+            )
+            Spacer()
+            Button(action: {
+              showCustomAsset = true
+            }) {
+              Text(Strings.Wallet.addCustomAsset)
+                .font(.footnote.weight(.bold))
+                .textCase(.none)
+                .foregroundColor(Color(.braveBlurpleTint))
+            }
+          }
             .osAvailabilityModifiers { content in
               if #available(iOS 15.0, *) {
                 content // Padding already applied
@@ -73,6 +86,35 @@ struct EditUserAssetsView: View {
         ) {
           ForEach(tokenStores, id: \.token.id) { store in
             EditTokenView(assetStore: store)
+              .osAvailabilityModifiers { content in
+                if !store.isCustomToken {
+                  content
+                } else {
+                  if #available(iOS 15.0, *) {
+                    content
+                      .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                          userAssetsStore.removeUserAsset(token: store.token) { [self] success in
+                            showError = !success
+                          }
+                        } label: {
+                          Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
+                        }
+                      }
+                  } else {
+                    content
+                      .contextMenu {
+                        Button {
+                          userAssetsStore.removeUserAsset(token: store.token) { [self] success in
+                            showError = !success
+                          }
+                        } label: {
+                          Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
+                        }
+                      }
+                  }
+                }
+              }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -91,6 +133,16 @@ struct EditUserAssetsView: View {
               .foregroundColor(Color(.braveOrange))
           }
         }
+      }
+      .sheet(isPresented: $showCustomAsset) {
+        AddCustomAssetView(userAssetStore: userAssetsStore)
+      }
+      .alert(isPresented: $showError) {
+        Alert(
+          title: Text(""),
+          message: Text(Strings.Wallet.removeCustomTokenError),
+          dismissButton: .default(Text(Strings.OKString))
+        )
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
