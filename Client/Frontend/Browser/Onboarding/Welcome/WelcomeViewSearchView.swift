@@ -84,7 +84,7 @@ private class SearchEngineButton: RoundInterfaceButton {
     private let titleView = UILabel().then {
         $0.textAlignment = .left
         $0.textColor = .bravePrimary
-        $0.font = .systemFont(ofSize: 17)
+        $0.font = .preferredFont(forTextStyle: .body)
         $0.isUserInteractionEnabled = false
     }
     

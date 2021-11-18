@@ -141,8 +141,26 @@ class WelcomeViewController: UIViewController {
             $0.setContentHuggingPriority(.init(rawValue: 5), for: .vertical)
         }
         
-        [backgroundImageView, topImageView, bottomImageView, stack, skipButton].forEach {
+        let scrollView = UIScrollView()
+        
+        [backgroundImageView, topImageView, bottomImageView, scrollView, skipButton].forEach {
             view.addSubview($0)
+        }
+        
+        scrollView.addSubview(stack)
+        
+        scrollView.contentLayoutGuide.snp.makeConstraints {
+            $0.top.bottom.equalTo(stack)
+            $0.width.equalToSuperview()
+        }
+        
+        scrollView.snp.makeConstraints {
+            $0.leading.trailing.top.equalToSuperview()
+            $0.bottom.equalTo(skipButton).inset(16)
+        }
+
+        stack.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         stack.addStackViewItems(
@@ -161,15 +179,10 @@ class WelcomeViewController: UIViewController {
         topImageView.snp.makeConstraints {
             $0.leading.trailing.top.equalToSuperview()
         }
-        
-        stack.snp.makeConstraints {
-            $0.leading.trailing.top.equalToSuperview()
-            $0.bottom.equalTo(skipButton).inset(16)
-        }
-        
+                
         skipButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(30.0)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
             $0.height.equalTo(48.0)
         }
         
