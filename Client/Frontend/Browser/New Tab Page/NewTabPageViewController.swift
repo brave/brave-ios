@@ -227,10 +227,6 @@ class NewTabPageViewController: UIViewController {
                 }
             }
         }
-        
-        if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
-            delegate?.showNTPOnboarding()
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -254,6 +250,12 @@ class NewTabPageViewController: UIViewController {
         
         reportSponsoredImageBackgroundEvent(.viewed)
         presentNotification()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
+            if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+                self.delegate?.showNTPOnboarding()
+            }
+        }
     }
     
     override func viewSafeAreaInsetsDidChange() {

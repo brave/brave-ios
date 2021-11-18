@@ -95,6 +95,7 @@ extension BrowserViewController {
         popover.popoverDidDismiss = { [weak self] _ in
             maskShape.removeFromSuperlayer()
             borderView.removeFromSuperview()
+            Preferences.FullScreenCallout.ntpCalloutCompleted.value = true
             self?.presentNTPMenuOnboarding()
         }
         

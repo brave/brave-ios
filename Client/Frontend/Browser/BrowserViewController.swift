@@ -2824,7 +2824,7 @@ extension BrowserViewController: NewTabPageDelegate {
     }
     
     func showNTPOnboarding() {
-        if Preferences.General.isNewRetentionUser.value == true {
+        if Preferences.General.isNewRetentionUser.value == true, !topToolbar.inOverlayMode {
             presentNTPStatsOnboarding()
         }
     }
