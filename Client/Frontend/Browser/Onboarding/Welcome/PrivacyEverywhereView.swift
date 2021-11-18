@@ -26,12 +26,13 @@ struct PrivacyEverywhereView: View {
             }
             VStack(spacing: 10) {
                 Text(Strings.Callout.privacyEverywhereCalloutTitle)
-                    .font(.title3.weight(.medium))
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundColor(Color(.bravePrimary))
                 Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-image"))
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                 Text(Strings.Callout.privacyEverywhereCalloutDescription)
+                    .font(.system(size: 16))
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color(.bravePrimary))
             }
@@ -40,7 +41,7 @@ struct PrivacyEverywhereView: View {
             }) {
                 Text(Strings.Callout.privacyEverywhereCalloutPrimaryButtonTitle)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .font(.title3.weight(.medium))
+                    .font(.system(size: 16))
                     .padding()
             }
             .frame(height: 44)

@@ -53,6 +53,7 @@ class WelcomeViewCallout: UIView {
         $0.textColor = .bravePrimary
         $0.textAlignment = .center
         $0.numberOfLines = 0
+        $0.font = .systemFont(ofSize: 17, weight: .bold)
         $0.minimumScaleFactor = 0.5
         $0.adjustsFontSizeToFitWidth = true
     }
@@ -61,6 +62,7 @@ class WelcomeViewCallout: UIView {
         $0.textColor = .bravePrimary
         $0.textAlignment = .left
         $0.numberOfLines = 0
+        $0.font = .systemFont(ofSize: 16)
         $0.minimumScaleFactor = 0.5
         $0.adjustsFontSizeToFitWidth = true
         $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
@@ -68,6 +70,7 @@ class WelcomeViewCallout: UIView {
     
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
         $0.setTitleColor(.white, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 16)
         $0.backgroundColor = .braveBlurple
     }
     
@@ -228,7 +231,7 @@ class WelcomeViewCallout: UIView {
             titleLabel.do {
                 $0.text = title
                 $0.textAlignment = .center
-                $0.font = .preferredFont(for: .title1, weight: .semibold)
+                $0.font = .systemFont(ofSize: 28, weight: .medium)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
@@ -261,21 +264,18 @@ class WelcomeViewCallout: UIView {
         case .privacy(let title, let details, let buttonTitle, let action):
             titleLabel.do {
                 $0.text = title
-                $0.font = .preferredFont(for: .title3, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = details
-                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
                 $0.setTitle(buttonTitle, for: .normal)
-                $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
                     action()
                 }), for: .touchUpInside)
@@ -306,21 +306,19 @@ class WelcomeViewCallout: UIView {
             }
             titleLabel.do {
                 $0.text = info.title
-                $0.font = .preferredFont(for: .title3, weight: .bold)
+                $0.font = .systemFont(ofSize: 17, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = info.details
-                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
                 $0.setTitle(info.primaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
                     info.primaryAction()
                 }), for: .touchUpInside)
@@ -335,7 +333,6 @@ class WelcomeViewCallout: UIView {
                 
             secondaryButton.do {
                 $0.setTitle(info.secondaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .preferredFont(for: .body, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     info.secondaryAction()
                 }), for: .touchUpInside)
@@ -358,21 +355,19 @@ class WelcomeViewCallout: UIView {
                 
             titleLabel.do {
                 $0.text = info.title
-                $0.font = .preferredFont(for: .title3, weight: .bold)
+                $0.font = .systemFont(ofSize: 17, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = info.details
-                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             primaryButton.do {
                 $0.setTitle(info.primaryButtonTitle, for: .normal)
-                $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
                 $0.addAction(UIAction(identifier: .init(rawValue: "primary.action"), handler: { _ in
                     info.primaryAction()
                 }), for: .touchUpInside)
@@ -383,7 +378,6 @@ class WelcomeViewCallout: UIView {
             secondaryLabel.do {
                 $0.text = Strings.Callout.defaultBrowserCalloutSecondaryButtonDescription
                 $0.textAlignment = .right
-                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
                 $0.numberOfLines = 1
@@ -393,7 +387,6 @@ class WelcomeViewCallout: UIView {
             
             secondaryButton.do {
                 $0.setTitle(info.secondaryButtonTitle, for: .normal)
-                    $0.titleLabel?.font = .preferredFont(for: .title3, weight: .bold)
                 $0.addAction(UIAction(identifier: .init(rawValue: "secondary.action"), handler: { _ in
                     info.secondaryAction()
                 }), for: .touchUpInside)
@@ -412,14 +405,13 @@ class WelcomeViewCallout: UIView {
         case .ready(let title, let details, let moreDetails):
             titleLabel.do {
                 $0.text = title
-                $0.font = .preferredFont(for: .title3, weight: .bold)
+                $0.font = .systemFont(ofSize: 17, weight: .bold)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
             
             detailsLabel.do {
                 $0.text = "\(details)\n\(moreDetails)"
-                $0.font = .preferredFont(forTextStyle: .body)
                 $0.alpha = 1.0
                 $0.isHidden = false
             }
