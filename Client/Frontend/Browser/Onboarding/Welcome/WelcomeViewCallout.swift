@@ -53,16 +53,16 @@ class WelcomeViewCallout: UIView {
         $0.textColor = .bravePrimary
         $0.textAlignment = .center
         $0.numberOfLines = 0
-        $0.setContentHuggingPriority(.required, for: .vertical)
-        $0.setContentCompressionResistancePriority(.required, for: .vertical)
+        $0.setContentHuggingPriority(.init(rawValue: 800), for: .vertical)
+        $0.setContentCompressionResistancePriority(.init(rawValue: 800), for: .vertical)
     }
     
     private let detailsLabel = UILabel().then {
         $0.textColor = .bravePrimary
         $0.textAlignment = .left
         $0.numberOfLines = 0
-        $0.setContentHuggingPriority(.required, for: .vertical)
-        $0.setContentCompressionResistancePriority(.required, for: .vertical)
+        $0.setContentHuggingPriority(.init(rawValue: 801), for: .vertical)
+        $0.setContentCompressionResistancePriority(.init(rawValue: 801), for: .vertical)
     }
     
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
@@ -130,10 +130,6 @@ class WelcomeViewCallout: UIView {
         
         [titleLabel, detailsLabel].forEach {
             $0.contentMode = pointsUp ? .bottom : .top
-            
-            $0.snp.makeConstraints {
-                $0.height.greaterThanOrEqualTo(17.0)
-            }
         }
     }
     

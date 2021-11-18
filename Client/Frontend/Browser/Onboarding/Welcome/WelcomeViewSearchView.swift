@@ -18,22 +18,20 @@ class WelcomeViewSearchView: UIView {
         static let scrollViewWidth = BraveUX.baseDimensionValue
     }
     
-    private let scrollView = UIScrollView()
-    
     private let contentView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = DesignUX.padding
         $0.layoutMargins = UIEdgeInsets(equalInset: DesignUX.contentPadding)
         $0.isLayoutMarginsRelativeArrangement = true
+        $0.setContentHuggingPriority(.required, for: .vertical)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(scrollView)
-        scrollView.addSubview(contentView)
+        addSubview(contentView)
         
-        scrollView.snp.makeConstraints {
+        contentView.snp.makeConstraints {
             if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
                 $0.edges.equalToSuperview()
             } else {
@@ -41,15 +39,7 @@ class WelcomeViewSearchView: UIView {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)            }
         }
-        
-        scrollView.contentLayoutGuide.snp.makeConstraints {
-            $0.top.bottom.equalTo(contentView)
-            $0.width.equalToSuperview()
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+
     }
     
     required init?(coder: NSCoder) {

@@ -69,15 +69,24 @@ class WelcomeViewController: UIViewController {
         $0.isLayoutMarginsRelativeArrangement = true
     }
     
-    private let calloutView = WelcomeViewCallout(pointsUp: false)
+    private let calloutView = WelcomeViewCallout(pointsUp: false).then {
+        $0.setContentCompressionResistancePriority(.init(rawValue: 900), for: .vertical)
+        $0.setContentHuggingPriority(.init(rawValue: 50), for: .vertical)
+    }
     
     private let iconView = UIImageView().then {
-        $0.image = #imageLiteral(resourceName: "welcome-view-icon")
-        $0.contentMode = .scaleAspectFill
+        $0.image = #imageLiteral(resourceName: "browser_lock_popup")
+        $0.contentMode = .scaleAspectFit
+        $0.snp.remakeConstraints {
+            $0.height.equalTo(100)
+        }
+        $0.setContentCompressionResistancePriority(.init(rawValue: 100), for: .vertical)
     }
     
     private let searchView = WelcomeViewSearchView().then {
         $0.isHidden = true
+        $0.setContentHuggingPriority(.required, for: .vertical)
+        $0.setContentCompressionResistancePriority(.init(rawValue: 800), for: .vertical)
     }
     
     private let bottomImageView = UIImageView().then {
@@ -97,8 +106,12 @@ class WelcomeViewController: UIViewController {
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
-    private let topSpacer = UIView()
-    private let bottomSpacer = UIView()
+    private let topSpacer = UIView().then {
+        $0.setContentCompressionResistancePriority(.init(rawValue: 30), for: .vertical)
+    }
+    private let bottomSpacer = UIView().then {
+        $0.setContentCompressionResistancePriority(.init(rawValue: 29), for: .vertical)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -138,7 +151,7 @@ class WelcomeViewController: UIViewController {
             view.addSubview($0)
         }
         
-        [calloutView, iconView, searchView].forEach {
+        [calloutView, iconView].forEach {
             contentContainer.addArrangedSubview($0)
         }
         
@@ -153,6 +166,7 @@ class WelcomeViewController: UIViewController {
         topSpacer.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.height.greaterThanOrEqualTo(10)
         }
         
         contentContainer.snp.makeConstraints {
@@ -283,7 +297,10 @@ class WelcomeViewController: UIViewController {
             
             topImageView.transform = topTransform
             bottomImageView.transform = bottomTransform
-            iconView.image = #imageLiteral(resourceName: "welcome-view-ready-icon")
+            iconView.image = #imageLiteral(resourceName: "browser_lock_popup")
+            iconView.snp.remakeConstraints {
+                $0.height.equalTo(150.0).priority(.low)
+            }
             skipButton.alpha = 1.0
             
             contentContainer.arrangedSubviews.forEach {
@@ -296,13 +313,9 @@ class WelcomeViewController: UIViewController {
             }
             
             contentContainer.spacing = 0.0
-            iconView.snp.remakeConstraints {
-                $0.height.equalTo(100.0)
-            }
-            
-            searchView.snp.remakeConstraints {
-                $0.height.equalTo(240.0)
-            }
+//            iconView.snp.remakeConstraints {
+//                $0.height.equalTo(100.0)
+//            }
             
             websitesForRegion().forEach { item in
                 searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
