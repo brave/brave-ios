@@ -32,7 +32,7 @@ struct PrivacyEverywhereView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                 Text(Strings.Callout.privacyEverywhereCalloutDescription)
-                    .font(.system(size: 16))
+                    .font(.system(size: 17))
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color(.bravePrimary))
             }
@@ -41,7 +41,7 @@ struct PrivacyEverywhereView: View {
             }) {
                 Text(Strings.Callout.privacyEverywhereCalloutPrimaryButtonTitle)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .font(.system(size: 16))
+                    .font(.system(size: 20, weight: .medium))
                     .padding()
             }
             .frame(height: 44)
