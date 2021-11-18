@@ -237,7 +237,7 @@ class WelcomeViewController: UIViewController {
             skipButton.alpha = 1.0
             contentContainer.spacing = 0.0
             iconView.snp.remakeConstraints {
-                $0.height.equalTo(150.0)
+                $0.height.equalTo(200.0)
             }
             calloutView.setState(state: state)
             
@@ -261,7 +261,7 @@ class WelcomeViewController: UIViewController {
             iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
             contentContainer.spacing = 0.0
             iconView.snp.remakeConstraints {
-                $0.height.equalTo(150.0)
+                $0.height.equalTo(200.0)
             }
             calloutView.setState(state: state)
             
