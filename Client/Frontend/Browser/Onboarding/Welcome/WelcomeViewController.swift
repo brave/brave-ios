@@ -64,22 +64,17 @@ class WelcomeViewController: UIViewController {
     
     private let contentContainer = UIStackView().then {
         $0.axis = .vertical
-        $0.spacing = 10.0
+        $0.spacing = 8
         $0.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
         $0.isLayoutMarginsRelativeArrangement = true
     }
     
-    private let calloutView = WelcomeViewCallout(pointsUp: false).then {
-        $0.setContentCompressionResistancePriority(.init(rawValue: 900), for: .vertical)
-        $0.setContentHuggingPriority(.init(rawValue: 50), for: .vertical)
-    }
+    private let calloutView = WelcomeViewCallout(pointsUp: false)
     
     private let iconView = UIImageView().then {
         $0.image = #imageLiteral(resourceName: "browser_lock_popup")
         $0.contentMode = .scaleAspectFit
-        $0.snp.remakeConstraints {
-            $0.height.equalTo(100)
-        }
+        
         $0.setContentCompressionResistancePriority(.init(rawValue: 100), for: .vertical)
     }
     
@@ -104,13 +99,6 @@ class WelcomeViewController: UIViewController {
         $0.alpha = 0.0
         $0.setContentHuggingPriority(.required, for: .vertical)
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
-    }
-    
-    private let topSpacer = UIView().then {
-        $0.setContentCompressionResistancePriority(.init(rawValue: 30), for: .vertical)
-    }
-    private let bottomSpacer = UIView().then {
-        $0.setContentCompressionResistancePriority(.init(rawValue: 29), for: .vertical)
     }
     
     override func viewDidLoad() {
@@ -147,9 +135,20 @@ class WelcomeViewController: UIViewController {
         
         skipButton.addTarget(self, action: #selector(onSkipButtonPressed(_:)), for: .touchUpInside)
         
-        [backgroundImageView, topImageView, bottomImageView, topSpacer, contentContainer, bottomSpacer, skipButton].forEach {
+        let stack = UIStackView().then {
+            $0.distribution = .equalSpacing
+            $0.axis = .vertical
+            $0.setContentHuggingPriority(.init(rawValue: 5), for: .vertical)
+        }
+        
+        [backgroundImageView, topImageView, bottomImageView, stack, skipButton].forEach {
             view.addSubview($0)
         }
+        
+        stack.addStackViewItems(
+            .view(UIView.spacer(.vertical, amount: 1)),
+            .view(contentContainer),
+            .view(UIView.spacer(.vertical, amount: 1)))
         
         [calloutView, iconView].forEach {
             contentContainer.addArrangedSubview($0)
@@ -163,23 +162,9 @@ class WelcomeViewController: UIViewController {
             $0.leading.trailing.top.equalToSuperview()
         }
         
-        topSpacer.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.height.greaterThanOrEqualTo(10)
-        }
-        
-        contentContainer.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.top.equalTo(topSpacer.snp.bottom)
-            $0.bottom.equalTo(bottomSpacer.snp.top)
-        }
-        
-        bottomSpacer.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(10.0)
-            $0.bottom.equalTo(skipButton.snp.top)
-            $0.height.equalTo(topSpacer.snp.height)
+        stack.snp.makeConstraints {
+            $0.leading.trailing.top.equalToSuperview()
+            $0.bottom.equalTo(skipButton).inset(16)
         }
         
         skipButton.snp.makeConstraints {
@@ -299,7 +284,7 @@ class WelcomeViewController: UIViewController {
             bottomImageView.transform = bottomTransform
             iconView.image = #imageLiteral(resourceName: "browser_lock_popup")
             iconView.snp.remakeConstraints {
-                $0.height.equalTo(150.0).priority(.low)
+                $0.height.equalTo(traitCollection.horizontalSizeClass == .regular ? 250 : 150)
             }
             skipButton.alpha = 1.0
             

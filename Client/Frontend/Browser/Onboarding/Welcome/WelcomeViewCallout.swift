@@ -31,7 +31,7 @@ enum WelcomeViewCalloutState {
 class WelcomeViewCallout: UIView {
     private struct DesignUX {
         static let padding = 20.0
-        static let contentPadding = 30.0
+        static let contentPadding = 24.0
         static let cornerRadius = 16.0
         static let shadowColor = UIColor(rgb: 0x767C81)
     }
@@ -53,16 +53,17 @@ class WelcomeViewCallout: UIView {
         $0.textColor = .bravePrimary
         $0.textAlignment = .center
         $0.numberOfLines = 0
-        $0.setContentHuggingPriority(.init(rawValue: 800), for: .vertical)
-        $0.setContentCompressionResistancePriority(.init(rawValue: 800), for: .vertical)
+        $0.minimumScaleFactor = 0.5
+        $0.adjustsFontSizeToFitWidth = true
     }
     
     private let detailsLabel = UILabel().then {
         $0.textColor = .bravePrimary
         $0.textAlignment = .left
         $0.numberOfLines = 0
-        $0.setContentHuggingPriority(.init(rawValue: 801), for: .vertical)
-        $0.setContentCompressionResistancePriority(.init(rawValue: 801), for: .vertical)
+        $0.minimumScaleFactor = 0.5
+        $0.adjustsFontSizeToFitWidth = true
+        $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
     }
     
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
@@ -160,7 +161,7 @@ class WelcomeViewCallout: UIView {
             
             arrowView.snp.makeConstraints {
                 $0.centerX.equalToSuperview()
-                $0.top.equalToSuperview()
+                $0.top.equalToSuperview().inset(8)
                 $0.width.equalTo(20.0)
                 $0.height.equalTo(13.0)
             }
