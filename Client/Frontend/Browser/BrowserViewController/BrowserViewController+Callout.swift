@@ -76,13 +76,14 @@ extension BrowserViewController {
                     details: Strings.Callout.defaultBrowserCalloutDescription,
                     primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
                     secondaryButtonTitle: Strings.Callout.defaultBrowserCalloutSecondaryButtonTitle,
-                    primaryAction: {
+                    primaryAction: { [weak self] in
                         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                             return
                         }
                     
                         Preferences.General.defaultBrowserCalloutDismissed.value = true
                         UIApplication.shared.open(settingsUrl)
+                        self?.dismiss(animated: false)
                     }, secondaryAction: { [weak self] in
                         self?.dismiss(animated: false)
                     }
