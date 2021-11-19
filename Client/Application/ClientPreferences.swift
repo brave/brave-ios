@@ -141,7 +141,7 @@ extension Preferences {
         
         /// Whether system notification showed or not
         static let defaultBrowserNotificationScheduled =
-            Option<Bool>(key: "defaultBrowserIntro.notification-scheduled", default: false)
+            Option<Bool>(key: "general.default-browser-notification-scheduled", default: false)
     }
     
     final class Search {

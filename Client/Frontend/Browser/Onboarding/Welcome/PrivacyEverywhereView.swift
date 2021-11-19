@@ -9,21 +9,17 @@ import BraveUI
 import BraveShared
 
 struct PrivacyEverywhereView: View {
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     var dismiss: (() -> Void)?
     var syncNow: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
-                Spacer()
-                Button {
-                    dismiss?()
-                } label: {
-                    Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+            Button {
+                dismiss?()
+            } label: {
+                Image(uiImage: #imageLiteral(resourceName: "privacy-everywhere-exit-icon"))
             }
+            .frame(maxWidth: .infinity, alignment: .trailing)
             VStack(spacing: 10) {
                 Text(Strings.Callout.privacyEverywhereCalloutTitle)
                     .font(.title3.weight(.medium))
@@ -51,7 +47,6 @@ struct PrivacyEverywhereView: View {
         .frame(maxWidth: BraveUX.baseDimensionValue)
         .padding()
         .background(Color(.braveBackground))
-        .cornerRadius(16)
         .accessibilityEmbedInScrollView()
     }
 }
@@ -59,18 +54,12 @@ struct PrivacyEverywhereView: View {
 struct PrivacyEverywhereView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ZStack {
-                Rectangle()
-                    .foregroundColor(.black)
-                    .edgesIgnoringSafeArea(.all)
+            BraveUI.PopupView {
                 PrivacyEverywhereView()
             }
             .previewDevice("iPhone 12 Pro")
             
-            ZStack {
-                Rectangle()
-                    .foregroundColor(.black)
-                    .edgesIgnoringSafeArea(.all)
+            BraveUI.PopupView {
                 PrivacyEverywhereView()
             }
             .previewDevice("iPad Pro (9.7-inch)")

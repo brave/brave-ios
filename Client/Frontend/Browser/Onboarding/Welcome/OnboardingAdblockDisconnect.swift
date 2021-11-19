@@ -11,12 +11,6 @@ private let log = Logger.browserLogger
 struct OnboardingDisconnectItem: Codable {
     let properties: [String]
     let resources: [String]
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        properties = try container.decode([String].self, forKey: .properties)
-        resources = try container.decode([String].self, forKey: .resources)
-    }
 }
 
 struct OnboardingDisconnectList: Codable {

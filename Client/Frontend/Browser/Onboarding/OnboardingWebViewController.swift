@@ -105,7 +105,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         case .URL:
             switch urlType {
             case .termsOfService:
-                    if BraveUX.braveTermsOfUseURL.origin == webView.url?.origin {
+                if BraveUX.braveTermsOfUseURL.origin == webView.url?.origin {
                     toolbar.urlLabel.text = webView.url?.host
                 }
             case .privacyPolicy:

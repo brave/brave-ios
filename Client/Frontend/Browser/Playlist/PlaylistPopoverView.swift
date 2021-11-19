@@ -76,39 +76,38 @@ struct PlaylistPopoverView: View {
     
     private var addedToPlaylistView: some View {
         VStack(alignment: .leading) {
-            if #available(iOS 14.0, *) {
-                Text(Strings.PlayList.playlistPopoverAddedTitle)
-                    .foregroundColor(Color(UIColor.primaryButtonTint))
-                    .font(.title2.weight(.medium))
-                    .padding(.bottom, 20.0)
-            } else {
-                Text(Strings.PlayList.playlistPopoverAddedTitle)
-                    .foregroundColor(Color(UIColor.primaryButtonTint))
-                    .font(.headline.weight(.medium))
-                    .padding(.bottom, 20.0)
+            VStack(spacing: 20.0) {
+                if #available(iOS 14.0, *) {
+                    Text(Strings.PlayList.playlistPopoverAddedTitle)
+                        .foregroundColor(Color(UIColor.primaryButtonTint))
+                        .font(.title2.weight(.medium))
+                } else {
+                    Text(Strings.PlayList.playlistPopoverAddedTitle)
+                        .foregroundColor(Color(UIColor.primaryButtonTint))
+                        .font(.headline.weight(.medium))
+                }
+                
+                Button(action: {
+                    onPrimaryButtonPressed?()
+                }) {
+                    if #available(iOS 14.0, *) {
+                        Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
+                            .frame(maxWidth: .infinity)
+                            .font(.title3.weight(.medium))
+                            .foregroundColor(.white)
+                            .padding()
+                    } else {
+                        Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
+                            .frame(maxWidth: .infinity)
+                            .font(.body.weight(.medium))
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+                .buttonStyle(BraveFilledButtonStyle(size: .small))
+                .foregroundColor(Color(UIColor.braveBlurple))
             }
             
-            Button(action: {
-                onPrimaryButtonPressed?()
-            }) {
-                if #available(iOS 14.0, *) {
-                    Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
-                        .frame(maxWidth: .infinity)
-                        .font(.title3.weight(.medium))
-                        .foregroundColor(.white)
-                        .padding()
-                } else {
-                    Text(Strings.PlayList.playlistPopoverOpenInBravePlaylist)
-                        .frame(maxWidth: .infinity)
-                        .font(.body.weight(.medium))
-                        .foregroundColor(.white)
-                        .padding()
-                }
-            }
-            .buttonStyle(BraveFilledButtonStyle(size: .small))
-            .foregroundColor(Color(UIColor.braveBlurple))
-            .padding(.bottom, 20.0)
-
             Button(action: {
                 onSecondaryButtonPressed?()
             }) {
@@ -140,10 +139,7 @@ struct PlaylistPopoverView: View {
 struct PlaylistPopoverView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ZStack {
-                Rectangle()
-                    .foregroundColor(.black)
-                    .edgesIgnoringSafeArea(.all)
+            BraveUI.PopupView {
                 PlaylistPopoverView(state: .addedToPlaylist)
             }
             .previewDevice("iPhone 12 Pro")
