@@ -19,12 +19,19 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
     private let iconView = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.image = #imageLiteral(resourceName: "welcome-view-ntp-logo")
+        $0.snp.makeConstraints {
+            $0.size.equalTo(40)
+        }
         $0.setContentHuggingPriority(.required, for: .horizontal)
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     private let textLabel = UILabel().then {
         $0.numberOfLines = 0
+        $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        $0.setContentHuggingPriority(.defaultLow, for: .vertical)
+        $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     override func viewDidLoad() {
@@ -41,7 +48,7 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
     func setText(title: String? = nil, details: String) {
         let attributedString = NSMutableAttributedString()
         if let title = title {
-            attributedString.append(NSAttributedString(string: "\(title)\n\n", attributes: [
+            attributedString.append(NSAttributedString(string: "\(title)\n", attributes: [
                 .font: UIFont.preferredFont(forTextStyle: .headline)
             ]))
         }
