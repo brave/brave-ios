@@ -36,7 +36,8 @@ extension BrowserViewController {
     
     func showBraveRewardsPanel() {
         if !Preferences.FullScreenCallout.rewardsCalloutCompleted.value,
-            Preferences.General.isNewRetentionUser.value == true {
+            Preferences.General.isNewRetentionUser.value == true,
+           !Preferences.Rewards.rewardsToggledOnce.value {
             
             let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
             controller.onOnboardingStateChanged = { [weak self] controller, state in
