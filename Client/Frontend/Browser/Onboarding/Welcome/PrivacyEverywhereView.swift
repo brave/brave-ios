@@ -52,6 +52,7 @@ struct PrivacyEverywhereView: View {
         .padding()
         .background(Color(.braveBackground))
         .cornerRadius(16)
+        .accessibilityEmbedInScrollView()
     }
 }
 
