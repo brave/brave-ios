@@ -1,29 +1,18 @@
 {
   "images" : [
     {
-      "filename" : "image 1.png",
-      "idiom" : "iphone",
+      "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "image 1@2x.png",
-      "idiom" : "iphone",
+      "filename" : "3d-icon.png",
+      "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "image 1@3x.png",
-      "idiom" : "iphone",
+      "filename" : "3d-icon-1.png",
+      "idiom" : "universal",
       "scale" : "3x"
-    },
-    {
-      "filename" : "3d brave logo@2x.png",
-      "idiom" : "ipad",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "3d brave logo@3x.png",
-      "idiom" : "ipad",
-      "scale" : "2x"
     }
   ],
   "info" : {

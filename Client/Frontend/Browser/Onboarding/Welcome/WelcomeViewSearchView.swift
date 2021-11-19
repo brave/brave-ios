@@ -18,22 +18,20 @@ class WelcomeViewSearchView: UIView {
         static let scrollViewWidth = BraveUX.baseDimensionValue
     }
     
-    private let scrollView = UIScrollView()
-    
     private let contentView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = DesignUX.padding
         $0.layoutMargins = UIEdgeInsets(equalInset: DesignUX.contentPadding)
         $0.isLayoutMarginsRelativeArrangement = true
+        $0.setContentHuggingPriority(.required, for: .vertical)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(scrollView)
-        scrollView.addSubview(contentView)
+        addSubview(contentView)
         
-        scrollView.snp.makeConstraints {
+        contentView.snp.makeConstraints {
             if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
                 $0.edges.equalToSuperview()
             } else {
@@ -41,15 +39,7 @@ class WelcomeViewSearchView: UIView {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)            }
         }
-        
-        scrollView.contentLayoutGuide.snp.makeConstraints {
-            $0.top.bottom.equalTo(contentView)
-            $0.width.equalToSuperview()
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+
     }
     
     required init?(coder: NSCoder) {
@@ -73,8 +63,9 @@ private class SearchEngineButton: RoundInterfaceButton {
         static let contentPaddingX = 15.0
         static let contentPaddingY = 10.0
         static let iconSize = 24.0
-        static let shadowColor = UIColor(rgb: 0x767C81)
     }
+    
+    private let roundedLayer = CALayer()
     
     private let contentView = UIStackView().then {
         $0.spacing = 10.0
@@ -109,7 +100,7 @@ private class SearchEngineButton: RoundInterfaceButton {
         
         iconView.image = icon
         titleView.text = title
-        backgroundColor = .secondaryBraveBackground
+        backgroundColor = .clear
         
         contentMode = .left
         addSubview(contentView)
@@ -144,35 +135,22 @@ private class SearchEngineButton: RoundInterfaceButton {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let roundedLayerName = "rounded.layer"
-        
-        let layers = contentView.layer.sublayers
-        layers?.filter({ $0.name == roundedLayerName }).forEach {
-            $0.removeFromSuperlayer()
-        }
-        
-        let maskBounds = contentView.bounds
-        let path = UIBezierPath(roundedRect: maskBounds,
-                                byRoundingCorners: .allCorners,
-                                cornerRadii: CGSize(width: DesignUX.cornerRadius,
-                                                    height: DesignUX.cornerRadius))
-
-        // Create the shape layer and set its path
-        let maskLayer = CAShapeLayer().then {
-            $0.frame = maskBounds
-            $0.path = path.cgPath
-        }
-
-        let roundedLayer = CALayer().then {
+        roundedLayer.do {
             $0.backgroundColor = UIColor.secondaryBraveBackground.cgColor
-            $0.frame = maskBounds
-            $0.mask = maskLayer
-            $0.name = roundedLayerName
+            $0.frame = contentView.bounds
+            $0.mask = CAShapeLayer().then {
+                $0.frame = contentView.bounds
+                $0.path = UIBezierPath(roundedRect: contentView.bounds,
+                                       byRoundingCorners: .allCorners,
+                                       cornerRadii: CGSize(width: DesignUX.cornerRadius,
+                                                           height: DesignUX.cornerRadius)).cgPath
+            }
         }
 
         contentView.layer.insertSublayer(roundedLayer, at: 0)
         
-        layer.shadowColor = DesignUX.shadowColor.cgColor
+        backgroundColor = .clear
+        layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = 0.36
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shadowRadius = DesignUX.cornerRadius
