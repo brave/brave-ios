@@ -33,7 +33,6 @@ class WelcomeViewCallout: UIView {
         static let padding = 20.0
         static let contentPadding = 24.0
         static let cornerRadius = 16.0
-        static let shadowColor = UIColor(rgb: 0x767C81)
     }
     
     private let backgroundView = RoundedBackgroundView(cornerRadius: DesignUX.cornerRadius)
@@ -55,6 +54,8 @@ class WelcomeViewCallout: UIView {
         $0.numberOfLines = 0
         $0.minimumScaleFactor = 0.5
         $0.adjustsFontSizeToFitWidth = true
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     private let detailsLabel = UILabel().then {
@@ -64,6 +65,8 @@ class WelcomeViewCallout: UIView {
         $0.minimumScaleFactor = 0.5
         $0.adjustsFontSizeToFitWidth = true
         $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     private let primaryButton = RoundInterfaceButton(type: .custom).then {
@@ -130,17 +133,6 @@ class WelcomeViewCallout: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        layer.shadowColor = DesignUX.shadowColor.cgColor
-        layer.shadowOpacity = 0.36
-        layer.shadowOffset = CGSize(width: 5, height: 5)
-        layer.shadowRadius = DesignUX.cornerRadius
-        layer.shadowPath = UIBezierPath(roundedRect: bounds,
-                                        cornerRadius: DesignUX.cornerRadius).cgPath
-    }
-    
     private func doLayout(pointsUp: Bool) {
         arrowView.removeFromSuperview()
         contentView.removeFromSuperview()
@@ -159,13 +151,14 @@ class WelcomeViewCallout: UIView {
             }
             
             contentView.snp.makeConstraints {
-                $0.top.equalTo(arrowView.snp.bottom)
                 if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
                     $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
                 } else {
-                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
+                    $0.leading.trailing.equalToSuperview().priority(.high)
+                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                 }
+                $0.top.equalTo(arrowView.snp.bottom)
                 $0.bottom.equalToSuperview()
             }
         } else {
@@ -178,16 +171,17 @@ class WelcomeViewCallout: UIView {
                 if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
                     $0.leading.trailing.equalToSuperview().inset(DesignUX.padding)
                 } else {
-                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                     $0.centerX.equalToSuperview()
+                    $0.leading.trailing.equalToSuperview().priority(.high)
+                    $0.width.lessThanOrEqualTo(BraveUX.baseDimensionValue)
                 }
                 $0.top.equalToSuperview()
+                $0.bottom.equalTo(arrowView.snp.top)
             }
             
             arrowView.snp.makeConstraints {
                 $0.centerX.equalToSuperview()
-                $0.top.equalTo(contentView.snp.bottom)
-                $0.bottom.equalToSuperview()
+                $0.bottom.equalToSuperview().inset(8)
                 $0.width.equalTo(20.0)
                 $0.height.equalTo(13.0)
             }
@@ -493,16 +487,41 @@ private class CalloutArrowView: UIView {
 }
 
 private class RoundedBackgroundView: UIView {
+    private let cornerRadius: CGFloat
+    private let roundedLayer = CALayer()
+    
     init(cornerRadius: CGFloat) {
+        self.cornerRadius = cornerRadius
         super.init(frame: .zero)
-        
-        layer.cornerRadius = cornerRadius
-        layer.cornerCurve = .continuous
-        layer.masksToBounds = true
-        layer.backgroundColor = UIColor.secondaryBraveBackground.cgColor
+
+        backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        roundedLayer.do {
+            $0.backgroundColor = UIColor.secondaryBraveBackground.cgColor
+            $0.frame = bounds
+            $0.cornerCurve = .continuous
+            $0.mask = CAShapeLayer().then {
+                $0.frame = bounds
+                $0.path = UIBezierPath(roundedRect: bounds,
+                                       byRoundingCorners: .allCorners,
+                                       cornerRadii: CGSize(width: cornerRadius, height: cornerRadius)).cgPath
+            }
+        }
+        
+        layer.insertSublayer(roundedLayer, at: 0)
+        backgroundColor = .clear
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowRadius = cornerRadius
+        layer.shadowOpacity = 0.36
+        layer.shadowPath = UIBezierPath(roundedRect: bounds,
+                                        cornerRadius: cornerRadius).cgPath
     }
 }

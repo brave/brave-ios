@@ -121,19 +121,18 @@ extension BrowserViewController {
                 
         if !BraveSyncAPI.shared.isInSyncGroup {
             var privacyEverywhereView = PrivacyEverywhereView()
-            let controller = PopupViewController(rootView: privacyEverywhereView)
-            
-            privacyEverywhereView.dismiss = { [unowned controller] in
-                controller.dismiss(animated: true)
+            privacyEverywhereView.dismiss = { [weak self] in
+                self?.dismiss(animated: true)
             }
             
-            privacyEverywhereView.syncNow = { [unowned controller] in
-                controller.dismiss(animated: true) { [weak self] in
-                    guard let self = self else { return }
+            privacyEverywhereView.syncNow = { [weak self] in
+                guard let self = self else { return }
+                self.dismiss(animated: true) {
                     self.openInsideSettingsNavigation(with: SyncWelcomeViewController())
                 }
             }
             
+            let controller = PopupViewController(rootView: privacyEverywhereView)
             present(controller, animated: true, completion: nil)
             isOnboardingOrFullScreenCalloutPresented = true
         }

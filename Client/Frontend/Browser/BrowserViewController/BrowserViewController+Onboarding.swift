@@ -111,7 +111,7 @@ extension BrowserViewController {
     }
     
     func presentNTPMenuOnboarding() {
-        guard let menuButton = toolbar?.menuButton else { return }
+        guard let menuButton = UIDevice.isIpad ? topToolbar.menuButton : toolbar?.menuButton else { return }
         let controller = WelcomeNTPOnboardingController()
         controller.setText(
             title: Strings.Onboarding.ntpOnboardingPopoverDoneTitle,
