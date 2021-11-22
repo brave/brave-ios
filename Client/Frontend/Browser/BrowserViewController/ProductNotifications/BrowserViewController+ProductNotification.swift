@@ -232,12 +232,6 @@ extension BrowserViewController {
                                from: topToolbar.locationView.shieldsButton,
                                on: popover,
                                browser: self)
-        
-        pulseAnimation.onTouchInside = { [weak self] in
-            self?.dismiss(animated: true)
-            pulseAnimation.removeFromSuperview()
-        }
-        
         popover.popoverDidDismiss = { _ in
             pulseAnimation.removeFromSuperview()
         }
