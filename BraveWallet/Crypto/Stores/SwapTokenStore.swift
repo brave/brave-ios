@@ -397,8 +397,8 @@ public class SwapTokenStore: ObservableObject {
       if let gasEstimation = gasEstimation {
         // Bump fast priority fee and max fee by 1 GWei if same as average fees.
         if gasEstimation.fastMaxPriorityFeePerGas == gasEstimation.avgMaxPriorityFeePerGas {
-          maxPriorityFeePerGas = "0x\(self.feeInGWeiHex(with: gasEstimation.fastMaxPriorityFeePerGas, by: 9) ?? "0")"
-          maxFeePerGas = "0x\(self.feeInGWeiHex(with: gasEstimation.fastMaxFeePerGas, by: 9) ?? "0")"
+          maxPriorityFeePerGas = "0x\(self.bumpFeeByOneGWei(with: gasEstimation.fastMaxPriorityFeePerGas) ?? "0")"
+          maxFeePerGas = "0x\(self.bumpFeeByOneGWei(with: gasEstimation.fastMaxFeePerGas) ?? "0")"
         } else {
           // Always suggest fast gas fees as default
           maxPriorityFeePerGas = gasEstimation.fastMaxPriorityFeePerGas
@@ -412,10 +412,10 @@ public class SwapTokenStore: ObservableObject {
     }
   }
   
-  private func feeInGWeiHex(with value: String, by decimals: Int) -> String? {
+  private func bumpFeeByOneGWei(with value: String) -> String? {
     guard let bv = BDouble(value) else { return nil }
-    let bumpValue = bv * (BDouble(10) ** decimals)
-    return bumpValue.rounded().asString(radix: 16)
+    let bumpedValue = bv + (BDouble(10) ** 9)
+    return bumpedValue.rounded().asString(radix: 16)
   }
   
   private func checkBalanceShowError(swapResponse: BraveWallet.SwapResponse) {
