@@ -27,12 +27,14 @@ extension AppDelegate {
     struct SceneInfoModel {
         let profile: Profile
         let diskImageStore: DiskImageStore?
+        let migration: Migration?
     }
 }
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var braveCore = BraveCoreMain()
+    var migration: Migration?
 
     private weak var application: UIApplication?
     var launchOptions: [AnyHashable: Any]?
@@ -84,6 +86,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set Brave Core's User-Agent
         braveCore.setUserAgent(UserAgent.mobile)
 
+        migration = Migration(bookmarksAPI: braveCore.bookmarksAPI,
+                              historyAPI: braveCore.historyAPI,
+                              syncAPI: braveCore.syncAPI)
+        
         // Setup Adblock Stats and HTTPSE Stats.
         AdBlockStats.shared.startLoading()
         
@@ -99,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         updateShortcutItems(application)
         
         // Must happen before passcode check, otherwise may unnecessarily reset keychain
-        Migration.moveDatabaseToApplicationDirectory()
+        migration?.moveDatabaseToApplicationDirectory()
         
         // Passcode checking, must happen on immediate launch
         if !DataController.shared.storeExists() {
@@ -150,11 +156,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Setup Scene Info
         sceneInfo = SceneInfoModel(profile: profile,
-                                   diskImageStore: diskImageStore)
+                                   diskImageStore: diskImageStore,
+                                   migration: migration)
         
         // Perform migrations
         let profilePrefix = profile.prefs.getBranchPrefix()
-        Migration.launchMigrations(keyPrefix: profilePrefix)
+        migration?.launchMigrations(keyPrefix: profilePrefix)
         
         // Setup GCD-WebServer
         setUpWebServer(profile)
@@ -317,10 +324,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SKPaymentQueue.default().remove(iapObserver)
         
         // Clean up BraveCore
-        BraveSyncAPI.removeAllObservers()
-       
-        Preferences.AppState.backgroundedCleanly.value = true
-        Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+        braveCore.syncAPI.removeAllObservers()
     }
     
     func updateShortcutItems(_ application: UIApplication) {
