@@ -7,6 +7,8 @@ import Foundation
 import BraveUI
 
 class RadialPulsingAnimation: UIView {
+    var onTouchInside: (() -> Void)?
+    
     private var pulseLayers = [CAShapeLayer]()
     
     init(ringCount: Int) {
@@ -25,6 +27,8 @@ class RadialPulsingAnimation: UIView {
             layer.lineCap = .round
             pulseLayers.append(layer)
         }
+        
+        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTouchInside(_:))))
     }
     
     required init?(coder: NSCoder) {
@@ -108,5 +112,10 @@ class RadialPulsingAnimation: UIView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.animate()
         }
+    }
+    
+    @objc
+    private func onTouchInside(_ recognizer: UITapGestureRecognizer) {
+        self.onTouchInside?()
     }
 }
