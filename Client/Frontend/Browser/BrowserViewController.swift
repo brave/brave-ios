@@ -101,6 +101,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     let tabManager: TabManager
     let historyAPI: BraveHistoryAPI
     let bookmarkManager: BookmarkManager
+    let syncAPI: BraveSyncAPI
+    let migration: Migration?
     
     /// Whether last session was a crash or not
     fileprivate let crashedLastSession: Bool
@@ -199,12 +201,16 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     init(profile: Profile,
          diskImageStore: DiskImageStore?,
          historyAPI: BraveHistoryAPI,
-         bookmarksAPI: BraveBookmarksAPI,
+         bookmarkAPI: BraveBookmarksAPI,
+         syncAPI: BraveSyncAPI,
+         migration: Migration?,
          crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
         self.historyAPI = historyAPI
         self.bookmarkManager = BookmarkManager(bookmarksAPI: bookmarksAPI)
+        self.syncAPI = syncAPI
+        self.migration = migration
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
 
