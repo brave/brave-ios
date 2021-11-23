@@ -929,6 +929,7 @@
 		CA439A5925E6F29D00FE9150 /* VideoPlayerInfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */; };
 		CA439A7625E8054A00FE9150 /* VideoPlayerControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */; };
 		CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */; };
+		CA4B1F7D274D6DA9009C5BBA /* BraveSyncQRCodeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4B1F7C274D6DA8009C5BBA /* BraveSyncQRCodeModel.swift */; };
 		CA550490269DED8F00C19917 /* MediaBackgrounding.js in Resources */ = {isa = PBXBuildFile; fileRef = CA55048F269DED8F00C19917 /* MediaBackgrounding.js */; };
 		CA752EA526CEABF8009356EF /* PlaylistToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA752EA426CEABF8009356EF /* PlaylistToast.swift */; };
 		CA752EB126CEBE52009356EF /* FontScaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9A22FF26A7370C00923D70 /* FontScaling.swift */; };
@@ -2718,6 +2719,7 @@
 		CA439A5825E6F29D00FE9150 /* VideoPlayerInfoBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerInfoBar.swift; sourceTree = "<group>"; };
 		CA439A7525E8054A00FE9150 /* VideoPlayerControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerControlsView.swift; sourceTree = "<group>"; };
 		CA439A8F25E80EE400FE9150 /* VideoPlayerTrackbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerTrackbar.swift; sourceTree = "<group>"; };
+		CA4B1F7C274D6DA8009C5BBA /* BraveSyncQRCodeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSyncQRCodeModel.swift; sourceTree = "<group>"; };
 		CA55048F269DED8F00C19917 /* MediaBackgrounding.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = MediaBackgrounding.js; sourceTree = "<group>"; };
 		CA752EA426CEABF8009356EF /* PlaylistToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistToast.swift; sourceTree = "<group>"; };
 		CA7C5CAC2731928F003366F7 /* WelcomeViewSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewSearchView.swift; sourceTree = "<group>"; };
@@ -4997,6 +4999,7 @@
 				5E09617F252B63F200F3AFBB /* BraveSyncAPIExtensions.swift */,
 				5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */,
 				2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */,
+				CA4B1F7C274D6DA8009C5BBA /* BraveSyncQRCodeModel.swift */,
 			);
 			path = BraveCore;
 			sourceTree = "<group>";
@@ -7655,6 +7658,7 @@
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
 				4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */,
 				0A8C69AB225CFCAF00988715 /* AddEditBookmarkTableViewController.swift in Sources */,
+				CA4B1F7D274D6DA9009C5BBA /* BraveSyncQRCodeModel.swift in Sources */,
 				27C5AC8725D6FA6D00B8F50E /* OPML.swift in Sources */,
 				27FD2CAD2146C31C00A5A779 /* AddToFavoritesActivity.swift in Sources */,
 				4422D4E121BFFB7600BF1855 /* filter_block.cc in Sources */,
