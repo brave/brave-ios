@@ -235,7 +235,7 @@ extension Strings {
         public static let privacyScreenTitle =
             NSLocalizedString("onboarding.privacyScreenTitle",
                               tableName: "BraveShared", bundle: .braveShared,
-                              value: "Privacy, simplified",
+                              value: "Privacy made easy",
                               comment: "Title for Privacy Screen in Onboarding")
         public static let privacyScreenDescription =
             NSLocalizedString("onboarding.privacyScreenDescription",
