@@ -31,16 +31,18 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         
         dataSource.sections = [
             debugFlags,
-            retentionFlags
+            retentionPreferenceFlags,
+            browserLocalFlags
         ]
     }
     
     private func presentDebugFlagAlert() {
         let alert = UIAlertController(
             title: "Value can't be changed!",
-            message: "this is debug flag value cant be changed.",
-            preferredStyle: UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet)
-        
+            message: "This is debug flag value cant be changed.",
+            preferredStyle: .alert)
+        alert.addAction(.init(title: "OK", style: .default, handler: nil))
+
         present(alert, animated: true, completion: nil)
     }
     
@@ -52,7 +54,7 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
             rows: [
                 .boolRow(
                     title: "Skip Onboarding Intro",
-                    detailText: "Flag for hide/show entire onboarding sequence",
+                    detailText: "Flag for hide/show entire onboarding sequence.",
                     toggleValue: Preferences.DebugFlag.skipOnboardingIntro ?? false,
                     valueChange: { [unowned self] _ in
                         self.presentDebugFlagAlert()
@@ -80,13 +82,13 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         return shields
     }()
     
-    private lazy var retentionFlags: Section = {
+    private lazy var retentionPreferenceFlags: Section = {
         var shields = Section(
-            header: .title("Retention Flags"),
+            header: .title("Retention Preferences"),
             rows: [
                 .boolRow(
                     title: "Retention User",
-                    detailText: "Flag showing if the user installed the application after new onboarding is added",
+                    detailText: "Flag showing if the user installed the application after new onboarding is added.",
                     toggleValue: Preferences.General.isNewRetentionUser.value ?? false,
                     valueChange: {
                         if $0 {
@@ -96,15 +98,85 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
                     },
                     cellReuseId: "RetentionUserCell"),
                 .boolRow(
+                    title: "VPN Callout Shown",
+                    detailText: "Flag determining if VPN callout is shown to user.",
+                    toggleValue: Preferences.FullScreenCallout.vpnCalloutCompleted.value,
+                    valueChange: {
+                        if $0 {
+                            let status = $0
+                            Preferences.FullScreenCallout.vpnCalloutCompleted.value = status
+                        }
+                    },
+                    cellReuseId: "VPNCalloutCell"),
+                .boolRow(
+                    title: "Sync Callout Shown",
+                    detailText: "Flag determining if Sync callout is shown to user.",
+                    toggleValue: Preferences.FullScreenCallout.syncCalloutCompleted.value,
+                    valueChange: {
+                        if $0 {
+                            let status = $0
+                            Preferences.FullScreenCallout.syncCalloutCompleted.value = status
+                        }
+                    },
+                    cellReuseId: "SyncCalloutCell"),
+                .boolRow(
+                    title: "Rewards Callout Shown",
+                    detailText: "Flag determining if Rewards callout is shown to user.",
+                    toggleValue: Preferences.FullScreenCallout.vpnCalloutCompleted.value,
+                    valueChange: {
+                        if $0 {
+                            let status = $0
+                            Preferences.FullScreenCallout.rewardsCalloutCompleted.value = status
+                        }
+                    },
+                    cellReuseId: "RewardsCalloutCell"),
+                .boolRow(
+                    title: "Default Browser Callout Shown",
+                    detailText: "Flag determining if DefaultBrowser callout is shown to user.",
+                    toggleValue: Preferences.DefaultBrowserIntro.completed.value,
+                    valueChange: {
+                        if $0 {
+                            let status = $0
+                            Preferences.DefaultBrowserIntro.completed.value = status
+                        }
+                    },
+                    cellReuseId: "DefaultBrowserCalloutCell")
+                ],
+                footer: .title("These are the preferences that stored in preferences for determining the If certain elements are shown to user.")
+        )
+        return shields
+    }()
+        
+    private lazy var browserLocalFlags: Section = {
+        var shields = Section(
+            header: .title("Local Browser Flags"),
+            rows: [
+                .boolRow(
                     title: "Benchmark Notification Presented",
-                    detailText: "Boolean which is tracking If a product notification is presented in the actual launch session. This flag is used in order to not to try to present another one over existing popover.",
+                    detailText: "Flag tracking If a product notification is presented in the actual launch session. This flag is used in order to not to try to present another one over existing popover.",
                     toggleValue: browserViewController?.benchmarkNotificationPresented ?? false,
                     valueChange: { [unowned self] status in
                         self.browserViewController?.benchmarkNotificationPresented = status
                     },
-                    cellReuseId: "These are the retention flags determines certain situations where an onboarding element, a callout or an education pop-up will appear.")
+                    cellReuseId: "BenchmarkNotificationCell"),
+                .boolRow(
+                    title: "Should Show NTP Education",
+                    detailText: "Flag tracking NTP Education should be loaded after onboarding of user.",
+                    toggleValue: browserViewController?.shouldShowNTPEducation ?? false,
+                    valueChange: { [unowned self] status in
+                        self.browserViewController?.shouldShowNTPEducation = status
+                    },
+                    cellReuseId: "ShouldShowNTPEducationCell"),
+                .boolRow(
+                    title: "Onboarding or Callout Presented",
+                    detailText: "Flag tracking If a full screen callout or onboarding is presented in order to not to try to present another callout  over existing one",
+                    toggleValue: browserViewController?.isOnboardingOrFullScreenCalloutPresented ?? false,
+                    valueChange: { [unowned self] status in
+                        self.browserViewController?.isOnboardingOrFullScreenCalloutPresented = status
+                    },
+                    cellReuseId: "OnboardingCalloutPresentedCell"),
             ],
-            footer: .title(Strings.shieldsDefaultsFooter)
+            footer: .title("These are flags locally stored in browser controller determines certain situations where an onboarding element, a callout or an education pop-up will appear.")
         )
         return shields
     }()
