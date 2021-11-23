@@ -95,7 +95,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             HttpsEverywhereStats.shared.startLoading()
         }
         
-        
         // Setup Application Shortcuts
         updateShortcutItems(application)
         
