@@ -227,8 +227,10 @@ extension PortfolioStore: BraveWalletKeyringControllerObserver {
   public func backedUp() {
   }
   public func keyringCreated() {
+    update()
   }
   public func keyringRestored() {
+    update()
   }
   public func locked() {
   }
