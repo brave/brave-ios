@@ -13,7 +13,7 @@ protocol TabTrayDelegate: AnyObject {
     func tabOrderChanged()
 }
 
-class TabTrayController: UIViewController {
+class TabTrayController: LoadingViewController {
     
     var tabTrayView: View {
         return view as! View // swiftlint:disable:this force_cast
@@ -53,6 +53,8 @@ class TabTrayController: UIViewController {
     private var isTabTrayBeingSearched = false
     private let tabTraySearchController = UISearchController(searchResultsController: nil)
     private var tabTraySearchQuery = ""
+    
+    private lazy var emptyStateOverlayView: UIView = createEmptyStateOverlayView()
 
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -208,7 +210,7 @@ class TabTrayController: UIViewController {
         }
     }
     
-    func remove(tab: Tab) {
+    private func remove(tab: Tab) {
         tabManager.removeTab(tab)
         applySnapshot()
     }
@@ -217,9 +219,68 @@ class TabTrayController: UIViewController {
         tabManager.removeTabsWithUndoToast(tabManager.tabsForCurrentMode)
         applySnapshot()
     }
+    
+    private func updateEmptyPanelState() {
+        if tabManager.tabsForCurrentMode.count == 0, isTabTrayBeingSearched {
+            showEmptyPanelState()
+        } else {
+            emptyStateOverlayView.removeFromSuperview()
+        }
+    }
+    
+    private func showEmptyPanelState() {
+        if emptyStateOverlayView.superview == nil {
+            view.addSubview(emptyStateOverlayView)
+            view.bringSubviewToFront(emptyStateOverlayView)
+            emptyStateOverlayView.snp.makeConstraints { make -> Void in
+                make.edges.equalTo(tabTrayView.collectionView)
+            }
+        }
+    }
+    
+    private func createEmptyStateOverlayView() -> UIView {
+        let overlayView = UIView().then {
+            $0.backgroundColor = .secondaryBraveBackground
+        }
+        
+        let logoImageView = UIImageView(image: #imageLiteral(resourceName: "emptyHistory").template).then {
+            $0.tintColor = .braveLabel
+        }
+        
+        let welcomeLabel = UILabel().then {
+            $0.text = "No Search Results Found"
+            $0.textAlignment = .center
+            $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+            $0.textColor = .braveLabel
+            $0.numberOfLines = 0
+            $0.adjustsFontSizeToFitWidth = true
+        }
+                
+        overlayView.addSubview(logoImageView)
+        
+        logoImageView.snp.makeConstraints { make in
+            make.centerX.equalTo(overlayView)
+            make.size.equalTo(60)
+            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+            make.centerY.equalTo(overlayView).offset(-180).priority(100)
+            // Sets proper top constraint for iPhone 4, 5 in portrait.
+            make.top.greaterThanOrEqualTo(overlayView).offset(50)
+        }
+        
+        overlayView.addSubview(welcomeLabel)
+        
+        welcomeLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(overlayView)
+            make.top.equalTo(logoImageView.snp.bottom).offset(15)
+            make.width.equalTo(170)
+        }
+        
+        return overlayView
+    }
 }
 
-// MARK: - UICollectionViewDelegate
+// MARK: UICollectionViewDelegate
+
 extension TabTrayController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let tab = dataSource.itemIdentifier(for: indexPath) else { return }
@@ -228,7 +289,8 @@ extension TabTrayController: UICollectionViewDelegate {
     }
 }
 
-// MARK: - TabManagerDelegate
+// MARK: TabManagerDelegate
+
 extension TabTrayController: TabManagerDelegate {
     func tabManager(_ tabManager: TabManager, didAddTab tab: Tab) {
         applySnapshot()
@@ -259,9 +321,8 @@ extension TabTrayController: TabManagerDelegate {
     func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) { }
 }
 
-// MARK: - Drag and Drop
-
 // MARK: UICollectionViewDragDelegate
+
 extension TabTrayController: UICollectionViewDragDelegate {
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         
@@ -276,6 +337,7 @@ extension TabTrayController: UICollectionViewDragDelegate {
 }
 
 // MARK: UICollectionViewDropDelegate
+
 extension TabTrayController: UICollectionViewDropDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         performDropWith coordinator: UICollectionViewDropCoordinator) {
@@ -306,7 +368,7 @@ extension TabTrayController: UICollectionViewDropDelegate {
     }
 }
 
-// MARK: - UIScrollViewAccessibilityDelegate
+// MARK: UIScrollViewAccessibilityDelegate
 
 extension TabTrayController: UIScrollViewAccessibilityDelegate {
     func accessibilityScrollStatus(for scrollView: UIScrollView) -> String? {
