@@ -136,7 +136,7 @@ struct BraveSyncQRCodeModel: Codable {
         }
         
         let codeWordsCount = codeWords.separatedBy(" ").count
-        if codeWordsCount < 24 {
+        if codeWordsCount != 24 {
             return .invalidFormat
         }
         
