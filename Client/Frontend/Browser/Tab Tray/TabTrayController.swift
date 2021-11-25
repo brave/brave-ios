@@ -54,7 +54,7 @@ class TabTrayController: LoadingViewController {
     private let tabTraySearchController = UISearchController(searchResultsController: nil)
     private var tabTraySearchQuery = ""
     
-    private lazy var emptyStateOverlayView: UIView = createEmptyStateOverlayView()
+    private lazy var emptyStateOverlayView: UIView = createNoSearchResultOverlayView()
 
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -80,6 +80,7 @@ class TabTrayController: LoadingViewController {
 
         tabTraySearchController.do {
             $0.searchBar.autocapitalizationType = .none
+            $0.searchBar.autocorrectionType = .no
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
             $0.searchBar.placeholder = "Search"
@@ -139,7 +140,9 @@ class TabTrayController: LoadingViewController {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.appendItems(tabManager.tabsForCurrentMode(for: query))
-        dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: true) { [unowned self] in
+            self.updateEmptyPanelState()
+        }
     }
     
     /// Reload the data source even if no changes are present. Use with caution.
@@ -219,9 +222,9 @@ class TabTrayController: LoadingViewController {
         tabManager.removeTabsWithUndoToast(tabManager.tabsForCurrentMode)
         applySnapshot()
     }
-    
+        
     private func updateEmptyPanelState() {
-        if tabManager.tabsForCurrentMode.count == 0, isTabTrayBeingSearched {
+        if dataSource.snapshot().numberOfItems == 0, isTabTrayBeingSearched {
             showEmptyPanelState()
         } else {
             emptyStateOverlayView.removeFromSuperview()
@@ -236,46 +239,6 @@ class TabTrayController: LoadingViewController {
                 make.edges.equalTo(tabTrayView.collectionView)
             }
         }
-    }
-    
-    private func createEmptyStateOverlayView() -> UIView {
-        let overlayView = UIView().then {
-            $0.backgroundColor = .secondaryBraveBackground
-        }
-        
-        let logoImageView = UIImageView(image: #imageLiteral(resourceName: "emptyHistory").template).then {
-            $0.tintColor = .braveLabel
-        }
-        
-        let welcomeLabel = UILabel().then {
-            $0.text = "No Search Results Found"
-            $0.textAlignment = .center
-            $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
-            $0.textColor = .braveLabel
-            $0.numberOfLines = 0
-            $0.adjustsFontSizeToFitWidth = true
-        }
-                
-        overlayView.addSubview(logoImageView)
-        
-        logoImageView.snp.makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.size.equalTo(60)
-            // Sets proper top constraint for iPhone 6 in portait and for iPad.
-            make.centerY.equalTo(overlayView).offset(-180).priority(100)
-            // Sets proper top constraint for iPhone 4, 5 in portrait.
-            make.top.greaterThanOrEqualTo(overlayView).offset(50)
-        }
-        
-        overlayView.addSubview(welcomeLabel)
-        
-        welcomeLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.top.equalTo(logoImageView.snp.bottom).offset(15)
-            make.width.equalTo(170)
-        }
-        
-        return overlayView
     }
 }
 
@@ -428,8 +391,7 @@ extension TabTrayController: UISearchResultsUpdating {
         }
         
         tabTraySearchQuery = query
-
-        // TODO: Reload And show loading
+        applySnapshot(for: tabTraySearchQuery)
     }
     
     private func invalidateSearchTimer() {

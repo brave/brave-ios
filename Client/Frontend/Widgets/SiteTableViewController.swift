@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
 import Storage
 
 struct SiteTableViewControllerUX {
@@ -150,5 +151,33 @@ class LoadingViewController: UIViewController {
                 spinner.removeFromSuperview()
             }
         }
+    }
+    
+    func createNoSearchResultOverlayView() -> UIView {
+        let overlayView = UIView().then {
+            $0.backgroundColor = .secondaryBraveBackground
+        }
+        
+        let welcomeLabel = UILabel().then {
+            $0.text = Strings.noSearchResultsfound
+            $0.textAlignment = .center
+            $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+            $0.textColor = .braveLabel
+            $0.numberOfLines = 0
+            $0.adjustsFontSizeToFitWidth = true
+        }
+        
+        overlayView.addSubview(welcomeLabel)
+        
+        welcomeLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(overlayView)
+            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+            make.centerY.equalTo(overlayView).offset(-180).priority(100)
+            // Sets proper top constraint for iPhone 4, 5 in portrait.
+            make.top.greaterThanOrEqualTo(overlayView).offset(50)
+            make.width.equalTo(170)
+        }
+        
+        return overlayView
     }
 }
