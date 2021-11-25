@@ -55,3 +55,10 @@ public class BuyTokenStore: ObservableObject {
     }
   }
 }
+
+extension BuyTokenStore: SubStore {
+  public func resetStore() {
+    selectedBuyToken = nil
+    buyTokens = []
+  }
+}

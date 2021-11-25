@@ -244,3 +244,14 @@ extension PortfolioStore: BraveWalletKeyringControllerObserver {
   public func selectedAccountChanged() {
   }
 }
+
+extension PortfolioStore: SubStore {
+  public func resetStore() {
+    isLoadingBalances = false
+    historicalBalances = []
+    timeframe = .oneDay
+    userVisibleAssets = []
+    balance = "$0.00"
+    update()
+  }
+}

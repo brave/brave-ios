@@ -640,3 +640,24 @@ extension SwapTokenStore: BraveWalletEthJsonRpcControllerObserver {
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
+
+extension SwapTokenStore: SubStore {
+  public func resetStore() {
+    allTokens = []
+    selectedFromToken = nil
+    selectedToToken = nil
+    selectedFromTokenBalance = nil
+    selectedToTokenBalance = nil
+    selectedFromTokenPrice = "0"
+    state = .idle
+    sellAmount = ""
+    buyAmount = ""
+    slippageOption = SlippageGrid.Option.halfPercent
+    overrideSlippage = nil
+    chainId = ""
+    slippage = 0.005
+    updatingPriceQuote = false
+    addingUnapprovedTx = false
+    timer = nil
+  }
+}

@@ -366,3 +366,11 @@ extension KeyringStore: BraveWalletKeyringControllerObserver {
     updateKeyringInfo()
   }  
 }
+
+extension KeyringStore: SubStore {
+  public func resetStore() {
+    controller.reset()
+    isOnboardingVisible = true
+    Self.resetKeychainStoredPassword()
+  }
+}

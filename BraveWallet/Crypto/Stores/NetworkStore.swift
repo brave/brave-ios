@@ -32,6 +32,11 @@ public class NetworkStore: ObservableObject {
   
   public init(rpcController: BraveWalletEthJsonRpcController) {
     controller = rpcController
+    update()
+    controller.add(self)
+  }
+  
+  private func update() {
     controller.allNetworks { chains in
       self.ethereumChains = chains.filter {
         $0.chainId != BraveWallet.LocalhostChainId
@@ -42,7 +47,6 @@ public class NetworkStore: ObservableObject {
       self.selectedChainId = id
       self.controller.setNetwork(id) { _ in }
     }
-    controller.add(self)
   }
 }
 
@@ -56,3 +60,12 @@ extension NetworkStore: BraveWalletEthJsonRpcControllerObserver {
   }
 }
 
+extension NetworkStore: SubStore {
+  public func resetStore() {
+    ethereumChains = []
+    selectedChainId = BraveWallet.MainnetChainId
+    controller.setNetwork(selectedChainId) { [self] _ in
+      update()
+    }
+  }
+}
