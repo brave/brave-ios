@@ -27,6 +27,7 @@ class SyncPairCameraViewController: SyncViewController {
     }
     
     private let syncAPI: BraveSyncAPI
+    private static let forcedCameraTimeout = 25.0
 
     init(syncAPI: BraveSyncAPI) {
         self.syncAPI = syncAPI
@@ -168,7 +169,7 @@ class SyncPairCameraViewController: SyncViewController {
             self.cameraView.cameraOverlayError()
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 25.0, execute: task)
+        DispatchQueue.main.asyncAfter(deadline: .now() + SyncPairCameraViewController.forcedCameraTimeout, execute: task)
         
         // Check Internet Connectivity
         if !DeviceInfo.hasConnectivity() {

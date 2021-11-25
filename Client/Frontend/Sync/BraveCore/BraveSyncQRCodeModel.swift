@@ -29,7 +29,10 @@ struct BraveSyncQRCodeModel: Codable {
     static let currentlySupportedVersion = 2
     
     /// The duration for which a QR code is valid
-    static let validityDuration = 60.minutes
+    static let validityDuration = 30.minutes
+    
+    /// The duration for which a QR code is invalid when generated too far into the future
+    static let futureValidityDuration = 60.minutes
     
     /// TimeInterval of BraveSync Epoch
     /// 2021-11-02T00:00:00+0000 [yyyy-MM-dd'T'hh:mm:ssZ]
@@ -103,8 +106,8 @@ struct BraveSyncQRCodeModel: Codable {
         }
         
         // Date validation
-        let minDate = Date().timeIntervalSince1970 - BraveSyncQRCodeModel.validityDuration
-        let maxDate = Date().timeIntervalSince1970 + BraveSyncQRCodeModel.validityDuration
+        let minDate = Date().timeIntervalSince1970
+        let maxDate = Date().timeIntervalSince1970 + BraveSyncQRCodeModel.futureValidityDuration
         
         // Currently Expired (QR code date is too far into the past)
         if TimeInterval(notValidAfter) <= minDate {
@@ -133,7 +136,7 @@ struct BraveSyncQRCodeModel: Codable {
         }
         
         let codeWordsCount = codeWords.separatedBy(" ").count
-        if codeWordsCount < 24 || codeWordsCount > 25 {
+        if codeWordsCount < 24 {
             return .invalidFormat
         }
         
