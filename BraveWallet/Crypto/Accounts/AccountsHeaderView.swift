@@ -7,7 +7,6 @@ import SwiftUI
 import struct Shared.Strings
 
 struct AccountsHeaderView: View {
-  var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
   
   @State private var isPresentingBackup: Bool = false
@@ -48,7 +47,7 @@ struct AccountsHeaderView: View {
               .navigationViewStyle(StackNavigationViewStyle())
             }
         )
-        NavigationLink(destination: WalletSettingsView(keyringStore: keyringStore, walletStore: walletStore)) {
+        NavigationLink(destination: WalletSettingsView(keyringStore: keyringStore)) {
           Image("brave.gear")
         }
       }
@@ -61,7 +60,7 @@ struct AccountsHeaderView: View {
 #if DEBUG
 struct AccountsHeaderView_Previews: PreviewProvider {
   static var previews: some View {
-    AccountsHeaderView(walletStore: .previewStore, keyringStore: .previewStore)
+    AccountsHeaderView(keyringStore: .previewStore)
       .previewLayout(.sizeThatFits)
       .previewColorSchemes()
   }

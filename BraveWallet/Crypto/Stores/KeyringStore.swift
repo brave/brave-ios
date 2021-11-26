@@ -223,6 +223,12 @@ public class KeyringStore: ObservableObject {
     }
   }
   
+  func reset() {
+    controller.reset()
+    isOnboardingVisible = true
+    Self.resetKeychainStoredPassword()
+  }
+  
   func privateKey(for account: BraveWallet.AccountInfo, completion: @escaping (String?) -> Void) {
     if account.isPrimary {
       controller.privateKey(forDefaultKeyringAccount: account.address) { success, key in
@@ -359,12 +365,4 @@ extension KeyringStore: BraveWalletKeyringControllerObserver {
   public func accountsChanged() {
     updateKeyringInfo()
   }  
-}
-
-extension KeyringStore: SubStore {
-  public func resetStore() {
-    controller.reset()
-    isOnboardingVisible = true
-    Self.resetKeychainStoredPassword()
-  }
 }

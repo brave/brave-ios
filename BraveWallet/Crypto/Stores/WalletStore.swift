@@ -5,12 +5,6 @@
 
 import Foundation
 import BraveCore
-import SwiftUI
-
-/// Sub stores under `WalletStore`
-public protocol SubStore {
-  func resetStore()
-}
 
 /// The main wallet store
 public class WalletStore: ObservableObject {
@@ -143,13 +137,6 @@ public class WalletStore: ObservableObject {
     )
     accountActivityStore = store
     return store
-  }
-  
-  func reset() {
-    let subStores: [SubStore] = [keyringStore, networkStore, portfolioStore, buyTokenStore, sendTokenStore, swapTokenStore]
-    subStores.forEach { store in
-      store.resetStore()
-    }
   }
 }
 

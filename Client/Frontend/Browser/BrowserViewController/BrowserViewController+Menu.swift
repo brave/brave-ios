@@ -156,28 +156,10 @@ extension BrowserViewController {
                 }
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-                let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-                guard
-                    let keyringController = BraveWallet.KeyringControllerFactory.get(privateMode: privateMode),
-                    let rpcController = BraveWallet.EthJsonRpcControllerFactory.get(privateMode: privateMode),
-                    let assetRatioController = BraveWallet.AssetRatioControllerFactory.get(privateMode: privateMode),
-                    let walletService = BraveWallet.ServiceFactory.get(privateMode: privateMode),
-                    let swapController = BraveWallet.SwapControllerFactory.get(privateMode: privateMode),
-                    let txController = BraveWallet.EthTxControllerFactory.get(privateMode: privateMode)
-                else {
-                    log.error("Failed to load wallet. One or more services were unavailable")
-                    return
-                }
+                let keyringStore = BraveWallet.KeyringControllerFactory
+                                    .get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing)
+                                    .map { KeyringStore(keyringController: $0) }
                 
-                let walletStore = WalletStore(
-                    keyringController: keyringController,
-                    rpcController: rpcController,
-                    walletService: walletService,
-                    assetRatioController: assetRatioController,
-                    swapController: swapController,
-                    tokenRegistry: BraveCoreMain.ercTokenRegistry,
-                    transactionController: txController
-                )
                 let vc = SettingsViewController(profile: self.profile,
                                                 tabManager: self.tabManager,
                                                 feedDataSource: self.feedDataSource,
@@ -186,7 +168,7 @@ extension BrowserViewController {
                                                 windowProtection: self.windowProtection,
                                                 historyAPI: self.historyAPI,
                                                 syncAPI: self.syncAPI,
-                                                walletStore: walletStore)
+                                                walletKeyringStore: keyringStore)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
             }

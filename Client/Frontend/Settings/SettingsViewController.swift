@@ -61,7 +61,7 @@ class SettingsViewController: TableViewController {
     private let feedDataSource: FeedDataSource
     private let historyAPI: BraveHistoryAPI
     private let syncAPI: BraveSyncAPI
-    private let walletStore: WalletStore?
+    private let walletKeyringStore: KeyringStore?
     private let windowProtection: WindowProtection?
 
     init(profile: Profile,
@@ -72,7 +72,7 @@ class SettingsViewController: TableViewController {
          windowProtection: WindowProtection?,
          historyAPI: BraveHistoryAPI,
          syncAPI: BraveSyncAPI,
-         walletStore: WalletStore? = nil
+         walletKeyringStore: KeyringStore? = nil
     ) {
         self.profile = profile
         self.tabManager = tabManager
@@ -82,7 +82,7 @@ class SettingsViewController: TableViewController {
         self.windowProtection = windowProtection
         self.historyAPI = historyAPI
         self.syncAPI = syncAPI
-        self.walletStore = walletStore
+        self.walletKeyringStore = walletKeyringStore
         
         super.init(style: .insetGrouped)
     }
@@ -249,7 +249,7 @@ class SettingsViewController: TableViewController {
             }, image: #imageLiteral(resourceName: "settings-playlist").template, accessory: .disclosureIndicator)
         )
         
-        if #available(iOS 14.0, *), let walletStore = walletStore {
+        if #available(iOS 14.0, *), let  keyringStore = walletKeyringStore {
             section.rows.append(
                 Row(text: Strings.Wallet.braveWallet, selection: { [unowned self] in
                     let vc = UIHostingController(rootView: WalletSettingsView(keyringStore: keyringStore))

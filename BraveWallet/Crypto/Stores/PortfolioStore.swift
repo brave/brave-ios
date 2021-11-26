@@ -227,10 +227,8 @@ extension PortfolioStore: BraveWalletKeyringControllerObserver {
   public func backedUp() {
   }
   public func keyringCreated() {
-    update()
   }
   public func keyringRestored() {
-    update()
   }
   public func locked() {
   }
@@ -242,16 +240,5 @@ extension PortfolioStore: BraveWalletKeyringControllerObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged() {
-  }
-}
-
-extension PortfolioStore: SubStore {
-  public func resetStore() {
-    isLoadingBalances = false
-    historicalBalances = []
-    timeframe = .oneDay
-    userVisibleAssets = []
-    balance = "$0.00"
-    update()
   }
 }

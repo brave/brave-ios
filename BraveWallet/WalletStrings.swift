@@ -1440,7 +1440,7 @@ extension Strings {
       "wallet.lock",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "lock",
+      value: "Lock",
       comment: "The title of the lock option inside the menu when user clicks the three dots button beside assets search button."
     )
     public static let settings = NSLocalizedString(

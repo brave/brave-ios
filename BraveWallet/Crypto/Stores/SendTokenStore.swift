@@ -219,11 +219,3 @@ extension SendTokenStore: BraveWalletEthJsonRpcControllerObserver {
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
-
-extension SendTokenStore: SubStore {
-  public func resetStore() {
-    userAssets = []
-    selectedSendToken = nil
-    selectedSendTokenBalance = nil
-  }
-}
