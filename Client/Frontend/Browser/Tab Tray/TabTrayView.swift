@@ -14,6 +14,9 @@ extension TabTrayController {
         private struct UX {
             static let regularCellHeight = 192.0
             static let largeCellHeight = 256.0
+            static let itemInset = 6.0
+            static let buttonEdgeInset = 10.0
+            static let buttonStackLayoutMargin = 16.0
         }
         
         private func generateLayout(numberOfColumns: Int,
@@ -22,7 +25,7 @@ extension TabTrayController {
                 widthDimension: .fractionalWidth(1.0),
                 heightDimension: .fractionalHeight(1.0))
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = .init(top: 6, leading: 6, bottom: 6, trailing: 6)
+            item.contentInsets = .init(top: UX.itemInset, leading: UX.itemInset, bottom: UX.itemInset, trailing: UX.itemInset)
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -47,7 +50,7 @@ extension TabTrayController {
             $0.accessibilityLabel = Strings.tabTrayAddTabAccessibilityLabel
             $0.accessibilityIdentifier = "TabTrayController.addTabButton"
             $0.tintColor = .braveLabel
-            $0.contentEdgeInsets = .init(top: 0, left: 10, bottom: 0, right: 10)
+            $0.contentEdgeInsets = .init(top: 0, left: UX.buttonEdgeInset, bottom: 0, right: UX.buttonEdgeInset)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
@@ -96,7 +99,11 @@ extension TabTrayController {
                     .view(doneButton)
                 )
                 $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-                $0.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+                $0.layoutMargins = UIEdgeInsets(
+                    top: UX.buttonStackLayoutMargin,
+                    left: UX.buttonStackLayoutMargin,
+                    bottom: 0,
+                    right: UX.buttonStackLayoutMargin)
                 $0.isLayoutMarginsRelativeArrangement = true
             }
             
@@ -106,7 +113,6 @@ extension TabTrayController {
                 $0.addStackViewItems(
                     .view(privateModeInfo),
                     .view(collectionView),
-                    .customSpace(10),
                     .view(buttonsStackView))
                 $0.isAccessibilityElement = false
             }
@@ -117,7 +123,7 @@ extension TabTrayController {
             
             addSubview(stackView)
             stackView.snp.makeConstraints {
-                $0.top.left.right.equalToSuperview()//.offset(8)
+                $0.top.left.right.equalToSuperview()
                 $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             }
             

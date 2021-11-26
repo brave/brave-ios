@@ -211,6 +211,9 @@ class TabTrayController: LoadingViewController {
             // So when you dismiss the modal, correct tab and url is showed.
             tabManager.selectTab(tabManager.tabsForCurrentMode.first)
         }
+        
+        // Disable Search when Private mode info is on 
+        tabTraySearchController.searchBar.isUserInteractionEnabled = !privateMode
     }
     
     private func remove(tab: Tab) {

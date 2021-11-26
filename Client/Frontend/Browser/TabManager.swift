@@ -179,8 +179,8 @@ class TabManager: NSObject {
         let allTabs = allTabs.filter { $0.type == type }
         
         if let query = query, !query.isEmpty {
-            // Last title is the only data that will be present on every situation
-            return allTabs.filter { $0.lastTitle?.contains(query) ?? false }
+            // Display title is the only data that will be present on every situation
+            return allTabs.filter { $0.displayTitle.lowercased().contains(query) }
         } else {
             return allTabs
         }
