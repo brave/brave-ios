@@ -138,4 +138,31 @@ extension BrowserViewController {
             isOnboardingOrFullScreenCalloutPresented = true
         }
     }
+    
+    func presentReleaseNotesCallout() {
+        if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+
+        // TODO: Cases Change
+        guard Preferences.FullScreenCallout.whatsNewCalloutOptIn.value else {
+            return
+        }
+
+        var releaseNotesView = ReleaseNotesView()
+        releaseNotesView.dismiss = { [weak self] in
+            self?.dismiss(animated: true)
+        }
+        
+        releaseNotesView.actionTest = { [weak self] in
+            guard let self = self else { return }
+            self.dismiss(animated: true) {
+                // TODO: Test Action Handle Test
+            }
+        }
+
+        let controller = PopupViewController(rootView: releaseNotesView)
+        present(controller, animated: true, completion: nil)
+        isOnboardingOrFullScreenCalloutPresented = true
+        return
+    }
+
 }

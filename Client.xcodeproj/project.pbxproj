@@ -414,6 +414,7 @@
 		2891F2CB1F991185001B105E /* v33.db in Resources */ = {isa = PBXBuildFile; fileRef = 2891F2BA1F991185001B105E /* v33.db */; };
 		289A4C131C4EB90600A460E3 /* StorageTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289A4C121C4EB90600A460E3 /* StorageTestUtils.swift */; };
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
+		2F0AF95F275175C5003FAA37 /* ReleaseNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0AF95E275175C5003FAA37 /* ReleaseNotesView.swift */; };
 		2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */; };
 		2F13B801273311CB00253A4D /* BrowserViewController+Callout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
@@ -2011,6 +2012,7 @@
 		28A6CE891AC082E200C1A2D4 /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Client-Bridging-Header.h"; sourceTree = "<group>"; };
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
+		2F0AF95E275175C5003FAA37 /* ReleaseNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseNotesView.swift; sourceTree = "<group>"; };
 		2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Callout.swift"; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };
@@ -5241,6 +5243,7 @@
 				CA0EE174273C248C00F269DA /* OnboardingPulseAnimationView.swift */,
 				CA0EE176273C402900F269DA /* WelcomeNTPOnboardingView.swift */,
 				CA29F2F2273DAEA100C391C3 /* PlaylistOnboardingView.swift */,
+				2F0AF95E275175C5003FAA37 /* ReleaseNotesView.swift */,
 			);
 			path = Welcome;
 			sourceTree = "<group>";
@@ -7728,6 +7731,7 @@
 				0BB5B30B1AC0AD1F0052877D /* LoginsHelper.swift in Sources */,
 				392ED7E61D0AEFEF009D9B62 /* HomePageAccessors.swift in Sources */,
 				7BA8D1C71BA037F500C8AE9E /* OpenInHelper.swift in Sources */,
+				2F0AF95F275175C5003FAA37 /* ReleaseNotesView.swift in Sources */,
 				0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */,
 				4433E15726B999B40023A134 /* BraveTalkRewardsOptInView.swift in Sources */,
 				A1AD4BCF20BF3E8C007A6EA1 /* BookmarksViewController.swift in Sources */,
