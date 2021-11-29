@@ -194,6 +194,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     /// in order to not to try to present another callout  over existing one
     var isOnboardingOrFullScreenCalloutPresented = false
     
+    /// Boolean tracking If whats new callout should be presented
+    let skipWhatsNewCallout = true
+    
     private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
     var widgetFaviconFetchers: [FaviconFetcher] = []
     let deviceCheckClient: DeviceCheckClient?
@@ -951,6 +954,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         presentDefaultBrowserScreenCallout()
         presentBraveRewardsScreenCallout()
         presentSyncAlertCallout()
+        presentReleaseNotesCallout()
                 
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)

@@ -124,9 +124,9 @@ extension Preferences {
         static let rewardsCalloutCompleted =
             Option<Bool>(key: "fullScreenCallout.full-screen-rewards-callout-completed", default: false)
         
-        /// Whether the whats new callout should be shown.
-        static let whatsNewCalloutOptIn =
-            Option<Bool>(key: "fullScreenCallout.full-screen-whats-new-callout-completed", default: false)
+        /// Version the whats new callout shown last time
+        static let whatsNewCalloutOptInVersion =
+            Option<String?>(key: "fullScreenCallout.full-screen-whats-new-callout-version", default: nil)
         
         /// Whether the ntp callout is shown.
         static let ntpCalloutCompleted =

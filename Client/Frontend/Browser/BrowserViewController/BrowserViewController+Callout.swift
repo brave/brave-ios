@@ -140,29 +140,43 @@ extension BrowserViewController {
     }
     
     func presentReleaseNotesCallout() {
-        if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
-
-        // TODO: Cases Change
-        guard Preferences.FullScreenCallout.whatsNewCalloutOptIn.value else {
+        // Check If Release Notes Callout should be skipped
+        if skipWhatsNewCallout ||
+            Preferences.DebugFlag.skipNTPCallouts == true ||
+            isOnboardingOrFullScreenCalloutPresented {
             return
         }
+        
+        func showReleaseNotesView() {
+            var releaseNotesView = ReleaseNotesView()
+            releaseNotesView.dismiss = { [weak self] in
+                self?.dismiss(animated: true)
+            }
+            
+            releaseNotesView.actionTest = { [weak self] in
+                guard let self = self else { return }
+                self.dismiss(animated: true) {
+                    // TODO: Test Action Handle Test
+                }
+            }
 
-        var releaseNotesView = ReleaseNotesView()
-        releaseNotesView.dismiss = { [weak self] in
-            self?.dismiss(animated: true)
+            let controller = PopupViewController(rootView: releaseNotesView)
+            present(controller, animated: true, completion: nil)
+            
+            Preferences.FullScreenCallout.whatsNewCalloutOptInVersion.value = AppInfo.appVersion
+            isOnboardingOrFullScreenCalloutPresented = true
         }
         
-        releaseNotesView.actionTest = { [weak self] in
-            guard let self = self else { return }
-            self.dismiss(animated: true) {
-                // TODO: Test Action Handle Test
-            }
+        // Check If ReleaseNotes has never been shown
+        guard let optInVersion = Preferences.FullScreenCallout.whatsNewCalloutOptInVersion.value else {
+            showReleaseNotesView()
+            return
         }
-
-        let controller = PopupViewController(rootView: releaseNotesView)
-        present(controller, animated: true, completion: nil)
-        isOnboardingOrFullScreenCalloutPresented = true
-        return
+        
+        // If the saved version is smaller than app version show the release notes
+        if optInVersion.compare(AppInfo.appVersion, options: .numeric) == .orderedAscending {
+            showReleaseNotesView()
+        }
     }
 
 }
