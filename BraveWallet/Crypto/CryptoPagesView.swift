@@ -12,7 +12,9 @@ import BraveUI
 import struct Shared.Strings
 
 struct CryptoPagesView: View {
-  @ObservedObject var walletStore: WalletStore
+  var walletStore: WalletStore
+  @ObservedObject var cryptoStore: CryptoStore
+  @ObservedObject var keyringStore: KeyringStore
   
   @State private var isShowingSettings: Bool = false
   @State private var isShowingSearch: Bool = false
@@ -21,8 +23,9 @@ struct CryptoPagesView: View {
   var body: some View {
     _CryptoPagesView(
       walletStore: walletStore,
-      isShowingTransactions: $walletStore.isPresentingTransactionConfirmations,
-      isConfirmationsButtonVisible: !walletStore.unapprovedTransactions.isEmpty
+      cryptoStore: cryptoStore,
+      isShowingTransactions: $cryptoStore.isPresentingTransactionConfirmations,
+      isConfirmationsButtonVisible: !cryptoStore.unapprovedTransactions.isEmpty
     )
       .onAppear {
         // If a user chooses not to confirm/reject their transactions we shouldn't
@@ -31,7 +34,7 @@ struct CryptoPagesView: View {
           // Give the animation time
           DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.fetchedUnapprovedTransactionsThisSession = true
-            self.walletStore.fetchUnapprovedTransactions()
+            self.cryptoStore.fetchUnapprovedTransactions()
           }
         }
       }
@@ -56,7 +59,7 @@ struct CryptoPagesView: View {
       })
       .background(
         NavigationLink(
-          destination: WalletSettingsView(keyringStore: walletStore.keyringStore),
+          destination: WalletSettingsView(keyringStore: keyringStore),
           isActive: $isShowingSettings
         ) {
           Text(Strings.Wallet.settings)
@@ -66,7 +69,10 @@ struct CryptoPagesView: View {
       .background(
         Color.clear
           .sheet(isPresented: $isShowingSearch) {
-            AssetSearchView(walletStore: walletStore)
+            AssetSearchView(
+              walletStore: walletStore,
+              cryptoStore: cryptoStore
+            )
           }
       )
       .toolbar {
@@ -111,12 +117,14 @@ struct CryptoPagesView: View {
   
   private struct _CryptoPagesView: UIViewControllerRepresentable {
     var walletStore: WalletStore
+    var cryptoStore: CryptoStore
     var isShowingTransactions: Binding<Bool>
     var isConfirmationsButtonVisible: Bool
     
     func makeUIViewController(context: Context) -> CryptoPagesViewController {
       CryptoPagesViewController(
         walletStore: walletStore,
+        cryptoStore: cryptoStore,
         buySendSwapDestination: context.environment.buySendSwapDestination,
         isShowingTransactions: isShowingTransactions
       )
@@ -129,14 +137,21 @@ struct CryptoPagesView: View {
 
 private class CryptoPagesViewController: TabbedPageViewController {
   private let walletStore: WalletStore
+  private let cryptoStore: CryptoStore
   private let swapButton = SwapButton()
   let confirmationsButton = ConfirmationsButton()
   
   @Binding private var buySendSwapDestination: BuySendSwapDestination?
   @Binding private var isShowingTransactions: Bool
   
-  init(walletStore: WalletStore, buySendSwapDestination: Binding<BuySendSwapDestination?>, isShowingTransactions: Binding<Bool>) {
+  init(
+    walletStore: WalletStore,
+    cryptoStore: CryptoStore,
+    buySendSwapDestination: Binding<BuySendSwapDestination?>,
+    isShowingTransactions: Binding<Bool>
+  ) {
     self.walletStore = walletStore
+    self.cryptoStore = cryptoStore
     self._buySendSwapDestination = buySendSwapDestination
     self._isShowingTransactions = isShowingTransactions
     super.init(nibName: nil, bundle: nil)
@@ -156,15 +171,15 @@ private class CryptoPagesViewController: TabbedPageViewController {
     
     pages = [
       UIHostingController(rootView: PortfolioView(
-        walletStore: walletStore,
+        cryptoStore: cryptoStore,
         keyringStore: walletStore.keyringStore,
-        networkStore: walletStore.networkStore,
-        portfolioStore: walletStore.portfolioStore
+        networkStore: cryptoStore.networkStore,
+        portfolioStore: cryptoStore.portfolioStore
       )).then {
         $0.title = Strings.Wallet.portfolioPageTitle
       },
       UIHostingController(rootView: AccountsView(
-        walletStore: walletStore,
+        cryptoStore: cryptoStore,
         keyringStore: walletStore.keyringStore
       )).then {
         $0.title = Strings.Wallet.accountsPageTitle

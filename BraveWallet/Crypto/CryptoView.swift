@@ -11,7 +11,7 @@ import Introspect
 import BraveUI
 
 public struct CryptoView: View {
-  @ObservedObject var walletStore: WalletStore
+  var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
   
   // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
@@ -28,7 +28,7 @@ public struct CryptoView: View {
     self.keyringStore = keyringStore
   }
   
-  private enum VisibleScreen: Equatable {
+  enum VisibleScreen: Equatable {
     case crypto
     case onboarding
     case unlock
@@ -58,63 +58,16 @@ public struct CryptoView: View {
   
   public var body: some View {
     ZStack {
-      switch visibleScreen {
-      case .crypto:
-        UIKitNavigationView {
-          CryptoPagesView(walletStore: walletStore)
-            .toolbar {
-              dismissButtonToolbarContents
-            }
-        }
-        .background(
-          Color.clear
-            .sheet(item: $walletStore.buySendSwapDestination) { action in
-              switch action {
-              case .buy:
-                BuyTokenView(
-                  keyringStore: walletStore.keyringStore,
-                  networkStore: walletStore.networkStore,
-                  buyTokenStore: walletStore.buyTokenStore
-                )
-              case .send:
-                SendTokenView(
-                  keyringStore: walletStore.keyringStore,
-                  networkStore: walletStore.networkStore,
-                  sendTokenStore: walletStore.sendTokenStore
-                )
-              case .swap:
-                SwapCryptoView(
-                  keyringStore: walletStore.keyringStore,
-                  ethNetworkStore: walletStore.networkStore,
-                  swapTokensStore: walletStore.swapTokenStore
-                )
-              }
-            }
+      if let cryptoStore = walletStore.cryptoStore {
+        CryptoContainerView(
+          walletStore: walletStore,
+          visibleScreen: visibleScreen,
+          dismissButtonToolbarContents: dismissButtonToolbarContents,
+          keyringStore: keyringStore,
+          cryptoStore: cryptoStore
         )
-        .background(
-          Color.clear
-            .sheet(isPresented: $walletStore.isPresentingTransactionConfirmations) {
-              if !walletStore.unapprovedTransactions.isEmpty {
-                TransactionConfirmationView(
-                  transactions: walletStore.unapprovedTransactions,
-                  confirmationStore: walletStore.confirmationStore,
-                  networkStore: walletStore.networkStore,
-                  keyringStore: walletStore.keyringStore
-                )
-              }
-            }
-        )
-        .transition(.asymmetric(insertion: .identity, removal: .opacity))
-      case .unlock:
-        UIKitNavigationView {
-          UnlockWalletView(keyringStore: keyringStore)
-            .toolbar {
-              dismissButtonToolbarContents
-            }
-        }
-        .transition(.move(edge: .bottom))
-        .zIndex(1)  // Needed or the dismiss animation messes up
-      case .onboarding:
+      } else {
+        // don't have a `cryptoStore` yet, means need to set up a new wallet
         UIKitNavigationView {
           SetupCryptoView(keyringStore: keyringStore)
             .toolbar {
@@ -130,6 +83,87 @@ public struct CryptoView: View {
     .environment(\.openWalletURLAction, .init(action: { url in
       openWalletURLAction?(url)
     }))
-    .environment(\.buySendSwapDestination, $walletStore.buySendSwapDestination)
+  }
+}
+
+struct CryptoContainerView<Toolbar: ToolbarContent>: View {
+  var walletStore: WalletStore
+  var visibleScreen: CryptoView.VisibleScreen
+  var dismissButtonToolbarContents: Toolbar
+  @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var cryptoStore: CryptoStore
+  
+  var body: some View {
+    switch visibleScreen {
+    case .crypto:
+      UIKitNavigationView {
+        CryptoPagesView(
+          walletStore: walletStore,
+          cryptoStore: cryptoStore,
+          keyringStore: keyringStore
+        )
+          .toolbar {
+            dismissButtonToolbarContents
+          }
+      }
+      .background(
+        Color.clear
+          .sheet(item: $cryptoStore.buySendSwapDestination) { action in
+            switch action {
+            case .buy:
+              BuyTokenView(
+                keyringStore: keyringStore,
+                networkStore: cryptoStore.networkStore,
+                buyTokenStore: cryptoStore.buyTokenStore
+              )
+            case .send:
+              SendTokenView(
+                keyringStore: keyringStore,
+                networkStore: cryptoStore.networkStore,
+                sendTokenStore: cryptoStore.sendTokenStore
+              )
+            case .swap:
+              SwapCryptoView(
+                keyringStore: keyringStore,
+                ethNetworkStore: cryptoStore.networkStore,
+                swapTokensStore: cryptoStore.swapTokenStore
+              )
+            }
+          }
+      )
+      .background(
+        Color.clear
+          .sheet(isPresented: $cryptoStore.isPresentingTransactionConfirmations) {
+            if !walletStore.cryptoStore!.unapprovedTransactions.isEmpty {
+              TransactionConfirmationView(
+                transactions: cryptoStore.unapprovedTransactions,
+                confirmationStore: cryptoStore.confirmationStore,
+                networkStore: cryptoStore.networkStore,
+                keyringStore: keyringStore
+              )
+            }
+          }
+      )
+      .transition(.asymmetric(insertion: .identity, removal: .opacity))
+      .environment(\.buySendSwapDestination, $cryptoStore.buySendSwapDestination)
+    case .unlock:
+      UIKitNavigationView {
+        UnlockWalletView(keyringStore: keyringStore)
+          .toolbar {
+            dismissButtonToolbarContents
+          }
+      }
+      .transition(.move(edge: .bottom))
+      .zIndex(1)  // Needed or the dismiss animation messes up
+    case .onboarding:
+      UIKitNavigationView {
+        SetupCryptoView(keyringStore: keyringStore)
+          .toolbar {
+            dismissButtonToolbarContents
+          }
+      }
+      .transition(.move(edge: .bottom))
+      .zIndex(2)  // Needed or the dismiss animation messes up
+    }
   }
 }
