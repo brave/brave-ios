@@ -49,20 +49,22 @@ public class WalletStore {
     transactionController: BraveWalletEthTxController
   ) {
     self.cancellable = self.keyringStore.$keyring
-      .sink { keyring in
-      if !keyring.isDefaultKeyringCreated, self.cryptoStore != nil {
-        self.cryptoStore = nil
-      } else if keyring.isDefaultKeyringCreated, self.cryptoStore == nil {
-        self.cryptoStore = CryptoStore(
-          keyringController: keyringController,
-          rpcController: rpcController,
-          walletService: walletService,
-          assetRatioController: assetRatioController,
-          swapController: swapController,
-          tokenRegistry: tokenRegistry,
-          transactionController: transactionController
-        )
-      }
+      .map(\.isDefaultKeyringCreated)
+      .removeDuplicates()
+      .sink { isDefaultKeyringCreated in
+        if !isDefaultKeyringCreated, self.cryptoStore != nil {
+          self.cryptoStore = nil
+        } else if isDefaultKeyringCreated, self.cryptoStore == nil {
+          self.cryptoStore = CryptoStore(
+            keyringController: keyringController,
+            rpcController: rpcController,
+            walletService: walletService,
+            assetRatioController: assetRatioController,
+            swapController: swapController,
+            tokenRegistry: tokenRegistry,
+            transactionController: transactionController
+          )
+        }
     }
   }
 }

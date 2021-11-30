@@ -28,7 +28,7 @@ public struct CryptoView: View {
     self.keyringStore = keyringStore
   }
   
-  enum VisibleScreen: Equatable {
+  private enum VisibleScreen: Equatable {
     case crypto
     case onboarding
     case unlock
@@ -58,16 +58,22 @@ public struct CryptoView: View {
   
   public var body: some View {
     ZStack {
-      if let cryptoStore = walletStore.cryptoStore {
-        CryptoContainerView(
-          walletStore: walletStore,
-          visibleScreen: visibleScreen,
-          dismissButtonToolbarContents: dismissButtonToolbarContents,
-          keyringStore: keyringStore,
-          cryptoStore: cryptoStore
-        )
-      } else {
-        // don't have a `cryptoStore` yet, means need to set up a new wallet
+      switch visibleScreen {
+      case .crypto:
+        if let store = walletStore.cryptoStore {
+          CryptoContainerView(walletStore: walletStore, cryptoStore: store, toolbarDismissContent: dismissButtonToolbarContents)
+            .transition(.asymmetric(insertion: .identity, removal: .opacity))
+        }
+      case .unlock:
+        UIKitNavigationView {
+          UnlockWalletView(keyringStore: keyringStore)
+            .toolbar {
+              dismissButtonToolbarContents
+            }
+        }
+        .transition(.move(edge: .bottom))
+        .zIndex(1)  // Needed or the dismiss animation messes up
+      case .onboarding:
         UIKitNavigationView {
           SetupCryptoView(keyringStore: keyringStore)
             .toolbar {
@@ -86,84 +92,56 @@ public struct CryptoView: View {
   }
 }
 
-struct CryptoContainerView<Toolbar: ToolbarContent>: View {
+private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
   var walletStore: WalletStore
-  var visibleScreen: CryptoView.VisibleScreen
-  var dismissButtonToolbarContents: Toolbar
-  @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
+  var toolbarDismissContent: DismissContent
   
   var body: some View {
-    switch visibleScreen {
-    case .crypto:
-      UIKitNavigationView {
-        CryptoPagesView(
-          walletStore: walletStore,
-          cryptoStore: cryptoStore,
-          keyringStore: keyringStore
-        )
-          .toolbar {
-            dismissButtonToolbarContents
-          }
-      }
-      .background(
-        Color.clear
-          .sheet(item: $cryptoStore.buySendSwapDestination) { action in
-            switch action {
-            case .buy:
-              BuyTokenView(
-                keyringStore: keyringStore,
-                networkStore: cryptoStore.networkStore,
-                buyTokenStore: cryptoStore.buyTokenStore
-              )
-            case .send:
-              SendTokenView(
-                keyringStore: keyringStore,
-                networkStore: cryptoStore.networkStore,
-                sendTokenStore: cryptoStore.sendTokenStore
-              )
-            case .swap:
-              SwapCryptoView(
-                keyringStore: keyringStore,
-                ethNetworkStore: cryptoStore.networkStore,
-                swapTokensStore: cryptoStore.swapTokenStore
-              )
-            }
-          }
-      )
-      .background(
-        Color.clear
-          .sheet(isPresented: $cryptoStore.isPresentingTransactionConfirmations) {
-            if !walletStore.cryptoStore!.unapprovedTransactions.isEmpty {
-              TransactionConfirmationView(
-                transactions: cryptoStore.unapprovedTransactions,
-                confirmationStore: cryptoStore.confirmationStore,
-                networkStore: cryptoStore.networkStore,
-                keyringStore: keyringStore
-              )
-            }
-          }
-      )
-      .transition(.asymmetric(insertion: .identity, removal: .opacity))
-      .environment(\.buySendSwapDestination, $cryptoStore.buySendSwapDestination)
-    case .unlock:
-      UIKitNavigationView {
-        UnlockWalletView(keyringStore: keyringStore)
-          .toolbar {
-            dismissButtonToolbarContents
-          }
-      }
-      .transition(.move(edge: .bottom))
-      .zIndex(1)  // Needed or the dismiss animation messes up
-    case .onboarding:
-      UIKitNavigationView {
-        SetupCryptoView(keyringStore: keyringStore)
-          .toolbar {
-            dismissButtonToolbarContents
-          }
-      }
-      .transition(.move(edge: .bottom))
-      .zIndex(2)  // Needed or the dismiss animation messes up
+    UIKitNavigationView {
+      CryptoPagesView(walletStore: walletStore, cryptoStore: cryptoStore, keyringStore: walletStore.keyringStore)
+        .toolbar {
+          toolbarDismissContent
+        }
     }
+    .background(
+      Color.clear
+        .sheet(item: $cryptoStore.buySendSwapDestination) { action in
+          switch action {
+          case .buy:
+            BuyTokenView(
+              keyringStore: walletStore.keyringStore,
+              networkStore: cryptoStore.networkStore,
+              buyTokenStore: cryptoStore.buyTokenStore
+            )
+          case .send:
+            SendTokenView(
+              keyringStore: walletStore.keyringStore,
+              networkStore: cryptoStore.networkStore,
+              sendTokenStore: cryptoStore.sendTokenStore
+            )
+          case .swap:
+            SwapCryptoView(
+              keyringStore: walletStore.keyringStore,
+              ethNetworkStore: cryptoStore.networkStore,
+              swapTokensStore: cryptoStore.swapTokenStore
+            )
+          }
+        }
+    )
+    .background(
+      Color.clear
+        .sheet(isPresented: $cryptoStore.isPresentingTransactionConfirmations) {
+          if !cryptoStore.unapprovedTransactions.isEmpty {
+            TransactionConfirmationView(
+              transactions: cryptoStore.unapprovedTransactions,
+              confirmationStore: cryptoStore.confirmationStore,
+              networkStore: cryptoStore.networkStore,
+              keyringStore: walletStore.keyringStore
+            )
+          }
+        }
+    )
+    .environment(\.buySendSwapDestination, $cryptoStore.buySendSwapDestination)
   }
 }
