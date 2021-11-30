@@ -51,7 +51,8 @@ public class WalletStore {
     self.cancellable = self.keyringStore.$keyring
       .map(\.isDefaultKeyringCreated)
       .removeDuplicates()
-      .sink { isDefaultKeyringCreated in
+      .sink { [weak self] isDefaultKeyringCreated in
+        guard let self = self else { return }
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {
