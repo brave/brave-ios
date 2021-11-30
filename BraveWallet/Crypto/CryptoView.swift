@@ -61,8 +61,12 @@ public struct CryptoView: View {
       switch visibleScreen {
       case .crypto:
         if let store = walletStore.cryptoStore {
-          CryptoContainerView(walletStore: walletStore, cryptoStore: store, toolbarDismissContent: dismissButtonToolbarContents)
-            .transition(.asymmetric(insertion: .identity, removal: .opacity))
+          CryptoContainerView(
+            keyringStore: keyringStore,
+            cryptoStore: store,
+            toolbarDismissContent: dismissButtonToolbarContents
+          )
+          .transition(.asymmetric(insertion: .identity, removal: .opacity))
         }
       case .unlock:
         UIKitNavigationView {
@@ -93,13 +97,13 @@ public struct CryptoView: View {
 }
 
 private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
-  var walletStore: WalletStore
+  var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
   
   var body: some View {
     UIKitNavigationView {
-      CryptoPagesView(walletStore: walletStore, cryptoStore: cryptoStore, keyringStore: walletStore.keyringStore)
+      CryptoPagesView(cryptoStore: cryptoStore, keyringStore: keyringStore)
         .toolbar {
           toolbarDismissContent
         }
@@ -110,19 +114,19 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           switch action {
           case .buy:
             BuyTokenView(
-              keyringStore: walletStore.keyringStore,
+              keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
               buyTokenStore: cryptoStore.buyTokenStore
             )
           case .send:
             SendTokenView(
-              keyringStore: walletStore.keyringStore,
+              keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
               sendTokenStore: cryptoStore.sendTokenStore
             )
           case .swap:
             SwapCryptoView(
-              keyringStore: walletStore.keyringStore,
+              keyringStore: keyringStore,
               ethNetworkStore: cryptoStore.networkStore,
               swapTokensStore: cryptoStore.swapTokenStore
             )
@@ -137,7 +141,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
               transactions: cryptoStore.unapprovedTransactions,
               confirmationStore: cryptoStore.confirmationStore,
               networkStore: cryptoStore.networkStore,
-              keyringStore: walletStore.keyringStore
+              keyringStore: keyringStore
             )
           }
         }

@@ -12,7 +12,6 @@ import BraveUI
 import struct Shared.Strings
 
 struct CryptoPagesView: View {
-  var walletStore: WalletStore
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
   
@@ -22,7 +21,7 @@ struct CryptoPagesView: View {
   
   var body: some View {
     _CryptoPagesView(
-      walletStore: walletStore,
+      keyringStore: keyringStore,
       cryptoStore: cryptoStore,
       isShowingTransactions: $cryptoStore.isPresentingTransactionConfirmations,
       isConfirmationsButtonVisible: !cryptoStore.unapprovedTransactions.isEmpty
@@ -70,7 +69,7 @@ struct CryptoPagesView: View {
         Color.clear
           .sheet(isPresented: $isShowingSearch) {
             AssetSearchView(
-              walletStore: walletStore,
+              keyringStore: keyringStore,
               cryptoStore: cryptoStore
             )
           }
@@ -86,7 +85,7 @@ struct CryptoPagesView: View {
           }
           Menu {
             Button(action: {
-              walletStore.keyringStore.lock()
+              keyringStore.lock()
             }) {
               Label(Strings.Wallet.lock, image: "brave.lock")
                 .imageScale(.medium) // Menu inside nav bar implicitly gets large
@@ -116,14 +115,14 @@ struct CryptoPagesView: View {
   }
   
   private struct _CryptoPagesView: UIViewControllerRepresentable {
-    var walletStore: WalletStore
+    var keyringStore: KeyringStore
     var cryptoStore: CryptoStore
     var isShowingTransactions: Binding<Bool>
     var isConfirmationsButtonVisible: Bool
     
     func makeUIViewController(context: Context) -> CryptoPagesViewController {
       CryptoPagesViewController(
-        walletStore: walletStore,
+        keyringStore: keyringStore,
         cryptoStore: cryptoStore,
         buySendSwapDestination: context.environment.buySendSwapDestination,
         isShowingTransactions: isShowingTransactions
@@ -136,7 +135,7 @@ struct CryptoPagesView: View {
 }
 
 private class CryptoPagesViewController: TabbedPageViewController {
-  private let walletStore: WalletStore
+  private let keyringStore: KeyringStore
   private let cryptoStore: CryptoStore
   private let swapButton = SwapButton()
   let confirmationsButton = ConfirmationsButton()
@@ -145,12 +144,12 @@ private class CryptoPagesViewController: TabbedPageViewController {
   @Binding private var isShowingTransactions: Bool
   
   init(
-    walletStore: WalletStore,
+    keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
     buySendSwapDestination: Binding<BuySendSwapDestination?>,
     isShowingTransactions: Binding<Bool>
   ) {
-    self.walletStore = walletStore
+    self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
     self._buySendSwapDestination = buySendSwapDestination
     self._isShowingTransactions = isShowingTransactions
@@ -172,7 +171,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
     pages = [
       UIHostingController(rootView: PortfolioView(
         cryptoStore: cryptoStore,
-        keyringStore: walletStore.keyringStore,
+        keyringStore: keyringStore,
         networkStore: cryptoStore.networkStore,
         portfolioStore: cryptoStore.portfolioStore
       )).then {
@@ -180,7 +179,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
       },
       UIHostingController(rootView: AccountsView(
         cryptoStore: cryptoStore,
-        keyringStore: walletStore.keyringStore
+        keyringStore: keyringStore
       )).then {
         $0.title = Strings.Wallet.accountsPageTitle
       }

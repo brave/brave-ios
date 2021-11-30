@@ -9,7 +9,7 @@ import BraveCore
 import struct Shared.Strings
 
 struct AssetSearchView: View {
-  var walletStore: WalletStore
+  var keyringStore: KeyringStore
   var cryptoStore: CryptoStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
@@ -22,7 +22,7 @@ struct AssetSearchView: View {
         NavigationLink(
           destination: AssetDetailView(
             assetDetailStore: cryptoStore.assetDetailStore(for: token),
-            keyringStore: walletStore.keyringStore,
+            keyringStore: keyringStore,
             networkStore: cryptoStore.networkStore
           )
         ) {
