@@ -5,7 +5,6 @@
 
 import Foundation
 import BraveCore
-import SwiftUI
 import Combine
 
 /// The main wallet store
