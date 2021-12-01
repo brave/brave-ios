@@ -559,7 +559,7 @@ extension Strings {
             "optionsMenu.braveVPNItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Get around censorship and increase your privacy protection.",
+            value: "Protect your entire device online",
             comment: "The subtitle description of menu item Brave VPN")
         public static let braveTalkItemTitle = NSLocalizedString(
             "optionsMenu.braveTalkItemTitle",
@@ -571,7 +571,7 @@ extension Strings {
             "optionsMenu.braveTalkItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Unlimited private video calls with your friends and colleagues.",
+            value: "Private video calls, right in your browser",
             comment: "The subtitle description of menu item Brave Talk")
         public static let braveNewsItemTitle = NSLocalizedString(
             "optionsMenu.braveNewsItemTitle",
@@ -583,7 +583,7 @@ extension Strings {
             "optionsMenu.braveNewsItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Today’s top stories in a completely private feed, just for you.",
+            value: "Today's top stories in a private news feed",
             comment: "The subtitle description of menu item Brave News")
         public static let bravePlaylistItemTitle = NSLocalizedString(
             "optionsMenu.bravePlaylistItemTitle",
@@ -595,7 +595,7 @@ extension Strings {
             "optionsMenu.bravePlaylistItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Create a playlist of your favorite audio and video streams, straight in your browser. ",
+            value: "Make an offline playlist of the content you love",
             comment: "The subtitle description of menu item Brave Playlist")
     }
 }
