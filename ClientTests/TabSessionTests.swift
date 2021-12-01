@@ -597,7 +597,7 @@ class TabSessionTests: XCTestCase {
                 XCTFail("WebView is not created yet")
                 return
             }
-            webView.evaluateSafeJavaScript(functionName: javascript, sandboxed: false,  asFunction: false) { result, error in
+            webView.evaluateSafeJavaScript(functionName: javascript, contentWorld: .page,  asFunction: false) { result, error in
                 guard let keys = result as? String else {
                     XCTFail("Javascript error while finding secret tokens")
                     expectation.fulfill()
