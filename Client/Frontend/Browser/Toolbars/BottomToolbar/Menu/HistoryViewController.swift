@@ -48,7 +48,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     var isHistoryRefreshing = false
     
-    // TODO: Uncomment once we restore saved logins, see #4599
+    // TODO: Uncomment once we restore search bar, see #4599
     /*
     private var searchHistoryTimer: Timer?
     private var isHistoryBeingSearched = false
@@ -85,7 +85,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             
         navigationItem.do {
             if !Preferences.Privacy.privateBrowsingOnly.value {
-                // TODO: Uncomment once we restore saved logins, see #4599
+                // TODO: Uncomment once we restore search bar, see #4599
                 /*
                 $0.searchController = searchController
                 $0.hidesSearchBarWhenScrolling = false
@@ -107,7 +107,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     private func applyTheme() {
         title = Strings.historyScreenTitle
 
-        // TODO: Uncomment once we restore saved logins, see #4599
+        // TODO: Uncomment once we restore search bar, see #4599
         /*
         searchController.do {
             $0.searchBar.autocapitalizationType = .none
@@ -231,7 +231,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
     }
     
-    // TODO: Uncomment once we restore saved logins, see #4599
+    // TODO: Uncomment once we restore search bar, see #4599
     /*
     private func invalidateSearchTimer() {
         if searchHistoryTimer != nil {
@@ -314,7 +314,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let historyItem = historyFRC?.object(at: indexPath) else { return }
         
-        // TODO: Uncomment once we restore saved logins, see #4599
+        // TODO: Uncomment once we restore search bar, see #4599
         /*
         if isHistoryBeingSearched {
             searchController.isActive = false
@@ -358,7 +358,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             case .delete:
                 guard let historyItem = historyFRC?.object(at: indexPath) else { return }
                 historyAPI.removeHistory(historyItem)
-                // TODO: Uncomment once we restore saved logins, see #4599
+                // TODO: Uncomment once we restore search bar, see #4599
                 /*
                 if isHistoryBeingSearched {
                     reloadDataAndShowLoading(with: searchQuery)
@@ -429,7 +429,7 @@ extension HistoryViewController: HistoryV2FetchResultsDelegate {
     }
 }
 
-// TODO: Uncomment once we restore saved logins, see #4599
+// TODO: Uncomment once we restore search bar, see #4599
 /*
 // MARK: UISearchResultUpdating
 
