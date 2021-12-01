@@ -54,7 +54,7 @@ public extension WKWebView {
         return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", nil)
     }
 
-    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], sandboxed: Bool = true, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
+    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
         var javascript = functionName
         
         if asFunction {
@@ -67,20 +67,14 @@ public extension WKWebView {
             }
             javascript = js.javascript
         }
-        if #available(iOS 14.0, *), sandboxed {
-            // swiftlint:disable:next safe_javascript
-            evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result  in
-                switch result {
-                    case .success(let value):
-                        completion?(value, nil)
-                    case .failure(let error):
-                        completion?(nil, error)
-                }
-            }
-        } else {
-            // swiftlint:disable:next safe_javascript
-            evaluateJavaScript(javascript) { data, error  in
-                completion?(data, error)
+        
+        // swiftlint:disable:next safe_javascript
+        evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result  in
+            switch result {
+                case .success(let value):
+                    completion?(value, nil)
+                case .failure(let error):
+                    completion?(nil, error)
             }
         }
     }
