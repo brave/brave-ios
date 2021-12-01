@@ -22,35 +22,43 @@ extension WKUserScript {
 }
 
 public extension WKWebView {
-    func generateJavascriptFunctionString(functionName: String, args: [Any], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
-        let context = JSContext()
-
-        var sanitizedArgs: [String] = []
-        var error: Error?
-
-        args.forEach {
-            if !escapeArgs {
-                sanitizedArgs.append("\($0)")
-                return
-            }
-            context?.exceptionHandler = { context, exception in
-                if exception != nil {
-                    error = JavascriptError.invalid
+    func generateJSFunctionString(functionName: String, args: [Any?], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
+        var sanitizedArgs = [String]()
+        for arg in args {
+            if let arg = arg {
+                do {
+                    if let arg = arg as? String {
+                        sanitizedArgs.append(escapeArgs ? "'\(arg.htmlEntityEncodedString)'" : "\(arg)")
+                    } else {
+                        let data = try JSONSerialization.data(withJSONObject: arg, options: [.fragmentsAllowed])
+                        
+                        if let str = String(data: data, encoding: .utf8) {
+                            sanitizedArgs.append(str)
+                        } else {
+                            throw JavascriptError.invalid
+                        }
+                    }
+                } catch {
+                    return ("", error)
                 }
+            } else {
+                sanitizedArgs.append("null")
             }
-            context?.evaluateScript("JSON.parse('\"\($0)\"')")
-            sanitizedArgs.append("'\(String(describing: $0).htmlEntityEncodedString)'")
-            return
         }
         
-        return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", error)
+        if args.count != sanitizedArgs.count {
+            assertionFailure("Javascript parsing failed.")
+            return ("", JavascriptError.invalid)
+        }
+        
+        return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", nil)
     }
 
     func evaluateSafeJavaScript(functionName: String, args: [Any] = [], sandboxed: Bool = true, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
         var javascript = functionName
         
         if asFunction {
-            let js = generateJavascriptFunctionString(functionName: functionName, args: args, escapeArgs: escapeArgs)
+            let js = generateJSFunctionString(functionName: functionName, args: args, escapeArgs: escapeArgs)
             if js.error != nil {
                 if let completionHandler = completion {
                     completionHandler(nil, js.error)
