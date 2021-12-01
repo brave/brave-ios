@@ -595,7 +595,7 @@ extension Strings {
             "optionsMenu.bravePlaylistItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Make an offline playlist of the content you love",
+            value: "Keep an offline playlist of any video/stream",
             comment: "The subtitle description of menu item Brave Playlist")
     }
 }
