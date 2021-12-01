@@ -208,12 +208,12 @@ extension Strings {
         public static let playlistOnboardingViewTitle =
             NSLocalizedString("callout.playlistOnboardingViewTitle",
                               tableName: "BraveShared", bundle: .braveShared,
-                              value: "Ad block is just the beginning",
+                              value: "Add video to Playlist…",
                               comment: "Title for Playlist Onboarding View")
         public static let playlistOnboardingViewDescription =
             NSLocalizedString("callout.playlistOnboardingViewDescription",
                               tableName: "BraveShared", bundle: .braveShared,
-                              value: "With Brave Playlist, you can play videos in the background, picture-in-picture, or even offline. And, of course, ad-free.",
+                              value: "…play anywhere, anytime. In the background, picture-in-picture, or even offline. And, of course, ad-free.",
                               comment: "Description for Playlist Onboarding View")
         public static let playlistOnboardingViewButtonTitle =
             NSLocalizedString("callout.playlistOnboardingViewButtonTitle",
