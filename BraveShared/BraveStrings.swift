@@ -542,31 +542,55 @@ extension Strings {
 // MARK: - OptionsMenu
 
 extension Strings {
-    public struct PrivacyFeature {
+    public struct OptionsMenu {
         public static let menuSectionTitle = NSLocalizedString(
             "optionsMenu.menuSectionTitle",
             tableName: "BraveShared",
             bundle: .braveShared,
-            value: "Privacy Features",
+            value: "Brave Features",
             comment: "Privacy Features Section title")
+        public static let braveVPNItemTitle = NSLocalizedString(
+            "optionsMenu.braveVPNItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "VPN",
+            comment: "Brave VPN Item Menu title")
         public static let braveVPNItemDescription = NSLocalizedString(
             "optionsMenu.braveVPNItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
             value: "Get around censorship and increase your privacy protection.",
             comment: "The subtitle description of menu item Brave VPN")
+        public static let braveTalkItemTitle = NSLocalizedString(
+            "optionsMenu.braveTalkItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Talk",
+            comment: "Brave Talk Item Menu title")
         public static let braveTalkItemDescription = NSLocalizedString(
             "optionsMenu.braveTalkItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
             value: "Unlimited private video calls with your friends and colleagues.",
             comment: "The subtitle description of menu item Brave Talk")
+        public static let braveNewsItemTitle = NSLocalizedString(
+            "optionsMenu.braveNewsItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "News",
+            comment: "Brave News Item Menu title")
         public static let braveNewsItemDescription = NSLocalizedString(
             "optionsMenu.braveNewsItemDescription",
             tableName: "BraveShared",
             bundle: .braveShared,
             value: "Today’s top stories in a completely private feed, just for you.",
             comment: "The subtitle description of menu item Brave News")
+        public static let bravePlaylistItemTitle = NSLocalizedString(
+            "optionsMenu.bravePlaylistItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Playlist",
+            comment: "Brave News Item Menu title")
         public static let bravePlaylistItemDescription = NSLocalizedString(
             "optionsMenu.bravePlaylistItemDescription",
             tableName: "BraveShared",
