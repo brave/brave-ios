@@ -8,10 +8,6 @@ import BraveCore
 public class CryptoStore: ObservableObject {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
-  public let buyTokenStore: BuyTokenStore
-  public let sendTokenStore: SendTokenStore
-  public let swapTokenStore: SwapTokenStore
-  public let confirmationStore: TransactionConfirmationStore
   
   @Published var buySendSwapDestination: BuySendSwapDestination?
   @Published var isPresentingTransactionConfirmations: Bool = false
@@ -50,17 +46,57 @@ public class CryptoStore: ObservableObject {
       assetRatioController: assetRatioController,
       tokenRegistry: tokenRegistry
     )
-    self.buyTokenStore = .init(
+    
+    self.keyringController.add(self)
+    self.transactionController.add(self)
+  }
+  
+  private var buyTokenStore: BuyTokenStore?
+  func openBuyTokenStore() -> BuyTokenStore {
+    if let store = buyTokenStore {
+      return store
+    }
+    let store = BuyTokenStore(
       tokenRegistry: tokenRegistry,
       rpcController: rpcController
     )
-    self.sendTokenStore = .init(
+    buyTokenStore = store
+    return store
+  }
+  
+  func closeBuyTokenStore() {
+    if buySendSwapDestination == nil, buyTokenStore != nil {
+      buyTokenStore = nil
+    }
+  }
+  
+  private var sendTokenStore: SendTokenStore?
+  func openSendTokenStore() -> SendTokenStore {
+    if let store = sendTokenStore {
+      return store
+    }
+    let store = SendTokenStore(
       keyringController: keyringController,
       rpcController: rpcController,
       walletService: walletService,
       transactionController: transactionController
     )
-    self.swapTokenStore = .init(
+    sendTokenStore = store
+    return store
+  }
+  
+  func closeSendTokenStore() {
+    if buySendSwapDestination == nil, sendTokenStore != nil {
+      sendTokenStore = nil
+    }
+  }
+  
+  private var swapTokenStore: SwapTokenStore?
+  func openSwapTokenStore() -> SwapTokenStore {
+    if let store = swapTokenStore {
+      return store
+    }
+    let store = SwapTokenStore(
       keyringController: keyringController,
       tokenRegistry: tokenRegistry,
       rpcController: rpcController,
@@ -68,15 +104,14 @@ public class CryptoStore: ObservableObject {
       swapController: swapController,
       transactionController: transactionController
     )
-    self.confirmationStore = .init(
-      assetRatioController: assetRatioController,
-      rpcController: rpcController,
-      txController: transactionController,
-      tokenRegistry: tokenRegistry
-    )
-    
-    self.keyringController.add(self)
-    self.transactionController.add(self)
+    swapTokenStore = store
+    return store
+  }
+  
+  func closeSwapTokenStore() {
+    if buySendSwapDestination == nil, swapTokenStore != nil {
+      swapTokenStore = nil
+    }
   }
   
   private var assetDetailStore: AssetDetailStore?
@@ -95,6 +130,12 @@ public class CryptoStore: ObservableObject {
     return store
   }
   
+  func closeAssetDetailStore(for token: BraveWallet.ERCToken) {
+    if let store = assetDetailStore, store.token.id == token.id {
+      assetDetailStore = nil
+    }
+  }
+  
   private var accountActivityStore: AccountActivityStore?
   func accountActivityStore(for account: BraveWallet.AccountInfo) -> AccountActivityStore {
     if let store = accountActivityStore, store.account.address == account.address {
@@ -109,6 +150,33 @@ public class CryptoStore: ObservableObject {
     )
     accountActivityStore = store
     return store
+  }
+  
+  func closeAccountActivityStore(for account: BraveWallet.AccountInfo) {
+    if let store = accountActivityStore, store.account.address == account.address {
+      accountActivityStore = nil
+    }
+  }
+  
+  private var confirmationStore: TransactionConfirmationStore?
+  func openConfirmationStore() -> TransactionConfirmationStore {
+    if let store = confirmationStore {
+      return store
+    }
+    let store = TransactionConfirmationStore(
+      assetRatioController: assetRatioController,
+      rpcController: rpcController,
+      txController: transactionController,
+      tokenRegistry: tokenRegistry
+    )
+    confirmationStore = store
+    return store
+  }
+  
+  func closeConfirmationStore() {
+    if !isPresentingTransactionConfirmations, confirmationStore != nil {
+      confirmationStore = nil
+    }
   }
   
   func fetchUnapprovedTransactions() {

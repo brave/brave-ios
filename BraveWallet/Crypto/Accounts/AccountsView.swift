@@ -29,9 +29,9 @@ struct AccountsView: View {
     // the navigation is a UINavigationController and this view is inside of a UIPageViewController
     let view = AccountView(address: account.address, name: account.name)
     let destination = AccountActivityView(
+      cryptoStore: cryptoStore,
       keyringStore: keyringStore,
-      activityStore: cryptoStore.accountActivityStore(for: account),
-      networkStore: cryptoStore.networkStore
+      account: account
     )
     if #available(iOS 15.0, *) {
       ZStack {

@@ -7,11 +7,14 @@ import SwiftUI
 import struct Shared.Strings
 import BraveUI
 import BigNumber
+import MapKit
 
 struct SendTokenView: View {
-  @ObservedObject var keyringStore: KeyringStore
-  @ObservedObject var networkStore: NetworkStore
-  @ObservedObject var sendTokenStore: SendTokenStore
+  private var cryptoStore: CryptoStore
+  
+  @ObservedObject private var keyringStore: KeyringStore
+  @ObservedObject private var networkStore: NetworkStore
+  @ObservedObject private var sendTokenStore: SendTokenStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
@@ -21,6 +24,16 @@ struct SendTokenView: View {
   @State private var isShowingError = false
   
   @ScaledMetric private var length: CGFloat = 16.0
+  
+  init(
+    cryptoStore: CryptoStore,
+    keyringStore: KeyringStore
+  ) {
+    self.cryptoStore = cryptoStore
+    self.keyringStore = keyringStore
+    self.networkStore = cryptoStore.networkStore
+    self.sendTokenStore = cryptoStore.openSendTokenStore()
+  }
   
   private var isSendDisabled: Bool {
     guard let sendAmount = BDouble(amountInput),
@@ -167,6 +180,9 @@ struct SendTokenView: View {
     .onAppear {
       sendTokenStore.fetchAssets()
     }
+    .onDisappear {
+      cryptoStore.closeSendTokenStore()
+    }
   }
 }
 
@@ -174,9 +190,8 @@ struct SendTokenView: View {
 struct SendTokenView_Previews: PreviewProvider {
     static var previews: some View {
       SendTokenView(
-        keyringStore: .previewStoreWithWalletCreated,
-        networkStore: .previewStore,
-        sendTokenStore: .previewStore
+        cryptoStore: .previewStore,
+        keyringStore: .previewStore
       )
         .previewColorSchemes()
     }

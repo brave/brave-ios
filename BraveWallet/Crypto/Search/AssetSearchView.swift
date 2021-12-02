@@ -21,9 +21,9 @@ struct AssetSearchView: View {
       TokenList(tokens: allTokens.filter({ $0.isErc20 || $0.isETH })) { token in
         NavigationLink(
           destination: AssetDetailView(
-            assetDetailStore: cryptoStore.assetDetailStore(for: token),
+            cryptoStore: cryptoStore,
             keyringStore: keyringStore,
-            networkStore: cryptoStore.networkStore
+            token: token
           )
         ) {
           TokenView(token: token)

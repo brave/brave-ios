@@ -10,7 +10,9 @@ import struct Shared.Strings
 import BigNumber
 
 struct TransactionConfirmationView: View {
-  var transactions: [BraveWallet.TransactionInfo]
+  private let cryptoStore: CryptoStore
+  private var transactions: [BraveWallet.TransactionInfo]
+  
   @ObservedObject var confirmationStore: TransactionConfirmationStore
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
@@ -28,6 +30,17 @@ struct TransactionConfirmationView: View {
     didSet {
       confirmationStore.fetchDetails(for: activeTransaction)
     }
+  }
+  
+  init(
+    cryptoStore: CryptoStore,
+    keyringStore: KeyringStore
+  ) {
+    self.cryptoStore = cryptoStore
+    self.keyringStore = keyringStore
+    self.confirmationStore = cryptoStore.openConfirmationStore()
+    self.networkStore = cryptoStore.networkStore
+    self.transactions = cryptoStore.unapprovedTransactions
   }
   
   private func next() {
@@ -304,6 +317,9 @@ struct TransactionConfirmationView: View {
       activeTransactionId = transactions[0].id
       confirmationStore.fetchDetails(for: activeTransaction)
     }
+    .onDisappear {
+      cryptoStore.closeConfirmationStore()
+    }
   }
   
   @ViewBuilder private var rejectConfirmContainer: some View {
@@ -364,17 +380,7 @@ private struct DetailsTextView: UIViewRepresentable {
 struct TransactionConfirmationView_Previews: PreviewProvider {
   static var previews: some View {
     TransactionConfirmationView(
-      transactions: [
-        BraveWallet.TransactionInfo.previewConfirmedERC20Approve,
-        .previewConfirmedSend,
-        .previewConfirmedSwap
-      ].map {
-        tx in
-        tx.txStatus = .unapproved
-        return tx
-      },
-      confirmationStore: .previewStore,
-      networkStore: .previewStore,
+      cryptoStore: .previewStore,
       keyringStore: .previewStoreWithWalletCreated
     )
       .previewLayout(.sizeThatFits)
