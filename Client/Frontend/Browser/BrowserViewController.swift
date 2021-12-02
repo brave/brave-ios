@@ -2828,10 +2828,17 @@ extension BrowserViewController: NewTabPageDelegate {
     }
     
     func showNTPOnboarding() {
+        let stats = BraveGlobalShieldStats.shared
+        let hasStats = (stats.adblock +
+                        stats.httpse +
+                        stats.trackingProtection +
+                        stats.images) > 0
+        
         if Preferences.General.isNewRetentionUser.value == true,
             Preferences.DebugFlag.skipNTPCallouts != true,
             !topToolbar.inOverlayMode,
-            !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+            !Preferences.FullScreenCallout.ntpCalloutCompleted.value,
+             hasStats {
             presentNTPStatsOnboarding()
         }
     }
