@@ -9,8 +9,35 @@ public class CryptoStore: ObservableObject {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
   
-  @Published var buySendSwapDestination: BuySendSwapDestination?
-  @Published var isPresentingTransactionConfirmations: Bool = false
+  @Published var buySendSwapDestination: BuySendSwapDestination? {
+    didSet {
+      if buySendSwapDestination == nil {
+        switch oldValue {
+        case .buy:
+          if buyTokenStore != nil {
+            buyTokenStore = nil
+          }
+        case .send:
+          if sendTokenStore != nil {
+            sendTokenStore = nil
+          }
+        case .swap:
+          if swapTokenStore != nil {
+            sendTokenStore = nil
+          }
+        case .none:
+          break
+        }
+      }
+    }
+  }
+  @Published var isPresentingTransactionConfirmations: Bool = false {
+    didSet {
+      if !isPresentingTransactionConfirmations, confirmationStore != nil {
+        confirmationStore = nil
+      }
+    }
+  }
   @Published private(set) var unapprovedTransactions: [BraveWallet.TransactionInfo] = []
   
   private let keyringController: BraveWalletKeyringController
@@ -64,12 +91,6 @@ public class CryptoStore: ObservableObject {
     return store
   }
   
-  func closeBuyTokenStore() {
-    if buySendSwapDestination == nil, buyTokenStore != nil {
-      buyTokenStore = nil
-    }
-  }
-  
   private var sendTokenStore: SendTokenStore?
   func openSendTokenStore() -> SendTokenStore {
     if let store = sendTokenStore {
@@ -83,12 +104,6 @@ public class CryptoStore: ObservableObject {
     )
     sendTokenStore = store
     return store
-  }
-  
-  func closeSendTokenStore() {
-    if buySendSwapDestination == nil, sendTokenStore != nil {
-      sendTokenStore = nil
-    }
   }
   
   private var swapTokenStore: SwapTokenStore?
@@ -106,12 +121,6 @@ public class CryptoStore: ObservableObject {
     )
     swapTokenStore = store
     return store
-  }
-  
-  func closeSwapTokenStore() {
-    if buySendSwapDestination == nil, swapTokenStore != nil {
-      swapTokenStore = nil
-    }
   }
   
   private var assetDetailStore: AssetDetailStore?
@@ -171,12 +180,6 @@ public class CryptoStore: ObservableObject {
     )
     confirmationStore = store
     return store
-  }
-  
-  func closeConfirmationStore() {
-    if !isPresentingTransactionConfirmations, confirmationStore != nil {
-      confirmationStore = nil
-    }
   }
   
   func fetchUnapprovedTransactions() {

@@ -10,8 +10,6 @@ import BraveUI
 import struct Shared.Strings
 
 struct AccountActivityView: View {
-  private let cryptoStore: CryptoStore
-  
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var activityStore: AccountActivityStore
   @ObservedObject var networkStore: NetworkStore
@@ -20,17 +18,6 @@ struct AccountActivityView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
-  
-  init(
-    cryptoStore: CryptoStore,
-    keyringStore: KeyringStore,
-    account: BraveWallet.AccountInfo
-  ) {
-    self.cryptoStore = cryptoStore
-    self.keyringStore = keyringStore
-    self.activityStore = cryptoStore.accountActivityStore(for: account)
-    self.networkStore = cryptoStore.networkStore
-  }
   
   private struct DetailsPresentation: Identifiable {
     var inEditMode: Bool
@@ -142,9 +129,6 @@ struct AccountActivityView: View {
     .onAppear {
       activityStore.update()
     }
-    .onDisappear {
-      cryptoStore.closeAccountActivityStore(for: activityStore.account)
-    }
   }
 }
 
@@ -192,9 +176,9 @@ private struct AccountActivityHeaderView: View {
 struct AccountActivityView_Previews: PreviewProvider {
   static var previews: some View {
     AccountActivityView(
-      cryptoStore: .previewStore,
-      keyringStore: .previewStoreWithWalletCreated,
-      account: .previewAccount
+      keyringStore: .previewStore,
+      activityStore: .previewStore,
+      networkStore: .previewStore
     )
     .previewColorSchemes()
   }

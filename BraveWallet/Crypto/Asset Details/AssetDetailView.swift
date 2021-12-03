@@ -11,11 +11,9 @@ import BraveUI
 import struct Shared.Strings
 
 struct AssetDetailView: View {
-  private let cryptoStore: CryptoStore
-  
-  @ObservedObject private var assetDetailStore: AssetDetailStore
-  @ObservedObject private var keyringStore: KeyringStore
-  @ObservedObject private var networkStore: NetworkStore
+  @ObservedObject var assetDetailStore: AssetDetailStore
+  @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var networkStore: NetworkStore
   
   @State private var tableInset: CGFloat = -16.0
   @State private var isShowingAddAccount: Bool = false
@@ -24,17 +22,6 @@ struct AssetDetailView: View {
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
   
   @Environment(\.openWalletURLAction) private var openWalletURL
-  
-  init(
-    cryptoStore: CryptoStore,
-    keyringStore: KeyringStore,
-    token: BraveWallet.ERCToken
-  ) {
-    self.cryptoStore = cryptoStore
-    self.keyringStore = keyringStore
-    self.networkStore = cryptoStore.networkStore
-    self.assetDetailStore = cryptoStore.assetDetailStore(for: token)
-  }
 
   var body: some View {
     List {
@@ -145,9 +132,6 @@ struct AssetDetailView: View {
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }
-    .onDisappear {
-      cryptoStore.closeAssetDetailStore(for: assetDetailStore.token)
-    }
   }
 }
 
@@ -156,9 +140,9 @@ struct CurrencyDetailView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
       AssetDetailView(
-        cryptoStore: .previewStore,
+        assetDetailStore: .previewStore,
         keyringStore: .previewStore,
-        token: TestTokenRegistry.testTokens.first!
+        networkStore: .previewStore
       )
         .navigationBarTitleDisplayMode(.inline)
     }

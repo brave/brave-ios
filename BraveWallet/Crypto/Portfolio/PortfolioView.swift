@@ -107,10 +107,13 @@ struct PortfolioView: View {
       ), destination: {
         if let token = selectedToken {
           AssetDetailView(
-            cryptoStore: cryptoStore,
+            assetDetailStore: cryptoStore.assetDetailStore(for: token),
             keyringStore: keyringStore,
-            token: token
+            networkStore: cryptoStore.networkStore
           )
+            .onDisappear {
+              cryptoStore.closeAssetDetailStore(for: token)
+            }
         }
       }, label: {
         EmptyView()

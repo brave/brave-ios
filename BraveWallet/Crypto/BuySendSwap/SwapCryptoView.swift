@@ -162,11 +162,9 @@ struct MarketPriceView: View {
 }
 
 struct SwapCryptoView: View {
-  private var cryptoStore: CryptoStore
-  
-  @ObservedObject private var keyringStore: KeyringStore
-  @ObservedObject private var ethNetworkStore: NetworkStore
-  @ObservedObject private var swapTokensStore: SwapTokenStore
+  @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var ethNetworkStore: NetworkStore
+  @ObservedObject var swapTokensStore: SwapTokenStore
   
   @State private var orderType: OrderType = .market
   @State var hideSlippage = true
@@ -174,16 +172,6 @@ struct SwapCryptoView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
-  
-  init(
-    cryptoStore: CryptoStore,
-    keyringStore: KeyringStore
-  ) {
-    self.cryptoStore = cryptoStore
-    self.keyringStore = keyringStore
-    self.ethNetworkStore = cryptoStore.networkStore
-    self.swapTokensStore = cryptoStore.openSwapTokenStore()
-  }
   
   @ViewBuilder var unsupportedSwapChainSection: some View {
     Section {
@@ -471,9 +459,6 @@ struct SwapCryptoView: View {
       .onAppear {
         swapTokensStore.prepare(with: keyringStore.selectedAccount)
       }
-      .onDisappear {
-        cryptoStore.closeSwapTokenStore()
-      }
     }
   }
 }
@@ -482,8 +467,9 @@ struct SwapCryptoView: View {
 struct SwapCryptoView_Previews: PreviewProvider {
   static var previews: some View {
     SwapCryptoView(
-      cryptoStore: .previewStore,
-      keyringStore: .previewStoreWithWalletCreated
+      keyringStore: .previewStore,
+      ethNetworkStore: .previewStore,
+      swapTokensStore: .previewStore
     )
 //      .previewSizeCategories([.large, .accessibilityLarge])
   }

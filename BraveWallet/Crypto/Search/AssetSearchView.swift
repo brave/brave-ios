@@ -21,10 +21,13 @@ struct AssetSearchView: View {
       TokenList(tokens: allTokens.filter({ $0.isErc20 || $0.isETH })) { token in
         NavigationLink(
           destination: AssetDetailView(
-            cryptoStore: cryptoStore,
+            assetDetailStore: cryptoStore.assetDetailStore(for: token),
             keyringStore: keyringStore,
-            token: token
+            networkStore: cryptoStore.networkStore
           )
+            .onDisappear {
+              cryptoStore.closeAssetDetailStore(for: token)
+            }
         ) {
           TokenView(token: token)
         }
