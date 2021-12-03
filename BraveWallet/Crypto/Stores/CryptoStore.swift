@@ -12,28 +12,15 @@ public class CryptoStore: ObservableObject {
   @Published var buySendSwapDestination: BuySendSwapDestination? {
     didSet {
       if buySendSwapDestination == nil {
-        switch oldValue {
-        case .buy:
-          if buyTokenStore != nil {
-            buyTokenStore = nil
-          }
-        case .send:
-          if sendTokenStore != nil {
-            sendTokenStore = nil
-          }
-        case .swap:
-          if swapTokenStore != nil {
-            sendTokenStore = nil
-          }
-        case .none:
-          break
-        }
+        buyTokenStore = nil
+        sendTokenStore = nil
+        swapTokenStore = nil
       }
     }
   }
   @Published var isPresentingTransactionConfirmations: Bool = false {
     didSet {
-      if !isPresentingTransactionConfirmations, confirmationStore != nil {
+      if !isPresentingTransactionConfirmations {
         confirmationStore = nil
       }
     }
