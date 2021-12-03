@@ -107,9 +107,9 @@ struct PortfolioView: View {
       ), destination: {
         if let token = selectedToken {
           AssetDetailView(
-            assetDetailStore: cryptoStore.assetDetailStore(for: token),
+            cryptoStore: cryptoStore,
             keyringStore: keyringStore,
-            networkStore: networkStore
+            token: token
           )
         }
       }, label: {
