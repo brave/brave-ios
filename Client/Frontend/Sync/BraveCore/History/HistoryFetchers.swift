@@ -6,7 +6,7 @@
 import Foundation
 import BraveCore
 import CoreData
-import OrderedCollections
+import struct OrderedCollections.OrderedDictionary
 import Shared
 
 // MARK: - HistoryV2FetchResultsDelegate

@@ -17,20 +17,49 @@ public protocol BraveWalletDelegate: AnyObject {
   func openWalletURL(_ url: URL)
 }
 
+import ComposableArchitecture
+
 /// The initial wallet controller to present when the user wants to view their wallet
-public class WalletHostingViewController: UIHostingController<CryptoView> {
+public class WalletHostingViewController: UIHostingController<CryptoView2> {
   public weak var delegate: BraveWalletDelegate?
   private var cancellable: AnyCancellable?
+  private let store: Store<WalletState, WalletAction>
   
   public init(walletStore: WalletStore) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
     )
-    super.init(
-      rootView: CryptoView(
-        walletStore: walletStore,
-        keyringStore: walletStore.keyringStore
+    store = .init(
+      initialState: .initial,
+      reducer: walletReducer,
+      environment: .init(
+        keyringController: walletStore.keyringController,
+        keyringObserver:
+          walletStore.keyringController.observer,
+        rpcController: walletStore.rpcController,
+        rpcControllerObserver:
+          walletStore.rpcController.observer,
+        walletService: walletStore.walletService,
+        assetRatioController:
+          walletStore.assetRatioController,
+        swapController: walletStore.swapController,
+        tokenRegistry: walletStore.tokenRegistry,
+        transactionController: walletStore.transactionController,
+        transactionObserver:
+          walletStore.transactionController.observer,
+        walletKeychain: .init(
+          savePassword: { _ in return .success(()) },
+          loadPassword: { .success("password") },
+          isPasswordSaved: { false }
+        )
       )
+    )
+    super.init(
+//      rootView: CryptoView(
+//        walletStore: walletStore,
+//        keyringStore: walletStore.keyringStore
+//      )
+      rootView: CryptoView2(store: store)
     )
     rootView.dismissAction = { [unowned self] in
       self.dismiss(animated: true)

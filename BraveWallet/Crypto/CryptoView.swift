@@ -149,3 +149,68 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
     .environment(\.buySendSwapDestination, $cryptoStore.buySendSwapDestination)
   }
 }
+
+import ComposableArchitecture
+
+public struct CryptoView2: View {
+  var store: Store<WalletState, WalletAction>
+  @ObservedObject var viewStore: ViewStore<WalletState, WalletAction>
+  
+  // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
+  // but for now we'll have to manage this ourselves
+  var dismissAction: (() -> Void)?
+  
+  var openWalletURLAction: ((URL) -> Void)?
+  
+  init(store: Store<WalletState, WalletAction>) {
+    self.store = store
+    self.viewStore = ViewStore(store)
+  }
+  
+  private enum VisibleScreen: Equatable {
+    case crypto
+    case onboarding
+    case unlock
+  }
+  
+  @ToolbarContentBuilder
+  private var dismissButtonToolbarContents: some ToolbarContent {
+    ToolbarItemGroup(placement: .cancellationAction) {
+      Button(action: { dismissAction?() }) {
+        Image("wallet-dismiss")
+          .renderingMode(.template)
+          .foregroundColor(Color(.braveOrange))
+      }
+    }
+  }
+  
+  public var body: some View {
+    SwitchStore(store) {
+      CaseLet(state: /WalletState.crypto, action: WalletAction.crypto) { store in
+        PortfolioView2(store: store.scope(state: \.portfolio, action: CryptoAction.portfolio))
+          .transition(.asymmetric(insertion: .identity, removal: .opacity))
+      }
+      CaseLet(state: /WalletState.unlock, action: WalletAction.unlock) { store in
+        UIKitNavigationView {
+          TcaUnlockWalletView(store: store)
+            .toolbar {
+              dismissButtonToolbarContents
+            }
+        }
+        .transition(.move(edge: .bottom))
+        .zIndex(1) // Needed or the dismiss animation messes up
+      }
+      CaseLet(state: /WalletState.onboarding, action: WalletAction.onboarding) { store in
+        Text("Onboarding")
+          .transition(.move(edge: .bottom))
+          .zIndex(2) // Needed or the dismiss animation messes up
+      }
+      Default {
+        EmptyView()
+      }
+    }
+    .onAppear {
+      viewStore.send(.onAppear)
+    }
+  }
+}

@@ -232,3 +232,104 @@ struct PortfolioViewController_Previews: PreviewProvider {
   }
 }
 #endif
+
+import ComposableArchitecture
+
+struct PortfolioView2: View {
+  var store: Store<PortfolioState, PortfolioAction>
+  @ObservedObject var viewStore: ViewStore<PortfolioState, PortfolioAction>
+  
+  init(store: Store<PortfolioState, PortfolioAction>) {
+    self.store = store
+    self.viewStore = ViewStore(store)
+  }
+  
+  @State private var tableInset: CGFloat = -16.0
+  
+  private let currencyFormatter = NumberFormatter().then {
+    $0.numberStyle = .currency
+    $0.currencyCode = "USD"
+  }
+  
+  var body: some View {
+    List {
+//      Section(
+//        header: listHeader
+//          .padding(.horizontal, tableInset) // inset grouped layout margins workaround
+//          .resetListHeaderStyle()
+//      ) {
+//      }
+      Section(
+        header: WalletListHeaderView(title: Text(Strings.Wallet.assetsTitle))
+      ) {
+        ForEach(viewStore.visibleAssets) { asset in
+          Button(action: {
+            viewStore.send(.assetTapped(asset.token))
+          }) {
+            PortfolioAssetView(
+              image: AssetIconView(token: asset.token),
+              title: asset.token.name,
+              symbol: asset.token.symbol,
+              amount: currencyFormatter.string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
+              quantity: String(format: "%.04f", asset.decimalBalance)
+            )
+          }
+        }
+        Button(action: {
+          viewStore.send(.binding(.set(\.isPresentingEditUserAssets, true)))
+        }) {
+          Text(Strings.Wallet.editVisibleAssetsButtonTitle)
+            .multilineTextAlignment(.center)
+            .font(.footnote.weight(.semibold))
+            .foregroundColor(Color(.bravePrimary))
+            .frame(maxWidth: .infinity)
+        }
+        .sheet(isPresented: viewStore.binding(\.$isPresentingEditUserAssets)) {
+          Text("Edit User Assets View")
+//          EditUserAssetsView(userAssetsStore: portfolioStore.userAssetsStore) {
+//            portfolioStore.update()
+//          }
+        }
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      Section {
+        Button("Lock") {
+          viewStore.send(.lock)
+        }
+        Button("Add Account") {
+          viewStore.send(.addAccount)
+        }
+      }
+    }
+    .background(
+      NavigationLink(isActive: Binding(
+        get: { viewStore.selectedToken != nil },
+        set: { if !$0 { viewStore.send(.assetDetailDismissed) } }
+      ), destination: {
+        if let token = viewStore.selectedToken {
+          Text("Asset Detail View")
+//          AssetDetailView(
+//            assetDetailStore: cryptoStore.assetDetailStore(for: token),
+//            keyringStore: keyringStore,
+//            networkStore: cryptoStore.networkStore
+//          )
+//            .onDisappear {
+//              cryptoStore.closeAssetDetailStore(for: token)
+//            }
+        }
+      }, label: {
+        EmptyView()
+      })
+    )
+    .animation(.default, value: viewStore.visibleAssets)
+    .listStyle(InsetGroupedListStyle())
+    .introspectTableView { tableView in
+      withAnimation(nil) {
+        tableInset = -tableView.layoutMargins.left
+      }
+    }
+    .onAppear {
+      viewStore.send(.onAppear)
+    }
+  }
+}

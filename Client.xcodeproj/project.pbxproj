@@ -206,6 +206,24 @@
 		270E37DB26F5177B00C73C29 /* ResetListStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270E37DA26F5177B00C73C29 /* ResetListStyleModifier.swift */; };
 		270E5F1326F29C320024C70E /* UIKitNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270E5F1226F29C320024C70E /* UIKitNavigationView.swift */; };
 		270E5F3226F3E1B40024C70E /* BraveWalletSwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270E5F3126F3E1B40024C70E /* BraveWalletSwiftUIExtensions.swift */; };
+		270FE6952763088A000E0600 /* BraveWalletPreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FE6942763088A000E0600 /* BraveWalletPreviewApp.swift */; };
+		270FE6992763088A000E0600 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 270FE6982763088A000E0600 /* Assets.xcassets */; };
+		270FE69C2763088A000E0600 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 270FE69B2763088A000E0600 /* Preview Assets.xcassets */; };
+		270FE6AF276308DF000E0600 /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; platformFilter = ios; };
+		270FE6B0276308DF000E0600 /* BraveUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6B4276308E2000E0600 /* BraveCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; };
+		270FE6B5276308E2000E0600 /* BraveCore.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6B6276308E6000E0600 /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; platformFilter = ios; };
+		270FE6B7276308E6000E0600 /* BraveShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6BA276308EA000E0600 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; platformFilter = ios; };
+		270FE6BB276308EA000E0600 /* Shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6BE276308ED000E0600 /* SPMLibraries.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; platformFilter = ios; };
+		270FE6BF276308ED000E0600 /* SPMLibraries.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6C2276308F9000E0600 /* BraveWallet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271F683526EBD0E400AA2A50 /* BraveWallet.framework */; platformFilter = ios; };
+		270FE6C3276308F9000E0600 /* BraveWallet.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 271F683526EBD0E400AA2A50 /* BraveWallet.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6C627630C4A000E0600 /* MaterialComponents.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */; };
+		270FE6C727630C4A000E0600 /* MaterialComponents.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		270FE6C927630D44000E0600 /* OnboardingReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FE6C827630D44000E0600 /* OnboardingReducer.swift */; };
 		27180150273ABD3A00F683E3 /* BiometricsPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2718014F273ABD3A00F683E3 /* BiometricsPromptView.swift */; };
 		2718018E272C7DBB0047EB15 /* AssetDetailStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2718018D272C7DBB0047EB15 /* AssetDetailStore.swift */; };
 		27187808216526090006036E /* AlertPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27187807216526090006036E /* AlertPopupView.swift */; };
@@ -283,6 +301,7 @@
 		2726636924944BFA0056CFE1 /* BraveNewsOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2726636824944BFA0056CFE1 /* BraveNewsOptInView.swift */; };
 		2726637324981B600056CFE1 /* FeedSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2726637224981B5F0056CFE1 /* FeedSectionHeaderView.swift */; };
 		2727369B24A65F650096DCB9 /* UIActionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2727369A24A65F650096DCB9 /* UIActionExtensions.swift */; };
+		2728AD1427630480005ADC41 /* TcaUnlockWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2728AD1327630480005ADC41 /* TcaUnlockWalletView.swift */; };
 		2729E7D326F502AC00200648 /* AccountPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2729E7D226F502AC00200648 /* AccountPicker.swift */; };
 		272B862B270BD96F005ED304 /* SandboxInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272B862A270BD96F005ED304 /* SandboxInspectorView.swift */; };
 		273EB3A72422AB24002A8AAF /* PaymentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9616E6A240EE43F00667C2D /* PaymentRequest.swift */; };
@@ -308,6 +327,7 @@
 		2748625D25AD309800BC40AA /* sqlcipher.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; };
 		2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; };
 		2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		274CDC26275D7F76007259AD /* PortfolioReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274CDC25275D7F76007259AD /* PortfolioReducer.swift */; };
 		275034E326EF9E6A00CF4C8A /* WalletSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275034E226EF9E6A00CF4C8A /* WalletSettingsView.swift */; };
 		2755AB7D23107BC600F0721F /* AdsReporting.js in Resources */ = {isa = PBXBuildFile; fileRef = 2755AB7C23107BC600F0721F /* AdsReporting.js */; };
 		2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */; };
@@ -351,6 +371,7 @@
 		2774300A2733126000183725 /* WalletColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277430092733126000183725 /* WalletColors.swift */; };
 		2774303227332C2F00183725 /* TransactionConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2774303127332C2F00183725 /* TransactionConfirmationView.swift */; };
 		2774303427332DAF00183725 /* BlockieGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2774303327332DAF00183725 /* BlockieGroup.swift */; };
+		2775224C27605041008B3BB6 /* AccountsReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2775224B27605041008B3BB6 /* AccountsReducer.swift */; };
 		277568D425ACF91600C129AF /* SPMLibraries.h in Headers */ = {isa = PBXBuildFile; fileRef = 277568D225ACF91600C129AF /* SPMLibraries.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		277568D725ACF91600C129AF /* SPMLibraries.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; };
 		277568D825ACF91600C129AF /* SPMLibraries.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -378,6 +399,7 @@
 		27756E9925AF6F5F00C129AF /* SPMLibraries.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277568D025ACF91500C129AF /* SPMLibraries.framework */; platformFilter = ios; };
 		27756EB925AF6F7A00C129AF /* WebServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD9F1C1A6D9C2800318571 /* WebServerTests.swift */; };
 		27756ED825AF701C00C129AF /* SearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA777A1A43B2990010CD32 /* SearchTests.swift */; };
+		27772238275C5549006623AD /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 27772237275C5549006623AD /* ComposableArchitecture */; };
 		2777273722EB43A100F0214C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273622EB43A100F0214C /* StringExtensions.swift */; };
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
@@ -437,9 +459,11 @@
 		27A1AC072485618600344503 /* PrivateCDNTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1AC062485618600344503 /* PrivateCDNTests.swift */; };
 		27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1AC0824859D0900344503 /* FeedHeadlineViews.swift */; };
 		27A1AC0C2485A1C200344503 /* FeedDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1AC0B2485A1C200344503 /* FeedDataSource.swift */; };
+		27A4410E275D2C28005FC276 /* CryptoReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A4410D275D2C28005FC276 /* CryptoReducer.swift */; };
 		27A586E1214C0DDD000CAE3C /* PreferencesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */; };
 		27AAE241274FFBA900288E90 /* TransactionConfirmationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AAE240274FFBA900288E90 /* TransactionConfirmationStore.swift */; };
 		27AC169823834510004BE19C /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27AC169623834510004BE19C /* UserNotifications.framework */; };
+		27AC3AA9275C4222004BFB42 /* WalletReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AC3AA8275C4222004BFB42 /* WalletReducer.swift */; };
 		27AC7CFA24C77EBC00441317 /* FeedActionAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AC7CF924C77EBC00441317 /* FeedActionAlertView.swift */; };
 		27AD20C326851C5400889AA7 /* BraveCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; };
 		27AD20C426851C5400889AA7 /* BraveCore.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1267,6 +1291,41 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		270FE6B1276308DF000E0600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 278C468523F1E6270083347F;
+			remoteInfo = BraveUI;
+		};
+		270FE6B8276308E6000E0600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5DE7688320B3456C00FF5533;
+			remoteInfo = BraveShared;
+		};
+		270FE6BC276308EA000E0600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 288A2D851AB8B3260023ABC3;
+			remoteInfo = Shared;
+		};
+		270FE6C0276308ED000E0600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 277568CF25ACF91500C129AF;
+			remoteInfo = SPMLibraries;
+		};
+		270FE6C4276308F9000E0600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 271F683426EBD0E400AA2A50;
+			remoteInfo = BraveWallet;
+		};
 		271F683A26EBD0E400AA2A50 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -1584,6 +1643,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		270FE6B3276308DF000E0600 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				270FE6C727630C4A000E0600 /* MaterialComponents.xcframework in Embed Frameworks */,
+				270FE6B0276308DF000E0600 /* BraveUI.framework in Embed Frameworks */,
+				270FE6B7276308E6000E0600 /* BraveShared.framework in Embed Frameworks */,
+				270FE6C3276308F9000E0600 /* BraveWallet.framework in Embed Frameworks */,
+				270FE6B5276308E2000E0600 /* BraveCore.xcframework in Embed Frameworks */,
+				270FE6BF276308ED000E0600 /* SPMLibraries.framework in Embed Frameworks */,
+				270FE6BB276308EA000E0600 /* Shared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27FD3F9225C8B91500696156 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1863,6 +1939,11 @@
 		270E37DA26F5177B00C73C29 /* ResetListStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetListStyleModifier.swift; sourceTree = "<group>"; };
 		270E5F1226F29C320024C70E /* UIKitNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitNavigationView.swift; sourceTree = "<group>"; };
 		270E5F3126F3E1B40024C70E /* BraveWalletSwiftUIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveWalletSwiftUIExtensions.swift; sourceTree = "<group>"; };
+		270FE69227630889000E0600 /* BraveWalletPreview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BraveWalletPreview.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		270FE6942763088A000E0600 /* BraveWalletPreviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveWalletPreviewApp.swift; sourceTree = "<group>"; };
+		270FE6982763088A000E0600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		270FE69B2763088A000E0600 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		270FE6C827630D44000E0600 /* OnboardingReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingReducer.swift; sourceTree = "<group>"; };
 		2718014F273ABD3A00F683E3 /* BiometricsPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricsPromptView.swift; sourceTree = "<group>"; };
 		2718018D272C7DBB0047EB15 /* AssetDetailStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailStore.swift; sourceTree = "<group>"; };
 		27187807216526090006036E /* AlertPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPopupView.swift; sourceTree = "<group>"; };
@@ -1942,6 +2023,7 @@
 		2726636824944BFA0056CFE1 /* BraveNewsOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveNewsOptInView.swift; sourceTree = "<group>"; };
 		2726637224981B5F0056CFE1 /* FeedSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSectionHeaderView.swift; sourceTree = "<group>"; };
 		2727369A24A65F650096DCB9 /* UIActionExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActionExtensions.swift; sourceTree = "<group>"; };
+		2728AD1327630480005ADC41 /* TcaUnlockWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TcaUnlockWalletView.swift; sourceTree = "<group>"; };
 		2729E7D226F502AC00200648 /* AccountPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPicker.swift; sourceTree = "<group>"; };
 		272B862A270BD96F005ED304 /* SandboxInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SandboxInspectorView.swift; sourceTree = "<group>"; };
 		273FCB9925A7BC5500F279B5 /* BraveNewsDebugSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveNewsDebugSettingsController.swift; sourceTree = "<group>"; };
@@ -1964,6 +2046,7 @@
 		2746D28024A4F8DA00E38852 /* RewardsInternalsShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsShareController.swift; sourceTree = "<group>"; };
 		2746D28224A4FB7400E38852 /* RewardsInternalsSharable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsSharable.swift; sourceTree = "<group>"; };
 		2748625C25AD308A00BC40AA /* sqlcipher.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = sqlcipher.xcframework; sourceTree = "<group>"; };
+		274CDC25275D7F76007259AD /* PortfolioReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioReducer.swift; sourceTree = "<group>"; };
 		275034E226EF9E6A00CF4C8A /* WalletSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletSettingsView.swift; sourceTree = "<group>"; };
 		2755AB7C23107BC600F0721F /* AdsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdsReporting.js; sourceTree = "<group>"; };
 		2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsMediaReporting.swift; sourceTree = "<group>"; };
@@ -2005,6 +2088,7 @@
 		277430092733126000183725 /* WalletColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletColors.swift; sourceTree = "<group>"; };
 		2774303127332C2F00183725 /* TransactionConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionConfirmationView.swift; sourceTree = "<group>"; };
 		2774303327332DAF00183725 /* BlockieGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockieGroup.swift; sourceTree = "<group>"; };
+		2775224B27605041008B3BB6 /* AccountsReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsReducer.swift; sourceTree = "<group>"; };
 		277568D025ACF91500C129AF /* SPMLibraries.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SPMLibraries.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		277568D225ACF91600C129AF /* SPMLibraries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPMLibraries.h; sourceTree = "<group>"; };
 		277568D325ACF91600C129AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2183,9 +2267,11 @@
 		27A1AC0824859D0900344503 /* FeedHeadlineViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedHeadlineViews.swift; sourceTree = "<group>"; };
 		27A1AC0B2485A1C200344503 /* FeedDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedDataSource.swift; sourceTree = "<group>"; };
 		27A1AC1424884EB300344503 /* Enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Enterprise.xcconfig; sourceTree = "<group>"; };
+		27A4410D275D2C28005FC276 /* CryptoReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoReducer.swift; sourceTree = "<group>"; };
 		27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTest.swift; sourceTree = "<group>"; };
 		27AAE240274FFBA900288E90 /* TransactionConfirmationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionConfirmationStore.swift; sourceTree = "<group>"; };
 		27AC169623834510004BE19C /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		27AC3AA8275C4222004BFB42 /* WalletReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletReducer.swift; sourceTree = "<group>"; };
 		27AC7CF724C759BE00441317 /* Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enterprise.entitlements; sourceTree = "<group>"; };
 		27AC7CF924C77EBC00441317 /* FeedActionAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedActionAlertView.swift; sourceTree = "<group>"; };
 		27AD20C226851C5400889AA7 /* BraveCore.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BraveCore.xcframework; path = "node_modules/brave-core-ios/BraveCore.xcframework"; sourceTree = "<group>"; };
@@ -3238,6 +3324,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		270FE68F27630889000E0600 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				270FE6C627630C4A000E0600 /* MaterialComponents.xcframework in Frameworks */,
+				270FE6AF276308DF000E0600 /* BraveUI.framework in Frameworks */,
+				270FE6B6276308E6000E0600 /* BraveShared.framework in Frameworks */,
+				270FE6C2276308F9000E0600 /* BraveWallet.framework in Frameworks */,
+				270FE6B4276308E2000E0600 /* BraveCore.xcframework in Frameworks */,
+				270FE6BE276308ED000E0600 /* SPMLibraries.framework in Frameworks */,
+				270FE6BA276308EA000E0600 /* Shared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		271F683226EBD0E400AA2A50 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3264,6 +3364,7 @@
 			files = (
 				271F68F026EBDC3600AA2A50 /* Then in Frameworks */,
 				277568F525ACF92400C129AF /* SwiftyJSON in Frameworks */,
+				27772238275C5549006623AD /* ComposableArchitecture in Frameworks */,
 				277568F725ACF92400C129AF /* Lottie in Frameworks */,
 				277046C22684CD2A001CB097 /* PanModal in Frameworks */,
 				277568EB25ACF92400C129AF /* ZIPFoundation in Frameworks */,
@@ -3802,6 +3903,26 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		270FE6932763088A000E0600 /* BraveWalletPreview */ = {
+			isa = PBXGroup;
+			children = (
+				270FE6942763088A000E0600 /* BraveWalletPreviewApp.swift */,
+				270FE6982763088A000E0600 /* Assets.xcassets */,
+				270FE69A2763088A000E0600 /* Preview Content */,
+			);
+			indentWidth = 2;
+			path = BraveWalletPreview;
+			sourceTree = "<group>";
+			tabWidth = 2;
+		};
+		270FE69A2763088A000E0600 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				270FE69B2763088A000E0600 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		271801BA273C72E700F683E3 /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
@@ -3865,6 +3986,7 @@
 		271F685626EBD27C00AA2A50 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				2728AD072763046D005ADC41 /* TCA */,
 				271801BA273C72E700F683E3 /* Transactions */,
 				2774302527332C1D00183725 /* Transaction Confirmations */,
 				7DAC596627235B0A00E735A2 /* Scanner */,
@@ -3915,6 +4037,10 @@
 				7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */,
 				27E17B802744067A00F3C282 /* AccountActivityStore.swift */,
 				27AAE240274FFBA900288E90 /* TransactionConfirmationStore.swift */,
+				27AC3AA8275C4222004BFB42 /* WalletReducer.swift */,
+				27A4410D275D2C28005FC276 /* CryptoReducer.swift */,
+				274CDC25275D7F76007259AD /* PortfolioReducer.swift */,
+				2775224B27605041008B3BB6 /* AccountsReducer.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -4060,6 +4186,15 @@
 				5DB474CE237F4BE9007B7652 /* NTP_Images */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		2728AD072763046D005ADC41 /* TCA */ = {
+			isa = PBXGroup;
+			children = (
+				2728AD1327630480005ADC41 /* TcaUnlockWalletView.swift */,
+				270FE6C827630D44000E0600 /* OnboardingReducer.swift */,
+			);
+			path = TCA;
 			sourceTree = "<group>";
 		};
 		2746D26C24A291ED00E38852 /* Rewards Internals */ = {
@@ -6388,6 +6523,7 @@
 				278C468723F1E6270083347F /* BraveUI */,
 				271F683626EBD0E400AA2A50 /* BraveWallet */,
 				277309E62721DF6D007643F6 /* BraveWalletTests */,
+				270FE6932763088A000E0600 /* BraveWalletPreview */,
 				277568D125ACF91600C129AF /* SPMLibraries */,
 				27756E9525AF6F5F00C129AF /* SPMLibrariesTests */,
 				2F6931B5260CFB3700ECEB38 /* BrowserIntents */,
@@ -6428,6 +6564,7 @@
 				271F683526EBD0E400AA2A50 /* BraveWallet.framework */,
 				277309E52721DF6D007643F6 /* BraveWalletTests.xctest */,
 				CA0391B2271E1023000EB13C /* BraveWidgetsExtension.appex */,
+				270FE69227630889000E0600 /* BraveWalletPreview.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6836,6 +6973,29 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		270FE69127630889000E0600 /* BraveWalletPreview */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 270FE6AE2763088A000E0600 /* Build configuration list for PBXNativeTarget "BraveWalletPreview" */;
+			buildPhases = (
+				270FE68E27630889000E0600 /* Sources */,
+				270FE68F27630889000E0600 /* Frameworks */,
+				270FE69027630889000E0600 /* Resources */,
+				270FE6B3276308DF000E0600 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				270FE6B2276308DF000E0600 /* PBXTargetDependency */,
+				270FE6B9276308E6000E0600 /* PBXTargetDependency */,
+				270FE6BD276308EA000E0600 /* PBXTargetDependency */,
+				270FE6C1276308ED000E0600 /* PBXTargetDependency */,
+				270FE6C5276308F9000E0600 /* PBXTargetDependency */,
+			);
+			name = BraveWalletPreview;
+			productName = BraveWalletPreview;
+			productReference = 270FE69227630889000E0600 /* BraveWalletPreview.app */;
+			productType = "com.apple.product-type.application";
+		};
 		271F683426EBD0E400AA2A50 /* BraveWallet */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 271F684F26EBD0E400AA2A50 /* Build configuration list for PBXNativeTarget "BraveWallet" */;
@@ -6853,6 +7013,8 @@
 				271F68E326EBD51100AA2A50 /* PBXTargetDependency */,
 			);
 			name = BraveWallet;
+			packageProductDependencies = (
+			);
 			productName = BraveWallet;
 			productReference = 271F683526EBD0E400AA2A50 /* BraveWallet.framework */;
 			productType = "com.apple.product-type.framework";
@@ -6908,6 +7070,7 @@
 				271F68E926EBD59F00AA2A50 /* Algorithms */,
 				271F68EF26EBDC3600AA2A50 /* Then */,
 				277309DF2721DE2E007643F6 /* BigNumber */,
+				27772237275C5549006623AD /* ComposableArchitecture */,
 			);
 			productName = SPMLibraries;
 			productReference = 277568D025ACF91500C129AF /* SPMLibraries.framework */;
@@ -7228,10 +7391,13 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 1310;
+				LastSwiftUpdateCheck = 1320;
 				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = Mozilla;
 				TargetAttributes = {
+					270FE69127630889000E0600 = {
+						CreatedOnToolsVersion = 13.2;
+					};
 					271F683426EBD0E400AA2A50 = {
 						CreatedOnToolsVersion = 12.5.1;
 						LastSwiftMigration = 1250;
@@ -7372,6 +7538,7 @@
 				271F68E826EBD59F00AA2A50 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				271F68EE26EBDC3600AA2A50 /* XCRemoteSwiftPackageReference "Then" */,
 				277309DA2721DDD2007643F6 /* XCRemoteSwiftPackageReference "Swift-BigInt" */,
+				27AC3A9A275C41F1004BFB42 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
@@ -7409,6 +7576,7 @@
 				27756E9325AF6F5F00C129AF /* SPMLibrariesTests */,
 				2F6931B3260CFB3700ECEB38 /* BrowserIntents */,
 				CA0391B1271E1023000EB13C /* BraveWidgetsExtension */,
+				270FE69127630889000E0600 /* BraveWalletPreview */,
 			);
 		};
 /* End PBXProject section */
@@ -7494,6 +7662,15 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		270FE69027630889000E0600 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				270FE69C2763088A000E0600 /* Preview Assets.xcassets in Resources */,
+				270FE6992763088A000E0600 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		271F683326EBD0E400AA2A50 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7878,6 +8055,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		270FE68E27630889000E0600 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				270FE6952763088A000E0600 /* BraveWalletPreviewApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		271F683126EBD0E400AA2A50 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -7909,6 +8094,7 @@
 				271F68B226EBD27E00AA2A50 /* RestoreWalletView.swift in Sources */,
 				2774300A2733126000183725 /* WalletColors.swift in Sources */,
 				27DDE88A26FE1A7700A70C3A /* TestBraveWalletService.swift in Sources */,
+				274CDC26275D7F76007259AD /* PortfolioReducer.swift in Sources */,
 				271F68F826EBE92900AA2A50 /* WalletHostingViewController.swift in Sources */,
 				7D49CDDF271FB359008AB67E /* SendTokenStore.swift in Sources */,
 				271F68A326EBD27E00AA2A50 /* AccountView.swift in Sources */,
@@ -7927,6 +8113,7 @@
 				2729E7D326F502AC00200648 /* AccountPicker.swift in Sources */,
 				27F3AEF4271DDE0C00F75B7F /* OpenWalletURLAction.swift in Sources */,
 				2762FF32271A2448001EF41D /* BuySendSwapDestination.swift in Sources */,
+				27A4410E275D2C28005FC276 /* CryptoReducer.swift in Sources */,
 				7D2D6EDD2731B7FF000650EA /* SwapTokenStore.swift in Sources */,
 				27D91E71274D55F0009B1FA3 /* EditGasFeeView.swift in Sources */,
 				271F68A426EBD27E00AA2A50 /* AccountsView.swift in Sources */,
@@ -7939,7 +8126,9 @@
 				7DCA34D427555E96001B0555 /* CryptoStore.swift in Sources */,
 				271F68B026EBD27E00AA2A50 /* BackupRecoveryPhraseView.swift in Sources */,
 				271F68A926EBD27E00AA2A50 /* BuySendSwapView.swift in Sources */,
+				2728AD1427630480005ADC41 /* TcaUnlockWalletView.swift in Sources */,
 				7D758917271A182800B643C3 /* TokenList.swift in Sources */,
+				270FE6C927630D44000E0600 /* OnboardingReducer.swift in Sources */,
 				271F68C226EBD27E00AA2A50 /* SwapButton.swift in Sources */,
 				27DDE85926FBE09A00A70C3A /* AccountPrivateKeyView.swift in Sources */,
 				271F68AA26EBD27E00AA2A50 /* TransactionView.swift in Sources */,
@@ -7947,6 +8136,7 @@
 				277C0A9A273DC0890059AB0A /* NamedAddresses.swift in Sources */,
 				2774303227332C2F00183725 /* TransactionConfirmationView.swift in Sources */,
 				271F689726EBD27E00AA2A50 /* CryptoPagesView.swift in Sources */,
+				27AC3AA9275C4222004BFB42 /* WalletReducer.swift in Sources */,
 				7D758915271A17AF00B643C3 /* BuyTokenStore.swift in Sources */,
 				7DF9113D275AC86100EF0D8B /* WalletLoadingButton.swift in Sources */,
 				271F68B326EBD27E00AA2A50 /* RecoveryPhraseGrid.swift in Sources */,
@@ -7969,6 +8159,7 @@
 				271F68AE26EBD27E00AA2A50 /* BackupWalletView.swift in Sources */,
 				7D758908271A172C00B643C3 /* BuyTokenView.swift in Sources */,
 				2718018E272C7DBB0047EB15 /* AssetDetailStore.swift in Sources */,
+				2775224C27605041008B3BB6 /* AccountsReducer.swift in Sources */,
 				7D3393EA2744200B00265F1A /* AddCustomAssetView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8908,6 +9099,36 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		270FE6B2276308DF000E0600 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 278C468523F1E6270083347F /* BraveUI */;
+			targetProxy = 270FE6B1276308DF000E0600 /* PBXContainerItemProxy */;
+		};
+		270FE6B9276308E6000E0600 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 5DE7688320B3456C00FF5533 /* BraveShared */;
+			targetProxy = 270FE6B8276308E6000E0600 /* PBXContainerItemProxy */;
+		};
+		270FE6BD276308EA000E0600 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 288A2D851AB8B3260023ABC3 /* Shared */;
+			targetProxy = 270FE6BC276308EA000E0600 /* PBXContainerItemProxy */;
+		};
+		270FE6C1276308ED000E0600 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 277568CF25ACF91500C129AF /* SPMLibraries */;
+			targetProxy = 270FE6C0276308ED000E0600 /* PBXContainerItemProxy */;
+		};
+		270FE6C5276308F9000E0600 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 271F683426EBD0E400AA2A50 /* BraveWallet */;
+			targetProxy = 270FE6C4276308F9000E0600 /* PBXContainerItemProxy */;
+		};
 		271F683B26EBD0E400AA2A50 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 271F683426EBD0E400AA2A50 /* BraveWallet */;
@@ -9368,6 +9589,240 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		270FE69D2763088A000E0600 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		270FE69E2763088A000E0600 /* Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Dev;
+		};
+		270FE69F2763088A000E0600 /* Enterprise */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Enterprise;
+		};
+		270FE6A02763088A000E0600 /* Release (AppStore) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release (AppStore)";
+		};
+		270FE6A12763088A000E0600 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		270FE6A22763088A000E0600 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"BraveWalletPreview/Preview Content\"";
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.BraveWalletPreview;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Beta;
+		};
 		271F683E26EBD0E400AA2A50 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -14795,6 +15250,19 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		270FE6AE2763088A000E0600 /* Build configuration list for PBXNativeTarget "BraveWalletPreview" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				270FE69D2763088A000E0600 /* Debug */,
+				270FE69E2763088A000E0600 /* Dev */,
+				270FE69F2763088A000E0600 /* Enterprise */,
+				270FE6A02763088A000E0600 /* Release (AppStore) */,
+				270FE6A12763088A000E0600 /* Release */,
+				270FE6A22763088A000E0600 /* Beta */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		271F684F26EBD0E400AA2A50 /* Build configuration list for PBXNativeTarget "BraveWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -15149,6 +15617,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		27AC3A9A275C41F1004BFB42 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
 		27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nmdias/FeedKit.git";
@@ -15245,6 +15721,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
+		};
+		27772237275C5549006623AD /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27AC3A9A275C41F1004BFB42 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 		27B68E5C25C88CA7002D0826 /* FeedKit */ = {
 			isa = XCSwiftPackageProductDependency;

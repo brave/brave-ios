@@ -36,5 +36,10 @@ public struct UIKitNavigationView<Content: View>: View {
     }
     func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {
     }
+    static func dismantleUIViewController(_ uiViewController: UINavigationController, coordinator: ()) {
+      if #available(iOS 15.0, *) {
+        uiViewController.viewControllers.removeAll()
+      }
+    }
   }
 }
