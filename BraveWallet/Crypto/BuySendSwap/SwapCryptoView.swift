@@ -376,13 +376,17 @@ struct SwapCryptoView: View {
           )
             .foregroundColor(Color(.braveLabel))
             .font(.footnote)
-          Button(action: {
-            swapTokensStore.prepareSwap()
-          }) {
-            Text(swapButtonTitle)
-          }
-          .disabled(isSwapButtonDisabled)
-          .buttonStyle(BraveFilledButtonStyle(size: .normal))
+          WalletLoadingButton(
+            isLoading: $swapTokensStore.isMakingTx,
+            action: {
+              swapTokensStore.prepareSwap()
+            },
+            title: {
+              Text(swapButtonTitle)
+            }
+          )
+            .disabled(isSwapButtonDisabled || swapTokensStore.isMakingTx)
+            .buttonStyle(BraveFilledButtonStyle(size: .normal))
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 16)

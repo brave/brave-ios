@@ -121,19 +121,23 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header:
-            Button(action: {
-              sendTokenStore.sendToken(
-                from: keyringStore.selectedAccount,
-                to: sendAddress,
-                amount: amountInput
-              ) { success in
-                isShowingError = !success
+            WalletLoadingButton(
+              isLoading: $sendTokenStore.isMakingTx,
+              action: {
+                sendTokenStore.sendToken(
+                  from: keyringStore.selectedAccount,
+                  to: sendAddress,
+                  amount: amountInput
+                ) { success in
+                  isShowingError = !success
+                }
+              },
+              title: {
+                Text(Strings.Wallet.sendCryptoSendButtonTitle)
               }
-            }) {
-              Text(Strings.Wallet.sendCryptoSendButtonTitle)
-            }
+            )
             .buttonStyle(BraveFilledButtonStyle(size: .normal))
-            .disabled(isSendDisabled)
+            .disabled(isSendDisabled || sendTokenStore.isMakingTx)
             .frame(maxWidth: .infinity)
             .resetListHeaderStyle()
             .listRowBackground(Color(.clear))
