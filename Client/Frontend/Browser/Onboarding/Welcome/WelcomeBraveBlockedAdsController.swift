@@ -13,6 +13,8 @@ import Shared
 class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponent {
     private let label = UILabel().then {
         $0.numberOfLines = 0
+        $0.textColor = .braveLabel
+        $0.font = .preferredFont(forTextStyle: .body)
     }
     
     override func viewDidLoad() {
@@ -53,9 +55,25 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
                 .font: UIFont.preferredFont(forTextStyle: .body)
             ]))
         } else {
-            let string = String(format: Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionTwo, trackerBlocked, domain)
+            let uuid = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+            let string = String(format: Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionTwo, "[\(uuid)]", domain)
+            let strings = string.separatedBy("[\(uuid)]")
+            guard strings.count == 2 else {
+                label.text = string
+                return
+            }
             
-            text.append(NSAttributedString(string: "\(string)\n\n\(Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionThree)", attributes: [
+            text.append(NSAttributedString(string: strings[0], attributes: [
+                .foregroundColor: UIColor.braveLabel,
+                .font: UIFont.preferredFont(forTextStyle: .body)
+            ]))
+            
+            text.append(NSAttributedString(string: " \(trackerBlocked) ", attributes: [
+                .foregroundColor: UIColor.braveLabel,
+                .font: UIFont.preferredFont(for: .body, weight: .bold)
+            ]))
+            
+            text.append(NSAttributedString(string: "\(strings[1])\n\n\(Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionThree)", attributes: [
                 .foregroundColor: UIColor.braveLabel,
                 .font: UIFont.preferredFont(forTextStyle: .body)
             ]))
