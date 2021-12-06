@@ -154,10 +154,7 @@ public class SendTokenStore: ObservableObject {
     
     isMakingTx = true
     rpcController.network { [weak self] network in
-      guard let self = self else {
-        self?.isMakingTx = false
-        return
-      }
+      guard let self = self else { return }
       defer { self.isMakingTx = false }
 
       if token.isETH {

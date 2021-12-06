@@ -215,7 +215,6 @@ public class SwapTokenStore: ObservableObject {
       guard let self = self else {
         self?.state = .error(Strings.Wallet.unknownError)
         self?.clearAllAmount()
-        self?.isMakingTx = false
         return
       }
       defer { self.isMakingTx = false }
