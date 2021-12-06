@@ -286,7 +286,7 @@ public class PopoverController: UIViewController {
     ///
     /// - parameter view: The view to have the popover present from (scaling from the location of this view)
     /// - parameter viewController: The view controller to present this popover on
-    public func present(from view: UIView, on viewController: UIViewController, _ completion: (() -> Void)? = nil) {
+    public func present(from view: UIView, on viewController: UIViewController) {
         let convertedOriginViewCenter = viewController.view.convert(view.center, from: view.superview)
         
         switch arrowDirectionBehavior {
@@ -332,7 +332,7 @@ public class PopoverController: UIViewController {
             presentedSize: contentSize
         )
         
-        viewController.present(self, animated: true, completion: completion)
+        viewController.present(self, animated: true)
     }
     
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {

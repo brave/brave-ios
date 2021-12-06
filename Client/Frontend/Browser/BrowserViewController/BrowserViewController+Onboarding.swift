@@ -168,6 +168,7 @@ extension BrowserViewController {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 guard let self = self else { return }
+                
                 if self.shouldShowPlaylistOnboardingThisSession {
                     self.showPlaylistOnboarding(tab: self.tabManager.selectedTab)
                 }
