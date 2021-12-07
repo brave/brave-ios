@@ -2823,16 +2823,6 @@ extension BrowserViewController: NewTabPageDelegate {
                                                arrowDirection: .any)
         }
     }
-    
-    func showNTPOnboarding() {
-        if Preferences.General.isNewRetentionUser.value == true,
-            Preferences.DebugFlag.skipNTPCallouts != true,
-            !topToolbar.inOverlayMode,
-            topToolbar.currentURL == nil,
-            !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
-            presentNTPStatsOnboarding()
-        }
-    }
 }
 
 extension BrowserViewController: PreferencesObserver {
