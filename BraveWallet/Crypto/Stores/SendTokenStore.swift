@@ -41,11 +41,11 @@ public class SendTokenStore: ObservableObject {
     var errorDescription: String? {
       switch self {
       case .sameAsFromAddress:
-        return Strings.Wallet.sendAddressWarning1
+        return Strings.Wallet.sendWarningAddressIsOwn
       case .contractAddress:
-        return Strings.Wallet.sendAddressWarning2
+        return Strings.Wallet.sendWarningAddressIsContract
       case .notEthAddress:
-        return Strings.Wallet.sendAddressWarning3
+        return Strings.Wallet.sendWarningAddressNotValid
       }
     }
   }
