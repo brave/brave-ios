@@ -95,32 +95,8 @@ struct SendTokenView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoToTitle))
-        ) {
-          VStack(alignment: .leading) {
-            HStack(spacing: 14.0) {
-              TextField(Strings.Wallet.sendCryptoAddressPlaceholder, text: $sendTokenStore.sendAddress)
-              Button(action: {
-                if let string = UIPasteboard.general.string {
-                  sendTokenStore.sendAddress = string
-                }
-              }) {
-                Label(Strings.Wallet.pasteFromPasteboard, image: "brave.clipboard")
-                  .labelStyle(.iconOnly)
-                  .foregroundColor(Color(.primaryButtonTint))
-                  .font(.body)
-              }
-              .buttonStyle(PlainButtonStyle())
-              Button(action: {
-                isShowingScanner = true
-              }) {
-                Label(Strings.Wallet.scanQRCodeAccessibilityLabel, image: "brave.qr-code")
-                  .labelStyle(.iconOnly)
-                  .foregroundColor(Color(.primaryButtonTint))
-                  .font(.body)
-              }
-              .buttonStyle(PlainButtonStyle())
-            }
+          header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoToTitle)),
+          footer: Group {
             if let error = sendTokenStore.addressError {
               HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: "exclamationmark.circle.fill")
@@ -137,6 +113,30 @@ struct SendTokenView: View {
               .font(.footnote)
               .foregroundColor(Color(.braveErrorLabel))
             }
+          }
+        ) {
+          HStack(spacing: 14.0) {
+            TextField(Strings.Wallet.sendCryptoAddressPlaceholder, text: $sendTokenStore.sendAddress)
+            Button(action: {
+              if let string = UIPasteboard.general.string {
+                sendTokenStore.sendAddress = string
+              }
+            }) {
+              Label(Strings.Wallet.pasteFromPasteboard, image: "brave.clipboard")
+                .labelStyle(.iconOnly)
+                .foregroundColor(Color(.primaryButtonTint))
+                .font(.body)
+            }
+            .buttonStyle(PlainButtonStyle())
+            Button(action: {
+              isShowingScanner = true
+            }) {
+              Label(Strings.Wallet.scanQRCodeAccessibilityLabel, image: "brave.qr-code")
+                .labelStyle(.iconOnly)
+                .foregroundColor(Color(.primaryButtonTint))
+                .font(.body)
+            }
+            .buttonStyle(PlainButtonStyle())
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
