@@ -213,7 +213,7 @@ public class SendTokenStore: ObservableObject {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     guard
       let token = selectedSendToken,
-      let weiHexString = weiFormatter.weiString(from: amount, radix: .hex, decimals: 18),
+      let weiHexString = weiFormatter.weiString(from: amount, radix: .hex, decimals: Int(token.decimals)),
       let fromAddress = currentAccountAddress
     else { return }
     
