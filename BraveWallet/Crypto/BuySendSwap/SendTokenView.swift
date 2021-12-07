@@ -112,6 +112,7 @@ struct SendTokenView: View {
               )
               .font(.footnote)
               .foregroundColor(Color(.braveErrorLabel))
+              .padding(.bottom)
             }
           }
         ) {
