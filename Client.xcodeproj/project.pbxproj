@@ -418,6 +418,7 @@
 		278C700A24F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */; };
 		2792CBC8275951B10055151E /* UIPasteboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792CBC7275951B10055151E /* UIPasteboardExtensions.swift */; };
 		2792CBD5275952C40055151E /* PasteboardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2792CBD4275952C40055151E /* PasteboardTests.swift */; };
+		279115422755597200033843 /* SendTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279115362755597200033843 /* SendTokenStoreTests.swift */; };
 		2795274A21A890EB00921AA1 /* FingerprintingProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */; };
 		27953F7423F5B04500B4B595 /* ViewLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7323F5B04500B4B595 /* ViewLabel.swift */; };
 		27953F7723F5DF5D00B4B595 /* AboutShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */; };
@@ -2165,6 +2166,7 @@
 		278C700924F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveShieldsAndPrivacySettingsController.swift; sourceTree = "<group>"; };
 		2792CBC7275951B10055151E /* UIPasteboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPasteboardExtensions.swift; sourceTree = "<group>"; };
 		2792CBD4275952C40055151E /* PasteboardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardTests.swift; sourceTree = "<group>"; };
+		279115362755597200033843 /* SendTokenStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendTokenStoreTests.swift; sourceTree = "<group>"; };
 		2795274921A890EB00921AA1 /* FingerprintingProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FingerprintingProtectionTests.swift; sourceTree = "<group>"; };
 		27953F7323F5B04500B4B595 /* ViewLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewLabel.swift; sourceTree = "<group>"; };
 		27953F7623F5DF5D00B4B595 /* AboutShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutShieldsViewController.swift; sourceTree = "<group>"; };
@@ -4179,6 +4181,7 @@
 		277309E62721DF6D007643F6 /* BraveWalletTests */ = {
 			isa = PBXGroup;
 			children = (
+				279115362755597200033843 /* SendTokenStoreTests.swift */,
 				277309E72721DF6D007643F6 /* WeiFormatterTests.swift */,
 				27EA1B0D2729E6C8003C5CF9 /* AddressTests.swift */,
 				7DC52B1E273D9D230067E237 /* WalletArrayExtensionTests.swift */,
@@ -7980,6 +7983,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2792CBD5275952C40055151E /* PasteboardTests.swift in Sources */,
+				279115422755597200033843 /* SendTokenStoreTests.swift in Sources */,
 				27EA1B0E2729E6C8003C5CF9 /* AddressTests.swift in Sources */,
 				7DC52B1F273D9D230067E237 /* WalletArrayExtensionTests.swift in Sources */,
 				277309E82721DF6D007643F6 /* WeiFormatterTests.swift in Sources */,
