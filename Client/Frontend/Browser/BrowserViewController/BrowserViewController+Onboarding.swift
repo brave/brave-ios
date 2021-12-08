@@ -25,6 +25,11 @@ extension BrowserViewController {
             
             controller.onPrivacyConsentCompleted = { [weak self, unowned controller] in
                 guard let self = self else { return }
+                
+                if Preferences.General.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
+                    controller.dismiss(animated: true, completion: nil)
+                    return
+                }
                 self.presentOnboardingWelcomeScreen(on: controller)
             }
             
