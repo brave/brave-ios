@@ -78,7 +78,7 @@ struct TransactionView: View {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, amount, networkStore.selectedChain.symbol, fiat))
       }
     case .erc20Transfer:
-      if let token = visibleTokens.first(where: {
+      if info.txArgs.count > 1, let token = visibleTokens.first(where: {
         $0.contractAddress.caseInsensitiveCompare(info.txData.baseData.to) == .orderedSame
       }) {
         let amount = formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
