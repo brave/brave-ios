@@ -1608,10 +1608,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                 let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
                     FavoritesHelper.add(url: url, title: tab?.displayTitle)
                 }
-                // TODO: Issue #4651 - Drag and drop Favourites crashing on iOS-14
-                if #available(iOS 15.0, *) {
-                    activities.append(addToFavoritesActivity)
-                }
+                
+                activities.append(addToFavoritesActivity)
             }
             activities.append(requestDesktopSiteActivity)
             
