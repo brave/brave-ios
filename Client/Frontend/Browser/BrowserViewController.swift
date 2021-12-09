@@ -944,11 +944,13 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         
         // Full Screen Callout Presentation
         // Priority: VPN - Default Browser - Rewards - Sync
-        presentVPNAlertCallout()
-        presentDefaultBrowserScreenCallout()
-        presentBraveRewardsScreenCallout()
-        presentSyncAlertCallout()
-                
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            presentVPNAlertCallout()
+            presentDefaultBrowserScreenCallout()
+            presentBraveRewardsScreenCallout()
+            presentSyncAlertCallout()
+        }
+        
         screenshotHelper.viewIsVisible = true
         screenshotHelper.takePendingScreenshots(tabManager.allTabs)
 
