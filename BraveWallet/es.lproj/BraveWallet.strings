@@ -326,7 +326,7 @@
 "wallet.maximumGasFee" = "Tarifa máxima";
 
 /* The title of the edit gas fee screen for EIP-1559 transactions */
-"wallet.maxPriorityFeeTitle" = "Tarifa de máx. prioridad";
+"wallet.maxPriorityFeeTitle" = "Tarifa máxima de prioridad";
 
 /* A button title next indicating the user to go to the next transaction. Will sit next to a label such as \"1 of 4\" where tapping next would move them to the second transaction */
 "wallet.nextTransaction" = "Siguiente";

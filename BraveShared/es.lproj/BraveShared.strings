@@ -608,7 +608,7 @@
 "login.loginEntryDeleteAlertMessage" = "El inicio de sesión guardado se eliminará permanentemente.";
 
 /* The message displayed in alert when a login entry deleted */
-"login.loginInfoCreatedHeaderTitle" = "Creado a las %@";
+"login.loginInfoCreatedHeaderTitle" = "Creado el %@";
 
 /* The header title displayed over the details of login entry */
 "login.loginInfoDetailsHeaderTitle" = "Detalles de inicio de sesión";
@@ -770,7 +770,7 @@
 "onboarding.blockedAdsOnboardingPopoverDescriptionThree" = "Toca la Protección de cualquier sitio web para ver todo lo que se ha bloqueado.";
 
 /* The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
-"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave ha bloqueado %1$@ el: %2$@.";
+"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave ha bloqueado %1$@ en: %2$@.";
 
 /* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
 "onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription" = "Brave ha bloqueado %1$@ y %2$d rastreadores más el: %3$@.";
@@ -1292,10 +1292,10 @@
 "SyncDevices" = "Dispositivos y ajustes";
 
 /* Sync Error Description */
-"syncExpiredError" = "Expirado";
+"syncExpiredError" = "Expirada";
 
 /* Sync Error Description */
-"syncFutureVersionError" = "Demasiado novedoso";
+"syncFutureVersionError" = "Demasiado reciente";
 
 /* Sync Error Description */
 "syncGenericError" = "Lo sentimos, algo salió mal";

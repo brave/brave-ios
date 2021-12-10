@@ -608,7 +608,7 @@
 "login.loginEntryDeleteAlertMessage" = "Login yang Disimpan akan dihapus permanen.";
 
 /* The message displayed in alert when a login entry deleted */
-"login.loginInfoCreatedHeaderTitle" = "Telah membuat %@";
+"login.loginInfoCreatedHeaderTitle" = "Dibuat pada %@";
 
 /* The header title displayed over the details of login entry */
 "login.loginInfoDetailsHeaderTitle" = "Detail Login";
@@ -770,7 +770,7 @@
 "onboarding.blockedAdsOnboardingPopoverDescriptionThree" = "Ketuk Perisai dari situs mana pun untuk melihat semua hal yang telah kami blokir.";
 
 /* The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
-"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave memblokir %1$@ pada: %2$@.";
+"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave memblokir %1$@ di: %2$@.";
 
 /* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
 "onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription" = "Brave memblokir %1$@ dan %2$d pelacak lainnya di: %3$@.";

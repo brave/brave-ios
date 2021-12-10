@@ -287,7 +287,7 @@
 "wallet.hidePrivateKeyButtonTitle" = "Sembunyikan Kunci Pribadi";
 
 /* A title above a text field that is used to enter a password */
-"wallet.importAccountOriginPasswordTitle" = "Kata Sandi Sebelumnya";
+"wallet.importAccountOriginPasswordTitle" = "Kata Sandi Dompet Asal";
 
 /* A placeholder on a text box for entering the users private key/json data to import accounts */
 "wallet.importAccountPlaceholder" = "Masukkan, tempel, atau impor berkas rangkaian kunci privat Anda atau JSON.";
