@@ -217,11 +217,9 @@ public class SwapTokenStore: ObservableObject {
         self?.clearAllAmount()
         return
       }
-      defer { self.isMakingTx = false }
       
       self.addingUnapprovedTx = true
       self.swapController.transactionPayload(swapParams) { success, swapResponse, error in
-        defer { self.addingUnapprovedTx = false }
         guard success else {
           self.state = .error(Strings.Wallet.unknownError)
           self.clearAllAmount()
@@ -251,7 +249,8 @@ public class SwapTokenStore: ObservableObject {
           self.makeEIP1559Tx(chainId: network.chainId,
                              baseData: baseData,
                              from: accountInfo) { success in
-            // should be observed
+            self.addingUnapprovedTx = false
+            self.isMakingTx = false
             guard success else {
               self.state = .error(Strings.Wallet.unknownError)
               self.clearAllAmount()
@@ -268,7 +267,8 @@ public class SwapTokenStore: ObservableObject {
             data: data
           )
           self.transactionController.addUnapprovedTransaction(baseData, from: accountInfo.address) { success, txMetaId, error in
-            // should be observed
+            self.addingUnapprovedTx = false
+            self.isMakingTx = false
             guard success else {
               self.state = .error(Strings.Wallet.unknownError)
               self.clearAllAmount()
@@ -347,6 +347,7 @@ public class SwapTokenStore: ObservableObject {
       )
     else { return }
     
+    isMakingTx = true
     rpcController.network { [weak self] network in
       guard let self = self else { return }
       self.addingUnapprovedTx = true
@@ -354,7 +355,6 @@ public class SwapTokenStore: ObservableObject {
         spenderAddress,
         amount: "0x\(balanceInWeiHex)"
       ) { success, data in
-        defer { self.addingUnapprovedTx = false }
         guard success else { return }
         let baseData = BraveWallet.TxData(
           nonce: "",
@@ -368,6 +368,8 @@ public class SwapTokenStore: ObservableObject {
           self.makeEIP1559Tx(chainId: network.chainId,
                              baseData: baseData,
                              from: accountInfo) { success in
+            self.addingUnapprovedTx = false
+            self.isMakingTx = false
             guard success else {
               self.state = .error(Strings.Wallet.unknownError)
               self.clearAllAmount()
@@ -379,7 +381,8 @@ public class SwapTokenStore: ObservableObject {
               baseData,
               from: accountInfo.address,
               completion: { success, txMetaId, error in
-                // should be observed
+                self.addingUnapprovedTx = false
+                self.isMakingTx = false
                 guard success else {
                   self.state = .error(Strings.Wallet.unknownError)
                   self.clearAllAmount()
