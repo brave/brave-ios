@@ -14,7 +14,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   var braveCoreMain: BraveCoreMain = .init(userAgent: "BraveWalletPreview")
   func application(
     _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
     braveCoreMain.scheduleLowPriorityStartupTasks()
     applyAppearanceDefaults()
