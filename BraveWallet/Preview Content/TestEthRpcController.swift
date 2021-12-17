@@ -33,6 +33,7 @@ class TestEthJsonRpcController: NSObject, BraveWalletEthJsonRpcController {
   }
   
   func balance(_ address: String, completion: @escaping (Bool, String) -> Void) {
+    // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
     completion(true, "0x13e25e19dc20ba7")
   }
   
