@@ -15,6 +15,7 @@ private let log = Logger.browserLogger
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
+    internal var window: UIWindow?
     private var windowProtection: WindowProtection?
     private var sceneInfo: AppDelegate.SceneInfoModel?
     static var shouldHandleUrpLookup = false
@@ -99,6 +100,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             $0.rootViewController = navigationController
         }
+        
+        self.window = window
         
         // TODO: Refactor to accept a UIWindowScene
         // Then store the `windowProtection` in the `BrowserViewController` directly.

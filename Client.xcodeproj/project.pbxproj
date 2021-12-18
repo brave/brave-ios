@@ -1088,6 +1088,7 @@
 		CABFA8F62728651C00B73E97 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */; };
 		CAC2CB402644488600BB8D36 /* RecentSearchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */; };
 		CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */; };
+		CACDE124276D5CA000753DA9 /* SyncInternalsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACDE123276D5CA000753DA9 /* SyncInternalsViewController.swift */; };
 		CE7F11941F3CEEC800ABFC0B /* RemoteDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */; };
 		D018F93E1F44A71A0098F8CA /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = D018F93D1F44A7190098F8CA /* Schema.swift */; };
 		D029A04920A62DB0001DB72F /* TemporaryDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = D029A04820A62DB0001DB72F /* TemporaryDocument.swift */; };
@@ -3023,6 +3024,7 @@
 		CABFA8F52728651C00B73E97 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		CAC2CB3F2644488600BB8D36 /* RecentSearchHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchHeaderView.swift; sourceTree = "<group>"; };
 		CAC2CB4C2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSearchClipboardHeaderView.swift; sourceTree = "<group>"; };
+		CACDE123276D5CA000753DA9 /* SyncInternalsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncInternalsViewController.swift; sourceTree = "<group>"; };
 		CE7F115E1F3CCEF900ABFC0B /* RemoteDevices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteDevices.swift; sourceTree = "<group>"; };
 		D000661320472890009BA6F6 /* __firefox__.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = __firefox__.js; sourceTree = "<group>"; };
 		D018F93D1F44A7190098F8CA /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
@@ -5522,6 +5524,7 @@
 				5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */,
 				2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */,
 				CA4B1F7C274D6DA8009C5BBA /* BraveSyncQRCodeModel.swift */,
+				CACDE123276D5CA000753DA9 /* SyncInternalsViewController.swift */,
 			);
 			path = BraveCore;
 			sourceTree = "<group>";
@@ -8781,6 +8784,7 @@
 				C8F457AA1F1FDD9B000CB895 /* BrowserViewController+KeyCommands.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
 				4422D54C21BFFB7E00BF1855 /* strutil.cc in Sources */,
+				CACDE124276D5CA000753DA9 /* SyncInternalsViewController.swift in Sources */,
 				CA039238271E2B11000EB13C /* BrowserNavigationHelper.swift in Sources */,
 				CA0EE177273C402900F269DA /* WelcomeNTPOnboardingView.swift in Sources */,
 				CA8D5C1C26D7CF04009BF13D /* PlaylistCarplayManager.swift in Sources */,
