@@ -6,15 +6,26 @@
 import Foundation
 import struct Shared.Strings
 import SwiftUI
+import BraveCore
 
 /// Used to determine where a user is navigated to when they tap on a buy, send or swap button
-enum BuySendSwapDestination: String, Identifiable, CaseIterable {
-  case buy
-  case send
-  case swap
+enum BuySendSwapDestination: Identifiable, CaseIterable, Equatable, Hashable {
+  
+  static var allCases: [BuySendSwapDestination] = [.buy(), .send(), .swap()]
+  
+  case buy(BraveWallet.ERCToken? = nil)
+  case send(BraveWallet.ERCToken? = nil)
+  case swap(BraveWallet.ERCToken? = nil)
   
   var id: String {
-    rawValue
+    switch self {
+    case .buy:
+      return "buy"
+    case .send:
+      return "send"
+    case .swap:
+      return "swap"
+    }
   }
   
   var localizedTitle: String {

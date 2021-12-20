@@ -140,7 +140,8 @@ public class SwapTokenStore: ObservableObject {
     rpcController: BraveWalletEthJsonRpcController,
     assetRatioController: BraveWalletAssetRatioController,
     swapController: BraveWalletSwapController,
-    transactionController: BraveWalletEthTxController
+    transactionController: BraveWalletEthTxController,
+    prefilledToken: BraveWallet.ERCToken?
   ) {
     self.keyringController = keyringController
     self.tokenRegistry = tokenRegistry
@@ -148,6 +149,7 @@ public class SwapTokenStore: ObservableObject {
     self.assetRatioController = assetRatioController
     self.swapController = swapController
     self.transactionController = transactionController
+    self.selectedFromToken = prefilledToken
     
     self.keyringController.add(self)
     self.rpcController.add(self)
