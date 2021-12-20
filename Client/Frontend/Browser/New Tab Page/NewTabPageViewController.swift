@@ -493,7 +493,7 @@ class NewTabPageViewController: UIViewController {
             // However we saw it crashing in XCode logs, see #4202.
             let firstItemIndexPath = IndexPath(item: 0, section: 0)
             if let itemCount = collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: 0),
-               itemCount > 0, // Cannot scroll to deleted item index.
+               itemCount > 0, // Only scroll if the section has items, otherwise it will crash.
                collectionView.dataSource?
                 .collectionView(collectionView, cellForItemAt: firstItemIndexPath) != nil {
                 collectionView.scrollToItem(at: firstItemIndexPath, at: .top, animated: true)
