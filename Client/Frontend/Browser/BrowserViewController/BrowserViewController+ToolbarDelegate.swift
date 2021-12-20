@@ -475,7 +475,7 @@ extension BrowserViewController: TopToolbarDelegate {
         presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
     }
     
-    private func presentSettingsNavigation(with controller: UIViewController, cancelEnabled: Bool = false) {
+    func presentSettingsNavigation(with controller: UIViewController, cancelEnabled: Bool = false) {
         let navigationController = SettingsNavigationController(rootViewController: controller)
         navigationController.modalPresentationStyle = .formSheet
         
@@ -561,34 +561,8 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidLongPressAddTab(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        showAddTabContextMenu(sourceView: toolbar ?? topToolbar, button: button)
-    }
-    
-    private func addTabAlertActions() -> [UIAlertAction] {
-        var actions: [UIAlertAction] = []
-        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-            let newPrivateTabAction = UIAlertAction(title: Strings.newPrivateTabTitle,
-                                                    style: .default,
-                                                    handler: { [unowned self] _ in
-                self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
-            })
-            actions.append(newPrivateTabAction)
-        }
-        let bottomActionTitle = PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.newPrivateTabTitle : Strings.newTabTitle
-        actions.append(UIAlertAction(title: bottomActionTitle, style: .default, handler: { [unowned self] _ in
-            self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        }))
-        return actions
-    }
-    
-    func showAddTabContextMenu(sourceView: UIView, button: UIButton) {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alertController.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-        addTabAlertActions().forEach(alertController.addAction)
-        alertController.popoverPresentationController?.sourceView = sourceView
-        alertController.popoverPresentationController?.sourceRect = button.frame
+        // The actions are carried to menu actions for Tab-Tray Button
         UIImpactFeedbackGenerator(style: .heavy).bzzt()
-        present(alertController, animated: true)
     }
     
     func tabToolbarDidLongPressForward(_ tabToolbar: ToolbarProtocol, button: UIButton) {
@@ -601,48 +575,8 @@ extension BrowserViewController: ToolbarDelegate {
     }
     
     func tabToolbarDidLongPressTabs(_ tabToolbar: ToolbarProtocol, button: UIButton) {
-        guard self.presentedViewController == nil else {
-            return
-        }
-        let controller = AlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden) ||
-            (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {
-            addTabAlertActions().forEach(controller.addAction)
-        }
-        
-        if tabManager.openedWebsitesCount > 0 {
-            controller.addAction( UIAlertAction(title: Strings.bookmarkAllTabsTitle, style: .default, handler: { [unowned self] _ in
-                let mode =  BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: self.tabManager.tabsForCurrentMode)
-                let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
-                
-                self.presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
-            }), accessibilityIdentifier: "toolbarTabButtonLongPress.bookmarkTab")
-        }
-            
-        if tabManager.tabsForCurrentMode.count > 1 {
-            controller.addAction(
-                UIAlertAction(title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
-                              style: .destructive, handler: { _ in
-                self.tabManager.removeAll()
-            }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
-        }
-        
-        controller.addAction(UIAlertAction(title: Strings.closeTabTitle, style: .destructive, handler: { _ in
-            if let tab = self.tabManager.selectedTab {
-                self.tabManager.removeTab(tab)
-            }
-        }), accessibilityIdentifier: "toolbarTabButtonLongPress.closeTab")
-        
-        controller.do {
-            $0.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil),
-                         accessibilityIdentifier: "toolbarTabButtonLongPress.cancel")
-            $0.popoverPresentationController?.sourceView = toolbar ?? topToolbar
-            $0.popoverPresentationController?.sourceRect = button.frame
-        }
-        
+        // The actions are carried to menu actions for Tab-Tray Button
         UIImpactFeedbackGenerator(style: .heavy).bzzt()
-        present(controller, animated: true, completion: nil)
     }
     
     func showBackForwardList() {

@@ -11,6 +11,7 @@ import BraveShared
 protocol TabsBarViewControllerDelegate: AnyObject {
     func tabsBarDidSelectTab(_ tabsBarController: TabsBarViewController, _ tab: Tab)
     func tabsBarDidLongPressAddTab(_ tabsBarController: TabsBarViewController, button: UIButton)
+    func tabsBarDidSelectAddNewTab(_ isPrivate: Bool)
 }
 
 class TabsBarViewController: UIViewController {
@@ -104,6 +105,31 @@ class TabsBarViewController: UIViewController {
             make.top.equalTo(view.snp.bottom)
             make.left.right.equalTo(view)
         }
+        
+        var newTabMenu: [UIAction] = []
+            
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            let openNewPrivateTab = UIAction(
+                title: Strings.newPrivateTabTitle,
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
+                    self.delegate?.tabsBarDidSelectAddNewTab(true)
+                    //self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
+                })
+            
+            newTabMenu.append(openNewPrivateTab)
+        }
+        
+        let openNewTab = UIAction(
+            title: PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.newPrivateTabTitle : Strings.newTabTitle,
+            handler: UIAction.deferredActionHandler { [unowned self] _ in
+                self.delegate?.tabsBarDidSelectAddNewTab(PrivateBrowsingManager.shared.isPrivateBrowsing)
+
+                //self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+            })
+        
+        newTabMenu.append(openNewTab)
+        
+        plusButton.menu = UIMenu(title: "", identifier: nil, children: newTabMenu)
     }
     
     override func viewWillAppear(_ animated: Bool) {
