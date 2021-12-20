@@ -94,7 +94,7 @@ extension BrowserViewController {
             
             MenuItemButton(
                 icon: #imageLiteral(resourceName: "menu-crypto").template,
-                title: "\(Strings.Wallet.wallet) (\(Strings.Wallet.betaLabel))",
+                title: "\(Strings.Wallet.wallet)",
                 subtitle: Strings.OptionsMenu.braveWalletItemDescription
             ) { [unowned self] in
                 self.presentWallet()
@@ -125,7 +125,7 @@ extension BrowserViewController {
             if isShownOnWebPage {
                 MenuItemButton(
                     icon: #imageLiteral(resourceName: "menu-crypto").template,
-                    title: "\(Strings.Wallet.wallet) (\(Strings.Wallet.betaLabel))"
+                    title: "\(Strings.Wallet.wallet)"
                 ) { [unowned self] in
                     self.presentWallet()
                 }
