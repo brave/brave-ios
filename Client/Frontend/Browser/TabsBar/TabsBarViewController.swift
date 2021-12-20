@@ -113,7 +113,6 @@ class TabsBarViewController: UIViewController {
                 title: Strings.newPrivateTabTitle,
                 handler: UIAction.deferredActionHandler { [unowned self] _ in
                     self.delegate?.tabsBarDidSelectAddNewTab(true)
-                    //self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
                 })
             
             newTabMenu.append(openNewPrivateTab)
@@ -123,8 +122,6 @@ class TabsBarViewController: UIViewController {
             title: PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.newPrivateTabTitle : Strings.newTabTitle,
             handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.delegate?.tabsBarDidSelectAddNewTab(PrivateBrowsingManager.shared.isPrivateBrowsing)
-
-                //self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             })
         
         newTabMenu.append(openNewTab)
