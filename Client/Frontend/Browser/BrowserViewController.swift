@@ -91,12 +91,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     // popover rotation handling
     var displayedPopoverController: UIViewController?
     var updateDisplayedPopoverProperties: (() -> Void)?
-
-    // location label actions
-    var pasteGoAction: AccessibleAction!
-    var pasteAction: AccessibleAction!
-    var copyAddressAction: AccessibleAction!
-
+    
     let profile: Profile
     let tabManager: TabManager
     let historyAPI: BraveHistoryAPI
@@ -680,6 +675,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         topToolbar.translatesAutoresizingMaskIntoConstraints = false
         topToolbar.delegate = self
         topToolbar.tabToolbarDelegate = self
+        
+        let toolBarInteraction = UIContextMenuInteraction(delegate: self)
+        topToolbar.locationView.addInteraction(toolBarInteraction)
+
         header = UIStackView().then {
             $0.axis = .vertical
             $0.clipsToBounds = true
@@ -695,30 +694,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         
         addChild(tabsBar)
         tabsBar.didMove(toParent: self)
-
-        // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
-        pasteGoAction = AccessibleAction(name: Strings.pasteAndGoTitle, handler: { () -> Bool in
-            if let pasteboardContents = UIPasteboard.general.string {
-                self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-                return true
-            }
-            return false
-        })
-        pasteAction = AccessibleAction(name: Strings.pasteTitle, handler: { () -> Bool in
-            if let pasteboardContents = UIPasteboard.general.string {
-                // Enter overlay mode and make the search controller appear.
-                self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-
-                return true
-            }
-            return false
-        })
-        copyAddressAction = AccessibleAction(name: Strings.copyAddressTitle, handler: { () -> Bool in
-            if let url = self.topToolbar.currentURL {
-                UIPasteboard.general.url = url as URL
-            }
-            return true
-        })
 
         view.addSubview(alertStackView)
         footer = UIView()

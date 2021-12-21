@@ -100,14 +100,6 @@ extension BrowserViewController: TopToolbarDelegate {
         }
     }
 
-    func locationActions(for topToolbar: TopToolbarView) -> [AccessibleAction] {
-        if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-            return [pasteGoAction, pasteAction, copyAddressAction]
-        } else {
-            return [copyAddressAction]
-        }
-    }
-
     func topToolbarDisplayTextForURL(_ topToolbar: URL?) -> (String?, Bool) {
         // use the initial value for the URL so we can do proper pattern matching with search URLs
         var searchURL = self.tabManager.selectedTab?.currentInitialURL
@@ -122,31 +114,7 @@ extension BrowserViewController: TopToolbarDelegate {
     }
 
     func topToolbarDidLongPressLocation(_ topToolbar: TopToolbarView) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        for action in locationActions(for: topToolbar) {
-            alert.addAction(action.alertAction(style: .default))
-        }
-        
-        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-        
-        let setupPopover = { [unowned self] in
-            if let popoverPresentationController = alert.popoverPresentationController {
-                popoverPresentationController.sourceView = topToolbar
-                popoverPresentationController.sourceRect = topToolbar.frame
-                popoverPresentationController.permittedArrowDirections = .any
-                popoverPresentationController.delegate = self
-            }
-        }
-        
-        setupPopover()
-        
-        if alert.popoverPresentationController != nil {
-            displayedPopoverController = alert
-            updateDisplayedPopoverProperties = setupPopover
-        }
-        
-        self.present(alert, animated: true)
+        // The actions are carried to menu actions for Top ToolBar Location View
     }
 
     func topToolbarDidPressScrollToTop(_ topToolbar: TopToolbarView) {
@@ -154,10 +122,6 @@ extension BrowserViewController: TopToolbarDelegate {
             // Only scroll to top if we are not showing the home view controller
             selectedTab.webView?.scrollView.setContentOffset(CGPoint.zero, animated: true)
         }
-    }
-
-    func topToolbarLocationAccessibilityActions(_ topToolbar: TopToolbarView) -> [UIAccessibilityCustomAction]? {
-        return locationActions(for: topToolbar).map { $0.accessibilityCustomAction }
     }
 
     func topToolbar(_ topToolbar: TopToolbarView, didEnterText text: String) {
@@ -596,6 +560,41 @@ extension BrowserViewController: ToolbarDelegate {
         let newTabIndex = index + (direction == .left ? -1 : 1)
         if newTabIndex >= 0 && newTabIndex < tabs.count {
             tabManager.selectTab(tabs[newTabIndex])
+        }
+    }
+}
+
+extension BrowserViewController: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+            var actionMenuChildren: [UIAction] = []
+            
+            let pasteGoAction = UIAction(title: Strings.pasteAndGoTitle, handler: UIAction.deferredActionHandler { _ in
+                if let pasteboardContents = UIPasteboard.general.string {
+                    self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
+                }
+            })
+            
+            let pasteAction = UIAction(title: Strings.pasteAndGoTitle, handler: UIAction.deferredActionHandler { _ in
+                if let pasteboardContents = UIPasteboard.general.string {
+                    // Enter overlay mode and make the search controller appear.
+                    self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+                }
+            })
+            
+            let copyAction = UIAction(title: Strings.copyAddressTitle, handler: UIAction.deferredActionHandler { _ in
+                if let url = self.topToolbar.currentURL {
+                    UIPasteboard.general.url = url as URL
+                }
+            })
+            
+            if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
+                actionMenuChildren = [pasteAction, pasteAction, copyAction]
+            } else {
+                actionMenuChildren = [copyAction]
+            }
+            
+            return UIMenu(title: "", identifier: nil, children: actionMenuChildren)
         }
     }
 }
