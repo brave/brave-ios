@@ -2346,7 +2346,7 @@ extension BrowserViewController: TabManagerDelegate {
             title: PrivateBrowsingManager.shared.isPrivateBrowsing ?
                 Strings.newPrivateTabTitle : Strings.newTabTitle,
             image: PrivateBrowsingManager.shared.isPrivateBrowsing ?
-                UIImage(systemName: "plus.square.fill.on.square.fill") :UIImage(systemName: "plus.square.on.square"),
+                UIImage(systemName: "plus.square.fill.on.square.fill") : UIImage(systemName: "plus.square.on.square"),
             handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             })
