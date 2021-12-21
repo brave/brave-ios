@@ -16,7 +16,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "default-sell-buy-token-on-main")
         XCTAssertNil(store.selectedFromToken)
@@ -40,7 +41,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: rpcController,
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "default-sell-buy-token-on-ropsten")
         XCTAssertNil(store.selectedFromToken)
@@ -67,7 +69,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "fetch-price-quote")
         store.setUpTest()
@@ -88,7 +91,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "make-erc20-eip1559-swap-transaction")
         store.setUpTest()
@@ -112,7 +116,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: rpcController,
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "make-erc20-swap-transaction")
         store.setUpTest()
@@ -139,7 +144,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "make-eth-swap-eip1559-transaction")
         store.setUpTest()
@@ -163,7 +169,8 @@ class SendSwapStoreTests: XCTestCase {
             rpcController: rpcController,
             assetRatioController: TestAssetRatioController(),
             swapController: TestSwapController(),
-            transactionController: TestEthTxController()
+            transactionController: TestEthTxController(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "make-eth-swap-eip1559-transaction")
         store.setUpTest()

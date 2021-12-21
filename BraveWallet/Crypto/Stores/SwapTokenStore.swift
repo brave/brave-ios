@@ -563,9 +563,17 @@ public class SwapTokenStore: ObservableObject {
         }
       } else {
         if chainId == BraveWallet.MainnetChainId {
-          selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "BAT" })
+          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == "BAT" {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != "BAT" })
+          } else {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "BAT" })
+          }
         } else if chainId == BraveWallet.RopstenChainId {
-          selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "DAI" })
+          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == "DAI" {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != "DAI" })
+          } else {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "DAI" })
+          }
         }
         completion?()
       }

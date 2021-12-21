@@ -17,7 +17,8 @@ class SendTokenStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
-            tokenRegistery: TestTokenRegistry()
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: nil
         )
         let ex = expectation(description: "fetch-assets")
         XCTAssertNil(store.selectedSendToken) // Initial state
@@ -41,9 +42,9 @@ class SendTokenStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
-            tokenRegistery: TestTokenRegistry()
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: .eth
         )
-        store.selectedSendToken = .eth
         store.setUpTest()
         let ex = expectation(description: "send-eth-eip1559-transaction")
         store.sendToken(amount: "0.01") { success in
@@ -62,9 +63,9 @@ class SendTokenStoreTests: XCTestCase {
             rpcController: rpcController,
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
-            tokenRegistery: TestTokenRegistry()
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: .eth
         )
-        store.selectedSendToken = .eth
         store.setUpTest()
         
         let ex = expectation(description: "send-eth-transaction")
@@ -86,7 +87,8 @@ class SendTokenStoreTests: XCTestCase {
             rpcController: TestEthJsonRpcController(),
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
-            tokenRegistery: TestTokenRegistry()
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: nil
         )
         let token: BraveWallet.ERCToken = .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: "BAT", decimals: 18, visible: true, tokenId: "")
         store.selectedSendToken = token
@@ -109,9 +111,9 @@ class SendTokenStoreTests: XCTestCase {
             rpcController: rpcController,
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
-            tokenRegistery: TestTokenRegistry()
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: .eth
         )
-        store.selectedSendToken = .eth
         store.setUpTest()
         
         let ex = expectation(description: "send-bat-transaction")
