@@ -344,19 +344,31 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
 
         return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { [unowned self] _ in
-            let openInNewTabAction = UIAction(title: Strings.openNewTabButtonTitle, handler: UIAction.deferredActionHandler { _ in
+            let openInNewTabAction = UIAction(
+                title: Strings.openNewTabButtonTitle,
+                image: UIImage(systemName: "plus.square.on.square"),
+                handler: UIAction.deferredActionHandler { _ in
                 self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: isPrivateBrowsing)
             })
             
-            let newPrivateTabAction = UIAction(title: Strings.openNewPrivateTabButtonTitle, handler: UIAction.deferredActionHandler {_ in
+            let newPrivateTabAction = UIAction(
+                title: Strings.openNewPrivateTabButtonTitle,
+                image: UIImage(systemName: "plus.square.fill.on.square.fill"),
+                handler: UIAction.deferredActionHandler {_ in
                 self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
             })
             
-            let copyAction = UIAction(title: Strings.copyLinkActionTitle, handler: UIAction.deferredActionHandler { _ in
+            let copyAction = UIAction(
+                title: Strings.copyLinkActionTitle,
+                image: UIImage(systemName: "doc.on.doc"),
+                handler: UIAction.deferredActionHandler { _ in
                 self.toolbarUrlActionsDelegate?.copy(historyItemURL)
             })
             
-            let shareAction = UIAction(title: Strings.shareLinkActionTitle, handler: UIAction.deferredActionHandler { _ in
+            let shareAction = UIAction(
+                title: Strings.shareLinkActionTitle,
+                image: UIImage(systemName: "square.and.arrow.up"),
+                handler: UIAction.deferredActionHandler { _ in
                 self.toolbarUrlActionsDelegate?.share(historyItemURL)
             })
             

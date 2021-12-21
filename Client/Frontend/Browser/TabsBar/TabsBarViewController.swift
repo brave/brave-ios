@@ -111,6 +111,7 @@ class TabsBarViewController: UIViewController {
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             let openNewPrivateTab = UIAction(
                 title: Strings.newPrivateTabTitle,
+                image: UIImage(systemName: "plus.square.fill.on.square.fill"),
                 handler: UIAction.deferredActionHandler { [unowned self] _ in
                     self.delegate?.tabsBarDidSelectAddNewTab(true)
                 })
@@ -119,7 +120,10 @@ class TabsBarViewController: UIViewController {
         }
         
         let openNewTab = UIAction(
-            title: PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.newPrivateTabTitle : Strings.newTabTitle,
+            title: PrivateBrowsingManager.shared.isPrivateBrowsing ?
+                Strings.newPrivateTabTitle : Strings.newTabTitle,
+            image: PrivateBrowsingManager.shared.isPrivateBrowsing ?
+                UIImage(systemName: "plus.square.fill.on.square.fill") : UIImage(systemName: "plus.square.on.square"),
             handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.delegate?.tabsBarDidSelectAddNewTab(PrivateBrowsingManager.shared.isPrivateBrowsing)
             })

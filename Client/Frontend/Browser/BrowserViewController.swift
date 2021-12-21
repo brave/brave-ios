@@ -2330,6 +2330,7 @@ extension BrowserViewController: TabManagerDelegate {
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
             let openNewPrivateTab = UIAction(
                 title: Strings.newPrivateTabTitle,
+                image: UIImage(systemName: "plus.square.fill.on.square.fill"),
                 handler: UIAction.deferredActionHandler { [unowned self] _ in
                     self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: true)
                 })
@@ -2343,7 +2344,10 @@ extension BrowserViewController: TabManagerDelegate {
         }
         
         let openNewTab = UIAction(
-            title: PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.newPrivateTabTitle : Strings.newTabTitle,
+            title: PrivateBrowsingManager.shared.isPrivateBrowsing ?
+                Strings.newPrivateTabTitle : Strings.newTabTitle,
+            image: PrivateBrowsingManager.shared.isPrivateBrowsing ?
+                UIImage(systemName: "plus.square.fill.on.square.fill") :UIImage(systemName: "plus.square.on.square"),
             handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
             })
@@ -2359,6 +2363,7 @@ extension BrowserViewController: TabManagerDelegate {
         if tabManager.openedWebsitesCount > 0 {
             let bookmarkAllTabs = UIAction(
                 title: Strings.bookmarkAllTabsTitle,
+                image: UIImage(systemName: "book"),
                 handler: UIAction.deferredActionHandler { [unowned self] _ in
                     let mode =  BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
                     let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
@@ -2374,6 +2379,7 @@ extension BrowserViewController: TabManagerDelegate {
         if tabManager.tabsForCurrentMode.count > 1 {
             let closeAllTabs = UIAction(
                 title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
+                image: UIImage(systemName: "xmark"),
                 attributes: .destructive,
                 handler: UIAction.deferredActionHandler { _ in
                 tabManager.removeAll()
@@ -2384,6 +2390,7 @@ extension BrowserViewController: TabManagerDelegate {
         
         let closeActiveTab = UIAction(
             title: String(format: Strings.closeTabTitle),
+            image: UIImage(systemName: "xmark"),
             attributes: .destructive,
             handler: UIAction.deferredActionHandler { [unowned self] _ in
                 if let tab = self.tabManager.selectedTab {

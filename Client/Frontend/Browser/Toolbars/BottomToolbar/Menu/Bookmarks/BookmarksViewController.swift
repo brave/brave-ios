@@ -612,6 +612,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             
             let openBatchURLAction = UIAction(
                 title: String(format: Strings.openAllBookmarks, children.count),
+                image: UIImage(systemName: "arrow.up.forward.app"),
                 handler: UIAction.deferredActionHandler { _ in
                 self.toolbarUrlActionsDelegate?.batchOpen(urls)
             })
@@ -624,19 +625,31 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         } else {
             guard let bookmarkItemURL = URL(string: bookmarkItem.url ?? "") else { return nil }
 
-            let openInNewTabAction = UIAction(title: Strings.openNewTabButtonTitle, handler: UIAction.deferredActionHandler { [unowned self] _ in
+            let openInNewTabAction = UIAction(
+                title: Strings.openNewTabButtonTitle,
+                image: UIImage(systemName: "plus.square.on.square"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: isPrivateBrowsing)
             })
             
-            let newPrivateTabAction = UIAction(title: Strings.openNewPrivateTabButtonTitle, handler: UIAction.deferredActionHandler { [unowned self] _ in
+            let newPrivateTabAction = UIAction(
+                title: Strings.openNewPrivateTabButtonTitle,
+                image: UIImage(systemName: "plus.square.fill.on.square.fill"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
             })
             
-            let copyAction = UIAction(title: Strings.copyLinkActionTitle, handler: UIAction.deferredActionHandler { [unowned self] _ in
+            let copyAction = UIAction(
+                title: Strings.copyLinkActionTitle,
+                image: UIImage(systemName: "doc.on.doc"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.toolbarUrlActionsDelegate?.copy(bookmarkItemURL)
             })
             
-            let shareAction = UIAction(title: Strings.shareLinkActionTitle, handler: UIAction.deferredActionHandler { [unowned self] _ in
+            let shareAction = UIAction(
+                title: Strings.shareLinkActionTitle,
+                image: UIImage(systemName: "square.and.arrow.up"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
                 self.toolbarUrlActionsDelegate?.share(bookmarkItemURL)
             })
             
