@@ -11,6 +11,28 @@ import BraveCore
 class SendTokenStoreTests: XCTestCase {
     private var cancellables: Set<AnyCancellable> = []
     
+    func testPrefilledToken() {
+        var store = SendTokenStore(
+            keyringController: TestKeyringController(),
+            rpcController: TestEthJsonRpcController(),
+            walletService: TestBraveWalletService(),
+            transactionController: TestEthTxController(),
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: nil
+        )
+        XCTAssertNil(store.selectedSendToken)
+        
+        store = SendTokenStore(
+            keyringController: TestKeyringController(),
+            rpcController: TestEthJsonRpcController(),
+            walletService: TestBraveWalletService(),
+            transactionController: TestEthTxController(),
+            tokenRegistery: TestTokenRegistry(),
+            prefilledToken: .eth
+        )
+        XCTAssertEqual(store.selectedSendToken?.symbol.lowercased(), BraveWallet.ERCToken.eth.symbol.lowercased())
+    }
+    
     func testFetchAssets() {
         let store = SendTokenStore(
             keyringController: TestKeyringController(),
