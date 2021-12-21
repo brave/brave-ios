@@ -2324,7 +2324,6 @@ extension BrowserViewController: TabManagerDelegate {
         
         // Update Actions for Tab-Tray Button
         var newTabMenuChildren: [UIAction] = []
-        
         var addTabMenuChildren: [UIAction] = []
             
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
