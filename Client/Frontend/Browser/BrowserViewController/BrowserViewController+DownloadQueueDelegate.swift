@@ -52,12 +52,7 @@ extension BrowserViewController: DownloadQueueDelegate {
                 let downloadCompleteToast = ButtonToast(labelText: download.filename, imageName: "check", buttonText: Strings.downloadsButtonTitle, completion: { buttonPressed in
                     guard buttonPressed else { return }
                     
-                    let downloadsPanel = DownloadsPanel(profile: self.profile)
-                    let nav = SettingsNavigationController(rootViewController: downloadsPanel)
-                    nav.modalPresentationStyle = .formSheet
-                    nav.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: nav, action: #selector(nav.done))
-                    
-                    self.present(nav, animated: true)
+                    FileManager.default.openBraveDownloadsFolder()
                 })
 
                 self.show(toast: downloadCompleteToast, duration: DispatchTimeInterval.seconds(8))
