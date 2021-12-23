@@ -113,6 +113,8 @@ public class SwapTokenStore: ObservableObject {
   }
   private var updatingPriceQuote = false
   private var timer: Timer?
+  private let batSymbol = "BAT"
+  private let daiSymbol = "DAI"
   
   enum SwapParamsBase {
     // calculating based on sell asset amount
@@ -563,16 +565,16 @@ public class SwapTokenStore: ObservableObject {
         }
       } else {
         if chainId == BraveWallet.MainnetChainId {
-          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == "BAT" {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != "BAT" })
+          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == batSymbol.uppercased() {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != batSymbol.uppercased() })
           } else {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "BAT" })
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == batSymbol.uppercased() })
           }
         } else if chainId == BraveWallet.RopstenChainId {
-          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == "DAI" {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != "DAI" })
+          if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == daiSymbol.uppercased() {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != daiSymbol.uppercased() })
           } else {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == "DAI" })
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == daiSymbol.uppercased() })
           }
         }
         completion?()

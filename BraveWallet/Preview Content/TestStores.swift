@@ -85,6 +85,7 @@ extension AssetDetailStore {
       keyringController: TestKeyringController(),
       rpcController: TestEthJsonRpcController(),
       txController: TestEthTxController(),
+      tokenRegistry: TestTokenRegistry(),
       token: .eth
     )
   }

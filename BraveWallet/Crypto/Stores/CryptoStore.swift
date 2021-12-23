@@ -124,6 +124,7 @@ public class CryptoStore: ObservableObject {
       keyringController: keyringController,
       rpcController: rpcController,
       txController: transactionController,
+      tokenRegistry: tokenRegistry,
       token: token
     )
     assetDetailStore = store
