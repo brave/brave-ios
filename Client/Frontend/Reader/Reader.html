@@ -20,6 +20,11 @@
   </div>
 
   <div id="reader-content" class="content">
+      <!--
+          This is already escaped.
+          Any scripts attempting to run here will be blocked by the content security policy as they don't have the same NONCE set in the native Swift code
+      -->
+      %READER-CONTENT%
   </div>
 
   <div id="reader-message" class="message">
@@ -41,11 +46,11 @@
   </ul>
 
   <script nonce="%READER-TITLE-NONCE%">
-      document.body.setAttribute('data-readerStyle', '%READER-STYLE');
+      document.body.setAttribute('data-readerStyle', '%READER-STYLE%');
       document.getElementById("reader-page-title").textContent = "%READER-TITLE%";
-      ["title", "credits", "content", "message"].forEach((name) => {
-        document.getElementById(`reader-${name}`).textContent = `%READER-${name.toUpperCase()}`;
-      });
+      document.getElementById("reader-title").textContent = "%READER-TITLE%";
+      document.getElementById("reader-credits").textContent = "%READER-CREDITS%";
+      document.getElementById("reader-message").textContent = "%READER-MESSAGE%";
   </script>
 
 </body>
