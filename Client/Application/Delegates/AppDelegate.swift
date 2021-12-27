@@ -388,12 +388,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             [(AboutHomeHandler.path, AboutHomeHandler()),
              (AboutLicenseHandler.path, AboutLicenseHandler()),
              (SessionRestoreHandler.path, SessionRestoreHandler()),
-             (ErrorPageHandler.path, ErrorPageHandler())]
+             (ErrorPageHandler.path, ErrorPageHandler()),
+             (ReaderModeHandler.path, ReaderModeHandler(profile: profile))]
         responders.forEach { (path, responder) in
             InternalSchemeHandler.responders[path] = responder
         }
         
-        ReaderModeHandlers.register(server, profile: profile) //TODO: PORT TO InternalSchemeHandler
+        //ReaderModeHandlers.register(server, profile: profile) //TODO: PORT TO InternalSchemeHandler
         SafeBrowsingHandler.register(server) //TODO: REMOVE COMPLETELY!!!
         BookmarksInterstitialPageHandler.register(server) //TODO: PORT TO InternalSchemeHandler
 

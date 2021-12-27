@@ -44,7 +44,16 @@ class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
             "/interstitial-icon/DarkWarning.svg": "image/svg+xml",
             "/interstitial-icon/Carret.png": "image/png",
             
-           // "/reader-mode/..."
+            "/reader-mode/styles/Reader.css": "text/css",
+            "/reader-mode/fonts/FiraSans-Bold": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-BoldItalic": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-Boook": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-Italic": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-Light": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-Medium": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-Regular": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-SemiBold": "application/x-font-ttf",
+            "/reader-mode/fonts/FiraSans-UltraLight": "application/x-font-ttf",
         ]
 
         // Handle resources from internal pages. For example 'internal://local/errorpage-resource/CertError.css'.
@@ -60,7 +69,7 @@ class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
                 return true
             }
         }
-
+        
         return false
     }
 

@@ -338,7 +338,7 @@ extension URL {
         guard self.isLocal else {
             return false
         }
-        let utilityURLs = ["/\(InternalURL.Path.errorpage)", "/\(InternalURL.Path.sessionrestore)", "/about/home", "/reader-mode"]
+        let utilityURLs = ["/\(InternalURL.Path.errorpage)", "/\(InternalURL.Path.sessionrestore)", "/about/home", "/\(InternalURL.Path.readermode)"]
         return utilityURLs.contains { self.path.hasPrefix($0) }
     }
 
@@ -385,7 +385,7 @@ extension URL {
 extension URL {
     public var isReaderModeURL: Bool {
         let scheme = self.scheme, host = self.host, path = self.path
-        return scheme == "http" && (host == "localhost" || host == "127.0.0.1") && path == "/reader-mode/page"
+        return scheme == "internal" && host == "local" && path == "/reader-mode"
     }
 
     public var decodeReaderModeURL: URL? {
@@ -401,7 +401,7 @@ extension URL {
 
     public func encodeReaderModeURL(_ baseReaderModeURL: String) -> URL? {
         if let encodedURL = absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
-            if let aboutReaderURL = URL(string: "\(baseReaderModeURL)?url=\(encodedURL)") {
+            if let aboutReaderURL = URL(string: "\("internal://local/reader-mode")?url=\(encodedURL)") {
                 return aboutReaderURL
             }
         }
@@ -605,6 +605,7 @@ public struct InternalURL {
     public enum Path: String {
         case errorpage = "errorpage"
         case sessionrestore = "sessionrestore"
+        case readermode = "reader-mode"
         func matches(_ string: String) -> Bool {
             return string.range(of: "/?\(self.rawValue)", options: .regularExpression, range: nil, locale: nil) != nil
         }
