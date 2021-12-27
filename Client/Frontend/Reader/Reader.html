@@ -40,7 +40,7 @@
     <li><a id="toggle-button" class="button toggle-button" href="#"></a></li>
   </ul>
 
-  <script>
+  <script nonce="%READER-TITLE-NONCE%">
       document.getElementById("reader-page-title").textContent = "%READER-TITLE%";
       ["title", "credits", "content", "message"].forEach((name) => {
         document.getElementById(`reader-${name}`).textContent = `%READER-${name.toUpperCase()}`;
