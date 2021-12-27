@@ -12,7 +12,7 @@
   <title id="reader-page-title"></title>
 </head>
 
-<body data-readerStyle='%READER-STYLE%'>
+<body>
   <div id="reader-header" class="header">
     <h1 id="reader-title"></h1>
     <div id="reader-credits" class="credits"></div>
@@ -41,6 +41,7 @@
   </ul>
 
   <script nonce="%READER-TITLE-NONCE%">
+      document.body.setAttribute('data-readerStyle', '%READER-STYLE');
       document.getElementById("reader-page-title").textContent = "%READER-TITLE%";
       ["title", "credits", "content", "message"].forEach((name) => {
         document.getElementById(`reader-${name}`).textContent = `%READER-${name.toUpperCase()}`;
