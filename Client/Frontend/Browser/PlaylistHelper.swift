@@ -224,7 +224,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
 
 extension PlaylistHelper {
     static func getCurrentTime(webView: WKWebView, nodeTag: String, completion: @escaping (Double) -> Void) {
-        guard let nodeTag = nodeTag.javaScriptEscapedString else {
+        guard UUID(uuidString: nodeTag) != nil else {
             log.error("Unsanitized NodeTag.")
             return
         }
