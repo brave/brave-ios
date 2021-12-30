@@ -29,7 +29,7 @@ func generateResponseThatRedirects(toUrl url: URL) -> (URLResponse, Data) {
 
     urlString = urlString.replacingOccurrences(of: "'", with: apostropheEncoded)
     
-    let startTags = "<!DOCTYPE html><html><head><script>"
+    let startTags = "<!DOCTYPE html><html><head><meta name=\"referrer\" content=\"no-referrer\"><script>"
     let endTags = "</script></head></html>"
     let html = startTags + "location.replace('\(urlString)');" + endTags
 
