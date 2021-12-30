@@ -154,50 +154,50 @@ extension BrowserViewController {
 
     override var keyCommands: [UIKeyCommand]? {
         let navigationCommands = [
+            // Web Page Key Commands
             UIKeyCommand(title: Strings.reloadPageTitle, action: #selector(reloadTabKeyCommand), input: "r", modifierFlags: .command),
             UIKeyCommand(title: Strings.backTitle, action: #selector(goBackKeyCommand), input: "[", modifierFlags: .command),
             UIKeyCommand(title: Strings.forwardTitle, action: #selector(goForwardKeyCommand), input: "]", modifierFlags: .command),
-            
-            UIKeyCommand(title: "Select URL Bar", action: #selector(selectLocationBarKeyCommand), input: "l", modifierFlags: .command), // TODO: title filter
-            
+            // URL Bar - Tab Key Commands
+            UIKeyCommand(title: Strings.selectLocationBarTitle, action: #selector(selectLocationBarKeyCommand), input: "l", modifierFlags: .command),
             UIKeyCommand(title: Strings.newTabTitle, action: #selector(newTabKeyCommand), input: "t", modifierFlags: .command),
             UIKeyCommand(title: Strings.newPrivateTabTitle, action: #selector(newPrivateTabKeyCommand), input: "p", modifierFlags: [.command, .shift]),
             UIKeyCommand(title: Strings.closeTabTitle, action: #selector(closeTabKeyCommand), input: "w", modifierFlags: .command),
             UIKeyCommand(title: Strings.showNextTabTitle, action: #selector(nextTabKeyCommand), input: "\t", modifierFlags: .control),
             UIKeyCommand(title: Strings.showPreviousTabTitle, action: #selector(previousTabKeyCommand), input: "\t", modifierFlags: [.control, .shift]),
-
             UIKeyCommand(title: Strings.showTabTrayFromTabKeyCodeTitle, action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .alternate]),
             UIKeyCommand(title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
-                         action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .shift]), // TODO: new 1
-            
-            UIKeyCommand(title: "Show History", action: #selector(showHistoryKeyCommand), input: "y", modifierFlags: [.command]), // TODO: new 1
-            UIKeyCommand(title: "Show Downloads", action: #selector(showDownloadsKeyCommand), input: "j", modifierFlags: .command), // TODO: new 1
-
+                         action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .shift]),
+            // Page Navigation Key Commands
+            UIKeyCommand(title: Strings.showHistoryTitle, action: #selector(showHistoryKeyCommand), input: "y", modifierFlags: [.command]),
+            UIKeyCommand(title: Strings.showDownloadsTitle, action: #selector(showDownloadsKeyCommand), input: "j", modifierFlags: .command),
             // Switch tab to match Safari on iOS.
             UIKeyCommand(input: "]", modifierFlags: [.command, .shift], action: #selector(nextTabKeyCommand)),
             UIKeyCommand(input: "[", modifierFlags: [.command, .shift], action: #selector(previousTabKeyCommand)),
             UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(showTabTrayKeyCommand)), // Safari on macOS
         ]
         
+        // Tab Navigation Key Commands Show tab # 1-9 - Command + 1-9
         var tabNavigationCommands: [UIKeyCommand] = []
-        
         for index in 1..<10 {
-            tabNavigationCommands.append(UIKeyCommand(input: String(index), modifierFlags: [.command], action: #selector(showTabKeyCommand(sender:)))) // TODO: new 1
+            tabNavigationCommands.append(UIKeyCommand(input: String(index), modifierFlags: [.command], action: #selector(showTabKeyCommand(sender:))))
         }
         
+        // Bookmarks Key Commands
         let bookmarkEditingCommands = [
-            UIKeyCommand(title: "Show Bookmarks", action: #selector(showBookmarksKeyCommand), input: "o", modifierFlags: [.shift, .command]), // TODO: new 1
-            UIKeyCommand(title: "Add Bookmark", action: #selector(addBookmarkCommand), input: "d", modifierFlags: [.command]), // TODO: title added
-            UIKeyCommand(title: "Add to Favourites", action: #selector(addToFavouritesCommand), input: "d", modifierFlags: [.command, .shift]) //TODO:  new 1
+            UIKeyCommand(title: Strings.showBookmarksTitle, action: #selector(showBookmarksKeyCommand), input: "o", modifierFlags: [.shift, .command]),
+            UIKeyCommand(title: Strings.addBookmarkTitle, action: #selector(addBookmarkCommand), input: "d", modifierFlags: [.command]),
+            UIKeyCommand(title: Strings.addFavouritesTitle, action: #selector(addToFavouritesCommand), input: "d", modifierFlags: [.command, .shift])
         ]
         
+        // Find in Page Key Commands
         var findTextCommands = [
-            UIKeyCommand(title: "Find in Page", action: #selector(findInPageKeyCommand), input: "f", modifierFlags: .command),
+            UIKeyCommand(title: Strings.findInPageTitle, action: #selector(findInPageKeyCommand), input: "f", modifierFlags: .command),
         ]
         
         let findTextUtilitiesCommands = [
-            UIKeyCommand(title: "Find Next", action: #selector(findNextCommand), input: "g", modifierFlags: [.command]), // TODO: new condition to show them
-            UIKeyCommand(title: "Find Previous", action: #selector(findPreviousCommand), input: "g", modifierFlags: [.command, .shift])
+            UIKeyCommand(title: Strings.findNextTitle, action: #selector(findNextCommand), input: "g", modifierFlags: [.command]),
+            UIKeyCommand(title: Strings.findPreviousTitle, action: #selector(findPreviousCommand), input: "g", modifierFlags: [.command, .shift])
         ]
         
         let isFindingText = !(findInPageBar?.text?.isEmpty ?? true)
@@ -206,14 +206,14 @@ extension BrowserViewController {
             findTextCommands.append(contentsOf: findTextUtilitiesCommands)
         }
         
+        // Share With Key Command
         let shareCommands = [
-            UIKeyCommand(title: "Share With...", action: #selector(shareWithKeyCommand), input: "s", modifierFlags: .command) // TODO: new 1
+            UIKeyCommand(title: Strings.shareWithTitle, action: #selector(shareWithKeyCommand), input: "s", modifierFlags: .command)
         ]
         
         var keyCommandList = navigationCommands + tabNavigationCommands + bookmarkEditingCommands + shareCommands + findTextCommands
         
         // URL completion and Override Key commands
-        
         let searchLocationCommands = [
             UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(moveURLCompletionKeyCommand(sender:))),
             UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(moveURLCompletionKeyCommand(sender:))),
