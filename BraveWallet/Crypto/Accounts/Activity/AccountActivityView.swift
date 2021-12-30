@@ -15,6 +15,7 @@ struct AccountActivityView: View {
   @ObservedObject var networkStore: NetworkStore
   
   @State private var detailsPresentation: DetailsPresentation?
+  @State private var selectedTx: BraveWallet.TransactionInfo?
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -84,16 +85,20 @@ struct AccountActivityView: View {
           emptyTextView(Strings.Wallet.noTransactions)
         } else {
           ForEach(activityStore.transactions) { tx in
-            TransactionView(
-              info: tx,
-              keyringStore: keyringStore,
-              networkStore: networkStore,
-              visibleTokens: activityStore.assets.map(\.token),
-              displayAccountCreator: false,
-              assetRatios: activityStore.assets.reduce(into: [String: Double](), {
-                $0[$1.token.symbol.lowercased()] = Double($1.price)
-              })
-            )
+            Button {
+              selectedTx = tx
+            } label: {
+              TransactionView(
+                info: tx,
+                keyringStore: keyringStore,
+                networkStore: networkStore,
+                visibleTokens: activityStore.assets.map(\.token),
+                displayAccountCreator: false,
+                assetRatios: activityStore.assets.reduce(into: [String: Double](), {
+                  $0[$1.token.symbol.lowercased()] = Double($1.price)
+                })
+              )
+            }
             .contextMenu {
               if !tx.txHash.isEmpty {
                 Button(action: {
@@ -112,6 +117,27 @@ struct AccountActivityView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(InsetGroupedListStyle())
+    .background(
+      NavigationLink(isActive: Binding(
+        get: { selectedTx != nil && selectedTx?.txStatus != .unapproved },
+        set: { if !$0 { selectedTx = nil } }
+      ), destination: {
+        if let tx = selectedTx {
+          TransactionDetailsView(
+            txInfo: tx,
+            keyringStore: keyringStore,
+            networkStore: networkStore,
+            visibleTokens: activityStore.assets.map(\.token),
+            displayAccountCreator: false,
+            assetRatios: activityStore.assets.reduce(into: [String: Double](), {
+              $0[$1.token.symbol.lowercased()] = Double($1.price)
+            })
+          )
+        }
+      }, label: {
+        EmptyView()
+      })
+    )
     .sheet(item: $detailsPresentation) {
       AccountDetailsView(
         keyringStore: keyringStore,

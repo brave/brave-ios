@@ -1562,5 +1562,89 @@ extension Strings {
       value: "Beta",
       comment: "Appended to 'Wallet' so that it appears as 'Wallet (Beta)' in the app menu. Describing 'beta' software"
     )
+    public static let transactionDetailsSent = NSLocalizedString(
+      "wallet.transactionDetailsSent",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Sent",
+      comment: "An action text shown for a send transaction in transaction details screen."
+    )
+    public static let transactionDetailsSwapped = NSLocalizedString(
+      "wallet.transactionDetailsSwapped",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Swapped",
+      comment: "An action text shown for a swap transaction in transaction details screen."
+    )
+    public static let transactionDetailsApproved = NSLocalizedString(
+      "wallet.transactionDetailsApproved",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Approved",
+      comment: "An action text shown for ERC20 approvals in transaction details screen."
+    )
+    public static let transactionDetailsAmount = NSLocalizedString(
+      "wallet.transactionDetailsAmount",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "%@ %@",
+      comment: "The amount shown for a erc 20 transfer, or erc 721 transaction. The first '%@' is the  amount, the second '%@' becomes the symbol for the cryptocurrency For example: \"0.0054 ETH\""
+    )
+    public static let transactionDetailsTxFee = NSLocalizedString(
+      "wallet.transactionDetailsTxFee",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transactions Fee",
+      comment: "The title for the first row in transaction details screen that displays transaction fee."
+    )
+    public static let transactionDetailsTxDate = NSLocalizedString(
+      "wallet.transactionDetailsTxDate",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Date",
+      comment: "The title for the second row in transaction details screen that displays the created date of this transaction."
+    )
+    public static let transactionDetailsTxHash = NSLocalizedString(
+      "wallet.transactionDetailsTxHash",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transactions Hash",
+      comment: "The title for the third row in transaction details screen that displays the hash value of this transaction."
+    )
+    public static let transactionDetailsTxNetwork = NSLocalizedString(
+      "wallet.transactionDetailsTxNetwork",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Network",
+      comment: "The title for the fourth row in transaction details screen that displays the created date of this transaction."
+    )
+    public static let transactionDetailsTxStatus = NSLocalizedString(
+      "wallet.transactionDetailsTxStatus",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Status",
+      comment: "The title for the fifteh row in transaction details screen that displays the hash value of this transaction."
+    )
+    public static let transactionDetailsSpeedUp = NSLocalizedString(
+      "wallet.transactionDetailsSpeedUp",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Speed up",
+      comment: "The button title for user to click in order to speed up the current submitted transaction from transaction details screen."
+    )
+    public static let transactionDetailsRetry = NSLocalizedString(
+      "wallet.transactionDetailsRetry",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Retry transaction",
+      comment: "The button title for user to click in order to retry the current failed transaction from transaction details screen."
+    )
+    public static let transactionDetailsNavTitle = NSLocalizedString(
+      "wallet.transactionDetailsNavTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transaction Details",
+      comment: "The navigation title for the transaction details screen."
+    )
   }
 }
