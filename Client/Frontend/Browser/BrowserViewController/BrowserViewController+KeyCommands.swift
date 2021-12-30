@@ -85,6 +85,18 @@ extension BrowserViewController {
             tabManager.selectTab(lastTab)
         }
     }
+    
+    @objc private func showTabKeyCommand(sender: UIKeyCommand) {
+        guard let input = sender.input, let index = Int(input) else {
+            return
+        }
+
+        let tabs = tabManager.tabsForCurrentMode
+
+        if tabs.count > index - 1 {
+            tabManager.selectTab(tabs[index - 1])
+        }
+    }
 
     @objc private func showTabTrayKeyCommand() {
         showTabTray()
@@ -112,13 +124,16 @@ extension BrowserViewController {
         navigationHelper.openShareSheet()
     }
     
-    @objc private func showHistoryCommand() {
+    @objc private func showHistoryKeyCommand() {
         navigationHelper.openHistory()
-
     }
     
-    @objc private func showBookmarksCommand() {
+    @objc private func showBookmarksKeyCommand() {
         navigationHelper.openBookmarks()
+    }
+    
+    @objc private func showDownloadsKeyCommand() {
+        navigationHelper.openDownloads()
     }
     
     @objc private func findNextCommand() {
@@ -138,7 +153,7 @@ extension BrowserViewController {
     }
 
     override var keyCommands: [UIKeyCommand]? {
-        let tabNavigationCommands = [
+        let navigationCommands = [
             UIKeyCommand(title: Strings.reloadPageTitle, action: #selector(reloadTabKeyCommand), input: "r", modifierFlags: .command),
             UIKeyCommand(title: Strings.backTitle, action: #selector(goBackKeyCommand), input: "[", modifierFlags: .command),
             UIKeyCommand(title: Strings.forwardTitle, action: #selector(goForwardKeyCommand), input: "]", modifierFlags: .command),
@@ -155,16 +170,23 @@ extension BrowserViewController {
             UIKeyCommand(title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
                          action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .shift]), // TODO: new 1
             
-            UIKeyCommand(title: "Show History", action: #selector(showHistoryCommand), input: "y", modifierFlags: [.command]), // TODO: new 1
-            
+            UIKeyCommand(title: "Show History", action: #selector(showHistoryKeyCommand), input: "y", modifierFlags: [.command]), // TODO: new 1
+            UIKeyCommand(title: "Show Downloads", action: #selector(showDownloadsKeyCommand), input: "j", modifierFlags: .command), // TODO: new 1
+
             // Switch tab to match Safari on iOS.
             UIKeyCommand(input: "]", modifierFlags: [.command, .shift], action: #selector(nextTabKeyCommand)),
             UIKeyCommand(input: "[", modifierFlags: [.command, .shift], action: #selector(previousTabKeyCommand)),
-            UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(showTabTrayKeyCommand)) // Safari on macOS
+            UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(showTabTrayKeyCommand)), // Safari on macOS
         ]
         
+        var tabNavigationCommands: [UIKeyCommand] = []
+        
+        for index in 1..<10 {
+            tabNavigationCommands.append(UIKeyCommand(input: String(index), modifierFlags: [.command], action: #selector(showTabKeyCommand(sender:)))) // TODO: new 1
+        }
+        
         let bookmarkEditingCommands = [
-            UIKeyCommand(title: "Show Bookmarks", action: #selector(showBookmarksCommand), input: "o", modifierFlags: [.shift, .command]), // TODO: new 1
+            UIKeyCommand(title: "Show Bookmarks", action: #selector(showBookmarksKeyCommand), input: "o", modifierFlags: [.shift, .command]), // TODO: new 1
             UIKeyCommand(title: "Add Bookmark", action: #selector(addBookmarkCommand), input: "d", modifierFlags: [.command]), // TODO: title added
             UIKeyCommand(title: "Add to Favourites", action: #selector(addToFavouritesCommand), input: "d", modifierFlags: [.command, .shift]) //TODO:  new 1
         ]
@@ -188,7 +210,7 @@ extension BrowserViewController {
             UIKeyCommand(title: "Share With...", action: #selector(shareWithKeyCommand), input: "s", modifierFlags: .command) // TODO: new 1
         ]
         
-        var keyCommandList = tabNavigationCommands + bookmarkEditingCommands + shareCommands + findTextCommands
+        var keyCommandList = navigationCommands + tabNavigationCommands + bookmarkEditingCommands + shareCommands + findTextCommands
         
         // URL completion and Override Key commands
         
