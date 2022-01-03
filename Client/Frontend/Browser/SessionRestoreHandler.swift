@@ -23,7 +23,7 @@ extension InternalSchemeResponse {
     func generateInvalidSchemeResponse(url: String, for originURL: URL) -> (URLResponse, Data)? {
         // Same validation as in WKNavigationDelegate -> decidePolicyFor
         guard let scheme = URL(string: url)?.scheme,
-              ["http", "https", "data", "blob", "file", "about", InternalURL.scheme].contains(scheme) else {
+              ["http", "https", "file", "about", InternalURL.scheme].contains(scheme) else {
                   
             let html = """
             <!DOCTYPE html>
