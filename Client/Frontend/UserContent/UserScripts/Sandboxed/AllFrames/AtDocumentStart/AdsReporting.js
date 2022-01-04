@@ -4,48 +4,46 @@
 
 "use strict";
 
-(function(){
-    if (webkit.messageHandlers.adsMediaReporting) {
-        install();
+if (webkit.messageHandlers.adsMediaReporting) {
+    install();
+}
+
+function install() {
+  function sendMessage(playing) {
+    webkit.messageHandlers.adsMediaReporting.postMessage({"securitytoken": SECURITY_TOKEN, "data": {playing}});
+  }
+
+  function checkVideoNode(node) {
+    if (node.constructor.name == "HTMLVideoElement") {
+      hookVideoFunctions();
     }
+  }
 
-    function install() {
-      function sendMessage(playing) {
-        webkit.messageHandlers.adsMediaReporting.postMessage({"securitytoken": SECURITY_TOKEN, "data": {playing}});
-      }
+  function mediaPaused() {
+    sendMessage(false)
+  }
 
-      function checkVideoNode(node) {
-        if (node.constructor.name == "HTMLVideoElement") {
-          hookVideoFunctions();
-        }
-      }
+  function mediaPlaying() {
+    sendMessage(true)
+  }
 
-      function mediaPaused() {
-        sendMessage(false)
-      }
+  function getVideoElements() {
+    return document.querySelectorAll('video')
+  }
 
-      function mediaPlaying() {
-        sendMessage(true)
-      }
+  function hookVideoFunctions() {
+    getVideoElements().forEach(function (item) {
+      item.addEventListener('pause', mediaPaused, false);
+      item.addEventListener('playing', mediaPlaying, false);
+    });
+  }
 
-      function getVideoElements() {
-        return document.querySelectorAll('video')
-      }
-
-      function hookVideoFunctions() {
-        getVideoElements().forEach(function (item) {
-          item.addEventListener('pause', mediaPaused, false);
-          item.addEventListener('playing', mediaPlaying, false);
-        });
-      }
-
-      var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-          mutation.addedNodes.forEach(function (node) {
-            checkVideoNode(node);
-          });
-        });
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      mutation.addedNodes.forEach(function (node) {
+        checkVideoNode(node);
       });
-      observer.observe(document, {subtree: true, childList: true });
-    }
-})()
+    });
+  });
+  observer.observe(document, {subtree: true, childList: true });
+}
