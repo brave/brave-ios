@@ -14,7 +14,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
 
-    private lazy var emptyStateOverlayView: UIView = createEmptyStateOverlayView()
+    private lazy var emptyStateOverlayView = HistoryStateOverlayView()
 
     private let spinner = UIActivityIndicatorView().then {
         $0.snp.makeConstraints { make in
@@ -159,48 +159,6 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         }
     }
     
-    private func createEmptyStateOverlayView() -> UIView {
-        let overlayView = UIView().then {
-            $0.backgroundColor = .secondaryBraveBackground
-        }
-        
-        let logoImageView = UIImageView(image: #imageLiteral(resourceName: "emptyHistory").template).then {
-            $0.tintColor = .braveLabel
-        }
-        
-        let welcomeLabel = UILabel().then {
-            $0.text = Preferences.Privacy.privateBrowsingOnly.value
-                ? Strings.History.historyPrivateModeOnlyStateTitle
-                : Strings.History.historyEmptyStateTitle
-            $0.textAlignment = .center
-            $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
-            $0.textColor = .braveLabel
-            $0.numberOfLines = 0
-            $0.adjustsFontSizeToFitWidth = true
-        }
-                
-        overlayView.addSubview(logoImageView)
-        
-        logoImageView.snp.makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.size.equalTo(60)
-            // Sets proper top constraint for iPhone 6 in portait and for iPad.
-            make.centerY.equalTo(overlayView).offset(-180).priority(100)
-            // Sets proper top constraint for iPhone 4, 5 in portrait.
-            make.top.greaterThanOrEqualTo(overlayView).offset(50)
-        }
-        
-        overlayView.addSubview(welcomeLabel)
-        
-        welcomeLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.top.equalTo(logoImageView.snp.bottom).offset(15)
-            make.width.equalTo(170)
-        }
-        
-        return overlayView
-    }
-    
     private func updateEmptyPanelState() {
         if historyFRC?.fetchedObjectsCount == 0 {
             showEmptyPanelState()
@@ -211,6 +169,15 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     
     private func showEmptyPanelState() {
         if emptyStateOverlayView.superview == nil {
+
+            if isHistoryBeingSearched {
+                emptyStateOverlayView.updateInfoLabel(with: Strings.noSearchResultsfound)
+            } else {
+                emptyStateOverlayView.updateInfoLabel(with: Preferences.Privacy.privateBrowsingOnly.value
+                    ? Strings.History.historyPrivateModeOnlyStateTitle
+                    : Strings.History.historyEmptyStateTitle)
+            }
+            
             view.addSubview(emptyStateOverlayView)
             view.bringSubviewToFront(emptyStateOverlayView)
             emptyStateOverlayView.snp.makeConstraints { make -> Void in
@@ -448,5 +415,57 @@ extension HistoryViewController: UISearchControllerDelegate {
         
         isHistoryBeingSearched = false
         tableView.reloadData()
+    }
+}
+
+class HistoryStateOverlayView: UIView {
+    
+    private let logoImageView = UIImageView(image: #imageLiteral(resourceName: "emptyHistory").template).then {
+        $0.tintColor = .braveLabel
+    }
+    
+    private let informationLabel = UILabel().then {
+        $0.text = Preferences.Privacy.privateBrowsingOnly.value
+            ? Strings.History.historyPrivateModeOnlyStateTitle
+            : Strings.History.historyEmptyStateTitle
+        $0.textAlignment = .center
+        $0.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+        $0.textColor = .braveLabel
+        $0.numberOfLines = 0
+        $0.adjustsFontSizeToFitWidth = true
+    }
+    
+    required init() {
+        super.init(frame: .zero)
+        
+        backgroundColor = .secondaryBraveBackground
+
+        addSubview(logoImageView)
+        
+        logoImageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.size.equalTo(60)
+            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+            make.centerY.equalToSuperview().offset(-180).priority(100)
+            // Sets proper top constraint for iPhone 4, 5 in portrait.
+            make.top.greaterThanOrEqualToSuperview().offset(50)
+        }
+        
+        addSubview(informationLabel)
+        
+        informationLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(logoImageView.snp.bottom).offset(15)
+            make.width.equalTo(170)
+        }
+    }
+    
+    @available(*, unavailable)
+    required init(coder: NSCoder) {
+        fatalError()
+    }
+    
+    func updateInfoLabel(with text: String) {
+        informationLabel.text = text
     }
 }
