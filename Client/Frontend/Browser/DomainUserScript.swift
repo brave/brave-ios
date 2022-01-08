@@ -15,6 +15,7 @@ enum DomainUserScript: CaseIterable {
     case archive
     case braveSearch
     case braveTalk
+    case braveSkus
     
     static func get(for url: URL) -> Self? {
         var found: DomainUserScript?
@@ -47,7 +48,7 @@ enum DomainUserScript: CaseIterable {
         switch self {
         case .youtube:
             return .AdblockAndTp
-        case .archive, .braveSearch, .braveTalk:
+        case .archive, .braveSearch, .braveTalk, .braveSkus:
             return nil
         }
     }
@@ -65,6 +66,11 @@ enum DomainUserScript: CaseIterable {
                          "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
                          "dev.talk.brave.software", "beta.talk.brave.software",
                          "talk.brave.software")
+        case .braveSkus:
+            // FIXME: Remove test domain once done with tests.
+            return .init(arrayLiteral: "account.brave.com",
+                         "account.bravesoftware.com",
+                         "account.brave.software", "iccub.github.io")
         }
     }
     
@@ -78,6 +84,8 @@ enum DomainUserScript: CaseIterable {
             return "BraveSearchHelper"
         case .braveTalk:
             return "BraveTalkHelper"
+        case .braveSkus:
+            return "BraveSkusHelper"
         }
     }
     
@@ -119,6 +127,18 @@ enum DomainUserScript: CaseIterable {
             alteredSource = alteredSource
                 .replacingOccurrences(of: "$<brave-talk-helper>",
                                       with: "BT\(UserScriptManager.messageHandlerTokenString)",
+                                      options: .literal)
+                .replacingOccurrences(of: "$<security_token>", with: securityToken)
+                
+            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+            
+        case .braveSkus:
+            var alteredSource = source
+            
+            let securityToken = UserScriptManager.securityTokenString
+            alteredSource = alteredSource
+                .replacingOccurrences(of: "$<brave-skus-helper>",
+                                      with: "BSKU\(UserScriptManager.messageHandlerTokenString)",
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)
                 
