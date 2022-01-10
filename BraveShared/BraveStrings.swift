@@ -121,7 +121,7 @@ extension Strings {
         NSLocalizedString("OpenDownloadsFolderErrorDescription",
                           tableName: "BraveShared",
                           bundle: Bundle.braveShared,
-                          value: "An unknown error occurred while opening the Downloads folder in Files app.",
+                          value: "An unknown error occurred while opening the Downloads folder in the Files app.",
                           comment: "Error description when there is an error while navigating to Files App")
 }
 
