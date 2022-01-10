@@ -6,20 +6,6 @@
 import Foundation
 import BraveCore
 
-extension BraveWallet.ERCToken {
-  static let eth: BraveWallet.ERCToken = .init(
-    contractAddress: "",
-    name: "Ethereum",
-    logo: "",
-    isErc20: false,
-    isErc721: false,
-    symbol: "ETH",
-    decimals: 18,
-    visible: false,
-    tokenId: ""
-  )
-}
-
 public class AssetStore: ObservableObject, Equatable {
   @Published var token: BraveWallet.ERCToken
   @Published var isVisible: Bool {
@@ -83,16 +69,25 @@ public class UserAssetsStore: ObservableObject {
     fetchVisibleAssets()
   }
   
-  private func updateSelectedAssets(_ chainId: String) {
-    walletService.userAssets(chainId) { [self] userAssets in
+  private func updateSelectedAssets(_ network: BraveWallet.EthereumChain) {
+    walletService.userAssets(network.chainId) { [self] userAssets in
       let visibleAssetIds = userAssets.filter(\.visible).map(\.id)
-      let isTestnet = chainId != BraveWallet.MainnetChainId
+      let isTestnet = network.chainId != BraveWallet.MainnetChainId
       tokenRegistry.allTokens { registryTokens in
-        let allTokens = (isTestnet ? [] : registryTokens) + [.eth]
+        let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
+                                                      name: network.symbolName,
+                                                      logo: network.iconUrls.first ?? "",
+                                                      isErc20: false,
+                                                      isErc721: false,
+                                                      symbol: network.symbol,
+                                                      decimals: network.decimals,
+                                                      visible: false,
+                                                      tokenId: "")
+        let allTokens = (isTestnet ? [] : registryTokens) + [nativeAsset]
         assetStores = allTokens.union(userAssets, f: { $0.id }).map { token in
           AssetStore(
             walletService: walletService,
-            chainId: chainId,
+            chainId: network.chainId,
             token: token,
             isCustomToken: !allTokens.contains(where: { $0.contractAddress == token.contractAddress }),
             isVisible: visibleAssetIds.contains(token.id)
@@ -103,11 +98,11 @@ public class UserAssetsStore: ObservableObject {
   }
   
   func addUserAsset(token: BraveWallet.ERCToken, completion: @escaping (_ success: Bool) -> Void) {
-    rpcController.chainId { [weak self] chainId in
+    rpcController.network { [weak self] network in
       guard let self = self else { return }
-      self.walletService.addUserAsset(token, chainId: chainId) { success in
+      self.walletService.addUserAsset(token, chainId: network.chainId) { success in
         if success {
-          self.updateSelectedAssets(chainId)
+          self.updateSelectedAssets(network)
         }
         completion(success)
       }
@@ -115,11 +110,11 @@ public class UserAssetsStore: ObservableObject {
   }
   
   func removeUserAsset(token: BraveWallet.ERCToken, completion: @escaping (_ success: Bool) -> Void) {
-    rpcController.chainId { [weak self] chainId in
+    rpcController.network { [weak self] network in
       guard let self = self else { return }
-      self.walletService.removeUserAsset(token, chainId: chainId) { success in
+      self.walletService.removeUserAsset(token, chainId: network.chainId) { success in
         if success {
-          self.updateSelectedAssets(chainId)
+          self.updateSelectedAssets(network)
         }
         completion(success)
       }
@@ -127,15 +122,17 @@ public class UserAssetsStore: ObservableObject {
   }
   
   func fetchVisibleAssets() {
-    rpcController.chainId { chainId in
-      self.updateSelectedAssets(chainId)
+    rpcController.network { [weak self] network in
+      self?.updateSelectedAssets(network)
     }
   }
 }
 
 extension UserAssetsStore: BraveWalletEthJsonRpcControllerObserver {
   public func chainChangedEvent(_ chainId: String) {
-    updateSelectedAssets(chainId)
+    rpcController.network { [weak self] network in
+      self?.updateSelectedAssets(network)
+    }
   }
   public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
   }

@@ -86,7 +86,7 @@ extension AssetDetailStore {
       rpcController: TestEthJsonRpcController(),
       txController: TestEthTxController(),
       tokenRegistry: TestTokenRegistry(),
-      token: .eth
+      token: .previewEth
     )
   }
 }

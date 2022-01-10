@@ -584,17 +584,27 @@ public class SwapTokenStore: ObservableObject {
     tokenRegistry.allTokens { [weak self] tokens in
       guard let self = self else { return }
       
-      self.rpcController.chainId { chainId in
-        self.chainId = chainId
-        if chainId == BraveWallet.RopstenChainId {
-          let supportedAssets = tokens.filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) } + [.eth]
+      self.rpcController.network { network in
+        let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
+                                                      name: network.symbolName,
+                                                      logo: network.iconUrls.first ?? "",
+                                                      isErc20: false,
+                                                      isErc721: false,
+                                                      symbol: network.symbol,
+                                                      decimals: network.decimals,
+                                                      visible: false,
+                                                      tokenId: "")
+        self.chainId = network.chainId
+        
+        if self.chainId == BraveWallet.RopstenChainId {
+          let supportedAssets = tokens.filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) } + [nativeAsset]
           self.allTokens = supportedAssets.sorted(by: { $0.symbol < $1.symbol })
-          updateSelectedTokens(chainId: chainId)
+          updateSelectedTokens(chainId: self.chainId)
         } else {
           self.tokenRegistry.allTokens { [self] tokens in
-            let fullList = tokens + [.eth]
+            let fullList = tokens + [nativeAsset]
             self.allTokens = fullList.sorted(by: { $0.symbol < $1.symbol })
-            updateSelectedTokens(chainId: chainId)
+            updateSelectedTokens(chainId: self.chainId)
           }
         }
       }
@@ -604,8 +614,8 @@ public class SwapTokenStore: ObservableObject {
   #if DEBUG
   func setUpTest() {
     accountInfo = .init()
-    selectedFromToken = .eth
-    selectedToToken = .eth
+    selectedFromToken = .previewEth
+    selectedToToken = .previewEth
     sellAmount = "0.01"
     selectedFromTokenBalance = 0.02
   }

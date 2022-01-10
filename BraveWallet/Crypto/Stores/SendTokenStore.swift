@@ -83,9 +83,9 @@ public class SendTokenStore: ObservableObject {
   }
   
   func fetchAssets() {
-    rpcController.chainId { [weak self] chainId in
+    rpcController.network { [weak self] network in
       guard let self = self else { return }
-      self.walletService.userAssets(chainId) { tokens in
+      self.walletService.userAssets(network.chainId) { tokens in
         self.userAssets = tokens
         
         if let selectedToken = self.selectedSendToken {
@@ -98,11 +98,20 @@ public class SendTokenStore: ObservableObject {
           self.selectedSendToken = tokens.first
         }
       }
-    }
-    
-    // store tokens in `allTokens` for address validation
-    tokenRegistery.allTokens { [weak self] tokens in
-      self?.allTokens = tokens + [.eth]
+      
+      // store tokens in `allTokens` for address validation
+      let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
+                                                    name: network.symbolName,
+                                                    logo: network.iconUrls.first ?? "",
+                                                    isErc20: false,
+                                                    isErc721: false,
+                                                    symbol: network.symbol,
+                                                    decimals: network.decimals,
+                                                    visible: false,
+                                                    tokenId: "")
+      self.tokenRegistery.allTokens { tokens in
+        self.allTokens = tokens + [nativeAsset]
+      }
     }
   }
   
