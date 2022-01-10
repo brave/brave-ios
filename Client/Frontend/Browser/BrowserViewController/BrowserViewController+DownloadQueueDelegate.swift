@@ -70,7 +70,7 @@ extension BrowserViewController: DownloadQueueDelegate {
     
     func displayOpenDownloadsError() {
         let alert = UIAlertController(
-            title: Strings.openDownloadsFolderErrorTitle,
+            title: Strings.genericErrorTitle,
             message: Strings.openDownloadsFolderErrorDescription,
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))

@@ -149,11 +149,20 @@ extension FileManager {
     /// Navigates to download Folder inside the application's folder
     func openBraveDownloadsFolder(_ completion: @escaping (Bool) -> Void) {
         do {
-            let downloadsPath = try FileManager.default.downloadsPath()
+            guard var downloadsPathComponents = URLComponents(
+                url: try FileManager.default.downloadsPath(),
+                resolvingAgainstBaseURL: false) else {
+                    completion(false)
+                    return
+            }
             
-            let folderPath = downloadsPath.absoluteString.replacingOccurrences(of: "file://", with: "shareddocuments://")
-            guard let braveFolderURL = URL(string: folderPath) else { return }
-
+            downloadsPathComponents.scheme = "shareddocuments"
+            
+            guard let braveFolderURL = downloadsPathComponents.url else {
+                completion(false)
+                return
+            }
+            
             UIApplication.shared.open(braveFolderURL) { success in
                 completion(success)
             }
