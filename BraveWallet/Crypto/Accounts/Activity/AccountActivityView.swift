@@ -131,7 +131,8 @@ struct AccountActivityView: View {
             displayAccountCreator: false,
             assetRatios: activityStore.assets.reduce(into: [String: Double](), {
               $0[$1.token.symbol.lowercased()] = Double($1.price)
-            })
+            }),
+            txDetailsStore: activityStore.openTxDetailsStore()
           )
         }
       }, label: {

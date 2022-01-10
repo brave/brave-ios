@@ -15,6 +15,7 @@ struct TransactionDetailsView: View {
   var visibleTokens: [BraveWallet.ERCToken]
   var displayAccountCreator: Bool
   var assetRatios: [String: Double]
+  var txDetailsStore: TransactionDetailsStore
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -248,16 +249,30 @@ struct TransactionDetailsView: View {
         Section(
           header:
             HStack {
-              Button(action: {}) {
-                Text(Strings.Wallet.transactionDetailsSpeedUp)
-              }
-              .buttonStyle(BraveFilledButtonStyle(size: sizeCategory.isAccessibilityCategory ? .small : .large))
-              .frame(maxWidth: .infinity)
-              Button(action: {}) {
-                Text(Strings.cancelButtonTitle)
-              }
-              .buttonStyle(BraveFilledButtonStyle(size: sizeCategory.isAccessibilityCategory ? .small : .large))
-              .frame(maxWidth: .infinity)
+              WalletLoadingButton(
+                isLoading: txDetailsStore.isLoading,
+                action: {
+                  txDetailsStore.speedUpTx(txMetaId: txInfo.id)
+                },
+                label: {
+                  Text(Strings.Wallet.transactionDetailsSpeedUp)
+                }
+              )
+                .disabled(txDetailsStore.isLoading)
+                .buttonStyle(BraveFilledButtonStyle(size: sizeCategory.isAccessibilityCategory ? .small : .large))
+                .frame(maxWidth: .infinity)
+              WalletLoadingButton(
+                isLoading: txDetailsStore.isLoading,
+                action: {
+                  txDetailsStore.cancelTx(txMetaId: txInfo.id)
+                },
+                label: {
+                  Text(Strings.cancelButtonTitle)
+                }
+              )
+                .disabled(txDetailsStore.isLoading)
+                .buttonStyle(BraveFilledButtonStyle(size: sizeCategory.isAccessibilityCategory ? .small : .large))
+                .frame(maxWidth: .infinity)
             }
             .resetListHeaderStyle()
             .padding(.top)
@@ -266,9 +281,16 @@ struct TransactionDetailsView: View {
       } else if txInfo.txStatus == .error {
         Section(
           header:
-            Button(action: {}) {
-              Text(Strings.Wallet.transactionDetailsRetry)
-            }
+            WalletLoadingButton(
+              isLoading: txDetailsStore.isLoading,
+              action: {
+                txDetailsStore.cancelTx(txMetaId: txInfo.id)
+              },
+              label: {
+                Text(Strings.Wallet.transactionDetailsRetry)
+              }
+            )
+            .disabled(txDetailsStore.isLoading)
             .buttonStyle(BraveFilledButtonStyle(size: sizeCategory.isAccessibilityCategory ? .small : .large))
             .resetListHeaderStyle()
             .frame(maxWidth: .infinity)
@@ -290,7 +312,8 @@ struct TransactionDetailsView_Previews: PreviewProvider {
       networkStore: .previewStore,
       visibleTokens: [.eth],
       displayAccountCreator: false,
-      assetRatios: ["eth": 4576.36]
+      assetRatios: ["eth": 4576.36],
+      txDetailsStore: .previewStore
     )
       .previewSizeCategories()
   }

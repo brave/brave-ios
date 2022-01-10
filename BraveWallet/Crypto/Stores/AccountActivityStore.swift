@@ -38,6 +38,10 @@ class AccountActivityStore: ObservableObject {
     fetchTransactions()
   }
   
+  func openTxDetailsStore() -> TransactionDetailsStore {
+    return TransactionDetailsStore(txController: txController)
+  }
+  
   private func fetchAssets() {
     rpcController.chainId { [self] chainId in
       walletService.userAssets(chainId) { tokens in

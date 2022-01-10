@@ -135,4 +135,10 @@ extension TransactionConfirmationStore {
   }
 }
 
+extension TransactionDetailsStore {
+  static var previewStore: TransactionDetailsStore {
+    .init(txController: TestEthTxController())
+  }
+}
+
 #endif
