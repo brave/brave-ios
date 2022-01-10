@@ -122,7 +122,11 @@ extension BrowserViewController {
                 menuController.pushInnerMenu(vc)
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned self] in
-                FileManager.default.openBraveDownloadsFolder()
+                FileManager.default.openBraveDownloadsFolder { success in
+                    if !success {
+                        self.displayOpenDownloadsError()
+                    }
+                }
             }
             if isShownOnWebPage {
                 MenuItemButton(

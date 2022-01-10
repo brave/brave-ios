@@ -5653,7 +5653,6 @@
 			children = (
 				0A7B5D5A2268971600AADF22 /* Bookmarks */,
 				A198E75020C701ED00334C11 /* HistoryViewController.swift */,
-				0AEF99A822E22C5E00294C76 /* DownloadsViewController.swift */,
 				27AE360C25E55AA200E795E5 /* MenuViewController.swift */,
 				277E94F125F834240001926E /* VPNMenuButton.swift */,
 				CA9A233326B97B4300923D70 /* PlaylistMenuButton.swift */,

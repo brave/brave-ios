@@ -133,7 +133,9 @@ extension BrowserViewController {
     }
     
     @objc private func showDownloadsKeyCommand() {
-        navigationHelper.openDownloads()
+        navigationHelper.openDownloads() { [weak self] success in
+            self?.displayOpenDownloadsError()
+        }
     }
     
     @objc private func findNextCommand() {

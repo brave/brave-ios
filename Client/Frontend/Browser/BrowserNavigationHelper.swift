@@ -52,8 +52,10 @@ class BrowserNavigationHelper {
         open(vc, doneButton: DoneButton(style: .done, position: .right))
     }
     
-    func openDownloads() {
-        FileManager.default.openBraveDownloadsFolder()
+    func openDownloads(_ completion: @escaping (Bool) -> Void) {
+        FileManager.default.openBraveDownloadsFolder() {
+            completion($0)
+        }
     }
     
     func openAddBookmark() {

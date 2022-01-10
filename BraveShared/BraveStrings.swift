@@ -117,6 +117,18 @@ extension Strings {
     public static let bookmarkAllTabsTitle = NSLocalizedString("BookmarkAllTabsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Bookmark All Tabs", comment: "Action item title of long press for Adding Bookmark for All Tabs in Tab List")
     public static let suppressAlertsActionTitle = NSLocalizedString("SuppressAlertsActionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Suppress Alerts", comment: "Title of alert that seeks permission from user to suppress future JS alerts")
     public static let suppressAlertsActionMessage = NSLocalizedString("SuppressAlertsActionMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevent this page from creating additional alerts", comment: "Message body of alert that seeks permission from user to suppress future JS alerts")
+    public static let openDownloadsFolderErrorTitle =
+        NSLocalizedString("OpenDownloadsFolderErrorTitle",
+                          tableName: "BraveShared",
+                          bundle: Bundle.braveShared,
+                          value: "Error",
+                          comment: "Error title when there is an error while navigating to Files App")
+    public static let openDownloadsFolderErrorDescription =
+        NSLocalizedString("OpenDownloadsFolderErrorDescription",
+                          tableName: "BraveShared",
+                          bundle: Bundle.braveShared,
+                          value: "Sorry, cant open downloads folder.",
+                          comment: "Error description when there is an error while navigating to Files App")
 }
 
 // MARK:-  DefaultBrowserIntroCalloutViewController.swift
