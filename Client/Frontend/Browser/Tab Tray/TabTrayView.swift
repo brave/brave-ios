@@ -15,6 +15,7 @@ extension TabTrayController {
             static let regularCellHeight = 192.0
             static let largeCellHeight = 256.0
             static let itemInset = 6.0
+            static let sectionInset = 4.0
             static let buttonEdgeInset = 10.0
             static let buttonStackLayoutMargin = 16.0
         }
@@ -36,6 +37,7 @@ extension TabTrayController {
                 count: numberOfColumns)
             
             let section = NSCollectionLayoutSection(group: group)
+            section.contentInsets = .init(top: UX.sectionInset, leading: UX.sectionInset, bottom: UX.sectionInset, trailing: UX.sectionInset)
             let layout = UICollectionViewCompositionalLayout(section: section)
             return layout
         }
@@ -99,11 +101,7 @@ extension TabTrayController {
                     .view(doneButton)
                 )
                 $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-                $0.layoutMargins = UIEdgeInsets(
-                    top: UX.buttonStackLayoutMargin,
-                    left: UX.buttonStackLayoutMargin,
-                    bottom: 0,
-                    right: UX.buttonStackLayoutMargin)
+                $0.layoutMargins = UIEdgeInsets(equalInset: UX.buttonStackLayoutMargin)
                 $0.isLayoutMarginsRelativeArrangement = true
             }
             
