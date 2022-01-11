@@ -83,7 +83,7 @@ class TabTrayController: LoadingViewController {
             $0.searchBar.autocorrectionType = .no
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
-            $0.searchBar.placeholder = "Search"
+            $0.searchBar.placeholder = Strings.tabTraySearchBarTitle
             $0.delegate = self
             // Don't hide the navigation bar because the search bar is in it.
             $0.hidesNavigationBarDuringPresentation = false
@@ -238,8 +238,8 @@ class TabTrayController: LoadingViewController {
         if emptyStateOverlayView.superview == nil {
             view.addSubview(emptyStateOverlayView)
             view.bringSubviewToFront(emptyStateOverlayView)
-            emptyStateOverlayView.snp.makeConstraints { make -> Void in
-                make.edges.equalTo(tabTrayView.collectionView)
+            emptyStateOverlayView.snp.makeConstraints {
+                $0.edges.equalTo(tabTrayView.collectionView)
             }
         }
     }
