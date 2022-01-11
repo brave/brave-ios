@@ -54,7 +54,7 @@ class TabTrayController: LoadingViewController {
     private let tabTraySearchController = UISearchController(searchResultsController: nil)
     private var tabTraySearchQuery = ""
     
-    private lazy var emptyStateOverlayView: UIView = createNoSearchResultOverlayView()
+    private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
 
     init(tabManager: TabManager) {
         self.tabManager = tabManager
@@ -184,6 +184,7 @@ class TabTrayController: LoadingViewController {
         
         if privateMode {
             tabTrayView.hidePrivateModeInfo()
+            tabTraySearchController.searchBar.isHidden = true
         }
         
         // If private mode info is showing it means we already added one tab.
@@ -213,7 +214,7 @@ class TabTrayController: LoadingViewController {
         }
         
         // Disable Search when Private mode info is on 
-        tabTraySearchController.searchBar.isUserInteractionEnabled = !privateMode
+        tabTraySearchController.searchBar.isHidden = privateMode
     }
     
     private func remove(tab: Tab) {
