@@ -30,13 +30,9 @@ extension BraveWallet.ERCToken: Identifiable {
   public var id: String {
     symbol.lowercased()
   }
-  /// Whether or not this ERCToken is actually ETH
-  public var isETH: Bool {
-    contractAddress.isEmpty && symbol.lowercased() == "eth"
-  }
   
-  public func contractAddress(in chainId: String) -> String {
-    if chainId == BraveWallet.RopstenChainId {
+  public func contractAddress(in network: BraveWallet.EthereumChain) -> String {
+    if network.chainId == BraveWallet.RopstenChainId {
       switch symbol.uppercased() {
       case "ETH": return BraveWallet.ethSwapAddress
       case "DAI" : return BraveWallet.daiSwapAddress
@@ -44,7 +40,7 @@ extension BraveWallet.ERCToken: Identifiable {
       default: return contractAddress
       }
     } else {
-      return isETH ? BraveWallet.ethSwapAddress : contractAddress
+      return symbol == network.symbol ? BraveWallet.ethSwapAddress : contractAddress
     }
   }
 }

@@ -29,11 +29,7 @@ struct AssetIconView: View {
       )
   }
   
-  private var image: Image? {
-    if token.isETH {
-      // Use bundled ETH icon
-      return Image("eth-icon")
-    }
+  private var localImage: Image? {
     guard let baseURL = BraveWallet.TokenRegistryUtils.tokenLogoBaseURL,
           case let imageURL = baseURL.appendingPathComponent(token.logo),
           let image = UIImage(contentsOfFile: imageURL.path) else {
@@ -44,7 +40,7 @@ struct AssetIconView: View {
   
   var body: some View {
     Group {
-      if let image = image {
+      if let image = localImage {
         image
           .resizable()
           .aspectRatio(contentMode: .fit)

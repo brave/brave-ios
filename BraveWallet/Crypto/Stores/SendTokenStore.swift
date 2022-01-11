@@ -151,37 +151,39 @@ public class SendTokenStore: ObservableObject {
         selectedSendTokenBalance = decimal
       }
       
-      // Get balance for ETH token
-      if token.isETH {
-        self.rpcController.balance(accountAddress) { success, balance in
-          guard success else {
-            self.selectedSendTokenBalance = nil
-            return
+      self.rpcController.network { network in
+        // Get balance for ETH token
+        if token.symbol == network.symbol {
+          self.rpcController.balance(accountAddress) { success, balance in
+            guard success else {
+              self.selectedSendTokenBalance = nil
+              return
+            }
+            updateBalance(success, balance)
           }
-          updateBalance(success, balance)
         }
-      }
-      // Get balance for erc20 token
-      else if token.isErc20 {
-        self.rpcController.erc20TokenBalance(token.contractAddress,
-                                        address: accountAddress) { success, balance in
-          guard success else {
-            self.selectedSendTokenBalance = nil
-            return
+        // Get balance for erc20 token
+        else if token.isErc20 {
+          self.rpcController.erc20TokenBalance(token.contractAddress,
+                                          address: accountAddress) { success, balance in
+            guard success else {
+              self.selectedSendTokenBalance = nil
+              return
+            }
+            updateBalance(success, balance)
           }
-          updateBalance(success, balance)
         }
-      }
-      // Get balance for erc721 token
-      else if token.isErc721 {
-        self.rpcController.erc721TokenBalance(token.contractAddress,
-                                              tokenId: token.id,
-                                              accountAddress: accountAddress) { success, balance in
-          guard success else {
-            self.selectedSendTokenBalance = nil
-            return
+        // Get balance for erc721 token
+        else if token.isErc721 {
+          self.rpcController.erc721TokenBalance(token.contractAddress,
+                                                tokenId: token.id,
+                                                accountAddress: accountAddress) { success, balance in
+            guard success else {
+              self.selectedSendTokenBalance = nil
+              return
+            }
+            updateBalance(success, balance)
           }
-          updateBalance(success, balance)
         }
       }
     }
@@ -232,7 +234,7 @@ public class SendTokenStore: ObservableObject {
     rpcController.network { [weak self] network in
       guard let self = self else { return }
 
-      if token.isETH {
+      if token.symbol == network.symbol {
         let baseData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: self.sendAddress, value: "0x\(weiHexString)", data: .init())
         if network.isEip1559 {
           self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: fromAddress) { success in
