@@ -45,7 +45,8 @@ struct AssetIconView: View {
           .resizable()
           .aspectRatio(contentMode: .fit)
       } else {
-        fallbackMonogram
+        WalletWebImage(url: URL(string: token.logo))
+          .placeholder { fallbackMonogram }
       }
     }
     .frame(width: length, height: length)
