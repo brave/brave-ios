@@ -11,16 +11,6 @@ enum JavascriptError: Error {
     case invalid
 }
 
-extension WKUserScript {
-    public class func createInDefaultContentWorld(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
-        if #available(iOS 14.0, *) {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .defaultClient)
-        } else {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
-        }
-    }
-}
-
 public extension WKWebView {
     func generateJSFunctionString(functionName: String, args: [Any?], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
         var sanitizedArgs = [String]()
@@ -54,7 +44,7 @@ public extension WKWebView {
         return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", nil)
     }
 
-    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
+    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], contentWorld: WKContentWorld, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
         var javascript = functionName
         
         if asFunction {
@@ -69,7 +59,7 @@ public extension WKWebView {
         }
         
         // swiftlint:disable:next safe_javascript
-        evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result  in
+        evaluateJavaScript(javascript, in: nil, in: contentWorld) { result  in
             switch result {
                 case .success(let value):
                     completion?(value, nil)

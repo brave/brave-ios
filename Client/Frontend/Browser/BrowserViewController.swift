@@ -1201,7 +1201,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             // IE: The user must explicitly tap a bookmark they have saved.
             // Block all other contexts such as redirects, downloads, embed, linked, etc..
             if visitType == .bookmark, let webView = tab.webView, let code = url.bookmarkletCodeComponent {
-                webView.evaluateSafeJavaScript(functionName: code, sandboxed: false, asFunction: false) { _, error in
+                webView.evaluateSafeJavaScript(functionName: code, contentWorld: .page, asFunction: false) { _, error in
                     if let error = error {
                         log.error(error)
                     }
@@ -1424,7 +1424,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             return
         }
         if NoImageModeHelper.isActivated {
-            webView.evaluateSafeJavaScript(functionName: "__firefox__.NoImageMode.setEnabled", args: ["true"])
+            webView.evaluateSafeJavaScript(functionName: "__firefox__.NoImageMode.setEnabled", args: ["true"], contentWorld: .defaultClient)
         }
     }
 
@@ -1768,7 +1768,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             findInPageBar.endEditing(true)
             let tab = tab ?? tabManager.selectedTab
             guard let webView = tab?.webView else { return }
-            webView.evaluateSafeJavaScript(functionName: "__firefox__.findDone")
+            webView.evaluateSafeJavaScript(functionName: "__firefox__.findDone", contentWorld: .defaultClient)
             findInPageBar.removeFromSuperview()
             self.findInPageBar = nil
             updateViewConstraints()
@@ -1792,7 +1792,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                 // because that event wil not always fire due to unreliable page caching. This will either let us know that
                 // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We
                 // ignore the result because we are being called back asynchronous when the readermode status changes.
-                webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", sandboxed: false)
+                webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: .page)
 
                 // Re-run additional scripts in webView to extract updated favicons and metadata.
                 runScriptsOnWebView(webView)
@@ -2483,7 +2483,7 @@ extension BrowserViewController: WKUIDelegate {
                     window.alert=window.confirm=window.prompt=function(n){},
                     [].slice.apply(document.querySelectorAll('iframe')).forEach(function(n){if(n.contentWindow != window){n.contentWindow.alert=n.contentWindow.confirm=n.contentWindow.prompt=function(n){}}})
                     """
-        webView.evaluateSafeJavaScript(functionName: script, sandboxed: false, asFunction: false)
+        webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
     }
     
     func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping () -> Void) {
@@ -2744,7 +2744,7 @@ extension BrowserViewController: FindInPageBarDelegate, FindInPageHelperDelegate
                 self.findInPageBar?.currentResult = index
             }
         } else {
-            webView.evaluateSafeJavaScript(functionName: "__firefox__.\(function)", args: [text], sandboxed: false)
+            webView.evaluateSafeJavaScript(functionName: "__firefox__.\(function)", args: [text], contentWorld: .page)
         }
     }
 
