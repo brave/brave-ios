@@ -612,8 +612,8 @@ public class SwapTokenStore: ObservableObject {
   #if DEBUG
   func setUpTest() {
     accountInfo = .init()
-    selectedFromToken = .previewEth
-    selectedToToken = .previewEth
+    selectedFromToken = .previewToken
+    selectedToToken = .previewToken
     sellAmount = "0.01"
     selectedFromTokenBalance = 0.02
   }

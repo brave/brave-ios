@@ -69,7 +69,7 @@ class SendTokenStoreTests: XCTestCase {
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
             tokenRegistery: TestTokenRegistry(),
-            prefilledToken: .previewEth
+            prefilledToken: .previewToken
         )
         store.setUpTest()
         let ex = expectation(description: "send-eth-eip1559-transaction")
@@ -138,7 +138,7 @@ class SendTokenStoreTests: XCTestCase {
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
             tokenRegistery: TestTokenRegistry(),
-            prefilledToken: .previewEth
+            prefilledToken: .previewToken
         )
         store.setUpTest()
         

@@ -9,7 +9,7 @@ import BraveCore
 #if DEBUG
 
 extension BraveWallet.ERCToken {
-  static let previewEth: BraveWallet.ERCToken = .init(
+  static let previewToken: BraveWallet.ERCToken = .init(
     contractAddress: "",
     name: "Ethereum",
     logo: "",

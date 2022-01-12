@@ -58,7 +58,7 @@ struct AssetIconView: View {
 
 struct AssetIconView_Previews: PreviewProvider {
   static var previews: some View {
-    AssetIconView(token: .previewEth)
+    AssetIconView(token: .previewToken)
       .previewLayout(.sizeThatFits)
       .padding()
       .previewSizeCategories()
