@@ -35,9 +35,10 @@ class SendTokenStoreTests: XCTestCase {
     }
     
     func testFetchAssets() {
+        let testRpcController = TestEthJsonRpcController()
         let store = SendTokenStore(
             keyringController: TestKeyringController(),
-            rpcController: TestEthJsonRpcController(),
+            rpcController: testRpcController,
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
             tokenRegistery: TestTokenRegistry(),
@@ -51,7 +52,9 @@ class SendTokenStoreTests: XCTestCase {
                 XCTFail("Token was nil")
                 return
             }
-            XCTAssert(token.isETH) // Should end up showing ETH as the default asset
+            testRpcController.network { network in
+                XCTAssertEqual(token.symbol, network.symbol)
+            }
         }.store(in: &cancellables)
         store.fetchAssets()
         waitForExpectations(timeout: 3) { error in
