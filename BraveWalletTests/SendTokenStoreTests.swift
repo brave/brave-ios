@@ -10,6 +10,7 @@ import BraveCore
 
 class SendTokenStoreTests: XCTestCase {
     private var cancellables: Set<AnyCancellable> = []
+    private let batSymbol = "BAT"
     
     func testPrefilledToken() {
         var store = SendTokenStore(
@@ -112,7 +113,7 @@ class SendTokenStoreTests: XCTestCase {
             tokenRegistery: TestTokenRegistry(),
             prefilledToken: nil
         )
-        let token: BraveWallet.ERCToken = .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: "BAT", decimals: 18, visible: true, tokenId: "")
+        let token: BraveWallet.ERCToken = .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: batSymbol, decimals: 18, visible: true, tokenId: "")
         store.selectedSendToken = token
         store.setUpTest()
         
