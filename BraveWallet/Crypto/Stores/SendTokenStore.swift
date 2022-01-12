@@ -100,17 +100,8 @@ public class SendTokenStore: ObservableObject {
       }
       
       // store tokens in `allTokens` for address validation
-      let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
-                                                    name: network.symbolName,
-                                                    logo: network.iconUrls.first ?? "",
-                                                    isErc20: false,
-                                                    isErc721: false,
-                                                    symbol: network.symbol,
-                                                    decimals: network.decimals,
-                                                    visible: false,
-                                                    tokenId: "")
       self.tokenRegistery.allTokens { tokens in
-        self.allTokens = tokens + [nativeAsset]
+        self.allTokens = tokens + [network.nativeToken]
       }
     }
   }

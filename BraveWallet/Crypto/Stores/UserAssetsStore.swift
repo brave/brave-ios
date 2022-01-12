@@ -74,16 +74,7 @@ public class UserAssetsStore: ObservableObject {
       let visibleAssetIds = userAssets.filter(\.visible).map(\.id)
       let isTestnet = network.chainId != BraveWallet.MainnetChainId
       tokenRegistry.allTokens { registryTokens in
-        let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
-                                                      name: network.symbolName,
-                                                      logo: network.iconUrls.first ?? "",
-                                                      isErc20: false,
-                                                      isErc721: false,
-                                                      symbol: network.symbol,
-                                                      decimals: network.decimals,
-                                                      visible: false,
-                                                      tokenId: "")
-        let allTokens = (isTestnet ? [] : registryTokens) + [nativeAsset]
+        let allTokens = (isTestnet ? [] : registryTokens) + [network.nativeToken]
         assetStores = allTokens.union(userAssets, f: { $0.id }).map { token in
           AssetStore(
             walletService: walletService,

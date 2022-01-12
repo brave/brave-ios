@@ -24,6 +24,19 @@ extension BraveWallet.EthereumChain: Identifiable {
   public var id: String {
     chainId
   }
+  
+  public var nativeToken: BraveWallet.ERCToken {
+    .init(contractAddress: "",
+          name: symbolName,
+          logo: iconUrls.first ?? "",
+          isErc20: false,
+          isErc721: false,
+          symbol: symbol,
+          decimals: decimals,
+          visible: false,
+          tokenId: ""
+    )
+  }
 }
 
 extension BraveWallet.ERCToken: Identifiable {

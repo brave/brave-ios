@@ -593,16 +593,7 @@ public class SwapTokenStore: ObservableObject {
       guard let self = self else { return }
       
       self.rpcController.network { network in
-        let nativeAsset: BraveWallet.ERCToken = .init(contractAddress: "",
-                                                      name: network.symbolName,
-                                                      logo: network.iconUrls.first ?? "",
-                                                      isErc20: false,
-                                                      isErc721: false,
-                                                      symbol: network.symbol,
-                                                      decimals: network.decimals,
-                                                      visible: false,
-                                                      tokenId: "")
-        
+        let nativeAsset = network.nativeToken
         if network.chainId == BraveWallet.RopstenChainId {
           let supportedAssets = tokens.filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) } + [nativeAsset]
           self.allTokens = supportedAssets.sorted(by: { $0.symbol < $1.symbol })
