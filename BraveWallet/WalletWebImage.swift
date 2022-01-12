@@ -15,7 +15,6 @@ class WalletWebImageManager: ObservableObject {
   @Published public var error: Error?
   
   var manager = SDWebImageManager.shared
-  var isFirstLoad: Bool = true
   var url: URL?
   var options: SDWebImageOptions
   
@@ -25,8 +24,6 @@ class WalletWebImageManager: ObservableObject {
   }
   
   func load() {
-    isFirstLoad = false
-    
     manager.loadImage(with: url, options: options, progress: nil, completed: { [weak self] image, data, error, _, finished, _ in
       guard let self = self else { return }
       self.image = image
@@ -61,10 +58,6 @@ struct WalletWebImage: View {
           }
         }
         .onAppear {
-          if imageManager.isFirstLoad {
-            imageManager.load()
-            return
-          }
           if imageManager.imageData == nil {
             imageManager.load()
           }
