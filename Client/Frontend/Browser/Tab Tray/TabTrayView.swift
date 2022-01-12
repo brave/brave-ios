@@ -70,7 +70,6 @@ extension TabTrayController {
         let privateModeButton = PrivateModeButton().then {
             $0.titleLabel?.font = .preferredFont(forTextStyle: .body)
             $0.titleLabel?.adjustsFontForContentSizeCategory = true
-            $0.titleLabel?.adjustsFontSizeToFitWidth = true
             $0.contentHorizontalAlignment = .left
             $0.setTitle(Strings.private, for: .normal)
             $0.tintColor = .braveLabel
@@ -93,30 +92,13 @@ extension TabTrayController {
             backgroundColor = .braveBackground
             accessibilityLabel = Strings.tabTrayAccessibilityLabel
             
-            let buttonsStackView = UIStackView().then {
-                $0.distribution = .equalSpacing
-                $0.addStackViewItems(
-                    .view(privateModeButton),
-                    .view(newTabButton),
-                    .view(doneButton)
-                )
-                $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-                $0.layoutMargins = UIEdgeInsets(equalInset: UX.buttonStackLayoutMargin)
-                $0.isLayoutMarginsRelativeArrangement = true
-            }
-            
             let stackView = UIStackView().then {
                 $0.axis = .vertical
                 $0.spacing = 0
                 $0.addStackViewItems(
                     .view(privateModeInfo),
-                    .view(collectionView),
-                    .view(buttonsStackView))
+                    .view(collectionView))
                 $0.isAccessibilityElement = false
-            }
-            
-            privateModeButton.snp.makeConstraints {
-                $0.width.equalTo(doneButton.snp.width)
             }
             
             addSubview(stackView)

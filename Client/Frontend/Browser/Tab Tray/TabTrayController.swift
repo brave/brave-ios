@@ -78,12 +78,15 @@ class TabTrayController: LoadingViewController {
         
         definesPresentationContext = true
 
-        tabTraySearchController.do {
+        let searchBarView = TabTraySearchBar(searchBar: tabTraySearchController.searchBar).then {
             $0.searchBar.autocapitalizationType = .none
             $0.searchBar.autocorrectionType = .no
+            $0.searchBar.placeholder = Strings.tabTraySearchBarTitle
+        }
+        
+        tabTraySearchController.do {
             $0.searchResultsUpdater = self
             $0.obscuresBackgroundDuringPresentation = false
-            $0.searchBar.placeholder = Strings.tabTraySearchBarTitle
             $0.delegate = self
             // Don't hide the navigation bar because the search bar is in it.
             $0.hidesNavigationBarDuringPresentation = false
@@ -91,7 +94,7 @@ class TabTrayController: LoadingViewController {
         
         navigationItem.do {
             // Place the search bar in the navigation item's title view.
-            $0.titleView = tabTraySearchController.searchBar
+            $0.titleView = searchBarView
             $0.hidesSearchBarWhenScrolling = true
         }
         
@@ -99,7 +102,6 @@ class TabTrayController: LoadingViewController {
         
         tabTrayView.collectionView.do {
             $0.register(TabCell.self, forCellWithReuseIdentifier: TabCell.identifier)
-            
             $0.dataSource = dataSource
             $0.delegate = self
             $0.dragDelegate = self
@@ -114,6 +116,14 @@ class TabTrayController: LoadingViewController {
             $0.newTabButton.addTarget(self, action: #selector(newTabAction), for: .touchUpInside)
             $0.privateModeButton.addTarget(self, action: #selector(togglePrivateModeAction), for: .touchUpInside)
         }
+        
+        navigationController?.isToolbarHidden = false
+        
+        toolbarItems = [UIBarButtonItem(customView: tabTrayView.privateModeButton),
+                        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
+                        UIBarButtonItem(customView: tabTrayView.newTabButton),
+                        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
+                        UIBarButtonItem(customView: tabTrayView.doneButton)]
     }
     
     private var initialScrollCompleted = false
@@ -184,7 +194,7 @@ class TabTrayController: LoadingViewController {
         
         if privateMode {
             tabTrayView.hidePrivateModeInfo()
-            tabTraySearchController.searchBar.isHidden = true
+            navigationController?.setNavigationBarHidden(false, animated: false)
         }
         
         // If private mode info is showing it means we already added one tab.
@@ -213,8 +223,8 @@ class TabTrayController: LoadingViewController {
             tabManager.selectTab(tabManager.tabsForCurrentMode.first)
         }
         
-        // Disable Search when Private mode info is on 
-        tabTraySearchController.searchBar.isHidden = privateMode
+        // Disable Search when Private mode info is on
+        navigationController?.setNavigationBarHidden(privateMode, animated: false)
     }
     
     private func remove(tab: Tab) {
@@ -420,5 +430,33 @@ extension TabTrayController: UISearchControllerDelegate {
         invalidateSearchTimer()
         isTabTrayBeingSearched = false
         tabTrayView.collectionView.reloadData()
+    }
+}
+
+// MARK: TabTraySearchBar
+
+class TabTraySearchBar: UIView {
+    let searchBar: UISearchBar
+    
+    init(searchBar: UISearchBar) {
+        self.searchBar = searchBar
+        super .init(frame: .zero)
+        addSubview(searchBar)
+    }
+    
+    @available(*, unavailable)
+    required init(coder: NSCoder) {
+        fatalError()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        searchBar.frame = bounds
+    }
+    
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
+        // This is done to adjust the frame of a UISearchBar inside of UISearchController
+        // Adjusting the bar frame directly doesnt work so had to create a custom view with UISearchBar
+        .init(width: size.width - 20, height: size.height)
     }
 }
