@@ -180,7 +180,7 @@ class TabManager: NSObject {
         
         if let query = query, !query.isEmpty {
             // Display title is the only data that will be present on every situation
-            return allTabs.filter { $0.displayTitle.lowercased().contains(query) }
+            return allTabs.filter { $0.displayTitle.lowercased().contains(query) || ($0.url?.baseDomain?.contains(query) ?? false) }
         } else {
             return allTabs
         }
