@@ -572,13 +572,13 @@ public class SwapTokenStore: ObservableObject {
           completion?()
         }
       } else {
-        if chainId == BraveWallet.MainnetChainId {
+        if network.chainId == BraveWallet.MainnetChainId {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == batSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != batSymbol.uppercased() })
           } else {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == batSymbol.uppercased() })
           }
-        } else if chainId == BraveWallet.RopstenChainId {
+        } else if network.chainId == BraveWallet.RopstenChainId {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == daiSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != daiSymbol.uppercased() })
           } else {
