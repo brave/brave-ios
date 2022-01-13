@@ -10,27 +10,22 @@ private class WalletWebImageManager: ObservableObject {
   /// loaded image, note when progressive loading, this will published multiple times with different partial image
   @Published public var image: UIImage?
   /// loaded image data, may be nil if hit from memory cache. This will only published once loading is finished
-  @Published public var imageData: Data?
+  @Published public var isFinished: Bool = false
   /// loading error
   @Published public var error: Error?
   
   private var manager = SDWebImageManager.shared
-  private var url: URL?
-  private var options: SDWebImageOptions
   private var operation: SDWebImageOperation?
   
-  init(url: URL?, options: SDWebImageOptions = []) {
-    self.url = url
-    self.options = options
-  }
+  init() { }
   
-  func load() {
+  func load(url: URL?, options: SDWebImageOptions = []) {
     operation = manager.loadImage(with: url, options: options, progress: nil, completed: { [weak self] image, data, error, _, finished, _ in
       guard let self = self else { return }
       self.image = image
       self.error = error
       if finished {
-        self.imageData = data
+        self.isFinished = true
       }
     })
   }
@@ -41,45 +36,29 @@ private class WalletWebImageManager: ObservableObject {
   }
 }
 
-struct WalletWebImage: View {
- 
-  @ObservedObject fileprivate var imageManager: WalletWebImageManager
+struct WebImageReader<Content: View>: View {
+  @StateObject private var imageManager: WalletWebImageManager = .init()
+  var url: URL?
+  var options: SDWebImageOptions
   
-  private var placeholder: AnyView?
+  private var content: (_ image: UIImage?, _ isFinished: Bool) -> Content
   
-  init(url: URL?, options: SDWebImageOptions = []) {
-    self.imageManager = WalletWebImageManager(url: url, options: options)
+  init(
+    url: URL?,
+    options: SDWebImageOptions = [],
+    @ViewBuilder content: @escaping (_ image: UIImage?, _ isFinished: Bool) -> Content
+  ) {
+    self.content = content
+    self.url = url
+    self.options = options
   }
   
   var body: some View {
-    if let image = imageManager.image {
-      Image(uiImage: image)
-        .resizable()
-        .aspectRatio(contentMode: .fit)
-    } else {
-      Group {
-        if let placeholder = placeholder {
-          placeholder
-        }
-      }
+    content(imageManager.image, imageManager.isFinished)
       .onAppear {
-        if imageManager.imageData == nil {
-          imageManager.load()
+        if !imageManager.isFinished {
+          imageManager.load(url: url, options: options)
         }
       }
-      .onDisappear {
-        if imageManager.imageData == nil {
-          imageManager.cancel()
-        }
-      }
-    }
-  }
-}
-
-extension WalletWebImage {
-  public func placeholder<T>(@ViewBuilder _ content: () -> T) -> WalletWebImage where T: View {
-    var result = self
-    result.placeholder = AnyView(content())
-    return result
   }
 }
