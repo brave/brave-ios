@@ -17,6 +17,7 @@ class WalletWebImageManager: ObservableObject {
   private var manager = SDWebImageManager.shared
   private var url: URL?
   private var options: SDWebImageOptions
+  private var operation: SDWebImageOperation?
   
   init(url: URL?, options: SDWebImageOptions = []) {
     self.url = url
@@ -24,7 +25,7 @@ class WalletWebImageManager: ObservableObject {
   }
   
   func load() {
-    manager.loadImage(with: url, options: options, progress: nil, completed: { [weak self] image, data, error, _, finished, _ in
+    operation = manager.loadImage(with: url, options: options, progress: nil, completed: { [weak self] image, data, error, _, finished, _ in
       guard let self = self else { return }
       self.image = image
       self.error = error
@@ -32,6 +33,11 @@ class WalletWebImageManager: ObservableObject {
         self.imageData = data
       }
     })
+  }
+  
+  func cancel() {
+    operation?.cancel()
+    operation = nil
   }
 }
 
@@ -57,6 +63,11 @@ struct WalletWebImage: View {
       .onAppear {
         if imageManager.imageData == nil {
           imageManager.load()
+        }
+      }
+      .onDisappear {
+        if imageManager.imageData == nil {
+          imageManager.cancel()
         }
       }
     }
