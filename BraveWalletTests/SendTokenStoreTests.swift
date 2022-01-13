@@ -29,9 +29,9 @@ class SendTokenStoreTests: XCTestCase {
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
             tokenRegistery: TestTokenRegistry(),
-            prefilledToken: .eth
+            prefilledToken: .previewToken
         )
-        XCTAssertEqual(store.selectedSendToken?.symbol.lowercased(), BraveWallet.ERCToken.eth.symbol.lowercased())
+        XCTAssertEqual(store.selectedSendToken?.symbol.lowercased(), BraveWallet.ERCToken.previewToken.symbol.lowercased())
     }
     
     func testFetchAssets() {
@@ -90,7 +90,7 @@ class SendTokenStoreTests: XCTestCase {
             walletService: TestBraveWalletService(),
             transactionController: TestEthTxController(),
             tokenRegistery: TestTokenRegistry(),
-            prefilledToken: .previewEth
+            prefilledToken: .previewToken
         )
         store.setUpTest()
         
