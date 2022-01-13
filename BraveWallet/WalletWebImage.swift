@@ -6,7 +6,7 @@
 import SwiftUI
 import SDWebImage
 
-class WalletWebImageManager: ObservableObject {
+private class WalletWebImageManager: ObservableObject {
   /// loaded image, note when progressive loading, this will published multiple times with different partial image
   @Published public var image: UIImage?
   /// loaded image data, may be nil if hit from memory cache. This will only published once loading is finished
@@ -43,7 +43,7 @@ class WalletWebImageManager: ObservableObject {
 
 struct WalletWebImage: View {
  
-  @ObservedObject var imageManager: WalletWebImageManager
+  @ObservedObject fileprivate var imageManager: WalletWebImageManager
   
   private var placeholder: AnyView?
   
