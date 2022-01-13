@@ -54,6 +54,8 @@ struct WalletWebImage: View {
   var body: some View {
     if let image = imageManager.image {
       Image(uiImage: image)
+        .resizable()
+        .aspectRatio(contentMode: .fit)
     } else {
       Group {
         if let placeholder = placeholder {
