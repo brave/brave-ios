@@ -14,9 +14,9 @@ class WalletWebImageManager: ObservableObject {
   /// loading error
   @Published public var error: Error?
   
-  var manager = SDWebImageManager.shared
-  var url: URL?
-  var options: SDWebImageOptions
+  private var manager = SDWebImageManager.shared
+  private var url: URL?
+  private var options: SDWebImageOptions
   
   init(url: URL?, options: SDWebImageOptions = []) {
     self.url = url
@@ -39,28 +39,24 @@ struct WalletWebImage: View {
  
   @ObservedObject var imageManager: WalletWebImageManager
   
-  var placeholder: AnyView?
+  private var placeholder: AnyView?
   
   init(url: URL?, options: SDWebImageOptions = []) {
     self.imageManager = WalletWebImageManager(url: url, options: options)
   }
   
   var body: some View {
-    Group {
-      if let image = imageManager.image {
-        Image(uiImage: image)
-      } else {
-        Group {
-          if let placeholder = placeholder {
-            placeholder
-          } else {
-            EmptyView()
-          }
+    if let image = imageManager.image {
+      Image(uiImage: image)
+    } else {
+      Group {
+        if let placeholder = placeholder {
+          placeholder
         }
-        .onAppear {
-          if imageManager.imageData == nil {
-            imageManager.load()
-          }
+      }
+      .onAppear {
+        if imageManager.imageData == nil {
+          imageManager.load()
         }
       }
     }
