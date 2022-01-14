@@ -34,11 +34,7 @@ extension BrowserViewController: TopToolbarDelegate {
             $0.delegate = self
         }
         
-        let navigationController = SettingsNavigationController(rootViewController: tabTrayController).then {
-            $0.modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-        }
-
-        present(navigationController, animated: true)
+        present(SettingsNavigationController(rootViewController: tabTrayController), animated: true)
     }
     
     func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
