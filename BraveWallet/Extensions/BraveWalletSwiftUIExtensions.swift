@@ -53,6 +53,9 @@ extension BraveWallet.ERCToken: Identifiable {
       default: return contractAddress
       }
     } else {
+      // ETH special swap address in Ropsten network
+      // Only checking token.symbol with selected network.symbol is sufficient
+      // since there is no swap support for custom networks.
       return symbol == network.symbol ? BraveWallet.ethSwapAddress : contractAddress
     }
   }
