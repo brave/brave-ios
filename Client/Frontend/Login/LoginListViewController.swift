@@ -193,7 +193,7 @@ extension LoginListViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: Constants.saveLoginsRowIdentifier, for: indexPath).then {
                 $0.textLabel?.text = Strings.saveLogins
                 $0.separatorInset = .zero
-                $0.accessoryView =  !searchController.isActive ? toggle :  nil
+                $0.accessoryView =  searchController.isActive ? nil : toggle
                 $0.selectionStyle = .none
             }
             
