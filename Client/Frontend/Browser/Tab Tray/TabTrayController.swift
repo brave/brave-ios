@@ -186,12 +186,14 @@ class TabTrayController: LoadingViewController {
     // MARK: - Actions
     
     @objc func doneAction() {
+        tabTraySearchController.isActive = false
+
         dismiss(animated: true)
     }
     
     @objc func newTabAction() {
-        let isPrivateModeInfoShowing = tabTrayView.isPrivateModeInfoShowing
-        
+        tabTraySearchController.isActive = false
+                
         if privateMode {
             tabTrayView.hidePrivateModeInfo()
             navigationController?.setNavigationBarHidden(false, animated: false)
@@ -199,7 +201,7 @@ class TabTrayController: LoadingViewController {
         
         // If private mode info is showing it means we already added one tab.
         // So when user taps on the 'new tab' button we do nothing, only dismiss the view.
-        if isPrivateModeInfoShowing {
+        if tabTrayView.isPrivateModeInfoShowing {
             dismiss(animated: true)
         } else {
             tabManager.addTabAndSelect(isPrivate: privateMode)
@@ -207,6 +209,8 @@ class TabTrayController: LoadingViewController {
     }
     
     @objc func togglePrivateModeAction() {
+        tabTraySearchController.isActive = false
+
         tabManager.willSwitchTabMode(leavingPBM: privateMode)
         privateMode.toggle()
         // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
