@@ -15,14 +15,17 @@ class Migration {
     
     private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
     private let braveCore: BraveCoreMain
+    private let profile: Profile
     
-    public init(braveCore: BraveCoreMain) {
+    public init(braveCore: BraveCoreMain, profile: Profile) {
         self.braveCore = braveCore
+        self.profile = profile
     }
     
     public static var isChromiumMigrationCompleted: Bool {
         return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
-            Preferences.Chromium.syncV2HistoryMigrationCompleted.value
+            Preferences.Chromium.syncV2HistoryMigrationCompleted.value &&
+            Preferences.Chromium.syncV2PasswordMigrationCompleted.value
     }
     
     func launchMigrations(keyPrefix: String) {
@@ -35,7 +38,7 @@ class Migration {
         
         // `.migrate` is called in `BrowserViewController.viewDidLoad()`
         if !Migration.isChromiumMigrationCompleted {
-            braveCoreSyncObjectsMigrator = BraveCoreMigrator(braveCore: braveCore)
+            braveCoreSyncObjectsMigrator = BraveCoreMigrator(braveCore: braveCore, profile: profile)
         }
         
         if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
