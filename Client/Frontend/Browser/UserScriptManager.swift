@@ -134,13 +134,6 @@ class UserScriptManager {
             if let path = Bundle.main.path(forResource: name, ofType: "js"),
                 let source = try? NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String {
                 let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerTokenString)'; \(source) })()"
-
-                if sandboxed {
-                    return WKUserScript(source: wrappedSource,
-                                        injectionTime: injectionTime,
-                                        forMainFrameOnly: mainFrameOnly,
-                                        in: .defaultClient)
-                }
                 
                 return WKUserScript(source: wrappedSource,
                                     injectionTime: injectionTime,
@@ -211,7 +204,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentEnd,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
     
     private let WindowRenderHelperScript: WKUserScript? = {
@@ -231,7 +224,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
     
     private let FullscreenHelperScript: WKUserScript? = {
@@ -243,7 +236,7 @@ class UserScriptManager {
         return WKUserScript(source: source,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
     
     private let PlaylistSwizzlerScript: WKUserScript? = {
@@ -256,7 +249,7 @@ class UserScriptManager {
         return WKUserScript(source: source,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
     
     private let PlaylistHelperScript: WKUserScript? = {
@@ -301,7 +294,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
     
     private let MediaBackgroundingScript: WKUserScript? = {
@@ -325,7 +318,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .page)
+                            in: .defaultClient)
     }()
 
     private func reloadUserScripts() {

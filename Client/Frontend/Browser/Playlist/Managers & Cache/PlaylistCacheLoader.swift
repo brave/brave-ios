@@ -416,7 +416,7 @@ class PlaylistWebLoader: UIView {
         // This webView is invisible and we don't want any UI being handled.
         webView.uiDelegate = nil
         webView.navigationDelegate = self
-        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), sandboxed: false)
+        tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), contentWorld: .defaultClient)
         
         if let script = playlistDetectorScript {
             // Do NOT inject the PlaylistHelper script!

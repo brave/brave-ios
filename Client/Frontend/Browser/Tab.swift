@@ -511,8 +511,8 @@ class Tab: NSObject {
         webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
     }
 
-    func addContentScript(_ helper: TabContentScript, name: String, sandboxed: Bool = true) {
-        contentScriptManager.addContentScript(helper, name: name, forTab: self, sandboxed: sandboxed)
+    func addContentScript(_ helper: TabContentScript, name: String, contentWorld: WKContentWorld) {
+        contentScriptManager.addContentScript(helper, name: name, forTab: self, contentWorld: contentWorld)
     }
 
     func getContentScript(name: String) -> TabContentScript? {
@@ -681,7 +681,7 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandler {
         }
     }
 
-    func addContentScript(_ helper: TabContentScript, name: String, forTab tab: Tab, sandboxed: Bool = true) {
+    func addContentScript(_ helper: TabContentScript, name: String, forTab tab: Tab, contentWorld: WKContentWorld) {
         if let _ = helpers[name] {
             assertionFailure("Duplicate helper added: \(name)")
         }
@@ -691,11 +691,7 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandler {
         // If this helper handles script messages, then get the handler name and register it. The Tab
         // receives all messages and then dispatches them to the right TabHelper.
         if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
-            if #available(iOS 14.0, *), sandboxed {
-                tab.webView?.configuration.userContentController.add(self, contentWorld: .defaultClient, name: scriptMessageHandlerName)
-            } else {
-                tab.webView?.configuration.userContentController.add(self, contentWorld: .page, name: scriptMessageHandlerName)
-            }
+            tab.webView?.configuration.userContentController.add(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
         }
     }
 
@@ -716,7 +712,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
     }
 
     @objc func menuHelperFindInPage() {
-        evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .page) { result, _ in
+        evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
             let selection = result as? String ?? ""
             self.delegate?.tabWebView(self, didSelectFindInPageForSelection: selection)
         }
@@ -751,7 +747,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
 class TabWebViewMenuHelper: UIView {
     @objc func swizzledMenuHelperFindInPage() {
         if let tabWebView = superview?.superview as? TabWebView {
-            tabWebView.evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .page) { result, _ in
+            tabWebView.evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
                 let selection = result as? String ?? ""
                 tabWebView.delegate?.tabWebView(tabWebView, didSelectFindInPageForSelection: selection)
             }
