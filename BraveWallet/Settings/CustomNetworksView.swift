@@ -44,8 +44,10 @@ struct CustomNetworksView: View {
   }
 }
 
+#if DEBUG
 struct CustomNetworksView_Previews: PreviewProvider {
     static var previews: some View {
       CustomNetworksView(networkStore: .previewStore)
     }
 }
+#endif

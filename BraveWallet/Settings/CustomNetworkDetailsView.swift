@@ -242,6 +242,7 @@ struct CustomNetworkDetailsView: View {
   }
 }
 
+#if DEBUG
 struct CustomNetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
       NavigationView {
@@ -252,3 +253,4 @@ struct CustomNetworkDetailsView_Previews: PreviewProvider {
       }
     }
 }
+#endif
