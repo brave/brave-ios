@@ -43,6 +43,15 @@ public struct WalletSettingsView: View {
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      Section(
+        footer: Text("Wallet networks customization")
+          .foregroundColor(Color(.secondaryBraveLabel))
+      ) {
+        NavigationLink(destination: CustomNetworksView(networkStore: networkStore)) {
+          Text("Networks")
+        }
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section {
         Button(action: { isShowingResetAlert = true }) {
           Text(Strings.Wallet.settingsResetButtonTitle)
