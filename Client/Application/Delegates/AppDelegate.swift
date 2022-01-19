@@ -33,7 +33,9 @@ extension AppDelegate {
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var braveCore = BraveCoreMain(userAgent: UserAgent.mobile)
+    var braveCore = BraveCoreMain(userAgent: UserAgent.mobile,
+                                  // FIXME: Use proper value, prod. Or prod for prod builds, development for others.
+                                  additionalSwitches: [.skusEnvironment: "development"])
     var migration: Migration?
 
     private weak var application: UIApplication?

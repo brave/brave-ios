@@ -238,6 +238,7 @@ extension Preferences {
         /// User can decide to choose their vpn region manually. If nil, automatic mode is used based on device timezone.
         static let vpnRegionOverride = Option<String?>(key: "vpn.region-override", default: nil)
         static let vpnHostDisplayName = Option<String?>(key: "vpn.host-location", default: nil)
+        static let skusCredential = Option<String?>(key: "skus.credential", default: nil)
     }
     
     final class Chromium {

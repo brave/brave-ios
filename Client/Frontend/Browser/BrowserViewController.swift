@@ -2003,6 +2003,10 @@ extension BrowserViewController: TabDelegate {
                                                         rewards: rewards),
                              name: BraveTalkScriptHandler.name(), contentWorld: .page)
         
+        tab.addContentScript(BraveSkusScriptHandler(tab: tab),
+                             name: BraveSkusScriptHandler.name(),
+                             contentWorld: .page)
+        
         tab.addContentScript(ResourceDownloadManager(tab: tab), name: ResourceDownloadManager.name(), contentWorld: .defaultClient)
         
         tab.addContentScript(WindowRenderHelperScript(tab: tab), name: WindowRenderHelperScript.name(), contentWorld: .defaultClient)
@@ -2104,6 +2108,10 @@ extension BrowserViewController: TabDelegate {
         tabManager.allTabs.forEach({
             PlaylistHelper.stopPlayback(tab: $0)
         })
+    }
+    
+    func showInstallVPNScreen(for credential: String) {
+        present(InstallVPNViewController(), animated: true)
     }
 }
 

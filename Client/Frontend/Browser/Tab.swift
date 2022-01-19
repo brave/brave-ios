@@ -29,6 +29,7 @@ protocol TabDelegate {
     @objc optional func tab(_ tab: Tab, willDeleteWebView webView: WKWebView)
     func showRequestRewardsPanel(_ tab: Tab)
     func stopMediaPlayback(_ tab: Tab)
+    func showInstallVPNScreen(for credential: String)
 }
 
 @objc

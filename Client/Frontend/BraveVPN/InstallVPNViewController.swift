@@ -50,43 +50,51 @@ class InstallVPNViewController: UIViewController {
     @objc func installVPNAction() {
         installVPNView.installVPNButton.isLoading = true
         
-        BraveVPN.connectOrMigrateToNewNode() { [weak self] status in
-            guard let self = self else { return }
+        if let skusCredential = Preferences.VPN.skusCredential.value {
+            BraveVPN.createWith1_2Credential(skusCredential) { [weak self] completion in
+                self?.handleStatusCompletion(completion)
+            }
+        } else {
+            BraveVPN.connectOrMigrateToNewNode() { [weak self] status in
+                self?.handleStatusCompletion(status)
+            }
+        }
+    }
+    
+    private func handleStatusCompletion(_ status: BraveVPN.VPNConfigStatus) {
+        DispatchQueue.main.async {
+            self.installVPNView.installVPNButton.isLoading = false
+        }
+        
+        switch status {
+        case .success:
+            self.dismiss(animated: true) {
+                self.showSuccessAlert()
+            }
+        case .error(let type):
+            let alert = { () -> UIAlertController in
+                let okAction = UIAlertAction(title: Strings.OKString, style: .default)
+                
+                switch type {
+                case .permissionDenied:
+                    let message = Strings.VPN.vpnConfigPermissionDeniedErrorBody
+                    
+                    let alert = UIAlertController(title: Strings.VPN.vpnConfigPermissionDeniedErrorTitle,
+                                                  message: message, preferredStyle: .alert)
+                    alert.addAction(okAction)
+                    return alert
+                case .loadConfigError, .saveConfigError:
+                    let message = Strings.VPN.vpnConfigGenericErrorBody
+                    let alert = UIAlertController(title: Strings.VPN.vpnConfigGenericErrorTitle,
+                                                  message: message,
+                                                  preferredStyle: .alert)
+                    alert.addAction(okAction)
+                    return alert
+                }
+            }()
             
             DispatchQueue.main.async {
-                self.installVPNView.installVPNButton.isLoading = false
-            }
-            
-            switch status {
-            case .success:
-                self.dismiss(animated: true) {
-                    self.showSuccessAlert()
-                }
-            case .error(let type):
-                let alert = { () -> UIAlertController in
-                    let okAction = UIAlertAction(title: Strings.OKString, style: .default)
-                    
-                    switch type {
-                    case .permissionDenied:
-                        let message = Strings.VPN.vpnConfigPermissionDeniedErrorBody
-                        
-                        let alert = UIAlertController(title: Strings.VPN.vpnConfigPermissionDeniedErrorTitle,
-                                                      message: message, preferredStyle: .alert)
-                        alert.addAction(okAction)
-                        return alert
-                    case .loadConfigError, .saveConfigError:
-                        let message = Strings.VPN.vpnConfigGenericErrorBody
-                        let alert = UIAlertController(title: Strings.VPN.vpnConfigGenericErrorTitle,
-                                                      message: message,
-                                                      preferredStyle: .alert)
-                        alert.addAction(okAction)
-                        return alert
-                    }
-                }()
-                
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true)
-                }
+                self.present(alert, animated: true)
             }
         }
     }

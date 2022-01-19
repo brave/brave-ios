@@ -7,6 +7,7 @@ import UIKit
 import Shared
 import BraveShared
 import NetworkExtension
+import Combine
 
 private let log = Logger.browserLogger
 
@@ -199,6 +200,8 @@ class BraveVPN {
             return Strings.VPN.vpnSettingsMonthlySubName
         case VPNProductInfo.ProductIdentifiers.yearlySub:
             return Strings.VPN.vpnSettingsYearlySubName
+        case VPNProductInfo.ProductIdentifiers.monthlySubSKU:
+            return Strings.VPN.vpnSettingsMonthlySubName
         default:
             assertionFailure("Can't get product id")
             return ""
@@ -290,6 +293,10 @@ class BraveVPN {
         }
         
         helper.disconnectVPN()
+    }
+    
+    private static var isBraveSkusVPN: Bool {
+        Preferences.VPN.skusCredential.value != nil
     }
     
     /// Connects to Guardian's server to validate locally stored receipt.
@@ -415,7 +422,7 @@ class BraveVPN {
     }
     
     /// Saves jwt credentials in keychain, returns true if save operation was successful.
-    private static func saveJwtCredential(_ credential: String) -> Bool {
+    static func saveJwtCredential(_ credential: String) -> Bool {
         let status = GRDKeychain.storePassword(credential, forAccount: kKeychainStr_SubscriberCredential,
                                                retry: true)
         
@@ -601,6 +608,82 @@ class BraveVPN {
         GRDVPNHelper.saveAll(inOneBoxHostname: hostname)
         GRDGatewayAPI.shared().apiHostname = hostname
         Preferences.VPN.vpnHostDisplayName.value = displayName
+    }
+    
+    private static var cancellables: Set<AnyCancellable> = []
+    
+    static func createWith1_2Credential(_ credential: String, completion: @escaping ((VPNConfigStatus) -> Void)) {
+        guard let endpoint = URL(string: "https://connect-api.guardianapp.com/api/v1.2/subscriber-credential/create") else {
+            return
+        }
+        
+        let session = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main)
+
+        // Dummy url can be used here.
+        guard let url = URL(string: "https://example.com"),
+              let cookie = HTTPCookie.cookies(withResponseHeaderFields: ["Set-Cookie": credential], for: url)
+                .first?.value.removingPercentEncoding else {
+                    return
+                }
+        
+        var request = URLRequest(url: endpoint)
+        // FIXME: Use configurable value for environment
+        request.addValue("development", forHTTPHeaderField: "Brave-Payments-Environment")
+        request.httpMethod = "POST"
+        
+        let body: [String: Any] = [
+            "validation-method": "brave-premium",
+            "brave-vpn-premium-monthly-pass": cookie
+        ]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+        } catch {
+            log.error(error)
+            return
+        }
+        
+        struct ResponseJSON: Codable {
+            enum CodingKeys: String, CodingKey {
+                case subscriberCredential = "subscriber-credential"
+            }
+            
+            let subscriberCredential: String
+        }
+        
+        session
+            .dataTaskPublisher(for: request)
+            .tryMap { output -> Data in
+                print(output.data)
+                
+                return output.data
+            }
+            .decode(type: ResponseJSON.self, decoder: JSONDecoder())
+            .sink(receiveCompletion: { completion in
+                
+            }, receiveValue: { credential in
+                crossPlatformConfiguration(with: credential.subscriberCredential, completion: completion)
+            })
+            .store(in: &cancellables)
+        
+        session.finishTasksAndInvalidate()
+    }
+    
+    static func crossPlatformConfiguration(with credential: String, completion: @escaping ((VPNConfigStatus) -> Void)) {
+        clearCredentials()
+        serverManager.selectGuardianHost { host, location, error in
+            guard let host = host, error == nil else {
+                logAndStoreError("configureFirstTimeUser connection problems")
+                completion(.error(type: .saveConfigError))
+                return
+            }
+            
+            saveHostname(host, displayName: location)
+            
+            _ = saveJwtCredential(credential)
+            connectOrMigrateToNewNode { comp in
+                completion(comp)
+            }
+        }
     }
     
     // MARK: - Server selection
