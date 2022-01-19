@@ -10,7 +10,7 @@ import BraveCore
 /// functionality for the use of SwiftUI Previews.
 ///
 /// - note: Do not use this directly, use ``TokenRegistryStore.previewStore``
-class TestBlockchainRegistry: BraveWalletBlockchainRegistry {
+class MockBlockchainRegistry: BraveWallet.TestBlockchainRegistry {
   static let testTokens: [BraveWallet.BlockchainToken] = [
     .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: "BAT", decimals: 18, visible: true, tokenId: "", coingeckoId: ""),
     .init(contractAddress: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52", name: "BNB", logo: "", isErc20: true, isErc721: false, symbol: "BNB", decimals: 18, visible: true, tokenId: "", coingeckoId: ""),
@@ -19,7 +19,7 @@ class TestBlockchainRegistry: BraveWalletBlockchainRegistry {
     .init(contractAddress: "0xad6d458402f60fd3bd25163575031acdce07538d", name: "DAI Stablecoin", logo: "", isErc20: true, isErc721: false, symbol: "DAI", decimals: 18, visible: false, tokenId: "", coingeckoId: "")
   ]
   
-  func token(byContract chainId: String, contract: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
+  override func token(byContract chainId: String, contract: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
     if let token = Self.testTokens.first(where: { $0.contractAddress == contract }) {
       completion(token)
       return
@@ -27,7 +27,7 @@ class TestBlockchainRegistry: BraveWalletBlockchainRegistry {
     completion(.init())
   }
   
-  func token(bySymbol chainId: String, symbol: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
+  override func token(bySymbol chainId: String, symbol: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
     if let token = Self.testTokens.first(where: { $0.symbol == symbol }) {
       completion(token)
       return
@@ -35,15 +35,11 @@ class TestBlockchainRegistry: BraveWalletBlockchainRegistry {
     completion(.init())
   }
   
-  func allTokens(_ chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
+  override func allTokens(_ chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(Self.testTokens)
   }
   
-  func buyTokens(_ chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
+  override func buyTokens(_ chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(Self.testTokens)
-  }
-  
-  func buyUrl(_ chainId: String, address: String, symbol: String, amount: String, completion: @escaping (String) -> Void) {
-    
   }
 }

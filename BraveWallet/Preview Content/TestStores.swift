@@ -11,13 +11,13 @@ import BraveCore
 extension WalletStore {
   static var previewStore: WalletStore {
     .init(
-      keyringService: TestKeyringService(),
-      rpcService: TestJsonRpcService(),
-      walletService: TestBraveWalletService(),
-      assetRatioService: TestAssetRatioService(),
-      swapService: TestSwapService(),
-      blockchainRegistry: TestBlockchainRegistry(),
-      txService: TestEthTxService()
+      keyringService: MockKeyringService(),
+      rpcService: MockJsonRpcService(),
+      walletService: MockBraveWalletService(),
+      assetRatioService: MockAssetRatioService(),
+      swapService: MockSwapService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      txService: MockEthTxService()
     )
   }
 }
@@ -25,13 +25,13 @@ extension WalletStore {
 extension CryptoStore {
   static var previewStore: CryptoStore {
     .init(
-      keyringService: TestKeyringService(),
-      rpcService: TestJsonRpcService(),
-      walletService: TestBraveWalletService(),
-      assetRatioService: TestAssetRatioService(),
-      swapService: TestSwapService(),
-      blockchainRegistry: TestBlockchainRegistry(),
-      txService: TestEthTxService()
+      keyringService: MockKeyringService(),
+      rpcService: MockJsonRpcService(),
+      walletService: MockBraveWalletService(),
+      assetRatioService: MockAssetRatioService(),
+      swapService: MockSwapService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      txService: MockEthTxService()
     )
   }
 }
@@ -39,17 +39,17 @@ extension CryptoStore {
 extension NetworkStore {
   static var previewStore: NetworkStore {
     .init(
-      rpcService: TestJsonRpcService()
+      rpcService: MockJsonRpcService()
     )
   }
 }
 
 extension KeyringStore {
   static var previewStore: KeyringStore {
-    .init(keyringService: TestKeyringService())
+    .init(keyringService: MockKeyringService())
   }
   static var previewStoreWithWalletCreated: KeyringStore {
-    let store = KeyringStore(keyringService: TestKeyringService())
+    let store = KeyringStore(keyringService: MockKeyringService())
     store.createWallet(password: "password")
     return store
   }
@@ -58,8 +58,8 @@ extension KeyringStore {
 extension BuyTokenStore {
   static var previewStore: BuyTokenStore {
     .init(
-      blockchainRegistry: TestBlockchainRegistry(),
-      rpcService: TestJsonRpcService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      rpcService: MockJsonRpcService(),
       prefilledToken: .previewToken
     )
   }
@@ -68,11 +68,11 @@ extension BuyTokenStore {
 extension SendTokenStore {
   static var previewStore: SendTokenStore {
     .init(
-      keyringService: TestKeyringService(),
-      rpcService: TestJsonRpcService(),
-      walletService: TestBraveWalletService(),
-      txService: TestEthTxService(),
-      blockchainRegistry: TestBlockchainRegistry(),
+      keyringService: MockKeyringService(),
+      rpcService: MockJsonRpcService(),
+      walletService: MockBraveWalletService(),
+      txService: MockEthTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
       prefilledToken: .previewToken
     )
   }
@@ -81,11 +81,11 @@ extension SendTokenStore {
 extension AssetDetailStore {
   static var previewStore: AssetDetailStore {
     .init(
-      assetRatioService: TestAssetRatioService(),
-      keyringService: TestKeyringService(),
-      rpcService: TestJsonRpcService(),
-      txService: TestEthTxService(),
-      blockchainRegistry: TestBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
+      keyringService: MockKeyringService(),
+      rpcService: MockJsonRpcService(),
+      txService: MockEthTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
       token: .previewToken
     )
   }
@@ -94,12 +94,12 @@ extension AssetDetailStore {
 extension SwapTokenStore {
   static var previewStore: SwapTokenStore {
     .init(
-      keyringService: TestKeyringService(),
-      blockchainRegistry: TestBlockchainRegistry(),
-      rpcService: TestJsonRpcService(),
-      assetRatioService: TestAssetRatioService(),
-      swapService: TestSwapService(),
-      txService: TestEthTxService(),
+      keyringService: MockKeyringService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      rpcService: MockJsonRpcService(),
+      assetRatioService: MockAssetRatioService(),
+      swapService: MockSwapService(),
+      txService: MockEthTxService(),
       prefilledToken: nil
     )
   }
@@ -108,9 +108,9 @@ extension SwapTokenStore {
 extension UserAssetsStore {
   static var previewStore: UserAssetsStore {
     .init(
-      walletService: TestBraveWalletService(),
-      blockchainRegistry: TestBlockchainRegistry(),
-      rpcService: TestJsonRpcService()
+      walletService: MockBraveWalletService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      rpcService: MockJsonRpcService()
     )
   }
 }
@@ -119,10 +119,10 @@ extension AccountActivityStore {
   static var previewStore: AccountActivityStore {
     .init(
       account: .previewAccount,
-      walletService: TestBraveWalletService(),
-      rpcService: TestJsonRpcService(),
-      assetRatioService: TestAssetRatioService(),
-      txService: TestEthTxService()
+      walletService: MockBraveWalletService(),
+      rpcService: MockJsonRpcService(),
+      assetRatioService: MockAssetRatioService(),
+      txService: MockEthTxService()
     )
   }
 }
@@ -130,11 +130,11 @@ extension AccountActivityStore {
 extension TransactionConfirmationStore {
   static var previewStore: TransactionConfirmationStore {
     .init(
-      assetRatioService: TestAssetRatioService(),
-      rpcService: TestJsonRpcService(),
-      txService: TestEthTxService(),
-      blockchainRegistry: TestBlockchainRegistry(),
-      walletService: TestBraveWalletService()
+      assetRatioService: MockAssetRatioService(),
+      rpcService: MockJsonRpcService(),
+      txService: MockEthTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      walletService: MockBraveWalletService()
     )
   }
 }

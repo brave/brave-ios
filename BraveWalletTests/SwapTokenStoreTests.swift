@@ -11,12 +11,12 @@ class SendSwapStoreTests: XCTestCase {
     
     func testDefaultSellBuyTokensOnMainnetWithoutPrefilledToken() {
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "default-sell-buy-token-on-main")
@@ -36,12 +36,12 @@ class SendSwapStoreTests: XCTestCase {
     func testDefaultSellBuyTokensOnMainnetWithPrefilledToken() {
         let batToken: BraveWallet.BlockchainToken = .init(contractAddress: "", name: "Brave BAT", logo: "", isErc20: true, isErc721: false, symbol: "BAT", decimals: 18, visible: false, tokenId: "", coingeckoId: "")
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: batToken
         )
         let ex = expectation(description: "default-sell-buy-token-on-main")
@@ -60,14 +60,14 @@ class SendSwapStoreTests: XCTestCase {
     }
     
     func testDefaultSellBuyTokensOnRopstenWithoutPrefilledToken() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             rpcService: rpcService,
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "default-sell-buy-token-on-ropsten")
@@ -90,14 +90,14 @@ class SendSwapStoreTests: XCTestCase {
     
     func testDefaultSellBuyTokensOnRopstenWithPrefilledToken() {
         let daiToken: BraveWallet.BlockchainToken = .init(contractAddress: "", name: "DAI Stablecoin", logo: "", isErc20: true, isErc721: false, symbol: "DAI", decimals: 18, visible: false, tokenId: "", coingeckoId: "")
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             rpcService: rpcService,
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: daiToken
         )
         let ex = expectation(description: "default-sell-buy-token-on-ropsten")
@@ -121,12 +121,12 @@ class SendSwapStoreTests: XCTestCase {
     
     func testFetchPriceQuote() {
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "fetch-price-quote")
@@ -143,12 +143,12 @@ class SendSwapStoreTests: XCTestCase {
     
     func testSwapERC20EIP1559Transaction() {
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "make-erc20-eip1559-swap-transaction")
@@ -166,14 +166,14 @@ class SendSwapStoreTests: XCTestCase {
     }
     
     func testSwapERC20Transaction() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             rpcService: rpcService,
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "make-erc20-swap-transaction")
@@ -196,12 +196,12 @@ class SendSwapStoreTests: XCTestCase {
     
     func testSwapETHSwapEIP1559Transaction() {
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "make-eth-swap-eip1559-transaction")
@@ -219,14 +219,14 @@ class SendSwapStoreTests: XCTestCase {
     }
     
     func testSwapETHSwapTransaction() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SwapTokenStore(
-            keyringService: TestKeyringService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             rpcService: rpcService,
-            assetRatioService: TestAssetRatioService(),
-            swapService: TestSwapService(),
-            txService: TestEthTxService(),
+            assetRatioService: MockAssetRatioService(),
+            swapService: MockSwapService(),
+            txService: MockEthTxService(),
             prefilledToken: nil
         )
         let ex = expectation(description: "make-eth-swap-eip1559-transaction")
