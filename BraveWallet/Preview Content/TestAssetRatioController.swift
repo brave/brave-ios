@@ -8,7 +8,7 @@ import BraveCore
 
 #if DEBUG
 
-class TestAssetRatioController: BraveWalletAssetRatioController {
+class TestAssetRatioService: BraveWalletAssetRatioService {
   private let assets: [String: BraveWallet.AssetPrice] = [
     "eth": .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23"),
     "bat": .init(fromAsset: "bat", toAsset: "usd", price: "0.627699", assetTimeframeChange: "-0.019865"),
@@ -31,7 +31,7 @@ class TestAssetRatioController: BraveWalletAssetRatioController {
     completion(nil)
   }
   
-  func tokenInfo(_ contractAddress: String, completion: @escaping (BraveWallet.ERCToken?) -> Void) {
+  func tokenInfo(_ contractAddress: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
     completion(nil)
   }
 }
