@@ -10,11 +10,11 @@ import BraveCore
 /// functionality for the use of SwiftUI Previews.
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
-class TestEthJsonRpcController: NSObject, BraveWalletEthJsonRpcController {
+class TestJsonRpcService: NSObject, BraveWalletJsonRpcService {
   private var chainId: String = BraveWallet.MainnetChainId
   private var networks: [BraveWallet.EthereumChain] = [.mainnet, .rinkeby, .ropsten]
   private var networkURL: URL?
-  private var observers: NSHashTable<BraveWalletEthJsonRpcControllerObserver> = .weakObjects()
+  private var observers: NSHashTable<BraveWalletJsonRpcServiceObserver> = .weakObjects()
   
   func chainId(_ completion: @escaping (String) -> Void) {
     completion(chainId)
@@ -32,7 +32,7 @@ class TestEthJsonRpcController: NSObject, BraveWalletEthJsonRpcController {
     completion(networks.first(where: { $0.chainId == self.chainId }) ?? .init())
   }
   
-  func balance(_ address: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+  func balance(_ address: String, coin: BraveWallet.CoinType, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
     completion("0x13e25e19dc20ba7", .success, "")
   }
@@ -53,7 +53,7 @@ class TestEthJsonRpcController: NSObject, BraveWalletEthJsonRpcController {
     completion(0, "", [:])
   }
   
-  func add(_ observer: BraveWalletEthJsonRpcControllerObserver) {
+  func add(_ observer: BraveWalletJsonRpcServiceObserver) {
     observers.add(observer)
   }
   
@@ -112,6 +112,18 @@ class TestEthJsonRpcController: NSObject, BraveWalletEthJsonRpcController {
   
   func notifySwitchChainRequestProcessed(_ approved: Bool, origin: URL) {
     
+  }
+  
+  func addEthereumChain(forOrigin chain: BraveWallet.EthereumChain, origin: URL, completion: @escaping (String, Bool) -> Void) {
+    completion("", false)
+  }
+  
+  func removeEthereumChain(_ chainId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
+  }
+  
+  func add(_ chain: BraveWallet.EthereumChain, completion: @escaping (String, Bool) -> Void) {
+    completion("", false)
   }
 }
 

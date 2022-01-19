@@ -10,26 +10,26 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class TestBraveWalletService: BraveWalletBraveWalletService {
-  private var assets: [String: [BraveWallet.ERCToken]] = [
+  private var assets: [String: [BraveWallet.BlockchainToken]] = [
     BraveWallet.MainnetChainId: [.previewToken],
     BraveWallet.RopstenChainId: [.previewToken],
   ]
   private var defaultCurrency = "usd"
   private var defaultCryptocurrency = "eth"
   
-  func userAssets(_ chainId: String, completion: @escaping ([BraveWallet.ERCToken]) -> Void) {
+  func userAssets(_ chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(assets[chainId] ?? [])
   }
   
-  func addUserAsset(_ token: BraveWallet.ERCToken, chainId: String, completion: @escaping (Bool) -> Void) {
+  func addUserAsset(_ token: BraveWallet.BlockchainToken, chainId: String, completion: @escaping (Bool) -> Void) {
     assets[chainId]?.append(token)
   }
   
-  func removeUserAsset(_ token: BraveWallet.ERCToken, chainId: String, completion: @escaping (Bool) -> Void) {
+  func removeUserAsset(_ token: BraveWallet.BlockchainToken, chainId: String, completion: @escaping (Bool) -> Void) {
     assets[chainId]?.removeAll(where: { $0.contractAddress == token.contractAddress })
   }
   
-  func setUserAssetVisible(_ token: BraveWallet.ERCToken, chainId: String, visible: Bool, completion: @escaping (Bool) -> Void) {
+  func setUserAssetVisible(_ token: BraveWallet.BlockchainToken, chainId: String, visible: Bool, completion: @escaping (Bool) -> Void) {
     let chainAssets = assets[chainId]
     if let index = chainAssets?.firstIndex(where: { $0.contractAddress == token.contractAddress }) {
       chainAssets?[index].visible = visible
@@ -127,5 +127,8 @@ class TestBraveWalletService: BraveWalletBraveWalletService {
   
   func addEthereumPermission(_ origin: String, account: String, completion: @escaping (Bool) -> Void) {
     completion(false)
+  }
+  
+  func reset() {
   }
 }
