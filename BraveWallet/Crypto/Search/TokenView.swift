@@ -28,7 +28,7 @@ struct TokenView: View {
 #if DEBUG
 struct TokenView_Previews: PreviewProvider {
     static var previews: some View {
-      TokenView(token: TestBlockchainRegistry.testTokens.first!)
+      TokenView(token: MockBlockchainRegistry.testTokens.first!)
     }
 }
 #endif

@@ -13,15 +13,15 @@ import BraveCore
 class BuyTokenStoreTests: XCTestCase {
     func testPrefilledToken() {
         var store = BuyTokenStore(
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
             prefilledToken: nil
         )
         XCTAssertNil(store.selectedBuyToken)
         
         store = BuyTokenStore(
-            blockchainRegistry: TestBlockchainRegistry(),
-            rpcService: TestJsonRpcService(),
+            blockchainRegistry: MockBlockchainRegistry(),
+            rpcService: MockJsonRpcService(),
             prefilledToken: .previewToken
         )
         XCTAssertEqual(store.selectedBuyToken?.symbol.lowercased(), BraveWallet.BlockchainToken.previewToken.symbol.lowercased())
