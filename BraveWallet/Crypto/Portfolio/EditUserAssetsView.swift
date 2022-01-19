@@ -155,7 +155,7 @@ struct EditUserAssetsView: View {
     .navigationViewStyle(StackNavigationViewStyle())
   }
   
-  private func removeCustomToken(_ token: BraveWallet.ERCToken) {
+  private func removeCustomToken(_ token: BraveWallet.BlockchainToken) {
     userAssetsStore.removeUserAsset(token: token) { [self] success in
       isPresentingAssetRemovalError = !success
     }

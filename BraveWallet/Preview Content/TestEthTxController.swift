@@ -8,7 +8,8 @@ import BraveCore
 
 #if DEBUG
 
-class TestEthTxController: BraveWalletEthTxController {
+class TestEthTxService: BraveWalletEthTxService {
+
   func nonce(forHardwareTransaction txMetaId: String, completion: @escaping (String?) -> Void) {
     completion(nil)
   }
@@ -68,13 +69,19 @@ class TestEthTxController: BraveWalletEthTxController {
   func allTransactionInfo(_ from: String, completion: @escaping ([BraveWallet.TransactionInfo]) -> Void) {
   }
   
-  func add(_ observer: BraveWalletEthTxControllerObserver) {
+  func add(_ observer: BraveWalletEthTxServiceObserver) {
   }
   
   func setGasFeeAndLimitForUnapprovedTransaction(_ txMetaId: String, maxPriorityFeePerGas: String, maxFeePerGas: String, gasLimit: String, completion: @escaping (Bool) -> Void) {
   }
   
   func makeErc721Transfer(fromData from: String, to: String, tokenId: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
+  }
+  
+  func setNonceForUnapprovedTransaction(_ txMetaId: String, nonce: String, completion: @escaping (Bool) -> Void) {
+  }
+  
+  func reset() {
   }
 }
 
