@@ -136,24 +136,6 @@ extension BrowserViewController: WKNavigationDelegate {
             decisionHandler(.allow, preferences)
             return
         }
-        
-        if url.scheme == "brave" {
-            if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged {
-                log.warning("Denying unprivileged request: \(navigationAction.request)")
-                decisionHandler(.cancel, preferences)
-                return
-            }
-            
-            if url.normalizedHost() == "sync-internals" {
-                let controller = UINavigationController(rootViewController: SyncInternalsViewController(syncAPI: syncAPI)).then {
-                    $0.modalPresentationStyle = .fullScreen
-                }
-                present(controller, animated: true)
-            }
-            
-            decisionHandler(.cancel, preferences)
-            return
-        }
 
         if url.scheme == "about" {
             decisionHandler(.allow, preferences)
