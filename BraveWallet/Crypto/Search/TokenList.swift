@@ -70,7 +70,7 @@ struct TokenList<Content: View>: View {
 #if DEBUG
 struct TokenListView_Previews: PreviewProvider {
   static var previews: some View {
-    TokenList(tokens: TestBlockchainRegistry.testTokens) { token in
+    TokenList(tokens: MockBlockchainRegistry.testTokens) { token in
       Text(token.name)
     }
   }

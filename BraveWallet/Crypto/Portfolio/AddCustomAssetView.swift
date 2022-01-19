@@ -107,9 +107,9 @@ struct AddCustomAssetView: View {
 #if DEBUG
 struct AddCustomAssetView_Previews: PreviewProvider {
     static var previews: some View {
-      AddCustomAssetView(userAssetStore: UserAssetsStore(walletService: TestBraveWalletService(),
-                                                         blockchainRegistry: TestBlockchainRegistry(),
-                                                         rpcService: TestJsonRpcService()))
+      AddCustomAssetView(userAssetStore: UserAssetsStore(walletService: MockBraveWalletService(),
+                                                         blockchainRegistry: MockBlockchainRegistry(),
+                                                         rpcService: MockJsonRpcService()))
     }
 }
 #endif

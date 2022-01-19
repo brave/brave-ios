@@ -14,34 +14,34 @@ class SendTokenStoreTests: XCTestCase {
     
     func testPrefilledToken() {
         var store = SendTokenStore(
-            keyringService: TestKeyringService(),
-            rpcService: TestJsonRpcService(),
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            rpcService: MockJsonRpcService(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: nil
         )
         XCTAssertNil(store.selectedSendToken)
         
         store = SendTokenStore(
-            keyringService: TestKeyringService(),
-            rpcService: TestJsonRpcService(),
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            rpcService: MockJsonRpcService(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: .previewToken
         )
         XCTAssertEqual(store.selectedSendToken?.symbol.lowercased(), BraveWallet.BlockchainToken.previewToken.symbol.lowercased())
     }
     
     func testFetchAssets() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SendTokenStore(
-            keyringService: TestKeyringService(),
+            keyringService: MockKeyringService(),
             rpcService: rpcService,
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: nil
         )
         let ex = expectation(description: "fetch-assets")
@@ -64,11 +64,11 @@ class SendTokenStoreTests: XCTestCase {
     
     func testMakeSendETHEIP1559Transaction() {
         let store = SendTokenStore(
-            keyringService: TestKeyringService(),
-            rpcService: TestJsonRpcService(),
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            rpcService: MockJsonRpcService(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: .previewToken
         )
         store.setUpTest()
@@ -83,13 +83,13 @@ class SendTokenStoreTests: XCTestCase {
     }
     
     func testMakeSendETHTransaction() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SendTokenStore(
-            keyringService: TestKeyringService(),
+            keyringService: MockKeyringService(),
             rpcService: rpcService,
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: .previewToken
         )
         store.setUpTest()
@@ -109,11 +109,11 @@ class SendTokenStoreTests: XCTestCase {
     
     func testMakeSendERC20EIP1559Transaction() {
         let store = SendTokenStore(
-            keyringService: TestKeyringService(),
-            rpcService: TestJsonRpcService(),
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            keyringService: MockKeyringService(),
+            rpcService: MockJsonRpcService(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: nil
         )
         let token: BraveWallet.BlockchainToken = .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: batSymbol, decimals: 18, visible: true, tokenId: "", coingeckoId: "")
@@ -131,13 +131,13 @@ class SendTokenStoreTests: XCTestCase {
     }
     
     func testMakeSendERC20Transaction() {
-        let rpcService = TestJsonRpcService()
+        let rpcService = MockJsonRpcService()
         let store = SendTokenStore(
-            keyringService: TestKeyringService(),
+            keyringService: MockKeyringService(),
             rpcService: rpcService,
-            walletService: TestBraveWalletService(),
-            txService: TestEthTxService(),
-            blockchainRegistry: TestBlockchainRegistry(),
+            walletService: MockBraveWalletService(),
+            txService: MockEthTxService(),
+            blockchainRegistry: MockBlockchainRegistry(),
             prefilledToken: .previewToken
         )
         store.setUpTest()
