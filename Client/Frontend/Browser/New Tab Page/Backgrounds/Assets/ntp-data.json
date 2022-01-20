@@ -1,86 +1,100 @@
 [
-  {
-    "packaged": true,
-    "imageUrl": "corwin-prescott_beach.jpg",
-    "focalPoint": {
-        "x": 925,
-        "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "corwin-prescott_beach.jpg",
+        "focalPoint":
+        {
+            "x": 925,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Corwin Prescott",
+            "url": ""
+        }
     },
-    "credit": {
-        "name": "Corwin Prescott",
-        "url": ""
-    }
+    {
+        "packaged": true,
+        "imageUrl": "corwin-prescott_canyon.jpg",
+        "focalPoint":
+        {
+            "x": 755,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Corwin Prescott",
+            "url": ""
+        }
     },
-  {
-    "packaged": true,
-    "imageUrl": "corwin-prescott_canyon.jpg",
-    "focalPoint": {
-      "x": 755,
-      "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "corwin-prescott_crestone.jpg",
+        "focalPoint":
+        {
+            "x": 1550,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Corwin Prescott",
+            "url": ""
+        }
     },
-    "credit": {
-      "name": "Corwin Prescott",
-      "url": ""
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "corwin-prescott_crestone.jpg",
-    "focalPoint": {
-      "x": 1550,
-      "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "dylan-malval_sea.jpg",
+        "focalPoint":
+        {
+            "x": 1500,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Dylan Malval",
+            "url": "https://www.instagram.com/vass_captures/"
+        }
     },
-    "credit": {
-      "name": "Corwin Prescott",
-      "url": ""
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "dylan-malval_sea.jpg",
-    "focalPoint": {
-      "x": 1500,
-      "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "spencer-moore_desert.jpg",
+        "focalPoint":
+        {
+            "x": 1200,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Spencer M. Moore",
+            "url": "https://www.smoorevisuals.com/landscapes"
+        }
     },
-    "credit": {
-      "name": "Dylan Malval",
-      "url": "https://www.instagram.com/vass_captures/"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "spencer-moore_desert.jpg",
-    "focalPoint": {
-      "x": 1200,
-      "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "spencer-moore_fern.jpg",
+        "focalPoint":
+        {
+            "x": 900,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Spencer M. Moore",
+            "url": "https://www.smoorevisuals.com/landscapes"
+        }
     },
-    "credit": {
-      "name": "Spencer M. Moore",
-      "url": "https://www.smoorevisuals.com/landscapes"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "spencer-moore_fern.jpg",
-    "focalPoint": {
-      "x": 900,
-      "y": 720
+    {
+        "packaged": true,
+        "imageUrl": "spencer-moore_ocean.jpg",
+        "focalPoint":
+        {
+            "x": 900,
+            "y": 720
+        },
+        "credit":
+        {
+            "name": "Spencer M. Moore",
+            "url": "https://www.smoorevisuals.com/landscapes"
+        }
     },
-    "credit": {
-      "name": "Spencer M. Moore",
-      "url": "https://www.smoorevisuals.com/landscapes"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "spencer-moore_ocean.jpg",
-    "focalPoint": {
-      "x": 900,
-      "y": 720
-    },
-    "credit": {
-      "name": "Spencer M. Moore",
-      "url": "https://www.smoorevisuals.com/landscapes"
-    }
-  },
 ]
