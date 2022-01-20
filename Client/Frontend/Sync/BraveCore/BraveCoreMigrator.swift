@@ -29,6 +29,7 @@ class BraveCoreMigrator {
     enum MigrationError: LocalizedError {
         case failedBookmarksMigration
         case failedHistoryMigration
+        case failedPasswordMigration
         
         public var failureReason: String {
             return Strings.Sync.v2MigrationErrorTitle
@@ -142,6 +143,15 @@ class BraveCoreMigrator {
                     completion?(.failedHistoryMigration)
                     
                     return
+                }
+                
+                migratePasswordForms { [unowned self] success in
+                    guard success else {
+                        self.migrationObserver = .failed
+                        completion?(.failedPasswordMigration)
+                        
+                        return
+                    }
                 }
                 
                 completion?(nil)
@@ -374,6 +384,10 @@ extension BraveCoreMigrator {
 
             for login in results.asArray() {
                 if self.migrateChromiumPasswords(login: login) {
+                    
+                    // TODO: Remove when migrateChromiumPasswords is properly implemented
+                    completion(true)
+                    
                     self.profile.logins.removeLoginByGUID(login.guid).upon { result in
                         DispatchQueue.main.async {
                             if result.isSuccess {
@@ -394,13 +408,15 @@ extension BraveCoreMigrator {
     }
     
     private func migrateChromiumPasswords(login: Login) -> Bool {
+        // TODO: Remove when migrateChromiumPasswords is properly implemented
+        return true
+        
         guard let url = (login.formSubmitURL?.asURL ?? login.hostname.asURL) else {
             return false
         }
         
 //        let passwordForm = PasswordForm(url: url, dateCreated: <#T##Date?#>, usernameValue: <#T##String?#>, passwordValue: <#T##String?#>, isBlockedByUser: <#T##Bool#>, scheme: PasswordFormScheme.typeHtml)
 //
-        return true
 //        guard let title = passwordForm.title,
 //              let absoluteUrl = passwordForm.url, let url = URL(string: absoluteUrl),
 //              let dateAdded = passwordForm.visitedOn else {
@@ -408,8 +424,6 @@ extension BraveCoreMigrator {
 //            return false
 //        }
 //
-//        let historyNode = HistoryNode(url: url, title: title, dateAdded: dateAdded)
-//        historyAPI.addHistory(historyNode, isURLTyped: true)
 //
 //        return true
     }
