@@ -770,10 +770,10 @@
 		445CA12627997F770040F5C4 /* joshn_larson_desert.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA11E27997F760040F5C4 /* joshn_larson_desert.jpg */; };
 		445CA12727997F770040F5C4 /* geran_de_klerk_forest.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA11F27997F760040F5C4 /* geran_de_klerk_forest.jpg */; };
 		445CA12827997F770040F5C4 /* curt_stump_nature.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12027997F760040F5C4 /* curt_stump_nature.jpg */; };
-		445CA12927997F770040F5C4 /* priyanuch_konkaew.png.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12127997F760040F5C4 /* priyanuch_konkaew.png.jpg */; };
 		445CA12A27997F770040F5C4 /* boris_baldinger.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12227997F760040F5C4 /* boris_baldinger.jpg */; };
 		445CA12B27997F770040F5C4 /* david_malenfant_mountains.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */; };
 		445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */; };
+		445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */; };
 		4481F22D26CBD1C600658EAC /* AmazonRootCA3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */; };
 		4481F22E26CBD1C600658EAC /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */; };
@@ -2528,10 +2528,10 @@
 		445CA11E27997F760040F5C4 /* joshn_larson_desert.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = joshn_larson_desert.jpg; sourceTree = "<group>"; };
 		445CA11F27997F760040F5C4 /* geran_de_klerk_forest.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = geran_de_klerk_forest.jpg; sourceTree = "<group>"; };
 		445CA12027997F760040F5C4 /* curt_stump_nature.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = curt_stump_nature.jpg; sourceTree = "<group>"; };
-		445CA12127997F760040F5C4 /* priyanuch_konkaew.png.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = priyanuch_konkaew.png.jpg; sourceTree = "<group>"; };
 		445CA12227997F760040F5C4 /* boris_baldinger.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = boris_baldinger.jpg; sourceTree = "<group>"; };
 		445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = david_malenfant_mountains.jpg; sourceTree = "<group>"; };
 		445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = alain_franchette_ocean.jpg; sourceTree = "<group>"; };
+		445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = priyanuch_konkaew.jpg; sourceTree = "<group>"; };
 		4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA3.cer; sourceTree = "<group>"; };
 		4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA4.cer; sourceTree = "<group>"; };
 		4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA2.cer; sourceTree = "<group>"; };
@@ -5444,8 +5444,8 @@
 				445CA12027997F760040F5C4 /* curt_stump_nature.jpg */,
 				445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */,
 				445CA11F27997F760040F5C4 /* geran_de_klerk_forest.jpg */,
+				445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */,
 				445CA11E27997F760040F5C4 /* joshn_larson_desert.jpg */,
-				445CA12127997F760040F5C4 /* priyanuch_konkaew.png.jpg */,
 				0AB22A86257EADA600126ADC /* corwin-prescott_beach.jpg */,
 				0AB22A84257EADA400126ADC /* corwin-prescott_canyon.jpg */,
 				0AB22A81257EAD9F00126ADC /* corwin-prescott_crestone.jpg */,
@@ -7537,6 +7537,7 @@
 			files = (
 				F979BE2F25BCC54E009B6ACF /* AllFramesAtDocumentStart.js in Resources */,
 				445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */,
+				445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */,
 				CA2202A227192A9B002D3582 /* NetworkError.css in Resources */,
 				4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */,
 				F979BE3025BCC54E009B6ACF /* AllFramesAtDocumentEnd.js in Resources */,
@@ -7597,7 +7598,6 @@
 				CA2202B227199123002D3582 /* DarkWarning.svg in Resources */,
 				F9488EB32589899800A72C84 /* RewardsReporting.js in Resources */,
 				39F4C0FA2045D87400746155 /* FocusHelper.js in Resources */,
-				445CA12927997F770040F5C4 /* priyanuch_konkaew.png.jpg in Resources */,
 				445CA12B27997F770040F5C4 /* david_malenfant_mountains.jpg in Resources */,
 				E4B7B7861A793CF20022C5E0 /* FiraSans-UltraLight.ttf in Resources */,
 				4481F23F26CBD3DC00658EAC /* ISRGRootCA_X1.cer in Resources */,
