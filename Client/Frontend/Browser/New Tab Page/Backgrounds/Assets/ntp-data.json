@@ -1,30 +1,6 @@
 [
   {
     "packaged": true,
-    "imageUrl": "alex-plesovskich.jpg",
-    "focalPoint": {
-      "x": 1355,
-      "y": 720
-    },
-    "credit": {
-      "name": "Alex Plesovskich",
-      "url": "https://unsplash.com/@aples"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "andre-benz.jpg",
-    "focalPoint": {
-      "x": 1150,
-      "y": 720
-    },
-    "credit": {
-      "name": "Andre Benz",
-      "url": "https://unsplash.com/@trapnation"
-    }
-  },
-  {
-    "packaged": true,
     "imageUrl": "corwin-prescott_beach.jpg",
     "focalPoint": {
         "x": 925,
@@ -61,30 +37,6 @@
   },
   {
     "packaged": true,
-    "imageUrl": "corwin-prescott_olympic.jpg",
-    "focalPoint": {
-      "x": 1700,
-      "y": 720
-    },
-    "credit": {
-      "name": "Corwin Prescott",
-      "url": ""
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "dylan-malval_alps.jpg",
-    "focalPoint": {
-      "x": 450,
-      "y": 720
-    },
-    "credit": {
-      "name": "Dylan Malval",
-      "url": "https://www.instagram.com/vass_captures/"
-    }
-  },
-  {
-    "packaged": true,
     "imageUrl": "dylan-malval_sea.jpg",
     "focalPoint": {
       "x": 1500,
@@ -93,18 +45,6 @@
     "credit": {
       "name": "Dylan Malval",
       "url": "https://www.instagram.com/vass_captures/"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "sora-sagano.jpg",
-    "focalPoint": {
-      "x": 1600,
-      "y": 720
-    },
-    "credit": {
-      "name": "Sora Sogano",
-      "url": "https://unsplash.com/@sorasagano"
     }
   },
   {
@@ -133,18 +73,6 @@
   },
   {
     "packaged": true,
-    "imageUrl": "spencer-moore_lake.jpg",
-    "focalPoint": {
-      "x": 1300,
-      "y": 720
-    },
-    "credit": {
-      "name": "Spencer M. Moore",
-      "url": "https://www.smoorevisuals.com/landscapes"
-    }
-  },
-  {
-    "packaged": true,
     "imageUrl": "spencer-moore_ocean.jpg",
     "focalPoint": {
       "x": 900,
@@ -153,30 +81,6 @@
     "credit": {
       "name": "Spencer M. Moore",
       "url": "https://www.smoorevisuals.com/landscapes"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "su-san-lee.jpg",
-    "focalPoint": {
-      "x": 250,
-      "y": 720
-    },
-    "credit": {
-      "name": "Su San Lee",
-      "url": "https://unsplash.com/@blackodc"
-    }
-  },
-  {
-    "packaged": true,
-    "imageUrl": "zane-lee.jpg",
-    "focalPoint": {
-      "x": 800,
-      "y": 720
-    },
-    "credit": {
-      "name": "Zane Lee",
-      "url": "https://unsplash.com/@zane404"
     }
   },
 ]
