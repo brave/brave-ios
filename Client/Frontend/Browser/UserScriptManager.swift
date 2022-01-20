@@ -128,7 +128,10 @@ class UserScriptManager {
          (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: true),
          (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: true),
          (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: false),
-         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: false)].compactMap { arg in
+         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: false),
+         (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: true),
+         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: true)
+        ].compactMap { arg in
             let (injectionTime, mainFrameOnly, sandboxed) = arg
             let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (injectionTime == .atDocumentStart ? "Start" : "End") + (sandboxed ? "Sandboxed" : "")
             if let path = Bundle.main.path(forResource: name, ofType: "js"),
@@ -138,7 +141,7 @@ class UserScriptManager {
                 return WKUserScript(source: wrappedSource,
                                     injectionTime: injectionTime,
                                     forMainFrameOnly: mainFrameOnly,
-                                    in: .page)
+                                    in: sandboxed ? .defaultClient : .page)
             }
             return nil
         }
@@ -236,7 +239,7 @@ class UserScriptManager {
         return WKUserScript(source: source,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .defaultClient)
+                            in: .page)
     }()
     
     private let PlaylistSwizzlerScript: WKUserScript? = {
@@ -294,7 +297,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .defaultClient)
+                            in: .page)
     }()
     
     private let MediaBackgroundingScript: WKUserScript? = {
@@ -318,7 +321,7 @@ class UserScriptManager {
         return WKUserScript(source: alteredSource,
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: false,
-                            in: .defaultClient)
+                            in: .page)
     }()
 
     private func reloadUserScripts() {

@@ -1201,7 +1201,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             // IE: The user must explicitly tap a bookmark they have saved.
             // Block all other contexts such as redirects, downloads, embed, linked, etc..
             if visitType == .bookmark, let webView = tab.webView, let code = url.bookmarkletCodeComponent {
-                webView.evaluateSafeJavaScript(functionName: code, contentWorld: .page, asFunction: false) { _, error in
+                webView.evaluateSafeJavaScript(functionName: code,
+                                               contentWorld: .bookmarkletSandbox,
+                                               asFunction: false) { _, error in
                     if let error = error {
                         log.error(error)
                     }
@@ -1955,7 +1957,7 @@ extension BrowserViewController: TabDelegate {
         // only add the logins helper if the tab is not a private browsing tab
         if !tab.isPrivate {
             let logins = LoginsHelper(tab: tab, profile: profile)
-            tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .page)
+            tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
         }
 
         let errorHelper = ErrorPageHelper(certStore: profile.certStore)
@@ -1976,7 +1978,7 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(printHelper, name: PrintHelper.name(), contentWorld: .page)
 
         let customSearchHelper = CustomSearchHelper(tab: tab)
-        tab.addContentScript(customSearchHelper, name: CustomSearchHelper.name(), contentWorld: .defaultClient)
+        tab.addContentScript(customSearchHelper, name: CustomSearchHelper.name(), contentWorld: .page)
 
         // XXX: Bug 1390200 - Disable NSUserActivity/CoreSpotlight temporarily
         // let spotlightHelper = SpotlightHelper(tab: tab)
@@ -1985,7 +1987,7 @@ extension BrowserViewController: TabDelegate {
         tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name(), contentWorld: .defaultClient)
 
         tab.contentBlocker.setupTabTrackingProtection()
-        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), contentWorld: .defaultClient)
+        tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), contentWorld: .page)
 
         tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name(), contentWorld: .defaultClient)
         
@@ -2007,10 +2009,10 @@ extension BrowserViewController: TabDelegate {
         
         let playlistHelper = PlaylistHelper(tab: tab)
         playlistHelper.delegate = self
-        tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), contentWorld: .defaultClient)
+        tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), contentWorld: .page)
 
         tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name(), contentWorld: .page)
-        tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name(), contentWorld: .page)
+        tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name(), contentWorld: .defaultClient)
     }
 
     func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
