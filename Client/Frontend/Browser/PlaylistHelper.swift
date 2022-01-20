@@ -206,7 +206,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
             
             let token = UserScriptManager.securityTokenString
 
-            webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, escapeArgs: false, asFunction: true) { _, error in
+            webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, asFunction: true) { _, error in
                 
                 if let error = error {
                     log.error("Error executing onLongPressActivated: \(error)")
@@ -236,7 +236,7 @@ extension PlaylistHelper {
         
         let token = UserScriptManager.securityTokenString
         
-        webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, escapeArgs: false, asFunction: true) { value, error in
+        webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, asFunction: true) { value, error in
             
             if let error = error {
                 log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
