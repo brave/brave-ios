@@ -104,7 +104,7 @@ class SyncSettingsTableViewController: UITableViewController {
     @objc
     private func onSyncInternalsTapped() {
         let syncInternalsController = syncAPI.createSyncInternalsController().then {
-            $0.title = "Sync Internals"
+            $0.title = Strings.braveSyncInternalsTitle
         }
         
         navigationController?.pushViewController(syncInternalsController, animated: true)
