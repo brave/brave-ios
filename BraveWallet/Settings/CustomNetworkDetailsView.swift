@@ -80,6 +80,7 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(placeholder: "A positive decimal number",
                          item: networkId) { newValue in
+          networkId.input = newValue
           if let intValue = Int(newValue), intValue > 0 {
             networkId.error = nil
           } else {
@@ -96,6 +97,7 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(placeholder: "Enter chain name",
                          item: networkName) { newValue in
+          networkName.input = newValue
           if newValue.count < 1 {
             networkName.error = "This field cannot be blank."
           } else {
@@ -112,6 +114,7 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(placeholder: "Enter currency name",
                          item: networkSymbolName) { newValue in
+          networkSymbolName.input = newValue
           if newValue.count < 1 {
             networkSymbolName.error = "This field cannot be blank."
           } else {
@@ -128,6 +131,7 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(placeholder: "Enter currency symbol",
                          item: networkSymbol) { newValue in
+          networkSymbol.input = newValue
           if newValue.count < 1 {
             networkSymbol.error = "This field cannot be blank."
           } else {
@@ -144,7 +148,10 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(placeholder: "Enter currency decimals",
                          item: networkDecimals) { newValue in
-          if let intValue = Int(newValue), intValue > 0 {
+          networkDecimals.input = newValue
+          if newValue.isEmpty {
+            networkDecimals.error = "This field cannot be blank."
+          } else if let intValue = Int(newValue), intValue > 0 {
             networkDecimals.error = nil
           } else {
             networkDecimals.error = "Invalid format, the currency decimals is a positive number."
@@ -160,6 +167,7 @@ struct CustomNetworkDetailsView: View {
           var item = rpcUrls[index]
           NetworkTextField(placeholder: "Enter URL",
                        item: item) { newValue in
+            item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
               rpcUrls[index] = item
@@ -183,6 +191,7 @@ struct CustomNetworkDetailsView: View {
           var item = iconUrls[index]
           NetworkTextField(placeholder: "Enter URL",
                        item: item) { newValue in
+            item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
               iconUrls[index] = item
@@ -206,6 +215,7 @@ struct CustomNetworkDetailsView: View {
           var item = blockUrls[index]
           NetworkTextField(placeholder: "Enter URL",
                        item: item) { newValue in
+            item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
               blockUrls[index] = item
@@ -227,7 +237,9 @@ struct CustomNetworkDetailsView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
-        Button(action: {}) {
+        Button(action: {
+          addCustomNetwork()
+        }) {
           Text(isAddMode ? "Add" : "Update")
             .foregroundColor(Color(.braveOrange))
         }
@@ -239,6 +251,69 @@ struct CustomNetworkDetailsView: View {
     let regex = "http[s]?://(([^/:.[:space:]]+(.[^/:.[:space:]]+)*)|([0-9](.[0-9]{3})))(:[0-9]+)?((/[^?#[:space:]]+)([^#[:space:]]+)?(#.+)?)?"
     let test = NSPredicate(format: "SELF MATCHES %@", regex)
     return test.evaluate(with: url)
+  }
+  
+  private func validateAllFields() -> Bool {
+    networkId.error = networkId.input.isEmpty ? "This field cannot be blank." : nil
+    networkName.error = networkName.input.isEmpty ? "This field cannot be blank." : nil
+    networkSymbolName.error = networkSymbolName.input.isEmpty ? "This field cannot be blank." : nil
+    networkSymbol.error = networkSymbol.input.isEmpty ? "This field cannot be blank." : nil
+    if networkDecimals.input.isEmpty {
+      networkDecimals.error = "This field cannot be blank."
+    } else if let value = Int(networkDecimals.input), value > 0 {
+      networkDecimals.error = nil
+    } else {
+      networkDecimals.error = "Invalid format, the currency decimals is a positive number."
+    }
+                 
+    if networkId.error != nil
+        || networkName.error != nil
+        || networkSymbolName.error != nil
+        || networkSymbol.error != nil
+        || networkDecimals.error != nil
+        || rpcUrls.first!.input.isEmpty {
+      return false
+    }
+    
+    return true
+  }
+  
+  private func addCustomNetwork() {
+    guard validateAllFields() else { return }
+    
+    let network: BraveWallet.EthereumChain = .init().then {
+      if let idValue = Int(networkId.input) {
+        $0.chainId = "0x\(String(format: "%02X", idValue))"
+      }
+      $0.chainName = networkName.input
+      $0.symbolName = networkSymbolName.input
+      $0.symbol = networkSymbol.input
+      $0.decimals = Int32(networkDecimals.input) ?? 18
+      $0.rpcUrls = rpcUrls.compactMap({
+        if !$0.input.isEmpty && $0.error == nil {
+          return $0.input
+        } else {
+          return nil
+        }
+      })
+      $0.iconUrls = iconUrls.compactMap({
+        if !$0.input.isEmpty && $0.error == nil {
+          return $0.input
+        } else {
+          return nil
+        }
+      })
+      $0.blockExplorerUrls = blockUrls.compactMap({
+        if !$0.input.isEmpty && $0.error == nil {
+          return $0.input
+        } else {
+          return nil
+        }
+      })
+    }
+    networkStore.addCustomNetwork(network) { accpted in
+      // what to do?
+    }
   }
 }
 

@@ -44,6 +44,22 @@ public class NetworkStore: ObservableObject {
     }
     rpcService.add(self)
   }
+  
+  // MARK: - Custom Networks
+  public func addCustomNetwork(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
+    rpcService.allNetworks { networks in
+      print("all networks")
+    }
+    rpcService.add(network) { chainId, accepted in
+      completion(accepted)
+    }
+  }
+  
+  public func removeCustomNetwork(_ chainId: String) {
+    rpcService.removeEthereumChain(chainId) { success in
+      
+    }
+  }
 }
 
 extension NetworkStore: BraveWalletJsonRpcServiceObserver {
