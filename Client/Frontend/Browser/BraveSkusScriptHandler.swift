@@ -72,33 +72,50 @@ class BraveSkusScriptHandler: TabContentScript {
     }
     
     private func handleRefreshOrder(for orderId: String) {
-        print("Implementation missing: handleRefreshOrder, orderId: \(orderId)")
-        callback(methodId: 1, result: false)
+        guard let sku = Skus.SkusServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) else {
+            return
+        }
+        
+        sku.refreshOrder(orderId) { [weak self] completion in
+            self?.callback(methodId: 1, result: completion)
+        }
     }
     
     private func handleFetchOrderCredentials(for orderId: String) {
-        print("Implementation missing: handleFetchOrderCredentials, orderId: \(orderId)")
-        callback(methodId: 2, result: false)
+        guard let sku = Skus.SkusServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) else {
+            return
+        }
+        
+        sku.fetchOrderCredentials(orderId) { [weak self] completion in
+            self?.callback(methodId: 2, result: completion)
+        }
     }
     
     private func handlePrepareCredentialsSummary(for domain: String) {
-        print("Implementation missing: handlePrepareCredentialsSummary, domain: \(domain)")
-        callback(methodId: 3, result: false)
+        guard let sku = Skus.SkusServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) else {
+            return
+        }
+        
+        sku.prepareCredentialsPresentation(domain, path: "") { [weak self] completion in
+            self?.callback(methodId: 3, result: completion)
+        }
     }
     
     private func handleCredentialsSummary(for domain: String) {
-        print("Implementation missing: handleCredentialsSummary, domain: \(domain)")
-        callback(methodId: 4, result: false)
+        guard let sku = Skus.SkusServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) else {
+            return
+        }
+        
+        sku.credentialSummary(domain) { [weak self] completion in
+            self?.callback(methodId: 4, result: completion)
+        }
     }
     
-    private func callback(methodId: Int, result: Bool?) {
+    private func callback(methodId: Int, result: String) {
         let functionName =
             "window.__firefox__.BSKU\(UserScriptManager.messageHandlerTokenString).resolve"
         
-        var args: [Any] = [methodId]
-        if let result = result {
-            args.append(result)
-        }
+        let args: [Any] = [methodId, result]
         
         self.tab?.webView?.evaluateSafeJavaScript(
             functionName: functionName,
