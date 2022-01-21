@@ -774,6 +774,8 @@
 		445CA12B27997F770040F5C4 /* david_malenfant_mountains.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */; };
 		445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */; };
 		445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */; };
+		447B486F279B272300D9D934 /* ResourceDownloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 447B486E279B272300D9D934 /* ResourceDownloader.js */; };
+		447B4871279B272900D9D934 /* WindowRenderHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 447B4870279B272900D9D934 /* WindowRenderHelper.js */; };
 		4481F22D26CBD1C600658EAC /* AmazonRootCA3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */; };
 		4481F22E26CBD1C600658EAC /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */; };
@@ -2536,6 +2538,8 @@
 		445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = david_malenfant_mountains.jpg; sourceTree = "<group>"; };
 		445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = alain_franchette_ocean.jpg; sourceTree = "<group>"; };
 		445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = priyanuch_konkaew.jpg; sourceTree = "<group>"; };
+		447B486E279B272300D9D934 /* ResourceDownloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = ResourceDownloader.js; sourceTree = "<group>"; };
+		447B4870279B272900D9D934 /* WindowRenderHelper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA3.cer; sourceTree = "<group>"; };
 		4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA4.cer; sourceTree = "<group>"; };
 		4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA2.cer; sourceTree = "<group>"; };
@@ -6596,6 +6600,8 @@
 			children = (
 				CA225DE22790E5140024C104 /* MainFrame */,
 				F9838EF525797E1A0051FA21 /* AllFrames */,
+				447B4870279B272900D9D934 /* WindowRenderHelper.js */,
+				447B486E279B272300D9D934 /* ResourceDownloader.js */,
 			);
 			path = Sandboxed;
 			sourceTree = "<group>";
@@ -7590,6 +7596,8 @@
 				44DDDC4A2789A9190001A796 /* BraveSkusHelper.js in Resources */,
 				59871C1921E4D83900316590 /* block-cookies.json in Resources */,
 				0AB22A90257EADA900126ADC /* corwin-prescott_crestone.jpg in Resources */,
+				447B486F279B272300D9D934 /* ResourceDownloader.js in Resources */,
+				447B4871279B272900D9D934 /* WindowRenderHelper.js in Resources */,
 				CA220295271928D1002D3582 /* Clock.svg in Resources */,
 				5E824A95260BCE0D00127F36 /* MainFrameAtDocumentEnd.js in Resources */,
 				3BC659491E5BA4AE006D560F /* TopSites in Resources */,
