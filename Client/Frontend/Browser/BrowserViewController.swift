@@ -93,8 +93,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     
     let profile: Profile
     let tabManager: TabManager
-    let historyAPI: BraveHistoryAPI
-    let syncAPI: BraveSyncAPI
+    let braveCore: BraveCoreMain
     let migration: Migration?
     let bookmarkManager: BookmarkManager
     
@@ -196,9 +195,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
          crashedLastSession: Bool,
          safeBrowsingManager: SafeBrowsing? = SafeBrowsing()) {
         self.profile = profile
-        self.historyAPI = braveCore.historyAPI
+        self.braveCore = braveCore
         self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
-        self.syncAPI = braveCore.syncAPI
         self.migration = migration
         self.crashedLastSession = crashedLastSession
         self.safeBrowsing = safeBrowsingManager
@@ -1789,9 +1787,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                     if let visitType =
                         typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
                        visitType == .typed {
-                        historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
+                        braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
                     } else {
-                        historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+                        braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
                     }
                 }
             }
