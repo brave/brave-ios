@@ -862,7 +862,6 @@
 		5E1645A824ABA35B0003C3B2 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1645A724ABA35B0003C3B2 /* SpinnerView.swift */; };
 		5E2A74B8262DE62900DBBE88 /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2A74B7262DE62900DBBE88 /* Gradients.swift */; };
 		5E2A74CF262E14E500DBBE88 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E2A74CE262E14E500DBBE88 /* GradientView.swift */; };
-		5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */; };
 		5E34781022D7A1D200B0D5F8 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */; };
 		5E46C371234FACC600ACA8C1 /* root.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C36D234FACC600ACA8C1 /* root.cer */; };
 		5E46C373234FACC600ACA8C1 /* intermediate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C36F234FACC600ACA8C1 /* intermediate.cer */; };
@@ -870,7 +869,6 @@
 		5E46C378234FB54000ACA8C1 /* untrusted.badssl.com-leaf.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C376234FB54000ACA8C1 /* untrusted.badssl.com-leaf.cer */; };
 		5E46C37A234FB61000ACA8C1 /* self-signed.badssl.com.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C379234FB60F00ACA8C1 /* self-signed.badssl.com.cer */; };
 		5E46C37C234FB9A700ACA8C1 /* self-signed.cer in Resources */ = {isa = PBXBuildFile; fileRef = 5E46C37B234FB9A700ACA8C1 /* self-signed.cer */; };
-		5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E4845BF22DE381200372022 /* WindowRenderHelper.js */; };
 		5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */; };
 		5E4E078324A0E4D700B01720 /* YoutubeAdblock.js in Resources */ = {isa = PBXBuildFile; fileRef = 5E4E078224A0E4D700B01720 /* YoutubeAdblock.js */; };
 		5E5E6E4625BA041E0035B6A0 /* PlaylistParticleEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5E6E4525BA041E0035B6A0 /* PlaylistParticleEmitter.swift */; };
@@ -2795,7 +2793,6 @@
 		5E1D8C6E232C0BDB00BDE662 /* onboarding-rewards.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "onboarding-rewards.json"; sourceTree = "<group>"; };
 		5E2A74B7262DE62900DBBE88 /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
 		5E2A74CE262E14E500DBBE88 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
-		5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = ResourceDownloader.js; sourceTree = "<group>"; };
 		5E34780F22D7A1D200B0D5F8 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
 		5E46C36D234FACC600ACA8C1 /* root.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = root.cer; sourceTree = "<group>"; };
 		5E46C36F234FACC600ACA8C1 /* intermediate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = intermediate.cer; sourceTree = "<group>"; };
@@ -2803,7 +2800,6 @@
 		5E46C376234FB54000ACA8C1 /* untrusted.badssl.com-leaf.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "untrusted.badssl.com-leaf.cer"; sourceTree = "<group>"; };
 		5E46C379234FB60F00ACA8C1 /* self-signed.badssl.com.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "self-signed.badssl.com.cer"; sourceTree = "<group>"; };
 		5E46C37B234FB9A700ACA8C1 /* self-signed.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "self-signed.cer"; sourceTree = "<group>"; };
-		5E4845BF22DE381200372022 /* WindowRenderHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WindowRenderHelper.js; sourceTree = "<group>"; };
 		5E4845C122DE3DF800372022 /* WindowRenderHelperScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRenderHelperScript.swift; sourceTree = "<group>"; };
 		5E4E078224A0E4D700B01720 /* YoutubeAdblock.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = YoutubeAdblock.js; sourceTree = "<group>"; };
 		5E5E6E4525BA041E0035B6A0 /* PlaylistParticleEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParticleEmitter.swift; sourceTree = "<group>"; };
@@ -5959,9 +5955,6 @@
 				449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */,
 				279C75C021A5B37D001CD1CB /* FingerprintingProtection.js */,
 				44DDDC492789A9190001A796 /* BraveSkusHelper.js */,
-				F99505FE22937E3900CC6543 /* U2F-low-level.js */,
-				5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */,
-				5E4845BF22DE381200372022 /* WindowRenderHelper.js */,
 				5EB57D0122FDC0CB00A07325 /* FullscreenHelper.js */,
 				F9B23EE123F61173000EB3D8 /* PaymentRequest.js */,
 				5E4E078224A0E4D700B01720 /* YoutubeAdblock.js */,
@@ -6603,8 +6596,6 @@
 			children = (
 				CA225DE22790E5140024C104 /* MainFrame */,
 				F9838EF525797E1A0051FA21 /* AllFrames */,
-				5E3477E822D7771700B0D5F8 /* ResourceDownloader.js */,
-				5E4845BF22DE381200372022 /* WindowRenderHelper.js */,
 			);
 			path = Sandboxed;
 			sourceTree = "<group>";
@@ -7612,7 +7603,6 @@
 				0A5E04F923FEADA800E5A3E9 /* LaunchScreen.storyboard in Resources */,
 				CA2202B4271993BD002D3582 /* CertificateError.css in Resources */,
 				CA225DF62795D1A80024C104 /* MainFrameAtDocumentStartSandboxed.js in Resources */,
-				0AB22A8F257EADA900126ADC /* su-san-lee.jpg in Resources */,
 				0AE50854261C63D70099C6A3 /* BraveSearchHelper.js in Resources */,
 				445ABC972731DDFF0089710D /* NewYorkMedium-RegularItalic.otf in Resources */,
 				5DB474F1237F4CC9007B7652 /* ntp-data.json in Resources */,
@@ -7620,7 +7610,6 @@
 				0A5E04FB23FEB53700E5A3E9 /* LaunchScreen.xcassets in Resources */,
 				5DE5250D218CE92C000DFAA6 /* block-ads.json in Resources */,
 				F35B8D2B1D6380EA008E3D61 /* SessionRestore.html in Resources */,
-				5E4845C022DE381200372022 /* WindowRenderHelper.js in Resources */,
 				3BC659591E5BA505006D560F /* top_sites.json in Resources */,
 				F9E0F3A8257739B1003A6A30 /* TrackingProtectionStats.js in Resources */,
 				5E5E6F2925BB61320035B6A0 /* Playlist.js in Resources */,
@@ -7662,7 +7651,6 @@
 				5E4E078324A0E4D700B01720 /* YoutubeAdblock.js in Resources */,
 				445ABC962731DDFF0089710D /* NewYorkMedium-Bold.otf in Resources */,
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
-				5E3477E922D7771700B0D5F8 /* ResourceDownloader.js in Resources */,
 				4481F23826CBD27B00658EAC /* GlobalSignRootCA_R6.cer in Resources */,
 				59D4161B232681080087A6E1 /* Localizable.strings in Resources */,
 				F9F8597C2533CEBC000CEB24 /* DownloadHelper.js in Resources */,

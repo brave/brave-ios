@@ -129,7 +129,7 @@ enum DomainUserScript: CaseIterable {
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)
                 
-            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: page)
+            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
             
         case .braveSkus:
             var alteredSource = source
@@ -141,7 +141,7 @@ enum DomainUserScript: CaseIterable {
                                       options: .literal)
                 .replacingOccurrences(of: "$<security_token>", with: securityToken)
                 
-            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: page)
+            return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
         }
     }
     
