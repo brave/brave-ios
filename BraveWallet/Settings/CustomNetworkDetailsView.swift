@@ -28,6 +28,16 @@ struct NetworkTextField: View {
   var onChange: (String) -> Void
   @State private var input = ""
   
+  init(placeholder: String,
+       item: NetworkInputItem,
+       onChange: @escaping (String) -> Void
+  ) {
+    self.placeholder = placeholder
+    self.item = item
+    self.onChange = onChange
+    self._input = State(wrappedValue: item.input)
+  }
+  
   var body: some View {
     VStack(alignment: .leading) {
       TextField(placeholder, text: $input)
@@ -59,7 +69,8 @@ struct NetworkTextField: View {
 struct CustomNetworkDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
   
-  var isAddMode: Bool
+  var isEditMode: Bool
+  var network: BraveWallet.EthereumChain?
   
   @State private var networkId: RegularItem = RegularItem(input: "")
   @State private var networkName: RegularItem = RegularItem(input: "")
@@ -70,6 +81,33 @@ struct CustomNetworkDetailsView: View {
   @State private var rpcUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
   @State private var iconUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
   @State private var blockUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
+  
+  @Environment(\.presentationMode) @Binding private var presentationMode
+  
+  init(networkStore: NetworkStore,
+       isEditMode: Bool,
+       network: BraveWallet.EthereumChain? = nil
+  ) {
+    self.networkStore = networkStore
+    self.isEditMode = isEditMode
+    self.network = network
+    if let network = network {
+      self._networkId = State(wrappedValue: RegularItem(input: network.chainId))
+      self._networkName = State(wrappedValue: RegularItem(input: network.chainName))
+      self._networkSymbolName = State(wrappedValue: RegularItem(input: network.symbolName))
+      self._networkSymbol = State(wrappedValue: RegularItem(input: network.symbol))
+      self._networkDecimals = State(wrappedValue: RegularItem(input: String(network.decimals)))
+      if network.rpcUrls.count > 0 {
+        self._rpcUrls = State(wrappedValue: network.rpcUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
+      }
+      if network.iconUrls.count > 0 {
+        self._iconUrls = State(wrappedValue: network.iconUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
+      }
+      if network.blockExplorerUrls.count > 0 {
+        self._blockUrls = State(wrappedValue: network.blockExplorerUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
+      }
+    }
+  }
   
   var body: some View {
     Form {
@@ -240,7 +278,7 @@ struct CustomNetworkDetailsView: View {
         Button(action: {
           addCustomNetwork()
         }) {
-          Text(isAddMode ? "Add" : "Update")
+          Text(isEditMode ? "Update" : "Add")
             .foregroundColor(Color(.braveOrange))
         }
       }
@@ -312,7 +350,11 @@ struct CustomNetworkDetailsView: View {
       })
     }
     networkStore.addCustomNetwork(network) { accpted in
-      // what to do?
+      guard accpted else {
+        return
+      }
+      
+      presentationMode.dismiss()
     }
   }
 }
@@ -323,7 +365,7 @@ struct CustomNetworkDetailsView_Previews: PreviewProvider {
       NavigationView {
         CustomNetworkDetailsView(
           networkStore: .previewStore,
-          isAddMode: true
+          isEditMode: true
         )
       }
     }

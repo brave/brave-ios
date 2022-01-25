@@ -47,17 +47,35 @@ public class NetworkStore: ObservableObject {
   
   // MARK: - Custom Networks
   public func addCustomNetwork(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
-    rpcService.allNetworks { networks in
-      print("all networks")
+    func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
+      rpcService.add(network) { [self] chainId, accepted in
+        if accepted {
+          ethereumChains.append(network)
+        }
+        completion(accepted)
+      }
     }
-    rpcService.add(network) { chainId, accepted in
-      completion(accepted)
+    
+    if ethereumChains.map({ $0.chainId}).contains(network.chainId) {
+      rpcService.removeEthereumChain(network.chainId) { success in
+        guard success else {
+          completion(false)
+          return
+        }
+        addNetwors(network, completion: completion)
+      }
+    } else {
+      addNetwors(network, completion: completion)
     }
   }
   
-  public func removeCustomNetwork(_ chainId: String) {
-    rpcService.removeEthereumChain(chainId) { success in
-      
+  public func removeCustomNetwork(_ network: BraveWallet.EthereumChain) {
+    rpcService.removeEthereumChain(network.chainId) { [self] success in
+      if success {
+        if let index = ethereumChains.firstIndex(of: network) {
+          ethereumChains.remove(at: index)
+        }
+      }
     }
   }
 }
