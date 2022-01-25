@@ -109,7 +109,8 @@ struct PortfolioView: View {
           AssetDetailView(
             assetDetailStore: cryptoStore.assetDetailStore(for: token),
             keyringStore: keyringStore,
-            networkStore: cryptoStore.networkStore
+            networkStore: cryptoStore.networkStore,
+            isPresentingAssetSearch: .constant(false)
           )
             .onDisappear {
               cryptoStore.closeAssetDetailStore(for: token)

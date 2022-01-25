@@ -20,6 +20,7 @@ struct AssetDetailHeaderView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   @Binding var buySendSwapDestination: BuySendSwapDestination?
+  @Binding var isPresentingAssetSearch: Bool
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -146,10 +147,13 @@ struct AssetDetailHeaderView: View {
         if assetDetailStore.isBuySupported {
           Button(
             action: {
-              buySendSwapDestination = BuySendSwapDestination(
-                kind: .buy,
-                initialToken: assetDetailStore.token
-              )
+              isPresentingAssetSearch = false
+              DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                buySendSwapDestination = BuySendSwapDestination(
+                  kind: .buy,
+                  initialToken: assetDetailStore.token
+                )
+              }
             }
           ) {
             Text(Strings.Wallet.buy)
@@ -157,20 +161,26 @@ struct AssetDetailHeaderView: View {
         }
         Button(
           action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .send,
-              initialToken: assetDetailStore.token
-            )
+            isPresentingAssetSearch = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+              buySendSwapDestination = BuySendSwapDestination(
+                kind: .send,
+                initialToken: assetDetailStore.token
+              )
+            }
           }
         ) {
           Text(Strings.Wallet.send)
         }
         Button(
           action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .swap,
-              initialToken: assetDetailStore.token
-            )
+            isPresentingAssetSearch = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+              buySendSwapDestination = BuySendSwapDestination(
+                kind: .swap,
+                initialToken: assetDetailStore.token
+              )
+            }
           }
         ) {
           Text(Strings.Wallet.swap)
@@ -188,7 +198,8 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
       assetDetailStore: .previewStore,
       keyringStore: .previewStore,
       networkStore: .previewStore,
-      buySendSwapDestination: .constant(nil)
+      buySendSwapDestination: .constant(nil),
+      isPresentingAssetSearch: .constant(false)
     )
     .padding(.vertical)
     .previewLayout(.sizeThatFits)

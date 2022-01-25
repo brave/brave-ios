@@ -22,6 +22,8 @@ struct AssetDetailView: View {
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
   
   @Environment(\.openWalletURLAction) private var openWalletURL
+  
+  @Binding var isPresentingAssetSearch: Bool
 
   var body: some View {
     List {
@@ -30,7 +32,8 @@ struct AssetDetailView: View {
           assetDetailStore: assetDetailStore,
           keyringStore: keyringStore,
           networkStore: networkStore,
-          buySendSwapDestination: buySendSwapDestination
+          buySendSwapDestination: buySendSwapDestination,
+          isPresentingAssetSearch: $isPresentingAssetSearch
         )
         .resetListHeaderStyle()
         .padding(.horizontal, tableInset) // inset grouped layout margins workaround
@@ -142,7 +145,8 @@ struct CurrencyDetailView_Previews: PreviewProvider {
       AssetDetailView(
         assetDetailStore: .previewStore,
         keyringStore: .previewStore,
-        networkStore: .previewStore
+        networkStore: .previewStore,
+        isPresentingAssetSearch: .constant(false)
       )
         .navigationBarTitleDisplayMode(.inline)
     }

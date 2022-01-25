@@ -16,6 +16,8 @@ struct AssetSearchView: View {
   
   @State private var allTokens: [BraveWallet.ERCToken] = []
   
+  @Binding var isPresentingAssetSearch: Bool
+  
   var body: some View {
     NavigationView {
       TokenList(tokens: allTokens.filter({ $0.isErc20 || $0.symbol == cryptoStore.networkStore.selectedChain.symbol })) { token in
@@ -23,7 +25,8 @@ struct AssetSearchView: View {
           destination: AssetDetailView(
             assetDetailStore: cryptoStore.assetDetailStore(for: token),
             keyringStore: keyringStore,
-            networkStore: cryptoStore.networkStore
+            networkStore: cryptoStore.networkStore,
+            isPresentingAssetSearch: $isPresentingAssetSearch
           )
             .onDisappear {
               cryptoStore.closeAssetDetailStore(for: token)
