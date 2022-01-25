@@ -23,7 +23,7 @@ struct NetworkCell: View {
   }
 }
 
-struct CustomNetworksView: View {
+struct NetworkListView: View {
   @ObservedObject var networkStore: NetworkStore
   @State private var isPresentingNetworkDetails: CustomNetworkDetails?
   
@@ -39,9 +39,14 @@ struct CustomNetworksView: View {
     List {
       ForEach(networkStore.ethereumChains) { network in
         if network.isCustom {
-          NetworkCell(network: network,
-                      isCurrentNetwork: network.chainId == networkStore.selectedChainId
-          )
+          Button(action: {
+            networkStore.updateSelectedNetwork(network)
+          }) {
+            NetworkCell(
+              network: network,
+              isCurrentNetwork: network.chainId == networkStore.selectedChainId
+            )
+          }
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
               content
@@ -77,9 +82,14 @@ struct CustomNetworksView: View {
             }
           }
         } else {
-          NetworkCell(network: network,
-                      isCurrentNetwork: network.chainId == networkStore.selectedChainId
-          )
+          Button(action: {
+            networkStore.updateSelectedNetwork(network)
+          }) {
+            NetworkCell(
+              network: network,
+              isCurrentNetwork: network.chainId == networkStore.selectedChainId
+            )
+          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -113,7 +123,7 @@ struct CustomNetworksView: View {
 #if DEBUG
 struct CustomNetworksView_Previews: PreviewProvider {
     static var previews: some View {
-      CustomNetworksView(networkStore: .previewStore)
+      NetworkListView(networkStore: .previewStore)
     }
 }
 #endif

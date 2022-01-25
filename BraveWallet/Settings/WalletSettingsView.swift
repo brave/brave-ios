@@ -47,7 +47,7 @@ public struct WalletSettingsView: View {
         footer: Text("Wallet networks customization")
           .foregroundColor(Color(.secondaryBraveLabel))
       ) {
-        NavigationLink(destination: CustomNetworksView(networkStore: networkStore)) {
+        NavigationLink(destination: NetworkListView(networkStore: networkStore)) {
           Text("Networks")
         }
       }
