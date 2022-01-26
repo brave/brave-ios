@@ -49,36 +49,59 @@ struct NetworkListView: View {
           }
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
-              content
-                .swipeActions(edge: .trailing) {
-                  Button(role: .destructive) {
-                    networkStore.removeCustomNetwork(network)
-                  } label: {
-                    Label("Delete custom network", systemImage: "trash")
+              if network.chainId != networkStore.selectedChainId {
+                content
+                  .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                      networkStore.removeCustomNetwork(network)
+                    } label: {
+                      Label("Delete custom network", systemImage: "trash")
+                    }
                   }
-                }
-                .swipeActions(edge: .trailing) {
-                  Button(role: .cancel) {
-                    isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                  } label: {
-                    Label("Edit custom network", systemImage: "square.and.pencil")
+                  .swipeActions(edge: .trailing) {
+                    Button(role: .cancel) {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label("Edit custom network", systemImage: "square.and.pencil")
+                    }
+                    .tint(Color(.braveBlurpleTint))
                   }
-                  .tint(Color(.braveBlurpleTint))
-                }
+              } else {
+                content
+                  .swipeActions(edge: .trailing) {
+                    Button(role: .cancel) {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label("Edit custom network", systemImage: "square.and.pencil")
+                    }
+                    .tint(Color(.braveBlurpleTint))
+                  }
+              }
             } else {
-              content
-                .contextMenu {
-                  Button {
-                    networkStore.removeCustomNetwork(network)
-                  } label: {
-                    Label("Delete custom network", systemImage: "trash")
+              if network.chainId != networkStore.selectedChainId {
+                content
+                  .contextMenu {
+                    Button {
+                      networkStore.removeCustomNetwork(network)
+                    } label: {
+                      Label("Delete custom network", systemImage: "trash")
+                    }
+                    Button {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label("Edit custom network", systemImage: "square.and.pencil")
+                    }
                   }
-                  Button {
-                    isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                  } label: {
-                    Label("Edit custom network", systemImage: "square.and.pencil")
+              } else {
+                content
+                  .contextMenu {
+                    Button {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label("Edit custom network", systemImage: "square.and.pencil")
+                    }
                   }
-                }
+              }
             }
           }
         } else {
