@@ -5,6 +5,7 @@
 
 import SwiftUI
 import BraveCore
+import Shared
 
 struct NetworkCell: View {
   var network: BraveWallet.EthereumChain
@@ -55,14 +56,14 @@ struct NetworkListView: View {
                     Button(role: .destructive) {
                       networkStore.removeCustomNetwork(network) { _ in }
                     } label: {
-                      Label("Delete custom network", systemImage: "trash")
+                      Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
                     }
                   }
                   .swipeActions(edge: .trailing) {
                     Button(role: .cancel) {
                       isPresentingNetworkDetails = .init(isEditMode: true, network: network)
                     } label: {
-                      Label("Edit custom network", systemImage: "square.and.pencil")
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
                     }
                     .tint(Color(.braveBlurpleTint))
                   }
@@ -72,7 +73,7 @@ struct NetworkListView: View {
                     Button(role: .cancel) {
                       isPresentingNetworkDetails = .init(isEditMode: true, network: network)
                     } label: {
-                      Label("Edit custom network", systemImage: "square.and.pencil")
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
                     }
                     .tint(Color(.braveBlurpleTint))
                   }
@@ -84,12 +85,12 @@ struct NetworkListView: View {
                     Button {
                       networkStore.removeCustomNetwork(network) { _ in }
                     } label: {
-                      Label("Delete custom network", systemImage: "trash")
+                      Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
                     }
                     Button {
                       isPresentingNetworkDetails = .init(isEditMode: true, network: network)
                     } label: {
-                      Label("Edit custom network", systemImage: "square.and.pencil")
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
                     }
                   }
               } else {
@@ -98,7 +99,7 @@ struct NetworkListView: View {
                     Button {
                       isPresentingNetworkDetails = .init(isEditMode: true, network: network)
                     } label: {
-                      Label("Edit custom network", systemImage: "square.and.pencil")
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
                     }
                   }
               }
@@ -119,13 +120,13 @@ struct NetworkListView: View {
     }
     .listStyle(PlainListStyle())
     .padding(.top, 23.0)
-    .navigationBarTitle("Select Network")
+    .navigationBarTitle(Strings.Wallet.networkListTitle)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
         Button(action: {
           isPresentingNetworkDetails = .init(isEditMode: false)
         }) {
-          Text("Add")
+          Text(Strings.Wallet.add)
             .foregroundColor(Color(.braveOrange))
         }
       }

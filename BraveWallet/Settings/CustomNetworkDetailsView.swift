@@ -5,6 +5,7 @@
 
 import SwiftUI
 import BraveCore
+import Shared
 
 protocol NetworkInputItem {
   var input: String { get set }
@@ -113,31 +114,33 @@ struct CustomNetworkDetailsView: View {
     Form {
       Section(
         header:
-          Text("The id of new chain")
+          Text(Strings.Wallet.customNetworkChainIdTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: "A positive decimal number",
-                         item: networkId) { newValue in
-          networkId.input = newValue
-          if let intValue = Int(newValue), intValue > 0 {
-            networkId.error = nil
-          } else {
-            networkId.error = "Invalid format, the chain id is a positive number."
-          }
+        NetworkTextField(
+          placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
+          item: networkId
+        ) { newValue in
+            networkId.input = newValue
+            if let intValue = Int(newValue), intValue > 0 {
+              networkId.error = nil
+            } else {
+              networkId.error = Strings.Wallet.customNetworkChainIdErrMsg
+            }
         }
           .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header:
-          Text("The name of new chain")
+          Text(Strings.Wallet.customNetworkChainNameTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: "Enter chain name",
+        NetworkTextField(placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
                          item: networkName) { newValue in
           networkName.input = newValue
           if newValue.count < 1 {
-            networkName.error = "This field cannot be blank."
+            networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
             networkName.error = nil
           }
@@ -147,14 +150,14 @@ struct CustomNetworkDetailsView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header:
-          Text("Chain's currency name")
+          Text(Strings.Wallet.customNetworkSymbolNameTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: "Enter currency name",
+        NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
                          item: networkSymbolName) { newValue in
           networkSymbolName.input = newValue
           if newValue.count < 1 {
-            networkSymbolName.error = "This field cannot be blank."
+            networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
             networkSymbolName.error = nil
           }
@@ -164,14 +167,14 @@ struct CustomNetworkDetailsView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header:
-          Text("Chain's currency symbol")
+          Text(Strings.Wallet.customNetworkSymbolTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: "Enter currency symbol",
+        NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
                          item: networkSymbol) { newValue in
           networkSymbol.input = newValue
           if newValue.count < 1 {
-            networkSymbol.error = "This field cannot be blank."
+            networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
             networkSymbol.error = nil
           }
@@ -181,29 +184,31 @@ struct CustomNetworkDetailsView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header:
-          Text("Chain's currency decimals")
+          Text(Strings.Wallet.customNetworkCurrencyDecimalTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: "Enter currency decimals",
+        NetworkTextField(placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
                          item: networkDecimals) { newValue in
           networkDecimals.input = newValue
           if newValue.isEmpty {
-            networkDecimals.error = "This field cannot be blank."
+            networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else if let intValue = Int(newValue), intValue > 0 {
             networkDecimals.error = nil
           } else {
-            networkDecimals.error = "Invalid format, the currency decimals is a positive number."
+            networkDecimals.error = Strings.Wallet.customNetworkCurrencyDecimalErrMsg
           }
         }
           .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text("RPC URLs")
+        header:
+          Text(Strings.Wallet.customNetworkRpcUrlsTitle)
+          .textCase(.none)
       ) {
         ForEach(rpcUrls.indices, id: \.self) { index in
           var item = rpcUrls[index]
-          NetworkTextField(placeholder: "Enter URL",
+          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
@@ -215,7 +220,7 @@ struct CustomNetworkDetailsView: View {
                 rpcUrls.append(newRow)
               }
             } else {
-              item.error = "Invalid address"
+              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
               rpcUrls[index] = item
             }
           }
@@ -223,11 +228,13 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text("Icon URLs")
+        header:
+          Text(Strings.Wallet.customNetworkIconUrlsTitle)
+          .textCase(.none)
       ) {
         ForEach(iconUrls.indices, id: \.self) { index in
           var item = iconUrls[index]
-          NetworkTextField(placeholder: "Enter URL",
+          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
@@ -239,7 +246,7 @@ struct CustomNetworkDetailsView: View {
                 iconUrls.append(newRow)
               }
             } else {
-              item.error = "Invalid address"
+              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
               iconUrls[index] = item
             }
           }
@@ -247,11 +254,13 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text("Block explorer URLs")
+        header:
+          Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle)
+          .textCase(.none)
       ) {
         ForEach(blockUrls.indices, id: \.self) { index in
           var item = blockUrls[index]
-          NetworkTextField(placeholder: "Enter URL",
+          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
@@ -263,7 +272,7 @@ struct CustomNetworkDetailsView: View {
                 blockUrls.append(newRow)
               }
             } else {
-              item.error = "Invalid address"
+              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
               blockUrls[index] = item
             }
           }
@@ -271,14 +280,14 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
-    .navigationBarTitle("Add new network")
+    .navigationBarTitle(Strings.Wallet.customNetworkDetailsTitle)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
         Button(action: {
           addCustomNetwork()
         }) {
-          Text(isEditMode ? "Update" : "Add")
+          Text(isEditMode ? Strings.Wallet.update : Strings.Wallet.add)
             .foregroundColor(Color(.braveOrange))
         }
       }
@@ -292,16 +301,20 @@ struct CustomNetworkDetailsView: View {
   }
   
   private func validateAllFields() -> Bool {
-    networkId.error = networkId.input.isEmpty ? "This field cannot be blank." : nil
-    networkName.error = networkName.input.isEmpty ? "This field cannot be blank." : nil
-    networkSymbolName.error = networkSymbolName.input.isEmpty ? "This field cannot be blank." : nil
-    networkSymbol.error = networkSymbol.input.isEmpty ? "This field cannot be blank." : nil
+    if networkId.input.isEmpty {
+      networkId.error = Strings.Wallet.customNetworkEmptyErrMsg
+    }
+    networkName.error = networkName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    networkSymbolName.error = networkSymbolName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    networkSymbol.error = networkSymbol.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
     if networkDecimals.input.isEmpty {
-      networkDecimals.error = "This field cannot be blank."
-    } else if let value = Int(networkDecimals.input), value > 0 {
-      networkDecimals.error = nil
-    } else {
-      networkDecimals.error = "Invalid format, the currency decimals is a positive number."
+      networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
+    }
+    if var rpcUrl = rpcUrls.first {
+      if rpcUrl.input.isEmpty {
+        rpcUrl.error = Strings.Wallet.customNetworkEmptyErrMsg
+        rpcUrls[0] = rpcUrl
+      }
     }
                  
     if networkId.error != nil
@@ -309,7 +322,7 @@ struct CustomNetworkDetailsView: View {
         || networkSymbolName.error != nil
         || networkSymbol.error != nil
         || networkDecimals.error != nil
-        || rpcUrls.first!.input.isEmpty {
+        || rpcUrls.first!.error != nil {
       return false
     }
     

@@ -124,7 +124,7 @@ struct EditUserAssetsView: View {
                           Button {
                             removeCustomToken(store.token)
                           } label: {
-                            Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
+                            Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
                           }
                         }
                     }
