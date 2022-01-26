@@ -53,7 +53,7 @@ struct NetworkListView: View {
                 content
                   .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
-                      networkStore.removeCustomNetwork(network)
+                      networkStore.removeCustomNetwork(network) { _ in }
                     } label: {
                       Label("Delete custom network", systemImage: "trash")
                     }
@@ -82,7 +82,7 @@ struct NetworkListView: View {
                 content
                   .contextMenu {
                     Button {
-                      networkStore.removeCustomNetwork(network)
+                      networkStore.removeCustomNetwork(network) { _ in }
                     } label: {
                       Label("Delete custom network", systemImage: "trash")
                     }

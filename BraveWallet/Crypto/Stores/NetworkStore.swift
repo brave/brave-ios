@@ -46,15 +46,18 @@ public class NetworkStore: ObservableObject {
   }
   
   public func updateSelectedNetwork(_ network: BraveWallet.EthereumChain) {
-    rpcService.setNetwork(network.chainId) { [self] success in
-      if success {
-        selectedChainId = network.chainId
+    if selectedChainId != network.chainId {
+      rpcService.setNetwork(network.chainId) { [self] success in
+        if success {
+          selectedChainId = network.chainId
+        }
       }
     }
   }
   
   // MARK: - Custom Networks
-  public func addCustomNetwork(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
+  public func addCustomNetwork(_ network: BraveWallet.EthereumChain,
+                               completion: @escaping (_ accpted: Bool) -> Void) {
     func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
       rpcService.add(network) { [self] chainId, accepted in
         if accepted {
@@ -64,8 +67,8 @@ public class NetworkStore: ObservableObject {
       }
     }
     
-    if ethereumChains.map({ $0.chainId}).contains(network.chainId) {
-      rpcService.removeEthereumChain(network.chainId) { success in
+    if ethereumChains.map({ $0.chainId }).contains(network.chainId) {
+      removeCustomNetwork(network) { success in
         guard success else {
           completion(false)
           return
@@ -77,13 +80,17 @@ public class NetworkStore: ObservableObject {
     }
   }
   
-  public func removeCustomNetwork(_ network: BraveWallet.EthereumChain) {
+  public func removeCustomNetwork(_ network: BraveWallet.EthereumChain,
+                                  completion: @escaping (_ success: Bool) -> Void) {
     rpcService.removeEthereumChain(network.chainId) { [self] success in
       if success {
-        if let index = ethereumChains.firstIndex(of: network) {
+        if let index = ethereumChains
+            .map({ $0.chainId })
+            .firstIndex(of: network.chainId) {
           ethereumChains.remove(at: index)
         }
       }
+      completion(success)
     }
   }
 }

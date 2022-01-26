@@ -28,4 +28,9 @@ extension String {
     // Check the length and the rest of the char is a hex digit
     return hex.count == 40 && hex.allSatisfy(\.isHexDigit)
   }
+  
+  var chainIdInDecimal: String {
+    guard let value = Int(removingHexPrefix, radix: 16) else { return self }
+    return "\(value)"
+  }
 }

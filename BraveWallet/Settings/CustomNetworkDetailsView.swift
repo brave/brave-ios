@@ -92,7 +92,7 @@ struct CustomNetworkDetailsView: View {
     self.isEditMode = isEditMode
     self.network = network
     if let network = network {
-      self._networkId = State(wrappedValue: RegularItem(input: network.chainId))
+      self._networkId = State(wrappedValue: RegularItem(input: network.chainId.chainIdInDecimal))
       self._networkName = State(wrappedValue: RegularItem(input: network.chainName))
       self._networkSymbolName = State(wrappedValue: RegularItem(input: network.symbolName))
       self._networkSymbol = State(wrappedValue: RegularItem(input: network.symbol))
