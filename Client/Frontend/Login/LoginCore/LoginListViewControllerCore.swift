@@ -38,9 +38,10 @@ class LoginListViewControllerCore: LoginAuthViewController {
     // MARK: Private
     
     private let profile: Profile
+    private let passwordAPI: BravePasswordAPI
     private let windowProtection: WindowProtection?
     
-//    private var loginEntries = [Login]()
+    private var loginEntriesx = [Login]()
     private var loginEntries = [PasswordForm]()
 
     private var isFetchingLoginEntries = false
@@ -53,6 +54,8 @@ class LoginListViewControllerCore: LoginAuthViewController {
     init(profile: Profile, passwordAPI: BravePasswordAPI, windowProtection: WindowProtection?) {
         self.profile = profile
         self.windowProtection = windowProtection
+        self.passwordAPI = passwordAPI
+        
         super.init(windowProtection: windowProtection, requiresAuthentication: true)
     }
     
@@ -136,12 +139,19 @@ class LoginListViewControllerCore: LoginAuthViewController {
             // TODO: Query Fetch List of Passwords / Login / Account
         } else {
             
-//            let x = passwordAPI.getSavedLogins()
-
-            
 //            profile.logins.getAllLogins() >>== { [weak self] results in
 //                self?.reloadEntries(results: results)
 //            }
+            
+//            let loginList = passwordAPI.getSavedLogins()
+//
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+//                self.reloadEntries(passwordForms: loginList)
+//            }
+            
+            profile.logins.getAllLogins() >>== { [weak self] results in
+                self?.addAllLogins(results: results)
+            }
         }
     }
     
@@ -152,6 +162,46 @@ class LoginListViewControllerCore: LoginAuthViewController {
 //            self.isFetchingLoginEntries = false
 //            self.navigationItem.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
 //        }
+    }
+    
+    private func addAllLogins(results: Cursor<Login>) {
+        let allLogins = results.asArray()
+        
+        for login in allLogins {
+            
+            let x = login
+            
+            print("Login \(x)")
+            
+            print("show me")
+            
+            guard let formSubmitURLString = login.formSubmitURL, let formSubmitURL = URL(string: formSubmitURLString) else {
+                return
+            }
+            
+            let loginForm = PasswordForm(
+                url: formSubmitURL,
+                signOnRealm: nil,
+                dateCreated: nil,
+                usernameElement: login.usernameField,
+                usernameValue: login.username,
+                passwordElement: login.password,
+                passwordValue: login.password,
+                isBlockedByUser: false,
+                scheme: .typeHtml)
+            
+            passwordAPI.addLogin(loginForm)
+        }
+    }
+    
+    private func reloadEntries(passwordForms: [PasswordForm]) {
+        loginEntries = passwordForms
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.isFetchingLoginEntries = false
+            self.navigationItem.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
+        }
     }
 }
 
@@ -209,6 +259,20 @@ extension LoginListViewControllerCore {
             }
             
             let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
+            
+            cell.do {
+                $0.selectionStyle = .none
+                $0.accessoryType = .disclosureIndicator
+
+                $0.setLines(loginInfo.signOnRealm, detailText: loginInfo.usernameValue)
+                $0.imageView?.contentMode = .scaleAspectFit
+                $0.imageView?.image = FaviconFetcher.defaultFaviconImage
+                $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+                $0.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
+                $0.imageView?.layer.cornerRadius = 6
+                $0.imageView?.layer.cornerCurve = .continuous
+                $0.imageView?.layer.masksToBounds = true
+            }
             
 //            cell.do {
 //                $0.selectionStyle = .none
