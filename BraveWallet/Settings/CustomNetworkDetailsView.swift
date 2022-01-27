@@ -7,42 +7,20 @@ import SwiftUI
 import BraveCore
 import Shared
 
-protocol NetworkInputItem {
-  var input: String { get set }
-  var error: String? { get set }
-}
-
-struct RegularItem: NetworkInputItem {
+struct NetworkInputItem {
   var input: String
   var error: String?
-}
-
-struct UrlItem: NetworkInputItem, Identifiable {
-  var input: String
-  var error: String?
-  var id: Int
 }
 
 struct NetworkTextField: View {
   var placeholder: String
-  var item: NetworkInputItem
+  @Binding var item: NetworkInputItem
   var onChange: (String) -> Void
-  @State private var input = ""
-  
-  init(placeholder: String,
-       item: NetworkInputItem,
-       onChange: @escaping (String) -> Void
-  ) {
-    self.placeholder = placeholder
-    self.item = item
-    self.onChange = onChange
-    self._input = State(wrappedValue: item.input)
-  }
   
   var body: some View {
     VStack(alignment: .leading) {
-      TextField(placeholder, text: $input)
-        .onChange(of: input) { newValue in
+      TextField(placeholder, text: $item.input)
+        .onChange(of: item.input) { newValue in
           onChange(newValue)
         }
         .autocapitalization(.none)
@@ -68,15 +46,17 @@ struct NetworkTextField: View {
 }
 
 class CustomNetworkModel: ObservableObject {
-  @Published var networkId = RegularItem(input: "")
-  @Published var networkName = RegularItem(input: "")
-  @Published var networkSymbolName = RegularItem(input: "")
-  @Published var networkSymbol = RegularItem(input: "")
-  @Published var networkDecimals = RegularItem(input: "")
+  @Published var networkId = NetworkInputItem(input: "")
+  @Published var networkName = NetworkInputItem(input: "")
+  @Published var networkSymbolName = NetworkInputItem(input: "")
+  @Published var networkSymbol = NetworkInputItem(input: "")
+  @Published var networkDecimals = NetworkInputItem(input: "")
   
-  @Published var rpcUrls = [UrlItem(input: "", id: 0)]
-  @Published var iconUrls = [UrlItem(input: "", id: 0)]
-  @Published var blockUrls = [UrlItem(input: "", id: 0)]
+  @Published var rpcUrls: [NetworkInputItem] = [NetworkInputItem(input: "")]
+  @Published var iconUrls = [NetworkInputItem(input: "")]
+  @Published var blockUrls = [NetworkInputItem(input: "")]
+  
+  @Published var testUrls = [NetworkInputItem(input: "")]
   
   init(network: BraveWallet.EthereumChain? = nil) {
     if let network = network {
@@ -86,13 +66,13 @@ class CustomNetworkModel: ObservableObject {
       self.networkSymbol.input = network.symbol
       self.networkDecimals.input = String(network.decimals)
       if network.rpcUrls.count > 0 {
-        self.rpcUrls = network.rpcUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+        self.rpcUrls = network.rpcUrls.compactMap({ NetworkInputItem(input: $0) })
       }
       if network.iconUrls.count > 0 {
-        self.iconUrls = network.iconUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+        self.iconUrls = network.iconUrls.compactMap({ NetworkInputItem(input: $0) })
       }
       if network.blockExplorerUrls.count > 0 {
-        self.blockUrls = network.blockExplorerUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+        self.blockUrls = network.blockExplorerUrls.compactMap({ NetworkInputItem(input: $0) })
       }
     }
   }
@@ -124,9 +104,8 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
-          item: model.networkId
+          item: $model.networkId
         ) { [self] newValue in
-            model.networkId.input = newValue
             if let intValue = Int(newValue), intValue > 0 {
               model.networkId.error = nil
             } else {
@@ -142,8 +121,7 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
-                         item: model.networkName) { newValue in
-          model.networkName.input = newValue
+                         item: $model.networkName) { newValue in
           if newValue.count < 1 {
             model.networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
@@ -159,8 +137,7 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
-                         item: model.networkSymbolName) { newValue in
-          model.networkSymbolName.input = newValue
+                         item: $model.networkSymbolName) { newValue in
           if newValue.count < 1 {
             model.networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
@@ -176,8 +153,7 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
-                         item: model.networkSymbol) { newValue in
-          model.networkSymbol.input = newValue
+                         item: $model.networkSymbol) { newValue in
           if newValue.count < 1 {
             model.networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
@@ -193,8 +169,7 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
-                         item: model.networkDecimals) { newValue in
-          model.networkDecimals.input = newValue
+                         item: $model.networkDecimals) { newValue in
           if newValue.isEmpty {
             model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else if let intValue = Int(newValue), intValue > 0 {
@@ -212,16 +187,15 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         ForEach(model.rpcUrls.indices, id: \.self) { index in
-          var item = model.rpcUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                       item: item) { newValue in
-            item.input = newValue
+                           item: $model.rpcUrls[index]) { newValue in
+            var item = model.rpcUrls[index]
             if validateUrl(newValue) {
               item.error = nil
               model.rpcUrls[index] = item
               
               if index == model.rpcUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: model.rpcUrls.count)
+                let newRow = NetworkInputItem(input: "")
                 model.rpcUrls.append(newRow)
               }
             } else {
@@ -238,16 +212,15 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         ForEach(model.iconUrls.indices, id: \.self) { index in
-          var item = model.iconUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                       item: item) { newValue in
-            item.input = newValue
+                           item: $model.iconUrls[index]) { newValue in
+            var item: NetworkInputItem = model.iconUrls[index]
             if validateUrl(newValue) {
               item.error = nil
               model.iconUrls[index] = item
               
               if index == model.iconUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: model.iconUrls.count)
+                let newRow = NetworkInputItem(input: "")
                 model.iconUrls.append(newRow)
               }
             } else {
@@ -264,16 +237,15 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         ForEach(model.blockUrls.indices, id: \.self) { index in
-          var item = model.blockUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                       item: item) { newValue in
-            item.input = newValue
+                           item: $model.blockUrls[index]) { newValue in
+            var item: NetworkInputItem = model.blockUrls[index]
             if validateUrl(newValue) {
               item.error = nil
               model.blockUrls[index] = item
               
               if index == model.blockUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: model.blockUrls.count)
+                let newRow = NetworkInputItem(input: "")
                 model.blockUrls.append(newRow)
               }
             } else {
