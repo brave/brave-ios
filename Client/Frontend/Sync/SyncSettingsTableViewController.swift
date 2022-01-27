@@ -174,6 +174,8 @@ class SyncSettingsTableViewController: UITableViewController {
                 Preferences.Chromium.syncBookmarksEnabled.value = toggle.isOn
             case SyncDataTypes.history.rawValue:
                 Preferences.Chromium.syncHistoryEnabled.value = toggle.isOn
+            case SyncDataTypes.passwords.rawValue:
+                Preferences.Chromium.syncPasswordsEnabled.value = toggle.isOn
             default:
                 return
         }
