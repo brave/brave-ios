@@ -67,47 +67,52 @@ struct NetworkTextField: View {
   }
 }
 
+class CustomNetworkModel: ObservableObject {
+  @Published var networkId = RegularItem(input: "")
+  @Published var networkName = RegularItem(input: "")
+  @Published var networkSymbolName = RegularItem(input: "")
+  @Published var networkSymbol = RegularItem(input: "")
+  @Published var networkDecimals = RegularItem(input: "")
+  
+  @Published var rpcUrls = [UrlItem(input: "", id: 0)]
+  @Published var iconUrls = [UrlItem(input: "", id: 0)]
+  @Published var blockUrls = [UrlItem(input: "", id: 0)]
+  
+  init(network: BraveWallet.EthereumChain? = nil) {
+    if let network = network {
+      self.networkId.input = network.chainId.chainIdInDecimal
+      self.networkName.input = network.chainName
+      self.networkSymbolName.input = network.symbolName
+      self.networkSymbol.input = network.symbol
+      self.networkDecimals.input = String(network.decimals)
+      if network.rpcUrls.count > 0 {
+        self.rpcUrls = network.rpcUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+      }
+      if network.iconUrls.count > 0 {
+        self.iconUrls = network.iconUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+      }
+      if network.blockExplorerUrls.count > 0 {
+        self.blockUrls = network.blockExplorerUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) })
+      }
+    }
+  }
+}
+
 struct CustomNetworkDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
+  @ObservedObject var model: CustomNetworkModel
   
   var isEditMode: Bool
-  var network: BraveWallet.EthereumChain?
-  
-  @State private var networkId: RegularItem = RegularItem(input: "")
-  @State private var networkName: RegularItem = RegularItem(input: "")
-  @State private var networkSymbolName: RegularItem = RegularItem(input: "")
-  @State private var networkSymbol: RegularItem = RegularItem(input: "")
-  @State private var networkDecimals: RegularItem = RegularItem(input: "")
-  
-  @State private var rpcUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
-  @State private var iconUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
-  @State private var blockUrls: [UrlItem] = [UrlItem(input: "", id: 0)]
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   init(networkStore: NetworkStore,
-       isEditMode: Bool,
-       network: BraveWallet.EthereumChain? = nil
+       model: CustomNetworkModel,
+       isEditMode: Bool
   ) {
     self.networkStore = networkStore
+    self.model = model
     self.isEditMode = isEditMode
-    self.network = network
-    if let network = network {
-      self._networkId = State(wrappedValue: RegularItem(input: network.chainId.chainIdInDecimal))
-      self._networkName = State(wrappedValue: RegularItem(input: network.chainName))
-      self._networkSymbolName = State(wrappedValue: RegularItem(input: network.symbolName))
-      self._networkSymbol = State(wrappedValue: RegularItem(input: network.symbol))
-      self._networkDecimals = State(wrappedValue: RegularItem(input: String(network.decimals)))
-      if network.rpcUrls.count > 0 {
-        self._rpcUrls = State(wrappedValue: network.rpcUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
-      }
-      if network.iconUrls.count > 0 {
-        self._iconUrls = State(wrappedValue: network.iconUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
-      }
-      if network.blockExplorerUrls.count > 0 {
-        self._blockUrls = State(wrappedValue: network.blockExplorerUrls.enumerated().compactMap({ UrlItem(input: $1, id: $0) }))
-      }
-    }
   }
   
   var body: some View {
@@ -119,13 +124,13 @@ struct CustomNetworkDetailsView: View {
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
-          item: networkId
-        ) { newValue in
-            networkId.input = newValue
+          item: model.networkId
+        ) { [self] newValue in
+            model.networkId.input = newValue
             if let intValue = Int(newValue), intValue > 0 {
-              networkId.error = nil
+              model.networkId.error = nil
             } else {
-              networkId.error = Strings.Wallet.customNetworkChainIdErrMsg
+              model.networkId.error = Strings.Wallet.customNetworkChainIdErrMsg
             }
         }
           .keyboardType(.numberPad)
@@ -137,12 +142,12 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
-                         item: networkName) { newValue in
-          networkName.input = newValue
+                         item: model.networkName) { newValue in
+          model.networkName.input = newValue
           if newValue.count < 1 {
-            networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
+            model.networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
-            networkName.error = nil
+            model.networkName.error = nil
           }
         }
           .disableAutocorrection(true)
@@ -154,12 +159,12 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
-                         item: networkSymbolName) { newValue in
-          networkSymbolName.input = newValue
+                         item: model.networkSymbolName) { newValue in
+          model.networkSymbolName.input = newValue
           if newValue.count < 1 {
-            networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
+            model.networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
-            networkSymbolName.error = nil
+            model.networkSymbolName.error = nil
           }
         }
           .disableAutocorrection(true)
@@ -171,12 +176,12 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
-                         item: networkSymbol) { newValue in
-          networkSymbol.input = newValue
+                         item: model.networkSymbol) { newValue in
+          model.networkSymbol.input = newValue
           if newValue.count < 1 {
-            networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
+            model.networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else {
-            networkSymbol.error = nil
+            model.networkSymbol.error = nil
           }
         }
           .disableAutocorrection(true)
@@ -188,14 +193,14 @@ struct CustomNetworkDetailsView: View {
           .textCase(.none)
       ) {
         NetworkTextField(placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
-                         item: networkDecimals) { newValue in
-          networkDecimals.input = newValue
+                         item: model.networkDecimals) { newValue in
+          model.networkDecimals.input = newValue
           if newValue.isEmpty {
-            networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
+            model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
           } else if let intValue = Int(newValue), intValue > 0 {
-            networkDecimals.error = nil
+            model.networkDecimals.error = nil
           } else {
-            networkDecimals.error = Strings.Wallet.customNetworkCurrencyDecimalErrMsg
+            model.networkDecimals.error = Strings.Wallet.customNetworkCurrencyDecimalErrMsg
           }
         }
           .keyboardType(.numberPad)
@@ -206,22 +211,22 @@ struct CustomNetworkDetailsView: View {
           Text(Strings.Wallet.customNetworkRpcUrlsTitle)
           .textCase(.none)
       ) {
-        ForEach(rpcUrls.indices, id: \.self) { index in
-          var item = rpcUrls[index]
+        ForEach(model.rpcUrls.indices, id: \.self) { index in
+          var item = model.rpcUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
-              rpcUrls[index] = item
+              model.rpcUrls[index] = item
               
-              if index == rpcUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: rpcUrls.count)
-                rpcUrls.append(newRow)
+              if index == model.rpcUrls.count - 1 { // add a new row
+                let newRow = UrlItem(input: "", id: model.rpcUrls.count)
+                model.rpcUrls.append(newRow)
               }
             } else {
               item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              rpcUrls[index] = item
+              model.rpcUrls[index] = item
             }
           }
         }
@@ -232,22 +237,22 @@ struct CustomNetworkDetailsView: View {
           Text(Strings.Wallet.customNetworkIconUrlsTitle)
           .textCase(.none)
       ) {
-        ForEach(iconUrls.indices, id: \.self) { index in
-          var item = iconUrls[index]
+        ForEach(model.iconUrls.indices, id: \.self) { index in
+          var item = model.iconUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
-              iconUrls[index] = item
+              model.iconUrls[index] = item
               
-              if index == iconUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: iconUrls.count)
-                iconUrls.append(newRow)
+              if index == model.iconUrls.count - 1 { // add a new row
+                let newRow = UrlItem(input: "", id: model.iconUrls.count)
+                model.iconUrls.append(newRow)
               }
             } else {
               item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              iconUrls[index] = item
+              model.iconUrls[index] = item
             }
           }
         }
@@ -258,22 +263,22 @@ struct CustomNetworkDetailsView: View {
           Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle)
           .textCase(.none)
       ) {
-        ForEach(blockUrls.indices, id: \.self) { index in
-          var item = blockUrls[index]
+        ForEach(model.blockUrls.indices, id: \.self) { index in
+          var item = model.blockUrls[index]
           NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
                        item: item) { newValue in
             item.input = newValue
             if validateUrl(newValue) {
               item.error = nil
-              blockUrls[index] = item
+              model.blockUrls[index] = item
               
-              if index == blockUrls.count - 1 { // add a new row
-                let newRow = UrlItem(input: "", id: blockUrls.count)
-                blockUrls.append(newRow)
+              if index == model.blockUrls.count - 1 { // add a new row
+                let newRow = UrlItem(input: "", id: model.blockUrls.count)
+                model.blockUrls.append(newRow)
               }
             } else {
               item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              blockUrls[index] = item
+              model.blockUrls[index] = item
             }
           }
         }
@@ -301,28 +306,28 @@ struct CustomNetworkDetailsView: View {
   }
   
   private func validateAllFields() -> Bool {
-    if networkId.input.isEmpty {
-      networkId.error = Strings.Wallet.customNetworkEmptyErrMsg
+    if model.networkId.input.isEmpty {
+      model.networkId.error = Strings.Wallet.customNetworkEmptyErrMsg
     }
-    networkName.error = networkName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
-    networkSymbolName.error = networkSymbolName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
-    networkSymbol.error = networkSymbol.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
-    if networkDecimals.input.isEmpty {
-      networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
+    model.networkName.error = model.networkName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    model.networkSymbolName.error = model.networkSymbolName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    model.networkSymbol.error = model.networkSymbol.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    if model.networkDecimals.input.isEmpty {
+      model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
     }
-    if var rpcUrl = rpcUrls.first {
+    if var rpcUrl = model.rpcUrls.first {
       if rpcUrl.input.isEmpty {
         rpcUrl.error = Strings.Wallet.customNetworkEmptyErrMsg
-        rpcUrls[0] = rpcUrl
+        model.rpcUrls[0] = rpcUrl
       }
     }
                  
-    if networkId.error != nil
-        || networkName.error != nil
-        || networkSymbolName.error != nil
-        || networkSymbol.error != nil
-        || networkDecimals.error != nil
-        || rpcUrls.first!.error != nil {
+    if model.networkId.error != nil
+        || model.networkName.error != nil
+        || model.networkSymbolName.error != nil
+        || model.networkSymbol.error != nil
+        || model.networkDecimals.error != nil
+        || model.rpcUrls.first!.error != nil {
       return false
     }
     
@@ -333,28 +338,28 @@ struct CustomNetworkDetailsView: View {
     guard validateAllFields() else { return }
     
     let network: BraveWallet.EthereumChain = .init().then {
-      if let idValue = Int(networkId.input) {
+      if let idValue = Int(model.networkId.input) {
         $0.chainId = "0x\(String(format: "%02X", idValue))"
       }
-      $0.chainName = networkName.input
-      $0.symbolName = networkSymbolName.input
-      $0.symbol = networkSymbol.input
-      $0.decimals = Int32(networkDecimals.input) ?? 18
-      $0.rpcUrls = rpcUrls.compactMap({
+      $0.chainName = model.networkName.input
+      $0.symbolName = model.networkSymbolName.input
+      $0.symbol = model.networkSymbol.input
+      $0.decimals = Int32(model.networkDecimals.input) ?? 18
+      $0.rpcUrls = model.rpcUrls.compactMap({
         if !$0.input.isEmpty && $0.error == nil {
           return $0.input
         } else {
           return nil
         }
       })
-      $0.iconUrls = iconUrls.compactMap({
+      $0.iconUrls = model.iconUrls.compactMap({
         if !$0.input.isEmpty && $0.error == nil {
           return $0.input
         } else {
           return nil
         }
       })
-      $0.blockExplorerUrls = blockUrls.compactMap({
+      $0.blockExplorerUrls = model.blockUrls.compactMap({
         if !$0.input.isEmpty && $0.error == nil {
           return $0.input
         } else {
@@ -378,6 +383,7 @@ struct CustomNetworkDetailsView_Previews: PreviewProvider {
       NavigationView {
         CustomNetworkDetailsView(
           networkStore: .previewStore,
+          model: .init(),
           isEditMode: true
         )
       }

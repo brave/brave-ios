@@ -135,8 +135,8 @@ struct NetworkListView: View {
       NavigationView {
         CustomNetworkDetailsView(
           networkStore: networkStore,
-          isEditMode: details.isEditMode,
-          network: details.network
+          model: CustomNetworkModel(network: details.network),
+          isEditMode: details.isEditMode
         )
       }
       .navigationViewStyle(StackNavigationViewStyle())
