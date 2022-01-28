@@ -137,7 +137,7 @@ struct AssetDetailHeaderView: View {
       Divider()
         .padding(.bottom)
       HStack {
-        if assetDetailStore.isBuySupported {
+        if assetDetailStore.isBuySupported && !networkStore.selectedChain.isCustom {
           Button(
             action: {
               buySendSwapDestination = BuySendSwapDestination(
@@ -159,15 +159,17 @@ struct AssetDetailHeaderView: View {
         ) {
           Text(Strings.Wallet.send)
         }
-        Button(
-          action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .swap,
-              initialToken: assetDetailStore.token
-            )
+        if !networkStore.selectedChain.isCustom {
+          Button(
+            action: {
+              buySendSwapDestination = BuySendSwapDestination(
+                kind: .swap,
+                initialToken: assetDetailStore.token
+              )
+            }
+          ) {
+            Text(Strings.Wallet.swap)
           }
-        ) {
-          Text(Strings.Wallet.swap)
         }
       }
       .buttonStyle(BraveFilledButtonStyle(size: .normal))

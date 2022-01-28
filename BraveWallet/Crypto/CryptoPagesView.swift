@@ -214,7 +214,8 @@ private class CryptoPagesViewController: TabbedPageViewController {
   
   @objc private func tappedSwapButton() {
     let controller = FixedHeightHostingPanModalController(
-      rootView: BuySendSwapView(action: { [weak self] destination in
+      rootView: BuySendSwapView(network: cryptoStore.networkStore.selectedChain,
+                                action: { [weak self] destination in
         self?.dismiss(animated: true, completion: {
           self?.buySendSwapDestination = destination
         })
