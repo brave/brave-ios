@@ -14,22 +14,13 @@ extension BraveWallet.EthereumChain {
 }
 
 struct NetworkPicker: View {
-  var networks: [BraveWallet.EthereumChain]
-  @Binding var selectedNetwork: BraveWallet.EthereumChain
+  @ObservedObject var networkStore: NetworkStore
+  @State private var isPresentingNetworkList: Bool = false
   
   var body: some View {
-    Menu {
-      Picker(
-        Strings.Wallet.selectedNetworkAccessibilityLabel,
-        selection: $selectedNetwork
-      ) {
-        ForEach(networks) {
-          Text($0.chainName).tag($0)
-        }
-      }
-    } label: {
+    Button(action: { isPresentingNetworkList = true}) {
       HStack {
-        Text(selectedNetwork.shortChainName)
+        Text(networkStore.selectedChain.shortChainName)
           .fontWeight(.bold)
         Image(systemName: "chevron.down.circle")
       }
@@ -42,17 +33,20 @@ struct NetworkPicker: View {
       )
       .clipShape(Capsule())
       .contentShape(Capsule())
-      .animation(nil, value: selectedNetwork)
+      .animation(nil, value: networkStore.selectedChain)
     }
     .accessibilityLabel(Strings.Wallet.selectedNetworkAccessibilityLabel)
-    .accessibilityValue(selectedNetwork.shortChainName)
+    .accessibilityValue(networkStore.selectedChain.shortChainName)
+    .sheet(isPresented: $isPresentingNetworkList) {
+      NetworkListView(networkStore: networkStore)
+    }
   }
 }
 
 #if DEBUG
 struct NetworkPicker_Previews: PreviewProvider {
   static var previews: some View {
-    NetworkPicker(networks: [.mainnet, .rinkeby, .ropsten], selectedNetwork: .constant(.mainnet))
+    NetworkPicker(networkStore: .previewStore)
       .padding()
       .previewLayout(.sizeThatFits)
       .previewColorSchemes()

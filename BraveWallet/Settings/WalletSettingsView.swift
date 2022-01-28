@@ -10,6 +10,7 @@ import BraveUI
 public struct WalletSettingsView: View {
   @ObservedObject var settingsStore: SettingsStore
   
+  @State private var isShowingNetworkList = false
   @State private var isShowingResetAlert = false
   
   public init(settingsStore: SettingsStore) {
@@ -35,10 +36,12 @@ public struct WalletSettingsView: View {
         Picker(selection: $settingsStore.autoLockInterval) {
           ForEach(autoLockIntervals) { interval in
             Text(interval.label)
+              .foregroundColor(Color(.secondaryBraveLabel))
               .tag(interval)
           }
         } label: {
           Text(Strings.Wallet.autoLockTitle)
+            .foregroundColor(Color(.braveLabel))
             .padding(.vertical, 4)
         }
       }
@@ -47,8 +50,14 @@ public struct WalletSettingsView: View {
         footer: Text("Wallet networks customization")
           .foregroundColor(Color(.secondaryBraveLabel))
       ) {
-        NavigationLink(destination: NetworkListView(networkStore: networkStore)) {
-          Text("Networks")
+        Button(action: { isShowingNetworkList = true }) {
+          HStack {
+            Text("Networks")
+              .foregroundColor(Color(.braveLabel))
+            Spacer()
+            Text(networkStore.selectedChain.shortChainName)
+              .foregroundColor(Color(.secondaryBraveLabel))
+          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -64,6 +73,9 @@ public struct WalletSettingsView: View {
     .listStyle(InsetGroupedListStyle())
     .navigationTitle(Strings.Wallet.braveWallet)
     .navigationBarTitleDisplayMode(.inline)
+    .sheet(isPresented: $isShowingNetworkList) {
+      NetworkListView(networkStore: networkStore)
+    }
     .alert(isPresented: $isShowingResetAlert) {
       Alert(
         title: Text(Strings.Wallet.settingsResetWalletAlertTitle),

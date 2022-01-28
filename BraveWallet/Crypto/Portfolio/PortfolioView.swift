@@ -146,19 +146,15 @@ struct BalanceHeaderView: View {
       Group {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
-            NetworkPicker(
-              networks: networkStore.ethereumChains,
-              selectedNetwork: networkStore.selectedChainBinding
-            )
+            NetworkPicker(networkStore: networkStore)
             Text(verbatim: balance)
+              .font(.largeTitle.bold())
           }
         } else {
           HStack {
             Text(verbatim: balance)
-            NetworkPicker(
-              networks: networkStore.ethereumChains,
-              selectedNetwork: networkStore.selectedChainBinding
-            )
+              .font(.largeTitle.bold())
+            NetworkPicker(networkStore: networkStore)
             Spacer()
           }
         }
@@ -168,6 +164,7 @@ struct BalanceHeaderView: View {
         Group {
           if let dataPoint = selectedBalance {
             Text(dataPoint.formattedPrice)
+              .font(.largeTitle.bold())
           }
         },
         alignment: .leading
@@ -182,7 +179,6 @@ struct BalanceHeaderView: View {
           )
       }
     }
-    .font(.largeTitle.bold())
     .foregroundColor(.primary)
     .padding(.top, 12)
   }

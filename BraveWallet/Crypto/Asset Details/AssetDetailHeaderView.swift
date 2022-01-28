@@ -52,10 +52,7 @@ struct AssetDetailHeaderView: View {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
             HStack {
-              NetworkPicker(
-                networks: networkStore.ethereumChains,
-                selectedNetwork: networkStore.selectedChainBinding
-              )
+              NetworkPicker(networkStore: networkStore)
               if horizontalSizeClass == .regular {
                 Spacer()
                 DateRangeView(selectedRange: $assetDetailStore.timeframe)
@@ -80,10 +77,7 @@ struct AssetDetailHeaderView: View {
             Text(assetDetailStore.token.name)
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
-            NetworkPicker(
-              networks: networkStore.ethereumChains,
-              selectedNetwork: networkStore.selectedChainBinding
-            )
+            NetworkPicker(networkStore: networkStore)
             if horizontalSizeClass == .regular {
               Spacer()
               DateRangeView(selectedRange: $assetDetailStore.timeframe)
