@@ -82,7 +82,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   }
   
   public override var shouldAutorotate: Bool {
-    false
+    true
   }
 }
 
