@@ -37,7 +37,6 @@ class LoginListViewController: LoginAuthViewController {
     
     // MARK: Private
     
-    private let profile: Profile
     private let passwordAPI: BravePasswordAPI
     private let windowProtection: WindowProtection?
     
@@ -50,8 +49,7 @@ class LoginListViewController: LoginAuthViewController {
     
     // MARK: Lifecycle
     
-    init(profile: Profile, passwordAPI: BravePasswordAPI, windowProtection: WindowProtection?) {
-        self.profile = profile
+    init(passwordAPI: BravePasswordAPI, windowProtection: WindowProtection?) {
         self.windowProtection = windowProtection
         self.passwordAPI = passwordAPI
         
@@ -252,15 +250,14 @@ extension LoginListViewController {
     }
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        if indexPath.section == Section.savedLogins.rawValue, let loginEntry = credentialList[safe: indexPath.row] {
-//            let loginDetailsViewController = LoginInfoViewController(
-//                profile: profile,
-//                loginEntry: loginEntry,
-//                windowProtection: windowProtection)
-//            loginDetailsViewController.settingsDelegate = settingsDelegate
-//            navigationController?.pushViewController(loginDetailsViewController, animated: true)
-//
-//            return indexPath
+        if indexPath.section == Section.savedLogins.rawValue, let credentials = credentialList[safe: indexPath.row] {
+            let loginDetailsViewController = LoginInfoViewController(
+                credentials: credentials,
+                windowProtection: windowProtection)
+            loginDetailsViewController.settingsDelegate = settingsDelegate
+            navigationController?.pushViewController(loginDetailsViewController, animated: true)
+
+            return indexPath
         }
         
         return nil
@@ -306,15 +303,15 @@ extension LoginListViewController {
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
-            let success = self?.profile.logins.removeLoginByGUID(loginItem.guid)
-            
-            success?.upon { result in
-                if result.isSuccess {
-                    self?.fetchLoginInfo()
-                } else {
-                    log.error("Error while deleting a login entry")
-                }
-            }
+//            let success = self?.profile.logins.removeLoginByGUID(loginItem.guid)
+//
+//            success?.upon { result in
+//                if result.isSuccess {
+//                    self?.fetchLoginInfo()
+//                } else {
+//                    log.error("Error while deleting a login entry")
+//                }
+//            }
         }))
         
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
