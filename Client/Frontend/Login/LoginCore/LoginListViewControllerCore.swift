@@ -134,68 +134,21 @@ class LoginListViewControllerCore: LoginAuthViewController {
         }
         
         isFetchingLoginEntries = true
-        
-        if let query = searchQuery {
-            // TODO: Query Fetch List of Passwords / Login / Account
+                
+        passwordAPI.getSavedLogins { credentials in
+            self.reloadEntries(with: searchQuery, passwordForms: credentials)
+        }
+    }
+    
+    private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
+        if let query = query, !query.isEmpty {
+            loginEntries = passwordForms.filter { form in
+                (form.signOnRealm?.lowercased() ?? "").contains(query) ||
+                (form.usernameValue?.lowercased() ?? "").contains(query)
+            }
         } else {
-            
-//            profile.logins.getAllLogins() >>== { [weak self] results in
-//                self?.reloadEntries(results: results)
-//            }
-            
-//            let loginList = passwordAPI.getSavedLogins()
-//
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-//                self.reloadEntries(passwordForms: loginList)
-//            }
-            
-            profile.logins.getAllLogins() >>== { [weak self] results in
-                self?.addAllLogins(results: results)
-            }
+            loginEntries = passwordForms
         }
-    }
-    
-    private func reloadEntries(results: Cursor<Login>) {
-//        loginEntries = results.asArray()
-//        DispatchQueue.main.async {
-//            self.tableView.reloadData()
-//            self.isFetchingLoginEntries = false
-//            self.navigationItem.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
-//        }
-    }
-    
-    private func addAllLogins(results: Cursor<Login>) {
-        let allLogins = results.asArray()
-        
-        for login in allLogins {
-            
-            let x = login
-            
-            print("Login \(x)")
-            
-            print("show me")
-            
-            guard let formSubmitURLString = login.formSubmitURL, let formSubmitURL = URL(string: formSubmitURLString) else {
-                return
-            }
-            
-            let loginForm = PasswordForm(
-                url: formSubmitURL,
-                signOnRealm: nil,
-                dateCreated: nil,
-                usernameElement: login.usernameField,
-                usernameValue: login.username,
-                passwordElement: login.password,
-                passwordValue: login.password,
-                isBlockedByUser: false,
-                scheme: .typeHtml)
-            
-            passwordAPI.addLogin(loginForm)
-        }
-    }
-    
-    private func reloadEntries(passwordForms: [PasswordForm]) {
-        loginEntries = passwordForms
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
