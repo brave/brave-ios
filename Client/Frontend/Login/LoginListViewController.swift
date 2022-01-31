@@ -41,7 +41,7 @@ class LoginListViewController: LoginAuthViewController {
     private let passwordAPI: BravePasswordAPI
     private let windowProtection: WindowProtection?
     
-    private var loginEntries = [PasswordForm]()
+    private var credentialList = [PasswordForm]()
 
     private var isFetchingLoginEntries = false
     private var searchLoginTimer: Timer?
@@ -77,7 +77,7 @@ class LoginListViewController: LoginAuthViewController {
             $0.searchController = searchController
             $0.hidesSearchBarWhenScrolling = false
             $0.rightBarButtonItem = editButtonItem
-            $0.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
+            $0.rightBarButtonItem?.isEnabled = !self.credentialList.isEmpty
         }
         definesPresentationContext = true
 
@@ -141,18 +141,18 @@ class LoginListViewController: LoginAuthViewController {
     
     private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
         if let query = query, !query.isEmpty {
-            loginEntries = passwordForms.filter { form in
+            credentialList = passwordForms.filter { form in
                 (form.signOnRealm?.lowercased() ?? "").contains(query) ||
                 (form.usernameValue?.lowercased() ?? "").contains(query)
             }
         } else {
-            loginEntries = passwordForms
+            credentialList = passwordForms
         }
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
             self.isFetchingLoginEntries = false
-            self.navigationItem.rightBarButtonItem?.isEnabled = !self.loginEntries.isEmpty
+            self.navigationItem.rightBarButtonItem?.isEnabled = !self.credentialList.isEmpty
         }
     }
 }
@@ -162,7 +162,7 @@ class LoginListViewController: LoginAuthViewController {
 extension LoginListViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        tableView.backgroundView = loginEntries.isEmpty ? emptyLoginView : nil
+        tableView.backgroundView = credentialList.isEmpty ? emptyLoginView : nil
 
         return Section.allCases.count
     }
@@ -171,7 +171,7 @@ extension LoginListViewController {
         if section == Section.options.rawValue {
             return 1
         } else {
-            return loginEntries.count
+            return credentialList.count
         }
     }
     
@@ -184,7 +184,7 @@ extension LoginListViewController {
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == Section.savedLogins.rawValue {
-            return loginEntries.isEmpty ? .zero : UX.headerHeight
+            return credentialList.isEmpty ? .zero : UX.headerHeight
         }
         
         return .zero
@@ -206,7 +206,7 @@ extension LoginListViewController {
             
             return cell
         } else {
-            guard let loginInfo = loginEntries[safe: indexPath.item] else {
+            guard let loginInfo = credentialList[safe: indexPath.item] else {
                 return UITableViewCell()
             }
             
@@ -252,7 +252,7 @@ extension LoginListViewController {
     }
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        if indexPath.section == Section.savedLogins.rawValue, let loginEntry = loginEntries[safe: indexPath.row] {
+        if indexPath.section == Section.savedLogins.rawValue, let loginEntry = credentialList[safe: indexPath.row] {
 //            let loginDetailsViewController = LoginInfoViewController(
 //                profile: profile,
 //                loginEntry: loginEntry,
@@ -289,7 +289,7 @@ extension LoginListViewController {
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let loginItem = loginEntries[safe: indexPath.row] else { return }
+            guard let loginItem = credentialList[safe: indexPath.row] else { return }
             
 //            showDeleteLoginWarning(with: loginItem)
         }
