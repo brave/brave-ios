@@ -532,8 +532,7 @@
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */; };
-		2F798390279A09DD001FA4B6 /* LoginListViewControllerCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F79838F279A09DD001FA4B6 /* LoginListViewControllerCore.swift */; };
-		2F8E21BD26C708EE00C5A0D9 /* LoginListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8E21BC26C708EE00C5A0D9 /* LoginListViewController.swift */; };
+		2F798390279A09DD001FA4B6 /* LoginListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F79838F279A09DD001FA4B6 /* LoginListViewController.swift */; };
 		2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
 		2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D8266698E600C6B74D /* DataSavedTests.swift */; };
@@ -2284,9 +2283,8 @@
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
 		2F693223260D218900ECEB38 /* CustomIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomIntentHandler.swift; sourceTree = "<group>"; };
 		2F697F7D1A9FD22D009E03AE /* SearchEnginesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchEnginesTests.swift; sourceTree = "<group>"; };
-		2F79838F279A09DD001FA4B6 /* LoginListViewControllerCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginListViewControllerCore.swift; sourceTree = "<group>"; };
+		2F79838F279A09DD001FA4B6 /* LoginListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginListViewController.swift; sourceTree = "<group>"; };
 		2F84BCF8267BE0A100850801 /* Model13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model13.xcdatamodel; sourceTree = "<group>"; };
-		2F8E21BC26C708EE00C5A0D9 /* LoginListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginListViewController.swift; sourceTree = "<group>"; };
 		2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShortcutManager.swift; sourceTree = "<group>"; };
 		2F9311D42665883400C6B74D /* DataSaved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaved.swift; sourceTree = "<group>"; };
 		2F9311D8266698E600C6B74D /* DataSavedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSavedTests.swift; sourceTree = "<group>"; };
@@ -4855,19 +4853,10 @@
 			path = BrowserIntents;
 			sourceTree = "<group>";
 		};
-		2F79839B279A09F0001FA4B6 /* LoginCore */ = {
-			isa = PBXGroup;
-			children = (
-				2F79838F279A09DD001FA4B6 /* LoginListViewControllerCore.swift */,
-			);
-			path = LoginCore;
-			sourceTree = "<group>";
-		};
 		2F8E21B026C707B200C5A0D9 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				2F79839B279A09F0001FA4B6 /* LoginCore */,
-				2F8E21BC26C708EE00C5A0D9 /* LoginListViewController.swift */,
+				2F79838F279A09DD001FA4B6 /* LoginListViewController.swift */,
 				2FB2F0CE26D3F92D00C8E576 /* LoginInfoViewController.swift */,
 				2F59562726D427B400FEE43B /* LoginAuthViewController.swift */,
 				2F59564126D5609800FEE43B /* LoginInfoTableViewCell.swift */,
@@ -8403,7 +8392,6 @@
 				0BF0DB941A8545800039F300 /* TopToolbarView.swift in Sources */,
 				4422D4C321BFFB7600BF1855 /* coding.cc in Sources */,
 				595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */,
-				2F8E21BD26C708EE00C5A0D9 /* LoginListViewController.swift in Sources */,
 				C615FAD9212A1E2600A8168C /* WebImageCache.swift in Sources */,
 				2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */,
 				0A56108424324B2A00B39107 /* BraveVPNSettingsViewController.swift in Sources */,
@@ -8461,7 +8449,7 @@
 				27036EC3256718DA004EF6B6 /* PartnerCardView.swift in Sources */,
 				0A39FE9C2486604D00290ABC /* GRDSubscriberCredential.m in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
-				2F798390279A09DD001FA4B6 /* LoginListViewControllerCore.swift in Sources */,
+				2F798390279A09DD001FA4B6 /* LoginListViewController.swift in Sources */,
 				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,

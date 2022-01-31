@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import Storage
 import Data
+import BraveCore
 
 private let log = Logger.browserLogger
 
@@ -37,9 +38,11 @@ class LoginListViewController: LoginAuthViewController {
     // MARK: Private
     
     private let profile: Profile
+    private let passwordAPI: BravePasswordAPI
     private let windowProtection: WindowProtection?
     
-    private var loginEntries = [Login]()
+    private var loginEntries = [PasswordForm]()
+
     private var isFetchingLoginEntries = false
     private var searchLoginTimer: Timer?
     private let searchController = UISearchController(searchResultsController: nil)
@@ -47,9 +50,11 @@ class LoginListViewController: LoginAuthViewController {
     
     // MARK: Lifecycle
     
-    init(profile: Profile, windowProtection: WindowProtection?) {
+    init(profile: Profile, passwordAPI: BravePasswordAPI, windowProtection: WindowProtection?) {
         self.profile = profile
         self.windowProtection = windowProtection
+        self.passwordAPI = passwordAPI
+        
         super.init(windowProtection: windowProtection, requiresAuthentication: true)
     }
     
@@ -128,20 +133,22 @@ class LoginListViewController: LoginAuthViewController {
         }
         
         isFetchingLoginEntries = true
-        
-        if let query = searchQuery {
-            profile.logins.getLoginsForQuery(query) >>== { [weak self] results in
-                self?.reloadEntries(results: results)
-            }
-        } else {
-            profile.logins.getAllLogins() >>== { [weak self] results in
-                self?.reloadEntries(results: results)
-            }
+                
+        passwordAPI.getSavedLogins { credentials in
+            self.reloadEntries(with: searchQuery, passwordForms: credentials)
         }
     }
     
-    private func reloadEntries(results: Cursor<Login>) {
-        loginEntries = results.asArray()
+    private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
+        if let query = query, !query.isEmpty {
+            loginEntries = passwordForms.filter { form in
+                (form.signOnRealm?.lowercased() ?? "").contains(query) ||
+                (form.usernameValue?.lowercased() ?? "").contains(query)
+            }
+        } else {
+            loginEntries = passwordForms
+        }
+        
         DispatchQueue.main.async {
             self.tableView.reloadData()
             self.isFetchingLoginEntries = false
@@ -209,7 +216,7 @@ extension LoginListViewController {
                 $0.selectionStyle = .none
                 $0.accessoryType = .disclosureIndicator
 
-                $0.setLines(loginInfo.hostname, detailText: loginInfo.username)
+                $0.setLines(loginInfo.signOnRealm, detailText: loginInfo.usernameValue)
                 $0.imageView?.contentMode = .scaleAspectFit
                 $0.imageView?.image = FaviconFetcher.defaultFaviconImage
                 $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
@@ -217,20 +224,20 @@ extension LoginListViewController {
                 $0.imageView?.layer.cornerRadius = 6
                 $0.imageView?.layer.cornerCurve = .continuous
                 $0.imageView?.layer.masksToBounds = true
-            }
-                      
-            if let loginHostnameURL = URL(string: loginInfo.hostname) {
-                let domain = Domain.getOrCreate(forUrl: loginHostnameURL, persistent: true)
                 
-                cell.imageView?.loadFavicon(
-                    for: loginHostnameURL,
-                    domain: domain,
-                    fallbackMonogramCharacter: loginHostnameURL.baseDomain?.first,
-                    shouldClearMonogramFavIcon: false,
-                    cachedOnly: true)
-            } else {
-                cell.imageView?.clearMonogramFavicon()
-                cell.imageView?.image = FaviconFetcher.defaultFaviconImage
+                if let signOnRealm = loginInfo.signOnRealm, let signOnRealmURL = URL(string: signOnRealm) {
+                    let domain = Domain.getOrCreate(forUrl: signOnRealmURL, persistent: true)
+    
+                    cell.imageView?.loadFavicon(
+                        for: signOnRealmURL,
+                        domain: domain,
+                        fallbackMonogramCharacter: signOnRealmURL.baseDomain?.first,
+                        shouldClearMonogramFavIcon: false,
+                        cachedOnly: true)
+                } else {
+                    cell.imageView?.clearMonogramFavicon()
+                    cell.imageView?.image = FaviconFetcher.defaultFaviconImage
+                }
             }
             
             return cell
@@ -246,14 +253,14 @@ extension LoginListViewController {
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == Section.savedLogins.rawValue, let loginEntry = loginEntries[safe: indexPath.row] {
-            let loginDetailsViewController = LoginInfoViewController(
-                profile: profile,
-                loginEntry: loginEntry,
-                windowProtection: windowProtection)
-            loginDetailsViewController.settingsDelegate = settingsDelegate
-            navigationController?.pushViewController(loginDetailsViewController, animated: true)
-            
-            return indexPath
+//            let loginDetailsViewController = LoginInfoViewController(
+//                profile: profile,
+//                loginEntry: loginEntry,
+//                windowProtection: windowProtection)
+//            loginDetailsViewController.settingsDelegate = settingsDelegate
+//            navigationController?.pushViewController(loginDetailsViewController, animated: true)
+//
+//            return indexPath
         }
         
         return nil
@@ -284,7 +291,7 @@ extension LoginListViewController {
         if editingStyle == .delete {
             guard let loginItem = loginEntries[safe: indexPath.row] else { return }
             
-            showDeleteLoginWarning(with: loginItem)
+//            showDeleteLoginWarning(with: loginItem)
         }
     }
     

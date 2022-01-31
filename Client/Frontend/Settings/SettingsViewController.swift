@@ -447,7 +447,7 @@ class SettingsViewController: TableViewController {
             rows: [
                 .boolRow(title: Strings.browserLock, detailText: Strings.browserLockDescription, option: Preferences.Privacy.lockWithPasscode, image: #imageLiteral(resourceName: "settings-passcode").template),
                 Row(text: Strings.Login.loginListNavigationTitle, selection: { [unowned self] in
-                    let loginsPasswordsViewController = LoginListViewControllerCore(
+                    let loginsPasswordsViewController = LoginListViewController(
                         profile: self.profile,
                         passwordAPI: self.passwordAPI,
                         windowProtection: self.windowProtection)
