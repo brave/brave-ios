@@ -8,28 +8,32 @@ import BraveCore
 
 #if DEBUG
 
-class MockAssetRatioService: BraveWallet.TestAssetRatioService {
+class MockAssetRatioService: BraveWalletAssetRatioService {
   private let assets: [String: BraveWallet.AssetPrice] = [
     "eth": .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23"),
     "bat": .init(fromAsset: "bat", toAsset: "usd", price: "0.627699", assetTimeframeChange: "-0.019865"),
   ]
-  override func price(_ fromAssets: [String], toAssets: [String], timeframe: BraveWallet.AssetPriceTimeframe, completion: @escaping (Bool, [BraveWallet.AssetPrice]) -> Void) {
+  func price(_ fromAssets: [String], toAssets: [String], timeframe: BraveWallet.AssetPriceTimeframe, completion: @escaping (Bool, [BraveWallet.AssetPrice]) -> Void) {
     let prices = assets.filter { (key, value) in
       fromAssets.contains(where: { key == $0 })
     }
     completion(!prices.isEmpty, Array(prices.values))
   }
   
-  override func estimatedTime(_ gasPrice: String, completion: @escaping (Bool, String) -> Void) {
+  func estimatedTime(_ gasPrice: String, completion: @escaping (Bool, String) -> Void) {
     completion(false, "")
   }
   
-  override func gasOracle(_ completion: @escaping (BraveWallet.GasEstimation1559?) -> Void) {
+  func gasOracle(_ completion: @escaping (BraveWallet.GasEstimation1559?) -> Void) {
     completion(nil)
   }
   
-  override func tokenInfo(_ contractAddress: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
+  func tokenInfo(_ contractAddress: String, completion: @escaping (BraveWallet.BlockchainToken?) -> Void) {
     completion(nil)
+  }
+  
+  func priceHistory(_ asset: String, vsAsset: String, timeframe: BraveWallet.AssetPriceTimeframe, completion: @escaping (Bool, [BraveWallet.AssetTimePrice]) -> Void) {
+    completion(false, [])
   }
 }
 
