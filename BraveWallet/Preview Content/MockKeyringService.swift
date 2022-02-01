@@ -65,7 +65,7 @@ class MockKeyringService: BraveWalletKeyringService {
     let info = BraveWallet.AccountInfo()
     info.name = accountName
     info.address = nextAddress()
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       keyring.accountInfos.append(info)
       observers.allObjects.forEach {
         $0.accountsChanged()
@@ -75,7 +75,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func createWallet(_ password: String, completion: @escaping (String) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       keyring.isDefaultKeyringCreated = true
       keyring.isLocked = false
       self.password = password
@@ -94,13 +94,13 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func isLocked(_ completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+    defaultKeyringInfo { keyring in
       completion(keyring.isLocked)
     }
   }
   
   func lock() {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       keyring.isLocked = true
       observers.allObjects.forEach {
         $0.locked()
@@ -109,7 +109,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func isWalletBackedUp(_ completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+    defaultKeyringInfo { keyring in
       completion(keyring.isBackedUp)
     }
   }
@@ -119,7 +119,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func unlock(_ password: String, completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       if !keyring.isDefaultKeyringCreated {
         completion(false)
         return
@@ -136,7 +136,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func notifyWalletBackupComplete() {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       keyring.isBackedUp = true
       observers.allObjects.forEach {
         $0.backedUp()
@@ -192,7 +192,7 @@ class MockKeyringService: BraveWalletKeyringService {
     info.address = nextImportedAddress()
     info.isImported = true
     privateKeys[info.address] = privateKey
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       keyring.accountInfos.append(info)
       observers.allObjects.forEach {
         $0.accountsChanged()
@@ -226,7 +226,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func removeImportedAccount(_ address: String, completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       guard let index = keyring.accountInfos.firstIndex(where: { $0.address == address }) else {
         completion(false)
         return
@@ -254,7 +254,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func setSelectedAccount(_ address: String, completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    defaultKeyringInfo { [self] keyring in
       guard let account = keyring.accountInfos.first(where: { $0.address == address }) else {
         completion(false)
         return

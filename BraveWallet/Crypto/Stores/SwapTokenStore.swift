@@ -644,7 +644,7 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
   }
   
   public func selectedAccountChanged() {
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyringInfo in
+    keyringService.defaultKeyringInfo { [self] keyringInfo in
       if !keyringInfo.accountInfos.isEmpty {
         keyringService.selectedAccount { accountAddress in
           let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ??

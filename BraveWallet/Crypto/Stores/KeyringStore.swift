@@ -102,7 +102,7 @@ public class KeyringStore: ObservableObject {
     self.keyringService = keyringService
     self.keyringService.add(self)
     updateKeyringInfo()
-    self.keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyringInfo in
+    self.keyringService.defaultKeyringInfo { [self] keyringInfo in
       isOnboardingVisible = !keyringInfo.isDefaultKeyringCreated
       if Self.isKeychainPasswordStored && isOnboardingVisible {
         // If a user deletes the app and they had a stored user password in the past that keychain item
@@ -123,7 +123,7 @@ public class KeyringStore: ObservableObject {
   }
   
   private func updateKeyringInfo() {
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyringInfo in
+    keyringService.defaultKeyringInfo { [self] keyringInfo in
       if UIApplication.shared.applicationState != .active {
         // Changes made in the backgroud due to timers going off at launch don't
         // re-render things properly.

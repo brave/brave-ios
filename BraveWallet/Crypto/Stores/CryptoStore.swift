@@ -177,7 +177,7 @@ public class CryptoStore: ObservableObject {
   }
   
   func fetchUnapprovedTransactions() {
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    keyringService.defaultKeyringInfo { [self] keyring in
       var pendingTransactions: [BraveWallet.TransactionInfo] = []
       let group = DispatchGroup()
       for info in keyring.accountInfos {

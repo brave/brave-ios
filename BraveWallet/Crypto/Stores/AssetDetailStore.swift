@@ -88,7 +88,7 @@ class AssetDetailStore: ObservableObject {
       isBuySupported = tokens.first(where: { $0.symbol.lowercased() == token.symbol.lowercased() }) != nil
     }
     
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    keyringService.defaultKeyringInfo { [self] keyring in
       accounts = keyring.accountInfos.map {
         .init(account: $0, decimalBalance: 0.0, balance: "", fiatBalance: "")
       }
@@ -131,7 +131,7 @@ class AssetDetailStore: ObservableObject {
   
   func fetchAccountBalances() {
     isLoadingAccountBalances = true
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    keyringService.defaultKeyringInfo { [self] keyring in
       let group = DispatchGroup()
       for account in keyring.accountInfos {
         group.enter()
@@ -153,7 +153,7 @@ class AssetDetailStore: ObservableObject {
   func fetchTransactions() {
     rpcService.network { [weak self] network in
       guard let self = self else { return }
-      self.keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+      self.keyringService.defaultKeyringInfo { keyring in
         var allTransactions: [BraveWallet.TransactionInfo] = []
         let group = DispatchGroup()
         for account in keyring.accountInfos {
@@ -188,7 +188,7 @@ extension AssetDetailStore: BraveWalletKeyringServiceObserver {
   }
   
   func accountsChanged() {
-    keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyring in
+    keyringService.defaultKeyringInfo { [self] keyring in
       accounts = keyring.accountInfos.map {
         .init(account: $0, decimalBalance: 0.0, balance: "", fiatBalance: "")
       }

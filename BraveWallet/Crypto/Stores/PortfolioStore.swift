@@ -164,7 +164,7 @@ public class PortfolioStore: ObservableObject {
         }
         let group = DispatchGroup()
         group.enter()
-        keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+        keyringService.defaultKeyringInfo { keyring in
           fetchBalances(accounts: keyring.accountInfos) {
             fetchHistoryForNonZeroBalances {
               group.leave()
