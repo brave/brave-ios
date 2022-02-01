@@ -86,16 +86,8 @@ class MockJsonRpcService: BraveWallet.TestJsonRpcService {
     completion([])
   }
   
-  func addEthereumChain(forOrigin chain: BraveWallet.EthereumChain, origin: URL, completion: @escaping (String, Bool) -> Void) {
-    completion("", false)
-  }
-  
   override func removeEthereumChain(_ chainId: String, completion: @escaping (Bool) -> Void) {
     completion(false)
-  }
-  
-  func add(_ chain: BraveWallet.EthereumChain, completion: @escaping (String, Bool) -> Void) {
-    completion("", false)
   }
 }
 
