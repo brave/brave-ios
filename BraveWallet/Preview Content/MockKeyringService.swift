@@ -316,7 +316,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func setKeyringDerivedAccountName(_ keyringId: String, address: String, name: String, completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+    keyringInfo(keyringId) { keyring in
       if let account = keyring.accountInfos.first(where: { $0.address == address }) {
         account.name = name
         completion(true)
@@ -327,7 +327,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func setKeyringImportedAccountName(_ keyringId: String, address: String, name: String, completion: @escaping (Bool) -> Void) {
-    keyringInfo(BraveWallet.DefaultKeyringId) { keyring in
+    keyringInfo(keyringId) { keyring in
       if let account = keyring.accountInfos.first(where: { $0.address == address && $0.isImported }) {
         account.name = name
         completion(true)
