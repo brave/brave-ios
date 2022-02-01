@@ -90,7 +90,8 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func keyringInfo(_ keyringId: String, completion: @escaping (BraveWallet.KeyringInfo) -> Void) {
-    return completion(keyrings.first(where: { $0.id == keyringId }) ?? keyrings[0])
+    let keyringInfo = keyrings.first(where: { $0.id == keyringId }) ?? keyrings[0]
+    completion(keyringInfo.copy() as! BraveWallet.KeyringInfo)
   }
   
   func isLocked(_ completion: @escaping (Bool) -> Void) {
@@ -338,9 +339,13 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func keyringsInfo(_ keyrings: [String], completion: @escaping ([BraveWallet.KeyringInfo]) -> Void) {
-    completion(self.keyrings.filter({
-      keyrings.contains($0.id)
-    }))
+    var keyringInfo = [BraveWallet.KeyringInfo]()
+    for item in self.keyrings {
+      if keyrings.contains(item.id) {
+        keyringInfo.append(item.copy() as! BraveWallet.KeyringInfo)
+      }
+    }
+    completion(keyringInfo)
   }
   
   func addHardwareAccounts(_ info: [BraveWallet.HardwareWalletAccount]) {
