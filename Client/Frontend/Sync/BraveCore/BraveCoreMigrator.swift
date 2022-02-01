@@ -384,10 +384,6 @@ extension BraveCoreMigrator {
 
             for login in results.asArray() {
                 if self.migrateChromiumPasswords(login: login) {
-                    
-                    // TODO: Remove when migrateChromiumPasswords is properly implemented
-                    completion(true)
-                    
                     self.profile.logins.removeLoginByGUID(login.guid).upon { result in
                         DispatchQueue.main.async {
                             if result.isSuccess {
@@ -408,24 +404,28 @@ extension BraveCoreMigrator {
     }
     
     private func migrateChromiumPasswords(login: Login) -> Bool {
-        // TODO: Remove when migrateChromiumPasswords is properly implemented
-        return true
-        
-        guard let url = (login.formSubmitURL?.asURL ?? login.hostname.asURL) else {
+        guard let formSubmitURLString = login.formSubmitURL, let formSubmitURL = URL(string: formSubmitURLString) else {
             return false
         }
         
-//        let passwordForm = PasswordForm(url: url, dateCreated: <#T##Date?#>, usernameValue: <#T##String?#>, passwordValue: <#T##String?#>, isBlockedByUser: <#T##Bool#>, scheme: PasswordFormScheme.typeHtml)
-//
-//        guard let title = passwordForm.title,
-//              let absoluteUrl = passwordForm.url, let url = URL(string: absoluteUrl),
-//              let dateAdded = passwordForm.visitedOn else {
-//            log.error("Invalid History Specifics")
-//            return false
-//        }
-//
-//
-//        return true
+        let loginForm = PasswordForm(
+            url: formSubmitURL,
+            signOnRealm: nil,
+            dateCreated: login.timeCreated.toDate(),
+            dateLastUsed: login.timeLastUsed.toDate(),
+            datePasswordChanged: login.timePasswordChanged.toDate(),
+            usernameElement: login.usernameField,
+            usernameValue: login.username,
+            passwordElement: login.password,
+            passwordValue: login.password,
+            isBlockedByUser: false,
+            scheme: .typeHtml)
+        
+        DispatchQueue.main.async {
+            self.passwordAPI.addLogin(loginForm)
+        }
+        
+        return true
     }
 }
 

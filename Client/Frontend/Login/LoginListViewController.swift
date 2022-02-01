@@ -286,9 +286,9 @@ extension LoginListViewController {
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            guard let loginItem = credentialList[safe: indexPath.row] else { return }
+            guard let credential = credentialList[safe: indexPath.row] else { return }
             
-//            showDeleteLoginWarning(with: loginItem)
+            showDeleteLoginWarning(with: credential)
         }
     }
     
@@ -296,22 +296,18 @@ extension LoginListViewController {
         return indexPath.section == Section.savedLogins.rawValue
     }
     
-    private func showDeleteLoginWarning(with loginItem: Login) {
+    private func showDeleteLoginWarning(with credential: PasswordForm) {
         let alert = UIAlertController(
             title: Strings.deleteLoginAlertTitle,
             message: Strings.Login.loginEntryDeleteAlertMessage,
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
-//            let success = self?.profile.logins.removeLoginByGUID(loginItem.guid)
-//
-//            success?.upon { result in
-//                if result.isSuccess {
-//                    self?.fetchLoginInfo()
-//                } else {
-//                    log.error("Error while deleting a login entry")
-//                }
-//            }
+            DispatchQueue.main.async {
+                // TODO: Not working for items brought from sync desktop
+                self?.passwordAPI.removeLogin(credential)
+                self?.fetchLoginInfo()
+            }
         }))
         
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
