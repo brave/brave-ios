@@ -26,7 +26,8 @@ public class WalletStore {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletEthTxService
   ) {
-    self.keyringStore = .init(keyringService: keyringService)
+    self.keyringStore = .init(keyringService: keyringService,
+                              walletService: walletService)
     self.setUp(
       keyringService: keyringService,
       rpcService: rpcService,
