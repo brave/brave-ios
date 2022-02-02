@@ -38,6 +38,7 @@ class LoginInfoViewController: LoginAuthViewController {
     }
     
     weak var settingsDelegate: SettingsDelegate?
+    private var passwordAPI: BravePasswordAPI
 
     // MARK: Private
     
@@ -69,7 +70,8 @@ class LoginInfoViewController: LoginAuthViewController {
     
     // MARK: Lifecycle
 
-    init(credentials: PasswordForm, windowProtection: WindowProtection?) {
+    init(passwordAPI: BravePasswordAPI, credentials: PasswordForm, windowProtection: WindowProtection?) {
+        self.passwordAPI = passwordAPI
         self.credentials = credentials
         super.init(windowProtection: windowProtection)
     }
@@ -277,33 +279,30 @@ extension LoginInfoViewController {
     }
     
     @objc private func done() {
-        updateLoginInfo { [weak self] in
+        updateLoginInfo { [weak self] success in
             guard let self = self else { return }
 
             self.isEditingFieldData = false
-            self.tableView.reloadData()
+            if success {
+                self.tableView.reloadData()
+            }
             self.navigationItem.rightBarButtonItem =
                 UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(self.edit))
         }
     }
     
-    private func updateLoginInfo(completion: @escaping () -> Void) {
+    private func updateLoginInfo(completion: @escaping (Bool) -> Void) {
         guard let username = usernameField?.text, let password = passwordField?.text,
               username != credentials.usernameValue || password != credentials.passwordValue else {
-            completion()
+            completion(false)
             return
         }
-                
-//        credentials.update(password: password, username: username)
         
-//        profile.logins.updateLoginByGUID(credentials.guid, new: credentials, significant: true).upon { result in
-//            DispatchQueue.main.async {
-//                if !result.isSuccess {
-//                    log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
-//                }
-//                completion()
-//            }
-//        }
+        let oldCredentials = credentials
+        credentials.update(username, passwordValue: password)
+        passwordAPI.updateLogin(credentials, oldPasswordForm: oldCredentials)
+        
+        completion(true)
     }
     
     private func deleteLogin() {
@@ -312,16 +311,11 @@ extension LoginInfoViewController {
             message: Strings.Login.loginEntryDeleteAlertMessage,
             preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [unowned self] _ in
-//            self.profile.logins.removeLoginByGUID(self.credentials.guid).upon { result in
-//                DispatchQueue.main.async {
-//                    if result.isSuccess {
-//                        self.navigationController?.popViewController(animated: true)
-//                    } else {
-//                        log.error("Error while deleting a login entry")
-//                    }
-//                }
-//            }
+        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.passwordAPI.removeLogin(self.credentials)
+            self.navigationController?.popViewController(animated: true)
         }))
         
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))

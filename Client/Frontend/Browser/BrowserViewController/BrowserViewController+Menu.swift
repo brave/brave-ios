@@ -161,15 +161,9 @@ extension BrowserViewController {
                                                 rewards: self.rewards,
                                                 legacyWallet: self.legacyWallet,
                                                 windowProtection: self.windowProtection,
-<<<<<<< HEAD
-                                                historyAPI: self.historyAPI,
-                                                syncAPI: self.syncAPI,
+                                                braveCore: self.braveCore,
                                                 walletSettingsStore: settingsStore,
                                                 walletNetworkStore: networkStore)
-=======
-                                                braveCore: self.braveCore,
-                                                walletKeyringStore: keyringStore)
->>>>>>> 35a5e1096 (Adding password reference to settings to login controllers)
                 vc.settingsDelegate = self
                 menuController.pushInnerMenu(vc)
             }

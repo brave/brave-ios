@@ -252,6 +252,7 @@ extension LoginListViewController {
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == Section.savedLogins.rawValue, let credentials = credentialList[safe: indexPath.row] {
             let loginDetailsViewController = LoginInfoViewController(
+                passwordAPI: passwordAPI,
                 credentials: credentials,
                 windowProtection: windowProtection)
             loginDetailsViewController.settingsDelegate = settingsDelegate
