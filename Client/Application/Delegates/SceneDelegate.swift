@@ -15,6 +15,8 @@ private let log = Logger.browserLogger
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
+    // This property must be non-null because even though it's optional,
+    // Chromium force unwraps it and uses it. For this reason, we always set this window property to the scene's main window.
     internal var window: UIWindow?
     private var windowProtection: WindowProtection?
     private var sceneInfo: AppDelegate.SceneInfoModel?
