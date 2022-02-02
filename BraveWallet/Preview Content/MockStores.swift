@@ -46,14 +46,10 @@ extension NetworkStore {
 
 extension KeyringStore {
   static var previewStore: KeyringStore {
-    .init(
-      keyringService: MockKeyringService(),
-      walletService: MockBraveWalletService()
-    )
+    .init(keyringService: MockKeyringService())
   }
   static var previewStoreWithWalletCreated: KeyringStore {
-    let store = KeyringStore(keyringService: MockKeyringService(),
-                             walletService: MockBraveWalletService())
+    let store = KeyringStore(keyringService: MockKeyringService())
     store.createWallet(password: "password")
     return store
   }

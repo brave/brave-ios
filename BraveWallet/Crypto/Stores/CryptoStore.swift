@@ -201,6 +201,10 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
+  
+  func reset() {
+    walletService.reset()
+  }
 }
 
 extension CryptoStore: BraveWalletEthTxServiceObserver {

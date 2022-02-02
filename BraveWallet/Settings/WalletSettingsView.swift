@@ -9,11 +9,16 @@ import BraveUI
 
 public struct WalletSettingsView: View {
   @ObservedObject var keyringStore: KeyringStore
+  var cryptoStore: CryptoStore
   
   @State private var isShowingResetAlert = false
   
-  public init(keyringStore: KeyringStore) {
+  public init(
+    keyringStore: KeyringStore,
+    cryptoStore: CryptoStore
+  ) {
     self.keyringStore = keyringStore
+    self.cryptoStore = cryptoStore
   }
   
   private var autoLockIntervals: [AutoLockInterval] {
@@ -60,7 +65,7 @@ public struct WalletSettingsView: View {
         title: Text(Strings.Wallet.settingsResetWalletAlertTitle),
         message: Text(Strings.Wallet.settingsResetWalletAlertMessage),
         primaryButton: .destructive(Text(Strings.Wallet.settingsResetWalletAlertButtonTitle), action: {
-          keyringStore.reset()
+          cryptoStore.reset()
         }),
         secondaryButton: .cancel(Text(Strings.no))
       )
@@ -72,7 +77,10 @@ public struct WalletSettingsView: View {
 struct WalletSettingsView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      WalletSettingsView(keyringStore: .previewStore)
+      WalletSettingsView(
+        keyringStore: .previewStore,
+        cryptoStore: .previewStore
+      )
     }
   }
 }

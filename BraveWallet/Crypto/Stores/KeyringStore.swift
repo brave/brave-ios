@@ -96,15 +96,10 @@ public class KeyringStore: ObservableObject {
   }
   
   private let keyringService: BraveWalletKeyringService
-  private let walletService: BraveWalletBraveWalletService // for wallet reset
   private var cancellable: AnyCancellable?
   
-  public init(
-    keyringService: BraveWalletKeyringService,
-    walletService: BraveWalletBraveWalletService
-  ) {
+  public init(keyringService: BraveWalletKeyringService) {
     self.keyringService = keyringService
-    self.walletService = walletService
     self.keyringService.add(self)
     updateKeyringInfo()
     self.keyringService.defaultKeyringInfo { [self] keyringInfo in
@@ -259,12 +254,6 @@ public class KeyringStore: ObservableObject {
     }
   }
   
-  func reset() {
-    walletService.reset()
-    isOnboardingVisible = true
-    Self.resetKeychainStoredPassword()
-  }
-  
   func privateKey(for account: BraveWallet.AccountInfo, completion: @escaping (String?) -> Void) {
     if account.isPrimary {
       keyringService.privateKey(forDefaultKeyringAccount: account.address) { success, key in
@@ -371,6 +360,8 @@ public class KeyringStore: ObservableObject {
 
 extension KeyringStore: BraveWalletKeyringServiceObserver {
   public func keyringReset() {
+    isOnboardingVisible = true
+    Self.resetKeychainStoredPassword()
   }
   
   public func autoLockMinutesChanged() {
