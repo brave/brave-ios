@@ -222,9 +222,9 @@ extension CryptoStore: BraveWalletEthTxServiceObserver {
 extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func keyringReset() {
   }
-  public func keyringCreated() {
+  public func keyringCreated(_ keyringId: String) {
   }
-  public func keyringRestored() {
+  public func keyringRestored(_ keyringId: String) {
   }
   public func locked() {
     isPresentingTransactionConfirmations = false

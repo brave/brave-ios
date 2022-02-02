@@ -59,7 +59,7 @@ class MockKeyringService: BraveWalletKeyringService {
     return address
   }
   
-  func addAccount(_ accountName: String, completion: @escaping (Bool) -> Void) {
+  func addAccount(_ accountName: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
     let info = BraveWallet.AccountInfo()
     info.name = accountName
     info.address = nextAddress()
@@ -74,11 +74,11 @@ class MockKeyringService: BraveWalletKeyringService {
     defaultKeyring.isDefaultKeyringCreated = true
     defaultKeyring.isLocked = false
     self.password = password
-    addAccount("Account 1") { [self] _ in
+    addAccount("Account 1", coin: .eth) { [self] _ in
       selectedAccount = defaultKeyring.accountInfos.first
     }
     observers.allObjects.forEach {
-      $0.keyringCreated()
+      $0.keyringCreated(BraveWallet.DefaultKeyringId)
     }
     completion(mnemonic)
   }
@@ -133,7 +133,7 @@ class MockKeyringService: BraveWalletKeyringService {
     self.password = password
     // Test store does not test phrase validity
     observers.allObjects.forEach {
-      $0.keyringRestored()
+      $0.keyringRestored(BraveWallet.DefaultKeyringId)
     }
     completion(true)
   }

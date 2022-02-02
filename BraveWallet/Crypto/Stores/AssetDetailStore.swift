@@ -197,10 +197,10 @@ extension AssetDetailStore: BraveWalletKeyringServiceObserver {
     }
   }
   
-  func keyringCreated() {
+  func keyringCreated(_ keyringId: String) {
   }
   
-  func keyringRestored() {
+  func keyringRestored(_ keyringId: String) {
   }
   
   func locked() {

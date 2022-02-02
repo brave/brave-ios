@@ -198,7 +198,7 @@ public class KeyringStore: ObservableObject {
   }
   
   func addPrimaryAccount(_ name: String, completion: ((Bool) -> Void)? = nil) {
-    keyringService.addAccount(name) { success in
+    keyringService.addAccount(name, coin: .eth) { success in
       self.updateKeyringInfo()
       completion?(success)
     }
@@ -357,11 +357,11 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
     updateKeyringInfo()
   }
 
-  public func keyringCreated() {
+  public func keyringCreated(_ keyringId: String) {
     updateKeyringInfo()
   }
   
-  public func keyringRestored() {
+  public func keyringRestored(_ keyringId: String) {
     updateKeyringInfo()
   }
   
