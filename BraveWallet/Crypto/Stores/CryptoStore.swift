@@ -176,18 +176,8 @@ public class CryptoStore: ObservableObject {
     return store
   }
   
-  private var settingsStore: SettingsStore?
-  func openSettingsStore() -> SettingsStore {
-    if let store = settingsStore {
-      return store
-    }
-    let store = SettingsStore(
-      keyringService: keyringService,
-      walletService: walletService
-    )
-    settingsStore = store
-    return store
-  }
+  private(set) lazy var settingsStore = SettingsStore(keyringService: keyringService,
+                                                      walletService: walletService)
   
   func fetchUnapprovedTransactions() {
     keyringService.defaultKeyringInfo { [self] keyring in
@@ -213,10 +203,6 @@ public class CryptoStore: ObservableObject {
         }
       }
     }
-  }
-  
-  func reset() {
-    walletService.reset()
   }
 }
 

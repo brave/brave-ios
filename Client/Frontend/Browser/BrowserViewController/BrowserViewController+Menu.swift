@@ -148,32 +148,17 @@ extension BrowserViewController {
                                                   walletService: walletService)
                 }
                 
-                settingsStore?.isDefaultKeyringCreated { created in
-                    if created {
-                        let vc = SettingsViewController(profile: self.profile,
-                                                        tabManager: self.tabManager,
-                                                        feedDataSource: self.feedDataSource,
-                                                        rewards: self.rewards,
-                                                        legacyWallet: self.legacyWallet,
-                                                        windowProtection: self.windowProtection,
-                                                        historyAPI: self.historyAPI,
-                                                        syncAPI: self.syncAPI,
-                                                        walletSettingsStore: settingsStore)
-                        vc.settingsDelegate = self
-                        menuController.pushInnerMenu(vc)
-                    } else {
-                        let vc = SettingsViewController(profile: self.profile,
-                                                        tabManager: self.tabManager,
-                                                        feedDataSource: self.feedDataSource,
-                                                        rewards: self.rewards,
-                                                        legacyWallet: self.legacyWallet,
-                                                        windowProtection: self.windowProtection,
-                                                        historyAPI: self.historyAPI,
-                                                        syncAPI: self.syncAPI)
-                        vc.settingsDelegate = self
-                        menuController.pushInnerMenu(vc)
-                    }
-                }
+                let vc = SettingsViewController(profile: self.profile,
+                                                tabManager: self.tabManager,
+                                                feedDataSource: self.feedDataSource,
+                                                rewards: self.rewards,
+                                                legacyWallet: self.legacyWallet,
+                                                windowProtection: self.windowProtection,
+                                                historyAPI: self.historyAPI,
+                                                syncAPI: self.syncAPI,
+                                                walletSettingsStore: settingsStore)
+                vc.settingsDelegate = self
+                menuController.pushInnerMenu(vc)
             }
         }
     }

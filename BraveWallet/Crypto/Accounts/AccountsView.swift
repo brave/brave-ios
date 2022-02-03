@@ -36,7 +36,7 @@ struct AccountsView: View {
     List {
       Section(
         header: AccountsHeaderView(keyringStore: keyringStore,
-                                   cryptoStore: cryptoStore)
+                                   settingsStore: cryptoStore.settingsStore)
           .resetListHeaderStyle()
       ) {
       }
