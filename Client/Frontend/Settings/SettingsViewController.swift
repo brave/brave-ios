@@ -577,7 +577,7 @@ class SettingsViewController: TableViewController {
     }()
     
     private func setUpSections() {
-        if #available(iOS 14.0, *), let settingsStore = walletSettingsStore {
+        if let settingsStore = walletSettingsStore {
             settingsStore.isDefaultKeyringCreated { [weak self] created in
                 guard let self = self else { return }
                 var copyOfSections = self.sections
@@ -590,10 +590,8 @@ class SettingsViewController: TableViewController {
                             self.navigationController?.pushViewController(vc, animated: true)
                         }, image: #imageLiteral(resourceName: "menu-crypto").template, accessory: .disclosureIndicator)
                     )
-                    self.dataSource.sections = copyOfSections
-                } else {
-                    self.dataSource.sections = self.sections
                 }
+                self.dataSource.sections = copyOfSections
             }
         }
     }
