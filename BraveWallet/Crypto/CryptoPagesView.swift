@@ -58,8 +58,7 @@ struct CryptoPagesView: View {
       })
       .background(
         NavigationLink(
-          destination: WalletSettingsView(keyringStore: keyringStore,
-                                          cryptoStore: cryptoStore),
+          destination: WalletSettingsView(settingsStore: cryptoStore.openSettingsStore()),
           isActive: $isShowingSettings
         ) {
           Text(Strings.Wallet.settings)

@@ -141,36 +141,39 @@ extension BrowserViewController {
                 }
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-                var keyringStore: KeyringStore?
-                var cryptoStore: CryptoStore?
+                var settingsStore: SettingsStore?
                 if let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-                   let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-                   let assetRatioService = BraveWallet.AssetRatioServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-                   let walletService = BraveWallet.ServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-                   let swapService = BraveWallet.SwapServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-                   let txService = BraveWallet.EthTxServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
-                    keyringStore = KeyringStore(keyringService: keyringService)
-                    cryptoStore = CryptoStore(keyringService: keyringService,
-                                              rpcService: rpcService,
-                                              walletService: walletService,
-                                              assetRatioService: assetRatioService,
-                                              swapService: swapService,
-                                              blockchainRegistry: BraveCoreMain.blockchainRegistry,
-                                              txService: txService)
+                   let walletService = BraveWallet.ServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
+                    settingsStore = SettingsStore(keyringService: keyringService,
+                                                  walletService: walletService)
                 }
                 
-                let vc = SettingsViewController(profile: self.profile,
-                                                tabManager: self.tabManager,
-                                                feedDataSource: self.feedDataSource,
-                                                rewards: self.rewards,
-                                                legacyWallet: self.legacyWallet,
-                                                windowProtection: self.windowProtection,
-                                                historyAPI: self.historyAPI,
-                                                syncAPI: self.syncAPI,
-                                                walletKeyringStore: keyringStore,
-                                                cryptoStore: cryptoStore)
-                vc.settingsDelegate = self
-                menuController.pushInnerMenu(vc)
+                settingsStore?.isDefaultKeyringCreated { created in
+                    if created {
+                        let vc = SettingsViewController(profile: self.profile,
+                                                        tabManager: self.tabManager,
+                                                        feedDataSource: self.feedDataSource,
+                                                        rewards: self.rewards,
+                                                        legacyWallet: self.legacyWallet,
+                                                        windowProtection: self.windowProtection,
+                                                        historyAPI: self.historyAPI,
+                                                        syncAPI: self.syncAPI,
+                                                        walletSettingsStore: settingsStore)
+                        vc.settingsDelegate = self
+                        menuController.pushInnerMenu(vc)
+                    } else {
+                        let vc = SettingsViewController(profile: self.profile,
+                                                        tabManager: self.tabManager,
+                                                        feedDataSource: self.feedDataSource,
+                                                        rewards: self.rewards,
+                                                        legacyWallet: self.legacyWallet,
+                                                        windowProtection: self.windowProtection,
+                                                        historyAPI: self.historyAPI,
+                                                        syncAPI: self.syncAPI)
+                        vc.settingsDelegate = self
+                        menuController.pushInnerMenu(vc)
+                    }
+                }
             }
         }
     }

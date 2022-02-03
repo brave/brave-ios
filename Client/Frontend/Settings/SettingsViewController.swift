@@ -61,8 +61,7 @@ class SettingsViewController: TableViewController {
     private let feedDataSource: FeedDataSource
     private let historyAPI: BraveHistoryAPI
     private let syncAPI: BraveSyncAPI
-    private let walletKeyringStore: KeyringStore?
-    private let cryptoStore: CryptoStore?
+    private let walletSettingsStore: SettingsStore?
     private let windowProtection: WindowProtection?
 
     init(profile: Profile,
@@ -73,8 +72,7 @@ class SettingsViewController: TableViewController {
          windowProtection: WindowProtection?,
          historyAPI: BraveHistoryAPI,
          syncAPI: BraveSyncAPI,
-         walletKeyringStore: KeyringStore? = nil,
-         cryptoStore: CryptoStore? = nil
+         walletSettingsStore: SettingsStore? = nil
     ) {
         self.profile = profile
         self.tabManager = tabManager
@@ -84,8 +82,7 @@ class SettingsViewController: TableViewController {
         self.windowProtection = windowProtection
         self.historyAPI = historyAPI
         self.syncAPI = syncAPI
-        self.walletKeyringStore = walletKeyringStore
-        self.cryptoStore = cryptoStore
+        self.walletSettingsStore = walletSettingsStore
         
         super.init(style: .insetGrouped)
     }
@@ -252,10 +249,10 @@ class SettingsViewController: TableViewController {
             }, image: #imageLiteral(resourceName: "settings-playlist").template, accessory: .disclosureIndicator)
         )
         
-        if #available(iOS 14.0, *), let keyringStore = walletKeyringStore, keyringStore.isDefaultKeyringCreated, let cryptoStore = cryptoStore {
+        if #available(iOS 14.0, *), let settingsStore = walletSettingsStore {
             section.rows.append(
                 Row(text: Strings.Wallet.braveWallet, selection: { [unowned self] in
-                    let vc = UIHostingController(rootView: WalletSettingsView(keyringStore: keyringStore, cryptoStore: cryptoStore))
+                    let vc = UIHostingController(rootView: WalletSettingsView(settingsStore: settingsStore))
                     self.navigationController?.pushViewController(vc, animated: true)
                 }, image: #imageLiteral(resourceName: "menu-crypto").template, accessory: .disclosureIndicator)
             )

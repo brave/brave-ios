@@ -49,8 +49,7 @@ struct AccountsHeaderView: View {
               .navigationViewStyle(StackNavigationViewStyle())
             }
         )
-        NavigationLink(destination: WalletSettingsView(keyringStore: keyringStore,
-                                                       cryptoStore: cryptoStore)
+        NavigationLink(destination: WalletSettingsView(settingsStore: cryptoStore.openSettingsStore())
         ) {
           Label(Strings.Wallet.settings, image: "brave.gear")
             .labelStyle(.iconOnly)

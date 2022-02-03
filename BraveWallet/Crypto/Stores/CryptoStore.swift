@@ -176,6 +176,19 @@ public class CryptoStore: ObservableObject {
     return store
   }
   
+  private var settingsStore: SettingsStore?
+  func openSettingsStore() -> SettingsStore {
+    if let store = settingsStore {
+      return store
+    }
+    let store = SettingsStore(
+      keyringService: keyringService,
+      walletService: walletService
+    )
+    settingsStore = store
+    return store
+  }
+  
   func fetchUnapprovedTransactions() {
     keyringService.defaultKeyringInfo { [self] keyring in
       var pendingTransactions: [BraveWallet.TransactionInfo] = []
