@@ -12,6 +12,8 @@ public struct WalletSettingsView: View {
   
   @State private var isShowingResetAlert = false
   
+  @Environment(\.presentationMode) @Binding private var presentationMode
+  
   public init(settingsStore: SettingsStore) {
     self.settingsStore = settingsStore
   }
@@ -61,6 +63,7 @@ public struct WalletSettingsView: View {
         message: Text(Strings.Wallet.settingsResetWalletAlertMessage),
         primaryButton: .destructive(Text(Strings.Wallet.settingsResetWalletAlertButtonTitle), action: {
           settingsStore.reset()
+          presentationMode.dismiss()
         }),
         secondaryButton: .cancel(Text(Strings.no))
       )
