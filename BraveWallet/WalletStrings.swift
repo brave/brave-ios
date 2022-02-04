@@ -1716,5 +1716,19 @@ extension Strings {
       value: "Add new network",
       comment: "The title for Custom Network Details Screen for user to add or edit custom network."
     )
+    public static let settingsNetworkButtonTitle = NSLocalizedString(
+      "wallet.settingsNetworkButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Networks",
+      comment: "The title of a button that will go the list of networks."
+    )
+    public static let networkFooter = NSLocalizedString(
+      "wallet.networkFooter",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Wallet networks customization",
+      comment: "The footer beneath the networks title in settings screen."
+    )
   }
 }

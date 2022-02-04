@@ -52,12 +52,12 @@ public struct WalletSettingsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        footer: Text("Wallet networks customization")
+        footer: Text(Strings.Wallet.networkFooter)
           .foregroundColor(Color(.secondaryBraveLabel))
       ) {
         Button(action: { isShowingNetworkList = true }) {
           HStack {
-            Text("Networks")
+            Text(Strings.Wallet.settingsNetworkButtonTitle)
               .foregroundColor(Color(.braveLabel))
             Spacer()
             Text(networkStore.selectedChain.shortChainName)
