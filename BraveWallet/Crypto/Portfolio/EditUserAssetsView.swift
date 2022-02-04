@@ -45,7 +45,7 @@ private struct SwipeActionsViewModifier_FB9812596: ViewModifier {
     content
       .swipeActions(edge: .trailing) {
         Button(role: .destructive, action: action) {
-          Label(Strings.Wallet.deleteCustomToken, systemImage: "trash")
+          Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
         }
       }
   }

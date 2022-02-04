@@ -59,11 +59,13 @@ public class NetworkStore: ObservableObject {
   public func addCustomNetwork(_ network: BraveWallet.EthereumChain,
                                completion: @escaping (_ accpted: Bool) -> Void) {
     func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
-      rpcService.add(network) { [self] chainId, accepted in
-        if accepted {
+      rpcService.add(network) { [self] chainId, status, _ in
+        if status == .success {
           ethereumChains.append(network)
+          completion(true)
+        } else {
+          completion(false)
         }
-        completion(accepted)
       }
     }
     

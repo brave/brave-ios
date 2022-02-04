@@ -9,12 +9,17 @@ import BraveUI
 
 public struct WalletSettingsView: View {
   @ObservedObject var settingsStore: SettingsStore
+  @ObservedObject var networkStore: NetworkStore
   
   @State private var isShowingNetworkList = false
   @State private var isShowingResetAlert = false
   
-  public init(settingsStore: SettingsStore) {
+  public init(
+    settingsStore: SettingsStore,
+    networkStore: NetworkStore
+  ) {
     self.settingsStore = settingsStore
+    self.networkStore = networkStore
   }
 
   private var autoLockIntervals: [AutoLockInterval] {
@@ -93,7 +98,10 @@ public struct WalletSettingsView: View {
 struct WalletSettingsView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      WalletSettingsView(settingsStore: .previewStore)
+      WalletSettingsView(
+        settingsStore: .previewStore,
+        networkStore: .previewStore
+      )
     }
   }
 }
