@@ -643,5 +643,6 @@ extension SettingsViewController: BraveWalletKeyringServiceObserver {
     
     func keyringReset() {
         setUpSections()
+        navigationController?.popViewController(animated: true)
     }
 }
