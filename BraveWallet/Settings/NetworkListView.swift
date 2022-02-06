@@ -14,13 +14,12 @@ struct NetworkCell: View {
   var body: some View {
     HStack {
       Text(network.chainName)
-        .font(.callout)
       Spacer()
       Image(systemName: "checkmark")
         .opacity(isCurrentNetwork ? 1 : 0)
-        .font(.callout)
         .foregroundColor(Color(.braveOrange))
     }
+    .font(.callout)
   }
 }
 
@@ -155,8 +154,6 @@ struct NetworkListView: View {
               .foregroundColor(Color(.braveOrange))
           }
         }
-      }
-      .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
             presentationMode.dismiss()

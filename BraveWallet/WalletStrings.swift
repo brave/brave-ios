@@ -1563,7 +1563,7 @@ extension Strings {
       comment: "Appended to 'Wallet' so that it appears as 'Wallet (Beta)' in the app menu. Describing 'beta' software"
     )
     public static let editCustomNetwork = NSLocalizedString(
-      "wallet.deleteCustomToken",
+      "wallet.editCustomNetwork",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Edit",

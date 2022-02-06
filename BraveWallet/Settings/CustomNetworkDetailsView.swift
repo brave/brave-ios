@@ -15,14 +15,10 @@ struct NetworkInputItem {
 struct NetworkTextField: View {
   var placeholder: String
   @Binding var item: NetworkInputItem
-  var onChange: (String) -> Void
   
   var body: some View {
     VStack(alignment: .leading) {
       TextField(placeholder, text: $item.input)
-        .onChange(of: item.input) { newValue in
-          onChange(newValue)
-        }
         .autocapitalization(.none)
         .disableAutocorrection(true)
       if let error = item.error {
@@ -60,18 +56,24 @@ class CustomNetworkModel: ObservableObject {
   
   init(network: BraveWallet.EthereumChain? = nil) {
     if let network = network {
-      self.networkId.input = network.chainId.chainIdInDecimal
+      let chainIdInDecimal: String
+      if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {
+        chainIdInDecimal = "\(intValue)"
+      } else {
+        chainIdInDecimal = network.chainId
+      }
+      self.networkId.input = chainIdInDecimal
       self.networkName.input = network.chainName
       self.networkSymbolName.input = network.symbolName
       self.networkSymbol.input = network.symbol
       self.networkDecimals.input = String(network.decimals)
-      if network.rpcUrls.count > 0 {
+      if !network.rpcUrls.isEmpty {
         self.rpcUrls = network.rpcUrls.compactMap({ NetworkInputItem(input: $0) })
       }
-      if network.iconUrls.count > 0 {
+      if !network.iconUrls.isEmpty{
         self.iconUrls = network.iconUrls.compactMap({ NetworkInputItem(input: $0) })
       }
-      if network.blockExplorerUrls.count > 0 {
+      if !network.blockExplorerUrls.isEmpty {
         self.blockUrls = network.blockExplorerUrls.compactMap({ NetworkInputItem(input: $0) })
       }
     }
@@ -98,161 +100,175 @@ struct CustomNetworkDetailsView: View {
   var body: some View {
     Form {
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkChainIdTitle)
+        header: Text(Strings.Wallet.customNetworkChainIdTitle)
           .textCase(.none)
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
           item: $model.networkId
-        ) { [self] newValue in
+        )
+          .onChange(of: model.networkId.input, perform: { newValue in
             if let intValue = Int(newValue), intValue > 0 {
               model.networkId.error = nil
             } else {
               model.networkId.error = Strings.Wallet.customNetworkChainIdErrMsg
             }
-        }
+          })
           .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkChainNameTitle)
+        header: Text(Strings.Wallet.customNetworkChainNameTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
-                         item: $model.networkName) { newValue in
-          if newValue.count < 1 {
-            model.networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
-          } else {
-            model.networkName.error = nil
-          }
-        }
+        NetworkTextField(
+          placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
+          item: $model.networkName
+        )
+          .onChange(of: model.networkName.input, perform: { newValue in
+            if newValue.isEmpty {
+              model.networkName.error = Strings.Wallet.customNetworkEmptyErrMsg
+            } else {
+              model.networkName.error = nil
+            }
+          })
           .disableAutocorrection(true)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkSymbolNameTitle)
+        header: Text(Strings.Wallet.customNetworkSymbolNameTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
-                         item: $model.networkSymbolName) { newValue in
-          if newValue.count < 1 {
-            model.networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
-          } else {
-            model.networkSymbolName.error = nil
-          }
-        }
+        NetworkTextField(
+          placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
+          item: $model.networkSymbolName
+        )
+          .onChange(of: model.networkSymbolName.input, perform: { newValue in
+            if newValue.isEmpty {
+              model.networkSymbolName.error = Strings.Wallet.customNetworkEmptyErrMsg
+            } else {
+              model.networkSymbolName.error = nil
+            }
+          })
           .disableAutocorrection(true)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkSymbolTitle)
+        header: Text(Strings.Wallet.customNetworkSymbolTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
-                         item: $model.networkSymbol) { newValue in
-          if newValue.count < 1 {
-            model.networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
-          } else {
-            model.networkSymbol.error = nil
-          }
-        }
+        NetworkTextField(
+          placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
+          item: $model.networkSymbol
+        )
+          .onChange(of: model.networkSymbol.input, perform: { newValue in
+            if newValue.isEmpty {
+              model.networkSymbol.error = Strings.Wallet.customNetworkEmptyErrMsg
+            } else {
+              model.networkSymbol.error = nil
+            }
+          })
           .disableAutocorrection(true)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkCurrencyDecimalTitle)
+        header: Text(Strings.Wallet.customNetworkCurrencyDecimalTitle)
           .textCase(.none)
       ) {
-        NetworkTextField(placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
-                         item: $model.networkDecimals) { newValue in
-          if newValue.isEmpty {
-            model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
-          } else if let intValue = Int(newValue), intValue > 0 {
-            model.networkDecimals.error = nil
-          } else {
-            model.networkDecimals.error = Strings.Wallet.customNetworkCurrencyDecimalErrMsg
-          }
-        }
+        NetworkTextField(
+          placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
+          item: $model.networkDecimals
+        )
+          .onChange(of: model.networkDecimals.input, perform: { newValue in
+            if newValue.isEmpty {
+              model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
+            } else if let intValue = Int(newValue), intValue > 0 {
+              model.networkDecimals.error = nil
+            } else {
+              model.networkDecimals.error = Strings.Wallet.customNetworkCurrencyDecimalErrMsg
+            }
+          })
           .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkRpcUrlsTitle)
+        header: Text(Strings.Wallet.customNetworkRpcUrlsTitle)
           .textCase(.none)
       ) {
         ForEach(model.rpcUrls.indices, id: \.self) { index in
-          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                           item: $model.rpcUrls[index]) { newValue in
-            var item = model.rpcUrls[index]
-            if validateUrl(newValue) {
-              item.error = nil
-              model.rpcUrls[index] = item
-              
-              if index == model.rpcUrls.count - 1 { // add a new row
-                let newRow = NetworkInputItem(input: "")
-                model.rpcUrls.append(newRow)
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+            item: $model.rpcUrls[index]
+          )
+            .onChange(of: model.rpcUrls[index].input) { newValue in
+              var item = model.rpcUrls[index]
+              if URIFixup.getURL(newValue) != nil {
+                item.error = nil
+                model.rpcUrls[index] = item
+                
+                if index == model.rpcUrls.count - 1 { // add a new row
+                  let newRow = NetworkInputItem(input: "")
+                  model.rpcUrls.append(newRow)
+                }
+              } else {
+                item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
+                model.rpcUrls[index] = item
               }
-            } else {
-              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              model.rpcUrls[index] = item
             }
-          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkIconUrlsTitle)
+        header: Text(Strings.Wallet.customNetworkIconUrlsTitle)
           .textCase(.none)
       ) {
         ForEach(model.iconUrls.indices, id: \.self) { index in
-          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                           item: $model.iconUrls[index]) { newValue in
-            var item: NetworkInputItem = model.iconUrls[index]
-            if validateUrl(newValue) {
-              item.error = nil
-              model.iconUrls[index] = item
-              
-              if index == model.iconUrls.count - 1 { // add a new row
-                let newRow = NetworkInputItem(input: "")
-                model.iconUrls.append(newRow)
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+            item: $model.iconUrls[index]
+          )
+            .onChange(of: model.iconUrls[index].input) { newValue in
+              var item: NetworkInputItem = model.iconUrls[index]
+              if URIFixup.getURL(newValue) != nil {
+                item.error = nil
+                model.iconUrls[index] = item
+                
+                if index == model.iconUrls.count - 1 { // add a new row
+                  let newRow = NetworkInputItem(input: "")
+                  model.iconUrls.append(newRow)
+                }
+              } else {
+                item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
+                model.iconUrls[index] = item
               }
-            } else {
-              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              model.iconUrls[index] = item
             }
-          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header:
-          Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle)
+        header: Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle)
           .textCase(.none)
       ) {
         ForEach(model.blockUrls.indices, id: \.self) { index in
-          NetworkTextField(placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                           item: $model.blockUrls[index]) { newValue in
-            var item: NetworkInputItem = model.blockUrls[index]
-            if validateUrl(newValue) {
-              item.error = nil
-              model.blockUrls[index] = item
-              
-              if index == model.blockUrls.count - 1 { // add a new row
-                let newRow = NetworkInputItem(input: "")
-                model.blockUrls.append(newRow)
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+            item: $model.blockUrls[index]
+          )
+            .onChange(of: model.blockUrls[index].input) { newValue in
+              var item: NetworkInputItem = model.blockUrls[index]
+              if URIFixup.getURL(newValue) != nil {
+                item.error = nil
+                model.blockUrls[index] = item
+                
+                if index == model.blockUrls.count - 1 { // add a new row
+                  let newRow = NetworkInputItem(input: "")
+                  model.blockUrls.append(newRow)
+                }
+              } else {
+                item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
+                model.blockUrls[index] = item
               }
-            } else {
-              item.error = Strings.Wallet.customNetworkInvalidAddressErrMsg
-              model.blockUrls[index] = item
             }
-          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -269,12 +285,6 @@ struct CustomNetworkDetailsView: View {
         }
       }
     }
-  }
-  
-  private func validateUrl(_ url: String) -> Bool {
-    let regex = "http[s]?://(([^/:.[:space:]]+(.[^/:.[:space:]]+)*)|([0-9](.[0-9]{3})))(:[0-9]+)?((/[^?#[:space:]]+)([^#[:space:]]+)?(#.+)?)?"
-    let test = NSPredicate(format: "SELF MATCHES %@", regex)
-    return test.evaluate(with: url)
   }
   
   private func validateAllFields() -> Bool {
@@ -339,8 +349,8 @@ struct CustomNetworkDetailsView: View {
         }
       })
     }
-    networkStore.addCustomNetwork(network) { accpted in
-      guard accpted else {
+    networkStore.addCustomNetwork(network) { accepted in
+      guard accepted else {
         return
       }
       
