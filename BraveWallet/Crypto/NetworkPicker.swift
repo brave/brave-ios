@@ -38,7 +38,9 @@ struct NetworkPicker: View {
     .accessibilityLabel(Strings.Wallet.selectedNetworkAccessibilityLabel)
     .accessibilityValue(networkStore.selectedChain.shortChainName)
     .sheet(isPresented: $isPresentingNetworkList) {
-      NetworkListView(networkStore: networkStore)
+      NavigationView {
+        NetworkListView(networkStore: networkStore)
+      }
     }
   }
 }

@@ -70,7 +70,7 @@ class CustomNetworkModel: ObservableObject {
       if !network.rpcUrls.isEmpty {
         self.rpcUrls = network.rpcUrls.compactMap({ NetworkInputItem(input: $0) })
       }
-      if !network.iconUrls.isEmpty{
+      if !network.iconUrls.isEmpty {
         self.iconUrls = network.iconUrls.compactMap({ NetworkInputItem(input: $0) })
       }
       if !network.blockExplorerUrls.isEmpty {

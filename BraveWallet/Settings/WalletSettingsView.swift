@@ -11,7 +11,6 @@ public struct WalletSettingsView: View {
   @ObservedObject var settingsStore: SettingsStore
   @ObservedObject var networkStore: NetworkStore
   
-  @State private var isShowingNetworkList = false
   @State private var isShowingResetAlert = false
   
   public init(
@@ -55,7 +54,7 @@ public struct WalletSettingsView: View {
         footer: Text(Strings.Wallet.networkFooter)
           .foregroundColor(Color(.secondaryBraveLabel))
       ) {
-        Button(action: { isShowingNetworkList = true }) {
+        NavigationLink(destination: NetworkListView(networkStore: networkStore)) {
           HStack {
             Text(Strings.Wallet.settingsNetworkButtonTitle)
               .foregroundColor(Color(.braveLabel))
@@ -78,9 +77,6 @@ public struct WalletSettingsView: View {
     .listStyle(InsetGroupedListStyle())
     .navigationTitle(Strings.Wallet.braveWallet)
     .navigationBarTitleDisplayMode(.inline)
-    .sheet(isPresented: $isShowingNetworkList) {
-      NetworkListView(networkStore: networkStore)
-    }
     .alert(isPresented: $isShowingResetAlert) {
       Alert(
         title: Text(Strings.Wallet.settingsResetWalletAlertTitle),

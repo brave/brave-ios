@@ -59,120 +59,118 @@ struct NetworkListView: View {
   }
   
   var body: some View {
-    NavigationView {
-      List {
-        ForEach(networkStore.ethereumChains) { network in
-          if network.isCustom {
-            Button(action: {
-              networkStore.updateSelectedNetwork(network)
-              presentationMode.dismiss()
-            }) {
-              NetworkCell(
-                network: network,
-                isCurrentNetwork: network.chainId == networkStore.selectedChainId
-              )
-            }
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                if network.chainId != networkStore.selectedChainId {
-                  content
-                    .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                      type: .delete,
-                      label: Strings.Wallet.deleteCustomTokenOrNetwork,
-                      action: {
-                        networkStore.removeCustomNetwork(network) { _ in }
-                      })
-                    )
-                    .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                      type: .edit,
-                      label: Strings.Wallet.editCustomNetwork,
-                      action: {
-                        isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                      })
-                    )
-                } else {
-                  content
-                    .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                      type: .edit,
-                      label: Strings.Wallet.editCustomNetwork,
-                      action: {
-                        isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                      })
-                    )
-                }
-              } else {
-                if network.chainId != networkStore.selectedChainId {
-                  content
-                    .contextMenu {
-                      Button {
-                        networkStore.removeCustomNetwork(network) { _ in }
-                      } label: {
-                        Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
-                      }
-                      Button {
-                        isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                      } label: {
-                        Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
-                      }
-                    }
-                } else {
-                  content
-                    .contextMenu {
-                      Button {
-                        isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                      } label: {
-                        Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
-                      }
-                    }
-                }
-              }
-            }
-          } else {
-            Button(action: {
-              networkStore.updateSelectedNetwork(network)
-              presentationMode.dismiss()
-            }) {
-              NetworkCell(
-                network: network,
-                isCurrentNetwork: network.chainId == networkStore.selectedChainId
-              )
-            }
-          }
-        }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
-      }
-      .listStyle(PlainListStyle())
-      .padding(.top, 23.0)
-      .navigationTitle(Strings.Wallet.networkListTitle)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItemGroup(placement: .confirmationAction) {
+    List {
+      ForEach(networkStore.ethereumChains) { network in
+        if network.isCustom {
           Button(action: {
-            isPresentingNetworkDetails = .init(isEditMode: false)
-          }) {
-            Text(Strings.Wallet.add)
-              .foregroundColor(Color(.braveOrange))
-          }
-        }
-        ToolbarItemGroup(placement: .cancellationAction) {
-          Button(action: {
+            networkStore.updateSelectedNetwork(network)
             presentationMode.dismiss()
           }) {
-            Text(Strings.cancelButtonTitle)
-              .foregroundColor(Color(.braveOrange))
+            NetworkCell(
+              network: network,
+              isCurrentNetwork: network.chainId == networkStore.selectedChainId
+            )
+          }
+          .osAvailabilityModifiers { content in
+            if #available(iOS 15.0, *) {
+              if network.chainId != networkStore.selectedChainId {
+                content
+                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
+                    type: .delete,
+                    label: Strings.Wallet.deleteCustomTokenOrNetwork,
+                    action: {
+                      networkStore.removeCustomNetwork(network) { _ in }
+                    })
+                  )
+                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
+                    type: .edit,
+                    label: Strings.Wallet.editCustomNetwork,
+                    action: {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    })
+                  )
+              } else {
+                content
+                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
+                    type: .edit,
+                    label: Strings.Wallet.editCustomNetwork,
+                    action: {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    })
+                  )
+              }
+            } else {
+              if network.chainId != networkStore.selectedChainId {
+                content
+                  .contextMenu {
+                    Button {
+                      networkStore.removeCustomNetwork(network) { _ in }
+                    } label: {
+                      Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
+                    }
+                    Button {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
+                    }
+                  }
+              } else {
+                content
+                  .contextMenu {
+                    Button {
+                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                    } label: {
+                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
+                    }
+                  }
+              }
+            }
+          }
+        } else {
+          Button(action: {
+            networkStore.updateSelectedNetwork(network)
+            presentationMode.dismiss()
+          }) {
+            NetworkCell(
+              network: network,
+              isCurrentNetwork: network.chainId == networkStore.selectedChainId
+            )
           }
         }
       }
-      .sheet(item: $isPresentingNetworkDetails) { details in
-        NavigationView {
-          CustomNetworkDetailsView(
-            networkStore: networkStore,
-            model: CustomNetworkModel(network: details.network),
-            isEditMode: details.isEditMode
-          )
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    }
+    .listStyle(PlainListStyle())
+    .padding(.top, 23.0)
+    .navigationTitle(Strings.Wallet.networkListTitle)
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItemGroup(placement: .confirmationAction) {
+        Button(action: {
+          isPresentingNetworkDetails = .init(isEditMode: false)
+        }) {
+          Text(Strings.Wallet.add)
+            .foregroundColor(Color(.braveOrange))
         }
-        .navigationViewStyle(StackNavigationViewStyle())
       }
+      ToolbarItemGroup(placement: .cancellationAction) {
+        Button(action: {
+          presentationMode.dismiss()
+        }) {
+          Text(Strings.cancelButtonTitle)
+            .foregroundColor(Color(.braveOrange))
+        }
+      }
+    }
+    .sheet(item: $isPresentingNetworkDetails) { details in
+      NavigationView {
+        CustomNetworkDetailsView(
+          networkStore: networkStore,
+          model: CustomNetworkModel(network: details.network),
+          isEditMode: details.isEditMode
+        )
+      }
+      .navigationViewStyle(StackNavigationViewStyle())
     }
   }
 }
