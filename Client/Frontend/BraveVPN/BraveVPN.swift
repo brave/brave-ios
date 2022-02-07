@@ -148,7 +148,15 @@ class BraveVPN {
         // The app has not expired yet and nothing is in keychain.
         // This means user has reinstalled the app while their vpn plan is still active.
         if GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential) == nil {
-            return .notPurchased
+            
+            if Preferences.VPN.skusCredential.value == nil {
+                return .notPurchased
+            } else {
+                // For Brave SKUs when a user purchase it, we get vpn credentials only,
+                // keychain items are configured on first connection.
+                // Therefore the vpn is purchased but not installed.
+                return .purchased
+            }
         }
         
         // No VPN config set means the user could buy the vpn but hasn't gone through the second screen

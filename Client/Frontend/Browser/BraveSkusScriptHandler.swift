@@ -94,12 +94,10 @@ class BraveSkusScriptHandler: TabContentScript {
     }
     
     private func handlePrepareCredentialsSummary(for domain: String, path: String) {
-        sku?.prepareCredentialsPresentation(domain, path: path) { [weak self, weak tab] credential in
+        sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
             // FIXME: Confirm we can pass string only not json/dict
-            print("bxx 3")
             if !credential.isEmpty {
                 Preferences.VPN.skusCredential.value = credential
-                tab?.tabDelegate?.showInstallVPNScreen(for: credential)
             }
             
             self?.callback(methodId: 3, result: credential)
