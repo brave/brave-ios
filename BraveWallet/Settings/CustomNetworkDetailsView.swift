@@ -28,6 +28,7 @@ struct NetworkTextField: View {
             .fixedSize(horizontal: false, vertical: true)
               .animation(nil, value: error)
         }
+        .accessibilityElement(children: .combine)
         .transition(
           .asymmetric(
             insertion: .opacity.animation(.default),
@@ -54,47 +55,50 @@ class CustomNetworkModel: ObservableObject {
   
   @Published var testUrls = [NetworkInputItem(input: "")]
   
-  init(network: BraveWallet.EthereumChain? = nil) {
-    if let network = network {
-      let chainIdInDecimal: String
-      if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {
-        chainIdInDecimal = "\(intValue)"
-      } else {
-        chainIdInDecimal = network.chainId
-      }
-      self.networkId.input = chainIdInDecimal
-      self.networkName.input = network.chainName
-      self.networkSymbolName.input = network.symbolName
-      self.networkSymbol.input = network.symbol
-      self.networkDecimals.input = String(network.decimals)
-      if !network.rpcUrls.isEmpty {
-        self.rpcUrls = network.rpcUrls.compactMap({ NetworkInputItem(input: $0) })
-      }
-      if !network.iconUrls.isEmpty {
-        self.iconUrls = network.iconUrls.compactMap({ NetworkInputItem(input: $0) })
-      }
-      if !network.blockExplorerUrls.isEmpty {
-        self.blockUrls = network.blockExplorerUrls.compactMap({ NetworkInputItem(input: $0) })
-      }
+  /// Updates the details of this class based on a custom network
+  func populateDetails(from network: BraveWallet.EthereumChain) {
+    let chainIdInDecimal: String
+    if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {
+      chainIdInDecimal = "\(intValue)"
+    } else {
+      chainIdInDecimal = network.chainId
+    }
+    self.networkId.input = chainIdInDecimal
+    self.networkName.input = network.chainName
+    self.networkSymbolName.input = network.symbolName
+    self.networkSymbol.input = network.symbol
+    self.networkDecimals.input = String(network.decimals)
+    if !network.rpcUrls.isEmpty {
+      self.rpcUrls = network.rpcUrls.compactMap({ NetworkInputItem(input: $0) })
+    }
+    if !network.iconUrls.isEmpty {
+      self.iconUrls = network.iconUrls.compactMap({ NetworkInputItem(input: $0) })
+    }
+    if !network.blockExplorerUrls.isEmpty {
+      self.blockUrls = network.blockExplorerUrls.compactMap({ NetworkInputItem(input: $0) })
     }
   }
 }
 
 struct CustomNetworkDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
-  @ObservedObject var model: CustomNetworkModel
+  @ObservedObject var model: CustomNetworkModel = .init()
   
   var isEditMode: Bool
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  init(networkStore: NetworkStore,
-       model: CustomNetworkModel,
-       isEditMode: Bool
+  init(
+    networkStore: NetworkStore,
+    network: BraveWallet.EthereumChain?
   ) {
     self.networkStore = networkStore
-    self.model = model
-    self.isEditMode = isEditMode
+    if let network = network {
+      self.isEditMode = true
+      self.model.populateDetails(from: network)
+    } else {
+      self.isEditMode = false
+    }
   }
   
   var body: some View {
@@ -365,8 +369,7 @@ struct CustomNetworkDetailsView_Previews: PreviewProvider {
       NavigationView {
         CustomNetworkDetailsView(
           networkStore: .previewStore,
-          model: .init(),
-          isEditMode: true
+          network: nil
         )
       }
     }
