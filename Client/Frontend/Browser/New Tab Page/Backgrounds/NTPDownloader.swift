@@ -35,7 +35,10 @@ class NTPDownloader {
                     .appendingPathComponent(code)
             case .sponsor:
                 guard let region = Locale.current.regionCode else { return nil }
-                return URL(string: baseUrl)?.appendingPathComponent(region)
+                let url = URL(string: baseUrl)?
+                    .appendingPathComponent(region)
+                    .appendingPathComponent("ios")
+                return url
             }
         }
         
