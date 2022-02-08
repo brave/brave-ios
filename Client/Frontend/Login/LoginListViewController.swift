@@ -41,9 +41,11 @@ class LoginListViewController: LoginAuthViewController {
     private let windowProtection: WindowProtection?
     
     private var credentialList = [PasswordForm]()
+    private var passwordStoreListener: PasswordStoreListener?
+    private var isCredentialsRefreshing = false
 
-    private var isFetchingLoginEntries = false
     private var searchLoginTimer: Timer?
+    private var isCredentialsBeingSearched = false
     private let searchController = UISearchController(searchResultsController: nil)
     private let emptyLoginView = EmptyStateOverlayView(description: Strings.Login.loginListEmptyScreenTitle)
     
@@ -54,10 +56,26 @@ class LoginListViewController: LoginAuthViewController {
         self.passwordAPI = passwordAPI
         
         super.init(windowProtection: windowProtection, requiresAuthentication: true)
+        
+        // Adding the Password store observer in constructor to watch credentials changes
+        passwordStoreListener = passwordAPI.add(PasswordStoreStateObserver { [weak self] _ in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.fetchLoginInfo()
+            }
+        })
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        // Remove the password store observer
+        if let observer = passwordStoreListener {
+            passwordAPI.removeObserver(observer)
+        }
     }
     
     override func viewDidLoad() {
@@ -126,14 +144,16 @@ class LoginListViewController: LoginAuthViewController {
     }
     
     private func fetchLoginInfo(_ searchQuery: String? = nil) {
-        guard !isFetchingLoginEntries else {
+        if isCredentialsBeingSearched {
             return
         }
         
-        isFetchingLoginEntries = true
-                
-        passwordAPI.getSavedLogins { credentials in
-            self.reloadEntries(with: searchQuery, passwordForms: credentials)
+        if !isCredentialsRefreshing {
+            isCredentialsRefreshing = true
+                    
+            passwordAPI.getSavedLogins { credentials in
+                self.reloadEntries(with: searchQuery, passwordForms: credentials)
+            }
         }
     }
     
@@ -149,7 +169,7 @@ class LoginListViewController: LoginAuthViewController {
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            self.isFetchingLoginEntries = false
+            self.isCredentialsRefreshing = false
             self.navigationItem.rightBarButtonItem?.isEnabled = !self.credentialList.isEmpty
         }
     }
@@ -359,11 +379,15 @@ extension LoginListViewController: UISearchResultsUpdating {
 extension LoginListViewController: UISearchControllerDelegate {
     
     func willPresentSearchController(_ searchController: UISearchController) {
+        isCredentialsBeingSearched = true
+        
         tableView.setEditing(false, animated: true)
         tableView.reloadData()
     }
     
     func willDismissSearchController(_ searchController: UISearchController) {
+        isCredentialsBeingSearched = false
+        
         tableView.reloadData()
     }
 }

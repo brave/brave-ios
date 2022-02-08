@@ -555,6 +555,7 @@
 		2FCEED8526EAAB6C00892699 /* HistoryAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */; };
 		2FD0E3AF2576C48A000C773B /* SchemePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */; };
 		2FD0E3D62577F327000C773B /* SearchSuggestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */; };
+		2FD155BE27B2F87000D383E7 /* PasswordStoreStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD155BD27B2F87000D383E7 /* PasswordStoreStateObserver.swift */; };
 		2FD1C60B2638823D00E3C25F /* HistoryFetchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */; };
 		2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */; };
 		2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */; };
@@ -2309,6 +2310,7 @@
 		2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryAPIExtensions.swift; sourceTree = "<group>"; };
 		2FD0E3AE2576C48A000C773B /* SchemePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemePermissionTests.swift; sourceTree = "<group>"; };
 		2FD0E3D52577F327000C773B /* SearchSuggestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionCell.swift; sourceTree = "<group>"; };
+		2FD155BD27B2F87000D383E7 /* PasswordStoreStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordStoreStateObserver.swift; sourceTree = "<group>"; };
 		2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryFetchers.swift; sourceTree = "<group>"; };
 		2FD1C61B2639AE9100E3C25F /* BrowserViewController+Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Onboarding.swift"; sourceTree = "<group>"; };
 		2FD70DB926C1C54D00345A33 /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
@@ -4945,6 +4947,14 @@
 			path = ThirdParty;
 			sourceTree = "<group>";
 		};
+		2FD155BC27B2F74E00D383E7 /* Password */ = {
+			isa = PBXGroup;
+			children = (
+				2FD155BD27B2F87000D383E7 /* PasswordStoreStateObserver.swift */,
+			);
+			path = Password;
+			sourceTree = "<group>";
+		};
 		2FD1C5FA2638599100E3C25F /* Bookmarks */ = {
 			isa = PBXGroup;
 			children = (
@@ -4971,6 +4981,7 @@
 				2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
 				2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */,
+				2FD155BC27B2F74E00D383E7 /* Password */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -8738,6 +8749,7 @@
 				0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */,
 				0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */,
 				274398F824E71E9800E79605 /* URLString.swift in Sources */,
+				2FD155BE27B2F87000D383E7 /* PasswordStoreStateObserver.swift in Sources */,
 				D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */,
 				0AF6B1E824A0EDC1005417FC /* InstallVPNViewController.swift in Sources */,
 				E4A961181AC041C40069AD6F /* ReadabilityService.swift in Sources */,

@@ -39,6 +39,7 @@ class LoginInfoViewController: LoginAuthViewController {
     
     weak var settingsDelegate: SettingsDelegate?
     private var passwordAPI: BravePasswordAPI
+    private var passwordStoreListener: PasswordStoreListener?
 
     // MARK: Private
     
@@ -74,10 +75,42 @@ class LoginInfoViewController: LoginAuthViewController {
         self.passwordAPI = passwordAPI
         self.credentials = credentials
         super.init(windowProtection: windowProtection)
+        
+        // Adding the Password store observer in constructor to watch credential passed to info screen is updated
+        passwordStoreListener = passwordAPI.add(PasswordStoreStateObserver { [weak self] stateChange in
+            guard let self = self else { return }
+            
+            switch stateChange {
+                case .passwordFormsChanged(let formList):
+                    guard self.isEditingFieldData else {
+                        return
+                    }
+                    
+                    // Observe password changes for an form with same signOnRealm and Username
+                    let observedForm = formList.first {
+                        $0.signOnRealm == self.credentials.signOnRealm &&
+                        $0.usernameElement == self.credentials.usernameElement
+                    }
+                    
+                    if let passwordForm = observedForm {
+                        self.credentials = passwordForm
+                    }
+                    
+                default:
+                    break
+            }
+        })
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        // Remove the password store observer
+        if let observer = passwordStoreListener {
+            passwordAPI.removeObserver(observer)
+        }
     }
 
     override func viewDidLoad() {
