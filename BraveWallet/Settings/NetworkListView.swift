@@ -49,6 +49,7 @@ struct NetworkListView: View {
   @ObservedObject var networkStore: NetworkStore
   @State private var isPresentingNetworkDetails: CustomNetworkDetails?
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.buySendSwapDestination) private var buySendSwapDestination
   
   private struct CustomNetworkDetails: Identifiable {
     var isEditMode: Bool
@@ -60,7 +61,14 @@ struct NetworkListView: View {
   
   var body: some View {
     List {
-      ForEach(networkStore.ethereumChains) { network in
+      ForEach(networkStore.ethereumChains.filter({ network in
+        if let destination = buySendSwapDestination.wrappedValue {
+          if destination.kind != .send {
+            return !network.isCustom
+          }
+        }
+        return true
+      })) { network in
         if network.isCustom {
           Button(action: {
             networkStore.updateSelectedNetwork(network)
