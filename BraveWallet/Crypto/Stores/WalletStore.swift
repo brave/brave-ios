@@ -48,7 +48,7 @@ public class WalletStore {
     txService: BraveWalletEthTxService
   ) {
     self.cancellable = self.keyringStore.$keyring
-      .map(\.isDefaultKeyringCreated)
+      .map(\.isKeyringCreated)
       .removeDuplicates()
       .sink { [weak self] isDefaultKeyringCreated in
         guard let self = self else { return }

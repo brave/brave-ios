@@ -93,7 +93,7 @@ public class KeyringStore: ObservableObject {
     self.keyringService.add(self)
     updateKeyringInfo()
     self.keyringService.defaultKeyringInfo { [self] keyringInfo in
-      isOnboardingVisible = !keyringInfo.isDefaultKeyringCreated
+      isOnboardingVisible = !keyringInfo.isKeyringCreated
       if Self.isKeychainPasswordStored && isOnboardingVisible {
         // If a user deletes the app and they had a stored user password in the past that keychain item
         // stays persisted. When we grab the keyring for the first time we should check to see if they have
@@ -142,7 +142,7 @@ public class KeyringStore: ObservableObject {
   }
   
   func unlock(password: String, completion: @escaping (Bool) -> Void) {
-    if !keyring.isDefaultKeyringCreated {
+    if !keyring.isKeyringCreated {
       return
     }
     keyringService.unlock(password) { [weak self] unlocked in

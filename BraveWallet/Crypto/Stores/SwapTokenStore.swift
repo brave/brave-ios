@@ -409,7 +409,8 @@ public class SwapTokenStore: ObservableObject {
   ) {
     var maxPriorityFeePerGas = ""
     var maxFeePerGas = ""
-    assetRatioService.gasOracle { [weak self] gasEstimation in
+    
+    txService.gasEstimation1559 { [weak self] gasEstimation in
       guard let self = self else { return }
       if let gasEstimation = gasEstimation {
         // Bump fast priority fee and max fee by 1 GWei if same as average fees.

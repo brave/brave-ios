@@ -11,7 +11,7 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``CryptoKeyringStore.previewStore``
 class MockKeyringService: BraveWalletKeyringService {
-  private var keyrings: [BraveWallet.KeyringInfo] = [.init(id: BraveWallet.DefaultKeyringId, isDefaultKeyringCreated: true, isLocked: false, isBackedUp: true, accountInfos: [])]
+  private var keyrings: [BraveWallet.KeyringInfo] = [.init(id: BraveWallet.DefaultKeyringId, isKeyringCreated: true, isLocked: false, isBackedUp: true, accountInfos: [])]
   private var privateKeys: [String: String] = [:]
   private var password = ""
   // Not a real phrase, has a duplicated word for testing
@@ -71,7 +71,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func createWallet(_ password: String, completion: @escaping (String) -> Void) {
-    defaultKeyring.isDefaultKeyringCreated = true
+    defaultKeyring.isKeyringCreated = true
     defaultKeyring.isLocked = false
     self.password = password
     addAccount("Account 1", coin: .eth) { [self] _ in
@@ -108,7 +108,7 @@ class MockKeyringService: BraveWalletKeyringService {
   }
   
   func unlock(_ password: String, completion: @escaping (Bool) -> Void) {
-    if !defaultKeyring.isDefaultKeyringCreated {
+    if !defaultKeyring.isKeyringCreated {
       completion(false)
       return
     }

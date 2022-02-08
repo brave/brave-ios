@@ -9,6 +9,10 @@ import BraveCore
 #if DEBUG
 
 class MockEthTxService: BraveWalletEthTxService {
+  func gasEstimation1559(_ completion: @escaping (BraveWallet.GasEstimation1559?) -> Void) {
+    completion(nil)
+  }
+
   func nonce(forHardwareTransaction txMetaId: String, completion: @escaping (String?) -> Void) {
     completion(nil)
   }
