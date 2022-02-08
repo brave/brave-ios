@@ -22,9 +22,10 @@ class NTPDownloader {
         /// Downloaded for all users if a sponsor is available in their region.
         case sponsor
         
-        var resourceBaseURL: URL? {
+        func resourceBaseURL(for buildChannel: AppBuildChannel = AppConstants.buildChannel,
+                             locale: Locale = .current) -> URL? {
             // This should _probably_ correspond host for URP
-            let baseUrl = AppConstants.buildChannel.isPublic
+            let baseUrl = buildChannel.isPublic
                 ? "https://mobile-data.s3.brave.com/"
                 : "https://mobile-data-dev.s3.brave.software"
             
@@ -34,7 +35,7 @@ class NTPDownloader {
                     .appendingPathComponent("superreferrer")
                     .appendingPathComponent(code)
             case .sponsor:
-                guard let region = Locale.current.regionCode else { return nil }
+                guard let region = locale.regionCode else { return nil }
                 let url = URL(string: baseUrl)?
                     .appendingPathComponent(region)
                     .appendingPathComponent("ios")
@@ -448,7 +449,7 @@ class NTPDownloader {
     
     // Downloads the item at the specified url relative to the baseUrl
     private func download(type: ResourceType, path: String?, etag: String?, _ completion: @escaping (Data?, CacheResponse?, Error?) -> Void) {
-        guard var url = type.resourceBaseURL else {
+        guard var url = type.resourceBaseURL() else {
             return completion(nil, nil, nil)
         }
         
