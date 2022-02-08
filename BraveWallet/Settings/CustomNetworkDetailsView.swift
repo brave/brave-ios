@@ -360,10 +360,9 @@ struct CustomNetworkDetailsView: View {
     if model.networkDecimals.input.isEmpty {
       model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
     }
-    if var rpcUrl = model.rpcUrls.first {
-      if rpcUrl.input.isEmpty {
-        rpcUrl.error = Strings.Wallet.customNetworkEmptyErrMsg
-        model.rpcUrls[0] = rpcUrl
+    if model.rpcUrls.first(where: { !$0.input.isEmpty && $0.error == nil }) == nil { // has no valid url
+      if let index = model.rpcUrls.firstIndex(where: { $0.input.isEmpty }) { // find the first empty entry
+        model.rpcUrls[index].error = Strings.Wallet.customNetworkEmptyErrMsg // set the empty err msg
       }
     }
     
@@ -372,7 +371,7 @@ struct CustomNetworkDetailsView: View {
         || model.networkSymbolName.error != nil
         || model.networkSymbol.error != nil
         || model.networkDecimals.error != nil
-        || model.rpcUrls.first?.error != nil {
+        || model.rpcUrls.filter({ !$0.input.isEmpty && $0.error == nil }).isEmpty {
       return false
     }
     
