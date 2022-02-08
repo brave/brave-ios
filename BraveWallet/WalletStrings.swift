@@ -1730,5 +1730,26 @@ extension Strings {
       value: "Wallet networks customization",
       comment: "The footer beneath the networks title in settings screen."
     )
+    public static let networkIdDuplicationErrMsg = NSLocalizedString(
+      "wallet.networkIdDuplicationErrMsg",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Chain ID already exists",
+      comment: "An error message will pop up when the user tries to add a custom network that its id already exists."
+    )
+    public static let failedToAddCustomNetworkErrorTitle = NSLocalizedString(
+      "wallet.failedToAddCustomNetworkErrorTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Failed to add this network.",
+      comment: "The title of an alert when the custom network the user attempted to add fails for some reason"
+    )
+    public static let failedToAddCustomNetworkErrorMessage = NSLocalizedString(
+      "wallet.failedToAddCustomNetworkErrorMessage",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Please try again.",
+      comment: "The message of an alert when the custom network the user attempted to add fails for some reason"
+    )
   }
 }

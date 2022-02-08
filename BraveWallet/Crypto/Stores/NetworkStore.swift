@@ -59,18 +59,30 @@ public class NetworkStore: ObservableObject {
   public func addCustomNetwork(_ network: BraveWallet.EthereumChain,
                                completion: @escaping (_ accepted: Bool) -> Void) {
     func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accepted: Bool) -> Void) {
-      rpcService.add(network) { [self] chainId, status, _ in
+      rpcService.add(network) { [self] chainId, status, message in
         if status == .success {
+          // meaning removal is also succeeded if id exists. need to update the list by removing the old then adding the new
+          if let index = ethereumChains.firstIndex(where: { $0.id == network.id }) {
+            ethereumChains.remove(at: index)
+          }
           ethereumChains.append(network)
           completion(true)
         } else {
-          completion(false)
+          // meaning add custom network failed for some reason. We will not update `ethereumChains`
+          // Also add the the old network back on rpc service
+          if let oldNetwork = ethereumChains.first(where: { $0.id == network.id }) {
+            rpcService.add(oldNetwork) { _, _, _ in
+              completion(false)
+            }
+          } else {
+            completion(false)
+          }
         }
       }
     }
     
     if ethereumChains.contains(where: { $0.chainId == network.chainId }) {
-      removeCustomNetwork(network) { success in
+      removeNetworkForNewAddition(network) { success in
         guard success else {
           completion(false)
           return
@@ -82,13 +94,19 @@ public class NetworkStore: ObservableObject {
     }
   }
   
+  /// This method will not update `ethereumChains`
+  private func removeNetworkForNewAddition(_ network: BraveWallet.EthereumChain,
+                                           completion: @escaping (_ success: Bool) -> Void) {
+    rpcService.removeEthereumChain(network.chainId) { success in
+      completion(success)
+    }
+  }
+  
   public func removeCustomNetwork(_ network: BraveWallet.EthereumChain,
                                   completion: @escaping (_ success: Bool) -> Void) {
     rpcService.removeEthereumChain(network.chainId) { [self] success in
       if success {
-        if let index = ethereumChains
-            .map({ $0.chainId })
-            .firstIndex(of: network.chainId) {
+        if let index = ethereumChains.firstIndex(where: { $0.id == network.id }) {
           ethereumChains.remove(at: index)
         }
       }
