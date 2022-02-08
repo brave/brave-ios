@@ -235,6 +235,7 @@ struct CustomNetworkDetailsView: View {
           item: $model.networkId
         )
           .keyboardType(.numberPad)
+          .disabled(isEditMode)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
