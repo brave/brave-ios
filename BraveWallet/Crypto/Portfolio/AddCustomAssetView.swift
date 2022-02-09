@@ -33,11 +33,13 @@ struct AddCustomAssetView: View {
         ) {
           TextField(Strings.Wallet.enterContractAddress, text: $addressInput)
             .onChange(of: addressInput) { newValue in
-              userAssetStore.tokenInfo(by: newValue) { token in
-                if let token = token, !token.isErc721 {
-                  nameInput = token.name
-                  symbolInput = token.symbol
-                  decimalsInput = "\(token.decimals)"
+              if !newValue.isEmpty {
+                userAssetStore.tokenInfo(by: newValue) { token in
+                  if let token = token, !token.isErc721 {
+                    nameInput = token.name
+                    symbolInput = token.symbol
+                    decimalsInput = "\(token.decimals)"
+                  }
                 }
               }
             }
