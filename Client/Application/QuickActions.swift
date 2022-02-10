@@ -73,6 +73,7 @@ class QuickActions: NSObject {
 
     fileprivate func dismissAlertPopupView() {
         UIApplication.shared.keyWindow?.subviews.forEach { ($0 as? AlertPopupView)?.dismissWithType(dismissType: .noAnimation) }
+    }
 
     fileprivate func handleScanQR(withBrowserViewController bvc: BrowserViewController) {
         bvc.scanQRCode()
