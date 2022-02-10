@@ -323,7 +323,20 @@ struct CustomNetworkDetailsView: View {
         Button(action: {
           addCustomNetwork()
         }) {
-          Text(isEditMode ? Strings.Wallet.update : Strings.Wallet.add)
+          if networkStore.isAddingNewNetwork {
+            ProgressView()
+          } else {
+            Text(isEditMode ? Strings.Wallet.update : Strings.Wallet.saveCustomNetworkButtonTitle)
+              .foregroundColor(Color(.braveOrange))
+          }
+        }
+        .disabled(networkStore.isAddingNewNetwork)
+      }
+      ToolbarItemGroup(placement: .cancellationAction) {
+        Button(action: {
+          presentationMode.dismiss()
+        }) {
+          Text(Strings.cancelButtonTitle)
             .foregroundColor(Color(.braveOrange))
         }
       }

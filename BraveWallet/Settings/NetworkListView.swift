@@ -14,34 +14,13 @@ struct NetworkCell: View {
   var body: some View {
     HStack {
       Text(network.chainName)
+        .foregroundColor(Color(.braveLabel))
       Spacer()
       Image(systemName: "checkmark")
         .opacity(isCurrentNetwork ? 1 : 0)
         .foregroundColor(Color(.braveOrange))
     }
     .font(.callout)
-  }
-}
-
-// Modifier workaround for FB9812596 to avoid crashing on iOS 14 on Release builds
-@available(iOS 15.0, *)
-private struct SwipeActionsViewModifier_FB9812596_NetworkList: ViewModifier {
-  enum ActionType {
-    case delete
-    case edit
-  }
-  var type: ActionType
-  var label: String
-  var action: () -> Void
-  
-  func body(content: Content) -> some View {
-    content
-      .swipeActions(edge: .trailing) {
-        Button(role: type == .delete ? .destructive : .cancel, action: action) {
-          Label(label, systemImage: type == .delete ? "trash" : "square.and.pencil")
-        }
-        .tint(type == .edit ? Color(.braveBlurpleTint) : nil)
-      }
   }
 }
 
@@ -70,67 +49,43 @@ struct NetworkListView: View {
         return true
       })) { network in
         if network.isCustom {
-          Button(action: {
-            networkStore.updateSelectedNetwork(network)
-            presentationMode.dismiss()
-          }) {
-            NetworkCell(
-              network: network,
-              isCurrentNetwork: network.chainId == networkStore.selectedChainId
-            )
-          }
-          .osAvailabilityModifiers { content in
-            if #available(iOS 15.0, *) {
-              if network.chainId != networkStore.selectedChainId {
-                content
-                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                    type: .delete,
-                    label: Strings.Wallet.deleteCustomTokenOrNetwork,
-                    action: {
-                      networkStore.removeCustomNetwork(network) { _ in }
-                    })
-                  )
-                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                    type: .edit,
-                    label: Strings.Wallet.editCustomNetwork,
-                    action: {
-                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                    })
-                  )
-              } else {
-                content
-                  .modifier(SwipeActionsViewModifier_FB9812596_NetworkList(
-                    type: .edit,
-                    label: Strings.Wallet.editCustomNetwork,
-                    action: {
-                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                    })
-                  )
+          if network.chainId != networkStore.selectedChainId {
+            Button(action: {
+              networkStore.updateSelectedNetwork(network)
+              presentationMode.dismiss()
+            }) {
+              NetworkCell(
+                network: network,
+                isCurrentNetwork: network.chainId == networkStore.selectedChainId
+              )
+            }
+            .contextMenu {
+              Button {
+                networkStore.removeCustomNetwork(network) { _ in }
+              } label: {
+                Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
               }
-            } else {
-              if network.chainId != networkStore.selectedChainId {
-                content
-                  .contextMenu {
-                    Button {
-                      networkStore.removeCustomNetwork(network) { _ in }
-                    } label: {
-                      Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
-                    }
-                    Button {
-                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                    } label: {
-                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
-                    }
-                  }
-              } else {
-                content
-                  .contextMenu {
-                    Button {
-                      isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                    } label: {
-                      Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
-                    }
-                  }
+              Button {
+                isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+              } label: {
+                Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
+              }
+            }
+          } else {
+            Button(action: {
+              networkStore.updateSelectedNetwork(network)
+              presentationMode.dismiss()
+            }) {
+              NetworkCell(
+                network: network,
+                isCurrentNetwork: network.chainId == networkStore.selectedChainId
+              )
+            }
+            .contextMenu {
+              Button {
+                isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+              } label: {
+                Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
               }
             }
           }
@@ -148,8 +103,7 @@ struct NetworkListView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
-    .listStyle(PlainListStyle())
-    .padding(.top, 23.0)
+    .listStyle(.grouped)
     .navigationTitle(Strings.Wallet.networkListTitle)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -157,7 +111,7 @@ struct NetworkListView: View {
         Button(action: {
           isPresentingNetworkDetails = .init(isEditMode: false)
         }) {
-          Text(Strings.Wallet.add)
+          Label(Strings.Wallet.addCustomNetworkTitle, systemImage: "plus")
             .foregroundColor(Color(.braveOrange))
         }
       }

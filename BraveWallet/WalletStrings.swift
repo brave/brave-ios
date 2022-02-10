@@ -1751,5 +1751,19 @@ extension Strings {
       value: "Please try again.",
       comment: "The message of an alert when the custom network the user attempted to add fails for some reason"
     )
+    public static let addCustomNetworkTitle = NSLocalizedString(
+      "wallet.addCustomNetworkTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Add Custom Network",
+      comment: "The title of the add custom network screen"
+    )
+    public static let saveCustomNetworkButtonTitle = NSLocalizedString(
+      "wallet.saveCustomNetworkButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Save",
+      comment: "The title of the button on top right navigation bar for the users to click to save a new custom network."
+    )
   }
 }
