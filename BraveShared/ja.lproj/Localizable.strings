@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "ダブルタップでBrave Shieldを切り替える";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave Talk";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "追加する";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "一回限りのクリップボードチェックを許可する";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "「開始する」をタップすると以下に同意したものと見なされます: ";
+"OBRewardsAgreementDetail" = "「開始する」をタップすると、以下に同意したものとみなされます";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "利用規約";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "、";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewardsでクリエイターを支援する";
+"OBRewardsAgreementTitle" = "Brave Rewards";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "ブラウジング中にプライバシーを重視した匿名広告を表示して、クリエイターを支援しましょう";
+"OBRewardsDetail" = "Braveプライベート広告を受け入れることで、広告を見るだけでウェブサイトやコンテンツクリエイターを支援することができます。";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "ブラウジング中にBATポイントを獲得し、同時にコンテンツクリエイターに還元することができます";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "プライバシーポリシー";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "Brave Playlistに追加する";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Brave Playlist";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "この動画はライブストリーミング動画であるか、期限切れです。再読み込みするには、リンクを再度開いてください。";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "リソースの読み込み中に問題が発生しました！";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "有効にすると、閲覧中のページにあるメディアがBrave Playlistに追加された可能性があることを示すバッジが、メインメニューのアイコンに表示されます。";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "メニューの通知バッジを表示する";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "ブラウザ内で、Brave Playlistにアイテムを追加することができます。";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "利用可能なアイテムがありません";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "前回の続きから再生";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "オンにすると、多くの動画・音声メディアのウェブサイトで、動画や音声を簡単にPlaylistに追加するためのバーが自動で表示されます。";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "「Brave Playlistに追加する」を表示する";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "WebKit MediaSource APIを無効化します";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "Web互換性";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Brave Playlistにより、オフライン再生、ピクチャー・イン・ピクチャー再生、連続再生、リピート再生ができるようになります。";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "このメディアはBrave Playlistに追加されています。";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "このメディアをBrave Playlistに追加しますか？";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "Brave Playlistで開く";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "削除する";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "削除する";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "オフライン再生のために保存中...";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "システムの共有メニューから、現在のアイテムを新タブで開いたり、シェアすることができます。";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Brave Playlist Menu";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "プライベートタブで開く";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "新タブで開く";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "共有...";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "申し訳ありません";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "Brave Playlistで見る";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "Braveブラウザのアドレスバーの横に、Playlistボタンを追加します。（4本の線と+が組み合わさったような見た目です。）このボタンにより、Playlistを開いたり、メディアを追加したり削除したりすることが素早く行えるようになります。";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "クイックアクセスボタンを有効にする";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "コンテキストメニューを閉じる";
@@ -431,7 +482,7 @@
 "RestoredFavoritesFolderName" = "復元されたお気に入り";
 
 /* Displayed when Brave Rewards is disabled */
-"rewards.disabledBody" = "有効にしてことで、コンテンツクリエイターを支援することができます。";
+"rewards.disabledBody" = "有効にしてコンテンツクリエイターを支援";
 
 /* Displayed in the status container when rewards is disabled */
 "rewards.disabledStatusBody" = "Brave Rewardsを使うと、ブラウジングすることででクリエイターを支援";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "カスタム検索エンジンを追加する";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "おめでとうございます。たくさんプライバシーを保護しましたね。";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "おめでとうございます。あなたはもう上級者クラブの一員です。";
 
 /* Subtitle for tracker benchmark Share */
@@ -791,7 +845,7 @@
 "shieldEducation.benchmarkProfessionalTierTitle" = "おめでとうございます。プロへの仲間入りです。";
 
 /* Subtitle for tracker benchmark Share */
-"shieldEducation.benchmarkSpecialTierTitle" = "おめでとうございます。あなたは特別な存在です。";
+"shieldEducation.benchmarkSpecialTierTitle" = "おめでとうございます。いつもBraveをご利用いただきありがとうございます。";
 
 /* Subtitle for  The parameter substituted for \"%@\" is the amount of data saved in MB. E.g.: Average Data Saved: 17.43 MB */
 "shieldEducation.domainSpecificDataSavedSubtitle" = "平均データ節約量\n%@ MB";
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "次回以降表示しない";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "見てみる";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "お知らせをシェアする";
-
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shieldsはすべてのサイトであなたのオンラインでのプライバシーを保護します。";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "%ld+ トラッカーと広告がこのページでブロックされました。";
 
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shieldsがあなたのオンラインでのプライバシーを保護しました。";
 
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "トラッカーと広告がこのページでブロックされました。";
-
 /* Subtitle for Shield Education Tracker Count Share */
-"shieldEducation.trackerCountShareSubtitle" = "おめでとうございます。あなたは特別な存在です。";
+"shieldEducation.trackerCountShareSubtitle" = "おめでとうございます。あなたは特別な存在です。いつもBraveをご利用いただきありがとうございます。";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "%ld トラッカーと広告がブロックされました。";
+"shieldEducation.trackerCountShareTitle" = "%ld トラッカーと広告をブロックしました！";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "広告がなければ動画のデータ量はより少なくなります。";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "現在Braveのプライバシー保護機能オフの状態でブラウジングしています。Shieldをオンにした状態では不具合が発生しますか？";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "Brave Newsを開いて今日のトップストーリーズをチェックする";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "新しいタブでブラウザを立ち上げ、プライベートブラウジングの履歴を全て消去する";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "ブラウザの履歴を消去する";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "Braveでのブラウジングの履歴を消去する";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "新タブでブラウザを立ち上げ、VPNを有効にする";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "VPNを有効にする";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "Braveブラウザを開き、VPNを有効にする";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "新しくプライベートブラウジングタブを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "新しくプライベートブラウジングのブラウザを立ち上げる";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "新タブを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "新しくブラウザタブを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "Brave Newsを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "Brave Newsを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "Playlist内の動画を再生開始する";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "Playlistを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "Playlistを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "Braveでwebを安全に検索する";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "ブックマークのウェブサイトを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "履歴のウェブサイトを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "ウェブサイトを開く";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "この項目は、Braveの設定を開きます。様々なSiriオプションを変更するには、「Siriと検索」メニューを選択し、設定をカスタマイズしてください。";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "設定を開く";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "Siri 音声アシスタントで新タブを開いてブラウザ履歴を消去するショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "Braveの履歴を消去する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "Siri 音声アシスタントでBrave VPNを開くショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "VPNを有効化する";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "Siri 音声アシスタントで新しくタブを開いてBrave Newsのフィードを表示するショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "Brave Newsを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "Siri 音声アシスタントで新しくプライベートタブを開くショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "新しくプライベートタブを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "Siri 音声アシスタントで新しくタブを開くショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "新しくタブを開く";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "Siri 音声アシスタントでPlaylistを開くショートカットを利用する";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "Playlistを開く";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Siri ショートカット";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "Braveの開発者にサイトの問題について知らせてくれてありがとうございます。修正するために最善を尽くします！";
@@ -944,7 +1091,7 @@
 "today.introCardNewTextBody" = "我々のプライベートCDNから配信される数百の主要コンテンツ配信元を利用して自分のフィードをカスタマイズし、お気に入りのサイトのRSSフィードを追加して自分に合ったフィードを作成できます。";
 
 /* No comment provided by engineer. */
-"today.introCardTitle" = "Brave Todayは、読みたい記事が上がってくるプライベート・ニュースリーダー。";
+"today.introCardTitle" = "Brave Newsは、読みたい記事が上がってくるプライベート・ニュースリーダー。";
 
 /* No comment provided by engineer. */
 "today.isEnabledToggleLabel" = "Brave Newsを表示する";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "検索候補をオンにしますか？";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "以下について詳しく";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "BATはお客様がアカウントを作成された地域では現在サポートされていません。また時間をおいてステータスを確認して見てください。";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "閉じる";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "未対応地域";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "Upholdのアカウントにログインする際に問題が発生しました。後ほど再度お試しください。";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "1年間";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "キャッシュ";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "Cookie";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "データベース";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "ローカルストレージ";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "ウェブサイトのデータを読み込み中...";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "ウェブサイトのデータを管理";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "保存されたウェブサイトデータはありません";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "すべてを削除";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "削除";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "%ld件のアイテムを削除";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "お気にいりのウェブサイトに素早くアクセス";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "お気に入り";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "Braveを開いてお気に入りのサイトを追加してください";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "Braveによって時間がどれだけ節約され、オンライン上でプライバシーが保護されたかのまとめです。";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "プライバシー統計";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "プライバシー統計";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "検索するか、URLを入力";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "新しいタブ";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "Playlist";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "プライベートタブ";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "簡単に素早くBraveでウェブを検索したりウェブページを開く";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "ショートカット";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "Braveがオンライン上でどれくらいプライバシーを保護したかのまとめです。";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "プライバシー統計";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "はい";

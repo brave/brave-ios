@@ -9,9 +9,11 @@ import SDWebImage
 import AVFoundation
 
 class PlaylistAssetFetcher {
+    let itemId: String
     private let asset: AVURLAsset
     
-    init(asset: AVURLAsset) {
+    init(itemId: String, asset: AVURLAsset) {
+        self.itemId = itemId
         self.asset = asset
     }
     
@@ -40,9 +42,7 @@ class PlaylistResizingThumbnailView: UIImageView {
 }
 
 class PlaylistCell: UITableViewCell {
-    var thumbnailGenerator: HLSThumbnailGenerator?
-    var imageAssetGenerator: AVAssetImageGenerator?
-    var durationFetcher: PlaylistAssetFetcher?
+    let thumbnailGenerator = PlaylistThumbnailRenderer()
     
     private let thumbnailMaskView = CAShapeLayer().then {
         $0.fillColor = UIColor.white.cgColor
@@ -97,11 +97,8 @@ class PlaylistCell: UITableViewCell {
     }
     
     func prepareForDisplay() {
-        thumbnailGenerator = nil
-        imageAssetGenerator = nil
+        thumbnailGenerator.cancel()
         thumbnailView.cancelFaviconLoad()
-        durationFetcher?.cancelLoading()
-        durationFetcher = nil
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

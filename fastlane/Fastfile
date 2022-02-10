@@ -31,7 +31,6 @@ platform :ios do
 
   desc "Run Unit Tests"
   lane :test do |options|
-    sh("../Client/WebFilters/ContentBlocker/Lists/test-compile-all-lists.sh")
     run_tests(
       scheme: "Debug",
       device: "iPhone 8",
@@ -45,7 +44,8 @@ platform :ios do
         "ClientTests/ContentBlockerTests",
         "ClientTests/HttpCookieExtensionTest/testSaveAndLoadCookie",
         "ClientTests/UserAgentTests",
-        "DataTests"
+        "DataTests",
+        "SPMLibrariesTests/WebServerTests/testWebServerIsServingRequests"
       ]
     )
 
@@ -61,7 +61,10 @@ platform :ios do
   lane :beta do |options|
     overrideParams = {
       scheme: "Beta",
-      export_method: "app-store"
+      export_method: "app-store",
+      export_options: {
+        manageAppVersionAndBuildNumber: false
+      }
     }
     testflight_build({overrideParams: overrideParams})
   end
@@ -71,7 +74,10 @@ platform :ios do
 
     overrideParams = {
       scheme: "Dev",
-      export_method: "app-store"
+      export_method: "app-store",
+      export_options: {
+        manageAppVersionAndBuildNumber: false
+      }
     }
     testflight_build({overrideParams: overrideParams})
   end
@@ -84,8 +90,11 @@ platform :ios do
         method: "app-store",
         provisioningProfiles: { 
           "com.brave.ios.browser" => "Brave iOS",
-          "com.brave.ios.browser.BraveShareTo" => "Brave iOS Share Extension"
-        }
+          "com.brave.ios.browser.ShareExtension" => "Brave iOS Share Extension",
+          "com.brave.ios.browser.BrowserIntents" => "Brave iOS Intents Extension",
+          "com.brave.ios.browser.BraveWidgetsExtension" => "Brave iOS Widgets Extension"
+        },
+        manageAppVersionAndBuildNumber: false
       },
     }
     testflight_build({overrideParams: overrideParams})
@@ -117,10 +126,13 @@ platform :ios do
         method: "enterprise",
         provisioningProfiles: { 
           "com.brave.ios.enterprise.Browser" => "BraveEnt",
-          "com.brave.ios.enterprise.Browser.BraveShareTo" => "Ent-ShareTo"
-        }
+          "com.brave.ios.enterprise.Browser.ShareExtension" => "Ent-ShareTo",
+          "com.brave.ios.enterprise.Browser.BrowserIntents" => "BraveEnt Browser Intents",
+          "com.brave.ios.enterprise.Browser.BraveWidgetsExtension" => "BraveEntWidgets"
+        },
+        manageAppVersionAndBuildNumber: false
       },
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\" BRAVE_VERSION=\"#{git_branch}\" GENERATED_BUILD_ID=\"#{get_build_number_repository}\""
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\" BRAVE_VERSION=\"#{git_branch}\" GENERATED_BUILD_ID=\"#{get_build_number_repository}\" BRAVE_SERVICES_KEY=\"#{ENV['BRAVE_SERVICES_KEY']}\""
     )
 
     unless options[:skip_upload]
@@ -141,7 +153,7 @@ platform :ios do
       sdk: "iphoneos",
       clean: true,
       output_directory: "build",
-      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\""
+      xcargs: "-allowProvisioningUpdates BRAVE_API_KEY=\"#{ENV['BRAVE_STATS_API_KEY']}\" BRAVE_SERVICES_KEY=\"#{ENV['BRAVE_SERVICES_KEY']}\""
     }
   end
 

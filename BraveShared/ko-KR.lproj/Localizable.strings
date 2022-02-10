@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "두 번 탭하여 Brave Shields 토글";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave Talk";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "추가";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "일회성 클립보드 확인 허용";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "시작을 탭하면 다음에 동의하는 것으로 간주됩니다.";
+"OBRewardsAgreementDetail" = "예를 탭하면 다음에 동의하는 것으로 간주됩니다.";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "서비스 약관";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "및";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards, 제작자를 지원하는 방법";
+"OBRewardsAgreementTitle" = "Brave Rewards";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "브라우징 시 비공개/익명 광고를 보고 콘텐츠 크리에이터 지원을 시작하세요.";
+"OBRewardsDetail" = "Brave Private Ads를 선택하면 광고를 보고 게시자와 콘텐츠 제작자를 지원할 수 있습니다.";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "브라우징하면서 토큰을 얻어 좋은 콘텐츠를 만들어준 제작자에게 보답하세요.";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "개인정보 취급방침";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "Brave Playlist에 추가";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Brave 재생목록";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "이 동영상은 라이브 스트림이었거나 시간 제한에 도달했습니다. 새로고침하려면 링크를 다시 여세요.";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "리소스를 로드하는 중에 문제가 발생했습니다.";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "활성화하면 메인 메뉴 아이콘에 배지가 표시되어 페이지상의 미디어가 Brave 재생목록에 추가될 수 있음을 나타냅니다.";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "메뉴 알림 배지 표시";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "브라우저 내에서 Brave 재생목록에 항목을 추가할 수 있습니다.";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "사용 가능한 항목 없음";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "종료한 위치에서 재생 시작";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "활성화하면 창에 대부분의 미디어 웹사이트가 자동으로 표시되어 동영상/오디오를 재생목록으로 쉽게 추가할 수 있습니다.";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "\"Brave Playlist에 추가\" 표시";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "WebKit MediaSource API를 비활성화합니다.";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "웹 호환성";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Brave 재생목록은 오프라인 재생, PIP(Picture-in-picture), 연속 재생, 반복 모드를 지원합니다.";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "Brave 재생목록에 있는 미디어";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "이 미디어를 Brave 재생목록에 추가하시겠습니까?";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "Brave 재생목록에서 열기";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "제거";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "제거";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "오프라인용으로 저장 중...";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "새 탭에서 현재 항목을 열거나 시스템 공유 메뉴를 통해 공유할 수 있습니다.";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Brave 재생목록 메뉴";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "비공개 탭에서 열기";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "새 탭에서 열기";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "공유...";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "죄송합니다";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "Brave Playlist에서 보기";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "Brave 브라우저 주소창 옆에 재생목록 버튼(줄 4개에 + 기호가 더해진 모양)을 추가합니다. 이 빠른 액세스 버튼을 이용하면 신속하게 재생목록을 열거나 미디어를 추가 또는 제거할 수 있습니다.";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "빠른 액세스 버튼 활성화";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "맥락 메뉴 닫기";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "맞춤 검색 엔진 추가";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "이 프라이버시 마일스톤에 도달하신 것을 축하합니다.";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "축하합니다. 익스클루시브 클럽원이십니다.";
 
 /* Subtitle for tracker benchmark Share */
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "다시 표시하지 않음";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "살펴보기";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "뉴스 공유";
 
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shields가 모든 사이트에서 온라인 프라이버시를 보호해드립니다.";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "이 페이지에서 %ld개 이상의 트래커와 광고가 차단되었습니다.";
-
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shields가 방금 온라인 프라이버시를 보호해드렸습니다.";
-
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "이 페이지에서 트래커와 광고가 차단되었습니다.";
 
 /* Subtitle for Shield Education Tracker Count Share */
 "shieldEducation.trackerCountShareSubtitle" = "축하합니다. 정말 특별하십니다.";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "%ld개의 트래커 및 광고 차단됨";
+"shieldEducation.trackerCountShareTitle" = "%ld개의 트래커 및 광고가 차단되었습니다!";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "동영상에서 광고가 제외되면 데이터를 덜 사용합니다.";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "Brave의 개인정보 보호 없이 이 사이트를 브라우징하고 계십니다. Shields 사용 시 제대로 작동하지 않나요?";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "Brave News를 열고 오늘의 인기 스토리 확인";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "새 탭에서 브라우저를 열고 비공개 브라우저 기록 데이터 삭제";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "브라우저 기록 지우기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "Brave 방문 기록 지우기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "새 탭에서 브라우저를 열고 VPN 활성화";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "VPN 활성화";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "새 탭에서 Brave 브라우저를 열고 VPN 활성화";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "새 비공개 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "새 비공개 브라우저 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "새 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "새 브라우저 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "Brave News 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "Brave News 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "재생목록 내 동영상 재생 시작";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "재생목록 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "재생목록 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "Brave로 안전하게 웹 검색 시작";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "북마크 웹사이트 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "기록 웹사이트 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "웹사이트 열기";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "이 옵션은 Brave 설정을 엽니다. 다양한 Siri 옵션을 변경하려면 '시리 및 검색' 메뉴 항목을 선택하고 원하는 대로 맞춤 설정하세요.";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "설정 열기";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 새 탭 열기 및 브라우저 기록 지우기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "브라우저 기록 지우기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 Brave VPN 활성화";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "VPN 활성화";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 새 탭 열기 및 Brave News 피드 표시";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "Brave News 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 새 비공개 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "새 비공개 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 새 탭 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "새 탭 열기";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "Siri - Voice Assistant를 통해 바로가기를 사용하여 재생목록 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "재생목록 열기";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Siri 바로가기";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "이 사이트에 문제가 있다는 사실을 Brave 개발자가 파악할 수 있게 해주셔서 감사합니다. 최선을 다해 해결하겠습니다!";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "추천 검색어를 사용하시겠습니까?";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "자세히 알아보기";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "계정이 개설된 위치를 기반으로 판단한 귀하의 거주 지역에서는 현재 BAT가 지원되지 않습니다. 나중에 사용 가능 여부를 다시 확인해주세요.";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "닫기";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "지원되지 않는 지역";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "Uphold 계정에 로그인하는 중에 문제가 발생했습니다. 다시 시도하세요.";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "1년";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "캐시";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "쿠키";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "데이터베이스";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "로컬 저장소";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "웹사이트 데이터 로드 중...";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "웹사이트 데이터 관리";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "저장된 웹사이트 데이터 없음";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "모두 제거";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "제거";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "%ld개 항목 제거";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "즐겨찾는 웹사이트에 빠르게 액세스할 수 있습니다.";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "즐겨찾기";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "여기서 즐겨찾기를 보려면 Brave를 여세요.";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "Brave가 어떻게 시간을 절약하고 온라인 프라이버시를 보호하는지에 대한 개요가 제공됩니다.";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "프라이버시 통계";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "프라이버시 통계";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "URL 검색 또는 직접 입력";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "새 탭";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "재생목록";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "비공개 탭";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "빠르게 액세스하여 웹을 검색하거나 Brave에서 웹페이지를 열 수 있습니다.";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "바로가기";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "Brave가 어떻게 온라인 프라이버시를 보호하는지에 대한 개요가 제공됩니다.";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "프라이버시 통계";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "예";

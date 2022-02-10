@@ -89,32 +89,35 @@ class SimpleShieldsView: UIView {
                 return string
             }()
             $0.backgroundColor = .clear
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            if #available(iOS 15.0, *) {
+                // do nothing
+            } else {
+                $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+            }
+            
             $0.isAccessibilityElement = false
             $0.textColor = .braveLabel
         }
         
-        let infoButton = Button().then {
+        let infoButton = BraveButton().then {
             $0.setImage(#imageLiteral(resourceName: "shields-help").template, for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
             $0.contentMode = .scaleAspectFit
-            $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
             $0.accessibilityLabel = Strings.Shields.aboutBraveShieldsTitle
             $0.tintColor = .bravePrimary
         }
         
-        let shareButton = Button().then {
+        let shareButton = BraveButton().then {
             $0.setImage(#imageLiteral(resourceName: "shields-share").withRenderingMode(.alwaysTemplate), for: .normal)
             $0.hitTestSlop = UX.hitBoxEdgeInsets
             $0.imageEdgeInsets = .zero
             $0.titleEdgeInsets = .zero
             $0.contentEdgeInsets = UIEdgeInsets(top: -2, left: 4, bottom: -3, right: 4)
             $0.contentMode = .scaleAspectFit
-            $0.setContentHuggingPriority(.required, for: .horizontal)
             $0.setContentCompressionResistancePriority(.required, for: .horizontal)
             $0.accessibilityLabel = Strings.share
             $0.tintColor = .bravePrimary

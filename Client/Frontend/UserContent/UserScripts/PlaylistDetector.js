@@ -1,25 +1,11 @@
-// The below is needed because the script may not be web-packed into a bundle so it may be missing the run-once code
-
-// MARK: - Include Once
-
-if (!window.__firefox__) {
-    window.__firefox__ = {};
-}
-
-if (!window.__firefox__.includeOnce) {
-    window.__firefox__ = {};
-    window.__firefox__.includeOnce = function(key, func) {
-        var keys = {};
-        if (!keys[key]) {
-            keys[key] = true;
-            func();
-        }
-    };
-}
+// Copyright 2021 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // MARK: - Media Detection
 
-window.__firefox__.includeOnce("$<PlaylistDetector>", function() {
+window.__firefox__.includeOnce("PlaylistDetector", function() {
     function is_nan(value) {
         return typeof value === "number" && value !== value;
     }
@@ -217,6 +203,10 @@ window.__firefox__.includeOnce("$<PlaylistDetector>", function() {
                     return result;
                 }
                 return original.call(node, tag);
+            };
+            
+            node.createElement.toString = function() {
+                return "function () { [native code] }";
             };
         }
 

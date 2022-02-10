@@ -6,7 +6,7 @@ import UIKit
 import Static
 import Shared
 import BraveShared
-import BraveRewards
+import BraveCore
 import BraveUI
 import DeviceCheck
 import Combine
@@ -61,7 +61,7 @@ class BraveRewardsSettingsViewController: TableViewController {
                             header: .title(Strings.Rewards.walletTransferTitle),
                             rows: [
                                 Row(text: Strings.Rewards.legacyWalletTransfer,
-                                    detailText: Preferences.Rewards.lastTransferStatus.value.map(DrainStatus.init)??.displayString,
+                                    detailText: Preferences.Rewards.lastTransferStatus.value.map(Ledger.DrainStatus.init)??.displayString,
                                     selection: { [unowned self] in
                                         guard let legacyWallet = self.legacyWallet else { return }
                                         let controller = WalletTransferViewController(legacyWallet: legacyWallet)
@@ -102,11 +102,12 @@ class BraveRewardsSettingsViewController: TableViewController {
         }
         
         if let ledger = rewards.ledger {
-            ledger.rewardsInternalInfo { info in
+            ledger.rewardsInternalInfo { [weak self] info in
                 if let info = info, !info.paymentId.isEmpty {
-                    dataSource.sections += [
+                    self?.dataSource.sections += [
                         Section(rows: [
                             Row(text: Strings.RewardsInternals.title, selection: {
+                                guard let self = self else { return }
                                 let controller = RewardsInternalsViewController(ledger: ledger, legacyLedger: self.legacyWallet)
                                 self.navigationController?.pushViewController(controller, animated: true)
                             }, accessory: .disclosureIndicator)

@@ -32,11 +32,20 @@ class BraveSearchManager: NSObject {
     /// such as whether to use search fallback, should safe search be performed etc.
     private let domainCookies: [HTTPCookie]
     
+    private let profile: Profile
+    
     /// The result we got from querying the fallback search engine.
     var fallbackQueryResult: String?
     /// Whether the call to the fallback search engine is pending.
     /// This is used to determine at what point of the web navigation we should inject the results.
-    var fallbackQueryResultsPending = false
+    var fallbackQueryResultsPending = false {
+        didSet {
+            // Fallback query ended, time to append debug log with all info we've gathered.
+            if let callbackLog = callbackLog, !fallbackQueryResultsPending {
+                BraveSearchLogEntry.shared.logs.append(callbackLog)
+            }
+        }
+    }
     
     private var cancellables: Set<AnyCancellable> = []
     private static var cachedCredentials: URLCredential?
@@ -47,7 +56,9 @@ class BraveSearchManager: NSObject {
         validDomains.contains(url.host ?? "")
     }
     
-    init?(url: URL, cookies: [HTTPCookie]) {
+    private var callbackLog: BraveSearchLogEntry.FallbackLogEntry?
+    
+    init?(profile: Profile, url: URL, cookies: [HTTPCookie]) {
         if !Self.isValidURL(url) {
             return nil
         }
@@ -56,11 +67,16 @@ class BraveSearchManager: NSObject {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItem = components.valueForQuery("q") else { return nil }
         
+        self.profile = profile
         self.url = url
         self.query = queryItem
         self.domainCookies = cookies.filter { $0.domain == url.host }
         if domainCookies.first(where: { $0.name == "fallback" })?.value != "1" {
             return nil
+        }
+        
+        if BraveSearchLogEntry.shared.isEnabled {
+            callbackLog = .init(date: Date(), url: url, query: queryItem, cookies: domainCookies)
         }
     }
     
@@ -94,18 +110,31 @@ class BraveSearchManager: NSObject {
             request.setValue($0.value, forHTTPHeaderField: $0.key)
         }
         
+        request.setValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")
+        
         let session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: .main)
+        
+        var timer: PerformanceTimer?
+        if callbackLog != nil {
+            timer = PerformanceTimer(label: "Brave Search Debug can answer api call")
+        }
         
         // Important, URLSessionDelegate must have been implemented here
         // to handle request authentication.
         session
             .dataTaskPublisher(for: request)
-            .tryMap { output -> Data in
+            .tryMap { [weak self] output -> Data in
+                if self?.callbackLog != nil, let timer = timer {
+                    _ = timer.stop()
+                    self?.callbackLog?.canAnswerTime = String(format: "%.2f", Double(timer.duration ?? 0))
+                }
+                
                 guard let response = output.response as? HTTPURLResponse,
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
                 }
      
+                self?.callbackLog?.backupQuery = String(data: output.data, encoding: .utf8)
                 return output.data
             }
             .decode(type: BackupQuery.self, decoder: JSONDecoder())
@@ -156,10 +185,20 @@ class BraveSearchManager: NSObject {
         request.addValue("text/html;charset=UTF-8, text/plain;charset=UTF-8",
                          forHTTPHeaderField: "Accept")
         
+        var timer: PerformanceTimer?
+        if callbackLog != nil {
+            timer = PerformanceTimer(label: "Brave Search Debug fallback results call")
+        }
+        
         let session = URLSession(configuration: .ephemeral)
         session
             .dataTaskPublisher(for: request)
-            .tryMap { output -> String in
+            .tryMap { [weak self] output -> String in
+                if self?.callbackLog != nil, let timer = timer {
+                    _ = timer.stop()
+                    self?.callbackLog?.fallbackTime = String(format: "%.2f", Double(timer.duration ?? 0))
+                }
+                
                 guard let response = output.response as? HTTPURLResponse,
                       response.statusCode >= 200 && response.statusCode < 300 else {
                     throw "Invalid response"
@@ -170,6 +209,7 @@ class BraveSearchManager: NSObject {
                     throw "Failed to decode string from data"
                 }
                 
+                self?.callbackLog?.fallbackData = output.data
                 return escapedString
             }
             .receive(on: DispatchQueue.main)
@@ -256,12 +296,7 @@ extension BraveSearchManager: URLSessionDataDelegate {
         
         // Lookup the credentials
         // If there is no profile or the challenge is not an auth challenge, reject the challenge
-        guard let profile = (UIApplication.shared.delegate as? AppDelegate)?.browserViewController.profile else {
-            completionHandler(.rejectProtectionSpace, nil)
-            return
-        }
-        
-        self.findLoginsForProtectionSpace(profile: profile, challenge: challenge, completion: { credential in
+        findLoginsForProtectionSpace(profile: profile, challenge: challenge, completion: { credential in
             if let credential = credential {
                 BraveSearchManager.cachedCredentials = credential
                 

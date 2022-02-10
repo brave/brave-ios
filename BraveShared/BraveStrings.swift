@@ -78,12 +78,6 @@ extension Strings {
                                                     bundle: .braveShared, value: "Oops! Something went wrong. Please try again.", comment: "")
 }
 
-// MARK:-  BasePasscodeViewController.swift
-extension Strings {
-    public static let passcodeConfirmMisMatchErrorText = NSLocalizedString("PasscodeConfirmMisMatchErrorText", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Passcodes didn’t match. Try again.", comment: "Error message displayed to user when their confirming passcode doesn't match the first code.")
-    public static let passcodeMatchOldErrorText = NSLocalizedString("PasscodeMatchOldErrorText", tableName: "BraveShared", bundle: Bundle.braveShared, value: "New passcode must be different than existing code.", comment: "Error message displayed when user tries to enter the same passcode as their existing code when changing it.")
-}
-
 // MARK:-  SearchViewController.swift
 extension Strings {
     public static let searchSettingsButtonTitle = NSLocalizedString("SearchSettingsButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Search Settings", comment: "Label for search settings button.")
@@ -93,6 +87,8 @@ extension Strings {
     public static let searchSuggestionSectionTitleFormat = NSLocalizedString("SearchSuggestionSectionTitleFormat", tableName: "BraveShared", bundle: Bundle.braveShared, value: "%@ Search", comment: "Section Title when showing search suggestions. The parameter substituted for \"%@\" is the name of the search engine. E.g.: Google Search")
     public static let turnOnSearchSuggestions = NSLocalizedString("Turn on search suggestions?", bundle: Bundle.braveShared, comment: "Prompt shown before enabling provider search queries")
     public static let searchSuggestionSectionTitleNoSearchFormat = NSLocalizedString("SearchSuggestionSectionTitleNoSearchFormat", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Search", comment: "Section Title when showing search suggestions and the engine does not contain the word 'Search'.")
+    public static let noSearchResultsfound = NSLocalizedString("noSearchResultsfound", tableName: "BraveShared", bundle: .braveShared, value: "No search results found.", comment: "The information title displayed when there is no search reault found")
+    public static let searchBookmarksTitle = NSLocalizedString("searchBookmarksTitle", tableName: "BraveShared", bundle: .braveShared, value: "Search Bookmarks", comment: "The placeholder text for bookmark search")
 }
 
 // MARK:-  Authenticator.swift
@@ -117,8 +113,16 @@ extension Strings {
     public static let openPhoneSettingsActionTitle = NSLocalizedString("OpenPhoneSettingsActionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let copyImageActionTitle = NSLocalizedString("CopyImageActionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Copy Image", comment: "Context menu item for copying an image to the clipboard")
     public static let closeAllTabsTitle = NSLocalizedString("CloseAllTabsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Close All %i Tabs", comment: "")
+    public static let savedTabsFolderTitle = NSLocalizedString("SavedTabsFolderTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Saved Tabs", comment: "The title for the folder created when all bookmarks are being ")
+    public static let bookmarkAllTabsTitle = NSLocalizedString("BookmarkAllTabsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Bookmark All Tabs", comment: "Action item title of long press for Adding Bookmark for All Tabs in Tab List")
     public static let suppressAlertsActionTitle = NSLocalizedString("SuppressAlertsActionTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Suppress Alerts", comment: "Title of alert that seeks permission from user to suppress future JS alerts")
     public static let suppressAlertsActionMessage = NSLocalizedString("SuppressAlertsActionMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevent this page from creating additional alerts", comment: "Message body of alert that seeks permission from user to suppress future JS alerts")
+    public static let openDownloadsFolderErrorDescription =
+        NSLocalizedString("OpenDownloadsFolderErrorDescription",
+                          tableName: "BraveShared",
+                          bundle: Bundle.braveShared,
+                          value: "An unknown error occurred while opening the Downloads folder in the Files app.",
+                          comment: "Error description when there is an error while navigating to Files App")
 }
 
 // MARK:-  DefaultBrowserIntroCalloutViewController.swift
@@ -154,18 +158,169 @@ extension Strings {
                               tableName: "BraveShared", bundle: .braveShared,
                               value: "Brave Web Browser",
                               comment: "Notification title to promote setting Brave app as default browser")
+        
         public static let notificationBody =
             NSLocalizedString("defaultBrowserCallout.notificationBody",
                               tableName: "BraveShared", bundle: .braveShared,
-                              value: "Optimized for iOS 14. Make Brave your default browser today.",
+                              value: "Optimized for iOS %@. Make Brave your default browser today.",
                               comment: "Notification body to promote setting Brave app as default browser")
+    }
+}
+
+// MARK:  Callouts
+
+extension Strings {
+    public struct Callout {
+        public static let defaultBrowserCalloutTitle =
+            NSLocalizedString("callout.defaultBrowserTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Make Brave your default browser",
+                              comment: "Title for Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutDescription =
+            NSLocalizedString("callout.defaultBrowserCalloutDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "With Brave as default, every link you click opens with Brave's privacy protections.",
+                              comment: "Subtitle - Description for Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutPrimaryButtonTitle =
+            NSLocalizedString("callout.defaultBrowserCalloutPrimaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Set as default",
+                              comment: "Title for main button in Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutSecondaryButtonTitle =
+            NSLocalizedString("callout.defaultBrowserCalloutSecondaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Skip this",
+                              comment: "Title for secondary button in Default Browser Full Screen Callout")
+        public static let defaultBrowserCalloutSecondaryButtonDescription =
+            NSLocalizedString("callout.defaultBrowserCalloutSecondaryButtonDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Already default?",
+                              comment: "Description for secondary button in Default Browser Full Screen Callout")
+        public static let privacyEverywhereCalloutTitle =
+            NSLocalizedString("callout.privacyEverywhereCalloutTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Privacy. Everywhere.",
+                              comment: "Title for Privacy Everywhere Full Screen Callout")
+        public static let privacyEverywhereCalloutDescription =
+            NSLocalizedString("callout.privacyEverywhereCalloutDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.",
+                              comment: "Subtitle - Description for Privacy Everywhere Full Screen Callout")
+        public static let privacyEverywhereCalloutPrimaryButtonTitle =
+            NSLocalizedString("callout.privacyEverywhereCalloutPrimaryButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Sync now",
+                              comment: "Title for button in Default Browser Full Screen Callout")
+        public static let playlistOnboardingViewTitle =
+            NSLocalizedString("callout.playlistOnboardingViewTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Add video to Playlist…",
+                              comment: "Title for Playlist Onboarding View")
+        public static let playlistOnboardingViewDescription =
+            NSLocalizedString("callout.playlistOnboardingViewDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "…play anywhere, anytime. In the background, picture-in-picture, or even offline. And, of course, ad-free.",
+                              comment: "Description for Playlist Onboarding View")
+        public static let playlistOnboardingViewButtonTitle =
+            NSLocalizedString("callout.playlistOnboardingViewButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Watch the video",
+                              comment: "Button title for Playlist Onboarding View")
+    }
+}
+
+// MARK:  Onboarding
+
+extension Strings {
+    public struct Onboarding {
+        public static let welcomeScreenTitle =
+            NSLocalizedString("onboarding.welcomeScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Welcome to Brave!",
+                              comment: "Title for Welcome Screen in Onboarding")
+        public static let privacyScreenTitle =
+            NSLocalizedString("onboarding.privacyScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Privacy made easy",
+                              comment: "Title for Privacy Screen in Onboarding")
+        public static let privacyScreenDescription =
+            NSLocalizedString("onboarding.privacyScreenDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "You're just a step away from the best privacy online. Ready?",
+                              comment: "Description for Privacy Screen in Onboarding")
+        public static let privacyScreenButtonTitle =
+            NSLocalizedString("onboarding.privacyScreenButtonTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Let's go",
+                              comment: "Button Title for Privacy Screen in Onboarding")
+        public static let readyScreenTitle =
+            NSLocalizedString("onboarding.readyScreenTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "You're ready to browse!",
+                              comment: "Title for Ready Screen in Onboarding")
+        public static let readyScreenDescription =
+            NSLocalizedString("onboarding.readyScreenDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Select a popular site below or enter your own...",
+                              comment: "Description for Ready Screen in Onboarding")
+        public static let readyScreenAdditionalDescription =
+            NSLocalizedString("onboarding.readyScreenAdditionalDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "...and watch those trackers & ads disappear.",
+                              comment: "Additional Description for Ready Screen in Onboarding")
+        public static let ntpOnboardingPopOverTrackerDescription =
+            NSLocalizedString("onboarding.ntpOnboardingPopOverTrackerDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "By blocking trackers & ads, websites use less data and load way faster.",
+                              comment: "Description for the NTP pop-over that describes the tracking information on NTP")
+        public static let ntpOnboardingPopoverDoneTitle =
+            NSLocalizedString("onboarding.ntpOnboardingPopoverDoneTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "All set!",
+                              comment: "Title for the NTP pop-over that describes the onboarding is done")
+        public static let ntpOnboardingPopoverDoneDescription =
+            NSLocalizedString("onboarding.ntpOnboardingPopoverDoneDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Check the menu for settings and more great privacy features!",
+                              comment: "DEscription for the NTP pop-over that describes the onboarding is done")
+        public static let searchViewEnterWebsiteRowTitle =
+            NSLocalizedString("onboarding.searchViewEnterWebsiteRowTitle",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Enter a website",
+                              comment: "The title of the row asking user to enter a website url")
+        public static let blockedAdsOnboardingPopoverSingleTrackerDescription =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Brave blocked %@ and %d other tracker on: %@.",
+                              comment: "The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
+        public static let blockedAdsOnboardingPopoverMultipleTrackerDescription =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Brave blocked %@ and %d other trackers on: %@.",
+                              comment: "The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
+        public static let blockedAdsOnboardingPopoverDescriptionTwo =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverDescriptionTwo",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Brave blocked %@ on: %@.",
+                              comment: "The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
+        public static let blockedAdsOnboardingPopoverDescriptionThree =
+            NSLocalizedString("onboarding.blockedAdsOnboardingPopoverDescriptionThree",
+                              tableName: "BraveShared", bundle: .braveShared,
+                              value: "Tap the Shield from any site to see all the stuff we blocked.",
+                              comment: "The description of the popover showing trackers that were blocked.")
     }
 }
 
 // MARK:-  ErrorPageHelper.swift
 extension Strings {
-    public static let errorPageReloadButtonTitle = NSLocalizedString("ErrorPageReloadButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Try again", comment: "Shown in error pages on a button that will try to load the page again")
+    public static let errorPageReloadButtonTitle = NSLocalizedString("ErrorPageReloadButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Reload", comment: "Shown in error pages on a button that will try to load the page again")
     public static let errorPageOpenInSafariButtonTitle = NSLocalizedString("ErrorPageOpenInSafariButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open in Safari", comment: "Shown in error pages for files that can't be shown and need to be downloaded.")
+    public static let errorPageCantBeReachedTry =
+    NSLocalizedString("errorPageCantBeReachedTry",
+                      tableName: "BraveShared",
+                      bundle: Bundle.braveShared,
+                      value: "Try re-typing the URL, or opening a search engine and searching for the new URL.",
+                      comment: "Shown in error pages to suggest a fix to the user.")
 }
 
 // MARK:-  FindInPageBar.swift
@@ -184,6 +339,7 @@ extension Strings {
 // MARK:-  TabLocationView.swift
 extension Strings {
     public static let tabToolbarStopButtonAccessibilityLabel = NSLocalizedString("TabToolbarStopButtonAccessibilityLabel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Stop", comment: "Accessibility Label for the tab toolbar Stop button")
+    public static let tabToolbarPlaylistButtonAccessibilityLabel = NSLocalizedString("TabToolbarPlaylistButtonAccessibilityLabel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Playlist", comment: "Accessibility Label for the tab toolbar Playlist button")
     public static let tabToolbarReloadButtonAccessibilityLabel = NSLocalizedString("TabToolbarReloadButtonAccessibilityLabel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Reload", comment: "Accessibility Label for the tab toolbar Reload button")
     public static let tabToolbarSearchAddressPlaceholderText = NSLocalizedString("TabToolbarSearchAddressPlaceholderText", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Search or enter address", comment: "The text shown in the URL bar on about:home")
     public static let tabToolbarLockImageAccessibilityLabel = NSLocalizedString("TabToolbarLockImageAccessibilityLabel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Secure connection", comment: "Accessibility label for the lock icon, which is only present if the connection is secure")
@@ -224,6 +380,7 @@ extension Strings {
     public static let tabTrayAddTabAccessibilityLabel = NSLocalizedString("TabTrayAddTabAccessibilityLabel", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
     public static let `private` = NSLocalizedString("Private", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Private", comment: "Private button title")
     public static let privateBrowsing = NSLocalizedString("PrivateBrowsing", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Private Browsing", comment: "")
+    public static let tabTraySearchBarTitle = NSLocalizedString("TabTraySearchBarTitle", tableName: "BraveShared", bundle: .braveShared, value: "Search Tabs", comment: "Title displayed for placeholder inside Search Bar in Tab Tray")
 }
 
 // MARK:-  TabTrayButtonExtensions.swift
@@ -389,6 +546,73 @@ extension Strings {
     }
 }
 
+// MARK: - OptionsMenu
+
+extension Strings {
+    public struct OptionsMenu {
+        public static let menuSectionTitle = NSLocalizedString(
+            "optionsMenu.menuSectionTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Brave Features",
+            comment: "Privacy Features Section title")
+        public static let braveVPNItemTitle = NSLocalizedString(
+            "optionsMenu.braveVPNItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "VPN",
+            comment: "Brave VPN Item Menu title")
+        public static let braveVPNItemDescription = NSLocalizedString(
+            "optionsMenu.braveVPNItemDescription",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Protect your entire device online",
+            comment: "The subtitle description of menu item Brave VPN")
+        public static let braveTalkItemTitle = NSLocalizedString(
+            "optionsMenu.braveTalkItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Talk",
+            comment: "Brave Talk Item Menu title")
+        public static let braveTalkItemDescription = NSLocalizedString(
+            "optionsMenu.braveTalkItemDescription",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Private video calls, right in your browser",
+            comment: "The subtitle description of menu item Brave Talk")
+        public static let braveNewsItemTitle = NSLocalizedString(
+            "optionsMenu.braveNewsItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "News",
+            comment: "Brave News Item Menu title")
+        public static let braveNewsItemDescription = NSLocalizedString(
+            "optionsMenu.braveNewsItemDescription",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Today's top stories in a private news feed",
+            comment: "The subtitle description of menu item Brave News")
+        public static let bravePlaylistItemTitle = NSLocalizedString(
+            "optionsMenu.bravePlaylistItemTitle",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Playlist",
+            comment: "Brave News Item Menu title")
+        public static let bravePlaylistItemDescription = NSLocalizedString(
+            "optionsMenu.bravePlaylistItemDescription",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "Keep an offline playlist of any video/stream",
+            comment: "The subtitle description of menu item Brave Playlist")
+        public static let braveWalletItemDescription = NSLocalizedString(
+            "optionsMenu.braveWalletItemDescription",
+            tableName: "BraveShared",
+            bundle: .braveShared,
+            value: "The secure crypto wallet, no extension required",
+            comment: "The subtitle description of menu item Brave Wallet")
+    }
+}
+
 // MARK:-  SettingsContentViewController.swift
 extension Strings {
     public static let settingsContentLoadErrorMessage = NSLocalizedString("SettingsContentLoadErrorMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Could not load page.", comment: "Error message that is shown in settings when there was a problem loading")
@@ -410,53 +634,23 @@ extension Strings {
     public static let menuItemOpenAndFillTitle = NSLocalizedString("MenuItemOpenAndFillTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open & Fill", comment: "Open and Fill website text selection menu item")
 }
 
-// MARK:-  AuthenticationManagerConstants.swift
+// MARK: - Passcode / Browser Lock
 extension Strings {
-    public static let authenticationPasscode = NSLocalizedString("AuthenticationPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Passcode For Logins", comment: "Label for the Passcode item in Settings")
+    public static let authenticationPasscode = NSLocalizedString("AuthenticationPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Passcode", comment: "Label for the Passcode item in Settings")
     
     public static let authenticationTouchIDPasscodeSetting = NSLocalizedString("AuthenticationTouchIDPasscodeSetting", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Touch ID & Passcode", comment: "Label for the Touch ID/Passcode item in Settings")
     
     public static let authenticationFaceIDPasscodeSetting = NSLocalizedString("AuthenticationFaceIDPasscodeSetting", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Face ID & Passcode", comment: "Label for the Face ID/Passcode item in Settings")
     
-    public static let authenticationRequirePasscode = NSLocalizedString("AuthenticationRequirePasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Require Passcode", comment: "Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately'")
+    public static let authenticationLoginsTouchReason = NSLocalizedString("AuthenticationLoginsTouchReason", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This authenticates your access to Brave", comment: "Touch ID or PIN entry prompt subtitle when accessing Brave with the Browser Lock feature enabled")
     
-    public static let authenticationEnterAPasscode = NSLocalizedString("AuthenticationEnterAPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enter a passcode", comment: "Text displayed above the input field when entering a new passcode")
+    public static let browserLockMigrationTitle = NSLocalizedString("browserLockMigrationTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Open Brave with your Apple Face ID, Touch ID, or passcode", comment: "Title on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature")
     
-    public static let authenticationEnterPasscodeTitle = NSLocalizedString("AuthenticationEnterPasscodeTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enter Passcode", comment: "Title of the dialog used to request the passcode")
+    public static let browserLockMigrationSubtitle = NSLocalizedString("browserLockMigrationSubtitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "We’ve simplified Brave Passcodes. You can now access Brave with the same ID or passcode you use on your phone.", comment: "Subtitle on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature")
     
-    public static let authenticationEnterPasscode = NSLocalizedString("AuthenticationEnterPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enter passcode", comment: "Text displayed above the input field when changing the existing passcode")
+    public static let browserLockMigrationNoPasscodeSetup = NSLocalizedString("browserLockMigrationNoPasscodeSetup", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Haven't set an ID or passcode? Open Settings, then tap \"%@\"", comment: "Displayed to the user when they don't have a passcode set on their phone, therefore cannot use the Browser Lock feature. \"%@\" will be filled with either \"Touch ID & Passcode\" or \"Face ID & Passcode\"")
     
-    public static let authenticationReenterPasscode = NSLocalizedString("AuthenticationReenterPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Re-enter passcode", comment: "Text displayed above the input field when confirming a passcode")
-    
-    public static let authenticationSetPasscode = NSLocalizedString("AuthenticationSetPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Set Passcode", comment: "Title of the dialog used to set a passcode")
-    
-    public static let authenticationTurnOffPasscode = NSLocalizedString("AuthenticationTurnOffPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Turn Passcode Off", comment: "Label used as a setting item to turn off passcode")
-    
-    public static let authenticationTurnOnPasscode = NSLocalizedString("AuthenticationTurnOnPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Turn Passcode On", comment: "Label used as a setting item to turn on passcode")
-    
-    public static let authenticationChangePasscode = NSLocalizedString("AuthenticationChangePasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Change Passcode", comment: "Label used as a setting item and title of the following screen to change the current passcode")
-    
-    public static let authenticationEnterNewPasscode = NSLocalizedString("AuthenticationEnterNewPasscode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enter a new passcode", comment: "Text displayed above the input field when changing the existing passcode")
-    
-    public static let authenticationImmediately = NSLocalizedString("AuthenticationImmediately", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Immediately", comment: "Immediately' interval item for selecting when to require passcode")
-    
-    public static let authenticationLoginsTouchReason = NSLocalizedString("AuthenticationLoginsTouchReason", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Use your fingerprint to access Logins now.", comment: "Touch ID prompt subtitle when accessing logins")
-    
-    public static let authenticationRequirePasscodeTouchReason = NSLocalizedString("AuthenticationRequirePasscodeTouchReason", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Use your fingerprint to access configuring your required passcode interval.", comment: "Touch ID prompt subtitle when accessing the require passcode setting")
-    
-    public static let authenticationDisableTouchReason = NSLocalizedString("AuthenticationDisableTouchReason", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Use your fingerprint to disable Touch ID.", comment: "Touch ID prompt subtitle when disabling Touch ID")
-    
-    public static let authenticationWrongPasscodeError = NSLocalizedString("AuthenticationWrongPasscodeError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Incorrect passcode. Try again.", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app")
-    
-    public static let authenticationIncorrectAttemptsRemaining = NSLocalizedString("AuthenticationIncorrectAttemptsRemaining", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Incorrect passcode. Try again (Attempts remaining: %d).", comment: "Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining")
-    
-    public static let authenticationMaximumAttemptsReached = NSLocalizedString("AuthenticationMaximumAttemptsReached", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Too many failed attempts.\n Please try again in %d minutes.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
-    
-    public static let authenticationMaximumAttemptsReachedOneMinute = NSLocalizedString("AuthenticationMaximumAttemptsReachedOneMinute", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Too many failed attempts.\n Please try again in 1 minute.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
-    
-    public static let authenticationMaximumAttemptsReachedNoTime = NSLocalizedString("AuthenticationMaximumAttemptsReachedNoTime", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Maximum attempts reached. Please try again later.", comment: "Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts.")
-    
-    public static let authenticationTouchForKeyboard = NSLocalizedString("AuthenticationTouchForKeyboard", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Tap to bring up the keyboard accessibility", comment: "When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad.")
+    public static let browserLockMigrationContinueButtonTitle = NSLocalizedString("browserLockMigrationContinueButtonTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Continue", comment: "A button title for the action to move to the next step of the browser lock migration process.")
 }
 
 // MARK:- Settings.
@@ -523,13 +717,31 @@ extension Strings {
 
 // MARK:- Error pages.
 extension Strings {
-    public static let errorPagesAdvancedButton = NSLocalizedString("ErrorPagesAdvancedButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Advanced", comment: "Label for button to perform advanced actions on the error page")
-    public static let errorPagesAdvancedWarning1 = NSLocalizedString("ErrorPagesAdvancedWarning1", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Warning: we can't confirm your connection to this website is secure.", comment: "Warning text when clicking the Advanced button on error pages")
-    public static let errorPagesAdvancedWarning2 = NSLocalizedString("ErrorPagesAdvancedWarning2", tableName: "BraveShared", bundle: Bundle.braveShared, value: "It may be a misconfiguration or tampering by an attacker. Proceed if you accept the potential risk.", comment: "Additional warning text when clicking the Advanced button on error pages")
-    public static let errorPagesCertWarningDescription = NSLocalizedString("ErrorPagesCertWarningDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "The owner of %@ has configured their website improperly. To protect your information from being stolen, Brave has not connected to this website.", comment: "Warning text on the certificate error page")
     public static let errorPagesCertWarningTitle = NSLocalizedString("ErrorPagesCertWarningTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Your connection is not private", comment: "Title on the certificate error page")
-    public static let errorPagesGoBackButton = NSLocalizedString("ErrorPagesGoBackButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Go Back", comment: "Label for button to go back from the error page")
-    public static let errorPagesVisitOnceButton = NSLocalizedString("ErrorPagesVisitOnceButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Visit site anyway", comment: "Button label to temporarily continue to the site from the certificate error page")
+    
+    public static let errorPagesCertErrorTitle = NSLocalizedString("ErrorPagesCertErrorTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This site can’t provide a secure connection", comment: "Title on the certificate error page")
+    
+    public static let errorPagesMoreDetailsButton = NSLocalizedString("ErrorPagesMoreDetailsButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "More details", comment: "Label for button to perform advanced actions on the error page")
+    
+    public static let errorPagesHideDetailsButton = NSLocalizedString("ErrorPagesHideDetailsButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Hide details", comment: "Label for button to hide advanced actions on the error page")
+    
+    public static let errorPagesLearnMoreButton = NSLocalizedString("ErrorPagesLearnMoreButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Learn more", comment: "Label for learn more link on error page")
+    
+    public static let errorPagesAdvancedWarningTitle = NSLocalizedString("ErrorPagesAdvancedWarningTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Attackers might be trying to steal your information from %@ (for example, passwords, messages, or credit cards).", comment: "Warning text when clicking the Advanced button on error pages")
+    
+    public static let errorPagesAdvancedWarningDetails = NSLocalizedString("ErrorPagesAdvancedWarningDetails", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This server could not prove that it is %@; its security certificate is not trusted by your device's operating system. This may be caused by a misconfiguration or an attacker trying to intercept your connection.", comment: "Additional warning text when clicking the Advanced button on error pages")
+    
+    public static let errorPagesBackToSafetyButton = NSLocalizedString("ErrorPagesBackToSafetyButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Back to safety", comment: "Label for button to go back from the error page")
+    
+    public static let errorPagesProceedAnywayButton = NSLocalizedString("ErrorPagesProceedAnywayButton", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Proceed to %@ (unsafe)", comment: "Button label to temporarily continue to the site from the certificate error page")
+    
+    public static let errorPagesNoInternetTitle = NSLocalizedString("ErrorPagesNoInternetTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "No internet access", comment: "Title of the No Internet error page")
+    
+    public static let errorPagesNoInternetTry = NSLocalizedString("ErrorPagesNoInternetTry", tableName: "BraveShared", bundle: Bundle.braveShared, value: "It appears you're not online. To fix this, try", comment: "Text telling the user to Try: The following list of things")
+    
+    public static let errorPagesNoInternetTryItem1 = NSLocalizedString("ErrorPagesNoInternetTryItem1", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Checking the network cables, modem, and router", comment: "List of things to try when internet is not working")
+    
+    public static let errorPagesNoInternetTryItem2 = NSLocalizedString("ErrorPagesNoInternetTryItem2", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Reconnecting to Wi-Fi", comment: "List of things to try when internet is not working")
 }
 
 // MARK: - Sync
@@ -540,6 +752,7 @@ extension Strings {
     public static let syncSettingsHeader = NSLocalizedString("SyncSettingsHeader", tableName: "BraveShared", bundle: Bundle.braveShared, value: "The device list below includes all devices in your sync chain. Each device can be managed from any other device.", comment: "Header title for Sync settings")
     public static let syncThisDevice = NSLocalizedString("SyncThisDevice", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This Device", comment: "This device cell")
     public static let braveSync = NSLocalizedString("BraveSync", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sync", comment: "Sync page title")
+    public static let braveSyncInternalsTitle = NSLocalizedString("BraveSyncInternalsTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sync Internals", comment: "Sync-Internals screen title (Sync Internals or Sync Debugging is fine).")
     public static let braveSyncWelcome = NSLocalizedString("BraveSyncWelcome", tableName: "BraveShared", bundle: Bundle.braveShared, value: "To start, you will need Brave installed on all the devices you plan to sync. To chain them together, start a sync chain that you will use to securely link all of your devices together.", comment: "Sync settings welcome")
     public static let newSyncCode = NSLocalizedString("NewSyncCode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Start a new Sync Chain", comment: "New sync code button title")
     public static let scanSyncCode = NSLocalizedString("ScanSyncCode", tableName: "BraveShared", bundle: Bundle.braveShared, value: "I have a Sync Code", comment: "Scan sync code button title")
@@ -597,6 +810,16 @@ extension Strings {
     public static let syncRemoveOtherDeviceTitle = NSLocalizedString("SyncRemoveOtherDeviceTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Remove %@ from Sync Chain?", comment: "Title for removing other device from Sync")
     public static let syncRemoveOtherDeviceMessage = NSLocalizedString("SyncRemoveOtherDeviceMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Removing the device from the Sync Chain will not clear previously synced data from the device.", comment: "Message for removing other device from Sync")
     public static let syncRemoveDeviceDefaultName = NSLocalizedString("SyncRemoveDeviceDefaultName", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Device", comment: "Default name for a device")
+    public static let syncJoinChainCodewordsWarning = NSLocalizedString("syncJoinChainCodewordsWarning", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This will share your Brave data, including potentially your passwords, with the device that generated these code words. Please double check that these code words were generated by a device that you own. Are you sure you want to do this?", comment: "Default name for a device")
+    public static let syncJoinChainCameraWarning = NSLocalizedString("syncJoinChainCameraWarning", tableName: "BraveShared", bundle: Bundle.braveShared, value: "This will share your Brave data, including potentially your passwords, with the device that generated this QR code. Please double check that this QR code was generated by a device that you own. Are you sure you want to do this?", comment: "Default name for a device")
+    public static let syncJoinChainWarningTitle = NSLocalizedString("syncJoinChainWarningTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Warning", comment: "Title for pairing sync device")
+    public static let syncInsecureVersionError = NSLocalizedString("syncInsecureVersionError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Older unsupported version", comment: "Sync Error Description")
+    public static let syncNewerVersionError = NSLocalizedString("syncNewerVersionError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported version", comment: "Sync Error Description")
+    public static let syncOlderVersionError = NSLocalizedString("syncOlderVersionError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "No longer supported version", comment: "Sync Error Description")
+    public static let syncInvalidVersionError = NSLocalizedString("syncInvalidVersionError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Invalid Format", comment: "Sync Error Description")
+    public static let syncExpiredError = NSLocalizedString("syncExpiredError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Expired", comment: "Sync Error Description")
+    public static let syncFutureVersionError = NSLocalizedString("syncFutureVersionError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Too New", comment: "Sync Error Description")
+    public static let syncGenericError = NSLocalizedString("syncGenericError", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sorry, something went wrong", comment: "Sync Error Description")
 }
 
 extension Strings {
@@ -621,6 +844,8 @@ extension Strings {
     public static let confirm = NSLocalizedString("Confirm", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Confirm", comment: "")
     public static let privacy = NSLocalizedString("Privacy", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Privacy", comment: "Settings privacy section title")
     public static let security = NSLocalizedString("Security", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Security", comment: "Settings security section title")
+    public static let browserLock = NSLocalizedString("BrowserLock", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Browser Lock", comment: "Setting to enable the browser lock privacy feature")
+    public static let browserLockDescription = NSLocalizedString("BrowserLockDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unlock Brave with Touch ID, Face ID or system passcode.", comment: "")
     public static let saveLogins = NSLocalizedString("SaveLogins", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Save Logins", comment: "Setting to enable the built-in password manager")
     public static let showBookmarkButtonInTopToolbar = NSLocalizedString("ShowBookmarkButtonInTopToolbar", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Bookmarks Shortcut", comment: "Setting to show a bookmark button on the top level menu that triggers a panel of the user's bookmarks.")
     public static let alwaysRequestDesktopSite = NSLocalizedString("AlwaysRequestDesktopSite", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Always Request Desktop Site", comment: "Setting to always request the desktop version of a website.")
@@ -649,6 +874,7 @@ extension Strings {
     public static let yesterday = NSLocalizedString("Yesterday", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Yesterday", comment: "History tableview section header")
     public static let lastWeek = NSLocalizedString("LastWeek", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Last week", comment: "History tableview section header")
     public static let lastMonth = NSLocalizedString("LastMonth", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Last month", comment: "History tableview section header")
+    public static let earlier = NSLocalizedString("Earlier", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Earlier", comment: "History tableview section header that indicated history items earlier than last month")
     public static let savedLogins = NSLocalizedString("SavedLogins", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Saved Logins", comment: "Settings item for clearing passwords and login data")
     public static let downloadedFiles = NSLocalizedString("DownloadedFiles", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Downloaded files", comment: "Settings item for clearing downloaded files.")
     public static let browsingHistory = NSLocalizedString("BrowsingHistory", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Browsing History", comment: "Settings item for clearing browsing history")
@@ -684,22 +910,22 @@ extension Strings {
 extension Strings {
     public static let blockPopups = NSLocalizedString("BlockPopups", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Popups", comment: "Setting to enable popup blocking")
     public static let followUniversalLinks = NSLocalizedString("FollowUniversalLinks", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Allow universal links to open in external apps", comment: "Setting to follow universal links")
-    public static let mediaAutoPlays = NSLocalizedString("MediaAutoPlays", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enable background video autoplay", comment: "Setting to allow media to play automatically")
+    public static let mediaAutoBackgrounding = NSLocalizedString("MediaAutoBackgrounding", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Enable Background Audio", comment: "Setting to allow media to play in the background")
     public static let showTabsBar = NSLocalizedString("ShowTabsBar", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
     public static let privateBrowsingOnly = NSLocalizedString("PrivateBrowsingOnly", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Private Browsing Only", comment: "Setting to keep app in private mode")
     public static let shieldsDefaults = NSLocalizedString("ShieldsDefaults", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Brave Shields Global Defaults", comment: "Section title for adbblock, tracking protection, HTTPS-E, and cookies")
     public static let shieldsDefaultsFooter = NSLocalizedString("ShieldsDefaultsFooter", tableName: "BraveShared", bundle: Bundle.braveShared, value: "These are the default Shields settings for new sites. Changing these won't affect your existing per-site settings.", comment: "Section footer for global shields defaults")
-    public static let blockAdsAndTracking = NSLocalizedString("BlockAdsAndTracking", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block cross-site trackers", comment: "")
-    public static let blockAdsAndTrackingDescription = NSLocalizedString("BlockAdsAndTrackingDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevents ads, popups, and trackers from loading", comment: "")
-    public static let HTTPSEverywhere = NSLocalizedString("HTTPSEverywhere", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Upgrade connections to HTTPS", comment: "")
-    public static let HTTPSEverywhereDescription = NSLocalizedString("HTTPSEverywhereDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Opens some sites using a secure HTTPS connection instead of plain HTTP.", comment: "")
+    public static let blockAdsAndTracking = NSLocalizedString("BlockAdsAndTracking", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Cross-Site Trackers", comment: "")
+    public static let blockAdsAndTrackingDescription = NSLocalizedString("BlockAdsAndTrackingDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevents ads, popups, and trackers from loading.", comment: "")
+    public static let HTTPSEverywhere = NSLocalizedString("HTTPSEverywhere", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Upgrade Connections to HTTPS", comment: "")
+    public static let HTTPSEverywhereDescription = NSLocalizedString("HTTPSEverywhereDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Opens sites using secure HTTPS instead of HTTP when possible.", comment: "")
     public static let blockPhishingAndMalware = NSLocalizedString("BlockPhishingAndMalware", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Phishing and Malware", comment: "")
     public static let googleSafeBrowsing = NSLocalizedString("GoogleSafeBrowsing", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block dangerous sites", comment: "")
     public static let googleSafeBrowsingUsingWebKitDescription = NSLocalizedString("GoogleSafeBrowsingUsingWebKitDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Sends obfuscated URLs of some pages you visit to the Google Safe Browsing service, when your security is at risk.", comment: "")
     public static let blockScripts = NSLocalizedString("BlockScripts", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Scripts", comment: "")
-    public static let blockScriptsDescription = NSLocalizedString("BlockScriptsDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Blocks JavaScript (may break sites)", comment: "")
-    public static let blockCookiesDescription = NSLocalizedString("BlockCookiesDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevents websites from storing information about your previous visits", comment: "")
-    public static let fingerprintingProtection = NSLocalizedString("FingerprintingProtection", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block fingerprinting", comment: "")
+    public static let blockScriptsDescription = NSLocalizedString("BlockScriptsDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Blocks JavaScript (may break sites).", comment: "")
+    public static let blockCookiesDescription = NSLocalizedString("BlockCookiesDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Prevents websites from storing information about your previous visits.", comment: "")
+    public static let fingerprintingProtection = NSLocalizedString("FingerprintingProtection", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Block Fingerprinting", comment: "")
     public static let fingerprintingProtectionDescription = NSLocalizedString("FingerprintingProtectionDescription", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Makes it harder for sites to recognize your device's distinctive characteristics. ", comment: "")
     public static let support = NSLocalizedString("Support", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Support", comment: "Support section title")
     public static let about = NSLocalizedString("About", tableName: "BraveShared", bundle: Bundle.braveShared, value: "About", comment: "About settings section title")
@@ -756,6 +982,7 @@ extension Strings {
     public static let bookmarksMenuItem = NSLocalizedString("BookmarksMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Bookmarks", comment: "Title for bookmarks menu item")
     public static let historyMenuItem = NSLocalizedString("HistortMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "History", comment: "Title for history menu item")
     public static let settingsMenuItem = NSLocalizedString("SettingsMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Settings", comment: "Title for settings menu item")
+    public static let passwordsMenuItem = NSLocalizedString("PasswordsMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Passwords", comment: "Title for passwords menu item")
     public static let addToMenuItem = NSLocalizedString("AddToMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Add Bookmark", comment: "Title for the button to add a new website bookmark.")
     public static let shareWithMenuItem = NSLocalizedString("ShareWithMenuItem", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Share with...", comment: "Title for sharing url menu item")
     public static let openExternalAppURLTitle = NSLocalizedString("ExternalAppURLAlertTitle", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Allow link to switch apps?", comment: "Allow link to switch apps?")
@@ -817,10 +1044,12 @@ extension Strings {
     public static let OBAdsOptInMessage = NSLocalizedString("OBAdsOptInMessage", bundle: Bundle.braveShared, value: "Earn tokens and reward creators for great content while you browse.", comment: "Message when opting into brave Ads when region becomes available")
     public static let OBAdsOptInMessageJapan = NSLocalizedString("OBAdsOptInMessageJapan", bundle: Bundle.braveShared, value: "Earn points and reward creators for great content while you browse.", comment: "Message when opting into brave Ads when region becomes available")
     public static let OBRewardsDetailInAdRegion = NSLocalizedString("OBRewardsDetailInAdRegion", bundle: Bundle.braveShared, value: "Earn tokens and reward creators for great content while you browse.", comment: "Detail text for rewards onboarding screen")
-    public static let OBRewardsDetail = NSLocalizedString("OBRewardsDetail", bundle: Bundle.braveShared, value: "Start supporting creators with private and anonymized ads while you browse", comment: "Detail text for rewards onboarding screen")
-    public static let OBRewardsAgreementTitle = NSLocalizedString("OBRewardsAgreementTitle", bundle: Bundle.braveShared, value: "Brave Rewards supports creators", comment: "Title for rewards agreement onboarding screen")
-    public static let OBRewardsAgreementDetail = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "By tapping Start, you agree to the", comment: "Detail text for rewards agreement onboarding screen")
+    public static let OBRewardsDetail = NSLocalizedString("OBRewardsDetail", bundle: Bundle.braveShared, value: "Opting into Brave Private Ads supports publishers and content creators with every ad viewed.", comment: "Detail text for rewards onboarding screen")
+    public static let OBRewardsAgreementTitle = NSLocalizedString("OBRewardsAgreementTitle", bundle: Bundle.braveShared, value: "Brave Rewards", comment: "Title for rewards agreement onboarding screen")
+    public static let OBRewardsAgreementDetail = NSLocalizedString("OBRewardsAgreementDetail", bundle: Bundle.braveShared, value: "By tapping Yes, you agree to the", comment: "Detail text for rewards agreement onboarding screen")
     public static let OBRewardsAgreementDetailLink = NSLocalizedString("OBRewardsAgreementDetailLink", bundle: Bundle.braveShared, value: "Terms of Service", comment: "Detail text for rewards agreement onboarding screen")
+    public static let OBRewardsPrivacyPolicyDetailLink = NSLocalizedString("OBRewardsPrivacyPolicyDetailLink", bundle: Bundle.braveShared, value: "Privacy Policy", comment: "Detail text for rewards agreement onboarding screen")
+    public static let OBRewardsAgreementDetailsAnd = NSLocalizedString("OBRewardsAgreementDetailsAnd", bundle: Bundle.braveShared, value: "and", comment: "Detail text for rewards agreement onboarding screen")
     public static let OBAdsTitle = NSLocalizedString("OBAdsTitle", bundle: Bundle.braveShared, value: "Brave will show your first ad in", comment: "Title for ads onboarding screen")
     public static let OBCompleteTitle = NSLocalizedString("OBCompleteTitle", bundle: Bundle.braveShared, value: "Now you're ready to go.", comment: "Title for when the user completes onboarding")
     public static let OBErrorTitle = NSLocalizedString("OBErrorTitle", bundle: Bundle.braveShared, value: "Sorry", comment: "A generic error title for onboarding")
@@ -847,9 +1076,6 @@ extension Strings {
 
 // MARK: - User Wallet
 extension Strings {
-    public static let userWalletBATNotAllowedTitle = NSLocalizedString("UserWalletDetailsDisconnectButtonTitle", bundle: Bundle.braveShared, value: "Region not supported", comment: "")
-    public static let userWalletBATNotAllowedMessage = NSLocalizedString("UserWalletBATNotAllowedMessage", bundle: Bundle.braveShared, value: "BAT is not currently supported in your region based on the location your account is opened. Check back later for availability.", comment: "")
-    public static let userWalletBATNotAllowedLearnMore = NSLocalizedString("UserWalletBATNotAllowedLearnMore", bundle: Bundle.braveShared, value: "Learn more", comment: "")
     public static let userWalletCloseButtonTitle = NSLocalizedString("UserWalletCloseButtonTitle", bundle: Bundle.braveShared, value: "Close", comment: "")
     public static let userWalletGenericErrorTitle = NSLocalizedString("UserWalletGenericErrorTitle", bundle: Bundle.braveShared, value: "Sorry, something went wrong", comment: "")
     public static let userWalletGenericErrorMessage = NSLocalizedString("UserWalletGenericErrorMessage", bundle: Bundle.braveShared, value: "There was a problem logging into your Uphold account. Please try again", comment: "")
@@ -969,26 +1195,14 @@ extension Strings {
         public static let trackerCountShareTitle =
             NSLocalizedString("shieldEducation.trackerCountShareTitle",
                               bundle: .braveShared,
-                              value: "%ld trackers & ads blocked",
+                              value: "%ld trackers & ads blocked!",
                               comment: "Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked")
-
-        public static let trackerAdWarningTitle =
-            NSLocalizedString("shieldEducation.trackerAdWarningTitle",
-                              bundle: .braveShared,
-                              value: "Trackers & ads blocked on this page.",
-                              comment: "Title for Shield Education Tracker Ad Warning")
         
         public static let videoAdBlockTitle =
             NSLocalizedString("shieldEducation.videoAdBlockTitle",
                               bundle: .braveShared,
                               value: "Ads are blocked while watching videos on this website.",
                               comment: "Title for Shield Education Tracker Video Ad Block")
-        
-        public static let trackerAdCountBlockTitle =
-            NSLocalizedString("shieldEducation.trackerAdCountBlockTitle",
-                              bundle: .braveShared,
-                              value: "%ld+ trackers & ads blocked on this page.",
-                              comment: "Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page")
         
         public static let trackerCountShareSubtitle =
             NSLocalizedString("shieldEducation.trackerCountShareSubtitle",
@@ -1008,23 +1222,17 @@ extension Strings {
                               value: "Videos without ads use less data.",
                               comment: "Subtitle for Shield Education Tracker Video Ad Block")
         
-        public static let trackerAdCountBlockSubtitle =
-            NSLocalizedString("shieldEducation.trackerAdCountBlockSubtitle",
-                              bundle: .braveShared,
-                              value: "Brave Shields protects your online privacy on every site.",
-                              comment: "Subtitle for Shield Education Tracker Ad Count Block")
-        
-        public static let educationInspectTitle =
-            NSLocalizedString("shieldEducation.inspectTitle",
-                              bundle: .braveShared,
-                              value: "Take a look",
-                              comment: "Action title for inspectable Education warnings")
-        
         public static let shareTheNewsTitle =
             NSLocalizedString("shieldEducation.shareTheNewsTitle",
                               bundle: .braveShared,
                               value: "Share the news",
                               comment: "Action title for actionable Share warnings")
+        
+        public static let benchmarkAnyTierTitle =
+            NSLocalizedString("shieldEducation.benchmarkAnyTierTitle",
+                              bundle: .braveShared,
+                              value: "Congrats on reaching this privacy milestone.",
+                              comment: "Subtitle for tracker benchmark Share")
         
         public static let benchmarkSpecialTierTitle =
             NSLocalizedString("shieldEducation.benchmarkSpecialTierTitle",
@@ -1162,7 +1370,13 @@ extension Strings {
             NSLocalizedString("playList.noItemLabelTitle",
                               bundle: .braveShared,
                               value: "No Items Available",
-                              comment: "Text indicator on the table cell If a video is already downloaded")
+                              comment: "Text when there are no items in the playlist")
+        
+        public static let noItemLabelDetailLabel =
+            NSLocalizedString("playList.noItemLabelDetailLabel",
+                              bundle: .braveShared,
+                              value: "You can add items to your Brave Playlist within the browser",
+                              comment: "Detail Text when there are no items in the playlist")
         
         public static let expiredLabelTitle =
             NSLocalizedString("playList.expiredLabelTitle",
@@ -1236,17 +1450,59 @@ extension Strings {
                               value: "This will delete the media from offline storage. Are you sure you want to continue?",
                               comment: "Message for the alert shown when the user tries to remove offline data of an item from playlist")
         
-        public static let playlistToastShowSettingsOptionTitle =
-            NSLocalizedString("playlist.playlistToastShowSettingsOptionTitle",
+        public static let urlBarButtonOptionTitle =
+            NSLocalizedString("playlist.urlBarButtonOptionTitle",
                               bundle: .braveShared,
-                              value: "Show \"Add to Brave Playlist\"",
-                              comment: "Title for the Playlist Settings Option for Enable/Disable Add Toast")
+                              value: "Enable quick-access button",
+                              comment: "Title for option to disable URL-Bar button")
         
-        public static let playlistToastShowSettingsOptionFooterText =
-            NSLocalizedString("playlist.playlistToastShowSettingsOptionFooterText",
+        public static let urlBarButtonOptionFooter =
+            NSLocalizedString("playlist.urlBarButtonOptionFooter",
                               bundle: .braveShared,
-                              value: "When enabled, a bar will automatically show on most media websites making it easier to add those video/audio files to your Playlist.",
-                              comment: "Footer Text for the Playlist Settings Option for Enable/Disable Add Toast")
+                              value: "Adds a playlist button (it looks like 4 lines with a + symbol) beside the address bar in the Brave browser. This button gives you quick access to open Playlist, or add or remove media.",
+                              comment: "Footer for option to disable URL-Bar button")
+        
+        public static let sharePlaylistActionTitle =
+            NSLocalizedString("playlist.sharePlaylistActionTitle",
+                              bundle: .braveShared,
+                              value: "Brave Playlist Menu",
+                              comment: "Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action")
+        
+        public static let sharePlaylistActionDetailsTitle =
+            NSLocalizedString("playlist.sharePlaylistActionDetailsTitle",
+                              bundle: .braveShared,
+                              value: "You can open the current item in a New Tab, or share it via the System Share Menu",
+                              comment: "Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action")
+        
+        public static let sharePlaylistOpenInNewTabTitle =
+            NSLocalizedString("playlist.sharePlaylistOpenInNewTabTitle",
+                              bundle: .braveShared,
+                              value: "Open In New Tab",
+                              comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
+        
+        public static let sharePlaylistOpenInNewPrivateTabTitle =
+            NSLocalizedString("playlist.sharePlaylistOpenInNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open In Private Tab",
+                              comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
+        
+        public static let sharePlaylistShareActionMenuTitle =
+            NSLocalizedString("playlist.sharePlaylistShareActionMenuTitle",
+                              bundle: .braveShared,
+                              value: "Share...",
+                              comment: "Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action")
+        
+        public static let menuBadgeOptionTitle =
+            NSLocalizedString("playlist.menuBadgeOptionTitle",
+                              bundle: .braveShared,
+                              value: "Show Menu Notification Badge",
+                              comment: "Title for playlist menu badge option")
+        
+        public static let menuBadgeOptionFooterText =
+            NSLocalizedString("playlist.menuBadgeOptionFooterText",
+                              bundle: .braveShared,
+                              value: "When enabled, a badge will be displayed on the main menu icon, indicating media on the page may be added to Brave Playlist.",
+                              comment: "Description footer for playlist menu badge option")
         
         public static let playlistLongPressSettingsOptionTitle =
             NSLocalizedString("playlist.playlistLongPressSettingsOptionTitle",
@@ -1409,6 +1665,258 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Adding video and audio files for offline use can use a lot of storage on your device. Please remove some files to free up storage space.",
                               comment: "When the user's disk space is almost full")
+        
+        public static let playlistPopoverAddTitle =
+            NSLocalizedString("playlist.popoverAddTitle",
+                              bundle: .braveShared,
+                              value: "Would you like to add this media to your Brave Playlist?",
+                              comment: "Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar")
+        
+        public static let playlistPopoverAddBody =
+            NSLocalizedString("playlist.popoverAddBody",
+                              bundle: .braveShared,
+                              value: "Brave Playlists support Offline Playback, Picture-in-picture, continuous playback and repeat modes.",
+                              comment: "Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar")
+        
+        public static let playlistPopoverAddedTitle =
+            NSLocalizedString("playlist.popoverAddedTitle",
+                              bundle: .braveShared,
+                              value: "This media is in your Brave Playlist",
+                              comment: "Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar")
+        
+        public static let playlistPopoverOpenInBravePlaylist =
+            NSLocalizedString("playlist.popoverOpenInBravePlaylist",
+                              bundle: .braveShared,
+                              value: "Open In Brave Playlist",
+                              comment: "Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar")
+        
+        public static let playlistPopoverRemoveFromBravePlaylist =
+            NSLocalizedString("playlist.popoverRemoveFromBravePlaylist",
+                              bundle: .braveShared,
+                              value: "Remove",
+                              comment: "Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar")
+        
+        public static let playlistCarplayTitle =
+            NSLocalizedString("playlist.carplayTitle",
+                              bundle: .braveShared,
+                              value: "Brave Playlist",
+                              comment: "The title of the playlist when in Carplay mode")
+    }
+}
+
+// MARK: - Shortcuts
+
+extension Strings {
+    public struct Shortcuts {
+        public static let activityTypeNewTabTitle =
+            NSLocalizedString("shortcuts.activityTypeNewTabTitle",
+                              bundle: .braveShared,
+                              value: "Open a New Browser Tab",
+                              comment: "")
+        
+        public static let activityTypeNewPrivateTabTitle =
+            NSLocalizedString("shortcuts.activityTypeNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open a New Private Browser Tab",
+                              comment: "")
+        
+        public static let activityTypeClearHistoryTitle =
+            NSLocalizedString("shortcuts.activityTypeClearHistoryTitle",
+                              bundle: .braveShared,
+                              value: "Clear Brave Browsing History",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNTitle =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNTitle",
+                              bundle: .braveShared,
+                              value: "Open Brave Browser and Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeOpenBraveNewsTitle =
+            NSLocalizedString("shortcuts.activityTypeOpenBraveNewsTitle",
+                              bundle: .braveShared,
+                              value: "Open Brave News",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistTitle =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let activityTypeTabDescription =
+            NSLocalizedString("shortcuts.activityTypeTabDescription",
+                              bundle: .braveShared,
+                              value: "Start Searching the Web Securely with Brave",
+                              comment: "")
+        
+        public static let activityTypeClearHistoryDescription =
+            NSLocalizedString("shortcuts.activityTypeClearHistoryDescription",
+                              bundle: .braveShared,
+                              value: "Open Browser in a New Tab and Delete All Private Browser History Data",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNDescription =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNDescription",
+                              bundle: .braveShared,
+                              value: "Open Browser in a New Tab and Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeBraveNewsDescription =
+            NSLocalizedString("shortcuts.activityTypeBraveNewsDescription",
+                              bundle: .braveShared,
+                              value: "Open Brave News and Check Today's Top Stories",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistDescription =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistDescription",
+                              bundle: .braveShared,
+                              value: "Start Playing your Videos in Playlist",
+                              comment: "")
+        
+        public static let activityTypeNewTabSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeNewTabSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open New Tab",
+                              comment: "")
+        
+        public static let activityTypeNewPrivateTabSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeNewPrivateTabSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open New Private Tab",
+                              comment: "")
+        
+        public static let activityTypeClearHistorySuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeClearHistorySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Clear Browser History",
+                              comment: "")
+        
+        public static let activityTypeEnableVPNSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeEnableVPNSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Enable VPN",
+                              comment: "")
+        
+        public static let activityTypeOpenBraveNewsSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeOpenBraveTodaySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Brave News",
+                              comment: "")
+        
+        public static let activityTypeOpenPlaylistSuggestedPhrase =
+            NSLocalizedString("shortcuts.activityTypeOpenPlaylistSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let customIntentOpenWebsiteSuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenWebsiteSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Website",
+                              comment: "")
+        
+        public static let customIntentOpenHistorySuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenHistorySuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open History Website",
+                              comment: "")
+        
+        public static let customIntentOpenBookmarkSuggestedPhrase =
+            NSLocalizedString("shortcuts.customIntentOpenBookmarkSuggestedPhrase",
+                              bundle: .braveShared,
+                              value: "Open Bookmark Website",
+                              comment: "")
+        
+        public static let shortcutSettingsTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsTitle",
+                              bundle: .braveShared,
+                              value: "Siri Shortcuts",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewTabTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewTabTitle",
+                              bundle: .braveShared,
+                              value: "Open New Tab",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewTabDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewTabDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to open a new tab via Siri - Voice Assistant",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewPrivateTabTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewPrivateTabTitle",
+                              bundle: .braveShared,
+                              value: "Open New Private Tab",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenNewPrivateTabDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenNewPrivateTabDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to open a new private tab via Siri - Voice Assistant",
+                              comment: "")
+        
+        public static let shortcutSettingsClearBrowserHistoryTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsClearBrowserHistoryTitle",
+                              bundle: .braveShared,
+                              value: "Clear Browser History",
+                              comment: "")
+        
+        public static let shortcutSettingsClearBrowserHistoryDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsClearBrowserHistoryDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to Open a New Tab & Clear Browser History via Siri - Voice Assistant",
+                              comment: "Description of Clear Browser History Siri Shortcut in Settings Screen")
+        
+        public static let shortcutSettingsEnableVPNTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsEnableVPNTitle",
+                              bundle: .braveShared,
+                              value: "Enable VPN",
+                              comment: "")
+        
+        public static let shortcutSettingsEnableVPNDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsEnableVPNDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to enable Brave VPN via Siri - Voice Assistant",
+                              comment: "")
+
+        public static let shortcutSettingsOpenBraveNewsTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveNewsTitle",
+                              bundle: .braveShared,
+                              value: "Open Brave News",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenBraveNewsDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenBraveNewsDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to Open a New Tab & Show Brave News Feed via Siri - Voice Assistant",
+                              comment: "Description of Open Brave News Siri Shortcut in Settings Screen")
+        
+        public static let shortcutSettingsOpenPlaylistTitle =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenPlaylistTitle",
+                              bundle: .braveShared,
+                              value: "Open Playlist",
+                              comment: "")
+        
+        public static let shortcutSettingsOpenPlaylistDescription =
+            NSLocalizedString("shortcuts.shortcutSettingsOpenPlaylistDescription",
+                              bundle: .braveShared,
+                              value: "Use Shortcuts to Open Playlist via Siri - Voice Assistant",
+                              comment: "Description of Open Playlist Siri Shortcut in Settings Screen")
+        
+        public static let shortcutOpenApplicationSettingsTitle =
+            NSLocalizedString("shortcuts.shortcutOpenApplicationSettingsTitle",
+                              bundle: .braveShared,
+                              value: "Open Settings",
+                              comment: "Button title that open application settings")
+        
+        public static let shortcutOpenApplicationSettingsDescription =
+            NSLocalizedString("shortcuts.shortcutOpenApplicationSettingsDescription",
+                              bundle: .braveShared,
+                              value: "This option will open Brave Settings. In order to change various Siri options, please select 'Siri & Search' menu item and customize your choices.",
+                              comment: "Description for opening Brave Settings for altering Siri shortcut.")
     }
 }
 
@@ -2007,6 +2515,123 @@ extension Strings {
             NSLocalizedString("sync.v2MigrationErrorMessage", tableName: "BraveShared", bundle: .braveShared,
                               value: "Failed to migrate bookmarks. Please try again later.",
                               comment: "Message for popup when the bookmark migration fails")
+        /// History Migration localization text
+        public static let syncConfigurationInformationText =
+            NSLocalizedString("sync.syncConfigurationInformationText", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Manage what information you would like to sync between devices. These settings only affect this device.",
+                              comment: "Information Text underneath the toggles for enable/disable different sync types for the device")
+        public static let syncSettingsTitle =
+            NSLocalizedString("sync.syncSettingsTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Sync Settings",
+                              comment: "Title for Sync Settings Toggle Header")
+    }
+}
+
+extension Strings {
+    public struct History {
+        public static let historyClearAlertTitle =
+            NSLocalizedString("history.historyClearAlertTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Clear Browsing History",
+                              comment: "Title for Clear All History Alert Title")
+        public static let historyClearAlertDescription =
+            NSLocalizedString("history.historyClearAlertDescription", tableName: "BraveShared", bundle: .braveShared,
+                              value: "This will clear all browsing history.",
+                              comment: "Description for Clear All History Alert Description")
+        public static let historyClearActionTitle =
+            NSLocalizedString("history.historyClearActionTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Clear History",
+                              comment: "Title for History Clear All Action")
+        
+        public static let historyEmptyStateTitle =
+            NSLocalizedString("history.historyEmptyStateTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "History will show up here.",
+                              comment: "Title which is displayed when History screen is empty.")
+        
+        public static let historyPrivateModeOnlyStateTitle =
+            NSLocalizedString("history.historyPrivateModeOnlyStateTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "History is not available in Private Browsing Only mode.",
+                              comment: "Title which is displayed on History screen as a overlay when Private Browsing Only enabled")
+        public static let historySearchBarTitle =
+            NSLocalizedString("history.historySearchBarTitle", tableName: "BraveShared", bundle: .braveShared,
+                              value: "Search History",
+                              comment: "Title displayed for placeholder inside Search Bar in History")
+    }
+}
+
+extension Strings {
+    public struct Login {
+        public static let loginListEmptyScreenTitle =
+            NSLocalizedString("login.loginListEmptyScreenTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "No logins found",
+                              comment: "The message displayed on the password list screen when there is not password found")
+        public static let loginListNavigationTitle =
+            NSLocalizedString("login.loginListNavigationTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Logins & Passwords",
+                              comment: "Title for navigation bar of the login list screen")
+        public static let loginListSearchBarPlaceHolderTitle =
+            NSLocalizedString("login.loginListSearchBarPlaceHolderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Filter",
+                              comment: "The text for placeholder inside search bar in login list")
+        public static let loginListSavedLoginsHeaderTitle =
+            NSLocalizedString("login.loginListSavedLoginsHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Saved Logins",
+                              comment: "The header title displayed over the login list")
+        public static let loginInfoDetailsHeaderTitle =
+            NSLocalizedString("login.loginInfoDetailsHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Login Details",
+                              comment: "The header title displayed over the details of login entry")
+        public static let loginInfoDetailsWebsiteFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsWebsiteFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Website",
+                              comment: "Title for the website field in password detail page")
+        public static let loginInfoDetailsUsernameFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsUsernameFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Username",
+                              comment: "Title for the username field in password detail page")
+        public static let loginInfoDetailsPasswordFieldTitle =
+            NSLocalizedString("login.loginInfoDetailsPasswordFieldTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Password",
+                              comment: "Title for the password field in password detail page")
+        public static let loginEntryDeleteAlertMessage =
+            NSLocalizedString("login.loginEntryDeleteAlertMessage",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Saved Login will be removed permanently.",
+                              comment: "The message displayed in alert when a login entry deleted")
+        public static let loginInfoCreatedHeaderTitle =
+            NSLocalizedString("login.loginInfoCreatedHeaderTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Created %@",
+                              comment: "The message displayed in alert when a login entry deleted")
+        public static let loginInfoSetPasscodeAlertTitle =
+            NSLocalizedString("login.loginInfoSetPasscodeAlertTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Set a Passcode",
+                              comment: "The title displayed in alert when a user needs to set passcode")
+        public static let loginInfoSetPasscodeAlertDescription =
+            NSLocalizedString("login.loginInfoSetPasscodeAlertDescription",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "To see passwords, you must first set a passcode on your device.",
+                              comment: "The message displayed in alert when a user needs to set a passcode")
     }
 }
 
@@ -2597,6 +3222,59 @@ extension Strings {
             value: "Your legacy wallet transfer is done! Your existing balance may still take several minutes to appear on your desktop Brave Rewards wallet.",
             comment: ""
         )
+        
+        public static let braveTalkRewardsOptInTitle =
+            NSLocalizedString("rewards.braveTalkRewardsOptInTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "To start a free call, turn on Brave Rewards",
+                              comment: "Title for Brave Talk rewards opt-in screen")
+        
+        public static let braveTalkRewardsOptInBody =
+            NSLocalizedString("rewards.braveTalkRewardsOptInBody",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "With Brave Rewards, you can view privacy-preserving ads from the Brave Ads network. No trackers. No slowdowns. And your data stays totally safe.",
+                              comment: "Body for Brave Talk rewards opt-in screen")
+        
+        public static let braveTalkRewardsOptInButtonTitle =
+            NSLocalizedString("rewards.braveTalkRewardsOptInButtonTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Turn on Rewards",
+                              comment: "Title for Brave Talk rewards opt-in screen button")
+        
+        public static let braveTalkRewardsOptInDisclaimer =
+            NSLocalizedString("rewards.optInDisclaimer",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "By clicking, you agree to the %@ and %@. Disable any time in Settings.",
+                              comment: "The placeholders say 'Terms of Service' and 'Privacy Policy'. So full sentence goes like: 'By clicking, you agree to the Terms of Service and Privacy Policy...'")
+        
+        public static let braveTalkRewardsOptInSuccessTitle =
+            NSLocalizedString("rewards.braveTalkRewardsOptInSuccessTitle",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "You can now start a free call",
+                              comment: "Title for successful Brave Talk rewards opt-in")
+        
+        public static let braveTalkRewardsOptInSuccessBody =
+            NSLocalizedString("rewards.braveTalkRewardsOptInSuccessBody",
+                              tableName: "BraveShared",
+                              bundle: .braveShared,
+                              value: "Click anywhere on the screen to continue to Brave Talk.",
+                              comment: "Body for successful Brave Talk rewards opt-in")
+    }
+}
+
+// MARK: - Talk
+extension Strings {
+    public struct BraveTalk {
+        public static let braveTalkTitle = NSLocalizedString(
+            "bravetalk.braveTalkTitle",
+            bundle: .braveShared,
+            value: "Brave Talk",
+            comment: "The name of the feature")
     }
 }
 
@@ -2630,4 +3308,157 @@ extension Strings {
     public static let recentSearchScannerDescriptionTitle = NSLocalizedString("RecentSearchScannerDescriptionTitle", bundle: .braveShared, value: "Instructions", comment: "Scanning a QR Code for title")
     public static let recentSearchScannerDescriptionBody = NSLocalizedString("RecentSearchScannerDescriptionBody", bundle: .braveShared, value: "To search by QR Code, align the QR Code in the center of the frame.", comment: "Scanning a QR Code for searching body")
     public static let recentSearchClearAlertButton = NSLocalizedString("RecentSearchClearAlertButton", bundle: .braveShared, value: "Clear Recent", comment: "The button title that shows when you clear all recent searches")
+}
+
+// MARK: - Widgets
+extension Strings {
+    public struct Widgets {
+        public static let noFavoritesFound = NSLocalizedString(
+            "widgets.noFavoritesFound",
+            bundle: .braveShared,
+            value: "Please open Brave to view your favorites here",
+            comment: "This shows when you add a widget but have no favorites added in your app")
+        
+        public static let favoritesWidgetTitle = NSLocalizedString(
+            "widgets.favoritesWidgetTitle",
+            bundle: .braveShared,
+            value: "Favorites",
+            comment: "Title for favorites widget on 'add widget' screen.")
+        
+        public static let favoritesWidgetDescription = NSLocalizedString(
+            "widgets.favoritesWidgetDescription",
+            bundle: .braveShared,
+            value: "Quickly access your favorite websites.",
+            comment: "Description for favorites widget on 'add widget' screen.")
+        
+        public static let shortcutsWidgetTitle = NSLocalizedString(
+            "widgets.shortcutsWidgetTitle",
+            bundle: .braveShared,
+            value: "Shortcuts",
+            comment: "Title for shortcuts widget on 'add widget' screen.")
+        
+        public static let shortcutsWidgetDescription = NSLocalizedString(
+            "widgets.shortcutsWidgetDescription",
+            bundle: .braveShared,
+            value: "Quick access to search the web or open web pages in Brave.",
+            comment: "Description for shortcuts widget on 'add widget' screen.")
+        
+        public static let shortcutsNewTabButton = NSLocalizedString(
+            "widgets.shortcutsNewTabButton",
+            bundle: .braveShared,
+            value: "New Tab",
+            comment: "Button to open new browser tab.")
+        
+        public static let shortcutsPrivateTabButton = NSLocalizedString(
+            "widgets.shortcutsPrivateTabButton",
+            bundle: .braveShared,
+            value: "Private Tab",
+            comment: "Button to open new private browser tab.")
+        
+        public static let shortcutsPlaylistButton = NSLocalizedString(
+            "widgets.shortcutsPlaylistButton",
+            bundle: .braveShared,
+            value: "Playlist",
+            comment: "Button to open video playlist window.")
+        
+        public static let shortcutsEnterURLButton = NSLocalizedString(
+            "widgets.shortcutsEnterURLButton",
+            bundle: .braveShared,
+            value: "Search or type a URL",
+            comment: "Button to the browser and enter URL or make a search query there.")
+        
+        public static let shieldStatsTitle = NSLocalizedString(
+            "widgets.shieldStatsTitle",
+            bundle: .braveShared,
+            value: "Privacy Stats",
+            comment: "Title for Brave Shields widget on 'add widget' screen.")
+        
+        public static let shieldStatsDescription = NSLocalizedString(
+            "widgets.shieldStatsDescription",
+            bundle: .braveShared,
+            value: "A summary of how Brave saves you time and protects you online.",
+            comment: "Description for Brave Shields widget on 'add widget' screen.")
+        
+        public static let shieldStatsWidgetTitle = NSLocalizedString(
+            "widgets.shieldStatsWidgetTitle",
+            bundle: .braveShared,
+            value: "Privacy Stats",
+            comment: "Title of Brave Shields widget shown above stat numbers.")
+        
+        public static let singleStatTitle = NSLocalizedString(
+            "widgets.singleStatTitle",
+            bundle: .braveShared,
+            value: "Privacy Stat",
+            comment: "Title for Brave Shields single stat widget on 'add widget' screen.")
+        
+        public static let singleStatDescription = NSLocalizedString(
+            "widgets.singleStatDescription",
+            bundle: .braveShared,
+            value: "A summary of how Brave has protected you online.",
+            comment: "Description for Brave Shields single stat widget on 'add widget' screen.")
+    }
+}
+
+// MARK: - ManageWebsiteData
+extension Strings {
+    public static let manageWebsiteDataTitle = NSLocalizedString(
+        "websiteData.manageWebsiteDataTitle",
+        bundle: .braveShared,
+        value: "Manage Website Data",
+        comment: "A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited"
+    )
+    public static let loadingWebsiteData = NSLocalizedString(
+        "websiteData.loadingWebsiteData",
+        bundle: .braveShared,
+        value: "Loading website data…",
+        comment: "A message displayed to users while the system fetches all website data to display."
+    )
+    public static let dataRecordCookies = NSLocalizedString(
+        "websiteData.dataRecordCookies",
+        bundle: .braveShared,
+        value: "Cookies",
+        comment: "The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies)"
+    )
+    public static let dataRecordCache = NSLocalizedString(
+        "websiteData.dataRecordCache",
+        bundle: .braveShared,
+        value: "Cache",
+        comment: "Temporary data that is stored on the users device to speed up future requests and interactions."
+    )
+    public static let dataRecordLocalStorage = NSLocalizedString(
+        "websiteData.dataRecordLocalStorage",
+        bundle: .braveShared,
+        value: "Local storage",
+        comment: "A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods."
+    )
+    public static let dataRecordDatabases = NSLocalizedString(
+        "websiteData.dataRecordDatabases",
+        bundle: .braveShared,
+        value: "Databases",
+        comment: "Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.)"
+    )
+    public static let removeDataRecord = NSLocalizedString(
+        "websiteData.removeDataRecord",
+        bundle: .braveShared,
+        value: "Remove",
+        comment: "Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list"
+    )
+    public static let removeSelectedDataRecord = NSLocalizedString(
+        "websiteData.removeSelectedDataRecord",
+        bundle: .braveShared,
+        value: "Remove %ld items",
+        comment: "Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list"
+    )
+    public static let removeAllDataRecords = NSLocalizedString(
+        "websiteData.removeAllDataRecords",
+        bundle: .braveShared,
+        value: "Remove All",
+        comment: "Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list"
+    )
+    public static let noSavedWebsiteData = NSLocalizedString(
+        "websiteData.noSavedWebsiteData",
+        bundle: .braveShared,
+        value: "No Saved Website Data",
+        comment: "Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device."
+    )
 }

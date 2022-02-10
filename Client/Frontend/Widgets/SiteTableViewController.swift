@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
 import Storage
 
 struct SiteTableViewControllerUX {
@@ -47,7 +48,7 @@ class SiteTableViewHeader: UITableViewHeaderFooterView {
  * Provides base shared functionality for site rows and headers.
  */
 @objcMembers
-class SiteTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class SiteTableViewController: LoadingViewController, UITableViewDelegate, UITableViewDataSource {
     fileprivate let CellIdentifier = "CellIdentifier"
     fileprivate let HeaderIdentifier = "HeaderIdentifier"
     var profile: Profile! {
@@ -68,16 +69,23 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
             return
         }
 
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(SiteTableViewCell.self, forCellReuseIdentifier: CellIdentifier)
-        tableView.register(SiteTableViewHeader.self, forHeaderFooterViewReuseIdentifier: HeaderIdentifier)
-        tableView.layoutMargins = .zero
-        tableView.keyboardDismissMode = .onDrag
-        tableView.backgroundColor = .secondaryBraveBackground
-        tableView.separatorColor = .braveSeparator
-        tableView.accessibilityIdentifier = "SiteTable"
-        tableView.cellLayoutMarginsFollowReadableWidth = false
+        tableView.do {
+            $0.delegate = self
+            $0.dataSource = self
+            $0.register(SiteTableViewCell.self, forCellReuseIdentifier: CellIdentifier)
+            $0.register(SiteTableViewHeader.self, forHeaderFooterViewReuseIdentifier: HeaderIdentifier)
+            $0.layoutMargins = .zero
+            $0.keyboardDismissMode = .onDrag
+            $0.backgroundColor = .secondaryBraveBackground
+            $0.separatorColor = .braveSeparator
+            $0.accessibilityIdentifier = "SiteTable"
+            $0.cellLayoutMarginsFollowReadableWidth = false
+            #if swift(>=5.5)
+            if #available(iOS 15.0, *) {
+                $0.sectionHeaderTopPadding = 5
+            }
+            #endif
+        }
 
         // Set an empty footer to prevent empty cells from appearing in the list.
         tableView.tableFooterView = UIView()
@@ -124,5 +132,31 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         true
+    }
+}
+
+class LoadingViewController: UIViewController {
+    
+    let spinner = UIActivityIndicatorView().then {
+        $0.snp.makeConstraints { make in
+            make.size.equalTo(24)
+        }
+        $0.hidesWhenStopped = true
+        $0.isHidden = true
+    }
+    
+    var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                view.addSubview(spinner)
+                spinner.snp.makeConstraints {
+                    $0.center.equalTo(view.snp.center)
+                }
+                spinner.startAnimating()
+            } else {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
     }
 }

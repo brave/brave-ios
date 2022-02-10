@@ -37,74 +37,17 @@
 /* Setting preference to always show the browser tabs bar. */
 "AlwaysShow" = "항상 표시";
 
-/* Label used as a setting item and title of the following screen to change the current passcode */
-"AuthenticationChangePasscode" = "암호 변경";
-
-/* Touch ID prompt subtitle when disabling Touch ID */
-"AuthenticationDisableTouchReason" = "Touch ID를 비활성화하려면 지문을 사용하십시오.";
-
-/* Text displayed above the input field when entering a new passcode */
-"AuthenticationEnterAPasscode" = "암호 입력";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterNewPasscode" = "새 암호 입력";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterPasscode" = "암호 입력";
-
-/* Title of the dialog used to request the passcode */
-"AuthenticationEnterPasscodeTitle" = "암호 입력";
-
 /* Label for the Face ID/Passcode item in Settings */
 "AuthenticationFaceIDPasscodeSetting" = "Face ID 및 암호";
 
-/* Immediately' interval item for selecting when to require passcode */
-"AuthenticationImmediately" = "즉시";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining */
-"AuthenticationIncorrectAttemptsRemaining" = "암호가 잘못되었습니다. 다시 시도하십시오(남은 시도 횟수: %d).";
-
-/* Touch ID prompt subtitle when accessing logins */
-"AuthenticationLoginsTouchReason" = "지금 로그인에 액세스하려면 지문을 사용하십시오.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReached" = "시도 횟수가 너무 많습니다.\n %d분 후에 다시 시도해주세요.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedNoTime" = "최대 시도 횟수에 도달했습니다. 나중에 다시 시도하십시오.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedOneMinute" = "시도 횟수가 너무 많습니다.\n 1분 후에 다시 시도해주세요.";
+/* Touch ID or PIN entry prompt subtitle when accessing Brave with the Browser Lock feature enabled */
+"AuthenticationLoginsTouchReason" = "이 방법으로 Brave 액세스를 인증합니다.";
 
 /* Label for the Passcode item in Settings */
-"AuthenticationPasscode" = "로그인용 암호";
-
-/* Text displayed above the input field when confirming a passcode */
-"AuthenticationReenterPasscode" = "암호 다시 입력";
-
-/* Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately' */
-"AuthenticationRequirePasscode" = "암호 필요";
-
-/* Touch ID prompt subtitle when accessing the require passcode setting */
-"AuthenticationRequirePasscodeTouchReason" = "필수 항목인 암호 간격 구성에 액세스하려면 지문을 사용하십시오.";
-
-/* Title of the dialog used to set a passcode */
-"AuthenticationSetPasscode" = "암호 설정";
-
-/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
-"AuthenticationTouchForKeyboard" = "스크린 키보드를 띄우려면 탭";
+"AuthenticationPasscode" = "패스코드";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID 및 암호";
-
-/* Label used as a setting item to turn off passcode */
-"AuthenticationTurnOffPasscode" = "암호 끄기";
-
-/* Label used as a setting item to turn on passcode */
-"AuthenticationTurnOnPasscode" = "암호 켜기";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app */
-"AuthenticationWrongPasscodeError" = "암호가 잘못되었습니다. 다시 시도하십시오.";
 
 /* Label for Cancel button */
 "AuthPromptAlertCancelButtonTitle" = "취소";
@@ -134,7 +77,7 @@
 "BlockAdsAndTracking" = "크로스사이트 트래커 차단";
 
 /* No comment provided by engineer. */
-"BlockAdsAndTrackingDescription" = "광고, 팝업, 트래커가 로드되지 않도록 차단";
+"BlockAdsAndTrackingDescription" = "광고, 팝업, 트래커가 로드되지 않도록 차단합니다.";
 
 /* Title for setting to block all website cookies. */
 "BlockAllCookies" = "모든 쿠키 차단";
@@ -152,7 +95,7 @@
 "BlockAllCookiesFailedAlertMsg" = "환경 설정을 설정하는 데 실패했습니다. 다시 시도하십시오.";
 
 /* No comment provided by engineer. */
-"BlockCookiesDescription" = "웹사이트에 이전 방문에 대한 정보가 저장되지 않도록 차단";
+"BlockCookiesDescription" = "웹사이트에 이전 방문에 대한 정보가 저장되지 않도록 차단합니다.";
 
 /* title for section showing page blocking statistics */
 "BlockingMonitor" = "차단 모니터";
@@ -170,7 +113,10 @@
 "BlockScripts" = "스크립트 차단";
 
 /* No comment provided by engineer. */
-"BlockScriptsDescription" = "자바스크립트 차단(사이트가 깨져 보일 수 있음)";
+"BlockScriptsDescription" = "자바스크립트를 차단합니다(사이트가 깨져 보일 수 있음).";
+
+/* Action item title of long press for Adding Bookmark for All Tabs in Tab List */
+"BookmarkAllTabsTitle" = "모든 탭 북마크";
 
 /* Bookmark Folder Section Title */
 "BookmarkFolder" = "북마크 폴더";
@@ -214,11 +160,62 @@
 /* Sync settings welcome */
 "BraveSyncWelcome" = "시작하려면 동기화하려는 모든 기기에 Brave가 설치되어 있어야 합니다. 모든 기기를 연결하려면 모든 기기를 안전하게 연결하는 데 사용할 동기화 체인을 시작하십시오.";
 
+/* Setting to enable the browser lock privacy feature */
+"BrowserLock" = "브라우저 잠금";
+
+/* No comment provided by engineer. */
+"BrowserLockDescription" = "Touch ID, Face ID 또는 시스템 패스코드로 Brave를 잠금 해제합니다.";
+
+/* A button title for the action to move to the next step of the browser lock migration process. */
+"browserLockMigrationContinueButtonTitle" = "계속";
+
+/* Displayed to the user when they don't have a passcode set on their phone, therefore cannot use the Browser Lock feature. \"%@\" will be filled with either \"Touch ID & Passcode\" or \"Face ID & Passcode\" */
+"browserLockMigrationNoPasscodeSetup" = "ID나 패스코드를 설정하지 않으셨나요? 설정을 열고 \"%@\"를 탭하세요.";
+
+/* Subtitle on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationSubtitle" = "Brave 패스코드가 간편해졌습니다. 휴대전화에서 사용하는 것과 동일한 ID 또는 패스코드로 Brave에 액세스할 수 있습니다.";
+
+/* Title on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationTitle" = "Apple Face ID, Touch ID, 또는 패스코드로 Brave 열기";
+
 /* Settings item for clearing browsing history */
 "BrowsingHistory" = "방문 기록";
 
 /* Settings item for clearing the cache */
 "Cache" = "캐시";
+
+/* Subtitle - Description for Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutDescription" = "Brave를 기본으로 설정하면 클릭한 모든 링크가 Brave의 프라이버시 보호가 적용되어 열립니다.";
+
+/* Title for main button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutPrimaryButtonTitle" = "기본값으로 설정";
+
+/* Description for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonDescription" = "이미 기본으로 설정하셨나요?";
+
+/* Title for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonTitle" = "건너뛰기";
+
+/* Title for Default Browser Full Screen Callout */
+"callout.defaultBrowserTitle" = "Brave를 기본 브라우저로 설정";
+
+/* Button title for Playlist Onboarding View */
+"callout.playlistOnboardingViewButtonTitle" = "동영상 보기";
+
+/* Description for Playlist Onboarding View */
+"callout.playlistOnboardingViewDescription" = "…언제 어디서든 재생. 백그라운드, PIP(Picture-In-Picture), 오프라인도 가능. 당연히 광고 없음.";
+
+/* Title for Playlist Onboarding View */
+"callout.playlistOnboardingViewTitle" = "재생목록에 동영상 추가...";
+
+/* Subtitle - Description for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutDescription" = "프라이버시가 뛰어난 Brave를 컴퓨터/태블릿에서 이용하고 기기 간 북마크와 확장 프로그램을 동기화하세요.";
+
+/* Title for button in Default Browser Full Screen Callout */
+"callout.privacyEverywhereCalloutPrimaryButtonTitle" = "지금 동기화";
+
+/* Title for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutTitle" = "프라이버시. 어디서나.";
 
 /* No comment provided by engineer. */
 "CancelButtonTitle" = "취소";
@@ -332,7 +329,7 @@
 "defaultBrowserCallout.introTertiaryText" = "설정을 열고 기본 브라우저 앱을 탭한 다음 Brave를 선택하세요.";
 
 /* Notification body to promote setting Brave app as default browser */
-"defaultBrowserCallout.notificationBody" = "iOS 14에 최적. Brave를 기본 브라우저로 설정하세요.";
+"defaultBrowserCallout.notificationBody" = "iOS %@에 최적. Brave를 기본 브라우저로 설정하세요.";
 
 /* Notification title to promote setting Brave app as default browser */
 "defaultBrowserCallout.notificationTitle" = "Brave 웹브라우저";
@@ -394,6 +391,9 @@
 /* Title for when a user has nothing downloaded onto their device, and the list is empty. */
 "DownloadsPanelEmptyStateTitle" = "다운로드한 파일이 여기에 표시됩니다.";
 
+/* History tableview section header that indicated history items earlier than last month */
+"Earlier" = "더 이전";
+
 /* No comment provided by engineer. */
 "Edit" = "편집";
 
@@ -415,6 +415,9 @@
 /* Title for editing a folder */
 "EditFolderTitle" = "폴더 편집";
 
+/* Describes whether or not the feature that allows the user to pull down from the top of a web page a certain amount before it triggers a page refresh */
+"enablePullToRefresh" = "밀어서 새로고침 활성화";
+
 /* Sync enter code words */
 "EnterCodeWords" = "코드 단어 입력";
 
@@ -424,32 +427,53 @@
 /* Description for new folder popup */
 "EnterFolderName" = "폴더 이름 입력";
 
+/* Shown in error pages to suggest a fix to the user. */
+"errorPageCantBeReachedTry" = "URL을 다시 입력해보거나 검색 엔진을 열고 새 URL을 검색하세요.";
+
 /* Shown in error pages for files that can't be shown and need to be downloaded. */
 "ErrorPageOpenInSafariButtonTitle" = "Safari에서 열기";
 
 /* Shown in error pages on a button that will try to load the page again */
-"ErrorPageReloadButtonTitle" = "다시 시도";
-
-/* Label for button to perform advanced actions on the error page */
-"ErrorPagesAdvancedButton" = "고급";
-
-/* Warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning1" = "경고: 이 웹사이트에 대한 연결이 안전한지 확신할 수 없습니다.";
+"ErrorPageReloadButtonTitle" = "다시 로드";
 
 /* Additional warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning2" = "공격자에 의해 구성이 잘못되거나 변조될 수 있습니다. 이런 잠재적인 위험을 수락한다면 계속 진행하십시오.";
+"ErrorPagesAdvancedWarningDetails" = "이 서버는 %@인지 입증할 수 없습니다. 서버의 보안 인증서를 귀하의 기기 운영체제에서 신뢰하고 있지 않습니다. 오구성 또는 공격자의 연결 탈취 시도가 원인일 수 있습니다.";
 
-/* Warning text on the certificate error page */
-"ErrorPagesCertWarningDescription" = "%@ 소유자가 웹사이트를 제대로 구성하지 못했습니다. 정보를 도난당하지 않도록 Brave에서 이 웹사이트에 연결하지 않았습니다.";
+/* Warning text when clicking the Advanced button on error pages */
+"ErrorPagesAdvancedWarningTitle" = "공격자가 %@에서 귀하의 정보(비밀번호, 메시지, 신용카드 등) 탈취 시도를 하는 중일 수 있습니다.";
+
+/* Label for button to go back from the error page */
+"ErrorPagesBackToSafetyButton" = "안전을 위해 돌아가기";
+
+/* Title on the certificate error page */
+"ErrorPagesCertErrorTitle" = "이 사이트는 보안 연결을 제공할 수 없습니다.";
 
 /* Title on the certificate error page */
 "ErrorPagesCertWarningTitle" = "연결 상태는 비공개가 아닙니다.";
 
-/* Label for button to go back from the error page */
-"ErrorPagesGoBackButton" = "뒤로 가기";
+/* Label for button to hide advanced actions on the error page */
+"ErrorPagesHideDetailsButton" = "세부정보 숨기기";
+
+/* Label for learn more link on error page */
+"ErrorPagesLearnMoreButton" = "자세히 알아보기";
+
+/* Label for button to perform advanced actions on the error page */
+"ErrorPagesMoreDetailsButton" = "세부정보 더보기";
+
+/* Title of the No Internet error page */
+"ErrorPagesNoInternetTitle" = "인터넷 액세스 없음";
+
+/* Text telling the user to Try: The following list of things */
+"ErrorPagesNoInternetTry" = "온라인 상태가 아닌 것 같습니다. 해결하려면 다음을 시도하세요.";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem1" = "네트워크 케이블, 모뎀, 공유기 확인";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem2" = "Wi-Fi에 다시 연결";
 
 /* Button label to temporarily continue to the site from the certificate error page */
-"ErrorPagesVisitOnceButton" = "사이트 방문";
+"ErrorPagesProceedAnywayButton" = "%@ 계속(안전하지 않음)";
 
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "절약된 \n예상 시간";
@@ -532,6 +556,24 @@
 /* Title for history menu item */
 "HistortMenuItem" = "방문기록";
 
+/* Title for History Clear All Action */
+"history.historyClearActionTitle" = "기록 지우기";
+
+/* Description for Clear All History Alert Description */
+"history.historyClearAlertDescription" = "방문 기록을 모두 지웁니다.";
+
+/* Title for Clear All History Alert Title */
+"history.historyClearAlertTitle" = "방문 기록 지우기";
+
+/* Title which is displayed when History screen is empty. */
+"history.historyEmptyStateTitle" = "기록이 여기 표시됩니다.";
+
+/* Title which is displayed on History screen as a overlay when Private Browsing Only enabled */
+"history.historyPrivateModeOnlyStateTitle" = "비공개 브라우징 모드에서는 기록을 사용할 수 없습니다.";
+
+/* Title displayed for placeholder inside Search Bar in History */
+"history.historySearchBarTitle" = "검색 기록";
+
 /* Title for history screen */
 "HistoryScreenTitle" = "방문기록";
 
@@ -542,7 +584,7 @@
 "HTTPSEverywhere" = "연결을 HTTPS로 업그레이드";
 
 /* No comment provided by engineer. */
-"HTTPSEverywhereDescription" = "일부 사이트를 평범한 HTTP가 아닌 보안 HTTPS 연결을 사용하여 엽니다.";
+"HTTPSEverywhereDescription" = "가능한 경우, HTTP 대신 안전한 HTTPS를 사용하여 사이트를 엽니다.";
 
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS 업그레이드";
@@ -561,6 +603,42 @@
 
 /* No comment provided by engineer. */
 "learnMore" = "자세히 알아보기";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginEntryDeleteAlertMessage" = "저장된 로그인 정보가 영구적으로 제거됩니다.";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginInfoCreatedHeaderTitle" = "만든 날짜 %@";
+
+/* The header title displayed over the details of login entry */
+"login.loginInfoDetailsHeaderTitle" = "로그인 세부정보";
+
+/* Title for the password field in password detail page */
+"login.loginInfoDetailsPasswordFieldTitle" = "비밀번호";
+
+/* Title for the username field in password detail page */
+"login.loginInfoDetailsUsernameFieldTitle" = "사용자 이름";
+
+/* Title for the website field in password detail page */
+"login.loginInfoDetailsWebsiteFieldTitle" = "웹사이트";
+
+/* The message displayed in alert when a user needs to set a passcode */
+"login.loginInfoSetPasscodeAlertDescription" = "비밀번호를 보려면 먼저 기기에서 패스코드를 설정해야 합니다.";
+
+/* The title displayed in alert when a user needs to set passcode */
+"login.loginInfoSetPasscodeAlertTitle" = "패스코드 설정";
+
+/* The message displayed on the password list screen when there is not password found */
+"login.loginListEmptyScreenTitle" = "로그인 정보를 찾을 수 없음";
+
+/* Title for navigation bar of the login list screen */
+"login.loginListNavigationTitle" = "로그인 정보 및 비밀번호";
+
+/* The header title displayed over the login list */
+"login.loginListSavedLoginsHeaderTitle" = "저장된 로그인 정보";
+
+/* The text for placeholder inside search bar in login list */
+"login.loginListSearchBarPlaceHolderTitle" = "필터";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "최종 수정 %@";
@@ -586,8 +664,8 @@
 /* Label for the button used to select all logins. */
 "LoginListSelectAllButtonTitle" = "모두 선택";
 
-/* Setting to allow media to play automatically */
-"MediaAutoPlays" = "백그라운드 동영상 자동재생 활성화";
+/* Setting to allow media to play in the background */
+"MediaAutoBackgrounding" = "백그라운드 오디오 활성화";
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "복사";
@@ -630,6 +708,9 @@
 
 /* New Tab title */
 "NewTab" = "새 탭";
+
+/* The information title displayed when there is no search reault found */
+"noSearchResultsfound" = "검색 결과가 없습니다.";
 
 /* Sync Alert */
 "NotEnoughWordsDescription" = "모든 단어를 입력한 후 다시 시도하십시오.";
@@ -685,11 +766,59 @@
 /* The placeholder says 'Terms of Service'. So full sentence goes like: 'By turning Rewards, you agree to the Terms of Service'. */
 "ntp.turnRewardsTos" = "Rewards를 켜면 %@에 동의하는 것으로 간주됩니다.";
 
+/* The description of the popover showing trackers that were blocked. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionThree" = "어느 사이트에서든 Shield를 탭하면 Brave가 차단한 콘텐츠를 볼 수 있습니다.";
+
+/* The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave가 %1$@ 차단함: %2$@.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription" = "Brave가 %1$@ 외 트래커 %2$d개 차단함: %3$@.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription" = "Brave가 %1$@ 외 트래커 %2$d개 차단함: %3$@.";
+
+/* DEscription for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneDescription" = "메뉴에서 설정과 매우 뛰어난 프라이버시 관련 기능을 확인해보세요!";
+
+/* Title for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneTitle" = "설정이 완료되었습니다!";
+
+/* Description for the NTP pop-over that describes the tracking information on NTP */
+"onboarding.ntpOnboardingPopOverTrackerDescription" = "트래커와 광고를 차단하여 웹사이트에서 데이터를 적게 사용하여 로딩이 빨라집니다.";
+
+/* Button Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenButtonTitle" = "시작합니다";
+
+/* Description for Privacy Screen in Onboarding */
+"onboarding.privacyScreenDescription" = "한 단계만 더 거치면 온라인 프라이버시를 최대화할 수 있습니다. 준비되셨나요?";
+
+/* Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenTitle" = "쉬운 프라이버시 보호";
+
+/* Additional Description for Ready Screen in Onboarding */
+"onboarding.readyScreenAdditionalDescription" = "...그러면 트래커와 광고가 사라지는 것이 가시적으로 확인됩니다.";
+
+/* Description for Ready Screen in Onboarding */
+"onboarding.readyScreenDescription" = "아래 유명 사이트를 선택하거나 직접 입력해보세요...";
+
+/* Title for Ready Screen in Onboarding */
+"onboarding.readyScreenTitle" = "브라우징할 준비가 되셨습니다!";
+
+/* The title of the row asking user to enter a website url */
+"onboarding.searchViewEnterWebsiteRowTitle" = "웹사이트 입력";
+
+/* Title for Welcome Screen in Onboarding */
+"onboarding.welcomeScreenTitle" = "반갑습니다, Brave입니다!";
+
 /* Context menu item for opening all folder bookmarks */
 "OpenAllBookmarks" = "모두 열기(%i)";
 
 /* Button title for opening the Brave Rewards panel to settings */
 "OpenBraveRewardsSettings" = "Brave Rewards 설정 열기";
+
+/* Error description when there is an error while navigating to Files App */
+"OpenDownloadsFolderErrorDescription" = "파일 앱에서 다운로드 폴더를 여는 중 알 수 없는 오류가 발생했습니다.";
 
 /* Context menu for opening image in new tab */
 "OpenImageInNewTab" = "새 탭에서 이미지 열기";
@@ -706,6 +835,36 @@
 /* Button title to that opens a website. */
 "OpenWebsite" = "웹사이트 열기";
 
+/* The subtitle description of menu item Brave News */
+"optionsMenu.braveNewsItemDescription" = "비공개 뉴스 피드에 오늘의 인기 스토리 제공";
+
+/* Brave News Item Menu title */
+"optionsMenu.braveNewsItemTitle" = "뉴스";
+
+/* The subtitle description of menu item Brave Playlist */
+"optionsMenu.bravePlaylistItemDescription" = "모든 동영상/스트림 오프라인 재생목록 유지";
+
+/* Brave News Item Menu title */
+"optionsMenu.bravePlaylistItemTitle" = "재생목록";
+
+/* The subtitle description of menu item Brave Talk */
+"optionsMenu.braveTalkItemDescription" = "브라우저에서 바로 비공개 영상 통화";
+
+/* Brave Talk Item Menu title */
+"optionsMenu.braveTalkItemTitle" = "Talk";
+
+/* The subtitle description of menu item Brave VPN */
+"optionsMenu.braveVPNItemDescription" = "온라인 상태인 기기 전체 보호";
+
+/* Brave VPN Item Menu title */
+"optionsMenu.braveVPNItemTitle" = "VPN";
+
+/* The subtitle description of menu item Brave Wallet */
+"optionsMenu.braveWalletItemDescription" = "안전한 암호화폐 월렛. 확장 프로그램 불필요";
+
+/* Privacy Features Section title */
+"optionsMenu.menuSectionTitle" = "Brave 특장점";
+
 /* Section name for other privacy settings */
 "OtherPrivacySettingsSection" = "기타 프라이버시 설정";
 
@@ -715,11 +874,8 @@
 /* Sync pair device settings section title */
 "Pair" = "페어링";
 
-/* Error message displayed to user when their confirming passcode doesn't match the first code. */
-"PasscodeConfirmMisMatchErrorText" = "암호가 일치하지 않습니다. 다시 시도하십시오.";
-
-/* Error message displayed when user tries to enter the same passcode as their existing code when changing it. */
-"PasscodeMatchOldErrorText" = "새 암호는 기존 암호와 달라야 합니다.";
+/* Title for passwords menu item */
+"PasswordsMenuItem" = "비밀번호";
 
 /* Label that says who took a photograph that will be displayed to the user. '%@' is a placeholder and will include be a specific person's name, example 'Bill Gates'. */
 "PhotoBy" = "사진 제공: %@";
@@ -853,6 +1009,24 @@
 /* Restore Tabs Prompt Title */
 "RestoreTabOnCrashAlertTitle" = "곤란한 문제가 발생했습니다.";
 
+/* Body for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInBody" = "Brave Rewards를 이용하면 Brave Ads 네트워크에서 프라이버시 보장 광고를 볼 수 있습니다. 트래커가 없어 느려지지 않습니다. 그리고 데이터가 완벽히 안전하게 보호됩니다.";
+
+/* Title for Brave Talk rewards opt-in screen button */
+"rewards.braveTalkRewardsOptInButtonTitle" = "Rewards 켜기";
+
+/* Body for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessBody" = "Brave Talk로 계속하려면 화면의 아무데나 클릭하세요.";
+
+/* Title for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessTitle" = "무료 통화를 시작할 수 있습니다.";
+
+/* Title for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInTitle" = "무료 통화를 시작하려면 Brave Rewards를 켜세요.";
+
+/* The placeholders say 'Terms of Service' and 'Privacy Policy'. So full sentence goes like: 'By clicking, you agree to the Terms of Service and Privacy Policy...' */
+"rewards.optInDisclaimer" = "클릭하면 %1$@ 및 %2$@에 동의하게 됩니다. 설정에서 언제든지 비활성화할 수 있습니다.";
+
 /* Button to show the rewards panel */
 "RewardsPanel" = "리워드 패널";
 
@@ -861,6 +1035,9 @@
 
 /* Settings item for clearing passwords and login data */
 "SavedLogins" = "저장된 로그인 정보";
+
+/* The title for the folder created when all bookmarks are being */
+"SavedTabsFolderTitle" = "탭 저장됨";
 
 /* Context menu item for saving an image */
 "SaveImageActionTitle" = "이미지 저장";
@@ -876,6 +1053,9 @@
 
 /* individual blocking statistic title */
 "ScriptsBlocked" = "차단된 스크립트";
+
+/* The placeholder text for bookmark search */
+"searchBookmarksTitle" = "북마크 검색";
 
 /* Label for search engine buttons. The argument corresponds to the name of the search engine. */
 "SearchEngineFormatText" = "%@ 검색";
@@ -1057,6 +1237,12 @@
 /* Sync settings section title */
 "Sync" = "동기화";
 
+/* Information Text underneath the toggles for enable/disable different sync types for the device */
+"sync.syncConfigurationInformationText" = "기기 간에 동기화할 정보를 관리합니다. 이 설정은 이 기기에만 적용됩니다.";
+
+/* Title for Sync Settings Toggle Header */
+"sync.syncSettingsTitle" = "동기화 설정";
+
 /* Message for popup when the bookmark migration fails */
 "sync.v2MigrationErrorMessage" = "북마크를 마이그레이션하지 못했습니다. 나중에 다시 시도하세요.";
 
@@ -1108,6 +1294,15 @@
 /* Sync you browser settings across devices. */
 "SyncDevices" = "기기 및 설정";
 
+/* Sync Error Description */
+"syncExpiredError" = "만료됨";
+
+/* Sync Error Description */
+"syncFutureVersionError" = "버전이 더 높음";
+
+/* Sync Error Description */
+"syncGenericError" = "문제가 발생했습니다.";
+
 /* Folder name for where bookmarks are imported into when the root folder is not empty. */
 "SyncImportFolderName" = "가져온 북마크";
 
@@ -1117,11 +1312,32 @@
 /* Title for sync initialization error alert */
 "SyncInitErrorTitle" = "동기화 통신 오류";
 
+/* Sync Error Description */
+"syncInsecureVersionError" = "지원되지 않는 구버전";
+
+/* Sync Error Description */
+"syncInvalidVersionError" = "유효하지 않은 형식";
+
+/* Default name for a device */
+"syncJoinChainCameraWarning" = "이러한 QR 코드를 생성하는 디바이스에 비밀번호 등, 귀하의 Brave 데이터가 공유됩니다. 본인이 소유한 디바이스에서 생성된 QR 코드인지 주의하여 확인하시기 바랍니다. 계속하시겠습니까?";
+
+/* Default name for a device */
+"syncJoinChainCodewordsWarning" = "이러한 코드 단어를 생성하는 디바이스에 비밀번호 등, 귀하의 Brave 데이터가 공유됩니다. 본인이 소유한 디바이스에서 생성된 코드 단어인지 주의하여 확인하시기 바랍니다. 계속하시겠습니까?";
+
+/* Title for pairing sync device */
+"syncJoinChainWarningTitle" = "경고";
+
+/* Sync Error Description */
+"syncNewerVersionError" = "지원되지 않는 버전";
+
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "인터넷 연결을 확인한 후 다시 시도하십시오.";
 
 /* No internet connection alert title. */
 "SyncNoConnectionTitle" = "동기화할 수 없음";
+
+/* Sync Error Description */
+"syncOlderVersionError" = "지원 중단된 버전";
 
 /* Message for removing the current device from Sync */
 "SyncRemoveCurrentDeviceMessage" = "로컬 기기 데이터는 모든 기기에서 그대로 유지됩니다. 이 동기화 체인의 다른 기기는 동기화된 상태로 유지됩니다.";
@@ -1216,6 +1432,9 @@
 /* Accessibility Label for the browser toolbar Menu button */
 "TabToolbarMenuButtonAccessibilityLabel" = "메뉴";
 
+/* Accessibility Label for the tab toolbar Playlist button */
+"TabToolbarPlaylistButtonAccessibilityLabel" = "재생목록";
+
 /* Accessibility label for the Reader View button */
 "TabToolbarReaderViewButtonAccessibilityLabel" = "읽기 전용 뷰";
 
@@ -1254,6 +1473,9 @@
 
 /* Accessibility label for the New Tab button in the tab toolbar. */
 "TabTrayNewTabButtonAccessibilityLabel" = "새 탭";
+
+/* Title displayed for placeholder inside Search Bar in Tab Tray */
+"TabTraySearchBarTitle" = "검색 탭";
 
 /* Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total. */
 "TabTraySingleTabPositionFormatVoiceOverText" = "탭 %1$@ / %2$@";

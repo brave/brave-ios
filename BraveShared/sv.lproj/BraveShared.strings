@@ -37,74 +37,17 @@
 /* Setting preference to always show the browser tabs bar. */
 "AlwaysShow" = "Visa alltid";
 
-/* Label used as a setting item and title of the following screen to change the current passcode */
-"AuthenticationChangePasscode" = "Ändra lösenord";
-
-/* Touch ID prompt subtitle when disabling Touch ID */
-"AuthenticationDisableTouchReason" = "Använd ditt fingeravtryck för att inaktivera Touch ID.";
-
-/* Text displayed above the input field when entering a new passcode */
-"AuthenticationEnterAPasscode" = "Ange ett lösenord";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterNewPasscode" = "Ange ett nytt lösenord";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterPasscode" = "Ange lösenord";
-
-/* Title of the dialog used to request the passcode */
-"AuthenticationEnterPasscodeTitle" = "Ange lösenord";
-
 /* Label for the Face ID/Passcode item in Settings */
 "AuthenticationFaceIDPasscodeSetting" = "Face ID och lösenord";
 
-/* Immediately' interval item for selecting when to require passcode */
-"AuthenticationImmediately" = "Omedelbart";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining */
-"AuthenticationIncorrectAttemptsRemaining" = "Felaktigt lösenord. Försök igen (Återstående försök: %d).";
-
-/* Touch ID prompt subtitle when accessing logins */
-"AuthenticationLoginsTouchReason" = "Använd ditt fingeravtryck för att komma inloggningar nu.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReached" = "För många misslyckade försök.\n Vänligen försök igen inom %d minuter.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedNoTime" = "Maximala antalet försök har nåtts. Försök igen senare.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedOneMinute" = "För många misslyckade försök.\n Vänligen försök igen om 1 minut.";
+/* Touch ID or PIN entry prompt subtitle when accessing Brave with the Browser Lock feature enabled */
+"AuthenticationLoginsTouchReason" = "Detta autentiserar din åtkomst till Brave";
 
 /* Label for the Passcode item in Settings */
-"AuthenticationPasscode" = "Lösenord för inloggning";
-
-/* Text displayed above the input field when confirming a passcode */
-"AuthenticationReenterPasscode" = "Ange lösenordet igen";
-
-/* Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately' */
-"AuthenticationRequirePasscode" = "Kräv lösenord";
-
-/* Touch ID prompt subtitle when accessing the require passcode setting */
-"AuthenticationRequirePasscodeTouchReason" = "Använd ditt fingeravtryck för att komma åt inställningarna för hur ofta lösenord behöver anges.";
-
-/* Title of the dialog used to set a passcode */
-"AuthenticationSetPasscode" = "Ställ in lösenord";
-
-/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
-"AuthenticationTouchForKeyboard" = "Tryck för att visa hjälpmedelstangentbordet";
+"AuthenticationPasscode" = "Lösenord";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Touch ID och lösenord";
-
-/* Label used as a setting item to turn off passcode */
-"AuthenticationTurnOffPasscode" = "Stäng av lösenord";
-
-/* Label used as a setting item to turn on passcode */
-"AuthenticationTurnOnPasscode" = "Sätt på lösenord";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app */
-"AuthenticationWrongPasscodeError" = "Felaktigt lösenord. Försök igen.";
 
 /* Label for Cancel button */
 "AuthPromptAlertCancelButtonTitle" = "Avbryt";
@@ -134,7 +77,7 @@
 "BlockAdsAndTracking" = "Blockera webbplatsspårare";
 
 /* No comment provided by engineer. */
-"BlockAdsAndTrackingDescription" = "Förhindrar att annonser, popups och spårare läses in";
+"BlockAdsAndTrackingDescription" = "Förhindrar att annonser, popups och spårare läses in.";
 
 /* Title for setting to block all website cookies. */
 "BlockAllCookies" = "Blockera alla kakor";
@@ -152,7 +95,7 @@
 "BlockAllCookiesFailedAlertMsg" = "Det gick inte att spara inställningen. Försök igen.";
 
 /* No comment provided by engineer. */
-"BlockCookiesDescription" = "Hindrar webbplatser från att lagra information om dina tidigare besök";
+"BlockCookiesDescription" = "Hindrar webbplatser från att lagra information om dina tidigare besök.";
 
 /* title for section showing page blocking statistics */
 "BlockingMonitor" = "Blockeringsvisare";
@@ -170,7 +113,10 @@
 "BlockScripts" = "Blockera skript";
 
 /* No comment provided by engineer. */
-"BlockScriptsDescription" = "Blockerar JavaScript (kan skada webbplatser)";
+"BlockScriptsDescription" = "Blockerar Javascript (kan få webbplatser att sluta fungera).";
+
+/* Action item title of long press for Adding Bookmark for All Tabs in Tab List */
+"BookmarkAllTabsTitle" = "Bokmärk alla flikar";
 
 /* Bookmark Folder Section Title */
 "BookmarkFolder" = "Bokmärkesmapp";
@@ -214,11 +160,62 @@
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Till att börja med måste du ha installerat Brave på alla enheter du vill synkronisera. För att sammanlänka dem kan du starta en synkroniseringskedja som du använder för att koppla ihop alla dina enheter säkert.";
 
+/* Setting to enable the browser lock privacy feature */
+"BrowserLock" = "Webbläsarlås";
+
+/* No comment provided by engineer. */
+"BrowserLockDescription" = "Lås upp Brave med Touch ID, Face ID eller systemets lösenord.";
+
+/* A button title for the action to move to the next step of the browser lock migration process. */
+"browserLockMigrationContinueButtonTitle" = "Fortsätt";
+
+/* Displayed to the user when they don't have a passcode set on their phone, therefore cannot use the Browser Lock feature. \"%@\" will be filled with either \"Touch ID & Passcode\" or \"Face ID & Passcode\" */
+"browserLockMigrationNoPasscodeSetup" = "Har du inte skapat ett ID eller en lösenordskod? Öppna Inställningar och tryck på \"%@\"";
+
+/* Subtitle on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationSubtitle" = "Vi har förenklat Brave-lösenord. Du kan nu komma åt Brave med samma ID eller lösenord som du använder på din telefon.";
+
+/* Title on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationTitle" = "Öppna Brave med ditt Apple Face ID, Touch ID eller lösenord";
+
 /* Settings item for clearing browsing history */
 "BrowsingHistory" = "Webbläsarhistorik";
 
 /* Settings item for clearing the cache */
 "Cache" = "Cache";
+
+/* Subtitle - Description for Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutDescription" = "Om du har Brave som standardwebbläsare öppnas alla länkar du klickar på med Braves integritetsskydd.";
+
+/* Title for main button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutPrimaryButtonTitle" = "Välj som standard";
+
+/* Description for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonDescription" = "Är det redan din standardwebbläsare?";
+
+/* Title for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonTitle" = "Hoppa över det här";
+
+/* Title for Default Browser Full Screen Callout */
+"callout.defaultBrowserTitle" = "Gör Brave till standardwebbläsare";
+
+/* Button title for Playlist Onboarding View */
+"callout.playlistOnboardingViewButtonTitle" = "Se videon";
+
+/* Description for Playlist Onboarding View */
+"callout.playlistOnboardingViewDescription" = "…spela var som helst, när som helst. I bakgrunden, som bild-i-bild eller offline. Reklamfritt, så klart.";
+
+/* Title for Playlist Onboarding View */
+"callout.playlistOnboardingViewTitle" = "Lägg till video i spellista…";
+
+/* Subtitle - Description for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutDescription" = "Få Braves integritetsskydd på din dator eller surfplatta och synkronisera bokmärken och tillägg mellan enheter.";
+
+/* Title for button in Default Browser Full Screen Callout */
+"callout.privacyEverywhereCalloutPrimaryButtonTitle" = "Synkronisera nu";
+
+/* Title for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutTitle" = "Integritet. Överallt.";
 
 /* No comment provided by engineer. */
 "CancelButtonTitle" = "Avbryt";
@@ -332,7 +329,7 @@
 "defaultBrowserCallout.introTertiaryText" = "Öppna Inställningar, tryck på Standardwebbläsare och välj Brave.";
 
 /* Notification body to promote setting Brave app as default browser */
-"defaultBrowserCallout.notificationBody" = "Optimerad för iOS 14. Gör Brave till din standardwebbläsare idag.";
+"defaultBrowserCallout.notificationBody" = "Optimerad för iOS %@. Gör Brave till din standardwebbläsare idag.";
 
 /* Notification title to promote setting Brave app as default browser */
 "defaultBrowserCallout.notificationTitle" = "Webbläsaren Brave";
@@ -394,6 +391,9 @@
 /* Title for when a user has nothing downloaded onto their device, and the list is empty. */
 "DownloadsPanelEmptyStateTitle" = "Hämtade filer kommer att visas här.";
 
+/* History tableview section header that indicated history items earlier than last month */
+"Earlier" = "Tidigare";
+
 /* No comment provided by engineer. */
 "Edit" = "Ändra";
 
@@ -415,6 +415,9 @@
 /* Title for editing a folder */
 "EditFolderTitle" = "Redigera mapp";
 
+/* Describes whether or not the feature that allows the user to pull down from the top of a web page a certain amount before it triggers a page refresh */
+"enablePullToRefresh" = "Aktivera Dra för att uppdatera";
+
 /* Sync enter code words */
 "EnterCodeWords" = "Ange kodord";
 
@@ -424,32 +427,53 @@
 /* Description for new folder popup */
 "EnterFolderName" = "Ange mappnamn";
 
+/* Shown in error pages to suggest a fix to the user. */
+"errorPageCantBeReachedTry" = "Prova att skriva in webbadressen igen eller öppna en sökmotor och leta efter den nya adressen.";
+
 /* Shown in error pages for files that can't be shown and need to be downloaded. */
 "ErrorPageOpenInSafariButtonTitle" = "Öppna i Safari";
 
 /* Shown in error pages on a button that will try to load the page again */
-"ErrorPageReloadButtonTitle" = "Försök igen";
-
-/* Label for button to perform advanced actions on the error page */
-"ErrorPagesAdvancedButton" = "Avancerat";
-
-/* Warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning1" = "Varning: Vi kan inte garantera att kopplingen till denna webbplats är säker.";
+"ErrorPageReloadButtonTitle" = "Ladda om";
 
 /* Additional warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning2" = "Det kan vara en felkonfiguration eller manipulering av en angripare. Fortsätt om du accepterar den potentiella risken.";
+"ErrorPagesAdvancedWarningDetails" = "Servern kunde inte bevisa att den är %@; dess säkerhetscertifikat är inte betrott av enhetens operativsystem. Det här kan bero på en felkonfigurering eller en angripare som försöker spärra din anslutning.";
 
-/* Warning text on the certificate error page */
-"ErrorPagesCertWarningDescription" = "Ägaren till % @ har konfigurerat sin webbplats felaktigt. För att skydda din information från att bli stulen så anslöt inte Brave till denna webbplats.";
+/* Warning text when clicking the Advanced button on error pages */
+"ErrorPagesAdvancedWarningTitle" = "Angripare kan försöka stjäla dina uppgifter från %@ (såsom lösenord, meddelanden och betalkort).";
+
+/* Label for button to go back from the error page */
+"ErrorPagesBackToSafetyButton" = "Tillbaka till säkerhet";
+
+/* Title on the certificate error page */
+"ErrorPagesCertErrorTitle" = "Webbplatsen kan inte upprätta en säker anslutning";
 
 /* Title on the certificate error page */
 "ErrorPagesCertWarningTitle" = "Din anslutning är inte säker";
 
-/* Label for button to go back from the error page */
-"ErrorPagesGoBackButton" = "Gå tillbaka";
+/* Label for button to hide advanced actions on the error page */
+"ErrorPagesHideDetailsButton" = "Dölj detaljer";
+
+/* Label for learn more link on error page */
+"ErrorPagesLearnMoreButton" = "Läs mer";
+
+/* Label for button to perform advanced actions on the error page */
+"ErrorPagesMoreDetailsButton" = "Mer information";
+
+/* Title of the No Internet error page */
+"ErrorPagesNoInternetTitle" = "Ingen internetåtkomst";
+
+/* Text telling the user to Try: The following list of things */
+"ErrorPagesNoInternetTry" = "Du verkar inte vara online. Prova följande åtgärder:";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem1" = "Kontrollera nätverkskablar, modem och router";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem2" = "Återanslut till trådlöst nätverk";
 
 /* Button label to temporarily continue to the site from the certificate error page */
-"ErrorPagesVisitOnceButton" = "Besök webbplatsen ändå";
+"ErrorPagesProceedAnywayButton" = "Fortsätt till %@ (inte säkert)";
 
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Uppskattad tid \nsparad";
@@ -532,6 +556,24 @@
 /* Title for history menu item */
 "HistortMenuItem" = "Historik";
 
+/* Title for History Clear All Action */
+"history.historyClearActionTitle" = "Rensa historik";
+
+/* Description for Clear All History Alert Description */
+"history.historyClearAlertDescription" = "Detta rensar all webbhistorik.";
+
+/* Title for Clear All History Alert Title */
+"history.historyClearAlertTitle" = "Rensa webbhistorik";
+
+/* Title which is displayed when History screen is empty. */
+"history.historyEmptyStateTitle" = "Historiken visas här.";
+
+/* Title which is displayed on History screen as a overlay when Private Browsing Only enabled */
+"history.historyPrivateModeOnlyStateTitle" = "Historiken är inte tillgänglig i Endast privat surfläge";
+
+/* Title displayed for placeholder inside Search Bar in History */
+"history.historySearchBarTitle" = "Sökhistorik";
+
 /* Title for history screen */
 "HistoryScreenTitle" = "Historik";
 
@@ -542,7 +584,7 @@
 "HTTPSEverywhere" = "Uppgradera anslutningar till HTTPS";
 
 /* No comment provided by engineer. */
-"HTTPSEverywhereDescription" = "Öppnar vissa webbplatser med hjälp av en säker HTTPS-anslutning i stället för vanligt HTTP.";
+"HTTPSEverywhereDescription" = "Öppnar webbplatser med det säkrare HTTPS i stället för HTTP när så är möjligt.";
 
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS-uppgraderingar";
@@ -561,6 +603,42 @@
 
 /* No comment provided by engineer. */
 "learnMore" = "Lär dig mer";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginEntryDeleteAlertMessage" = "Den sparade inloggningen tas bort permanent.";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginInfoCreatedHeaderTitle" = "Skapades %@";
+
+/* The header title displayed over the details of login entry */
+"login.loginInfoDetailsHeaderTitle" = "Inloggningsuppgifter";
+
+/* Title for the password field in password detail page */
+"login.loginInfoDetailsPasswordFieldTitle" = "Lösenord";
+
+/* Title for the username field in password detail page */
+"login.loginInfoDetailsUsernameFieldTitle" = "Användarnamn";
+
+/* Title for the website field in password detail page */
+"login.loginInfoDetailsWebsiteFieldTitle" = "Webbplats";
+
+/* The message displayed in alert when a user needs to set a passcode */
+"login.loginInfoSetPasscodeAlertDescription" = "För att se lösenorden måste du först ställa in en lösenkod på din enhet.";
+
+/* The title displayed in alert when a user needs to set passcode */
+"login.loginInfoSetPasscodeAlertTitle" = "Ställ in lösenkod";
+
+/* The message displayed on the password list screen when there is not password found */
+"login.loginListEmptyScreenTitle" = "Inga inloggningar hittades";
+
+/* Title for navigation bar of the login list screen */
+"login.loginListNavigationTitle" = "Inloggningar och lösenord";
+
+/* The header title displayed over the login list */
+"login.loginListSavedLoginsHeaderTitle" = "Sparade inloggningar";
+
+/* The text for placeholder inside search bar in login list */
+"login.loginListSearchBarPlaceHolderTitle" = "Filtrera";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Senast ändrad %@";
@@ -586,8 +664,8 @@
 /* Label for the button used to select all logins. */
 "LoginListSelectAllButtonTitle" = "Välj alla";
 
-/* Setting to allow media to play automatically */
-"MediaAutoPlays" = "Aktivera uppspelning av videor i bakgrunden";
+/* Setting to allow media to play in the background */
+"MediaAutoBackgrounding" = "Aktivera bakgrundsljud";
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Kopiera";
@@ -630,6 +708,9 @@
 
 /* New Tab title */
 "NewTab" = "Ny flik";
+
+/* The information title displayed when there is no search reault found */
+"noSearchResultsfound" = "Inga sökresultat.";
 
 /* Sync Alert */
 "NotEnoughWordsDescription" = "Ange alla ord och försök igen.";
@@ -685,11 +766,59 @@
 /* The placeholder says 'Terms of Service'. So full sentence goes like: 'By turning Rewards, you agree to the Terms of Service'. */
 "ntp.turnRewardsTos" = "Genom att aktivera Rewards godkänner du %@.";
 
+/* The description of the popover showing trackers that were blocked. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionThree" = "Tryck på skölden på vilken webbplats som helst för att se allt vi blockerat.";
+
+/* The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave blockerade %1$@ på: %2$@.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription" = "Brave blockerade %1$@ och %2$d andra spårare på: %3$@.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription" = "Brave blockerade %1$@ och %2$d annan spårare på: %3$@.";
+
+/* DEscription for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneDescription" = "Kolla in menyn för inställningar och andra praktiska integritetsfunktioner!";
+
+/* Title for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneTitle" = "Allt klart!";
+
+/* Description for the NTP pop-over that describes the tracking information on NTP */
+"onboarding.ntpOnboardingPopOverTrackerDescription" = "Webbplatser använder färre data och laddar mycket snabbare när spårare och annonser blockeras.";
+
+/* Button Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenButtonTitle" = "Nu kör vi!";
+
+/* Description for Privacy Screen in Onboarding */
+"onboarding.privacyScreenDescription" = "Du är bara ett steg bort från den bästa onlineintegriteten någonsin. Är du redo?";
+
+/* Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenTitle" = "Integritet  enkelt och smidigt";
+
+/* Additional Description for Ready Screen in Onboarding */
+"onboarding.readyScreenAdditionalDescription" = "…och se spårare och annonser gå upp i rök.";
+
+/* Description for Ready Screen in Onboarding */
+"onboarding.readyScreenDescription" = "Välj en populär webbplats nedan eller skriv in din egen…";
+
+/* Title for Ready Screen in Onboarding */
+"onboarding.readyScreenTitle" = "Webbläsaren är klar att använda!";
+
+/* The title of the row asking user to enter a website url */
+"onboarding.searchViewEnterWebsiteRowTitle" = "Skriv in en webbplats";
+
+/* Title for Welcome Screen in Onboarding */
+"onboarding.welcomeScreenTitle" = "Välkommen till Brave!";
+
 /* Context menu item for opening all folder bookmarks */
 "OpenAllBookmarks" = "Öppna alla (%i)";
 
 /* Button title for opening the Brave Rewards panel to settings */
 "OpenBraveRewardsSettings" = "Öppna inställningar för Brave Rewards";
+
+/* Error description when there is an error while navigating to Files App */
+"OpenDownloadsFolderErrorDescription" = "Ett okänt fel uppstod när mappen Nedladdningar öppnades i appen Files.";
 
 /* Context menu for opening image in new tab */
 "OpenImageInNewTab" = "Öppna bild i ny flik";
@@ -706,6 +835,36 @@
 /* Button title to that opens a website. */
 "OpenWebsite" = "Öppne hemsida";
 
+/* The subtitle description of menu item Brave News */
+"optionsMenu.braveNewsItemDescription" = "Dagens största nyheter i ett privat nyhetsflöde";
+
+/* Brave News Item Menu title */
+"optionsMenu.braveNewsItemTitle" = "Nyheter";
+
+/* The subtitle description of menu item Brave Playlist */
+"optionsMenu.bravePlaylistItemDescription" = "Spara valfri video/stream i en offlinespellista";
+
+/* Brave News Item Menu title */
+"optionsMenu.bravePlaylistItemTitle" = "Spellista";
+
+/* The subtitle description of menu item Brave Talk */
+"optionsMenu.braveTalkItemDescription" = "Privata videosamtal direkt i webbläsaren";
+
+/* Brave Talk Item Menu title */
+"optionsMenu.braveTalkItemTitle" = "Samtal";
+
+/* The subtitle description of menu item Brave VPN */
+"optionsMenu.braveVPNItemDescription" = "Skydda hela din enhet online";
+
+/* Brave VPN Item Menu title */
+"optionsMenu.braveVPNItemTitle" = "VPN";
+
+/* The subtitle description of menu item Brave Wallet */
+"optionsMenu.braveWalletItemDescription" = "En säker kryptoplånbok – inga tillägg krävs";
+
+/* Privacy Features Section title */
+"optionsMenu.menuSectionTitle" = "Brave-funktioner";
+
 /* Section name for other privacy settings */
 "OtherPrivacySettingsSection" = "Andra sekretessinställningar";
 
@@ -715,11 +874,8 @@
 /* Sync pair device settings section title */
 "Pair" = "Parkoppla";
 
-/* Error message displayed to user when their confirming passcode doesn't match the first code. */
-"PasscodeConfirmMisMatchErrorText" = "Lösenorden matchade inte. Försök igen.";
-
-/* Error message displayed when user tries to enter the same passcode as their existing code when changing it. */
-"PasscodeMatchOldErrorText" = "Ditt nya lösenord får inte vara samma som ditt befintliga.";
+/* Title for passwords menu item */
+"PasswordsMenuItem" = "Lösenord";
 
 /* Label that says who took a photograph that will be displayed to the user. '%@' is a placeholder and will include be a specific person's name, example 'Bill Gates'. */
 "PhotoBy" = "Foto av %@";
@@ -853,6 +1009,24 @@
 /* Restore Tabs Prompt Title */
 "RestoreTabOnCrashAlertTitle" = "Oj, det här var ju pinsamt.";
 
+/* Body for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInBody" = "Med Brave Rewards kan du se sekretessbevarande annonser från Brave Ads-nätverket. Inga spårare. Inga kapacitetssänkningar. Och dina data förblir helt säkra.";
+
+/* Title for Brave Talk rewards opt-in screen button */
+"rewards.braveTalkRewardsOptInButtonTitle" = "Aktivera Rewards";
+
+/* Body for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessBody" = "Klicka var som helst på skärmen för att fortsätta till Brave Talk.";
+
+/* Title for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessTitle" = "Nu kan du starta ett gratis samtal";
+
+/* Title for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInTitle" = "Aktivera Brave Rewards för att starta ett gratis samtal";
+
+/* The placeholders say 'Terms of Service' and 'Privacy Policy'. So full sentence goes like: 'By clicking, you agree to the Terms of Service and Privacy Policy...' */
+"rewards.optInDisclaimer" = "Genom att klicka godkänner du %1$@ och %2$@. Inaktivera när som helst i Inställningar.";
+
 /* Button to show the rewards panel */
 "RewardsPanel" = "Belöningspanel";
 
@@ -861,6 +1035,9 @@
 
 /* Settings item for clearing passwords and login data */
 "SavedLogins" = "Sparade inloggningar";
+
+/* The title for the folder created when all bookmarks are being */
+"SavedTabsFolderTitle" = "Sparade flikar";
 
 /* Context menu item for saving an image */
 "SaveImageActionTitle" = "Spara bild";
@@ -876,6 +1053,9 @@
 
 /* individual blocking statistic title */
 "ScriptsBlocked" = "Blockerade skript";
+
+/* The placeholder text for bookmark search */
+"searchBookmarksTitle" = "Sök efter bokmärken";
 
 /* Label for search engine buttons. The argument corresponds to the name of the search engine. */
 "SearchEngineFormatText" = "%@ sök";
@@ -1057,6 +1237,12 @@
 /* Sync settings section title */
 "Sync" = "Synkronisera";
 
+/* Information Text underneath the toggles for enable/disable different sync types for the device */
+"sync.syncConfigurationInformationText" = "Hantera vilken information du vill synkronisera mellan enheter. Dessa inställningar påverkar bara den här enheten.";
+
+/* Title for Sync Settings Toggle Header */
+"sync.syncSettingsTitle" = "Synkronisera inställningar";
+
 /* Message for popup when the bookmark migration fails */
 "sync.v2MigrationErrorMessage" = "Det gick inte att migrera bokmärken. Försök igen senare.";
 
@@ -1108,6 +1294,15 @@
 /* Sync you browser settings across devices. */
 "SyncDevices" = "Enheter och inställningar";
 
+/* Sync Error Description */
+"syncExpiredError" = "Utgången";
+
+/* Sync Error Description */
+"syncFutureVersionError" = "För ny";
+
+/* Sync Error Description */
+"syncGenericError" = "Något gick fel";
+
 /* Folder name for where bookmarks are imported into when the root folder is not empty. */
 "SyncImportFolderName" = "Importerade bokmärken";
 
@@ -1117,11 +1312,32 @@
 /* Title for sync initialization error alert */
 "SyncInitErrorTitle" = "Synkroniserings kommunikationsfel";
 
+/* Sync Error Description */
+"syncInsecureVersionError" = "Äldre version som inte stöds";
+
+/* Sync Error Description */
+"syncInvalidVersionError" = "Ogiltigt format";
+
+/* Default name for a device */
+"syncJoinChainCameraWarning" = "Det här delar dina Brave-data, vilket kan innefatta dina lösenord, med enheten som genererade den här QR-koden. Kontrollera att QR-koden skapades av en enhet du äger. Är du säker på att du vill gå vidare?";
+
+/* Default name for a device */
+"syncJoinChainCodewordsWarning" = "Det här delar dina Brave-data, vilket kan innefatta dina lösenord, med enheten som genererade de här kodorden. Kontrollera att kodorden skapades av en enhet du äger. Är du säker på att du vill gå vidare?";
+
+/* Title for pairing sync device */
+"syncJoinChainWarningTitle" = "Varning";
+
+/* Sync Error Description */
+"syncNewerVersionError" = "Versionen stöds inte";
+
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "Kontrollera din internetanslutning och försök igen.";
 
 /* No internet connection alert title. */
 "SyncNoConnectionTitle" = "Kan inte ansluta till synkronisering";
+
+/* Sync Error Description */
+"syncOlderVersionError" = "Versionen stöds inte längre";
 
 /* Message for removing the current device from Sync */
 "SyncRemoveCurrentDeviceMessage" = "Lokal enhetsdata finns kvar på alla enheter. Andra enheter i synkroniseringskedjan förblir synkroniserade.";
@@ -1216,6 +1432,9 @@
 /* Accessibility Label for the browser toolbar Menu button */
 "TabToolbarMenuButtonAccessibilityLabel" = "Meny";
 
+/* Accessibility Label for the tab toolbar Playlist button */
+"TabToolbarPlaylistButtonAccessibilityLabel" = "Playlist";
+
 /* Accessibility label for the Reader View button */
 "TabToolbarReaderViewButtonAccessibilityLabel" = "Läsläge";
 
@@ -1254,6 +1473,9 @@
 
 /* Accessibility label for the New Tab button in the tab toolbar. */
 "TabTrayNewTabButtonAccessibilityLabel" = "Ny flik";
+
+/* Title displayed for placeholder inside Search Bar in Tab Tray */
+"TabTraySearchBarTitle" = "Sök flikar";
 
 /* Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total. */
 "TabTraySingleTabPositionFormatVoiceOverText" = "Flik %1$@ av %2$@";

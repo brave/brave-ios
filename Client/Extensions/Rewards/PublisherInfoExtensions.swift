@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveRewards
+import BraveCore
 import Shared
 
 public protocol ProviderDisplayString {
@@ -29,10 +29,10 @@ extension ProviderDisplayString {
     }
 }
 
-extension PublisherInfo: ProviderDisplayString {}
-extension PendingContributionInfo: ProviderDisplayString {}
+extension Ledger.PublisherInfo: ProviderDisplayString {}
+extension Ledger.PendingContributionInfo: ProviderDisplayString {}
 
-extension PublisherInfo {
+extension Ledger.PublisherInfo {
     /// The display name to show when showing Publisher names (example: "X on GitHub", "Y on
     /// YouTube", or "reddit.com" for publishers that dont have individual content providers)
     var displayName: String {

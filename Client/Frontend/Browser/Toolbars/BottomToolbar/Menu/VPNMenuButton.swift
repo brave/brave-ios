@@ -12,9 +12,14 @@ import BraveUI
 struct VPNMenuButton: View {
     /// The product info
     var vpnProductInfo: VPNProductInfo
+    /// The description for product info
+    var description: String?
     /// A closure executed when the parent must display a VPN-specific view controller due to some
     /// user action
     var displayVPNDestination: (UIViewController) -> Void
+    /// A closure executed when VPN is toggled and status is installed. This will be used to set
+    /// current activity for user
+    var enableInstalledVPN: () -> Void
     
     @State private var isVPNStatusChanging: Bool = BraveVPN.reconnectPending
     @State private var isVPNEnabled = BraveVPN.isConnected
@@ -43,7 +48,12 @@ struct VPNMenuButton: View {
         case .installed:
             isVPNStatusChanging = true
             // Do not modify UISwitch state here, update it based on vpn status observer.
-            enabled ? BraveVPN.reconnect() : BraveVPN.disconnect()
+            if enabled {
+                BraveVPN.reconnect()
+                enableInstalledVPN()
+            } else {
+                BraveVPN.disconnect()
+            }
         }
     }
     
@@ -61,7 +71,10 @@ struct VPNMenuButton: View {
     
     var body: some View {
         HStack {
-            MenuItemHeaderView(icon: #imageLiteral(resourceName: "vpn_menu_icon").template, title: "Brave VPN")
+            MenuItemHeaderView(
+                icon: #imageLiteral(resourceName: "vpn_menu_icon").template,
+                title: description == nil ? "Brave VPN" : Strings.OptionsMenu.braveVPNItemTitle,
+                subtitle: description)
             Spacer()
             if isVPNStatusChanging {
                 ActivityIndicatorView(isAnimating: true)

@@ -5,21 +5,21 @@
 import WebKit
 import Shared
 import Data
-import YubiKit
 
 private let log = Logger.browserLogger
 
 class UserScriptManager {
 
     // Scripts can use this to verify the app –not js on the page– is calling into them.
-    public static let securityToken = UUID()
+    private static let securityToken = UUID()
     
     // Ensures that the message handlers cannot be invoked by the page scripts
-    public static let messageHandlerToken = UUID()
+    private static let messageHandlerToken = UUID()
     
     // String representation of messageHandlerToken
     public static let messageHandlerTokenString = UserScriptManager.messageHandlerToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
 
+    // String representation of securityToken
     public static let securityTokenString = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
 
     private weak var tab: Tab?
@@ -35,14 +35,6 @@ class UserScriptManager {
     var isCookieBlockingEnabled: Bool {
         didSet {
             if oldValue == isCookieBlockingEnabled { return }
-            reloadUserScripts()
-        }
-    }
-    
-    // Whether or not the U2F APIs should be exposed
-    var isU2FEnabled: Bool {
-        didSet {
-            if oldValue == isU2FEnabled { return }
             reloadUserScripts()
         }
     }
@@ -71,6 +63,14 @@ class UserScriptManager {
         }
     }
     
+    /// Whether or not the Media Background Playback is enabled
+    var isMediaBackgroundPlaybackEnabled: Bool {
+        didSet {
+            if oldValue == isMediaBackgroundPlaybackEnabled { return }
+            reloadUserScripts()
+        }
+    }
+    
     /// Stores domain specific scriplet, usually used for webcompat workarounds.
     var domainUserScript: DomainUserScript? {
         didSet {
@@ -80,8 +80,7 @@ class UserScriptManager {
     }
     
     func handleDomainUserScript(for url: URL) {
-        guard let baseDomain = url.baseDomain,
-            let customDomainUserScript = DomainUserScript.get(for: baseDomain) else {
+        guard let customDomainUserScript = DomainUserScript.get(for: url) else {
                 // No custom script for this domain, clearing existing user script
                 // in case the previous domain had one.
                 domainUserScript = nil
@@ -104,20 +103,20 @@ class UserScriptManager {
     }
     
     public static func isMessageHandlerTokenMissing(in body: [String: Any]) -> Bool {
-        guard let token = body["securitytoken"] as? String, token == UserScriptManager.messageHandlerToken.uuidString else {
+        guard let token = body["securitytoken"] as? String, token == UserScriptManager.messageHandlerTokenString else {
             return true
         }
         return false
     }
     
-    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isU2FEnabled: Bool, isPaymentRequestEnabled: Bool, isWebCompatibilityMediaSourceAPIEnabled: Bool) {
+    init(tab: Tab, isFingerprintingProtectionEnabled: Bool, isCookieBlockingEnabled: Bool, isPaymentRequestEnabled: Bool, isWebCompatibilityMediaSourceAPIEnabled: Bool, isMediaBackgroundPlaybackEnabled: Bool) {
         self.tab = tab
         self.isFingerprintingProtectionEnabled = isFingerprintingProtectionEnabled
         self.isCookieBlockingEnabled = isCookieBlockingEnabled
-        self.isU2FEnabled = isU2FEnabled
         self.isPaymentRequestEnabled = isPaymentRequestEnabled
         self.isWebCompatibilityMediaSourceAPIEnabled = isWebCompatibilityMediaSourceAPIEnabled
         self.isPlaylistEnabled = true
+        self.isMediaBackgroundPlaybackEnabled = isMediaBackgroundPlaybackEnabled
         reloadUserScripts()
     }
     
@@ -129,18 +128,20 @@ class UserScriptManager {
          (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: true),
          (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: true),
          (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: false),
-         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: false)].compactMap { arg in
+         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: false),
+         (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: true),
+         (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: true)
+        ].compactMap { arg in
             let (injectionTime, mainFrameOnly, sandboxed) = arg
             let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (injectionTime == .atDocumentStart ? "Start" : "End") + (sandboxed ? "Sandboxed" : "")
             if let path = Bundle.main.path(forResource: name, ofType: "js"),
                 let source = try? NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String {
-                let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerToken)'; \(source) })()"
-
-                if sandboxed {
-                    return WKUserScript.createInDefaultContentWorld(source: wrappedSource, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly)
-                } else {
-                    return WKUserScript(source: wrappedSource, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly)
-                }
+                let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerTokenString)'; \(source) })()"
+                
+                return WKUserScript.create(source: wrappedSource,
+                                    injectionTime: injectionTime,
+                                    forMainFrameOnly: mainFrameOnly,
+                                    in: sandboxed ? .defaultClient : .page)
             }
             return nil
         }
@@ -153,7 +154,10 @@ class UserScriptManager {
         }
         var alteredSource = source
         alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "FingerprintingProtection\(messageHandlerTokenString)", options: .literal)
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
     
     private let cookieControlUserScript: WKUserScript? = {
@@ -162,29 +166,10 @@ class UserScriptManager {
             return nil
         }
         
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-    }()
-    
-    // U2FUserScript is injected at document start to avoid overriding the low-level
-    // FIDO legacy sign and register APIs that have different arguments
-    private let U2FUserScript: WKUserScript? = {
-        guard let path = Bundle.main.path(forResource: "U2F", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-            log.error("Failed to load U2F.js")
-            return nil
-        }
-        
-        var alteredSource = source
-        
-        alteredSource = alteredSource.replacingOccurrences(of: "$<webauthn>", with: "fido2\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<webauthn-internal>", with: "fido2internal\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f>", with: "fido\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f-internal>", with: "fidointernal\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<pkc>", with: "pkp\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<assert>", with: "assert\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<attest>", with: "attest\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "U2F\(messageHandlerTokenString)", options: .literal)
-        
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.create(source: source,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
     
     // PaymentRequestUserScript is injected at document start to handle
@@ -203,23 +188,10 @@ class UserScriptManager {
         alteredSource = alteredSource.replacingOccurrences(of: "$<paymentreqcallback>", with: "PaymentRequestCallback\(securityTokenString)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "PaymentRequest\(messageHandlerTokenString)", options: .literal)
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-    }()
-    
-    // U2FLowLevelUserScript is injected at documentEnd to override the message channels
-    // with hooks that plug into the Yubico API
-    private let U2FLowLevelUserScript: WKUserScript? = {
-        guard let path = Bundle.main.path(forResource: "U2F-low-level", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-            log.error("Failed to load U2F-low-level.js")
-            return nil
-        }
-        var alteredSource = source
-
-        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f>", with: "fido\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<u2f-internal>", with: "fidointernal\(securityTokenString)", options: .literal)
-        alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "U2F\(messageHandlerTokenString)", options: .literal)
-
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
     
     private let resourceDownloadManagerUserScript: WKUserScript? = {
@@ -232,7 +204,10 @@ class UserScriptManager {
         alteredSource = alteredSource.replacingOccurrences(of: "$<downloadManager>", with: "D\(securityTokenString)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "ResourceDownloadManager\(messageHandlerTokenString)", options: .literal)
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentEnd,
+                            forMainFrameOnly: false,
+                            in: .defaultClient)
     }()
     
     private let WindowRenderHelperScript: WKUserScript? = {
@@ -249,7 +224,10 @@ class UserScriptManager {
         alteredSource = alteredSource.replacingOccurrences(of: "$<windowRenderer>", with: "W\(securityTokenString)", options: .literal)
         alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "WindowRenderHelper\(messageHandlerTokenString)", options: .literal)
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .defaultClient)
     }()
     
     private let FullscreenHelperScript: WKUserScript? = {
@@ -257,7 +235,11 @@ class UserScriptManager {
             log.error("Failed to load FullscreenHelper.js")
             return nil
         }
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        
+        return WKUserScript.create(source: source,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
     
     private let PlaylistSwizzlerScript: WKUserScript? = {
@@ -266,7 +248,11 @@ class UserScriptManager {
             log.error("Failed to load PlaylistSwizzler.js")
             return nil
         }
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        
+        return WKUserScript.create(source: source,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
     
     private let PlaylistHelperScript: WKUserScript? = {
@@ -276,17 +262,22 @@ class UserScriptManager {
         }
         
         var alteredSource = source
-        let token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        let token = UserScriptManager.securityTokenString
         
         let replacements = [
             "$<Playlist>": "Playlist_\(token)",
             "$<security_token>": "\(token)",
+            "$<tagNode>": "tagNode_\(token)",
+            "$<tagUUID>": "tagUUID_\(token)",
+            "$<mediaCurrentTimeFromTag>": "mediaCurrentTimeFromTag_\(token)",
+            "$<stopMediaPlayback>": "stopMediaPlayback_\(token)",
             "$<sendMessage>": "playlistHelper_sendMessage_\(token)",
             "$<handler>": "playlistHelper_\(messageHandlerTokenString)",
             "$<notify>": "notify_\(token)",
             "$<onLongPressActivated>": "onLongPressActivated_\(token)",
             "$<setupLongPress>": "setupLongPress_\(token)",
             "$<setupDetector>": "setupDetector_\(token)",
+            "$<setupTagNode>": "setupTagNode_\(token)",
             "$<notifyNodeSource>": "notifyNodeSource_\(token)",
             "$<notifyNode>": "notifyNode_\(token)",
             "$<observeNode>": "observeNode_\(token)",
@@ -295,6 +286,7 @@ class UserScriptManager {
             "$<getAllVideoElements>": "getAllVideoElements_\(token)",
             "$<getAllAudioElements>": "getAllAudioElements_\(token)",
             "$<onReady>": "onReady_\(token)",
+            "$<requestWhenIdleShim>": "requestWhenIdleShim_\(token)",
             "$<observePage>": "observePage_\(token)",
         ]
         
@@ -302,7 +294,34 @@ class UserScriptManager {
             alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
         })
         
-        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
+    }()
+    
+    private let MediaBackgroundingScript: WKUserScript? = {
+        guard let path = Bundle.main.path(forResource: "MediaBackgrounding", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+            log.error("Failed to load MediaBackgrounding.js")
+            return nil
+        }
+        
+        var alteredSource = source
+        let token = UserScriptManager.securityTokenString
+        
+        let replacements = [
+            "$<MediaBackgrounding>": "MediaBackgrounding_\(token)",
+            "$<handler>": "mediaBackgrounding_\(messageHandlerTokenString)",
+        ]
+        
+        replacements.forEach({
+            alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+        })
+        
+        return WKUserScript.create(source: alteredSource,
+                            injectionTime: .atDocumentStart,
+                            forMainFrameOnly: false,
+                            in: .page)
     }()
 
     private func reloadUserScripts() {
@@ -314,14 +333,6 @@ class UserScriptManager {
                 $0.addUserScript(script)
             }
             if isCookieBlockingEnabled, let script = cookieControlUserScript {
-                $0.addUserScript(script)
-            }
-            
-            if YubiKitDeviceCapabilities.supportsMFIAccessoryKey, isU2FEnabled, let script = U2FUserScript {
-                $0.addUserScript(script)
-            }
-
-            if isU2FEnabled, let script = U2FLowLevelUserScript {
                 $0.addUserScript(script)
             }
             
@@ -342,6 +353,10 @@ class UserScriptManager {
             }
             
             if isPlaylistEnabled, let script = PlaylistHelperScript {
+                $0.addUserScript(script)
+            }
+            
+            if isMediaBackgroundPlaybackEnabled, let script = MediaBackgroundingScript {
                 $0.addUserScript(script)
             }
             

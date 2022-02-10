@@ -10,6 +10,7 @@ import Shared
 import SwiftyJSON
 import Fuzi
 import SDWebImage
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -37,13 +38,6 @@ class FaviconFetcher {
         }
     }
     
-    struct FaviconAttributes {
-        var image: UIImage?
-        var backgroundColor: UIColor?
-        var contentMode: UIView.ContentMode = .scaleAspectFit
-        var includePadding: Bool = false
-    }
-    
     private let url: URL
     private let domain: Domain
     private let kind: Kind
@@ -61,12 +55,12 @@ class FaviconFetcher {
     
     static let defaultFaviconImage = #imageLiteral(resourceName: "defaultFavicon")
     
-    init(siteURL: URL, kind: Kind, domain: Domain? = nil) {
+    init(siteURL: URL, kind: Kind, domain: Domain? = nil, persistentCheckOverride: Bool? = nil) {
         self.url = siteURL
         self.kind = kind
         self.domain = domain ?? Domain.getOrCreate(
             forUrl: siteURL,
-            persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing
+            persistent: persistentCheckOverride ?? !PrivateBrowsingManager.shared.isPrivateBrowsing
         )
     }
     
@@ -564,9 +558,12 @@ extension UIImageView {
     func loadFavicon(for siteURL: URL,
                      domain: Domain? = nil,
                      fallbackMonogramCharacter: Character? = nil,
+                     shouldClearMonogramFavIcon: Bool = true,
                      cachedOnly: Bool = false,
                      completion: (() -> Void)? = nil) {
-        clearMonogramFavicon()
+        if shouldClearMonogramFavIcon {
+            clearMonogramFavicon()
+        }
         faviconFetcher = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
         faviconFetcher?.load(cachedOnly) { [weak self] _, attributes in
             guard let self = self,
@@ -574,6 +571,10 @@ extension UIImageView {
                   !cancellable.isCancelled  else {
                 completion?()
                 return
+            }
+            
+            if !shouldClearMonogramFavIcon {
+                self.clearMonogramFavicon()
             }
             
             if let image = attributes.image {

@@ -28,10 +28,10 @@ protocol TopToolbarDelegate: AnyObject {
     func topToolbarDidPressReaderMode(_ topToolbar: TopToolbarView)
     /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
     func topToolbarDidLongPressReaderMode(_ topToolbar: TopToolbarView) -> Bool
+    func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView)
     func topToolbarDidEnterOverlayMode(_ topToolbar: TopToolbarView)
     func topToolbarDidLeaveOverlayMode(_ topToolbar: TopToolbarView)
     func topToolbarDidLongPressLocation(_ topToolbar: TopToolbarView)
-    func topToolbarLocationAccessibilityActions(_ topToolbar: TopToolbarView) -> [UIAccessibilityCustomAction]?
     func topToolbarDidPressScrollToTop(_ topToolbar: TopToolbarView)
     func topToolbar(_ topToolbar: TopToolbarView, didEnterText text: String)
     func topToolbar(_ topToolbar: TopToolbarView, didSubmitText text: String)
@@ -157,8 +157,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     var addTabButton = ToolbarButton(top: true)
     // Do nothing with this, just required for protocol conformance
     var searchButton = ToolbarButton(top: true)
-    lazy var menuButton = ToolbarButton(top: true).then {
-        $0.contentMode = .center
+    lazy var menuButton = MenuButton(top: true).then {
         $0.accessibilityIdentifier = "topToolbarView-menuButton"
     }
 
@@ -601,15 +600,14 @@ extension TopToolbarView: TabLocationViewDelegate {
     
     func tabLocationViewDidLongPressReload(_ tabLocationView: TabLocationView, from button: UIButton) {
         delegate?.topToolbarDidLongPressReloadButton(self, from: button)
-        delegate?.topToolbarDidLongPressLocation(self)
     }
 
     func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView) {
         delegate?.topToolbarDidPressReaderMode(self)
     }
-
-    func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]? {
-        return delegate?.topToolbarLocationAccessibilityActions(self)
+    
+    func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView) {
+        delegate?.topToolbarDidPressPlaylistButton(self)
     }
     
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView) {

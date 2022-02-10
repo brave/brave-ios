@@ -8,6 +8,8 @@ import BraveUI
 import Shared
 import Data
 
+private let log = Logger.browserLogger
+
 // MARK: - ProductNotification
 
 extension BrowserViewController {
@@ -24,23 +26,6 @@ extension BrowserViewController {
         case primeTier = 250_000
         case grandTier = 500_000
         case legendaryTier = 1_000_000
-
-        var title: String {
-            switch self {
-                case .specialTier:
-                    return Strings.ShieldEducation.benchmarkSpecialTierTitle
-                case .newbieExclusiveTier, .casualExclusiveTier, .regularExclusiveTier, .expertExclusiveTier:
-                    return Strings.ShieldEducation.benchmarkExclusiveTierTitle
-                case .professionalTier:
-                    return Strings.ShieldEducation.benchmarkProfessionalTierTitle
-                case .primeTier:
-                    return Strings.ShieldEducation.benchmarkPrimeTierTitle
-                case .grandTier:
-                    return Strings.ShieldEducation.benchmarkGrandTierTitle
-                case .legendaryTier:
-                    return Strings.ShieldEducation.benchmarkLegendaryTierTitle
-            }
-        }
 
         var nextTier: BenchmarkTrackerCountTier? {
             guard let indexOfSelf = Self.allCases.firstIndex(where: { self == $0 }) else {
@@ -65,35 +50,84 @@ extension BrowserViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
             
+            self.presentOnboardingAdblockNotifications()
             self.presentEducationalProductNotifications()
+        }
+    }
+    
+    private func presentOnboardingAdblockNotifications() {
+        if Preferences.DebugFlag.skipEduPopups == true { return }
+
+        var isAboutHomeUrl = false
+        if let selectedTab = tabManager.selectedTab,
+           let url = selectedTab.url,
+           let internalURL = InternalURL(url) {
+            isAboutHomeUrl = internalURL.isAboutHomeURL
+        }
+        
+        guard let selectedTab = tabManager.selectedTab,
+              !Preferences.General.onboardingAdblockPopoverShown.value,
+              !benchmarkNotificationPresented,
+              !Preferences.AppState.backgroundedCleanly.value,
+              Preferences.General.isNewRetentionUser.value == true,
+              !topToolbar.inOverlayMode,
+              !isTabTrayActive,
+              selectedTab.webView?.scrollView.isDragging == false,
+              isAboutHomeUrl == false else {
+            return
+        }
+        
+        guard let onboardingList = OnboardingDisconnectList.loadFromFile() else {
+            log.error("CANNOT LOAD ONBOARDING DISCONNECT LIST")
+            return
+        }
+        
+        var trackers = [String: [String]]()
+        let urls = selectedTab.contentBlocker.blockedRequests
+        
+        for entity in onboardingList.entities {
+            for url in urls {
+                let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
+                let resources = entity.value.resources.filter({ $0 == domain })
+                
+                if !resources.isEmpty {
+                    trackers[entity.key] = resources
+                } else {
+                    trackers[domain] = [domain]
+                }
+            }
+        }
+        
+        if !trackers.isEmpty, let url = selectedTab.url {
+            let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
+            notifyTrackersBlocked(domain: domain, trackers: trackers)
+            Preferences.General.onboardingAdblockPopoverShown.value = true
         }
     }
     
     private func presentEducationalProductNotifications() {
         if Preferences.DebugFlag.skipEduPopups == true { return }
         
+        var isAboutHomeUrl = false
+        if let selectedTab = tabManager.selectedTab,
+           let url = selectedTab.url,
+           let internalURL = InternalURL(url) {
+            isAboutHomeUrl = internalURL.isAboutHomeURL
+        }
+        
         guard let selectedTab = tabManager.selectedTab,
+              presentedViewController == nil,
               !benchmarkNotificationPresented,
+              !isOnboardingOrFullScreenCalloutPresented,
+              !Preferences.AppState.backgroundedCleanly.value,
               !topToolbar.inOverlayMode,
               !isTabTrayActive,
               selectedTab.webView?.scrollView.isDragging == false,
-              tabManager.selectedTab?.url?.isAboutHomeURL == false else {
-            return
-        }
-        
-        let contentBlockerStats = selectedTab.contentBlocker.stats
-        
-        // Step 1: First Time Block Notification
-        if !Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value,
-           contentBlockerStats.total > 0 {
-            
-            notifyFirstTimeBlock()
-            Preferences.ProductNotificationBenchmarks.firstTimeBlockingShown.value = true
-            
+              isAboutHomeUrl == false else {
             return
         }
 
-        // Step 2: Load a video on a streaming site
+        // Step 1: Load a video on a streaming site
         if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
            selectedTab.url?.isVideoSteamingSiteURL == true {
 
@@ -103,36 +137,27 @@ extension BrowserViewController {
             return
         }
         
-        // Step 3: Pre-determined # of Trackers and Ads Blocked
-        if !Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value,
-           contentBlockerStats.total > benchmarkNumberOfTrackers {
-            
-            notifyPrivacyProtectBlock()
-            Preferences.ProductNotificationBenchmarks.privacyProtectionBlockShown.value = true
-
-            return
-        }
-        
-        // Step 4: Share Brave Benchmark Tiers
-        // Benchmark Tier Pop-Over only exist in JP locale
-        if Locale.current.regionCode == "JP" {
-            let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-            guard numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 else { return }
-                
-            let existingTierList = BenchmarkTrackerCountTier.allCases.filter({ Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.value})
+        // Step 2: Share Brave Benchmark Tiers
+        let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+        if numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 {
+            let existingTierList = BenchmarkTrackerCountTier.allCases.filter {
+                Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.value}
             
             if !existingTierList.isEmpty {
-                guard let firstExistingTier = existingTierList.first else { return }
-                
                 Preferences.ProductNotificationBenchmarks.trackerTierCount.value = numOfTrackerAds
                 
+                guard let firstExistingTier = existingTierList.filter({ numOfTrackerAds > $0.value }).first else {
+                    return
+                }
+
                 if numOfTrackerAds > firstExistingTier.value {
-                    notifyTrackerAdsCount(firstExistingTier.value, description: firstExistingTier.title)
+                    notifyTrackerAdsCount(firstExistingTier.value,
+                                          description: Strings.ShieldEducation.benchmarkAnyTierTitle)
                 }
             }
         }
         
-        // Step 5: Domain Specific Data Saved
+        // Step 3: Domain Specific Data Saved
         // Data Saved Pop-Over only exist in JP locale
         if Locale.current.regionCode == "JP" {
             if !benchmarkNotificationPresented,
@@ -152,27 +177,9 @@ extension BrowserViewController {
         }
     }
     
-    private func notifyFirstTimeBlock() {
-        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdWarning)
-        
-        shareTrackersViewController.actionHandler = { [weak self] action in
-            guard let self = self, action == .takeALookTapped else { return }
-            
-            self.showShieldsScreen()
-        }
-        
-        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
-    }
-    
     private func notifyVideoAdsBlocked() {
         let shareTrackersViewController = ShareTrackersController(trackingType: .videoAdBlock)
         
-        dismiss(animated: true)
-        showBenchmarkNotificationPopover(controller: shareTrackersViewController)
-    }
-    
-    private func notifyPrivacyProtectBlock() {
-        let shareTrackersViewController = ShareTrackersController(trackingType: .trackerAdCountBlock(count: benchmarkNumberOfTrackers))
         dismiss(animated: true)
         showBenchmarkNotificationPopover(controller: shareTrackersViewController)
     }
@@ -209,16 +216,19 @@ extension BrowserViewController {
 
         let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
         popover.addsConvenientDismissalMargins = false
-        popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+        
+        let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
+        pulseAnimation.present(icon: topToolbar.locationView.shieldsButton.imageView?.image,
+                               from: topToolbar.locationView.shieldsButton,
+                               on: popover,
+                               browser: self)
+        popover.popoverDidDismiss = { _ in
+            pulseAnimation.removeFromSuperview()
+        }
     }
     
     // MARK: Actions
-    
-    func showShieldsScreen() {
-        dismiss(animated: true) {
-            self.presentBraveShieldsViewController()
-        }
-    }
     
     func showShareScreen() {
         dismiss(animated: true) {
@@ -226,6 +236,11 @@ extension BrowserViewController {
                 ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController()
             globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
     
+            globalShieldsActivityController.popoverPresentationController?.sourceRect = self.view.convert(
+                self.topToolbar.locationView.shieldsButton.frame,
+                from: self.topToolbar.locationView.shieldsButton.superview)
+            globalShieldsActivityController.popoverPresentationController?.permittedArrowDirections = [.up]
+            
             self.present(globalShieldsActivityController, animated: true, completion: nil)
         }
     }

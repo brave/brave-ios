@@ -3,19 +3,41 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import UIKit
-import struct SwiftUI.Angle
+import SwiftUI
+
+extension Gradient {
+  init(braveGradient gradient: BraveGradient) {
+    self.init(
+      stops: gradient.stops.map { stop in
+        .init(color: Color(stop.color), location: CGFloat(stop.position))
+      }
+    )
+  }
+}
+
+extension LinearGradient {
+  /// Create a SwiftUI LinearGradient from a Brave defined Gradient
+  public init(braveGradient gradient: BraveGradient) {
+    assert(gradient.type == .axial, "Attempting to create a LinearGradient with a non-linear Brave defined gradient")
+    self.init(
+      gradient: Gradient(braveGradient: gradient),
+      startPoint: .init(x: gradient.startPoint.x, y: gradient.startPoint.y),
+      endPoint: .init(x: gradient.endPoint.x, y: gradient.endPoint.y)
+    )
+  }
+}
 
 public struct BraveGradient {
   public struct Stop {
-    var color: UIColor
-    var position: Double
+    public var color: UIColor
+    public var position: Double
   }
-  var type: CAGradientLayerType = .axial
-  var stops: [Stop]
-  var startPoint: CGPoint
-  var endPoint: CGPoint
+  public var type: CAGradientLayerType = .axial
+  public var stops: [Stop]
+  public var startPoint: CGPoint
+  public var endPoint: CGPoint
   
-  init(stops: [Stop], angle: Angle) {
+  public init(stops: [Stop], angle: Angle) {
     let alpha = angle.radians
     let startPoint = CGPoint(
       x: 0.5 * sin(alpha) + 0.5,
@@ -28,7 +50,7 @@ public struct BraveGradient {
     self.init(stops: stops, startPoint: startPoint, endPoint: endPoint)
   }
   
-  init(stops: [Stop], startPoint: CGPoint, endPoint: CGPoint) {
+  public init(stops: [Stop], startPoint: CGPoint, endPoint: CGPoint) {
     self.stops = stops
     self.startPoint = startPoint
     self.endPoint = endPoint
@@ -55,6 +77,16 @@ extension BraveGradient {
       angle: .figmaDegrees(122.5)
     )
   }
+  public static var lightAlternateGradient02: BraveGradient {
+    .init(
+      stops: [
+        .init(color: DesignSystemColor.gradient02_alt_step0.color, position: 0.16),
+        .init(color: DesignSystemColor.gradient02_alt_step1.color, position: 0.63),
+        .init(color: DesignSystemColor.gradient02_alt_step2.color, position: 1.0),
+      ],
+      angle: .figmaDegrees(304.5)
+    )
+  }
   public static var darkGradient02: BraveGradient {
     .init(
       stops: [
@@ -63,6 +95,16 @@ extension BraveGradient {
         .init(color: DesignSystemColor.gradient02_step2.color, position: 1.0),
       ],
       angle: .figmaDegrees(314)
+    )
+  }
+  public static var darkAlternateGradient02: BraveGradient {
+    .init(
+      stops: [
+        .init(color: DesignSystemColor.gradient02_alt_step0.color, position: 0.12),
+        .init(color: DesignSystemColor.gradient02_alt_step1.color, position: 0.47),
+        .init(color: DesignSystemColor.gradient02_alt_step2.color, position: 1.0),
+      ],
+      angle: .figmaDegrees(135)
     )
   }
   public static var gradient03: BraveGradient {
@@ -83,6 +125,14 @@ extension BraveGradientView {
         return .darkGradient02
       }
       return .lightGradient02
+    }
+  }
+  public static var alternateGradient02: BraveGradientView {
+    .init { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        return .darkAlternateGradient02
+      }
+      return .lightAlternateGradient02
     }
   }
   public static var gradient03: BraveGradientView {

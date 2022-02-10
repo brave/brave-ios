@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "Brave Shields: чтобы переключить, нажмите дважды";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave Разговоры";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "Добавить";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "Разрешить однократную проверку буфера обмена";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "Нажимая «Начать», вы принимаете";
+"OBRewardsAgreementDetail" = "Нажимая «Да», вы принимаете";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "Условия использования";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "и";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards поддерживает создателей контента";
+"OBRewardsAgreementTitle" = "Brave Награды";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "Начните поддерживать создателей контента, просматривая в Интернете объявления, которые не будут нарушать конфиденциальность ваших данных.";
+"OBRewardsDetail" = "Подключив функцию «Brave Реклама», которая не нарушает конфиденциальность ваших данных, вы сможете поддерживать создателей контента и издателей за счет просмотра объявлений.";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "Зарабатывайте баллы и вознаграждайте авторов контента, пользуясь браузером.";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "Политика конфиденциальности";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "Добавьте видео в плейлист Brave";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Плейлист Brave";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "Это видео идет в прямом эфире, или время ожидания для него истекло. Чтобы обновить, откройте ссылку еще раз.";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "При загрузке этого ресурса произошла ошибка.";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "Когда настройка включена, на значке главного меню будет отображаться пометка, если медиафайлы на странице можно добавить в плейлист Brave.";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "Включить уведомления на значке меню";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "Добавляйте в браузере аудио и видео в ваш плейлист Brave";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "Нет доступных объектов";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "Начинать воспроизведение с того места, где вы остановились";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "Если включить этот параметр, на большинстве сайтов с медиаконтентом будет показываться панель, с помощью которой можно легко добавлять аудио- и видеофайлы в свой плейлист.";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "Показывать кнопку «Добавить в плейлист Brave»";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "Отключить WebKit MediaSource API";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "Веб-совместимость";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Плейлисты Brave поддерживают воспроизведение без перерыва, на повторе и офлайн, а также функцию «Картинка в картинке».";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "Этот медиафайл уже есть в плейлисте Brave";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "Вы хотите добавить этот медиафайл в плейлист Brave?";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "Открыть в плейлисте Brave";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "Удалить";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "Удалить";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "Сохранение для офлайн-доступа…";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "Вы можете открыть текущий контент в новой вкладке или отправить его через меню «Поделиться»";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Меню плейлиста Brave";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "Открыть во вкладке инкогнито";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "Открыть в новой вкладке";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "Отправить";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "Произошла ошибка";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "Посмотреть в плейлисте Brave";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "Добавляет кнопку плейлиста (четыре полоски с символом плюса) рядом с адресной строкой в браузере Brave. Она позволяет быстро перейти к плейлисту, добавить или удалить контент.";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "Включить кнопку быстрого доступа";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "Закрыть контекстное меню";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "Добавление системы пользовательского поиска";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "Поздравляем с достижением!";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "Поздравляем с вступлением в клуб!";
 
 /* Subtitle for tracker benchmark Share */
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "Не показывать снова";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "Посмотрите";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "Поделиться новостями";
 
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shields защищает вашу конфиденциальность на каждом сайте.";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "Трекеров и рекламы заблокировано на странице: %ld+";
-
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shields защищает вашу конфиденциальность.";
-
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "Трекеры и реклама блокируются на этой странице";
 
 /* Subtitle for Shield Education Tracker Count Share */
 "shieldEducation.trackerCountShareSubtitle" = "Поздравляем! Отличный результат!";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "Трекеров и рекламы заблокировано: %ld";
+"shieldEducation.trackerCountShareTitle" = "Вот сколько трекеров и объявлений уже заблокировано: целых %ld!";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "Видео без рекламы используют меньше данных.";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "Вы выключили защиту конфиденциальности. Сайт неправильно отображается при включенных щитах?";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "Откройте Brave News и узнайте главные новости на сегодня";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "Откройте новую вкладку и удалите все конфиденциальные данные из истории браузера";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "Очистить историю браузера";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "Очистить историю браузера";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "Откройте новую вкладку и включите VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "Включить VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "Откройте браузер Brave и включите VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "Открыть новую вкладку инкогнито";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "Открыть новую вкладку инкогнито";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "Открыть новую вкладку";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "Открыть новую вкладку";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "Открыть Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "Открыть Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "Смотрите видео из своего плейлиста Brave";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "Открыть плейлист";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "Открыть плейлист";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "Пользуйтесь безопасным поиском в интернете с Brave";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "Открыть закладку";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "Открыть историю сайта";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "Открыть сайт";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "Этот параметр перенаправит вас в настройки Brave. Чтобы изменить настройки Siri, выберите в меню «Siri и Поиск».";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "Открыть настройки";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "Открывайте новые вкладки и удаляйте историю браузера с помощью быстрых команд для Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "Очистить историю браузера";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "Используйте быстрые команды, чтобы включать VPN в Brave с помощью Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "Включить VPN";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "Используйте быстрые команды, чтобы открывать новые вкладки и ленту Brave News с помощью Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "Открыть Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "Используйте быстрые команды, чтобы открывать новые вкладки инкогнито с помощью Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "Открыть новую вкладку инкогнито";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "Используйте быстрые команды, чтобы открывать новые вкладки с помощью Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "Откройте новую вкладку";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "Открывайте плейлисты с помощью быстрых команд для Siri.";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "Откройте плейлист";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Быстрые команды Siri";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "Спасибо за предоставленную информацию. Мы постараемся как можно скорее исправить проблему, обещаем.";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "Включить подсказки при поиске?";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "Подробнее";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "К сожалению, криптовалюта BAT пока не поддерживается в регионе, который вы указали в своем аккаунте. Возможно, она станет доступна позже. Следите за обновлениями.";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "Закрыть";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "Регион не поддерживается";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "Не удалось войти в аккаунт Uphold. Повторите попытку.";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "Годовая";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "Кеш";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "Файлы cookie";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "Базы данных";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "Локальное хранилище";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "Загрузка данных с сайта…";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "Управление данными сайтов";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "На устройстве не хранятся данные сайтов";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "Удалить все";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "Удалить";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "Удалить (%ld)";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "Быстрый доступ к любимым сайтам.";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "Избранное";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "Откройте Brave, чтобы добавить сюда избранные сайты.";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "Информация о том, как Brave экономит ваше время и обеспечивает конфиденциальность в Интернете.";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "Показатели";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "Показатели";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "Ввести запрос или URL";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "Новая вкладка";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "Плейлист";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "Вкладка инкогнито";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "Быстрый доступ к поиску и веб-страницам в Brave.";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "Ярлыки";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "Информация о том, как Brave обеспечивает вашу безопасность в Интернете.";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "Конфиденциальность";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "Да";

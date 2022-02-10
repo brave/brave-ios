@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "Dobbeltklikk for å skru av og på Brave Shields";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave Prat";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "Legg til";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "Tillat engangskontroll av utklippstavle";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "Ved å trykke på Start godtar du";
+"OBRewardsAgreementDetail" = "Ved å trykke på «Ja» samtykker du i";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "Vilkår for bruk";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "og";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards støtter innholdsskapere";
+"OBRewardsAgreementTitle" = "Brave Belønninger";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "Begynn å støtte skapere med private og anonymiserte annonser mens du surfer";
+"OBRewardsDetail" = "Ved å takke ja til Brave Private Annonser støtter du innholdsutgivere og -produsenter hver gang du ser på en annonse.";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "Tjen tokener og belønn skaperne for supert innhold mens du surfer.";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "Personvernreglene";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "Legg til i Brave Playlist";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Brave-spilleliste";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "Enten var denne videoen en direktestrømming, ellers var det tidsfristen som ble nådd. Åpne koblingen på nytt for å oppdatere.";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "Det oppstod et problem under innlastingen av ressursen!";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "Etter aktivering vil et merke vises på hovedmenyikonet, hvilket indikerer at videoen på siden kan legges til i Brave-spillelisten.";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "Vis menyvarselmerke";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "Du kan legge til elementer i Brave-spillelisten din inne i nettleseren";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "Ingen tilgjengelige elementer";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "Start avspilling fra der jeg var";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "Når dette aktiveres, vises en stolpe automatisk på de fleste medienettsteder, hvilket gjør det lettere å legge til video-/ lydfilene i spillelisten din.";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "Vis «Legg til i Brave-spilleliste»";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "Deaktiverer WebKit MediaSource-API";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "Nettkompatibilitet";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Brave-spillelister støtter frakoblet avspilling, bilde-i-bilde, kontinuerlig avspilling og gjentagelsesmoduser.";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "Denne videoen er i Brave-spillelisten din";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "Vil du legge til denne videoen i spillelisten din?";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "Åpne i Brave-spilleliste";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "Fjern";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "Fjern";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "Lagrer for frakoblet modus ...";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "Du kan åpne det gjeldende elementet i en ny fane, eller dele det via systemdelingsmenyen";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Brave-spillelistemeny";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "Åpne i privat fane";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "Åpne i ny fane";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "Del ...";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "Beklager";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "Vis i Brave Playlist";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "Legger til en spilleliste-knapp (den ser ut som 4 linjer med et +-symbol) ved siden av adresselinjen i Brave-nettleseren. Denne knappen gir deg rask tilgang til å åpne spillelisten, eller legge til eller fjerne medier.";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "Aktiver hurtigtilgangsknapp";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "Lukk kontekstmenyen";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "Legg til tilpasset søkemotor";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "Gratulerer!";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "Gratulerer. Du er en del av en eksklusiv klubb.";
 
 /* Subtitle for tracker benchmark Share */
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "Ikke vis dette på nytt";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "Ta en titt";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "Del nyhetene";
 
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shields beskytter personvernet ditt på hvert nettsted.";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "%ld+ sporere og annonser blokkerte på denne siden.";
-
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shields beskyttet nettopp personvernet ditt på nettet.";
-
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "Sporere og annonser blokkert på denne siden.";
 
 /* Subtitle for Shield Education Tracker Count Share */
 "shieldEducation.trackerCountShareSubtitle" = "Gratulerer. Du er noe for deg selv.";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "%ld sporere og annonser blokkerte";
+"shieldEducation.trackerCountShareTitle" = "%ld trackere og annonser er blokkert!";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "Videoer uten annonser bruker mindre data.";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "Du surfer på dette nettstedet uten Braves personvernsbeskyttelse. Fungerer det ikke med Skjold oppe?";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "Åpne Brave News og sjekk dagens nyheter";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "Åpne nettleseren i en ny fane og slett den private nettleserens historikk";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "Slett nettleserhistorikk";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "Slett Brave-nettleserhistorikk";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "Åpne nettleseren i en ny fane og aktiver VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "Aktiver VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "Åpne Brave-nettleseren og aktiver VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "Åpne en ny privat fane";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "Åpne en ny privat nettleserfane";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "Åpne ny fane";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "Åpne en ny nettleserfane";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "Åpne Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "Åpne Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "Begynn å spille av videoene i spillelisten";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "Åpne spilleliste";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "Åpne spilleliste";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "Begynn å søke på nettet på trygt vis med Brave";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "Åpne det bokmerkede nettstedet";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "Åpne nettstedet fra nettloggen";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "Åpne nettsted";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "Dette alternativet åpner Brave-innstillinger. For å endre forskjellige Siri-alternativer, kan du velge 'Siri og søk' i menyen og tilpasse valgene dine.";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "Åpne innstillinger";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "Bruk Snarveier til å Åpne en ny Fane og Slett Nettleserloggen via Siri - Voice Assistant";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "Slett nettleserhistorikk";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "Bruk snarveier for å aktivere Brave VPN via Siri – Stemmeassistent";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "Aktiver VPN";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "Bruk snarveier for å åpne en ny fane og vise Brave-nyhetsfeeden via Siri – Stemmeassistent";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "Åpne Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "Bruk snarveier for å åpne en ny privat fane via Siri – Stemmeassistent";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "Åpne en ny privat fane";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "Bruk snarveier for å åpne en ny fane via Siri – Stemmeassistent";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "Åpne ny fane";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "Bruk Snarveier til å Åpne Spilleliste via Siri - Voice Assistant";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "Åpne spilleliste";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Siri-snarveier";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "Takk for at du forteller Braves utviklere at det er noe galt med dette nettstedet. Vi vil gjøre vårt beste for å fikse det!";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "Slå på søkeforslag?";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "Lær mer";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "BAT støttes for øyeblikket ikke i regionen din basert på stedet kontoen din er åpnet. Kom tilbake senere for tilgjengelighet.";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "Lukk";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "Regionen støttes ikke";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "Det oppstod et problem med å logge på Uphold-kontoen din. Vennligst prøv på nytt";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "Ett år";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "Buffer";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "Informasjonskapsler";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "Databaser";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "Lokal lagring";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "Laster inn nettstedsdata …";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "Administrer nettstedsdata";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "Ingen lagrede nettstedsdata";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "Fjern alle";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "Fjern";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "Fjern %ld elementer";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "Få umiddelbar tilgang til favorittnettstedene dine.";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "Favoritter";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "Åpne Brave for å se favorittene dine her";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "En oversikt over hvordan Brave beskytter deg på nettet og gjør at du sparer tid.";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "Personvernstatistikk";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "Personvernstatistikk";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "Søk etter eller skriv inn en URL";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "Ny fane";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "Spilleliste";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "Privat fane";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "Rask tilgang til å søke på nettet eller åpne nettsider i Brave.";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "Snarveier";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "En oversikt over hvordan Brave beskytter deg på nettet.";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "Personvernstatistikk";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "Ja";

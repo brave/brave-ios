@@ -19,7 +19,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     let searchButton = ToolbarButton(top: false).then {
         $0.isHidden = true
     }
-    let menuButton = ToolbarButton(top: false)
+    let menuButton = MenuButton(top: false)
     let actionButtons: [UIButton]
 
     var helper: ToolbarHelper?
@@ -65,7 +65,11 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     }
     
     func setSearchButtonState(url: URL?) {
-        isSearchButtonEnabled = url?.isAboutHomeURL == true
+        if let url = url {
+            isSearchButtonEnabled = InternalURL(url)?.isAboutHomeURL == true
+        } else {
+            isSearchButtonEnabled = false
+        }
     }
 
     override func updateConstraints() {

@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "Ketuk dua kali untuk mengalihkan Brave Shields";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave Talk";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "Tambahkan";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "Izinkan pemeriksaan clipboard satu kali";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "Dengan mengetuk Mulai, Anda menyetujui";
+"OBRewardsAgreementDetail" = "Dengan mengetuk Ya, Anda menyetujui";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "Persyaratan Layanan";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "dan";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards mendukung para kreator";
+"OBRewardsAgreementTitle" = "Brave Rewards";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "Mulailah mendukung kreator dengan dengan pengaturan iklan anonim dan privat saat Anda menjelajah";
+"OBRewardsDetail" = "Memilih untuk menggunakan Brave Private Ads akan mendukung penerbit dan pembuat konten melalui setiap iklan yang dilihat.";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "Dapatkan token dan beri reward pada pembuat konten atas konten hebat selagi Anda menjelajahi";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "Kebijakan Privasi";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "Tambahkan ke Brave Playlist";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Daftar Putar Brave";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "Video ini merupakan siaran aliran langsung atau telah mecapai batas waktunya. Silakan buka tautannya kembali untuk melakukan penyegaran. ";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "Terjadi masalah saat memuat sumber!";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "Saat diaktifkan, sebuah emblem akan ditampilkan pada lambang menu utama, yang menunjukkan bahwa media pada halaman tersebut dapat ditambahkan ke Daftar Putar Brave.";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "Tampilkan Emblem Notifikasi Menu";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "Anda dapat menambahkan media ke Brave Playlist Anda di dalam peramban";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "Video Tidak Tersedia";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "Mulai Putar Ulang dari saat saya terakhir memutarnya";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "Saat diaktifkan, sebuah bilah akan secara otomatis muncul di sebagian besar situs web media, sehingga menambahkan berkas video/audio ke Daftar Putar Anda menjadi lebih mudah.";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "Tampilkan \"Tambahkan ke Daftar Putar Brave\"";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "Nonaktifkan API WebKit MediaSource";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "Kompatibilitas Web";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Daftar Putar Brave mendukung Putar Kembali Luring, Gambar dalam Gambar, putar kembali terus-menerus, serta mode pengulangan.";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "Media ini ada di Daftar Putar Brave Anda";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "Apakah Anda ingin menambahkan media ini ke Daftar Putar Brave Anda?";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "Buka di Daftar Putar Brave";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "Hapus";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "Hapus";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "Menyimpan untuk Luring...";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "Anda dapat membuka media saat ini di Tab Baru, atau membagikannya melalui Menu Pembagian Sistem";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Menu Brave Playlist";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "Buka di Tab Privat";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "Buka di Tab Baru";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "Bagikan...";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "Maaf";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "Lihat di Brave Playlist";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "Tambahkan tombol daftar putar (seperti 4 garis dengan simbol +) di samping bilah alamat pada peramban Brave. Tombol ini memberikan Anda akses cepat untuk membuka Daftar Putar, atau menambahkan atau menyingkirkan media.";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "Aktifkan tombol akses cepat";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "Tutup Menu Konteks";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "Tambahkan Mesin Pencari Ubahsuaian";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "Selamat atas pencapaian tahapan kerahasiaan ini.";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "Selamat. Anda menjadi bagian klub eksklusif.";
 
 /* Subtitle for tracker benchmark Share */
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "Jangan tampilkan ini lagi";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "Tengok";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "Bagikan berita";
 
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shields menjaga privasi online Anda di setiap situs.";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "%ldentitas+ pelacak & iklan terblokir pada halaman ini.";
-
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shield telah menjaga privasi online Anda.";
-
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "Iklan & pelacak terblokir pada halaman ini.";
 
 /* Subtitle for Shield Education Tracker Count Share */
 "shieldEducation.trackerCountShareSubtitle" = "Selamat. Anda cukup spesial.";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "%ldentitas+ pelacak & iklan terblokir";
+"shieldEducation.trackerCountShareTitle" = "Pelacak %ld & iklan diblokir!";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "Video tanpa iklan menghabiskan sedikit data.";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "Anda menjelajahi situs ini tanpa perlindungan privasi Brave. Apakah situs tidak berfungsi benar dengan Perisai?";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "Buka Brave News dan Dapatkan Kabar Terpopuler Hari Ini";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "Buka Peramban di Tab Baru dan Hapus Semua Data Riwayat Peramban Privat";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "Hapus Riwayat Peramban";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "Hapus Riwayat Peramban Brave";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "Buka Peramban di Tab Baru dan Aktfkan VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "Aktifkan VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "Buka Peramban Brave dan Aktifkan VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "Buka Tab Privat Baru";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "Buka Tab Peramban Privat Baru";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "Buka Tab Baru";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "Buka Tab Peramban Baru";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "Buka Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "Buka Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "Mulai Memutar Video Anda di Daftar Putar";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "Buka Daftar Putar";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "Buka Daftar Putar";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "Mulai Mencari di Web Dengan Aman Bersama Brave";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "Buka Situs Web yang Ditandai";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "Buka Situs Web Riwayat";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "Buka Situs Web";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "Pilihan ini akan membuka Pengaturan Brave. Untuk mengubah berbagai pilihan Siri, silakan pilih menu 'Siri & Cari' dan sesuaikan pilihan Anda.";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "Buka Pengaturan";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "Gunakan Jalan Pintas untuk Membuka Tab Baru & Menghapus Riwayat Peramban melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "Hapus Riwayat Perambanan";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "Gunakan Jalan Pintas untuk mengaktifkan VPN Brave melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "Aktifkan VPN";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "Gunakan Jalan Pintas untuk Membuka Tab Baru & Menampilkan Umpan Brave News melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "Buka Brave News";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "Gunakan Jalan Pintas untuk membuka tab privat baru melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "Buka Tab Privat Baru";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "Gunakan Jalan Pintas untuk membuka tab baru melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "Buka Tab Baru";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "Gunakan Jalan Pintas untuk Membuka Daftar Putar melalui Siri - Bantuan Suara";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "Buka Daftar Putar";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Jalan Pintas Siri";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "Terima kasih telah memberi tahu pengembang Brave bahwa ada yang tidak berfungsi dengan benar di situs ini. Kami akan membetulkannya sejauh yang kami bisa!";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "Aktifkan saran pencarian?";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "Pelajari lebih lanjut";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "Saat ini, BAT tidak mendapat dukungan di wilayah Anda berdasarkan lokasi tempat Anda membuka akun. Silakan periksa kembali ketersediaannya nanti.";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "Tutup";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "Wilayah ini tidak didukung";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "Terjadi masalah saat Anda mencoba masuk ke akun Uphold Anda. Silakan coba lagi.";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "Satu tahun";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "Cache";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "Cookie";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "Basis data";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "Penyimpanan lokal";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "Memuat data situs web...";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "Mengelola Data Situs Web";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "Tidak ada Data Situs Web yang Disimpan";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "Hapus Semua";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "Hapus";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "Hapus %ld hal";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "Mengakses situs web favorit Anda dengan cepat.";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "Favorit";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "Silakan buka Brave untuk melihat favorit Anda di sini";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "Rangkuman cara Brave menghemat waktu Anda dan melindungi Anda secara daring.";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "Statistik Kerahasiaan";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "Statistik Kerahasiaan";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "Cari atau ketikkan URL";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "Tab Baru";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "Daftar Putar";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "Tab Pribadi";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "Akses cepat untuk mencari situs web atau membuka halaman web di Brave.";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "Jalan Pintas";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "Rangkuman cara Brave telah melindungi Anda secara daring.";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "Statistik Kerahasiaan";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "Ya";

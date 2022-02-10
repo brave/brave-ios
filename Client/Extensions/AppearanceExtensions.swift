@@ -15,30 +15,38 @@ extension AppDelegate {
     ///
     /// - warning: Be careful adjusting colors here, and make sure impact is well known
     func applyAppearanceDefaults() {
-        // important! for privacy concerns, otherwise UI can bleed through
-        UIView.appearance(whenContainedInInstancesOf: [BasePasscodeViewController.self])
-            .backgroundColor = .braveBackground
-        
         UIToolbar.appearance().do {
             $0.tintColor = .braveOrange
-            $0.standardAppearance = {
+            let appearance: UIToolbarAppearance = {
                 let appearance = UIToolbarAppearance()
-                appearance.configureWithDefaultBackground()
+                appearance.configureWithOpaqueBackground()
                 appearance.backgroundColor = .braveBackground
+                appearance.backgroundEffect = nil
                 return appearance
             }()
+            $0.standardAppearance = appearance
+            $0.compactAppearance = appearance
+            #if swift(>=5.5)
+            if #available(iOS 15.0, *) {
+                $0.scrollEdgeAppearance = appearance
+            }
+            #endif
         }
         
         UINavigationBar.appearance().do {
             $0.tintColor = .braveOrange
-            $0.standardAppearance = {
+            let appearance: UINavigationBarAppearance = {
                 let appearance = UINavigationBarAppearance()
-                appearance.configureWithDefaultBackground()
+                appearance.configureWithOpaqueBackground()
                 appearance.titleTextAttributes = [.foregroundColor: UIColor.braveLabel]
                 appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
                 appearance.backgroundColor = .braveBackground
+                appearance.backgroundEffect = nil
                 return appearance
             }()
+            $0.standardAppearance = appearance
+            $0.compactAppearance = appearance
+            $0.scrollEdgeAppearance = appearance
         }
         
         UISwitch.appearance().onTintColor = UIColor.braveOrange
@@ -58,14 +66,23 @@ extension AppDelegate {
         
         UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self])
             .tintColor = .braveLabel
-
-        UIView.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self])
-            .backgroundColor = tablePrimaryColor
         
         UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).textColor = .braveLabel
         UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self])
             .textColor = .braveLabel
         
         UITextField.appearance().textColor = .braveLabel
+        
+        UISegmentedControl.appearance().do {
+            $0.selectedSegmentTintColor = .init(dynamicProvider: {
+                if $0.userInterfaceStyle == .dark {
+                    return .secondaryButtonTint
+                }
+                return .white
+            })
+            $0.backgroundColor = .secondaryBraveBackground
+            $0.setTitleTextAttributes([.foregroundColor: UIColor.bravePrimary], for: .selected)
+            $0.setTitleTextAttributes([.foregroundColor: UIColor.braveLabel], for: .normal)
+        }
     }
 }

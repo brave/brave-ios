@@ -12,19 +12,21 @@ import CoreServices
 private let log = Logger.browserLogger
 
 class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
+
+    private var bookmarksFRC: BookmarksV2FetchResultsController?
+    private let bookmarkManager: BookmarkManager
     /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
-    var bookmarksDidChange: (() -> Void)?
+    private var bookmarksDidChange: (() -> Void)?
     weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
-    var bookmarksFRC: BookmarksV2FetchResultsController?
     
-    lazy var editBookmarksButton: UIBarButtonItem? = UIBarButtonItem().then {
+    private lazy var editBookmarksButton: UIBarButtonItem? = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "edit").template
         $0.style = .plain
         $0.target = self
         $0.action = #selector(onEditBookmarksButton)
     }
     
-    lazy var addFolderButton: UIBarButtonItem? = UIBarButtonItem().then {
+    private lazy var addFolderButton: UIBarButtonItem? = UIBarButtonItem().then {
         $0.image = #imageLiteral(resourceName: "bookmarks_newfolder_icon").template
         $0.style = .plain
         $0.target = self
@@ -37,71 +39,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         $0.target = self
         $0.action = #selector(importExportAction(_:))
     }
-    
-    private let spinner = UIActivityIndicatorView().then {
-        $0.snp.makeConstraints { make in
-            make.size.equalTo(24)
-        }
-        $0.hidesWhenStopped = true
-        $0.isHidden = true
-    }
-    
-    weak var addBookmarksFolderOkAction: UIAlertAction?
-    
-    var isEditingIndividualBookmark: Bool = false
-    
-    var currentFolder: Bookmarkv2?
-    /// Certain bookmark actions are different in private browsing mode.
-    let isPrivateBrowsing: Bool
-    
-    private var isAtBookmarkRootLevel: Bool {
-        return self.currentFolder == nil
-    }
-    
-    private let importExportUtility = BraveCoreImportExportUtility()
-    private var documentInteractionController: UIDocumentInteractionController?
-    
-    init(folder: Bookmarkv2?, isPrivateBrowsing: Bool) {
-        self.isPrivateBrowsing = isPrivateBrowsing
-        super.init(nibName: nil, bundle: nil)
-        
-        self.currentFolder = folder
-        self.title = folder?.displayTitle ?? Strings.bookmarks
-        self.bookmarksFRC = Bookmarkv2.frc(parent: folder)
-        self.bookmarksFRC?.delegate = self
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
-        
-        tableView.allowsSelectionDuringEditing = true
-        tableView.register(BookmarkTableViewCell.self,
-                           forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
-        
-        setUpToolbar()
-        updateEditBookmarksButtonStatus()
-        updatedFolderHierarchy()
-    }
-    
-    @objc private func tappedDone() {
-        dismiss(animated: true)
-    }
-    
-    private func updateEditBookmarksButtonStatus() {
-        guard let objectsCount = bookmarksFRC?.fetchedObjectsCount else { return }
-        
-        editBookmarksButton?.isEnabled = objectsCount != 0
-        if tableView.isEditing && objectsCount == 0 {
-            disableTableEditingMode()
-        }
-    }
-    
+
     private var leftToolbarItems: [UIBarButtonItem?] {
         var items: [UIBarButtonItem?] = [.fixedSpace(5)]
         if currentFolder == nil {
@@ -119,50 +57,52 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         return items
     }
     
-    private func setUpToolbar() {
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        
-        let rightItem = { () -> UIBarButtonItem? in
-            return currentFolder == nil ? nil : editBookmarksButton
-        }()
-        
-        let items = (leftToolbarItems + [flexibleSpace, rightItem, .fixedSpace(5)]).compactMap { $0 }
-        setToolbarItems(items, animated: true)
+    private weak var addBookmarksFolderOkAction: UIAlertAction?
+    
+    private var isEditingIndividualBookmark = false
+    
+    private var currentFolder: Bookmarkv2?
+    
+    /// Certain bookmark actions are different in private browsing mode.
+    private let isPrivateBrowsing: Bool
+    
+    private var isAtBookmarkRootLevel: Bool {
+        return self.currentFolder == nil
     }
     
-    private func updatedFolderHierarchy() {
-        DispatchQueue.main.async {
-            guard let navigationController = self.navigationController else { return }
-            let index = navigationController.viewControllers.firstIndex(of: self) ?? 0
-            if index <= 0 && self.currentFolder != nil {
-                let nextController = BookmarksViewController(folder: self.currentFolder?.parent, isPrivateBrowsing: self.isPrivateBrowsing)
-                nextController.profile = self.profile
-                nextController.bookmarksDidChange = self.bookmarksDidChange
-                nextController.toolbarUrlActionsDelegate = self.toolbarUrlActionsDelegate
-                navigationController.viewControllers.insert(nextController, at: index)
-                nextController.loadViewIfNeeded()
-            }
-        }
-    }
+    private let importExportUtility = BraveCoreImportExportUtility()
+    private var documentInteractionController: UIDocumentInteractionController?
     
-    private func updateLastVisitedFolder(_ folder: Bookmarkv2?) {
-        Preferences.Chromium.lastBookmarksFolderNodeId.value = folder?.objectID ?? -1
-    }
+    private var searchBookmarksTimer: Timer?
+    private var isBookmarksBeingSearched = false
+    private let bookmarksSearchController = UISearchController(searchResultsController: nil)
+    private var bookmarksSearchQuery = ""
+    private lazy var noSearchResultOverlayView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
+
+    // MARK: Lifecycle
     
-    override func reloadData() {
-        do {
-            // Recreate the frc if it was previously removed
-            // (when user navigated into a nested folder for example)
-            if bookmarksFRC == nil {
-                bookmarksFRC = Bookmarkv2.frc(parent: currentFolder)
-                bookmarksFRC?.delegate = self
-            }
-            try self.bookmarksFRC?.performFetch()
-        } catch let error as NSError {
-            log.error(error.description)
-        }
+    init(folder: Bookmarkv2?, bookmarkManager: BookmarkManager, isPrivateBrowsing: Bool) {
+        self.isPrivateBrowsing = isPrivateBrowsing
+        self.bookmarkManager = bookmarkManager
+        super.init(nibName: nil, bundle: nil)
         
-        super.reloadData()
+        self.currentFolder = folder
+        self.title = folder?.title ?? Strings.bookmarks
+        self.bookmarksFRC = bookmarkManager.frc(parent: folder)
+        self.bookmarksFRC?.delegate = self
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        applyTheme()
+        setUpToolbar()
+        updateEditBookmarksButtonStatus()
+        updatedFolderHierarchy()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -176,7 +116,9 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         spinner.isHidden = false
         updateLastVisitedFolder(currentFolder)
         
-        Bookmarkv2.waitForBookmarkModelLoaded({
+        bookmarkManager.waitForBookmarkModelLoaded({ [weak self] in
+            guard let self = self else { return }
+           
             self.navigationController?.setToolbarHidden(false, animated: true)
             self.reloadData()
             self.switchTableEditingMode(true)
@@ -194,33 +136,102 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         bookmarksFRC = nil
     }
     
-    func disableTableEditingMode() {
-        switchTableEditingMode(true)
-    }
+    // MARK: Layout - Theme
     
-    func switchTableEditingMode(_ forceOff: Bool = false) {
-        let editMode: Bool = forceOff ? false : !tableView.isEditing
-        tableView.setEditing(editMode, animated: forceOff ? false : true)
+    private func applyTheme() {
+        bookmarksSearchController.do {
+            $0.searchBar.autocapitalizationType = .none
+            $0.searchResultsUpdater = self
+            $0.obscuresBackgroundDuringPresentation = false
+            $0.searchBar.placeholder = Strings.searchBookmarksTitle
+            $0.delegate = self
+            $0.hidesNavigationBarDuringPresentation = true
+        }
         
-        updateEditBookmarksButton(editMode)
-        resetCellLongpressGesture(tableView.isEditing)
+        navigationItem.do {
+            $0.searchController = bookmarksSearchController
+            $0.hidesSearchBarWhenScrolling = false
+            $0.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+        }
         
-        editBookmarksButton?.isEnabled = bookmarksFRC?.fetchedObjectsCount != 0
-        addFolderButton?.isEnabled = !editMode
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+        
+        tableView.do {
+            $0.allowsSelectionDuringEditing = true
+            $0.register(BookmarkTableViewCell.self,
+                           forCellReuseIdentifier: String(describing: BookmarkTableViewCell.self))
+        }
+        
+        definesPresentationContext = true
     }
     
-    func updateEditBookmarksButton(_ tableIsEditing: Bool) {
-        self.editBookmarksButton?.title = tableIsEditing ? Strings.done : Strings.edit
-        self.editBookmarksButton?.style = tableIsEditing ? .done : .plain
+    override func accessibilityPerformEscape() -> Bool {
+        dismiss(animated: true)
+        return true
     }
     
-    func resetCellLongpressGesture(_ editing: Bool) {
-        for cell in self.tableView.visibleCells {
-            cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
-            if !editing {
-                cell.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:))))
+    private func setUpToolbar() {
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        let rightItem = { () -> UIBarButtonItem? in
+            return currentFolder == nil ? nil : editBookmarksButton
+        }()
+        
+        let items = (leftToolbarItems + [flexibleSpace, rightItem, .fixedSpace(5)]).compactMap { $0 }
+        setToolbarItems(items, animated: true)
+    }
+    
+    private func updateEditBookmarksButtonStatus() {
+        guard let objectsCount = bookmarksFRC?.fetchedObjectsCount else { return }
+        
+        editBookmarksButton?.isEnabled = objectsCount != 0
+        if tableView.isEditing && objectsCount == 0 {
+            disableTableEditingMode()
+        }
+    }
+
+    private func updatedFolderHierarchy() {
+        DispatchQueue.main.async {
+            guard let navigationController = self.navigationController else { return }
+            let index = navigationController.viewControllers.firstIndex(of: self) ?? 0
+            if index <= 0 && self.currentFolder != nil {
+
+                let nextController = BookmarksViewController(folder: self.currentFolder?.parent, bookmarkManager: self.bookmarkManager, isPrivateBrowsing: self.isPrivateBrowsing)
+                nextController.profile = self.profile
+                nextController.bookmarksDidChange = self.bookmarksDidChange
+                nextController.toolbarUrlActionsDelegate = self.toolbarUrlActionsDelegate
+                navigationController.viewControllers.insert(nextController, at: index)
+                nextController.loadViewIfNeeded()
             }
         }
+    }
+    
+    private func updateLastVisitedFolder(_ folder: Bookmarkv2?) {
+        Preferences.Chromium.lastBookmarksFolderNodeId.value = folder?.objectID ?? -1
+    }
+
+    private func updateEmptyPanelState() {
+        if isBookmarksBeingSearched, bookmarkManager.fetchedSearchObjectsCount == 0 {
+            showEmptyPanelState()
+        } else {
+            noSearchResultOverlayView.removeFromSuperview()
+        }
+    }
+    
+    private func showEmptyPanelState() {
+        if noSearchResultOverlayView.superview == nil {
+            view.addSubview(noSearchResultOverlayView)
+            view.bringSubviewToFront(noSearchResultOverlayView)
+            noSearchResultOverlayView.snp.makeConstraints { make -> Void in
+                make.edges.equalTo(tableView)
+            }
+        }
+    }
+    
+    // MARK: Actions
+    
+    @objc private func tappedDone() {
+        dismiss(animated: true)
     }
     
     @objc private func onAddBookmarksFolderButton() {
@@ -256,37 +267,114 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         present(alert, animated: true)
     }
     
-    func addFolder(titled title: String) {
-        Bookmarkv2.addFolder(title: title, parentFolder: currentFolder)
-        tableView.setContentOffset(CGPoint.zero, animated: true)
-    }
-    
     @objc private func onEditBookmarksButton() {
         switchTableEditingMode()
     }
     
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        Bookmarkv2.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+    // MARK: Data Fetch
+    
+    override func reloadData() {
+        performBookmarkFetch()
+        super.reloadData()
     }
     
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    fileprivate func configureCell(_ cell: BookmarkTableViewCell, atIndexPath indexPath: IndexPath) {
-        // Make sure Bookmark at index path exists,
-        // `frc.object(at:)` crashes otherwise, doesn't fail safely with nil
-        if let objectsCount = bookmarksFRC?.fetchedObjectsCount, indexPath.row >= objectsCount {
-            assertionFailure("Bookmarks FRC index out of bounds")
+    private func performBookmarkFetch() {
+        if isBookmarksBeingSearched {
             return
         }
         
-        guard let item = bookmarksFRC?.object(at: indexPath) else { return }
+        do {
+            // Recreate the frc if it was previously removed
+            // (when user navigated into a nested folder for example)
+            if bookmarksFRC == nil {
+                bookmarksFRC = bookmarkManager.frc(parent: currentFolder)
+                bookmarksFRC?.delegate = self
+            }
+            try self.bookmarksFRC?.performFetch()
+        } catch let error as NSError {
+            log.error(error.description)
+        }
+    }
+    
+    private func refreshBookmarkSearchResult(with query: String = "") {
+        guard isBookmarksBeingSearched else {
+            return
+        }
+        
+        isLoading = true
+        
+        fetchBookmarks(with: query) { [weak self] in
+            self?.isLoading = false
+        }
+    }
+    
+    private func fetchBookmarks(with query: String, _ completion: @escaping () -> Void) {
+        bookmarkManager.fetchBookmarks(with: query) { [weak self] in
+            guard let self = self else { return }
+                    
+            self.tableView.reloadData()
+            self.updateEmptyPanelState()
+            
+            completion()
+        }
+    }
+    
+    private func fetchBookmarkItem(at indexPath: IndexPath) -> Bookmarkv2? {
+        if isBookmarksBeingSearched {
+            return bookmarkManager.searchObject(at: indexPath)
+        } else {
+            return bookmarksFRC?.object(at: indexPath)
+        }
+    }
+    
+    //MARK: Internal
+    
+    private func disableTableEditingMode() {
+        switchTableEditingMode(true)
+    }
+    
+    private func switchTableEditingMode(_ forceOff: Bool = false) {
+        let editMode: Bool = forceOff ? false : !tableView.isEditing
+        tableView.setEditing(editMode, animated: forceOff ? false : true)
+        
+        updateEditBookmarksButton(editMode)
+        
+        editBookmarksButton?.isEnabled = bookmarksFRC?.fetchedObjectsCount != 0
+        addFolderButton?.isEnabled = !editMode
+    }
+    
+    private func updateEditBookmarksButton(_ tableIsEditing: Bool) {
+        self.editBookmarksButton?.title = tableIsEditing ? Strings.done : Strings.edit
+        self.editBookmarksButton?.style = tableIsEditing ? .done : .plain
+    }
+
+    private func addFolder(titled title: String) {
+        bookmarkManager.addFolder(title: title, parentFolder: currentFolder)
+        tableView.setContentOffset(CGPoint.zero, animated: true)
+    }
+    
+    fileprivate func configureCell(_ cell: BookmarkTableViewCell, atIndexPath indexPath: IndexPath) {
+        var fetchedBookmarkItem: Bookmarkv2?
+        
+        if isBookmarksBeingSearched {
+            fetchedBookmarkItem = bookmarkManager.searchObject(at: indexPath)
+        } else {
+            // Make sure Bookmark at index path exists,
+            // `frc.object(at:)` crashes otherwise, doesn't fail safely with nil
+            if let objectsCount = bookmarksFRC?.fetchedObjectsCount, indexPath.row >= objectsCount {
+                assertionFailure("Bookmarks FRC index out of bounds")
+                return
+            }
+            
+            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+        }
+        
+        guard let item = fetchedBookmarkItem else { return }
         cell.tag = item.objectID
         
         // See if the cell holds the same bookmark. If yes, we do not have to recreate its image view
         // This makes scrolling through bookmarks better if there's many bookmarks with the same url
-        let domainOrFolderName = item.isFolder ? item.displayTitle : (item.domain?.url ?? item.url)
+        let domainOrFolderName = item.isFolder ? item.title : (item.domain?.url ?? item.url)
         let shouldReuse = domainOrFolderName != cell.domainOrFolderName
         
         cell.domainOrFolderName = domainOrFolderName
@@ -294,8 +382,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         func configCell(image: UIImage? = nil, icon: FaviconMO? = nil) {
             if !tableView.isEditing {
                 cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
-                let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressedCell(_:)))
-                cell.addGestureRecognizer(lp)
             }
             
             if !shouldReuse {
@@ -325,7 +411,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 let setFavIcon = { (cell: UITableViewCell, item: Bookmarkv2) in
                     cell.imageView?.clearMonogramFavicon()
                     
-                    if let icon = item.icon {
+                    if let icon = item.bookmarkNode.icon {
                         cell.imageView?.image = icon
                     } else if let domain = item.domain, let url = domain.url?.asURL {
                         // favicon object associated through domain relationship - set from cache only
@@ -337,11 +423,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 }
                 
                 // Brave-Core favIcons are async and notify an observer when changed..
-                item.addFavIconObserver { [weak item] in
+                bookmarkManager.addFavIconObserver(item) { [weak item] in
                     guard let item = item else { return }
-                    if item.isFavIconLoaded {
-                        item.removeFavIconObserver()
-                    }
                     
                     setFavIcon(cell, item)
                 }
@@ -349,7 +432,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 // `item.icon` triggers a favIcon load on Brave-Core, then it will notify observers
                 // and update `item.isFavIconLoading` and `item.isFavIconLoaded` properties..
                 // Order of this if-statement matters because of that logic!
-                if (item.icon == nil && (item.isFavIconLoading || item.isFavIconLoaded)) || item.icon != nil {
+                if (item.bookmarkNode.icon == nil && (item.bookmarkNode.isFavIconLoading || item.bookmarkNode.isFavIconLoaded))
+                    || item.bookmarkNode.icon != nil {
                     setFavIcon(cell, item)
                 } else if let domain = item.domain, let url = domain.url?.asURL {
                     // favicon object associated through domain relationship - set from cache or download
@@ -362,7 +446,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         let fontSize: CGFloat = 14.0
-        cell.textLabel?.text = item.displayTitle ?? item.url
+        cell.textLabel?.text = item.title ?? item.url
         cell.textLabel?.lineBreakMode = .byTruncatingTail
         
         if !item.isFolder {
@@ -376,59 +460,23 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
             cell.setRightBadge(nil)
         }
     }
-    
-    @objc private func longPressedCell(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began,
-              let cell = gesture.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: cell),
-              let bookmark = bookmarksFRC?.object(at: indexPath) else {
-            return
-        }
         
-        presentLongPressActions(gesture, urlString: bookmark.url, isPrivateBrowsing: isPrivateBrowsing,
-                                customActions: bookmark.isFolder ? folderLongPressActions(bookmark) : nil)
-    }
-    
-    private func folderLongPressActions(_ folder: Bookmarkv2) -> [UIAlertAction] {
-        let children = Bookmarkv2.getChildren(forFolder: folder, includeFolders: false) ?? []
-        
-        let urls: [URL] = children.compactMap { b in
-            guard let url = b.url else { return nil }
-            return URL(string: url)
-        }
-        
-        return [
-            UIAlertAction(
-                title: String(format: Strings.openAllBookmarks, children.count),
-                style: .default,
-                handler: { [weak self] _ in
-                    self?.toolbarUrlActionsDelegate?.batchOpen(urls)
-                    self?.presentingViewController?.dismiss(animated: true)
-                }
-            )
-        ]
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return nil
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return super.tableView(tableView, heightForRowAt: indexPath)
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        nil
     }
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        return indexPath
+        indexPath
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         
-        guard let bookmark = bookmarksFRC?.object(at: indexPath) else { return }
+        guard let bookmark = fetchBookmarkItem(at: indexPath) else { return }
         
         if !bookmark.isFolder {
             if tableView.isEditing {
@@ -436,8 +484,19 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 self.showEditBookmarkController(bookmark: bookmark)
             } else {
                 if let url = URL(string: bookmark.url ?? "") {
-                    presentingViewController?.dismiss(animated: true) {
-                        self.toolbarUrlActionsDelegate?.select(url: url, isBookmark: true)
+                    let bookmarkClickEvent: (() -> Void)? = {
+                        /// Donate Custom Intent Open Bookmark List
+                        if !self.isPrivateBrowsing {
+                            ActivityShortcutManager.shared.donateCustomIntent(for: .openBookmarks, with: url.absoluteString)
+                        }
+                        
+                        self.toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
+                    }
+                    
+                    if presentingViewController is MenuViewController {
+                        presentingViewController?.dismiss(animated: true, completion: bookmarkClickEvent)
+                    } else {
+                        dismiss(animated: true, completion: bookmarkClickEvent)
                     }
                 }
             }
@@ -447,7 +506,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                 self.showEditBookmarkController(bookmark: bookmark)
             } else {
                 self.updateLastVisitedFolder(bookmark)
-                let nextController = BookmarksViewController(folder: bookmark, isPrivateBrowsing: isPrivateBrowsing)
+
+                let nextController = BookmarksViewController(folder: bookmark, bookmarkManager: bookmarkManager, isPrivateBrowsing: isPrivateBrowsing)
                 nextController.profile = profile
                 nextController.bookmarksDidChange = bookmarksDidChange
                 nextController.toolbarUrlActionsDelegate = toolbarUrlActionsDelegate
@@ -456,16 +516,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        // Intentionally blank. Required to use UITableViewRowActions
-    }
-    
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
-    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return bookmarksFRC?.fetchedObjectsCount ?? 0
+        isBookmarksBeingSearched ? bookmarkManager.fetchedSearchObjectsCount : bookmarksFRC?.fetchedObjectsCount ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -480,14 +532,109 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let item = bookmarksFRC?.object(at: indexPath) else { return false }
-        return item.canBeDeleted
+        var fetchedBookmarkItem: Bookmarkv2?
+        
+        if isBookmarksBeingSearched {
+            return true
+        } else {
+            fetchedBookmarkItem = bookmarksFRC?.object(at: indexPath)
+            return fetchedBookmarkItem?.canBeDeleted ?? false
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let bookmarkItem = fetchBookmarkItem(at: indexPath) else {
+            return nil
+        }
+        
+        var actionItemsMenu: UIMenu
+        
+        if bookmarkItem.isFolder {
+            var actionChildren: [UIAction] = []
+
+            let children = bookmarkManager.getChildren(forFolder: bookmarkItem, includeFolders: false) ?? []
+            
+            let urls: [URL] = children.compactMap { bookmark in
+                guard let url = bookmark.url else { return nil }
+                return URL(string: url)
+            }
+            
+            let openBatchURLAction = UIAction(
+                title: String(format: Strings.openAllBookmarks, children.count),
+                image: UIImage(systemName: "arrow.up.forward.app"),
+                handler: UIAction.deferredActionHandler { _ in
+                self.toolbarUrlActionsDelegate?.batchOpen(urls)
+            })
+            
+            if children.count > 0 {
+                actionChildren.append(openBatchURLAction)
+            }
+            
+            actionItemsMenu = UIMenu(title: "", identifier: nil, children: actionChildren)
+        } else {
+            guard let bookmarkItemURL = URL(string: bookmarkItem.url ?? "") else { return nil }
+
+            let openInNewTabAction = UIAction(
+                title: Strings.openNewTabButtonTitle,
+                image: UIImage(systemName: "plus.square.on.square"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
+                self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: isPrivateBrowsing)
+            })
+            
+            let newPrivateTabAction = UIAction(
+                title: Strings.openNewPrivateTabButtonTitle,
+                image: UIImage(systemName: "plus.square.fill.on.square.fill"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
+                self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
+            })
+            
+            let copyAction = UIAction(
+                title: Strings.copyLinkActionTitle,
+                image: UIImage(systemName: "doc.on.doc"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
+                self.toolbarUrlActionsDelegate?.copy(bookmarkItemURL)
+            })
+            
+            let shareAction = UIAction(
+                title: Strings.shareLinkActionTitle,
+                image: UIImage(systemName: "square.and.arrow.up"),
+                handler: UIAction.deferredActionHandler { [unowned self] _ in
+                self.toolbarUrlActionsDelegate?.share(bookmarkItemURL)
+            })
+            
+            var newTabActionMenu: [UIAction] = [openInNewTabAction]
+            
+            if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+                newTabActionMenu.append(newPrivateTabAction)
+            }
+            
+            let urlMenu = UIMenu(title: "", options: .displayInline, children: newTabActionMenu)
+            let linkMenu = UIMenu(title: "", options: .displayInline, children: [copyAction, shareAction])
+            
+            actionItemsMenu = UIMenu(title: bookmarkItemURL.absoluteString, identifier: nil, children: [urlMenu, linkMenu])
+        }
+
+        return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ in
+            return actionItemsMenu
+        }
+    }
+}
+
+// MARK: UITableViewDelegate - Editing
+
+extension BookmarksViewController {
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        // Intentionally blank. Required to use UITableViewRowActions
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        .delete
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let item = bookmarksFRC?.object(at: indexPath),
-              item.canBeDeleted else { return nil }
-        
+        guard let item = fetchBookmarkItem(at: indexPath), item.canBeDeleted else { return nil }
+
         let deleteAction = UIContextualAction(style: .destructive, title: Strings.delete) { [weak self] _, _, completion in
             guard let self = self else {
                 completion(false)
@@ -500,13 +647,13 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
                     completion(false)
                 })
                 alert.addAction(UIAlertAction(title: Strings.yesDeleteButtonTitle, style: .destructive) { _ in
-                    item.delete()
+                    self.bookmarkManager.delete(item)
                     completion(true)
                 })
                 
                 self.present(alert, animated: true, completion: nil)
             } else {
-                item.delete()
+                self.bookmarkManager.delete(item)
                 completion(true)
             }
         }
@@ -519,7 +666,19 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
     }
     
-    fileprivate func showEditBookmarkController(bookmark: Bookmarkv2) {
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard let bookmarksFRC = bookmarksFRC else {
+            return
+        }
+
+        bookmarkManager.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        !isBookmarksBeingSearched
+    }
+    
+    private func showEditBookmarkController(bookmark: Bookmarkv2) {
         self.isEditingIndividualBookmark = true
         
         var mode: BookmarkEditMode?
@@ -530,18 +689,17 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         }
         
         if let mode = mode {
-            let vc = AddEditBookmarkTableViewController(mode: mode)
+            let vc = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    override func accessibilityPerformEscape() -> Bool {
-        dismiss(animated: true)
-        return true
-    }
 }
 
+// MARK: BookmarksV2FetchResultsDelegate
+
 extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
+    
     func controllerWillChangeContent(_ controller: BookmarksV2FetchResultsController) {
         tableView.beginUpdates()
     }
@@ -587,6 +745,11 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
     }
     
     func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController) {
+        if isBookmarksBeingSearched {
+            refreshBookmarkSearchResult(with: bookmarksSearchQuery)
+            return
+        }
+        
         // We're in some sort of invalid state in sync..
         // Somehow this folder was deleted but the user is currently viewing it..
         // Might be a good idea to let the user know in the future that the folder they are currently viewing
@@ -604,7 +767,10 @@ extension BookmarksViewController: BookmarksV2FetchResultsDelegate {
     }
 }
 
+// MARK: UIDocumentPickerDelegate - UIDocumentInteractionControllerDelegate
+
 extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate {
+    
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let url = urls.first, urls.count == 1 else {
             return
@@ -642,24 +808,21 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
     }
 }
 
+// MARK: Export-Import Bookmarks
+
 extension BookmarksViewController {
+    
     func importBookmarks(from url: URL) {
-        self.view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(self.view.snp.center)
-        }
-        
-        spinner.startAnimating()
-        spinner.isHidden = false
+        isLoading = true
         
         self.importExportUtility.importBookmarks(from: url) { [weak self] success in
             guard let self = self else { return }
             
-            self.spinner.stopAnimating()
-            self.spinner.removeFromSuperview()
+            self.isLoading = false
             
             let alert = UIAlertController(title: Strings.Sync.bookmarksImportPopupErrorTitle,
-                                          message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
+                                          message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage :
+                                            Strings.Sync.bookmarksImportPopupFailureMessage,
                                           preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
@@ -667,19 +830,12 @@ extension BookmarksViewController {
     }
     
     func exportBookmarks(to url: URL) {
-        self.view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-            $0.center.equalTo(self.view.snp.center)
-        }
-        
-        spinner.startAnimating()
-        spinner.isHidden = false
+        isLoading = true
         
         self.importExportUtility.exportBookmarks(to: url) { [weak self] success in
             guard let self = self else { return }
             
-            self.spinner.stopAnimating()
-            self.spinner.removeFromSuperview()
+            self.isLoading = false
             
             // Controller must be retained otherwise `AirDrop` and other sharing options will fail!
             self.documentInteractionController = UIDocumentInteractionController(url: url)
@@ -691,5 +847,57 @@ extension BookmarksViewController {
             guard let importExportButton = self.importExportButton else { return }
             vc.presentOptionsMenu(from: importExportButton, animated: true)
         }
+    }
+
+}
+
+// MARK: UISearchResultUpdating
+
+extension BookmarksViewController: UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let query = searchController.searchBar.text else { return }
+
+        if searchBookmarksTimer != nil {
+            searchBookmarksTimer?.invalidate()
+            searchBookmarksTimer = nil
+        }
+        
+        searchBookmarksTimer =
+            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    }
+    
+    @objc private func fetchSearchResults(timer: Timer) {
+        guard let query = timer.userInfo as? String else {
+            bookmarksSearchQuery = ""
+            return
+        }
+        
+        bookmarksSearchQuery = query
+        refreshBookmarkSearchResult(with: bookmarksSearchQuery)
+    }
+}
+
+// MARK: UISearchControllerDelegate
+
+extension BookmarksViewController: UISearchControllerDelegate {
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        isBookmarksBeingSearched = true
+        bookmarksSearchQuery = ""
+        tableView.setEditing(false, animated: true)
+        tableView.reloadData()
+        
+        // Bottom toolbar needs to be hidden when searching for bookmarks
+        navigationController?.setToolbarHidden(true, animated: true)
+    }
+    
+    func willDismissSearchController(_ searchController: UISearchController) {
+        isBookmarksBeingSearched = false
+        updateEmptyPanelState()
+        reloadData()
+        
+        // Re-enable bottom var options when search is done
+        navigationController?.setToolbarHidden(false, animated: true)
     }
 }

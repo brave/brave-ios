@@ -3,18 +3,18 @@
 import UIKit
 import Shared
 import BraveShared
-import BraveRewards
+import BraveCore
 import Data
 
 private let log = Logger.browserLogger
 
 class SyncPairWordsViewController: SyncViewController {
     
-    var syncHandler: ((String) -> Void)?
+    weak var delegate: SyncPairControllerDelegate?
     var scrollView: UIScrollView!
     var containerView: UIView!
     var codewordsView: SyncCodewordsView!
-    
+
     lazy var wordCountLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
@@ -40,6 +40,18 @@ class SyncPairWordsViewController: SyncViewController {
     
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(style: .large)
+    
+    private let syncAPI: BraveSyncAPI
+
+    init(syncAPI: BraveSyncAPI) {
+        self.syncAPI = syncAPI
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init(coder: NSCoder) {
+        fatalError()
+    }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -153,7 +165,7 @@ class SyncPairWordsViewController: SyncViewController {
     
     @objc func SEL_done() {
         doIfConnected {
-            checkCodes()
+            self.checkCodes()
         }
     }
     
@@ -161,7 +173,7 @@ class SyncPairWordsViewController: SyncViewController {
         log.debug("check codes")
         
         func alert(title: String? = nil, message: String? = nil) {
-            if BraveSyncAPI.shared.isInSyncGroup {
+            if syncAPI.isInSyncGroup {
                 // No alert
                 return
             }
@@ -189,8 +201,8 @@ class SyncPairWordsViewController: SyncViewController {
             alert()
         })
         
-        if BraveSyncAPI.shared.isValidSyncCode(codes.joined(separator: " ")) {
-            syncHandler?(codes.joined(separator: " "))
+        if syncAPI.isValidSyncCode(codes.joined(separator: " ")) {
+            delegate?.syncOnWordsEntered(self, codeWords: codes.joined(separator: " "))
         } else {
             alert(message: Strings.invalidSyncCodeDescription)
             disableNavigationPrevention()

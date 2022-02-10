@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveRewards
+import BraveCore
 import Data
 import Shared
 import BraveShared
@@ -12,18 +12,7 @@ import Storage
 import XCGLogger
 import WebKit
 
-private let log = Logger.rewardsLogger
-
-private extension Int32 {
-    var loggerLevel: XCGLogger.Level {
-        switch self {
-        case 0: return .error
-        case 1: return .info
-        case 2..<7: return .debug
-        default: return .verbose
-        }
-    }
-}
+private let log = Logger.braveCoreLogger
 
 extension BrowserViewController {
     func updateRewardsButtonState() {
@@ -46,6 +35,23 @@ extension BrowserViewController {
     }
     
     func showBraveRewardsPanel() {
+        if !Preferences.FullScreenCallout.rewardsCalloutCompleted.value,
+            Preferences.General.isNewRetentionUser.value == true,
+           !Preferences.Rewards.rewardsToggledOnce.value {
+            
+            let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+            controller.onOnboardingStateChanged = { [weak self] controller, state in
+                self?.completeOnboarding(controller)
+            }
+            
+            Preferences.FullScreenCallout.rewardsCalloutCompleted.value = true
+            present(controller, animated: true)
+            topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value ?
+                (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled) :
+                .initial
+            return
+        }
+        
         updateRewardsButtonState()
         
         UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
@@ -156,25 +162,6 @@ extension BrowserViewController {
                             self.showBraveRewardsPanel()
                         }
                     }
-                case .batNotAllowed:
-                    // Uphold account doesn't support BAT...
-                    let popup = AlertPopupView(
-                        imageView: nil,
-                        title: Strings.userWalletBATNotAllowedTitle,
-                        message: Strings.userWalletBATNotAllowedMessage,
-                        titleWeight: .semibold,
-                        titleSize: 18.0
-                    )
-                    popup.addButton(title: Strings.userWalletBATNotAllowedLearnMore, type: .link, fontSize: 14.0) { () -> PopupViewDismissType in
-                        if let url = URL(string: "https://uphold.com/en/brave/support") {
-                            tab.loadRequest(URLRequest(url: url))
-                        }
-                        return .flyDown
-                    }
-                    popup.addButton(title: Strings.userWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
-                        return .flyDown
-                    }
-                    popup.showWithType(showType: .flyUp)
                 default:
                     // Some other issue occured with authorization
                     let popup = AlertPopupView(
@@ -197,14 +184,14 @@ extension BrowserViewController {
         Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = false
     }
     
-    static func migrateAdsConfirmations(for configruation: BraveRewardsConfiguration) {
+    static func migrateAdsConfirmations(for configruation: BraveRewards.Configuration) {
         // To ensure after a user launches 1.21 that their ads confirmations, viewed count and
         // estimated payout remain correct.
         //
         // This hack is unfortunately neccessary due to a missed migration path when moving
         // confirmations from ledger to ads, we must extract `confirmations.json` out of ledger's
         // state file and save it as a new file under the ads directory.
-        let base = URL(fileURLWithPath: configruation.stateStoragePath)
+        let base = configruation.storageURL
         let ledgerStateContainer = base.appendingPathComponent("ledger/random_state.plist")
         let adsConfirmations = base.appendingPathComponent("ads/confirmations.json")
         let fm = FileManager.default
@@ -296,7 +283,7 @@ extension BrowserViewController {
 }
 
 extension Tab {
-    func reportPageLoad(to rewards: BraveRewards) {
+    func reportPageLoad(to rewards: BraveRewards, redirectionURLs urls: [URL]) {
         guard let webView = webView, let url = webView.url else { return }
         if url.isLocal || PrivateBrowsingManager.shared.isPrivateBrowsing { return }
                 
@@ -306,14 +293,14 @@ extension Tab {
         let group = DispatchGroup()
         group.enter()
         
-        webView.evaluateSafeJavaScript(functionName: "document.documentElement.outerHTML.toString") { html, _ in
+        webView.evaluateSafeJavaScript(functionName: "document.documentElement.outerHTML.toString", contentWorld: .defaultClient) { html, _ in
             htmlBlob = html as? String
             group.leave()
         }
         
         if shouldClassifyLoadsForAds {
             group.enter()
-            webView.evaluateSafeJavaScript(functionName: "document.body.innerText", asFunction: false) { text, _ in
+            webView.evaluateSafeJavaScript(functionName: "document.body.innerText", contentWorld: .defaultClient, asFunction: false) { text, _ in
                 // Get the list of words in the page and join them together with a space
                 // to send to the classifier
                 classifierText = (text as? String)?.words.joined(separator: " ")
@@ -326,26 +313,13 @@ extension Tab {
             if faviconURL == nil {
                 log.warning("No favicon found in \(self) to report to rewards panel")
             }
-            rewards.reportLoadedPage(url: url, redirectionURLs: [], faviconUrl: faviconURL, tabId: self.rewardsId, html: htmlBlob ?? "", adsInnerText: classifierText)
+            rewards.reportLoadedPage(url: url, redirectionURLs: urls,
+                                     faviconURL: faviconURL, tabId: Int(self.rewardsId),
+                                     html: htmlBlob ?? "", adsInnerText: classifierText)
         }
     }
     
-    func reportPageNaviagtion(to rewards: BraveRewards) {
+    func reportPageNavigation(to rewards: BraveRewards) {
         rewards.reportTabNavigation(tabId: self.rewardsId)
-    }
-}
-
-extension BrowserViewController: BraveRewardsDelegate {
-    func faviconURL(fromPageURL pageURL: URL, completion: @escaping (URL?) -> Void) {
-        // Currently unused, may be removed in the future
-    }
-    
-    func logMessage(withFilename file: String, lineNumber: Int32, verbosity: Int32, message: String) {
-        if message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return }
-        log.logln(verbosity.loggerLevel, fileName: file, lineNumber: Int(lineNumber), closure: { message })
-    }
-    
-    func ledgerServiceDidStart(_ ledger: BraveLedger) {
-        setupLedger()
     }
 }

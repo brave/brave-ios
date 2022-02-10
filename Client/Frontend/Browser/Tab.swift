@@ -6,7 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
-import BraveRewards
+import BraveCore
 import BraveShared
 import SwiftyJSON
 import XCGLogger
@@ -27,6 +27,8 @@ protocol TabDelegate {
     func tab(_ tab: Tab, didSelectFindInPageForSelection selection: String)
     @objc optional func tab(_ tab: Tab, didCreateWebView webView: WKWebView)
     @objc optional func tab(_ tab: Tab, willDeleteWebView webView: WKWebView)
+    func showRequestRewardsPanel(_ tab: Tab)
+    func stopMediaPlayback(_ tab: Tab)
 }
 
 @objc
@@ -46,9 +48,14 @@ class Tab: NSObject {
     
     let rewardsId: UInt32
     
+    var onScreenshotUpdated: (() -> Void)?
+    var rewardsEnabledCallback: ((Bool) -> Void)?
+    
     var alertShownCount: Int = 0
     var blockAllAlerts: Bool = false
     private(set) var type: TabType = .regular
+    
+    var redirectURLs = [URL]()
     
     var isPrivate: Bool {
         return type.isPrivate
@@ -67,6 +74,20 @@ class Tab: NSObject {
         }
         return self.url
     }
+    
+    /// The URL that should be shared when requested by the user via the share sheet
+    ///
+    /// If the canonical URL of the page points to a different base domain entirely, this will result in
+    /// sharing the canonical URL. This is to ensure pages such as Google's AMP share the correct URL while
+    /// also ensuring single page applications which don't update their canonical URLs on navigation share
+    /// the current pages URL
+    var shareURL: URL? {
+        guard let url = url else { return nil }
+        if let canonicalURL = canonicalURL, canonicalURL.baseDomain != url.baseDomain {
+            return canonicalURL
+        }
+        return url
+    }
 
     var userActivity: NSUserActivity?
 
@@ -80,10 +101,26 @@ class Tab: NSObject {
     fileprivate var lastRequest: URLRequest?
     var restoring: Bool = false
     var pendingScreenshot = false
-    var url: URL?
+    var url: URL? {
+        didSet {
+            if let _url = url, let internalUrl = InternalURL(_url), internalUrl.isAuthorized {
+                url = URL(string: internalUrl.stripAuthorization)
+            }
+        }
+    }
+    var lastKnownUrl: URL? {
+        // Tab url can be nil when user cold starts the app
+        // thus we check session data for last known url
+        guard self.url != nil else {
+            return self.sessionData?.urls.last
+        }
+        return self.url
+    }
     var mimeType: String?
     var isEditing: Bool = false
     var shouldClassifyLoadsForAds = true
+    var playlistItem: PlaylistInfo?
+    var playlistItemState: PlaylistItemAddedState = .none
     
     /// The tabs new tab page controller.
     ///
@@ -196,12 +233,19 @@ class Tab: NSObject {
             configuration!.userContentController = WKUserContentController()
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
-            if #available(iOS 14.0, *) {
-                configuration!.preferences.isFraudulentWebsiteWarningEnabled = Preferences.Shields.googleSafeBrowsing.value
-            }
+            configuration!.preferences.isFraudulentWebsiteWarningEnabled = Preferences.Shields.googleSafeBrowsing.value
             configuration!.allowsInlineMediaPlayback = true
             // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
             configuration!.ignoresViewportScaleLimits = true
+            
+            // TODO: Downgrade to 14.5 once api becomes available.
+            if #available(iOS 15.0, *) {
+                configuration!.upgradeKnownHostsToHTTPS = Preferences.Shields.httpsEverywhere.value
+            }
+            
+            if configuration!.urlSchemeHandler(forURLScheme: InternalURL.scheme) == nil {
+                configuration!.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
+            }
             let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
             webView.delegate = self
             configuration = nil
@@ -223,9 +267,9 @@ class Tab: NSObject {
                 tab: self,
                 isFingerprintingProtectionEnabled: Preferences.Shields.fingerprintingProtection.value,
                 isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value,
-                isU2FEnabled: webView.hasOnlySecureContent,
                 isPaymentRequestEnabled: webView.hasOnlySecureContent,
-                isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value)
+                isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
+                isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value)
             tabDelegate?.tab?(self, didCreateWebView: webView)
         }
     }
@@ -268,37 +312,29 @@ class Tab: NSObject {
         // we extract the information needed to restore the tabs and create a NSURLRequest with the custom session restore URL
         // to trigger the session restore via custom handlers
         if let sessionData = restorationData {
-            lastTitle = sessionData.title
-            var updatedURLs = [String]()
-            var previous = ""
+            restoring = true
             
-            for urlString in sessionData.history {
-                guard let url = URL(string: urlString) else { continue }
-                let updatedURL = WebServer.sharedInstance.updateLocalURL(url)!.absoluteString
-                guard let current = try? updatedURL.regexReplacePattern("https?:..", with: "") else { continue }
-                if current.count > 1 && current == previous {
-                    updatedURLs.removeLast()
-                }
-                previous = current
-                updatedURLs.append(updatedURL)
+            lastTitle = sessionData.title
+            
+            var urls = [String]()
+            for url in sessionData.history {
+                guard let url = URL(string: url) else { continue }
+                urls.append(url.absoluteString)
             }
             
             let currentPage = sessionData.historyIndex
             self.sessionData = nil
-            
             var jsonDict = [String: AnyObject]()
-            jsonDict[SessionData.Keys.history] = updatedURLs as AnyObject
-            jsonDict[SessionData.Keys.currentPage] = Int(currentPage) as AnyObject
-            
-            guard let escapedJSON = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed),
-                  let restoreURL = URL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?history=\(escapedJSON)") else {
+            jsonDict["history"] = urls as AnyObject?
+            jsonDict["currentPage"] = currentPage as AnyObject?
+            guard let json = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
                 return
             }
-            
-            lastRequest = PrivilegedRequest(url: restoreURL) as URLRequest
-            
-            if let request = lastRequest {
+
+            if let restoreURL = URL(string: "\(InternalURL.baseUrl)/\(SessionRestoreHandler.path)?history=\(json)") {
+                let request = PrivilegedRequest(url: restoreURL) as URLRequest
                 webView.load(request)
+                lastRequest = request
             }
         } else if let request = lastRequest {
             webView.load(request)
@@ -322,12 +358,6 @@ class Tab: NSObject {
         deleteWebView()
         deleteNewTabPageController()
         contentScriptManager.helpers.removeAll()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        
-        let rewards = appDelegate.browserViewController.rewards
-        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-            rewards.reportTabClosed(tabId: rewardsId)
-        }
     }
 
     var loading: Bool {
@@ -360,11 +390,26 @@ class Tab: NSObject {
     var displayTitle: String {
         if let title = webView?.title, !title.isEmpty {
             return title.contains("localhost") ? "" : title
-        } else if let url = webView?.url ?? self.url, url.isAboutHomeURL {
+        }
+        
+        // When picking a display title. Tabs with sessionData are pending a restore so show their old title.
+        // To prevent flickering of the display title. If a tab is restoring make sure to use its lastTitle.
+        if let url = self.url, InternalURL(url)?.isAboutHomeURL ?? false, sessionData == nil, !restoring {
             return Strings.newTabTitle
         }
         
+        //lets double check the sessionData in case this is a non-restored new tab
+        if let firstURL = sessionData?.urls.first, sessionData?.urls.count == 1, InternalURL(firstURL)?.isAboutHomeURL ?? false {
+            return Strings.newTabTitle
+        }
+        
+        if let url = self.url, !InternalURL.isValid(url: url), let shownUrl = url.displayURL?.absoluteString {
+            return shownUrl
+        }
+        
         guard let lastTitle = lastTitle, !lastTitle.isEmpty else {
+            // FF uses url?.displayURL?.absoluteString ??  ""
+            // but we can grab the title from `TabMO`
             if let title = url?.absoluteString {
                 return title
             } else if let tab = TabMO.get(fromId: id) {
@@ -381,7 +426,7 @@ class Tab: NSObject {
     }
 
     var displayFavicon: Favicon? {
-        if url?.isAboutHomeURL == true { return nil }
+        if let url = url, InternalURL(url)?.isAboutHomeURL == true { return nil }
         return favicons.max { $0.width! < $1.width! }
     }
 
@@ -408,8 +453,15 @@ class Tab: NSObject {
     @discardableResult func loadRequest(_ request: URLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request
-            if let url = request.url, url.isFileURL, request.isPrivileged {
-                return webView.loadFileURL(url, allowingReadAccessTo: url)
+            if let url = request.url {
+                if url.isFileURL, request.isPrivileged {
+                    return webView.loadFileURL(url, allowingReadAccessTo: url)
+                }
+                
+                /// Donate Custom Intent Open Website
+                if url.isSecureWebPage(), !isPrivate {
+                    ActivityShortcutManager.shared.donateCustomIntent(for: .openWebsite, with: url.absoluteString)
+                }
             }
 
             return webView.load(request)
@@ -435,9 +487,9 @@ class Tab: NSObject {
             }
         }
         
-        // Refreshing error, safe browsing warning pages.
-        if let originalUrlFromErrorUrl = webView?.url?.originalURLFromErrorURL {
-            webView?.load(URLRequest(url: originalUrlFromErrorUrl))
+        // If the current page is an error page, and the reload button is tapped, load the original URL
+        if let url = webView?.url, let internalUrl = InternalURL(url), let page = internalUrl.originalURLFromErrorPage {
+            webView?.replaceLocation(with: page)
             return
         }
 
@@ -459,8 +511,8 @@ class Tab: NSObject {
         webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
     }
 
-    func addContentScript(_ helper: TabContentScript, name: String, sandboxed: Bool = true) {
-        contentScriptManager.addContentScript(helper, name: name, forTab: self, sandboxed: sandboxed)
+    func addContentScript(_ helper: TabContentScript, name: String, contentWorld: WKContentWorld) {
+        contentScriptManager.addContentScript(helper, name: name, forTab: self, contentWorld: contentWorld)
     }
 
     func getContentScript(name: String) -> TabContentScript? {
@@ -516,6 +568,8 @@ class Tab: NSObject {
         if revUUID {
             self.screenshotUUID = UUID()
         }
+        
+        onScreenshotUpdated?()
     }
 
     /// Switches user agent Desktop -> Mobile or Mobile -> Desktop.
@@ -573,13 +627,13 @@ class Tab: NSObject {
         return sequence(first: parent) { $0?.parent }.contains { $0 == ancestor }
     }
 
-    func injectUserScriptWith(fileName: String, type: String = "js", injectionTime: WKUserScriptInjectionTime = .atDocumentEnd, mainFrameOnly: Bool = true) {
+    func injectUserScriptWith(fileName: String, type: String = "js", injectionTime: WKUserScriptInjectionTime = .atDocumentEnd, mainFrameOnly: Bool = true, contentWorld: WKContentWorld) {
         guard let webView = self.webView else {
             return
         }
         if let path = Bundle.main.path(forResource: fileName, ofType: type),
             let source = try? String(contentsOfFile: path) {
-            let userScript = WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly)
+            let userScript = WKUserScript.create(source: source, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly, in: contentWorld)
             webView.configuration.userContentController.addUserScript(userScript)
         }
     }
@@ -592,6 +646,10 @@ class Tab: NSObject {
         if let existing = self.urlDidChangeDelegate, existing === delegate {
             self.urlDidChangeDelegate = nil
         }
+    }
+    
+    func stopMediaPlayback() {
+        tabDelegate?.stopMediaPlayback(self)
     }
 }
 
@@ -623,7 +681,7 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandler {
         }
     }
 
-    func addContentScript(_ helper: TabContentScript, name: String, forTab tab: Tab, sandboxed: Bool = true) {
+    func addContentScript(_ helper: TabContentScript, name: String, forTab tab: Tab, contentWorld: WKContentWorld) {
         if let _ = helpers[name] {
             assertionFailure("Duplicate helper added: \(name)")
         }
@@ -633,8 +691,8 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandler {
         // If this helper handles script messages, then get the handler name and register it. The Tab
         // receives all messages and then dispatches them to the right TabHelper.
         if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
-            if #available(iOS 14.0, *), sandboxed {
-                tab.webView?.configuration.userContentController.add(self, contentWorld: .defaultClient, name: scriptMessageHandlerName)
+            if #available(iOS 14.3, *) {
+                tab.webView?.configuration.userContentController.add(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
             } else {
                 tab.webView?.configuration.userContentController.add(self, name: scriptMessageHandlerName)
             }
@@ -658,7 +716,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
     }
 
     @objc func menuHelperFindInPage() {
-        evaluateSafeJavaScript(functionName: "getSelection().toString", sandboxed: false) { result, _ in
+        evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
             let selection = result as? String ?? ""
             self.delegate?.tabWebView(self, didSelectFindInPageForSelection: selection)
         }
@@ -693,7 +751,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
 class TabWebViewMenuHelper: UIView {
     @objc func swizzledMenuHelperFindInPage() {
         if let tabWebView = superview?.superview as? TabWebView {
-            tabWebView.evaluateSafeJavaScript(functionName: "getSelection().toString", sandboxed: false) { result, _ in
+            tabWebView.evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
                 let selection = result as? String ?? ""
                 tabWebView.delegate?.tabWebView(tabWebView, didSelectFindInPageForSelection: selection)
             }
@@ -709,9 +767,6 @@ extension Tab {
     /// or when the fallback call should not happen at all.
     /// The website expects the iOS device to always call this method(blocks on it).
     func injectResults() {
-        
-        
-        
         DispatchQueue.main.async {
             // If the backup search results happen before the Brave Search loads
             // The method we pass data to is undefined.
@@ -745,7 +800,7 @@ extension Tab {
                 self.webView?.evaluateSafeJavaScript(
                     functionName: "window.onFetchedBackupResults",
                     args: [queryResult],
-                    sandboxed: false,
+                    contentWorld: .page,
                     escapeArgs: false)
                 
                 // Cleanup

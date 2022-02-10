@@ -4,13 +4,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveRewards
+import BraveCore
 import Static
 import Shared
 
 class RewardsInternalsContributionPublishersListController: TableViewController {
-    private let publishers: [ContributionPublisher]
-    init(publishers: [ContributionPublisher]) {
+    private let publishers: [Ledger.ContributionPublisher]
+    init(publishers: [Ledger.ContributionPublisher]) {
         self.publishers = publishers
         super.init(style: .grouped)
     }

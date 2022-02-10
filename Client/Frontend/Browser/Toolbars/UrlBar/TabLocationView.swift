@@ -15,6 +15,7 @@ protocol TabLocationViewDelegate {
     func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView)
     func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
+    func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView)
     func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView)
     func tabLocationViewDidLongPressReload(_ tabLocationView: TabLocationView, from button: UIButton)
     func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
@@ -24,7 +25,6 @@ protocol TabLocationViewDelegate {
     
     /// - returns: whether the long-press was handled by the delegate; i.e. return `false` when the conditions for even starting handling long-press were not satisfied
     @discardableResult func tabLocationViewDidLongPressReaderMode(_ tabLocationView: TabLocationView) -> Bool
-    func tabLocationViewLocationAccessibilityActions(_ tabLocationView: TabLocationView) -> [UIAccessibilityCustomAction]?
 }
 
 private struct TabLocationViewUX {
@@ -122,7 +122,6 @@ class TabLocationView: UIView {
         urlTextField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .horizontal)
         urlTextField.attributedPlaceholder = self.placeholder
         urlTextField.accessibilityIdentifier = "url"
-        urlTextField.accessibilityActionsSource = self
         urlTextField.font = UIConstants.defaultChromeFont
         urlTextField.backgroundColor = .clear
         urlTextField.clipsToBounds = true
@@ -162,6 +161,15 @@ class TabLocationView: UIView {
         readerModeButton.selectedTintColor = .braveOrange
         return readerModeButton
     }()
+    
+    lazy var playlistButton = PlaylistURLBarButton(frame: .zero).then {
+        $0.accessibilityIdentifier = "TabToolbar.playlistButton"
+        $0.isAccessibilityElement = true
+        $0.accessibilityLabel = Strings.tabToolbarPlaylistButtonAccessibilityLabel
+        $0.buttonState = .none
+        $0.tintColor = .white
+        $0.addTarget(self, action: #selector(didClickPlaylistButton), for: .touchUpInside)
+    }
     
     lazy var reloadButton = ToolbarButton(top: true).then {
         $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
@@ -214,7 +222,7 @@ class TabLocationView: UIView {
         addGestureRecognizer(longPressRecognizer)
         addGestureRecognizer(tapRecognizer)
         
-        var optionSubviews = [readerModeButton, reloadButton, separatorLine, shieldsButton]
+        var optionSubviews = [readerModeButton, playlistButton, reloadButton, separatorLine, shieldsButton]
         separatorLine.isUserInteractionEnabled = false
         
         optionSubviews.append(rewardsButton)
@@ -265,7 +273,7 @@ class TabLocationView: UIView {
 
     override var accessibilityElements: [Any]? {
         get {
-            return [lockImageView, urlTextField, readerModeButton, reloadButton, shieldsButton].filter { !$0.isHidden }
+            return [lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton].filter { !$0.isHidden }
         }
         set {
             super.accessibilityElements = newValue
@@ -280,6 +288,10 @@ class TabLocationView: UIView {
         if recognizer.state == .began {
             delegate?.tabLocationViewDidLongPressReaderMode(self)
         }
+    }
+    
+    @objc func didClickPlaylistButton() {
+        delegate?.tabLocationViewDidTapPlaylist(self)
     }
     
     @objc func didClickStopReload() {
@@ -356,7 +368,7 @@ extension TabLocationView: UIGestureRecognizerDelegate {
 extension TabLocationView: UIDragInteractionDelegate {
     func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
         // Ensure we actually have a URL in the location bar and that the URL is not local.
-        guard let url = self.url, !url.isLocal, let itemProvider = NSItemProvider(contentsOf: url),
+        guard let url = self.url, !InternalURL.isValid(url: url), let itemProvider = NSItemProvider(contentsOf: url),
             !reloadButton.isHighlighted else {
             return []
         }
@@ -367,17 +379,6 @@ extension TabLocationView: UIDragInteractionDelegate {
 
     func dragInteraction(_ interaction: UIDragInteraction, sessionWillBegin session: UIDragSession) {
         delegate?.tabLocationViewDidBeginDragInteraction(self)
-    }
-}
-
-// MARK: - AccessibilityActionsSource
-
-extension TabLocationView: AccessibilityActionsSource {
-    func accessibilityCustomActionsForView(_ view: UIView) -> [UIAccessibilityCustomAction]? {
-        if view === urlTextField {
-            return delegate?.tabLocationViewLocationAccessibilityActions(self)
-        }
-        return nil
     }
 }
 

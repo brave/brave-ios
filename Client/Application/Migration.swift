@@ -7,13 +7,25 @@ import Shared
 import BraveShared
 import SwiftKeychainWrapper
 import Data
+import BraveCore
 
 private let log = Logger.browserLogger
 
 class Migration {
-    private(set) public static var braveCoreBookmarksMigrator: BraveCoreMigrator?
     
-    static func launchMigrations(keyPrefix: String) {
+    private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
+    private let braveCore: BraveCoreMain
+    
+    public init(braveCore: BraveCoreMain) {
+        self.braveCore = braveCore
+    }
+    
+    public static var isChromiumMigrationCompleted: Bool {
+        return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value &&
+            Preferences.Chromium.syncV2HistoryMigrationCompleted.value
+    }
+    
+    func launchMigrations(keyPrefix: String) {
         Preferences.migratePreferences(keyPrefix: keyPrefix)
         
         if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
@@ -22,16 +34,25 @@ class Migration {
         }
         
         // `.migrate` is called in `BrowserViewController.viewDidLoad()`
-        if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
-            braveCoreBookmarksMigrator = BraveCoreMigrator()
+        if !Migration.isChromiumMigrationCompleted {
+            braveCoreSyncObjectsMigrator = BraveCoreMigrator(braveCore: braveCore)
         }
         
         if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
             movePlaylistV1Items()
         }
+
+        // Adding Observer to enable sync types
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(enableUserSelectedTypesForSync),
+            name: BraveServiceStateObserver.coreServiceLoadedNotification,
+            object: nil
+        )
     }
     
-    static func moveDatabaseToApplicationDirectory() {
+    func moveDatabaseToApplicationDirectory() {
         if Preferences.Database.DocumentToSupportDirectoryMigration.completed.value {
             // Migration has been done in some regard, so drop out.
             return
@@ -53,9 +74,18 @@ class Migration {
         Preferences.Database.DocumentToSupportDirectoryMigration.previousAttemptedVersion.value = AppInfo.appVersion
     }
     
+    @objc private func enableUserSelectedTypesForSync() {
+        guard braveCore.syncAPI.isInSyncGroup else {
+            log.info("Sync is not active")
+            return
+        }
+        
+        braveCore.syncAPI.enableSyncTypes()
+    }
+    
     /// Adblock files don't have to be moved, they now have a new directory and will be downloaded there.
     /// Downloads folder was nefer used before, it's a leftover from FF.
-    private static func documentsDirectoryCleanup() {
+    private func documentsDirectoryCleanup() {
         FileManager.default.removeFolder(withName: "abp-data", location: .documentDirectory)
         FileManager.default.removeFolder(withName: "https-everywhere-data", location: .documentDirectory)
         
@@ -64,7 +94,7 @@ class Migration {
                                      destinationLocation: .applicationSupportDirectory)
     }
     
-    private static func movePlaylistV1Items() {
+    private func movePlaylistV1Items() {
         // If moving the file fails, we'll never bother trying again.
         // It doesn't hurt and the user can easily delete it themselves.
         defer {
@@ -102,10 +132,38 @@ class Migration {
                 } catch {
                     log.error("Moving Playlist Item for \(errorPath) failed: \(error)")
                 }
+                
+                do {
+                    try FileManager.default.removeItem(at: url)
+                } catch {
+                    log.error("Deleting Playlist Item for \(errorPath) failed: \(error)")
+                }
             }
         } catch {
             log.error("Moving Playlist Files for \(errorPath) failed: \(error)")
         }
+    }
+    
+    static func postCoreDataInitMigrations() {
+        if !Preferences.Migration.removeLargeFaviconsMigrationCompleted.value {
+            FaviconMO.clearTooLargeFavicons()
+            Preferences.Migration.removeLargeFaviconsMigrationCompleted.value = true
+        }
+        
+        if Preferences.Migration.coreDataCompleted.value { return }
+        
+        // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
+        //  - Cleared private data
+        //  - Exited Private Mode
+        //  - The app was terminated (bug)
+        // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
+        // we must dismiss any records that are private tabs during migration from Model7
+        TabMO.deleteAllPrivateTabs()
+        
+        Domain.migrateShieldOverrides()
+        LegacyBookmarksHelper.migrateBookmarkOrders()
+        
+        Preferences.Migration.coreDataCompleted.value = true
     }
 }
 
@@ -120,6 +178,14 @@ fileprivate extension Preferences {
             Option<Bool>(key: "migration.documents-dir-completed", default: false)
         static let playlistV1FileSettingsLocationCompleted =
             Option<Bool>(key: "migration.playlistv1-file-settings-location-completed", default: false)
+        static let removeLargeFaviconsMigrationCompleted =
+            Option<Bool>(key: "migration.remove-large-favicons", default: false)
+        // This is new preference introduced in iOS 1.32.3, tracks whether we should perform database migration.
+        // It should be called only for users who have not completed the migration beforehand.
+        // The reason for second migration flag is to first do file system migrations like moving database files,
+        // then do CRUD operations on the db if needed.
+        static let coreDataCompleted = Option<Bool>(key: "migration.cd-completed",
+                                                    default: Preferences.Migration.completed.value)
     }
     
     /// Migrate the users preferences from prior versions of the app (<2.0)
@@ -194,19 +260,6 @@ fileprivate extension Preferences {
         // On 1.6 lastLaunchInfo is used to check if it's first app launch or not.
         // This needs to be translated to our new preference.
         Preferences.General.isFirstLaunch.value = Preferences.DAU.lastLaunchInfo.value == nil
-        
-        // Core Data
-        
-        // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
-        //  - Cleared private data
-        //  - Exited Private Mode
-        //  - The app was terminated (bug)
-        // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
-        // we must dismiss any records that are private tabs during migration from Model7
-        TabMO.deleteAllPrivateTabs()
-        
-        Domain.migrateShieldOverrides()
-        LegacyBookmarksHelper.migrateBookmarkOrders()
         
         Preferences.Migration.completed.value = true
     }

@@ -112,7 +112,7 @@ class TabManagerTests: XCTestCase {
         super.setUp()
         
         let profile = MockProfile()
-        manager = TabManager(prefs: profile.prefs, imageStore: nil)
+        manager = TabManager(prefs: profile.prefs, imageStore: nil, rewards: nil)
         PrivateBrowsingManager.shared.isPrivateBrowsing = false
     }
     
@@ -505,7 +505,7 @@ class TabManagerTests: XCTestCase {
         let delegate = MockTabManagerDelegate()
         manager.addDelegate(delegate)
         DataController.shared = InMemoryDataController()
-        DataController.shared.initialize()
+        DataController.shared.initializeOnce()
         
         delegate.expect([willAdd, didAdd])
         let tab = manager.addTab(isPrivate: false)
@@ -522,7 +522,7 @@ class TabManagerTests: XCTestCase {
         let delegate = MockTabManagerDelegate()
         manager.addDelegate(delegate)
         DataController.shared = InMemoryDataController()
-        DataController.shared.initialize()
+        DataController.shared.initializeOnce()
         
         delegate.expect([willAdd, didAdd])
         manager.addTab(isPrivate: true)
@@ -537,7 +537,7 @@ class TabManagerTests: XCTestCase {
         let delegate = MockTabManagerDelegate()
         manager.addDelegate(delegate)
         DataController.shared = InMemoryDataController()
-        DataController.shared.initialize()
+        DataController.shared.initializeOnce()
         
         delegate.expect([willAdd, didAdd, willAdd, didAdd])
         manager.addTab(isPrivate: true)

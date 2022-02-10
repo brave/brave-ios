@@ -7,6 +7,8 @@ import Foundation
 import Static
 import Shared
 import BraveShared
+import BraveCore
+import class SwiftUI.UIHostingController
 
 private let log = Logger.browserLogger
 
@@ -14,11 +16,13 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     let profile: Profile
     let tabManager: TabManager
     let feedDataSource: FeedDataSource
+    let historyAPI: BraveHistoryAPI
     
-    init(profile: Profile, tabManager: TabManager, feedDataSource: FeedDataSource) {
+    init(profile: Profile, tabManager: TabManager, feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI) {
         self.profile = profile
         self.tabManager = tabManager
         self.feedDataSource = feedDataSource
+        self.historyAPI = historyAPI
         super.init(style: .insetGrouped)
     }
     
@@ -35,6 +39,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         dataSource.sections = [
             shieldsSection,
             clearPrivateDataSection,
+            manageWebsiteDataSection,
             otherSettingsSection
         ]
     }
@@ -116,7 +121,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     
     private lazy var clearables: [(clearable: Clearable, checked: Bool)] = {
         var alwaysVisible: [(clearable: Clearable, checked: Bool)] =
-            [(HistoryClearable(), true),
+            [(HistoryClearable(historyAPI: self.historyAPI), true),
              (CacheClearable(), true),
              (CookiesAndCacheClearable(), true),
              (PasswordsClearable(profile: self.profile), true),
@@ -140,13 +145,32 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         return Section(
             header: .title(Strings.clearPrivateData),
             rows: clearables.indices.map { idx in
-                Row(text: self.clearables[idx].clearable.label, accessory: .switchToggle(value: self.toggles[idx], { [unowned self] checked in
+                let title = self.clearables[idx].clearable.label
+                    
+                return .boolRow(title: title, toggleValue: self.toggles[idx], valueChange: { [unowned self] checked in
                     self.toggles[idx] = checked
-                }))
+                    Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
+                }, cellReuseId: "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))\(idx)")
             } + [
                 Row(text: Strings.clearDataNow, selection: { [unowned self] in
                     self.tappedClearPrivateData()
                 }, cellClass: CenteredButtonCell.self)
+            ]
+        )
+    }()
+    
+    private lazy var manageWebsiteDataSection: Section = {
+        return Section(
+            rows: [
+                Row(text: Strings.manageWebsiteDataTitle, selection: { [unowned self] in
+                    var view = ManageWebsiteDataView(onDismiss: { [weak self] in
+                        self?.dismiss(animated: true, completion: nil)
+                    })
+                    let controller = UIHostingController(rootView: view)
+                    // pushing SwiftUI with navigation/toolbars inside the PanModal is buggy…
+                    // presenting over context is also buggy (eats swipe gestures)
+                    self.present(controller, animated: true)
+                }, accessory: .disclosureIndicator)
             ]
         )
     }()
@@ -330,6 +354,11 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
                     
                     if historyCleared {
                         self.tabManager.clearTabHistory()
+                        
+                        /// Donate Clear Browser History for suggestions
+                        let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
+                        self.userActivity = clearBrowserHistoryActivity
+                        clearBrowserHistoryActivity.becomeCurrent()
                     }
                     
                     _toggleFolderAccessForBlockCookies(locked: true)

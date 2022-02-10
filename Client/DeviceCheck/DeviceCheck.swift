@@ -4,7 +4,7 @@
 
 import Foundation
 import DeviceCheck
-import BraveRewards
+import BraveCore
 import BraveShared
 import Shared
 
@@ -132,7 +132,7 @@ public class DeviceCheckClient {
   private static let privateKeyId = "com.brave.device.check.private.key"
   
   // The current build environment
-  private let environment: BATEnvironment
+  private let environment: Ledger.Environment
   
   // A structure representing an error returned by the server
   public struct DeviceCheckError: Error, Codable {
@@ -143,7 +143,7 @@ public class DeviceCheckClient {
     let code: Int
   }
   
-  public init(environment: BATEnvironment) {
+  public init(environment: Ledger.Environment) {
     self.environment = environment
   }
   

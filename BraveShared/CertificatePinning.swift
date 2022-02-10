@@ -10,11 +10,17 @@ private let log = Logger.browserLogger
 // Taken from: https://github.com/Brandon-T/Jarvis and modified to simplify
 
 public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
+    struct ExcludedPinningHostUrls {
+        static let urls = ["laptop-updates.brave.com",
+                           "updates.bravesoftware.com",
+                           "updates-cdn.bravesoftware.com"]
+    }
+    
     private let hosts: [String]
     private let certificates: [SecCertificate]
     private let options: PinningOptions
     
-    public init(hosts: [String], options: PinningOptions = [.default, .validateHost]) {
+    public init(hosts: [String], options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]) {
         self.hosts = hosts
         self.options = options
         
@@ -33,7 +39,7 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
         }()
     }
     
-    public init(hosts: [String: SecCertificate], options: PinningOptions = [.default, .validateHost]) {
+    public init(hosts: [String: SecCertificate], options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]) {
         self.hosts = hosts.map({ $0.key })
         self.certificates = hosts.map({ $0.value })
         self.options = options
@@ -46,7 +52,12 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
             if let serverTrust = challenge.protectionSpace.serverTrust {
                 do {
                     let host = challenge.protectionSpace.host
+                    if ExcludedPinningHostUrls.urls.contains(host) {
+                        return completionHandler(.performDefaultHandling, nil)
+                    }
+                    
                     if !canPinHost(host) {
+                        fatalErrorInDebugModeIfPinningFailed()
                         throw error(reason: "Host not specified for pinning: \(host)")
                     }
                     
@@ -54,9 +65,11 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
                     return completionHandler(.useCredential, URLCredential(trust: serverTrust))
                 } catch {
                     log.error(error)
+                    fatalErrorInDebugModeIfPinningFailed()
                     return completionHandler(.cancelAuthenticationChallenge, nil)
                 }
             }
+            fatalErrorInDebugModeIfPinningFailed()
             return completionHandler(.cancelAuthenticationChallenge, nil)
         }
         return completionHandler(.performDefaultHandling, nil)
@@ -76,14 +89,27 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
             throw error(reason: "Empty Certificates")
         }
         
-        // Self signed anchoring
-        if options.contains(.allowSelfSigned) {
+        // Certificate anchoring
+        if options.contains(.anchorSpecificTrustsOnly) || options.contains(.anchorSpecificAndSystemTrusts) {
+            // Add the certificates to the trust
             guard SecTrustSetAnchorCertificates(trust, certificates as CFArray) == errSecSuccess else {
-                throw error(reason: "Self Signed Certificate Anchor Failed")
+                throw error(reason: "Certificate Anchor Failed")
             }
             
-            guard SecTrustSetAnchorCertificatesOnly(trust, true) == errSecSuccess else {
-                throw error(reason: "Self Signed Certificate Anchor Only Failed")
+            if options.contains(.anchorSpecificTrustsOnly) {
+                // Trust only the passed in certificates (true)
+                //
+                // This is the default behaviour, however we do it explicitly to throw an exception
+                // immediately upon failure
+                // The default behaviour will silently ignore the exception until validation
+                guard SecTrustSetAnchorCertificatesOnly(trust, true) == errSecSuccess else {
+                    throw error(reason: "Self-Signed Certificate Anchor Only Failed")
+                }
+            } else {
+                // Trust also the built in system certificates (false)
+                guard SecTrustSetAnchorCertificatesOnly(trust, false) == errSecSuccess else {
+                    throw error(reason: "Certificate Anchor Only Failed")
+                }
             }
         }
         
@@ -131,6 +157,12 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
         }
     }
     
+    private func fatalErrorInDebugModeIfPinningFailed() {
+        if !AppConstants.buildChannel.isPublic {
+            assertionFailure("An SSL Pinning error has occurred")
+        }
+    }
+    
     public struct PinningOptions: OptionSet {
         public let rawValue: Int
         
@@ -138,9 +170,20 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
             self.rawValue = rawValue
         }
         
+        /// System's default pinning policies
         public static let `default` = PinningOptions(rawValue: 1 << 0)
+        
+        /// Host Validation
         public static let validateHost = PinningOptions(rawValue: 1 << 1)
-        public static let allowSelfSigned = PinningOptions(rawValue: 1 << 2)
-        public static let all: PinningOptions = [.default, .validateHost, .allowSelfSigned]
+        
+        /// Anchor ONLY the specified trusts passed to `PinningCertificateEvaluator.evaluate(trust:host:)`
+        public static let anchorSpecificTrustsOnly = PinningOptions(rawValue: 1 << 2)
+        
+        /// Anchor the specified trusts passed to `PinningCertificateEvaluator.evaluate(trust:host:)`
+        /// Also anchors the default trusts of the System
+        public static let anchorSpecificAndSystemTrusts = PinningOptions(rawValue: 1 << 3)
+        
+        /// Default pinning policies + Host Validation + Anchor the specified trusts + Anchor system trusts
+        public static let all: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]
     }
 }

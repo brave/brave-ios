@@ -11,10 +11,11 @@ enum JavascriptError: Error {
     case invalid
 }
 
-extension WKUserScript {
-    public class func createInDefaultContentWorld(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) -> WKUserScript {
-        if #available(iOS 14.0, *) {
-            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: .defaultClient)
+public extension WKUserScript {
+    static func create(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) -> WKUserScript {
+        
+        if #available(iOS 14.3, *) {
+            return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         } else {
             return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
         }
@@ -22,35 +23,43 @@ extension WKUserScript {
 }
 
 public extension WKWebView {
-    func generateJavascriptFunctionString(functionName: String, args: [Any], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
-        let context = JSContext()
-
-        var sanitizedArgs: [String] = []
-        var error: Error?
-
-        args.forEach {
-            if !escapeArgs {
-                sanitizedArgs.append("\($0)")
-                return
-            }
-            context?.exceptionHandler = { context, exception in
-                if exception != nil {
-                    error = JavascriptError.invalid
+    func generateJSFunctionString(functionName: String, args: [Any?], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
+        var sanitizedArgs = [String]()
+        for arg in args {
+            if let arg = arg {
+                do {
+                    if let arg = arg as? String {
+                        sanitizedArgs.append(escapeArgs ? "'\(arg.htmlEntityEncodedString)'" : "\(arg)")
+                    } else {
+                        let data = try JSONSerialization.data(withJSONObject: arg, options: [.fragmentsAllowed])
+                        
+                        if let str = String(data: data, encoding: .utf8) {
+                            sanitizedArgs.append(str)
+                        } else {
+                            throw JavascriptError.invalid
+                        }
+                    }
+                } catch {
+                    return ("", error)
                 }
+            } else {
+                sanitizedArgs.append("null")
             }
-            context?.evaluateScript("JSON.parse('\"\($0)\"')")
-            sanitizedArgs.append("'\(String(describing: $0).encodingHTMLEntities())'")
-            return
         }
         
-        return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", error)
+        if args.count != sanitizedArgs.count {
+            assertionFailure("Javascript parsing failed.")
+            return ("", JavascriptError.invalid)
+        }
+        
+        return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", nil)
     }
 
-    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], sandboxed: Bool = true, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
+    func evaluateSafeJavaScript(functionName: String, args: [Any] = [], contentWorld: WKContentWorld, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
         var javascript = functionName
         
         if asFunction {
-            let js = generateJavascriptFunctionString(functionName: functionName, args: args, escapeArgs: escapeArgs)
+            let js = generateJSFunctionString(functionName: functionName, args: args, escapeArgs: escapeArgs)
             if js.error != nil {
                 if let completionHandler = completion {
                     completionHandler(nil, js.error)
@@ -59,9 +68,10 @@ public extension WKWebView {
             }
             javascript = js.javascript
         }
-        if #available(iOS 14.0, *), sandboxed {
+        
+        if #available(iOS 14.3, *) {
             // swiftlint:disable:next safe_javascript
-            evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result  in
+            evaluateJavaScript(javascript, in: nil, in: contentWorld) { result  in
                 switch result {
                     case .success(let value):
                         completion?(value, nil)
@@ -71,23 +81,13 @@ public extension WKWebView {
             }
         } else {
             // swiftlint:disable:next safe_javascript
-            evaluateJavaScript(javascript) { data, error  in
-                completion?(data, error)
+            evaluateJavaScript(javascript) { result, error in
+                if let error = error {
+                    completion?(nil, error)
+                } else {
+                    completion?(result, error)
+                }
             }
         }
     }
 }
-
-extension String {
-    /// Encode HTMLStrings
-    fileprivate func encodingHTMLEntities() -> String {
-       return self
-        .replacingOccurrences(of: "&", with: "&amp;", options: .literal)
-        .replacingOccurrences(of: "\"", with: "&quot;", options: .literal)
-        .replacingOccurrences(of: "'", with: "&#39;", options: .literal)
-        .replacingOccurrences(of: "<", with: "&lt;", options: .literal)
-        .replacingOccurrences(of: ">", with: "&gt;", options: .literal)
-        .replacingOccurrences(of: "`", with: "&lsquo;", options: .literal)
-    }
-}
-

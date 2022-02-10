@@ -32,7 +32,26 @@ class SearchTests: XCTestCase {
         checkValidURL("ftp://ftp.mozilla.org", afterFixup: "ftp://ftp.mozilla.org")
         checkValidURL("foo.bar", afterFixup: "http://foo.bar")
         checkValidURL(" foo.bar ", afterFixup: "http://foo.bar")
-        checkValidURL("1.2.3", afterFixup: "http://1.2.3")
+        checkValidURL("[::1]:80", afterFixup: "http://[::1]:80")
+        checkValidURL("[2a04:4e42:400::288]", afterFixup: "http://[2a04:4e42:400::288]")
+        checkValidURL("[2a04:4e42:600::288]:80", afterFixup: "http://[2a04:4e42:600::288]:80")
+        checkValidURL("[2605:2700:0:3::4713:93e3]:443", afterFixup: "http://[2605:2700:0:3::4713:93e3]:443")
+        checkValidURL("[::192.9.5.5]", afterFixup: "http://[::192.9.5.5]")
+        checkValidURL("[::192.9.5.5]:80", afterFixup: "http://[::192.9.5.5]:80")
+        checkValidURL("[::192.9.5.5]/png", afterFixup: "http://[::192.9.5.5]/png")
+        checkValidURL("[::192.9.5.5]:80/png", afterFixup: "http://[::192.9.5.5]:80/png")
+        checkValidURL("192.168.2.1", afterFixup: "http://192.168.2.1")
+        checkValidURL("brave.io", afterFixup: "http://brave.io")
+        checkValidURL("brave.new.world", afterFixup: "http://brave.new.world")
+        checkValidURL("brave.new.world.test", afterFixup: "http://brave.new.world.test")
+        checkValidURL("brave.new.world.test.io", afterFixup: "http://brave.new.world.test.io")
+        checkValidURL("brave.new.world.test.whatever.io", afterFixup: "http://brave.new.world.test.whatever.io")
+        checkValidURL("http://2130706433:8000/", afterFixup: "http://2130706433:8000/")
+        checkValidURL("http://127.0.0.1:8080", afterFixup: "http://127.0.0.1:8080")
+        checkValidURL("http://127.0.1", afterFixup: "http://127.0.1")
+        checkValidURL("http://127.1", afterFixup: "http://127.1")
+        checkValidURL("http://127.1:8000", afterFixup: "http://127.1:8000")
+        checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
 
         // Check invalid URLs. These are passed along to the default search engine.
         checkInvalidURL("foobar")
@@ -45,6 +64,10 @@ class SearchTests: XCTestCase {
         checkInvalidURL("创业咖啡. 中国")
         checkInvalidURL("data:text/html;base64,SGVsbG8gV29ybGQhCg==")
         checkInvalidURL("data://https://www.example.com,fake example.com")
+        checkInvalidURL("1.2.3")
+        checkInvalidURL("1.1")
+        checkInvalidURL("127.1")
+        checkInvalidURL("127.1.1")
         
         // Check invalid quoted URLs, emails, and quoted domains.
         // These are passed along to the default search engine.
@@ -59,6 +82,9 @@ class SearchTests: XCTestCase {
         checkInvalidURL("\"foo@brave.com\"")
         checkInvalidURL(#""创业咖啡.中国"#)
         checkInvalidURL(#""创业咖啡.中国""#)
+        checkInvalidURL("foo:5000")
+        checkInvalidURL("http://::192.9.5.5")
+        checkInvalidURL("http://::192.9.5.5:8080")
     }
 
     fileprivate func checkValidURL(_ beforeFixup: String, afterFixup: String) {
@@ -68,45 +94,6 @@ class SearchTests: XCTestCase {
     fileprivate func checkInvalidURL(_ beforeFixup: String) {
         XCTAssertNil(URIFixup.getURL(beforeFixup))
     }
-
-//    func testSuggestClient() {
-//        let webServerBase = startMockSuggestServer()
-//        let engine = OpenSearchEngine(engineID: "mock", shortName: "Mock engine", image: UIImage(), searchTemplate: "", suggestTemplate: "\(webServerBase)?q={searchTerms}",
-//                                      isCustomEngine: false)
-//        let client = SearchSuggestClient(searchEngine: engine, userAgent: "Fx-testSuggestClient")
-//
-//        let query1 = self.expectation(description: "foo query")
-//        client.query("foo", callback: { response, error in
-//            withExtendedLifetime(client) {
-//                if error != nil {
-//                    XCTFail("Error: \(error?.description ?? "nil")")
-//                }
-//
-//                XCTAssertEqual(response![0], "foo")
-//                XCTAssertEqual(response![1], "foo2")
-//                XCTAssertEqual(response![2], "foo you")
-//
-//                query1.fulfill()
-//            }
-//        })
-//        waitForExpectations(timeout: 10, handler: nil)
-//
-//        let query2 = self.expectation(description: "foo bar query")
-//        client.query("foo bar", callback: { response, error in
-//            withExtendedLifetime(client) {
-//                if error != nil {
-//                    XCTFail("Error: \(error?.description ?? "nil")")
-//                }
-//
-//                XCTAssertEqual(response![0], "foo bar soap")
-//                XCTAssertEqual(response![1], "foo barstool")
-//                XCTAssertEqual(response![2], "foo bartender")
-//
-//                query2.fulfill()
-//            }
-//        })
-//        waitForExpectations(timeout: 10, handler: nil)
-//    }
 
     func testExtractingOfSearchTermsFromURL() {
         let parser = OpenSearchParser(pluginMode: true)
@@ -137,28 +124,4 @@ class SearchTests: XCTestCase {
         // check that if you pass in a nil URL that everything works
         XCTAssertNil(duckDuckGoEngine.queryForSearchURL(nil))
     }
-
-//    fileprivate func startMockSuggestServer() -> String {
-//        let webServer: GCDWebServer = GCDWebServer()
-//
-//        webServer.addHandler(forMethod: "GET", path: "/", request: GCDWebServerRequest.self) { (request) -> GCDWebServerResponse? in
-//            var suggestions: [String]!
-//            let query = request.query?["q"] as! String
-//            switch query {
-//            case "foo":
-//                suggestions = ["foo", "foo2", "foo you"]
-//            case "foo bar":
-//                suggestions = ["foo bar soap", "foo barstool", "foo bartender"]
-//            default:
-//                XCTFail("Unexpected query: \(query)")
-//            }
-//            return GCDWebServerDataResponse(jsonObject: [query, suggestions])
-//        }
-//
-//        if !webServer.start(withPort: 0, bonjourName: nil) {
-//            XCTFail("Can't start the GCDWebServer")
-//        }
-//
-//        return "http://localhost:\(webServer.port)"
-//    }
 }

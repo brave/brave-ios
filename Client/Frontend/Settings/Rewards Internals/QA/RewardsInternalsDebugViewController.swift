@@ -7,13 +7,13 @@ import Foundation
 import Static
 import BraveShared
 import Shared
-import BraveRewards
+import BraveCore
 
 /// A place where all rewards debugging information will live.
 class RewardsInternalsDebugViewController: TableViewController {
     
     private let ledger: BraveLedger
-    private var internalsInfo: RewardsInternalsInfo?
+    private var internalsInfo: Ledger.RewardsInternalsInfo?
     private var transferrableTokens: Double = 0.0
     
     init(ledger: BraveLedger) {

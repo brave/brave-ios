@@ -54,6 +54,8 @@ extension Preferences {
     final class General {
         /// Whether this is the first time user has ever launched Brave after intalling. *Should never be set to `true` manually!*
         static let isFirstLaunch = Option<Bool>(key: "general.first-launch", default: true)
+        /// Whether this is a new user who installed the application after onboarding retention updates
+        static let isNewRetentionUser = Option<Bool?>(key: "general.new-retention", default: nil)
         /// Whether or not to save logins in Brave
         static let saveLogins = Option<Bool>(key: "general.save-logins", default: true)
         /// Whether or not to block popups from websites automaticaly
@@ -71,8 +73,8 @@ extension Preferences {
         /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only).
         /// Do not read it directly, prefer to use `UserAgent.shouldUseDesktopMode` instead.
         static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
-        /// Controls whether or not media auto-plays
-        static let mediaAutoPlays = Option<Bool>(key: "general.media-auto-plays", default: false)
+        /// Controls whether or not media should continue playing in the background
+        static let mediaAutoBackgrounding = Option<Bool>(key: "general.media-auto-backgrounding", default: false)
         /// Controls whether or not to show the last visited bookmarks folder
         static let showLastVisitedBookmarksFolder = Option<Bool>(key: "general.bookmarks-show-last-visited-bookmarks-folder", default: true)
         
@@ -91,6 +93,9 @@ extension Preferences {
         
         /// The progress the user has made with onboarding
         static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
+        /// The preference for determining whether or not to show the adblock onboarding popup
+        static let onboardingAdblockPopoverShown = Option<Bool>(key: "general.basic-onboarding-adblock-popover-shown", default: false)
+        
         /// Whether or not link preview upon long press action should be shown.
         static let enableLinkPreview = Option<Bool>(key: "general.night-mode", default: true)
         
@@ -106,18 +111,33 @@ extension Preferences {
         static let enablePullToRefresh = Option<Bool>(key: "general.enable-pull-to-refresh", default: true)
     }
     
+    final class FullScreenCallout {
+        /// Whether the vpn callout is shown.
+        static let vpnCalloutCompleted =
+            Option<Bool>(key: "fullScreenCallout.full-screen-vpn-callout-completed", default: false)
+        
+        /// Whether the sync callout is shown.
+        static let syncCalloutCompleted =
+            Option<Bool>(key: "fullScreenCallout.full-screen-sync-callout-completed", default: false)
+        
+        /// Whether the rewards callout is shown.
+        static let rewardsCalloutCompleted =
+            Option<Bool>(key: "fullScreenCallout.full-screen-rewards-callout-completed", default: false)
+        
+        /// Whether the whats new callout should be shown.
+        static let whatsNewCalloutOptIn =
+            Option<Bool>(key: "fullScreenCallout.full-screen-whats-new-callout-completed", default: false)
+        
+        /// Whether the ntp callout is shown.
+        static let ntpCalloutCompleted =
+            Option<Bool>(key: "fullScreenCallout.full-screen-ntp-callout-completed", default: false)
+    }
+    
     final class DefaultBrowserIntro {
         /// Whether the default browser onboarding completed. This can happen by opening app settings or after the user
         /// dismissed the intro screen enough amount of times.
         static let completed =
-            Option<Bool>(key: "general.default-browser-intro-completed", default: false)
-        
-        static let appLaunchCount =
-            Option<Int>(key: "general.default-browser-intro-launch-count", default: 0)
-        
-        /// When to show next default browser popup.
-        static let nextShowDate =
-            Option<Date?>(key: "general.default-browser-intro-next-show-date", default: nil)
+            Option<Bool>(key: "defaultBrowserIntro.intro-completed", default: false)
         
         /// Whether system notification showed or not
         static let defaultBrowserNotificationScheduled =
@@ -149,6 +169,7 @@ extension Preferences {
 
     }
     final class Privacy {
+        static let lockWithPasscode = Option<Bool>(key: "privacy.lock-with-passcode", default: false)
         /// Forces all private tabs
         static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)
         /// Blocks all cookies and access to local storage
@@ -200,7 +221,6 @@ extension Preferences {
     
     final class VPN {
         static let popupShowed = Option<Bool>(key: "vpn.popup-showed", default: false)
-        static let appLaunchCountForVPNPopup = Option<Int>(key: "vpn.popup-launch-count", default: 0)
         /// We get it from Guardian's servers.
         static let lastPurchaseProductId = Option<String?>(key: "vpn.last-purchase-id", default: nil)
         /// When the current subscription plan expires. It is nil if the user has not bought any vpn plan yet.
@@ -221,9 +241,19 @@ extension Preferences {
     }
     
     final class Chromium {
+        /// The boolean determine Bookmark Migration is finished on client side
         static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: false)
-        static let syncV2BookmarksMigrationCount = Option<Int>(key: "chromium.migration.bookmarks.count", default: 0)
+        /// The boolean determine History Migration is finished on client side
+        static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
+        /// The count of how many times migration is performed on client side - the value increases with every fail attempt and after 3 tries migration marked as successful
+        static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.attempt.count", default: 0)
+        /// Whether the device is in sync chain
         static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
+        /// The sync type bookmarks enabled for the device in sync chain
+        static let syncBookmarksEnabled = Option<Bool>(key: "chromium.sync.syncBookmarksEnabled", default: true)
+        /// The sync type history enabled for the device in sync chain
+        static let syncHistoryEnabled = Option<Bool>(key: "chromium.sync.syncHistoryEnabled", default: false)
+        /// Node Id for last bookmark folder
         static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
     }
     
@@ -237,8 +267,8 @@ extension Preferences {
     final class Playlist {
         /// The Option to show video list left or right side
         static let listViewSide = Option<String>(key: "playlist.listViewSide", default: PlayListSide.left.rawValue)
-        /// Whether to show Add to playlist Toast
-        static let showToastForAdd = Option<Bool>(key: "playlist.showToastForAdd", default: true)
+        /// The count of how many times  Add to Playlist URL-Bar onboarding has been shown
+        static let addToPlaylistURLBarOnboardingCount = Option<Int>(key: "playlist.addToPlaylistURLBarOnboardingCount", default: 0)
         /// The last played item url
         static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
         /// The last played item time
@@ -254,6 +284,15 @@ extension Preferences {
         /// The option to disable long-press-to-add-to-playlist gesture.
         static let enableLongPressAddToPlaylist =
             Option<Bool>(key: "playlist.longPressAddToPlaylist", default: true)
+        /// The option to enable or disable the 3-dot menu badge for playlist
+        static let enablePlaylistMenuBadge =
+            Option<Bool>(key: "playlist.enablePlaylistMenuBadge", default: true)
+        /// The option to enable or disable the URL-Bar button for playlist
+        static let enablePlaylistURLBarButton =
+            Option<Bool>(key: "playlist.enablePlaylistURLBarButton", default: true)
+        /// The option to enable or disable the continue where left-off playback in CarPlay
+        static let enableCarPlayRestartPlayback =
+            Option<Bool>(key: "playlist.enableCarPlayRestartPlayback", default: false)
     }
 }
 

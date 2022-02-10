@@ -7,6 +7,20 @@ import Shared
 import WebKit
 import Storage
 
+// MARK: VisitType
+
+enum VisitType: Int {
+    case unknown
+    /// Transition type where user followed a link and got a new top-level window
+    case link
+    /// Transition type where user typed the page's URL in the URL bar or selected it from URL bar autocomplete results.
+    case typed
+
+    /// Transition type where user opened a link from bookmarks.
+    case bookmark
+    case download
+}
+
 // MARK: - ReaderModeDelegate
 
 extension BrowserViewController: ReaderModeDelegate {
@@ -14,7 +28,11 @@ extension BrowserViewController: ReaderModeDelegate {
         // If this reader mode availability state change is for the tab that we currently show, then update
         // the button. Otherwise do nothing and the button will be updated when the tab is made active.
         if tabManager.selectedTab === tab {
-            topToolbar.updateReaderModeState(state)
+            let shouldShowPlaylistURLBarButton = tab.url?.isPlaylistSupportedSiteURL == true
+            
+            if !shouldShowPlaylistURLBarButton || tab.playlistItemState == .none {
+                topToolbar.updateReaderModeState(state)
+            }
         }
     }
 
@@ -132,16 +150,22 @@ extension BrowserViewController {
         guard let currentURL = webView.backForwardList.currentItem?.url, let readerModeURL = currentURL.encodeReaderModeURL(WebServer.sharedInstance.baseReaderModeURL()) else { return }
 
         if backList.count > 1 && backList.last?.url == readerModeURL {
+            let playlistItem = tab.playlistItem
             webView.go(to: backList.last!)
+            PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
         } else if !forwardList.isEmpty && forwardList.first?.url == readerModeURL {
+            let playlistItem = tab.playlistItem
             webView.go(to: forwardList.first!)
+            PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
         } else {
             // Store the readability result in the cache and load it. This will later move to the ReadabilityHelper.
-            webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).readerize", sandboxed: false) { (object, error) -> Void in
+            webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).readerize", contentWorld: .defaultClient) { (object, error) -> Void in
                 if let readabilityResult = ReadabilityResult(object: object as AnyObject?) {
+                    let playlistItem = tab.playlistItem
                     try? self.readerModeCache.put(currentURL, readabilityResult)
                     if let nav = webView.load(PrivilegedRequest(url: readerModeURL) as URLRequest) {
                         self.ignoreNavigationInTab(tab, navigation: nav)
+                        PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
                     }
                 }
             }
@@ -162,12 +186,18 @@ extension BrowserViewController {
             if let currentURL = webView.backForwardList.currentItem?.url {
                 if let originalURL = currentURL.decodeReaderModeURL {
                     if backList.count > 1 && backList.last?.url == originalURL {
+                        let playlistItem = tab.playlistItem
                         webView.go(to: backList.last!)
+                        PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
                     } else if !forwardList.isEmpty && forwardList.first?.url == originalURL {
+                        let playlistItem = tab.playlistItem
                         webView.go(to: forwardList.first!)
+                        PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
                     } else {
+                        let playlistItem = tab.playlistItem
                         if let nav = webView.load(URLRequest(url: originalURL)) {
                             ignoreNavigationInTab(tab, navigation: nav)
+                            PlaylistHelper.updatePlaylistTab(tab: tab, item: playlistItem)
                         }
                     }
                 }
@@ -189,6 +219,10 @@ extension BrowserViewController {
     }
     
     func ignoreNavigationInTab(_ tab: Tab, navigation: WKNavigation) {
-        self.ignoredNavigation.insert(navigation)
+        ignoredNavigation.insert(navigation)
+    }
+    
+    func recordNavigationInTab(_ url: URL, visitType: VisitType) {
+        typedNavigation[url] = visitType
     }
 }

@@ -9,7 +9,7 @@ import CoreData
 import Data
 import Shared
 import BraveShared
-import BraveRewards
+import BraveCore
 import SnapKit
 
 /// The behavior for sizing sections when the user is in landscape orientation
@@ -76,12 +76,24 @@ protocol NewTabPageDelegate: AnyObject {
     func handleFavoriteAction(favorite: Favorite, action: BookmarksAction)
     func brandedImageCalloutActioned(_ state: BrandedImageCalloutState)
     func tappedQRCodeButton(url: URL)
+    func showNTPOnboarding()
 }
 
 /// The new tab page. Shows users a variety of information, including stats and
 /// favourites
 class NewTabPageViewController: UIViewController {
     weak var delegate: NewTabPageDelegate?
+    
+    var ntpStatsOnboardingFrame: CGRect? {
+        guard let section = sections.firstIndex(where: { $0 is StatsSectionProvider }) else {
+            return nil
+        }
+        
+        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: section)) as? NewTabCollectionViewCell<BraveShieldStatsView> {
+            return cell.contentView.convert(cell.contentView.frame, to: view)
+        }
+        return nil
+    }
     
     /// The modules to show on the new tab page
     private var sections: [NTPSectionProvider] = []
@@ -136,7 +148,7 @@ class NewTabPageViewController: UIViewController {
             sections.append(
                 BraveNewsSectionProvider(
                     dataSource: feedDataSource,
-                    ads: rewards.ads,
+                    rewards: rewards,
                     actionHandler: { [weak self] in
                         self?.handleBraveNewsAction($0)
                     }
@@ -146,8 +158,12 @@ class NewTabPageViewController: UIViewController {
         }
         #endif
         
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        collectionView.do {
+            $0.delegate = self
+            $0.dataSource = self
+            $0.dragDelegate = self
+            $0.dropDelegate = self
+        }
         
         background.changed = { [weak self] in
             self?.setupBackgroundImage()
@@ -234,6 +250,10 @@ class NewTabPageViewController: UIViewController {
         
         reportSponsoredImageBackgroundEvent(.viewed)
         presentNotification()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
+            self.delegate?.showNTPOnboarding()
+        }
     }
     
     override func viewSafeAreaInsetsDidChange() {
@@ -377,7 +397,7 @@ class NewTabPageViewController: UIViewController {
         backgroundView.imageConstraints?.landscapeCenter.update(offset: inset)
     }
     
-    private func reportSponsoredImageBackgroundEvent(_ event: NewTabPageAdEventType) {
+    private func reportSponsoredImageBackgroundEvent(_ event: Ads.NewTabPageAdEventType) {
         guard let backgroundType = background.currentBackground?.type,
               case .withBrandLogo = backgroundType,
               let creativeInstanceId = background.currentBackground?.wallpaper.creativeInstanceId else {
@@ -467,7 +487,23 @@ class NewTabPageViewController: UIViewController {
             if let section = layout.braveNewsSection, collectionView.numberOfItems(inSection: section) != 0 {
                 collectionView.deleteItems(at: [IndexPath(item: 0, section: section)])
             }
-            collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+            
+            // We check if first item exists before scrolling up to it.
+            // This should never happen since first item is our shields stats view.
+            // However we saw it crashing in XCode logs, see #4202.
+            let firstItemIndexPath = IndexPath(item: 0, section: 0)
+            if let itemCount = collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: 0),
+               itemCount > 0, // Only scroll if the section has items, otherwise it will crash.
+               collectionView.dataSource?
+                .collectionView(collectionView, cellForItemAt: firstItemIndexPath) != nil {
+                collectionView.scrollToItem(at: firstItemIndexPath, at: .top, animated: true)
+            } else {
+                // Cannot scorll to deleted item index.
+                // Collection-View datasource never changes or updates
+                // Therefore we need to scroll to offset 0.
+                // See: #4575.
+                collectionView.setContentOffset(.zero, animated: true)
+            }
             collectionView.verticalScrollIndicatorInsets = .zero
             UIView.animate(withDuration: 0.25) {
                 self.feedOverlayView.headerView.alpha = 0.0
@@ -480,7 +516,10 @@ class NewTabPageViewController: UIViewController {
             Preferences.BraveNews.userOptedIn.value = true
             Preferences.BraveNews.isShowingOptIn.value = false
             Preferences.BraveNews.isEnabled.value = true
-            loadFeedContents()
+            rewards.ads.initialize { [weak self] _ in
+                // Initialize ads if it hasn't already been done
+                self?.loadFeedContents()
+            }
         case .emptyCardTappedSourcesAndSettings:
             tappedBraveNewsSettings()
         case .errorCardTappedRefresh:
@@ -513,6 +552,11 @@ class NewTabPageViewController: UIViewController {
                 inNewTab: inNewTab,
                 switchingToPrivateMode: switchingToPrivateMode
             )
+            
+            /// Donate Open Brave News Activity for Custom Suggestions
+            let openBraveNewsActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .openBraveNews)
+            self.userActivity = openBraveNewsActivity
+            openBraveNewsActivity.becomeCurrent()
         case .itemAction(.toggledSource, let context):
             let isEnabled = feedDataSource.isSourceEnabled(context.item.source)
             feedDataSource.toggleSource(context.item.source, enabled: !isEnabled)
@@ -524,6 +568,23 @@ class NewTabPageViewController: UIViewController {
                 )
                 alert.present(on: self)
             }
+        case .inlineContentAdAction(.opened(let inNewTab, let switchingToPrivateMode), let ad):
+            guard let url = ad.targetURL.asURL else { return }
+            if !switchingToPrivateMode {
+                rewards.ads.reportInlineContentAdEvent(
+                    ad.uuid,
+                    creativeInstanceId: ad.creativeInstanceID,
+                    eventType: .clicked
+                )
+            }
+            delegate?.navigateToInput(
+                url.absoluteString,
+                inNewTab: inNewTab,
+                switchingToPrivateMode: switchingToPrivateMode
+            )
+        case .inlineContentAdAction(.toggledSource, _):
+            // Inline content ads have no source
+            break
         }
     }
     
@@ -624,6 +685,7 @@ class NewTabPageViewController: UIViewController {
         if !feedDataSource.shouldLoadContent {
             return
         }
+        rewards.ads.purgeOrphanedAdEvents(.inlineContentAd)
         feedDataSource.load(completion)
     }
     
@@ -646,7 +708,7 @@ class NewTabPageViewController: UIViewController {
     }
     
     @objc private func tappedBraveNewsSettings() {
-        let controller = BraveNewsSettingsViewController(dataSource: feedDataSource)
+        let controller = BraveNewsSettingsViewController(dataSource: feedDataSource, rewards: rewards)
         let container = UINavigationController(rootViewController: controller)
         present(container, animated: true)
     }
@@ -739,6 +801,9 @@ extension NewTabPageViewController {
         #endif
     }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        for section in sections {
+            section.scrollViewDidScroll?(scrollView)
+        }
         guard isBraveNewsVisible, let newsSection = layout.braveNewsSection else { return }
         if collectionView.numberOfItems(inSection: newsSection) > 0 {
             // Hide the buttons as Brave News feeds appear
@@ -777,6 +842,13 @@ extension NewTabPageViewController {
                 }
             }
         }
+    }
+    
+    /// Moves New Tab Page Scroll to start of Brave News - Used for shortcut
+    func scrollToBraveNews() {
+        // Offset of where Brave News starts
+        let todayStart = collectionView.frame.height - feedOverlayView.headerView.bounds.height - 32 - 16
+        collectionView.contentOffset.y = todayStart
     }
 }
 
@@ -863,6 +935,91 @@ extension NewTabPageViewController: UICollectionViewDataSource {
     }
 }
 
+// MARK: - UICollectionViewDragDelegate & UICollectionViewDropDelegate
+
+extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        // Check If the item that is dragged is a favourite item
+        guard sections[indexPath.section] is FavoritesSectionProvider else {
+            return []
+        }
+        
+        let itemProvider = NSItemProvider(object: "\(indexPath)" as NSString)
+        let dragItem = UIDragItem(itemProvider: itemProvider).then {
+            $0.previewProvider = { () -> UIDragPreview? in
+                guard let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell else {
+                    return nil
+                }
+                return UIDragPreview(view: cell.imageView)
+            }
+        }
+        
+        return [dragItem]
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+        let destinationIndexPath: IndexPath
+        
+        if let indexPath = coordinator.destinationIndexPath {
+            destinationIndexPath = indexPath
+        } else {
+            let section = max(collectionView.numberOfSections - 1, 0)
+            let row = collectionView.numberOfItems(inSection: section)
+            destinationIndexPath = IndexPath(row: max(row - 1, 0), section: section)
+        }
+        
+        guard sourceIndexPath.section == destinationIndexPath.section else { return }
+        
+        if coordinator.proposal.operation == .move {
+            guard let item = coordinator.items.first else { return }
+            
+            Favorite.reorder(
+                sourceIndexPath: sourceIndexPath,
+                destinationIndexPath: destinationIndexPath,
+                isInteractiveDragReorder: true
+            )
+            _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+        guard let destinationIndexSection = destinationIndexPath?.section,
+              let favouriteSection = sections[destinationIndexSection] as? FavoritesSectionProvider,
+              favouriteSection.hasMoreThanOneFavouriteItems else {
+            return .init(operation: .cancel)
+        }
+        
+        return .init(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        fetchInteractionPreviewParameters(at: indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dropPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+        fetchInteractionPreviewParameters(at: indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
+        return true
+    }
+    
+    private func fetchInteractionPreviewParameters(at indexPath: IndexPath) -> UIDragPreviewParameters {
+        let previewParameters = UIDragPreviewParameters().then {
+            $0.backgroundColor = .clear
+            
+            if let cell = collectionView.cellForItem(at: indexPath) as? FavoriteCell {
+                $0.visiblePath = UIBezierPath(roundedRect: cell.imageView.frame, cornerRadius: 8)
+            }
+        }
+        
+        return previewParameters
+    }
+}
+
 extension NewTabPageViewController {
     private class NewTabCollectionView: UICollectionView {
         override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
@@ -877,6 +1034,9 @@ extension NewTabPageViewController {
             showsVerticalScrollIndicator = false
             // Even on light mode we use a darker background now
             indicatorStyle = .white
+            
+            // Drag should be enabled to rearrange favourite
+            dragInteractionEnabled = true
         }
         @available(*, unavailable)
         required init(coder: NSCoder) {

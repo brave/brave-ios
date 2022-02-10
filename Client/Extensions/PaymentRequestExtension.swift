@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import BraveRewards
+import BraveCore
 import BraveShared
 import Data
 import Shared
@@ -32,7 +32,7 @@ class PaymentRequestExtension: NSObject {
     
     init(rewards: BraveRewards, tab: Tab, paymentRequested: @escaping PaymentRequestHandler) {
         self.paymentRequested = paymentRequested
-        token = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+        token = UserScriptManager.securityTokenString
         self.tab = tab
         self.rewards = rewards
     }
@@ -49,7 +49,7 @@ extension PaymentRequestExtension: TabContentScript {
     
     private func sendPaymentRequestError(errorName: String, errorMessage: String) {
         ensureMainThread {
-            self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage]) { _, error in
+            self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage], contentWorld: .page) { _, error in
                     if error != nil {
                         log.error(error)
                     }
@@ -93,7 +93,7 @@ extension PaymentRequestExtension: TabContentScript {
                     }
                 case .completed(let orderId):
                     ensureMainThread {
-                        self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""]) { _, error in
+                        self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""], contentWorld: .page) { _, error in
                                 if error != nil {
                                     log.error(error)
                                 }

@@ -1,0 +1,183 @@
+/* (No Comment) */
+"0W40Cl" = "新标签页";
+
+/* (No Comment) */
+"5ixvGX-tYwiRd" = "存在 ${count} 个与“预计节省时间”匹配的选项。";
+
+/* (No Comment) */
+"5ixvGX-vjA5pZ" = "存在 ${count} 个与“预计节省数据”匹配的选项。";
+
+/* (No Comment) */
+"5ixvGX-xcI3h9" = "有 ${count} 个与“拦截的广告”匹配的选项。";
+
+/* (No Comment) */
+"7JYzOv" = "类型";
+
+/* (No Comment) */
+"8vyYRy" = "#3";
+
+/* (No Comment) */
+"9E2oRR" = "#1";
+
+/* (No Comment) */
+"AGMpus" = "快捷方式配置";
+
+/* (No Comment) */
+"bUXzTx" = "统计数据种类";
+
+/* (No Comment) */
+"crhbMy" = "书签";
+
+/* (No Comment) */
+"e13lS3-0W40Cl" = "您要的是“新标签页”，对吗？";
+
+/* (No Comment) */
+"e13lS3-crhbMy" = "您要的是“书签”，对吗？";
+
+/* (No Comment) */
+"e13lS3-FGO5qW" = "您要的是“播放列表”，对吗？";
+
+/* (No Comment) */
+"e13lS3-nthxSL" = "您要的是“下载”，对吗？";
+
+/* (No Comment) */
+"e13lS3-VBH4G6" = "您要的是“历史记录”，对吗？";
+
+/* (No Comment) */
+"e13lS3-vs094F" = "您要的是“新隐私标签页”，对吗？";
+
+/* (No Comment) */
+"EUS9FL" = "小组件快捷方式";
+
+/* (No Comment) */
+"FGO5qW" = "播放列表";
+
+/* (No Comment) */
+"gpCwrM" = "统计数据配置";
+
+/* (No Comment) */
+"joEZJM" = "#2";
+
+/* (No Comment) */
+"L1fziM-0W40Cl" = "有 ${count} 个与“新标签页”匹配的选项。";
+
+/* (No Comment) */
+"L1fziM-crhbMy" = "有 ${count} 个与“书签”匹配的选项。";
+
+/* (No Comment) */
+"L1fziM-FGO5qW" = "有 ${count} 个与“播放列表”匹配的选项。";
+
+/* (No Comment) */
+"L1fziM-nthxSL" = "有 ${count} 个与“下载”匹配的选项。";
+
+/* (No Comment) */
+"L1fziM-VBH4G6" = "有 ${count} 个与“历史记录”匹配的选项。";
+
+/* (No Comment) */
+"L1fziM-vs094F" = "有 ${count} 个与“新隐私标签页”匹配的选项。";
+
+/* (No Comment) */
+"nthxSL" = "下载";
+
+/* (No Comment) */
+"r2EI05-0W40Cl" = "您要的是“新标签页”，对吗？";
+
+/* (No Comment) */
+"r2EI05-crhbMy" = "您要的是“书签”，对吗？";
+
+/* (No Comment) */
+"r2EI05-FGO5qW" = "您要的是“播放列表”，对吗？";
+
+/* (No Comment) */
+"r2EI05-nthxSL" = "您要的是“下载”，对吗？";
+
+/* (No Comment) */
+"r2EI05-VBH4G6" = "您要的是“历史记录”，对吗？";
+
+/* (No Comment) */
+"r2EI05-vs094F" = "您要的是“新隐私标签页”，对吗？";
+
+/* (No Comment) */
+"sdOBtj-tYwiRd" = "您要的是“预计节省时间”，对吗？";
+
+/* (No Comment) */
+"sdOBtj-vjA5pZ" = "您要的是“预计节省数据”，对吗？";
+
+/* (No Comment) */
+"sdOBtj-xcI3h9" = "您要的是“拦截广告”，对吗？";
+
+/* (No Comment) */
+"tNCrcE-0W40Cl" = "有 ${count} 个与“新标签页”匹配的选项。";
+
+/* (No Comment) */
+"tNCrcE-crhbMy" = "有 ${count} 个与“书签”匹配的选项。";
+
+/* (No Comment) */
+"tNCrcE-FGO5qW" = "有 ${count} 个与“播放列表”匹配的选项。";
+
+/* (No Comment) */
+"tNCrcE-nthxSL" = "有 ${count} 个与“下载”匹配的选项。";
+
+/* (No Comment) */
+"tNCrcE-VBH4G6" = "有 ${count} 个与“历史记录”匹配的选项。";
+
+/* (No Comment) */
+"tNCrcE-vs094F" = "有 ${count} 个与“新隐私标签页”匹配的选项。";
+
+/* (No Comment) */
+"tVvJ9c" = "统计数据配置小组件";
+
+/* (No Comment) */
+"TxuMja-0W40Cl" = "有 ${count} 个与“新标签页”匹配的选项。";
+
+/* (No Comment) */
+"TxuMja-crhbMy" = "有 ${count} 个与“书签”匹配的选项。";
+
+/* (No Comment) */
+"TxuMja-FGO5qW" = "有 ${count} 个与“播放列表”匹配的选项。";
+
+/* (No Comment) */
+"TxuMja-nthxSL" = "有 ${count} 个与“下载”匹配的选项。";
+
+/* (No Comment) */
+"TxuMja-VBH4G6" = "有 ${count} 个与“历史记录”匹配的选项。";
+
+/* (No Comment) */
+"TxuMja-vs094F" = "有 ${count} 个与“新隐私标签页”匹配的选项。";
+
+/* (No Comment) */
+"tYwiRd" = "预计节省时间";
+
+/* (No Comment) */
+"VBH4G6" = "历史记录";
+
+/* (No Comment) */
+"vjA5pZ" = "预计节省数据";
+
+/* (No Comment) */
+"vs094F" = "新隐私标签页";
+
+/* (No Comment) */
+"xcI3h9" = "拦截广告";
+
+/* (No Comment) */
+"YQiQuz-0W40Cl" = "您要的是“新标签页”，对吗？";
+
+/* (No Comment) */
+"YQiQuz-crhbMy" = "您要的是“书签”，对吗？";
+
+/* (No Comment) */
+"YQiQuz-FGO5qW" = "您要的是“播放列表”，对吗？";
+
+/* (No Comment) */
+"YQiQuz-nthxSL" = "您要的是“下载”，对吗？";
+
+/* (No Comment) */
+"YQiQuz-VBH4G6" = "您要的是“历史记录”，对吗？";
+
+/* (No Comment) */
+"YQiQuz-vs094F" = "您要的是“新隐私标签页”，对吗？";
+
+/* (No Comment) */
+"ziTvSZ" = "统计数据配置小组件";
+

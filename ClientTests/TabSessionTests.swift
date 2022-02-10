@@ -88,7 +88,7 @@ class TabSessionTests: XCTestCase {
         
         tabManager = { () -> TabManager in
             let profile = BrowserProfile(localName: "profile")
-            return TabManager(prefs: profile.prefs, imageStore: nil)
+            return TabManager(prefs: profile.prefs, imageStore: nil, rewards: nil)
         }()
     }
     
@@ -507,31 +507,50 @@ class TabSessionTests: XCTestCase {
            var parsed = []
 
            // search all user known functions for tokens
-           var functions = [
-             navigator.credentials.create,
-             navigator.credentials.get
-           ]
+           var functions = []
+           if (typeof navigator.credentials !== 'undefined') {
+             if (typeof navigator.credentials.create !== 'undefined') {
+               functions.push(navigator.credentials.create)
+             }
+        
+             if (typeof navigator.credentials.get !== 'undefined') {
+               functions.push(navigator.credentials.get)
+             }
+           }
 
            // search all enumerable objects for tokens
            var objects = [
              document,
-             registerResponse,
-             signResponse,
-             window,
-             navigator.credentials
+             window
            ]
+        
+           if (typeof registerResponse !== 'undefined') {
+             objects.push(registerResponse)
+           }
+        
+           if (typeof signResponse !== 'undefined') {
+             objects.push(signResponse)
+           }
+        
+           if (typeof navigator.credentials !== 'undefined') {
+             objects.push(navigator.credentials)
+           }
 
            function isTokenPresent(value) {
              if (typeof value == "undefined" || typeof value.indexOf == "undefined") {
                return false;
              }
-             if (value.indexOf("\(UserScriptManager.messageHandlerToken)") >= 0 || value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0 || value.indexOf("\(UserScriptManager.securityToken)") >= 0 || value.indexOf("\(UserScriptManager.securityTokenString)") >= 0) {
+             if (value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0 || value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0) {
                return true;
              }
              return false;
            }
 
            function secretTokensInObject(obj) {
+             if (obj == undefined) {
+               return ''
+             }
+        
              if (isTokenPresent(obj.name) || isTokenPresent(obj.toString())) {
                return '' + obj
              }
@@ -557,6 +576,10 @@ class TabSessionTests: XCTestCase {
            }
 
            function secretTokensInFunctions(func) {
+             if (func == undefined) {
+               return '';
+             }
+        
              if (isTokenPresent(func.toString())) {
                return func.toString();
              }
@@ -578,7 +601,6 @@ class TabSessionTests: XCTestCase {
         for tab in self.tabManager.allTabs {
             // include all scripts
             tab.userScriptManager?.isFingerprintingProtectionEnabled = true
-            tab.userScriptManager?.isU2FEnabled = true
             tab.userScriptManager?.isCookieBlockingEnabled = true
                         
             group.enter()
@@ -598,7 +620,7 @@ class TabSessionTests: XCTestCase {
                 XCTFail("WebView is not created yet")
                 return
             }
-            webView.evaluateSafeJavaScript(functionName: javascript, sandboxed: false,  asFunction: false) { result, error in
+            webView.evaluateSafeJavaScript(functionName: javascript, contentWorld: .page,  asFunction: false) { result, error in
                 guard let keys = result as? String else {
                     XCTFail("Javascript error while finding secret tokens")
                     expectation.fulfill()

@@ -1,5 +1,123 @@
 # Changelog
 
+
+## [1.34.1](https://github.com/brave/brave-ios/releases/tag/v1.34.1)
+
+- Implemented ERC20 Token Swap hardening against future 0x API changes. ([#4886](https://github.com/brave/brave-ios/issues/4886))
+
+## [1.34](https://github.com/brave/brave-ios/releases/tag/v1.34)
+
+- Added support for initial set of Brave Widgets. ([#4329](https://github.com/brave/brave-ios/issues/4329))
+- Removed older Canvas Fingerprinting protection implementation which was causing web compat issues. ([#4522](https://github.com/brave/brave-ios/issues/4522))
+- Implemented "Login & Passwords" feature for managing saved credentials. ([#4112](https://github.com/brave/brave-ios/issues/4112))
+- [Security] Fixed reader mode issue as reported on HackerOne by nishimunea. ([#4772](https://github.com/brave/brave-ios/issues/4772))
+- [Security] Fixed message token handling as reported on HackerOne by nishimunea. ([#4775](https://github.com/brave/brave-ios/issues/4775))
+- [Security] Added "no-referrer" for content for all internal pages as reported on HackerOne by nishimunea. ([#4784](https://github.com/brave/brave-ios/issues/4784))
+- Fixed Wallet page indicator width on portfolio screen. ([#4586](https://github.com/brave/brave-ios/issues/4586))
+
+## [1.33](https://github.com/brave/brave-ios/releases/tag/v1.33)
+
+- Added first steps of Brave Wallet (Dapps and EVM support in future releases).([#4837](https://github.com/brave/brave-ios/issues/4837))
+- Implemented drag-and-drop option to rearrange favorites on New Tab Page. ([#3713](https://github.com/brave/brave-ios/issues/3713))
+- Improved auto-fill of saved credentials on websites. ([#4113](https://github.com/brave/brave-ios/issues/4113))
+- Implemented time-limited sync QR codes. ([#4534](https://github.com/brave/brave-ios/issues/4534))
+- Fixed last active tab not being focused when closing and relaunching the browser. ([#736](https://github.com/brave/brave-ios/issues/736))
+- Fixed searching on opened PDF's within Brave not working in certain cases. ([#3312](https://github.com/brave/brave-ios/issues/3312))
+- Fixed PDF tab from showing blank when opening tab-tray and re-selecting the PDF tab. ([#3534](https://github.com/brave/brave-ios/issues/3534))
+- Fixed auto-fill issue on certain Japanese websites. ([#4483](https://github.com/brave/brave-ios/issues/4483))
+- Disabled Brave Shields from opening on new tab page. ([#4660](https://github.com/brave/brave-ios/issues/4660))
+
+## [1.32.3](https://github.com/brave/brave-ios/releases/tag/v1.32.3)
+
+- Replaced Brave's HTTPSE with Apple's HTTPS upgrades in WKWebView and removed Brave HTTPSE setting from shields, still available as an option in global settings. ([#4335](https://github.com/brave/brave-ios/issues/4335))
+- Updated designs for error and interstitial pages. ([#4338](https://github.com/brave/brave-ios/issues/4338))
+- Fixed crash when closing Brave via the app switcher. ([#4490](https://github.com/brave/brave-ios/issues/4490))
+
+## [1.32.2](https://github.com/brave/brave-ios/releases/tag/v1.32.2)
+
+- [Security] Clarified sync setup instructions. ([#4470](https://github.com/brave/brave-ios/issues/4470))
+
+## [1.32.1](https://github.com/brave/brave-ios/releases/tag/v1.32.1)
+
+- Added CarPlay support for Brave Playlist. ([#3673](https://github.com/brave/brave-ios/issues/3673))
+- Added a new section in browsing history for entries older than last month. ([#4040](https://github.com/brave/brave-ios/issues/4040))
+- Added support for sharing playlist items. ([#4191](https://github.com/brave/brave-ios/issues/4191))
+- Added an option to disable "Add to playlist" button in toolbar. ([#4234](https://github.com/brave/brave-ios/issues/4234))
+- Implemented "Bookmark all tabs" feature. ([#4132](https://github.com/brave/brave-ios/issues/4132))
+- Updated default browser notification to display device's iOS version. ([#3899](https://github.com/brave/brave-ios/issues/3899))
+- [Security] Fixed address bar spoofing via interstitial content as reported on HackerOne by dogeshark. ([#4396](https://github.com/brave/brave-ios/issues/4396))
+- Fixed app freeze when enabling rewards. ([#3941](https://github.com/brave/brave-ios/issues/3941))
+- Fixed black screen on tabs when launching Brave app. ([#4190](https://github.com/brave/brave-ios/issues/4190))
+- Removed "Favorites" title when there are no favorites on New Tab Page. ([#4128](https://github.com/brave/brave-ios/issues/4128))
+
+
+## [1.32](https://github.com/brave/brave-ios/releases/tag/v1.32)
+
+- Updated default search engine to "Brave Search" for selected regions on new install. ([#4221](https://github.com/brave/brave-ios/issues/4221))
+- Fixed issue where tabs appear blank and URL is not shown when browser is restarted after visiting certain sites. ([#4301](https://github.com/brave/brave-ios/issues/4301))
+
+## [1.31.1](https://github.com/brave/brave-ios/releases/tag/v1.31.1)
+
+- Updated user agent for devices running iOS 15. ([#4230](https://github.com/brave/brave-ios/issues/4230))
+- Fixed "Create PDF" action button in menu. ([#4193](https://github.com/brave/brave-ios/issues/4193))
+- Fixed app freeze on iOS 13 devices when setting focus on the URL bar. ([#4200](https://github.com/brave/brave-ios/issues/4200))
+- Fixed reader mode bug where wrong content is shown when reader mode is enabled. ([#4208](https://github.com/brave/brave-ios/issues/4208))
+
+## [1.31](https://github.com/brave/brave-ios/releases/tag/v1.31)
+
+- Added auto-play settings for sites to auto-play video/audio. ([#1738](https://github.com/brave/brave-ios/issues/1738))
+- Added "Scan QR Code" shortcut when long pressed on Brave on home-screen. ([#3798](https://github.com/brave/brave-ios/issues/3798))
+- Added new playlist URL button and menu notification icon. ([#3976](https://github.com/brave/brave-ios/issues/3976))
+- Added support for background playback and picture-in-picture (PiP) support for videos. ([#4031](https://github.com/brave/brave-ios/issues/4031))
+- Added support for IPv6 address resolution. ([#3866](https://github.com/brave/brave-ios/issues/3866))
+- Updated "Brave Search beta" to "Brave Search" under search engines and on the on-boarding screen. ([#4049](https://github.com/brave/brave-ios/issues/4049))
+- Updated settings for playlist menu notification. ([#4098](https://github.com/brave/brave-ios/issues/4098))
+- Fixed preview URLs always showing in lowercase. ([#3901](https://github.com/brave/brave-ios/issues/3901))
+- Fixed shields stats not updating in certain cases. ([#4021](https://github.com/brave/brave-ios/issues/4021))
+- Fixed share menu only sharing the canonical (base) URL instead of the actual page URL. ([#4071](https://github.com/brave/brave-ios/issues/4071))
+- Fixed Brave crashing in certain cases when history sync is enabled. ([#4073](https://github.com/brave/brave-ios/issues/4073))
+- Fixed issue when returning search results instead of computing arithmetic queries typed into the URL bar. ([#4081](https://github.com/brave/brave-ios/issues/4081))
+- Fixed links not marked as visited when revisiting a search link via "Open in Brave". ([#4082](https://github.com/brave/brave-ios/issues/4082))
+- Fixed issue where audio continues to play on tab when opening and closing the settings menu. ([#4092](https://github.com/brave/brave-ios/issues/4092))
+- Fixed playlist playback speed when playing in background. ([#4102](https://github.com/brave/brave-ios/issues/4102))
+- Fixed issue with playlist where it continues to play even after removing the item from playlist. ([#4129](https://github.com/brave/brave-ios/issues/4129))
+- Fixed tab appearing black when the subsequent tab is closed. ([#4149](https://github.com/brave/brave-ios/issues/4149))
+
+## [1.30.1](https://github.com/brave/brave-ios/releases/tag/v1.30.1)
+
+- Reordered "Pull-to-Refresh" setting position to be above "Set default browser" option for iOS 14 devices. ([#4045](https://github.com/brave/brave-ios/issues/4045))
+- Fixed previously viewed websites from being displayed in the tab webView when opening or closing a tab via the tab tray. ([#4019](https://github.com/brave/brave-ios/issues/4019))
+
+## [1.30](https://github.com/brave/brave-ios/releases/tag/v1.30)
+
+- Implemented History Sync. ([#3227](https://github.com/brave/brave-ios/issues/3227))
+- Added display ads to the Brave News feed. ([#3872](https://github.com/brave/brave-ios/issues/3872))
+- Added "Delete All" functionality to clear history via history page. ([#3723](https://github.com/brave/brave-ios/issues/3723))
+- Added ability to share selected text from other apps to Brave via share sheet. ([#3863](https://github.com/brave/brave-ios/issues/3863))
+- Fixed an issue with rewards not being disabled when toggling off via rewards panel. ([#3591](https://github.com/brave/brave-ios/issues/3591))
+- Fixed app theme issue at launch, being set to light mode, when Private Browsing only mode is enabled. ([#3936](https://github.com/brave/brave-ios/issues/3936))
+- Fixed menu to auto-close when a bookmark is selected. ([#3950](https://github.com/brave/brave-ios/issues/3950))
+- Fixed "Clear private data" global settings from resetting to defaults when menu is closed after changing the settings. ([#3958](https://github.com/brave/brave-ios/issues/3958))
+- Fixed crash when editing/deleting favorites when focus is set on URL (show more mode). ([#3974](https://github.com/brave/brave-ios/issues/3974))
+
+## [1.29](https://github.com/brave/brave-ios/releases/tag/v1.29)
+
+ - Added Siri Shortcuts. ([#2227](https://github.com/brave/brave-ios/issues/2227))
+ - Added Pull-to-Refresh functionality. ([#916](https://github.com/brave/brave-ios/issues/916))
+ - Added brave://search URL scheme support. ([#627](https://github.com/brave/brave-ios/issues/627))
+ - Updated custom browser PIN feature to use users native device authentication instead. ([#3921](https://github.com/brave/brave-ios/issues/3921))
+ - Updated adblock-rust library to support new DAT format. ([#3848](https://github.com/brave/brave-ios/issues/3848))
+ - Updated URLs for custom top tiles for the Japan region. ([#3568](https://github.com/brave/brave-ios/issues/3568))
+ - Improved Playlist performance. ([#3855](https://github.com/brave/brave-ios/issues/3855))
+ - Improved progress bar reactivity when loading pages. ([#3892](https://github.com/brave/brave-ios/issues/3892))
+ - Fixed favicon crash in certain cases. ([#3868](https://github.com/brave/brave-ios/issues/3868))
+ - Fixed custom search URLs being capped at 150 characters. ([#3914](https://github.com/brave/brave-ios/issues/3914))
+ - Fixed memory performance issues when re-opening new tabs in certain cases. ([#3867](https://github.com/brave/brave-ios/issues/3867))
+ - Fixed setting toggles not persisting when scrolling away from changed settings. ([#3543](https://github.com/brave/brave-ios/issues/3543))
+ - Fixed add search button not resizing correctly when moving between text fields. ([#3735](https://github.com/brave/brave-ios/issues/3735))
+ - Fixed on-screen keyboard overlapping quick search bar in certain cases. ([#3688](https://github.com/brave/brave-ios/issues/3688))
+ - Fixed % characters not being parsed correctly in certain cases. ([#3865](https://github.com/brave/brave-ios/issues/3865))
+
 ## [1.28](https://github.com/brave/brave-ios/releases/tag/v1.28)
 
 - Added switch app alert message to be shown when clicking on telephone numbers. ([#3361](https://github.com/brave/brave-ios/issues/3361))
@@ -148,12 +266,12 @@
  - Updated user agent to be the same per iOS version. ([#2864](https://github.com/brave/brave-ios/issues/2864))
  - Updated text to be more clear under the VPN In-App Purchase (IAP) subscription model. ([#2747](https://github.com/brave/brave-ios/issues/2747))
  - Removed all references to USD on both the rewards panel and tips banner. ([#2829](https://github.com/brave/brave-ios/issues/2829))
- 
+
 ## [1.19.2](https://github.com/brave/brave-ios/releases/tag/v1.19.2)
 
  - Implemented URL scheme handlers for both "HTTP" and "HTTPS". ([#2784](https://github.com/brave/brave-ios/issues/2784))
  - Removed Sync UI from settings. ([#2718](https://github.com/brave/brave-ios/issues/2718))
- 
+
 ## [1.19](https://github.com/brave/brave-ios/releases/tag/v1.19)
 
  - Implemented "Brave Firewall + VPN". ([#2739](https://github.com/brave/brave-ios/issues/2739))
@@ -172,7 +290,7 @@
  - Implemented enhancements to favorites to use fallback monogram letters instead of low-resolution icons. ([#2579](https://github.com/brave/brave-ios/issues/2579))
  - Fixed an issue where favorites icon mismatch when they are reordered. ([#2099](https://github.com/brave/brave-ios/issues/2099))
  - Fixed New Tab Page from loading new images when switching between tabs. ([#2071](https://github.com/brave/brave-ios/issues/2071))
- - Fixed fuzzy/low-resolution favicons for favorites. ([#528](https://github.com/brave/brave-ios/issues/528)) 
+ - Fixed fuzzy/low-resolution favicons for favorites. ([#528](https://github.com/brave/brave-ios/issues/528))
 
 ## [1.17](https://github.com/brave/brave-ios/releases/tag/v1.17)
 
@@ -214,7 +332,7 @@
  - Fixed claiming grant from the rewards panel not always working on the first attempt. ([#2329](https://github.com/brave/brave-ios/issues/2329))
 
 ## [1.15](https://github.com/brave/brave-ios/releases/tag/v1.15)
- 
+
  - Implemented Safari / iOS User Agent. ([#2210](https://github.com/brave/brave-ios/issues/2210))
  - Added haptic feedback. ([#2283](https://github.com/brave/brave-ios/issues/2283))
  - Added detailed view of pending contributions for rewards. ([#1670](https://github.com/brave/brave-ios/issues/1670))
@@ -231,14 +349,14 @@
  - Fixed spacing issues between sync text and warning message under "Enter the sync code" screen. ([#2006](https://github.com/brave/brave-ios/issues/2006))
 
 ## [1.14.3](https://github.com/brave/brave-ios/releases/tag/v1.14.3)
- 
+
   - Added New Tab Page Sponsored Images. ([#2151](https://github.com/brave/brave-ios/issues/2151))
   - Disable bookmarklets in URL bar. ([#2297](https://github.com/brave/brave-ios/issues/2297))
   - Fix ads region support when calendar is set to non-default. ([#2022](https://github.com/brave/brave-ios/issues/2022))
   - Removed unverified info message for Brave verified publisher. ([#2202](https://github.com/brave/brave-ios/issues/2202))
 
 ## [1.14.2](https://github.com/brave/brave-ios/releases/tag/v1.14.2)
- 
+
   - Added support for NFC authentication. ([#1609](https://github.com/brave/brave-ios/issues/1609))
   - Restore lost bookmarks and favorites during 1.12 migration experienced by a subset of users. ([#2015](https://github.com/brave/brave-ios/issues/2015))
 
@@ -262,7 +380,7 @@
  - Fixed force 3D Touch cursor movement in the URL bar when URL is highlighted. ([#1081](https://github.com/brave/brave-ios/issues/1081))
 
 ## [1.13](https://github.com/brave/brave-ios/releases/tag/v1.13)
- 
+
  - Added Brave Rewards and Ads. ([#1920](https://github.com/brave/brave-ios/issues/1920))
  - Added new preview menu on iOS13. ([#1499](https://github.com/brave/brave-ios/issues/1499))
  - Added bookmarklet support. ([#1119](https://github.com/brave/brave-ios/issues/1119))
@@ -327,8 +445,8 @@
  - Fixed app crash when switching from Private mode to normal mode. ([#1309](https://github.com/brave/brave-ios/issues/1309))
 
 ## [1.11](https://github.com/brave/brave-ios/releases/tag/v1.11)
- 
- - Added quick action for New Private Tab from home screen. ([#1258](https://github.com/brave/brave-ios/issues/1258))  
+
+ - Added quick action for New Private Tab from home screen. ([#1258](https://github.com/brave/brave-ios/issues/1258))
  - Improved video orientation on Youtube. ([#1189](https://github.com/brave/brave-ios/issues/1189))
  - Fixed passcode not being reset when resuming from background. ([#1203](https://github.com/brave/brave-ios/issues/1203))
  - Fixed browser becoming unresponsive when using print preview in certain conditions. ([#1144](https://github.com/brave/brave-ios/issues/1144))
@@ -341,15 +459,14 @@
  - Added 1Password activity in share sheet. ([#948](https://github.com/brave/brave-ios/issues/948))
  - Added image titles when using long-press on images. ([#851](https://github.com/brave/brave-ios/issues/851))
  - Added privacy warning on Brave Sync code page. ([#1225](https://github.com/brave/brave-ios/issues/1225))
- - Improved swipe gesture on bookmark hanger. ([#953](https://github.com/brave/brave-ios/issues/953)) 
+ - Improved swipe gesture on bookmark hanger. ([#953](https://github.com/brave/brave-ios/issues/953))
  - Improved scrolling issue on websites with sticky headers and footers. ([#631](https://github.com/brave/brave-ios/issues/631))
  - Improved icon resolution for favourites. ([#463](https://github.com/brave/brave-ios/issues/463))
  - Fixed several random crashes in certain conditions. ([#1120](https://github.com/brave/brave-ios/issues/1120))
  - Fixed "Block-all-cookies" toggle behaviour. ([#897](https://github.com/brave/brave-ios/issues/897))
  - Fixed not being able to enter passcode after lockout timer. ([#938](https://github.com/brave/brave-ios/issues/938))
- - Fixed browser failing to start on iPad Air2 in certain conditions. ([#1040](https://github.com/brave/brave-ios/issues/1040)) 
+ - Fixed browser failing to start on iPad Air2 in certain conditions. ([#1040](https://github.com/brave/brave-ios/issues/1040))
  - Fixed browser failing to launch when device uses Swedish as default language. ([#1111](https://github.com/brave/brave-ios/issues/1111))
  - Fixed auto-focus of a tab when a link is opened using the share sheet. ([#698](https://github.com/brave/brave-ios/issues/698))
  - Fixed missing translations when viewing introduction summary under private tab. ([#1239](https://github.com/brave/brave-ios/issues/1239))
  - Fixed webcompat issues with https://borsen.dk/ due to Brave shields. ([#1061](https://github.com/brave/brave-ios/issues/1061))
- 

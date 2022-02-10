@@ -6,6 +6,7 @@
 import Foundation
 import XCTest
 import Storage
+import BraveCore
 
 @testable import Client
 
@@ -57,11 +58,18 @@ class SchemePermissionTests: XCTestCase {
         profile = BrowserProfile(localName: "mockProfile")
 
         imageStore = try! DiskImageStore(files: MockFiles(), namespace: "MockTabManagerScreenshots", quality: 1)
-        tabManager = TabManager(prefs: profile.prefs, imageStore: imageStore)
+
+        guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
+            return
+        }
+        
+        let migration = Migration(braveCore: appDelegate.braveCore)
         
         subject = BrowserViewController(
             profile: profile,
-            tabManager: tabManager,
+            diskImageStore: imageStore,
+            braveCore: appDelegate.braveCore,
+            migration: migration,
             crashedLastSession: false)
     }
     

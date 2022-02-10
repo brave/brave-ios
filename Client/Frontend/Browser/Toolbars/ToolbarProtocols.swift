@@ -13,7 +13,7 @@ protocol ToolbarProtocol: AnyObject {
     var shareButton: ToolbarButton { get }
     var addTabButton: ToolbarButton { get }
     var searchButton: ToolbarButton { get }
-    var menuButton: ToolbarButton { get }
+    var menuButton: MenuButton { get }
     var actionButtons: [UIButton] { get }
     
     func updateBackStatus(_ canGoBack: Bool)
@@ -37,6 +37,10 @@ extension ToolbarProtocol {
     func updateTabCount(_ count: Int) {
         tabsButton.updateTabCount(count)
     }
+}
+
+protocol ToolbarUrlActionsProtocol where Self: UIViewController {
+    var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate? { get }
 }
 
 protocol ToolbarDelegate: AnyObject {

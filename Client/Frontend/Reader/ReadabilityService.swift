@@ -37,7 +37,7 @@ class ReadabilityOperation: Operation {
         // Setup a tab, attach a Readability helper. Kick all this off on the main thread since UIKit
         // and WebKit are not safe from other threads.
 
-        DispatchQueue.main.async(execute: { () -> Void in
+        DispatchQueue.main.async {
             let configuration = WKWebViewConfiguration()
             self.tab = Tab(configuration: configuration)
             self.tab.createWebview()
@@ -45,13 +45,13 @@ class ReadabilityOperation: Operation {
 
             let readerMode = ReaderMode(tab: self.tab)
             readerMode.delegate = self
-            self.tab.addContentScript(readerMode, name: ReaderMode.name())
+            self.tab.addContentScript(readerMode, name: ReaderMode.name(), contentWorld: .defaultClient)
 
             // Load the page in the webview. This either fails with a navigation error, or we
             // get a readability callback. Or it takes too long, in which case the semaphore
             // times out. The script on the page will retry every 500ms for 10 seconds.
             self.tab.loadRequest(URLRequest(url: self.url))
-        })
+        }
         let timeout = DispatchTime.now() + .seconds(10)
         if semaphore.wait(timeout: timeout) == .timedOut {
             result = ReadabilityOperationResult.timeout
@@ -91,7 +91,7 @@ extension ReadabilityOperation: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", sandboxed: false)
+        webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: .defaultClient)
     }
 }
 
@@ -117,7 +117,7 @@ class ReadabilityService {
         return ReadabilityServiceSharedInstance
     }
 
-    var queue: OperationQueue
+    private var queue: OperationQueue
 
     init() {
         queue = OperationQueue()

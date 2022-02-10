@@ -2,13 +2,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import BraveShared
 import Foundation
 import WebKit
 import Shared
 
 class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     
-    private let url = URL(string: "https://brave.com/terms-of-use/")
+    enum URLType {
+        case termsOfService
+        case privacyPolicy
+    }
+    
+    private let urlType: URLType
     private var helpers = [String: TabContentScript]()
     private var profile: Profile
     
@@ -33,6 +39,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
             configuration.processPool = WKProcessPool()
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
             configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            configuration.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
             return configuration
         }()
         
@@ -43,8 +50,9 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
     }
     
-    init(profile: Profile) {
+    init(profile: Profile, url: URLType) {
         self.profile = profile
+        self.urlType = url
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -70,7 +78,13 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         
         webView.navigationDelegate = self
         setupScripts()
-        webView.load(PrivilegedRequest(url: url!) as URLRequest)
+        
+        switch urlType {
+        case .termsOfService:
+            webView.load(PrivilegedRequest(url: BraveUX.braveTermsOfUseURL) as URLRequest)
+        case .privacyPolicy:
+            webView.load(PrivilegedRequest(url: BraveUX.bravePrivacyURL) as URLRequest)
+        }
         
         toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
         toolbar.backButton.addTarget(self, action: #selector(onBack), for: .touchUpInside)
@@ -78,7 +92,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     }
     
     private func setupScripts() {
-        let errorHelper = ErrorPageHelper()
+        let errorHelper = ErrorPageHelper(certStore: profile.certStore)
         addScript(errorHelper, for: ErrorPageHelper.name())
     }
     
@@ -89,8 +103,15 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
 
         switch path {
         case .URL:
-            if url?.origin == webView.url?.origin {
-                toolbar.urlLabel.text = webView.url?.host
+            switch urlType {
+            case .termsOfService:
+                if BraveUX.braveTermsOfUseURL.origin == webView.url?.origin {
+                    toolbar.urlLabel.text = webView.url?.host
+                }
+            case .privacyPolicy:
+                if BraveUX.bravePrivacyURL.origin == webView.url?.origin {
+                    toolbar.urlLabel.text = webView.url?.host
+                }
             }
         case .canGoBack:
             updateBackForwardUI()
@@ -176,7 +197,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
         }
 
         if let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL {
-            ErrorPageHelper().showPage(error, forUrl: url, inWebView: webView)
+            ErrorPageHelper(certStore: profile.certStore).loadPage(error, forUrl: url, inWebView: webView)
         }
     }
     

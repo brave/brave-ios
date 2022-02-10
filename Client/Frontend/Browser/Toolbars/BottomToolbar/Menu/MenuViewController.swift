@@ -11,23 +11,32 @@ import BraveUI
 import SwiftUI
 
 struct MenuItemHeaderView: View {
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     var icon: UIImage
     var title: String
+    var subtitle: String?
     
     var body: some View {
         HStack(spacing: 14) {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color(.secondaryBraveGroupedBackground))
+            Image(uiImage: icon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .padding(6)
                 .frame(width: 32, height: 32)
-                .overlay(
-                    Image(uiImage: icon)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(6)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.secondaryBraveGroupedBackground))
+                        .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
                 )
-                .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-            Text(verbatim: title)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(verbatim: title)
+                if let subTitle = subtitle {
+                    Text(subTitle)
+                        .font(.subheadline)
+                        .foregroundColor(Color(.secondaryBraveLabel))
+                }
+            }
+            .padding(.vertical, subtitle != nil ? 5 : 0)
         }
         .foregroundColor(Color(.braveLabel))
     }
@@ -50,11 +59,12 @@ struct MenuItemButton: View {
     
     var icon: UIImage
     var title: String
+    var subtitle: String?
     var action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            MenuItemHeaderView(icon: icon, title: title)
+            MenuItemHeaderView(icon: icon, title: title, subtitle: subtitle)
                 .padding(.horizontal, 14)
                 .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         }
@@ -246,6 +256,7 @@ extension MenuViewController: PanModalPresentable {
     var panModalBackgroundColor: UIColor {
         UIColor(white: 0.0, alpha: 0.5)
     }
+
     var dragIndicatorBackgroundColor: UIColor {
         UIColor(white: 0.95, alpha: 1.0)
     }

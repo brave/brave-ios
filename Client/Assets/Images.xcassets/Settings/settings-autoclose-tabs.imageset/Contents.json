@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "window-tabs-2@2x.png",
+      "filename" : "settings-autoclose-tabs@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "window-tabs-2@3x.png",
+      "filename" : "settings-autoclose-tabs@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

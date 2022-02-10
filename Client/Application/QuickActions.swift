@@ -11,6 +11,7 @@ import XCGLogger
 enum ShortcutType: String {
     case newTab = "NewTab"
     case newPrivateTab = "NewPrivateTab"
+    case scanQRCode = "ScanQRCode"
 
     init?(fullType: String) {
         guard let last = fullType.components(separatedBy: ".").last else { return nil }
@@ -61,6 +62,8 @@ class QuickActions: NSObject {
             handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: false)
         case .newPrivateTab:
             handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: true)
+        case .scanQRCode:
+            handleScanQR(withBrowserViewController: browserViewController)
         }
     }
 
@@ -70,5 +73,8 @@ class QuickActions: NSObject {
 
     fileprivate func dismissAlertPopupView() {
         UIApplication.shared.keyWindow?.subviews.forEach { ($0 as? AlertPopupView)?.dismissWithType(dismissType: .noAnimation) }
+
+    fileprivate func handleScanQR(withBrowserViewController bvc: BrowserViewController) {
+        bvc.scanQRCode()
     }
 }

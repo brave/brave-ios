@@ -16,8 +16,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     private lazy var url: URL? = {
         guard let _url = tab.url else { return nil }
         
-        if _url.isErrorPageURL {
-            return _url.originalURLFromErrorURL
+        if InternalURL.isValid(url: _url),
+           let internalURL = InternalURL(_url),
+           internalURL.isErrorPage {
+            return internalURL.originalURLFromErrorPage
         }
         
         return _url
@@ -206,7 +208,6 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         (.AdblockAndTp, shieldsView.advancedShieldView.adsTrackersControl, Preferences.Shields.blockAdsAndTracking),
         (.SafeBrowsing, shieldsView.advancedShieldView.blockMalwareControl, Preferences.Shields.blockPhishingAndMalware),
         (.NoScript, shieldsView.advancedShieldView.blockScriptsControl, Preferences.Shields.blockScripts),
-        (.HTTPSE, shieldsView.advancedShieldView.httpsUpgradesControl, Preferences.Shields.httpsEverywhere),
         (.FpProtection, shieldsView.advancedShieldView.fingerprintingControl, Preferences.Shields.fingerprintingProtection),
     ]
     
@@ -254,7 +255,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         }
         
         shieldControlMapping.forEach { shield, toggle, option in
-            toggle.valueToggled = { [unowned self] on in
+            toggle.valueToggled = { [weak self] on in
+                guard let self = self else { return }
                 // Localized / per domain toggles triggered here
                 self.updateBraveShieldState(shield: shield, on: on, option: option)
                 // Wait a fraction of a second to allow DB write to complete otherwise it will not use the

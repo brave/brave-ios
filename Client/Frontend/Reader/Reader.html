@@ -7,23 +7,27 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=.25, maximum-scale=1.6, initial-scale=1.0">
-  <meta name="referrer" content="never">
+  <meta name="referrer" content="no-referrer">
   <link rel="stylesheet" type="text/css" href="/reader-mode/styles/Reader.css">
-  <title>%READER-TITLE%</title>
+  <title id="reader-page-title"></title>
 </head>
 
-<body data-readerStyle='%READER-STYLE%'>
+<body>
   <div id="reader-header" class="header">
-    <h1 id="reader-title">%READER-TITLE%</h1>
-    <div id="reader-credits" class="credits">%READER-CREDITS%</div>
+    <h1 id="reader-title"></h1>
+    <div id="reader-credits" class="credits"></div>
+    <script type="text/javascript" src="/reader-mode/javascript/Reader.js"></script>
   </div>
 
   <div id="reader-content" class="content">
-    %READER-CONTENT%
+      <!--
+          This is already escaped.
+          Any scripts attempting to run here will be blocked by the content security policy as they don't have the same NONCE set in the native Swift code
+      -->
+      %READER-CONTENT%
   </div>
 
   <div id="reader-message" class="message">
-    %READER-MESSAGE%
   </div>
 
   <ul id="reader-toolbar" class="toolbar toolbar-hidden">
@@ -40,6 +44,14 @@
     </ul>
     <li><a id="toggle-button" class="button toggle-button" href="#"></a></li>
   </ul>
+
+  <script nonce="%READER-TITLE-NONCE%">
+      document.body.setAttribute('data-readerStyle', '%READER-STYLE%');
+      document.getElementById("reader-page-title").textContent = "%READER-TITLE%";
+      document.getElementById("reader-title").textContent = "%READER-TITLE%";
+      document.getElementById("reader-credits").textContent = "%READER-CREDITS%";
+      document.getElementById("reader-message").textContent = "%READER-MESSAGE%";
+  </script>
 
 </body>
 

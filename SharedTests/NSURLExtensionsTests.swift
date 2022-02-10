@@ -200,66 +200,121 @@ class NSURLExtensionsTests: XCTestCase {
 
     func testisAboutHomeURL() {
         let goodurls = [
-            "http://localhost:1234/about/home/#panel=0",
-            "http://localhost:6571/errors/error.html?url=http%3A//localhost%3A6571/about/home/%23panel%3D1",
+            "http://localhost:\(AppConstants.webServerPort)/about/home/#panel=0",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//localhost%3A\(AppConstants.webServerPort)/about/home/%23panel%3D1",
 
             ]
         let badurls = [
             "http://google.com",
-            "http://localhost:6571/sessionrestore.html",
-            "http://localhost:6571/errors/error.html?url=http%3A//mozilla.com",
-            "http://localhost:6571/errors/error.html?url=http%3A//mozilla.com/about/home/%23panel%3D1",
+            "http://localhost:\(AppConstants.webServerPort)/sessionrestore.html",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com/about/home/%23panel%3D1",
             ]
 
-        goodurls.forEach { XCTAssertTrue(URL(string:$0)!.isAboutHomeURL, $0) }
-        badurls.forEach { XCTAssertFalse(URL(string:$0)!.isAboutHomeURL, $0) }
+        goodurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertTrue(InternalURL(url)?.isAboutHomeURL == true, $0)
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
+        badurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertFalse(InternalURL(url)?.isAboutHomeURL == true, $0)
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
     }
 
     func testisAboutURL() {
         let goodurls = [
-            "http://localhost:1234/about/home/#panel=0",
-            "http://localhost:1234/about/firefox"
+            "http://localhost:\(AppConstants.webServerPort)/about/home/#panel=0",
+            "http://localhost:\(AppConstants.webServerPort)/about/firefox"
         ]
         let badurls = [
             "http://google.com",
-            "http://localhost:6571/sessionrestore.html",
-            "http://localhost:6571/errors/error.html?url=http%3A//mozilla.com",
-            "http://localhost:6571/errors/error.html?url=http%3A//mozilla.com/about/home/%23panel%3D1",
+            "http://localhost:\(AppConstants.webServerPort)/sessionrestore.html",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com/about/home/%23panel%3D1",
             ]
 
-        goodurls.forEach { XCTAssertTrue(URL(string:$0)!.isAboutURL, $0) }
-        badurls.forEach { XCTAssertFalse(URL(string:$0)!.isAboutURL, $0) }
+        goodurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertTrue(InternalURL(url)?.isAboutURL == true, $0)
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
+        
+        badurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertFalse(InternalURL(url)?.isAboutURL == true, $0)
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
     }
 
     func testisErrorPage() {
         let goodurls = [
-            "http://localhost:6571/errors/error.html?url=http%3A//mozilla.com",
-            "http://localhost:6572/errors/error.html?url=blah",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=blah",
             ]
         let badurls = [
             "http://google.com",
-            "http://localhost:6571/sessionrestore.html",
-            "http://localhost:1234/about/home/#panel=0"
+            "http://localhost:\(AppConstants.webServerPort)/sessionrestore.html",
+            "http://localhost:\(AppConstants.webServerPort)/about/home/#panel=0"
         ]
 
-        goodurls.forEach { XCTAssertTrue(URL(string:$0)!.isErrorPageURL, $0) }
-        badurls.forEach { XCTAssertFalse(URL(string:$0)!.isErrorPageURL, $0) }
+        goodurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertTrue(InternalURL(url)?.isErrorPage == true, $0)
+                
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
+            
+        badurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertFalse(InternalURL(url)?.isErrorPage == true, $0)
+                
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
     }
 
     func testoriginalURLFromErrorURL() {
         let goodurls = [
-            ("http://localhost:6571/errors/error.html?url=http%3A//mozilla.com", URL(string: "http://mozilla.com")),
-            ("http://localhost:6571/errors/error.html?url=http%3A//localhost%3A6571/about/home/%23panel%3D1", URL(string: "http://localhost:6571/about/home/#panel=1")),
+            ("http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com", URL(string: "http://mozilla.com")),
+            ("http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//localhost%3A\(AppConstants.webServerPort)/about/home/%23panel%3D1", URL(string: "http://localhost:\(AppConstants.webServerPort)/about/home/#panel=1")),
             ]
         let badurls = [
             "http://google.com",
-            "http://localhost:6571/sessionrestore.html",
-            "http://localhost:1234/about/home/#panel=0",
-            "http://localhost:6571/errors/error.html"
+            "http://localhost:\(AppConstants.webServerPort)/sessionrestore.html",
+            "http://localhost:\(AppConstants.webServerPort)/about/home/#panel=0",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html"
         ]
 
-        goodurls.forEach { XCTAssertEqual(URL(string:$0.0)!.originalURLFromErrorURL, $0.1) }
-        badurls.forEach { XCTAssertNil(URL(string:$0)!.originalURLFromErrorURL) }
+        goodurls.forEach {
+            if let url = URL(string: $0.0) {
+                XCTAssertEqual(InternalURL(url)?.originalURLFromErrorPage, $0.1)
+                
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
+        
+        badurls.forEach {
+            if let url = URL(string: $0) {
+                XCTAssertNil(InternalURL(url)?.originalURLFromErrorPage)
+                
+            } else {
+                XCTAssert(false, "Invalid URL: \($0)")
+            }
+        }
     }
 
     func testisReaderModeURL() {
@@ -328,8 +383,8 @@ class NSURLExtensionsTests: XCTestCase {
     func testIsLocalUtility() {
         let goodurls = [
             "http://localhost:6571/reader-mode/page",
-            "http://LOCALhost:6571/about/sessionrestore.html",
-            "http://127.0.0.1:6571/errors/error.html"
+            "http://LOCALhost:6571/\(InternalURL.Path.sessionrestore)/sessionrestore.html",
+            "http://127.0.0.1:6571/\(InternalURL.Path.errorpage)/error.html"
         ]
         let badurls = [
             "http://google.com",
@@ -398,14 +453,15 @@ class NSURLExtensionsTests: XCTestCase {
     func testdisplayURL() {
         let goodurls = [
             ("http://localhost:6571/reader-mode/page?url=https%3A%2F%2Fen%2Em%2Ewikipedia%2Eorg%2Fwiki%2F", "https://en.m.wikipedia.org/wiki/"),
-            ("http://user:pass@localhost:6571/errors/error.html?url=http%3A//mozilla.com", "http://mozilla.com"),
-            ("http://user:pass@localhost:6571/errors/error.html?url=http%3A//mozilla.com", "http://mozilla.com"),
-            ("http://localhost:6571/errors/error.html?url=http%3A%2F%2Flocalhost%3A6571%2Freader-mode%2Fpage%3Furl%3Dhttps%253A%252F%252Fen%252Em%252Ewikipedia%252Eorg%252Fwiki%252F", "https://en.m.wikipedia.org/wiki/"),
+            ("http://user:pass@localhost:6571/reader-mode/page?url=https%3A%2F%2Fen%2Em%2Ewikipedia%2Eorg%2Fwiki%2F", "https://en.m.wikipedia.org/wiki/"),
+            ("http://user:pass@localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com", "http://mozilla.com"),
+            ("http://user:pass@localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//mozilla.com", "http://mozilla.com"),
+            ("http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A%2F%2Flocalhost%3A6571%2Freader-mode%2Fpage%3Furl%3Dhttps%253A%252F%252Fen%252Em%252Ewikipedia%252Eorg%252Fwiki%252F", "https://en.m.wikipedia.org/wiki/"),
             ("https://mail.example.co.uk/index.html", "https://mail.example.co.uk/index.html"),
         ]
         let badurls = [
-            "http://localhost:6571/errors/error.html?url=http%3A//localhost%3A6571/about/home/%23panel%3D1",
-            "http://localhost:6571/errors/error.html",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html?url=http%3A//localhost%3A\(AppConstants.webServerPort)/about/home/%23panel%3D1",
+            "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/error.html",
 
         ]
 
@@ -501,21 +557,23 @@ class NSURLExtensionsTests: XCTestCase {
         let urlA = URL(string: "http://brave.com?url=https://foo.com")
         let urlB = URL(string: "http://brave.com/?url=https://foo.com")
         let urlC = URL(string: "http://brave.com?url=https://foo.com/meh")
-        let urlD = URL(string: "http://localhost/errors/foo.hmtl?url=https://foo.com")
-        let urlE = URL(string: "http://localhost/errors/foo.hmtl?url=https://foo.com/meh")
+        let urlD = URL(string: "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/foo.hmtl?url=https://foo.com")
+        let urlE = URL(string: "http://localhost:\(AppConstants.webServerPort)/\(InternalURL.Path.errorpage)/foo.hmtl?url=https://foo.com/meh")
+        let urlF = URL(string: "http://localhost\(InternalURL.Path.errorpage)/foo.html?url=https://foo.com/meh")
         
-        for url in [urlA, urlB, urlC, urlD, urlE] {
+        for url in [urlA, urlB, urlC, urlD, urlE, urlF] {
             if url == nil {
                 XCTAssertTrue(false, "Cannot parse URL")
                 return
             }
         }
         
-        XCTAssertNotEqual(urlA?.originalURLFromErrorURL, urlA)
-        XCTAssertNotEqual(urlB?.originalURLFromErrorURL, urlB)
-        XCTAssertNotEqual(urlC?.originalURLFromErrorURL, urlC)
-        XCTAssertEqual(urlD?.originalURLFromErrorURL?.absoluteString, "https://foo.com")
-        XCTAssertEqual(urlE?.originalURLFromErrorURL?.absoluteString, "https://foo.com/meh")
+        XCTAssertNotEqual(InternalURL(urlA!)?.originalURLFromErrorPage, urlA)
+        XCTAssertNotEqual(InternalURL(urlB!)?.originalURLFromErrorPage, urlB)
+        XCTAssertNotEqual(InternalURL(urlC!)?.originalURLFromErrorPage, urlC)
+        XCTAssertEqual(InternalURL(urlD!)?.originalURLFromErrorPage?.absoluteString, "https://foo.com")
+        XCTAssertEqual(InternalURL(urlE!)?.originalURLFromErrorPage?.absoluteString, "https://foo.com/meh")
+        XCTAssertNil(InternalURL(urlF!)?.originalURLFromErrorPage)
     }
     
     func testAppendPathComponentsHelper() {
@@ -638,44 +696,16 @@ class NSURLExtensionsTests: XCTestCase {
         }
     }
     
-    func testMediaSiteURL() {
-        let goodURLs = [
-            "https://www.youtube.com",
-            "https://www.vimeo.com",
-            "https://m.youtube.com",
-            "https://m.twitch.tv",
-            "https://www.twitch.tv"
-        ]
-        
-        let badURLs = [
-            "https://youtube.xyz.com",
-            "https://www.google.com",
-            "https://www.you.tube.com"
-        ]
-        
-        func getURL(url: String) -> URL? {
-            return URL(string: url)
-        }
-        
-        goodURLs.forEach {
-            XCTAssertTrue(getURL(url: $0)?.isMediaSiteURL ?? true, "failed for \($0)")
-        }
-        
-        badURLs.forEach {
-            XCTAssertFalse((getURL(url: $0)?.isMediaSiteURL) ?? false, "failed for \($0)")
-        }
-    }
-    
     func testVideoSteamingSiteURL() {
         let streamingSiteURLs = [
-            "https://www.youtube.com",
             "https://www.vimeo.com",
-            "https://m.youtube.com",
             "https://m.twitch.tv",
             "https://www.twitch.tv"
         ]
         
         let notSteamingSiteUrls = [
+            "https://m.youtube.com",
+            "https://www.youtube.com",
             "https://xyz.com",
             "https://tube.tube",
             "https://www.google.com",
@@ -694,5 +724,28 @@ class NSURLExtensionsTests: XCTestCase {
         notSteamingSiteUrls.forEach {
             XCTAssertFalse(URL(string: $0)?.isVideoSteamingSiteURL ?? false, "failed for \($0)")
         }
+    }
+    
+    func testTypedDisplayString() {
+        let testURL1 = URL(string: "https://www.youtube.com")
+        let testURL2 = URL(string: "http://google.com")
+        let testURL3 = URL(string: "www.brave.com")
+        let testURL4 = URL(string: "http://brave.com/foo/")
+        let testURL5 = URL(string: "http://brave.com/foo")
+        
+        func checkDisplayURLString(testURL: URL?, displayString: String) {
+            if let actual = testURL?.typedDisplayString {
+                XCTAssertEqual(actual, displayString)
+            } else {
+                XCTFail("Actual url is nil")
+            }
+        }
+
+        checkDisplayURLString(testURL: testURL1, displayString: "www.youtube.com")
+        checkDisplayURLString(testURL: testURL2, displayString: "google.com")
+        checkDisplayURLString(testURL: testURL3, displayString: "www.brave.com")
+        checkDisplayURLString(testURL: testURL4, displayString: "brave.com/foo")
+        checkDisplayURLString(testURL: testURL5, displayString: "brave.com/foo")
+
     }
 }

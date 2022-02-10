@@ -37,74 +37,17 @@
 /* Setting preference to always show the browser tabs bar. */
 "AlwaysShow" = "Her Zaman Göster";
 
-/* Label used as a setting item and title of the following screen to change the current passcode */
-"AuthenticationChangePasscode" = "Parolayı Değiştir";
-
-/* Touch ID prompt subtitle when disabling Touch ID */
-"AuthenticationDisableTouchReason" = "Touch ID'yi devre dışı bırakmak için parmak izinizi kullanın.";
-
-/* Text displayed above the input field when entering a new passcode */
-"AuthenticationEnterAPasscode" = "Parola girme";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterNewPasscode" = "Yeni parola girme";
-
-/* Text displayed above the input field when changing the existing passcode */
-"AuthenticationEnterPasscode" = "Parola girin";
-
-/* Title of the dialog used to request the passcode */
-"AuthenticationEnterPasscodeTitle" = "Parola Girin";
-
 /* Label for the Face ID/Passcode item in Settings */
 "AuthenticationFaceIDPasscodeSetting" = "Yüz Kimliği ve Parola";
 
-/* Immediately' interval item for selecting when to require passcode */
-"AuthenticationImmediately" = "hemen";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app with attempts remaining */
-"AuthenticationIncorrectAttemptsRemaining" = "Yanlış parola. Yeniden deneyin (Kalan denemeler: %d).";
-
-/* Touch ID prompt subtitle when accessing logins */
-"AuthenticationLoginsTouchReason" = "Girişlere şimdi erişmek için parmak izinizi kullanın.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReached" = "Çok fazla başarısız deneme.\n Lütfen %d dakika içinde yeniden deneyin.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedNoTime" = "Maksimum deneme sayısına ulaşıldı. Lütfen daha sonra yeniden deneyin.";
-
-/* Error message displayed when user enters incorrect passcode and has reached the maximum number of attempts. */
-"AuthenticationMaximumAttemptsReachedOneMinute" = "Çok fazla başarısız deneme.\n Lütfen 1 dakika içinde yeniden deneyin.";
+/* Touch ID or PIN entry prompt subtitle when accessing Brave with the Browser Lock feature enabled */
+"AuthenticationLoginsTouchReason" = "Bu işlem, Brave erişiminizin kimliğini doğrular";
 
 /* Label for the Passcode item in Settings */
-"AuthenticationPasscode" = "Oturum Açma Parolası";
-
-/* Text displayed above the input field when confirming a passcode */
-"AuthenticationReenterPasscode" = "Parolayı yeniden girin";
-
-/* Text displayed in the 'Interval' section, followed by the current interval setting, e.g. 'Immediately' */
-"AuthenticationRequirePasscode" = "Parola İste";
-
-/* Touch ID prompt subtitle when accessing the require passcode setting */
-"AuthenticationRequirePasscodeTouchReason" = "Gerekli parola aralığınızı yapılandırmaya erişmek için parmak izinizi kullanın.";
-
-/* Title of the dialog used to set a passcode */
-"AuthenticationSetPasscode" = "Parola Belirle";
-
-/* When the user taps on the passcode pane, the touch gesture recognizer will bring up the keyboard back on the screen when hidden on iPad. */
-"AuthenticationTouchForKeyboard" = "Klavye erişilebilirliğini getirmek için dokunun";
+"AuthenticationPasscode" = "Geçiş kodu";
 
 /* Label for the Touch ID/Passcode item in Settings */
 "AuthenticationTouchIDPasscodeSetting" = "Dokunmatik Kimlik ve Parola";
-
-/* Label used as a setting item to turn off passcode */
-"AuthenticationTurnOffPasscode" = "Parolayı Kapat";
-
-/* Label used as a setting item to turn on passcode */
-"AuthenticationTurnOnPasscode" = "Parolayı Aç";
-
-/* Error message displayed when user enters incorrect passcode when trying to enter a protected section of the app */
-"AuthenticationWrongPasscodeError" = "Yanlış parola. Yeniden deneyin.";
 
 /* Label for Cancel button */
 "AuthPromptAlertCancelButtonTitle" = "İptal";
@@ -131,10 +74,10 @@
 "Block3rdPartyCookies" = "Üçüncü taraf çerezlerini engelle";
 
 /* No comment provided by engineer. */
-"BlockAdsAndTracking" = "Siteler arası izleyicileri engelle";
+"BlockAdsAndTracking" = "Siteler Arası İzleyicileri Engelle";
 
 /* No comment provided by engineer. */
-"BlockAdsAndTrackingDescription" = "Reklamların, açılır pencerelerin ve izleyicilerin yüklenmesini engeller";
+"BlockAdsAndTrackingDescription" = "Reklamların, açılır pencerelerin ve izleyicilerin yüklenmesini engeller.";
 
 /* Title for setting to block all website cookies. */
 "BlockAllCookies" = "Tüm Çerezleri Engelle";
@@ -152,7 +95,7 @@
 "BlockAllCookiesFailedAlertMsg" = "Tercih ayarlanamadı. Lütfen yeniden deneyin.";
 
 /* No comment provided by engineer. */
-"BlockCookiesDescription" = "Web sitelerinin önceki ziyaretleriniz hakkında bilgi depolamasını engeller";
+"BlockCookiesDescription" = "Web sitelerinin önceki ziyaretleriniz hakkında bilgi depolamasını engeller.";
 
 /* title for section showing page blocking statistics */
 "BlockingMonitor" = "Engelleme İzleyicisi";
@@ -170,7 +113,10 @@
 "BlockScripts" = "Komut Dosyalarını Engelle";
 
 /* No comment provided by engineer. */
-"BlockScriptsDescription" = "JavaScript'i engeller (siteleri bozabilir)";
+"BlockScriptsDescription" = "JavaScript'i engeller (siteleri bozabilir).";
+
+/* Action item title of long press for Adding Bookmark for All Tabs in Tab List */
+"BookmarkAllTabsTitle" = "Tüm Sekmelere Yer İşareti Ekle";
 
 /* Bookmark Folder Section Title */
 "BookmarkFolder" = "Yer İşareti Klasörü";
@@ -214,11 +160,62 @@
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Başlamak için, senkronize etmeyi planladığınız tüm cihazlarda Brave'in yüklü olması gerekir. Bunları birbirine zincirlemek için, tüm cihazlarınızı güvenli bir şekilde birbirine bağlarken kullanacağınız bir eşitleme zinciri başlatın.";
 
+/* Setting to enable the browser lock privacy feature */
+"BrowserLock" = "Tarayıcı Kilidi";
+
+/* No comment provided by engineer. */
+"BrowserLockDescription" = "Touch ID, Face ID veya sistem geçiş koduyla Brave'in kilidini açın.";
+
+/* A button title for the action to move to the next step of the browser lock migration process. */
+"browserLockMigrationContinueButtonTitle" = "Devam";
+
+/* Displayed to the user when they don't have a passcode set on their phone, therefore cannot use the Browser Lock feature. \"%@\" will be filled with either \"Touch ID & Passcode\" or \"Face ID & Passcode\" */
+"browserLockMigrationNoPasscodeSetup" = "ID veya geçiş kodu ayarlamadınız mı? Ayarlar'ı açın, ardından \"%@\" öğesine dokunun";
+
+/* Subtitle on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationSubtitle" = "Brave Geçiş Kodlarını basitleştirdik. Artık Brave'e telefonunuzda kullandığınız aynı ID veya geçiş koduyla erişebilirsiniz.";
+
+/* Title on the screen shown to the user when they are being migrated from the old Passcode feature to the new Browser Lock feature */
+"browserLockMigrationTitle" = "Apple Face ID, Touch ID veya geçiş kodunuzla Brave'i açın";
+
 /* Settings item for clearing browsing history */
 "BrowsingHistory" = "Arama Geçmişi";
 
 /* Settings item for clearing the cache */
 "Cache" = "Önbellek";
+
+/* Subtitle - Description for Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutDescription" = "Brave varsayılan olarak ayarlandığında, tıkladığınız her bağlantı Brave'in gizlilik korumasıyla açılır.";
+
+/* Title for main button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutPrimaryButtonTitle" = "Varsayılan olarak ayarla";
+
+/* Description for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonDescription" = "Zaten varsayılan mı?";
+
+/* Title for secondary button in Default Browser Full Screen Callout */
+"callout.defaultBrowserCalloutSecondaryButtonTitle" = "Bunu atla";
+
+/* Title for Default Browser Full Screen Callout */
+"callout.defaultBrowserTitle" = "Brave'i varsayılan tarayıcınız yapın";
+
+/* Button title for Playlist Onboarding View */
+"callout.playlistOnboardingViewButtonTitle" = "Videoyu izleyin";
+
+/* Description for Playlist Onboarding View */
+"callout.playlistOnboardingViewDescription" = "...istediğiniz yerde, istediğiniz zaman oynatım. Arka planda, görüntü içinde görüntüde, hatta çevrimdışıyken bile. Ve tabii ki reklamsız.";
+
+/* Title for Playlist Onboarding View */
+"callout.playlistOnboardingViewTitle" = "Videoyu Oynatma Listesine ekle...";
+
+/* Subtitle - Description for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutDescription" = "Bilgisayarınızda veya tabletinizde Brave'in gizliliğinin keyfini çıkarın, cihazlarınız arasında yer işaretlerinizi ve eklentilerinizi senkronize edin.";
+
+/* Title for button in Default Browser Full Screen Callout */
+"callout.privacyEverywhereCalloutPrimaryButtonTitle" = "Şimdi senkronize et";
+
+/* Title for Privacy Everywhere Full Screen Callout */
+"callout.privacyEverywhereCalloutTitle" = "Gizlilik. Her yerde.";
 
 /* No comment provided by engineer. */
 "CancelButtonTitle" = "İptal";
@@ -332,7 +329,7 @@
 "defaultBrowserCallout.introTertiaryText" = "Ayarlar'ı açın, Varsayılan Tarayıcı Uygulaması'nı dokunun ve Brave'i seçin.";
 
 /* Notification body to promote setting Brave app as default browser */
-"defaultBrowserCallout.notificationBody" = "iOS 14 için optimize edilmiştir. Brave'i bugün varsayılan tarayıcınız yapın.";
+"defaultBrowserCallout.notificationBody" = "iOS %@ için optimize edilmiştir. Brave'i bugün varsayılan tarayıcınız yapın.";
 
 /* Notification title to promote setting Brave app as default browser */
 "defaultBrowserCallout.notificationTitle" = "Brave Web Tarayıcısı";
@@ -394,6 +391,9 @@
 /* Title for when a user has nothing downloaded onto their device, and the list is empty. */
 "DownloadsPanelEmptyStateTitle" = "İndirilen dosyalar burada görünecektir.";
 
+/* History tableview section header that indicated history items earlier than last month */
+"Earlier" = "Önceki";
+
 /* No comment provided by engineer. */
 "Edit" = "Düzenle";
 
@@ -415,6 +415,9 @@
 /* Title for editing a folder */
 "EditFolderTitle" = "Klasörü düzenle";
 
+/* Describes whether or not the feature that allows the user to pull down from the top of a web page a certain amount before it triggers a page refresh */
+"enablePullToRefresh" = "Çekerek Yenilemeyi Etkinleştir";
+
 /* Sync enter code words */
 "EnterCodeWords" = "Kod sözcüklerini girme";
 
@@ -424,32 +427,53 @@
 /* Description for new folder popup */
 "EnterFolderName" = "Klasör adını girin";
 
+/* Shown in error pages to suggest a fix to the user. */
+"errorPageCantBeReachedTry" = "URL'yi tekrar yazmayı veya bir arama motoru açarak yeni URL'yi aratmayı deneyin.";
+
 /* Shown in error pages for files that can't be shown and need to be downloaded. */
 "ErrorPageOpenInSafariButtonTitle" = "Safari'de aç";
 
 /* Shown in error pages on a button that will try to load the page again */
-"ErrorPageReloadButtonTitle" = "Yeniden deneyin";
-
-/* Label for button to perform advanced actions on the error page */
-"ErrorPagesAdvancedButton" = "Gelişmiş";
-
-/* Warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning1" = "Uyarı: Bu web sitesine bağlantınızın güvenli olduğunu doğrulayamıyoruz.";
+"ErrorPageReloadButtonTitle" = "Yeniden Yükle";
 
 /* Additional warning text when clicking the Advanced button on error pages */
-"ErrorPagesAdvancedWarning2" = "Bir saldırgan tarafından yanlış yapılandırılma veya değiştirme yapılmış olabilir. Olası riski kabul ediyorsanız devam edin.";
+"ErrorPagesAdvancedWarningDetails" = "Bu sunucu, bunun %@ olduğunu kanıtlayamadı, cihazınızın işletim sistemi bunun güvenlik sertifikasına güvenmiyor. Bu durum hatalı yapılandırmadan veya bağlantınıza sızmaya çalışan bir saldırgandan kaynaklanıyor olabilir.";
 
-/* Warning text on the certificate error page */
-"ErrorPagesCertWarningDescription" = "%@ sahibi web sitelerini yanlış yapılandırmış. Bilgilerinizin çalınmasını engellemek için Brave bu web sitesine bağlanmadı.";
+/* Warning text when clicking the Advanced button on error pages */
+"ErrorPagesAdvancedWarningTitle" = "Saldırganlar %@ hedefinden bilgilerinizi çalmaya çalışıyor olabilir (örneğin şifreler, mesajlar veya kredi kartları).";
+
+/* Label for button to go back from the error page */
+"ErrorPagesBackToSafetyButton" = "Güvenliğe geri dön";
+
+/* Title on the certificate error page */
+"ErrorPagesCertErrorTitle" = "Bu site güvenli bir bağlantı sağlayamıyor";
 
 /* Title on the certificate error page */
 "ErrorPagesCertWarningTitle" = "Bağlantınız gizli değil";
 
-/* Label for button to go back from the error page */
-"ErrorPagesGoBackButton" = "Geri Git";
+/* Label for button to hide advanced actions on the error page */
+"ErrorPagesHideDetailsButton" = "Detayları gizle";
+
+/* Label for learn more link on error page */
+"ErrorPagesLearnMoreButton" = "Daha fazla bilgi edinin";
+
+/* Label for button to perform advanced actions on the error page */
+"ErrorPagesMoreDetailsButton" = "Daha fazla detay";
+
+/* Title of the No Internet error page */
+"ErrorPagesNoInternetTitle" = "İnternet erişimi yok";
+
+/* Text telling the user to Try: The following list of things */
+"ErrorPagesNoInternetTry" = "Görünüşe göre çevrimiçi değilsiniz. Bu durumu düzeltmek için, şunları deneyin:";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem1" = "Ağ kablolarını, modemi ve yönlendiriciyi kontrol etmek";
+
+/* List of things to try when internet is not working */
+"ErrorPagesNoInternetTryItem2" = "Wi-Fi'a yeniden bağlanmak";
 
 /* Button label to temporarily continue to the site from the certificate error page */
-"ErrorPagesVisitOnceButton" = "Siteyi yine de ziyaret et";
+"ErrorPagesProceedAnywayButton" = "%@ sitesine devam et (güvenli değil)";
 
 /* Shields Time Saved Stat */
 "EstTimerSaved" = "Tah. Zaman \nMiktarı";
@@ -497,7 +521,7 @@
 "FingerprintingMethods" = "Parmak İzi Yöntemleri";
 
 /* No comment provided by engineer. */
-"FingerprintingProtection" = "Parmak izini engelleme";
+"FingerprintingProtection" = "Parmak İzini Engelle";
 
 /* No comment provided by engineer. */
 "FingerprintingProtectionDescription" = "Sitelerin cihazınızın ayırt edici özelliklerini tanımasını zorlaştırır. ";
@@ -532,6 +556,24 @@
 /* Title for history menu item */
 "HistortMenuItem" = "Geçmiş";
 
+/* Title for History Clear All Action */
+"history.historyClearActionTitle" = "Geçmişi Temizle";
+
+/* Description for Clear All History Alert Description */
+"history.historyClearAlertDescription" = "Bu işlem tüm tarama geçmişini temizler.";
+
+/* Title for Clear All History Alert Title */
+"history.historyClearAlertTitle" = "Tarama Geçmişini Temizle";
+
+/* Title which is displayed when History screen is empty. */
+"history.historyEmptyStateTitle" = "Geçmiş burada görünür.";
+
+/* Title which is displayed on History screen as a overlay when Private Browsing Only enabled */
+"history.historyPrivateModeOnlyStateTitle" = "Yalnızca Özel Tarama modunda Geçmiş mevcut olmaz.";
+
+/* Title displayed for placeholder inside Search Bar in History */
+"history.historySearchBarTitle" = "Arama Geçmişi";
+
 /* Title for history screen */
 "HistoryScreenTitle" = "Geçmiş";
 
@@ -539,10 +581,10 @@
 "Home" = "Ana Sayfa";
 
 /* No comment provided by engineer. */
-"HTTPSEverywhere" = "Bağlantıları HTTPS'ye yükselt";
+"HTTPSEverywhere" = "Bağlantıları HTTPS'ye Yükselt";
 
 /* No comment provided by engineer. */
-"HTTPSEverywhereDescription" = "Bazı siteleri düz HTTP yerine güvenli bir HTTPS bağlantısı kullanarak açar.";
+"HTTPSEverywhereDescription" = "Mümkün olduğunda siteleri HTTP yerine güvenli HTTPS ile açar.";
 
 /* individual blocking statistic title */
 "HTTPSUpgrades" = "HTTPS Yükseltmeleri";
@@ -561,6 +603,42 @@
 
 /* No comment provided by engineer. */
 "learnMore" = "Daha fazla bilgi edinin";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginEntryDeleteAlertMessage" = "Kaydedilmiş Giriş Bilgileri kalıcı olarak kaldırılacaktır.";
+
+/* The message displayed in alert when a login entry deleted */
+"login.loginInfoCreatedHeaderTitle" = "%@ tarihinde oluşturuldu";
+
+/* The header title displayed over the details of login entry */
+"login.loginInfoDetailsHeaderTitle" = "Giriş Detayları";
+
+/* Title for the password field in password detail page */
+"login.loginInfoDetailsPasswordFieldTitle" = "Şifre";
+
+/* Title for the username field in password detail page */
+"login.loginInfoDetailsUsernameFieldTitle" = "Kullanıcı adı";
+
+/* Title for the website field in password detail page */
+"login.loginInfoDetailsWebsiteFieldTitle" = "Web sitesi";
+
+/* The message displayed in alert when a user needs to set a passcode */
+"login.loginInfoSetPasscodeAlertDescription" = "Şifreleri görmek için, öncelikle cihazınızda bir parola belirlemeniz gerekiyor.";
+
+/* The title displayed in alert when a user needs to set passcode */
+"login.loginInfoSetPasscodeAlertTitle" = "Bir Parola Belirleyin";
+
+/* The message displayed on the password list screen when there is not password found */
+"login.loginListEmptyScreenTitle" = "Giriş bilgisi bulunamadı";
+
+/* Title for navigation bar of the login list screen */
+"login.loginListNavigationTitle" = "Girişler ve Şifreler";
+
+/* The header title displayed over the login list */
+"login.loginListSavedLoginsHeaderTitle" = "Kaydedilen Girişler";
+
+/* The text for placeholder inside search bar in login list */
+"login.loginListSearchBarPlaceHolderTitle" = "Filtrele";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Son değiştirilen %@";
@@ -586,8 +664,8 @@
 /* Label for the button used to select all logins. */
 "LoginListSelectAllButtonTitle" = "Tümünü seç";
 
-/* Setting to allow media to play automatically */
-"MediaAutoPlays" = "Arka planda video otomatik oynatmayı etkinleştir";
+/* Setting to allow media to play in the background */
+"MediaAutoBackgrounding" = "Arka Plan Sesini Etkinleştir";
 
 /* Copy password text selection menu item */
 "MenuItemCopyTitle" = "Kopyala";
@@ -630,6 +708,9 @@
 
 /* New Tab title */
 "NewTab" = "Yeni Sekme";
+
+/* The information title displayed when there is no search reault found */
+"noSearchResultsfound" = "Arama sonucu bulunamadı.";
 
 /* Sync Alert */
 "NotEnoughWordsDescription" = "Lütfen tüm sözcükleri girin ve yeniden deneyin.";
@@ -685,11 +766,59 @@
 /* The placeholder says 'Terms of Service'. So full sentence goes like: 'By turning Rewards, you agree to the Terms of Service'. */
 "ntp.turnRewardsTos" = "Ödülleri açarak %@'nı kabul ediyorsunuz.";
 
+/* The description of the popover showing trackers that were blocked. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionThree" = "Engellediğimiz tüm içerikleri görmek için herhangi bir sitedeyken Kalkana dokunun.";
+
+/* The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverDescriptionTwo" = "Brave, %2$@ sitesinde %1$@ izleyicisini engelledi.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription" = "Brave, %3$@ sitesinde %1$@ ve %2$d başka izleyici engelledi.";
+
+/* The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count. */
+"onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription" = "Brave, %3$@ sitesinde %1$@ ve %2$d başka izleyici engelledi.";
+
+/* DEscription for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneDescription" = "Ayarlar ve muhteşem gizlilik özelliklerinin daha fazlası için menüye bakın!";
+
+/* Title for the NTP pop-over that describes the onboarding is done */
+"onboarding.ntpOnboardingPopoverDoneTitle" = "Her şey tamam!";
+
+/* Description for the NTP pop-over that describes the tracking information on NTP */
+"onboarding.ntpOnboardingPopOverTrackerDescription" = "İzleyiciler ve reklamlar engellendiğinde, web siteleri daha az veri kullanır ve çok daha hızlı yüklenir.";
+
+/* Button Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenButtonTitle" = "Başlayalım";
+
+/* Description for Privacy Screen in Onboarding */
+"onboarding.privacyScreenDescription" = "İnternetteki en iyi gizlilikten sadece bir adım uzaktasınız. Hazır mısınız?";
+
+/* Title for Privacy Screen in Onboarding */
+"onboarding.privacyScreenTitle" = "Gizlilik şimdi çok kolay";
+
+/* Additional Description for Ready Screen in Onboarding */
+"onboarding.readyScreenAdditionalDescription" = "...ve izleyicilerle reklamların yok oluşunu izleyin.";
+
+/* Description for Ready Screen in Onboarding */
+"onboarding.readyScreenDescription" = "Aşağıdan popüler bir site seçin veya kendi istediğinizi girin...";
+
+/* Title for Ready Screen in Onboarding */
+"onboarding.readyScreenTitle" = "Göz atmaya hazırsınız!";
+
+/* The title of the row asking user to enter a website url */
+"onboarding.searchViewEnterWebsiteRowTitle" = "Bir web sitesi girin";
+
+/* Title for Welcome Screen in Onboarding */
+"onboarding.welcomeScreenTitle" = "Brave'e hoş geldiniz!";
+
 /* Context menu item for opening all folder bookmarks */
 "OpenAllBookmarks" = "Tümünü Aç (%i)";
 
 /* Button title for opening the Brave Rewards panel to settings */
 "OpenBraveRewardsSettings" = "Brave Ödülleri Ayarlarını Aç";
+
+/* Error description when there is an error while navigating to Files App */
+"OpenDownloadsFolderErrorDescription" = "Dosyalar uygulamasında İndirilenler klasörü açılırken bilinmeyen bir hata oluştu.";
 
 /* Context menu for opening image in new tab */
 "OpenImageInNewTab" = "Resmi Yeni Sekmede Aç";
@@ -706,6 +835,36 @@
 /* Button title to that opens a website. */
 "OpenWebsite" = "Web Sitesini Aç";
 
+/* The subtitle description of menu item Brave News */
+"optionsMenu.braveNewsItemDescription" = "Günün en iyi hikayeleri özel bir haber akışında";
+
+/* Brave News Item Menu title */
+"optionsMenu.braveNewsItemTitle" = "Haberler";
+
+/* The subtitle description of menu item Brave Playlist */
+"optionsMenu.bravePlaylistItemDescription" = "Tüm videolar/akışlar için çevrimdışı bir oynatma listesi tutun";
+
+/* Brave News Item Menu title */
+"optionsMenu.bravePlaylistItemTitle" = "Oynatma listesi";
+
+/* The subtitle description of menu item Brave Talk */
+"optionsMenu.braveTalkItemDescription" = "Özel görüntülü aramalar, doğrudan tarayıcınızın içinde";
+
+/* Brave Talk Item Menu title */
+"optionsMenu.braveTalkItemTitle" = "Sohbet";
+
+/* The subtitle description of menu item Brave VPN */
+"optionsMenu.braveVPNItemDescription" = "Çevrimiçi ortamda tüm cihazınızı koruyun";
+
+/* Brave VPN Item Menu title */
+"optionsMenu.braveVPNItemTitle" = "VPN";
+
+/* The subtitle description of menu item Brave Wallet */
+"optionsMenu.braveWalletItemDescription" = "Güvenli kripto cüzdanı, eklenti gerektirmez";
+
+/* Privacy Features Section title */
+"optionsMenu.menuSectionTitle" = "Brave Özellikleri";
+
 /* Section name for other privacy settings */
 "OtherPrivacySettingsSection" = "Diğer Gizlilik Ayarları";
 
@@ -715,11 +874,8 @@
 /* Sync pair device settings section title */
 "Pair" = "Eşleştir";
 
-/* Error message displayed to user when their confirming passcode doesn't match the first code. */
-"PasscodeConfirmMisMatchErrorText" = "Parolalar eşleşmedi. Yeniden deneyin.";
-
-/* Error message displayed when user tries to enter the same passcode as their existing code when changing it. */
-"PasscodeMatchOldErrorText" = "Yeni parola varolan koddan farklı olmalıdır.";
+/* Title for passwords menu item */
+"PasswordsMenuItem" = "Şifreler";
 
 /* Label that says who took a photograph that will be displayed to the user. '%@' is a placeholder and will include be a specific person's name, example 'Bill Gates'. */
 "PhotoBy" = "Fotoğraf : %@";
@@ -853,6 +1009,24 @@
 /* Restore Tabs Prompt Title */
 "RestoreTabOnCrashAlertTitle" = "Şey, bu utanç verici.";
 
+/* Body for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInBody" = "Brave Rewards ile Brave Ads ağından gizlilik korumalı reklamları görüntüleyebilirsiniz. İzleyici yok. Yavaşlama yok. Üstelik verileriniz tamamen güvende kalır.";
+
+/* Title for Brave Talk rewards opt-in screen button */
+"rewards.braveTalkRewardsOptInButtonTitle" = "Rewards'u aç";
+
+/* Body for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessBody" = "Brave Sohbet'e devam etmek için ekranda herhangi bir yere tıklayın.";
+
+/* Title for successful Brave Talk rewards opt-in */
+"rewards.braveTalkRewardsOptInSuccessTitle" = "Şimdi ücretsiz bir arama başlatabilirsiniz";
+
+/* Title for Brave Talk rewards opt-in screen */
+"rewards.braveTalkRewardsOptInTitle" = "Ücretsiz arama başlatmak için Brave Rewards'u açın";
+
+/* The placeholders say 'Terms of Service' and 'Privacy Policy'. So full sentence goes like: 'By clicking, you agree to the Terms of Service and Privacy Policy...' */
+"rewards.optInDisclaimer" = "Tıkladığınızda %1$@ ve %2$@ içeriğini kabul etmiş olursunuz. Dilediğiniz zaman Ayarlar bölümünden devre dışı bırakın.";
+
 /* Button to show the rewards panel */
 "RewardsPanel" = "Ödül Paneli";
 
@@ -861,6 +1035,9 @@
 
 /* Settings item for clearing passwords and login data */
 "SavedLogins" = "Kaydedilen Oturumlar";
+
+/* The title for the folder created when all bookmarks are being */
+"SavedTabsFolderTitle" = "Kayıtlı Sekmeler";
 
 /* Context menu item for saving an image */
 "SaveImageActionTitle" = "Resmi Kaydet";
@@ -876,6 +1053,9 @@
 
 /* individual blocking statistic title */
 "ScriptsBlocked" = "Engellenen Komut Dosyaları";
+
+/* The placeholder text for bookmark search */
+"searchBookmarksTitle" = "Yer İşaretleri arayın";
 
 /* Label for search engine buttons. The argument corresponds to the name of the search engine. */
 "SearchEngineFormatText" = "%@ arama";
@@ -1057,6 +1237,12 @@
 /* Sync settings section title */
 "Sync" = "Eşitle";
 
+/* Information Text underneath the toggles for enable/disable different sync types for the device */
+"sync.syncConfigurationInformationText" = "Cihazlar arasında hangi bilgileri senkronize etmek istediğinizi yönetin. Bu ayarlar yalnızca bu cihazı etkiler.";
+
+/* Title for Sync Settings Toggle Header */
+"sync.syncSettingsTitle" = "Senkronizasyon Ayarları";
+
 /* Message for popup when the bookmark migration fails */
 "sync.v2MigrationErrorMessage" = "Yer işaretleri aktarılamadı. Lütfen daha sonra yeniden deneyin.";
 
@@ -1108,6 +1294,15 @@
 /* Sync you browser settings across devices. */
 "SyncDevices" = "Aygıtlar ve Ayarlar";
 
+/* Sync Error Description */
+"syncExpiredError" = "Süresi Dolmuş";
+
+/* Sync Error Description */
+"syncFutureVersionError" = "Çok Yeni";
+
+/* Sync Error Description */
+"syncGenericError" = "Üzgünüz, bir sorun oluştu";
+
 /* Folder name for where bookmarks are imported into when the root folder is not empty. */
 "SyncImportFolderName" = "İçe Aktarılan Yer İşaretleri";
 
@@ -1117,11 +1312,32 @@
 /* Title for sync initialization error alert */
 "SyncInitErrorTitle" = "Eşitleme iletişim hatası";
 
+/* Sync Error Description */
+"syncInsecureVersionError" = "Daha eski, desteklenmeyen sürüm";
+
+/* Sync Error Description */
+"syncInvalidVersionError" = "Geçersiz Biçim";
+
+/* Default name for a device */
+"syncJoinChainCameraWarning" = "Bu işlem, potansiyel olarak şifrelerinizi de içeren Brave verilerinizi bu QR kodunu oluşturmuş olan cihazla paylaşacaktır. Lütfen bu QR kodunun size ait bir cihaz tarafından oluşturulduğundan emin olun. Bunu yapmak istediğinizden emin misiniz?";
+
+/* Default name for a device */
+"syncJoinChainCodewordsWarning" = "Bu işlem, potansiyel olarak şifrelerinizi de içeren Brave verilerinizi bu kod kelimelerini oluşturmuş olan cihazla paylaşacaktır. Lütfen bu kod kelimelerinin size ait bir cihaz tarafından oluşturulduğundan emin olun. Bunu yapmak istediğinizden emin misiniz?";
+
+/* Title for pairing sync device */
+"syncJoinChainWarningTitle" = "Uyarı";
+
+/* Sync Error Description */
+"syncNewerVersionError" = "Desteklenmeyen sürüm";
+
 /* No internet connection alert body. */
 "SyncNoConnectionBody" = "İnternet bağlantınızı kontrol edin ve yeniden deneyin.";
 
 /* No internet connection alert title. */
 "SyncNoConnectionTitle" = "Eşitlemeye bağlanılamıyor";
+
+/* Sync Error Description */
+"syncOlderVersionError" = "Artık desteklenmeyen sürüm";
 
 /* Message for removing the current device from Sync */
 "SyncRemoveCurrentDeviceMessage" = "Yerel cihaz verileri tüm cihazlarda bozulmadan kalır. Bu Eşitleme Zincirindeki diğer aygıtlar eşitlenmeye devam edecek. ";
@@ -1216,6 +1432,9 @@
 /* Accessibility Label for the browser toolbar Menu button */
 "TabToolbarMenuButtonAccessibilityLabel" = "Menü";
 
+/* Accessibility Label for the tab toolbar Playlist button */
+"TabToolbarPlaylistButtonAccessibilityLabel" = "Oynatma Listesi";
+
 /* Accessibility label for the Reader View button */
 "TabToolbarReaderViewButtonAccessibilityLabel" = "Okuyucu Görünümü";
 
@@ -1254,6 +1473,9 @@
 
 /* Accessibility label for the New Tab button in the tab toolbar. */
 "TabTrayNewTabButtonAccessibilityLabel" = "Yeni Sekme";
+
+/* Title displayed for placeholder inside Search Bar in Tab Tray */
+"TabTraySearchBarTitle" = "Sekmeleri Ara";
 
 /* Message spoken by VoiceOver saying the position of the single currently visible tab in Tabs Tray, along with the total number of tabs. E.g. \"Tab 2 of 5\" says that tab 2 is visible (and is the only visible tab), out of 5 tabs total. */
 "TabTraySingleTabPositionFormatVoiceOverText" = "Sekme %1$ @ %2$ @";

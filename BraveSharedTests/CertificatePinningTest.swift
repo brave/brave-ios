@@ -26,7 +26,7 @@ class CertificatePinningTest: XCTestCase {
     private lazy var root = certificate(named: "root")
     
     func testPinningWithHostValidation() {
-        let host = "brave.com"
+        let host = "www.apple.com"
         let trust = self.trust(for: [leaf, intermediate, root])
         let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost])
         
@@ -109,7 +109,7 @@ class CertificatePinningTest: XCTestCase {
 
         let host = "unit-test.brave.com"
         let trust = self.trust(for: [leaf])
-        let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .allowSelfSigned])
+        let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .anchorSpecificTrustsOnly])
         
         do {
             try evaluator.evaluate(trust, forHost: host)
@@ -125,12 +125,86 @@ class CertificatePinningTest: XCTestCase {
 
         let host = "badssl.com"
         let trust = self.trust(for: [root])
-        let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .allowSelfSigned])
+        let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .anchorSpecificTrustsOnly])
         
         do {
             try evaluator.evaluate(trust, forHost: host)
         } catch {
             XCTFail("Validation failed but should have succeeded: \(error)")
         }
+    }
+    
+    // Test whether or not exception URLs are NOT pinned!
+    func testLivePinningSuccess() {
+        let urls = PinningCertificateEvaluator.ExcludedPinningHostUrls.urls.map({ "https://\($0)" })
+        
+        var expectations = [XCTestExpectation]()
+        for host in urls {
+            let expectation = XCTestExpectation(description: "Test Pinning Live URLs: \(host)")
+            expectations.append(expectation)
+            
+            guard let hostUrl = URL(string: host),
+                  let normalizedHost = hostUrl.normalizedHost() else {
+                
+                XCTFail("Invalid URL/Host for pinning: \(host)")
+                expectation.fulfill()
+                return
+            }
+            
+            let certificateEvaluator = PinningCertificateEvaluator(hosts: [normalizedHost])
+            let sessionManager = URLSession(configuration: .default, delegate: certificateEvaluator, delegateQueue: .main)
+
+            sessionManager.request(hostUrl, method: .put, parameters: ["unit-test":"unit-value"], encoding: .json) { response in
+                switch response {
+                case .success:
+                    break
+                    
+                case .failure(let error as NSError):
+                    if error.code == NSURLErrorCancelled {
+                        XCTFail("Invalid URL/Host for pinning: \(error) for host: \(host)")
+                    }
+                }
+                
+                expectation.fulfill()
+            }.resume()
+            sessionManager.finishTasksAndInvalidate()
+        }
+        
+        wait(for: expectations, timeout: 10.0)
+    }
+    
+    // Test whether or not pinning actually works on a live URL
+    func testLivePinningFailure() {
+        let urls = ["https://brave.com"]
+        
+        var managers = [URLSession]()
+        var expectations = [XCTestExpectation]()
+        for host in urls {
+            let expectation = XCTestExpectation(description: "Test Pinning Live URLs: \(host)")
+            expectations.append(expectation)
+            
+            guard let hostUrl = URL(string: host),
+                  let normalizedHost = hostUrl.normalizedHost() else {
+                
+                XCTFail("Invalid URL/Host for pinning: \(host)")
+                expectation.fulfill()
+                return
+            }
+            
+            let certificateEvaluator = PinningCertificateEvaluator(hosts: [normalizedHost])
+            let sessionManager = URLSession(configuration: .default, delegate: certificateEvaluator, delegateQueue: .main)
+            managers.append(sessionManager)
+
+            sessionManager.dataTask(with: hostUrl) { data, response, error in
+                if let error = error as NSError?, error.code == NSURLErrorCancelled {
+                    XCTFail("Invalid URL/Host for pinning: \(error) for host: \(host)")
+                }
+                
+                expectation.fulfill()
+            }.resume()
+            sessionManager.finishTasksAndInvalidate()
+        }
+        
+        wait(for: expectations, timeout: 10.0)
     }
 }

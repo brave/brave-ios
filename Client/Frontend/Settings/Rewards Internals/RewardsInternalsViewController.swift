@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
-import BraveRewards
+import BraveCore
 import Static
 import DeviceCheck
 import Shared
@@ -27,10 +27,10 @@ private class WarningCell: MultilineSubtitleCell {
 class RewardsInternalsViewController: TableViewController {
     
     private let ledger: BraveLedger
-    private var internalsInfo: RewardsInternalsInfo?
+    private var internalsInfo: Ledger.RewardsInternalsInfo?
     
     private let legacyLedger: BraveLedger?
-    private var legacyInternalsInfo: RewardsInternalsInfo?
+    private var legacyInternalsInfo: Ledger.RewardsInternalsInfo?
     private var hasTransferrableBalance = false
     
     init(ledger: BraveLedger, legacyLedger: BraveLedger?) {
@@ -147,7 +147,7 @@ class RewardsInternalsViewController: TableViewController {
 struct RewardsInternalsBasicInfoGenerator: RewardsInternalsFileGenerator {
     func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
         // Only 1 file to make here
-        var internals: RewardsInternalsInfo?
+        var internals: Ledger.RewardsInternalsInfo?
         builder.ledger.rewardsInternalInfo { info in
             internals = info
         }

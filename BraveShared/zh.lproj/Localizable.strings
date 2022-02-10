@@ -40,6 +40,9 @@
 /* The accessibility hint spoken when focused on the main shields toggle */
 "BraveShieldsToggleHint" = "轻击两次即可切换 Brave Shields";
 
+/* The name of the feature */
+"bravetalk.braveTalkTitle" = "Brave 通话";
+
 /* Button title for Adding Engine in navigation Bar */
 "customSearchEngine.addButtonTitle" = "添加";
 
@@ -146,19 +149,25 @@
 "OBPrivacyConsentYesButton" = "允许一次性剪贴板检查";
 
 /* Detail text for rewards agreement onboarding screen */
-"OBRewardsAgreementDetail" = "轻击“开始”即表示您同意";
+"OBRewardsAgreementDetail" = "轻击“是”即表示您同意";
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailLink" = "服务条款";
 
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsAgreementDetailsAnd" = "和";
+
 /* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards 支持创建者";
+"OBRewardsAgreementTitle" = "Brave 奖励";
 
 /* Detail text for rewards onboarding screen */
-"OBRewardsDetail" = "浏览时开始为创作者提供私人广告支持和匿名广告支持";
+"OBRewardsDetail" = "选择加入 Brave 私密广告后，每查看一条广告，即可支持发布者和内容创作者。";
 
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetailInAdRegion" = "一边浏览，一边赚取代币并奖励创作者，以获得精彩内容。";
+
+/* Detail text for rewards agreement onboarding screen */
+"OBRewardsPrivacyPolicyDetailLink" = "隐私政策";
 
 /* Title for rewards onboarding screen */
 "OBRewardsTitle" = "Brave Rewards";
@@ -199,6 +208,9 @@
 /* Alert Title for adding videos to playlist */
 "playList.addToPlayListAlertTitle" = "添加至 Brave Playlist";
 
+/* The title of the playlist when in Carplay mode */
+"playlist.carplayTitle" = "Brave 播放列表";
+
 /* The description for the alert that shows up when an item is expired */
 "playList.expiredAlertDescription" = "此视频是直播流媒体或超出了时长限制。请重新打开此链接以刷新。";
 
@@ -211,7 +223,16 @@
 /* Description for load resources error alert */
 "playList.loadResourcesErrorAlertDescription" = "加载资源时出现问题。";
 
-/* Text indicator on the table cell If a video is already downloaded */
+/* Description footer for playlist menu badge option */
+"playlist.menuBadgeOptionFooterText" = "启用后，主菜单图标上会显示一个徽章，表示可以将页面上的媒体添加到 Brave 播放列单中。";
+
+/* Title for playlist menu badge option */
+"playlist.menuBadgeOptionTitle" = "显示菜单通知徽章";
+
+/* Detail Text when there are no items in the playlist */
+"playList.noItemLabelDetailLabel" = "您可以在浏览器中将项目添加到 Brave 播放列表";
+
+/* Text when there are no items in the playlist */
 "playList.noItemLabelTitle" = "无可用项目";
 
 /* Title for download video error alert */
@@ -301,17 +322,26 @@
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
 "playlist.playlistStartPlaybackSettingsOptionTitle" = "从我上次停止播放的位置开始播放 ";
 
-/* Footer Text for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionFooterText" = "启用后，大部分多媒体网站上均会自动显示一个工具栏，用于轻松将视频/音频文件添加至播放列表。";
-
-/* Title for the Playlist Settings Option for Enable/Disable Add Toast */
-"playlist.playlistToastShowSettingsOptionTitle" = "显示“添加至 Brave 播放列表”";
-
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "禁用 WebKit MediaSource API";
 
 /* Title for Playlist setting */
 "playlist.playlistWebCompatibilityTitle" = "Web 兼容性";
+
+/* Body of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddBody" = "Brave 播放列表支持离线播放、画中画、连续播放和重复模式。";
+
+/* Title of the popover that shows when you already have the current media item in your playlist and you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddedTitle" = "此媒体已在您的 Brave 播放列表中";
+
+/* Title of the popover that shows when you tap on the 'Add to Playlist' button in the URL bar */
+"playlist.popoverAddTitle" = "您想将此媒体添加到您的 Brave 播放列表中？";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverOpenInBravePlaylist" = "在 Brave 播放列表中打开";
+
+/* Button title in the popover when an item is already in your playlist and you tap the 'Add to Playlist' button in the URL bar */
+"playlist.popoverRemoveFromBravePlaylist" = "移除";
 
 /* Title for removing offline mode storage */
 "playList.removeActionButtonTitle" = "移除";
@@ -337,6 +367,21 @@
 /* Text indicator on the table cell while saving a video for offline */
 "playList.savingForOfflineLabelTitle" = "正在离线保存...";
 
+/* Details Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionDetailsTitle" = "您可以在新选项卡中打开当前项目，或通过系统共享菜单进行共享";
+
+/* Title of the ActionSheet/Alert when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistActionTitle" = "Brave 播放列表菜单";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewPrivateTabTitle" = "在私人标签中打开";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistOpenInNewTabTitle" = "在新标签中打开";
+
+/* Button Title of the ActionSheet/Alert Button when sharing a playlist item from the Swipe-Action */
+"playlist.sharePlaylistShareActionMenuTitle" = "共享...";
+
 /* Title for load resources error alert */
 "playList.sorryAlertTitle" = "抱歉";
 
@@ -351,6 +396,12 @@
 
 /* The title for the toast that shows up on a page when an item that has already been added, was updated. */
 "playList.toastExitingItemPlaylistTitle" = "在 Brave Playlist 中查看";
+
+/* Footer for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionFooter" = "在 Brave 浏览器的地址栏旁边添加一个播放列表按钮（它看起来就象是 4 行带有一个 + 符号）。此按钮可让您能够快速访问、打开播放列表，或者添加或删除媒体。";
+
+/* Title for option to disable URL-Bar button */
+"playlist.urlBarButtonOptionTitle" = "启用快速访问按钮";
 
 /* Description for closing a popover menu that is displayed. */
 "PopoverDefaultClose" = "关闭 Context 菜单";
@@ -776,6 +827,9 @@
 "searchSettingAddCustomEngineCellTitle" = "添加自定义搜索引擎";
 
 /* Subtitle for tracker benchmark Share */
+"shieldEducation.benchmarkAnyTierTitle" = "恭喜您来到此隐私里程碑。";
+
+/* Subtitle for tracker benchmark Share */
 "shieldEducation.benchmarkExclusiveTierTitle" = "您是独家奖励俱乐部的成员了。恭喜您！";
 
 /* Subtitle for tracker benchmark Share */
@@ -799,29 +853,17 @@
 /* Action title for button at domain specific data saved pop-up */
 "shieldEducation.dontShowThisTitle" = "请不要再显示此内容";
 
-/* Action title for inspectable Education warnings */
-"shieldEducation.inspectTitle" = "看一看";
-
 /* Action title for actionable Share warnings */
 "shieldEducation.shareTheNewsTitle" = "分享消息";
 
-/* Subtitle for Shield Education Tracker Ad Count Block */
-"shieldEducation.trackerAdCountBlockSubtitle" = "Brave Shields 保护您在每个站点上的在线隐私。";
-
-/* Title for Shield Education Tracker Ad Count Block when block count raises over the defined limit. The parameter substituted for \"%ld\" is the limit of the trackers and ads blocked on the page when education pop over is presented. E.g.: 10+ trackers & ads blocked on the page */
-"shieldEducation.trackerAdCountBlockTitle" = "页面上屏蔽了 %ld 多个跟踪器和广告";
-
 /* Subtitle for Shield Education Tracker Ad Warning */
 "shieldEducation.trackerAdWarningSubTitle" = "Brave Shields 只是保护了您的在线隐私。";
-
-/* Title for Shield Education Tracker Ad Warning */
-"shieldEducation.trackerAdWarningTitle" = "跟踪器和广告已在此页面上被屏蔽。";
 
 /* Subtitle for Shield Education Tracker Count Share */
 "shieldEducation.trackerCountShareSubtitle" = "您很特别。恭喜您！";
 
 /* Title for Shield Education Tracker Count Share. The parameter substituted for \"%ld\" is the count of the trackers and ads blocked in total until present. E.g.: 5000 trackers & ads blocked */
-"shieldEducation.trackerCountShareTitle" = "%ld 个跟踪器和广告已被屏蔽";
+"shieldEducation.trackerCountShareTitle" = "%ld 个跟踪器和广告已被屏蔽！";
 
 /* Subtitle for Shield Education Tracker Video Ad Block */
 "shieldEducation.videoAdBlockSubtitle" = "没有广告的视频使用的数据更少。";
@@ -831,6 +873,111 @@
 
 /* No comment provided by engineer. */
 "ShieldsDownDisclaimer" = "你正在没有 Brave 隐私保护的情况下浏览本网站。Shields 处于开启状态时无法正常工作吗？";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeBraveNewsDescription" = "打开 Brave 新闻并查看今日头条";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryDescription" = "在新标签页中打开浏览器，然后删除所有私人浏览器的历史记录数据";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistorySuggestedPhrase" = "清除浏览器历史记录";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeClearHistoryTitle" = "清除 Brave 浏览器历史记录";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNDescription" = "在新标签页中打开浏览器并启用 VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNSuggestedPhrase" = "启用 VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeEnableVPNTitle" = "打开 Brave 浏览器并启用 VPN";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabSuggestedPhrase" = "打开新的私人标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewPrivateTabTitle" = "打开新的私人浏览器标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabSuggestedPhrase" = "打开新标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeNewTabTitle" = "打开一个新的浏览器标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveNewsTitle" = "打开 Brave 新闻";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenBraveTodaySuggestedPhrase" = "打开 Brave 新闻";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistDescription" = "开始播放播放列表中的视频";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistSuggestedPhrase" = "打开播放列表";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeOpenPlaylistTitle" = "打开播放列表";
+
+/* No comment provided by engineer. */
+"shortcuts.activityTypeTabDescription" = "开始通过 Brave 安全地搜索网络";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenBookmarkSuggestedPhrase" = "打开书签网站";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenHistorySuggestedPhrase" = "打开历史记录网站";
+
+/* No comment provided by engineer. */
+"shortcuts.customIntentOpenWebsiteSuggestedPhrase" = "打开网站";
+
+/* Description for opening Brave Settings for altering Siri shortcut. */
+"shortcuts.shortcutOpenApplicationSettingsDescription" = "此选项会打开 Brave 设置。要更改各种 Siri 选项，请选择“Siri & Search”菜单项并自定义您的选择。";
+
+/* Button title that open application settings */
+"shortcuts.shortcutOpenApplicationSettingsTitle" = "打开设置";
+
+/* Description of Clear Browser History Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsClearBrowserHistoryDescription" = "用快捷方式通过 Siri - 语音助手打开新标签页并清除浏览器的历史记录";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsClearBrowserHistoryTitle" = "清除浏览器历史记录";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNDescription" = "用快捷方式通过 Siri - 语音助手来启用 Brave VPN ";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsEnableVPNTitle" = "启用 VPN";
+
+/* Description of Open Brave News Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenBraveNewsDescription" = "用快捷方式打开一个新标签页并通过 Siri - 语音助手来显示 Brave 的新闻提要";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenBraveNewsTitle" = "打开 Brave 新闻";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabDescription" = "用快捷方式通过 Siri - 语音助手打开一个新标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewPrivateTabTitle" = "打开新的私人标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabDescription" = "用快捷方式通过 Siri - 语音助手打开一个新标签页";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenNewTabTitle" = "打开新标签页";
+
+/* Description of Open Playlist Siri Shortcut in Settings Screen */
+"shortcuts.shortcutSettingsOpenPlaylistDescription" = "用快捷方式通过 Siri - 语音助手打开播放列表 ";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsOpenPlaylistTitle" = "打开播放列表";
+
+/* No comment provided by engineer. */
+"shortcuts.shortcutSettingsTitle" = "Siri 快捷方式";
 
 /* No comment provided by engineer. */
 "SiteReportedBody" = "感谢您让 Brave 的开发人员知道该站点出了问题。我们将尽力解决这个问题！";
@@ -995,16 +1142,7 @@
 "Turn on search suggestions?" = "开启搜索建议功能？";
 
 /* No comment provided by engineer. */
-"UserWalletBATNotAllowedLearnMore" = "了解更多";
-
-/* No comment provided by engineer. */
-"UserWalletBATNotAllowedMessage" = "您开启账户的位置区域尚不支持 BAT。请稍后查看可用性。";
-
-/* No comment provided by engineer. */
 "UserWalletCloseButtonTitle" = "关闭";
-
-/* No comment provided by engineer. */
-"UserWalletDetailsDisconnectButtonTitle" = "不支持该区域";
 
 /* No comment provided by engineer. */
 "UserWalletGenericErrorMessage" = "登录 Uphold 账户时出现问题。请重试";
@@ -1278,6 +1416,78 @@
 
 /* One year lenght vpn subcription */
 "vpn.yearlySubTitle" = "一年";
+
+/* Temporary data that is stored on the users device to speed up future requests and interactions. */
+"websiteData.dataRecordCache" = "缓存";
+
+/* The word used to describe small bits of state stored locally in a web browser (e.g. Browser cookies) */
+"websiteData.dataRecordCookies" = "Cookies";
+
+/* Some data stored on disk that is a kind of database (such as WebSQL or IndexedDB.) */
+"websiteData.dataRecordDatabases" = "数据库";
+
+/* A kind of browser storage particularely for saving data on the users device for a specific webpage for the given session or longer time periods. */
+"websiteData.dataRecordLocalStorage" = "本地存储";
+
+/* A message displayed to users while the system fetches all website data to display. */
+"websiteData.loadingWebsiteData" = "正在加载网站数据…";
+
+/* A button or screen title describing that the user is there to manually manage website data that is persisted to their device. I.e. to manage data specific to a web page the user has visited */
+"websiteData.manageWebsiteDataTitle" = "管理网站数据…";
+
+/* Shown when the user has no website data (such as cookies, caches, or local storage) persisted to their device. */
+"websiteData.noSavedWebsiteData" = "没有已保存的网站数据";
+
+/* Shown on a button to delete all displayed webpage records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeAllDataRecords" = "全部移除";
+
+/* Shown when a user has attempted to delete a single webpage data record such as cookies, caches, or local storage that has been persisted on their device. Tapping it will delete that records and remove it from the list */
+"websiteData.removeDataRecord" = "移除";
+
+/* Shown on a button when a user has selected multiple webpage data records (such as cookies, caches, or local storage) that has been persisted on their device. Tapping it will delete those records and remove them from the list */
+"websiteData.removeSelectedDataRecord" = "移除 %ld 项";
+
+/* Description for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetDescription" = "快速访问您喜爱的网站。";
+
+/* Title for favorites widget on 'add widget' screen. */
+"widgets.favoritesWidgetTitle" = "收藏夹";
+
+/* This shows when you add a widget but have no favorites added in your app */
+"widgets.noFavoritesFound" = "请打开 Brave，在此查看您的收藏夹";
+
+/* Description for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsDescription" = "一览 Brave 是如何节省时间以及提供在线保护的。";
+
+/* Title for Brave Shields widget on 'add widget' screen. */
+"widgets.shieldStatsTitle" = "隐私统计数据";
+
+/* Title of Brave Shields widget shown above stat numbers. */
+"widgets.shieldStatsWidgetTitle" = "隐私统计数据";
+
+/* Button to the browser and enter URL or make a search query there. */
+"widgets.shortcutsEnterURLButton" = "搜索或输入 URL";
+
+/* Button to open new browser tab. */
+"widgets.shortcutsNewTabButton" = "新标签页";
+
+/* Button to open video playlist window. */
+"widgets.shortcutsPlaylistButton" = "播放列表";
+
+/* Button to open new private browser tab. */
+"widgets.shortcutsPrivateTabButton" = "隐私标签页";
+
+/* Description for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetDescription" = "快速访问，在 Brave 中搜索 Web 或打开网页。";
+
+/* Title for shortcuts widget on 'add widget' screen. */
+"widgets.shortcutsWidgetTitle" = "快捷方式";
+
+/* Description for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatDescription" = "一览 Brave 是如何提供在线保护的。";
+
+/* Title for Brave Shields single stat widget on 'add widget' screen. */
+"widgets.singleStatTitle" = "隐私统计数据";
 
 /* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
 "Yes" = "是";

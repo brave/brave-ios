@@ -4,11 +4,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
-import BraveRewards
+import BraveCore
 import Static
 import Shared
 
-extension PromotionStatus {
+extension Ledger.PromotionStatus {
     fileprivate var displayText: String {
         let s = Strings.RewardsInternals.self
         switch self {
@@ -22,7 +22,7 @@ extension PromotionStatus {
         }
     }
 }
-extension PromotionType {
+extension Ledger.PromotionType {
     fileprivate var displayText: String {
         switch self {
         case .ugp: return "UGP"

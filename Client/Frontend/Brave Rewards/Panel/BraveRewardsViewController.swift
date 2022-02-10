@@ -4,13 +4,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveRewards
+import BraveCore
 import BraveUI
 import BraveShared
 import Shared
 import Combine
 
-private let log = Logger.rewardsLogger
+private let log = Logger.braveCoreLogger
 
 class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     enum Action {
@@ -22,11 +22,11 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     let rewards: BraveRewards
     let legacyWallet: BraveLedger?
     var actionHandler: ((Action) -> Void)?
-    private var drainStatus: DrainStatus?
+    private var drainStatus: Ledger.DrainStatus?
     private var prefsCancellable: AnyCancellable?
     
     private var ledgerObserver: LedgerObserver?
-    private var publisher: PublisherInfo? {
+    private var publisher: Ledger.PublisherInfo? {
         didSet {
             let isVerified = publisher?.status != .notVerified
             rewardsView.publisherView.learnMoreButton.isHidden = isVerified
@@ -89,7 +89,7 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
             self.rewardsView.statusView.setVisibleStatus(status: .rewardsOff, animated: false)
             self.rewardsView.publisherView.isHidden = true
         } else {
-            if let url = self.tab.url, !url.isLocal {
+            if let url = self.tab.url, !url.isLocal, !InternalURL.isValid(url: url) {
                 self.rewardsView.publisherView.isHidden = false
                 self.rewardsView.publisherView.hostLabel.text = url.baseDomain
                 ledger.fetchPublisherActivity(from: url, faviconURL: nil, publisherBlob: nil, tabId: UInt64(self.tab.rewardsId))
@@ -253,7 +253,7 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
         guard let publisher = publisher else { return }
         rewards.ledger?.refreshPublisher(withId: publisher.id) { [weak self] status in
             guard let self = self else { return }
-            let copy = publisher.copy() as! PublisherInfo // swiftlint:disable:this force_cast
+            let copy = publisher.copy() as! Ledger.PublisherInfo // swiftlint:disable:this force_cast
             copy.status = status
             self.publisher = copy
             
