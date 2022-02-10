@@ -23,8 +23,13 @@ struct AddCustomAssetView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenName))
         ) {
-          TextField(Strings.Wallet.enterTokenName, text: $nameInput)
-            .disabled(userAssetStore.isSearchingToken)
+          HStack {
+            TextField(Strings.Wallet.enterTokenName, text: $nameInput)
+              .disabled(userAssetStore.isSearchingToken)
+            if userAssetStore.isSearchingToken && nameInput.isEmpty {
+              ProgressView()
+            }
+          }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
@@ -54,21 +59,26 @@ struct AddCustomAssetView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenSymbol))
         ) {
-          TextField(Strings.Wallet.enterTokenSymbol, text: $symbolInput)
-            .disabled(userAssetStore.isSearchingToken)
+          HStack {
+            TextField(Strings.Wallet.enterTokenSymbol, text: $symbolInput)
+              .disabled(userAssetStore.isSearchingToken)
+            if userAssetStore.isSearchingToken && symbolInput.isEmpty {
+              ProgressView()
+            }
+          }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.decimalsPrecision)),
-          footer: Group {
-            ProgressView()
-              .frame(maxWidth: .infinity)
-              .opacity(userAssetStore.isSearchingToken ? 1 : 0)
-          }
+          header: WalletListHeaderView(title: Text(Strings.Wallet.decimalsPrecision))
         ) {
-          TextField(NumberFormatter().string(from: NSNumber(value: 0)) ?? "0", text: $decimalsInput)
-            .keyboardType(.numberPad)
-            .disabled(userAssetStore.isSearchingToken)
+          HStack {
+            TextField(NumberFormatter().string(from: NSNumber(value: 0)) ?? "0", text: $decimalsInput)
+              .keyboardType(.numberPad)
+              .disabled(userAssetStore.isSearchingToken)
+            if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
+              ProgressView()
+            }
+          }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
