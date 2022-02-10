@@ -18,6 +18,7 @@ struct NetworkPicker: View {
   @Binding var selectedNetwork: BraveWallet.EthereumChain
   @State private var isPresentingNetworkList: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.buySendSwapDestination) private var buySendSwapDestination
   
   var body: some View {
     Menu {
@@ -26,7 +27,14 @@ struct NetworkPicker: View {
           Strings.Wallet.selectedNetworkAccessibilityLabel,
           selection: $selectedNetwork
         ) {
-          ForEach(networkStore.ethereumChains) {
+          ForEach(networkStore.ethereumChains.filter({
+            if let destination = buySendSwapDestination.wrappedValue {
+              if destination.kind != .send {
+                return !$0.isCustom
+              }
+            }
+            return true
+          })) {
             Text($0.chainName).tag($0)
           }
         }
