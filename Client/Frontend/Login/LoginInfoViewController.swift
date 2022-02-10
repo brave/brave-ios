@@ -331,9 +331,10 @@ extension LoginInfoViewController {
             return
         }
         
-        let oldCredentials = credentials
-        credentials.update(username, passwordValue: password)
-        passwordAPI.updateLogin(credentials, oldPasswordForm: oldCredentials)
+        if let oldCredentials = credentials.copy() as? PasswordForm {
+            credentials.update(username, passwordValue: password)
+            passwordAPI.updateLogin(credentials, oldPasswordForm: oldCredentials)
+        }
         
         completion(true)
     }
@@ -344,9 +345,7 @@ extension LoginInfoViewController {
             message: Strings.Login.loginEntryDeleteAlertMessage,
             preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
-            guard let self = self else { return }
-            
+        alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { _ in
             self.passwordAPI.removeLogin(self.credentials)
             self.navigationController?.popViewController(animated: true)
         }))

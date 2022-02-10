@@ -325,7 +325,6 @@ extension LoginListViewController {
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
             DispatchQueue.main.async {
-                // TODO: Not working for items brought from sync desktop
                 self?.passwordAPI.removeLogin(credential)
                 self?.fetchLoginInfo()
             }
