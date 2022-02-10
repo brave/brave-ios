@@ -104,7 +104,10 @@ struct AccountPicker: View {
   }
   
   private var networkPickerView: some View {
-    NetworkPicker(networkStore: networkStore)
+    NetworkPicker(
+      networkStore: networkStore,
+      selectedNetwork: networkStore.selectedChainBinding
+    )
   }
   
   private var pickerList: some View {

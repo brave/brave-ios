@@ -60,12 +60,12 @@ public class NetworkStore: ObservableObject {
   @Published var isAddingNewNetwork: Bool = false
   
   public func addCustomNetwork(_ network: BraveWallet.EthereumChain,
-                               completion: @escaping (_ accepted: Bool) -> Void) {
-    func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accepted: Bool) -> Void) {
+                               completion: @escaping (_ accpted: Bool) -> Void) {
+    func addNetwors(_ network: BraveWallet.EthereumChain, completion: @escaping (_ accpted: Bool) -> Void) {
       rpcService.add(network) { [self] chainId, status, message in
         if status == .success {
           // meaning removal is also succeeded if id exists. need to update the list by removing the old then adding the new
-          if let index = ethereumChains.firstIndex(where: { $0.id == network.id }) {
+          if let index = ethereumChains.firstIndex(where: { $0.id.lowercased() == network.id.lowercased() }) {
             ethereumChains.remove(at: index)
           }
           ethereumChains.append(network)
@@ -74,7 +74,7 @@ public class NetworkStore: ObservableObject {
         } else {
           // meaning add custom network failed for some reason. We will not update `ethereumChains`
           // Also add the the old network back on rpc service
-          if let oldNetwork = ethereumChains.first(where: { $0.id == network.id }) {
+          if let oldNetwork = ethereumChains.first(where: { $0.id.lowercased() == network.id.lowercased() }) {
             rpcService.add(oldNetwork) { _, _, _ in
               isAddingNewNetwork = false
               completion(false)
@@ -88,14 +88,13 @@ public class NetworkStore: ObservableObject {
     }
     
     isAddingNewNetwork = true
-    if ethereumChains.contains(where: { $0.chainId == network.chainId }) {
+    if ethereumChains.contains(where: { $0.id.lowercased() == network.id.lowercased() }) {
       removeNetworkForNewAddition(network) { [self] success in
         guard success else {
           isAddingNewNetwork = false
           completion(false)
           return
         }
-        
         addNetwors(network, completion: completion)
       }
     } else {
@@ -106,16 +105,21 @@ public class NetworkStore: ObservableObject {
   /// This method will not update `ethereumChains`
   private func removeNetworkForNewAddition(_ network: BraveWallet.EthereumChain,
                                            completion: @escaping (_ success: Bool) -> Void) {
-    rpcService.removeEthereumChain(network.chainId) { success in
+    rpcService.removeEthereumChain(network.id) { success in
       completion(success)
     }
   }
   
   public func removeCustomNetwork(_ network: BraveWallet.EthereumChain,
                                   completion: @escaping (_ success: Bool) -> Void) {
-    rpcService.removeEthereumChain(network.chainId) { [self] success in
+    rpcService.removeEthereumChain(network.id) { [self] success in
       if success {
-        if let index = ethereumChains.firstIndex(where: { $0.id == network.id }) {
+        // check if its the current network, set mainnet the active net
+        if network.id.lowercased() == selectedChainId.lowercased() {
+          rpcService.setNetwork(BraveWallet.MainnetChainId, completion: { _ in })
+        }
+        // update `ethereumChains`
+        if let index = ethereumChains.firstIndex(where: { $0.id.lowercased() == network.id.lowercased() }) {
           ethereumChains.remove(at: index)
         }
       }

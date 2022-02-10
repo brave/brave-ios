@@ -15,12 +15,29 @@ extension BraveWallet.EthereumChain {
 
 struct NetworkPicker: View {
   @ObservedObject var networkStore: NetworkStore
+  @Binding var selectedNetwork: BraveWallet.EthereumChain
   @State private var isPresentingNetworkList: Bool = false
+  @Environment(\.presentationMode) @Binding private var presentationMode
   
   var body: some View {
-    Button(action: { isPresentingNetworkList = true}) {
+    Menu {
       HStack {
-        Text(networkStore.selectedChain.shortChainName)
+        Picker(
+          Strings.Wallet.selectedNetworkAccessibilityLabel,
+          selection: $selectedNetwork
+        ) {
+          ForEach(networkStore.ethereumChains) {
+            Text($0.chainName).tag($0)
+          }
+        }
+        Divider()
+        Button(action: { isPresentingNetworkList = true }) {
+          Label(Strings.Wallet.addCustomNetworkDropdownButtonTitle, systemImage: "plus")
+        }
+      }
+    } label: {
+      HStack {
+        Text(selectedNetwork.shortChainName)
           .fontWeight(.bold)
         Image(systemName: "chevron.down.circle")
       }
@@ -33,13 +50,23 @@ struct NetworkPicker: View {
       )
       .clipShape(Capsule())
       .contentShape(Capsule())
-      .animation(nil, value: networkStore.selectedChain)
+      .animation(nil, value: selectedNetwork)
     }
     .accessibilityLabel(Strings.Wallet.selectedNetworkAccessibilityLabel)
-    .accessibilityValue(networkStore.selectedChain.shortChainName)
+    .accessibilityValue(selectedNetwork.shortChainName)
     .sheet(isPresented: $isPresentingNetworkList) {
       NavigationView {
-        NetworkListView(networkStore: networkStore)
+        CustomNetworkListView(networkStore: networkStore)
+          .toolbar {
+            ToolbarItemGroup(placement: .cancellationAction) {
+              Button(action: {
+                isPresentingNetworkList = false
+              }) {
+                Text(Strings.cancelButtonTitle)
+                  .foregroundColor(Color(.braveOrange))
+              }
+            }
+          }
       }
     }
   }
@@ -48,7 +75,7 @@ struct NetworkPicker: View {
 #if DEBUG
 struct NetworkPicker_Previews: PreviewProvider {
   static var previews: some View {
-    NetworkPicker(networkStore: .previewStore)
+    NetworkPicker(networkStore: .previewStore, selectedNetwork: .constant(.mainnet))
       .padding()
       .previewLayout(.sizeThatFits)
       .previewColorSchemes()

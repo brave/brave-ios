@@ -146,7 +146,10 @@ struct BalanceHeaderView: View {
       Group {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
-            NetworkPicker(networkStore: networkStore)
+            NetworkPicker(
+              networkStore: networkStore,
+              selectedNetwork: networkStore.selectedChainBinding
+            )
             Text(verbatim: balance)
               .font(.largeTitle.bold())
           }
@@ -154,7 +157,10 @@ struct BalanceHeaderView: View {
           HStack {
             Text(verbatim: balance)
               .font(.largeTitle.bold())
-            NetworkPicker(networkStore: networkStore)
+            NetworkPicker(
+              networkStore: networkStore,
+              selectedNetwork: networkStore.selectedChainBinding
+            )
             Spacer()
           }
         }

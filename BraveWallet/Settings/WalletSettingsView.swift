@@ -54,14 +54,9 @@ public struct WalletSettingsView: View {
         footer: Text(Strings.Wallet.networkFooter)
           .foregroundColor(Color(.secondaryBraveLabel))
       ) {
-        NavigationLink(destination: NetworkListView(networkStore: networkStore)) {
-          HStack {
-            Text(Strings.Wallet.settingsNetworkButtonTitle)
-              .foregroundColor(Color(.braveLabel))
-            Spacer()
-            Text(networkStore.selectedChain.shortChainName)
-              .foregroundColor(Color(.secondaryBraveLabel))
-          }
+        NavigationLink(destination: CustomNetworkListView(networkStore: networkStore)) {
+          Text(Strings.Wallet.settingsNetworkButtonTitle)
+            .foregroundColor(Color(.braveLabel))
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))

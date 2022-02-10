@@ -1755,7 +1755,7 @@ extension Strings {
       "wallet.addCustomNetworkTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Add Custom Network",
+      value: "Add New Network",
       comment: "The title of the add custom network screen"
     )
     public static let saveCustomNetworkButtonTitle = NSLocalizedString(
@@ -1764,6 +1764,13 @@ extension Strings {
       bundle: .braveWallet,
       value: "Save",
       comment: "The title of the button on top right navigation bar for the users to click to save a new custom network."
+    )
+    public static let addCustomNetworkDropdownButtonTitle = NSLocalizedString(
+      "wallet.addCustomNetworkDropdownButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Add Network...",
+      comment: "The title of last option in the network selection dropdown menu. A short-cut for user to add new custom network."
     )
   }
 }

@@ -52,7 +52,10 @@ struct AssetDetailHeaderView: View {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
             HStack {
-              NetworkPicker(networkStore: networkStore)
+              NetworkPicker(
+                networkStore: networkStore,
+                selectedNetwork: networkStore.selectedChainBinding
+              )
               if horizontalSizeClass == .regular {
                 Spacer()
                 DateRangeView(selectedRange: $assetDetailStore.timeframe)
@@ -77,7 +80,10 @@ struct AssetDetailHeaderView: View {
             Text(assetDetailStore.token.name)
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
-            NetworkPicker(networkStore: networkStore)
+            NetworkPicker(
+              networkStore: networkStore,
+              selectedNetwork: networkStore.selectedChainBinding
+            )
             if horizontalSizeClass == .regular {
               Spacer()
               DateRangeView(selectedRange: $assetDetailStore.timeframe)
