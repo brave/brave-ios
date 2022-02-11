@@ -466,7 +466,6 @@ extension MediaPlayer {
             case .began:
                 // An interruption began. Update the UI as necessary.
                 self.pause()
-                break
 
             case .ended:
                // An interruption ended. Resume playback, if appropriate.
