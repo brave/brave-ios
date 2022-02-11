@@ -208,8 +208,34 @@ struct CustomNetworkDetailsView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  @State private var isDuplicateIdErrorPresented: Bool = false
-  @State private var isGenericErrorPresented: Bool = false
+  @State private var customNetworkError: CustomNetworkError?
+  
+  enum CustomNetworkError: LocalizedError, Identifiable {
+    case generic
+    case duplicateId
+    
+    var id: String {
+      errorDescription
+    }
+    
+    var errorTitle: String {
+      switch self {
+      case .generic:
+        return Strings.Wallet.failedToAddCustomNetworkErrorTitle
+      case .duplicateId:
+        return ""
+      }
+    }
+    
+    var errorDescription: String {
+      switch self {
+      case .generic:
+        return Strings.Wallet.failedToAddCustomNetworkErrorMessage
+      case .duplicateId:
+        return Strings.Wallet.networkIdDuplicationErrMsg
+      }
+    }
+  }
   
   init(
     networkStore: NetworkStore,
@@ -320,17 +346,16 @@ struct CustomNetworkDetailsView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
-        Button(action: {
-          addCustomNetwork()
-        }) {
-          if networkStore.isAddingNewNetwork {
-            ProgressView()
-          } else {
+        if networkStore.isAddingNewNetwork {
+          ProgressView()
+        } else {
+          Button(action: {
+            addCustomNetwork()
+          }) {
             Text(isEditMode ? Strings.Wallet.update : Strings.Wallet.saveCustomNetworkButtonTitle)
               .foregroundColor(Color(.braveOrange))
           }
         }
-        .disabled(networkStore.isAddingNewNetwork)
       }
       ToolbarItemGroup(placement: .cancellationAction) {
         Button(action: {
@@ -343,23 +368,13 @@ struct CustomNetworkDetailsView: View {
     }
     .background(
       Color.clear
-        .alert(isPresented: $isDuplicateIdErrorPresented) {
+        .alert(item: $customNetworkError, content: { error in
           Alert(
-            title: Text(""),
-            message: Text(Strings.Wallet.networkIdDuplicationErrMsg),
+            title: Text(error.errorTitle),
+            message: Text(error.errorDescription),
             dismissButton: .default(Text(Strings.OKString))
           )
-        }
-    )
-    .background(
-      Color.clear
-        .alert(isPresented: $isGenericErrorPresented) {
-          Alert(
-            title: Text(Strings.Wallet.failedToAddCustomNetworkErrorTitle),
-            message: Text(Strings.Wallet.failedToAddCustomNetworkErrorMessage),
-            dismissButton: .default(Text(Strings.OKString))
-          )
-        }
+        })
     )
   }
   
@@ -401,7 +416,7 @@ struct CustomNetworkDetailsView: View {
     // Check if input chain id already existed for non-edit mode
     if !isEditMode,
         networkStore.ethereumChains.contains(where: { $0.id == chainIdInHex }) {
-      isDuplicateIdErrorPresented = true
+      customNetworkError = .duplicateId
       return
     }
     
@@ -437,7 +452,7 @@ struct CustomNetworkDetailsView: View {
                                                    isEip1559: false)
     networkStore.addCustomNetwork(network) { accepted in
       guard accepted else {
-        isGenericErrorPresented = true
+        customNetworkError = .generic
         return
       }
       
