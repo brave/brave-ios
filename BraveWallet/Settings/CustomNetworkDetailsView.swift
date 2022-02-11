@@ -405,34 +405,36 @@ struct CustomNetworkDetailsView: View {
       return
     }
     
-    let network: BraveWallet.EthereumChain = .init().then {
-      $0.chainId = chainIdInHex
-      $0.chainName = model.networkName.input
-      $0.symbolName = model.networkSymbolName.input
-      $0.symbol = model.networkSymbol.input
-      $0.decimals = Int32(model.networkDecimals.input) ?? 18
-      $0.rpcUrls = model.rpcUrls.compactMap({
-        if !$0.input.isEmpty && $0.error == nil {
-          return $0.input
-        } else {
-          return nil
-        }
-      })
-      $0.iconUrls = model.iconUrls.compactMap({
-        if !$0.input.isEmpty && $0.error == nil {
-          return $0.input
-        } else {
-          return nil
-        }
-      })
-      $0.blockExplorerUrls = model.blockUrls.compactMap({
-        if !$0.input.isEmpty && $0.error == nil {
-          return $0.input
-        } else {
-          return nil
-        }
-      })
-    }
+    let blockExplorerUrls: [String] = model.blockUrls.compactMap({
+      if !$0.input.isEmpty && $0.error == nil {
+        return $0.input
+      } else {
+        return nil
+      }
+    })
+    let iconUrls: [String] = model.iconUrls.compactMap({
+      if !$0.input.isEmpty && $0.error == nil {
+        return $0.input
+      } else {
+        return nil
+      }
+    })
+    let rpcUrls: [String] = model.rpcUrls.compactMap({
+      if !$0.input.isEmpty && $0.error == nil {
+        return $0.input
+      } else {
+        return nil
+      }
+    })
+    let network: BraveWallet.EthereumChain = .init(chainId: chainIdInHex,
+                                                   chainName: model.networkName.input,
+                                                   blockExplorerUrls: blockExplorerUrls,
+                                                   iconUrls: iconUrls,
+                                                   rpcUrls: rpcUrls,
+                                                   symbol: model.networkSymbol.input,
+                                                   symbolName: model.networkSymbol.input,
+                                                   decimals: Int32(model.networkDecimals.input) ?? 18,
+                                                   isEip1559: false)
     networkStore.addCustomNetwork(network) { accepted in
       guard accepted else {
         isGenericErrorPresented = true

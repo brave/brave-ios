@@ -18,30 +18,32 @@ struct NetworkPicker: View {
   @Binding var selectedNetwork: BraveWallet.EthereumChain
   @State private var isPresentingNetworkList: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @Environment(\.buySendSwapDestination) private var buySendSwapDestination
+  @Environment(\.buySendSwapDestination) @Binding private var buySendSwapDestination
+  
+  private var availableChains: [BraveWallet.EthereumChain] {
+    networkStore.ethereumChains.filter({
+      if let destination = buySendSwapDestination {
+        if destination.kind != .send {
+          return !$0.isCustom
+        }
+      }
+      return true
+    })
+  }
   
   var body: some View {
     Menu {
-      HStack {
-        Picker(
-          Strings.Wallet.selectedNetworkAccessibilityLabel,
-          selection: $selectedNetwork
-        ) {
-          ForEach(networkStore.ethereumChains.filter({
-            if let destination = buySendSwapDestination.wrappedValue {
-              if destination.kind != .send {
-                return !$0.isCustom
-              }
-            }
-            return true
-          })) {
-            Text($0.chainName).tag($0)
-          }
+      Picker(
+        Strings.Wallet.selectedNetworkAccessibilityLabel,
+        selection: $selectedNetwork
+      ) {
+        ForEach(availableChains) {
+          Text($0.chainName).tag($0)
         }
-        Divider()
-        Button(action: { isPresentingNetworkList = true }) {
-          Label(Strings.Wallet.addCustomNetworkDropdownButtonTitle, systemImage: "plus")
-        }
+      }
+      Divider()
+      Button(action: { isPresentingNetworkList = true }) {
+        Label(Strings.Wallet.addCustomNetworkDropdownButtonTitle, systemImage: "plus")
       }
     } label: {
       HStack {

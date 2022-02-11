@@ -23,35 +23,33 @@ struct CustomNetworkListView: View {
   var body: some View {
     List {
       Section {
-        Group {
-          if networkStore.ethereumChains.filter({ $0.isCustom }).isEmpty {
-            Text("No networks added")
-              .font(.footnote.weight(.medium))
-              .frame(maxWidth: .infinity)
-              .multilineTextAlignment(.center)
-              .foregroundColor(Color(.secondaryBraveLabel))
-          } else {
-            ForEach(networkStore.ethereumChains.filter({ $0.isCustom })) { network in
-              Text(network.chainName)
-                .foregroundColor(Color(.braveLabel))
-                .font(.callout)
-                .contextMenu {
-                  Button {
-                    networkStore.removeCustomNetwork(network) { _ in }
-                  } label: {
-                    Label(Strings.Wallet.deleteCustomTokenOrNetwork, systemImage: "trash")
-                  }
-                  Button {
-                    isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-                  } label: {
-                    Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
-                  }
+        if networkStore.ethereumChains.filter({ $0.isCustom }).isEmpty {
+          Text(Strings.Wallet.noNetworks)
+            .font(.footnote.weight(.medium))
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.center)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        } else {
+          ForEach(networkStore.ethereumChains.filter({ $0.isCustom })) { network in
+            Text(network.chainName)
+              .foregroundColor(Color(.braveLabel))
+              .font(.callout)
+              .contextMenu {
+                Button {
+                  networkStore.removeCustomNetwork(network) { _ in }
+                } label: {
+                  Label(Strings.Wallet.delete, systemImage: "trash")
                 }
-            }
+                Button {
+                  isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+                } label: {
+                  Label(Strings.Wallet.editCustomNetwork, systemImage: "square.and.pencil")
+                }
+              }
           }
         }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(.grouped)
     .navigationTitle(Strings.Wallet.addCustomNetworkTitle)

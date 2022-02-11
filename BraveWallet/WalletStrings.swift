@@ -1429,8 +1429,8 @@ extension Strings {
       value: "Add custom asset",
       comment: "The title of the button that is located in the same area of the assets list header but on the right side. Users will click it and go to add custom asset screen."
     )
-    public static let deleteCustomTokenOrNetwork = NSLocalizedString(
-      "wallet.deleteCustomToken",
+    public static let delete = NSLocalizedString(
+      "wallet.delete",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Delete",
@@ -1755,7 +1755,7 @@ extension Strings {
       "wallet.addCustomNetworkTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Add New Network",
+      value: "Add Network",
       comment: "The title of the add custom network screen"
     )
     public static let saveCustomNetworkButtonTitle = NSLocalizedString(
@@ -1769,8 +1769,15 @@ extension Strings {
       "wallet.addCustomNetworkDropdownButtonTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Add Network...",
+      value: "Add Network…",
       comment: "The title of last option in the network selection dropdown menu. A short-cut for user to add new custom network."
+    )
+    public static let noNetworks = NSLocalizedString(
+      "wallet.noNetworks",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "No networks added",
+      comment: "The empty state displayed when the user has not yet added any custom networks."
     )
   }
 }
