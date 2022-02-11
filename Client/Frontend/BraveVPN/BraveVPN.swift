@@ -347,6 +347,12 @@ class BraveVPN {
             }
         }
         
+        if Preferences.VPN.skusCredential.value != nil {
+            // Receipt verification applies to Apple's IAP only,
+            // if we detect Brave's SKU token we should not look at Apple's receipt.
+            return
+        }
+        
         housekeepingApi.verifyReceipt { validSubscriptions, success, error in
             if !success {
                 // Api call for receipt verification failed,

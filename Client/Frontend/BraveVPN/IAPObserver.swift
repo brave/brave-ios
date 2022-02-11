@@ -35,6 +35,12 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
                         SKPaymentQueue.default().finishTransaction(transaction)
                         
                         if expired == false {
+                            // If we purchased via Apple's IAP we reset the Brave SKUs credential
+                            // to avoid mixing two purchase types in the app.
+                            //
+                            // The user will be able to retrieve the shared credential
+                            // after log in to account.brave website.
+                            Preferences.VPN.skusCredential.reset()
                             self.delegate?.purchasedOrRestoredProduct()
                         } else {
                             // Receipt either expired or receipt validation returned some error.
