@@ -178,7 +178,7 @@ class CustomNetworkModel: ObservableObject {
   /// Updates the details of this class based on a custom network
   func populateDetails(from network: BraveWallet.EthereumChain) {
     let chainIdInDecimal: String
-    if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {
+    if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) { // BraveWallet.EthereumChain.chainId should always in hex
       chainIdInDecimal = "\(intValue)"
     } else {
       chainIdInDecimal = network.chainId
