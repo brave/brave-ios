@@ -186,6 +186,15 @@ class BraveVPN {
         return expirationDate < Date()
     }
     
+    static var neverPurchasedVPN: Bool {
+        switch BraveVPN.vpnState {
+        case .notPurchased:
+            return true
+        default:
+            return false
+        }
+    }
+    
     /// Location of last used server for the vpn configuration.
     static var serverLocation: String? {
         guard let serverHostname = hostname else { return nil }

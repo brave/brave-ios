@@ -2092,10 +2092,16 @@ extension Strings {
                               value: "Expires",
                               comment: "Table cell title for cell that shows when the VPN subscription expires.")
         
-        public static let settingsManageSubscription =
+        public static let settingsManageBraveAccountSubscription =
+            NSLocalizedString("vpn.settingsManageBraveAccountSubscription",
+                              bundle: .braveShared,
+                              value: "Manage Brave Account Subscription",
+                              comment: "Button to manage your VPN subscription from Brave website")
+        
+        public static let settingsManageAppleSubscription =
             NSLocalizedString("vpn.settingsManageSubscription",
                               bundle: .braveShared,
-                              value: "Manage Subscription",
+                              value: "Manage Apple Subscription",
                               comment: "Button to manage your VPN subscription")
         
         public static let settingsServerHost =
@@ -2457,6 +2463,12 @@ extension Strings {
                               bundle: .braveShared,
                               value: "Can't send email. Please check your email configuration.",
                               comment: "Button name to send contact form.")
+        
+        public static let settingsBuyVPNButton =
+            NSLocalizedString("vpn.settingsBuyVPNButton",
+                              bundle: .braveShared,
+                              value: "Buy Brave VPN",
+                              comment: "Button to buy Brave VPN from the settings screen")
     }
 }
 

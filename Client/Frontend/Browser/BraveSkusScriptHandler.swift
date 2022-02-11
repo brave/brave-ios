@@ -94,6 +94,7 @@ class BraveSkusScriptHandler: TabContentScript {
     }
     
     private func handlePrepareCredentialsSummary(for domain: String, path: String) {
+        print("bxx 3")
         sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
             // FIXME: Confirm we can pass string only not json/dict
             if !credential.isEmpty {

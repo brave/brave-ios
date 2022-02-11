@@ -416,17 +416,23 @@ class SettingsViewController: TableViewController {
         }()
         
         return Row(text: Strings.VPN.vpnName, detailText: text, selection: { [unowned self] in
-            
             let vc = { () -> UIViewController? in
-                switch BraveVPN.vpnState {
-                case .notPurchased, .purchased, .expired:
-                    return BraveVPN.vpnState.enableVPNDestinationVC
-                case .installed:
+                if false {
+                //if BraveVPN.neverPurchasedVPN {
+                    return BuyVPNViewController()
+                } else {
                     let vc = BraveVPNSettingsViewController()
                     vc.faqButtonTapped = { [weak self] in
                         self?.settingsDelegate?.settingsOpenURLInNewTab(BraveUX.braveVPNFaqURL)
                         self?.dismiss(animated: true)
                     }
+                    
+                    vc.manageBraveAccountSubscriptionTapped = { [weak self] in
+                        // TODO: Update url
+                        self?.settingsDelegate?.settingsOpenURLInNewTab(URL(string: "https://account.brave.com")!)
+                        self?.dismiss(animated: true)
+                    }
+                    
                     return vc
                 }
             }()
