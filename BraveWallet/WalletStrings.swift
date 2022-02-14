@@ -1702,18 +1702,18 @@ extension Strings {
       value: "Block explorer URLs",
       comment: "The title above the input fields for users to input network block explorer urls in Custom Network Details Screen."
     )
-    public static let update = NSLocalizedString(
-      "wallet.update",
+    public static let editfCustomNetworkTitle = NSLocalizedString(
+      "wallet.editfCustomNetworkTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Update",
-      comment: "The title of the navigation bar item on the top right in Custom Network Details Screen for users to update an existed custom network."
+      value: "Edit Network",
+      comment: "The title of form for users to edit an existed custom network."
     )
     public static let customNetworkDetailsTitle = NSLocalizedString(
       "wallet.customNetworkDetailsTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Add new network",
+      value: "Add New Network",
       comment: "The title for Custom Network Details Screen for user to add or edit custom network."
     )
     public static let settingsNetworkButtonTitle = NSLocalizedString(
@@ -1751,12 +1751,19 @@ extension Strings {
       value: "Please try again.",
       comment: "The message of an alert when the custom network the user attempted to add fails for some reason"
     )
-    public static let addCustomNetworkTitle = NSLocalizedString(
-      "wallet.addCustomNetworkTitle",
+    public static let customNetworksTitle = NSLocalizedString(
+      "wallet.customNetworksTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Custom Networks",
+      comment: "The title of custom network list screen"
+    )
+    public static let addCustomNetworkBarItemTitle = NSLocalizedString(
+      "wallet.addCustomNetworkBarItemTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Add Network",
-      comment: "The title of the add custom network screen"
+      comment: "The title of bar item for users to add custom network screen"
     )
     public static let saveCustomNetworkButtonTitle = NSLocalizedString(
       "wallet.saveCustomNetworkButtonTitle",
@@ -1776,7 +1783,7 @@ extension Strings {
       "wallet.noNetworks",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "No networks added",
+      value: "No Networks Added",
       comment: "The empty state displayed when the user has not yet added any custom networks."
     )
   }

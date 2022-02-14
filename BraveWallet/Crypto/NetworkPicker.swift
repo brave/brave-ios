@@ -16,7 +16,7 @@ extension BraveWallet.EthereumChain {
 struct NetworkPicker: View {
   @ObservedObject var networkStore: NetworkStore
   @Binding var selectedNetwork: BraveWallet.EthereumChain
-  @State private var isPresentingNetworkList: Bool = false
+  @State private var isPresentingAddNetwork: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.buySendSwapDestination) @Binding private var buySendSwapDestination
   
@@ -42,7 +42,7 @@ struct NetworkPicker: View {
         }
       }
       Divider()
-      Button(action: { isPresentingNetworkList = true }) {
+      Button(action: { isPresentingAddNetwork = true }) {
         Label(Strings.Wallet.addCustomNetworkDropdownButtonTitle, systemImage: "plus")
       }
     } label: {
@@ -64,19 +64,9 @@ struct NetworkPicker: View {
     }
     .accessibilityLabel(Strings.Wallet.selectedNetworkAccessibilityLabel)
     .accessibilityValue(selectedNetwork.shortChainName)
-    .sheet(isPresented: $isPresentingNetworkList) {
+    .sheet(isPresented: $isPresentingAddNetwork) {
       NavigationView {
-        CustomNetworkListView(networkStore: networkStore)
-          .toolbar {
-            ToolbarItemGroup(placement: .cancellationAction) {
-              Button(action: {
-                isPresentingNetworkList = false
-              }) {
-                Text(Strings.cancelButtonTitle)
-                  .foregroundColor(Color(.braveOrange))
-              }
-            }
-          }
+        CustomNetworkDetailsView(networkStore: networkStore, network: nil)
       }
     }
   }

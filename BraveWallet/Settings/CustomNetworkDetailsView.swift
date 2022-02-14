@@ -342,7 +342,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
-    .navigationBarTitle(Strings.Wallet.customNetworkDetailsTitle)
+    .navigationBarTitle(isEditMode ? Strings.Wallet.editfCustomNetworkTitle : Strings.Wallet.customNetworkDetailsTitle)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
@@ -352,7 +352,7 @@ struct CustomNetworkDetailsView: View {
           Button(action: {
             addCustomNetwork()
           }) {
-            Text(isEditMode ? Strings.Wallet.update : Strings.Wallet.saveCustomNetworkButtonTitle)
+            Text(Strings.Wallet.saveCustomNetworkButtonTitle)
               .foregroundColor(Color(.braveOrange))
           }
         }
