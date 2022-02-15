@@ -588,6 +588,8 @@
 		3BF56D271CDBBE1F00AC4D75 /* SimpleToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */; };
 		44029EA327BBCEC800E6CE18 /* BlockedResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EA227BBCEC800E6CE18 /* BlockedResource.swift */; };
 		44029EAF27BBD78400E6CE18 /* BlockedTrackerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EAE27BBD78400E6CE18 /* BlockedTrackerParser.swift */; };
+		44029EB427BC101800E6CE18 /* PrivacyReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */; };
+		44029EB627BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */; };
 		440982A526658EAA00BB37FE /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440982A426658EAA00BB37FE /* BraveSearchManager.swift */; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
 		4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */; };
@@ -2383,6 +2385,8 @@
 		3BF56D261CDBBE1F00AC4D75 /* SimpleToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleToast.swift; sourceTree = "<group>"; };
 		44029EA227BBCEC800E6CE18 /* BlockedResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedResource.swift; sourceTree = "<group>"; };
 		44029EAE27BBD78400E6CE18 /* BlockedTrackerParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedTrackerParser.swift; sourceTree = "<group>"; };
+		44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyReportsView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyReportAllTimeListsView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		440982A426658EAA00BB37FE /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
 		4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpsEverywhereStats.swift; sourceTree = "<group>"; };
@@ -5128,6 +5132,15 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		44029EB227BC0FFF00E6CE18 /* PrivacyHub */ = {
+			isa = PBXGroup;
+			children = (
+				44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */,
+				44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */,
+			);
+			path = PrivacyHub;
+			sourceTree = "<group>";
+		};
 		4422D41A21BFCE3900BF1855 /* Httpse */ = {
 			isa = PBXGroup;
 			children = (
@@ -6300,6 +6313,7 @@
 				CA2202A527192E22002D3582 /* Interstitial Pages */,
 				CAA7DC5D26332C4700E3910E /* Certificate Viewer */,
 				5E5E6E3825BA03360035B6A0 /* Playlist */,
+				44029EB227BC0FFF00E6CE18 /* PrivacyHub */,
 				0A3C789423055AC80022F6D8 /* Onboarding */,
 				C6D267612137E45D00465DFA /* PrivacyProtection */,
 				C6D267592137E39A00465DFA /* ImageCache */,
@@ -8668,6 +8682,7 @@
 				27E0652824CB6AE300134946 /* BraveNewsErrorView.swift in Sources */,
 				E650755C1E37F747006961AC /* Swizzling.m in Sources */,
 				2777954927E126AB00536D0C /* BraveCoreDebugSwitchesView.swift in Sources */,
+				44029EB427BC101800E6CE18 /* PrivacyReportsView.swift in Sources */,
 				2FE63DB8258BCC29004B219D /* BrowserViewController+OpenSearch.swift in Sources */,
 				2719DA09249D37490080AB48 /* SponsorCardView.swift in Sources */,
 				D3B6923D1B9F9444004B87A4 /* FindInPageBar.swift in Sources */,
@@ -8791,6 +8806,7 @@
 				E65075611E37F77D006961AC /* MenuHelper.swift in Sources */,
 				C615FACF2129FBD000A8168C /* ImageCacheProtocol.swift in Sources */,
 				4422D4BB21BFFB7600BF1855 /* cache.cc in Sources */,
+				44029EB627BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift in Sources */,
 				CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */,
 				0A39FEA0248660EA00290ABC /* VPNConstants.m in Sources */,
 				2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */,
