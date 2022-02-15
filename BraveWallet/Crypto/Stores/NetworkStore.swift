@@ -68,8 +68,8 @@ public class NetworkStore: ObservableObject {
           if let oldNetwork = ethereumChains.first(where: { $0.id.lowercased() == network.id.lowercased() }) {
             rpcService.add(oldNetwork) { _, _, _ in
               // Update `ethereumChains` by api calling
-              updateChainList()
-              isAddingNewNetwork = false
+              self.updateChainList()
+              self.isAddingNewNetwork = false
               completion(false)
             }
           } else {

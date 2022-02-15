@@ -48,25 +48,31 @@ struct CustomNetworkListView: View {
           Button(action: {
             isPresentingNetworkDetails = .init(isEditMode: true, network: network)
           }) {
-            VStack(alignment: .leading, spacing: 2) {
-              Text(network.chainName)
-                .foregroundColor(Color(.braveLabel))
-                .font(.callout)
-              Group {
-                if sizeCategory.isAccessibilityCategory {
-                  VStack(alignment: .leading) {
-                    Text(network.id)
-                    Text(network.rpcUrls.first ?? "")
-                  }
-                } else {
-                  HStack {
-                    Text(network.id)
-                    Text(network.rpcUrls.first ?? "")
+            HStack {
+              VStack(alignment: .leading, spacing: 2) {
+                Text(network.chainName)
+                  .foregroundColor(Color(.braveLabel))
+                  .font(.callout)
+                Group {
+                  if sizeCategory.isAccessibilityCategory {
+                    VStack(alignment: .leading) {
+                      Text(network.id)
+                      Text(network.rpcUrls.first ?? "")
+                    }
+                  } else {
+                    HStack {
+                      Text(network.id)
+                      Text(network.rpcUrls.first ?? "")
+                    }
                   }
                 }
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .font(.footnote)
               }
-              .foregroundColor(Color(.secondaryBraveLabel))
-              .font(.footnote)
+              Spacer()
+              Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundColor(Color(.separator))
             }
             .padding(.vertical, 6)
           }
@@ -134,6 +140,9 @@ struct CustomNetworkListView_Previews: PreviewProvider {
     static var previews: some View {
       NavigationView {
         CustomNetworkListView(networkStore: .previewStore)
+      }
+      NavigationView {
+        CustomNetworkListView(networkStore: .previewStoreWithCustomNetworkAdded)
       }
     }
 }
