@@ -254,6 +254,13 @@ struct CustomNetworkDetailsView: View {
     Form {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainIdTitle))
+          .osAvailabilityModifiers { content in
+            if #available(iOS 15.0, *) {
+              content // padding already exists in 15
+            } else {
+              content.padding(.top)
+            }
+          }
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
