@@ -36,72 +36,75 @@ struct CustomNetworkListView: View {
     }
   }
   
+  private func removeNetwork(_ network: BraveWallet.EthereumChain) {
+    networkStore.removeCustomNetwork(network) { _ in }
+  }
+  
   var body: some View {
-    Group {
-      if networkStore.ethereumChains.filter({ $0.isCustom }).isEmpty {
-        ZStack {
-          Color(.braveGroupedBackground)
-            .ignoresSafeArea()
-          Text(Strings.Wallet.noNetworks)
-            .font(.headline.weight(.medium))
-            .frame(maxWidth: .infinity)
-            .multilineTextAlignment(.center)
-            .foregroundColor(Color(.secondaryBraveLabel))
-        }
-      } else {
-        List {
-          Section {
-            ForEach(networkStore.ethereumChains.filter({ $0.isCustom })) { network in
-              Button(action: {
-                isPresentingNetworkDetails = .init(isEditMode: true, network: network)
-              }) {
-                VStack(alignment: .leading, spacing: 5) {
-                  Text(network.chainName)
-                    .foregroundColor(Color(.braveLabel))
-                    .font(.callout)
-                  Group {
-                    if sizeCategory.isAccessibilityCategory {
-                      VStack(alignment: .leading) {
-                        Text(network.id)
-                        Text(network.rpcUrls.first ?? "")
-                      }
-                    } else {
-                      HStack {
-                        Text(network.id)
-                        Text(network.rpcUrls.first ?? "")
-                      }
-                    }
+    List {
+      Section {
+        let customNetworks = networkStore.ethereumChains.filter({ $0.isCustom })
+        ForEach(customNetworks) { network in
+          Button(action: {
+            isPresentingNetworkDetails = .init(isEditMode: true, network: network)
+          }) {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(network.chainName)
+                .foregroundColor(Color(.braveLabel))
+                .font(.callout)
+              Group {
+                if sizeCategory.isAccessibilityCategory {
+                  VStack(alignment: .leading) {
+                    Text(network.id)
+                    Text(network.rpcUrls.first ?? "")
                   }
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .font(.footnote)
-                }
-              }
-              .osAvailabilityModifiers { content in
-                if #available(iOS 15.0, *) {
-                  content
-                    .modifier(SwipeActionsViewModifier_FB9812596 {
-                      networkStore.removeCustomNetwork(network) { _ in }
-                    })
                 } else {
-                  content
-                    .contextMenu {
-                      Button {
-                        networkStore.removeCustomNetwork(network) { _ in }
-                      } label: {
-                        Label(Strings.Wallet.delete, systemImage: "trash")
-                      }
-                    }
+                  HStack {
+                    Text(network.id)
+                    Text(network.rpcUrls.first ?? "")
+                  }
                 }
               }
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .font(.footnote)
+            }
+            .padding(.vertical, 6)
+          }
+          .osAvailabilityModifiers { content in
+            if #available(iOS 15.0, *) {
+              content
+                .modifier(SwipeActionsViewModifier_FB9812596 {
+                  withAnimation(.default) {
+                    removeNetwork(network)
+                  }
+                })
+            } else {
+              content
             }
           }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
-        .padding(.top, 23.0)
-        .listStyle(.plain)
-        .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.bottom))
+        .onDelete { indexSet in
+          let networksToRemove = indexSet.map({ customNetworks[$0] })
+          withAnimation(.default) {
+            for network in networksToRemove {
+              removeNetwork(network)
+            }
+          }
+        }
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
+    .listStyle(.insetGrouped)
+    .overlay(Group {
+      if networkStore.ethereumChains.filter({ $0.isCustom }).isEmpty {
+        Text(Strings.Wallet.noNetworks)
+          .font(.headline.weight(.medium))
+          .frame(maxWidth: .infinity)
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .transition(.opacity)
+      }
+    })
     .navigationTitle(Strings.Wallet.customNetworksTitle)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
