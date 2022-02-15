@@ -1580,7 +1580,7 @@ extension Strings {
       "wallet.customNetworkChainIdTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "The ID of the new chain",
+      value: "The ID of the chain",
       comment: "The title above the input field for users to input network chain ID in Custom Network Details Screen."
     )
     public static let customNetworkChainIdPlaceholder = NSLocalizedString(
@@ -1601,7 +1601,7 @@ extension Strings {
       "wallet.customNetworkChainNameTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "The name of the new chain",
+      value: "The name of the chain",
       comment: "The title above the input field for users to input network chain name in Custom Network Details Screen."
     )
     public static let customNetworkChainNamePlaceholder = NSLocalizedString(
