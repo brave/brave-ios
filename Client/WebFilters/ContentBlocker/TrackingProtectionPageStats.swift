@@ -56,7 +56,7 @@ class TPStatsBlocklistChecker {
 
   func isBlocked(request: URLRequest, domain: Domain, resourceType: TPStatsResourceType? = nil, _ completion: @escaping (BlocklistName?) -> Void) {
 
-    guard let url = request.url, let host = url.host, !host.isEmpty else {
+        guard let url = request.url, let host = url.host, !host.isEmpty, let domainUrl = domain.url else {
       // TP Stats init isn't complete yet
       completion(nil)
       return
@@ -85,10 +85,13 @@ class TPStatsBlocklistChecker {
 
       let isAdOrTrackerListEnabled = enabledLists.contains(.ad) || enabledLists.contains(.tracker)
 
-      if isAdOrTrackerListEnabled
-        && AdBlockStats.shared.shouldBlock(
-          request,
-          currentTabUrl: currentTabUrl) {
+            if isAdOrTrackerListEnabled && AdBlockStats.shared.shouldBlock(request,
+                                                                           currentTabUrl: currentTabUrl) {
+                
+                if let dom = URL(string: domainUrl) {
+                    BlockedResource.create(url: url, domain: dom, resourceType: .ad)
+                }
+                
         completion(BlocklistName.ad)
         return
       }
