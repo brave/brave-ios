@@ -1562,20 +1562,6 @@ extension Strings {
       value: "Beta",
       comment: "Appended to 'Wallet' so that it appears as 'Wallet (Beta)' in the app menu. Describing 'beta' software"
     )
-    public static let editCustomNetwork = NSLocalizedString(
-      "wallet.editCustomNetwork",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "Edit",
-      comment: "The title of the option inside the context menu for custom network row in networks list screen."
-    )
-    public static let networkListTitle = NSLocalizedString(
-      "wallet.networkListTitile",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "Select Network",
-      comment: "The title of the screen that will list all the networks that have been added to Json-RPC server."
-    )
     public static let customNetworkChainIdTitle = NSLocalizedString(
       "wallet.customNetworkChainIdTitle",
       tableName: "BraveWallet",
