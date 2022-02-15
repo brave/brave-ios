@@ -253,8 +253,7 @@ struct CustomNetworkDetailsView: View {
   var body: some View {
     Form {
       Section(
-        header: Text(Strings.Wallet.customNetworkChainIdTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainIdTitle))
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
@@ -265,8 +264,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkChainNameTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainNameTitle))
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
@@ -275,8 +273,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkSymbolNameTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolNameTitle))
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
@@ -285,8 +282,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkSymbolTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolTitle))
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
@@ -295,8 +291,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkCurrencyDecimalTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkCurrencyDecimalTitle))
       ) {
         NetworkTextField(
           placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
@@ -306,8 +301,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkRpcUrlsTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkRpcUrlsTitle))
       ) {
         ForEach($model.rpcUrls) { $url in
           NetworkTextField(
@@ -318,8 +312,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkIconUrlsTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkIconUrlsTitle))
       ) {
         ForEach($model.iconUrls) { $url in
           NetworkTextField(
@@ -330,8 +323,7 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
-        header: Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle)
-          .textCase(.none)
+        header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle))
       ) {
         ForEach($model.blockUrls) { $url in
           NetworkTextField(
