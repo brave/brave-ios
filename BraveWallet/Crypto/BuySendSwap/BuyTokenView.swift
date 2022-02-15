@@ -14,7 +14,6 @@ struct BuyTokenView: View {
   @ObservedObject var buyTokenStore: BuyTokenStore
   
   @State private var amountInput = ""
-  @State private var isPresentingAddNetwork = false
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -25,8 +24,7 @@ struct BuyTokenView: View {
         Section(
           header: AccountPicker(
             keyringStore: keyringStore,
-            networkStore: networkStore,
-            isPresentingAddNetwork: $isPresentingAddNetwork
+            networkStore: networkStore
           )
             .listRowBackground(Color.clear)
             .resetListHeaderStyle()
@@ -115,11 +113,6 @@ struct BuyTokenView: View {
       }
       .navigationTitle(Strings.Wallet.buy)
       .navigationBarTitleDisplayMode(.inline)
-      .sheet(isPresented: $isPresentingAddNetwork) {
-        NavigationView {
-          CustomNetworkDetailsView(networkStore: networkStore, network: nil)
-        }
-      }
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {

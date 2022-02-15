@@ -167,9 +167,8 @@ struct SwapCryptoView: View {
   @ObservedObject var swapTokensStore: SwapTokenStore
   
   @State private var orderType: OrderType = .market
-  @State private var hideSlippage: Bool = true
+  @State var hideSlippage = true
   @State private var isSwapDisclaimerVisible: Bool = false
-  @State private var isPresentingAddNetwork: Bool = false
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -438,8 +437,7 @@ struct SwapCryptoView: View {
         Section(
           header: AccountPicker(
             keyringStore: keyringStore,
-            networkStore: ethNetworkStore,
-            isPresentingAddNetwork: $isPresentingAddNetwork
+            networkStore: ethNetworkStore
           )
             .listRowBackground(Color.clear)
             .resetListHeaderStyle()
@@ -455,11 +453,6 @@ struct SwapCryptoView: View {
       }
       .navigationTitle(Strings.Wallet.swap)
       .navigationBarTitleDisplayMode(.inline)
-      .sheet(isPresented: $isPresentingAddNetwork) {
-        NavigationView {
-          CustomNetworkDetailsView(networkStore: ethNetworkStore, network: nil)
-        }
-      }
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {

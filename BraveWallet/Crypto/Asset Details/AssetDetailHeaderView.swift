@@ -20,7 +20,6 @@ struct AssetDetailHeaderView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   @Binding var buySendSwapDestination: BuySendSwapDestination?
-  @Binding var isPresentingAddNetwork: Bool
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -54,9 +53,8 @@ struct AssetDetailHeaderView: View {
           VStack(alignment: .leading) {
             HStack {
               NetworkPicker(
-                networks: networkStore.ethereumChains,
-                selectedNetwork: networkStore.selectedChainBinding,
-                isPresentingAddNetwork: $isPresentingAddNetwork
+                networkStore: networkStore,
+                selectedNetwork: networkStore.selectedChainBinding
               )
               if horizontalSizeClass == .regular {
                 Spacer()
@@ -83,9 +81,8 @@ struct AssetDetailHeaderView: View {
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
             NetworkPicker(
-              networks: networkStore.ethereumChains,
-              selectedNetwork: networkStore.selectedChainBinding,
-              isPresentingAddNetwork: $isPresentingAddNetwork
+              networkStore: networkStore,
+              selectedNetwork: networkStore.selectedChainBinding
             )
             if horizontalSizeClass == .regular {
               Spacer()
@@ -193,8 +190,7 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
       assetDetailStore: .previewStore,
       keyringStore: .previewStore,
       networkStore: .previewStore,
-      buySendSwapDestination: .constant(nil),
-      isPresentingAddNetwork: .constant(false)
+      buySendSwapDestination: .constant(nil)
     )
     .padding(.vertical)
     .previewLayout(.sizeThatFits)
