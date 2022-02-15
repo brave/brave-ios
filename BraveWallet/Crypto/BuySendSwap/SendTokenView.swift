@@ -18,6 +18,7 @@ struct SendTokenView: View {
   @State private var amountInput = ""
   @State private var isShowingScanner = false
   @State private var isShowingError = false
+  @State private var isPresentingAddNetwork = false
   
   @ScaledMetric private var length: CGFloat = 16.0
   
@@ -46,7 +47,8 @@ struct SendTokenView: View {
         Section(
           header: AccountPicker(
             keyringStore: keyringStore,
-            networkStore: networkStore
+            networkStore: networkStore,
+            isPresentingAddNetwork: $isPresentingAddNetwork
           )
             .listRowBackground(Color.clear)
             .resetListHeaderStyle()
@@ -176,6 +178,11 @@ struct SendTokenView: View {
       }
       .sheet(isPresented: $isShowingScanner) {
         AddressQRCodeScannerView(address: $sendTokenStore.sendAddress)
+      }
+      .sheet(isPresented: $isPresentingAddNetwork) {
+        NavigationView {
+          CustomNetworkDetailsView(networkStore: networkStore, network: nil)
+        }
       }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)

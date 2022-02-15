@@ -19,6 +19,9 @@ struct PortfolioView: View {
   @State private var dismissedBackupBannerThisSession: Bool = false
   @State private var isPresentingBackup: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
+  @State private var tableInset: CGFloat = -16.0
+  @State private var selectedToken: BraveWallet.BlockchainToken?
+  @State private var isPresentingAddNetwork: Bool = false
   
   private var isShowingBackupBanner: Bool {
     !keyringStore.keyring.isBackedUp && !dismissedBackupBannerThisSession
@@ -52,14 +55,11 @@ struct PortfolioView: View {
         historicalBalances: portfolioStore.historicalBalances,
         isLoading: portfolioStore.isLoadingBalances,
         networkStore: networkStore,
-        selectedDateRange: $portfolioStore.timeframe
+        selectedDateRange: $portfolioStore.timeframe,
+        isPresentingAddNetwork: $isPresentingAddNetwork
       )
     }
   }
-  
-  @State private var tableInset: CGFloat = -16.0
-  
-  @State private var selectedToken: BraveWallet.BlockchainToken?
   
   var body: some View {
     List {
@@ -126,6 +126,11 @@ struct PortfolioView: View {
         tableInset = -tableView.layoutMargins.left
       }
     }
+    .sheet(isPresented: $isPresentingAddNetwork) {
+      NavigationView {
+        CustomNetworkDetailsView(networkStore: networkStore, network: nil)
+      }
+    }
   }
 }
 
@@ -135,6 +140,7 @@ struct BalanceHeaderView: View {
   var isLoading: Bool
   @ObservedObject var networkStore: NetworkStore
   @Binding var selectedDateRange: BraveWallet.AssetPriceTimeframe
+  @Binding var isPresentingAddNetwork: Bool
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -147,8 +153,9 @@ struct BalanceHeaderView: View {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
             NetworkPicker(
-              networkStore: networkStore,
-              selectedNetwork: networkStore.selectedChainBinding
+              networks: networkStore.ethereumChains,
+              selectedNetwork: networkStore.selectedChainBinding,
+              isPresentingAddNetwork: $isPresentingAddNetwork
             )
             Text(verbatim: balance)
               .font(.largeTitle.bold())
@@ -158,8 +165,9 @@ struct BalanceHeaderView: View {
             Text(verbatim: balance)
               .font(.largeTitle.bold())
             NetworkPicker(
-              networkStore: networkStore,
-              selectedNetwork: networkStore.selectedChainBinding
+              networks: networkStore.ethereumChains,
+              selectedNetwork: networkStore.selectedChainBinding,
+              isPresentingAddNetwork: $isPresentingAddNetwork
             )
             Spacer()
           }

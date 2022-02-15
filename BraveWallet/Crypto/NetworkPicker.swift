@@ -14,14 +14,14 @@ extension BraveWallet.EthereumChain {
 }
 
 struct NetworkPicker: View {
-  @ObservedObject var networkStore: NetworkStore
+  var networks: [BraveWallet.EthereumChain]
   @Binding var selectedNetwork: BraveWallet.EthereumChain
-  @State private var isPresentingAddNetwork: Bool = false
+  @Binding var isPresentingAddNetwork: Bool
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.buySendSwapDestination) @Binding private var buySendSwapDestination
   
   private var availableChains: [BraveWallet.EthereumChain] {
-    networkStore.ethereumChains.filter({
+    networks.filter({
       if let destination = buySendSwapDestination {
         if destination.kind != .send {
           return !$0.isCustom
@@ -64,18 +64,17 @@ struct NetworkPicker: View {
     }
     .accessibilityLabel(Strings.Wallet.selectedNetworkAccessibilityLabel)
     .accessibilityValue(selectedNetwork.shortChainName)
-    .sheet(isPresented: $isPresentingAddNetwork) {
-      NavigationView {
-        CustomNetworkDetailsView(networkStore: networkStore, network: nil)
-      }
-    }
   }
 }
 
 #if DEBUG
 struct NetworkPicker_Previews: PreviewProvider {
   static var previews: some View {
-    NetworkPicker(networkStore: .previewStore, selectedNetwork: .constant(.mainnet))
+    NetworkPicker(
+      networks: [.mainnet, .rinkeby, .ropsten],
+      selectedNetwork: .constant(.mainnet),
+      isPresentingAddNetwork: .constant(false)
+    )
       .padding()
       .previewLayout(.sizeThatFits)
       .previewColorSchemes()

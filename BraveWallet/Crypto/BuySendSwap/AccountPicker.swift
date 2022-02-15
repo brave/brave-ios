@@ -11,6 +11,8 @@ struct AccountPicker: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
+  @Binding var isPresentingAddNetwork: Bool
+  
   @State private var isPresentingPicker: Bool = false
   @State private var isPresentingAddAccount: Bool = false
   @Environment(\.sizeCategory) private var sizeCategory
@@ -105,8 +107,9 @@ struct AccountPicker: View {
   
   private var networkPickerView: some View {
     NetworkPicker(
-      networkStore: networkStore,
-      selectedNetwork: networkStore.selectedChainBinding
+      networks: networkStore.ethereumChains,
+      selectedNetwork: networkStore.selectedChainBinding,
+      isPresentingAddNetwork: $isPresentingAddNetwork
     )
   }
   
@@ -166,7 +169,8 @@ struct AccountPicker_Previews: PreviewProvider {
   static var previews: some View {
     AccountPicker(
       keyringStore: .previewStoreWithWalletCreated,
-      networkStore: .previewStore
+      networkStore: .previewStore,
+      isPresentingAddNetwork: .constant(false)
     )
     .padding()
     .previewLayout(.sizeThatFits)
