@@ -9,15 +9,18 @@ import Storage
 import XCGLogger
 import WebKit
 import SwiftyJSON
+import BraveCore
 
 private let log = Logger.browserLogger
 
 class LoginsHelper: TabContentScript {
-    fileprivate weak var tab: Tab?
-    fileprivate let profile: Profile
-    fileprivate var snackBar: SnackBar?
+    private weak var tab: Tab?
+    private let profile: Profile
+    private let passwordAPI: BravePasswordAPI
+    
+    private var snackBar: SnackBar?
 
-    // Exposed for mocking purposes
+    // Used while handling authentication challenge
     var logins: BrowserLogins {
         return profile.logins
     }
@@ -26,9 +29,10 @@ class LoginsHelper: TabContentScript {
         return "LoginsHelper"
     }
 
-    required init(tab: Tab, profile: Profile) {
+    required init(tab: Tab, profile: Profile, passwordAPI: BravePasswordAPI) {
         self.tab = tab
         self.profile = profile
+        self.passwordAPI = passwordAPI
     }
 
     func scriptMessageHandlerName() -> String? {
@@ -45,7 +49,7 @@ class LoginsHelper: TabContentScript {
             return
         }
 
-        guard var res = body["data"] as? [String: AnyObject] else { return }
+        guard let res = body["data"] as? [String: AnyObject] else { return }
         guard let type = res["type"] as? String else { return }
 
         // Check to see that we're in the foreground before trying to check the logins. We want to
@@ -63,17 +67,29 @@ class LoginsHelper: TabContentScript {
             // Since responses go to the main frame, make sure we only listen for main frame requests
             // to avoid XSS attacks.
             if type == "request" {
-                res["username"] = "" as AnyObject?
-                res["password"] = "" as AnyObject?
-                if let login = Login.fromScript(url, script: res),
-                   let requestId = res["requestId"] as? String {
-                    requestLogins(login, requestId: requestId, frameInfo: message.frameInfo)
+                passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
+                    guard let self = self else { return }
+
+                    if let requestId = res["requestId"] as? String {
+                        self.autoFillRequestedCredentials(
+                            formSubmitURL: res["formSubmitURL"] as? String ?? "",
+                            logins: logins,
+                            requestId: requestId,
+                            frameInfo: message.frameInfo)
+                    }
                 }
             } else if type == "submit" {
                 if Preferences.General.saveLogins.value {
-                    if let login = Login.fromScript(url, script: res) {
-                        setCredentials(login)
+//                    if let login = Login.fromScript(url, script: res) {
+//                        setCredentials(login)
+//                    }
+                    
+                    passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
+                        guard let self = self else { return }
+                        
+                        self.updateORSaveCredentials(logins: logins)
                     }
+                    
                 }
             }
         }
@@ -147,7 +163,7 @@ class LoginsHelper: TabContentScript {
         tab?.addSnackbar(snackBar!)
     }
 
-    fileprivate func promptUpdateFromLogin(login old: LoginData, toLogin new: LoginData) {
+    private func promptUpdateFromLogin(login old: LoginData, toLogin new: LoginData) {
         guard new.isValid.isSuccess else {
             return
         }
@@ -180,47 +196,83 @@ class LoginsHelper: TabContentScript {
         snackBar?.addButton(update)
         tab?.addSnackbar(snackBar!)
     }
-
-    fileprivate func requestLogins(_ login: LoginData, requestId: String, frameInfo: WKFrameInfo) {
+    
+    private func updateORSaveCredentials(logins: [PasswordForm]) {
+        
+//        for login in logins {
+//            if (login.usernameValue? ?? "").caseInsensitivelyEqual(to: login.)
+//        }
+        
+//        if login.passwordValue.isEmpty {
+//            log.debug("Empty password")
+//            return
+//        }
+//
+//        profile.logins
+//               .getLoginsForProtectionSpace(login.protectionSpace, withUsername: login.username)
+//               .uponQueue(.main) { res in
+//            if let data = res.successValue {
+//                log.debug("Found \(data.count) logins.")
+//                for saved in data {
+//                    if let saved = saved {
+//                        if saved.password == login.password {
+//                            self.profile.logins.addUseOfLoginByGUID(saved.guid)
+//                            return
+//                        }
+//
+//                        self.promptUpdateFromLogin(login: saved, toLogin: login)
+//                        return
+//                    }
+//                }
+//            }
+//
+//            self.promptSave(login)
+//        }
+    }
+    
+    private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
         let currentHost = tab?.webView?.url?.host
         let frameHost = frameInfo.securityOrigin.host
         
-        profile.logins.getLoginsForProtectionSpace(login.protectionSpace).uponQueue(.main) { res in
-            var jsonObj = [String: Any]()
-            if let cursor = res.successValue {
-                log.debug("Found \(cursor.count) logins.")
-                jsonObj["requestId"] = requestId
-                jsonObj["name"] = "RemoteLogins:loginsFound"
-                jsonObj["logins"] = cursor.compactMap { loginData -> [String: String]? in
-                    if frameInfo.isMainFrame {
-                        return loginData?.toDict()
-                    }
-                    
-                    // The frame must belong to the same security origin
-                    if let currentHost = currentHost,
-                       !currentHost.isEmpty,
-                       currentHost == frameHost {
-                        // Prevent XSS on non main frame
-                        // If it is not the main frame, return username only, but no password!
-                        // Chromium does the same on iOS.
-                        // Firefox does NOT support third-party frames or iFrames.
-                        loginData?.update(password: "", username: loginData?.username ?? "")
-                        return loginData?.toDict()
-                    }
-                    
-                    return nil
-                }
-            }
-
-            let json = JSON(jsonObj)
-            guard let jsonString = json.stringValue() else {
-                return
+        var jsonObj = [String: Any]()
+        jsonObj["requestId"] = requestId
+        jsonObj["name"] = "RemoteLogins:loginsFound"
+        jsonObj["logins"] = logins.compactMap { loginData -> [String: String]? in
+            if frameInfo.isMainFrame {
+                return loginData.toDict(formSubmitURL: formSubmitURL)
             }
             
-            self.tab?.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.logins.inject", args: [jsonString], contentWorld: .defaultClient, escapeArgs: false) { (obj, err) -> Void in
-                if err != nil {
-                    log.debug(err)
+            // The frame must belong to the same security origin
+            if let currentHost = currentHost,
+               !currentHost.isEmpty,
+               currentHost == frameHost {
+                // Prevent XSS on non main frame
+                // If it is not the main frame, return username only, but no password!
+                // Chromium does the same on iOS.
+                // Firefox does NOT support third-party frames or iFrames.
+                
+                if let updatedLogin = loginData.copy() as? PasswordForm {
+                    updatedLogin.update(loginData.usernameValue, passwordValue: "")
+                    
+                    return updatedLogin.toDict(formSubmitURL: formSubmitURL)
                 }
+            }
+            
+            return nil
+        }
+        
+        let json = JSON(jsonObj)
+        guard let jsonString = json.stringValue() else {
+            return
+        }
+        
+        self.tab?.webView?.evaluateSafeJavaScript(
+            functionName: "window.__firefox__.logins.inject",
+            args: [jsonString],
+            contentWorld: .defaultClient,
+            escapeArgs: false) { (obj, err) -> Void in
+            if err != nil {
+                log.debug(err)
             }
         }
     }

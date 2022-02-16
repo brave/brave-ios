@@ -537,6 +537,7 @@
 		2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */; };
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
 		2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D8266698E600C6B74D /* DataSavedTests.swift */; };
+		2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */; };
 		2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */; };
 		2FA01E5D25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */; };
 		2FA5A7582649CD9200740035 /* HistoryServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */; };
@@ -2291,6 +2292,7 @@
 		2F91AFD225FFA830002DBC4A /* ActivityShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityShortcutManager.swift; sourceTree = "<group>"; };
 		2F9311D42665883400C6B74D /* DataSaved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaved.swift; sourceTree = "<group>"; };
 		2F9311D8266698E600C6B74D /* DataSavedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSavedTests.swift; sourceTree = "<group>"; };
+		2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordAPIExtensions.swift; sourceTree = "<group>"; };
 		2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkTierTests.swift; sourceTree = "<group>"; };
 		2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsActivityItemSourceProvider.swift; sourceTree = "<group>"; };
 		2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceStateObserver.swift; sourceTree = "<group>"; };
@@ -4950,6 +4952,7 @@
 		2FD155BC27B2F74E00D383E7 /* Password */ = {
 			isa = PBXGroup;
 			children = (
+				2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */,
 				2FD155BD27B2F87000D383E7 /* PasswordStoreStateObserver.swift */,
 			);
 			path = Password;
@@ -4981,7 +4984,6 @@
 				2FCEED8426EAAB6C00892699 /* HistoryAPIExtensions.swift */,
 				2FD1C60A2638823D00E3C25F /* HistoryFetchers.swift */,
 				2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */,
-				2FD155BC27B2F74E00D383E7 /* Password */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -5553,6 +5555,7 @@
 			children = (
 				2FD1C5FA2638599100E3C25F /* Bookmarks */,
 				2FD1C60726385AEC00E3C25F /* History */,
+				2FD155BC27B2F74E00D383E7 /* Password */,
 				5E096173252B63A300F3AFBB /* BraveCoreMigrator.swift */,
 				5E09617F252B63F200F3AFBB /* BraveSyncAPIExtensions.swift */,
 				5E72D54E253657FF00F8D62D /* BraveCoreImportExportUtility.swift */,
@@ -8579,6 +8582,7 @@
 				C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */,
 				E6927EC01C7B6FB800D03F75 /* ErrorToast.swift in Sources */,
+				2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */,
 				27C647832550AF34006D72FC /* WalletTransferCompleteView.swift in Sources */,
 				4422D4B821BFFB7600BF1855 /* histogram.cc in Sources */,
 				27FD3FBA25C8D20200696156 /* FeedDataSource+RSS.swift in Sources */,

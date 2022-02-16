@@ -1937,7 +1937,7 @@ extension BrowserViewController: TabDelegate {
 
         // only add the logins helper if the tab is not a private browsing tab
         if !tab.isPrivate {
-            let logins = LoginsHelper(tab: tab, profile: profile)
+            let logins = LoginsHelper(tab: tab, profile: profile, passwordAPI: braveCore.passwordAPI)
             tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
         }
 
