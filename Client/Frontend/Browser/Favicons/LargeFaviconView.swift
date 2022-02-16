@@ -32,7 +32,7 @@ class LargeFaviconView: UIView {
     
     func cancelLoading() {
         fetcher = nil
-        imageView.image = UIImage()
+        imageView.image = nil
         imageView.contentMode = .scaleAspectFit
         backgroundColor = .clear
         layoutMargins = .zero
