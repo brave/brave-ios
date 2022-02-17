@@ -645,4 +645,47 @@ class BraveVPN {
       }
     }
   }
+    
+    static var vpnAlertsTimer: Timer?
+    
+    static func scheduleVPNAlertsTask() {
+        vpnAlertsTimer?.invalidate()
+        
+        GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
+        
+        vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+            processVPNAlerts()
+        }
+        
+        processVPNAlerts()
+    }
+    
+    private static func processVPNAlerts() {
+        Task.init {
+            let (data, success, error) = await GRDGatewayAPI.shared().events()
+            if !success {
+                log.error("VPN getEvents call failed")
+                if let error = error {
+                    log.warning(error)
+                }
+                
+                return
+            }
+            
+            guard let alertsData = data["alerts"] else {
+                log.error("Failed to unwrap json for vpn alerts")
+                return
+            }
+            
+            do {
+                let dataAsJSON =
+                try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
+                let decoded = try JSONDecoder().decode([VPNAlertModel].self, from: dataAsJSON)
+                
+                print("bxx data: \(decoded)")
+            } catch {
+                log.error("Error: \(error)")
+            }
+        }
+    }
 }

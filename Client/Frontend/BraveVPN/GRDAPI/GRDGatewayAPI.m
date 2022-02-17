@@ -313,7 +313,7 @@
     NSMutableArray *fakeAlerts = [NSMutableArray array];
    
     NSInteger i = 0;
-    for (i = 0; i < 20000; i++){
+    for (i = 0; i < 20; i++){
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app",
                                 @"host":@"analytics.localytics.com",
@@ -360,7 +360,7 @@
     return [NSArray arrayWithArray:fakeAlerts];
 }
 
-- (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString *error))completion {
+- (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
     if (self.dummyDataForDebugging == NO) {
         if ([self _canMakeApiRequests] == NO) {
             NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
