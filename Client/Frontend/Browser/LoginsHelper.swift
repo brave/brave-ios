@@ -80,27 +80,16 @@ class LoginsHelper: TabContentScript {
                 }
             } else if type == "submit" {
                 if Preferences.General.saveLogins.value {
+                    
+                    // TODO: Used in authenticator
 //                    if let login = Login.fromScript(url, script: res) {
 //                        setCredentials(login)
 //                    }
                     
-                    passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
-                        guard let self = self else { return }
-                        
-                        self.updateORSaveCredentials(logins: logins)
-                    }
-                    
+                    updateORSaveCredentials(for: url, script: res)
                 }
             }
         }
-    }
-
-    func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace) -> Deferred<Maybe<Cursor<LoginData>>> {
-        return profile.logins.getLoginsForProtectionSpace(protectionSpace)
-    }
-
-    func updateLoginByGUID(_ guid: GUID, new: LoginData, significant: Bool) -> Success {
-        return profile.logins.updateLoginByGUID(guid, new: new, significant: significant)
     }
 
     func setCredentials(_ login: LoginData) {
@@ -197,38 +186,69 @@ class LoginsHelper: TabContentScript {
         tab?.addSnackbar(snackBar!)
     }
     
-    private func updateORSaveCredentials(logins: [PasswordForm]) {
+    private func updateORSaveCredentials(for url: URL, script: [String: Any]) {
+                
+        guard let scriptCredentials = passwordAPI.fetchCredentialsFromScript(url, script: script) else {
+            return
+        }
         
-//        for login in logins {
-//            if (login.usernameValue? ?? "").caseInsensitivelyEqual(to: login.)
-//        }
+        if scriptCredentials.password.isEmpty {
+            log.debug("Empty Password")
+        }
         
-//        if login.passwordValue.isEmpty {
-//            log.debug("Empty password")
-//            return
-//        }
-//
-//        profile.logins
-//               .getLoginsForProtectionSpace(login.protectionSpace, withUsername: login.username)
-//               .uponQueue(.main) { res in
-//            if let data = res.successValue {
-//                log.debug("Found \(data.count) logins.")
-//                for saved in data {
-//                    if let saved = saved {
-//                        if saved.password == login.password {
-//                            self.profile.logins.addUseOfLoginByGUID(saved.guid)
-//                            return
-//                        }
-//
-//                        self.promptUpdateFromLogin(login: saved, toLogin: login)
-//                        return
-//                    }
-//                }
-//            }
-//
-//            self.promptSave(login)
-//        }
+        passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
+            guard let self = self else { return }
+            
+            for login in logins {
+                if (login.usernameValue ?? "").caseInsensitivelyEqual(to: scriptCredentials.username) {
+                    guard scriptCredentials.password == login.passwordValue else {
+                        return
+                    }
+                    
+                    self.showSaveCredentialPrompt(for: login, isUpdating: true)
+                    return
+                } else {
+                    self.showSaveCredentialPrompt(for: login, isUpdating: false)
+                    return
+                }
+            }
+        }
     }
+    
+    private func showSaveCredentialPrompt(for login: PasswordForm, isUpdating: Bool) {
+        guard let username = login.usernameValue else {
+            return
+        }
+
+        let formattedDescription = String(format: Strings.updateLoginUsernamePrompt, username, login.signOnRealm ?? "")
+
+        if let existingPrompt = self.snackBar {
+            tab?.removeSnackbar(existingPrompt)
+        }
+
+        snackBar = TimerSnackBar(text: formattedDescription, img: #imageLiteral(resourceName: "key"))
+        let dontSaveORUpdate = SnackButton(
+            title: isUpdating ? Strings.loginsHelperDontUpdateButtonTitle : Strings.loginsHelperDontSaveButtonTitle,
+            accessibilityIdentifier: "UpdateLoginPrompt.dontSaveUpdateButton") { [unowned self] bar in
+                self.tab?.removeSnackbar(bar)
+                self.snackBar = nil
+                return
+        }
+        
+        let saveORUpdate = SnackButton(
+            title: isUpdating ?  Strings.loginsHelperUpdateButtonTitle : Strings.loginsHelperSaveLoginButtonTitle,
+            accessibilityIdentifier: "UpdateLoginPrompt.saveUpdateButton") { [unowned self] bar in
+                self.tab?.removeSnackbar(bar)
+                self.snackBar = nil
+                
+                // TODO: Call add update
+        }
+        
+        snackBar?.addButton(dontSaveORUpdate)
+        snackBar?.addButton(saveORUpdate)
+        tab?.addSnackbar(snackBar!)
+    }
+    
     
     private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
         let currentHost = tab?.webView?.url?.host
