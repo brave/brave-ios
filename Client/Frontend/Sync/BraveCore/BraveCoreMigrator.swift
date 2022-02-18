@@ -383,6 +383,12 @@ extension BraveCoreMigrator {
             guard let self = self else { return }
 
             for login in results.asArray() {
+                
+                // Do not migrate login entries which URLCredential persistence is stored for the session
+                guard login.credentials.persistence == .forSession else {
+                    return
+                }
+                
                 if self.migrateChromiumPasswords(login: login) {
                     self.profile.logins.removeLoginByGUID(login.guid).upon { result in
                         DispatchQueue.main.async {
@@ -410,7 +416,7 @@ extension BraveCoreMigrator {
         
         let loginForm = PasswordForm(
             url: formSubmitURL,
-            signOnRealm: nil,
+            signOnRealm: formSubmitURL.getURLStringOrigin() ?? "",
             dateCreated: login.timeCreated.toDate(),
             dateLastUsed: login.timeLastUsed.toDate(),
             datePasswordChanged: login.timePasswordChanged.toDate(),

@@ -160,7 +160,7 @@ class LoginListViewController: LoginAuthViewController {
     private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
         if let query = query, !query.isEmpty {
             credentialList = passwordForms.filter { form in
-                (form.signOnRealm?.lowercased() ?? "").contains(query) ||
+                (form.url.getURLStringOrigin()?.lowercased() ?? "").contains(query) ||
                 (form.usernameValue?.lowercased() ?? "").contains(query)
             }
         } else {
@@ -234,7 +234,8 @@ extension LoginListViewController {
                 $0.selectionStyle = .none
                 $0.accessoryType = .disclosureIndicator
 
-                $0.setLines(loginInfo.signOnRealm, detailText: loginInfo.usernameValue)
+                $0.setLines(loginInfo.displayURLString,
+                            detailText: loginInfo.usernameValue)
                 $0.imageView?.contentMode = .scaleAspectFit
                 $0.imageView?.image = FaviconFetcher.defaultFaviconImage
                 $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
@@ -243,7 +244,7 @@ extension LoginListViewController {
                 $0.imageView?.layer.cornerCurve = .continuous
                 $0.imageView?.layer.masksToBounds = true
                 
-                if let signOnRealm = loginInfo.signOnRealm, let signOnRealmURL = URL(string: signOnRealm) {
+                if let signOnRealmURL = URL(string: loginInfo.signOnRealm) {
                     let domain = Domain.getOrCreate(forUrl: signOnRealmURL, persistent: true)
     
                     cell.imageView?.loadFavicon(

@@ -117,7 +117,7 @@ class LoginInfoViewController: LoginAuthViewController {
         super.viewDidLoad()
 
         navigationItem.do {
-            $0.title = URL(string: credentials.signOnRealm ?? "")?.baseDomain ?? ""
+            $0.title = URL(string: credentials.signOnRealm)?.baseDomain ?? ""
             $0.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
         }
 
@@ -171,7 +171,8 @@ extension LoginInfoViewController {
                         cell.do {
                             $0.delegate = self
                             $0.highlightedLabel.text = Strings.Login.loginInfoDetailsWebsiteFieldTitle
-                            $0.descriptionTextField.text = credentials.signOnRealm ?? ""
+                            $0.descriptionTextField.text =
+                                credentials.url.getURLStringOrigin() ?? credentials.signOnRealm
                             $0.isEditingFieldData = false
                             $0.tag = InfoItem.websiteItem.rawValue
                         }

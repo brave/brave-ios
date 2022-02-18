@@ -80,12 +80,6 @@ class LoginsHelper: TabContentScript {
                 }
             } else if type == "submit" {
                 if Preferences.General.saveLogins.value {
-                    
-                    // TODO: Used in authenticator
-//                    if let login = Login.fromScript(url, script: res) {
-//                        setCredentials(login)
-//                    }
-                    
                     updateORSaveCredentials(for: url, script: res)
                 }
             }
@@ -187,46 +181,75 @@ class LoginsHelper: TabContentScript {
     }
     
     private func updateORSaveCredentials(for url: URL, script: [String: Any]) {
-                
-        guard let scriptCredentials = passwordAPI.fetchCredentialsFromScript(url, script: script) else {
+        guard let scriptCredentials = passwordAPI.fetchFromScript(url, script: script),
+              let username = scriptCredentials.usernameValue,
+              scriptCredentials.usernameElement != nil,
+              let password = scriptCredentials.passwordValue,
+              scriptCredentials.passwordElement != nil else {
+            log.debug("Missing Credentials from script")
             return
         }
         
-        if scriptCredentials.password.isEmpty {
+        if password.isEmpty {
             log.debug("Empty Password")
+            return
         }
         
         passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
             guard let self = self else { return }
             
             for login in logins {
-                if (login.usernameValue ?? "").caseInsensitivelyEqual(to: scriptCredentials.username) {
-                    guard scriptCredentials.password == login.passwordValue else {
+                if (login.usernameValue ?? "").caseInsensitivelyEqual(to: username) {
+                    guard password == login.passwordValue else {
                         return
                     }
                     
-                    self.showSaveCredentialPrompt(for: login, isUpdating: true)
+                    self.showUpdatePrompt(from: login, to: scriptCredentials)
                     return
                 } else {
-                    self.showSaveCredentialPrompt(for: login, isUpdating: false)
+                    self.showAddPrompt(for: scriptCredentials)
                     return
                 }
+            }
+            
+            self.showAddPrompt(for: scriptCredentials)
+        }
+    }
+    
+    private func showAddPrompt(for login: PasswordForm) {
+        addSnackBarForPrompt(for: login, isUpdating: false) { [unowned self] in
+            DispatchQueue.main.async {
+                print("LOGIN URL \(login.url)")
+                print("LOGIN REALM \(login.signOnRealm)")
+                self.passwordAPI.addLogin(login)
             }
         }
     }
     
-    private func showSaveCredentialPrompt(for login: PasswordForm, isUpdating: Bool) {
+    private func showUpdatePrompt(from old: PasswordForm, to new: PasswordForm) {
+        addSnackBarForPrompt(for: new, isUpdating: true) { [unowned self] in
+            self.passwordAPI.updateLogin(new, oldPasswordForm: old)
+        }
+    }
+    
+    private func addSnackBarForPrompt(for login: PasswordForm, isUpdating: Bool, _ completion: @escaping () -> Void) {
         guard let username = login.usernameValue else {
             return
         }
-
-        let formattedDescription = String(format: Strings.updateLoginUsernamePrompt, username, login.signOnRealm ?? "")
-
+        
+        // Remove the existing prompt
         if let existingPrompt = self.snackBar {
             tab?.removeSnackbar(existingPrompt)
         }
+        
+        let promptMessage = String(
+            format: isUpdating ? Strings.updateLoginUsernamePrompt: Strings.saveLoginUsernamePrompt, username,
+            login.url.getURLStringOrigin() ?? login.signOnRealm)
 
-        snackBar = TimerSnackBar(text: formattedDescription, img: #imageLiteral(resourceName: "key"))
+        snackBar = TimerSnackBar(
+            text: promptMessage,
+            img: isUpdating ? #imageLiteral(resourceName: "key") : #imageLiteral(resourceName: "shields-menu-icon"))
+        
         let dontSaveORUpdate = SnackButton(
             title: isUpdating ? Strings.loginsHelperDontUpdateButtonTitle : Strings.loginsHelperDontSaveButtonTitle,
             accessibilityIdentifier: "UpdateLoginPrompt.dontSaveUpdateButton") { [unowned self] bar in
@@ -241,14 +264,14 @@ class LoginsHelper: TabContentScript {
                 self.tab?.removeSnackbar(bar)
                 self.snackBar = nil
                 
-                // TODO: Call add update
+                completion()
         }
         
         snackBar?.addButton(dontSaveORUpdate)
         snackBar?.addButton(saveORUpdate)
-        tab?.addSnackbar(snackBar!)
+        
+        tab?.addSnackbar(snackBar)
     }
-    
     
     private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
         let currentHost = tab?.webView?.url?.host
@@ -295,5 +318,35 @@ class LoginsHelper: TabContentScript {
                 log.debug(err)
             }
         }
+    }
+}
+
+extension URL {
+    
+    /// Retrieving the the origin from url
+    /// This method will be used to fetch singOnRealm from url while saving credentials
+    /// - Parameter allowJS: Boolean determining if scheme javascript allowed
+    /// - Returns: Origin of the url
+    func getURLStringOrigin(allowJS: Bool = false) -> String? {
+        var realm: String?
+        if let scheme = self.scheme, !scheme.isEmpty,
+           let host = self.host {
+            if allowJS && scheme == "javascript" {
+                return "javascript:"
+            }
+
+            realm = "\(scheme)://\(host)/"
+
+            // If the URI explicitly specified a port, only include it when
+            // it's not the default. (We never want "http://foo.com:80")
+            if let port = self.port {
+                realm? += ":\(port)"
+            }
+        } else {
+            log.debug("Couldn't parse origin for \(self)")
+            realm = nil
+        }
+        
+        return realm
     }
 }

@@ -541,9 +541,11 @@ class Tab: NSObject {
         }
     }
 
-    func addSnackbar(_ bar: SnackBar) {
-        bars.append(bar)
-        tabDelegate?.tab(self, didAddSnackbar: bar)
+    func addSnackbar(_ bar: SnackBar?) {
+        if let snackBar = bar {
+            bars.append(snackBar)
+            tabDelegate?.tab(self, didAddSnackbar: snackBar)
+        }
     }
 
     func removeSnackbar(_ bar: SnackBar) {
