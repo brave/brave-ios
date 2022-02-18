@@ -93,6 +93,12 @@ public struct CryptoView: View {
     .environment(\.openWalletURLAction, .init(action: { url in
       openWalletURLAction?(url)
     }))
+    .onAppear {
+      if UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight {
+        UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+        UINavigationController.attemptRotationToDeviceOrientation()
+      }
+    }
   }
 }
 
