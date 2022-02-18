@@ -227,7 +227,8 @@ class SyncPairCameraViewController: SyncViewController {
     private func showErrorAlert(error: BraveSyncQRCodeError) {
         let errorMessage = { (error: BraveSyncQRCodeError) -> String in
             switch error {
-            case .insecure, .newerVersion: return Strings.syncInsecureVersionError
+            case .insecure: return Strings.syncInsecureVersionError
+            case .newerVersion: return Strings.syncNewerVersionError
             case .invalidFormat: return Strings.syncInvalidVersionError
             case .expired: return Strings.syncExpiredError
             case .futureDate: return Strings.syncFutureVersionError
