@@ -223,7 +223,7 @@ public class KeyringStore: ObservableObject {
   }
   
   func removeSecondaryAccount(forAddress address: String, completion: ((Bool) -> Void)? = nil) {
-    keyringService.removeImportedAccount(address) { success in
+    keyringService.removeImportedAccount(address, coin: .eth) { success in
       self.updateKeyringInfo()
       completion?(success)
     }
@@ -247,7 +247,7 @@ public class KeyringStore: ObservableObject {
         completion(success ? key : nil)
       }
     } else {
-      keyringService.privateKey(forImportedAccount: account.address) { success, key in
+      keyringService.privateKey(forImportedAccount: account.address, coin: .eth) { success, key in
         completion(success ? key : nil)
       }
     }

@@ -39,8 +39,8 @@ class MockTxService: BraveWalletTxService {
     completion("Mock transaction message")
   }
   
-  func approveTransaction(_ coinType: BraveWallet.CoinType, txMetaId: String, completion: @escaping (Bool) -> Void) {
-    completion(false)
+  func approveTransaction(_ coinType: BraveWallet.CoinType, txMetaId: String, completion: @escaping (Bool, BraveWallet.ProviderError, String) -> Void) {
+    completion(false, .internalError, "Error Message")
   }
 }
 

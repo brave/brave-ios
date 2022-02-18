@@ -45,8 +45,8 @@ class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
     completion(nil)
   }
   
-  func processHardwareSignature(_ txMetaId: String, v: String, r: String, s: String, completion: @escaping (Bool) -> Void) {
-    completion(false)
+  func processHardwareSignature(_ txMetaId: String, v: String, r: String, s: String, completion: @escaping (Bool, BraveWallet.ProviderError, String) -> Void) {
+    completion(false, .internalError, "Error Message")
   }
 }
 
