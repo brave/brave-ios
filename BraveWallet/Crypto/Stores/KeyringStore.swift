@@ -205,7 +205,7 @@ public class KeyringStore: ObservableObject {
   }
   
   func addSecondaryAccount(_ name: String, privateKey: String, completion: ((Bool, String) -> Void)? = nil) {
-    keyringService.importAccount(name, privateKey: privateKey) { success, address in
+    keyringService.importAccount(name, privateKey: privateKey, coin: .eth) { success, address in
       self.updateKeyringInfo()
       completion?(success, address)
     }
@@ -243,7 +243,7 @@ public class KeyringStore: ObservableObject {
   
   func privateKey(for account: BraveWallet.AccountInfo, completion: @escaping (String?) -> Void) {
     if account.isPrimary {
-      keyringService.privateKey(forDefaultKeyringAccount: account.address) { success, key in
+      keyringService.privateKey(forKeyringAccount: account.address, coin: .eth) { success, key in
         completion(success ? key : nil)
       }
     } else {

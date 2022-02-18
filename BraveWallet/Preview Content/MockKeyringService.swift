@@ -196,7 +196,15 @@ class MockKeyringService: BraveWalletKeyringService {
     completion(false, "")
   }
   
-  func privateKey(forDefaultKeyringAccount address: String, completion: @escaping (Bool, String) -> Void) {
+  func importAccount(_ accountName: String, privateKey: String, coin: BraveWallet.CoinType, completion: @escaping (Bool, String) -> Void) {
+    completion(false, "")
+  }
+  
+  func importFilecoinBlsAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
+    completion(false, "")
+  }
+  
+  func privateKey(forKeyringAccount address: String, coin: BraveWallet.CoinType, completion: @escaping (Bool, String) -> Void) {
     completion(true, "807df4db569fab37cdf475a4bda779897f0f3dd9c5d90a2cb953c88ef762fd96")
   }
   
