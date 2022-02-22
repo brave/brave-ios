@@ -261,23 +261,18 @@ struct SwapCryptoView: View {
         Button(action: {
           swapTokensStore.swapSelectedTokens()
         }) {
-          HStack {
-            Spacer()
-            Image(systemName: "chevron.up.chevron.down")
-              .font(.body)
-              .foregroundColor(Color(.bravePrimary))
-              .padding(.horizontal, 20)
-              .padding(.vertical, 5)
-              .background(
-                Color(.secondaryButtonTint)
-                  .clipShape(Capsule().inset(by: 0.5).stroke())
-              )
-              .clipShape(Capsule())
-            Spacer()
-          }
+          Label(Strings.Wallet.swapSelectedTokens, systemImage: "chevron.up.chevron.down")
+            .labelStyle(.iconOnly)
+            .font(.body)
+            .foregroundColor(Color(.bravePrimary))
+            .padding(.horizontal, 20)
+            .padding(.vertical, 5)
+            .background(
+              Color(.secondaryButtonTint)
+                .clipShape(Capsule().inset(by: 0.5).stroke())
+            )
+            .clipShape(Capsule())
         }
-        .contentShape(Rectangle())
-        .accessibilityLabel(Strings.Wallet.swapSelectedTokens)
         .accessibility(addTraits: .isButton)
       }
         .listRowInsets(.zero)
