@@ -273,7 +273,6 @@ struct SwapCryptoView: View {
             )
             .clipShape(Capsule())
         }
-        .accessibility(addTraits: .isButton)
       }
         .listRowInsets(.zero)
     ) {
