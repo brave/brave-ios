@@ -253,12 +253,34 @@ struct SwapCryptoView: View {
           Strings.Wallet.swapCryptoAmountTitle,
           swapTokensStore.selectedFromToken?.symbol ?? ""))
       ),
-      footer: ShortcutAmountGrid(action: { amount in
-        swapTokensStore.sellAmount = ((swapTokensStore.selectedFromTokenBalance ?? 0) * amount.rawValue)
-          .decimalExpansion(precisionAfterDecimalPoint: Int(swapTokensStore.selectedFromToken?.decimals ?? 18))
-      })
-      .listRowInsets(.zero)
-      .padding(.bottom, 8)
+      footer: VStack(spacing: 20) {
+        ShortcutAmountGrid(action: { amount in
+          swapTokensStore.sellAmount = ((swapTokensStore.selectedFromTokenBalance ?? 0) * amount.rawValue)
+            .decimalExpansion(precisionAfterDecimalPoint: Int(swapTokensStore.selectedFromToken?.decimals ?? 18))
+        })
+        Button(action: {
+          swapTokensStore.swapSelectedTokens()
+        }) {
+          HStack {
+            Spacer()
+            Image(systemName: "chevron.up.chevron.down")
+              .font(.body)
+              .foregroundColor(Color(.bravePrimary))
+              .padding(.horizontal, 20)
+              .padding(.vertical, 5)
+              .background(
+                Color(.secondaryButtonTint)
+                  .clipShape(Capsule().inset(by: 0.5).stroke())
+              )
+              .clipShape(Capsule())
+            Spacer()
+          }
+        }
+        .contentShape(Rectangle())
+        .accessibilityLabel(Strings.Wallet.swapSelectedTokens)
+        .accessibility(addTraits: .isButton)
+      }
+        .listRowInsets(.zero)
     ) {
       TextField(
         String.localizedStringWithFormat(
