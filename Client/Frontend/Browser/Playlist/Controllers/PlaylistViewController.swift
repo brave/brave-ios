@@ -176,6 +176,42 @@ class PlaylistViewController: UIViewController {
         updateLayoutForOrientationChange()
         
         detailController.setVideoPlayer(playerView)
+        updateLayoutForOrientationMode()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        folderObserver = PlaylistManager.shared.onCurrentFolderDidChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self = self,
+                      self.listController.parent == nil,
+                      PlaylistManager.shared.currentFolder != nil
+                else { return }
+                
+                self.updateLayoutForOrientationMode()
+                self.folderController.navigationController?.pushViewController(self.listController, animated: true)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        folderObserver = nil
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        updateLayoutForOrientationChange()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    private func updateLayoutForOrientationMode() {
         detailController.navigationController?.setNavigationBarHidden(splitController.isCollapsed || traitCollection.horizontalSizeClass == .regular, animated: false)
         
         if UIDevice.isPhone {
@@ -195,37 +231,6 @@ class PlaylistViewController: UIViewController {
             listController.updateLayoutForMode(.pad)
             detailController.updateLayoutForMode(.pad)
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        folderObserver = PlaylistManager.shared.onCurrentFolderDidChange
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                guard let self = self,
-                      self.listController.parent == nil,
-                      PlaylistManager.shared.currentFolder != nil
-                else { return }
-                
-                self.folderController.navigationController?.pushViewController(self.listController, animated: true)
-        }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        folderObserver = nil
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        
-        updateLayoutForOrientationChange()
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
     }
     
     private func updateLayoutForOrientationChange() {

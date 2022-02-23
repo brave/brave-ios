@@ -174,6 +174,13 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
         PlaylistItem.deleteAll(predicate: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src), context: .new(inMemory: false), includesPropertyValues: false)
     }
     
+    public static func removeItems(_ items: [PlaylistInfo]) {
+        let pageSrcs = items.map({ $0.pageSrc })
+        let mediaSrcs = items.map({ $0.src })
+        
+        PlaylistItem.deleteAll(predicate: NSPredicate(format: "pageSrc IN %@ OR mediaSrc IN %@", pageSrcs, mediaSrcs), context: .new(inMemory: false), includesPropertyValues: false)
+    }
+    
     public static func moveItems(items: [NSManagedObjectID], to folderUUID: String?) {
         DataController.perform { context in
             var folder: PlaylistFolder?

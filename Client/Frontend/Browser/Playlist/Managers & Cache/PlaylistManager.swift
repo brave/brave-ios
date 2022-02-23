@@ -243,22 +243,49 @@ class PlaylistManager: NSObject {
         downloadManager.cancelDownload(item: item)
     }
     
-    func delete(folder: PlaylistFolder) {
-        if currentFolder?.objectID == folder.objectID {
+    @discardableResult
+    func delete(folder: PlaylistFolder) -> Bool {
+        var success = true
+        var itemsToDelete = [PlaylistInfo]()
+        
+        folder.playlistItems?.forEach({
+            let item = PlaylistInfo(item: $0)
+            cancelDownload(item: item)
+            
+            if let index = assetInformation.firstIndex(where: { $0.itemId == item.pageSrc }) {
+                let assetFetcher = self.assetInformation.remove(at: index)
+                assetFetcher.cancelLoading()
+            }
+            
+            if let cacheItem = PlaylistItem.getItem(pageSrc: item.pageSrc),
+               cacheItem.cachedData != nil {
+                if !deleteCache(item: item) {
+                    // If we cannot delete an item's cache for any given reason,
+                    // Do NOT delete the folder containing the item.
+                    // Delete all other items.
+                    success = false
+                } else {
+                    itemsToDelete.append(item)
+                }
+            }
+        })
+        
+        if success, currentFolder?.objectID == folder.objectID {
             currentFolder = nil
         }
         
-        folder.playlistItems?.forEach({
-            self.delete(item: PlaylistInfo(item: $0))
-        })
-        
-        if folder.uuid != PlaylistFolder.savedFolderUUID {
+        if success, folder.uuid != PlaylistFolder.savedFolderUUID {
             PlaylistFolder.removeFolder(folder)
+        } else {
+            PlaylistItem.removeItems(itemsToDelete)
         }
         
         if currentFolder?.isDeleted == true {
             currentFolder = nil
         }
+        
+        reloadData()
+        return success
     }
     
     @discardableResult

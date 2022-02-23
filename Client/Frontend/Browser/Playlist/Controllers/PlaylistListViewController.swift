@@ -530,7 +530,12 @@ extension PlaylistListViewController {
         if PlaylistManager.shared.numberOfAssets > 0 {
             tableView.backgroundView = nil
             tableView.separatorStyle = .singleLine
-            navigationController?.setToolbarHidden(false, animated: true)
+            
+            if !playerView.isFullscreen, UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
+                navigationController?.setToolbarHidden(true, animated: true)
+            } else {
+                navigationController?.setToolbarHidden(false, animated: true)
+            }
         } else {
             let messageLabel = UILabel(frame: view.bounds).then {
                 $0.text = Strings.PlayList.noItemLabelTitle
