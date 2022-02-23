@@ -24,7 +24,7 @@ class PlaylistFolderController: UIViewController {
     private let savedFolder = PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID)
     private let othersFRC = PlaylistFolder.frc(savedFolderContentsOnly: false)
     
-    var onFolderSelected: ((_ playlistFolder: PlaylistFolder?) -> Void)?
+    var onFolderSelected: ((_ playlistFolder: PlaylistFolder) -> Void)?
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -259,9 +259,13 @@ extension PlaylistFolderController: UITableViewDelegate {
         
         switch section {
         case .savedItems:
-            onFolderSelected?(savedFolder)
+            if let savedFolder = savedFolder {
+                onFolderSelected?(savedFolder)
+            }
         case .folders:
-            onFolderSelected?(othersFRC.fetchedObjects?[safe: indexPath.row])
+            if let folder = othersFRC.fetchedObjects?[safe: indexPath.row] {
+                onFolderSelected?(folder)
+            }
         }
     }
     

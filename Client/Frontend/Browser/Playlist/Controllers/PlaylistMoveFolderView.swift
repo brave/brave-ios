@@ -51,11 +51,13 @@ private struct PlaylistFolderView: View {
     let isSourceFolder: Bool
     let folder: PlaylistFolder?
     @Binding var selectedFolder: PlaylistFolder?
+    @ScaledMetric private var imageSize = 28.0
     
     var body: some View {
-        HStack(spacing: 12.0) {
+        HStack(spacing: 10.0) {
             Image(systemName: "folder")
-                .foregroundColor(isSourceFolder ? Color(.braveDisabled) : Color(.braveOrange))
+                .foregroundColor(isSourceFolder ? Color(.secondaryBraveLabel) : Color(.braveOrange))
+                .frame(width: imageSize)
             
             VStack(alignment: .leading) {
                 if let folder = folder {
@@ -63,12 +65,10 @@ private struct PlaylistFolderView: View {
                     
                     Text(folder.title ?? "")
                         .font(.body)
-                        .foregroundColor(.white)
-                        .opacity(isSourceFolder ? 0.5 : 1.0)
+                        .foregroundColor(isSourceFolder ? Color(.secondaryBraveLabel) : .white)
                     Text("\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))")
                         .font(.footnote)
-                        .foregroundColor(.white)
-                        .opacity(0.5)
+                        .foregroundColor(Color(.secondaryBraveLabel))
                 }
             }
             
@@ -220,7 +220,7 @@ struct PlaylistMoveFolderView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Strings.done) { onDoneButtonPressed?(selectedItems, selectedFolder) }
-                    .foregroundColor(isMoveDisabled ? Color(.braveDisabled) : .white)
+                    .foregroundColor(isMoveDisabled ? Color(.secondaryBraveLabel) : .white)
                     .disabled(isMoveDisabled)
                 }
             }
