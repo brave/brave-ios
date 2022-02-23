@@ -268,8 +268,9 @@ class PlaylistCarplayController: NSObject {
         let folders = frc.fetchedObjects ?? []
 
         // Construct Folders UI
-        let savedFolder = CPListItem(text: savedFolder?.title ?? "",
-                                     detailText: "\(savedFolder?.playlistItems?.count ?? 0) Items",
+        let itemCount = savedFolder?.playlistItems?.count ?? 0
+        let savedFolder = CPListItem(text: savedFolder?.title ?? Strings.PlaylistFolders.playlistUntitledFolderTitle,
+                                     detailText: "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
                                      image: nil,
                                      accessoryImage: nil,
                                      accessoryType: .disclosureIndicator).then {
@@ -283,8 +284,9 @@ class PlaylistCarplayController: NSObject {
         }
         
         let otherFolders = folders.compactMap { folder -> CPListItem? in
-            CPListItem(text: folder.title ?? "",
-                                      detailText: "\(folder.playlistItems?.count ?? 0) Items",
+            let itemCount = folder.playlistItems?.count ?? 0
+            return CPListItem(text: folder.title ?? Strings.PlaylistFolders.playlistUntitledFolderTitle,
+                                      detailText: "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
                                       image: nil,
                                       accessoryImage: nil,
                                       accessoryType: .disclosureIndicator).then {
