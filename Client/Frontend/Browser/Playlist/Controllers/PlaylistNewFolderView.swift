@@ -44,23 +44,18 @@ class PlaylistFolderImageLoader: ObservableObject {
     }
 }
 
-private struct PlaylistFolderImage: View, Identifiable {
+private struct PlaylistFolderImage: View {
+    let item: PlaylistItem
+    
     static let cornerRadius = 10.0
     private static let favIconSize = 16.0
-    private let item: PlaylistItem
     private var title: String?
     
     @StateObject private var thumbnailLoader = PlaylistFolderImageLoader()
     @StateObject private var favIconLoader = PlaylistFolderImageLoader()
-    @State private var thumbnail = UIImage()
-    @State private var favIcon = UIImage()
-    
-    let id: String
     
     init(item: PlaylistItem) {
         self.item = item
-        id = item.id
-        title = item.name
     }
     
     var body: some View {
@@ -82,7 +77,7 @@ private struct PlaylistFolderImage: View, Identifiable {
                 
                 Spacer()
                 
-                if let title = title {
+                if let title = item.name {
                     Text(title)
                         .font(.footnote.weight(.semibold))
                         .lineLimit(2)
@@ -152,10 +147,12 @@ struct PlaylistNewFolderView: View {
                                       spacing: PlaylistNewFolderView.designGridSpacing) {
                                 ForEach(items) { item in
                                     Button(action: {
-                                        if let index = selected.firstIndex(of: item.objectID) {
-                                            selected.remove(at: index)
-                                        } else {
-                                            selected.append(item.objectID)
+                                        withAnimation(.linear(duration: 0.1)) {
+                                            if let index = selected.firstIndex(of: item.objectID) {
+                                                selected.remove(at: index)
+                                            } else {
+                                                selected.append(item.objectID)
+                                            }
                                         }
                                     }, label: {
                                         PlaylistFolderImage(item: item)
@@ -163,10 +160,13 @@ struct PlaylistNewFolderView: View {
                                     .frame(height: PlaylistNewFolderView.designGridItemHeight)
                                     .buttonStyle(.plain)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: PlaylistFolderImage.cornerRadius,
-                                                         style: .continuous)
-                                            .stroke(Color.blue,
-                                                    lineWidth: selected.contains(item.objectID) ? 2.0 : 0.0)
+                                        Group {
+                                            if selected.contains(item.objectID) {
+                                                RoundedRectangle(cornerRadius: PlaylistFolderImage.cornerRadius,
+                                                                 style: .continuous)
+                                                    .strokeBorder(Color.blue, lineWidth: 2)
+                                            }
+                                        }
                                     )
                                 }
                             }

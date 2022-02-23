@@ -47,7 +47,7 @@ struct PlaylistEditFolderView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Strings.saveButtonTitle) { onEditFolder?(folderName) }
-                    .foregroundColor(isEditDisabled ? Color(.secondaryBraveLabel) : .white)
+                    .foregroundColor(isEditDisabled ? Color(.braveDisabled) : .white)
                     .disabled(isEditDisabled)
                 }
             }

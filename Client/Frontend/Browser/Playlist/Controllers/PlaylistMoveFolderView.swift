@@ -10,20 +10,16 @@ import CoreData
 import Shared
 import BraveShared
 
-private struct PlaylistFolderImage: View, Identifiable {
+private struct PlaylistFolderImage: View {
+    let item: PlaylistItem
+    
     static let cornerRadius = 5.0
     private static let favIconSize = 16.0
-    private let item: PlaylistItem
     @StateObject private var thumbnailLoader = PlaylistFolderImageLoader()
     @StateObject private var favIconLoader = PlaylistFolderImageLoader()
-    @State private var thumbnail = UIImage()
-    @State private var favIcon = UIImage()
-    
-    let id: String
     
     init(item: PlaylistItem) {
         self.item = item
-        id = item.id
     }
     
     var body: some View {
@@ -54,23 +50,26 @@ private struct PlaylistFolderView: View {
     @ScaledMetric private var imageSize = 28.0
     
     var body: some View {
-        HStack(spacing: 10.0) {
-            Image(systemName: "folder")
-                .foregroundColor(isSourceFolder ? Color(.secondaryBraveLabel) : Color(.braveOrange))
-                .frame(width: imageSize)
-            
-            VStack(alignment: .leading) {
-                if let folder = folder {
-                    let itemCount = folder.playlistItems?.count ?? 0
-                    
-                    Text(folder.title ?? "")
-                        .font(.body)
-                        .foregroundColor(isSourceFolder ? Color(.secondaryBraveLabel) : .white)
-                    Text("\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))")
-                        .font(.footnote)
-                        .foregroundColor(Color(.secondaryBraveLabel))
+        HStack {
+            HStack(spacing: 10.0) {
+                Image(systemName: "folder")
+                    .foregroundColor(isSourceFolder ? Color(.braveDisabled.resolvedColor(with: .init(userInterfaceStyle: .light))) : Color(.braveOrange))
+                    .frame(width: imageSize)
+                
+                VStack(alignment: .leading) {
+                    if let folder = folder {
+                        let itemCount = folder.playlistItems?.count ?? 0
+                        
+                        Text(folder.title ?? "")
+                            .font(.body)
+                            .foregroundColor(.white)
+                        Text("\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))")
+                            .font(.footnote)
+                            .foregroundColor(Color(.secondaryBraveLabel))
+                    }
                 }
             }
+            .opacity(isSourceFolder ? 0.5 : 1.0)
             
             Spacer()
             
@@ -79,7 +78,7 @@ private struct PlaylistFolderView: View {
                     .foregroundColor(.white)
             }
         }
-        .padding(.vertical, 7.0)
+        .padding(.vertical, 6.0)
     }
 }
 
@@ -194,15 +193,15 @@ struct PlaylistMoveFolderView: View {
                     }
                     
                     // Show all folders except the current one
-                    ForEach(folders) { folder in
-                        if folder.uuid != PlaylistManager.shared.currentFolder?.uuid {
-                            Button(action: {
-                                selectedFolder = folder
-                            }) {
-                                PlaylistFolderView(isSourceFolder: false,
-                                                   folder: folder,
-                                                   selectedFolder: $selectedFolder)
-                            }
+                    ForEach(
+                        folders.filter { $0.uuid != PlaylistManager.shared.currentFolder?.uuid }
+                    ) { folder in
+                        Button(action: {
+                            selectedFolder = folder
+                        }) {
+                            PlaylistFolderView(isSourceFolder: false,
+                                               folder: folder,
+                                               selectedFolder: $selectedFolder)
                         }
                     }
                 }
@@ -220,7 +219,7 @@ struct PlaylistMoveFolderView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Strings.done) { onDoneButtonPressed?(selectedItems, selectedFolder) }
-                    .foregroundColor(isMoveDisabled ? Color(.secondaryBraveLabel) : .white)
+                    .foregroundColor(isMoveDisabled ? Color(.braveDisabled) : .white)
                     .disabled(isMoveDisabled)
                 }
             }
