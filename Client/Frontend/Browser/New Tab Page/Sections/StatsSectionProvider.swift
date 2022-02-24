@@ -9,6 +9,12 @@ import BraveShared
 import BraveUI
 
 class StatsSectionProvider: NSObject, NTPSectionProvider {
+    let action: () -> Void
+    
+    init(action: @escaping () -> Void) {
+        self.action = action
+    }
+    
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 1
   }
@@ -17,6 +23,10 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     collectionView.register(NewTabCollectionViewCell<BraveShieldStatsView>.self)
   }
 
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        action()
+    }
+    
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
   }
