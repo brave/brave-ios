@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
+import BraveUI
 
 struct PrivacyReportsView: View {
   
@@ -25,7 +26,7 @@ struct PrivacyReportsView: View {
           VStack {
             HStack(alignment: .top) {
               HStack {
-                Image(systemName: "globe")
+                Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
                 Text("Get weekly privacy updates on tracker & ad blocking.")
                   .font(.headline)
               }
@@ -34,18 +35,21 @@ struct PrivacyReportsView: View {
             }
             .frame(maxWidth: .infinity)
             
-            
             Button(action: {
               
             }, label: {
-              Label("Turn on noticications", systemImage: "bell")
-                .font(.callout)
+              ZStack {
+                  VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                      .edgesIgnoringSafeArea(.all)
+                  
+                  Label("Turn on noticications", image: "brave.bell")
+                      .font(.callout)
+                      .padding(.vertical, 12)
+              }
+              .clipShape(Capsule())
             })
               .frame(maxWidth: .infinity)
-              .padding(.vertical, 12)
-            // FIXME: This is iOS 15 only
-            // .background(.ultraThinMaterial)
-              .clipShape(Capsule())
+              .padding(.vertical)
           }
           .padding()
           .foregroundColor(Color.white)

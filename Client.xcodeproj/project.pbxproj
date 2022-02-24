@@ -590,6 +590,7 @@
 		44029EAF27BBD78400E6CE18 /* BlockedTrackerParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EAE27BBD78400E6CE18 /* BlockedTrackerParser.swift */; };
 		44029EB427BC101800E6CE18 /* PrivacyReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */; };
 		44029EB627BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */; };
+		440848AC27C7CC2200998C13 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440848AB27C7CC2200998C13 /* VisualEffectView.swift */; };
 		440982A526658EAA00BB37FE /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440982A426658EAA00BB37FE /* BraveSearchManager.swift */; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
 		4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */; };
@@ -2387,6 +2388,7 @@
 		44029EAE27BBD78400E6CE18 /* BlockedTrackerParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedTrackerParser.swift; sourceTree = "<group>"; };
 		44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyReportsView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyReportAllTimeListsView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		440848AB27C7CC2200998C13 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		440982A426658EAA00BB37FE /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
 		4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpsEverywhereStats.swift; sourceTree = "<group>"; };
@@ -4654,6 +4656,7 @@
 				27B1041A275ECE7600728421 /* NoCaptureViewModifier.swift */,
 				27B10427275ED44900728421 /* AlertOnScreenshotViewModifier.swift */,
 				2710C12927CE876C00391304 /* BasicMarkdownParsing.swift */,
+				440848AB27C7CC2200998C13 /* VisualEffectView.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -8185,6 +8188,7 @@
 				278C46B123F4A91D0083347F /* PopoverContentComponent.swift in Sources */,
 				278C46AF23F4A91C0083347F /* PopoverController.swift in Sources */,
 				278C46B523F4A9C80083347F /* POPExtensions.swift in Sources */,
+				440848AC27C7CC2200998C13 /* VisualEffectView.swift in Sources */,
 				271F68C926EBD29500AA2A50 /* DocumentOpenerView.swift in Sources */,
 				27733E792697867D0086799A /* AccessibilityEmbedInScrollViewViewModifier.swift in Sources */,
 				271F68C726EBD29500AA2A50 /* UIKitController.swift in Sources */,
