@@ -80,7 +80,7 @@ public class SendTokenStore: ObservableObject {
     self.keyringService.add(self)
     self.rpcService.add(self)
     
-    self.keyringService.selectedAccount { address in
+    self.keyringService.selectedAccount(.eth) { address in
       self.currentAccountAddress = address
     }
   }
@@ -127,7 +127,7 @@ public class SendTokenStore: ObservableObject {
   }
   
   private func fetchBalance(for token: BraveWallet.BlockchainToken) {
-    keyringService.selectedAccount { [self] accountAddress in
+    keyringService.selectedAccount(.eth) { [self] accountAddress in
       guard let accountAddress = accountAddress else {
         self.selectedSendTokenBalance = nil
         return
@@ -300,9 +300,9 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   
-  public func selectedAccountChanged() {
+  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
     fetchAssetBalance()
-    keyringService.selectedAccount { [weak self] address in
+    keyringService.selectedAccount(.eth) { [weak self] address in
       self?.currentAccountAddress = address
       self?.validateSendAddress()
     }

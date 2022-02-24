@@ -643,8 +643,8 @@ extension SettingsViewController: BraveWalletKeyringServiceObserver {
     func backedUp() {}
     func accountsChanged() {}
     func autoLockMinutesChanged() {}
-    func selectedAccountChanged() {}
-    
+    func selectedAccountChanged(_ coin: BraveWallet.CoinType) {}
+        
     func keyringReset() {
         setUpSections()
         navigationController?.popViewController(animated: true)

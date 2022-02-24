@@ -238,11 +238,11 @@ class MockKeyringService: BraveWalletKeyringService {
     completion([])
   }
   
-  func selectedAccount(_ completion: @escaping (String?) -> Void) {
+  func selectedAccount(_ coin: BraveWallet.CoinType, completion: @escaping (String?) -> Void) {
     completion(selectedAccount?.address)
   }
   
-  func setSelectedAccount(_ address: String, completion: @escaping (Bool) -> Void) {
+  func setSelectedAccount(_ address: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
     guard let account = defaultKeyring.accountInfos.first(where: { $0.address == address }) else {
       completion(false)
       return
@@ -337,9 +337,14 @@ class MockKeyringService: BraveWalletKeyringService {
   func addHardwareAccounts(_ info: [BraveWallet.HardwareWalletAccount]) {
   }
   
-  func removeHardwareAccount(_ address: String) {
+  func setHardwareAccountName(_ address: String, name: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
+    completion(true)
+  }
+  
+  func removeHardwareAccount(_ address: String, coin: BraveWallet.CoinType) {
   }
   
   func notifyUserInteraction() {
   }
+  
 }

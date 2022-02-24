@@ -243,6 +243,6 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   }
   public func autoLockMinutesChanged() {
   }
-  public func selectedAccountChanged() {
+  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
   }
 }

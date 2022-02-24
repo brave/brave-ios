@@ -81,7 +81,7 @@ public class KeyringStore: ObservableObject {
   /// The users selected account when buying/sending/swapping currencies
   @Published var selectedAccount: BraveWallet.AccountInfo = .init() {
     didSet {
-      keyringService.setSelectedAccount(selectedAccount.address) { _ in }
+      keyringService.setSelectedAccount(selectedAccount.address, coin: .eth) { _ in }
     }
   }
   
@@ -120,7 +120,7 @@ public class KeyringStore: ObservableObject {
       }
       keyring = keyringInfo
       if !keyring.accountInfos.isEmpty {
-        keyringService.selectedAccount { accountAddress in
+        keyringService.selectedAccount(.eth) { accountAddress in
           selectedAccount = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ??
             keyringInfo.accountInfos.first!
         }
@@ -353,7 +353,7 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   
-  public func selectedAccountChanged() {
+  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
     updateKeyringInfo()
   }
 

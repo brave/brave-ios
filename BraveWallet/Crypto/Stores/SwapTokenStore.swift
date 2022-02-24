@@ -684,10 +684,10 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   
-  public func selectedAccountChanged() {
+  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
     keyringService.defaultKeyringInfo { [self] keyringInfo in
       if !keyringInfo.accountInfos.isEmpty {
-        keyringService.selectedAccount { accountAddress in
+        keyringService.selectedAccount(.eth) { accountAddress in
           let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ??
             keyringInfo.accountInfos.first!
           prepare(with: selectedAccountInfo) {

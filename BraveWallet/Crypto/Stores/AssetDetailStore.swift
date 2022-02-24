@@ -215,7 +215,7 @@ extension AssetDetailStore: BraveWalletKeyringServiceObserver {
   func autoLockMinutesChanged() {
   }
   
-  func selectedAccountChanged() {
+  func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
   }
 }
 
