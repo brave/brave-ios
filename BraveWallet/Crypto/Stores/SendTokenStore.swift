@@ -226,7 +226,9 @@ public class SendTokenStore: ObservableObject {
     else { return }
     
     isMakingTx = true
-    rpcService.network { [weak self] network in
+    
+    // Validate if there are pending `submitted` transaction
+    txService.allTransactionInfo(fromAddress) { [weak self] txs in
       guard let self = self else { return }
 
       if token.contractAddress.isEmpty {
