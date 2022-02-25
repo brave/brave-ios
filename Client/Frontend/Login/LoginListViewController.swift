@@ -59,7 +59,7 @@ class LoginListViewController: LoginAuthViewController {
         
         // Adding the Password store observer in constructor to watch credentials changes
         passwordStoreListener = passwordAPI.add(PasswordStoreStateObserver { [weak self] _ in
-            guard let self = self else { return }
+            guard let self = self, !self.isCredentialsBeingSearched else { return }
             
             DispatchQueue.main.async {
                 self.fetchLoginInfo()
@@ -144,10 +144,6 @@ class LoginListViewController: LoginAuthViewController {
     }
     
     private func fetchLoginInfo(_ searchQuery: String? = nil) {
-        if isCredentialsBeingSearched {
-            return
-        }
-        
         if !isCredentialsRefreshing {
             isCredentialsRefreshing = true
                     
