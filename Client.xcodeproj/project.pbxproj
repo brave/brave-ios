@@ -780,7 +780,14 @@
 		445CA12B27997F770040F5C4 /* david_malenfant_mountains.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */; };
 		445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */; };
 		445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */; };
-		4463CDB627C92FDB00402202 /* VPNAlertCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4463CDB527C92FDB00402202 /* VPNAlertCell.swift */; };
+		4472701F27C963CD0093BFF2 /* NotificationCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */; };
+		4472702D27C967030093BFF2 /* NoDataCallout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472702C27C967030093BFF2 /* NoDataCallout.swift */; };
+		4472702F27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */; };
+		4472703127C96A510093BFF2 /* PrivacyHubAllTimeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */; };
+		4472703427C96EC80093BFF2 /* VPNAlertStat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703227C96EC80093BFF2 /* VPNAlertStat.swift */; };
+		4472703527C96EC80093BFF2 /* AllVPNAlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703327C96EC80093BFF2 /* AllVPNAlertsView.swift */; };
+		4472703B27C96FA50093BFF2 /* VPNAlertCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703A27C96FA50093BFF2 /* VPNAlertCell.swift */; };
+		4472703D27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703C27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift */; };
 		4481F22D26CBD1C600658EAC /* AmazonRootCA3.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */; };
 		4481F22E26CBD1C600658EAC /* AmazonRootCA4.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */; };
 		4481F22F26CBD1C600658EAC /* AmazonRootCA2.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */; };
@@ -2596,7 +2603,14 @@
 		445CA12327997F770040F5C4 /* david_malenfant_mountains.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = david_malenfant_mountains.jpg; sourceTree = "<group>"; };
 		445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = alain_franchette_ocean.jpg; sourceTree = "<group>"; };
 		445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = priyanuch_konkaew.jpg; sourceTree = "<group>"; };
-		4463CDB527C92FDB00402202 /* VPNAlertCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAlertCell.swift; sourceTree = "<group>"; };
+		4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = NotificationCalloutView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		4472702C27C967030093BFF2 /* NoDataCallout.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = NoDataCallout.swift; sourceTree = "<group>"; tabWidth = 2; };
+		4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyHubLastWeekSection.swift; sourceTree = "<group>"; tabWidth = 2; };
+		4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyHubAllTimeSection.swift; sourceTree = "<group>"; tabWidth = 2; };
+		4472703227C96EC80093BFF2 /* VPNAlertStat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNAlertStat.swift; sourceTree = "<group>"; };
+		4472703327C96EC80093BFF2 /* AllVPNAlertsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllVPNAlertsView.swift; sourceTree = "<group>"; };
+		4472703A27C96FA50093BFF2 /* VPNAlertCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAlertCell.swift; sourceTree = "<group>"; };
+		4472703C27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyHubVPNAlertsSection.swift; sourceTree = "<group>"; };
 		4481F22926CBD1C400658EAC /* AmazonRootCA3.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA3.cer; sourceTree = "<group>"; };
 		4481F22A26CBD1C500658EAC /* AmazonRootCA4.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA4.cer; sourceTree = "<group>"; };
 		4481F22B26CBD1C600658EAC /* AmazonRootCA2.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AmazonRootCA2.cer; sourceTree = "<group>"; };
@@ -5142,10 +5156,19 @@
 			children = (
 				44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */,
 				44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */,
-				4463CDB527C92FDB00402202 /* VPNAlertCell.swift */,
+				4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */,
+				4472702C27C967030093BFF2 /* NoDataCallout.swift */,
+				4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */,
+				4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */,
+				4472703327C96EC80093BFF2 /* AllVPNAlertsView.swift */,
+				4472703227C96EC80093BFF2 /* VPNAlertStat.swift */,
+				4472703A27C96FA50093BFF2 /* VPNAlertCell.swift */,
+				4472703C27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift */,
 			);
+			indentWidth = 2;
 			path = PrivacyHub;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		4422D41A21BFCE3900BF1855 /* Httpse */ = {
 			isa = PBXGroup;
@@ -8493,7 +8516,6 @@
 				278C700A24F96D7000A246C8 /* BraveShieldsAndPrivacySettingsController.swift in Sources */,
 				27D114D42358FBBF00166534 /* BraveRewardsSettingsViewController.swift in Sources */,
 				27036F8725684F64004EF6B6 /* Cryptography.swift in Sources */,
-				4463CDB627C92FDB00402202 /* VPNAlertCell.swift in Sources */,
 				CAB54B8626A5BFA800F08BF3 /* PlaylistURLBarButton.swift in Sources */,
 				2746D27124A2A12700E38852 /* RewardsInternalsPromotionListController.swift in Sources */,
 				0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */,
@@ -8542,6 +8564,7 @@
 				4422D56321BFFB7F00BF1855 /* compile.cc in Sources */,
 				2FBCB169262784BF00F512D8 /* BrowserViewController+CoreMigration.swift in Sources */,
 				D3C3696E1CC6B78800348A61 /* LocalRequestHelper.swift in Sources */,
+				4472703D27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift in Sources */,
 				2FD70DBA26C1C54D00345A33 /* BookmarkManager.swift in Sources */,
 				27733E5826977EC40086799A /* PasscodeMigrationView.swift in Sources */,
 				CA8D5C2926D7D0C6009BF13D /* MediaPlayer.swift in Sources */,
@@ -8603,6 +8626,7 @@
 				CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */,
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,
+				4472702D27C967030093BFF2 /* NoDataCallout.swift in Sources */,
 				0A8A6225257905E300B035F4 /* UniversalLinkManager.swift in Sources */,
 				0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,
@@ -8767,6 +8791,7 @@
 				E6927EC01C7B6FB800D03F75 /* ErrorToast.swift in Sources */,
 				2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */,
 				27C647832550AF34006D72FC /* WalletTransferCompleteView.swift in Sources */,
+				4472703127C96A510093BFF2 /* PrivacyHubAllTimeSection.swift in Sources */,
 				4422D4B821BFFB7600BF1855 /* histogram.cc in Sources */,
 				27FD3FBA25C8D20200696156 /* FeedDataSource+RSS.swift in Sources */,
 				27FCFB0C2673F265008E43AB /* AdCardView.swift in Sources */,
@@ -8776,6 +8801,7 @@
 				4422D4E821BFFB7600BF1855 /* log_writer.cc in Sources */,
 				F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */,
 				CAADEFE026E2707F0020DC4C /* SceneDelegate.swift in Sources */,
+				4472702F27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift in Sources */,
 				0A7B5D6722689C5D00AADF22 /* AddEditHeaderView.swift in Sources */,
 				E653422D1C5944F90039DD9E /* BrowserPrompts.swift in Sources */,
 				0A55E53224349FE70069F06A /* EnableVPNSettingHeader.swift in Sources */,
@@ -8862,6 +8888,7 @@
 				2746D28324A4FB7400E38852 /* RewardsInternalsSharable.swift in Sources */,
 				44331DDA22552313007E3E93 /* LocationContainerView.swift in Sources */,
 				5E5E6E4625BA041E0035B6A0 /* PlaylistParticleEmitter.swift in Sources */,
+				4472703527C96EC80093BFF2 /* AllVPNAlertsView.swift in Sources */,
 				2718780A216526240006036E /* PopupView.swift in Sources */,
 				CA8D5C2726D7D0A8009BF13D /* MPRemoteCommandCenter+Combine.swift in Sources */,
 				4422D4C221BFFB7600BF1855 /* comparator.cc in Sources */,
@@ -8916,6 +8943,7 @@
 				D3968F251A38FE8500CEFD3B /* TabManager.swift in Sources */,
 				2788E9CE2786421F0093FBE8 /* TabTrayAnimation.swift in Sources */,
 				5E6683A923D61CF7005B3A6C /* NTPDownloader.swift in Sources */,
+				4472703B27C96FA50093BFF2 /* VPNAlertCell.swift in Sources */,
 				2816F0001B33E05400522243 /* UIConstants.swift in Sources */,
 				CA8D5C1026D7CDAF009BF13D /* PlaylistListViewController+DragDropDelegate.swift in Sources */,
 				4422D56521BFFB7F00BF1855 /* filtered_re2.cc in Sources */,
@@ -8923,6 +8951,7 @@
 				CAADEFB326E26A9D0020DC4C /* CPTemplateApplicationSceneDelegate.swift in Sources */,
 				274398F524E71D8700E79605 /* FailableDecodable.swift in Sources */,
 				CA752EA526CEABF8009356EF /* PlaylistToast.swift in Sources */,
+				4472701F27C963CD0093BFF2 /* NotificationCalloutView.swift in Sources */,
 				0A918DCD252C81FA00496088 /* BraveVPNRegionPickerViewController.swift in Sources */,
 				E650755F1E37F756006961AC /* Try.m in Sources */,
 				2746D27324A2A5DA00E38852 /* RewardsInternalsContributionListController.swift in Sources */,
@@ -8967,6 +8996,7 @@
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
 				2746D27D24A3E44900E38852 /* RewardsInternalsLogController.swift in Sources */,
 				0AFC8F9523D1DF6500941895 /* TranslucentBottomSheet.swift in Sources */,
+				4472703427C96EC80093BFF2 /* VPNAlertStat.swift in Sources */,
 				5E99D01525E56BFB003F30B4 /* PlaylistManager.swift in Sources */,
 				5E1645A824ABA35B0003C3B2 /* SpinnerView.swift in Sources */,
 				274398E224E4827800E79605 /* FeedCard.swift in Sources */,

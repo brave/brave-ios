@@ -1,28 +1,27 @@
-// Copyright 2022 The Brave Authors. All rights reserved.
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
 
 struct VPNAlertCell: View {
   enum AlertType {
     case data, location, mail
-  }
-  
-  private var assetName: String {
-    switch vpnAlert.type {
-    case .data: return "vpn_data_tracker"
-    case .location: return "vpn_location_tracker"
-    case .mail: return "vpn_mail_tracker"
+    
+    var assetName: String {
+      switch self {
+      case .data: return "vpn_data_tracker"
+      case .location: return "vpn_location_tracker"
+      case .mail: return "vpn_mail_tracker"
+      }
     }
-  }
-  
-  private var headerText: String {
-    switch vpnAlert.type {
-    case .data: return "Tracker & Ad"
-    case .location: return "Location Ping"
-    case .mail: return "Email tracker"
+    
+    var headerText: String {
+      switch self {
+      case .data: return "Tracker & Ad"
+      case .location: return "Location Ping"
+      case .mail: return "Email tracker"
+      }
     }
   }
   
@@ -33,7 +32,7 @@ struct VPNAlertCell: View {
     return formatter.string(from: vpnAlert.date)
   }
   
-  struct VPNAlert {
+  struct VPNAlert: Hashable {
     let date: Date
     let text: String
     let type: AlertType
@@ -45,13 +44,14 @@ struct VPNAlertCell: View {
     self.vpnAlert = vpnAlert
   }
   
+  @State private var vpnAlertsEnabled = true
+  
   var body: some View {
-    
     HStack(alignment: .top) {
-      Image(assetName)
+      Image(vpnAlert.type.assetName)
       VStack(alignment: .leading) {
         HStack(spacing: 4) {
-          Text(headerText)
+          Text(vpnAlert.type.headerText)
             .foregroundColor(Color(.secondaryBraveLabel))
           Text("Blocked")
             .foregroundColor(Color(.braveErrorBorder))
@@ -63,14 +63,19 @@ struct VPNAlertCell: View {
         
         Text(vpnAlert.text)
           .font(.callout)
+          .fixedSize(horizontal: false, vertical: true)
         
         Text(date)
           .font(.caption)
           .foregroundColor(Color(.secondaryBraveLabel))
       }
+      Spacer()
     }
+    .background(Color(.braveBackground))
     .frame(maxWidth: .infinity)
-    .padding()
+    .padding(.horizontal)
+    .padding(.vertical, 8)
+    .cornerRadius(15)
   }
 }
 
