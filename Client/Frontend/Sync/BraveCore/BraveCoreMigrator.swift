@@ -410,13 +410,16 @@ extension BraveCoreMigrator {
     }
     
     private func migrateChromiumPasswords(login: Login) -> Bool {
-        guard let formSubmitURLString = login.formSubmitURL, let formSubmitURL = URL(string: formSubmitURLString) else {
+        guard let formSubmitURLString = login.formSubmitURL,
+              let formSubmitURL = URL(string: formSubmitURLString),
+              let originURLString = formSubmitURL.origin,
+              let originURL = URL(string: originURLString) else {
             return false
         }
         
         let loginForm = PasswordForm(
-            url: formSubmitURL,
-            signOnRealm: formSubmitURL.getURLStringOrigin() ?? "",
+            url: originURL,
+            signOnRealm: originURLString,
             dateCreated: login.timeCreated.toDate(),
             dateLastUsed: login.timeLastUsed.toDate(),
             datePasswordChanged: login.timePasswordChanged.toDate(),

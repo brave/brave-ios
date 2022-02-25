@@ -15,7 +15,7 @@ private var log = Logger.syncLogger
 typealias Credential = (username: String, password: String)
 
 extension PasswordForm {
-    open func toDict(formSubmitURL: String, httpRealm: String = "") -> [String: String] {
+    func toDict(formSubmitURL: String, httpRealm: String = "") -> [String: String] {
         return [
             "hostname": signOnRealm,
             "formSubmitURL": formSubmitURL,
@@ -28,14 +28,16 @@ extension PasswordForm {
     }
     
     var displayURLString: String {
-        self.url.getURLStringOrigin() ?? self.signOnRealm
+        self.url.origin ?? self.signOnRealm
     }
     
 }
 
 extension BravePasswordAPI {
      func fetchFromScript(_ url: URL, script: [String: Any]) -> PasswordForm? {
-        guard let username = script["username"] as? String,
+        guard let signOnRealm = url.origin,
+              let formURL = URL(string: signOnRealm),
+              let username = script["username"] as? String,
               let usernameElement = script["usernameField"] as? String,
               let password = script["password"] as? String,
               let passwordElement = script["passwordField"] as? String else {
@@ -43,8 +45,8 @@ extension BravePasswordAPI {
         }
         
         let loginForm = PasswordForm(
-            url: url,
-            signOnRealm: url.getURLStringOrigin() ?? "",
+            url: formURL,
+            signOnRealm: signOnRealm,
             dateCreated: Date(),
             dateLastUsed: Date(),
             datePasswordChanged: Date(),
@@ -56,14 +58,5 @@ extension BravePasswordAPI {
             scheme: .typeHtml)
 
         return loginForm
-    }
-
-    func fetchCredentialsFromScript(_ url: URL, script: [String: Any]) -> Credential? {
-        guard let username = script["username"] as? String,
-              let password = script["password"] as? String else {
-                return nil
-        }
-        
-       return (username, password)
     }
 }

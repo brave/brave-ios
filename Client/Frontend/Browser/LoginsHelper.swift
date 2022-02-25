@@ -244,7 +244,7 @@ class LoginsHelper: TabContentScript {
         
         let promptMessage = String(
             format: isUpdating ? Strings.updateLoginUsernamePrompt: Strings.saveLoginUsernamePrompt, username,
-            login.url.getURLStringOrigin() ?? login.signOnRealm)
+            login.url.origin ?? login.signOnRealm)
 
         snackBar = TimerSnackBar(
             text: promptMessage,
@@ -318,35 +318,5 @@ class LoginsHelper: TabContentScript {
                 log.debug(err)
             }
         }
-    }
-}
-
-extension URL {
-    
-    /// Retrieving the the origin from url
-    /// This method will be used to fetch singOnRealm from url while saving credentials
-    /// - Parameter allowJS: Boolean determining if scheme javascript allowed
-    /// - Returns: Origin of the url
-    func getURLStringOrigin(allowJS: Bool = false) -> String? {
-        var realm: String?
-        if let scheme = self.scheme, !scheme.isEmpty,
-           let host = self.host {
-            if allowJS && scheme == "javascript" {
-                return "javascript:"
-            }
-
-            realm = "\(scheme)://\(host)/"
-
-            // If the URI explicitly specified a port, only include it when
-            // it's not the default. (We never want "http://foo.com:80")
-            if let port = self.port {
-                realm? += ":\(port)"
-            }
-        } else {
-            log.debug("Couldn't parse origin for \(self)")
-            realm = nil
-        }
-        
-        return realm
     }
 }

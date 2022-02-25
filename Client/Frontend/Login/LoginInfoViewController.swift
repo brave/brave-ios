@@ -172,7 +172,7 @@ extension LoginInfoViewController {
                             $0.delegate = self
                             $0.highlightedLabel.text = Strings.Login.loginInfoDetailsWebsiteFieldTitle
                             $0.descriptionTextField.text =
-                                credentials.url.getURLStringOrigin() ?? credentials.signOnRealm
+                                credentials.url.origin ?? credentials.signOnRealm
                             $0.isEditingFieldData = false
                             $0.tag = InfoItem.websiteItem.rawValue
                         }
@@ -383,7 +383,7 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     func canPerform(action: Selector, for cell: LoginInfoTableViewCell) -> Bool {
         switch cell.tag {
             case InfoItem.websiteItem.rawValue:
-                return action == MenuHelper.selectorCopy || action == MenuHelper.selectorOpenAndFill
+                return action == MenuHelper.selectorCopy || action == MenuHelper.selectorOpenWebsite
         case InfoItem.usernameItem.rawValue:
             return action == MenuHelper.selectorCopy
         case InfoItem.passwordItem.rawValue:

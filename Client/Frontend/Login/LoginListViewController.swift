@@ -156,7 +156,7 @@ class LoginListViewController: LoginAuthViewController {
     private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
         if let query = query, !query.isEmpty {
             credentialList = passwordForms.filter { form in
-                (form.url.getURLStringOrigin()?.lowercased() ?? "").contains(query) ||
+                (form.url.origin?.lowercased() ?? "").contains(query) ||
                 (form.usernameValue?.lowercased() ?? "").contains(query)
             }
         } else {
