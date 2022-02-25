@@ -26,7 +26,7 @@ class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
   }
   
   func makeErc20TransferData(_ toAddress: String, amount: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
-    completion(false, .init())
+    completion(true, .init())
   }
   
   func makeErc20ApproveData(_ spenderAddress: String, amount: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
