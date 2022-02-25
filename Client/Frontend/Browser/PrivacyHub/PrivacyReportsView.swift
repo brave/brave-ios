@@ -81,7 +81,7 @@ struct PrivacyReportsView: View {
               .font(.footnote.weight(.medium))
             
             HStack {
-              Image(systemName: "hand.thumbsdown")
+              Image("frequent_tracker")
               VStack(alignment: .leading) {
                 Text("MOST FREQUENT TRACKED & AD")
                   .font(.caption)
@@ -110,7 +110,7 @@ struct PrivacyReportsView: View {
             .cornerRadius(15)
             
             HStack {
-              Image(systemName: "exclamationmark.triangle")
+              Image("creepy_website")
               VStack(alignment: .leading) {
                 
                 if let lastWeekRiskiestWebsite = lastWeekRiskiestWebsite {
