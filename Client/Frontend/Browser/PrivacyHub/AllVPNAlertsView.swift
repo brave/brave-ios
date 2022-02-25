@@ -35,7 +35,7 @@ struct AllVPNAlertsView: View {
                 .font(.headline.weight(.semibold))
             }
             .padding()
-            .background(Color(.tertiaryBraveBackground))
+            .background(Color("total_alerts_background"))
             .cornerRadius(15)
             
             HStack {
@@ -47,7 +47,7 @@ struct AllVPNAlertsView: View {
               VPNAlertStat(type: .mail, compact: true)
             }
           }
-          .padding(.bottom)
+          .padding(.vertical)
           .listRowInsets(.init())
         }
         

@@ -53,11 +53,7 @@ struct VPNAlertCell: View {
         HStack(spacing: 4) {
           Text(vpnAlert.type.headerText)
             .foregroundColor(Color(.secondaryBraveLabel))
-          Text("Blocked")
-            .foregroundColor(Color(.braveErrorBorder))
-            .padding(.horizontal, 4)
-            .background(Color(.braveErrorBackground))
-            .cornerRadius(4)
+          PrivacyReportsView.BlockedLabel()
         }
         .font(.caption.weight(.semibold))
         

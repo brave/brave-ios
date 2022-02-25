@@ -36,7 +36,6 @@ extension PrivacyReportsView {
             .clipShape(Capsule())
           })
             .frame(maxWidth: .infinity)
-            .padding(.vertical)
         }
         .padding()
         .foregroundColor(Color.white)
@@ -47,7 +46,7 @@ extension PrivacyReportsView {
                                 .init(.braveInfoLabel)]),
             startPoint: .topLeading, endPoint: .bottomTrailing)
         )
-      .cornerRadius(15)
+        .cornerRadius(15)
       }
     }
   }
