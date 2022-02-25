@@ -142,6 +142,7 @@ extension AccountActivityStore {
 extension TransactionConfirmationStore {
   static var previewStore: TransactionConfirmationStore {
     .init(
+      keyringService: MockKeyringService(),
       assetRatioService: MockAssetRatioService(),
       rpcService: MockJsonRpcService(),
       txService: MockTxService(),

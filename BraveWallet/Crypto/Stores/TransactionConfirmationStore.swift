@@ -22,6 +22,7 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published var state: State = .init()
   @Published var isLoading: Bool = false
   @Published var gasEstimation1559: BraveWallet.GasEstimation1559?
+  @Published var backedUpTx: BraveWallet.TransactionInfo?
   
   private var assetRatios: [String: Double] = [:]
   
@@ -30,6 +31,7 @@ public class TransactionConfirmationStore: ObservableObject {
     $0.currencyCode = "USD"
   }
   
+  private let keyringService: BraveWalletKeyringService
   private let assetRatioService: BraveWalletAssetRatioService
   private let rpcService: BraveWalletJsonRpcService
   private let txService: BraveWalletTxService
@@ -40,6 +42,7 @@ public class TransactionConfirmationStore: ObservableObject {
   private var activeTransaction: BraveWallet.TransactionInfo?
   
   init(
+    keyringService: BraveWalletKeyringService,
     assetRatioService: BraveWalletAssetRatioService,
     rpcService: BraveWalletJsonRpcService,
     txService: BraveWalletTxService,
@@ -47,6 +50,7 @@ public class TransactionConfirmationStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy
   ) {
+    self.keyringService = keyringService
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
     self.txService = txService
@@ -233,6 +237,17 @@ public class TransactionConfirmationStore: ObservableObject {
       gasLimit: gasLimit
     ) { success in
       completion?(success)
+    }
+  }
+  
+  func checkTransactionBacklog() {
+    keyringService.selectedAccount { [weak self] accountAddress in
+      guard let address = accountAddress, let self = self else { return }
+      self.txService.allTransactionInfo(address) { transactions in
+        self.backedUpTx = transactions.filter({
+          $0.txStatus == .submitted && $0.createdTime.timeIntervalSinceNow > 1.days
+        }).sorted(by: { $0.createdTime < $1.createdTime }).last
+      }
     }
   }
 }

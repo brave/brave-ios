@@ -30,6 +30,7 @@ struct TransactionConfirmationView: View {
       confirmationStore.fetchDetails(for: activeTransaction)
     }
   }
+  @State private var replaceBadTx = false
   
   private func next() {
     if let index = transactions.firstIndex(where: { $0.id == activeTransactionId }) {
@@ -116,188 +117,227 @@ struct TransactionConfirmationView: View {
     .font(.footnote)
   }
   
+  @ViewBuilder private var transactionBacklogView: some View {
+    VStack(spacing: 15) {
+      Text(Strings.Wallet.transactionBacklogTitle)
+        .font(.title2.bold())
+        .foregroundColor(Color(.braveLabel))
+      VStack {
+        Text(Strings.Wallet.transactionBacklogbBody)
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.braveLabel))
+        Button(action: {}) {
+          Text(Strings.Wallet.learnMore)
+            .foregroundColor(Color(.braveBlurpleTint))
+        }
+      }
+      HStack {
+        Toggle(isOn: $replaceBadTx) {
+          Text(Strings.Wallet.transactionBacklogToggleText)
+            .font(.callout)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        }
+        .toggleStyle(SwitchToggleStyle(tint: Color(.braveOrange)))
+      }
+      Button(action: {}) {
+        Text(Strings.Wallet.continueButtonTitle)
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .large))
+      .padding(.top, 10)
+    }
+    .padding(.horizontal, 20)
+  }
+  
   var body: some View {
     NavigationView {
-      ScrollView(.vertical) {
-        VStack {
-          // Header
-          HStack {
-            Text(networkStore.selectedChain.shortChainName)
-            Spacer()
-            if transactions.count > 1 {
-              let index = transactions.firstIndex(of: activeTransaction) ?? 0
-              Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, transactions.count))
-                .fontWeight(.semibold)
-              Button(action: next) {
-                Text(Strings.Wallet.nextTransaction)
-                  .fontWeight(.semibold)
-                  .foregroundColor(Color(.braveBlurpleTint))
-              }
-            }
-          }
-          .font(.callout)
-          // Summary
-          VStack(spacing: 8) {
+      Group {
+        if confirmationStore.backedUpTx != nil {
+          transactionBacklogView
+        } else {
+          ScrollView(.vertical) {
             VStack {
-              BlockieGroup(
-                fromAddress: activeTransaction.fromAddress,
-                toAddress: activeTransaction.ethTxToAddress,
-                size: 48
-              )
-              Group {
-                if sizeCategory.isAccessibilityCategory {
-                  VStack {
-                    Text(fromAccountName)
-                    Image(systemName: "arrow.down")
-                    Text(toAccountName)
-                  }
-                } else {
-                  HStack {
-                    Text(fromAccountName)
-                    Image(systemName: "arrow.right")
-                    Text(toAccountName)
+              // Header
+              HStack {
+                Text(networkStore.selectedChain.shortChainName)
+                Spacer()
+                if transactions.count > 1 {
+                  let index = transactions.firstIndex(of: activeTransaction) ?? 0
+                  Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, transactions.count))
+                    .fontWeight(.semibold)
+                  Button(action: next) {
+                    Text(Strings.Wallet.nextTransaction)
+                      .fontWeight(.semibold)
+                      .foregroundColor(Color(.braveBlurpleTint))
                   }
                 }
               }
-              .foregroundColor(Color(.bravePrimary))
               .font(.callout)
-            }
-            .accessibilityElement()
-            .accessibility(addTraits: .isStaticText)
-            .accessibility(
-              label: Text(String.localizedStringWithFormat(
-                Strings.Wallet.transactionFromToAccessibilityLabel, fromAccountName, toAccountName
-              ))
-            )
-            VStack(spacing: 4) {
-              Text(transactionType)
-                .font(.footnote)
-              Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
-                .fontWeight(.semibold)
-                .foregroundColor(Color(.bravePrimary))
-              Text(confirmationStore.state.fiat) // Value in Fiat
-                .font(.footnote)
-            }
-            .padding(.vertical, 8)
-          }
-          // View Mode
-          VStack(spacing: 12) {
-            Picker("", selection: $viewMode) {
-              Text(Strings.Wallet.confirmationViewModeTransaction).tag(ViewMode.transaction)
-              Text(Strings.Wallet.confirmationViewModeDetails).tag(ViewMode.details)
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            Group {
-              switch viewMode {
-              case .transaction:
-                VStack(spacing: 0) {
-                  HStack {
-                    VStack(alignment: .leading) {
-                      Text(Strings.Wallet.gasFee)
-                        .foregroundColor(Color(.bravePrimary))
-                      editGasFeeButton
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                      Text("\(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
-                        .foregroundColor(Color(.bravePrimary))
-                      Text(confirmationStore.state.gasFiat)
-                        .font(.footnote)
-                    }
-                  }
-                  .font(.callout)
-                  .padding()
-                  .accessibilityElement(children: .contain)
-                  Divider()
-                    .padding(.leading)
-                  HStack {
-                    Text(Strings.Wallet.total)
-                      .foregroundColor(Color(.bravePrimary))
-                      .font(.callout)
-                      .accessibility(sortPriority: 1)
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                      Text(Strings.Wallet.amountAndGas)
-                        .font(.footnote)
-                        .foregroundColor(Color(.secondaryBraveLabel))
-                      Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol) + \(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
-                        .foregroundColor(Color(.bravePrimary))
-                      HStack(spacing: 4) {
-                        if !confirmationStore.state.isBalanceSufficient {
-                          Text(Strings.Wallet.insufficientBalance)
-                            .foregroundColor(Color(.braveErrorLabel))
-                        }
-                        Text(confirmationStore.state.totalFiat)
-                          .foregroundColor(
-                            confirmationStore.state.isBalanceSufficient ? Color(.braveLabel) : Color(.braveErrorLabel)
-                          )
+              // Summary
+              VStack(spacing: 8) {
+                VStack {
+                  BlockieGroup(
+                    fromAddress: activeTransaction.fromAddress,
+                    toAddress: activeTransaction.txData.baseData.to,
+                    size: 48
+                  )
+                  Group {
+                    if sizeCategory.isAccessibilityCategory {
+                      VStack {
+                        Text(fromAccountName)
+                        Image(systemName: "arrow.down")
+                        Text(toAccountName)
                       }
-                      .accessibilityElement(children: .contain)
-                      .font(.footnote)
+                    } else {
+                      HStack {
+                        Text(fromAccountName)
+                        Image(systemName: "arrow.right")
+                        Text(toAccountName)
+                      }
                     }
                   }
-                  .padding()
-                  .accessibilityElement(children: .contain)
+                  .foregroundColor(Color(.bravePrimary))
+                  .font(.callout)
                 }
-              case .details:
-                VStack(alignment: .leading) {
-                  DetailsTextView(text: transactionDetails)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 200)
-                    .background(Color(.tertiaryBraveGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-                }
-                .padding()
-              }
-            }
-            .frame(maxWidth: .infinity)
-            .background(
-              Color(.secondaryBraveGroupedBackground)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-          }
-          if transactions.count > 1 {
-            Button(action: rejectAll) {
-              Text(String.localizedStringWithFormat(Strings.Wallet.rejectAllTransactions, transactions.count))
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(Color(.braveBlurpleTint))
-            }
-            .padding(.top, 8)
-          }
-          rejectConfirmContainer
-            .padding(.top)
-            .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
-            .accessibility(hidden: sizeCategory.isAccessibilityCategory)
-        }
-        .padding()
-      }
-      .overlay(
-        Group {
-          if sizeCategory.isAccessibilityCategory {
-            rejectConfirmContainer
-              .frame(maxWidth: .infinity)
-              .padding(.top)
-              .background(
-                LinearGradient(
-                  stops: [
-                    .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
-                    .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
-                    .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
-                  ],
-                  startPoint: .top,
-                  endPoint: .bottom
+                .accessibilityElement()
+                .accessibility(addTraits: .isStaticText)
+                .accessibility(
+                  label: Text(String.localizedStringWithFormat(
+                    Strings.Wallet.transactionFromToAccessibilityLabel, fromAccountName, toAccountName
+                  ))
                 )
-                  .ignoresSafeArea()
-                  .allowsHitTesting(false)
-              )
+                VStack(spacing: 4) {
+                  Text(transactionType)
+                    .font(.footnote)
+                  Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
+                    .fontWeight(.semibold)
+                    .foregroundColor(Color(.bravePrimary))
+                  Text(confirmationStore.state.fiat) // Value in Fiat
+                    .font(.footnote)
+                }
+                .padding(.vertical, 8)
+              }
+              // View Mode
+              VStack(spacing: 12) {
+                Picker("", selection: $viewMode) {
+                  Text(Strings.Wallet.confirmationViewModeTransaction).tag(ViewMode.transaction)
+                  Text(Strings.Wallet.confirmationViewModeDetails).tag(ViewMode.details)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                Group {
+                  switch viewMode {
+                  case .transaction:
+                    VStack(spacing: 0) {
+                      HStack {
+                        VStack(alignment: .leading) {
+                          Text(Strings.Wallet.gasFee)
+                            .foregroundColor(Color(.bravePrimary))
+                          editGasFeeButton
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                          Text("\(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
+                            .foregroundColor(Color(.bravePrimary))
+                          Text(confirmationStore.state.gasFiat)
+                            .font(.footnote)
+                        }
+                      }
+                      .font(.callout)
+                      .padding()
+                      .accessibilityElement(children: .contain)
+                      Divider()
+                        .padding(.leading)
+                      HStack {
+                        Text(Strings.Wallet.total)
+                          .foregroundColor(Color(.bravePrimary))
+                          .font(.callout)
+                          .accessibility(sortPriority: 1)
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                          Text(Strings.Wallet.amountAndGas)
+                            .font(.footnote)
+                            .foregroundColor(Color(.secondaryBraveLabel))
+                          Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol) + \(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
+                            .foregroundColor(Color(.bravePrimary))
+                          HStack(spacing: 4) {
+                            if !confirmationStore.state.isBalanceSufficient {
+                              Text(Strings.Wallet.insufficientBalance)
+                                .foregroundColor(Color(.braveErrorLabel))
+                            }
+                            Text(confirmationStore.state.totalFiat)
+                              .foregroundColor(
+                                confirmationStore.state.isBalanceSufficient ? Color(.braveLabel) : Color(.braveErrorLabel)
+                              )
+                          }
+                          .accessibilityElement(children: .contain)
+                          .font(.footnote)
+                        }
+                      }
+                      .padding()
+                      .accessibilityElement(children: .contain)
+                    }
+                  case .details:
+                    VStack(alignment: .leading) {
+                      DetailsTextView(text: transactionDetails)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 200)
+                        .background(Color(.tertiaryBraveGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    }
+                    .padding()
+                  }
+                }
+                .frame(maxWidth: .infinity)
+                .background(
+                  Color(.secondaryBraveGroupedBackground)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+              }
+              if transactions.count > 1 {
+                Button(action: rejectAll) {
+                  Text(String.localizedStringWithFormat(Strings.Wallet.rejectAllTransactions, transactions.count))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(Color(.braveBlurpleTint))
+                }
+                .padding(.top, 8)
+              }
+              rejectConfirmContainer
+                .padding(.top)
+                .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
+                .accessibility(hidden: sizeCategory.isAccessibilityCategory)
+            }
+            .padding()
           }
-        },
-        alignment: .bottom
-      )
+          .overlay(
+            Group {
+              if sizeCategory.isAccessibilityCategory {
+                rejectConfirmContainer
+                  .frame(maxWidth: .infinity)
+                  .padding(.top)
+                  .background(
+                    LinearGradient(
+                      stops: [
+                        .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
+                        .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
+                        .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
+                      ],
+                      startPoint: .top,
+                      endPoint: .bottom
+                    )
+                      .ignoresSafeArea()
+                      .allowsHitTesting(false)
+                  )
+              }
+            },
+            alignment: .bottom
+          )
+          .background(
+            Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all)
+          )
+        }
+      }
       .navigationBarTitle(transactions.count > 1 ? Strings.Wallet.confirmTransactionsTitle : Strings.Wallet.confirmTransactionTitle)
       .navigationBarTitleDisplayMode(.inline)
       .foregroundColor(Color(.braveLabel))
-      .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: { presentationMode.dismiss() }) {

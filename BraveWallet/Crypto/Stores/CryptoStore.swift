@@ -172,6 +172,7 @@ public class CryptoStore: ObservableObject {
       return store
     }
     let store = TransactionConfirmationStore(
+      keyringService: keyringService,
       assetRatioService: assetRatioService,
       rpcService: rpcService,
       txService: txService,
