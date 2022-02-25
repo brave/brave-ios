@@ -302,7 +302,7 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
   
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
     fetchAssetBalance()
-    keyringService.selectedAccount(.eth) { [weak self] address in
+    keyringService.selectedAccount(coinType) { [weak self] address in
       self?.currentAccountAddress = address
       self?.validateSendAddress()
     }
