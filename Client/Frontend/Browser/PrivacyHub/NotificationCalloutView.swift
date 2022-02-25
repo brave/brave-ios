@@ -40,11 +40,7 @@ extension PrivacyReportsView {
         .padding()
         .foregroundColor(Color.white)
         .background(
-          LinearGradient(
-            gradient:
-              Gradient(colors: [.init(.braveBlurple),
-                                .init(.braveInfoLabel)]),
-            startPoint: .topLeading, endPoint: .bottomTrailing)
+          LinearGradient(braveGradient: .gradient05)
         )
         .cornerRadius(15)
       }
