@@ -1798,7 +1798,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Clear & replace the incomplete transaction(s)",
-      comment: "Text of checkbox for a confirmation prompt when there's a backlog of wallet transactions"
+      comment: "Text of toggle for a confirmation prompt when there's a backlog of wallet transactions"
     )
     public static let transactionBacklogLearnMoreButton = NSLocalizedString(
       "wallet.transactionBacklogLearnMoreButton",
