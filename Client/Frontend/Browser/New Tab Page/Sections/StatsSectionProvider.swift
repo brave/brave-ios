@@ -7,6 +7,7 @@ import Foundation
 import Shared
 import BraveShared
 import BraveUI
+import UIKit
 
 class StatsSectionProvider: NSObject, NTPSectionProvider {
     let action: () -> Void
