@@ -1804,7 +1804,7 @@ extension Strings {
       "wallet.transactionBacklogLearnMoreButton",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Learn More.",
+      value: "Learn More",
       comment: "Button to learn more about incomplete/pending wallet transactions."
     )
   }
