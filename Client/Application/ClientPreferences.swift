@@ -247,6 +247,8 @@ extension Preferences {
         static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
         /// The boolean determine Password Migration is finished on client side
         static let syncV2PasswordMigrationCompleted = Option<Bool>(key: "chromium.migration.password", default: false)
+        /// The boolean determine Password Migration is started on client side
+        static let syncV2PasswordMigrationStarted = Option<Bool>(key: "chromium.migration.password.started", default: false)
         /// The count of how many times migration is performed on client side - the value increases with every fail attempt and after 3 tries migration marked as successful
         static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.attempt.count", default: 0)
         /// Whether the device is in sync chain

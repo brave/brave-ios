@@ -145,6 +145,7 @@ class BraveCoreMigrator {
                     return
                 }
                 
+                // Step 3: Check If passwords are migrate / migrate
                 migratePasswordForms { [unowned self] success in
                     guard success else {
                         self.migrationObserver = .failed
@@ -357,13 +358,11 @@ extension BraveCoreMigrator {
 extension BraveCoreMigrator {
     
     private func migratePasswordForms(_ completion: @escaping (Bool) -> Void) {
+        Preferences.Chromium.syncV2PasswordMigrationStarted.value = true
+        
         if !Preferences.Chromium.syncV2PasswordMigrationCompleted.value {
-            // If the password store has already loaded, the observer does NOT get called!
-            // Therefore we should continue to migrate the password forms
-            if passwordAPI.isAbleToSavePasswords == true {
-                performPasswordMigrationIfNeeded { success in
-                    completion(success)
-                }
+            performPasswordMigrationIfNeeded { success in
+                completion(success)
             }
         } else {
             completion(true)
@@ -383,18 +382,10 @@ extension BraveCoreMigrator {
             guard let self = self else { return }
 
             for login in results.asArray() {
-                
-                // Do not migrate login entries which URLCredential persistence is stored for the session
-                guard login.credentials.persistence == .forSession else {
-                    return
-                }
-                
                 if self.migrateChromiumPasswords(login: login) {
                     self.profile.logins.removeLoginByGUID(login.guid).upon { result in
                         DispatchQueue.main.async {
-                            if result.isSuccess {
-                                completion(true)
-                            } else {
+                            if !result.isSuccess {
                                 completion(false)
                                 log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
                             }
@@ -406,6 +397,8 @@ extension BraveCoreMigrator {
                     }
                 }
             }
+            
+            completion(true)
         }
     }
     

@@ -736,6 +736,11 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         showWalletTransferExpiryPanelIfNeeded()
         
         /// Perform migration to brave-core sync objects
+        if !Migration.isChromiumMigrationCompleted,
+           !Preferences.Chromium.syncV2PasswordMigrationStarted.value {
+            Preferences.Chromium.syncV2ObjectMigrationCount.value = 0
+        }
+        
         doSyncMigration()
         
         if #available(iOS 14, *), !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
