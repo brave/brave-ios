@@ -14,7 +14,7 @@ struct PrivacyReportAllTimeListsView: View {
       rawValue
     }
   }
-  @State private var currentPage: Page = .websites
+  @State private var currentPage: Page = .trackersAndAds
   
   var body: some View {
     VStack(spacing: 0) {
@@ -33,9 +33,23 @@ struct PrivacyReportAllTimeListsView: View {
           Section {
             ForEach(0..<20) { i in
               HStack {
-                Text("\(i)-analytics.com")
+                VStack(alignment: .leading, spacing: 4) {
+                  Text("\(i)-analytics.com")
+                    .font(.callout)
+                  HStack(spacing: 4) {
+                    Text("Blocked by")
+                      .foregroundColor(Color(.secondaryBraveLabel))
+                    PrivacyReportsView.BlockedByShieldsLabel()
+                    if i % 2 == 0 {
+                      PrivacyReportsView.BlockedByVPNLabel()
+                    }
+                  }
+                  .font(.caption)
+                }
+                
                 Spacer()
                 Text("\(i * 17)")
+                  .font(.headline.weight(.semibold))
               }
             }
           } header: {
@@ -54,10 +68,12 @@ struct PrivacyReportAllTimeListsView: View {
                 Label("\(i).com", systemImage: "globe")
                 Spacer()
                 Text("\(i * 17)")
+                  .font(.headline.weight(.semibold))
               }
             }
           } header: {
             Text("Websites with the most trackers & ads")
+              .font(.callout)
               .listRowInsets(.init())
               .padding(.vertical, 8)
               .padding(.horizontal)
