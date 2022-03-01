@@ -10,34 +10,59 @@ import BraveShared
 
 extension PrivacyReportsView {
   struct NotificationCalloutView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private var enableNotificationsButton: some View {
+      Button(action: {
+        
+      }, label: {
+        ZStack {
+          VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+            .edgesIgnoringSafeArea(.all)
+          
+          Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
+            .font(.callout)
+            .padding(.vertical, 12)
+        }
+        .clipShape(Capsule())
+      })
+    }
+    
     var body: some View {
       Group {
         VStack {
-          HStack(alignment: .top) {
+          
+          if horizontalSizeClass == .compact {
+            HStack(alignment: .top) {
+              HStack {
+                Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
+                Text(Strings.PrivacyHub.notificationCalloutBody)
+                  .font(.headline)
+              }
+              Spacer()
+              Image(systemName: "xmark")
+            }
+            .frame(maxWidth: .infinity)
+            
+            enableNotificationsButton
+              .frame(maxWidth: .infinity)
+          } else {
             HStack {
+              Spacer()
+              Image(systemName: "xmark")
+            }
+            
+            HStack(spacing: 24) {
               Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
               Text(Strings.PrivacyHub.notificationCalloutBody)
                 .font(.headline)
+              Spacer()
+              enableNotificationsButton
             }
-            Spacer()
-            Image(systemName: "xmark")
+            .padding()
+            // Extra bottom padding to offset the close button we have in top right.
+            .padding(.bottom)
           }
-          .frame(maxWidth: .infinity)
-          
-          Button(action: {
-            
-          }, label: {
-            ZStack {
-              VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
-                .edgesIgnoringSafeArea(.all)
-              
-              Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
-                .font(.callout)
-                .padding(.vertical, 12)
-            }
-            .clipShape(Capsule())
-          })
-            .frame(maxWidth: .infinity)
         }
         .padding()
         .foregroundColor(Color.white)
