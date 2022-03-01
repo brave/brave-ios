@@ -81,6 +81,7 @@ public class KeyringStore: ObservableObject {
   /// The users selected account when buying/sending/swapping currencies
   @Published var selectedAccount: BraveWallet.AccountInfo = .init() {
     didSet {
+      if oldValue.address == selectedAccount.address { return }
       keyringService.setSelectedAccount(selectedAccount.address, coin: .eth) { _ in }
     }
   }

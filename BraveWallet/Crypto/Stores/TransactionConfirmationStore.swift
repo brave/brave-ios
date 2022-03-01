@@ -185,7 +185,7 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   func fetchGasEstimation1559() {
-    assetRatioService.gasOracle() { [weak self] gasEstimation in
+    ethTxManagerProxy.gasEstimation1559() { [weak self] gasEstimation in
       self?.gasEstimation1559 = gasEstimation
     }
   }
