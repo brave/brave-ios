@@ -121,17 +121,17 @@ struct TransactionConfirmationView: View {
         .font(.title2.bold())
         .foregroundColor(Color(.braveLabel))
       VStack {
-        Text(Strings.Wallet.transactionBacklogbBody)
+        Text(Strings.Wallet.transactionBacklogBody)
           .multilineTextAlignment(.center)
           .foregroundColor(Color(.braveLabel))
         Button(action: {}) {
-          Text(Strings.Wallet.learnMore)
+          Text(Strings.Wallet.transactionBacklogLearnMoreButton)
             .foregroundColor(Color(.braveBlurpleTint))
         }
       }
       HStack {
         Toggle(isOn: $replaceBadTx) {
-          Text(Strings.Wallet.transactionBacklogToggleText)
+          Text(Strings.Wallet.transactionBacklogAcknowledgement)
             .font(.callout)
             .foregroundColor(Color(.secondaryBraveLabel))
         }
