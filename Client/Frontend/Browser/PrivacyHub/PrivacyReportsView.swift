@@ -63,7 +63,6 @@ struct PrivacyReportsView: View {
         .padding()
         .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationViewStyle(.stack)
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing, content: {
             Image(systemName: "xmark.circle.fill")
@@ -72,6 +71,7 @@ struct PrivacyReportsView: View {
       }
       .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     }
+    .navigationViewStyle(.stack)
   }
 }
 
