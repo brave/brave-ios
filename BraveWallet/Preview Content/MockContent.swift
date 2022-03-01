@@ -123,6 +123,19 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508)
     )
   }
+  static var previewSubmitedEthSend: BraveWallet.TransactionInfo {
+    BraveWallet.TransactionInfo(id: "fake_tx_id",
+                                fromAddress: BraveWallet.AccountInfo.previewAccount.id,
+                                txHash: "0xfaketxhash",
+                                txData: .init(),
+                                txStatus: .submitted,
+                                txType: .ethSend,
+                                txParams: [],
+                                txArgs: [],
+                                createdTime: Date(timeIntervalSince1970: 1645899670),
+                                submittedTime: Date(timeIntervalSince1970: 1645899671),
+                                confirmedTime: Date(timeIntervalSince1970: 1645899672))
+  }
   static private func _transactionBase64ToData(_ base64String: String) -> [NSNumber] {
     guard let data = Data(base64Encoded: base64String) else { return [] }
     return Array(data).map(NSNumber.init(value:))
