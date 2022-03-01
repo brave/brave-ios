@@ -244,7 +244,7 @@ class TabLocationView: UIView {
         contentView.spacing = 10
         contentView.setCustomSpacing(5, after: urlTextField)
         
-        tabOptionsStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 6)
+        tabOptionsStackView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
         tabOptionsStackView.isLayoutMarginsRelativeArrangement = true
         addSubview(contentView)
         
