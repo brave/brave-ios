@@ -219,8 +219,6 @@ class LoginsHelper: TabContentScript {
     private func showAddPrompt(for login: PasswordForm) {
         addSnackBarForPrompt(for: login, isUpdating: false) { [unowned self] in
             DispatchQueue.main.async {
-                print("LOGIN URL \(login.url)")
-                print("LOGIN REALM \(login.signOnRealm)")
                 self.passwordAPI.addLogin(login)
             }
         }
@@ -287,7 +285,7 @@ class LoginsHelper: TabContentScript {
             // Check for current tab has a url to begin with
             // and the frame is not modified
             guard let currentURL = tab?.webView?.url,
-                  LoginsHelper.checkIfFrameInfoNotModified(
+                  LoginsHelper.checkIsSameFrame(
                     url: currentURL,
                     frameScheme: securityOrigin.protocol,
                     frameHost: securityOrigin.host,
@@ -295,7 +293,6 @@ class LoginsHelper: TabContentScript {
                 return nil
             }
             
-            // Prevent XSS on non main frame
             // If it is not the main frame, return username only, but no password!
             // Chromium does the same on iOS.
             // Firefox does NOT support third-party frames or iFrames.
@@ -334,7 +331,8 @@ extension LoginsHelper {
     ///   - frameHost: Host of frameInfo
     ///   - framePort: Port of frameInfo
     /// - Returns: Boolean indicating url and frameInfo has same elements
-    static func checkIfFrameInfoNotModified(url: URL, frameScheme: String, frameHost: String, framePort: Int) -> Bool {
+    static func checkIsSameFrame(url: URL, frameScheme: String, frameHost: String, framePort: Int) -> Bool {
+        // Prevent XSS on non main frame
         // Check the frame origin host belongs to the same security origin host
         guard let currentHost = url.host, !currentHost.isEmpty, currentHost == frameHost else {
             return false
@@ -358,5 +356,4 @@ extension LoginsHelper {
         
         return true
     }
-    
 }

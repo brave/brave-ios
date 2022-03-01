@@ -538,6 +538,7 @@
 		2F9311D52665883400C6B74D /* DataSaved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D42665883400C6B74D /* DataSaved.swift */; };
 		2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D8266698E600C6B74D /* DataSavedTests.swift */; };
 		2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */; };
+		2F9CE87327CEA0AC008C9C44 /* LoginsHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9CE87227CEA0AC008C9C44 /* LoginsHelperTests.swift */; };
 		2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */; };
 		2FA01E5D25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */; };
 		2FA5A7582649CD9200740035 /* HistoryServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */; };
@@ -2293,6 +2294,7 @@
 		2F9311D42665883400C6B74D /* DataSaved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSaved.swift; sourceTree = "<group>"; };
 		2F9311D8266698E600C6B74D /* DataSavedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSavedTests.swift; sourceTree = "<group>"; };
 		2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordAPIExtensions.swift; sourceTree = "<group>"; };
+		2F9CE87227CEA0AC008C9C44 /* LoginsHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsHelperTests.swift; sourceTree = "<group>"; };
 		2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkTierTests.swift; sourceTree = "<group>"; };
 		2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsActivityItemSourceProvider.swift; sourceTree = "<group>"; };
 		2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceStateObserver.swift; sourceTree = "<group>"; };
@@ -6503,6 +6505,7 @@
 				F84B21D71A090F8100AAB793 /* Supporting Files */,
 				CA04E8A527022D9D00BFBB4D /* PlaylistTests.swift */,
 				CA84F895274F428B00B1388E /* SyncTests.swift */,
+				2F9CE87227CEA0AC008C9C44 /* LoginsHelperTests.swift */,
 			);
 			path = ClientTests;
 			sourceTree = "<group>";
@@ -8852,6 +8855,7 @@
 				D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */,
 				0AD9F88E22F05376008B4D95 /* AdblockRustTests.swift in Sources */,
 				CA84F896274F428B00B1388E /* SyncTests.swift in Sources */,
+				2F9CE87327CEA0AC008C9C44 /* LoginsHelperTests.swift in Sources */,
 				0BA8964B1A250E6500C1010C /* ProfileTest.swift in Sources */,
 				5953AAEF2226E9D800A92DE1 /* HttpCookieExtensionTest.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,

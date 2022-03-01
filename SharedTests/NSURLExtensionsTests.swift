@@ -496,8 +496,8 @@ class NSURLExtensionsTests: XCTestCase {
 
     func testorigin() {
         let urls = [
-            ("https://www.example.com/index.html", "https://www.example.com"),
-            ("https://user:pass@m.foo.com/bar/baz?noo=abc#123", "https://m.foo.com"),
+            ("https://www.example.com/index.html", "https://www.example.com/"),
+            ("https://user:pass@m.foo.com/bar/baz?noo=abc#123", "https://m.foo.com/"),
         ]
 
         let badurls = [
