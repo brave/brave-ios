@@ -6,6 +6,7 @@
 import SwiftUI
 import Shared
 import BraveShared
+import BraveUI
 
 extension PrivacyReportsView {
   struct PrivacyHubLastWeekSection: View {
@@ -25,8 +26,7 @@ extension PrivacyReportsView {
                 .font(.caption)
                 .foregroundColor(.init(.secondaryBraveLabel))
               if let lastWeekMostFrequentTracker = lastWeekMostFrequentTracker {
-                // FIXME: Add bold for string args.
-                Text(String(format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
+                Text(markdown: String(format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
                             lastWeekMostFrequentTracker.0, lastWeekMostFrequentTracker.1))
                   .font(.callout)
               } else {
@@ -50,8 +50,7 @@ extension PrivacyReportsView {
                 .foregroundColor(Color(.secondaryBraveLabel))
               
               if let lastWeekRiskiestWebsite = lastWeekRiskiestWebsite {
-                // FIXME: Add bold for string args.
-                Text(String(format: Strings.PrivacyHub.riskiestWebsiteBody,
+                Text(markdown: String(format: Strings.PrivacyHub.riskiestWebsiteBody,
                             lastWeekRiskiestWebsite.0, lastWeekRiskiestWebsite.1))
                   .font(.callout)
               } else {
