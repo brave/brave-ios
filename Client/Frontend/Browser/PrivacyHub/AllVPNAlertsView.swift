@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
+import Shared
+import BraveShared
 
 struct AllVPNAlertsView: View {
   let vpnAlerts: [VPNAlertCell.VPNAlert] =
@@ -28,7 +30,7 @@ struct AllVPNAlertsView: View {
         } header: {
           VStack {
             HStack {
-              Text("Total alerts".uppercased())
+              Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
                 .font(.subheadline.weight(.medium))
               Spacer()
               Text("123")
@@ -58,6 +60,7 @@ struct AllVPNAlertsView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     .ignoresSafeArea(.container, edges: .bottom)
+    .navigationTitle(Strings.PrivacyHub.allVPNAlertsButtonText)
   }
 }
 

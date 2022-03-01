@@ -4,6 +4,8 @@
 
 import SwiftUI
 import BraveUI
+import Shared
+import BraveShared
 
 struct PrivacyReportsView: View {
   
@@ -59,7 +61,7 @@ struct PrivacyReportsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-        .navigationTitle("Privacy report")
+        .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .navigationViewStyle(.stack)
         .toolbar {

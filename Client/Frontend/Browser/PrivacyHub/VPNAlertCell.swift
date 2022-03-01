@@ -57,13 +57,15 @@ struct VPNAlertCell: View {
         }
         .font(.caption.weight(.semibold))
         
-        Text(vpnAlert.text)
-          .font(.callout)
-          .fixedSize(horizontal: false, vertical: true)
-        
-        Text(date)
-          .font(.caption)
-          .foregroundColor(Color(.secondaryBraveLabel))
+        VStack(alignment: .leading, spacing: 4) {
+          Text(vpnAlert.text)
+            .font(.callout)
+            .fixedSize(horizontal: false, vertical: true)
+          
+          Text(date)
+            .font(.caption)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        }
       }
       Spacer()
     }

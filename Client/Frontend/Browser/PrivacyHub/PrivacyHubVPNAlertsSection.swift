@@ -4,6 +4,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct PrivacyHubVPNAlertsSection: View {
@@ -15,7 +17,7 @@ extension PrivacyReportsView {
     
     var body: some View {
       VStack(alignment: .leading) {
-        Text("BRAVE FIREWALL + VPN ALERTS")
+        Text(Strings.PrivacyHub.vpnAlertsHeader.uppercased())
           .font(.footnote.weight(.medium))
         
         ForEach(vpnAlerts, id: \.self) { alert in
@@ -29,9 +31,10 @@ extension PrivacyReportsView {
         }) {
           NavigationLink(destination: AllVPNAlertsView()) {
             HStack {
-              Text("All alerts")
+              Text(Strings.PrivacyHub.allVPNAlertsButtonText)
               Image(systemName: "arrow.right")
             }
+            .frame(maxWidth: .infinity)
           }
           .padding(.vertical, 12)
           .frame(maxWidth: .infinity)

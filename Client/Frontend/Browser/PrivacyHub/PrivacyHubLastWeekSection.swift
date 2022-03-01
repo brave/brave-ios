@@ -4,6 +4,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct PrivacyHubLastWeekSection: View {
@@ -13,28 +15,22 @@ extension PrivacyReportsView {
     var body: some View {
       Group {
         VStack(alignment: .leading, spacing: 8) {
-          Text("LAST WEEK")
+          Text(Strings.PrivacyHub.lastWeekHeader.uppercased())
             .font(.footnote.weight(.medium))
           
           HStack {
             Image("frequent_tracker")
             VStack(alignment: .leading) {
-              Text("MOST FREQUENT TRACKED & AD")
+              Text(Strings.PrivacyHub.mostFrequentTrackerAndAdTitle.uppercased())
                 .font(.caption)
                 .foregroundColor(.init(.secondaryBraveLabel))
               if let lastWeekMostFrequentTracker = lastWeekMostFrequentTracker {
-                Group {
-                  Text(lastWeekMostFrequentTracker.0)
-                    .fontWeight(.medium) +
-                  Text(" was blocked by Brave Shields on ") +
-                  Text("\(lastWeekMostFrequentTracker.1)")
-                    .fontWeight(.medium) +
-                  Text(" times")
-                }
-                .font(.callout)
-                
+                // FIXME: Add bold for string args.
+                Text(String(format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
+                            lastWeekMostFrequentTracker.0, lastWeekMostFrequentTracker.1))
+                  .font(.callout)
               } else {
-                Text("No data to show yet.")
+                Text(Strings.PrivacyHub.noDataToShow)
                   .foregroundColor(.init(.secondaryBraveLabel))
               }
             }
@@ -49,21 +45,17 @@ extension PrivacyReportsView {
             Image("creepy_website")
             VStack(alignment: .leading) {
               
+              Text(Strings.PrivacyHub.riskiestWebsiteTitle.uppercased())
+                .font(.caption)
+                .foregroundColor(Color(.secondaryBraveLabel))
+              
               if let lastWeekRiskiestWebsite = lastWeekRiskiestWebsite {
-                Group {
-                  Text(lastWeekRiskiestWebsite.0)
-                    .fontWeight(.medium) +
-                  Text(" had an average of ") +
-                  Text("\(lastWeekRiskiestWebsite.1)")
-                    .fontWeight(.medium) +
-                  Text(" trackers & ads blocked per visit")
-                }
-                .font(.callout)
+                // FIXME: Add bold for string args.
+                Text(String(format: Strings.PrivacyHub.riskiestWebsiteBody,
+                            lastWeekRiskiestWebsite.0, lastWeekRiskiestWebsite.1))
+                  .font(.callout)
               } else {
-                Text("RISKIEST WEBSITE YOU VISITED")
-                  .font(.caption)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                Text("No data to show yet.")
+                Text(Strings.PrivacyHub.noDataToShow)
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
             }

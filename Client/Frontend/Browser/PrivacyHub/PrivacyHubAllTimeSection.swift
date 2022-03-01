@@ -4,6 +4,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct PrivacyHubAllTimeSection: View {
@@ -12,12 +14,12 @@ extension PrivacyReportsView {
     
     var body: some View {
       VStack(alignment: .leading, spacing: 8) {
-        Text("ALL TIME")
+        Text(Strings.PrivacyHub.allTimeListsHeader.uppercased())
           .font(.footnote.weight(.medium))
         
         HStack(spacing: 12) {
           VStack {
-            Text("TRACKER & AD")
+            Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
               .font(.caption)
               .frame(maxWidth: .infinity, alignment: .leading)
               .foregroundColor(Color(.secondaryBraveLabel))
@@ -25,13 +27,15 @@ extension PrivacyReportsView {
             if let allTimeMostFrequentTracker = allTimeMostFrequentTracker {
               VStack(alignment: .leading) {
                 Text(allTimeMostFrequentTracker.0)
-                Text("\(allTimeMostFrequentTracker.1) sites")
+                
+                Text(String(format: Strings.PrivacyHub.allTimeTrackersCount,
+                            allTimeMostFrequentTracker.1))
               }
               .frame(maxWidth: .infinity, alignment: .leading)
               .font(.subheadline)
               
             } else {
-              Text("No data to show yet.")
+              Text(Strings.PrivacyHub.noDataToShow)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.subheadline)
                 .foregroundColor(Color(.secondaryBraveLabel))
@@ -43,7 +47,7 @@ extension PrivacyReportsView {
           .cornerRadius(15)
           
           VStack {
-            Text("WEBSITE")
+            Text(Strings.PrivacyHub.allTimeWebsiteTitle.uppercased())
               .font(.caption)
               .frame(maxWidth: .infinity, alignment: .leading)
               .foregroundColor(Color(.secondaryBraveLabel))
@@ -51,13 +55,14 @@ extension PrivacyReportsView {
             if let allTimeRiskiestWebsite = allTimeRiskiestWebsite {
               VStack(alignment: .leading) {
                 Text(allTimeRiskiestWebsite.0)
-                Text("\(allTimeRiskiestWebsite.1) sites")
+                Text(String(format: Strings.PrivacyHub.allTimeSitesCount,
+                            allTimeRiskiestWebsite.1))
               }
               .frame(maxWidth: .infinity, alignment: .leading)
               .font(.subheadline)
               
             } else {
-              Text("No data to show yet.")
+              Text(Strings.PrivacyHub.noDataToShow)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.subheadline)
                 .foregroundColor(Color(.secondaryBraveLabel))
@@ -74,9 +79,10 @@ extension PrivacyReportsView {
         }) {
           NavigationLink(destination: PrivacyReportAllTimeListsView()) {
             HStack {
-              Text("All time lists")
+              Text(Strings.PrivacyHub.allTimeListsButtonText)
               Image(systemName: "arrow.right")
             }
+            .frame(maxWidth: .infinity)
           }
           .padding(.vertical, 12)
           .frame(maxWidth: .infinity)

@@ -4,13 +4,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct NoDataCallout: View {
     var body: some View {
       HStack {
         Image(systemName: "info.circle.fill")
-        Text("Visit some websites to see data here.")
+        Text(Strings.PrivacyHub.noDataCalloutBody)
       }
       .foregroundColor(Color.white)
       .frame(maxWidth: .infinity)

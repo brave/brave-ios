@@ -3,24 +3,33 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
+import Shared
+import BraveShared
 
 struct PrivacyReportAllTimeListsView: View {
   
-  enum Page: String, CaseIterable, Identifiable {
-    case trackersAndAds = "Trackers & Ads"
-    case websites = "Websites"
+  enum Page: CaseIterable, Identifiable {
+    case trackersAndAds, websites
     
     var id: String {
-      rawValue
+      displayString
+    }
+    
+    var displayString: String {
+      switch self {
+      case .trackersAndAds: return Strings.PrivacyHub.allTimeListsTrackersView
+      case .websites: return Strings.PrivacyHub.allTimeListsWebsitesView
+      }
     }
   }
+  
   @State private var currentPage: Page = .trackersAndAds
   
   var body: some View {
     VStack(spacing: 0) {
       Picker("", selection: $currentPage) {
         ForEach(Page.allCases) {
-          Text($0.rawValue)
+          Text($0.displayString)
             .tag($0)
         }
       }
@@ -37,7 +46,7 @@ struct PrivacyReportAllTimeListsView: View {
                   Text("\(i)-analytics.com")
                     .font(.callout)
                   HStack(spacing: 4) {
-                    Text("Blocked by")
+                    Text(Strings.PrivacyHub.blockedBy)
                       .foregroundColor(Color(.secondaryBraveLabel))
                     PrivacyReportsView.BlockedByShieldsLabel()
                     if i % 2 == 0 {
@@ -53,10 +62,10 @@ struct PrivacyReportAllTimeListsView: View {
               }
             }
           } header: {
-            Text("Most frequent trackers & ads on sites you Visit")
+            Text(Strings.PrivacyHub.allTimeListTrackersHeaderTitle)
               .listRowInsets(.init())
               .padding(.vertical, 8)
-              .padding(.horizontal)
+              .font(.footnote)
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
@@ -72,11 +81,10 @@ struct PrivacyReportAllTimeListsView: View {
               }
             }
           } header: {
-            Text("Websites with the most trackers & ads")
-              .font(.callout)
+            Text(Strings.PrivacyHub.allTimeListWebsitesHeaderTitle)
+              .font(.footnote)
               .listRowInsets(.init())
               .padding(.vertical, 8)
-              .padding(.horizontal)
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
@@ -87,7 +95,7 @@ struct PrivacyReportAllTimeListsView: View {
       .ignoresSafeArea(.container, edges: .bottom)
       .animation(.default, value: currentPage)
       .environment(\.defaultMinListHeaderHeight, 0)
-      .navigationTitle("Privacy report")
+      .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
     }
   }
 }

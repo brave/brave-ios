@@ -5,6 +5,8 @@
 
 import SwiftUI
 import BraveUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct NotificationCalloutView: View {
@@ -14,7 +16,7 @@ extension PrivacyReportsView {
           HStack(alignment: .top) {
             HStack {
               Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
-              Text("Get weekly privacy updates on tracker & ad blocking.")
+              Text(Strings.PrivacyHub.notificationCalloutBody)
                 .font(.headline)
             }
             Spacer()
@@ -29,7 +31,7 @@ extension PrivacyReportsView {
               VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
                 .edgesIgnoringSafeArea(.all)
               
-              Label("Turn on noticications", image: "brave.bell")
+              Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
                 .font(.callout)
                 .padding(.vertical, 12)
             }

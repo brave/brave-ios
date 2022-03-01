@@ -4,11 +4,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import Shared
+import BraveShared
 
 extension PrivacyReportsView {
   struct BlockedLabel: View {
     var body: some View {
-      Text("Blocked".uppercased())
+      Text(Strings.PrivacyHub.blockedLabel.uppercased())
         .foregroundColor(Color("label_red_foreground"))
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
@@ -19,7 +21,7 @@ extension PrivacyReportsView {
   
   struct BlockedByVPNLabel: View {
     var body: some View {
-      Text("Firewall + VPN".uppercased())
+      Text(Strings.PrivacyHub.vpnLabel.uppercased())
         .foregroundColor(Color("label_violet_foreground"))
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
@@ -30,7 +32,7 @@ extension PrivacyReportsView {
   
   struct BlockedByShieldsLabel: View {
     var body: some View {
-      Text("Shields".uppercased())
+      Text(Strings.PrivacyHub.shieldsLabel.uppercased())
         .foregroundColor(Color("label_orange_foreground"))
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
