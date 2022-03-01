@@ -274,8 +274,7 @@ class LoginsHelper: TabContentScript {
     }
     
     private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
-        let currentHost = tab?.webView?.url?.host
-        let frameHost = frameInfo.securityOrigin.host
+        let securityOrigin = frameInfo.securityOrigin
         
         var jsonObj = [String: Any]()
         jsonObj["requestId"] = requestId
@@ -285,20 +284,25 @@ class LoginsHelper: TabContentScript {
                 return loginData.toDict(formSubmitURL: formSubmitURL)
             }
             
-            // The frame must belong to the same security origin
-            if let currentHost = currentHost,
-               !currentHost.isEmpty,
-               currentHost == frameHost {
-                // Prevent XSS on non main frame
-                // If it is not the main frame, return username only, but no password!
-                // Chromium does the same on iOS.
-                // Firefox does NOT support third-party frames or iFrames.
+            // Check for current tab has a url to begin with
+            // and the frame is not modified
+            guard let currentURL = tab?.webView?.url,
+                  LoginsHelper.checkIfFrameInfoNotModified(
+                    url: currentURL,
+                    frameScheme: securityOrigin.protocol,
+                    frameHost: securityOrigin.host,
+                    framePort: securityOrigin.port) else {
+                return nil
+            }
+            
+            // Prevent XSS on non main frame
+            // If it is not the main frame, return username only, but no password!
+            // Chromium does the same on iOS.
+            // Firefox does NOT support third-party frames or iFrames.
+            if let updatedLogin = loginData.copy() as? PasswordForm {
+                updatedLogin.update(loginData.usernameValue, passwordValue: "")
                 
-                if let updatedLogin = loginData.copy() as? PasswordForm {
-                    updatedLogin.update(loginData.usernameValue, passwordValue: "")
-                    
-                    return updatedLogin.toDict(formSubmitURL: formSubmitURL)
-                }
+                return updatedLogin.toDict(formSubmitURL: formSubmitURL)
             }
             
             return nil
@@ -319,4 +323,40 @@ class LoginsHelper: TabContentScript {
             }
         }
     }
+}
+
+extension LoginsHelper {
+    
+    /// Helper method for checking if frame security origin elements are same as url from the webview
+    /// - Parameters:
+    ///   - url: url of the webview / tab
+    ///   - frameScheme: Scheme of frameInfo
+    ///   - frameHost: Host of frameInfo
+    ///   - framePort: Port of frameInfo
+    /// - Returns: Boolean indicating url and frameInfo has same elements
+    static func checkIfFrameInfoNotModified(url: URL, frameScheme: String, frameHost: String, framePort: Int) -> Bool {
+        // Check the frame origin host belongs to the same security origin host
+        guard let currentHost = url.host, !currentHost.isEmpty, currentHost == frameHost else {
+            return false
+        }
+        
+        // Check port for frame origin exists
+        // and belongs to the same security origin port
+        if let currentPort = url.port, currentPort != framePort {
+            return false
+        }
+        
+        if url.port == nil, framePort != 0 {
+            return false
+        }
+        
+        // Check scheme exists for frame origin
+        // and belongs to the same security origin protocol
+        if let currentScheme = url.scheme, currentScheme != frameScheme {
+            return false
+        }
+        
+        return true
+    }
+    
 }
