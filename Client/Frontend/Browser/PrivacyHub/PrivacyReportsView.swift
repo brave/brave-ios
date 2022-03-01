@@ -68,7 +68,7 @@ struct PrivacyReportsView: View {
           })
         }
       }
-      .background(Color(.secondaryBraveBackground))
+      .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     }
   }
 }

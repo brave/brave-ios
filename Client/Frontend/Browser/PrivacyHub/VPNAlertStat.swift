@@ -18,6 +18,7 @@ extension AllVPNAlertsView {
     var body: some View {
       HStack {
         Image(type.assetName)
+          .padding(.leading)
         
         if compact {
           VStack(alignment: .leading) {
@@ -26,16 +27,20 @@ extension AllVPNAlertsView {
               .font(.caption.weight(.semibold))
             Text("\(123)")
               .font(.headline.weight(.semibold))
+              // Smaller custom padding here to try to display the cell's text in one line
+              // on regular font size English language.
+              .padding(.trailing, 4)
           }
           Spacer()
         } else {
           Text(type.headerText)
+            .font(.caption.weight(.semibold))
           Spacer()
           Text("\(123)")
             .font(.headline.weight(.semibold))
+            .padding(.trailing)
         }
       }
-      .padding(.horizontal)
       .padding(.vertical, 8)
       .frame(maxWidth: .infinity)
       .background(Color(.braveBackground))

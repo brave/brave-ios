@@ -19,7 +19,7 @@ struct VPNAlertCell: View {
     var headerText: String {
       switch self {
       case .data: return "Tracker & Ad"
-      case .location: return "Location Ping"
+      case .location: return "Location Pings"
       case .mail: return "Email tracker"
       }
     }

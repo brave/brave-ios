@@ -56,7 +56,8 @@ struct AllVPNAlertsView: View {
       Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(.secondaryBraveBackground))
+    .background(Color(.secondaryBraveBackground).ignoresSafeArea())
+    .ignoresSafeArea(.container, edges: .bottom)
   }
 }
 
