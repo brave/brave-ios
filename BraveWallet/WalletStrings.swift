@@ -1812,7 +1812,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "For now, no additional action is required. Just wait for the unconfirmed transactions to clear.",
-      comment: "Additional information, when users have previsouly clear and replace the incomplete transaction(s)"
+      comment: "Additional information, when users have previously clear and replace the incomplete transaction(s)"
     )
   }
 }
