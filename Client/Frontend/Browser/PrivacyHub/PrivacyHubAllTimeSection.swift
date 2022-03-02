@@ -9,8 +9,70 @@ import BraveShared
 
 extension PrivacyReportsView {
   struct PrivacyHubAllTimeSection: View {
+    @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
     let allTimeMostFrequentTracker: (String, Int)?
     let allTimeRiskiestWebsite: (String, Int)?
+    
+    private var allTimeTrackerView: some View {
+      VStack {
+        Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
+          .font(.caption)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .foregroundColor(Color(.secondaryBraveLabel))
+        
+        if let allTimeMostFrequentTracker = allTimeMostFrequentTracker {
+          VStack(alignment: .leading) {
+            Text(allTimeMostFrequentTracker.0)
+            
+            Text(String(format: Strings.PrivacyHub.allTimeTrackersCount,
+                        allTimeMostFrequentTracker.1))
+          }
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+          .font(.subheadline)
+          
+        } else {
+          Text(Strings.PrivacyHub.noDataToShow)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.subheadline)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        }
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(.braveBackground))
+      .cornerRadius(15)
+    }
+    
+    private var allTimeWebsiteView: some View {
+      VStack {
+        Text(Strings.PrivacyHub.allTimeWebsiteTitle.uppercased())
+          .font(.caption)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .foregroundColor(Color(.secondaryBraveLabel))
+        
+        if let allTimeRiskiestWebsite = allTimeRiskiestWebsite {
+          VStack(alignment: .leading) {
+            Text(allTimeRiskiestWebsite.0)
+            Text(String(format: Strings.PrivacyHub.allTimeSitesCount,
+                        allTimeRiskiestWebsite.1))
+          }
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+          .font(.subheadline)
+          
+        } else {
+          Text(Strings.PrivacyHub.noDataToShow)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.subheadline)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        }
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(.braveBackground))
+      .cornerRadius(15)
+    }
     
     var body: some View {
       VStack(alignment: .leading, spacing: 8) {
@@ -18,61 +80,16 @@ extension PrivacyReportsView {
           .font(.footnote.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
         
-        HStack(spacing: 12) {
+        if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
           VStack {
-            Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
-              .font(.caption)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .foregroundColor(Color(.secondaryBraveLabel))
-            
-            if let allTimeMostFrequentTracker = allTimeMostFrequentTracker {
-              VStack(alignment: .leading) {
-                Text(allTimeMostFrequentTracker.0)
-                
-                Text(String(format: Strings.PrivacyHub.allTimeTrackersCount,
-                            allTimeMostFrequentTracker.1))
-              }
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-              .font(.subheadline)
-              
-            } else {
-              Text(Strings.PrivacyHub.noDataToShow)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.subheadline)
-                .foregroundColor(Color(.secondaryBraveLabel))
-            }
+            allTimeTrackerView
+            allTimeWebsiteView
           }
-          .frame(maxWidth: .infinity)
-          .padding()
-          .background(Color(.braveBackground))
-          .cornerRadius(15)
-          
-          VStack {
-            Text(Strings.PrivacyHub.allTimeWebsiteTitle.uppercased())
-              .font(.caption)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .foregroundColor(Color(.secondaryBraveLabel))
-            
-            if let allTimeRiskiestWebsite = allTimeRiskiestWebsite {
-              VStack(alignment: .leading) {
-                Text(allTimeRiskiestWebsite.0)
-                Text(String(format: Strings.PrivacyHub.allTimeSitesCount,
-                            allTimeRiskiestWebsite.1))
-              }
-              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-              .font(.subheadline)
-              
-            } else {
-              Text(Strings.PrivacyHub.noDataToShow)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.subheadline)
-                .foregroundColor(Color(.secondaryBraveLabel))
-            }
+        } else {
+          HStack(spacing: 12) {
+            allTimeTrackerView
+            allTimeWebsiteView
           }
-          .frame(maxWidth: .infinity)
-          .padding()
-          .background(Color(.braveBackground))
-          .cornerRadius(15)
         }
         
         Button(action: {

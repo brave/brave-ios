@@ -44,7 +44,8 @@ extension AllVPNAlertsView {
       .padding(.vertical, 8)
       .frame(maxWidth: .infinity)
       .background(Color(.braveBackground))
-      .cornerRadius(15)
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .fixedSize(horizontal: false, vertical: true)
       
     }
   }

@@ -5,6 +5,9 @@
 import SwiftUI
 
 struct VPNAlertCell: View {
+  @Environment(\.sizeCategory) private var sizeCategory
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  
   enum AlertType {
     case data, location, mail
     
@@ -50,10 +53,21 @@ struct VPNAlertCell: View {
     HStack(alignment: .top) {
       Image(vpnAlert.type.assetName)
       VStack(alignment: .leading) {
-        HStack(spacing: 4) {
-          Text(vpnAlert.type.headerText)
-            .foregroundColor(Color(.secondaryBraveLabel))
-          PrivacyReportsView.BlockedLabel()
+        
+        Group {
+          if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
+            VStack(alignment: .leading, spacing: 4) {
+              Text(vpnAlert.type.headerText)
+                .foregroundColor(Color(.secondaryBraveLabel))
+              PrivacyReportsView.BlockedLabel()
+            }
+          } else {
+            HStack(spacing: 4) {
+              Text(vpnAlert.type.headerText)
+                .foregroundColor(Color(.secondaryBraveLabel))
+              PrivacyReportsView.BlockedLabel()
+            }
+          }
         }
         .font(.caption.weight(.semibold))
         

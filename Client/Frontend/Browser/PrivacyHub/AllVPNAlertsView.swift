@@ -7,6 +7,9 @@ import Shared
 import BraveShared
 
 struct AllVPNAlertsView: View {
+  @Environment(\.sizeCategory) private var sizeCategory
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  
   let vpnAlerts: [VPNAlertCell.VPNAlert] =
   [.init(date: Date(), text: "'App Measurement' collects app usage, device info, and app activity.", type: .data),
    .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location),
@@ -40,14 +43,18 @@ struct AllVPNAlertsView: View {
             .background(Color("total_alerts_background"))
             .cornerRadius(15)
             
-            HStack {
-              VPNAlertStat(type: .data, compact: false)
-            }
-            
-            HStack {
+            if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
+              VPNAlertStat(type: .data, compact: true)
               VPNAlertStat(type: .location, compact: true)
               VPNAlertStat(type: .mail, compact: true)
+            } else {
+              VPNAlertStat(type: .data, compact: false)
+              HStack {
+                VPNAlertStat(type: .location, compact: true)
+                VPNAlertStat(type: .mail, compact: true)
+              }
             }
+            
           }
           .padding(.vertical)
           .listRowInsets(.init())

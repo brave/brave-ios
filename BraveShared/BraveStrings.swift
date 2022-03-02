@@ -4351,7 +4351,7 @@ extension Strings {
         public static let notificationCalloutButtonText = NSLocalizedString(
             "privacyHub.notificationCalloutButtonText",
             bundle: .braveShared,
-            value: "Turn on noticications",
+            value: "Turn on notifications",
             comment: "Text of a button to encourage user to enable Apple notification system."
         )
         
