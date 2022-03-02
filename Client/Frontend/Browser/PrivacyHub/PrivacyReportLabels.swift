@@ -16,28 +16,43 @@ extension PrivacyReportsView {
         .padding(.vertical, 2)
         .background(Color("label_red_background"))
         .cornerRadius(4)
+        .fixedSize(horizontal: false, vertical: true)
     }
   }
   
   struct BlockedByVPNLabel: View {
+    @Environment(\.sizeCategory) private var sizeCategory
+    
     var body: some View {
       Text(Strings.PrivacyHub.vpnLabel.uppercased())
         .foregroundColor(Color("label_violet_foreground"))
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
         .background(Color("label_violet_background"))
-        .clipShape(Capsule())
+        .clipShape(
+          RoundedRectangle(
+            cornerRadius: sizeCategory.isAccessibilityCategory ? 8.0 : 24.0,
+            style: .continuous)
+        )
+        .fixedSize(horizontal: false, vertical: true)
     }
   }
   
   struct BlockedByShieldsLabel: View {
+    @Environment(\.sizeCategory) private var sizeCategory
+    
     var body: some View {
       Text(Strings.PrivacyHub.shieldsLabel.uppercased())
         .foregroundColor(Color("label_orange_foreground"))
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
         .background(Color("label_orange_background"))
-        .clipShape(Capsule())
+        .clipShape(
+          RoundedRectangle(
+            cornerRadius: sizeCategory.isAccessibilityCategory ? 8.0 : 24.0,
+            style: .continuous)
+        )
+        .fixedSize(horizontal: false, vertical: true)
     }
   }
 }

@@ -7,6 +7,8 @@ import Shared
 import BraveShared
 
 struct PrivacyReportAllTimeListsView: View {
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.sizeCategory) private var sizeCategory
   
   enum Page: CaseIterable, Identifiable {
     case trackersAndAds, websites
@@ -25,6 +27,26 @@ struct PrivacyReportAllTimeListsView: View {
   
   @State private var currentPage: Page = .trackersAndAds
   
+  func blockedByLabels(i: Int) -> some View {
+    Group {
+      if horizontalSizeClass == .compact {
+        VStack(alignment: .leading) {
+          PrivacyReportsView.BlockedByShieldsLabel()
+          if i % 2 == 0 {
+            PrivacyReportsView.BlockedByVPNLabel()
+          }
+        }
+      } else {
+        HStack {
+          PrivacyReportsView.BlockedByShieldsLabel()
+          if i % 2 == 0 {
+            PrivacyReportsView.BlockedByVPNLabel()
+          }
+        }
+      }
+    }
+  }
+  
   var body: some View {
     VStack(spacing: 0) {
       Picker("", selection: $currentPage) {
@@ -36,7 +58,6 @@ struct PrivacyReportAllTimeListsView: View {
       .pickerStyle(.segmented)
       .padding(.horizontal, 20)
       .padding(.vertical, 12)
-      .background(Color(.braveGroupedBackground))
       TabView(selection: $currentPage) {
         List {
           Section {
@@ -45,12 +66,24 @@ struct PrivacyReportAllTimeListsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                   Text("\(i)-analytics.com")
                     .font(.callout)
-                  HStack(spacing: 4) {
-                    Text(Strings.PrivacyHub.blockedBy)
-                      .foregroundColor(Color(.secondaryBraveLabel))
-                    PrivacyReportsView.BlockedByShieldsLabel()
-                    if i % 2 == 0 {
-                      PrivacyReportsView.BlockedByVPNLabel()
+                  
+                  Group {
+                    if sizeCategory.isAccessibilityCategory {
+                      VStack(alignment: .leading, spacing: 4) {
+                        Text(Strings.PrivacyHub.blockedBy)
+                          .foregroundColor(Color(.secondaryBraveLabel))
+                        
+                        blockedByLabels(i: i)
+                      }
+                    } else {
+                      HStack(spacing: 4) {
+                        Text(Strings.PrivacyHub.blockedBy)
+                          .foregroundColor(Color(.secondaryBraveLabel))
+                        PrivacyReportsView.BlockedByShieldsLabel()
+                        if i % 2 == 0 {
+                          PrivacyReportsView.BlockedByVPNLabel()
+                        }
+                      }
                     }
                   }
                   .font(.caption)
@@ -91,12 +124,12 @@ struct PrivacyReportAllTimeListsView: View {
         .tag(Page.websites)
       }
       .tabViewStyle(.page(indexDisplayMode: .never))
-      .background(Color(.braveGroupedBackground))
-      .ignoresSafeArea(.container, edges: .bottom)
       .animation(.default, value: currentPage)
       .environment(\.defaultMinListHeaderHeight, 0)
       .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
     }
+    .background(Color(.braveGroupedBackground))
+    .ignoresSafeArea(.container, edges: [.bottom, .trailing, .leading])
   }
 }
 
