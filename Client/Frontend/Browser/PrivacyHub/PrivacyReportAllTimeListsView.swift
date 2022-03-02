@@ -68,7 +68,8 @@ struct PrivacyReportAllTimeListsView: View {
         selectionPicker
       }
       
-      TabView(selection: $currentPage) {
+      switch currentPage {
+      case .trackersAndAds:
         List {
           Section {
             ForEach(0..<20) { i in
@@ -112,9 +113,9 @@ struct PrivacyReportAllTimeListsView: View {
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
-        .tag(Page.trackersAndAds)
         .listStyle(.insetGrouped)
         
+      case .websites:
         List {
           Section {
             ForEach(0..<20) { i in
@@ -133,16 +134,12 @@ struct PrivacyReportAllTimeListsView: View {
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
-        .tag(Page.websites)
         .listStyle(.insetGrouped)
       }
-      .tabViewStyle(.page(indexDisplayMode: .never))
-      .animation(.default, value: currentPage)
-      .environment(\.defaultMinListHeaderHeight, 0)
-      .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
     }
-    .background(Color(.braveGroupedBackground))
-    .ignoresSafeArea(.container, edges: [.bottom, .trailing, .leading])
+    .background(Color(.braveGroupedBackground).ignoresSafeArea())
+    .ignoresSafeArea(.container, edges: .bottom)
+    .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
   }
 }
 
