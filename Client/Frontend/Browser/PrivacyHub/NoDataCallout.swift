@@ -18,7 +18,7 @@ extension PrivacyReportsView {
       .frame(maxWidth: .infinity)
       .padding()
       .background(Color(.braveInfoLabel))
-      .cornerRadius(15)
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
   }
 }

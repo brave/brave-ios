@@ -24,7 +24,7 @@ extension PrivacyReportsView {
         ForEach(vpnAlerts, id: \.self) { alert in
           VPNAlertCell(vpnAlert: alert)
             .background(Color(.braveBackground))
-            .cornerRadius(15)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         
         Button(action: {

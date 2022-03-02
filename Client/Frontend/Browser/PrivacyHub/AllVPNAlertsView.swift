@@ -28,7 +28,7 @@ struct AllVPNAlertsView: View {
             VPNAlertCell(vpnAlert: alert)
               .listRowInsets(.init())
               .background(Color(.braveBackground))
-              .cornerRadius(15)
+              .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
           }
         } header: {
           VStack {
@@ -41,7 +41,7 @@ struct AllVPNAlertsView: View {
             }
             .padding()
             .background(Color("total_alerts_background"))
-            .cornerRadius(15)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             
             if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
               VPNAlertStat(type: .data, compact: true)

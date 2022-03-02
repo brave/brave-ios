@@ -87,7 +87,7 @@ struct VPNAlertCell: View {
     .fixedSize(horizontal: false, vertical: true)
     .padding(.horizontal)
     .padding(.vertical, 8)
-    .cornerRadius(15)
+    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
   }
 }
 

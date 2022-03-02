@@ -47,17 +47,27 @@ struct PrivacyReportAllTimeListsView: View {
     }
   }
   
+  private var selectionPicker: some View {
+    Picker("", selection: $currentPage) {
+      ForEach(Page.allCases) {
+        Text($0.displayString)
+          .tag($0)
+      }
+    }
+    .pickerStyle(.segmented)
+    .padding(.horizontal, 20)
+    .padding(.vertical, 12)
+  }
+  
   var body: some View {
     VStack(spacing: 0) {
-      Picker("", selection: $currentPage) {
-        ForEach(Page.allCases) {
-          Text($0.displayString)
-            .tag($0)
-        }
+      if #available(iOS 15.0, *) {
+        selectionPicker
+          .accessibilityShowsLargeContentViewer()
+      } else {
+        selectionPicker
       }
-      .pickerStyle(.segmented)
-      .padding(.horizontal, 20)
-      .padding(.vertical, 12)
+      
       TabView(selection: $currentPage) {
         List {
           Section {

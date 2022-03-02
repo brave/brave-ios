@@ -40,7 +40,7 @@ extension PrivacyReportsView {
           .frame(maxWidth: .infinity)
           .padding()
           .background(Color(.braveBackground))
-          .cornerRadius(15)
+          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
           
           HStack {
             Image("creepy_website")
@@ -65,7 +65,7 @@ extension PrivacyReportsView {
           .frame(maxWidth: .infinity)
           .padding()
           .background(Color(.braveBackground))
-          .cornerRadius(15)
+          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .fixedSize(horizontal: false, vertical: true)
       }

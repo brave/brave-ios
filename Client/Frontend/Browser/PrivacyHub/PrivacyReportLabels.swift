@@ -15,7 +15,7 @@ extension PrivacyReportsView {
         .padding(.horizontal, 4)
         .padding(.vertical, 2)
         .background(Color("label_red_background"))
-        .cornerRadius(4)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .fixedSize(horizontal: false, vertical: true)
     }
   }

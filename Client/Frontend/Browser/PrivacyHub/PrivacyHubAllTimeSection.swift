@@ -42,7 +42,7 @@ extension PrivacyReportsView {
       .frame(maxWidth: .infinity)
       .padding()
       .background(Color(.braveBackground))
-      .cornerRadius(15)
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
     
     private var allTimeWebsiteView: some View {
@@ -71,7 +71,7 @@ extension PrivacyReportsView {
       .frame(maxWidth: .infinity)
       .padding()
       .background(Color(.braveBackground))
-      .cornerRadius(15)
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
     
     var body: some View {
