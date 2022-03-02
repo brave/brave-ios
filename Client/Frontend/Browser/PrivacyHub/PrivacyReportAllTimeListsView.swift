@@ -113,6 +113,8 @@ struct PrivacyReportAllTimeListsView: View {
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
         .tag(Page.trackersAndAds)
+        .listStyle(.insetGrouped)
+        
         List {
           Section {
             ForEach(0..<20) { i in
@@ -132,6 +134,7 @@ struct PrivacyReportAllTimeListsView: View {
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
         .tag(Page.websites)
+        .listStyle(.insetGrouped)
       }
       .tabViewStyle(.page(indexDisplayMode: .never))
       .animation(.default, value: currentPage)

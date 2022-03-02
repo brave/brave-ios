@@ -59,8 +59,8 @@ struct AllVPNAlertsView: View {
           .padding(.vertical)
           .listRowInsets(.init())
         }
-        
       }
+      .listStyle(.insetGrouped)
       
       Spacer()
     }
