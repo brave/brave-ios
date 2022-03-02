@@ -11,6 +11,7 @@ import BraveShared
 extension PrivacyReportsView {
   struct NotificationCalloutView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.sizeCategory) private var sizeCategory
     
     private var enableNotificationsButton: some View {
       Button(action: {
@@ -20,22 +21,31 @@ extension PrivacyReportsView {
           VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
             .edgesIgnoringSafeArea(.all)
           
-          Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
-            .font(.callout)
-            .padding(.vertical, 12)
+          Group {
+            if sizeCategory.isAccessibilityCategory {
+              Text(Strings.PrivacyHub.notificationCalloutButtonText)
+            } else {
+              Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
+            }
+          }
+          .font(.callout)
+          .padding(.vertical, 12)
         }
         .clipShape(Capsule())
+        .fixedSize(horizontal: false, vertical: true)
       })
     }
     
     var body: some View {
       Group {
         VStack {
-          
-          if horizontalSizeClass == .compact {
+          if horizontalSizeClass == .compact
+              || (horizontalSizeClass == .regular && sizeCategory.isAccessibilityCategory) {
             HStack(alignment: .top) {
               HStack {
-                Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
+                if !sizeCategory.isAccessibilityCategory {
+                  Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
+                }
                 Text(Strings.PrivacyHub.notificationCalloutBody)
                   .font(.headline)
               }
@@ -56,6 +66,7 @@ extension PrivacyReportsView {
               Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
               Text(Strings.PrivacyHub.notificationCalloutBody)
                 .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
               Spacer()
               enableNotificationsButton
             }
@@ -69,7 +80,9 @@ extension PrivacyReportsView {
         .background(
           LinearGradient(braveGradient: .gradient05)
         )
-        .cornerRadius(15)
+        .clipShape(RoundedRectangle(
+          cornerRadius: 12.0, style: .continuous)
+        )
       }
     }
   }

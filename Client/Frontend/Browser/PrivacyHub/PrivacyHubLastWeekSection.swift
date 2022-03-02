@@ -18,6 +18,7 @@ extension PrivacyReportsView {
         VStack(alignment: .leading, spacing: 8) {
           Text(Strings.PrivacyHub.lastWeekHeader.uppercased())
             .font(.footnote.weight(.medium))
+            .fixedSize(horizontal: false, vertical: true)
           
           HStack {
             Image("frequent_tracker")

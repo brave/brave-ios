@@ -16,6 +16,7 @@ extension PrivacyReportsView {
       VStack(alignment: .leading, spacing: 8) {
         Text(Strings.PrivacyHub.allTimeListsHeader.uppercased())
           .font(.footnote.weight(.medium))
+          .fixedSize(horizontal: false, vertical: true)
         
         HStack(spacing: 12) {
           VStack {
@@ -31,7 +32,7 @@ extension PrivacyReportsView {
                 Text(String(format: Strings.PrivacyHub.allTimeTrackersCount,
                             allTimeMostFrequentTracker.1))
               }
-              .frame(maxWidth: .infinity, alignment: .leading)
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
               .font(.subheadline)
               
             } else {
@@ -58,7 +59,7 @@ extension PrivacyReportsView {
                 Text(String(format: Strings.PrivacyHub.allTimeSitesCount,
                             allTimeRiskiestWebsite.1))
               }
-              .frame(maxWidth: .infinity, alignment: .leading)
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
               .font(.subheadline)
               
             } else {

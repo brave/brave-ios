@@ -19,6 +19,7 @@ extension PrivacyReportsView {
       VStack(alignment: .leading) {
         Text(Strings.PrivacyHub.vpnAlertsHeader.uppercased())
           .font(.footnote.weight(.medium))
+          .fixedSize(horizontal: false, vertical: true)
         
         ForEach(vpnAlerts, id: \.self) { alert in
           VPNAlertCell(vpnAlert: alert)

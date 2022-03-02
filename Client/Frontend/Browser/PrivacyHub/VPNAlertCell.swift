@@ -60,7 +60,6 @@ struct VPNAlertCell: View {
         VStack(alignment: .leading, spacing: 4) {
           Text(vpnAlert.text)
             .font(.callout)
-            .fixedSize(horizontal: false, vertical: true)
           
           Text(date)
             .font(.caption)
@@ -71,6 +70,7 @@ struct VPNAlertCell: View {
     }
     .background(Color(.braveBackground))
     .frame(maxWidth: .infinity)
+    .fixedSize(horizontal: false, vertical: true)
     .padding(.horizontal)
     .padding(.vertical, 8)
     .cornerRadius(15)
