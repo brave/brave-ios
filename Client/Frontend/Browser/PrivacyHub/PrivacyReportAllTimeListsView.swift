@@ -10,6 +10,8 @@ struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
+  private(set) var onDismiss: () -> Void
+  
   enum Page: CaseIterable, Identifiable {
     case trackersAndAds, websites
     
@@ -140,6 +142,14 @@ struct PrivacyReportAllTimeListsView: View {
     .background(Color(.braveGroupedBackground).ignoresSafeArea())
     .ignoresSafeArea(.container, edges: .bottom)
     .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
+    .toolbar {
+      ToolbarItem(placement: .confirmationAction) {
+          Button(Strings.done) {
+            onDismiss()
+          }
+          .foregroundColor(Color(.braveOrange))
+      }
+    }
   }
 }
 

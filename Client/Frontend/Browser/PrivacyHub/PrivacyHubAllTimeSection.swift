@@ -15,6 +15,8 @@ extension PrivacyReportsView {
     let allTimeMostFrequentTracker: (String, Int)?
     let allTimeRiskiestWebsite: (String, Int)?
     
+    private(set) var onDismiss: () -> Void
+    
     private var allTimeTrackerView: some View {
       VStack {
         Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
@@ -95,7 +97,9 @@ extension PrivacyReportsView {
         Button(action: {
           
         }) {
-          NavigationLink(destination: PrivacyReportAllTimeListsView()) {
+          NavigationLink(destination: PrivacyReportAllTimeListsView(onDismiss: {
+            onDismiss()
+          })) {
             HStack {
               Text(Strings.PrivacyHub.allTimeListsButtonText)
               Image(systemName: "arrow.right")

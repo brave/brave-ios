@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 
 struct PrivacyReportsView: View {
+  @Environment(\.presentationMode) @Binding private var presentationMode
   
   let lastWeekMostFrequentTracker: (String, Int)?
   let lastWeekRiskiestWebsite: (String, Int)?
@@ -50,23 +51,30 @@ struct PrivacyReportsView: View {
           Divider()
           
           if vpnAlertsEnabled {
-            PrivacyHubVPNAlertsSection()
+            PrivacyHubVPNAlertsSection(onDismiss: {
+              presentationMode.dismiss()
+            })
           }
           
           Divider()
           
           PrivacyHubAllTimeSection(
             allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-            allTimeRiskiestWebsite: allTimeRiskiestWebsite)
+            allTimeRiskiestWebsite: allTimeRiskiestWebsite, onDismiss: {
+              presentationMode.dismiss()
+            })
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing, content: {
-            Image(systemName: "xmark.circle.fill")
-          })
+          ToolbarItem(placement: .confirmationAction) {
+              Button(Strings.done) {
+                presentationMode.dismiss()
+              }
+              .foregroundColor(Color(.braveOrange))
+          }
         }
       }
       .background(Color(.secondaryBraveBackground).ignoresSafeArea())

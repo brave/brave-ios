@@ -10,6 +10,8 @@ struct AllVPNAlertsView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
+  private(set) var onDismiss: () -> Void
+  
   let vpnAlerts: [VPNAlertCell.VPNAlert] =
   [.init(date: Date(), text: "'App Measurement' collects app usage, device info, and app activity.", type: .data),
    .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location),
@@ -68,6 +70,14 @@ struct AllVPNAlertsView: View {
     .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     .ignoresSafeArea(.container, edges: .bottom)
     .navigationTitle(Strings.PrivacyHub.allVPNAlertsButtonText)
+    .toolbar {
+      ToolbarItem(placement: .confirmationAction) {
+        Button(Strings.done) {
+          onDismiss()
+        }
+        .foregroundColor(Color(.braveOrange))
+      }
+    }
   }
 }
 
