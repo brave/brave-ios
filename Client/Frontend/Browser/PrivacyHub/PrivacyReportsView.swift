@@ -15,6 +15,8 @@ struct PrivacyReportsView: View {
   let allTimeMostFrequentTracker: (String, Int)?
   let allTimeRiskiestWebsite: (String, Int)?
   
+  var onDismiss: (() -> Void)?
+  
   private var noData: Bool {
     return lastWeekMostFrequentTracker == nil
     && lastWeekRiskiestWebsite == nil
@@ -29,6 +31,17 @@ struct PrivacyReportsView: View {
   
   private var vpnAlertsEnabled: Bool {
     return true
+  }
+  
+  private func dismissView() {
+    // Dismiss on presentation mode does not work on iOS 14
+    // when using the UIHostingController at the top.
+    // As a workaround a simple completion handler is used.
+    if #available(iOS 15, *) {
+      presentationMode.dismiss()
+    } else {
+      onDismiss?()
+    }
   }
   
   var body: some View {
@@ -52,7 +65,7 @@ struct PrivacyReportsView: View {
           
           if vpnAlertsEnabled {
             PrivacyHubVPNAlertsSection(onDismiss: {
-              presentationMode.dismiss()
+              dismissView()
             })
           }
           
@@ -61,7 +74,7 @@ struct PrivacyReportsView: View {
           PrivacyHubAllTimeSection(
             allTimeMostFrequentTracker: allTimeMostFrequentTracker,
             allTimeRiskiestWebsite: allTimeRiskiestWebsite, onDismiss: {
-              presentationMode.dismiss()
+              dismissView()
             })
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -71,7 +84,7 @@ struct PrivacyReportsView: View {
         .toolbar {
           ToolbarItem(placement: .confirmationAction) {
               Button(Strings.done) {
-                presentationMode.dismiss()
+                dismissView()
               }
               .foregroundColor(Color(.braveOrange))
           }

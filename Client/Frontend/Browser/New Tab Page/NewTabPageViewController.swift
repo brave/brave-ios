@@ -133,7 +133,15 @@ class NewTabPageViewController: UIViewController {
                 let allTimeMostFrequentTracker = ("scary-analytics", 678)
                 let allTimeRiskiestWebsite = ("scary.example.com", 554)
                 
-                let host = UIHostingController(rootView: PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker, lastWeekRiskiestWebsite: lastWeekRiskiestWebsite, allTimeMostFrequentTracker: allTimeMostFrequentTracker, allTimeRiskiestWebsite: allTimeRiskiestWebsite))
+                let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
+                                              lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
+                                              allTimeMostFrequentTracker: allTimeMostFrequentTracker,
+                                              allTimeRiskiestWebsite: allTimeRiskiestWebsite)
+                
+                let host = UIHostingController(rootView: view)
+                host.rootView.onDismiss = { [weak host] in
+                    host?.dismiss(animated: true)
+                }
                 
                 self?.present(host, animated: true)
             }),
