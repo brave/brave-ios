@@ -199,7 +199,11 @@ class LoginsHelper: TabContentScript {
             guard let self = self else { return }
             
             for login in logins {
-                if (login.usernameValue ?? "").caseInsensitivelyEqual(to: username) {
+                guard let usernameLogin = login.usernameValue else {
+                   continue
+                }
+                
+                if usernameLogin.caseInsensitivelyEqual(to: username) {
                     guard password == login.passwordValue else {
                         return
                     }
