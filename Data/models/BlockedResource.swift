@@ -23,8 +23,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
     
     public static func create(url: URL, domain: URL, resourceType: BlockedResourceType, timestamp: Date = Date()) {
         DataController.perform { context in
-            guard let entity =  entity(in: context) else {
-                log.error("Error fetching the entity 'DataSaved' from Managed Object-Model")
+            guard let entity = entity(in: context) else {
+                log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
 
                 return
             }

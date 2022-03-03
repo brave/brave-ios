@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21D62" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BlockedResource" representedClassName=".BlockedResource" syncable="YES">
+        <attribute name="count" attributeType="Integer 32" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="domain" optional="YES" attributeType="String"/>
+        <attribute name="resourceType" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="Bookmark" representedClassName=".Favorite" syncable="YES">
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="customTitle" optional="YES" attributeType="String"/>
@@ -159,5 +166,6 @@
         <element name="RecentSearch" positionX="-573.386474609375" positionY="-432.0953826904297" width="128" height="89"/>
         <element name="RSSFeedSource" positionX="-413.9057006835938" positionY="-436.2492065429688" width="128" height="73"/>
         <element name="TabMO" positionX="-488" positionY="-229" width="128" height="224"/>
+        <element name="BlockedResource" positionX="-360" positionY="-279" width="128" height="104"/>
     </elements>
 </model>
