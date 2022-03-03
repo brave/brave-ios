@@ -38,6 +38,8 @@ class TemporaryDocument: NSObject {
         }
     }
 
+    /// Get a deferred url to the locally stored file.
+    /// - Note: If an error occurs, the original web url will be returned
     func getURL() -> Deferred<URL> {
         if let url = localFileURL {
             let result = Deferred<URL>()
@@ -63,7 +65,8 @@ class TemporaryDocument: NSObject {
 
         return result
     }
-    
+
+    /// A callback available when there is a download response
     func onDocumentDownloaded(document: DownloadedResourceResponse?, error: Error?) {
         // Store the blob/data in a local temporary file.
         if let document = document, let data = document.data, !data.isEmpty {

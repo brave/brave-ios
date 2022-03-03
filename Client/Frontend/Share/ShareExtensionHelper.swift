@@ -76,6 +76,7 @@ class ShareExtensionHelper: NSObject {
         return activityViewController
     }
 
+    /// Function that writes the current webpage data to a PDF
     private func writeWebPagePDFDataToURL(_ completion: @escaping (URL?, Error?) -> Void) {
         #if compiler(>=5.3)
         if let webView = selectedTab?.webView, selectedTab?.temporaryDocument == nil {
