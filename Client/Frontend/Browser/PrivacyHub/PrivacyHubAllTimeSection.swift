@@ -94,22 +94,18 @@ extension PrivacyReportsView {
           }
         }
         
-        Button(action: {
-          
-        }) {
-          NavigationLink(destination: PrivacyReportAllTimeListsView(onDismiss: {
-            onDismiss()
-          })) {
-            HStack {
-              Text(Strings.PrivacyHub.allTimeListsButtonText)
-              Image(systemName: "arrow.right")
-            }
-            .frame(maxWidth: .infinity)
+        NavigationLink(destination: PrivacyReportAllTimeListsView(onDismiss: {
+          onDismiss()
+        })) {
+          HStack {
+            Text(Strings.PrivacyHub.allTimeListsButtonText)
+            Image(systemName: "arrow.right")
           }
-          .padding(.vertical, 12)
           .frame(maxWidth: .infinity)
-          .foregroundColor(Color(.braveLabel))
         }
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .foregroundColor(Color(.braveLabel))
         .overlay(
           RoundedRectangle(cornerRadius: 25)
             .stroke(Color(.braveLabel), lineWidth: 1))

@@ -29,22 +29,18 @@ extension PrivacyReportsView {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         
-        Button(action: {
-          
-        }) {
-          NavigationLink(destination: AllVPNAlertsView(onDismiss: {
-            onDismiss()
-          })) {
-            HStack {
-              Text(Strings.PrivacyHub.allVPNAlertsButtonText)
-              Image(systemName: "arrow.right")
-            }
-            .frame(maxWidth: .infinity)
+        NavigationLink(destination: AllVPNAlertsView(onDismiss: {
+          onDismiss()
+        })) {
+          HStack {
+            Text(Strings.PrivacyHub.allVPNAlertsButtonText)
+            Image(systemName: "arrow.right")
           }
-          .padding(.vertical, 12)
           .frame(maxWidth: .infinity)
-          .foregroundColor(Color(.braveLabel))
         }
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .foregroundColor(Color(.braveLabel))
         .overlay(
           RoundedRectangle(cornerRadius: 25)
             .stroke(Color(.braveLabel), lineWidth: 1))
