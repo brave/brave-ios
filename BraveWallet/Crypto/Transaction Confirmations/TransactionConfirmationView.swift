@@ -140,7 +140,7 @@ struct TransactionConfirmationView: View {
       .foregroundColor(Color(.braveBlurpleTint))
     Group {
       if confirmationStore.activeTransaction.isEIP1559Transaction {
-        if let gasEstimation = confirmationStore.gasEstimation {
+        if let gasEstimation = confirmationStore.gasEstimation1559 {
           NavigationLink(
             destination: EditPriorityFeeView(
               transaction: confirmationStore.activeTransaction,
@@ -193,7 +193,7 @@ struct TransactionConfirmationView: View {
                 VStack {
                   BlockieGroup(
                     fromAddress: confirmationStore.activeTransaction.fromAddress,
-                    toAddress: confirmationStore.activeTransaction.txData.baseData.to,
+                    toAddress: confirmationStore.activeTransaction.ethTxToAddress,
                     size: 48
                   )
                   Group {

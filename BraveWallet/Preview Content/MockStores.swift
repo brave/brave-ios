@@ -147,7 +147,7 @@ extension TransactionConfirmationStore {
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy()
+      ethTxManagerProxy: MockEthTxManagerProxy(),
       keyringService: MockKeyringService()
     )
   }

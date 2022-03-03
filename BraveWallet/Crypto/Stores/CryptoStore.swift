@@ -36,7 +36,6 @@ public class CryptoStore: ObservableObject {
   let blockchainRegistry: BraveWalletBlockchainRegistry
   private let txService: BraveWalletTxService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
-  private let txService: BraveWalletEthTxService
   private var unapprovedTransactions: [BraveWallet.TransactionInfo] = [] {
     didSet {
       hasUnapprovedTransactions = !unapprovedTransactions.isEmpty
@@ -183,7 +182,7 @@ public class CryptoStore: ObservableObject {
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
-      ethTxManagerProxy: ethTxManagerProxy
+      ethTxManagerProxy: ethTxManagerProxy,
       keyringService: keyringService
     )
     confirmationStore = store

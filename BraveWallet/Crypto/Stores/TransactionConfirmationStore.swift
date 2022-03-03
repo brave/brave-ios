@@ -72,7 +72,7 @@ public class TransactionConfirmationStore: ObservableObject {
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     walletService: BraveWalletBraveWalletService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     keyringService: BraveWalletKeyringService
   ) {
     self.assetRatioService = assetRatioService
@@ -228,7 +228,7 @@ public class TransactionConfirmationStore: ObservableObject {
       let group = DispatchGroup()
       for info in keyring.accountInfos {
         group.enter()
-        self.txService.allTransactionInfo(info.address) { tx in
+        self.txService.allTransactionInfo(.eth, from: info.address) { tx in
           defer { group.leave() }
           pendingTransactions.append(contentsOf: tx.filter { $0.txStatus == .unapproved })
           if info.address == selectedAccount.address {
@@ -294,9 +294,9 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   func checkTransactionsBacklog(for account: BraveWallet.AccountInfo) {
-    let allNonce = allTxUnderSelectedAccount.compactMap { tx in
-      tx.txData.baseData.nonce.isEmpty ? nil : tx.txData.baseData.nonce
-    }
+    let allNonce = allTxUnderSelectedAccount
+      .compactMap({ $0.txDataUnion.ethTxData1559?.baseData.nonce })
+      .filter({ !$0.isEmpty })
     let duplicatedNonce = Dictionary(grouping: allNonce, by: {$0}).filter { $1.count > 1 }.keys
     
     if !duplicatedNonce.isEmpty {
@@ -316,7 +316,7 @@ public class TransactionConfirmationStore: ObservableObject {
     if let replaceWith = allUnapprovedTx.filter({ $0.fromAddress == tx.fromAddress })
         .sorted(by: { $0.createdTime < $1.createdTime }) // ascending order
         .last { // the latest one
-      txService.setNonceForUnapprovedTransaction(replaceWith.id, nonce: tx.txData.baseData.nonce) { [weak self] success in
+      ethTxManagerProxy.setNonceForUnapprovedTransaction(replaceWith.id, nonce: tx.txDataUnion.ethTxData1559?.baseData.nonce ?? "") { [weak self] success in
         guard success else { return }
         self?.txBacklogState = .normal
       }
