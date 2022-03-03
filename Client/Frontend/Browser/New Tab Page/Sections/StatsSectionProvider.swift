@@ -39,7 +39,17 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
   }
 
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-    return UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        
+        let isLandscape = collectionView.frame.width > collectionView.frame.height
+        
+        let looseInsets = UIEdgeInsets(top: 8, left: 64, bottom: 16, right: 64)
+        let compactInsets = UIEdgeInsets(top: 8, left: 16, bottom: 16, right: 16)
+        
+        if collectionView.traitCollection.horizontalSizeClass == .regular {
+            return isLandscape ? compactInsets : looseInsets
+        } else {
+            return compactInsets
+        }
   }
 }
 
@@ -65,17 +75,73 @@ class BraveShieldStatsView: UIView {
     return statView
   }()
 
-  private lazy var stats: [StatView] = {
-    return [self.adsStatView, self.dataSavedStatView, self.timeStatView]
+    private let statsStackView = UIStackView().then {
+        $0.distribution = .fillEqually
+        $0.spacing = 8
+    }
+    
+    private let topStackView = UIStackView().then {
+        $0.distribution = .equalSpacing
+        $0.alignment = .center
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.directionalLayoutMargins = .init(.init(top: 8, leading: 0, bottom: -4, trailing: 0))
+    }
+    
+    private let contentStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 8
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.directionalLayoutMargins = .init(.init(top: 0, leading: 16, bottom: 16, trailing: 16))
+    }
+    
+    private let privacyReportLabel = UILabel().then {
+        let image = #imageLiteral(resourceName: "privacy_reports_shield").template
+        $0.textColor = .white
+        $0.textAlignment = .center
+        
+        $0.attributedText = {
+            let imageAttachment = NSTextAttachment().then {
+                $0.image = image
+                if let image = $0.image {
+                    $0.bounds = .init(x: 0, y: -3, width: image.size.width, height: image.size.height)
+                }
+            }
+            
+            var string = NSMutableAttributedString(attachment: imageAttachment)
+            
+            let padding = NSTextAttachment()
+            padding.bounds = CGRect(width: 6, height: 0)
+            
+            string.append(NSAttributedString(attachment: padding))
+            
+            string.append(NSMutableAttributedString(
+                string: Strings.PrivacyHub.privacyReportsTitle,
+                attributes: [.font: UIFont.systemFont(ofSize: 14.0, weight: .medium)]
+            ))
+            return string
   }()
+    }
 
   override init(frame: CGRect) {
     super.init(frame: frame)
 
-    for s: StatView in stats {
-      addSubview(s)
+        let image = UIImageView(image: #imageLiteral(resourceName: "privacy_reports_3dots").template)
+        image.tintColor = .white
+        
+        let bg = UIView()
+        bg.backgroundColor = .init(white: 0, alpha: 0.24)
+        bg.layer.cornerRadius = 12
+        bg.layer.cornerCurve = .continuous
+        insertSubview(bg, at: 0)
+        bg.snp.makeConstraints {
+            $0.edges.equalToSuperview()
     }
 
+        topStackView.addStackViewItems(.view(privacyReportLabel), .view(image))
+        statsStackView.addStackViewItems(.view(adsStatView), .view(dataSavedStatView), .view(timeStatView))
+        contentStackView.addStackViewItems(.view(topStackView), .view(statsStackView))
+        addSubview(contentStackView)
+        
     update()
 
     NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
@@ -90,15 +156,10 @@ class BraveShieldStatsView: UIView {
   }
 
   override func layoutSubviews() {
-    let width: CGFloat = frame.width / CGFloat(stats.count)
-    var offset: CGFloat = 0
-    for s: StatView in stats {
-      var f: CGRect = s.frame
-      f.origin.x = offset
-      f.size = CGSize(width: width, height: frame.height)
-      s.frame = f
-      offset += width
-    }
+        super.layoutSubviews()
+        
+        // Dev note: attaching to superview's edge constraints did not seem to work well for some reason.
+        contentStackView.frame = self.frame
   }
 
   @objc private func update() {
@@ -148,20 +209,17 @@ private class StatView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
 
-    addSubview(statLabel)
-    addSubview(titleLabel)
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
 
-    statLabel.snp.makeConstraints({ (make) -> Void in
-      make.left.equalTo(0)
-      make.right.equalTo(0)
-      make.centerY.equalTo(self).offset(-(statLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).height) - 10)
-    })
+        stackView.addStackViewItems(.view(statLabel), .view(titleLabel))
 
-    titleLabel.snp.makeConstraints({ (make) -> Void in
-      make.left.equalTo(0)
-      make.right.equalTo(0)
-      make.top.equalTo(statLabel.snp.bottom).offset(5)
-    })
+        addSubview(stackView)
+        
+        stackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
   }
 
   required init?(coder aDecoder: NSCoder) {
