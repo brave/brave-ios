@@ -136,7 +136,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
     .background(
       Color.clear
         .sheet(isPresented: $cryptoStore.isPresentingTransactionConfirmations) {
-          if !cryptoStore.unapprovedTransactions.isEmpty {
+          if cryptoStore.hasUnapprovedTransactions {
             TransactionConfirmationView(
               confirmationStore: cryptoStore.openConfirmationStore(),
               networkStore: cryptoStore.networkStore,

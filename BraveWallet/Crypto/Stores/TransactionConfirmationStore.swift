@@ -19,13 +19,38 @@ public class TransactionConfirmationStore: ObservableObject {
     var totalFiat: String = ""
     var isBalanceSufficient: Bool = true
   }
+  
+  enum TxBacklogState {
+    case normal
+    case replacementReady(BraveWallet.TransactionInfo)
+    case replacementDone
+  }
+  
   @Published var state: State = .init()
   @Published var isLoading: Bool = false
+  @Published var txBacklogState: TxBacklogState = .normal
   @Published var gasEstimation1559: BraveWallet.GasEstimation1559?
-  @Published var transactions: [BraveWallet.TransactionInfo] = []
-  @Published var backedUpTx: BraveWallet.TransactionInfo?
+  /// This is a list of all unpproved transactions iterated through all the accounts for the current keyring
+  @Published var allUnapprovedTx: [BraveWallet.TransactionInfo] = []
+  /// This is an id for the unppproved transaction that is currently displayed on screen
+  @Published var activeTransactionId: BraveWallet.TransactionInfo.ID = "" {
+    didSet {
+      if let tx = allUnapprovedTx.first(where: { $0.id == activeTransactionId }) {
+        activeTransaction = tx
+      } else if let firstTx = allUnapprovedTx.first {
+        activeTransaction = firstTx
+      }
+      fetchDetails(for: activeTransaction)
+    }
+  }
+  /// This is a transaction object from `allUnapprovedTx` that its `id` is the value of `activeTransactionId`
+  @Published var activeTransaction: BraveWallet.TransactionInfo = .init()
   
   private var assetRatios: [String: Double] = [:]
+  /// This is a list of all transactions under the current selected account
+  private var allTxUnderSelectedAccount: [BraveWallet.TransactionInfo] = []
+  /// The current selected account
+  private var selectedAccount: BraveWallet.AccountInfo = .init()
   
   let numberFormatter = NumberFormatter().then {
     $0.numberStyle = .currency
@@ -38,8 +63,8 @@ public class TransactionConfirmationStore: ObservableObject {
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let walletService: BraveWalletBraveWalletService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
+  private let keyringService: BraveWalletKeyringService
   private var selectedChain: BraveWallet.EthereumChain = .init()
-  private var activeTransaction: BraveWallet.TransactionInfo?
   
   init(
     assetRatioService: BraveWalletAssetRatioService,
@@ -48,6 +73,7 @@ public class TransactionConfirmationStore: ObservableObject {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     walletService: BraveWalletBraveWalletService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    keyringService: BraveWalletKeyringService
   ) {
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
@@ -55,6 +81,7 @@ public class TransactionConfirmationStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.walletService = walletService
     self.ethTxManagerProxy = ethTxManagerProxy
+    self.keyringService = keyringService
     
     self.txService.add(self)
   }
@@ -186,9 +213,37 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  func fetchGasEstimation1559() {
+  private func fetchGasEstimation1559() {
     ethTxManagerProxy.gasEstimation1559() { [weak self] gasEstimation in
       self?.gasEstimation1559 = gasEstimation
+    }
+  }
+  
+  func prepare(selectedAccount: BraveWallet.AccountInfo) {
+    self.selectedAccount = selectedAccount
+    
+    keyringService.defaultKeyringInfo { [weak self] keyring in
+      guard let self = self else { return }
+      var pendingTransactions: [BraveWallet.TransactionInfo] = []
+      let group = DispatchGroup()
+      for info in keyring.accountInfos {
+        group.enter()
+        self.txService.allTransactionInfo(info.address) { tx in
+          defer { group.leave() }
+          pendingTransactions.append(contentsOf: tx.filter { $0.txStatus == .unapproved })
+          if info.address == selectedAccount.address {
+            self.allTxUnderSelectedAccount = tx
+          }
+        }
+      }
+      group.notify(queue: .main) {
+        self.allUnapprovedTx = pendingTransactions
+        if let firstTx = self.allUnapprovedTx.first { // only do additional set up if we have some unapproved tx
+          self.activeTransactionId = firstTx.id
+          self.checkTransactionsBacklog(for: selectedAccount)
+          self.fetchGasEstimation1559()
+        }
+      }
     }
   }
   
@@ -239,36 +294,46 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   func checkTransactionsBacklog(for account: BraveWallet.AccountInfo) {
-    self.txService.allTransactionInfo(account.id) { transactions in
-      self.backedUpTx = transactions.filter({
-        $0.txStatus == .submitted
-        && $0.createdTime.timeIntervalSinceNow < 0 // make sure this tx is created before `now`
-        && abs($0.createdTime.timeIntervalSinceNow) > 1.days // make sure this tx has been pending for more than 1 day
-      }).sorted(by: { $0.createdTime < $1.createdTime }).first // pick the oldest tx in the backlog
+    let allNonce = allTxUnderSelectedAccount.compactMap { tx in
+      tx.txData.baseData.nonce.isEmpty ? nil : tx.txData.baseData.nonce
+    }
+    let duplicatedNonce = Dictionary(grouping: allNonce, by: {$0}).filter { $1.count > 1 }.keys
+    
+    if !duplicatedNonce.isEmpty {
+      txBacklogState = .replacementDone
+    } else if let backedUpTx = allTxUnderSelectedAccount.filter({
+      $0.txStatus == .submitted // it is `submitted`
+      && $0.createdTime.timeIntervalSinceNow < 0 // make sure this tx is created before `now`
+      && abs($0.createdTime.timeIntervalSinceNow) > 1.days // make sure this tx has been pending for more than 1 day
+    }).sorted(by: { $0.createdTime < $1.createdTime }).first { // pick the oldest tx in the backlog
+      txBacklogState = .replacementReady(backedUpTx)
+    } else {
+      txBacklogState = .normal
     }
   }
   
-  func replaceBackedUpTx() {
-    guard let tx = backedUpTx else { return }
-    if let replaceWith = transactions.filter({ $0.fromAddress == tx.fromAddress })
-        .sorted(by: { $0.createdTime < $1.createdTime })
-        .last {
+  func replaceBackedUpTx(tx: BraveWallet.TransactionInfo) {
+    if let replaceWith = allUnapprovedTx.filter({ $0.fromAddress == tx.fromAddress })
+        .sorted(by: { $0.createdTime < $1.createdTime }) // ascending order
+        .last { // the latest one
       txService.setNonceForUnapprovedTransaction(replaceWith.id, nonce: tx.txData.baseData.nonce) { [weak self] success in
         guard success else { return }
-        self?.backedUpTx = nil
+        self?.txBacklogState = .normal
       }
+    } else {
+      txBacklogState = .normal
     }
   }
 }
 
 extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
   public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
+    prepare(selectedAccount: selectedAccount)
   }
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
+    prepare(selectedAccount: selectedAccount)
   }
   public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
-    if let tx = activeTransaction, txInfo.id == tx.id {
-      fetchDetails(for: txInfo)
-    }
+    prepare(selectedAccount: selectedAccount)
   }
 }

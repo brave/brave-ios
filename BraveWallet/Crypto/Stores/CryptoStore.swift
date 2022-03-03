@@ -26,7 +26,7 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
-  @Published private(set) var unapprovedTransactions: [BraveWallet.TransactionInfo] = []
+  @Published var hasUnapprovedTransactions: Bool = false
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -36,6 +36,12 @@ public class CryptoStore: ObservableObject {
   let blockchainRegistry: BraveWalletBlockchainRegistry
   private let txService: BraveWalletTxService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
+  private let txService: BraveWalletEthTxService
+  private var unapprovedTransactions: [BraveWallet.TransactionInfo] = [] {
+    didSet {
+      hasUnapprovedTransactions = !unapprovedTransactions.isEmpty
+    }
+  }
   
   public init(
     keyringService: BraveWalletKeyringService,
@@ -178,6 +184,7 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy
+      keyringService: keyringService
     )
     confirmationStore = store
     return store
