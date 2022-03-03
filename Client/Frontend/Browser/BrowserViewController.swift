@@ -1648,6 +1648,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             }
 
         } else {
+            // Check if it's a feed, url is a temp document file URL
             if let selectedTab = tabManager.selectedTab,
                (selectedTab.mimeType == "application/xml" || selectedTab.mimeType == "application/json"),
                let tabURL = selectedTab.url {
@@ -1685,8 +1686,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
 
     func presentActivityViewController(_ url: URL, tab: Tab? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
-        let helper = ShareExtensionHelper(url: url, tab: tab)
-
         let activities: [UIActivity] = makeShareActivities(
             for: url,
             tab: tab,
@@ -1695,7 +1694,11 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             arrowDirection: arrowDirection
         )
 
-        let controller = helper.makeActivityViewController(activities: activities) { [weak self] completed, _, documentUrl  in
+        let controller = ShareExtensionHelper.makeActivityViewController(
+            selectedURL: url,
+            selectedTab: tab,
+            applicationActivities: activities
+        ) { [weak self] completed, _, documentUrl  in
             guard let self = self else { return }
 
             if let url = documentUrl {
@@ -2633,7 +2636,18 @@ extension BrowserViewController: WKUIDelegate {
                         let touchPoint = braveWebView.lastHitPoint
                         let touchSize = CGSize(width: 0, height: 16)
                         let touchRect = CGRect(origin: touchPoint, size: touchSize)
-                        
+
+                        // TODO: Find a way to add fixes #3323 and #2961 here:
+                        // Normally we use `tab.temporaryDocument` for the downloaded file on the tab.
+                        // `temporaryDocument` returns the downloaded file to disk on the current tab.
+                        // Using a downloaded file url results in having functions like "Save to files" available.
+                        // It also attaches the file (image, pdf, etc) and not the url to emails, slack, etc.
+                        // Since this is **not** a tab but a standalone web view, the downloaded temporary file is **not** available.
+                        // This results in the fixes for #3323 and #2961 not being included in this share scenario.
+                        // This is not a regression, we simply never handled this scenario in both fixes.
+                        // Some possibile fixes include:
+                        // - Detect the file type and download it if necessary and don't rely on the `tab.temporaryDocument`.
+                        // - Add custom "Save to file" functionality (needs investigation).
                         self.presentActivityViewController(url, sourceView: self.view,
                                                            sourceRect: touchRect,
                                                            arrowDirection: .any)

@@ -4,52 +4,45 @@
 
 import Foundation
 import Shared
-import MobileCoreServices
 
-private let log = Logger.browserLogger
+/// A helper class that aids in the creation of share sheets
+class ShareExtensionHelper {
+    typealias CompletionHandler = (_ completed: Bool, _ activityType: UIActivity.ActivityType?, _ documentURL: URL?) -> Void
 
-class ShareExtensionHelper: NSObject {
-    
-    enum ShareActivityType {
-        case password
-        case iBooks
-        case openByCopy
-        case `default`
-    }
-    
-    fileprivate weak var selectedTab: Tab?
-
-    fileprivate let selectedURL: URL
-    fileprivate let browserFillIdentifier = "org.appextension.fill-browser-action"
-
-    init(url: URL, tab: Tab?) {
-        self.selectedURL = tab?.shareURL?.displayURL ?? url
-        self.selectedTab = tab
-    }
-
-    func makeActivityViewController(
-        activities: [UIActivity] = [],
-        _ completionHandler: @escaping (_ completed: Bool, _ activityType: UIActivity.ActivityType?, _ documentURL: URL? ) -> Void
+    /// Create a activity view controller with the given elements.
+    /// - Parameters:
+    ///   - selectedURL: The url or url content to share. May include an internal file or a link
+    ///   - selectedTab: The provided tab is used for additional info such as a print renderer and title
+    ///   - applicationActivities: The application activities to include in this share sheet.
+    ///   - completionHandler: This will be triggered once the share sheet is dismissed and can be used to cleanup any lingering data
+    /// - Returns: An `UIActivityViewController` prepped and ready to present.
+    static func makeActivityViewController(
+        selectedURL: URL,
+        selectedTab: Tab? = nil,
+        applicationActivities: [UIActivity] = [],
+        completionHandler: @escaping CompletionHandler
     ) -> UIActivityViewController {
-        var activityItems = [Any]()
-
         let printInfo = UIPrintInfo(dictionary: nil)
-
-        let absoluteString = selectedTab?.url?.absoluteString ?? selectedURL.absoluteString
-        printInfo.jobName = absoluteString
+        printInfo.jobName = selectedURL.absoluteString
         printInfo.outputType = .general
-        activityItems.append(printInfo)
+
+        var activityItems: [Any] = [
+            printInfo, selectedURL
+        ]
 
         if let tab = selectedTab {
+            // Adds the ability to "Print" or "Markup" the page using this custom renderer
+            // Without this, the "Print" or "Markup feature would not exist"
             activityItems.append(TabPrintPageRenderer(tab: tab))
         }
-        
+
         if let title = selectedTab?.title {
+            // Makes sure the share sheet shows the same title as the tab
+            // Also adds a title to several places, such as the Subject field in Mail
             activityItems.append(TitleActivityItemProvider(title: title))
         }
-        activityItems.append(self)
 
-        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: activities)
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
 
         // Hide 'Add to Reading List' which currently uses Safari.
         // We would also hide View Later, if possible, but the exclusion list doesn't currently support
@@ -58,14 +51,13 @@ class ShareExtensionHelper: NSObject {
             UIActivity.ActivityType.addToReadingList,
         ]
 
-        activityViewController.completionWithItemsHandler = { [weak self] activityType, completed, returnedItems, activityError in
-            guard let self = self else { return }
-            #if DEBUG
-            print("Share type \(self.shareActivityType(activityType.map { $0.rawValue }))")
-            #endif
-
-            if self.shareActivityType(activityType.map { $0.rawValue }) == .iBooks {
-                self.writeWebPagePDFDataToURL { url, error in
+        activityViewController.completionWithItemsHandler = { [weak selectedTab] activityType, completed, returnedItems, activityError in
+            if let activityType = activityType, activityType == .openInIBooks, let selectedTab = selectedTab {
+                // TODO: @JS Investigate why this is needed.
+                // Is it for Fix #2961? Fix sharing to iBooks
+                // (note: Could not test this as I could not trigger this scenario)
+                // #2961 steps don't use `openInIBooks`. Perhaps that's an os change?
+                Self.writeWebPagePDFDataToURL(selectedTab: selectedTab) { url, error in
                     completionHandler(completed, activityType, url)
                 }
             } else {
@@ -76,10 +68,11 @@ class ShareExtensionHelper: NSObject {
         return activityViewController
     }
 
+    // TODO: @JS Figure of if this is ever used
     /// Function that writes the current webpage data to a PDF
-    private func writeWebPagePDFDataToURL(_ completion: @escaping (URL?, Error?) -> Void) {
+    private static func writeWebPagePDFDataToURL(selectedTab: Tab, completion: @escaping (URL?, Error?) -> Void) {
         #if compiler(>=5.3)
-        if let webView = selectedTab?.webView, selectedTab?.temporaryDocument == nil {
+        if let webView = selectedTab.webView, selectedTab.temporaryDocument == nil {
             
             webView.createPDF { result in
                 dispatchPrecondition(condition: .onQueue(.main))
@@ -99,84 +92,14 @@ class ShareExtensionHelper: NSObject {
                         completion(url, nil)
                     } catch {
                         completion(nil, error)
-                        log.error("Failed to write PDF to disk: \(error)")
+                        Logger.browserLogger.error("Failed to write PDF to disk: \(error)")
                     }
                 case .failure(let error):
                     completion(nil, error)
-                    log.error("Failed to write PDF to disk: \(error)")
+                    Logger.browserLogger.error("Failed to write PDF to disk: \(error)")
                 }
             }
         }
         #endif
-    }
-}
-
-extension ShareExtensionHelper: UIActivityItemSource {
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return selectedURL
-    }
-  
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        let selectedURLItem = selectedURL.isReaderModeURL ? selectedURL.decodeReaderModeURL : selectedURL
-        
-        guard let uiActivityType = activityType else { return selectedURLItem }
-                
-        switch shareActivityType(uiActivityType.rawValue) {
-            case .openByCopy:
-                return selectedURL
-            default:
-                // Return the URL for the selected tab. If we are in reader view then decode
-                // it so that we copy the original and not the internal localhost one.
-                return selectedURLItem
-        }
-    }
-
-    func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {
-        let dataType = activityType == nil ? browserFillIdentifier : kUTTypeURL as String
-        
-        guard let uiActivityType = activityType else { return dataType }
-
-        switch shareActivityType(uiActivityType.rawValue) {
-            case .password:
-                return browserFillIdentifier
-            case .openByCopy:
-                return selectedURL.isFileScheme ? kUTTypeFileURL as String : kUTTypeURL as String
-            default:
-                // Return the URL for the selected tab. If we are in reader view then decode
-                // it so that we copy the original and not the internal localhost one.
-                return dataType
-        }
-    }
-}
-
-private extension ShareExtensionHelper {
-    
-    private func shareActivityType(_ activityType: String?) -> ShareActivityType {
-        // A 'password' substring covers the most cases, such as pwsafe and 1Password.
-        // com.agilebits.onepassword-ios.extension
-        // com.app77.ios.pwsafe2.find-login-action-password-actionExtension
-        // If your extension's bundle identifier does not contain "password", simply submit a pull request by adding your bundle identifier.
-        let isPasswordManagerType = (activityType?.range(of: "password") != nil)
-            || (activityType == "com.lastpass.ilastpass.LastPassExt")
-            || (activityType == "in.sinew.Walletx.WalletxExt")
-            || (activityType == "com.8bit.bitwarden.find-login-action-extension")
-            || (activityType == "me.mssun.passforios.find-login-action-extension")
-        
-        let isOpenInIBooksActivityType = (activityType?.range(of: "OpenInIBooks") != nil)
-            || (activityType == "com.apple.UIKit.activity.OpenInIBooks")
-        
-        let isOpenByCopy = activityType?.lowercased().range(of: "remoteopeninapplication-bycopy") != nil
-        
-        var shareActivityType: ShareActivityType = .default
-        
-        if isPasswordManagerType {
-            shareActivityType = .password
-        } else if isOpenInIBooksActivityType {
-            shareActivityType = .iBooks
-        } else if isOpenByCopy {
-            shareActivityType = .openByCopy
-        }
-        
-        return shareActivityType
     }
 }
