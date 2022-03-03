@@ -75,7 +75,12 @@ class TemporaryDocument: NSObject {
             
             do {
                 try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true, attributes: nil)
-                try FileManager.default.removeItem(at: url)
+
+                // Delete the file if there is already one. We will replace it with a new file
+                if FileManager.default.fileExists(atPath: url.absoluteString) {
+                    try FileManager.default.removeItem(at: url)
+                }
+
                 try data.write(to: url, options: [.atomic])
                 
                 localFileURL = url
