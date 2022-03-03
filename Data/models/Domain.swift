@@ -303,6 +303,8 @@ extension Domain {
                                         context: NSManagedObjectContext) {
        if grant {
            if let permittedAccounts = wallet_permittedAccounts {
+               // make sure stored `wallet_permittedAccounts` does not contain this `account`
+               // make sure this `account` is 42-char long and does not contain any comma 
                if !permittedAccounts.contains(account), account.count == 42, !account.contains(",") {
                    wallet_permittedAccounts = [permittedAccounts, account].joined(separator: ",")
                }
