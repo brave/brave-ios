@@ -1575,13 +1575,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         }
     }
     
-    func shareActivities(for url: URL, tab: Tab?, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) -> [UIActivity] {
+    func makeShareActivities(for url: URL, tab: Tab?, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) -> [UIActivity] {
         let findInPageActivity = FindInPageActivity() { [unowned self] in
             self.updateFindInPageVisibility(visible: true)
-        }
-        
-        let requestDesktopSiteActivity = RequestDesktopSiteActivity(tab: tab) { [weak tab] in
-            tab?.switchUserAgent()
         }
         
         var activities: [UIActivity] = [findInPageActivity]
@@ -1590,21 +1586,20 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         if !url.isFileURL {
             // We don't allow to have 2 same favorites.
             if !FavoritesHelper.isAlreadyAdded(url) {
-                let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
+                activities.append(AddToFavoritesActivity() { [weak tab] in
                     FavoritesHelper.add(url: url, title: tab?.displayTitle)
-                }
-                
-                activities.append(addToFavoritesActivity)
+                })
             }
-            activities.append(requestDesktopSiteActivity)
+
+            activities.append(RequestDesktopSiteActivity(tab: tab) { [weak tab] in
+                tab?.switchUserAgent()
+            })
             
             if Preferences.BraveNews.isEnabled.value, let metadata = tab?.pageMetadata,
                !metadata.feeds.isEmpty {
                 let feeds: [RSSFeedLocation] = metadata.feeds.compactMap { feed in
-                    if let url = URL(string: feed.href) {
-                        return RSSFeedLocation(title: feed.title, url: url)
-                    }
-                    return nil
+                    guard let url = URL(string: feed.href) else { return nil }
+                    return RSSFeedLocation(title: feed.title, url: url)
                 }
                 if !feeds.isEmpty {
                     let addToBraveNews = AddFeedToBraveNewsActivity() { [weak self] in
@@ -1617,18 +1612,14 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                         )
                         let container = UINavigationController(rootViewController: controller)
                         let idiom = UIDevice.current.userInterfaceIdiom
-                        if #available(iOS 13.0, *) {
-                            container.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-                        } else {
-                            container.modalPresentationStyle = idiom == .phone ? .fullScreen : .formSheet
-                        }
+                        container.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
                         self.present(container, animated: true)
                     }
                     activities.append(addToBraveNews)
                 }
             }
             
-            if #available(iOS 14.0, *), let webView = tab?.webView, tab?.temporaryDocument == nil {
+            if let webView = tab?.webView, tab?.temporaryDocument == nil {
                 let createPDFActivity = CreatePDFActivity(webView: webView) { [weak self] pdfData in
                     guard let self = self else { return }
                     // Create a valid filename
@@ -1655,11 +1646,12 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                 }
                 activities.append(createPDFActivity)
             }
+
         } else {
-            // Check if its a feed, url is a temp document file URL
             if let selectedTab = tabManager.selectedTab,
                (selectedTab.mimeType == "application/xml" || selectedTab.mimeType == "application/json"),
                let tabURL = selectedTab.url {
+
                 let parser = FeedParser(URL: url)
                 if case .success(let feed) = parser.parse() {
                     let addToBraveNews = AddFeedToBraveNewsActivity() { [weak self] in
@@ -1672,11 +1664,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
                         )
                         let container = UINavigationController(rootViewController: controller)
                         let idiom = UIDevice.current.userInterfaceIdiom
-                        if #available(iOS 13.0, *) {
-                            container.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
-                        } else {
-                            container.modalPresentationStyle = idiom == .phone ? .fullScreen : .formSheet
-                        }
+                        container.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
                         self.present(container, animated: true)
                     }
                     activities.append(addToBraveNews)
@@ -1698,22 +1686,22 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
     func presentActivityViewController(_ url: URL, tab: Tab? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
         let helper = ShareExtensionHelper(url: url, tab: tab)
-        
-        let activities: [UIActivity] = shareActivities(
+
+        let activities: [UIActivity] = makeShareActivities(
             for: url,
             tab: tab,
             sourceView: sourceView,
             sourceRect: sourceRect,
             arrowDirection: arrowDirection
         )
-        
-        let controller = helper.createActivityViewController(items: activities) { [weak self] completed, _, documentUrl  in
+
+        let controller = helper.makeActivityViewController(activities: activities) { [weak self] completed, _, documentUrl  in
             guard let self = self else { return }
-            
+
             if let url = documentUrl {
                 self.openPDFInIBooks(url)
             }
-            
+
             self.cleanUpCreateActivity()
         }
 

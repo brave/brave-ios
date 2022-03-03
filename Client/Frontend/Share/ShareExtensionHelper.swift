@@ -22,18 +22,16 @@ class ShareExtensionHelper: NSObject {
     fileprivate let selectedURL: URL
     fileprivate let browserFillIdentifier = "org.appextension.fill-browser-action"
 
-//    fileprivate func isFile(url: URL) -> Bool { url.scheme == "file" }
-
     init(url: URL, tab: Tab?) {
         self.selectedURL = tab?.shareURL?.displayURL ?? url
         self.selectedTab = tab
     }
 
-    func createActivityViewController(
-        items: [UIActivity] = [],
-        _ completionHandler: @escaping (_ completed: Bool, _ activityType: UIActivity.ActivityType?, _ documentURL: URL? ) -> Void) -> UIActivityViewController {
-        
-        var activityItems = [AnyObject]()
+    func makeActivityViewController(
+        activities: [UIActivity] = [],
+        _ completionHandler: @escaping (_ completed: Bool, _ activityType: UIActivity.ActivityType?, _ documentURL: URL? ) -> Void
+    ) -> UIActivityViewController {
+        var activityItems = [Any]()
 
         let printInfo = UIPrintInfo(dictionary: nil)
 
@@ -51,7 +49,7 @@ class ShareExtensionHelper: NSObject {
         }
         activityItems.append(self)
 
-        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: items)
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: activities)
 
         // Hide 'Add to Reading List' which currently uses Safari.
         // We would also hide View Later, if possible, but the exclusion list doesn't currently support
@@ -62,34 +60,25 @@ class ShareExtensionHelper: NSObject {
 
         activityViewController.completionWithItemsHandler = { [weak self] activityType, completed, returnedItems, activityError in
             guard let self = self else { return }
-            
+            #if DEBUG
             print("Share type \(self.shareActivityType(activityType.map { $0.rawValue }))")
-            
-            if self.shareActivityType(activityType.map { $0.rawValue }) != .iBooks {
-                if !completed {
-                    completionHandler(completed, activityType, nil)
-                    return
-                }
-                // Bug 1392418 - When copying a url using the share extension there are 2 urls in the pasteboard.
-                // This is a iOS 11.0 bug. Fixed in 11.2
-                if UIPasteboard.general.hasURLs, let url = UIPasteboard.general.urls?.first {
-                    UIPasteboard.general.urls = [url]
-                }
+            #endif
 
-                completionHandler(completed, activityType, nil)
-            } else {
+            if self.shareActivityType(activityType.map { $0.rawValue }) == .iBooks {
                 self.writeWebPagePDFDataToURL { url, error in
                     completionHandler(completed, activityType, url)
                 }
+            } else {
+                completionHandler(completed, activityType, nil)
             }
         }
         
         return activityViewController
     }
-    
-    func writeWebPagePDFDataToURL(_ completion: @escaping (URL?, Error?) -> Void) {
+
+    private func writeWebPagePDFDataToURL(_ completion: @escaping (URL?, Error?) -> Void) {
         #if compiler(>=5.3)
-        if #available(iOS 14.0, *), let webView = selectedTab?.webView, selectedTab?.temporaryDocument == nil {
+        if let webView = selectedTab?.webView, selectedTab?.temporaryDocument == nil {
             
             webView.createPDF { result in
                 dispatchPrecondition(condition: .onQueue(.main))
