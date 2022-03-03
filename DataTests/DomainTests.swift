@@ -125,18 +125,18 @@ class DomainTests: CoreDataTestCase {
         let polygonDomain = Domain.getOrCreate(forUrl: polygon, persistent: true)
 
         backgroundSaveAndWaitForExpectation {
-            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount, grant: true, isPrivateBrowsing: false)
+            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount, grant: true)
         }
 
         XCTAssertTrue(compondDomain.permissionGranted(for: walletAccount))
 
         backgroundSaveAndWaitForExpectation {
-            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount2, grant: true, isPrivateBrowsing: false)
+            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount2, grant: true)
         }
         XCTAssertTrue(compondDomain.permissionGranted(for: walletAccount2))
 
         backgroundSaveAndWaitForExpectation {
-            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount, grant: false, isPrivateBrowsing: false)
+            Domain.setBraveWalletDappPermission(forUrl: compound, account: walletAccount, grant: false)
         }
         XCTAssertFalse(compondDomain.permissionGranted(for: walletAccount))
 

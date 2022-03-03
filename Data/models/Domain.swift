@@ -135,9 +135,9 @@ public final class Domain: NSManagedObject, CRUD {
     
     // MARK: Wallet
         
-    public class func setBraveWalletDappPermission(forUrl url: URL, account: String,
-                                                   grant: Bool, isPrivateBrowsing: Bool) {
-        let _context: WriteContext = isPrivateBrowsing ? .new(inMemory: true) : .new(inMemory: false)
+    public class func setBraveWalletDappPermission(forUrl url: URL, account: String, grant: Bool) {
+        // no dapps support in private browsing mode
+        let _context: WriteContext = .new(inMemory: false)
         setWalletDappPermission(forUrl: url, account: account, grant: grant, context: _context)
     }
 
@@ -303,7 +303,7 @@ extension Domain {
                                         context: NSManagedObjectContext) {
        if grant {
            if let permittedAccounts = wallet_permittedAccounts {
-               if !permittedAccounts.contains(account) {
+               if !permittedAccounts.contains(account), account.count == 42, !account.contains(",") {
                    wallet_permittedAccounts = [permittedAccounts, account].joined(separator: ",")
                }
            } else {
