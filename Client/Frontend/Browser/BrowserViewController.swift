@@ -1698,14 +1698,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             selectedURL: url,
             selectedTab: tab,
             applicationActivities: activities
-        ) { [weak self] completed, _, documentUrl  in
-            guard let self = self else { return }
+        )
 
-            if let url = documentUrl {
-                self.openPDFInIBooks(url)
-            }
-
-            self.cleanUpCreateActivity()
+        controller.completionWithItemsHandler = { [weak self] _, _, _, _ in
+            self?.cleanUpCreateActivity()
         }
 
         if let popoverPresentationController = controller.popoverPresentationController {
@@ -1727,14 +1723,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         // invoked on iOS 10. See Bug 1297768 for additional details.
         displayedPopoverController = nil
         updateDisplayedPopoverProperties = nil
-    }
-    
-    private func openPDFInIBooks(_ url: URL) {
-        let iBooksURL = "itms-books://\(url.absoluteString)"
-
-        guard let url = URL(string: iBooksURL) else { return }
-        
-        UIApplication.shared.open(url, options: [:])
     }
 
     func updateFindInPageVisibility(visible: Bool, tab: Tab? = nil) {

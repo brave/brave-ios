@@ -7,8 +7,6 @@ import Shared
 
 /// A helper class that aids in the creation of share sheets
 class ShareExtensionHelper {
-    typealias CompletionHandler = (_ completed: Bool, _ activityType: UIActivity.ActivityType?, _ documentURL: URL?) -> Void
-
     /// Create a activity view controller with the given elements.
     /// - Parameters:
     ///   - selectedURL: The url or url content to share. May include an internal file or a link
@@ -19,8 +17,7 @@ class ShareExtensionHelper {
     static func makeActivityViewController(
         selectedURL: URL,
         selectedTab: Tab? = nil,
-        applicationActivities: [UIActivity] = [],
-        completionHandler: @escaping CompletionHandler
+        applicationActivities: [UIActivity] = []
     ) -> UIActivityViewController {
         let printInfo = UIPrintInfo(dictionary: nil)
         printInfo.jobName = selectedURL.absoluteString
@@ -50,56 +47,7 @@ class ShareExtensionHelper {
         activityViewController.excludedActivityTypes = [
             UIActivity.ActivityType.addToReadingList,
         ]
-
-        activityViewController.completionWithItemsHandler = { [weak selectedTab] activityType, completed, returnedItems, activityError in
-            if let activityType = activityType, activityType == .openInIBooks, let selectedTab = selectedTab {
-                // TODO: @JS Investigate why this is needed.
-                // Is it for Fix #2961? Fix sharing to iBooks
-                // (note: Could not test this as I could not trigger this scenario)
-                // #2961 steps don't use `openInIBooks`. Perhaps that's an os change?
-                Self.writeWebPagePDFDataToURL(selectedTab: selectedTab) { url, error in
-                    completionHandler(completed, activityType, url)
-                }
-            } else {
-                completionHandler(completed, activityType, nil)
-            }
-        }
         
         return activityViewController
-    }
-
-    // TODO: @JS Figure of if this is ever used
-    /// Function that writes the current webpage data to a PDF
-    private static func writeWebPagePDFDataToURL(selectedTab: Tab, completion: @escaping (URL?, Error?) -> Void) {
-        #if compiler(>=5.3)
-        if let webView = selectedTab.webView, selectedTab.temporaryDocument == nil {
-            
-            webView.createPDF { result in
-                dispatchPrecondition(condition: .onQueue(.main))
-                
-                switch result {
-                case .success(let data):
-                    let validFilenameSet = CharacterSet(charactersIn: ":/")
-                        .union(.newlines)
-                        .union(.controlCharacters)
-                        .union(.illegalCharacters)
-                    let filename = webView.title?.components(separatedBy: validFilenameSet).joined()
-
-                    let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(filename ?? "Untitled").pdf")
-                    
-                    do {
-                        try data.write(to: url)
-                        completion(url, nil)
-                    } catch {
-                        completion(nil, error)
-                        Logger.browserLogger.error("Failed to write PDF to disk: \(error)")
-                    }
-                case .failure(let error):
-                    completion(nil, error)
-                    Logger.browserLogger.error("Failed to write PDF to disk: \(error)")
-                }
-            }
-        }
-        #endif
     }
 }
