@@ -11,6 +11,7 @@ import Shared
     @objc optional func menuHelperReveal()
     @objc optional func menuHelperSecure()
     @objc optional func menuHelperFindInPage()
+    @objc optional func menuHelperSearchWithBrave()
 }
 
 open class MenuHelper: NSObject {
@@ -19,6 +20,7 @@ open class MenuHelper: NSObject {
     public static let selectorOpenWebsite: Selector = #selector(MenuHelperInterface.menuHelperOpenWebsite)
     public static let selectorReveal: Selector = #selector(MenuHelperInterface.menuHelperReveal)
     public static let selectorFindInPage: Selector = #selector(MenuHelperInterface.menuHelperFindInPage)
+    public static let selectorSearchWithBrave: Selector = #selector(MenuHelperInterface.menuHelperSearchWithBrave)
 
     open class var defaultHelper: MenuHelper {
         struct Singleton {
@@ -33,7 +35,8 @@ open class MenuHelper: NSObject {
         let copyItem = UIMenuItem(title: Strings.menuItemCopyTitle, action: MenuHelper.selectorCopy)
         let openWebsiteItem = UIMenuItem(title: Strings.menuItemOpenWebsiteTitle, action: MenuHelper.selectorOpenWebsite)
         let findInPageItem = UIMenuItem(title: Strings.findInPage, action: MenuHelper.selectorFindInPage)
+        let searchWithBraveItem = UIMenuItem(title: Strings.searchWithBrave, action: MenuHelper.selectorSearchWithBrave)
 
-        UIMenuController.shared.menuItems = [copyItem, revealPasswordItem, hidePasswordItem, openWebsiteItem, findInPageItem]
+        UIMenuController.shared.menuItems = [copyItem, revealPasswordItem, hidePasswordItem, openWebsiteItem, findInPageItem, searchWithBraveItem]
     }
 }
