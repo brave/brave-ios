@@ -87,7 +87,7 @@ public struct WalletSettingsView: View {
       Color.clear
         .alert(isPresented: $isShowingResetTransactionAlert) {
           Alert(
-            title: Text(Strings.Wallet.settingsResetWalletAlertTitle),
+            title: Text(Strings.Wallet.settingsResetTransactionAlertTitle),
             message: Text(Strings.Wallet.settingsResetTransactionAlertMessage),
             primaryButton: .destructive(Text(Strings.Wallet.settingsResetTransactionAlertButtonTitle), action: {
               settingsStore.resetTransaction()
