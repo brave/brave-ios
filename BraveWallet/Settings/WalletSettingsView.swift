@@ -67,7 +67,7 @@ public struct WalletSettingsView: View {
       ) {
         Button(action: { isShowingResetTransactionAlert = true }) {
           Text(Strings.Wallet.settingsResetTransactionTitle)
-            .foregroundColor(Color(.braveLabel))
+            .foregroundColor(Color(.braveBlurpleTint))
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -92,7 +92,7 @@ public struct WalletSettingsView: View {
             primaryButton: .destructive(Text(Strings.Wallet.settingsResetTransactionAlertButtonTitle), action: {
               settingsStore.resetTransaction()
             }),
-            secondaryButton: .cancel(Text(Strings.no))
+            secondaryButton: .cancel(Text(Strings.cancelButtonTitle))
           )
         }
     )

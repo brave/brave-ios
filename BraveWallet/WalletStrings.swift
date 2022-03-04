@@ -1818,7 +1818,7 @@ extension Strings {
       "wallet.settingsResetTransactionTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Clear wallet transaction and nonce information",
+      value: "Clear transaction & nonce info",
       comment: "The title of a button that will reset transaction and nonce information. As in to erase the users transaction history and reset nonce value starting from 0x0"
     )
     public static let settingsResetTransactionFooter = NSLocalizedString(
