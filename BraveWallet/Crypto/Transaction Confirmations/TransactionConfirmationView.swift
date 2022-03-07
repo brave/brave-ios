@@ -235,6 +235,21 @@ struct TransactionConfirmationView: View {
                   }
                   .padding()
                   .accessibilityElement(children: .contain)
+                  Divider()
+                    .padding(.leading)
+                  NavigationLink(destination: EditNonceView()) {
+                    HStack {
+                      Image("brave.gear")
+                        .foregroundColor(Color(.braveBlurpleTint))
+                      Text("Advanced Settings")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(Color(.braveBlurpleTint))
+                      Spacer()
+                      Image(systemName: "chevron.right")
+                    }
+                    .padding()
+                    .font(.footnote.weight(.semibold))
+                  }
                 }
               case .details:
                 VStack(alignment: .leading) {
