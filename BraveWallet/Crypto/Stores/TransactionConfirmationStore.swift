@@ -23,20 +23,17 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published var isLoading: Bool = false
   @Published var gasEstimation1559: BraveWallet.GasEstimation1559?
   /// This is a list of all unpproved transactions iterated through all the accounts for the current keyring
-  @Published var transactions: [BraveWallet.TransactionInfo] = []
+  @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
   /// This is an id for the unppproved transaction that is currently displayed on screen
   @Published var activeTransactionId: BraveWallet.TransactionInfo.ID = "" {
     didSet {
       if let tx = transactions.first(where: { $0.id == activeTransactionId }) {
-        activeTransaction = tx
+        fetchDetails(for: tx)
       } else if let firstTx = transactions.first {
-        activeTransaction = firstTx
+        fetchDetails(for: firstTx)
       }
-      fetchDetails(for: activeTransaction)
     }
   }
-  /// This is a transaction object from `transactions` that its `id` is the value of `activeTransactionId`
-  @Published var activeTransaction: BraveWallet.TransactionInfo = .init()
   
   private var assetRatios: [String: Double] = [:]
   
@@ -108,7 +105,6 @@ public class TransactionConfirmationStore: ObservableObject {
   func fetchDetails(for transaction: BraveWallet.TransactionInfo) {
     state = .init() // Reset state
     isLoading = true
-    activeTransaction = transaction
     
     rpcService.chainId { [weak self] chainId in
       guard let self = self else { return }

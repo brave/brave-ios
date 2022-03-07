@@ -25,6 +25,10 @@ struct TransactionConfirmationView: View {
   
   @State private var viewMode: ViewMode = .transaction
   
+  private var activeTransaction: BraveWallet.TransactionInfo {
+    confirmationStore.transactions.first(where: { $0.id == confirmationStore.activeTransactionId }) ?? (confirmationStore.transactions.first ?? .init())
+  }
+  
   private func next() {
     if let index = confirmationStore.transactions.firstIndex(where: { $0.id == confirmationStore.activeTransactionId }) {
       var nextIndex = confirmationStore.transactions.index(after: index)
@@ -44,23 +48,23 @@ struct TransactionConfirmationView: View {
   }
   
   private var fromAccountName: String {
-    NamedAddresses.name(for: confirmationStore.activeTransaction.fromAddress, accounts: keyringStore.keyring.accountInfos)
+    NamedAddresses.name(for: activeTransaction.fromAddress, accounts: keyringStore.keyring.accountInfos)
   }
   
   private var toAccountName: String {
-    return NamedAddresses.name(for: confirmationStore.activeTransaction.ethTxToAddress, accounts: keyringStore.keyring.accountInfos)
+    return NamedAddresses.name(for: activeTransaction.ethTxToAddress, accounts: keyringStore.keyring.accountInfos)
   }
   
   private var transactionType: String {
-    if confirmationStore.activeTransaction.txType == .erc20Approve {
+    if activeTransaction.txType == .erc20Approve {
       return Strings.Wallet.transactionTypeApprove
     }
-    return confirmationStore.activeTransaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
+    return activeTransaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
   }
   
   private var transactionDetails: String {
-    if confirmationStore.activeTransaction.txArgs.isEmpty {
-      let data = confirmationStore.activeTransaction.ethTxData
+    if activeTransaction.txArgs.isEmpty {
+      let data = activeTransaction.ethTxData
         .map { byte in
           String(format: "%02X", byte.uint8Value)
         }
@@ -70,7 +74,7 @@ struct TransactionConfirmationView: View {
       }
       return "0x\(data)"
     } else {
-      return zip(confirmationStore.activeTransaction.txParams, confirmationStore.activeTransaction.txArgs)
+      return zip(activeTransaction.txParams, activeTransaction.txArgs)
         .map { (param, arg) in
           "\(param): \(arg)"
         }
@@ -83,11 +87,11 @@ struct TransactionConfirmationView: View {
       .fontWeight(.semibold)
       .foregroundColor(Color(.braveBlurpleTint))
     Group {
-      if confirmationStore.activeTransaction.isEIP1559Transaction {
-        if let gasEstimation = confirmationStore.activeTransaction.txDataUnion.ethTxData1559?.gasEstimation {
+      if activeTransaction.isEIP1559Transaction {
+        if let gasEstimation = activeTransaction.txDataUnion.ethTxData1559?.gasEstimation {
           NavigationLink(
             destination: EditPriorityFeeView(
-              transaction: confirmationStore.activeTransaction,
+              transaction: activeTransaction,
               gasEstimation: gasEstimation,
               confirmationStore: confirmationStore
             )
@@ -98,7 +102,7 @@ struct TransactionConfirmationView: View {
       } else {
         NavigationLink(
           destination: EditGasFeeView(
-            transaction: confirmationStore.activeTransaction,
+            transaction: activeTransaction,
             confirmationStore: confirmationStore
           )
         ) {
@@ -118,7 +122,7 @@ struct TransactionConfirmationView: View {
             Text(networkStore.selectedChain.shortChainName)
             Spacer()
             if confirmationStore.transactions.count > 1 {
-              let index = confirmationStore.transactions.firstIndex(of: confirmationStore.activeTransaction) ?? 0
+              let index = confirmationStore.transactions.firstIndex(of: activeTransaction) ?? 0
               Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, confirmationStore.transactions.count))
                 .fontWeight(.semibold)
               Button(action: next) {
@@ -133,8 +137,8 @@ struct TransactionConfirmationView: View {
           VStack(spacing: 8) {
             VStack {
               BlockieGroup(
-                fromAddress: confirmationStore.activeTransaction.fromAddress,
-                toAddress: confirmationStore.activeTransaction.ethTxToAddress,
+                fromAddress: activeTransaction.fromAddress,
+                toAddress: activeTransaction.ethTxToAddress,
                 size: 48
               )
               Group {
@@ -320,13 +324,13 @@ struct TransactionConfirmationView: View {
   
   @ViewBuilder private var rejectConfirmButtons: some View {
     Button(action: {
-      confirmationStore.reject(transaction: confirmationStore.activeTransaction)
+      confirmationStore.reject(transaction: activeTransaction)
     }) {
       Label(Strings.Wallet.rejectTransactionButtonTitle, systemImage: "xmark")
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
     Button(action: {
-      confirmationStore.confirm(transaction: confirmationStore.activeTransaction)
+      confirmationStore.confirm(transaction: activeTransaction)
     }) {
       Label(Strings.Wallet.confirmTransactionButtonTitle, systemImage: "checkmark.circle.fill")
     }
