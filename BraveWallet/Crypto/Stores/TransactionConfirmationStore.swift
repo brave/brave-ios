@@ -22,6 +22,21 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published var state: State = .init()
   @Published var isLoading: Bool = false
   @Published var gasEstimation1559: BraveWallet.GasEstimation1559?
+  /// This is a list of all unpproved transactions iterated through all the accounts for the current keyring
+  @Published var transactions: [BraveWallet.TransactionInfo] = []
+  /// This is an id for the unppproved transaction that is currently displayed on screen
+  @Published var activeTransactionId: BraveWallet.TransactionInfo.ID = "" {
+    didSet {
+      if let tx = transactions.first(where: { $0.id == activeTransactionId }) {
+        activeTransaction = tx
+      } else if let firstTx = transactions.first {
+        activeTransaction = firstTx
+      }
+      fetchDetails(for: activeTransaction)
+    }
+  }
+  /// This is a transaction object from `transactions` that its `id` is the value of `activeTransactionId`
+  @Published var activeTransaction: BraveWallet.TransactionInfo = .init()
   
   private var assetRatios: [String: Double] = [:]
   
@@ -36,8 +51,8 @@ public class TransactionConfirmationStore: ObservableObject {
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let walletService: BraveWalletBraveWalletService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
+  private let keyringService: BraveWalletKeyringService
   private var selectedChain: BraveWallet.EthereumChain = .init()
-  private var activeTransaction: BraveWallet.TransactionInfo?
   
   init(
     assetRatioService: BraveWalletAssetRatioService,
@@ -45,7 +60,8 @@ public class TransactionConfirmationStore: ObservableObject {
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     walletService: BraveWalletBraveWalletService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
+    keyringService: BraveWalletKeyringService
   ) {
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
@@ -53,6 +69,7 @@ public class TransactionConfirmationStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.walletService = walletService
     self.ethTxManagerProxy = ethTxManagerProxy
+    self.keyringService = keyringService
     
     self.txService.add(self)
   }
@@ -235,16 +252,39 @@ public class TransactionConfirmationStore: ObservableObject {
       completion?(success)
     }
   }
+  
+  func fetchTransactions() {
+    keyringService.defaultKeyringInfo { [weak self] keyring in
+      guard let self = self else { return }
+      var pendingTransactions: [BraveWallet.TransactionInfo] = []
+      let group = DispatchGroup()
+      for info in keyring.accountInfos {
+        group.enter()
+        self.txService.allTransactionInfo(.eth, from: info.address) { tx in
+          defer { group.leave() }
+          pendingTransactions.append(contentsOf: tx.filter { $0.txStatus == .unapproved })
+        }
+      }
+      group.notify(queue: .main) {
+        self.transactions = pendingTransactions
+        if let firstTx = self.transactions.first { // only do additional set up if we have some unapproved tx
+          self.activeTransactionId = firstTx.id
+          self.fetchGasEstimation1559()
+        }
+      }
+    }
+  }
 }
 
 extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
   public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
+    // won't have any new unapproved tx being added if you on tx confirmation panel
   }
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
+    fetchTransactions()
   }
   public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
-    if let tx = activeTransaction, txInfo.id == tx.id {
-      fetchDetails(for: txInfo)
-    }
+    // refresh the unapproved transaction list, as well as tx details UI
+    fetchTransactions()
   }
 }
