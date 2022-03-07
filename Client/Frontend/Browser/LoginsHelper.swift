@@ -204,7 +204,7 @@ class LoginsHelper: TabContentScript {
                 }
                 
                 if usernameLogin.caseInsensitivelyEqual(to: username) {
-                    guard password == login.passwordValue else {
+                    if password == login.passwordValue {
                         return
                     }
                     

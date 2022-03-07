@@ -328,10 +328,10 @@ extension LoginListViewController {
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.deleteLoginButtonTitle, style: .destructive, handler: { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.passwordAPI.removeLogin(credential)
-                self?.fetchLoginInfo()
-            }
+            guard let self = self else { return }
+            
+            self.passwordAPI.removeLogin(credential)
+            self.fetchLoginInfo()
         }))
         
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
