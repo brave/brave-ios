@@ -335,9 +335,11 @@ extension LoginInfoViewController {
         if let oldCredentials = credentials.copy() as? PasswordForm {
             credentials.update(username, passwordValue: password)
             passwordAPI.updateLogin(credentials, oldPasswordForm: oldCredentials)
+            
+            completion(true)
+        } else {
+            completion(false)
         }
-        
-        completion(true)
     }
     
     private func deleteLogin() {

@@ -221,7 +221,9 @@ class LoginsHelper: TabContentScript {
     }
     
     private func showAddPrompt(for login: PasswordForm) {
-        addSnackBarForPrompt(for: login, isUpdating: false) { [unowned self] in
+        addSnackBarForPrompt(for: login, isUpdating: false) { [weak self] in
+            guard let self = self else { return }
+            
             DispatchQueue.main.async {
                 self.passwordAPI.addLogin(login)
             }
@@ -229,7 +231,9 @@ class LoginsHelper: TabContentScript {
     }
     
     private func showUpdatePrompt(from old: PasswordForm, to new: PasswordForm) {
-        addSnackBarForPrompt(for: new, isUpdating: true) { [unowned self] in
+        addSnackBarForPrompt(for: new, isUpdating: true) { [weak self] in
+            guard let self = self else { return }
+            
             self.passwordAPI.updateLogin(new, oldPasswordForm: old)
         }
     }
@@ -272,7 +276,9 @@ class LoginsHelper: TabContentScript {
         snackBar?.addButton(dontSaveORUpdate)
         snackBar?.addButton(saveORUpdate)
         
-        tab?.addSnackbar(snackBar)
+        if let bar = snackBar {
+            tab?.addSnackbar(bar)
+        }
     }
     
     private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
@@ -318,9 +324,9 @@ class LoginsHelper: TabContentScript {
             functionName: "window.__firefox__.logins.inject",
             args: [jsonString],
             contentWorld: .defaultClient,
-            escapeArgs: false) { (obj, err) -> Void in
-            if err != nil {
-                log.debug(err)
+            escapeArgs: false) { (object, error) -> Void in
+            if error != nil {
+                log.error(error)
             }
         }
     }
