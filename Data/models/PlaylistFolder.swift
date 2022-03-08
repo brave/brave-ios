@@ -83,6 +83,21 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
         folder.delete()
     }
     
+    public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (PlaylistFolder?, Error?) -> Void) {
+        DataController.perform(context: .new(inMemory: false), save: true) { context in
+            do {
+                guard let folder = try context.existingObject(with: folderID) as? PlaylistFolder else {
+                    update(nil, "Invalid Folder")
+                    return
+                }
+                
+                update(folder, nil)
+            } catch {
+                update(nil, error)
+            }
+        }
+    }
+    
     // MARK: - Internal
     private static func reorderItems(context: NSManagedObjectContext) {
         DataController.perform(context: .existing(context), save: true) { context in
