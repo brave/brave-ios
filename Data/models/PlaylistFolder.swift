@@ -83,17 +83,17 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
         folder.delete()
     }
     
-    public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (PlaylistFolder?, Error?) -> Void) {
+    public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (Result<PlaylistFolder, Error>) -> Void) {
         DataController.perform(context: .new(inMemory: false), save: true) { context in
             do {
                 guard let folder = try context.existingObject(with: folderID) as? PlaylistFolder else {
-                    update(nil, "Invalid Folder")
+                    update(.failure("No Existing Object in CoreData"))
                     return
                 }
                 
-                update(folder, nil)
+                update(.success(folder))
             } catch {
-                update(nil, error)
+                update(.failure(error))
             }
         }
     }
