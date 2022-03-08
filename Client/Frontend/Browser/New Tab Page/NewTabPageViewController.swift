@@ -133,6 +133,11 @@ class NewTabPageViewController: UIViewController {
                 let allTimeMostFrequentTracker = ("scary-analytics", 678)
                 let allTimeRiskiestWebsite = ("scary.example.com", 554)
                 
+                DispatchQueue.main.async {
+                    let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
+                    print(lastWeekMostFrequentTracker)
+                }
+                
                 let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
                                               lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
                                               allTimeMostFrequentTracker: allTimeMostFrequentTracker,

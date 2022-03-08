@@ -3,9 +3,9 @@
     <entity name="BlockedResource" representedClassName=".BlockedResource" syncable="YES">
         <attribute name="count" attributeType="Integer 32" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="domain" optional="YES" attributeType="String"/>
+        <attribute name="host" optional="YES" attributeType="String"/>
         <attribute name="resourceType" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="url" optional="YES" attributeType="String"/>
     </entity>
     <entity name="Bookmark" representedClassName=".Favorite" syncable="YES">
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
