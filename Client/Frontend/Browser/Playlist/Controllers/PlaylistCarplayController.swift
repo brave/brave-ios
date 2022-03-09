@@ -174,10 +174,14 @@ class PlaylistCarplayController: NSObject {
         }.store(in: &playerStateObservers)
         
         player.publisher(for: .stop).sink { [weak self] _ in
+            guard let self = self else { return }
             MPNowPlayingInfoCenter.default().playbackState = .stopped
-            self?.interfaceController.popToRootTemplate(animated: true) { success, error in
-                if !success, let error = error {
-                    log.error(error)
+            
+            if self.interfaceController.topTemplate == CPNowPlayingTemplate.shared {
+                self.interfaceController.popTemplate(animated: false) { success, error in
+                    if !success, let error = error {
+                        log.error(error)
+                    }
                 }
             }
         }.store(in: &playerStateObservers)
@@ -222,14 +226,6 @@ class PlaylistCarplayController: NSObject {
         .sink { _ in
             reloadData()
         }.store(in: &playlistObservers)
-    }
-    
-    func popToRootViewController() {
-        interfaceController.popToRootTemplate(animated: true, completion: { success, error in
-            if !success, let error = error {
-                log.error(error)
-            }
-        })
     }
     
     private func doLayout() {
@@ -510,7 +506,8 @@ extension PlaylistCarplayController: CPInterfaceControllerDelegate {
     func templateWillAppear(_ aTemplate: CPTemplate, animated: Bool) {
         log.debug("Template \(aTemplate.classForCoder) will appear.")
         
-        if (aTemplate.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.folders.rawValue {
+        if interfaceController.topTemplate != CPNowPlayingTemplate.shared,
+            (aTemplate.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.folders.rawValue {
             self.stop()
             
             PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.send()

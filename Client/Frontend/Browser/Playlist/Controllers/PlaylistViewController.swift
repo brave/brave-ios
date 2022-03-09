@@ -515,11 +515,6 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
         // Cancel all loading.
         assetLoadingStateObservers.removeAll()
         assetStateObservers.removeAll()
-        
-        // Delay CarPlay updating its UI
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            PlaylistCarplayManager.shared.popToRootViewController()
-        }
     }
     
     func deleteItem(item: PlaylistInfo, at index: Int) {
