@@ -103,6 +103,13 @@ class PlaylistListViewController: UIViewController {
                                          displayName: $0.displayName,
                                          error: $0.error)
         }.store(in: &observers)
+        
+        PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+            guard let self = self else { return }
+            self.navigationController?.popToRootViewController(animated: true)
+        }.store(in: &observers)
     
         // Theme
         title = Strings.PlayList.playListSectionTitle
@@ -170,6 +177,7 @@ class PlaylistListViewController: UIViewController {
         folderObserver = nil
         if isMovingFromParent || isBeingDismissed {
             delegate?.stopPlaying()
+            PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.send()
         }
     }
     

@@ -23,6 +23,7 @@ class PlaylistCarplayManager: NSObject {
     private var carPlayController: PlaylistCarplayController?
     private var carplayInterface: CPInterfaceController?
     private var carplaySessionConfiguration: CPSessionConfiguration?
+    let onCarplayUIChangedToRoot = PassthroughSubject<Void, Never>()
     
     var browserController: BrowserViewController?
     
@@ -50,6 +51,10 @@ class PlaylistCarplayManager: NSObject {
     // Because there can only be a single AudioSession and MediaPlayer
     // in use at any given moment
     static let shared = PlaylistCarplayManager()
+    
+    func popToRootViewController() {
+        carPlayController?.popToRootViewController()
+    }
     
     func getCarPlayController() -> PlaylistCarplayController? {
         // On iOS 14, we use CPTemplate (Custom UI)
