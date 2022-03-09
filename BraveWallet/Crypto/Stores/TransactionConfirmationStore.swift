@@ -203,7 +203,7 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  private func fetchTransactions(completion: (() -> Void)?) {
+  private func fetchTransactions(completion: @escaping (() -> Void)) {
     keyringService.defaultKeyringInfo { [weak self] keyring in
       guard let self = self else { return }
       var pendingTransactions: [BraveWallet.TransactionInfo] = []
@@ -217,7 +217,7 @@ public class TransactionConfirmationStore: ObservableObject {
       }
       group.notify(queue: .main) {
         self.transactions = pendingTransactions
-        completion?()
+        completion()
       }
     }
   }
@@ -281,13 +281,13 @@ public class TransactionConfirmationStore: ObservableObject {
   func editNonce(
     for transaction: BraveWallet.TransactionInfo,
     nonce: String,
-    completion: ((Bool) -> Void)? = nil
+    completion: @escaping ((Bool) -> Void)
   ) {
     ethTxManagerProxy.setNonceForUnapprovedTransaction(transaction.id, nonce: nonce) { success in
       // not going to refresh unapproved transactions since the tx observer will be
       // notified `onTransactionStatusChanged` and `ononUnapprovedTxUpdated`
       // `transactions` list will be refreshed there.
-      completion?(success)
+      completion(success)
     }
   }
 }
