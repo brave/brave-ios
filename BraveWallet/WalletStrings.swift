@@ -1849,5 +1849,40 @@ extension Strings {
       value: "Reset",
       comment: "The title of a button that will reset transaction and nonce information. As in to erase the users transaction history and reset nonce value starting from 0x0"
     )
+    public static let advancedSettingsTransaction = NSLocalizedString(
+      "wallet.advancedSettingsTransaction",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Advanced settings",
+      comment: "The title of the button that is displayed under the total gas fee in the confirmation transaction screen. Users can click it to go to advanced settings screen."
+    )
+    public static let editNonceHeader = NSLocalizedString(
+      "wallet.editNonceHeader",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Nonce",
+      comment: "The header title for edit nonce section in advanced settings screen."
+    )
+    public static let editNonceFooter = NSLocalizedString(
+      "wallet.editNonceFooter",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transaction may not be propagated to the network if custom nonce value is non-sequential or has other errors",
+      comment: "The footer title for edit nonce section in advanced settings screen."
+    )
+    public static let editNoncePlaceholder = NSLocalizedString(
+      "wallet.editNoncePlaceholder",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Enter custom nonce value",
+      comment: "The placeholder for custom nonce textfield."
+    )
+    public static let saveCustomNonce = NSLocalizedString(
+      "wallet.saveCustomNonce",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Save",
+      comment: "The title of the button for users to save custom nonce"
+    )
   }
 }

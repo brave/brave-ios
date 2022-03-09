@@ -237,11 +237,14 @@ struct TransactionConfirmationView: View {
                   .accessibilityElement(children: .contain)
                   Divider()
                     .padding(.leading)
-                  NavigationLink(destination: EditNonceView()) {
+                  NavigationLink(destination: EditNonceView(
+                    confirmationStore: confirmationStore,
+                    transaction: activeTransaction
+                  )) {
                     HStack {
                       Image("brave.gear")
                         .foregroundColor(Color(.braveBlurpleTint))
-                      Text("Advanced Settings")
+                      Text(Strings.Wallet.advancedSettingsTransaction)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(Color(.braveBlurpleTint))
                       Spacer()
@@ -321,7 +324,7 @@ struct TransactionConfirmationView: View {
     }
     .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
-      confirmationStore.fetchTransactions()
+      confirmationStore.prepare()
     }
   }
   

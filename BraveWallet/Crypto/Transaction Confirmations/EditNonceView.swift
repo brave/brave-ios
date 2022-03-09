@@ -5,45 +5,44 @@
 
 import SwiftUI
 import BraveUI
+import BraveCore
+import struct Shared.Strings
 
 struct EditNonceView: View {
-  @Environment(\.sizeCategory) private var sizeCategory
-  @State private var nonce = ""
+  var confirmationStore: TransactionConfirmationStore
+  var transaction: BraveWallet.TransactionInfo
   
-  @ViewBuilder private var editNonceButtons: some View {
-    Button(action: {}) {
-      Text("Cancel")
-    }
-    .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: {}) {
-      Text("Save")
-    }
-    .buttonStyle(BraveFilledButtonStyle(size: .large))
-  }
+  @Environment(\.presentationMode) @Binding private var presentationMode
+  @State private var nonce = ""
   
   var body: some View {
     List {
-      Section {
-        TextField("Enter custom nonce value", text: $nonce)
+      Section(
+        header: Text(Strings.Wallet.editNonceHeader)
+          .textCase(.none),
+        footer: Text(Strings.Wallet.editNonceFooter)
+      ) {
+        TextField(Strings.Wallet.editNoncePlaceholder, text: $nonce)
           .keyboardType(.numberPad)
-      } header: {
-        Text("Nonce")
-          .textCase(.none)
-      } footer: {
-        Text("Transaction may not be propagated in the network.")
       }
       Section {
-        Group {
-          if sizeCategory.isAccessibilityCategory {
-            VStack {
-              editNonceButtons
-            }
-          } else {
-            HStack {
-              editNonceButtons
-            }
+        Button(action: {
+          if let value = Int(nonce) {
+            let nonceHex = "0x\(String(format: "%02x", value))"
+            confirmationStore.editNonce(
+              for: transaction,
+              nonce: nonceHex) { success in
+                if success {
+                  presentationMode.dismiss()
+                } else {
+                  // Show error?
+               }
+              }
           }
+        }) {
+          Text(Strings.Wallet.saveCustomNonce)
         }
+        .buttonStyle(BraveFilledButtonStyle(size: .large))
         .frame(maxWidth: .infinity)
         .listRowInsets(.zero)
         .listRowBackground(Color(.braveGroupedBackground))
@@ -51,7 +50,24 @@ struct EditNonceView: View {
     }
     .listStyle(InsetGroupedListStyle())
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle("Advanced settings")
+    .navigationTitle(Strings.Wallet.advancedSettingsTransaction)
+    .onAppear {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        setup()
+      }
+    }
+  }
+  
+  private func setup() {
+    if let txNonce = transaction.txDataUnion.ethTxData1559?.baseData.nonce {
+      let nonceDecimal: String
+      if let intValue = Int(txNonce.removingHexPrefix, radix: 16) { // BaseData.nonce should always in hex
+        nonceDecimal = "\(intValue)"
+      } else {
+        nonceDecimal = txNonce
+      }
+      nonce = nonceDecimal
+    }
   }
 }
 
@@ -59,7 +75,10 @@ struct EditNonceView: View {
 struct EditNonceView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      EditNonceView()
+      EditNonceView(
+        confirmationStore: .previewStore,
+        transaction: .previewConfirmedSend
+      )
     }
   }
 }
