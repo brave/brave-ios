@@ -210,31 +210,25 @@ class Tab: NSObject {
 
     var nightMode: Bool {
         didSet {
-            guard nightMode != oldValue else {
-                return
-            }
-            
-            let nightModeArgs = nightMode ? ["true"] : ["false"]
-            
-            webView?.evaluateSafeJavaScript(
-                functionName: "__firefox__.NightMode.setEnabled",
-                args: nightModeArgs,
-                contentWorld: .defaultClient) {  _, error in
-                if let error = error {
-                    log.error("Error executing script: \(error)")
+            if nightMode {
+                webView?.evaluateSafeJavaScript(
+                    functionName: "__firefox__.NightMode.setEnabled",
+                    args: ["true"],
+                    contentWorld: .defaultClient) {  _, error in
+                    if let error = error {
+                        log.error("Error executing script: \(error)")
+                    }
                 }
             }
-            // For WKWebView background color to take effect, isOpaque must be false,
-            // which is counter-intuitive. Default is true. The color is previously
-            // set to black in the WKWebView init.
-            webView?.isOpaque = !nightMode
+            
+            userScriptManager?.isNightModeEnabled = nightMode
         }
     }
     
-    init(configuration: WKWebViewConfiguration, type: TabType = .regular, nightMode: Bool = false) {
+    init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
         self.configuration = configuration
         rewardsId = UInt32.random(in: 1...UInt32.max)
-        self.nightMode = nightMode
+        nightMode = Preferences.General.nightModeEnabled.value
 
         super.init()
         self.type = type
@@ -298,8 +292,10 @@ class Tab: NSObject {
                 isPaymentRequestEnabled: webView.hasOnlySecureContent,
                 isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
                 isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
-                isNightModeEnabled: true)
+                isNightModeEnabled: Preferences.General.nightModeEnabled.value)
             tabDelegate?.tab?(self, didCreateWebView: webView)
+            
+            nightMode = Preferences.General.nightModeEnabled.value
         }
     }
     
@@ -524,12 +520,14 @@ class Tab: NSObject {
 
         if let _ = webView?.reloadFromOrigin() {
             log.debug("reloaded zombified tab from origin")
+            nightMode = Preferences.General.nightModeEnabled.value
             return
         }
 
         if let webView = self.webView {
             log.debug("restoring webView from scratch")
             restore(webView, restorationData: sessionData?.savedTabData)
+            nightMode = Preferences.General.nightModeEnabled.value
         }
     }
     
