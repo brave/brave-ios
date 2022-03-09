@@ -21,13 +21,16 @@ public final class BlockedResource: NSManagedObject, CRUD {
     @NSManaged public var resourceType: Int32
     @NSManaged public var timestamp: Date
     
-    static let thisWeek = getDate(-7)
+    private static let entityName = "BlockedResource"
+    private static let hostKeyPath = #keyPath(BlockedResource.host)
+    private static let domainKeyPath = #keyPath(BlockedResource.domain)
+    private static let timestampKeyPath = #keyPath(BlockedResource.timestamp)
     
     public static func create(host: String, domain: String, resourceType: BlockedResourceType, timestamp: Date = Date()) {
         DataController.perform { context in
             guard let entity = entity(in: context) else {
                 log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
-
+                
                 return
             }
             
@@ -39,41 +42,29 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
-    private static func countExpression(for name: String) -> NSExpressionDescription {
-        let expression = NSExpressionDescription()
-        let nameExpr = NSExpression(forKeyPath: name)
-
-        expression.name = "count" + name
-        expression.expression = NSExpression(forFunction: "count:", arguments: [nameExpr])
-        expression.expressionResultType = .integer32AttributeType
-        
-        return expression
-    }
-    
     public static func mostBlockedTracker(inLastDays days: Int?) -> (String, Int)? {
         
-        var maxNumberOfSites = ("", 0)
+        var mostFrequentTracker = ("", 0)
         
         do {
-            let results = try groupByFetch(property: "host", daysRange: days)
+            let results = try groupByFetch(property: hostKeyPath, daysRange: days)
             
             for result in results {
-                guard let host = result["host"] as? String else {
+                guard let host = result[hostKeyPath] as? String else {
                     continue
                 }
                 
-                let result = try distinctValues(property: "host", propertyToFetch: "domain", value: host, daysRange: days).count
+                let result = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: days).count
                 
-                if result > maxNumberOfSites.1 {
-                    maxNumberOfSites = (host, result)
+                if result > mostFrequentTracker.1 {
+                    mostFrequentTracker = (host, result)
                 }
             }
             
-            return maxNumberOfSites.1 > 0 ? maxNumberOfSites : nil
+            return mostFrequentTracker.1 > 0 ? mostFrequentTracker : nil
         } catch {
             log.error(error)
             return nil
-            
         }
     }
     
@@ -81,14 +72,14 @@ public final class BlockedResource: NSManagedObject, CRUD {
         var maxNumberOfSites = [(String, Int)]()
         
         do {
-            let results = try groupByFetch(property: "host", daysRange: nil)
+            let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
             
             for result in results {
-                guard let host = result["host"] as? String else {
+                guard let host = result[hostKeyPath] as? String else {
                     continue
                 }
                 
-                let result = try distinctValues(property: "host", propertyToFetch: "domain", value: host, daysRange: nil).count
+                let result = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: nil).count
                 
                 maxNumberOfSites.append((host, result))
             }
@@ -105,14 +96,14 @@ public final class BlockedResource: NSManagedObject, CRUD {
         var maxNumberOfSites = ("", 0)
         
         do {
-            let results = try groupByFetch(property: "domain", daysRange: days)
+            let results = try groupByFetch(property: domainKeyPath, daysRange: days)
             
             for result in results {
-                guard let domain = result["domain"] as? String else {
+                guard let domain = result[domainKeyPath] as? String else {
                     continue
                 }
                 
-                let result = try distinctValues(property: "domain", propertyToFetch: "host", value: domain, daysRange: nil).count
+                let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
                 
                 if result > maxNumberOfSites.1 {
                     maxNumberOfSites = (domain, result)
@@ -130,14 +121,14 @@ public final class BlockedResource: NSManagedObject, CRUD {
         var maxNumberOfSites = [(String, Int)]()
         
         do {
-            let results = try groupByFetch(property: "domain", daysRange: nil)
+            let results = try groupByFetch(property: domainKeyPath, daysRange: nil)
             
             for result in results {
-                guard let domain = result["domain"] as? String else {
+                guard let domain = result[domainKeyPath] as? String else {
                     continue
                 }
                 
-                let result = try distinctValues(property: "domain", propertyToFetch: "host", value: domain, daysRange: nil).count
+                let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
                 
                 maxNumberOfSites.append((domain, result))
             }
@@ -149,27 +140,28 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
+    /// A helper method for to group up elements and then count them.
+    /// Note: This query skips single elements(< 1)
     private static func groupByFetch(property: String, daysRange days: Int?) throws -> [NSDictionary] {
-        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BlockedResource")
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
         let context = DataController.viewContext
         fetchRequest.entity = BlockedResource.entity(in: context)
         
         let expression = NSExpressionDescription()
-
-        expression.name = "hostcount"
-        expression.expression = NSExpression(forFunction: "count:", arguments: [NSExpression(forKeyPath: property)])
+        expression.name = "group_by_count"
+        expression.expression = .init(forFunction: "count:", arguments: [NSExpression(forKeyPath: property)])
         expression.expressionResultType = .integer32AttributeType
         
-        let countVariableExpr = NSExpression(forVariable: "hostcount")
-
+        // This expression is required. Otherwise we can not pass this custom expression to the NSPredicate.
+        let countVariableExpr = NSExpression(forVariable: "group_by_count")
+        
         fetchRequest.propertiesToFetch = [property, expression]
         fetchRequest.propertiesToGroupBy = [property]
         fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.returnsDistinctResults = true
         
         if let days = days {
             fetchRequest.havingPredicate =
-            NSPredicate(format: "timestamp >= %@ AND %@ > 1", getDate(-days) as CVarArg, countVariableExpr)
+            NSPredicate(format: "\(timestampKeyPath) >= %@ AND %@ > 1", getDate(-days) as CVarArg, countVariableExpr)
         } else {
             fetchRequest.havingPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
         }
@@ -178,33 +170,40 @@ public final class BlockedResource: NSManagedObject, CRUD {
         return results
     }
     
+    /// Helper method which returns unique values for a given query.
+    /// - Parameters:
+    ///     - property: What property do we query for.
+    ///     - propertyToFetch: What property we do want to fetch from our model.
+    ///     - value: Value of property we query for.
+    ///     - daysRange: If not nil it constraits returned results, retrieves results no older than this param. If nil, we check for all entries.
     private static func distinctValues(property: String,
                                        propertyToFetch: String,
                                        value: String,
                                        daysRange days: Int?) throws -> [NSFetchRequestResult] {
         var predicate: NSPredicate?
         if let days = days {
-            predicate = NSPredicate(format: "timestamp >= %@ AND host == %@", getDate(-days) as CVarArg, value)
+            predicate = NSPredicate(
+                format: "\(timestampKeyPath) >= %@ AND \(property) == %@", getDate(-days) as CVarArg, value)
         } else {
             predicate = NSPredicate(format: "\(property) == %@", value)
         }
         
-        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "BlockedResource")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         let context = DataController.viewContext
-        fr.entity = BlockedResource.entity(in: context)
-
-        fr.propertiesToFetch = [propertyToFetch]
-        fr.resultType = .dictionaryResultType
-        fr.returnsDistinctResults = true
-        fr.predicate = predicate
+        fetchRequest.entity = BlockedResource.entity(in: context)
+        
+        fetchRequest.propertiesToFetch = [propertyToFetch]
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.returnsDistinctResults = true
+        fetchRequest.predicate = predicate
         
         // Dev note: Unfortunately context.count() can't be used here.
         // It ignores `returnDistinctResults` property.
-        let result = try context.fetch(fr)
+        let result = try context.fetch(fetchRequest)
         return result
     }
     
     private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {
-        NSEntityDescription.entity(forEntityName: "BlockedResource", in: context)
+        NSEntityDescription.entity(forEntityName: entityName, in: context)
     }
 }
