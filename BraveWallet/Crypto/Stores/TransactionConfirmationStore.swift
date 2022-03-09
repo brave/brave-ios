@@ -203,7 +203,7 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  private func fetchTransactions(completion: (() -> Void)? = nil) {
+  private func fetchTransactions(completion: (() -> Void)?) {
     keyringService.defaultKeyringInfo { [weak self] keyring in
       guard let self = self else { return }
       var pendingTransactions: [BraveWallet.TransactionInfo] = []

@@ -40,7 +40,7 @@ struct EditNonceView: View {
               }
           }
         }) {
-          Text(Strings.Wallet.saveCustomNonce)
+          Text(Strings.Wallet.saveButtonTitle)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
         .disabled(nonce.isEmpty)
@@ -54,19 +54,14 @@ struct EditNonceView: View {
     .navigationTitle(Strings.Wallet.advancedSettingsTransaction)
     .onAppear {
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        // Most likely a SwiftUI bug. Need add a delay here to render text properly
         setup()
       }
     }
   }
   
   private func setup() {
-    let nonceDecimal: String
-    if let intValue = Int(transaction.ethTxNonce.removingHexPrefix, radix: 16) { // BaseData.nonce should always in hex
-      nonceDecimal = "\(intValue)"
-    } else {
-      nonceDecimal = transaction.ethTxNonce
-    }
-    nonce = nonceDecimal
+    nonce = Int(transaction.ethTxNonce.removingHexPrefix, radix: 16).map(String.init) ?? transaction.ethTxNonce
   }
 }
 
