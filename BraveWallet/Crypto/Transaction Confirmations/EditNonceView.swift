@@ -43,6 +43,7 @@ struct EditNonceView: View {
           Text(Strings.Wallet.saveCustomNonce)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
+        .disabled(nonce.isEmpty)
         .frame(maxWidth: .infinity)
         .listRowInsets(.zero)
         .listRowBackground(Color(.braveGroupedBackground))
@@ -59,15 +60,13 @@ struct EditNonceView: View {
   }
   
   private func setup() {
-    if let txNonce = transaction.txDataUnion.ethTxData1559?.baseData.nonce {
-      let nonceDecimal: String
-      if let intValue = Int(txNonce.removingHexPrefix, radix: 16) { // BaseData.nonce should always in hex
-        nonceDecimal = "\(intValue)"
-      } else {
-        nonceDecimal = txNonce
-      }
-      nonce = nonceDecimal
+    let nonceDecimal: String
+    if let intValue = Int(transaction.ethTxNonce.removingHexPrefix, radix: 16) { // BaseData.nonce should always in hex
+      nonceDecimal = "\(intValue)"
+    } else {
+      nonceDecimal = transaction.ethTxNonce
     }
+    nonce = nonceDecimal
   }
 }
 
