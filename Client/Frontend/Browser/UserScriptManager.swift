@@ -350,14 +350,8 @@ class UserScriptManager {
 
         return WKUserScript.create(source: source,
                             injectionTime: .atDocumentStart,
-                            forMainFrameOnly: false,
+                            forMainFrameOnly: true,
                             in: .page)
-        
-//        return WKUserScript.create(source: "window.__firefox__.NightMode.setEnabled(true)",
-//                            injectionTime: .atDocumentStart,
-//                            forMainFrameOnly: true,
-//                            in: .page)
-        
     }()
 
     private func reloadUserScripts() {

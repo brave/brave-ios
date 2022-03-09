@@ -329,6 +329,24 @@ class SettingsViewController: TableViewController {
             )
             optionsViewController.headerText = Strings.themesDisplayBrightness
             optionsViewController.footerText = Strings.themesDisplayBrightnessFooter
+
+            let sectionTest = Section(
+                header: .title("MODE"),
+                rows: [
+                    .boolRow(
+                        title: "Night Mode",
+                        detailText: "Turn on/off Night Mode",
+                        option: Preferences.General.nightModeEnabled,
+                        onValueChange: { enabled in
+                            print("True or false \(enabled)")
+                            NightModeHelper.setNightMode(tabManager: tabManager, enabled: enabled)
+                        },
+                        image: UIImage(systemName: "moon"))
+                ],
+                footer: .title("Night mode will effect website appearance and general system appearance at the same time. ")
+            )
+            
+            optionsViewController.dataSource.sections.append(sectionTest)
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
         display.rows.append(row)

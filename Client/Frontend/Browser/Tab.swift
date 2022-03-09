@@ -208,9 +208,34 @@ class Tab: NSObject {
     /// tab instance, queue it for later until we become foregrounded.
     fileprivate var alertQueue = [JSAlertInfo]()
 
-    init(configuration: WKWebViewConfiguration, type: TabType = .regular) {
+    var nightMode: Bool {
+        didSet {
+            guard nightMode != oldValue else {
+                return
+            }
+            
+            let nightModeArgs = nightMode ? ["true"] : ["false"]
+            
+            webView?.evaluateSafeJavaScript(
+                functionName: "__firefox__.NightMode.setEnabled",
+                args: nightModeArgs,
+                contentWorld: .defaultClient) {  _, error in
+                if let error = error {
+                    log.error("Error executing script: \(error)")
+                }
+            }
+            // For WKWebView background color to take effect, isOpaque must be false,
+            // which is counter-intuitive. Default is true. The color is previously
+            // set to black in the WKWebView init.
+            webView?.isOpaque = !nightMode
+        }
+    }
+    
+    init(configuration: WKWebViewConfiguration, type: TabType = .regular, nightMode: Bool = false) {
         self.configuration = configuration
         rewardsId = UInt32.random(in: 1...UInt32.max)
+        self.nightMode = nightMode
+
         super.init()
         self.type = type
     }
