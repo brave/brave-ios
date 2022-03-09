@@ -14,6 +14,8 @@ struct PrivacyReportsView: View {
   let lastWeekRiskiestWebsite: (String, Int)?
   let allTimeMostFrequentTracker: (String, Int)?
   let allTimeRiskiestWebsite: (String, Int)?
+  let allTimeListTrackers: [PrivacyReportsItem]
+  let allTimeListWebsites: [PrivacyReportsItem]
   
   var onDismiss: (() -> Void)?
   
@@ -73,7 +75,10 @@ struct PrivacyReportsView: View {
           
           PrivacyHubAllTimeSection(
             allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-            allTimeRiskiestWebsite: allTimeRiskiestWebsite, onDismiss: {
+            allTimeRiskiestWebsite: allTimeRiskiestWebsite,
+            allTimeListTrackers: allTimeListTrackers,
+            allTimeListWebsites: allTimeListWebsites,
+            onDismiss: {
               dismissView()
             })
         }

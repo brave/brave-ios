@@ -10,6 +10,9 @@ struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
+  let allTimeListTrackers: [PrivacyReportsItem]
+  let allTimeListWebsites: [PrivacyReportsItem]
+  
   private(set) var onDismiss: () -> Void
   
   enum Page: CaseIterable, Identifiable {
@@ -74,10 +77,10 @@ struct PrivacyReportAllTimeListsView: View {
       case .trackersAndAds:
         List {
           Section {
-            ForEach(0..<20) { i in
+            ForEach(allTimeListTrackers) { item in
               HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                  Text("\(i)-analytics.com")
+                  Text(item.domainOrTracker)
                     .font(.callout)
                   
                   Group {
@@ -86,14 +89,14 @@ struct PrivacyReportAllTimeListsView: View {
                         Text(Strings.PrivacyHub.blockedBy)
                           .foregroundColor(Color(.secondaryBraveLabel))
                         
-                        blockedByLabels(i: i)
+                        blockedByLabels(i: item.count) // FIXME: count not needed here, was for tests.
                       }
                     } else {
                       HStack(spacing: 4) {
                         Text(Strings.PrivacyHub.blockedBy)
                           .foregroundColor(Color(.secondaryBraveLabel))
                         PrivacyReportsView.BlockedByShieldsLabel()
-                        if i % 2 == 0 {
+                        if item.count % 2 == 0 {
                           PrivacyReportsView.BlockedByVPNLabel()
                         }
                       }
@@ -103,7 +106,7 @@ struct PrivacyReportAllTimeListsView: View {
                 }
                 
                 Spacer()
-                Text("\(i * 17)")
+                Text("\(item.count)")
                   .font(.headline.weight(.semibold))
               }
             }
@@ -120,11 +123,11 @@ struct PrivacyReportAllTimeListsView: View {
       case .websites:
         List {
           Section {
-            ForEach(0..<20) { i in
+            ForEach(allTimeListWebsites) { item in
               HStack {
-                Label("\(i).com", systemImage: "globe")
+                Label(item.domainOrTracker, systemImage: "globe")
                 Spacer()
-                Text("\(i * 17)")
+                Text("\(item.count)")
                   .font(.headline.weight(.semibold))
               }
             }

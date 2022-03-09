@@ -15,6 +15,9 @@ extension PrivacyReportsView {
     let allTimeMostFrequentTracker: (String, Int)?
     let allTimeRiskiestWebsite: (String, Int)?
     
+    let allTimeListTrackers: [PrivacyReportsItem]
+    let allTimeListWebsites: [PrivacyReportsItem]
+    
     private(set) var onDismiss: () -> Void
     
     private var allTimeTrackerView: some View {
@@ -94,7 +97,10 @@ extension PrivacyReportsView {
           }
         }
         
-        NavigationLink(destination: PrivacyReportAllTimeListsView(onDismiss: {
+        NavigationLink(destination: PrivacyReportAllTimeListsView(
+          allTimeListTrackers: allTimeListTrackers,
+          allTimeListWebsites: allTimeListWebsites,
+          onDismiss: {
           onDismiss()
         })) {
           HStack {

@@ -135,11 +135,20 @@ class NewTabPageViewController: UIViewController {
                     let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
                     let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
                     
+                    let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers().map {
+                        PrivacyReportsItem(domainOrTracker: $0.0, count: $0.1)
+                    }
+                    
+                    let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
+                        PrivacyReportsItem(domainOrTracker: $0.0, count: $0.1)
+                    }
                 
                 let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
                                               lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
                                               allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-                                              allTimeRiskiestWebsite: allTimeRiskiestWebsite)
+                                                  allTimeRiskiestWebsite: allTimeRiskiestWebsite,
+                                                  allTimeListTrackers: allTimeListTracker,
+                                                  allTimeListWebsites: allTimeListWebsites)
                 
                 let host = UIHostingController(rootView: view)
                 host.rootView.onDismiss = { [weak host] in

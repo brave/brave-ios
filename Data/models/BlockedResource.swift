@@ -122,6 +122,67 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
+    public static func allTimeMostFrequentTrackers() -> [(String, Int)] {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BlockedResource")
+        let context = DataController.viewContext
+        fetchRequest.entity = BlockedResource.entity(in: context)
+        
+        let hostKeypath = #keyPath(BlockedResource.host)
+        
+        let expression = NSExpressionDescription()
+
+        expression.name = "hostcount"
+        expression.expression = NSExpression(forFunction: "count:", arguments: [NSExpression(forKeyPath: "host")])
+        expression.expressionResultType = .integer32AttributeType
+        
+        let countVariableExpr = NSExpression(forVariable: "hostcount")
+
+        fetchRequest.propertiesToFetch = [hostKeypath, expression]
+        fetchRequest.propertiesToGroupBy = [hostKeypath]
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.returnsDistinctResults = true
+        
+        fetchRequest.havingPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+        
+        var maxNumberOfSites = [(String, Int)]()
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            
+            for result in results {
+                guard let host = result["host"] as? String else {
+                    continue
+                }
+                
+                let predicate = NSPredicate(format: "host == %@", host)
+                
+                let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "BlockedResource")
+                let context = DataController.viewContext
+                fr.entity = BlockedResource.entity(in: context)
+                
+                let domainKeyPath = #keyPath(BlockedResource.domain)
+
+                fr.propertiesToFetch = [domainKeyPath]
+                fr.resultType = .dictionaryResultType
+                fr.returnsDistinctResults = true
+                fr.predicate = predicate
+                
+                // Dev note: Unfortunately context.count() can't be used here.
+                // It ignores `returnDistinctResults` property.
+                let result = try context.fetch(fr).count
+                
+                
+                maxNumberOfSites.append((host, result))
+            }
+            
+            return maxNumberOfSites.sorted(by: { $0.1 > $1.1 })
+        } catch {
+            log.error(error)
+            return []
+            
+        }
+    }
+    
     public static func riskiestWebsite(inLastDays days: Int?) -> (String, Int)? {
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BlockedResource")
         let context = DataController.viewContext
@@ -193,34 +254,62 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
-    public static func allBlockedResources() -> [String: Int] {
+    public static func allTimeMostRiskyWebsites() -> [(String, Int)] {
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BlockedResource")
         let context = DataController.viewContext
         fetchRequest.entity = BlockedResource.entity(in: context)
         
-        let hostKeypath = #keyPath(BlockedResource.host)
+        let domainKeyPath = #keyPath(BlockedResource.domain)
         
-        let count = countExpression(for: "host")
+        let expression = NSExpressionDescription()
+
+        expression.name = "domaincount"
+        expression.expression = NSExpression(forFunction: "count:", arguments: [NSExpression(forKeyPath: "domain")])
+        expression.expressionResultType = .integer32AttributeType
         
-        fetchRequest.propertiesToFetch = [hostKeypath, count]
-        fetchRequest.propertiesToGroupBy = [hostKeypath]
+        let countVariableExpr = NSExpression(forVariable: "domaincount")
+        
+        fetchRequest.propertiesToFetch = [domainKeyPath, expression]
+        fetchRequest.propertiesToGroupBy = [domainKeyPath]
         fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.returnsDistinctResults = true
+        
+        fetchRequest.havingPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+        
+        var maxNumberOfSites = [(String, Int)]()
         
         do {
-            let result = try context.fetch(fetchRequest)
-            var flatResults: [String: Int] = [:]
+            let results = try context.fetch(fetchRequest)
             
-            for r in result {
-                guard let host = r["host"] as? String, let count = r["count"] as? Int else { continue }
+            for result in results {
+                guard let domain = result["domain"] as? String else {
+                    continue
+                }
                 
-                flatResults[host] = count // TODO: Multiply by consolidation count
+                let predicate = NSPredicate(format: "domain == %@", domain)
+                
+                let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "BlockedResource")
+                let context = DataController.viewContext
+                fr.entity = BlockedResource.entity(in: context)
+                
+                let hostKeyPath = #keyPath(BlockedResource.host)
+
+                fr.propertiesToFetch = [hostKeyPath]
+                fr.resultType = .dictionaryResultType
+                fr.returnsDistinctResults = true
+                fr.predicate = predicate
+                
+                // Dev note: Unfortunately context.count() can't be used here.
+                // It ignores `returnDistinctResults` property.
+                let fetch = try context.fetch(fr)
+                let result = fetch.count
+                
+                maxNumberOfSites.append((domain, result))
             }
             
-            return flatResults
+            return maxNumberOfSites.sorted(by: { $0.1 > $1.1 })
         } catch {
             log.error(error)
-            return [:]
+            return []
         }
     }
     
