@@ -6,6 +6,28 @@ import SwiftUI
 import Shared
 import BraveShared
 
+private struct FaviconImage: View {
+  let url: URL?
+  
+  @StateObject private var faviconLoader = PlaylistFolderImageLoader()
+  
+  init(url: String) {
+    self.url = URL(string: url)
+  }
+  
+  var body: some View {
+    Image(uiImage: faviconLoader.image ?? .init(imageLiteralResourceName: "defaultFavicon"))
+      .resizable()
+      .aspectRatio(contentMode: .fit)
+      .frame(width: 30, height: 30)
+      .onAppear {
+        if let url = url {
+          faviconLoader.load(domainUrl: url)
+        }
+      }
+  }
+}
+
 struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
@@ -125,7 +147,8 @@ struct PrivacyReportAllTimeListsView: View {
           Section {
             ForEach(allTimeListWebsites) { item in
               HStack {
-                Label(item.domainOrTracker, systemImage: "globe")
+                FaviconImage(url: item.domainOrTracker)
+                Text(item.domainOrTracker)
                 Spacer()
                 Text("\(item.count)")
                   .font(.headline.weight(.semibold))
