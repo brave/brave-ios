@@ -14,8 +14,8 @@ class SearchLoader: Loader<[Site], SearchViewController> {
 
   var autocompleteSuggestionHandler: ((String) -> Void)?
 
-  init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager) {
-    frequencyQuery = FrequencyQuery(historyAPI: historyAPI, bookmarkManager: bookmarkManager)
+  init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager, tabManager: TabManager) {
+    frequencyQuery = FrequencyQuery(historyAPI: historyAPI, bookmarkManager: bookmarkManager, tabManager: tabManager)
   }
 
   var query: String = "" {
@@ -28,7 +28,7 @@ class SearchLoader: Loader<[Site], SearchViewController> {
       frequencyQuery.sitesByFrequency(containing: query) { [weak self] result in
         guard let self = self else { return }
 
-        self.load(Array(result))
+        self.load(result)
 
         // If the new search string is not longer than the previous
         // we don't need to find an autocomplete suggestion.

@@ -49,7 +49,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     case searchSuggestionsOptIn
     case searchSuggestions
     case findInPage
-    case bookmarksAndHistory
+    case bookmarksAndHistoryAndTabs
   }
 
   // MARK: Properties
@@ -75,11 +75,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   private let searchEngineScrollViewContent = UIView().then {
     $0.backgroundColor = .braveBackground
   }
-
-  private lazy var bookmarkedBadge: UIImage = {
-    return #imageLiteral(resourceName: "bookmarked_passive")
-  }()
-
+  
   private var suggestions = [String]()
   private lazy var suggestionLongPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onSuggestionLongPressed(_:)))
 
@@ -145,7 +141,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       sections.append(.searchSuggestions)
     }
     sections.append(.findInPage)
-    sections.append(.bookmarksAndHistory)
+    sections.append(.bookmarksAndHistoryAndTabs)
     return sections
   }
 
@@ -356,16 +352,16 @@ class SearchViewController: SiteTableViewController, LoaderListener {
           let isSuggestClientError = error.domain == SearchSuggestClientErrorDomain
 
           switch error.code {
-          case NSURLErrorCancelled where error.domain == NSURLErrorDomain:
-            // Request was cancelled. Do nothing.
-            break
-          case SearchSuggestClientErrorInvalidEngine where isSuggestClientError:
-            // Engine does not support search suggestions. Do nothing.
-            break
-          case SearchSuggestClientErrorInvalidResponse where isSuggestClientError:
-            print("Error: Invalid search suggestion data")
-          default:
-            print("Error: \(error.description)")
+            case NSURLErrorCancelled where error.domain == NSURLErrorDomain:
+              // Request was cancelled. Do nothing.
+              break
+            case SearchSuggestClientErrorInvalidEngine where isSuggestClientError:
+              // Engine does not support search suggestions. Do nothing.
+              break
+            case SearchSuggestClientErrorInvalidResponse where isSuggestClientError:
+              print("Error: Invalid search suggestion data")
+            default:
+              print("Error: \(error.description)")
           }
         } else if let suggestionList = suggestions {
           self.suggestions = suggestionList
@@ -419,52 +415,55 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     guard let section = availableSections[safe: indexPath.section] else { return }
 
     switch section {
-    case .quickBar:
-      if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-        RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl: nil)
-      }
-      searchDelegate?.searchViewController(self, didSubmit: searchQuery)
-    case .searchSuggestionsOptIn: return
-    case .searchSuggestions:
-      // Assume that only the default search engine can provide search suggestions.
-      let engine = searchEngines?.defaultEngine()
-      let suggestion = suggestions[indexPath.row]
-
-      var url = URIFixup.getURL(suggestion)
-      if url == nil {
-        url = engine?.searchURLForQuery(suggestion)
-      }
-
-      if let url = url {
+      case .quickBar:
         if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-          RecentSearch.addItem(type: .website, text: suggestion, websiteUrl: url.absoluteString)
+          RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl: nil)
         }
-        searchDelegate?.searchViewController(self, didSelectURL: url)
-      }
-    case .bookmarksAndHistory:
-      let site = data[indexPath.row]
-      if let url = URL(string: site.url) {
-        searchDelegate?.searchViewController(self, didSelectURL: url)
-      }
-    case .findInPage:
-      let localSearchQuery = searchQuery.lowercased()
-      searchDelegate?.searchViewController(self, shouldFindInPage: localSearchQuery)
+        searchDelegate?.searchViewController(self, didSubmit: searchQuery)
+      case .searchSuggestionsOptIn: return
+      case .searchSuggestions:
+        // Assume that only the default search engine can provide search suggestions.
+        let engine = searchEngines?.defaultEngine()
+        let suggestion = suggestions[indexPath.row]
+        
+        var url = URIFixup.getURL(suggestion)
+        if url == nil {
+          url = engine?.searchURLForQuery(suggestion)
+        }
+        
+        if let url = url {
+          if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            RecentSearch.addItem(type: .website, text: suggestion, websiteUrl: url.absoluteString)
+          }
+          searchDelegate?.searchViewController(self, didSelectURL: url)
+        }
+      case .bookmarksAndHistoryAndTabs:
+        let site = data[indexPath.row]
+        
+        //TODO: For Tab selection add open tab
+        
+        if let url = URL(string: site.url) {
+          searchDelegate?.searchViewController(self, didSelectURL: url)
+        }
+      case .findInPage:
+        let localSearchQuery = searchQuery.lowercased()
+        searchDelegate?.searchViewController(self, shouldFindInPage: localSearchQuery)
     }
   }
 
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     if let currentSection = availableSections[safe: indexPath.section] {
       switch currentSection {
-      case .quickBar:
-        return super.tableView(tableView, heightForRowAt: indexPath)
-      case .searchSuggestionsOptIn:
-        return 100.0
-      case .searchSuggestions:
-        return 44.0
-      case .bookmarksAndHistory:
-        return super.tableView(tableView, heightForRowAt: indexPath)
-      case .findInPage:
-        return super.tableView(tableView, heightForRowAt: indexPath)
+        case .quickBar:
+          return super.tableView(tableView, heightForRowAt: indexPath)
+        case .searchSuggestionsOptIn:
+          return 100.0
+        case .searchSuggestions:
+          return 44.0
+        case .bookmarksAndHistoryAndTabs:
+          return super.tableView(tableView, heightForRowAt: indexPath)
+        case .findInPage:
+          return super.tableView(tableView, heightForRowAt: indexPath)
       }
     }
 
@@ -475,18 +474,18 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     guard let searchSection = availableSections[safe: section] else { return nil }
 
     switch searchSection {
-    case .quickBar: return nil
-    case .searchSuggestionsOptIn: return nil
-    case .searchSuggestions:
-      if let defaultSearchEngine = searchEngines?.defaultEngine() {
-        if defaultSearchEngine.shortName.contains(Strings.searchSuggestionSectionTitleNoSearchFormat) || defaultSearchEngine.shortName.lowercased().contains("search") {
-          return defaultSearchEngine.displayName
+      case .quickBar: return nil
+      case .searchSuggestionsOptIn: return nil
+      case .searchSuggestions:
+        if let defaultSearchEngine = searchEngines?.defaultEngine() {
+          if defaultSearchEngine.shortName.contains(Strings.searchSuggestionSectionTitleNoSearchFormat) || defaultSearchEngine.shortName.lowercased().contains("search") {
+            return defaultSearchEngine.displayName
+          }
+          return String(format: Strings.searchSuggestionSectionTitleFormat, defaultSearchEngine.displayName)
         }
-        return String(format: Strings.searchSuggestionSectionTitleFormat, defaultSearchEngine.displayName)
-      }
-      return Strings.searchSuggestionsSectionHeader
-    case .bookmarksAndHistory: return Strings.searchHistorySectionHeader
-    case .findInPage: return Strings.findOnPageSectionHeader
+        return Strings.searchSuggestionsSectionHeader
+      case .bookmarksAndHistoryAndTabs: return Strings.searchHistorySectionHeader
+      case .findInPage: return Strings.findOnPageSectionHeader
     }
   }
 
@@ -501,18 +500,18 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     let headerHeight: CGFloat = 22
 
     switch searchSection {
-    case .quickBar:
-      return 0.0
-    case .searchSuggestionsOptIn:
-      return 0.0
-    case .searchSuggestions:
-      return suggestions.isEmpty ? 0 : headerHeight * 2.0
-    case .bookmarksAndHistory: return data.isEmpty ? 0 : headerHeight
-    case .findInPage:
-      if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
-        return headerHeight
-      }
-      return 0.0
+      case .quickBar:
+        return 0.0
+      case .searchSuggestionsOptIn:
+        return 0.0
+      case .searchSuggestions:
+        return suggestions.isEmpty ? 0 : headerHeight * 2.0
+      case .bookmarksAndHistoryAndTabs: return data.isEmpty ? 0 : headerHeight
+      case .findInPage:
+        if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+          return headerHeight
+        }
+        return 0.0
     }
   }
 
@@ -525,15 +524,15 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     let footerHeight: CGFloat = 10.0
 
     switch searchSection {
-    case .quickBar:
-      return CGFloat.leastNormalMagnitude
-    case .searchSuggestionsOptIn:
-      return footerHeight
-    case .searchSuggestions:
-      return suggestions.isEmpty ? CGFloat.leastNormalMagnitude : footerHeight
-    case .bookmarksAndHistory: return footerHeight
-    case .findInPage:
-      return CGFloat.leastNormalMagnitude
+      case .quickBar:
+        return CGFloat.leastNormalMagnitude
+      case .searchSuggestionsOptIn:
+        return footerHeight
+      case .searchSuggestions:
+        return suggestions.isEmpty ? CGFloat.leastNormalMagnitude : footerHeight
+      case .bookmarksAndHistoryAndTabs: return footerHeight
+      case .findInPage:
+        return CGFloat.leastNormalMagnitude
     }
   }
 
@@ -543,74 +542,75 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     switch section {
-    case .quickBar:
-      let cell = TwoLineTableViewCell()
-      cell.textLabel?.text = searchQuery
-      cell.textLabel?.textColor = .bravePrimary
-      cell.imageView?.image = #imageLiteral(resourceName: "search_bar_find_in_page_icon")
-      cell.imageView?.contentMode = .center
-      cell.backgroundColor = .secondaryBraveBackground
-
-      return cell
-    case .searchSuggestionsOptIn:
-      let cell = tableView.dequeueReusableCell(withIdentifier: SearchSuggestionPromptCell.identifier, for: indexPath)
-      if let promptCell = cell as? SearchSuggestionPromptCell {
-        promptCell.selectionStyle = .none
-        promptCell.onOptionSelected = { [weak self] option in
-          guard let self = self else { return }
-
-          self.searchEngines?.shouldShowSearchSuggestions = option
-          self.searchEngines?.shouldShowSearchSuggestionsOptIn = false
-
-          if option {
-            self.querySuggestClient()
-          }
-          self.layoutSuggestionsOptInPrompt()
-          self.reloadSearchEngines()
-        }
-      }
-      return cell
-    case .searchSuggestions:
-      let cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
-      if let suggestionCell = cell as? SuggestionCell {
-        suggestionCell.setTitle(suggestions[indexPath.row])
-        suggestionCell.separatorInset = UIEdgeInsets(top: 0.0, left: view.bounds.width, bottom: 0.0, right: -view.bounds.width)
-        suggestionCell.openButtonActionHandler = { [weak self] in
-          guard let self = self else { return }
-
-          let suggestion = self.suggestions[indexPath.row]
-          self.searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
-        }
-      }
-      return cell
-
-    case .bookmarksAndHistory:
-      let cell = super.tableView(tableView, cellForRowAt: indexPath)
-      let site = data[indexPath.row]
-      if let cell = cell as? TwoLineTableViewCell {
-        let isBookmark = site.bookmarked ?? false
+      case .quickBar:
+        let cell = TwoLineTableViewCell()
+        cell.textLabel?.text = searchQuery
         cell.textLabel?.textColor = .bravePrimary
-        cell.setLines(site.title, detailText: site.url)
-        cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
-        cell.imageView?.contentMode = .scaleAspectFit
-        cell.imageView?.layer.borderColor = SearchViewControllerUX.iconBorderColor.cgColor
-        cell.imageView?.layer.borderWidth = SearchViewControllerUX.iconBorderWidth
-        cell.imageView?.image = UIImage()
-        cell.imageView?.loadFavicon(for: site.tileURL)
+        cell.imageView?.image = #imageLiteral(resourceName: "search_bar_find_in_page_icon")
+        cell.imageView?.contentMode = .center
         cell.backgroundColor = .secondaryBraveBackground
-      }
-      return cell
-
-    case .findInPage:
-      let cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
-      cell.textLabel?.text = String(format: Strings.findInPageFormat, searchQuery)
-      cell.textLabel?.textColor = .bravePrimary
-      cell.textLabel?.numberOfLines = 2
-      cell.textLabel?.font = .systemFont(ofSize: 15.0)
-      cell.textLabel?.lineBreakMode = .byWordWrapping
-      cell.textLabel?.textAlignment = .left
-      cell.backgroundColor = .secondaryBraveBackground
-      return cell
+        
+        return cell
+      case .searchSuggestionsOptIn:
+        let cell = tableView.dequeueReusableCell(withIdentifier: SearchSuggestionPromptCell.identifier, for: indexPath)
+        if let promptCell = cell as? SearchSuggestionPromptCell {
+          promptCell.selectionStyle = .none
+          promptCell.onOptionSelected = { [weak self] option in
+            guard let self = self else { return }
+            
+            self.searchEngines?.shouldShowSearchSuggestions = option
+            self.searchEngines?.shouldShowSearchSuggestionsOptIn = false
+            
+            if option {
+              self.querySuggestClient()
+            }
+            self.layoutSuggestionsOptInPrompt()
+            self.reloadSearchEngines()
+          }
+        }
+        return cell
+      case .searchSuggestions:
+        let cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
+        if let suggestionCell = cell as? SuggestionCell {
+          suggestionCell.setTitle(suggestions[indexPath.row])
+          suggestionCell.separatorInset = UIEdgeInsets(top: 0.0, left: view.bounds.width, bottom: 0.0, right: -view.bounds.width)
+          suggestionCell.openButtonActionHandler = { [weak self] in
+            guard let self = self else { return }
+            
+            let suggestion = self.suggestions[indexPath.row]
+            self.searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
+          }
+        }
+        return cell
+        
+      case .bookmarksAndHistoryAndTabs:
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        let site = data[indexPath.row]
+        if let cell = cell as? TwoLineTableViewCell {
+          cell.textLabel?.textColor = .bravePrimary
+          cell.setLines(site.title, detailText: site.url)
+          cell.setRightBadge(site.siteType.icon?.template ?? nil)
+          cell.accessoryView?.tintColor = .secondaryButtonTint
+          
+          cell.imageView?.contentMode = .scaleAspectFit
+          cell.imageView?.layer.borderColor = SearchViewControllerUX.iconBorderColor.cgColor
+          cell.imageView?.layer.borderWidth = SearchViewControllerUX.iconBorderWidth
+          cell.imageView?.image = UIImage()
+          cell.imageView?.loadFavicon(for: site.tileURL)
+          cell.backgroundColor = .secondaryBraveBackground
+        }
+        return cell
+        
+      case .findInPage:
+        let cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
+        cell.textLabel?.text = String(format: Strings.findInPageFormat, searchQuery)
+        cell.textLabel?.textColor = .bravePrimary
+        cell.textLabel?.numberOfLines = 2
+        cell.textLabel?.font = .systemFont(ofSize: 15.0)
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.textAlignment = .left
+        cell.backgroundColor = .secondaryBraveBackground
+        return cell
     }
   }
 
@@ -620,33 +620,33 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     }
 
     switch section {
-    case .quickBar:
-      return 1
-    case .searchSuggestionsOptIn:
-      return 1
-    case .searchSuggestions:
-      guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else { return 0 }
-      return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
-    case .bookmarksAndHistory:
-      return data.count
-    case .findInPage:
-      if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+      case .quickBar:
         return 1
-      }
-      return 0
+      case .searchSuggestionsOptIn:
+        return 1
+      case .searchSuggestions:
+        guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else { return 0 }
+        return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
+      case .bookmarksAndHistoryAndTabs:
+        return data.count
+      case .findInPage:
+        if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+          return 1
+        }
+        return 0
     }
   }
-
+  
   func numberOfSections(in tableView: UITableView) -> Int {
     return availableSections.count
   }
-
+  
   func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
     guard let section = availableSections[safe: indexPath.section] else {
       return
     }
-
-    if section == .bookmarksAndHistory {
+    
+    if section == .bookmarksAndHistoryAndTabs {
       let suggestion = data[indexPath.item]
       searchDelegate?.searchViewController(self, didHighlightText: suggestion.url, search: false)
     }
@@ -669,8 +669,8 @@ extension SearchViewController: KeyboardHelperDelegate {
 
 extension SearchViewController {
   func handleKeyCommands(sender: UIKeyCommand) {
-    let initialSection = SearchListSection.bookmarksAndHistory.rawValue
-
+    let initialSection = SearchListSection.bookmarksAndHistoryAndTabs.rawValue
+    
     guard let current = tableView.indexPathForSelectedRow else {
       let numberOfRows = tableView(tableView, numberOfRowsInSection: initialSection)
       if sender.input == UIKeyCommand.inputDownArrow, numberOfRows > 0 {
@@ -686,39 +686,39 @@ extension SearchViewController {
     guard let input = sender.input else { return }
 
     switch input {
-    case UIKeyCommand.inputUpArrow:
-      // we're going down, we should check if we've reached the first item in this section.
-      if current.item == 0 {
-        // We have, so check if we can decrement the section.
-        if current.section == initialSection {
-          // We've reached the first item in the first section.
-          searchDelegate?.searchViewController(self, didHighlightText: searchQuery, search: false)
-          return
+      case UIKeyCommand.inputUpArrow:
+        // we're going down, we should check if we've reached the first item in this section.
+        if current.item == 0 {
+          // We have, so check if we can decrement the section.
+          if current.section == initialSection {
+            // We've reached the first item in the first section.
+            searchDelegate?.searchViewController(self, didHighlightText: searchQuery, search: false)
+            return
+          } else {
+            nextSection = current.section - 1
+            nextItem = tableView(tableView, numberOfRowsInSection: nextSection) - 1
+          }
         } else {
-          nextSection = current.section - 1
-          nextItem = tableView(tableView, numberOfRowsInSection: nextSection) - 1
+          nextSection = current.section
+          nextItem = current.item - 1
         }
-      } else {
-        nextSection = current.section
-        nextItem = current.item - 1
-      }
-    case UIKeyCommand.inputDownArrow:
-      let currentSectionItemsCount = tableView(tableView, numberOfRowsInSection: current.section)
-      if current.item == currentSectionItemsCount - 1 {
-        if current.section == tableView.numberOfSections - 1 {
-          // We've reached the last item in the last section
-          return
+      case UIKeyCommand.inputDownArrow:
+        let currentSectionItemsCount = tableView(tableView, numberOfRowsInSection: current.section)
+        if current.item == currentSectionItemsCount - 1 {
+          if current.section == tableView.numberOfSections - 1 {
+            // We've reached the last item in the last section
+            return
+          } else {
+            // We can go to the next section.
+            nextSection = current.section + 1
+            nextItem = 0
+          }
         } else {
-          // We can go to the next section.
-          nextSection = current.section + 1
-          nextItem = 0
+          nextSection = current.section
+          nextItem = current.item + 1
         }
-      } else {
-        nextSection = current.section
-        nextItem = current.item + 1
-      }
-    default:
-      return
+      default:
+        return
     }
 
     guard nextItem >= 0 else { return }
@@ -734,9 +734,9 @@ extension SearchViewController {
     if gestureRecognizer.state == .began {
       let location = gestureRecognizer.location(in: self.tableView)
       if let indexPath = tableView.indexPathForRow(at: location),
-        let section = availableSections[safe: indexPath.section],
-        let suggestion = suggestions[safe: indexPath.row],
-        section == .searchSuggestions {
+         let section = availableSections[safe: indexPath.section],
+         let suggestion = suggestions[safe: indexPath.row],
+         section == .searchSuggestions {
         searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
       }
     }
