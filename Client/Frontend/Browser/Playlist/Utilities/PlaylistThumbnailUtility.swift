@@ -9,6 +9,7 @@ import CoreImage
 import Combine
 import SDWebImage
 import Shared
+import Data
 
 private let log = Logger.browserLogger
 
@@ -265,7 +266,8 @@ private class FavIconImageRenderer {
     func loadIcon(siteURL: URL, completion: ((UIImage?) -> Void)?) {
         task?.cancel()
         task = DispatchWorkItem {
-            var faviconFetcher: FaviconFetcher? = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: nil)
+            let domain = Domain.getOrCreate(forUrl: siteURL, persistent: false)
+            var faviconFetcher: FaviconFetcher? = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
             faviconFetcher?.load() { [weak self] _, attributes in
                 faviconFetcher = nil
                 
@@ -278,10 +280,22 @@ private class FavIconImageRenderer {
                 
                 if let image = attributes.image {
                     if let backgroundColor = attributes.backgroundColor,
-                       let image = image.cgImage {
-                        let finalImage = self.renderOnImageContext { context, rect in
+                       let cgImage = image.cgImage {
+                        // attributes.includesPadding sometimes returns 0 for icons that should. It's better this way to always include the padding.
+                        let padding = 4.0
+                        let size = CGSize(width: image.size.width + padding,
+                                          height: image.size.height + padding)
+                        
+                        let finalImage = self.renderOnImageContext(size: size) { context, rect in
+                            context.saveGState()
                             context.setFillColor(backgroundColor.cgColor)
-                            context.draw(image, in: rect)
+                            context.fill(rect)
+                            
+                            context.translateBy(x: 0.0, y: rect.size.height)
+                            context.scaleBy(x: 1.0, y: -1.0)
+                            
+                            context.draw(cgImage, in: rect.insetBy(dx: padding, dy: padding))
+                            context.restoreGState()
                         }
                         completion?(finalImage)
                     } else {
@@ -300,8 +314,20 @@ private class FavIconImageRenderer {
                         fallbackCharacter: nil
                     )
                     
-                    let finalImage = self.renderOnImageContext { context, _ in
+                    let finalImage = self.renderOnImageContext { context, rect in
+                        label.frame = rect
+                        let padding = 2.0
+                        
+                        context.saveGState()
+                        if let backgroundColor = attributes.backgroundColor?.cgColor {
+                            context.setFillColor(backgroundColor)
+                            context.fill(rect)
+                        }
+                        
+                        context.translateBy(x: rect.minX + ((rect.width - label.frame.width) / 2.0) + padding,
+                                            y: rect.minY + ((rect.height - label.frame.height) / 2.0) + 0.0)
                         label.layer.render(in: context)
+                        context.restoreGState()
                     }
                     
                     completion?(finalImage)
@@ -314,12 +340,16 @@ private class FavIconImageRenderer {
         }
     }
     
-    private func renderOnImageContext(_ draw: (CGContext, CGRect) -> Void) -> UIImage? {
-        let size = CGSize(width: 100.0, height: 100.0)
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+    private func renderOnImageContext(size: CGSize, _ draw: (CGContext, CGRect) -> Void) -> UIImage? {
+        let size = CGSize(width: size.width, height: size.height)
+        UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
         draw(UIGraphicsGetCurrentContext()!, CGRect(size: size))
         let img = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return img
+    }
+    
+    private func renderOnImageContext(_ draw: (CGContext, CGRect) -> Void) -> UIImage? {
+        renderOnImageContext(size: CGSize(width: 16.0, height: 16.0), draw)
     }
 }
