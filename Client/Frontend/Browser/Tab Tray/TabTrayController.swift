@@ -194,7 +194,6 @@ class TabTrayController: LoadingViewController {
     @objc func newTabAction() {
         tabTraySearchController.isActive = false
                 
-        
         let wasPrivateModeInfoShowing = tabTrayView.isPrivateModeInfoShowing
         if privateMode {
             tabTrayView.hidePrivateModeInfo()

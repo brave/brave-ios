@@ -49,7 +49,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         case searchSuggestionsOptIn
         case searchSuggestions
         case findInPage
-        case bookmarksAndHistory
+        case bookmarksAndHistoryAndTabs
     }
 
     // MARK: Properties
@@ -75,10 +75,6 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     private let searchEngineScrollViewContent = UIView().then {
         $0.backgroundColor = .braveBackground
     }
-    
-    private lazy var bookmarkedBadge: UIImage = {
-        return #imageLiteral(resourceName: "bookmarked_passive")
-    }()
 
     private var suggestions = [String]()
     private lazy var suggestionLongPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onSuggestionLongPressed(_:)))
@@ -154,7 +150,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             sections.append(.searchSuggestions)
         }
         sections.append(.findInPage)
-        sections.append(.bookmarksAndHistory)
+        sections.append(.bookmarksAndHistoryAndTabs)
         return sections
     }
 
@@ -447,8 +443,11 @@ class SearchViewController: SiteTableViewController, LoaderListener {
                 }
                 searchDelegate?.searchViewController(self, didSelectURL: url)
             }
-        case .bookmarksAndHistory:
+        case .bookmarksAndHistoryAndTabs:
             let site = data[indexPath.row]
+            
+            //TODO: For Tab selection add open tab
+                
             if let url = URL(string: site.url) {
                 searchDelegate?.searchViewController(self, didSelectURL: url)
             }
@@ -467,7 +466,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
                 return 100.0
             case .searchSuggestions:
                 return 44.0
-            case .bookmarksAndHistory:
+            case .bookmarksAndHistoryAndTabs:
                 return super.tableView(tableView, heightForRowAt: indexPath)
             case .findInPage:
                 return super.tableView(tableView, heightForRowAt: indexPath)
@@ -492,7 +491,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
                 return String(format: Strings.searchSuggestionSectionTitleFormat, defaultSearchEngine.displayName)
             }
             return Strings.searchSuggestionsSectionHeader
-        case .bookmarksAndHistory: return Strings.searchHistorySectionHeader
+        case .bookmarksAndHistoryAndTabs: return Strings.searchHistorySectionHeader
         case .findInPage: return Strings.findOnPageSectionHeader
         }
     }
@@ -514,7 +513,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             return 0.0
         case .searchSuggestions:
             return suggestions.isEmpty ? 0 : headerHeight * 2.0
-        case .bookmarksAndHistory: return data.isEmpty ? 0 : headerHeight
+        case .bookmarksAndHistoryAndTabs: return data.isEmpty ? 0 : headerHeight
         case .findInPage:
             if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
                 return headerHeight
@@ -538,7 +537,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             return footerHeight
         case .searchSuggestions:
             return suggestions.isEmpty ? CGFloat.leastNormalMagnitude : footerHeight
-        case .bookmarksAndHistory: return footerHeight
+        case .bookmarksAndHistoryAndTabs: return footerHeight
         case .findInPage:
             return CGFloat.leastNormalMagnitude
         }
@@ -591,14 +590,15 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             }
             return cell
 
-        case .bookmarksAndHistory:
+        case .bookmarksAndHistoryAndTabs:
             let cell = super.tableView(tableView, cellForRowAt: indexPath)
             let site = data[indexPath.row]
             if let cell = cell as? TwoLineTableViewCell {
-                let isBookmark = site.bookmarked ?? false
                 cell.textLabel?.textColor = .bravePrimary
                 cell.setLines(site.title, detailText: site.url)
-                cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
+                cell.setRightBadge(site.siteType.icon?.template ?? nil)
+                cell.accessoryView?.tintColor = .secondaryButtonTint
+                
                 cell.imageView?.contentMode = .scaleAspectFit
                 cell.imageView?.layer.borderColor = SearchViewControllerUX.iconBorderColor.cgColor
                 cell.imageView?.layer.borderWidth = SearchViewControllerUX.iconBorderWidth
@@ -634,7 +634,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         case .searchSuggestions:
             guard let shouldShowSuggestions =  searchEngines?.shouldShowSearchSuggestions else { return 0 }
             return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
-        case .bookmarksAndHistory:
+        case .bookmarksAndHistoryAndTabs:
             return data.count
         case .findInPage:
             if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
@@ -653,7 +653,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
             return
         }
 
-        if section == .bookmarksAndHistory {
+        if section == .bookmarksAndHistoryAndTabs {
             let suggestion = data[indexPath.item]
             searchDelegate?.searchViewController(self, didHighlightText: suggestion.url, search: false)
         }
@@ -676,7 +676,7 @@ extension SearchViewController: KeyboardHelperDelegate {
 
 extension SearchViewController {
     func handleKeyCommands(sender: UIKeyCommand) {
-        let initialSection = SearchListSection.bookmarksAndHistory.rawValue
+        let initialSection = SearchListSection.bookmarksAndHistoryAndTabs.rawValue
         
         guard let current = tableView.indexPathForSelectedRow else {
             let numberOfRows = tableView(tableView, numberOfRowsInSection: initialSection)
