@@ -309,25 +309,43 @@ private class FavIconImageRenderer {
                         $0.minimumScaleFactor = 0.5
                     }
                     
-                    label.text = FaviconFetcher.monogramLetter(
+                    let text = FaviconFetcher.monogramLetter(
                         for: siteURL,
                         fallbackCharacter: nil
-                    )
+                    ) as NSString
                     
+                    let padding = 4.0
                     let finalImage = self.renderOnImageContext { context, rect in
-                        label.frame = rect
-                        let padding = 2.0
+                        let font = label.font!
+                        var fontSize = font.pointSize
                         
-                        context.saveGState()
+                        // Estimate the size of the font required to fit the context's bounds + padding
+                        // Usually we can do this by iterating and calculating the size that fits
+                        // But this is a very good estimated size
+                        let newSize = text.size(withAttributes: [.font: font.withSize(fontSize)])
+                        let ratio = min((rect.size.width - padding) / newSize.width,
+                                        (rect.size.height - padding) / newSize.height)
+                        fontSize *= ratio
+                        
+                        if fontSize < label.font.pointSize * 0.5 {
+                            fontSize = label.font.pointSize * 0.5
+                        }
+                        
                         if let backgroundColor = attributes.backgroundColor?.cgColor {
                             context.setFillColor(backgroundColor)
                             context.fill(rect)
                         }
                         
-                        context.translateBy(x: rect.minX + ((rect.width - label.frame.width) / 2.0) + padding,
-                                            y: rect.minY + ((rect.height - label.frame.height) / 2.0) + 0.0)
-                        label.layer.render(in: context)
-                        context.restoreGState()
+                        let newFont = font.withSize(fontSize)
+                        let size = text.size(withAttributes: [.font: newFont])
+                        
+                        // Center the text drawing in the CGContext
+                        let x = (rect.size.width - size.width) / 2.0
+                        let y = (rect.size.height - size.height) / 2.0
+                        
+                        text.draw(in: rect.insetBy(dx: x, dy: y),
+                                  withAttributes: [.font: newFont,
+                                                   .foregroundColor: UIColor.white])
                     }
                     
                     completion?(finalImage)
