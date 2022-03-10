@@ -11,5 +11,12 @@ struct PrivacyReportsItem: Identifiable {
   }
   
   let domainOrTracker: String
+  let faviconUrl: String?
   let count: Int
+  
+  init(domainOrTracker: String, faviconUrl: String? = nil, count: Int) {
+    self.domainOrTracker = domainOrTracker
+    self.faviconUrl = faviconUrl
+    self.count = count
+  }
 }

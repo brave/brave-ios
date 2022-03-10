@@ -17,6 +17,7 @@ public enum BlockedResourceType: Int32 {
 public final class BlockedResource: NSManagedObject, CRUD {
     @NSManaged public var consolidationCount: Int32
     @NSManaged public var domain: String
+    @NSManaged public var faviconUrl: String
     @NSManaged public var host: String
     @NSManaged public var resourceType: Int32
     @NSManaged public var timestamp: Date
@@ -26,7 +27,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     private static let domainKeyPath = #keyPath(BlockedResource.domain)
     private static let timestampKeyPath = #keyPath(BlockedResource.timestamp)
     
-    public static func create(host: String, domain: String, resourceType: BlockedResourceType, timestamp: Date = Date()) {
+    public static func create(host: String, domain: URL, resourceType: BlockedResourceType, timestamp: Date = Date()) {
         DataController.perform { context in
             guard let entity = entity(in: context) else {
                 log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
@@ -34,9 +35,14 @@ public final class BlockedResource: NSManagedObject, CRUD {
                 return
             }
             
+            guard let baseDomain = domain.baseDomain else {
+                return
+            }
+            
             let blockedResource = BlockedResource(entity: entity, insertInto: context)
             blockedResource.host = host
-            blockedResource.domain = domain
+            blockedResource.domain = baseDomain
+            blockedResource.faviconUrl = domain.domainURL.absoluteString
             blockedResource.resourceType = resourceType.rawValue
             blockedResource.timestamp = timestamp
         }
@@ -117,23 +123,36 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
-    public static func allTimeMostRiskyWebsites() -> [(String, Int)] {
-        var maxNumberOfSites = [(String, Int)]()
+    public static func allTimeMostRiskyWebsites() -> [(domain: String, faviconUrl: String, count: Int)] {
+        var maxNumberOfSites = [(domain: String, faviconUrl: String, count: Int)]()
         
         do {
-            let results = try groupByFetch(property: domainKeyPath, daysRange: nil)
+            let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
+            let context = DataController.viewContext
+            fetchRequest.entity = BlockedResource.entity(in: context)
+            
+            let expression = NSExpressionDescription()
+            expression.name = "favicon"
+            expression.expression = .init(forFunction: "lowercase:", arguments: [NSExpression(forKeyPath: "faviconUrl")])
+            expression.expressionResultType = .stringAttributeType
+            
+            fetchRequest.propertiesToFetch = ["domain", expression]
+            fetchRequest.propertiesToGroupBy = ["domain"]
+            fetchRequest.resultType = .dictionaryResultType
+            
+            let results = try context.fetch(fetchRequest)
             
             for result in results {
-                guard let domain = result[domainKeyPath] as? String else {
+                guard let domain = result[domainKeyPath] as? String, let favicon = result["favicon"] as? String else {
                     continue
                 }
-                
+
                 let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
-                
-                maxNumberOfSites.append((domain, result))
+
+                maxNumberOfSites.append((domain, favicon, result))
             }
             
-            return maxNumberOfSites.sorted(by: { $0.1 > $1.1 })
+            return maxNumberOfSites.sorted(by: { $0.count > $1.count })
         } catch {
             log.error(error)
             return []

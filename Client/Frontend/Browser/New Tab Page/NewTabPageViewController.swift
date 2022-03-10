@@ -140,7 +140,7 @@ class NewTabPageViewController: UIViewController {
                     }
                     
                     let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
-                        PrivacyReportsItem(domainOrTracker: $0.0, count: $0.1)
+                        PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
                     }
                 
                 let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,

@@ -11,8 +11,12 @@ private struct FaviconImage: View {
   
   @StateObject private var faviconLoader = PlaylistFolderImageLoader()
   
-  init(url: String) {
-    self.url = URL(string: url)
+  init(url: String?) {
+    if let url = url {
+      self.url = URL(string: url)
+    } else {
+      self.url = nil
+    }
   }
   
   var body: some View {
@@ -147,7 +151,7 @@ struct PrivacyReportAllTimeListsView: View {
           Section {
             ForEach(allTimeListWebsites) { item in
               HStack {
-                FaviconImage(url: item.domainOrTracker)
+                FaviconImage(url: item.faviconUrl)
                 Text(item.domainOrTracker)
                 Spacer()
                 Text("\(item.count)")
