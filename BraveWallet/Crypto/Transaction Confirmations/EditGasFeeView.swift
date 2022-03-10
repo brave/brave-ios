@@ -23,7 +23,7 @@ struct EditGasFeeView: View {
   
   @State private var perGasPrice: String = ""
   @State private var gasLimit: String = ""
-  @State private var showError: Bool = false
+  @State private var isShowingAlert: Bool = false
   
   private func setup() {
     perGasPrice = WeiFormatter.weiToDecimalGwei(transaction.ethTxGasPrice.removingHexPrefix, radix: .hex) ?? "0"
@@ -56,7 +56,7 @@ struct EditGasFeeView: View {
       if success {
         presentationMode.dismiss()
       } else {
-        showError = true
+        isShowingAlert = true
       }
     }
   }
@@ -108,7 +108,7 @@ struct EditGasFeeView: View {
     .listStyle(InsetGroupedListStyle())
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(Strings.Wallet.editGasTitle)
-    .alert(isPresented: $showError) {
+    .alert(isPresented: $isShowingAlert) {
       Alert(
         title: Text(Strings.Wallet.unknownError),
         message: Text(Strings.Wallet.editTransactionError),

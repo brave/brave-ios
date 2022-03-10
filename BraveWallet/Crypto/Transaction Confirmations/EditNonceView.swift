@@ -14,7 +14,7 @@ struct EditNonceView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var nonce = ""
-  @State private var showError = false
+  @State private var isShowingAlert = false
   
   var body: some View {
     List {
@@ -36,7 +36,7 @@ struct EditNonceView: View {
                 if success {
                   presentationMode.dismiss()
                 } else {
-                  showError = true
+                  isShowingAlert = true
                }
               }
           }
@@ -53,7 +53,7 @@ struct EditNonceView: View {
     .listStyle(InsetGroupedListStyle())
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(Strings.Wallet.advancedSettingsTransaction)
-    .alert(isPresented: $showError) {
+    .alert(isPresented: $isShowingAlert) {
       Alert(
         title: Text(Strings.Wallet.unknownError),
         message: Text(Strings.Wallet.editTransactionError),
