@@ -184,7 +184,7 @@ public class SwapTokenStore: ObservableObject {
 
   private func swapParameters(
     for base: SwapParamsBase,
-    in network: BraveWallet.EthereumChain
+    in network: BraveWallet.NetworkInfo
   ) -> BraveWallet.SwapParams? {
     guard
       let accountInfo = accountInfo,
@@ -590,7 +590,7 @@ public class SwapTokenStore: ObservableObject {
   func prepare(with accountInfo: BraveWallet.AccountInfo, completion: (() -> Void)? = nil) {
     self.accountInfo = accountInfo
 
-    func updateSelectedTokens(in network: BraveWallet.EthereumChain) {
+    func updateSelectedTokens(in network: BraveWallet.NetworkInfo) {
       if let fromToken = selectedFromToken {  // refresh balance
         rpcService.balance(for: fromToken, in: accountInfo) { [weak self] balance in
           self?.selectedFromTokenBalance = BDouble(balance ?? 0)
@@ -703,7 +703,7 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
 }
 
 extension SwapTokenStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String) {
+  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
     guard
       let accountInfo = accountInfo,
       chainId == BraveWallet.MainnetChainId || chainId == BraveWallet.RopstenChainId

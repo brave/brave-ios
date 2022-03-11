@@ -49,7 +49,7 @@ public class TransactionConfirmationStore: ObservableObject {
   private let walletService: BraveWalletBraveWalletService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
   private let keyringService: BraveWalletKeyringService
-  private var selectedChain: BraveWallet.EthereumChain = .init()
+  private var selectedChain: BraveWallet.NetworkInfo = .init()
 
   init(
     assetRatioService: BraveWalletAssetRatioService,

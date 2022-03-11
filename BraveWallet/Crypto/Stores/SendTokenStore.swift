@@ -318,7 +318,7 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
 }
 
 extension SendTokenStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String) {
+  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
     // nil `selectedSendToken` to force refresh `selectedSendToken` in `fetchAssets()`
     selectedSendToken = nil
     fetchAssets()
