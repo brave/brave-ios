@@ -158,7 +158,7 @@
 "BraveSync" = "Eşitleme";
 
 /* Sync-Internals screen title (Sync Internals or Sync Debugging is fine). */
-"BraveSyncInternalsTitle" = "Dahili Unsurları Eşitle";
+"BraveSyncInternalsTitle" = "Senkronizasyon Hata Ayıklama";
 
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Başlamak için, senkronize etmeyi planladığınız tüm cihazlarda Brave'in yüklü olması gerekir. Bunları birbirine zincirlemek için, tüm cihazlarınızı güvenli bir şekilde birbirine bağlarken kullanacağınız bir eşitleme zinciri başlatın.";
