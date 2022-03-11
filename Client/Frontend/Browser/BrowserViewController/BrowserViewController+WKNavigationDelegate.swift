@@ -183,10 +183,21 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-
-    // Check if custom user scripts must be added to the web view.
     let tab = tabManager[webView]
-    tab?.userScriptManager?.handleDomainUserScript(for: url)
+
+    #if DEBUG
+    print("[NAV] -------------------------------")
+    print("[NAV] Tab URL:     \(tab?.url?.absoluteString ?? "nil")")
+    print("[NAV] MD URL:      \(navigationAction.request.mainDocumentURL?.absoluteString ?? "nil")")
+    print("[NAV] WebView URL: \(webView.url?.absoluteString ?? "nil")")
+    print("[NAV] Next URL:    \(url.absoluteString)")
+    print("[NAV] type:        \(String(reflecting: navigationAction.navigationType))")
+    #endif
+
+    // Check if custom user scripts must be added to or removed from the web view.
+    tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
+      for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
+    )
 
     // Brave Search logic.
 
@@ -268,17 +279,8 @@ extension BrowserViewController: WKNavigationDelegate {
         on.compactMap { $0.rule }.forEach(controller.add)
         off.compactMap { $0.rule }.forEach(controller.remove)
 
-        if let tab = tabManager[webView] {
-          tab.userScriptManager?.isFingerprintingProtectionEnabled =
-            domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
-        }
-
         let isScriptsEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
-        if #available(iOS 14.0, *) {
           preferences.allowsContentJavaScript = isScriptsEnabled
-        } else {
-          webView.configuration.preferences.javaScriptEnabled = isScriptsEnabled
-        }
       }
 
       // Cookie Blocking code below
@@ -513,5 +515,20 @@ extension BrowserViewController: WKNavigationDelegate {
   func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
     guard let tab = tabManager[webView], let url = webView.url, rewards.isEnabled else { return }
     tab.redirectURLs.append(url)
+  }
+}
+
+extension WKNavigationType: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    switch self {
+    case .linkActivated: return "linkActivated"
+    case .formResubmitted: return "formResubmitted"
+    case .backForward: return "backForward"
+    case .formSubmitted: return "formSubmitted"
+    case .other: return "other"
+    case .reload: return "reload"
+    @unknown default:
+      return "Unknown(\(rawValue))"
+    }
   }
 }
