@@ -150,21 +150,21 @@ public class PortfolioStore: ObservableObject {
   }
 
   func update() {
-    self.isLoadingBalances = true
-    self.rpcService.chainId { [self] chainId in
+    isLoadingBalances = true
+    rpcService.chainId { [self] chainId in
       // Get user assets for the selected chain
-      self.walletService.userAssets(chainId) { [self] tokens in
+      walletService.userAssets(chainId) { [self] tokens in
         let visibleTokens = tokens.filter(\.visible)
         let dispatchGroup = DispatchGroup()
         // fetch user balances, then fetch price history for tokens with non-zero balance
         var balances: [String: Double] = [:]
         var priceHistories: [String: [BraveWallet.AssetTimePrice]] = [:]
         dispatchGroup.enter()
-        self.keyringService.defaultKeyringInfo { keyring in
-          self.fetchBalances(for: visibleTokens, accounts: keyring.accountInfos) { fetchedBalances in
+        keyringService.defaultKeyringInfo { keyring in
+          fetchBalances(for: visibleTokens, accounts: keyring.accountInfos) { fetchedBalances in
             balances = fetchedBalances
             let nonZeroBalanceTokens = balances.filter { $1 > 0 }.map { $0.key }
-            self.fetchPriceHistory(for: nonZeroBalanceTokens) { fetchedPriceHistories in
+            fetchPriceHistory(for: nonZeroBalanceTokens) { fetchedPriceHistories in
               defer { dispatchGroup.leave() }
               priceHistories = fetchedPriceHistories
             }
@@ -174,13 +174,13 @@ public class PortfolioStore: ObservableObject {
         let visibleTokenSymbols = visibleTokens.map { $0.symbol.lowercased() }
         var prices: [String: String] = [:]
         dispatchGroup.enter()
-        self.fetchPrices(for: visibleTokenSymbols) { fetchedPrices in
+        fetchPrices(for: visibleTokenSymbols) { fetchedPrices in
           defer { dispatchGroup.leave() }
           prices = fetchedPrices
         }
         dispatchGroup.notify(queue: .main) {
           // build our userVisibleAssets
-          self.userVisibleAssets = visibleTokens.map { token in
+          userVisibleAssets = visibleTokens.map { token in
             let symbol = token.symbol.lowercased()
             return AssetViewModel(
               token: token,
@@ -198,21 +198,21 @@ public class PortfolioStore: ObservableObject {
               return nil
             }
             .reduce(0.0, +)
-          self.balance = self.numberFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
+          balance = numberFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
           // Compute historical balances based on historical prices and current balances
           let assets = userVisibleAssets.filter { !$0.history.isEmpty } // [[AssetTimePrice]]
           let minCount = assets.map(\.history.count).min() ?? 0 // Shortest array count
-          self.historicalBalances = (0..<minCount).map { index in
+          historicalBalances = (0..<minCount).map { index in
             let value = assets.reduce(0.0, {
               $0 + ((Double($1.history[index].price) ?? 0.0) * $1.decimalBalance)
             })
             return .init(
               date: assets.map { $0.history[index].date }.max() ?? .init(),
               price: value,
-              formattedPrice: self.numberFormatter.string(from: NSNumber(value: value)) ?? "0.00"
+              formattedPrice: numberFormatter.string(from: NSNumber(value: value)) ?? "0.00"
             )
           }
-          self.isLoadingBalances = false
+          isLoadingBalances = false
         }
       }
     }
