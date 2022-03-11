@@ -316,13 +316,15 @@ private class FavIconImageRenderer {
                     
                     let padding = 4.0
                     let finalImage = self.renderOnImageContext { context, rect in
-                        let font = label.font!
+                        guard let font = label.font else { return }
                         var fontSize = font.pointSize
                         
                         // Estimate the size of the font required to fit the context's bounds + padding
                         // Usually we can do this by iterating and calculating the size that fits
                         // But this is a very good estimated size
                         let newSize = text.size(withAttributes: [.font: font.withSize(fontSize)])
+                        guard newSize.width > 0.0 && newSize.height > 0.0 else { return }
+                        
                         let ratio = min((rect.size.width - padding) / newSize.width,
                                         (rect.size.height - padding) / newSize.height)
                         fontSize *= ratio
