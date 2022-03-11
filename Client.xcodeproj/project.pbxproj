@@ -502,9 +502,9 @@
 		2891F2CB1F991185001B105E /* v33.db in Resources */ = {isa = PBXBuildFile; fileRef = 2891F2BA1F991185001B105E /* v33.db */; };
 		289A4C131C4EB90600A460E3 /* StorageTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289A4C121C4EB90600A460E3 /* StorageTestUtils.swift */; };
 		2F098F8B255F2D730084FB37 /* BrowserViewController+ReaderMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */; };
-		2F12744027DA56C7007EE7B7 /* LoginInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12743F27DA56C6007EE7B7 /* LoginInfoViewController.swift */; };
 		2F1273C027D67232007EE7B7 /* NightModeHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F1273B527D67232007EE7B7 /* NightModeHelper.js */; };
 		2F1273C427D67414007EE7B7 /* NightModeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F1273C327D67413007EE7B7 /* NightModeHelper.swift */; };
+		2F12744027DA56C7007EE7B7 /* LoginInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12743F27DA56C6007EE7B7 /* LoginInfoViewController.swift */; };
 		2F12A176260A3B17005A8C2B /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */; };
 		2F13B801273311CB00253A4D /* BrowserViewController+Callout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */; };
 		2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */; };
@@ -2242,9 +2242,9 @@
 		28A6CE891AC082E200C1A2D4 /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		28CE83E81A1D206D00576538 /* Client-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Client-Bridging-Header.h"; sourceTree = "<group>"; };
 		2F098F8A255F2D730084FB37 /* BrowserViewController+ReaderMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+ReaderMode.swift"; sourceTree = "<group>"; };
-		2F12743F27DA56C6007EE7B7 /* LoginInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginInfoViewController.swift; sourceTree = "<group>"; };
 		2F1273B527D67232007EE7B7 /* NightModeHelper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = NightModeHelper.js; sourceTree = "<group>"; };
 		2F1273C327D67413007EE7B7 /* NightModeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightModeHelper.swift; sourceTree = "<group>"; };
+		2F12743F27DA56C6007EE7B7 /* LoginInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginInfoViewController.swift; sourceTree = "<group>"; };
 		2F12A175260A3B17005A8C2B /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		2F13B800273311CB00253A4D /* BrowserViewController+Callout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowserViewController+Callout.swift"; sourceTree = "<group>"; };
 		2F13E79A1AC0C02700D75081 /* StringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensionsTests.swift; sourceTree = "<group>"; };

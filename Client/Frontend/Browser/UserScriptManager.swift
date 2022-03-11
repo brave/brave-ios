@@ -343,15 +343,10 @@ class UserScriptManager {
     }()
     
     private let NightModeScript: WKUserScript? = {
-        guard let path = Bundle.main.path(forResource: "NightModeHelper", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
-            log.error("Failed to load night mode user script")
-            return nil
-        }
-
-        return WKUserScript.create(source: source,
+        return WKUserScript.create(source: "window.__firefox__.NightMode.setEnabled(true);",
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: true,
-                            in: .page)
+                            in: .defaultClient)
     }()
 
     private func reloadUserScripts() {

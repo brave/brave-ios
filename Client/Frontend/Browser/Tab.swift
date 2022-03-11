@@ -210,14 +210,17 @@ class Tab: NSObject {
 
     var nightMode: Bool {
         didSet {
-            if nightMode {
-                webView?.evaluateSafeJavaScript(
-                    functionName: "__firefox__.NightMode.setEnabled",
-                    args: ["true"],
-                    contentWorld: .defaultClient) {  _, error in
-                    if let error = error {
-                        log.error("Error executing script: \(error)")
-                    }
+            guard nightMode != oldValue else {
+                return
+            }
+            
+            webView?.evaluateSafeJavaScript(
+                functionName: "window.__firefox__.NightMode.setEnabled",
+                args: [nightMode],
+                contentWorld: .defaultClient,
+                asFunction: true) {  _, error in
+                if let error = error {
+                    log.error("Error executing script: \(error)")
                 }
             }
             
@@ -520,14 +523,12 @@ class Tab: NSObject {
 
         if let _ = webView?.reloadFromOrigin() {
             log.debug("reloaded zombified tab from origin")
-            nightMode = Preferences.General.nightModeEnabled.value
             return
         }
 
         if let webView = self.webView {
             log.debug("restoring webView from scratch")
             restore(webView, restorationData: sessionData?.savedTabData)
-            nightMode = Preferences.General.nightModeEnabled.value
         }
     }
     
