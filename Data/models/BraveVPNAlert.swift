@@ -9,19 +9,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-public final class BraveVPNAlert: NSManagedObject, CRUD {
-    enum Action: Int {
-        case drop
-        case detected
-    }
-    
-    public enum Category: Int {
-        case securityPhishing
-        case privacyTrackerAppLocation
-        case privacyTrackerApp
-        case encryptionAllowInvalidHttps
-        case adsAggresive
-    }
+public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
     
     @NSManaged public var action: Int32
     @NSManaged public var category: Int32
@@ -32,20 +20,41 @@ public final class BraveVPNAlert: NSManagedObject, CRUD {
     @NSManaged public var uuid: String
     @NSManaged public var timestamp: Date
     
-    public static func create() {
+    public var categoryEnum: VPNAlertJSONModel.Category? {
+        return .init(rawValue: Int(category))
+    }
+    
+    public var id: String {
+        uuid
+    }
+    
+    public static func batchCreate(alerts: [VPNAlertJSONModel]) {
         DataController.perform { context in
             guard let entity = entity(in: context) else {
                 log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
-
+                
                 return
             }
             
-//            let blockedResource = BlockedResource(entity: entity, insertInto: context)
-//            blockedResource.url = url.absoluteString
-//            blockedResource.domain = domain.absoluteString
-//            blockedResource.resourceType = resourceType.rawValue
-//            blockedResource.timestamp = timestamp
+            alerts.forEach {
+                let vpnAlert = BraveVPNAlert(entity: entity, insertInto: context)
+                vpnAlert.action = Int32($0.action.rawValue)
+                vpnAlert.category = Int32($0.category.rawValue)
+                vpnAlert.count = 1 // FIXME: Handle consolidation.
+                vpnAlert.host = $0.host
+                vpnAlert.message = $0.message
+                vpnAlert.title = $0.title
+                vpnAlert.uuid = $0.uuid
+                vpnAlert.timestamp = $0.timestamp
+            }
         }
+    }
+    
+    public static func last(_ count: Int) -> [BraveVPNAlert]? {
+        
+        let dateSort = NSSortDescriptor(keyPath: \BraveVPNAlert.timestamp, ascending: false)
+        
+        return all(sortDescriptors: [dateSort], fetchLimit: count)
     }
     
     private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {

@@ -143,12 +143,15 @@ class NewTabPageViewController: UIViewController {
                         PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
                     }
                 
+                    let last = BraveVPNAlert.last(3)
+                    
                 let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
                                               lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
                                               allTimeMostFrequentTracker: allTimeMostFrequentTracker,
                                                   allTimeRiskiestWebsite: allTimeRiskiestWebsite,
                                                   allTimeListTrackers: allTimeListTracker,
-                                                  allTimeListWebsites: allTimeListWebsites)
+                                                  allTimeListWebsites: allTimeListWebsites,
+                                                  lastVPNAlerts: last)
                 
                 let host = UIHostingController(rootView: view)
                 host.rootView.onDismiss = { [weak host] in

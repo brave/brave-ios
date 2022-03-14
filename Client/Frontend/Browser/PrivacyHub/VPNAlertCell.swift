@@ -3,68 +3,67 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
+import Data
 
 struct VPNAlertCell: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
-  enum AlertType {
-    case data, location, mail
-    
-    var assetName: String {
-      switch self {
-      case .data: return "vpn_data_tracker"
-      case .location: return "vpn_location_tracker"
-      case .mail: return "vpn_mail_tracker"
-      }
-    }
-    
-    var headerText: String {
-      switch self {
-      case .data: return "Tracker & Ad"
-      case .location: return "Location Pings"
-      case .mail: return "Email tracker"
-      }
-    }
-  }
-  
   var date: String {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium
     formatter.timeStyle = .short
-    return formatter.string(from: vpnAlert.date)
+    return formatter.string(from: vpnAlert.timestamp)
   }
   
-  struct VPNAlert: Hashable {
-    let date: Date
-    let text: String
-    let type: AlertType
+  private func assetName(for type: VPNAlertJSONModel.Category) -> String {
+    switch type {
+    case .privacyTrackerApp: return "vpn_data_tracker"
+    case .privacyTrackerAppLocation: return "vpn_location_tracker"
+    case .privacyTrackerMail: return "vpn_mail_tracker"
+    }
   }
   
-  private let vpnAlert: VPNAlert
+  private func headerText(for type: VPNAlertJSONModel.Category) -> String {
+    switch type {
+    case .privacyTrackerApp: return "Tracker & Ad"
+    case .privacyTrackerAppLocation: return "Location Pings"
+    case .privacyTrackerMail: return "Email tracker"
+    }
+  }
   
-  init(vpnAlert: VPNAlert) {
+  private let vpnAlert: BraveVPNAlert
+  
+  init(vpnAlert: BraveVPNAlert) {
     self.vpnAlert = vpnAlert
   }
   
-  @State private var vpnAlertsEnabled = true
+  private var headerText: some View {
+    Group {
+      if let category = vpnAlert.categoryEnum {
+        Text(headerText(for: category))
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .font(.caption.weight(.semibold))
+      } else {
+        EmptyView()
+      }
+    }
+  }
   
   var body: some View {
     HStack(alignment: .top) {
-      Image(vpnAlert.type.assetName)
+      Image(assetName(for: vpnAlert.categoryEnum!))
       VStack(alignment: .leading) {
         
         Group {
           if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
             VStack(alignment: .leading, spacing: 4) {
-              Text(vpnAlert.type.headerText)
-                .foregroundColor(Color(.secondaryBraveLabel))
+              headerText
               PrivacyReportsView.BlockedLabel()
             }
           } else {
             HStack(spacing: 4) {
-              Text(vpnAlert.type.headerText)
-                .foregroundColor(Color(.secondaryBraveLabel))
+              headerText
               PrivacyReportsView.BlockedLabel()
             }
           }
@@ -72,7 +71,7 @@ struct VPNAlertCell: View {
         .font(.caption.weight(.semibold))
         
         VStack(alignment: .leading, spacing: 4) {
-          Text(vpnAlert.text)
+          Text(vpnAlert.message)
             .font(.callout)
           
           Text(date)

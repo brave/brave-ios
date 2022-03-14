@@ -5,32 +5,31 @@
 
 import Foundation
 
-struct VPNAlertModel: Decodable {
-    enum Action: Int {
+public struct VPNAlertJSONModel: Decodable {
+    public enum Action: Int {
         case drop
+        case detected
     }
     
-    enum Category: Int {
-        case securityPhishing
+    public enum Category: Int {
         case privacyTrackerAppLocation
         case privacyTrackerApp
-        case encryptionAllowInvalidHttps
-        case adsAggresive
+        case privacyTrackerMail
     }
     
     enum CodingKeys: String, CodingKey {
         case uuid, action, category, host, message, timestamp, title
     }
     
-    let uuid: String
-    let action: Action
-    let category: Category
-    let host: String
-    let message: String
-    let timestamp: Date
-    let title: String
+    public let uuid: String
+    public let action: Action
+    public let category: Category
+    public let host: String
+    public let message: String
+    public let timestamp: Date
+    public let title: String
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.uuid = try container.decode(String.self, forKey: .uuid)
@@ -51,16 +50,12 @@ struct VPNAlertModel: Decodable {
         
         let categoryString = try container.decode(String.self, forKey: .category)
         switch categoryString {
-        case "security-phishing":
-            self.category = .securityPhishing
+        case "privacy-tracker-mail":
+            self.category = .privacyTrackerMail
         case "privacy-tracker-app-location":
             self.category = .privacyTrackerAppLocation
         case "privacy-tracker-app":
             self.category = .privacyTrackerApp
-        case "encryption-allows-invalid-https":
-            self.category = .encryptionAllowInvalidHttps
-        case "ads/aggressive":
-            self.category = .adsAggresive
         default:
             throw "Casting `category` failed, incorrect value: \(categoryString)"
         }

@@ -7,6 +7,7 @@ import UIKit
 import Shared
 import BraveShared
 import NetworkExtension
+import Data
 
 private let log = Logger.browserLogger
 
@@ -661,7 +662,7 @@ class BraveVPN {
     }
     
     private static func processVPNAlerts() {
-        Task.init {
+        Task {
             let (data, success, error) = await GRDGatewayAPI.shared().events()
             if !success {
                 log.error("VPN getEvents call failed")
@@ -680,9 +681,9 @@ class BraveVPN {
             do {
                 let dataAsJSON =
                 try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
-                let decoded = try JSONDecoder().decode([VPNAlertModel].self, from: dataAsJSON)
+                let decoded = try JSONDecoder().decode([VPNAlertJSONModel].self, from: dataAsJSON)
                 
-                print("bxx data: \(decoded)")
+                BraveVPNAlert.batchCreate(alerts: decoded)
             } catch {
                 log.error("Error: \(error)")
             }

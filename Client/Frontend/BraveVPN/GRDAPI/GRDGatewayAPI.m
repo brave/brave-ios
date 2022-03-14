@@ -309,7 +309,7 @@
 }
 
 - (NSArray *)_fakeAlertsArray {
-    NSString *curDateStr = [NSString stringWithFormat:@"%f", [[NSDate date] timeIntervalSince1970]];
+    NSNumber *curDateStr = [NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]];
     NSMutableArray *fakeAlerts = [NSMutableArray array];
    
     NSInteger i = 0;
@@ -331,7 +331,7 @@
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
         
         [fakeAlerts addObject:@{@"action":@"drop",
-                                @"category":@"security-phishing",
+                                @"category":@"privacy-tracker-app",
                                 @"host":@"api.phishy-mcphishface-thisisanexampleofalonghostname.com",
                                 @"message":@"Prevented 'Phishy McPhishface' from obtaining unknown data from device",
                                 @"timestamp":curDateStr,
@@ -339,7 +339,7 @@
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
         
         [fakeAlerts addObject:@{@"action":@"drop",
-                                @"category":@"encryption-allows-invalid-https",
+                                @"category":@"privacy-tracker-mail",
                                 @"host":@"facebook.com",
                                 @"message":@"Prevented 'Facebook', you're welcome",
                                 @"timestamp":curDateStr,
@@ -347,7 +347,7 @@
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
         
         [fakeAlerts addObject:@{@"action":@"drop",
-                                @"category":@"ads/aggressive",
+                                @"category":@"privacy-tracker-app",
                                 @"host":@"google.com",
                                 @"message":@"Prevented Google from forcing shit you don't need down your throat",
                                 @"timestamp":curDateStr,
@@ -361,7 +361,7 @@
 }
 
 - (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
-    if (self.dummyDataForDebugging == NO) {
+    if (self.dummyDataForDebugging == YES) {
         if ([self _canMakeApiRequests] == NO) {
             NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
             if (completion) completion(nil, NO, @"cant make API requests");

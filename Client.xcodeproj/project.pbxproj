@@ -751,6 +751,8 @@
 		4422D57321BFFB7F00BF1855 /* stringpiece.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4422D54121BFFB7E00BF1855 /* stringpiece.cc */; };
 		4422D57421BFFB7F00BF1855 /* prog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4422D54221BFFB7E00BF1855 /* prog.cc */; };
 		4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */; };
+		44234BB727DFBA310088937F /* BraveVPNAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44234BAC27DFBA310088937F /* BraveVPNAlert.swift */; };
+		44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */; };
 		442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */; };
 		442E7FB92731F96300412A36 /* GCDWebservers.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; };
 		442E7FBA2731F96300412A36 /* GCDWebservers.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -809,7 +811,6 @@
 		44A58CC82693A309005C0879 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CC72693A309005C0879 /* ActivityView.swift */; };
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
 		44BCBB9927D90B8A00BC6691 /* PrivacyReportsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */; };
-		44BDACBB27D6467D00DDEE53 /* VPNAlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BDACB027D6467700DDEE53 /* VPNAlertModel.swift */; };
 		44C2364526A05714005A573D /* TabTrayPrivateModeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C42CF7268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
@@ -2560,7 +2561,8 @@
 		4422D54121BFFB7E00BF1855 /* stringpiece.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringpiece.cc; sourceTree = "<group>"; };
 		4422D54221BFFB7E00BF1855 /* prog.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prog.cc; sourceTree = "<group>"; };
 		4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = httpse.leveldb.tgz; sourceTree = "<group>"; };
-		442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuDetail.swift; sourceTree = "<group>"; };
+		44234BAC27DFBA310088937F /* BraveVPNAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveVPNAlert.swift; sourceTree = "<group>"; };
+		442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuDetail.swift; sourceTree = "<group>"; tabWidth = 2; };
 		442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GCDWebservers.xcframework; sourceTree = "<group>"; };
 		44331DD122551AFE007E3E93 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		44331DD322551CC0007E3E93 /* ToolbarHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarHelper.swift; sourceTree = "<group>"; };
@@ -2644,7 +2646,7 @@
 		44A58CC72693A309005C0879 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuFixture.swift; sourceTree = "<group>"; };
 		44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsItem.swift; sourceTree = "<group>"; };
-		44BDACB027D6467700DDEE53 /* VPNAlertModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNAlertModel.swift; sourceTree = "<group>"; };
+		44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNAlertJSONModel.swift; sourceTree = "<group>"; };
 		44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayPrivateModeInfoView.swift; sourceTree = "<group>"; };
 		44C42CF8268378B1009572D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
 		44C42D0626837935009572D7 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
@@ -3796,7 +3798,6 @@
 				0A0A07CD247518B100591DFB /* BraveVPNContactFormViewController.swift */,
 				0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */,
 				0A918DC0252C785200496088 /* VPNRegion.swift */,
-				44BDACB027D6467700DDEE53 /* VPNAlertModel.swift */,
 			);
 			path = BraveVPN;
 			sourceTree = "<group>";
@@ -5616,6 +5617,8 @@
 				CAB127622639F37C00BBFC75 /* RecentSearches.swift */,
 				2F9311D42665883400C6B74D /* DataSaved.swift */,
 				44029EA227BBCEC800E6CE18 /* BlockedResource.swift */,
+				44234BAC27DFBA310088937F /* BraveVPNAlert.swift */,
+				44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -8376,6 +8379,7 @@
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,
 				27FD3FA625C8CE4B00696156 /* RSSFeedSource.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
+				44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */,
 				CAC5342327A83DE000013056 /* PlaylistFolder.swift in Sources */,
 				2F29FB8B267BE06100B0AD6A /* Model.xcdatamodeld in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,
@@ -8388,6 +8392,7 @@
 				CAB127632639F37C00BBFC75 /* RecentSearches.swift in Sources */,
 				5EC0029826052341005DDE4A /* PlaylistInfo.swift in Sources */,
 				2F9311D52665883400C6B74D /* DataSaved.swift in Sources */,
+				44234BB727DFBA310088937F /* BraveVPNAlert.swift in Sources */,
 				0AF0411B2267C61100EBF982 /* ManagedObjectExtensions.swift in Sources */,
 				0AD0B33225CC6106002EF4F4 /* LegacyBookmark.swift in Sources */,
 				0AA4FC392109D685000B173A /* CRUDProtocols.swift in Sources */,
@@ -9034,7 +9039,6 @@
 				F35B8D2D1D6383E9008E3D61 /* SessionRestoreHelper.swift in Sources */,
 				744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */,
 				2F5893C5265ED772002323D9 /* BrowserViewController+ProductNotification.swift in Sources */,
-				44BDACBB27D6467D00DDEE53 /* VPNAlertModel.swift in Sources */,
 				D04D1B862097859B0074B35F /* DownloadToast.swift in Sources */,
 				4422D4F721BFFB7600BF1855 /* dbformat.cc in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,

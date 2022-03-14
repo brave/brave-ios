@@ -6,6 +6,7 @@ import SwiftUI
 import BraveUI
 import Shared
 import BraveShared
+import Data
 
 struct PrivacyReportsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
@@ -16,6 +17,7 @@ struct PrivacyReportsView: View {
   let allTimeRiskiestWebsite: (String, Int)?
   let allTimeListTrackers: [PrivacyReportsItem]
   let allTimeListWebsites: [PrivacyReportsItem]
+  let lastVPNAlerts: [BraveVPNAlert]?
   
   var onDismiss: (() -> Void)?
   
@@ -65,8 +67,8 @@ struct PrivacyReportsView: View {
           
           Divider()
           
-          if vpnAlertsEnabled {
-            PrivacyHubVPNAlertsSection(onDismiss: {
+          if vpnAlertsEnabled, let lastVPNAlerts = lastVPNAlerts {
+            PrivacyHubVPNAlertsSection(lastVPNAlerts: lastVPNAlerts, onDismiss: {
               dismissView()
             })
           }

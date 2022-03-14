@@ -6,16 +6,13 @@
 import SwiftUI
 import Shared
 import BraveShared
+import Data
 
 extension PrivacyReportsView {
   struct PrivacyHubVPNAlertsSection: View {
-    private(set) var onDismiss: () -> Void
+    let lastVPNAlerts: [BraveVPNAlert]
     
-    let vpnAlerts: [VPNAlertCell.VPNAlert] =
-    [.init(date: Date(), text: "'App Measurement' collects app usage, device info, and app activity.", type: .data),
-     .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location),
-     .init(date: Date(), text: "App Measurement collects app usage, device info, and app activity.", type: .mail)
-    ]
+    private(set) var onDismiss: () -> Void
     
     var body: some View {
       VStack(alignment: .leading) {
@@ -23,13 +20,13 @@ extension PrivacyReportsView {
           .font(.footnote.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
         
-        ForEach(vpnAlerts, id: \.self) { alert in
+        ForEach(lastVPNAlerts) { alert in
           VPNAlertCell(vpnAlert: alert)
             .background(Color(.braveBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         
-        NavigationLink(destination: AllVPNAlertsView(onDismiss: {
+        NavigationLink(destination: AllVPNAlertsView(vpnAlerts: BraveVPNAlert.last(100) ?? [], onDismiss: {
           onDismiss()
         })) {
           HStack {

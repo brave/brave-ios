@@ -5,66 +5,87 @@
 import SwiftUI
 import Shared
 import BraveShared
+import Data
 
 struct AllVPNAlertsView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
+  let vpnAlerts: [BraveVPNAlert]
   private(set) var onDismiss: () -> Void
   
-  let vpnAlerts: [VPNAlertCell.VPNAlert] =
-  [.init(date: Date(), text: "'App Measurement' collects app usage, device info, and app activity.", type: .data),
-   .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location),
-   .init(date: Date(), text: "App Measurement collects app usage, device info, and app activity.", type: .mail),
-   .init(date: Date(), text: "'App Measurement' collects app usage, device info, and app activity.", type: .data),
-   .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location),
-   .init(date: Date(), text: "App Measurement collects app usage, device info, and app activity.", type: .mail)
-  ]
+  private var headerView: some View {
+    VStack {
+      HStack {
+        Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
+          .font(.subheadline.weight(.medium))
+        Spacer()
+        Text("123")
+          .font(.headline.weight(.semibold))
+      }
+      .padding()
+      .background(Color("total_alerts_background"))
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      
+      if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
+        VPNAlertStat(assetName: "vpn_data_tracker", title: "Tracker & Ad", compact: true)
+        VPNAlertStat(assetName: "vpn_location_tracker", title: "Location Pings", compact: true)
+        VPNAlertStat(assetName: "vpn_mail_tracker", title: "Email tracker", compact: true)
+      } else {
+        VPNAlertStat(assetName: "vpn_data_tracker", title: "Tracker & Ad", compact: false)
+        HStack {
+          VPNAlertStat(assetName: "vpn_location_tracker", title: "Location Pings", compact: true)
+          VPNAlertStat(assetName: "vpn_mail_tracker", title: "Email tracker", compact: true)
+        }
+      }
+      
+    }
+    .padding(.vertical)
+  }
+  
+  private func cell(_ alert: BraveVPNAlert) -> some View {
+    VPNAlertCell(vpnAlert: alert)
+      .listRowInsets(.init())
+      .background(Color(.braveBackground))
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .padding(.vertical, 4)
+  }
   
   var body: some View {
     
-    VStack(alignment: .leading) {
-      List {
-        Section {
-          ForEach(vpnAlerts, id: \.self) { alert in
-            VPNAlertCell(vpnAlert: alert)
+    Group {
+      VStack(alignment: .leading) {
+        
+        if #available(iOS 15, *) {
+          List {
+            Section {
+              ForEach(vpnAlerts) { alert in
+                cell(alert)
+                  .listRowBackground(Color.clear)
+                  .listRowSeparator(.hidden)
+              }
+            } header: {
+              headerView
               .listRowInsets(.init())
-              .background(Color(.braveBackground))
-              .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-          }
-        } header: {
-          VStack {
-            HStack {
-              Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
-                .font(.subheadline.weight(.medium))
-              Spacer()
-              Text("123")
-                .font(.headline.weight(.semibold))
             }
-            .padding()
-            .background(Color("total_alerts_background"))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+          }
+          .listStyle(.insetGrouped)
+          
+          Spacer()
+        } else {
+          // Workaround: iOS 14 does not easily support hidden separators for List, have to use LazyVSack instead.
+          ScrollView {
+            headerView
             
-            if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
-              VPNAlertStat(type: .data, compact: true)
-              VPNAlertStat(type: .location, compact: true)
-              VPNAlertStat(type: .mail, compact: true)
-            } else {
-              VPNAlertStat(type: .data, compact: false)
-              HStack {
-                VPNAlertStat(type: .location, compact: true)
-                VPNAlertStat(type: .mail, compact: true)
+            LazyVStack(spacing: 0) {
+              ForEach(vpnAlerts) { alert in
+                cell(alert)
               }
             }
-            
           }
-          .padding(.vertical)
-          .listRowInsets(.init())
+          .padding(.horizontal)
         }
       }
-      .listStyle(.insetGrouped)
-      
-      Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color(.secondaryBraveBackground).ignoresSafeArea())

@@ -7,22 +7,25 @@ import SwiftUI
 extension AllVPNAlertsView {
   struct VPNAlertStat: View {
     
-    private let type: VPNAlertCell.AlertType
+    private let assetName: String
+    private let title: String
     private let compact: Bool
     
-    init(type: VPNAlertCell.AlertType, compact: Bool) {
-      self.type = type
+    
+    init(assetName: String, title: String, compact: Bool) {
+      self.assetName = assetName
+      self.title = title
       self.compact = compact
     }
     
     var body: some View {
       HStack {
-        Image(type.assetName)
+        Image(assetName)
           .padding(.leading)
         
         if compact {
           VStack(alignment: .leading) {
-            Text(type.headerText)
+            Text(title)
               .foregroundColor(Color(.secondaryBraveLabel))
               .font(.caption.weight(.semibold))
             Text("\(123)")
@@ -33,7 +36,7 @@ extension AllVPNAlertsView {
           }
           Spacer()
         } else {
-          Text(type.headerText)
+          Text(title)
             .font(.caption.weight(.semibold))
           Spacer()
           Text("\(123)")
