@@ -471,7 +471,7 @@ public class SwapTokenStore: ObservableObject {
     // Get ETH balance for this account because gas can only be paid in ETH
     rpcService.network { [weak self] network in
       guard let self = self else { return }
-      self.rpcService.balance(accountInfo.address, coin: .eth) { balance, status, _ in
+      self.rpcService.balance(accountInfo.address, coin: .eth, chainId: network.chainId) { balance, status, _ in
         if status == BraveWallet.ProviderError.success {
           let fee = gasLimit * gasPrice
           let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)

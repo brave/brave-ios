@@ -25,8 +25,8 @@ extension BraveWalletJsonRpcService {
     chainId(.eth, completion: completion)
   }
   
-  func balance(_ address: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
-    balance(address, coin: .eth, completion: completion)
+  func balance(_ address: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+    balance(address, coin: .eth, chainId: chainId, completion: completion)
   }
 }
 
