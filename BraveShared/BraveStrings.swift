@@ -3593,6 +3593,37 @@ extension Strings {
     }
 }
 
+// MARK: - Night Mode
+
+extension Strings {
+    public struct NightMode {
+        public static let sectionTitle = NSLocalizedString(
+            "nightMode.modeTitle",
+            bundle: .braveShared,
+            value: "MODE",
+            comment: "A section title where night mode is defined"
+        )
+        public static let settingsTitle = NSLocalizedString(
+            "nightMode.settingsTitle",
+            bundle: .braveShared,
+            value: "Night Mode",
+            comment: "A table cell title for Night Mode - defining element for the toggle"
+        )
+        public static let settingsDescription = NSLocalizedString(
+            "nightMode.settingsDescription",
+            bundle: .braveShared,
+            value: "Turn on/off Night Mode",
+            comment: "A table cell subtitle for Night Mode - explanatory element for the toggle preference"
+        )
+        public static let sectionDescription = NSLocalizedString(
+            "nightMode.sectionDescription",
+            bundle: .braveShared,
+            value: "Night mode will effect website appearance and general system appearance at the same time.",
+            comment: "A table cell subtitle for Night Mode - explanatory element for the toggle preference"
+        )
+    }
+}
+
 // MARK: - ManageWebsiteData
 extension Strings {
     public static let manageWebsiteDataTitle = NSLocalizedString(
