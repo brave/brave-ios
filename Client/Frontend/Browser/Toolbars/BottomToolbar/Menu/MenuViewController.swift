@@ -12,22 +12,24 @@ import SwiftUI
 
 struct MenuItemHeaderView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
-    var icon: UIImage
+    var icon: UIImage?
     var title: String
     var subtitle: String?
     
     var body: some View {
         HStack(spacing: 14) {
-            Image(uiImage: icon)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .padding(6)
-                .frame(width: 32, height: 32)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.secondaryBraveGroupedBackground))
-                        .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-                )
+            if let icon = icon {
+                Image(uiImage: icon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(6)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(Color(.secondaryBraveGroupedBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+                    )
+            }
             VStack(alignment: .leading, spacing: 3) {
                 Text(verbatim: title)
                 if let subTitle = subtitle {
@@ -57,7 +59,7 @@ private struct MenuView<Content: View>: View {
 struct MenuItemButton: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     
-    var icon: UIImage
+    var icon: UIImage?
     var title: String
     var subtitle: String?
     var action: () -> Void

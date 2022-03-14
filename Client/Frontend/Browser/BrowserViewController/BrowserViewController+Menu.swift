@@ -279,6 +279,11 @@ extension BrowserViewController {
                             browserViewController.openAddBookmark()
                         }
                     }
+                    NightModeMenuButton(changeNightModePreference: { status in
+                        browserViewController.dismiss(animated: true) {
+                            NightModeHelper.setNightMode(tabManager: browserViewController.tabManager, enabled: status)
+                        }
+                    })
                     ForEach(activities, id: \.activityTitle) { activity in
                         MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") {
                             browserViewController.dismiss(animated: true)

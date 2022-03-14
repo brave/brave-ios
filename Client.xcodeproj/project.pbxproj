@@ -516,6 +516,7 @@
 		2F2C3549261D10AE00631310 /* CustomIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* CustomIntentHandler.swift */; };
 		2F2C35A6261DF41100631310 /* CustomIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F693223260D218900ECEB38 /* CustomIntentHandler.swift */; };
 		2F41064527860EE200732FFF /* EmptyStateOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F41064427860EE200732FFF /* EmptyStateOverlayView.swift */; };
+		2F43742F27DFB44400BEDD5A /* NightModeMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F43742E27DFB44400BEDD5A /* NightModeMenuButton.swift */; };
 		2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */; };
 		2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B7421A793CF20022C5E0 /* FiraSans-BoldItalic.ttf */; };
 		2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */; };
@@ -2265,6 +2266,7 @@
 		2F29FB89267BE06100B0AD6A /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		2F29FB8A267BE06100B0AD6A /* Model9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model9.xcdatamodel; sourceTree = "<group>"; };
 		2F41064427860EE200732FFF /* EmptyStateOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateOverlayView.swift; sourceTree = "<group>"; };
+		2F43742E27DFB44400BEDD5A /* NightModeMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightModeMenuButton.swift; sourceTree = "<group>"; };
 		2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestHashExtensions.swift; sourceTree = "<group>"; };
 		2F44FC711A9E840300FD20CC /* SettingsNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		2F44FCC41A9E85E900FD20CC /* SettingsTableSectionHeaderFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableSectionHeaderFooterView.swift; sourceTree = "<group>"; };
@@ -5719,6 +5721,7 @@
 				27AE360C25E55AA200E795E5 /* MenuViewController.swift */,
 				277E94F125F834240001926E /* VPNMenuButton.swift */,
 				CA9A233326B97B4300923D70 /* PlaylistMenuButton.swift */,
+				2F43742E27DFB44400BEDD5A /* NightModeMenuButton.swift */,
 				2F41064427860EE200732FFF /* EmptyStateOverlayView.swift */,
 			);
 			path = Menu;
@@ -8644,6 +8647,7 @@
 				27829E092548AA8B007CF0B2 /* BraveRewardsView.swift in Sources */,
 				D38A1BEE1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
 				CA8D5C1426D7CDEB009BF13D /* PlaylistListViewController+TableViewDelegate.swift in Sources */,
+				2F43742F27DFB44400BEDD5A /* NightModeMenuButton.swift in Sources */,
 				4422D4B121BFFB7600BF1855 /* bloom.cc in Sources */,
 				4422D4FD21BFFB7600BF1855 /* dumpfile.cc in Sources */,
 				0A19365423508756002E2B81 /* LinkPreviewViewController.swift in Sources */,
