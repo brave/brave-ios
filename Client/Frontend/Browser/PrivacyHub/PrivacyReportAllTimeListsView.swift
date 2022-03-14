@@ -106,8 +106,20 @@ struct PrivacyReportAllTimeListsView: View {
             ForEach(allTimeListTrackers) { item in
               HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                  Text(item.domainOrTracker)
-                    .font(.callout)
+                  
+                  VStack(alignment: .leading, spacing: 0) {
+                    Text(item.domainOrTracker)
+                      .font(.callout)
+                      .foregroundColor(Color(.bravePrimary))
+                    
+                    if let url = URL(string: item.domainOrTracker),
+                        let humanFriendlyTrackerName =
+                        BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
+                      Text(humanFriendlyTrackerName)
+                        .font(.footnote)
+                        .foregroundColor(Color(.braveLabel))
+                    }
+                  }
                   
                   Group {
                     if sizeCategory.isAccessibilityCategory {

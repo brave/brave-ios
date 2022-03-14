@@ -85,7 +85,7 @@ extension BrowserViewController {
             let firstBlockedUrl = blockedRequests.first {
 
         let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
-            let trackerName = BlockedTrackerParser.parse(url: firstBlockedUrl) ?? domain
+            let trackerName = BlockedTrackerParser.parse(url: firstBlockedUrl, fallbackToDomainURL: true) ?? domain
 
             notifyTrackersBlocked(domain: domain, trackerName: trackerName,
                                   remainingTrackersCount: blockedRequests.count - 1)

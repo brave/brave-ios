@@ -10,7 +10,7 @@ import BraveShared
 class BlockedTrackerParser {
     static let entityList = OnboardingDisconnectList.loadFromFile()
     
-    static func parse(url: URL) -> String? {
+    static func parse(url: URL, fallbackToDomainURL: Bool) -> String? {
         guard let list = entityList else { return nil }
         
         let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
@@ -23,6 +23,6 @@ class BlockedTrackerParser {
             }
         }
         
-        return domain
+        return fallbackToDomainURL ? domain : nil
     }
 }
