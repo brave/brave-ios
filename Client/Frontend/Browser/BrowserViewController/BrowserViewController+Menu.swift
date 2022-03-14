@@ -139,6 +139,13 @@ extension BrowserViewController {
                     guard let self = self else { return }
                     self.presentPlaylistController()
                 }
+                NightModeMenuButton(changeNightModePreference: { [weak self] status in
+                    guard let self = self else { return }
+
+                    self.dismiss(animated: true) {
+                        NightModeHelper.setNightMode(tabManager: self.tabManager, enabled: status)
+                    }
+                })
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
                 var settingsStore: SettingsStore?
@@ -279,11 +286,6 @@ extension BrowserViewController {
                             browserViewController.openAddBookmark()
                         }
                     }
-                    NightModeMenuButton(changeNightModePreference: { status in
-                        browserViewController.dismiss(animated: true) {
-                            NightModeHelper.setNightMode(tabManager: browserViewController.tabManager, enabled: status)
-                        }
-                    })
                     ForEach(activities, id: \.activityTitle) { activity in
                         MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") {
                             browserViewController.dismiss(animated: true)

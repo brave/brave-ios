@@ -330,7 +330,7 @@ class SettingsViewController: TableViewController {
             optionsViewController.headerText = Strings.themesDisplayBrightness
             optionsViewController.footerText = Strings.themesDisplayBrightnessFooter
 
-            let sectionTest = Section(
+            let nightModeSection = Section(
                 header: .title(Strings.NightMode.sectionTitle),
                 rows: [
                     .boolRow(
@@ -345,7 +345,7 @@ class SettingsViewController: TableViewController {
                 footer: .title(Strings.NightMode.sectionDescription)
             )
             
-            optionsViewController.dataSource.sections.append(sectionTest)
+            optionsViewController.dataSource.sections.append(nightModeSection)
             self.navigationController?.pushViewController(optionsViewController, animated: true)
         }
         display.rows.append(row)

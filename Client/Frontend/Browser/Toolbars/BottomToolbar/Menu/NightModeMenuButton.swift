@@ -48,7 +48,7 @@ struct NightModeMenuButton: View {
         .padding(.horizontal, 14)
         .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
         .background(
-            Button(action: { toggleNightMode(!Preferences.General.nightModeEnabled) }) {
+            Button(action: { toggleNightMode(!Preferences.General.nightModeEnabled.value) }) {
                 Color.clear
             }
             .buttonStyle(TableCellButtonStyle())
