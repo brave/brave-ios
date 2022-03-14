@@ -923,6 +923,7 @@
 		7BA8D1C71BA037F500C8AE9E /* OpenInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8D1C61BA037F500C8AE9E /* OpenInHelper.swift */; };
 		7BBFEE741BB405D900A305AA /* TabManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBFEE731BB405D900A305AA /* TabManagerTests.swift */; };
 		7BEFC6801BFF68C30059C952 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEFC67F1BFF68C30059C952 /* QuickActions.swift */; };
+		7D1B136927DC12FA00BC6F5B /* WalletConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */; };
 		7D2D6EDD2731B7FF000650EA /* SwapTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */; };
 		7D2D6EEB2731D6BA000650EA /* SwapTokenSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */; };
 		7D2D6F162735BCDB000650EA /* TokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2D6F152735BCDB000650EA /* TokenView.swift */; };
@@ -2891,6 +2892,7 @@
 		7BA8D1C61BA037F500C8AE9E /* OpenInHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInHelper.swift; sourceTree = "<group>"; };
 		7BBFEE731BB405D900A305AA /* TabManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabManagerTests.swift; sourceTree = "<group>"; };
 		7BEFC67F1BFF68C30059C952 /* QuickActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
+		7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = WalletConnectionView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenStore.swift; sourceTree = "<group>"; };
 		7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenSearchView.swift; sourceTree = "<group>"; };
 		7D2D6F152735BCDB000650EA /* TokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenView.swift; sourceTree = "<group>"; };
@@ -3779,6 +3781,7 @@
 		27036F9225684F9F004EF6B6 /* Ads */ = {
 			isa = PBXGroup;
 			children = (
+				7D1B135D27DC12D300BC6F5B /* BraveWallet */,
 				27036F9325684F9F004EF6B6 /* AdsViewController.swift */,
 				27036F9425684F9F004EF6B6 /* AdSwipeButton.swift */,
 				27036F9525684F9F004EF6B6 /* AdView.swift */,
@@ -5735,6 +5738,14 @@
 				2F41064427860EE200732FFF /* EmptyStateOverlayView.swift */,
 			);
 			path = Menu;
+			sourceTree = "<group>";
+		};
+		7D1B135D27DC12D300BC6F5B /* BraveWallet */ = {
+			isa = PBXGroup;
+			children = (
+				7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */,
+			);
+			path = BraveWallet;
 			sourceTree = "<group>";
 		};
 		7DAC596627235B0A00E735A2 /* Scanner */ = {
@@ -8478,6 +8489,7 @@
 				0A39FE9C2486604D00290ABC /* GRDSubscriberCredential.m in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
 				2F798390279A09DD001FA4B6 /* LoginListViewController.swift in Sources */,
+				7D1B136927DC12FA00BC6F5B /* WalletConnectionView.swift in Sources */,
 				27448533245B5EC2001920B5 /* NTPDataSource.swift in Sources */,
 				39F4C10A2045DB2E00746155 /* FocusHelper.swift in Sources */,
 				E4CD9F2D1A6DC91200318571 /* TabLocationView.swift in Sources */,
