@@ -32,12 +32,12 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion(networks.first(where: { $0.chainId == self.chainId }) ?? .init())
   }
   
-  func balance(_ address: String, coin: BraveWallet.CoinType, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+  func balance(_ address: String, coin: BraveWallet.CoinType, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
     completion("0x13e25e19dc20ba7", .success, "")
   }
   
-  func erc20TokenBalance(_ contract: String, address: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+  func erc20TokenBalance(_ contract: String, address: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     completion("10", .success, "")
   }
   
@@ -78,7 +78,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .unknownChain, "Error Message")
   }
   
-  func erc721TokenBalance(_ contractAddress: String, tokenId: String, accountAddress: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+  func erc721TokenBalance(_ contractAddress: String, tokenId: String, accountAddress: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     completion("", .disconnected, "Error Message")
   }
   
