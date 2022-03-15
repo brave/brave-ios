@@ -59,7 +59,7 @@ class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
       return .zero
     }
 
-    return UIEdgeInsets(top: 12, left: 16, bottom: -16, right: 16)
+        return UIEdgeInsets(top: 12, left: 16, bottom: 0, right: 16)
   }
 
   @objc func openSettings() {
