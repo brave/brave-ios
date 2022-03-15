@@ -2892,7 +2892,7 @@
 		7BA8D1C61BA037F500C8AE9E /* OpenInHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInHelper.swift; sourceTree = "<group>"; };
 		7BBFEE731BB405D900A305AA /* TabManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabManagerTests.swift; sourceTree = "<group>"; };
 		7BEFC67F1BFF68C30059C952 /* QuickActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
-		7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = WalletConnectionView.swift; sourceTree = "<group>"; tabWidth = 2; };
+		7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = WalletConnectionView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		7D2D6EDC2731B7FF000650EA /* SwapTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenStore.swift; sourceTree = "<group>"; };
 		7D2D6EEA2731D6BA000650EA /* SwapTokenSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenSearchView.swift; sourceTree = "<group>"; };
 		7D2D6F152735BCDB000650EA /* TokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenView.swift; sourceTree = "<group>"; };

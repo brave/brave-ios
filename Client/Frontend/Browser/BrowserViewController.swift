@@ -517,6 +517,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         }
         let request = URLRequest(url: targetURL)
         self.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+            } else if action == .connectWallet {
+                //show wallet connection flow
       }
     }
   }
