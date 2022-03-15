@@ -100,6 +100,7 @@ struct PrivacyReportsView: View {
       .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     }
     .navigationViewStyle(.stack)
+    .environment(\.managedObjectContext, DataController.swiftUIContext)
   }
 }
 

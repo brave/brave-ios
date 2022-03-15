@@ -11,7 +11,15 @@ struct AllVPNAlertsView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
-  let vpnAlerts: [BraveVPNAlert]
+  @Environment(\.managedObjectContext) var context
+  
+  @FetchRequest(
+      entity: BraveVPNAlert.entity(),
+      sortDescriptors: [
+          NSSortDescriptor(keyPath: \BraveVPNAlert.timestamp, ascending: false)
+      ]
+  ) var vpnAlerts: FetchedResults<BraveVPNAlert>
+  
   let trackerCounts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)
   private(set) var onDismiss: () -> Void
   
