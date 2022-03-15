@@ -361,7 +361,7 @@
 }
 
 - (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
-    if (self.dummyDataForDebugging == YES) {
+    if (self.dummyDataForDebugging == NO) {
         if ([self _canMakeApiRequests] == NO) {
             NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
             if (completion) completion(nil, NO, @"cant make API requests");

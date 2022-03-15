@@ -8,7 +8,7 @@ import Foundation
 public struct VPNAlertJSONModel: Decodable {
     public enum Action: Int {
         case drop
-        case detected
+        case log
     }
     
     public enum Category: Int {
@@ -26,7 +26,7 @@ public struct VPNAlertJSONModel: Decodable {
     public let category: Category
     public let host: String
     public let message: String
-    public let timestamp: Date
+    public let timestamp: Int64
     public let title: String
     
     public init(from decoder: Decoder) throws {
@@ -37,13 +37,18 @@ public struct VPNAlertJSONModel: Decodable {
         self.message = try container.decode(String.self, forKey: .message)
         self.title = try container.decode(String.self, forKey: .title)
         
-        let timestampInt = try container.decode(Int.self, forKey: .timestamp)
-        self.timestamp = Date(timeIntervalSince1970: TimeInterval(timestampInt))
+        let decodedTimestamp = Int64(try container.decode(Int.self, forKey: .timestamp))
+        
+        // The VPN alerts array we receive is pretty spammy.
+        // In order to avoid having many duplicates 'seconds' are cleared from the timestamp.
+        self.timestamp = decodedTimestamp - decodedTimestamp % 60
         
         let actionString = try container.decode(String.self, forKey: .action)
         switch actionString {
         case "drop":
             self.action = .drop
+        case "log":
+            self.action = .log
         default:
             throw "Casting `action` failed, incorrect value: \(actionString)"
         }

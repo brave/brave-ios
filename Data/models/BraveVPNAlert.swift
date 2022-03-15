@@ -18,7 +18,7 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
     @NSManaged public var message: String
     @NSManaged public var title: String
     @NSManaged public var uuid: String
-    @NSManaged public var timestamp: Date
+    @NSManaged public var timestamp: Int64
     
     public var categoryEnum: VPNAlertJSONModel.Category? {
         return .init(rawValue: Int(category))

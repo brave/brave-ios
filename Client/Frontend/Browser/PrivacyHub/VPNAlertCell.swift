@@ -13,7 +13,8 @@ struct VPNAlertCell: View {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium
     formatter.timeStyle = .short
-    return formatter.string(from: vpnAlert.timestamp)
+    let date = Date(timeIntervalSince1970: TimeInterval(vpnAlert.timestamp))
+    return formatter.string(from: date)
   }
   
   private func assetName(for type: VPNAlertJSONModel.Category) -> String {
