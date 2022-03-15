@@ -67,7 +67,7 @@ struct PrivacyReportsView: View {
           
           Divider()
           
-          if vpnAlertsEnabled, let lastVPNAlerts = lastVPNAlerts {
+          if vpnAlertsEnabled, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
             PrivacyHubVPNAlertsSection(lastVPNAlerts: lastVPNAlerts, onDismiss: {
               dismissView()
             })

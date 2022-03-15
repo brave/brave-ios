@@ -57,6 +57,20 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
         return all(sortDescriptors: [dateSort], fetchLimit: count)
     }
     
+    public static func count(for host: String) -> Int {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BraveVPNAlert")
+        let context = DataController.viewContext
+        fetchRequest.entity = BraveVPNAlert.entity(in: context)
+        fetchRequest.predicate = .init(format: "host == %@", host)
+        
+        do {
+            return try context.count(for: fetchRequest)
+        } catch {
+            log.error("countForHost failed: \(error)")
+            return 0
+        }
+    }
+    
     public static func totalAlertCounts() -> (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int) {
         let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BraveVPNAlert")
         let context = DataController.viewContext

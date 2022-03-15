@@ -22,6 +22,12 @@ public final class BlockedResource: NSManagedObject, CRUD {
     @NSManaged public var resourceType: Int32
     @NSManaged public var timestamp: Date
     
+    public enum Source {
+        case shields
+        case vpn
+        case both
+    }
+    
     private static let entityName = "BlockedResource"
     private static let hostKeyPath = #keyPath(BlockedResource.host)
     private static let domainKeyPath = #keyPath(BlockedResource.domain)
@@ -74,8 +80,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
-    public static func allTimeMostFrequentTrackers() -> [(String, Int)] {
-        var maxNumberOfSites = [(String, Int)]()
+    public static func allTimeMostFrequentTrackers(includeVPNAlerts: Bool) -> [(String, Int, Source?)] {
+        var maxNumberOfSites = [(String, Int, Source?)]()
         
         do {
             let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
@@ -85,9 +91,24 @@ public final class BlockedResource: NSManagedObject, CRUD {
                     continue
                 }
                 
-                let result = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: nil).count
+                let shieldsCount = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: nil).count
                 
-                maxNumberOfSites.append((host, result))
+                if includeVPNAlerts {
+                    let vpnCount = BraveVPNAlert.count(for: host)
+                    
+                    var source: Source?
+                    if vpnCount > 0 && shieldsCount > 0 {
+                        source = .both
+                    } else if vpnCount > 0 && shieldsCount <= 0 {
+                        source = .vpn
+                    } else if shieldsCount > 0 && vpnCount <= 0 {
+                        source = .shields
+                    }
+                    
+                    maxNumberOfSites.append((host, shieldsCount + vpnCount, source))
+                } else {
+                    maxNumberOfSites.append((host, shieldsCount, .shields))
+                }
             }
             
             return maxNumberOfSites.sorted(by: { $0.1 > $1.1 })

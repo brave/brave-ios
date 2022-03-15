@@ -90,6 +90,98 @@ struct PrivacyReportAllTimeListsView: View {
     .padding(.vertical, 12)
   }
   
+  private var trackersList: some View {
+    List {
+      Section {
+        ForEach(allTimeListTrackers) { item in
+          HStack {
+            VStack(alignment: .leading, spacing: 4) {
+              
+              VStack(alignment: .leading, spacing: 0) {
+                Text(item.domainOrTracker)
+                  .font(.callout)
+                  .foregroundColor(Color(.bravePrimary))
+                
+                if let url = URL(string: item.domainOrTracker),
+                    let humanFriendlyTrackerName =
+                    BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
+                  Text(humanFriendlyTrackerName)
+                    .font(.footnote)
+                    .foregroundColor(Color(.braveLabel))
+                }
+              }
+              
+              Group {
+                if sizeCategory.isAccessibilityCategory {
+                  VStack(alignment: .leading, spacing: 4) {
+                    Text(Strings.PrivacyHub.blockedBy)
+                      .foregroundColor(Color(.secondaryBraveLabel))
+                    
+                    blockedByLabels(i: item.count) // FIXME: count not needed here, was for tests.
+                  }
+                } else {
+                  HStack(spacing: 4) {
+                    Text(Strings.PrivacyHub.blockedBy)
+                      .foregroundColor(Color(.secondaryBraveLabel))
+                    
+                    if let source = item.source {
+                      Group {
+                        switch source {
+                        case .shields:
+                          PrivacyReportsView.BlockedByShieldsLabel()
+                        case .vpn:
+                          PrivacyReportsView.BlockedByVPNLabel()
+                        case .both:
+                          PrivacyReportsView.BlockedByShieldsLabel()
+                          PrivacyReportsView.BlockedByVPNLabel()
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              .font(.caption)
+            }
+            
+            Spacer()
+            Text("\(item.count)")
+              .font(.headline.weight(.semibold))
+          }
+        }
+      } header: {
+        Text(Strings.PrivacyHub.allTimeListTrackersHeaderTitle)
+          .listRowInsets(.init())
+          .padding(.vertical, 8)
+          .font(.footnote)
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    }
+    .listStyle(.insetGrouped)
+  }
+  
+  private var websitesList: some View {
+    List {
+      Section {
+        ForEach(allTimeListWebsites) { item in
+          HStack {
+            FaviconImage(url: item.faviconUrl)
+            Text(item.domainOrTracker)
+            Spacer()
+            Text("\(item.count)")
+              .font(.headline.weight(.semibold))
+          }
+        }
+      } header: {
+        Text(Strings.PrivacyHub.allTimeListWebsitesHeaderTitle)
+          .font(.footnote)
+          .listRowInsets(.init())
+          .padding(.vertical, 8)
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    }
+    .listStyle(.insetGrouped)
+  }
+  
   var body: some View {
     VStack(spacing: 0) {
       if #available(iOS 15.0, *) {
@@ -101,84 +193,9 @@ struct PrivacyReportAllTimeListsView: View {
       
       switch currentPage {
       case .trackersAndAds:
-        List {
-          Section {
-            ForEach(allTimeListTrackers) { item in
-              HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                  
-                  VStack(alignment: .leading, spacing: 0) {
-                    Text(item.domainOrTracker)
-                      .font(.callout)
-                      .foregroundColor(Color(.bravePrimary))
-                    
-                    if let url = URL(string: item.domainOrTracker),
-                        let humanFriendlyTrackerName =
-                        BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
-                      Text(humanFriendlyTrackerName)
-                        .font(.footnote)
-                        .foregroundColor(Color(.braveLabel))
-                    }
-                  }
-                  
-                  Group {
-                    if sizeCategory.isAccessibilityCategory {
-                      VStack(alignment: .leading, spacing: 4) {
-                        Text(Strings.PrivacyHub.blockedBy)
-                          .foregroundColor(Color(.secondaryBraveLabel))
-                        
-                        blockedByLabels(i: item.count) // FIXME: count not needed here, was for tests.
-                      }
-                    } else {
-                      HStack(spacing: 4) {
-                        Text(Strings.PrivacyHub.blockedBy)
-                          .foregroundColor(Color(.secondaryBraveLabel))
-                        PrivacyReportsView.BlockedByShieldsLabel()
-                        if item.count % 2 == 0 {
-                          PrivacyReportsView.BlockedByVPNLabel()
-                        }
-                      }
-                    }
-                  }
-                  .font(.caption)
-                }
-                
-                Spacer()
-                Text("\(item.count)")
-                  .font(.headline.weight(.semibold))
-              }
-            }
-          } header: {
-            Text(Strings.PrivacyHub.allTimeListTrackersHeaderTitle)
-              .listRowInsets(.init())
-              .padding(.vertical, 8)
-              .font(.footnote)
-          }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        }
-        .listStyle(.insetGrouped)
-        
+        trackersList
       case .websites:
-        List {
-          Section {
-            ForEach(allTimeListWebsites) { item in
-              HStack {
-                FaviconImage(url: item.faviconUrl)
-                Text(item.domainOrTracker)
-                Spacer()
-                Text("\(item.count)")
-                  .font(.headline.weight(.semibold))
-              }
-            }
-          } header: {
-            Text(Strings.PrivacyHub.allTimeListWebsitesHeaderTitle)
-              .font(.footnote)
-              .listRowInsets(.init())
-              .padding(.vertical, 8)
-          }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        }
-        .listStyle(.insetGrouped)
+        websitesList
       }
     }
     .background(Color(.braveGroupedBackground).ignoresSafeArea())

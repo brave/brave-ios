@@ -33,7 +33,13 @@ public struct VPNAlertJSONModel: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.uuid = try container.decode(String.self, forKey: .uuid)
-        self.host = try container.decode(String.self, forKey: .host)
+        
+        let hostString = try container.decode(String.self, forKey: .host)
+        
+        // If possible we only add the base domain part of the host.
+        // Reason is we do the same for regular ad blocking resources
+        // This makes it easier to group together and show total counts for vpn + regular blocked resources.
+        self.host = URL(string: "https://" + hostString)?.baseDomain ?? hostString
         self.message = try container.decode(String.self, forKey: .message)
         self.title = try container.decode(String.self, forKey: .title)
         

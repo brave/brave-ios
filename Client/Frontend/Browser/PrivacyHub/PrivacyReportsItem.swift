@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Data
 
 struct PrivacyReportsItem: Identifiable {
   var id: String {
@@ -13,10 +14,12 @@ struct PrivacyReportsItem: Identifiable {
   let domainOrTracker: String
   let faviconUrl: String?
   let count: Int
+  let source: BlockedResource.Source?
   
-  init(domainOrTracker: String, faviconUrl: String? = nil, count: Int) {
+  init(domainOrTracker: String, faviconUrl: String? = nil, count: Int, source: BlockedResource.Source? = nil) {
     self.domainOrTracker = domainOrTracker
     self.faviconUrl = faviconUrl
     self.count = count
+    self.source = source
   }
 }
