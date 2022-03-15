@@ -80,8 +80,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
         }
     }
     
-    public static func allTimeMostFrequentTrackers(includeVPNAlerts: Bool) -> [(String, Int, Source?)] {
-        var maxNumberOfSites = [(String, Int, Source?)]()
+    public static func allTimeMostFrequentTrackers() -> Set<CountableEntity> {
+        var maxNumberOfSites = Set<CountableEntity>()
         
         do {
             let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
@@ -93,29 +93,13 @@ public final class BlockedResource: NSManagedObject, CRUD {
                 
                 let shieldsCount = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: nil).count
                 
-                if includeVPNAlerts {
-                    let vpnCount = BraveVPNAlert.count(for: host)
-                    
-                    var source: Source?
-                    if vpnCount > 0 && shieldsCount > 0 {
-                        source = .both
-                    } else if vpnCount > 0 && shieldsCount <= 0 {
-                        source = .vpn
-                    } else if shieldsCount > 0 && vpnCount <= 0 {
-                        source = .shields
-                    }
-                    
-                    maxNumberOfSites.append((host, shieldsCount + vpnCount, source))
-                } else {
-                    maxNumberOfSites.append((host, shieldsCount, .shields))
-                }
+                maxNumberOfSites.insert(.init(name: host, count: shieldsCount))
             }
             
-            return maxNumberOfSites.sorted(by: { $0.1 > $1.1 })
+            return maxNumberOfSites
         } catch {
             log.error(error)
-            return []
-            
+            return maxNumberOfSites
         }
     }
     

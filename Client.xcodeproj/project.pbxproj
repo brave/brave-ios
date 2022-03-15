@@ -753,6 +753,7 @@
 		4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */; };
 		44234BB727DFBA310088937F /* BraveVPNAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44234BAC27DFBA310088937F /* BraveVPNAlert.swift */; };
 		44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */; };
+		44234BBA27E123D70088937F /* CountableEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44234BB927E123D70088937F /* CountableEntity.swift */; };
 		442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */; };
 		442E7FB92731F96300412A36 /* GCDWebservers.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; };
 		442E7FBA2731F96300412A36 /* GCDWebservers.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -2562,6 +2563,7 @@
 		4422D54221BFFB7E00BF1855 /* prog.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prog.cc; sourceTree = "<group>"; };
 		4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */ = {isa = PBXFileReference; lastKnownFileType = file; path = httpse.leveldb.tgz; sourceTree = "<group>"; };
 		44234BAC27DFBA310088937F /* BraveVPNAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveVPNAlert.swift; sourceTree = "<group>"; };
+		44234BB927E123D70088937F /* CountableEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountableEntity.swift; sourceTree = "<group>"; };
 		442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuDetail.swift; sourceTree = "<group>"; tabWidth = 2; };
 		442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GCDWebservers.xcframework; sourceTree = "<group>"; };
 		44331DD122551AFE007E3E93 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
@@ -5619,6 +5621,7 @@
 				44029EA227BBCEC800E6CE18 /* BlockedResource.swift */,
 				44234BAC27DFBA310088937F /* BraveVPNAlert.swift */,
 				44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */,
+				44234BB927E123D70088937F /* CountableEntity.swift */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -8380,6 +8383,7 @@
 				27FD3FA625C8CE4B00696156 /* RSSFeedSource.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
 				44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */,
+				44234BBA27E123D70088937F /* CountableEntity.swift in Sources */,
 				CAC5342327A83DE000013056 /* PlaylistFolder.swift in Sources */,
 				2F29FB8B267BE06100B0AD6A /* Model.xcdatamodeld in Sources */,
 				5D1DC55520AE004600905E5A /* TabMO.swift in Sources */,

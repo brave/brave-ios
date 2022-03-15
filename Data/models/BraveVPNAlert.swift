@@ -50,8 +50,36 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
         }
     }
     
-    public static func last(_ count: Int) -> [BraveVPNAlert]? {
+    public static func trackerCounts() -> Set<CountableEntity> {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BraveVPNAlert")
+        let context = DataController.viewContext
+        fetchRequest.entity = BraveVPNAlert.entity(in: context)
         
+        let expression = NSExpressionDescription()
+        expression.name = "group_by_count"
+        expression.expression = .init(forFunction: "count:", arguments: [NSExpression(forKeyPath: "host")])
+        expression.expressionResultType = .integer32AttributeType
+        
+        fetchRequest.propertiesToFetch = ["host", expression]
+        fetchRequest.propertiesToGroupBy = ["host"]
+        fetchRequest.resultType = .dictionaryResultType
+        
+        let results = try? context.fetch(fetchRequest)
+        
+        var ar = Set<CountableEntity>()
+        
+        for result in results ?? [] {
+            guard let host = result["host"] as? String, let count = result["group_by_count"] as? Int else {
+                continue
+            }
+            
+            ar.insert(.init(name: host, count: count))
+        }
+        
+        return ar
+    }
+    
+    public static func last(_ count: Int) -> [BraveVPNAlert]? {
         let dateSort = NSSortDescriptor(keyPath: \BraveVPNAlert.timestamp, ascending: false)
         
         return all(sortDescriptors: [dateSort], fetchLimit: count)
