@@ -139,7 +139,7 @@ class NewTabPageViewController: UIViewController {
                     let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers()
                     
                     // FIXME: VPNAlerts flag
-                    let allTimeVPN = BraveVPNAlert.trackerCounts()
+                    let allTimeVPN = BraveVPNAlert.allByHostCount
                     
                     let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
                         PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)

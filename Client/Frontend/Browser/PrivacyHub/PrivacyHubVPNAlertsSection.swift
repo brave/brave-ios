@@ -27,7 +27,7 @@ extension PrivacyReportsView {
         }
         
         NavigationLink(destination:
-                        AllVPNAlertsView(trackerCounts: BraveVPNAlert.totalAlertCounts(), onDismiss: {
+                        AllVPNAlertsView(trackerCounts: BraveVPNAlert.alertTotals, onDismiss: {
           onDismiss()
         })) {
           HStack {

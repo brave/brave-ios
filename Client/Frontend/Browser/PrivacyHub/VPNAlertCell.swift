@@ -17,19 +17,19 @@ struct VPNAlertCell: View {
     return formatter.string(from: date)
   }
   
-  private func assetName(for type: VPNAlertJSONModel.Category) -> String {
+  private func assetName(for type: BraveVPNAlert.TrackerType) -> String {
     switch type {
-    case .privacyTrackerApp: return "vpn_data_tracker"
-    case .privacyTrackerAppLocation: return "vpn_location_tracker"
-    case .privacyTrackerMail: return "vpn_mail_tracker"
+    case .app: return "vpn_data_tracker"
+    case .location: return "vpn_location_tracker"
+    case .mail: return "vpn_mail_tracker"
     }
   }
   
-  private func headerText(for type: VPNAlertJSONModel.Category) -> String {
+  private func headerText(for type: BraveVPNAlert.TrackerType) -> String {
     switch type {
-    case .privacyTrackerApp: return "Tracker & Ad"
-    case .privacyTrackerAppLocation: return "Location Pings"
-    case .privacyTrackerMail: return "Email tracker"
+    case .app: return "Tracker & Ad"
+    case .location: return "Location Pings"
+    case .mail: return "Email tracker"
     }
   }
   
@@ -53,7 +53,10 @@ struct VPNAlertCell: View {
   
   var body: some View {
     HStack(alignment: .top) {
-      Image(assetName(for: vpnAlert.categoryEnum!))
+      if let category = vpnAlert.categoryEnum {
+        Image(assetName(for: category))
+      }
+      
       VStack(alignment: .leading) {
         
         Group {

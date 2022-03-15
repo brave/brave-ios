@@ -752,7 +752,7 @@
 		4422D57421BFFB7F00BF1855 /* prog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4422D54221BFFB7E00BF1855 /* prog.cc */; };
 		4422D57621C05DE600BF1855 /* httpse.leveldb.tgz in Resources */ = {isa = PBXBuildFile; fileRef = 4422D57521C05DE500BF1855 /* httpse.leveldb.tgz */; };
 		44234BB727DFBA310088937F /* BraveVPNAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44234BAC27DFBA310088937F /* BraveVPNAlert.swift */; };
-		44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */; };
+		44234BB827DFBD8F0088937F /* BraveVPNAlertJSONModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BDACB027D6467700DDEE53 /* BraveVPNAlertJSONModel.swift */; };
 		44234BBA27E123D70088937F /* CountableEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44234BB927E123D70088937F /* CountableEntity.swift */; };
 		442477FA268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442477F9268CB86F008A04D7 /* BraveSearchDebugMenuDetail.swift */; };
 		442E7FB92731F96300412A36 /* GCDWebservers.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; };
@@ -2648,7 +2648,7 @@
 		44A58CC72693A309005C0879 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuFixture.swift; sourceTree = "<group>"; };
 		44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsItem.swift; sourceTree = "<group>"; };
-		44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNAlertJSONModel.swift; sourceTree = "<group>"; };
+		44BDACB027D6467700DDEE53 /* BraveVPNAlertJSONModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveVPNAlertJSONModel.swift; sourceTree = "<group>"; };
 		44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayPrivateModeInfoView.swift; sourceTree = "<group>"; };
 		44C42CF8268378B1009572D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
 		44C42D0626837935009572D7 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
@@ -5620,7 +5620,7 @@
 				2F9311D42665883400C6B74D /* DataSaved.swift */,
 				44029EA227BBCEC800E6CE18 /* BlockedResource.swift */,
 				44234BAC27DFBA310088937F /* BraveVPNAlert.swift */,
-				44BDACB027D6467700DDEE53 /* VPNAlertJSONModel.swift */,
+				44BDACB027D6467700DDEE53 /* BraveVPNAlertJSONModel.swift */,
 				44234BB927E123D70088937F /* CountableEntity.swift */,
 			);
 			path = models;
@@ -8382,7 +8382,7 @@
 				44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */,
 				27FD3FA625C8CE4B00696156 /* RSSFeedSource.swift in Sources */,
 				5D1DC55620AE004600905E5A /* DataController.swift in Sources */,
-				44234BB827DFBD8F0088937F /* VPNAlertJSONModel.swift in Sources */,
+				44234BB827DFBD8F0088937F /* BraveVPNAlertJSONModel.swift in Sources */,
 				44234BBA27E123D70088937F /* CountableEntity.swift in Sources */,
 				CAC5342327A83DE000013056 /* PlaylistFolder.swift in Sources */,
 				2F29FB8B267BE06100B0AD6A /* Model.xcdatamodeld in Sources */,

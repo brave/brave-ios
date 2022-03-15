@@ -681,9 +681,9 @@ class BraveVPN {
             do {
                 let dataAsJSON =
                 try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
-                let decoded = try JSONDecoder().decode([VPNAlertJSONModel].self, from: dataAsJSON)
+                let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
                 
-                BraveVPNAlert.batchCreate(alerts: decoded)
+                BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
             } catch {
                 log.error("Error: \(error)")
             }
