@@ -20,6 +20,8 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     case timedOut
     /// The user clicked the thumbs down button by swiping on the ad
     case disliked
+    /// The user clicked the wallet connection notification
+    case walletConnection
   }
   /// An ad was tapped and a URL should be opened
   public var actionOccured: ((AdNotification, Action) -> Void)?
@@ -75,6 +77,8 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
         case .disliked:
           self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
           self.ads.toggleThumbsDown(forAd: notification.uuid, advertiserId: notification.advertiserID)
+      case .walletConnection:
+          return
         }
         self.actionOccured?(notification, action)
 
@@ -94,6 +98,9 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
 
   public func showNotification(_ notification: AdNotification) {
     adsQueue.insert(notification, at: 0)
+    if let walletConnectionPanel = adsViewController.walletConnectionView {
+      adsViewController.hide(adView: walletConnectionPanel)
+    }
     if adsViewController.visibleAdView == nil {
       // Nothing currently waiting
       displayAd(notification: adsQueue.popLast()!)

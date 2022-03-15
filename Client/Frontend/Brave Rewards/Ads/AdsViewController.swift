@@ -8,6 +8,31 @@ import BraveShared
 import Shared
 import pop
 
+public protocol Ad {
+  var handler: AdsViewController.ActionHandler { get set }
+  func makeAdView() -> UIView
+}
+
+struct RewardsAd: Ad {
+  var ad: AdNotification
+  var handler: AdsViewController.ActionHandler
+  
+  func makeAdView() -> UIView {
+    let adView = AdView()
+    adView.adContentButton.titleLabel.text = ad.title
+    adView.adContentButton.bodyLabel.text = ad.body
+    return adView
+  }
+}
+
+struct WalletConnectionAd: Ad {
+  var handler: AdsViewController.ActionHandler
+  
+  func makeAdView() -> UIView {
+    return WalletConnectionView()
+  }
+}
+
 public class AdsViewController: UIViewController {
   public typealias ActionHandler = (AdNotification, AdsNotificationHandler.Action) -> Void
   private var widthAnchor: NSLayoutConstraint?
@@ -20,8 +45,8 @@ public class AdsViewController: UIViewController {
 
   /// The number of seconds until the ad is automatically dismissed
   private let automaticDismissalInterval: TimeInterval = 30
-
-  private var displayedAds: [AdView: DisplayedAd] = [:]
+  
+  private var displayedAds: [UIView: DisplayedAd] = [:]
   private(set) var visibleAdView: AdView?
 
   public override func loadView() {
@@ -93,8 +118,8 @@ public class AdsViewController: UIViewController {
   public func hide(adView: AdView) {
     hide(adView: adView, velocity: nil)
   }
-
-  private func hide(adView: AdView, velocity: CGFloat?) {
+  
+  private func hide(adView: UIView, velocity: CGFloat?) {
     visibleAdView = nil
     let handler = displayedAds[adView]
     displayedAds[adView] = nil
@@ -109,10 +134,10 @@ public class AdsViewController: UIViewController {
   }
 
   // MARK: - Actions
-
-  private var dismissTimers: [AdView: Timer] = [:]
-
-  private func setupTimeoutTimer(for adView: AdView) {
+  
+  private var dismissTimers: [UIView: Timer] = [:]
+  
+  private func setupTimeoutTimer(for adView: UIView) {
     if let timer = dismissTimers[adView] {
       // Invalidate and reschedule
       timer.invalidate()
@@ -261,8 +286,8 @@ public class AdsViewController: UIViewController {
   }
 
   // MARK: - Animations
-
-  private func animateIn(adView: AdView) {
+  
+  private func animateIn(adView: UIView) {
     adView.layoutIfNeeded()
     adView.layer.transform = CATransform3DMakeTranslation(0, -adView.bounds.size.height, 0)
 
@@ -270,8 +295,8 @@ public class AdsViewController: UIViewController {
       animation.toValue = 0
     }
   }
-
-  private func animateOut(adView: AdView, velocity: CGFloat? = nil, completion: @escaping () -> Void) {
+  
+  private func animateOut(adView: UIView, velocity: CGFloat? = nil, completion: @escaping () -> Void) {
     adView.layoutIfNeeded()
     let y = adView.frame.minY - view.safeAreaInsets.top - adView.transform.ty
 
@@ -292,6 +317,8 @@ extension AdsViewController {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
       // Only allow tapping the ad part of this VC
       if let view = super.hitTest(point, with: event), view.superview is AdView {
+        return view
+      } else if let view = super.hitTest(point, with: event), view is WalletConnectionView {
         return view
       }
       return nil

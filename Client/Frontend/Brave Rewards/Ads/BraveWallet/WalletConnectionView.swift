@@ -5,9 +5,9 @@
 
 import Foundation
 import UIKit
-import BraveWallet
+import Shared
 
-class WalletConnectionView: UIView {
+class WalletConnectionView: UIControl {
   private let stackView: UIStackView = {
     let result = UIStackView()
     result.axis = .horizontal
@@ -15,13 +15,13 @@ class WalletConnectionView: UIView {
     result.alignment = .center
     return result
   }()
-  
+
   private let iconImageView: UIImageView = {
     let result = UIImageView(image: UIImage(imageLiteralResourceName: "brave.unlock"))
     result.tintColor = .white
     return result
   }()
-  
+
   private let titleLabel: UILabel = {
     let result = UILabel()
     result.textColor = .white
@@ -30,19 +30,17 @@ class WalletConnectionView: UIView {
     result.text = Strings.Wallet.dappsConnectionNotificationTitle
     return result
   }()
-    
+
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
+
     addSubview(stackView)
-    
     stackView.snp.makeConstraints {
       $0.edges.equalToSuperview().inset(21)
     }
-    
     stackView.addArrangedSubview(iconImageView)
     stackView.addArrangedSubview(titleLabel)
-    
+
     layer.backgroundColor = UIColor.braveBlurpleTint.cgColor
     layer.cornerRadius = 10
   }
