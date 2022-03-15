@@ -26,7 +26,9 @@ extension PrivacyReportsView {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         
-        NavigationLink(destination: AllVPNAlertsView(vpnAlerts: BraveVPNAlert.last(100) ?? [], onDismiss: {
+        NavigationLink(destination: AllVPNAlertsView(vpnAlerts: BraveVPNAlert.last(100) ?? [],
+                                                     trackerCounts: BraveVPNAlert.totalAlertCounts(),
+                                                     onDismiss: {
           onDismiss()
         })) {
           HStack {

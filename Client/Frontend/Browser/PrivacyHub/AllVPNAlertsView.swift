@@ -12,6 +12,7 @@ struct AllVPNAlertsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
   let vpnAlerts: [BraveVPNAlert]
+  let trackerCounts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)
   private(set) var onDismiss: () -> Void
   
   private var headerView: some View {
@@ -20,7 +21,7 @@ struct AllVPNAlertsView: View {
         Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
           .font(.subheadline.weight(.medium))
         Spacer()
-        Text("123")
+        Text("\(trackerCounts.trackerCount + trackerCounts.locationPingCount + trackerCounts.emailTrackerCount)")
           .font(.headline.weight(.semibold))
       }
       .padding()
@@ -28,14 +29,32 @@ struct AllVPNAlertsView: View {
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
       
       if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
-        VPNAlertStat(assetName: "vpn_data_tracker", title: "Tracker & Ad", compact: true)
-        VPNAlertStat(assetName: "vpn_location_tracker", title: "Location Pings", compact: true)
-        VPNAlertStat(assetName: "vpn_mail_tracker", title: "Email tracker", compact: true)
+        VPNAlertStat(assetName: "vpn_data_tracker",
+                     title: "Tracker & Ad",
+                     count: trackerCounts.trackerCount,
+                     compact: true)
+        VPNAlertStat(assetName: "vpn_location_tracker",
+                     title: "Location Pings",
+                     count: trackerCounts.locationPingCount,
+                     compact: true)
+        VPNAlertStat(assetName: "vpn_mail_tracker",
+                     title: "Email tracker",
+                     count: trackerCounts.emailTrackerCount,
+                     compact: true)
       } else {
-        VPNAlertStat(assetName: "vpn_data_tracker", title: "Tracker & Ad", compact: false)
+        VPNAlertStat(assetName: "vpn_data_tracker",
+                     title: "Tracker & Ad",
+                     count: trackerCounts.trackerCount,
+                     compact: false)
         HStack {
-          VPNAlertStat(assetName: "vpn_location_tracker", title: "Location Pings", compact: true)
-          VPNAlertStat(assetName: "vpn_mail_tracker", title: "Email tracker", compact: true)
+          VPNAlertStat(assetName: "vpn_location_tracker",
+                       title: "Location Pings",
+                       count: trackerCounts.locationPingCount,
+                       compact: true)
+          VPNAlertStat(assetName: "vpn_mail_tracker",
+                       title: "Email tracker",
+                       count: trackerCounts.emailTrackerCount,
+                       compact: true)
         }
       }
       

@@ -10,11 +10,12 @@ extension AllVPNAlertsView {
     private let assetName: String
     private let title: String
     private let compact: Bool
+    private let count: Int
     
-    
-    init(assetName: String, title: String, compact: Bool) {
+    init(assetName: String, title: String, count: Int, compact: Bool) {
       self.assetName = assetName
       self.title = title
+      self.count = count
       self.compact = compact
     }
     
@@ -28,7 +29,7 @@ extension AllVPNAlertsView {
             Text(title)
               .foregroundColor(Color(.secondaryBraveLabel))
               .font(.caption.weight(.semibold))
-            Text("\(123)")
+            Text("\(count)")
               .font(.headline.weight(.semibold))
               // Smaller custom padding here to try to display the cell's text in one line
               // on regular font size English language.
@@ -39,7 +40,7 @@ extension AllVPNAlertsView {
           Text(title)
             .font(.caption.weight(.semibold))
           Spacer()
-          Text("\(123)")
+          Text("\(count)")
             .font(.headline.weight(.semibold))
             .padding(.trailing)
         }

@@ -57,6 +57,30 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
         return all(sortDescriptors: [dateSort], fetchLimit: count)
     }
     
+    public static func totalAlertCounts() -> (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int) {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BraveVPNAlert")
+        let context = DataController.viewContext
+        fetchRequest.entity = BraveVPNAlert.entity(in: context)
+        
+        do {
+            fetchRequest.predicate = .init(format: "category == %d",
+                                           VPNAlertJSONModel.Category.privacyTrackerApp.rawValue)
+            let trackerCount = try context.count(for: fetchRequest)
+            
+            fetchRequest.predicate = .init(format: "category == %d",
+                                           VPNAlertJSONModel.Category.privacyTrackerAppLocation.rawValue)
+            let locationPingCount = try context.count(for: fetchRequest)
+            
+            fetchRequest.predicate = .init(format: "category == %d",
+                                           VPNAlertJSONModel.Category.privacyTrackerMail.rawValue)
+            let emailTrackerCount = try context.count(for: fetchRequest)
+            
+            return (trackerCount, locationPingCount, emailTrackerCount)
+        } catch {
+            return (0, 0, 0)
+        }
+    }
+    
     private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {
         NSEntityDescription.entity(forEntityName: "BraveVPNAlert", in: context)
     }
