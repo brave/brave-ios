@@ -113,68 +113,36 @@ struct TransactionDetailsView: View {
     let marketPrice = numberFormatter.string(from: NSNumber(value: assetRatios[symbol.lowercased(), default: 0])) ?? "$0.00"
     return marketPrice
   }
-  
-  /// The transfer view between accounts
-  @ViewBuilder private var transferView: some View {
-    // For the time being, use the same subtitle label until we have the ability to parse
-    // Swap from/to addresses
-    let from = namedAddress(for: info.fromAddress)
-    let to = namedAddress(for: info.ethTxToAddress)
-    Text("\(from) \(Image(systemName: "arrow.right")) \(to)")
-      .font(.callout.weight(.semibold))
-      .accessibilityLabel(
-        String.localizedStringWithFormat(
-          Strings.Wallet.transactionFromToAccessibilityLabel, from, to
-        )
-      )
-  }
 
   private func namedAddress(for address: String) -> String {
     NamedAddresses.name(for: address, accounts: keyringStore.keyring.accountInfos)
   }
 
-  private var title: String? {
+  private var title: String {
     switch info.txType {
     case .erc20Approve:
       return Strings.Wallet.transactionUnknownApprovalTitle
-    case .ethSend, .other:
+    default:
       if info.isSwap {
         return Strings.Wallet.swap
       } else {
         return Strings.Wallet.sent
       }
-    case .erc20Transfer, .erc721TransferFrom, .erc721SafeTransferFrom:
-      return Strings.Wallet.sent
-    @unknown default:
-      return nil
     }
   }
 
   private var header: some View {
-    VStack(spacing: 16) {
-      BlockieGroup(
-        fromAddress: info.fromAddress,
-        toAddress: info.ethTxToAddress,
-        alignVisuallyCentered: true
-      )
-      transferView
-      VStack(spacing: 4) {
-        if let title = title {
-          Text(title)
-            .font(.callout)
-        }
-        Text(value)
-          .font(.title.weight(.semibold))
-          .foregroundColor(Color(.braveLabel))
-        if let fiat = fiat {
-          Text(fiat)
-            .font(.callout.weight(.medium))
-        }
-      }
-      .foregroundColor(Color(.secondaryBraveLabel))
-    }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 30)
+    TransactionHeader(
+      fromAccountAddress: info.fromAddress,
+      fromAccountName: namedAddress(for: info.fromAddress),
+      toAccountAddress: info.ethTxToAddress,
+      toAccountName: namedAddress(for: info.ethTxToAddress),
+      transactionType: title,
+      value: value,
+      fiat: fiat
+    )
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 30)
   }
   
   var body: some View {
@@ -182,7 +150,7 @@ struct TransactionDetailsView: View {
       List {
         Section(
           header: header
-            .textCase(.none)
+            .resetListHeaderStyle()
             .osAvailabilityModifiers { content in
               if #available(iOS 15.0, *) {
                 content // Padding already applied

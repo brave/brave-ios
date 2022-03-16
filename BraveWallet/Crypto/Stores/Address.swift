@@ -13,7 +13,7 @@ extension String {
     let prefixLength = hasPrefix("0x") ? 6 : 4
     return "\(prefix(prefixLength))…\(suffix(4))"
   }
-  
+
   /// Truncates an hash to only show the first 6 digits and last 6 digits
   var truncatedHash: String {
     // All addresses should be at least 26 characters long but for the sake of this function, we will ensure
