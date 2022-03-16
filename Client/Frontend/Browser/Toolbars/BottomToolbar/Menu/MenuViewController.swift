@@ -18,18 +18,16 @@ struct MenuItemHeaderView: View {
     
     var body: some View {
         HStack(spacing: 14) {
-            if let icon = icon {
-                Image(uiImage: icon)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .padding(6)
-                    .frame(width: 32, height: 32)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(Color(.secondaryBraveGroupedBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-                    )
-            }
+            Image(uiImage: icon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .padding(6)
+                .frame(width: 32, height: 32)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.secondaryBraveGroupedBackground))
+                        .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+            )
             VStack(alignment: .leading, spacing: 3) {
                 Text(verbatim: title)
                 if let subTitle = subtitle {

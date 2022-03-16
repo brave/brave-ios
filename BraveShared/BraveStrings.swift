@@ -3600,8 +3600,8 @@ extension Strings {
         public static let sectionTitle = NSLocalizedString(
             "nightMode.modeTitle",
             bundle: .braveShared,
-            value: "mode",
-            comment: "A section title where night mode is defined"
+            value: "Mode",
+            comment: "It refers to a night mode, to a type of mode a user can change referring to website appearance."
         )
         public static let settingsTitle = NSLocalizedString(
             "nightMode.settingsTitle",

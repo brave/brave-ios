@@ -11,7 +11,7 @@ import BraveShared
 
 /// A menu button that provides a shortcut to toggling Night Mode
 struct NightModeMenuButton: View {
-    @State private var nightMode = Preferences.General.nightModeEnabled
+    @ObservedObject private var nightMode = Preferences.General.nightModeEnabled
     
     var dismiss: () -> Void
     
@@ -24,6 +24,9 @@ struct NightModeMenuButton: View {
             Toggle("", isOn: $nightMode.value)
                 .labelsHidden()
                 .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+                .onChange(of: nightMode.value) { _ in
+                    dismiss()
+                }
         }
         .padding(.horizontal, 14)
         .frame(maxWidth: .infinity, minHeight: 48.0)
