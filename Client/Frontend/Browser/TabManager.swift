@@ -782,6 +782,32 @@ class TabManager: NSObject {
         configuration.processPool = WKProcessPool()
     }
 
+    func fetchSitesFromAllTabs(for query: String? = nil) -> [Site] {
+        var tabList = [Site]()
+        
+        for tab in tabsForCurrentMode(for: query) {
+            if PrivateBrowsingManager.shared.isPrivateBrowsing {
+                if let url = tab.url, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
+                    tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab))
+                }
+            } else {
+                if let tabID = tab.id {
+                    let fetchedTab = TabMO.get(fromId: tabID)
+                    
+                    if let urlString = fetchedTab?.url,
+                        let url = URL(string: urlString),
+                        url.isWebPage(),
+                        !(InternalURL(url)?.isAboutHomeURL ?? false) {
+                        tabList.append(
+                            Site(url: url.absoluteString, title: fetchedTab?.title ?? tab.displayTitle, siteType: .tab))
+                    }
+                }
+            }
+        }
+        
+        return tabList
+    }
+    
     static fileprivate func tabsStateArchivePath() -> String {
         guard let profilePath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("profile.profile").path else {
             let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]

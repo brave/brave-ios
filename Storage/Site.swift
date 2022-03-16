@@ -68,7 +68,7 @@ open class Site: Identifiable, Hashable {
                 case .bookmark:
                     return UIImage(systemName: "star.fill")
                 case .tab:
-                    return UIImage(systemName: "folder.fill")
+                    return #imageLiteral(resourceName: "settings-save-logins")//UIImage(systemName: "iphone.and.arrow.forward")
                 default:
                     return nil
             }

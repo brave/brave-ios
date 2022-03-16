@@ -13,15 +13,13 @@ class FrequencyQuery {
     
     private let historyAPI: BraveHistoryAPI
     private let bookmarkManager: BookmarkManager
-    private let tabManager: TabManager
     
     private let frequencyQueue = DispatchQueue(label: "frequency-query-queue")
     private var task: DispatchWorkItem?
     
-    init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager, tabManager: TabManager) {
+    init(historyAPI: BraveHistoryAPI, bookmarkManager: BookmarkManager) {
         self.historyAPI = historyAPI
         self.bookmarkManager = bookmarkManager
-        self.tabManager = tabManager
     }
     
     deinit {
@@ -37,10 +35,6 @@ class FrequencyQuery {
             // brave-core fetch can be slow over 200ms per call,
             // a cancellable serial queue is used for it.
             DispatchQueue.main.async {
-                // Tab Fetch
-                let tabFetched = self.tabManager.tabsForCurrentMode(for: query)
-                searchResult += self.fetchSitesFromTabs(tabFetched)
-
                 // History Fetch
                 self.historyAPI.byFrequency(query: query) { historyList in
                     let historySites = historyList.map { Site(url: $0.url.absoluteString, title: $0.title ?? "", siteType: .history) }
@@ -60,27 +54,5 @@ class FrequencyQuery {
         if let task = self.task {
             frequencyQueue.async(execute: task)
         }
-    }
-    
-    private func fetchSitesFromTabs(_ tabs: [Tab]) -> [Site] {
-        var tabList = [Site]()
-        
-        for tab in tabs {
-            if PrivateBrowsingManager.shared.isPrivateBrowsing {
-                if let url = tab.url, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-                    tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab))
-                }
-            } else {
-                if let tabID = tab.id {
-                    let fetchedTab = TabMO.get(fromId: tabID)
-                    
-                    if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-                        tabList.append(Site(url: url.absoluteString, title: fetchedTab?.title ?? tab.displayTitle, siteType: .tab))
-                    }
-                }
-            }
-        }
-        
-        return tabList
     }
 }

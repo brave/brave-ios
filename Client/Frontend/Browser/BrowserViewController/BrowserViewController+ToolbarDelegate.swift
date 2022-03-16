@@ -287,7 +287,7 @@ extension BrowserViewController: TopToolbarDelegate {
         if searchController != nil { return }
 
         let tabType = TabType.of(tabManager.selectedTab)
-        searchController = SearchViewController(forTabType: tabType)
+        searchController = SearchViewController(forTabType: tabType, tabManager: tabManager)
         
         guard let searchController = searchController else { return }
 
@@ -295,10 +295,7 @@ extension BrowserViewController: TopToolbarDelegate {
         searchController.searchDelegate = self
         searchController.profile = self.profile
 
-        searchLoader = SearchLoader(
-            historyAPI: braveCore.historyAPI,
-            bookmarkManager: bookmarkManager,
-            tabManager: tabManager)
+        searchLoader = SearchLoader(historyAPI: braveCore.historyAPI, bookmarkManager: bookmarkManager)
         searchLoader?.addListener(searchController)
         searchLoader?.autocompleteSuggestionHandler = { [weak self] completion in
             self?.topToolbar.setAutocompleteSuggestion(completion)
