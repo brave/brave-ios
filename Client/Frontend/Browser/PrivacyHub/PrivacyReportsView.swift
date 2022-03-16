@@ -39,8 +39,8 @@ struct PrivacyReportsView: View {
   
   private func dismissView() {
     // Dismiss on presentation mode does not work on iOS 14
-    // when using the UIHostingController at the top.
-    // As a workaround a simple completion handler is used.
+    // when using the UIHostingController is parent view.
+    // As a workaround a simple completion handler is used instead.
     if #available(iOS 15, *) {
       presentationMode.dismiss()
     } else {
@@ -71,9 +71,9 @@ struct PrivacyReportsView: View {
             PrivacyHubVPNAlertsSection(lastVPNAlerts: lastVPNAlerts, onDismiss: {
               dismissView()
             })
+            
+            Divider()
           }
-          
-          Divider()
           
           PrivacyHubAllTimeSection(
             allTimeMostFrequentTracker: allTimeMostFrequentTracker,

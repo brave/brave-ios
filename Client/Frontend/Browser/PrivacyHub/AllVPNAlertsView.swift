@@ -38,29 +38,29 @@ struct AllVPNAlertsView: View {
       
       if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
         VPNAlertStat(assetName: "vpn_data_tracker",
-                     title: "Tracker & Ad",
+                     title: Strings.PrivacyHub.vpnAlertRegularTrackerTypePlural,
                      count: trackerCounts.trackerCount,
                      compact: true)
         VPNAlertStat(assetName: "vpn_location_tracker",
-                     title: "Location Pings",
+                     title: Strings.PrivacyHub.vpnAlertLocationTrackerTypePlural,
                      count: trackerCounts.locationPingCount,
                      compact: true)
         VPNAlertStat(assetName: "vpn_mail_tracker",
-                     title: "Email tracker",
+                     title: Strings.PrivacyHub.vpnAlertEmailTrackerTypePlural,
                      count: trackerCounts.emailTrackerCount,
                      compact: true)
       } else {
         VPNAlertStat(assetName: "vpn_data_tracker",
-                     title: "Tracker & Ad",
+                     title: Strings.PrivacyHub.vpnAlertRegularTrackerTypePlural,
                      count: trackerCounts.trackerCount,
                      compact: false)
         HStack {
           VPNAlertStat(assetName: "vpn_location_tracker",
-                       title: "Location Pings",
+                       title: Strings.PrivacyHub.vpnAlertLocationTrackerTypePlural,
                        count: trackerCounts.locationPingCount,
                        compact: true)
           VPNAlertStat(assetName: "vpn_mail_tracker",
-                       title: "Email tracker",
+                       title: Strings.PrivacyHub.vpnAlertEmailTrackerTypePlural,
                        count: trackerCounts.emailTrackerCount,
                        compact: true)
         }

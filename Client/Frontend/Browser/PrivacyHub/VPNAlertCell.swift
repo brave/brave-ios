@@ -4,6 +4,8 @@
 
 import SwiftUI
 import Data
+import Shared
+import BraveShared
 
 struct VPNAlertCell: View {
   @Environment(\.sizeCategory) private var sizeCategory
@@ -27,9 +29,9 @@ struct VPNAlertCell: View {
   
   private func headerText(for type: BraveVPNAlert.TrackerType) -> String {
     switch type {
-    case .app: return "Tracker & Ad"
-    case .location: return "Location Pings"
-    case .mail: return "Email tracker"
+    case .app: return Strings.PrivacyHub.vpnAlertRegularTrackerTypeSingular
+    case .location: return Strings.PrivacyHub.vpnAlertLocationTrackerTypeSingular
+    case .mail: return Strings.PrivacyHub.vpnAlertEmailTrackerTypeSingular
     }
   }
   

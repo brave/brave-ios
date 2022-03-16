@@ -48,6 +48,7 @@ extension PrivacyReportsView {
                 }
                 Text(Strings.PrivacyHub.notificationCalloutBody)
                   .font(.headline)
+                  .fixedSize(horizontal: false, vertical: true)
               }
               Spacer()
               Image(systemName: "xmark")

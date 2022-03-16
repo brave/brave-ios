@@ -4495,7 +4495,6 @@ extension Strings {
             comment: "Header title for a list of websites with ads and trackers."
         )
         
-        
         public static let vpvnAlertsTotalCount = NSLocalizedString(
             "privacyHub.vpvnAlertsTotalCount",
             bundle: .braveShared,
@@ -4522,6 +4521,48 @@ extension Strings {
             bundle: .braveShared,
             value: "Blocked",
             comment: "It says that a ad or tracker was blocked. Think of it in context of 'A tracker X was blocked'"
+        )
+        
+        public static let vpnAlertRegularTrackerTypeSingular = NSLocalizedString(
+            "privacyHub.vpnAlertRegularTrackerTypeSingular",
+            bundle: .braveShared,
+            value: "Tracker or Ad",
+            comment: "Type of tracker blocked by the VPN, it's a regular tracker or an ad."
+        )
+        
+        public static let vpnAlertLocationTrackerTypeSingular = NSLocalizedString(
+            "privacyHub.vpnAlertLocationTrackerTypeSingular",
+            bundle: .braveShared,
+            value: "Location Ping",
+            comment: "Type of tracker blocked by the VPN, it's a tracker that asks you for your location."
+        )
+        
+        public static let vpnAlertEmailTrackerTypeSingular = NSLocalizedString(
+            "privacyHub.vpnAlertEmailTrackerTypeSingular",
+            bundle: .braveShared,
+            value: "Email Tracker",
+            comment: "Type of tracker blocked by the VPN, it's a tracker contained in an email."
+        )
+        
+        public static let vpnAlertRegularTrackerTypePlural = NSLocalizedString(
+            "privacyHub.vpnAlertRegularTrackerTypePlural",
+            bundle: .braveShared,
+            value: "Trackers & Ads",
+            comment: "Type of tracker blocked by the VPN, it's a regular tracker or an ad."
+        )
+        
+        public static let vpnAlertLocationTrackerTypePlural = NSLocalizedString(
+            "privacyHub.vpnAlertLocationTrackerTypePlural",
+            bundle: .braveShared,
+            value: "Location Pings",
+            comment: "Type of tracker blocked by the VPN, it's a tracker that asks you for your location."
+        )
+        
+        public static let vpnAlertEmailTrackerTypePlural = NSLocalizedString(
+            "privacyHub.vpnAlertEmailTrackerTypePlural",
+            bundle: .braveShared,
+            value: "Email Trackers",
+            comment: "Type of tracker blocked by the VPN, it's a tracker contained in an email."
         )
     }
 }

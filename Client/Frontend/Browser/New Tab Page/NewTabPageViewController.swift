@@ -135,7 +135,6 @@ class NewTabPageViewController: UIViewController {
                     let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
                     let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
                     
-                    
                     let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers()
                     
                     // FIXME: VPNAlerts flag
