@@ -52,20 +52,7 @@ class AccountActivityStore: ObservableObject {
             let additionalAssets = allTokens
               .filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) }
               .sorted(by: { $0.symbol < $1.symbol })
-              .map {
-                AssetViewModel(
-                  token: $0.then {
-                    if $0.symbol == "USDC" {
-                      $0.contractAddress = BraveWallet.usdcSwapAddress
-                    } else if $0.symbol == "DAI" {
-                      $0.contractAddress = BraveWallet.daiSwapAddress
-                    }
-                  },
-                  decimalBalance: 0,
-                  price: "",
-                  history: []
-                )
-              }
+              .map { AssetViewModel(token: $0, decimalBalance: 0, price: "", history: []) }
             updatedAssets.append(contentsOf: additionalAssets)
           }
           let updatedTokens = updatedAssets.map { $0.token }
