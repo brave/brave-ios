@@ -1884,5 +1884,61 @@ extension Strings {
       value: "Go back",
       comment: "The transaction edit error alert button which will dismiss the alert."
     )
+    public static let transactionDetailsTitle = NSLocalizedString(
+      "wallet.transactionDetailsTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transaction Details",
+      comment: "The title for the transaction details modal."
+    )
+    public static let transactionDetailsViewOnEtherscanTitle = NSLocalizedString(
+      "wallet.transactionDetailsViewOnEtherscanTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "View on etherscan.io",
+      comment: "The title for the button to open on etherscan.io in the transaction details modal."
+    )
+    public static let transactionDetailsTxFeeTitle = NSLocalizedString(
+      "wallet.transactionDetailsTxFeeTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transaction fee",
+      comment: "The title for displaying the transaction fee of the transaction in the transaction details modal."
+    )
+    public static let transactionDetailsMarketPriceTitle = NSLocalizedString(
+      "wallet.transactionDetailsMarketPriceTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Market price",
+      comment: "The title for displaying the market price of the transaction in the transaction details modal."
+    )
+    public static let transactionDetailsToAddressTitle = NSLocalizedString(
+      "wallet.transactionDetailsToAddressTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "To address",
+      comment: "The title for displaying the to address of the transaction in the transaction details modal."
+    )
+    public static let transactionDetailsDateTitle = NSLocalizedString(
+      "wallet.transactionDetailsDateTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Date",
+      comment: "The title for displaying the date of the transaction in the transaction details modal."
+    )
+    public static let transactionDetailsNetworkTitle = NSLocalizedString(
+      "wallet.transactionDetailsNetworkTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Network",
+      comment: "The title for displaying the network of the transaction in the transaction details modal."
+    )
+    public static let transactionDetailsTxHashTitle = NSLocalizedString(
+      "wallet.transactionDetailsTransactionHashTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Transaction hash",
+      comment: "The title for displaying the transaction hash in the transaction details modal."
+    )
   }
 }
