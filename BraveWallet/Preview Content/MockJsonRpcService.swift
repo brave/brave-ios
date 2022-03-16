@@ -41,8 +41,8 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("10", .success, "")
   }
   
-  func request(_ jsonPayload: String, autoRetryOnNetworkChange: Bool, coin: BraveWallet.CoinType, completion: @escaping (Int32, String, [String: String]) -> Void) {
-    completion(0, "", [:])
+  func request(_ jsonPayload: String, autoRetryOnNetworkChange: Bool, id: MojoBase.Value, coin: BraveWallet.CoinType, completion: @escaping (MojoBase.Value, MojoBase.Value, Bool, String, Bool) -> Void) {
+    completion(.init(), .init(), true, "", false)
   }
   
   func add(_ observer: BraveWalletJsonRpcServiceObserver) {
