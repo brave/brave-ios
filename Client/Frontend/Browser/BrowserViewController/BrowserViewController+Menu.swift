@@ -139,12 +139,8 @@ extension BrowserViewController {
                     guard let self = self else { return }
                     self.presentPlaylistController()
                 }
-                NightModeMenuButton(changeNightModePreference: { [weak self] status in
-                    guard let self = self else { return }
-
-                    self.dismiss(animated: true) {
-                        NightModeHelper.setNightMode(tabManager: self.tabManager, enabled: status)
-                    }
+                NightModeMenuButton(dismiss: { [weak self] in
+                    self?.dismiss(animated: true)
                 })
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
