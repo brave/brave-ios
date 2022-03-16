@@ -12,7 +12,7 @@ import SwiftUI
 
 struct MenuItemHeaderView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
-    var icon: UIImage?
+    var icon: UIImage
     var title: String
     var subtitle: String?
     
@@ -59,7 +59,7 @@ private struct MenuView<Content: View>: View {
 struct MenuItemButton: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     
-    var icon: UIImage?
+    var icon: UIImage
     var title: String
     var subtitle: String?
     var action: () -> Void

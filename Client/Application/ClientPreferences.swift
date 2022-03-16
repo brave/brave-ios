@@ -69,7 +69,7 @@ extension Preferences {
         /// `system`, follows the current OS display mode
         static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: DefaultTheme.system.rawValue)
         /// Specifies If Night Mode is enabled
-        static let nightModeEnabled = Option<Bool>(key: "general.night-mode-theme", default: false)
+        static let nightModeEnabled = Option<Bool>(key: "general.night-mode-enabled", default: false)
         /// Specifies whether the bookmark button is present on toolbar
         static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
         /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only).

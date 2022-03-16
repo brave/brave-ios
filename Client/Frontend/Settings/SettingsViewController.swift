@@ -331,7 +331,7 @@ class SettingsViewController: TableViewController {
             optionsViewController.footerText = Strings.themesDisplayBrightnessFooter
 
             let nightModeSection = Section(
-                header: .title(Strings.NightMode.sectionTitle),
+                header: .title(Strings.NightMode.sectionTitle.uppercased()),
                 rows: [
                     .boolRow(
                         title: Strings.NightMode.settingsTitle,

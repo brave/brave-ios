@@ -18,9 +18,7 @@ struct NightModeMenuButton: View {
     var body: some View {
         HStack {
             MenuItemHeaderView(
-                icon: nightMode.value ?
-                    UIImage(systemName: "moon.fill")?.template :
-                    UIImage(systemName: "moon")?.template ?? UIImage(),
+                icon: UIImage(systemName: nightMode.value ? "moon.fill": "moon")?.template ?? UIImage(),
                 title: Strings.NightMode.settingsTitle)
             Spacer()
             Toggle("", isOn: $nightMode.value)
@@ -40,6 +38,6 @@ struct NightModeMenuButton: View {
         )
         .accessibilityElement()
         .accessibility(addTraits: .isButton)
-        .accessibility(label: Text("Night Mode"))
+        .accessibility(label: Text(Strings.NightMode.settingsTitle))
     }
 }
