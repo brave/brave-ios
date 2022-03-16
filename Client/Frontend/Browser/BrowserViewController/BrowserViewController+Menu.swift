@@ -139,9 +139,6 @@ extension BrowserViewController {
                     guard let self = self else { return }
                     self.presentPlaylistController()
                 }
-                NightModeMenuButton(dismiss: { [weak self] in
-                    self?.dismiss(animated: true)
-                })
             }
             MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
                 var settingsStore: SettingsStore?
@@ -277,6 +274,9 @@ extension BrowserViewController {
                         browserViewController.dismiss(animated: true)
                         browserViewController.tabToolbarDidPressShare()
                     }
+                    NightModeMenuButton(dismiss: {
+                        browserViewController.dismiss(animated: true)
+                    })
                     MenuItemButton(icon: #imageLiteral(resourceName: "menu-add-bookmark").template, title: Strings.addToMenuItem) {
                         browserViewController.dismiss(animated: true) {
                             browserViewController.openAddBookmark()
