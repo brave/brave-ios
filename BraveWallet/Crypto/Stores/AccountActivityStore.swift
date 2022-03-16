@@ -15,20 +15,23 @@ class AccountActivityStore: ObservableObject {
   private let rpcService: BraveWalletJsonRpcService
   private let assetRatioService: BraveWalletAssetRatioService
   private let txService: BraveWalletTxService
+  private let blockchainRegistry: BraveWalletBlockchainRegistry
 
   init(
     account: BraveWallet.AccountInfo,
     walletService: BraveWalletBraveWalletService,
     rpcService: BraveWalletJsonRpcService,
     assetRatioService: BraveWalletAssetRatioService,
-    txService: BraveWalletTxService
+    txService: BraveWalletTxService,
+    blockchainRegistry: BraveWalletBlockchainRegistry
   ) {
     self.account = account
     self.walletService = walletService
     self.rpcService = rpcService
     self.assetRatioService = assetRatioService
     self.txService = txService
-
+    self.blockchainRegistry = blockchainRegistry
+    
     self.rpcService.add(self)
     self.txService.add(self)
   }
@@ -39,33 +42,62 @@ class AccountActivityStore: ObservableObject {
   }
 
   private func fetchAssets() {
-    rpcService.chainId { [self] chainId in
-      walletService.userAssets(chainId) { tokens in
-        assets = tokens.map {
-          .init(token: $0, decimalBalance: 0, price: "", history: [])
-        }
-        assetRatioService.price(
-          tokens.map { $0.symbol.lowercased() },
-          toAssets: ["usd"],
-          timeframe: .oneDay
-        ) { success, prices in
-          for price in prices {
-            if let index = assets.firstIndex(where: {
-              $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
-            }) {
-              assets[index].price = price.price
+    blockchainRegistry.allTokens(BraveWallet.MainnetChainId) { [self] allTokens in
+      rpcService.chainId { [self] chainId in
+        walletService.userAssets(chainId) { [self] tokens in
+          var updatedAssets = tokens.map {
+            AssetViewModel(token: $0, decimalBalance: 0, price: "", history: [])
+          }
+          if chainId == BraveWallet.RopstenChainId {
+            let additionalAssets = allTokens
+              .filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) }
+              .sorted(by: { $0.symbol < $1.symbol })
+              .map {
+                AssetViewModel(
+                  token: $0.then {
+                    if $0.symbol == "USDC" {
+                      $0.contractAddress = BraveWallet.usdcSwapAddress
+                    } else if $0.symbol == "DAI" {
+                      $0.contractAddress = BraveWallet.daiSwapAddress
+                    }
+                  },
+                  decimalBalance: 0,
+                  price: "",
+                  history: []
+                )
+              }
+            updatedAssets.append(contentsOf: additionalAssets)
+          }
+          let updatedTokens = updatedAssets.map { $0.token }
+          // fetch price & balance for each asset
+          let dispatchGroup = DispatchGroup()
+          dispatchGroup.enter()
+          assetRatioService.price(
+            updatedTokens.map { $0.symbol.lowercased() },
+            toAssets: ["usd"],
+            timeframe: .oneDay) { success, prices in
+              defer { dispatchGroup.leave() }
+              for price in prices {
+                if let index = updatedAssets.firstIndex(where: {
+                  $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
+                }) {
+                  updatedAssets[index].price = price.price
+                }
+              }
+            }
+          for token in updatedTokens {
+            dispatchGroup.enter()
+            rpcService.balance(for: token, in: account) { value in
+              defer { dispatchGroup.leave() }
+              if let value = value, let index = updatedAssets.firstIndex(where: {
+                $0.token.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
+              }) {
+                updatedAssets[index].decimalBalance = value
+              }
             }
           }
-        }
-        for token in tokens {
-          rpcService.balance(for: token, in: account) { value in
-            if let value = value,
-              let index = assets.firstIndex(where: {
-                $0.token.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
-              })
-            {
-              assets[index].decimalBalance = value
-            }
+          dispatchGroup.notify(queue: .main) {
+            self.assets = updatedAssets
           }
         }
       }

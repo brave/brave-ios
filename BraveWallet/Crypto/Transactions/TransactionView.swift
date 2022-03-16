@@ -55,11 +55,10 @@ struct TransactionView: View {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     switch info.txType {
     case .erc20Approve:
-      if info.txArgs.count > 1,
-        let token = visibleTokens.first(where: {
-          $0.contractAddress == info.txArgs[0]
-        })
-      {
+      let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to ?? ""
+      if info.txArgs.count > 1, let token = visibleTokens.first(where: {
+        $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame
+      }) {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? "", token.symbol))
       } else {
         Text(Strings.Wallet.transactionUnknownApprovalTitle)
