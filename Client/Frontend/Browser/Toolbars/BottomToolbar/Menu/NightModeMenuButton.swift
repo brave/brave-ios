@@ -39,9 +39,10 @@ struct NightModeMenuButton: View {
     var body: some View {
         HStack {
             MenuItemHeaderView(
-                icon: UIImage(systemName: "moon")?.template ?? UIImage(),
-                title: Strings.NightMode.settingsTitle,
-                subtitle: Strings.NightMode.settingsDescription)
+                icon: isNightModeEnabled ?
+                    UIImage(systemName: "moon.fill")?.template :
+                    UIImage(systemName: "moon")?.template ?? UIImage(),
+                title: Strings.NightMode.settingsTitle)
             Spacer()
             actionToggle
         }
