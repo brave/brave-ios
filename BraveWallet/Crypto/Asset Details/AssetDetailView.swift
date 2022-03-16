@@ -145,6 +145,7 @@ struct AssetDetailView: View {
           TransactionDetailsView(
             info: tx,
             networkStore: networkStore,
+            keyringStore: keyringStore,
             visibleTokens: [],
             assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue]
           )

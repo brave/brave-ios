@@ -14,6 +14,7 @@ struct TransactionDetailsView: View {
   
   var info: BraveWallet.TransactionInfo
   @ObservedObject var networkStore: NetworkStore
+  @ObservedObject var keyringStore: KeyringStore
   var visibleTokens: [BraveWallet.BlockchainToken]
   var assetRatios: [String: Double]
   
@@ -29,35 +30,38 @@ struct TransactionDetailsView: View {
     $0.currencyCode = "USD"
   }
 
+  /// The value of the transaction with symbol, ex. `"0.0100 ETH"`
   private var value: String {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
+    let amount: String
     switch info.txType {
     case .erc20Transfer:
-      return info.txArgs[1]
+      amount = info.txArgs[0]
     case .erc721TransferFrom, .erc721SafeTransferFrom:
-      return "1" // Can only send 1 erc721 at a time
+      amount = "1" // Can only send 1 erc721 at a time
     case .erc20Approve:
       if info.txArgs.count > 1, let token = visibleTokens.first(where: {
         $0.contractAddress == info.txArgs[0]
       }) {
-        return formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+        amount = formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+        return String(format: "%@ %@", amount, token.symbol)
       } else {
         return "0.0"
       }
     case .ethSend, .other:
-      return formatter.decimalString(for: info.ethTxValue.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) ?? ""
+      amount = formatter.decimalString(for: info.ethTxValue.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) ?? ""
     @unknown default:
-      return "0.0"
+      amount = "0.0"
     }
+    return String(format: "%@ %@", amount, networkStore.selectedChain.symbol)
   }
   
+  /// The fiat of the transaction, ex. `"$45.76"`
   private var fiat: String? {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     switch info.txType {
-    case .erc721TransferFrom, .erc721SafeTransferFrom:
+    case .erc721TransferFrom, .erc721SafeTransferFrom, .erc20Approve:
       return nil
-    case .erc20Approve:
-      return Strings.Wallet.transactionUnknownApprovalTitle
     case .ethSend, .other:
       let amount = formatter.decimalString(for: info.ethTxValue.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) ?? ""
       let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
@@ -77,6 +81,7 @@ struct TransactionDetailsView: View {
     }
   }
   
+  /// The gas fee including the fiat for the transaction, ex. `("0.003402 ETC", "$15.57")`
   private var gasFee: (String, fiat: String)? {
     let isEIP1559Transaction = info.isEIP1559Transaction
     let limit = info.ethTxGasLimit
@@ -93,6 +98,7 @@ struct TransactionDetailsView: View {
     return nil
   }
   
+  /// The formatted transaction fee for the transaction, ex. `"0.003401\n$15.57"`
   private var transactionFee: String? {
     guard let (fee, fiat) = gasFee else {
       return nil
@@ -101,35 +107,71 @@ struct TransactionDetailsView: View {
     return String(format: "%@ %@\n%@", fee, symbol, fiat)
   }
   
+  /// The market price for the asset
   private var marketPrice: String {
     let symbol = networkStore.selectedChain.symbol
     let marketPrice = numberFormatter.string(from: NSNumber(value: assetRatios[symbol.lowercased(), default: 0])) ?? "$0.00"
     return marketPrice
   }
-    
+  
+  /// The transfer view between accounts
+  @ViewBuilder private var transferView: some View {
+    // For the time being, use the same subtitle label until we have the ability to parse
+    // Swap from/to addresses
+    let from = namedAddress(for: info.fromAddress)
+    let to = namedAddress(for: info.ethTxToAddress)
+    Text("\(from) \(Image(systemName: "arrow.right")) \(to)")
+      .font(.callout.weight(.semibold))
+      .accessibilityLabel(
+        String.localizedStringWithFormat(
+          Strings.Wallet.transactionFromToAccessibilityLabel, from, to
+        )
+      )
+  }
+
+  private func namedAddress(for address: String) -> String {
+    NamedAddresses.name(for: address, accounts: keyringStore.keyring.accountInfos)
+  }
+
+  private var title: String? {
+    switch info.txType {
+    case .erc20Approve:
+      return Strings.Wallet.transactionUnknownApprovalTitle
+    case .ethSend, .other:
+      if info.isSwap {
+        return Strings.Wallet.swap
+      } else {
+        return Strings.Wallet.sent
+      }
+    case .erc20Transfer, .erc721TransferFrom, .erc721SafeTransferFrom:
+      return Strings.Wallet.sent
+    @unknown default:
+      return nil
+    }
+  }
+
   private var header: some View {
     VStack(spacing: 16) {
-      VStack(spacing: 8) {
+      BlockieGroup(
+        fromAddress: info.fromAddress,
+        toAddress: info.ethTxToAddress,
+        alignVisuallyCentered: true
+      )
+      transferView
+      VStack(spacing: 4) {
+        if let title = title {
+          Text(title)
+            .font(.callout)
+        }
+        Text(value)
+          .font(.title.weight(.semibold))
+          .foregroundColor(Color(.braveLabel))
         if let fiat = fiat {
           Text(fiat)
-            .font(.title.weight(.semibold))
-            .foregroundColor(Color(.braveLabel))
+            .font(.callout.weight(.medium))
         }
-        Text(String(format: "%@ %@", value, networkStore.selectedChain.symbol))
-          .font(.callout.weight(.medium))
-          .foregroundColor(Color(.secondaryBraveLabel))
       }
-      HStack(spacing: 4) {
-        Image(systemName: "circle.fill")
-          .foregroundColor(info.txStatus.color)
-          .imageScale(.small)
-          .accessibilityHidden(true)
-        Text(info.txStatus.localizedDescription)
-          .foregroundColor(Color(.braveLabel))
-          .multilineTextAlignment(.trailing)
-      }
-      .accessibilityElement(children: .combine)
-      .font(.caption.weight(.semibold))
+      .foregroundColor(Color(.secondaryBraveLabel))
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, 30)
@@ -153,10 +195,22 @@ struct TransactionDetailsView: View {
             detailRow(title: Strings.Wallet.transactionDetailsTxFeeTitle, value: transactionFee)
           }
           detailRow(title: Strings.Wallet.transactionDetailsMarketPriceTitle, value: marketPrice)
-          detailRow(title: Strings.Wallet.transactionDetailsToAddressTitle, value: info.ethTxToAddress.truncatedAddress)
           detailRow(title: Strings.Wallet.transactionDetailsDateTitle, value: dateFormatter.string(from: info.createdTime))
-          detailRow(title: Strings.Wallet.transactionDetailsNetworkTitle, value: networkStore.selectedChain.chainName)
           detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle, value: !info.txHash.isEmpty ? info.txHash.truncatedHash : "***")
+          detailRow(title: Strings.Wallet.transactionDetailsNetworkTitle, value: networkStore.selectedChain.chainName)
+          detailRow(title: Strings.Wallet.transactionDetailsStatusTitle) {
+            HStack(spacing: 4) {
+              Image(systemName: "circle.fill")
+                .foregroundColor(info.txStatus.color)
+                .imageScale(.small)
+                .accessibilityHidden(true)
+              Text(info.txStatus.localizedDescription)
+                .foregroundColor(Color(.braveLabel))
+                .multilineTextAlignment(.trailing)
+            }
+            .accessibilityElement(children: .combine)
+            .font(.caption.weight(.semibold))
+          }
         }
         .listRowInsets(.zero)
         if !info.txHash.isEmpty {
@@ -192,11 +246,17 @@ struct TransactionDetailsView: View {
   }
   
   private func detailRow(title: String, value: String) -> some View {
+    detailRow(title: title) {
+      Text(value)
+        .multilineTextAlignment(.trailing)
+    }
+  }
+  
+  private func detailRow<ValueView: View>(title: String, @ViewBuilder valueView: () -> ValueView) -> some View {
     HStack {
       Text(title)
       Spacer()
-      Text(value)
-        .multilineTextAlignment(.trailing)
+      valueView()
     }
     .font(.caption)
     .foregroundColor(Color(.braveLabel))
@@ -213,6 +273,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
       TransactionDetailsView(
         info: .previewConfirmedSend,
         networkStore: .previewStore,
+        keyringStore: .previewStore,
         visibleTokens: [.previewToken],
         assetRatios: ["eth": 4576.36]
       )
@@ -220,13 +281,15 @@ struct TransactionDetailsView_Previews: PreviewProvider {
       TransactionDetailsView(
         info: .previewConfirmedSwap,
         networkStore: .previewStore,
+        keyringStore: .previewStore,
         visibleTokens: [.previewToken],
         assetRatios: ["eth": 4576.36]
       )
         .previewColorSchemes()
       TransactionDetailsView(
-        info: .previewConfirmedERC20Approve, // FIXME: failing to get value / fiat value
+        info: .previewConfirmedERC20Approve,
         networkStore: .previewStore,
+        keyringStore: .previewStore,
         visibleTokens: [.previewToken],
         assetRatios: ["eth": 4576.36]
       )

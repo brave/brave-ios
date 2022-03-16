@@ -133,6 +133,7 @@ struct AccountActivityView: View {
           TransactionDetailsView(
             info: tx,
             networkStore: networkStore,
+            keyringStore: keyringStore,
             visibleTokens: activityStore.assets.map(\.token),
             assetRatios: assetRatios
           )

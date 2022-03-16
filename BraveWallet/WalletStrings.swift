@@ -1912,13 +1912,6 @@ extension Strings {
       value: "Market price",
       comment: "The title for displaying the market price of the transaction in the transaction details modal."
     )
-    public static let transactionDetailsToAddressTitle = NSLocalizedString(
-      "wallet.transactionDetailsToAddressTitle",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "To address",
-      comment: "The title for displaying the to address of the transaction in the transaction details modal."
-    )
     public static let transactionDetailsDateTitle = NSLocalizedString(
       "wallet.transactionDetailsDateTitle",
       tableName: "BraveWallet",
@@ -1939,6 +1932,20 @@ extension Strings {
       bundle: .braveWallet,
       value: "Transaction hash",
       comment: "The title for displaying the transaction hash in the transaction details modal."
+    )
+    public static let transactionDetailsStatusTitle = NSLocalizedString(
+      "wallet.transactionDetailsStatusTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Status",
+      comment: "The title for displaying the transaction status in the transaction details modal."
+    )
+    public static let sent = NSLocalizedString(
+      "wallet.sent",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Sent",
+      comment: "As in sending cryptocurrency from one asset to another"
     )
   }
 }
