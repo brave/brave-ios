@@ -41,7 +41,8 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   
   public init(
     walletStore: WalletStore,
-    presentingContext: PresentingContext = .default
+    presentingContext: PresentingContext = .default,
+    onUnlock: (() -> Void)? = nil
   ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
@@ -61,18 +62,22 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         self.delegate?.openWalletURL(url)
       }
     }
-    // SwiftUI has a bug where nested sheets do not dismiss correctly if the root View holding onto
-    // the sheet is removed from the view hierarchy. The root's sheet stays visible even though the
-    // root doesn't exist anymore.
-    //
-    // As a workaround to this issue, we can just watch keyring's `isLocked` value from here
-    // and dismiss the first sheet ourselves to ensure we dont get stuck with a child view visible
-    // while the wallet is locked.
     cancellable = walletStore.keyringStore.$keyring
-      .dropFirst()
+      .dropFirst() // Drop initial value
       .map(\.isLocked)
       .removeDuplicates()
+      .dropFirst() // Drop first async fetch of keyring
       .sink { [weak self] isLocked in
+        if !isLocked {
+          onUnlock?()
+        }
+        // SwiftUI has a bug where nested sheets do not dismiss correctly if the root View holding onto
+        // the sheet is removed from the view hierarchy. The root's sheet stays visible even though the
+        // root doesn't exist anymore.
+        //
+        // As a workaround to this issue, we can just watch keyring's `isLocked` value from here
+        // and dismiss the first sheet ourselves to ensure we dont get stuck with a child view visible
+        // while the wallet is locked.
         if let self = self, isLocked, self.presentedViewController != nil {
           self.dismiss(animated: true)
         }

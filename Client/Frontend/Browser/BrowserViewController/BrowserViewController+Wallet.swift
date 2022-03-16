@@ -10,6 +10,7 @@ import struct Shared.Logger
 import BraveCore
 import SwiftUI
 import BraveUI
+import Data
 
 private let log = Logger.browserLogger
 
@@ -95,88 +96,90 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         return accounts
     }
     
+    private var selectedTabOrigin: URL? {
+        guard let tab = tabManager.selectedTab, let origin = tab.url?.origin else { return nil }
+        return URL(string: origin)
+    }
+    
     func showPanel() {
-        guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false) else { return }
-        let keyringStore = KeyringStore(keyringService: keyringService)
         // TODO: Show ad-like notification prompt before calling `presentWalletPanel`
         presentWalletPanel()
     }
     
     func getOrigin() -> URL {
-        guard let selectedTab = tabManager.selectedTab,
-              let origin = selectedTab.url?.origin,
-              let url = URL(string: origin) else {
-                  assert(false, "We should have a valid origin to get to this point")
-                  return NSURL() as URL // We can't make an "empty" URL like you can with NSURL
-              }
-        return url
+        guard let origin = selectedTabOrigin else {
+            assert(false, "We should have a valid origin to get to this point")
+            return NSURL() as URL // We can't make an "empty" URL like you can with NSURL
+        }
+        return origin
     }
     
     func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
-        // TODO: Figure out what order these calls happen in...
-        
-        /*
-         1. RequestEthereumPermissions calls...
-         2. GetAllowedAccounts
-                - gets selected account from KeyringService
-                - gets keyring info for default keyring, maps account infos to addresses
-                - fetches permissions (BraveEthereumPermissionContext::GetAllowedAccounts)
-                  for each address of the domain, returns allowed accounts
-                - "Filters" accounts if keyring is unlocked or include_accounts_when_locked is true (w/ selected account)
-                - error here is `success` or `internalError` if fail to obtain permissions
-         4. ContinueRequestEthereumPermissions
-                - checks success passed from GetAllowedAccounts, bails early if its an error
-                - if there are no allowed accounts: responds with an empty array, success and empty error string
-                - otherwise gets keyring info and passes to next function
-         5. ContinueRequestEthereumPermissionsKeyringInfo
-                - if no wallet is created, shows onboarding, errors with `internalError`
-                - if the keyring is locked, response with an empty array, success and empty error string
-         6. BraveEthereumPermissionContext::RequestPermissions (fetches ContentSetting permissions for each)
-                - ???? Apparently does the same thing as GetAllowedAccounts version
-                - Sets up a pending permissions request, which then is checked for in BraveWalletTabHelper::GetBubbleURL ?
-         7. OnRequestEthereumPermissions
-                - Just calls back with filtered account
-         
-         "Filter account" means possibly returning only 1 address if its the selected account instead of
-         all of them
-         */
-        guard let walletStore = WalletStore.from(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) else {
-            completion([], .internalError, "")
-            return
-        }
-        let permissions = WalletHostingViewController(
-            walletStore: walletStore,
-            presentingContext: .requestEthererumPermissions { response in
-                switch response {
-                case .granted(let accounts):
-                    completion(accounts, .success, "")
-                case .rejected:
-                    completion([], .userRejectedRequest, "User rejected request")
-                }
-            }
-        )
-        present(permissions, animated: true)
-    }
-    
-    func getAllowedAccounts(_ includeAccountsWhenLocked: Bool, completion: @escaping BraveWalletProviderResultsCallback) {
-        updateURLBarWalletButton()
-        guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false) else { return }
         Task { @MainActor in
-            let isLocked = await keyringService.isLocked()
-            if !includeAccountsWhenLocked && isLocked {
-                completion([], .success, "")
+            let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+            guard let walletStore = WalletStore.from(privateMode: isPrivate) else {
+                completion([], .internalError, "")
                 return
             }
-            let keyring = await keyringService.keyringInfo(BraveWallet.DefaultKeyringId)
-            let selectedAccount = await keyringService.selectedAccount(.eth)
-            // TODO: Pull from domain
-            completion(
-                filterAccounts(keyring.accountInfos.map(\.address), selectedAccount: selectedAccount),
-                .success,
-                ""
+            let (accounts, status, message) = await allowedAccounts(false)
+            if status != .success {
+                completion([], status, message)
+                return
+            }
+            if status == .success && !accounts.isEmpty {
+                completion(accounts, .success, "")
+                return
+            }
+            
+            let permissions = WalletHostingViewController(
+                walletStore: walletStore,
+                presentingContext: .requestEthererumPermissions { [weak self] response in
+                    guard let self = self else { return }
+                    switch response {
+                    case .granted(let accounts):
+                        Domain.setEthereumPermissions(forUrl: self.getOrigin(), accounts: accounts, grant: true)
+                        completion(accounts, .success, "")
+                    case .rejected:
+                        completion([], .userRejectedRequest, "User rejected request")
+                    }
+                },
+                onUnlock: {
+                    Task { @MainActor in
+                        // If the user unlocks their wallet and we already have permissions setup they do not
+                        // go through the regular flow
+                        let (accounts, status, _) = await self.allowedAccounts(false)
+                        if status == .success, !accounts.isEmpty {
+                            completion(accounts, .success, "")
+                            self.dismiss(animated: true)
+                            return
+                        }
+                    }
+                }
             )
+            present(permissions, animated: true)
         }
-//        completion(["0x2f76C097a15792839655077346Aa4b5ef367EB90"], .success, "")
+    }
+    
+    func allowedAccounts(_ includeAccountsWhenLocked: Bool) async -> ([String], BraveWallet.ProviderError, String) {
+        // This method is called immediately upon creation of the wallet provider, which happens at tab
+        // configuration, which means it may not be selected or ready yet.
+        guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
+              selectedTabOrigin != nil else {
+            return ([], .internalError, "Internal error")
+        }
+        updateURLBarWalletButton()
+        let origin = getOrigin()
+        let isLocked = await keyringService.isLocked()
+        if !includeAccountsWhenLocked && isLocked {
+            return ([], .success, "")
+        }
+        let selectedAccount = await keyringService.selectedAccount(.eth)
+        let permissions = Domain.ethereumPermissions(forUrl: origin)
+        return (
+            filterAccounts(permissions ?? [], selectedAccount: selectedAccount),
+            .success,
+            ""
+        )
     }
     
     func updateURLBarWalletButton() {
