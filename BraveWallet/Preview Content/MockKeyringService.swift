@@ -184,11 +184,7 @@ class MockKeyringService: BraveWalletKeyringService {
     completion(true, info.address)
   }
 
-  func importFilecoinSecp256k1Account(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
-    completion(false, "")
-  }
-
-  func importFilecoinBlsAccount(_ accountName: String, privateKey: String, publicKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
+  func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
     completion(false, "")
   }
 
