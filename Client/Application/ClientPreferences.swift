@@ -311,4 +311,9 @@ extension Preferences {
     static let enableCarPlayRestartPlayback =
       Option<Bool>(key: "playlist.enableCarPlayRestartPlayback", default: false)
   }
+    
+    final class PrivacyHub {
+        static let shouldShowNotificationPermissionCallout =
+            Option<Bool>(key: "playlist.show-notification-permission-callout", default: true)
+    }
 }

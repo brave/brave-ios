@@ -28,13 +28,24 @@ struct PrivacyReportsView: View {
     && allTimeRiskiestWebsite == nil
   }
   
-  private var showNotificationCallout: Bool {
-    // FIXME: Notifications disabled AND user did not dismiss it yet - pref.
-    return true
-  }
+  @State var showNotificationCallout = false
+  
+  @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyHub.shouldShowNotificationPermissionCallout
   
   private var vpnAlertsEnabled: Bool {
     return true
+  }
+  
+  @State private var correctAuthStatus: Bool = false
+  
+  /// This is to cover a case where user has set up their notifications already, and pressing on 'Enable notifications' would do nothing.
+  private func determineNotificationPermissionStatus() {
+    UNUserNotificationCenter.current().getNotificationSettings { settings in
+      DispatchQueue.main.async {
+        correctAuthStatus =
+        settings.authorizationStatus == .notDetermined || settings.authorizationStatus == .provisional
+      }
+    }
   }
   
   private func dismissView() {
@@ -53,7 +64,7 @@ struct PrivacyReportsView: View {
       ScrollView(.vertical) {
         VStack(alignment: .leading, spacing: 16) {
           
-          if showNotificationCallout {
+          if showNotificationPermissionCallout.value && correctAuthStatus {
             NotificationCalloutView()
           }
           
@@ -101,6 +112,7 @@ struct PrivacyReportsView: View {
     }
     .navigationViewStyle(.stack)
     .environment(\.managedObjectContext, DataController.swiftUIContext)
+    .onAppear(perform: determineNotificationPermissionStatus)
   }
 }
 

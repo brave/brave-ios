@@ -8,15 +8,40 @@ import BraveUI
 import Shared
 import BraveShared
 
+private let log = Logger.browserLogger
+
 extension PrivacyReportsView {
   struct NotificationCalloutView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.sizeCategory) private var sizeCategory
     
-    private var enableNotificationsButton: some View {
+    private func askForNotificationAuthorization() {
+      let center = UNUserNotificationCenter.current()
+      
+      center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+          
+          if let error = error {
+            log.warning("requestAuthorization: \(error)")
+            return
+          }
+          
+        DispatchQueue.main.async {
+          Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
+        }
+      }
+    }
+    
+    var closeButton: some View {
       Button(action: {
-        
+        Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
       }, label: {
+        Image(systemName: "xmark")
+      })
+      
+    }
+    
+    private var enableNotificationsButton: some View {
+      Button(action: askForNotificationAuthorization, label: {
         ZStack {
           VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
             .edgesIgnoringSafeArea(.all)
@@ -51,7 +76,7 @@ extension PrivacyReportsView {
                   .fixedSize(horizontal: false, vertical: true)
               }
               Spacer()
-              Image(systemName: "xmark")
+              closeButton
             }
             .frame(maxWidth: .infinity)
             
@@ -60,7 +85,7 @@ extension PrivacyReportsView {
           } else {
             HStack {
               Spacer()
-              Image(systemName: "xmark")
+              closeButton
             }
             
             HStack(spacing: 24) {
