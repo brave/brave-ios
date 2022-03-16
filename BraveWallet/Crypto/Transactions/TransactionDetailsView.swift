@@ -54,8 +54,10 @@ struct TransactionDetailsView: View {
   private var fiat: String? {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     switch info.txType {
-    case .erc721TransferFrom, .erc721SafeTransferFrom, .erc20Approve:
+    case .erc721TransferFrom, .erc721SafeTransferFrom:
       return nil
+    case .erc20Approve:
+      return Strings.Wallet.transactionUnknownApprovalTitle
     case .ethSend, .other:
       let amount = formatter.decimalString(for: info.ethTxValue.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) ?? ""
       let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
@@ -104,37 +106,49 @@ struct TransactionDetailsView: View {
     let marketPrice = numberFormatter.string(from: NSNumber(value: assetRatios[symbol.lowercased(), default: 0])) ?? "$0.00"
     return marketPrice
   }
+    
+  private var header: some View {
+    VStack(spacing: 16) {
+      VStack(spacing: 8) {
+        if let fiat = fiat {
+          Text(fiat)
+            .font(.title.weight(.semibold))
+            .foregroundColor(Color(.braveLabel))
+        }
+        Text(String(format: "%@ %@", value, networkStore.selectedChain.symbol))
+          .font(.callout.weight(.medium))
+          .foregroundColor(Color(.secondaryBraveLabel))
+      }
+      HStack(spacing: 4) {
+        Image(systemName: "circle.fill")
+          .foregroundColor(info.txStatus.color)
+          .imageScale(.small)
+          .accessibilityHidden(true)
+        Text(info.txStatus.localizedDescription)
+          .foregroundColor(Color(.braveLabel))
+          .multilineTextAlignment(.trailing)
+      }
+      .accessibilityElement(children: .combine)
+      .font(.caption.weight(.semibold))
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 30)
+  }
   
   var body: some View {
     NavigationView {
-      VStack {
-        VStack(spacing: 16) {
-          VStack(spacing: 8) {
-            if let fiat = fiat {
-              Text(fiat)
-                .font(.title.weight(.semibold))
-                .foregroundColor(Color(.braveLabel))
+      List {
+        Section(
+          header: header
+            .textCase(.none)
+            .osAvailabilityModifiers { content in
+              if #available(iOS 15.0, *) {
+                content // Padding already applied
+              } else {
+                content.padding(.top)
+              }
             }
-            Text(String(format: "%@ %@", value, networkStore.selectedChain.symbol))
-              .font(.callout.weight(.medium))
-              .foregroundColor(Color(.secondaryBraveLabel))
-          }
-          HStack(spacing: 4) {
-            Image(systemName: "circle.fill")
-              .foregroundColor(info.txStatus.color)
-              .imageScale(.small)
-              .accessibilityHidden(true)
-            Text(info.txStatus.localizedDescription)
-              .foregroundColor(Color(.braveLabel))
-              .multilineTextAlignment(.trailing)
-          }
-          .accessibilityElement(children: .combine)
-          .font(.caption.weight(.semibold))
-        }
-        .padding(.top, 46)
-        .padding(.bottom, 32)
-        Divider()
-        VStack(spacing: 0) {
+        ) {
           if let transactionFee = transactionFee {
             detailRow(title: Strings.Wallet.transactionDetailsTxFeeTitle, value: transactionFee)
           }
@@ -144,20 +158,25 @@ struct TransactionDetailsView: View {
           detailRow(title: Strings.Wallet.transactionDetailsNetworkTitle, value: networkStore.selectedChain.chainName)
           detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle, value: !info.txHash.isEmpty ? info.txHash.truncatedHash : "***")
         }
+        .listRowInsets(.zero)
         if !info.txHash.isEmpty {
-          Button(action: {
-            if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-               let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
-              openWalletURL?(url)
+          Section {
+            Button(action: {
+              if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+                 let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
+                openWalletURL?(url)
+              }
+            }) {
+              Text(Strings.Wallet.transactionDetailsViewOnEtherscanTitle)
             }
-          }) {
-            Text(Strings.Wallet.transactionDetailsViewOnEtherscanTitle)
+            .buttonStyle(BraveFilledButtonStyle(size: .large))
+            .frame(maxWidth: .infinity)
+            .listRowInsets(.zero)
+            .listRowBackground(Color(.braveGroupedBackground))
           }
-          .buttonStyle(BraveFilledButtonStyle(size: .large))
-          .padding(.top)
         }
-        Spacer()
       }
+      .listStyle(.insetGrouped)
       .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
       .navigationTitle(Strings.Wallet.transactionDetailsTitle)
       .navigationBarTitleDisplayMode(.inline)
@@ -183,6 +202,7 @@ struct TransactionDetailsView: View {
     .foregroundColor(Color(.braveLabel))
     .padding(.horizontal)
     .padding(.vertical, 13)
+    .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
 }
 
