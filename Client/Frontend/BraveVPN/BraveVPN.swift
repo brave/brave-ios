@@ -34,6 +34,9 @@ class BraveVPN {
         logAndStoreError("Failed to load vpn conection: \(error)")
       }
 
+            GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
+            BraveVPN.scheduleVPNAlertsTask()
+            
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
         BraveVPN.clearConfiguration()
@@ -647,18 +650,15 @@ class BraveVPN {
     }
   }
     
-    static var vpnAlertsTimer: Timer?
+    private static var vpnAlertsTimer: Timer?
     
-    static func scheduleVPNAlertsTask() {
+    private static func scheduleVPNAlertsTask() {
         vpnAlertsTimer?.invalidate()
         
-        GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
-        
-        vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+        let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
+        vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
             processVPNAlerts()
         }
-        
-        processVPNAlerts()
     }
     
     private static func processVPNAlerts() {
