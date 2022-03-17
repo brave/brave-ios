@@ -102,7 +102,8 @@ struct AllVPNAlertsView: View {
           
           Spacer()
         } else {
-          // Workaround: iOS 14 does not easily support hidden separators for List, have to use LazyVSack instead.
+          // Workaround: iOS 14 does not easily support hidden separators for List,
+          // have to use ScrollView > LazyVSack instead.
           ScrollView {
             headerView
             
