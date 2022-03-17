@@ -165,7 +165,18 @@ struct TransactionDetailsView: View {
           }
           detailRow(title: Strings.Wallet.transactionDetailsMarketPriceTitle, value: marketPrice)
           detailRow(title: Strings.Wallet.transactionDetailsDateTitle, value: dateFormatter.string(from: info.createdTime))
-          detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle, value: !info.txHash.isEmpty ? info.txHash.truncatedHash : "***")
+          Button(action: {
+            if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+               let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
+              openWalletURL?(url)
+            }
+          }) {
+            detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle) {
+              Label(!info.txHash.isEmpty ? info.txHash.truncatedHash : "***", systemImage: "arrow.up.forward.square")
+                .foregroundColor(Color(.braveBlurple))
+            }
+          }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
           detailRow(title: Strings.Wallet.transactionDetailsNetworkTitle, value: networkStore.selectedChain.chainName)
           detailRow(title: Strings.Wallet.transactionDetailsStatusTitle) {
             HStack(spacing: 4) {
@@ -182,22 +193,6 @@ struct TransactionDetailsView: View {
           }
         }
         .listRowInsets(.zero)
-        if !info.txHash.isEmpty {
-          Section {
-            Button(action: {
-              if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                 let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
-                openWalletURL?(url)
-              }
-            }) {
-              Text(Strings.Wallet.transactionDetailsViewOnEtherscanTitle)
-            }
-            .buttonStyle(BraveFilledButtonStyle(size: .large))
-            .frame(maxWidth: .infinity)
-            .listRowInsets(.zero)
-            .listRowBackground(Color(.braveGroupedBackground))
-          }
-        }
       }
       .listStyle(.insetGrouped)
       .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))

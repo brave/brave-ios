@@ -1891,13 +1891,6 @@ extension Strings {
       value: "Transaction Details",
       comment: "The title for the transaction details modal."
     )
-    public static let transactionDetailsViewOnEtherscanTitle = NSLocalizedString(
-      "wallet.transactionDetailsViewOnEtherscanTitle",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
-      value: "View on etherscan.io",
-      comment: "The title for the button to open on etherscan.io in the transaction details modal."
-    )
     public static let transactionDetailsTxFeeTitle = NSLocalizedString(
       "wallet.transactionDetailsTxFeeTitle",
       tableName: "BraveWallet",
