@@ -4564,5 +4564,19 @@ extension Strings {
             value: "Email Trackers",
             comment: "Type of tracker blocked by the VPN, it's a tracker contained in an email."
         )
+        
+        public static let notificationTitle = NSLocalizedString(
+            "privacyHub.notificationTitle",
+            bundle: .braveShared,
+            value: "Your weekly privacy report is ready",
+            comment: "Title of a notification we show to the user, on tapping it, a privacy reports screen will open."
+        )
+        
+        public static let notificationMessage = NSLocalizedString(
+            "privacyHub.notificationMessage",
+            bundle: .braveShared,
+            value: "See a report of the ads & trackers Brave blocked this week, plus the riskiest sites you visited.",
+            comment: "Message of a notification we show to the user, on tapping it, a privacy reports screen will open."
+        )
     }
 }
