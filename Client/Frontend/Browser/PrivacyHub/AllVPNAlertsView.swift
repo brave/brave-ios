@@ -17,7 +17,9 @@ struct AllVPNAlertsView: View {
       entity: BraveVPNAlert.entity(),
       sortDescriptors: [
           NSSortDescriptor(keyPath: \BraveVPNAlert.timestamp, ascending: false)
-      ]
+      ],
+      // For performance reasons we grab last month's alerts only.
+      predicate: NSPredicate(format: "timestamp > %lld", Int64(Date().timeIntervalSince1970 - 30.days))
   ) var vpnAlerts: FetchedResults<BraveVPNAlert>
   
   let trackerCounts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)
