@@ -40,8 +40,9 @@ struct TransactionDetailsView: View {
     case .erc721TransferFrom, .erc721SafeTransferFrom:
       amount = "1" // Can only send 1 erc721 at a time
     case .erc20Approve:
+      let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to ?? ""
       if info.txArgs.count > 1, let token = visibleTokens.first(where: {
-        $0.contractAddress == info.txArgs[0]
+        $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
       }) {
         amount = formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         return String(format: "%@ %@", amount, token.symbol)
