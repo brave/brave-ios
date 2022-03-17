@@ -811,7 +811,7 @@
 		449AC16F26D9008D00A53F33 /* BraveTalkHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = 449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */; };
 		44A58CC82693A309005C0879 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CC72693A309005C0879 /* ActivityView.swift */; };
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
-		44A7883627E351E700AA7CD0 /* PrivacyReportsNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A7883527E351E700AA7CD0 /* PrivacyReportsNotification.swift */; };
+		44A7883627E351E700AA7CD0 /* PrivacyReportsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */; };
 		44BCBB9927D90B8A00BC6691 /* PrivacyReportsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */; };
 		44C2364526A05714005A573D /* TabTrayPrivateModeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
@@ -2648,7 +2648,7 @@
 		449AC16E26D9008D00A53F33 /* BraveTalkHelper.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = BraveTalkHelper.js; sourceTree = "<group>"; };
 		44A58CC72693A309005C0879 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuFixture.swift; sourceTree = "<group>"; };
-		44A7883527E351E700AA7CD0 /* PrivacyReportsNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsNotification.swift; sourceTree = "<group>"; };
+		44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsManager.swift; sourceTree = "<group>"; };
 		44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsItem.swift; sourceTree = "<group>"; };
 		44BDACB027D6467700DDEE53 /* BraveVPNAlertJSONModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveVPNAlertJSONModel.swift; sourceTree = "<group>"; };
 		44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayPrivateModeInfoView.swift; sourceTree = "<group>"; };
@@ -5178,7 +5178,7 @@
 				4472703C27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift */,
 				4472704027C995350093BFF2 /* PrivacyReportLabels.swift */,
 				44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */,
-				44A7883527E351E700AA7CD0 /* PrivacyReportsNotification.swift */,
+				44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */,
 			);
 			indentWidth = 2;
 			path = PrivacyHub;
@@ -8569,7 +8569,7 @@
 				5E72D54F253657FF00F8D62D /* BraveCoreImportExportUtility.swift in Sources */,
 				4422D4D921BFFB7600BF1855 /* merger.cc in Sources */,
 				4422D4EF21BFFB7600BF1855 /* log_reader.cc in Sources */,
-				44A7883627E351E700AA7CD0 /* PrivacyReportsNotification.swift in Sources */,
+				44A7883627E351E700AA7CD0 /* PrivacyReportsManager.swift in Sources */,
 				4422D4E621BFFB7600BF1855 /* two_level_iterator.cc in Sources */,
 				D3B6923F1B9F9A58004B87A4 /* FindInPageHelper.swift in Sources */,
 				0A6E20492608D7E200575798 /* DebugFlag.swift in Sources */,

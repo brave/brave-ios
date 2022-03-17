@@ -19,7 +19,6 @@ public final class BlockedResource: NSManagedObject, CRUD {
     @NSManaged public var domain: String
     @NSManaged public var faviconUrl: String
     @NSManaged public var host: String
-    @NSManaged public var resourceType: Int32
     @NSManaged public var timestamp: Date
     
     public enum Source {
@@ -33,24 +32,25 @@ public final class BlockedResource: NSManagedObject, CRUD {
     private static let domainKeyPath = #keyPath(BlockedResource.domain)
     private static let timestampKeyPath = #keyPath(BlockedResource.timestamp)
     
-    public static func create(host: String, domain: URL, resourceType: BlockedResourceType, timestamp: Date = Date()) {
+    public static func batchInsert(items: [(host: String, domain: URL, date: Date)]) {
+        
         DataController.perform { context in
             guard let entity = entity(in: context) else {
                 log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
+                return
+            }
+            
+            items.forEach {
+                guard let baseDomain = $0.domain.baseDomain else {
+                    return
+                }
                 
-                return
+                let blockedResource = BlockedResource(entity: entity, insertInto: context)
+                blockedResource.host = $0.host
+                blockedResource.domain = baseDomain
+                blockedResource.faviconUrl = $0.domain.domainURL.absoluteString
+                blockedResource.timestamp = $0.date
             }
-            
-            guard let baseDomain = domain.baseDomain else {
-                return
-            }
-            
-            let blockedResource = BlockedResource(entity: entity, insertInto: context)
-            blockedResource.host = host
-            blockedResource.domain = baseDomain
-            blockedResource.faviconUrl = domain.domainURL.absoluteString
-            blockedResource.resourceType = resourceType.rawValue
-            blockedResource.timestamp = timestamp
         }
     }
     

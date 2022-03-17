@@ -324,8 +324,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AdblockResourceDownloader.shared.startLoading()
     CosmeticFiltersResourceDownloader.shared.startLoading()
 
-        PrivacyReportsNotification.scheduleIfNeeded()
-      
     return shouldPerformAdditionalDelegateHandling
   }
 

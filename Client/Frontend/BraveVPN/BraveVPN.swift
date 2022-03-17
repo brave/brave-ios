@@ -35,7 +35,6 @@ class BraveVPN {
       }
 
             GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
-            BraveVPN.scheduleVPNAlertsTask()
             
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
@@ -650,18 +649,8 @@ class BraveVPN {
     }
   }
     
-    private static var vpnAlertsTimer: Timer?
+    static func processVPNAlerts() {
     
-    private static func scheduleVPNAlertsTask() {
-        vpnAlertsTimer?.invalidate()
-        
-        let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
-        vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-            processVPNAlerts()
-        }
-    }
-    
-    private static func processVPNAlerts() {
         Task {
             let (data, success, error) = await GRDGatewayAPI.shared().events()
             if !success {

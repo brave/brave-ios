@@ -90,7 +90,7 @@ class TPStatsBlocklistChecker {
                 
                 if let dom = URL(string: domainUrl),
                     let blockedResourceHost = url.baseDomain {
-                    BlockedResource.create(host: blockedResourceHost, domain: dom, resourceType: .ad)
+                    PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, dom, Date()))
                 }
                 
                 completion(BlocklistName.ad)

@@ -6,20 +6,57 @@
 import Foundation
 import Shared
 import BraveShared
+import Data
 
 private let log = Logger.browserLogger
 
-struct PrivacyReportsNotification {
-  private static let notificationID = "privacy-report-weekly-notification"
+struct PrivacyReportsManager {
   
-  static func scheduleIfNeeded(debugMode: Bool = false) {
+  // MARK: - Notifications
+  
+  static var pendingBlockedRequests: [(host: String, domain: URL, date: Date)] = []
+  
+  static func processBlockedRequests() {
+    let itemsToSave = pendingBlockedRequests
+    pendingBlockedRequests.removeAll()
+    
+    BlockedResource.batchInsert(items: itemsToSave)
+  }
+  
+  private static var saveBlockedResourcesTimer: Timer?
+  private static var vpnAlertsTimer: Timer?
+  
+  static func scheduleProcessingBlockedRequests() {
+    saveBlockedResourcesTimer?.invalidate()
+    
+    saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: 1.minutes, repeats: true) { _ in
+      processBlockedRequests()
+    }
+  }
+  
+  static func scheduleVPNAlertsTask() {
+    vpnAlertsTimer?.invalidate()
+    
+    // Because fetching VPN alerts involves making a url request,
+    // the time interval to fetch them is longer than the local on-device blocked requests
+    let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
+    vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
+      BraveVPN.processVPNAlerts()
+    }
+  }
+  
+  // MARK: - Notifications
+  
+  static let notificationID = "privacy-report-weekly-notification"
+  
+  static func scheduleNotification(debugMode: Bool = false) {
     let notificationCenter = UNUserNotificationCenter.current()
     
     notificationCenter.getPendingNotificationRequests {  requests in
-        if !debugMode && requests.contains(where: { $0.identifier == notificationID }) {
-            // Already has one scheduled no need to schedule again.
-            return
-        }
+      if !debugMode && requests.contains(where: { $0.identifier == notificationID }) {
+        // Already has one scheduled no need to schedule again.
+        return
+      }
       
       let content = UNMutableNotificationContent()
       content.title = Strings.PrivacyHub.notificationTitle
@@ -28,7 +65,7 @@ struct PrivacyReportsNotification {
       var dateComponents = DateComponents()
       let calendar = Calendar.current
       dateComponents.calendar = calendar
-
+      
       // For testing purposes, notification launched from the debug menu will show up
       // in the next 5 minutes of the time it was requested.
       if debugMode {
@@ -47,13 +84,13 @@ struct PrivacyReportsNotification {
       
       // Create the trigger as a repeating event.
       let trigger = UNCalendarNotificationTrigger(
-               dateMatching: dateComponents, repeats: true)
+        dateMatching: dateComponents, repeats: true)
       
       // Create the request
       let identifier = debugMode ? UUID().uuidString : notificationID
       let request = UNNotificationRequest(identifier: identifier,
-                  content: content, trigger: trigger)
-
+                                          content: content, trigger: trigger)
+      
       // Schedule the request with the system.
       
       notificationCenter.add(request) { error in
@@ -64,7 +101,7 @@ struct PrivacyReportsNotification {
     }
   }
   
-  static func cancel() {
+  static func cancelNotification() {
     UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationID])
   }
 }
