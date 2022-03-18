@@ -57,7 +57,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion(networks)
   }
   
-  func setNetwork(_ coin: BraveWallet.CoinType, chainId: String, completion: @escaping (Bool) -> Void) {
+  func setNetwork(_ chainId: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
     self.chainId = chainId
     completion(true)
   }
