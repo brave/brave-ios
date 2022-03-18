@@ -36,15 +36,25 @@ struct TransactionDetailsView: View {
     let amount: String
     switch info.txType {
     case .erc20Transfer:
-      amount = info.txArgs[0]
+      amount = info.txArgs[safe: 0] ?? ""
     case .erc721TransferFrom, .erc721SafeTransferFrom:
-      amount = "1" // Can only send 1 erc721 at a time
+      if let tokenID = info.txArgs[safe: 2],
+         let tokenIDValue = Int(tokenID.removingHexPrefix, radix: 16),
+         let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to,
+         let token = visibleTokens.first(where: {
+           $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame }
+         ) {
+        return String(format: "%@ %d", token.name, tokenIDValue)
+      } else {
+        return ""
+      }
     case .erc20Approve:
-      let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to ?? ""
-      if info.txArgs.count > 1, let token = visibleTokens.first(where: {
-        $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
-      }) {
-        amount = formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+      if let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to,
+         let value = info.txArgs[safe: 1],
+         let token = visibleTokens.first(where: {
+           $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame }
+         ) {
+        amount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         return String(format: "%@ %@", amount, token.symbol)
       } else {
         return "0.0"
@@ -68,10 +78,10 @@ struct TransactionDetailsView: View {
       let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
       return fiat
     case .erc20Transfer:
-      if info.txArgs.count > 1, let token = visibleTokens.first(where: {
+      if let value = info.txArgs[safe: 1], let token = visibleTokens.first(where: {
         $0.contractAddress.caseInsensitiveCompare(info.ethTxToAddress) == .orderedSame
       }) {
-        let amount = formatter.decimalString(for: info.txArgs[1].removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+        let amount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[token.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
         return fiat
       } else {
@@ -124,11 +134,7 @@ struct TransactionDetailsView: View {
     case .erc20Approve:
       return Strings.Wallet.transactionUnknownApprovalTitle
     default:
-      if info.isSwap {
-        return Strings.Wallet.swap
-      } else {
-        return Strings.Wallet.sent
-      }
+      return info.isSwap ? Strings.Wallet.swap : Strings.Wallet.sent
     }
   }
 
@@ -165,18 +171,23 @@ struct TransactionDetailsView: View {
           }
           detailRow(title: Strings.Wallet.transactionDetailsMarketPriceTitle, value: marketPrice)
           detailRow(title: Strings.Wallet.transactionDetailsDateTitle, value: dateFormatter.string(from: info.createdTime))
-          Button(action: {
-            if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-               let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
-              openWalletURL?(url)
+          if !info.txHash.isEmpty {
+            Button(action: {
+              if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+                 let url = baseURL?.appendingPathComponent("tx/\(info.txHash)") {
+                openWalletURL?(url)
+              }
+            }) {
+              detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle) {
+                HStack {
+                  Text(info.txHash.truncatedHash)
+                  Image(systemName: "arrow.up.forward.square")
+                }
+                  .foregroundColor(Color(.braveBlurpleTint))
+              }
             }
-          }) {
-            detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle) {
-              Label(!info.txHash.isEmpty ? info.txHash.truncatedHash : "***", systemImage: "arrow.up.forward.square")
-                .foregroundColor(Color(.braveBlurple))
-            }
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
           detailRow(title: Strings.Wallet.transactionDetailsNetworkTitle, value: networkStore.selectedChain.chainName)
           detailRow(title: Strings.Wallet.transactionDetailsStatusTitle) {
             HStack(spacing: 4) {
@@ -198,6 +209,7 @@ struct TransactionDetailsView: View {
       .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
       .navigationTitle(Strings.Wallet.transactionDetailsTitle)
       .navigationBarTitleDisplayMode(.inline)
+      .navigationViewStyle(.stack)
       .toolbar {
         ToolbarItemGroup(placement: .confirmationAction) {
           Button(action: { presentationMode.dismiss() }) {
@@ -225,7 +237,7 @@ struct TransactionDetailsView: View {
     .font(.caption)
     .foregroundColor(Color(.braveLabel))
     .padding(.horizontal)
-    .padding(.vertical, 13)
+    .padding(.vertical, 12)
     .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
 }
