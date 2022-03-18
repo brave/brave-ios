@@ -135,6 +135,7 @@ struct AccountActivityView: View {
             networkStore: networkStore,
             keyringStore: keyringStore,
             visibleTokens: activityStore.assets.map(\.token),
+            allTokens: [],
             assetRatios: assetRatios
           )
         }

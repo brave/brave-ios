@@ -16,6 +16,7 @@ struct TransactionDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
   var visibleTokens: [BraveWallet.BlockchainToken]
+  var allTokens: [BraveWallet.BlockchainToken]
   var assetRatios: [String: Double]
   
   @Environment(\.presentationMode) @Binding private var presentationMode
@@ -29,6 +30,11 @@ struct TransactionDetailsView: View {
     $0.numberStyle = .currency
     $0.currencyCode = "USD"
   }
+  
+  private func token(for contractAddress: String) -> BraveWallet.BlockchainToken? {
+    let findToken: (BraveWallet.BlockchainToken) -> Bool = { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame }
+    return visibleTokens.first(where: findToken) ?? allTokens.first(where: findToken)
+  }
 
   /// The value of the transaction with symbol, ex. `"0.0100 ETH"`
   private var value: String {
@@ -41,9 +47,7 @@ struct TransactionDetailsView: View {
       if let tokenID = info.txArgs[safe: 2],
          let tokenIDValue = Int(tokenID.removingHexPrefix, radix: 16),
          let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to,
-         let token = visibleTokens.first(where: {
-           $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame }
-         ) {
+         let token = token(for: contractAddress) {
         return String(format: "%@ %d", token.name, tokenIDValue)
       } else {
         return ""
@@ -51,9 +55,7 @@ struct TransactionDetailsView: View {
     case .erc20Approve:
       if let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to,
          let value = info.txArgs[safe: 1],
-         let token = visibleTokens.first(where: {
-           $0.contractAddress(in: networkStore.selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame }
-         ) {
+         let token = token(for: contractAddress) {
         amount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         return String(format: "%@ %@", amount, token.symbol)
       } else {
@@ -78,9 +80,7 @@ struct TransactionDetailsView: View {
       let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
       return fiat
     case .erc20Transfer:
-      if let value = info.txArgs[safe: 1], let token = visibleTokens.first(where: {
-        $0.contractAddress.caseInsensitiveCompare(info.ethTxToAddress) == .orderedSame
-      }) {
+      if let value = info.txArgs[safe: 1], let token = token(for: info.ethTxToAddress) {
         let amount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[token.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
         return fiat
@@ -251,6 +251,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         networkStore: .previewStore,
         keyringStore: .previewStore,
         visibleTokens: [.previewToken],
+        allTokens: [],
         assetRatios: ["eth": 4576.36]
       )
         .previewColorSchemes()
@@ -259,6 +260,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         networkStore: .previewStore,
         keyringStore: .previewStore,
         visibleTokens: [.previewToken],
+        allTokens: [],
         assetRatios: ["eth": 4576.36]
       )
         .previewColorSchemes()
@@ -267,6 +269,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         networkStore: .previewStore,
         keyringStore: .previewStore,
         visibleTokens: [.previewToken],
+        allTokens: [],
         assetRatios: ["eth": 4576.36]
       )
         .previewColorSchemes()
