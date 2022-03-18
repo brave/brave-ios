@@ -1889,56 +1889,56 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Transaction Details",
-      comment: "The title for the transaction details modal."
+      comment: "The title for the view displaying the details of a cryptocurrency transaction."
     )
     public static let transactionDetailsTxFeeTitle = NSLocalizedString(
       "wallet.transactionDetailsTxFeeTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Transaction fee",
-      comment: "The title for displaying the transaction fee of the transaction in the transaction details modal."
+      comment: "The label for the fees involved in a cryptocurrency transaction. Appears next to the value transferred and the currency amount."
     )
     public static let transactionDetailsMarketPriceTitle = NSLocalizedString(
       "wallet.transactionDetailsMarketPriceTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Market price",
-      comment: "The title for displaying the market price of the transaction in the transaction details modal."
+      comment: "The label for the market price of the asset used in a cryptocurrency transaction. Appears next to the formatted currency such as $1523.50"
     )
     public static let transactionDetailsDateTitle = NSLocalizedString(
       "wallet.transactionDetailsDateTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Date",
-      comment: "The title for displaying the date of the transaction in the transaction details modal."
+      comment: "The label for displaying the date a transaction occurred. Appears next to the formatted date such as '3:00PM - Jan 1 2022'"
     )
     public static let transactionDetailsNetworkTitle = NSLocalizedString(
       "wallet.transactionDetailsNetworkTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Network",
-      comment: "The title for displaying the network of the transaction in the transaction details modal."
+      comment: "The label for the network a transaction occurred on. Appears next to 'Ethereum Mainnet', 'Rinkeby Test Network', 'Ropsten Test Network', etc. "
     )
     public static let transactionDetailsTxHashTitle = NSLocalizedString(
       "wallet.transactionDetailsTransactionHashTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Transaction hash",
-      comment: "The title for displaying the transaction hash in the transaction details modal."
+      comment: "The label for the transaction hash (the identifier) of a cryptocurrency transaction. Appears next to a button that opens a URL for the transaction."
     )
     public static let transactionDetailsStatusTitle = NSLocalizedString(
       "wallet.transactionDetailsStatusTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Status",
-      comment: "The title for displaying the transaction status in the transaction details modal."
+      comment: "The label for the transaction status, which describes the how far along a transaction is to completing. Appears next to the words such as 'Approved', 'Submitted', 'Pending', etc."
     )
     public static let sent = NSLocalizedString(
       "wallet.sent",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Sent",
-      comment: "As in sending cryptocurrency from one asset to another"
+      comment: "As in sent cryptocurrency from one asset to another"
     )
   }
 }
