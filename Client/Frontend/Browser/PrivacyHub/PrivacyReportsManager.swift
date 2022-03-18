@@ -45,12 +45,49 @@ struct PrivacyReportsManager {
     }
   }
   
+  // MARK: - View
+  static func prepareView() -> PrivacyReportsView {
+    let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
+    let allTimeMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
+    
+    let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
+    let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
+    
+    let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers()
+    
+    // FIXME: VPNAlerts flag
+    let allTimeVPN = BraveVPNAlert.allByHostCount
+    
+    let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
+        PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+    }
+    
+    let allAlerts: [PrivacyReportsItem] =
+        PrivacyReportsItem.merge(shieldItems: allTimeListTracker, vpnItems: allTimeVPN)
+    
+    let last = BraveVPNAlert.last(3)
+    
+    let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
+                                  lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
+                                  allTimeMostFrequentTracker: allTimeMostFrequentTracker,
+                                  allTimeRiskiestWebsite: allTimeRiskiestWebsite,
+                                  allTimeListTrackers: allAlerts,
+                                  allTimeListWebsites: allTimeListWebsites,
+                                  lastVPNAlerts: last)
+    
+    return view
+  }
+  
   // MARK: - Notifications
   
   static let notificationID = "privacy-report-weekly-notification"
   
   static func scheduleNotification(debugMode: Bool = false) {
     let notificationCenter = UNUserNotificationCenter.current()
+    
+    if debugMode {
+      cancelNotification()
+    }
     
     notificationCenter.getPendingNotificationRequests {  requests in
       if !debugMode && requests.contains(where: { $0.identifier == notificationID }) {
@@ -87,8 +124,7 @@ struct PrivacyReportsManager {
         dateMatching: dateComponents, repeats: true)
       
       // Create the request
-      let identifier = debugMode ? UUID().uuidString : notificationID
-      let request = UNNotificationRequest(identifier: identifier,
+      let request = UNNotificationRequest(identifier: notificationID,
                                           content: content, trigger: trigger)
       
       // Schedule the request with the system.

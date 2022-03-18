@@ -129,35 +129,7 @@ class NewTabPageViewController: UIViewController {
             StatsSectionProvider(action: { [weak self] in
                 
                 DispatchQueue.main.async {
-                    let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
-                    let allTimeMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
-                    
-                    let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
-                    let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
-                    
-                    let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers()
-                    
-                    // FIXME: VPNAlerts flag
-                    let allTimeVPN = BraveVPNAlert.allByHostCount
-                    
-                    let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
-                        PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-                    }
-                
-                    let allAlerts: [PrivacyReportsItem] =
-                        PrivacyReportsItem.merge(shieldItems: allTimeListTracker, vpnItems: allTimeVPN)
-                    
-                    let last = BraveVPNAlert.last(3)
-                    
-                let view = PrivacyReportsView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
-                                              lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
-                                              allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-                                                  allTimeRiskiestWebsite: allTimeRiskiestWebsite,
-                                                  allTimeListTrackers: allAlerts,
-                                                  allTimeListWebsites: allTimeListWebsites,
-                                                  lastVPNAlerts: last)
-                
-                let host = UIHostingController(rootView: view)
+                    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
                 host.rootView.onDismiss = { [weak host] in
                     host?.dismiss(animated: true)
                 }
