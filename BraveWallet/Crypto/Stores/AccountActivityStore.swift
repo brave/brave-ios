@@ -10,6 +10,7 @@ class AccountActivityStore: ObservableObject {
   let account: BraveWallet.AccountInfo
   @Published private(set) var assets: [AssetViewModel] = []
   @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
+  @Published private(set) var allTokens: [BraveWallet.BlockchainToken] = []
 
   private let walletService: BraveWalletBraveWalletService
   private let rpcService: BraveWalletJsonRpcService
@@ -42,18 +43,13 @@ class AccountActivityStore: ObservableObject {
   }
 
   private func fetchAssets() {
-    blockchainRegistry.allTokens(BraveWallet.MainnetChainId) { [self] allTokens in
       rpcService.chainId { [self] chainId in
+      blockchainRegistry.allTokens(chainId) { [self] allTokens in
+        self.allTokens = allTokens
+      }
         walletService.userAssets(chainId) { [self] tokens in
           var updatedAssets = tokens.map {
             AssetViewModel(token: $0, decimalBalance: 0, price: "", history: [])
-          }
-          if chainId == BraveWallet.RopstenChainId {
-            let additionalAssets = allTokens
-              .filter { BraveWallet.assetsSwapInRopsten.contains($0.symbol) }
-              .sorted(by: { $0.symbol < $1.symbol })
-              .map { AssetViewModel(token: $0, decimalBalance: 0, price: "", history: []) }
-            updatedAssets.append(contentsOf: additionalAssets)
           }
           let updatedTokens = updatedAssets.map { $0.token }
           // fetch price & balance for each asset
@@ -89,7 +85,6 @@ class AccountActivityStore: ObservableObject {
         }
       }
     }
-  }
 
   private func fetchTransactions() {
     txService.allTransactionInfo(.eth, from: account.address) { transactions in
