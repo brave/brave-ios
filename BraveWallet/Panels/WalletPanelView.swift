@@ -5,6 +5,8 @@
 
 import Foundation
 import SwiftUI
+import BraveUI
+import struct Shared.Strings
 
 public protocol WalletSiteConnectionDelegate {
   /// A list of accounts connected to this webpage (addresses)
@@ -13,18 +15,123 @@ public protocol WalletSiteConnectionDelegate {
   func updateConnectionStatusForAccountAddress(_ address: String)
 }
 
-public struct WalletPanelView: View {
+public struct WalletPanelContainerView: View {
+  var walletStore: WalletStore
+  @ObservedObject var keyringStore: KeyringStore
+  var presentWalletWithContext: ((PresentingContext) -> Void)?
+  
+  // When the screen first apperas the keyring is set as the default value
+  // which causes an unnessary animation
+  @State private var fetchingInitialKeyring: Bool = true
+  
+  private enum VisibleScreen: Equatable {
+    case panel
+    case onboarding
+    case unlock
+  }
+  
+  private var visibleScreen: VisibleScreen {
+    let keyring = keyringStore.keyring
+    if !keyring.isKeyringCreated || keyringStore.isOnboardingVisible {
+      return .onboarding
+    }
+    if keyring.isLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible {
+      return .unlock
+    }
+    return .panel
+  }
+  
+  private var lockedView: some View {
+    VStack(spacing: 36) {
+      Image("graphic-lock")
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+        .frame(maxWidth: 150)
+      Button {
+        presentWalletWithContext?(.panelUnlockOrSetup)
+      } label: {
+        HStack(spacing: 4) {
+          Image("brave.unlock")
+          Text("Unlock Wallet")
+        }
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .normal))
+    }
+    .padding()
+    .padding()
+    .frame(maxWidth: .infinity)
+    .background(Color(.braveBackground).ignoresSafeArea())
+  }
+  
+  private var setupView: some View {
+    ScrollView(.vertical) {
+      VStack(spacing: 36) {
+        VStack(spacing: 4) {
+          Text("Brave Wallet")
+            .foregroundColor(Color(.bravePrimary))
+            .font(.headline)
+          Text("Use this panel to securely access web3 and all your crypto assets.")
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .font(.subheadline)
+        }
+        .multilineTextAlignment(.center)
+        Button {
+          presentWalletWithContext?(.panelUnlockOrSetup)
+        } label: {
+          Text("Learn More")
+        }
+        .buttonStyle(BraveFilledButtonStyle(size: .normal))
+      }
+      .padding()
+      .padding()
+    }
+    .frame(maxWidth: .infinity)
+    .background(Color(.braveBackground).ignoresSafeArea())
+  }
+  
+  public var body: some View {
+    ZStack {
+      switch visibleScreen {
+      case .panel:
+        if let cryptoStore = walletStore.cryptoStore {
+          WalletPanelView(
+            keyringStore: keyringStore,
+            networkStore: cryptoStore.networkStore,
+            presentWalletWithContext: { context in
+              self.presentWalletWithContext?(context)
+            }
+          )
+          .transition(.asymmetric(insertion: .identity, removal: .opacity))
+        }
+      case .unlock:
+        lockedView
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .zIndex(1)
+      case .onboarding:
+        setupView
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .zIndex(2)  // Needed or the dismiss animation messes up
+      }
+    }
+    .animation(fetchingInitialKeyring ? nil : .default, value: visibleScreen)
+    .frame(idealWidth: 320, maxWidth: .infinity)
+    .onAppear {
+      fetchingInitialKeyring = keyringStore.keyring.id.isEmpty
+    }
+    .onChange(of: keyringStore.keyring) { newValue in
+      fetchingInitialKeyring = false
+    }
+  }
+}
+
+struct WalletPanelView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
+  var presentWalletWithContext: (PresentingContext) -> Void
   
   @Environment(\.pixelLength) private var pixelLength
   @Environment(\.sizeCategory) private var sizeCategory
   @ScaledMetric private var blockieSize = 54
-  
-  public init(keyringStore: KeyringStore, networkStore: NetworkStore) {
-    self.keyringStore = keyringStore
-    self.networkStore = networkStore
-  }
   
   private var connectButton: some View {
     Button {
@@ -70,7 +177,7 @@ public struct WalletPanelView: View {
     }
   }
   
-  public var body: some View {
+  var body: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
         Text("Brave Wallet")
@@ -161,17 +268,33 @@ public struct WalletPanelView: View {
       )
       .ignoresSafeArea()
     )
-    .frame(idealWidth: 320)
   }
 }
 
 #if DEBUG
 struct WalletPanelView_Previews: PreviewProvider {
   static var previews: some View {
-    WalletPanelView(
-      keyringStore: .previewStoreWithWalletCreated,
-      networkStore: .previewStore
-    )
+    Group {
+      WalletPanelView(
+        keyringStore: .previewStoreWithWalletCreated,
+        networkStore: .previewStore,
+        presentWalletWithContext: { _ in }
+      )
+      WalletPanelView(
+        keyringStore: .previewStore,
+        networkStore: .previewStore,
+        presentWalletWithContext: { _ in }
+      )
+      WalletPanelView(
+        keyringStore: {
+          let store = KeyringStore.previewStoreWithWalletCreated
+          store.lock()
+          return store
+        }(),
+        networkStore: .previewStore,
+        presentWalletWithContext: { _ in }
+      )
+    }
       .fixedSize(horizontal: false, vertical: true)
       .previewLayout(.sizeThatFits)
   }

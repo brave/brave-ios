@@ -32,6 +32,8 @@ public enum PresentingContext {
   case webpageRequests
   /// Shows when a webpage wants to connect with the users wallet
   case requestEthererumPermissions(_ handler: (EthereumPermissionResponse) -> Void)
+  /// Shows the user only the unlock/setup screen then dismisses to view an unlocked panel
+  case panelUnlockOrSetup
 }
 
 /// The initial wallet controller to present when the user wants to view their wallet
@@ -112,7 +114,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   }
 }
 
-private class WalletInteractionGestureRecognizer: UIGestureRecognizer {
+class WalletInteractionGestureRecognizer: UIGestureRecognizer {
   private let store: KeyringStore
   init(keyringStore: KeyringStore) {
     store = keyringStore

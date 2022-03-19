@@ -45,20 +45,16 @@ extension WalletStore {
 extension BrowserViewController {
     func presentWalletPanel() {
         let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
-              let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode) else {
-                  return
-              }
-        let controller = WalletPanelHostingController(
-            rootView: WalletPanelView(
-                keyringStore: KeyringStore(keyringService: keyringService),
-                networkStore: NetworkStore(rpcService: rpcService)
-            )
-        )
+        guard let walletStore = WalletStore.from(privateMode: privateMode) else {
+            return
+        }
+        let controller = WalletPanelHostingController(walletStore: walletStore)
         let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
         popover.present(from: topToolbar.locationView.walletButton, on: self, completion: nil)
     }
 }
+
+extension WalletPanelHostingController: PopoverContentComponent {}
 
 extension BrowserViewController: BraveWalletDelegate {
     func openWalletURL(_ destinationURL: URL) {
@@ -70,18 +66,6 @@ extension BrowserViewController: BraveWalletDelegate {
                 isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
             )
         }
-    }
-}
-
-private class WalletPanelHostingController: UIHostingController<WalletPanelView> & PopoverContentComponent {
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        // For some reason these 2 calls are required in order for the `UIHostingController` to layout
-        // correctly. Without this it for some reason becomes taller than what it needs to be despite its
-        // `sizeThatFits(_:)` calls returning the correct value once the parent does layout.
-        view.setNeedsUpdateConstraints()
-        view.updateConstraintsIfNeeded()
     }
 }
 

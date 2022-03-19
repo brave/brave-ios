@@ -91,6 +91,8 @@ public struct CryptoView: View {
                   dismissAction?()
                 }
               )
+            case .panelUnlockOrSetup:
+              EmptyView()
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
@@ -122,6 +124,11 @@ public struct CryptoView: View {
       .init(action: { url in
         openWalletURLAction?(url)
       }))
+    .onChange(of: visibleScreen) { newValue in
+      if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
+        dismissAction?()
+      }
+    }
   }
 }
 
