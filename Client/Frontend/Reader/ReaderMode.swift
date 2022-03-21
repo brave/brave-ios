@@ -31,6 +31,20 @@ enum ReaderModeTheme: String {
   case light = "light"
   case dark = "dark"
   case sepia = "sepia"
+  case black = "black"
+  
+  var backgroundColor: UIColor {
+    switch self {
+    case .light:
+      return .white
+    case .dark:
+      return .darkGray
+    case .sepia:
+      return .init(rgb: 0xf0e6dc) // Light Beige
+    case .black:
+      return .black
+    }
+  }
 }
 
 enum ReaderModeFontType: String {
@@ -52,11 +66,11 @@ enum ReaderModeFontSize: Int {
   case size11 = 11
   case size12 = 12
   case size13 = 13
-
+  
   func isSmallest() -> Bool {
     return self == ReaderModeFontSize.size1
   }
-
+  
   func smaller() -> ReaderModeFontSize {
     if isSmallest() {
       return self
@@ -64,11 +78,11 @@ enum ReaderModeFontSize: Int {
       return ReaderModeFontSize(rawValue: self.rawValue - 1)!
     }
   }
-
+  
   func isLargest() -> Bool {
     return self == ReaderModeFontSize.size13
   }
-
+  
   static var defaultSize: ReaderModeFontSize {
     switch UIApplication.shared.preferredContentSizeCategory {
     case .extraSmall:
@@ -89,7 +103,7 @@ enum ReaderModeFontSize: Int {
       return .size5
     }
   }
-
+  
   func bigger() -> ReaderModeFontSize {
     if isLargest() {
       return self
@@ -103,23 +117,23 @@ struct ReaderModeStyle {
   var theme: ReaderModeTheme
   var fontType: ReaderModeFontType
   var fontSize: ReaderModeFontSize
-
+  
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
   func encode() -> String {
     return JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]).stringValue() ?? ""
   }
-
+  
   /// Encode the style to a dictionary that can be stored in the profile
   func encodeAsDictionary() -> [String: Any] {
     return ["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]
   }
-
+  
   init(theme: ReaderModeTheme, fontType: ReaderModeFontType, fontSize: ReaderModeFontSize) {
     self.theme = theme
     self.fontType = fontType
     self.fontSize = fontSize
   }
-
+  
   /// Initialize the style from a dictionary, taken from the profile. Returns nil if the object cannot be decoded.
   init?(dict: [String: Any]) {
     let themeRawValue = dict["theme"] as? String
@@ -128,14 +142,14 @@ struct ReaderModeStyle {
     if themeRawValue == nil || fontTypeRawValue == nil || fontSizeRawValue == nil {
       return nil
     }
-
+    
     let theme = ReaderModeTheme(rawValue: themeRawValue!)
     let fontType = ReaderModeFontType(rawValue: fontTypeRawValue!)
     let fontSize = ReaderModeFontSize(rawValue: fontSizeRawValue!)
     if theme == nil || fontType == nil || fontSize == nil {
       return nil
     }
-
+    
     self.theme = theme!
     self.fontType = fontType!
     self.fontSize = fontSize!
@@ -151,7 +165,7 @@ struct ReadabilityResult {
   var content = ""
   var title = ""
   var credits = ""
-
+  
   init?(object: AnyObject?) {
     if let dict = object as? NSDictionary {
       if let uri = dict["uri"] as? NSDictionary {
@@ -175,7 +189,7 @@ struct ReadabilityResult {
       return nil
     }
   }
-
+  
   /// Initialize from a JSON encoded string
   init?(string: String) {
     let object = JSON(parseJSON: string)
@@ -184,23 +198,23 @@ struct ReadabilityResult {
     let content = object["content"].string
     let title = object["title"].string
     let credits = object["credits"].string
-
+    
     if domain == nil || url == nil || content == nil || title == nil || credits == nil {
       return nil
     }
-
+    
     self.domain = domain!
     self.url = url!
     self.content = content!
     self.title = title!
     self.credits = credits!
   }
-
+  
   /// Encode to a dictionary, which can then for example be json encoded
   func encode() -> [String: Any] {
     return ["domain": domain, "url": url, "content": content, "title": title, "credits": credits]
   }
-
+  
   /// Encode to a JSON encoded string
   func encode() -> String {
     let dict: [String: Any] = self.encode()
@@ -219,23 +233,23 @@ let ReaderModeNamespace = "window.__firefox__.reader"
 
 class ReaderMode: TabContentScript {
   var delegate: ReaderModeDelegate?
-
+  
   fileprivate weak var tab: Tab?
   var state: ReaderModeState = ReaderModeState.unavailable
   fileprivate var originalURL: URL?
-
+  
   class func name() -> String {
     return "ReaderMode"
   }
-
+  
   required init(tab: Tab) {
     self.tab = tab
   }
-
+  
   func scriptMessageHandlerName() -> String? {
     return "readerModeMessageHandler"
   }
-
+  
   fileprivate func handleReaderPageEvent(_ readerPageEvent: ReaderPageEvent) {
     switch readerPageEvent {
     case .pageShow:
@@ -244,7 +258,7 @@ class ReaderMode: TabContentScript {
       }
     }
   }
-
+  
   fileprivate func handleReaderModeStateChange(_ state: ReaderModeState) {
     self.state = state
     guard let tab = tab else {
@@ -252,25 +266,25 @@ class ReaderMode: TabContentScript {
     }
     delegate?.readerMode(self, didChangeReaderModeState: state, forTab: tab)
   }
-
+  
   fileprivate func handleReaderContentParsed(_ readabilityResult: ReadabilityResult) {
     guard let tab = tab else {
       return
     }
     delegate?.readerMode(self, didParseReadabilityResult: readabilityResult, forTab: tab)
   }
-
+  
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
     }
-
+    
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
       log.debug("Missing required security token.")
       return
     }
-
+    
     if let msg = body["data"] as? Dictionary<String, Any> {
       if let messageType = ReaderModeMessageType(rawValue: msg["Type"] as? String ?? "") {
         switch messageType {
@@ -290,7 +304,7 @@ class ReaderMode: TabContentScript {
       }
     }
   }
-
+  
   var style: ReaderModeStyle = DefaultReaderModeStyle {
     didSet {
       if state == ReaderModeState.active {
@@ -300,7 +314,7 @@ class ReaderMode: TabContentScript {
       }
     }
   }
-
+  
   static func cache(for tab: Tab?) -> ReaderModeCache {
     switch TabType.of(tab) {
     case .regular:
@@ -309,5 +323,5 @@ class ReaderMode: TabContentScript {
       return MemoryReaderModeCache.sharedInstance
     }
   }
-
+  
 }
