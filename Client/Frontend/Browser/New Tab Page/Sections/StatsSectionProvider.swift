@@ -10,208 +10,208 @@ import BraveUI
 import UIKit
 
 class StatsSectionProvider: NSObject, NTPSectionProvider {
-    let action: () -> Void
+  let action: () -> Void
+  
+  init(action: @escaping () -> Void) {
+    self.action = action
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return 1
+  }
+  
+  func registerCells(to collectionView: UICollectionView) {
+    collectionView.register(NewTabCenteredCollectionViewCell<BraveShieldStatsView>.self)
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    action()
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    return collectionView.dequeueReusableCell(for: indexPath) as NewTabCenteredCollectionViewCell<BraveShieldStatsView>
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
+    size.height = 110
+    return size
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
     
-    init(action: @escaping () -> Void) {
-        self.action = action
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    func registerCells(to collectionView: UICollectionView) {
-        collectionView.register(NewTabCenteredCollectionViewCell<BraveShieldStatsView>.self)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        action()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return collectionView.dequeueReusableCell(for: indexPath) as NewTabCenteredCollectionViewCell<BraveShieldStatsView>
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
-        size.height = 110
-        return size
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
-        return UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
-    }
+    return UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+  }
 }
 
 class BraveShieldStatsView: UIView {
-    private lazy var adsStatView: StatView = {
-        let statView = StatView(frame: CGRect.zero)
-        statView.title = Strings.shieldsAdAndTrackerStats.capitalized
-        statView.color = .statsAdsBlockedTint
-        return statView
-    }()
+  private lazy var adsStatView: StatView = {
+    let statView = StatView(frame: CGRect.zero)
+    statView.title = Strings.shieldsAdAndTrackerStats.capitalized
+    statView.color = .statsAdsBlockedTint
+    return statView
+  }()
+  
+  private lazy var dataSavedStatView: StatView = {
+    let statView = StatView(frame: .zero)
+    statView.title = Strings.dataSavedStat
+    statView.color = .statsDataSavedTint
+    return statView
+  }()
+  
+  private lazy var timeStatView: StatView = {
+    let statView = StatView(frame: .zero)
+    statView.title = Strings.shieldsTimeStats
+    statView.color = .statsTimeSavedTint
+    return statView
+  }()
+  
+  private let statsStackView = UIStackView().then {
+    $0.distribution = .fillEqually
+    $0.spacing = 8
+  }
+  
+  private let topStackView = UIStackView().then {
+    $0.distribution = .equalSpacing
+    $0.alignment = .center
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.directionalLayoutMargins = .init(.init(top: 8, leading: 0, bottom: -4, trailing: 0))
+  }
+  
+  private let contentStackView = UIStackView().then {
+    $0.axis = .vertical
+    $0.spacing = 8
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.directionalLayoutMargins = .init(.init(top: 0, leading: 16, bottom: 16, trailing: 16))
+  }
+  
+  private let privacyReportLabel = UILabel().then {
+    let image = #imageLiteral(resourceName: "privacy_reports_shield").template
+    $0.textColor = .white
+    $0.textAlignment = .center
     
-    private lazy var dataSavedStatView: StatView = {
-        let statView = StatView(frame: .zero)
-        statView.title = Strings.dataSavedStat
-        statView.color = .statsDataSavedTint
-        return statView
-    }()
-    
-    private lazy var timeStatView: StatView = {
-        let statView = StatView(frame: .zero)
-        statView.title = Strings.shieldsTimeStats
-        statView.color = .statsTimeSavedTint
-        return statView
-    }()
-    
-    private let statsStackView = UIStackView().then {
-        $0.distribution = .fillEqually
-        $0.spacing = 8
-    }
-    
-    private let topStackView = UIStackView().then {
-        $0.distribution = .equalSpacing
-        $0.alignment = .center
-        $0.isLayoutMarginsRelativeArrangement = true
-        $0.directionalLayoutMargins = .init(.init(top: 8, leading: 0, bottom: -4, trailing: 0))
-    }
-    
-    private let contentStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 8
-        $0.isLayoutMarginsRelativeArrangement = true
-        $0.directionalLayoutMargins = .init(.init(top: 0, leading: 16, bottom: 16, trailing: 16))
-    }
-    
-    private let privacyReportLabel = UILabel().then {
-        let image = #imageLiteral(resourceName: "privacy_reports_shield").template
-        $0.textColor = .white
-        $0.textAlignment = .center
-        
-        $0.attributedText = {
-            let imageAttachment = NSTextAttachment().then {
-                $0.image = image
-                if let image = $0.image {
-                    $0.bounds = .init(x: 0, y: -3, width: image.size.width, height: image.size.height)
-                }
-            }
-            
-            var string = NSMutableAttributedString(attachment: imageAttachment)
-            
-            let padding = NSTextAttachment()
-            padding.bounds = CGRect(width: 6, height: 0)
-            
-            string.append(NSAttributedString(attachment: padding))
-            
-            string.append(NSMutableAttributedString(
-                string: Strings.PrivacyHub.privacyReportsTitle,
-                attributes: [.font: UIFont.systemFont(ofSize: 14.0, weight: .medium)]
-            ))
-            return string
-        }()
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        let image = UIImageView(image: #imageLiteral(resourceName: "privacy_reports_3dots").template)
-        image.tintColor = .white
-        
-        let bg = UIView()
-        bg.backgroundColor = .init(white: 0, alpha: 0.24)
-        bg.layer.cornerRadius = 12
-        bg.layer.cornerCurve = .continuous
-        insertSubview(bg, at: 0)
-        bg.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+    $0.attributedText = {
+      let imageAttachment = NSTextAttachment().then {
+        $0.image = image
+        if let image = $0.image {
+          $0.bounds = .init(x: 0, y: -3, width: image.size.width, height: image.size.height)
         }
-        
-        topStackView.addStackViewItems(.view(privacyReportLabel), .view(image))
-        statsStackView.addStackViewItems(.view(adsStatView), .view(dataSavedStatView), .view(timeStatView))
-        contentStackView.addStackViewItems(.view(topStackView), .view(statsStackView))
-        addSubview(contentStackView)
-        
-        update()
-        
-        contentStackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-            $0.width.equalTo(640)
-        }
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
+      }
+      
+      var string = NSMutableAttributedString(attachment: imageAttachment)
+      
+      let padding = NSTextAttachment()
+      padding.bounds = CGRect(width: 6, height: 0)
+      
+      string.append(NSAttributedString(attachment: padding))
+      
+      string.append(NSMutableAttributedString(
+        string: Strings.PrivacyHub.privacyReportsTitle,
+        attributes: [.font: UIFont.systemFont(ofSize: 14.0, weight: .medium)]
+      ))
+      return string
+    }()
+  }
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    let image = UIImageView(image: #imageLiteral(resourceName: "privacy_reports_3dots").template)
+    image.tintColor = .white
+    
+    let bg = UIView()
+    bg.backgroundColor = .init(white: 0, alpha: 0.24)
+    bg.layer.cornerRadius = 12
+    bg.layer.cornerCurve = .continuous
+    insertSubview(bg, at: 0)
+    bg.snp.makeConstraints {
+      $0.edges.equalToSuperview()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    topStackView.addStackViewItems(.view(privacyReportLabel), .view(image))
+    statsStackView.addStackViewItems(.view(adsStatView), .view(dataSavedStatView), .view(timeStatView))
+    contentStackView.addStackViewItems(.view(topStackView), .view(statsStackView))
+    addSubview(contentStackView)
+    
+    update()
+    
+    contentStackView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+      $0.width.equalTo(640)
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc private func update() {
-        adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).kFormattedNumber
-        dataSavedStatView.stat = BraveGlobalShieldStats.shared.dataSaved
-        timeStatView.stat = BraveGlobalShieldStats.shared.timeSaved
-    }
+    NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+  
+  @objc private func update() {
+    adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).kFormattedNumber
+    dataSavedStatView.stat = BraveGlobalShieldStats.shared.dataSaved
+    timeStatView.stat = BraveGlobalShieldStats.shared.timeSaved
+  }
 }
 
 private class StatView: UIView {
-    var color: UIColor = .braveLabel {
-        didSet {
-            statLabel.textColor = color
-        }
+  var color: UIColor = .braveLabel {
+    didSet {
+      statLabel.textColor = color
     }
-    
-    var stat: String = "" {
-        didSet {
-            statLabel.text = "\(stat)"
-        }
+  }
+  
+  var stat: String = "" {
+    didSet {
+      statLabel.text = "\(stat)"
     }
-    
-    var title: String = "" {
-        didSet {
-            titleLabel.text = "\(title)"
-        }
+  }
+  
+  var title: String = "" {
+    didSet {
+      titleLabel.text = "\(title)"
     }
+  }
+  
+  fileprivate var statLabel: UILabel = {
+    let label = UILabel()
+    label.textAlignment = .center
+    label.font = .systemFont(ofSize: 32, weight: UIFont.Weight.medium)
+    label.minimumScaleFactor = 0.5
+    label.adjustsFontSizeToFitWidth = true
+    return label
+  }()
+  
+  fileprivate var titleLabel: UILabel = {
+    let label = UILabel()
+    label.textColor = .white
+    label.textAlignment = .center
+    label.numberOfLines = 0
+    label.font = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.medium)
+    return label
+  }()
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     
-    fileprivate var statLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 32, weight: UIFont.Weight.medium)
-        label.minimumScaleFactor = 0.5
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
+    let stackView = UIStackView()
+    stackView.axis = .vertical
+    stackView.alignment = .center
     
-    fileprivate var titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.medium)
-        return label
-    }()
+    stackView.addStackViewItems(.view(statLabel), .view(titleLabel))
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.alignment = .center
-        
-        stackView.addStackViewItems(.view(statLabel), .view(titleLabel))
-        
-        addSubview(stackView)
-        
-        stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+    addSubview(stackView)
+    
+    stackView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 }
