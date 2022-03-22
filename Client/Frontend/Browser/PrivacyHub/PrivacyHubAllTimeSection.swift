@@ -33,7 +33,7 @@ extension PrivacyReportsView {
 
             Text(
               String(
-                format: Strings.PrivacyHub.allTimeTrackersCount,
+                format: Strings.PrivacyHub.allTimeSitesCount,
                 allTimeMostFrequentTracker.1))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -64,7 +64,7 @@ extension PrivacyReportsView {
             Text(allTimeRiskiestWebsite.0)
             Text(
               String(
-                format: Strings.PrivacyHub.allTimeSitesCount,
+                format: Strings.PrivacyHub.allTimeTrackersCount,
                 allTimeRiskiestWebsite.1))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
