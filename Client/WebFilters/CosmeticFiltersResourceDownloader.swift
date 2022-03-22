@@ -312,8 +312,11 @@ class CosmeticFiltersResourceDownloader {
           return
         }
         
-        engine.set(json: data)
-        continuation.resume()
+        if engine.set(json: data) {
+          continuation.resume()
+        } else {
+          continuation.resume(throwing: "Invalid JSON String - Bad Encoding")
+        }
       }
     }
   }

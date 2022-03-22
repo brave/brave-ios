@@ -61,12 +61,18 @@ public class AdblockRustEngine {
     return status
   }
 
-  public func set(json: Data) {
+  public func set(json: Data) -> Bool {
+    guard let string = String(data: json, encoding: .utf8),
+          let cString = NSString(string: string).utf8String else {
+      return false
+    }
+    
     // Extra safety check to prevent race condition in case engine deserialization
     // is called from another thread than `shouldBlock` invocation(#2699).
     deserializationPending = true
-    engine_add_resources(engine, json.int8Array)
+    engine_add_resources(engine, cString)
     deserializationPending = false
+    return true
   }
 
   func cssRules(for url: URL) -> String? {
