@@ -1,0 +1,48 @@
+// Copyright 2022 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import SwiftUI
+import Shared
+import BraveShared
+
+struct PrivacyReportSettingsView: View {
+  
+  @ObservedObject private var shieldsDataEnabled = Preferences.PrivacyHub.captureShieldsData
+  @ObservedObject private var vpnAlertsEnabled = Preferences.PrivacyHub.captureVPNAlerts
+  
+  var body: some View {
+    List {
+      Section(footer: Text(Strings.PrivacyHub.settingsEnableShieldsFooter)) {
+        Toggle(Strings.PrivacyHub.settingsEnableShieldsTitle, isOn: $shieldsDataEnabled.value)
+          .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      
+      Section(footer: Text(Strings.PrivacyHub.settingsEnableVPNAlertsFooter)) {
+        Toggle(Strings.PrivacyHub.settingsEnableVPNAlertsTitle, isOn: $vpnAlertsEnabled.value)
+          .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      
+      Section(footer: Text(Strings.PrivacyHub.settingsClearDataFooter)) {
+        HStack() {
+          Button(action: {}, label: {
+            Text(Strings.PrivacyHub.settingsSlearDataTitle)
+              .frame(maxWidth: .infinity)
+          })
+        }
+      }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    }
+  }
+}
+
+#if DEBUG
+struct PrivacyReportSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        PrivacyReportSettingsView()
+    }
+}
+#endif

@@ -314,6 +314,8 @@ extension Preferences {
     
     final class PrivacyHub {
         static let shouldShowNotificationPermissionCallout =
-            Option<Bool>(key: "playlist.show-notification-permission-callout", default: true)
+      Option<Bool>(key: "privacy-hub.show-notification-permission-callout", default: true)
+    static let captureShieldsData = Option<Bool>(key: "privacy-hub.capture-shields-data", default: true)
+    static let captureVPNAlerts = Option<Bool>(key: "privacy-hub.capture-vpn-alerts", default: true)
     }
 }

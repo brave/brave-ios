@@ -4578,5 +4578,47 @@ extension Strings {
             value: "See a report of the ads & trackers Brave blocked this week, plus the riskiest sites you visited.",
             comment: "Message of a notification we show to the user, on tapping it, a privacy reports screen will open."
         )
+    
+    public static let settingsEnableShieldsTitle = NSLocalizedString(
+      "privacyHub.settingsEnableShieldsTitle",
+      bundle: .braveShared,
+      value: "Capture Shields data",
+      comment: "Title of a setting that lets Brave monitor blocked network requests"
+    )
+    
+    public static let settingsEnableShieldsFooter = NSLocalizedString(
+      "privacyHub.settingsEnableShieldsFooter",
+      bundle: .braveShared,
+      value: "This setting will not affect the shield stats counter on the New Tab Page. Shields data is not captured when in Private Browsing Mode",
+      comment: "This text explains a setting that lets Brave monitor blocked network requests"
+    )
+    
+    public static let settingsEnableVPNAlertsTitle = NSLocalizedString(
+      "privacyHub.settingsEnableVPNAlertsTitle",
+      bundle: .braveShared,
+      value: "Capture VPN Alerts",
+      comment: "Title of a setting that lets Brave monitor blocked network requests captured by Brave VPN"
+    )
+    
+    public static let settingsEnableVPNAlertsFooter = NSLocalizedString(
+      "privacyHub.settingsEnableVPNAlertsFooter",
+      bundle: .braveShared,
+      value: "This setting has no effect if you have not purchased the Brave VPN",
+      comment: "This text explains a setting that lets Brave monitor blocked network requests captured by Brave VPN"
+    )
+    
+    public static let settingsSlearDataTitle = NSLocalizedString(
+      "privacyHub.settingsSlearDataTitle",
+      bundle: .braveShared,
+      value: "Clear Data",
+      comment: "Button that lets user clear all blocked requests and vpn alerts data that Brave captured for them."
+    )
+    
+    public static let settingsClearDataFooter = NSLocalizedString(
+      "privacyHub.settingsClearDataFooter",
+      bundle: .braveShared,
+      value: "Deletes all data captured so far",
+      comment: "Footer that explains to the user a button to clear all blocked requests and vpn alerts data that Brave captured for them."
+    )
     }
 }
