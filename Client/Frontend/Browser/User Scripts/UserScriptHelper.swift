@@ -63,7 +63,7 @@ class UserScriptHelper {
       // It is also added for every frame, including subframes.
       if let etldP1 = mainDocumentURL.baseDomain, isFPProtectionOn {
         #if DEBUG
-        print("[NAV] Doc ETLD+1:  \(etldP1)")
+        print("[NAV] Doc eTLD+1:  \(etldP1)")
         #endif
         userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
         userScriptTypes.insert(.farblingProtection(etld: etldP1))

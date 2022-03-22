@@ -5,7 +5,6 @@
 
 import Foundation
 import WebKit
-import CryptoKit
 import GameplayKit
 
 /// An error representing failures in loading scripts
@@ -57,7 +56,7 @@ enum ScriptSourceType {
 
 /// An enum representing a specific (modified) variation of a local script replacing any dynamic variables.
 enum UserScriptType: Hashable {
-  /// This type does farbling protection and is customized for the provided ETLD+1
+  /// This type does farbling protection and is customized for the provided eTLD+1
   /// Has a dependency on `nacl`
   case farblingProtection(etld: String)
   /// Scripts specific to certain domains
@@ -148,7 +147,6 @@ class ScriptFactory {
   func clearCaches() {
     cachedScriptSources = [:]
     cachedDomainScriptsSources = [:]
-    SeedManager.shared.clearCache()
   }
   
   /// Returns a script source by loading a file or returning cached data
@@ -169,7 +167,7 @@ class ScriptFactory {
   /// - On the modfied source file (per `UserScriptType`)
   func makeScript(for domainType: UserScriptType) throws -> WKUserScript {
     var source = try makeScriptSource(of: domainType.sourceType)
-    
+
     // First check for and return cached value
     if let script = cachedDomainScriptsSources[domainType] {
       return script
@@ -177,7 +175,9 @@ class ScriptFactory {
     
     switch domainType {
     case .farblingProtection(let etld):
-      let seed = SeedManager.shared.getSeed(forETLD: etld)
+      let randomManager = RandomManager(etld: etld)
+      let seed = randomManager.seed
+
       // From the seed, let's generate a fudge factor between 0.99 and 1
       // `GKMersenneTwisterRandomSource` gives us a value between 0.0 and 1.0,
       // so we convert it to a value between 0.99 and 1.
@@ -187,9 +187,16 @@ class ScriptFactory {
       // it is greater than 1 it has the potential to be out of the appropriate range giving us JS errors.
       let randomSource = GKMersenneTwisterRandomSource(seed: seed)
       let fudgeFactor = 0.99 + (randomSource.nextUniform() / 100)
+      let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomManager)
+
+      print("[ScriptFactory] eTLD+1: \(etld)")
+      print("[ScriptFactory] String: \(fakePluginData)")
+      print("[ScriptFactory] Seed:   \(seed)")
+      print("[ScriptFactory] Fudge:  \(fudgeFactor)")
       
       source = source
         .replacingOccurrences(of: "$<fudge_factor>", with: "\(fudgeFactor)", options: .literal)
+        .replacingOccurrences(of: "$<fake_plugin_data>", with: "\(fakePluginData)", options: .literal)
       
     case .nacl:
       // No modifications needed
@@ -233,76 +240,5 @@ class ScriptFactory {
     let userScript = WKUserScript.create(source: source, injectionTime: domainType.injectionTime, forMainFrameOnly: domainType.forMainFrameOnly, in: domainType.contentWorld)
     cachedDomainScriptsSources[domainType] = userScript
     return userScript
-  }
-}
-
-/// Class responsible for creating and caching seeds.
-///
-/// These seeds are used by scripts to randomize output in a situation where output has to be the same for the same ETLD but different for different ETLDs
-private class SeedManager {
-  /// The shared instance of the SeedManager
-  ///
-  /// The seed manager is shared because we need the seeds to be persisted across different tabs and while the application is active.
-  /// We can easily drop the shared instance as the sessionKey is a static variable. But for now this simplifies things a lot as we don't have a need for instances.
-  static let shared = SeedManager()
-  
-  /// This is used to encode the domain key (i.e. the ETLD+1).
-  ///
-  /// This key should be the same for the lifecycle of the app. Hence we use a static variable.
-  /// Not strictly necessary at this point because the `SeedManager` is a shared instance.
-  private static let sessionKey = SymmetricKey(size: .bits256)
-  
-  /// Cached seeds per etld. Results in less hashing.
-  private var seeds: [String: UInt64]
-  
-  init(seeds: [String: UInt64] = [:]) {
-    self.seeds = seeds
-  }
-  
-  /// Clear all the stored seeds
-  func clearCache() {
-    seeds = [:]
-  }
-  
-  /// Returns a seed for the given etld. Seeds are cached per ETLD so each ETLD returns the same seed
-  func getSeed(forETLD etld: String) -> UInt64 {
-    // Return an existing seed if we have it
-    guard seeds[etld] == nil else {
-      return seeds[etld]!
-    }
-    
-    // Sign the etld using our session key
-    let signed = Self.signedKey(forETLD: etld).hexString
-    
-    // We need to represent the signed value as an UInt64.
-    let seed = seed(from: signed)
-    seeds[etld] = seed
-    return seed
-  }
-  
-  /// Hash the string value into a `UInt64` representation to be used as a seed.
-  private func seed(from value: String) -> UInt64 {
-    // First we hash the string to have an `Int` value
-    let hashValue = value.hashValue
-    
-    // And then we reinterpret cast it into a UInt64
-    // This works because Int uses 64 bits so their capacities are the same.
-    return withUnsafePointer(to: hashValue) {
-      $0.withMemoryRebound(to: UInt64.self, capacity: 1) {
-        $0.pointee
-      }
-    }
-  }
-  
-  /// Signs this given value using a static session key.
-  private static func signedKey(forETLD etld: String) -> Data {
-    let signature = HMAC<SHA256>.authenticationCode(for: Data(etld.utf8), using: sessionKey)
-    return Data(signature)
-  }
-}
-
-private extension Data {
-  var hexString: String {
-    map({ String(format: "%02hhx", $0) }).joined()
   }
 }

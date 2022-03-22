@@ -101,4 +101,113 @@
       farbleArrayData(arguments[0])
     }
   }
+
+  // An array of fake data that will be used to make fake plugins
+  const fakePluginData = $<fake_plugin_data>
+
+  // Function that create a fake mime-type based on the given fake data
+  function makeFakeMimeType (fakeData) {
+    return Object.create(window.MimeType.prototype, {
+      suffixes: {
+        get: function () {
+          return fakeData.suffixes
+        }
+      },
+      type: {
+        get: function () {
+          return fakeData.type
+        }
+      },
+      description: {
+        get: function () {
+          return fakeData.description
+        }
+      }
+    })
+  }
+
+  // Create a fake plugin given the plugin data
+  function makeFakePlugin (pluginData) {
+    const newPlugin = Object.create(window.Plugin.prototype, {
+      description: {
+        get: function () {
+          return pluginData.description
+        }
+      },
+      name: {
+        get: function () {
+          return pluginData.name
+        }
+      },
+      filename: {
+        get: function () {
+          return pluginData.filename
+        }
+      },
+      length: {
+        get: function () {
+          return pluginData.mimeTypes.length
+        }
+      }
+    })
+
+    // Create mime-types and link them to the new plugin
+    for (let index = 0; index < pluginData.mimeTypes.length; index++) {
+      const newMimeType = makeFakeMimeType(pluginData.mimeTypes[index])
+
+      newPlugin[index] = newMimeType
+      newPlugin[newMimeType.type] = newMimeType
+
+      Reflect.defineProperty(newMimeType, 'enabledPlugin', {
+        get: function () {
+          return newPlugin
+        }
+      })
+    }
+
+    // Fix .item() function to return the correct item
+    newPlugin.item = function (index) {
+      return newPlugin[index]
+    }
+
+    return newPlugin
+  }
+
+  // We need the original length so we can reference it (as we will change it)
+  const plugins = window.navigator.plugins
+  const originalPluginsLength = plugins.length
+  const originalItemFunction = plugins.item
+
+  // for (let index = 0; index < originalPluginsLength; index++) {
+  //   originalPlugins.push(plugins.item(index))
+  // }
+
+  // Adds a fake plugin for the given index on fakePluginData
+  function addPluginAtIndex (newPlugin, index) {
+    const pluginPosition = originalPluginsLength + index
+    window.navigator.plugins[pluginPosition] = newPlugin
+    window.navigator.plugins[newPlugin.name] = newPlugin
+  }
+
+  for (let index = 0; index < fakePluginData.length; index++) {
+    const pluginData = fakePluginData[index]
+    const newPlugin = makeFakePlugin(pluginData)
+    addPluginAtIndex(newPlugin, index)
+  }
+
+  // Adjust the length of the original plugin array
+  Reflect.defineProperty(window.navigator.plugins, 'length', {
+    get: function () {
+      return originalPluginsLength + fakePluginData.length
+    }
+  })
+
+  // Fix .item() function to return the correct item
+  window.PluginArray.prototype.item = function (index) {
+    if (index < originalPluginsLength) {
+      return Reflect.apply(originalItemFunction, plugins, arguments)
+    } else {
+      return plugins[index]
+    }
+  }
 })()

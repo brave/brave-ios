@@ -24,7 +24,7 @@ enum DomainUserScript: CaseIterable {
       return
     }
 
-    // If no matches, we look for a baseDomain (ETLD+1) match.
+    // If no matches, we look for a baseDomain (eTLD+1) match.
     if let baseDomain = url.baseDomain, let found = Self.allCases.first(where: { $0.associatedDomains.contains(baseDomain) }) {
       self = found
       return
