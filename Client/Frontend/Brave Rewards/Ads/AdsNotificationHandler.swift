@@ -9,32 +9,9 @@ import pop
 import SnapKit
 import BraveShared
 
-public extension AdNotification {
-  /// A hard coded string for a Wallet type of `AdNotification`
-  static let walletNotificationURL = "brave_wallet"
-  
-  /// A boolean value indicate if this notification is custom make for Brave Wallet
-  var isWallet: Bool {
-    uuid.isEmpty && targetURL == AdNotification.walletNotificationURL
-  }
-}
-
 public class AdsNotificationHandler: BraveAdsNotificationHandler {
-  /// An action type occuring on the ad
-  public enum Action {
-    /// The user opened the ad by either clicking on it directly or by swiping and clicking the "view" button
-    case opened
-    /// The user swiped the ad away
-    case dismissed
-    /// The user ignored the ad for a given amount of time for it to automatically dismiss
-    case timedOut
-    /// The user clicked the thumbs down button by swiping on the ad
-    case disliked
-    /// The user clicked the wallet connection notification
-    case connectWallet
-  }
   /// An ad was tapped and a URL should be opened
-  public var actionOccured: ((AdNotification, Action) -> Void)?
+  public var actionOccured: ((AdNotification?, BraveNotificationAction) -> Void)?
   /// The ads object
   public let ads: BraveAds
   /// Whether or not we should currently show ads currently based on exteranl
@@ -52,88 +29,81 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     self.ads.notificationsHandler = self
     self.presentingController = presentingController
   }
-
-  private var adsQueue: [AdNotification] = []
-
-  private lazy var adsViewController = AdsViewController()
-
-  private func displayAd(notification: AdNotification) {
+    
+  private lazy var notificationsController = BraveNotificationsController()
+  
+  private func display(notification: BraveNotification) {
     guard let presentingController = presentingController else { return }
-
-    guard let window = presentingController.view.window else {
-      return
-    }
-
-    if adsViewController.parent == nil {
-      window.addSubview(adsViewController.view)
-      adsViewController.view.snp.makeConstraints {
+    guard let window = presentingController.view.window else { return }
+    
+    if notificationsController.parent == nil {
+      window.addSubview(notificationsController.view)
+      notificationsController.view.snp.makeConstraints {
         $0.edges.equalTo(window.safeAreaLayoutGuide.snp.edges)
       }
     }
-
-    if !notification.isWallet {
-    self.ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
-    }
-
-    adsViewController.display(
-      ad: notification,
-      handler: { [weak self] (notification, action) in
-        guard let self = self else { return }
-        switch action {
-        case .opened:
-          self.ads.reportAdNotificationEvent(notification.uuid, eventType: .clicked)
-        case .dismissed:
-          self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
-        case .timedOut:
-          self.ads.reportAdNotificationEvent(notification.uuid, eventType: .timedOut)
-        case .disliked:
-          self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
-          self.ads.toggleThumbsDown(forAd: notification.uuid, advertiserId: notification.advertiserID)
-      case .connectWallet:
-        break
-        }
-        self.actionOccured?(notification, action)
-
-      if !notification.isWallet, let nextAd = self.adsQueue.popLast() {
-          self.displayAd(notification: nextAd)
-        }
-      },
-      animatedOut: { [weak self] in
-        guard let self = self else { return }
-        if self.adsViewController.visibleAdView == nil && self.adsQueue.isEmpty {
-          self.adsViewController.willMove(toParent: nil)
-          self.adsViewController.view.removeFromSuperview()
-          self.adsViewController.removeFromParent()
-        }
-      })
-  }
-
-  // This method can be used to display a wallet connection prompt when we detect users are visiting
-  // a web3 site.
-  public func showWalletConnectionNotification() {
-    let walletNotification = AdNotification.customAd(title: "", body: "", url: AdNotification.walletNotificationURL)
     
-    if adsViewController.visibleAdView == nil {
-      // do not have a rewards ad displaying
-      displayAd(notification: walletNotification)
+    if let rewards = notification as? RewardsNotification {
+      notificationsController.display(notification: rewards) { [weak self] in
+        guard let self = self else { return }
+        self.notificationsController.willMove(toParent: nil)
+        self.notificationsController.view.removeFromSuperview()
+        self.notificationsController.removeFromParent()
+      }
+    } else if let wallet = notification as? WalletNotification {
+      notificationsController.display(notification: wallet) { [weak self] in
+        guard let self = self else { return }
+        self.notificationsController.willMove(toParent: nil)
+        self.notificationsController.view.removeFromSuperview()
+        self.notificationsController.removeFromParent()
+      }
     }
   }
   
+  // This method can be used to display a wallet connection prompt when we detect users are visiting
+  // a web3 site.
+  public func showWalletConnectionNotification() {
+    let walletNotification = WalletNotification(priority: .low) { [weak self] action in
+      guard let self = self else { return }
+      
+      self.actionOccured?(nil, .wallet(action))
+      
+      if let nextNotification = self.notificationsController.notificationsQueue.popLast() {
+        self.display(notification: nextNotification)
+      }
+    }
+    notificationsController.safeInsert(notification: walletNotification)
+    display(notification: notificationsController.notificationsQueue.popLast()!)
+  }
+  
   public func showNotification(_ notification: AdNotification) {
-    adsQueue.insert(notification, at: 0)
-    if let adView = adsViewController.visibleAdView, let walletPanel = adView as? WalletConnectionView {
-      // hide wallet connection panel if it is currently shown
-      adsViewController.hide(adView: walletPanel)
+    let rewardsNotification = RewardsNotification(ad: notification) { [weak self] action in
+      guard let self = self else { return }
+      switch action {
+      case .opened:
+        self.ads.reportAdNotificationEvent(notification.uuid, eventType: .clicked)
+      case .dismissed:
+        self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
+      case .timedOut:
+        self.ads.reportAdNotificationEvent(notification.uuid, eventType: .timedOut)
+      case .disliked:
+        self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
+        self.ads.toggleThumbsDown(forAd: notification.uuid, advertiserId: notification.advertiserID)
+      }
+      self.actionOccured?(notification, .rewards(action))
+      
+      if let nextNotification = self.notificationsController.notificationsQueue.popLast() {
+        self.display(notification: nextNotification)
+      }
     }
     
-    if adsViewController.visibleAdView == nil {
-      // Nothing currently waiting
-      displayAd(notification: adsQueue.popLast()!)
-    }
+    ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
+    notificationsController.safeInsert(notification: rewardsNotification)
+    display(notification: notificationsController.notificationsQueue.popLast()!)
   }
 
   public func clearNotification(withIdentifier identifier: String) {
-    adsQueue.removeAll(where: { $0.uuid == identifier })
+    notificationsController.removeRewardsNotification(with: identifier)
   }
 
   public func shouldShowNotifications() -> Bool {
