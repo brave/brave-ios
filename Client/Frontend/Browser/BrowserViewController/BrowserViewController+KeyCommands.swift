@@ -205,9 +205,6 @@ extension BrowserViewController {
       UIKeyCommand(input: "}", modifierFlags: [.command], action: #selector(nextTabKeyCommand)),
       UIKeyCommand(input: "{", modifierFlags: [.command], action: #selector(previousTabKeyCommand)),
       UIKeyCommand(title: Strings.showTabTrayFromTabKeyCodeTitle, action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .alternate]),
-      UIKeyCommand(
-        title: String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count),
-        action: #selector(showTabTrayKeyCommand), input: "\t", modifierFlags: [.command, .shift]),
       
       // Page Navigation Key Commands
       UIKeyCommand(title: Strings.showHistoryTitle, action: #selector(showHistoryKeyCommand), input: "y", modifierFlags: [.command]),
