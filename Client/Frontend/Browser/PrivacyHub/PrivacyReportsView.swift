@@ -78,7 +78,7 @@ struct PrivacyReportsView: View {
 
           Divider()
 
-          if vpnAlertsEnabled, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
+          if Preferences.PrivacyHub.captureVPNAlerts.value, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
             PrivacyHubVPNAlertsSection(
               lastVPNAlerts: lastVPNAlerts,
               onDismiss: {

@@ -6,6 +6,7 @@
 // The preload and postload js files are unmodified from Focus.
 
 import Shared
+import BraveShared
 import Data
 
 struct TPPageStats {
@@ -88,12 +89,11 @@ class TPStatsBlocklistChecker {
       if isAdOrTrackerListEnabled
         && AdBlockStats.shared.shouldBlock(
           request,
-          currentTabUrl: currentTabUrl)
-      {
+          currentTabUrl: currentTabUrl) {
 
-        if let dom = URL(string: domainUrl),
-          let blockedResourceHost = url.baseDomain
-        {
+        if Preferences.PrivacyHub.captureShieldsData.value,
+          let dom = URL(string: domainUrl),
+          let blockedResourceHost = url.baseDomain {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, dom, Date()))
         }
 

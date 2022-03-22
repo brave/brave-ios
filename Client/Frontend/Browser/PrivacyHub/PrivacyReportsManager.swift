@@ -17,6 +17,8 @@ struct PrivacyReportsManager {
   static var pendingBlockedRequests: [(host: String, domain: URL, date: Date)] = []
 
   static func processBlockedRequests() {
+    if !Preferences.PrivacyHub.captureShieldsData.value { return }
+    
     let itemsToSave = pendingBlockedRequests
     pendingBlockedRequests.removeAll()
 

@@ -650,6 +650,7 @@ class BraveVPN {
   }
 
   static func processVPNAlerts() {
+    if !Preferences.PrivacyHub.captureVPNAlerts.value { return }
 
     Task {
       let (data, success, error) = await GRDGatewayAPI.shared().events()
