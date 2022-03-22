@@ -11,25 +11,29 @@ import Data
 extension PrivacyReportsView {
   struct PrivacyHubVPNAlertsSection: View {
     let lastVPNAlerts: [BraveVPNAlert]
-    
+
     private(set) var onDismiss: () -> Void
-    
+
     var body: some View {
       VStack(alignment: .leading) {
         Text(Strings.PrivacyHub.vpnAlertsHeader.uppercased())
           .font(.footnote.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
-        
+
         ForEach(lastVPNAlerts) { alert in
           VPNAlertCell(vpnAlert: alert)
             .background(Color(.braveBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        
-        NavigationLink(destination:
-                        AllVPNAlertsView(trackerCounts: BraveVPNAlert.alertTotals, onDismiss: {
-          onDismiss()
-        })) {
+
+        NavigationLink(
+          destination:
+            AllVPNAlertsView(
+              trackerCounts: BraveVPNAlert.alertTotals,
+              onDismiss: {
+                onDismiss()
+              })
+        ) {
           HStack {
             Text(Strings.PrivacyHub.allVPNAlertsButtonText)
             Image(systemName: "arrow.right")

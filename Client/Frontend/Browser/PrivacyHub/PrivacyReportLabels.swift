@@ -19,10 +19,10 @@ extension PrivacyReportsView {
         .fixedSize(horizontal: false, vertical: true)
     }
   }
-  
+
   struct BlockedByVPNLabel: View {
     @Environment(\.sizeCategory) private var sizeCategory
-    
+
     var body: some View {
       Text(Strings.PrivacyHub.vpnLabel.uppercased())
         .foregroundColor(Color("label_violet_foreground"))
@@ -37,10 +37,10 @@ extension PrivacyReportsView {
         .fixedSize(horizontal: false, vertical: true)
     }
   }
-  
+
   struct BlockedByShieldsLabel: View {
     @Environment(\.sizeCategory) private var sizeCategory
-    
+
     var body: some View {
       Text(Strings.PrivacyHub.shieldsLabel.uppercased())
         .foregroundColor(Color("label_orange_foreground"))
@@ -64,18 +64,18 @@ struct PrivacyReportLabels_Previews: PreviewProvider {
       PrivacyReportsView.BlockedLabel()
       PrivacyReportsView.BlockedByVPNLabel()
       PrivacyReportsView.BlockedByShieldsLabel()
-      
+
       Group {
         PrivacyReportsView.BlockedLabel()
         PrivacyReportsView.BlockedByVPNLabel()
         PrivacyReportsView.BlockedByShieldsLabel()
       }
       .preferredColorScheme(.dark)
-      
+
     }
     .previewLayout(.sizeThatFits)
     .padding()
-    
+
   }
 }
 #endif

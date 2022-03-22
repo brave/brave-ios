@@ -34,8 +34,8 @@ class BraveVPN {
         logAndStoreError("Failed to load vpn conection: \(error)")
       }
 
-            GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
-            
+      GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
+
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
         BraveVPN.clearConfiguration()
@@ -648,34 +648,34 @@ class BraveVPN {
       }
     }
   }
-    
-    static func processVPNAlerts() {
-    
-        Task {
-            let (data, success, error) = await GRDGatewayAPI.shared().events()
-            if !success {
-                log.error("VPN getEvents call failed")
-                if let error = error {
-                    log.warning(error)
-                }
-                
-                return
-            }
-            
-            guard let alertsData = data["alerts"] else {
-                log.error("Failed to unwrap json for vpn alerts")
-                return
-            }
-            
-            do {
-                let dataAsJSON =
-                try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
-                let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
-                
-                BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
-            } catch {
-                log.error("Error: \(error)")
-            }
+
+  static func processVPNAlerts() {
+
+    Task {
+      let (data, success, error) = await GRDGatewayAPI.shared().events()
+      if !success {
+        log.error("VPN getEvents call failed")
+        if let error = error {
+          log.warning(error)
         }
+
+        return
+      }
+
+      guard let alertsData = data["alerts"] else {
+        log.error("Failed to unwrap json for vpn alerts")
+        return
+      }
+
+      do {
+        let dataAsJSON =
+          try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
+        let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
+
+        BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
+      } catch {
+        log.error("Error: \(error)")
+      }
     }
+  }
 }

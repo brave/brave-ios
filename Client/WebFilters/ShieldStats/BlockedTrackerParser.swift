@@ -8,21 +8,21 @@ import Shared
 import BraveShared
 
 class BlockedTrackerParser {
-    static let entityList = OnboardingDisconnectList.loadFromFile()
-    
-    static func parse(url: URL, fallbackToDomainURL: Bool) -> String? {
-        guard let list = entityList else { return nil }
-        
-        let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
-        
-        for entity in list.entities {
-            let resources = entity.value.resources.filter({ $0 == domain })
-            
-            if !resources.isEmpty {
-                return entity.key
-            }
-        }
-        
-        return fallbackToDomainURL ? domain : nil
+  static let entityList = OnboardingDisconnectList.loadFromFile()
+
+  static func parse(url: URL, fallbackToDomainURL: Bool) -> String? {
+    guard let list = entityList else { return nil }
+
+    let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
+
+    for entity in list.entities {
+      let resources = entity.value.resources.filter({ $0 == domain })
+
+      if !resources.isEmpty {
+        return entity.key
+      }
     }
+
+    return fallbackToDomainURL ? domain : nil
+  }
 }

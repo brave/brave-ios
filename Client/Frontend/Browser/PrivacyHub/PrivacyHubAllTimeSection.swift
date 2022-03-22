@@ -11,32 +11,34 @@ extension PrivacyReportsView {
   struct PrivacyHubAllTimeSection: View {
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    
+
     let allTimeMostFrequentTracker: (String, Int)?
     let allTimeRiskiestWebsite: (String, Int)?
-    
+
     let allTimeListTrackers: [PrivacyReportsItem]
     let allTimeListWebsites: [PrivacyReportsItem]
-    
+
     private(set) var onDismiss: () -> Void
-    
+
     private var allTimeTrackerView: some View {
       VStack {
         Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
           .font(.caption)
           .frame(maxWidth: .infinity, alignment: .leading)
           .foregroundColor(Color(.secondaryBraveLabel))
-        
+
         if let allTimeMostFrequentTracker = allTimeMostFrequentTracker {
           VStack(alignment: .leading) {
             Text(allTimeMostFrequentTracker.0)
-            
-            Text(String(format: Strings.PrivacyHub.allTimeTrackersCount,
-                        allTimeMostFrequentTracker.1))
+
+            Text(
+              String(
+                format: Strings.PrivacyHub.allTimeTrackersCount,
+                allTimeMostFrequentTracker.1))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .font(.subheadline)
-          
+
         } else {
           Text(Strings.PrivacyHub.noDataToShow)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -49,23 +51,25 @@ extension PrivacyReportsView {
       .background(Color(.braveBackground))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
-    
+
     private var allTimeWebsiteView: some View {
       VStack {
         Text(Strings.PrivacyHub.allTimeWebsiteTitle.uppercased())
           .font(.caption)
           .frame(maxWidth: .infinity, alignment: .leading)
           .foregroundColor(Color(.secondaryBraveLabel))
-        
+
         if let allTimeRiskiestWebsite = allTimeRiskiestWebsite {
           VStack(alignment: .leading) {
             Text(allTimeRiskiestWebsite.0)
-            Text(String(format: Strings.PrivacyHub.allTimeSitesCount,
-                        allTimeRiskiestWebsite.1))
+            Text(
+              String(
+                format: Strings.PrivacyHub.allTimeSitesCount,
+                allTimeRiskiestWebsite.1))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .font(.subheadline)
-          
+
         } else {
           Text(Strings.PrivacyHub.noDataToShow)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,13 +82,13 @@ extension PrivacyReportsView {
       .background(Color(.braveBackground))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
-    
+
     var body: some View {
       VStack(alignment: .leading, spacing: 8) {
         Text(Strings.PrivacyHub.allTimeListsHeader.uppercased())
           .font(.footnote.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
-        
+
         if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
           VStack {
             allTimeTrackerView
@@ -96,13 +100,15 @@ extension PrivacyReportsView {
             allTimeWebsiteView
           }
         }
-        
-        NavigationLink(destination: PrivacyReportAllTimeListsView(
-          allTimeListTrackers: allTimeListTrackers,
-          allTimeListWebsites: allTimeListWebsites,
-          onDismiss: {
-          onDismiss()
-        })) {
+
+        NavigationLink(
+          destination: PrivacyReportAllTimeListsView(
+            allTimeListTrackers: allTimeListTrackers,
+            allTimeListWebsites: allTimeListWebsites,
+            onDismiss: {
+              onDismiss()
+            })
+        ) {
           HStack {
             Text(Strings.PrivacyHub.allTimeListsButtonText)
             Image(systemName: "arrow.right")

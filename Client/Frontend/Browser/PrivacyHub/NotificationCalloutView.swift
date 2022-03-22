@@ -14,58 +14,63 @@ extension PrivacyReportsView {
   struct NotificationCalloutView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.sizeCategory) private var sizeCategory
-    
+
     private func askForNotificationAuthorization() {
       let center = UNUserNotificationCenter.current()
-      
+
       center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-          
-          if let error = error {
-            log.warning("requestAuthorization: \(error)")
-            return
-          }
-          
+
+        if let error = error {
+          log.warning("requestAuthorization: \(error)")
+          return
+        }
+
         DispatchQueue.main.async {
           Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
         }
       }
     }
-    
+
     var closeButton: some View {
-      Button(action: {
-        Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
-      }, label: {
-        Image(systemName: "xmark")
-      })
-      
+      Button(
+        action: {
+          Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
+        },
+        label: {
+          Image(systemName: "xmark")
+        })
+
     }
-    
+
     private var enableNotificationsButton: some View {
-      Button(action: askForNotificationAuthorization, label: {
-        ZStack {
-          VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
-            .edgesIgnoringSafeArea(.all)
-          
-          Group {
-            if sizeCategory.isAccessibilityCategory {
-              Text(Strings.PrivacyHub.notificationCalloutButtonText)
-            } else {
-              Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
+      Button(
+        action: askForNotificationAuthorization,
+        label: {
+          ZStack {
+            VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+              .edgesIgnoringSafeArea(.all)
+
+            Group {
+              if sizeCategory.isAccessibilityCategory {
+                Text(Strings.PrivacyHub.notificationCalloutButtonText)
+              } else {
+                Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
+              }
             }
+            .font(.callout)
+            .padding(.vertical, 12)
           }
-          .font(.callout)
-          .padding(.vertical, 12)
-        }
-        .clipShape(Capsule())
-        .fixedSize(horizontal: false, vertical: true)
-      })
+          .clipShape(Capsule())
+          .fixedSize(horizontal: false, vertical: true)
+        })
     }
-    
+
     var body: some View {
       Group {
         VStack {
           if horizontalSizeClass == .compact
-              || (horizontalSizeClass == .regular && sizeCategory.isAccessibilityCategory) {
+            || (horizontalSizeClass == .regular && sizeCategory.isAccessibilityCategory)
+          {
             HStack(alignment: .top) {
               HStack {
                 if !sizeCategory.isAccessibilityCategory {
@@ -79,7 +84,7 @@ extension PrivacyReportsView {
               closeButton
             }
             .frame(maxWidth: .infinity)
-            
+
             enableNotificationsButton
               .frame(maxWidth: .infinity)
           } else {
@@ -87,7 +92,7 @@ extension PrivacyReportsView {
               Spacer()
               closeButton
             }
-            
+
             HStack(spacing: 24) {
               Image(uiImage: .init(imageLiteralResourceName: "brave_document"))
               Text(Strings.PrivacyHub.notificationCalloutBody)
@@ -106,8 +111,9 @@ extension PrivacyReportsView {
         .background(
           LinearGradient(braveGradient: .gradient05)
         )
-        .clipShape(RoundedRectangle(
-          cornerRadius: 12.0, style: .continuous)
+        .clipShape(
+          RoundedRectangle(
+            cornerRadius: 12.0, style: .continuous)
         )
       }
     }

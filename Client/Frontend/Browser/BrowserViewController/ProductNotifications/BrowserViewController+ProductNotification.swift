@@ -82,12 +82,14 @@ extension BrowserViewController {
 
         if !blockedRequests.isEmpty,
             let url = selectedTab.url,
-            let firstBlockedUrl = blockedRequests.first {
+      let firstBlockedUrl = blockedRequests.first
+    {
 
         let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
             let trackerName = BlockedTrackerParser.parse(url: firstBlockedUrl, fallbackToDomainURL: true) ?? domain
 
-            notifyTrackersBlocked(domain: domain, trackerName: trackerName,
+      notifyTrackersBlocked(
+        domain: domain, trackerName: trackerName,
                                   remainingTrackersCount: blockedRequests.count - 1)
       Preferences.General.onboardingAdblockPopoverShown.value = true
     }

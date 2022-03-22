@@ -6,14 +6,14 @@
 import Foundation
 
 public struct CountableEntity: Hashable, Equatable {
-    public let name: String
-    public let count: Int
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
-    }
-    
-    public static func == (lhs: CountableEntity, rhs: CountableEntity) -> Bool {
-        return lhs.name == rhs.name
-    }
+  public let name: String
+  public let count: Int
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(name)
+  }
+
+  public static func == (lhs: CountableEntity, rhs: CountableEntity) -> Bool {
+    return lhs.name == rhs.name
+  }
 }

@@ -6,24 +6,24 @@ import SwiftUI
 
 extension AllVPNAlertsView {
   struct VPNAlertStat: View {
-    
+
     private let assetName: String
     private let title: String
     private let compact: Bool
     private let count: Int
-    
+
     init(assetName: String, title: String, count: Int, compact: Bool) {
       self.assetName = assetName
       self.title = title
       self.count = count
       self.compact = compact
     }
-    
+
     var body: some View {
       HStack {
         Image(assetName)
           .padding(.leading)
-        
+
         if compact {
           VStack(alignment: .leading) {
             Text(title)
@@ -50,7 +50,7 @@ extension AllVPNAlertsView {
       .background(Color(.braveBackground))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
       .fixedSize(horizontal: false, vertical: true)
-      
+
     }
   }
 }
@@ -66,7 +66,7 @@ struct VPNAlertStat_Previews: PreviewProvider {
       AllVPNAlertsView.VPNAlertStat(type: .location, compact: true)
         .previewLayout(PreviewLayout.sizeThatFits)
     }
-    
+
   }
 }
 #endif

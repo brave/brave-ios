@@ -12,14 +12,14 @@ extension PrivacyReportsView {
   struct PrivacyHubLastWeekSection: View {
     let lastWeekMostFrequentTracker: (String, Int)?
     let lastWeekRiskiestWebsite: (String, Int)?
-    
+
     var body: some View {
       Group {
         VStack(alignment: .leading, spacing: 8) {
           Text(Strings.PrivacyHub.lastWeekHeader.uppercased())
             .font(.footnote.weight(.medium))
             .fixedSize(horizontal: false, vertical: true)
-          
+
           HStack {
             Image("frequent_tracker")
             VStack(alignment: .leading) {
@@ -27,9 +27,12 @@ extension PrivacyReportsView {
                 .font(.caption)
                 .foregroundColor(.init(.secondaryBraveLabel))
               if let lastWeekMostFrequentTracker = lastWeekMostFrequentTracker {
-                Text(markdown: String(format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
-                            lastWeekMostFrequentTracker.0, lastWeekMostFrequentTracker.1))
-                  .font(.callout)
+                Text(
+                  markdown: String(
+                    format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
+                    lastWeekMostFrequentTracker.0, lastWeekMostFrequentTracker.1)
+                )
+                .font(.callout)
               } else {
                 Text(Strings.PrivacyHub.noDataToShow)
                   .foregroundColor(.init(.secondaryBraveLabel))
@@ -41,25 +44,28 @@ extension PrivacyReportsView {
           .padding()
           .background(Color(.braveBackground))
           .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-          
+
           HStack {
             Image("creepy_website")
             VStack(alignment: .leading) {
-              
+
               Text(Strings.PrivacyHub.riskiestWebsiteTitle.uppercased())
                 .font(.caption)
                 .foregroundColor(Color(.secondaryBraveLabel))
-              
+
               if let lastWeekRiskiestWebsite = lastWeekRiskiestWebsite {
-                Text(markdown: String(format: Strings.PrivacyHub.riskiestWebsiteBody,
-                            lastWeekRiskiestWebsite.0, lastWeekRiskiestWebsite.1))
-                  .font(.callout)
+                Text(
+                  markdown: String(
+                    format: Strings.PrivacyHub.riskiestWebsiteBody,
+                    lastWeekRiskiestWebsite.0, lastWeekRiskiestWebsite.1)
+                )
+                .font(.callout)
               } else {
                 Text(Strings.PrivacyHub.noDataToShow)
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
             }
-            
+
             Spacer()
           }
           .frame(maxWidth: .infinity)

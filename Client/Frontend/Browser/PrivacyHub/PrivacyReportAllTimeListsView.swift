@@ -8,9 +8,9 @@ import BraveShared
 
 private struct FaviconImage: View {
   let url: URL?
-  
+
   @StateObject private var faviconLoader = PlaylistFolderImageLoader()
-  
+
   init(url: String?) {
     if let url = url {
       self.url = URL(string: url)
@@ -18,7 +18,7 @@ private struct FaviconImage: View {
       self.url = nil
     }
   }
-  
+
   var body: some View {
     Image(uiImage: faviconLoader.image ?? .init(imageLiteralResourceName: "defaultFavicon"))
       .resizable()
@@ -35,19 +35,19 @@ private struct FaviconImage: View {
 struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
-  
+
   let allTimeListTrackers: [PrivacyReportsItem]
   let allTimeListWebsites: [PrivacyReportsItem]
-  
+
   private(set) var onDismiss: () -> Void
-  
+
   enum Page: CaseIterable, Identifiable {
     case trackersAndAds, websites
-    
+
     var id: String {
       displayString
     }
-    
+
     var displayString: String {
       switch self {
       case .trackersAndAds: return Strings.PrivacyHub.allTimeListsTrackersView
@@ -55,9 +55,9 @@ struct PrivacyReportAllTimeListsView: View {
       }
     }
   }
-  
+
   @State private var currentPage: Page = .trackersAndAds
-  
+
   func blockedByLabels(i: Int) -> some View {
     Group {
       if horizontalSizeClass == .compact {
@@ -77,7 +77,7 @@ struct PrivacyReportAllTimeListsView: View {
       }
     }
   }
-  
+
   private var selectionPicker: some View {
     Picker("", selection: $currentPage) {
       ForEach(Page.allCases) {
@@ -89,41 +89,42 @@ struct PrivacyReportAllTimeListsView: View {
     .padding(.horizontal, 20)
     .padding(.vertical, 12)
   }
-  
+
   private var trackersList: some View {
     List {
       Section {
         ForEach(allTimeListTrackers) { item in
           HStack {
             VStack(alignment: .leading, spacing: 4) {
-              
+
               VStack(alignment: .leading, spacing: 0) {
                 Text(item.domainOrTracker)
                   .font(.callout)
                   .foregroundColor(Color(.bravePrimary))
-                
+
                 if let url = URL(string: item.domainOrTracker),
-                    let humanFriendlyTrackerName =
-                    BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
+                  let humanFriendlyTrackerName =
+                    BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false)
+                {
                   Text(humanFriendlyTrackerName)
                     .font(.footnote)
                     .foregroundColor(Color(.braveLabel))
                 }
               }
-              
+
               Group {
                 if sizeCategory.isAccessibilityCategory {
                   VStack(alignment: .leading, spacing: 4) {
                     Text(Strings.PrivacyHub.blockedBy)
                       .foregroundColor(Color(.secondaryBraveLabel))
-                    
-                    blockedByLabels(i: item.count) // FIXME: count not needed here, was for tests.
+
+                    blockedByLabels(i: item.count)  // FIXME: count not needed here, was for tests.
                   }
                 } else {
                   HStack(spacing: 4) {
                     Text(Strings.PrivacyHub.blockedBy)
                       .foregroundColor(Color(.secondaryBraveLabel))
-                    
+
                     if let source = item.source {
                       Group {
                         switch source {
@@ -142,7 +143,7 @@ struct PrivacyReportAllTimeListsView: View {
               }
               .font(.caption)
             }
-            
+
             Spacer()
             Text("\(item.count)")
               .font(.headline.weight(.semibold))
@@ -158,7 +159,7 @@ struct PrivacyReportAllTimeListsView: View {
     }
     .listStyle(.insetGrouped)
   }
-  
+
   private var websitesList: some View {
     List {
       Section {
@@ -181,7 +182,7 @@ struct PrivacyReportAllTimeListsView: View {
     }
     .listStyle(.insetGrouped)
   }
-  
+
   var body: some View {
     VStack(spacing: 0) {
       if #available(iOS 15.0, *) {
@@ -190,7 +191,7 @@ struct PrivacyReportAllTimeListsView: View {
       } else {
         selectionPicker
       }
-      
+
       switch currentPage {
       case .trackersAndAds:
         trackersList
@@ -203,10 +204,10 @@ struct PrivacyReportAllTimeListsView: View {
     .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-          Button(Strings.done) {
-            onDismiss()
-          }
-          .foregroundColor(Color(.braveOrange))
+        Button(Strings.done) {
+          onDismiss()
+        }
+        .foregroundColor(Color(.braveOrange))
       }
     }
   }

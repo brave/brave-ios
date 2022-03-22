@@ -10,7 +10,7 @@ import BraveShared
 struct VPNAlertCell: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-  
+
   var date: String {
     let formatter = DateFormatter()
     formatter.dateStyle = .medium
@@ -18,7 +18,7 @@ struct VPNAlertCell: View {
     let date = Date(timeIntervalSince1970: TimeInterval(vpnAlert.timestamp))
     return formatter.string(from: date)
   }
-  
+
   private func assetName(for type: BraveVPNAlert.TrackerType) -> String {
     switch type {
     case .app: return "vpn_data_tracker"
@@ -26,7 +26,7 @@ struct VPNAlertCell: View {
     case .mail: return "vpn_mail_tracker"
     }
   }
-  
+
   private func headerText(for type: BraveVPNAlert.TrackerType) -> String {
     switch type {
     case .app: return Strings.PrivacyHub.vpnAlertRegularTrackerTypeSingular
@@ -34,13 +34,13 @@ struct VPNAlertCell: View {
     case .mail: return Strings.PrivacyHub.vpnAlertEmailTrackerTypeSingular
     }
   }
-  
+
   private let vpnAlert: BraveVPNAlert
-  
+
   init(vpnAlert: BraveVPNAlert) {
     self.vpnAlert = vpnAlert
   }
-  
+
   private var headerText: some View {
     Group {
       if let category = vpnAlert.categoryEnum {
@@ -52,15 +52,15 @@ struct VPNAlertCell: View {
       }
     }
   }
-  
+
   var body: some View {
     HStack(alignment: .top) {
       if let category = vpnAlert.categoryEnum {
         Image(assetName(for: category))
       }
-      
+
       VStack(alignment: .leading) {
-        
+
         Group {
           if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
             VStack(alignment: .leading, spacing: 4) {
@@ -75,11 +75,11 @@ struct VPNAlertCell: View {
           }
         }
         .font(.caption.weight(.semibold))
-        
+
         VStack(alignment: .leading, spacing: 4) {
           Text(vpnAlert.message)
             .font(.callout)
-          
+
           Text(date)
             .font(.caption)
             .foregroundColor(Color(.secondaryBraveLabel))
@@ -107,7 +107,7 @@ struct VPNAlertCell_Previews: PreviewProvider {
       VPNAlertCell(vpnAlert: .init(date: Date(), text: "App Measurement collects app usage, device info, and app activity.", type: .mail))
         .previewLayout(PreviewLayout.sizeThatFits)
     }
-    
+
   }
 }
 #endif
