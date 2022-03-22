@@ -307,9 +307,33 @@ class CosmeticFiltersResourceDownloader {
           return
         }
 
+        if !CosmeticFiltersResourceDownloader.isValidJSONData(data) {
+          continuation.resume(throwing: "Invalid JSON Data")
+          return
+        }
+        
         engine.set(json: data)
         continuation.resume()
       }
+    }
+  }
+  
+  private static func isValidJSONData(_ data: Data) -> Bool {
+    do {
+      let value = try JSONSerialization.jsonObject(with: data, options: [])
+      if let value = value as? NSArray {
+        return value.count > 0
+      }
+      
+      if let value = value as? NSDictionary {
+        return value.count > 0
+      }
+      
+      log.error("JSON Must have a top-level type of Array of Dictionary.")
+      return false
+    } catch {
+      log.error("JSON Deserialization Failed: \(error)")
+      return false
     }
   }
 }
