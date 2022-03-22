@@ -43,48 +43,48 @@ class AccountActivityStore: ObservableObject {
   }
 
   private func fetchAssets() {
-      rpcService.chainId { [self] chainId in
+    rpcService.chainId { [self] chainId in
       blockchainRegistry.allTokens(chainId) { [self] allTokens in
         self.allTokens = allTokens
       }
-        walletService.userAssets(chainId) { [self] tokens in
-          var updatedAssets = tokens.map {
-            AssetViewModel(token: $0, decimalBalance: 0, price: "", history: [])
-          }
-          let updatedTokens = updatedAssets.map { $0.token }
-          // fetch price & balance for each asset
-          let dispatchGroup = DispatchGroup()
-          dispatchGroup.enter()
-          assetRatioService.price(
-            updatedTokens.map { $0.symbol.lowercased() },
-            toAssets: ["usd"],
-            timeframe: .oneDay) { success, prices in
-              defer { dispatchGroup.leave() }
-              for price in prices {
-                if let index = updatedAssets.firstIndex(where: {
-                  $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
-                }) {
-                  updatedAssets[index].price = price.price
-                }
-              }
-            }
-          for token in updatedTokens {
-            dispatchGroup.enter()
-            rpcService.balance(for: token, in: account) { value in
-              defer { dispatchGroup.leave() }
-              if let value = value, let index = updatedAssets.firstIndex(where: {
-                $0.token.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
+      walletService.userAssets(chainId) { [self] tokens in
+        var updatedAssets = tokens.map {
+          AssetViewModel(token: $0, decimalBalance: 0, price: "", history: [])
+        }
+        let updatedTokens = updatedAssets.map(\.token)
+        // fetch price & balance for each asset
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
+        assetRatioService.price(
+          updatedTokens.map { $0.symbol.lowercased() },
+          toAssets: ["usd"],
+          timeframe: .oneDay) { success, prices in
+            defer { dispatchGroup.leave() }
+            for price in prices {
+              if let index = updatedAssets.firstIndex(where: {
+                $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
               }) {
-                updatedAssets[index].decimalBalance = value
+                updatedAssets[index].price = price.price
               }
             }
           }
-          dispatchGroup.notify(queue: .main) {
-            self.assets = updatedAssets
+        for token in updatedTokens {
+          dispatchGroup.enter()
+          rpcService.balance(for: token, in: account) { value in
+            defer { dispatchGroup.leave() }
+            if let value = value, let index = updatedAssets.firstIndex(where: {
+              $0.token.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
+            }) {
+              updatedAssets[index].decimalBalance = value
+            }
           }
+        }
+        dispatchGroup.notify(queue: .main) {
+          self.assets = updatedAssets
         }
       }
     }
+  }
 
   private func fetchTransactions() {
     txService.allTransactionInfo(.eth, from: account.address) { transactions in

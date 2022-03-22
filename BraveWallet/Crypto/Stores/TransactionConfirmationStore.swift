@@ -138,7 +138,8 @@ public class TransactionConfirmationStore: ObservableObject {
                 self.state.value = formatter.decimalString(for: approvalValue, radix: .hex, decimals: Int(token.decimals)) ?? ""
               }
             case .erc20Transfer:
-              if let token = allTokens.first(where: { $0.contractAddress(in: selectedChain).caseInsensitiveCompare(transaction.ethTxToAddress) == .orderedSame
+              if let token = allTokens.first(where: {
+                $0.contractAddress(in: selectedChain).caseInsensitiveCompare(transaction.ethTxToAddress) == .orderedSame
               }) {
                 self.state.symbol = token.symbol
                 let value = transaction.txArgs[1].removingHexPrefix
