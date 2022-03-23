@@ -80,10 +80,6 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     }
   }
 
-  func cssRules(for url: URL) -> String? {
-    CosmeticFiltersResourceDownloader.shared.cssRules(for: url)
-  }
-
   func shouldBlock(_ request: URLRequest, currentTabUrl: URL?) -> Bool {
     guard let url = request.url, let requestHost = url.host else {
       return false
@@ -174,5 +170,55 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
   private func isGeneralAdblocker(id: String) -> Bool {
     return id == AdblockerType.general.identifier || id == bundledGeneralBlocklist
+  }
+}
+
+extension AdBlockStats {
+  func cosmeticFiltersScript(for url: URL) throws -> String? {
+    guard let rules = CosmeticFiltersResourceDownloader.shared.cssRules(for: url)?.data(using: .utf8) else {
+      return nil
+    }
+    
+    let model = try JSONDecoder().decode(CosmeticFilterModel.self, from: rules)
+    
+    var cssRules = ""
+    for rule in model.hideSelectors {
+      cssRules += "\(rule){display: none !important}\n"
+    }
+    
+    for (key, value) in model.styleSelectors {
+      var subRules = ""
+      for subRule in value {
+        subRules += subRule + ";"
+      }
+      
+      cssRules += "\(key){" + subRules + " !important}\n"
+    }
+    
+    return """
+    (function() {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      if (head == null) {
+          return;
+      }
+      
+      var style = document.createElement('style');
+      style.type = 'text/css';
+    
+      var styles = atob("\(cssRules.toBase64())");
+      
+      if (style.styleSheet) {
+        style.styleSheet.cssText = styles;
+      } else {
+        style.appendChild(document.createTextNode(styles));
+      }
+
+      head.appendChild(style);
+      
+      (function(){
+        \(model.injectedScript)
+      })();
+    })();
+    """
   }
 }

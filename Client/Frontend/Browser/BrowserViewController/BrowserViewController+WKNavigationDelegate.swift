@@ -485,6 +485,11 @@ extension BrowserViewController: WKNavigationDelegate {
 
     // Cosmetic Filters
     do {
+      // If the URL is not an `internal://`
+      // about:home url
+      // local-host url
+      // or any sort of internal-url, then we run cosmetic filters on it.
+      // If ad-block shields are enabled for this URL
       if let url = webView.url,
         !InternalURL.isValid(url: url),
         !(InternalURL(url)?.isSessionRestore ?? false),
@@ -493,51 +498,10 @@ extension BrowserViewController: WKNavigationDelegate {
           persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing
         )
         .isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
-        let rules = AdBlockStats.shared.cssRules(for: url)?.data(using: .utf8)
+        let cosmeticFiltersScript = try AdBlockStats.shared.cosmeticFiltersScript(for: url)
       {
-        let model = try JSONDecoder().decode(CosmeticFilterModel.self, from: rules)
-        
-        var cssRules = ""
-        for rule in model.hideSelectors {
-          cssRules += "\(rule){display: none !important}\n"
-        }
-        
-        for (key, value) in model.styleSelectors {
-          var subRules = ""
-          for subRule in value {
-            subRules += subRule + ";"
-          }
-          
-          cssRules += "\(key){" + subRules + " !important}\n"
-        }
-        
-        let script = """
-        (function() {
-          var head = document.head || document.getElementsByTagName('head')[0];
-          if (head == null) {
-              return;
-          }
-          
-          var style = document.createElement('style');
-          style.type = 'text/css';
-        
-          var styles = atob("\(cssRules.toBase64())");
-          
-          if (style.styleSheet) {
-            style.styleSheet.cssText = styles;
-          } else {
-            style.appendChild(document.createTextNode(styles));
-          }
-
-          head.appendChild(style);
-          
-          (function(){
-            \(model.injectedScript)
-          })();
-        })();
-        """
-        
-        webView.evaluateSafeJavaScript(functionName: script, args: [], contentWorld: .defaultClient, asFunction: false) { _, error in
+        // Execute the cosmetic filters script in the cosmetic filters sandbox world
+        webView.evaluateSafeJavaScript(functionName: cosmeticFiltersScript, args: [], contentWorld: .cosmeticFiltersSandbox, asFunction: false) { _, error in
           log.error("AdblockRustInjector error: \(String(describing: error))")
         }
       }
