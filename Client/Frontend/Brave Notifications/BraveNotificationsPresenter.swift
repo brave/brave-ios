@@ -42,7 +42,7 @@ public enum BraveNotificationPriority: Int, Comparable {
 }
 
 public enum DismissPolicy {
-  case automatic(after: TimeInterval = 5)
+  case automatic(after: TimeInterval = 30)
   case explicit
 }
 

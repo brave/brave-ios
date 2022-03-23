@@ -176,7 +176,7 @@
 		27036EC3256718DA004EF6B6 /* PartnerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036EC2256718DA004EF6B6 /* PartnerCardView.swift */; };
 		27036F8725684F64004EF6B6 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F8525684F64004EF6B6 /* Cryptography.swift */; };
 		27036F8825684F64004EF6B6 /* DeviceCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F8625684F64004EF6B6 /* DeviceCheck.swift */; };
-		27036F9825684F9F004EF6B6 /* AdsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F9325684F9F004EF6B6 /* AdsViewController.swift */; };
+		27036F9825684F9F004EF6B6 /* BraveNotificationsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F9325684F9F004EF6B6 /* BraveNotificationsPresenter.swift */; };
 		27036F9925684F9F004EF6B6 /* AdSwipeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F9425684F9F004EF6B6 /* AdSwipeButton.swift */; };
 		27036F9A25684F9F004EF6B6 /* AdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F9525684F9F004EF6B6 /* AdView.swift */; };
 		27036F9B25684F9F004EF6B6 /* AdsNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27036F9625684F9F004EF6B6 /* AdsNotificationHandler.swift */; };
@@ -1849,7 +1849,7 @@
 		27036EC2256718DA004EF6B6 /* PartnerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerCardView.swift; sourceTree = "<group>"; };
 		27036F8525684F64004EF6B6 /* Cryptography.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
 		27036F8625684F64004EF6B6 /* DeviceCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceCheck.swift; sourceTree = "<group>"; };
-		27036F9325684F9F004EF6B6 /* AdsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdsViewController.swift; sourceTree = "<group>"; };
+		27036F9325684F9F004EF6B6 /* BraveNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveNotificationsPresenter.swift; sourceTree = "<group>"; };
 		27036F9425684F9F004EF6B6 /* AdSwipeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdSwipeButton.swift; sourceTree = "<group>"; };
 		27036F9525684F9F004EF6B6 /* AdView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdView.swift; sourceTree = "<group>"; };
 		27036F9625684F9F004EF6B6 /* AdsNotificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AdsNotificationHandler.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -3781,8 +3781,6 @@
 		27036F9225684F9F004EF6B6 /* Ads */ = {
 			isa = PBXGroup;
 			children = (
-				7D1B135D27DC12D300BC6F5B /* BraveWallet */,
-				27036F9325684F9F004EF6B6 /* AdsViewController.swift */,
 				27036F9425684F9F004EF6B6 /* AdSwipeButton.swift */,
 				27036F9525684F9F004EF6B6 /* AdView.swift */,
 				27036F9625684F9F004EF6B6 /* AdsNotificationHandler.swift */,
@@ -5740,12 +5738,21 @@
 			path = Menu;
 			sourceTree = "<group>";
 		};
-		7D1B135D27DC12D300BC6F5B /* BraveWallet */ = {
+		7D1B135D27DC12D300BC6F5B /* Brave Wallet */ = {
 			isa = PBXGroup;
 			children = (
 				7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */,
 			);
-			path = BraveWallet;
+			path = "Brave Wallet";
+			sourceTree = "<group>";
+		};
+		7D9D0AB427EBA0740099FC46 /* Brave Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				7D1B135D27DC12D300BC6F5B /* Brave Wallet */,
+				27036F9325684F9F004EF6B6 /* BraveNotificationsPresenter.swift */,
+			);
+			path = "Brave Notifications";
 			sourceTree = "<group>";
 		};
 		7DAC596627235B0A00E735A2 /* Scanner */ = {
@@ -6596,6 +6603,7 @@
 		F84B21F11A0910F600AAB793 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				7D9D0AB427EBA0740099FC46 /* Brave Notifications */,
 				CA22024B271881CE002D3582 /* InternalSchemeHandler */,
 				0A4B012320D0321A004D4011 /* UX.swift */,
 				2816EFFF1B33E05400522243 /* UIConstants.swift */,
@@ -8333,7 +8341,7 @@
 				5E4845C222DE3DF800372022 /* WindowRenderHelperScript.swift in Sources */,
 				CA8D5C2C26D7D0F7009BF13D /* VideoPlayer.swift in Sources */,
 				CAA10597266FE94700A0372D /* RecentSearchQRCodeScannerController.swift in Sources */,
-				27036F9825684F9F004EF6B6 /* AdsViewController.swift in Sources */,
+				27036F9825684F9F004EF6B6 /* BraveNotificationsPresenter.swift in Sources */,
 				27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */,
 				CA225DF92795D7690024C104 /* WKContentWorld+Sandbox.swift in Sources */,
 				5E096174252B63A300F3AFBB /* BraveCoreMigrator.swift in Sources */,
