@@ -20,6 +20,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
   /// Adblock engine for regional, non-english locales.
   private var regionalAdblockEngine: AdblockRustEngine?
 
+  /// The task that downloads all the files. Can be cancelled
+  private var downloadTask: Task<Void, Never>?
+
   fileprivate var isRegionalAdblockEnabled: Bool { return Preferences.Shields.useRegionAdBlock.value }
 
   fileprivate init() {
@@ -62,12 +65,23 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     let filePaths = enumerator?.allObjects as? [URL]
     let datFileUrls = filePaths?.filter { $0.pathExtension == "dat" }
 
-    datFileUrls?.forEach {
-      let fileName = $0.deletingPathExtension().lastPathComponent
-
-      guard let data = fm.contents(atPath: $0.path) else { return }
-      setDataFile(data: data, id: fileName)
+    downloadTask?.cancel()
+    downloadTask = Task {
+      do {
+        try await datFileUrls?.asyncConcurrentForEach {
+          try Task.checkCancellation()
+          let fileName = $0.deletingPathExtension().lastPathComponent
+          guard let data = fm.contents(atPath: $0.path) else { return }
+          try await self.setDataFile(data: data, id: fileName)
+        }
+      } catch {
+        log.error(error)
+      }
     }
+  }
+
+  func cssRules(for url: URL) -> String? {
+    CosmeticFiltersResourceDownloader.shared.cssRules(for: url)
   }
 
   func shouldBlock(_ request: URLRequest, currentTabUrl: URL?) -> Bool {
@@ -127,31 +141,35 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     }
   }
 
-  @discardableResult func setDataFile(data: Data, id: String) -> Deferred<()> {
-    let completion = Deferred<()>()
-
+  func setDataFile(data: Data, id: String) async throws {
     if !isGeneralAdblocker(id: id) && regionalAdblockEngine == nil {
       regionalAdblockEngine = AdblockRustEngine()
     }
 
     guard let engine = isGeneralAdblocker(id: id) ? generalAdblockEngine : regionalAdblockEngine else {
-      log.error("Adblock engine with id: \(id) is nil")
-      return completion
+      throw "Adblock engine with id: \(id) is nil"
     }
 
-    AdBlockStats.adblockSerialQueue.async {
-      if engine.set(data: data) {
-        log.debug("Adblock file with id: \(id) deserialized successfully")
-        // Clearing the cache or checked urls.
-        // The new list can bring blocked resource that were previously set as not-blocked.
-        self.fifoCacheOfUrlsChecked = FifoDict()
-        completion.fill(())
-      } else {
-        log.error("Failed to deserialize adblock list with id: \(id)")
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+      AdBlockStats.adblockSerialQueue.async {
+        do {
+          try Task.checkCancellation()
+        } catch {
+          continuation.resume(throwing: error)
+          return
+        }
+
+        if engine.set(data: data) {
+          log.debug("Adblock file with id: \(id) deserialized successfully")
+          // Clearing the cache or checked urls.
+          // The new list can bring blocked resource that were previously set as not-blocked.
+          self.fifoCacheOfUrlsChecked = FifoDict()
+          continuation.resume()
+        } else {
+          continuation.resume(throwing: "Failed to deserialize adblock list with id: \(id)")
+        }
       }
     }
-
-    return completion
   }
 
   private func isGeneralAdblocker(id: String) -> Bool {
