@@ -19,64 +19,29 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
   public var canShowNotifications: (() -> Bool)?
   /// The controller which we will show notifications on top of
   public private(set) weak var presentingController: UIViewController?
+  /// The controller that display, hide and manage notifications
+  private let notificationPresenter: BraveNotificationsController
 
   /// Create a handler instance with the given ads instance.
   ///
   /// - note: This method automatically sets `notificationsHandler` on BATBraveAds
   /// to itself
-  public init(ads: BraveAds, presentingController: UIViewController) {
+  public init(
+    ads: BraveAds,
+    presentingController: UIViewController,
+    notificationPresenter: BraveNotificationsController
+  ) {
     self.ads = ads
+    self.notificationPresenter = notificationPresenter
     self.ads.notificationsHandler = self
     self.presentingController = presentingController
   }
     
-  private lazy var notificationsController = BraveNotificationsController()
-  
-  private func display(notification: BraveNotification) {
-    guard let presentingController = presentingController else { return }
-    guard let window = presentingController.view.window else { return }
-    
-    if notificationsController.parent == nil {
-      window.addSubview(notificationsController.view)
-      notificationsController.view.snp.makeConstraints {
-        $0.edges.equalTo(window.safeAreaLayoutGuide.snp.edges)
-      }
-    }
-    
-    if let rewards = notification as? RewardsNotification {
-      notificationsController.display(notification: rewards) { [weak self] in
-        guard let self = self else { return }
-        self.notificationsController.willMove(toParent: nil)
-        self.notificationsController.view.removeFromSuperview()
-        self.notificationsController.removeFromParent()
-      }
-    } else if let wallet = notification as? WalletNotification {
-      notificationsController.display(notification: wallet) { [weak self] in
-        guard let self = self else { return }
-        self.notificationsController.willMove(toParent: nil)
-        self.notificationsController.view.removeFromSuperview()
-        self.notificationsController.removeFromParent()
-      }
-    }
-  }
-  
-  // This method can be used to display a wallet connection prompt when we detect users are visiting
-  // a web3 site.
-  public func showWalletConnectionNotification() {
-    let walletNotification = WalletNotification(priority: .low) { [weak self] action in
-      guard let self = self else { return }
-      
-      self.actionOccured?(nil, .wallet(action))
-      
-      if let nextNotification = self.notificationsController.notificationsQueue.popLast() {
-        self.display(notification: nextNotification)
-      }
-    }
-    notificationsController.safeInsert(notification: walletNotification)
-    display(notification: notificationsController.notificationsQueue.popLast()!)
-  }
-  
   public func showNotification(_ notification: AdNotification) {
+    guard let presentingController = presentingController else {
+      return
+  }
+  
     let rewardsNotification = RewardsNotification(ad: notification) { [weak self] action in
       guard let self = self else { return }
       switch action {
@@ -91,19 +56,14 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
         self.ads.toggleThumbsDown(forAd: notification.uuid, advertiserId: notification.advertiserID)
       }
       self.actionOccured?(notification, .rewards(action))
-      
-      if let nextNotification = self.notificationsController.notificationsQueue.popLast() {
-        self.display(notification: nextNotification)
-      }
     }
     
     ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
-    notificationsController.safeInsert(notification: rewardsNotification)
-    display(notification: notificationsController.notificationsQueue.popLast()!)
+    notificationPresenter.display(notification: rewardsNotification, presentingController: presentingController)
   }
 
   public func clearNotification(withIdentifier identifier: String) {
-    notificationsController.removeRewardsNotification(with: identifier)
+    notificationPresenter.removeRewardsNotification(with: identifier)
   }
 
   public func shouldShowNotifications() -> Bool {

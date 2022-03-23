@@ -51,6 +51,7 @@ public protocol BraveNotification: AnyObject {
   var view: UIView { get }
   var dismissAction: (() -> Void)? { get set }
   var dismissPolicy: DismissPolicy { get }
+  var id: String { get }
   func willDismiss(timedout: Bool)
 }
 
@@ -62,8 +63,8 @@ extension BraveNotification {
 public class RewardsNotification: NSObject, BraveNotification {
   public var view: UIView
   public var dismissAction: (() -> Void)?
-  
-  public  let ad: AdNotification
+  public var id: String
+  public let ad: AdNotification
   private let rewardsHandler: (BraveNotificationAction.Rewards) -> Void
 
   public func willDismiss(timedout: Bool) {
@@ -79,6 +80,7 @@ public class RewardsNotification: NSObject, BraveNotification {
     self.ad = ad
     self.view = AdView()
     self.rewardsHandler = rewardsHandler
+    self.id = ad.uuid
     super.init()
     self.setup()
   }
@@ -175,8 +177,12 @@ extension RewardsNotification: UIGestureRecognizerDelegate {
 }
 
 public class WalletNotification: NSObject, BraveNotification {
+  struct Constant {
+    static let id = "wallet-notification"
+  }
   public var priority: BraveNotificationPriority
   public var view: UIView
+  public var id: String { WalletNotification.Constant.id }
   public var dismissAction: (() -> Void)?
   private let walletHandler: (BraveNotificationAction.Wallet) -> Void
   
@@ -201,46 +207,42 @@ public class WalletNotification: NSObject, BraveNotification {
   }
   
   @objc private func tappedWalletConnectionView(_ sender: WalletConnectionView) {
-    walletHandler(.connectWallet)
     dismissAction?()
+    walletHandler(.connectWallet)
   }
 }
 
 public class BraveNotificationsController: UIViewController {
-  public var notificationsQueue: [BraveNotification] = []
-  
+  private var notificationsQueue: [BraveNotification] = []
   private var widthAnchor: NSLayoutConstraint?
   private var displayedNotifications: [BraveNotification] = []
   private var visibleNotification: BraveNotification?
-  private var animatedOut: (() -> Void)?
   
   public override func loadView() {
     view = View(frame: UIScreen.main.bounds)
   }
-    
-  public func safeInsert(notification: BraveNotification) {
-    if notification is WalletNotification, notificationsQueue.contains(where: { $0 is WalletNotification }) {
-      return
-    }
-    notificationsQueue.insert(notification, at: 0)
-  }
   
-  public func display<T: BraveNotification>(notification: T, animatedOut: (() -> Void)?) {
-    // store the animation block which will be executed once all the notifications have been displayed
-    self.animatedOut = animatedOut
-    
+  public func display(notification: BraveNotification, presentingController: UIViewController) {
     // check the priority of the notification
     if let visibleNotification = visibleNotification {
       if notification.priority <= visibleNotification.priority {
         // won't display if the incoming notification has the same or lower priority
-        // put it back to the queue
-        notificationsQueue.insert(notification, at: 0)
+        // put it in queue
+        safeInsert(notification: notification)
         return
       } else {
         // will hide the current visible notification and display the incoming notification
         // if the notification has higher priority
         self.hide(visibleNotification)
       }
+    }
+    
+    presentingController.addChild(self)
+    presentingController.view.addSubview(view)
+    didMove(toParent: presentingController)
+    
+    view.snp.makeConstraints {
+      $0.edges.equalTo(presentingController.view.safeAreaLayoutGuide.snp.edges)
     }
     
     let notificationView = notification.view
@@ -268,7 +270,8 @@ public class BraveNotificationsController: UIViewController {
     view.layoutIfNeeded()
     
     notification.dismissAction = { [weak self] in
-      self?.hide(notification)
+      guard let self = self else { return }
+      self.hide(notification)
     }
     animateIn(adView: notificationView)
     if case .automatic(let interval) = notification.dismissPolicy {
@@ -281,10 +284,10 @@ public class BraveNotificationsController: UIViewController {
     dismissPanGesture.delegate = self
     notificationView.addGestureRecognizer(dismissPanGesture)
   }
-
+  
   public override func viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
-
+    
     if UIDevice.current.userInterfaceIdiom == .pad {
       let constant = max(view.bounds.width, view.bounds.height) * 0.40
       widthAnchor?.constant = ceil(constant * UIScreen.main.scale) / UIScreen.main.scale
@@ -311,16 +314,34 @@ public class BraveNotificationsController: UIViewController {
     animateOut(adView: notificationView, velocity: velocity) { [weak self] in
       guard let self = self else { return }
       notificationView.removeFromSuperview()
-      if self.notificationsQueue.isEmpty && self.visibleNotification == nil {
-        self.animatedOut?()
+      if self.visibleNotification == nil {
+        if self.notificationsQueue.isEmpty {
+          self.willMove(toParent: nil)
+          self.view.removeFromSuperview()
+          self.removeFromParent()
+        } else {
+          guard let presentingController = self.parent else { return }
+          self.display(notification: self.notificationsQueue.popLast()!, presentingController: presentingController)
+        }
       }
     }
   }
-
+  
+  private func safeInsert(notification: BraveNotification) {
+    // We will skip duplication checking for notifications that have empty id. These notifications are usually custom ads
+    if !notification.id.isEmpty,
+       notificationsQueue.contains(where: { $0.id == notification.id }) {
+      return
+    }
+    // Kepp wallet notification alway the last to display
+    let index: Int = notificationsQueue.first?.id == WalletNotification.Constant.id ? 1 : 0
+    notificationsQueue.insert(notification, at: index)
+  }
+  
   deinit {
     dismissTimers.forEach({ $0.value.invalidate() })
   }
-
+  
   // MARK: - Actions
   
   private var dismissTimers: [UIView: Timer] = [:]
@@ -340,12 +361,12 @@ public class BraveNotificationsController: UIViewController {
       notification.willDismiss(timedout: true)
     })
   }
-
+  
   // Distance travelled after decelerating to zero velocity at a constant rate
   func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
     return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
   }
-
+  
   private var panState: CGPoint = .zero
   @objc private func dismissPannedAdView(_ pan: UIPanGestureRecognizer) {
     guard let notificationView = pan.view else { return }
@@ -381,13 +402,13 @@ public class BraveNotificationsController: UIViewController {
       break
     }
   }
-
+  
   // MARK: - Animations
   
   private func animateIn(adView: UIView) {
     adView.layoutIfNeeded()
     adView.layer.transform = CATransform3DMakeTranslation(0, -adView.bounds.size.height, 0)
-
+    
     adView.layer.springAnimate(property: kPOPLayerTranslationY, key: "translation.y") { animation, _ in
       animation.toValue = 0
     }
@@ -396,7 +417,7 @@ public class BraveNotificationsController: UIViewController {
   private func animateOut(adView: UIView, velocity: CGFloat? = nil, completion: @escaping () -> Void) {
     adView.layoutIfNeeded()
     let y = adView.frame.minY - view.safeAreaInsets.top - adView.transform.ty
-
+    
     adView.layer.springAnimate(property: kPOPLayerTranslationY, key: "translation.y") { animation, _ in
       animation.toValue = -(view.safeAreaInsets.top + y + adView.bounds.size.height)
       if let velocity = velocity {
@@ -449,22 +470,12 @@ extension BraveNotificationsController {
   /// Display a "My First Ad" on a presenting controller and be notified if they tap it
   public static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (BraveNotificationAction.Rewards, URL) -> Void) {
     let notificationPresenter = BraveNotificationsController()
-    
-    guard let window = presentingController.view.window else {
-      return
-    }
-    
-    window.addSubview(notificationPresenter.view)
-    notificationPresenter.view.snp.makeConstraints {
-      $0.edges.equalTo(window.safeAreaLayoutGuide.snp.edges)
-    }
-
     let notification = AdNotification.customAd(
-      title: Strings.Ads.myFirstAdTitle,
-      body: Strings.Ads.myFirstAdBody,
+        title: Strings.Ads.myFirstAdTitle,
+        body: Strings.Ads.myFirstAdBody,
       url: "https://brave.com/my-first-ad"
     )
-
+    
     guard let targetURL = URL(string: notification.targetURL) else {
       assertionFailure("My First Ad URL is not valid: \(notification.targetURL)")
       return
@@ -473,30 +484,6 @@ extension BraveNotificationsController {
     let rewardsNotification = RewardsNotification(ad: notification) { action in
       completion(action, targetURL)
     }
-    notificationPresenter.display(notification: rewardsNotification) {
-      notificationPresenter.view.removeFromSuperview()
-    }
-  }
-}
-
-extension BraveNotificationsController {
-  public static func displayWalletConnectionPanel(on presentingController: UIViewController, completion: @escaping (BraveNotificationAction.Wallet) -> Void) {
-    let notificationPresenter = BraveNotificationsController()
-    
-    guard let window = presentingController.view.window else {
-      return
-    }
-    
-    window.addSubview(notificationPresenter.view)
-    notificationPresenter.view.snp.makeConstraints {
-      $0.edges.equalTo(window.safeAreaLayoutGuide.snp.edges)
-    }
-    
-    let walletNotification = WalletNotification(priority: .low) { action in
-      completion(action)
-    }
-    notificationPresenter.display(notification: walletNotification) {
-      notificationPresenter.view.removeFromSuperview()
-    }
+    notificationPresenter.display(notification: rewardsNotification, presentingController: presentingController)
   }
 }

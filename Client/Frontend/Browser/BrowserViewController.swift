@@ -153,6 +153,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   let legacyWallet: BraveLedger?
   var promotionFetchTimer: Timer?
   private var notificationsHandler: AdsNotificationHandler?
+    let notificationPresenter = BraveNotificationsController()
   var publisher: Ledger.PublisherInfo?
 
   let vpnProductInfo = VPNProductInfo()
@@ -496,7 +497,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   }
 
   private func setupAdsNotificationHandler() {
-    notificationsHandler = AdsNotificationHandler(ads: rewards.ads, presentingController: self)
+        notificationsHandler = AdsNotificationHandler(ads: rewards.ads,
+                                                      presentingController: self,
+                                                      notificationPresenter: notificationPresenter)
     notificationsHandler?.canShowNotifications = { [weak self] in
       guard let self = self else { return false }
       return !PrivateBrowsingManager.shared.isPrivateBrowsing && !self.topToolbar.inOverlayMode
