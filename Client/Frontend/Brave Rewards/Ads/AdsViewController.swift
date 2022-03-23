@@ -52,6 +52,7 @@ public protocol BraveNotification: AnyObject {
   var dismissAction: (() -> Void)? { get set }
   var dismissPolicy: DismissPolicy { get }
   var id: String { get }
+  
   func willDismiss(timedout: Bool)
 }
 
@@ -65,6 +66,7 @@ public class RewardsNotification: NSObject, BraveNotification {
   public var dismissAction: (() -> Void)?
   public var id: String
   public let ad: AdNotification
+  
   private let rewardsHandler: (BraveNotificationAction.Rewards) -> Void
 
   public func willDismiss(timedout: Bool) {
@@ -180,10 +182,12 @@ public class WalletNotification: NSObject, BraveNotification {
   struct Constant {
     static let id = "wallet-notification"
   }
+  
   public var priority: BraveNotificationPriority
   public var view: UIView
   public var id: String { WalletNotification.Constant.id }
   public var dismissAction: (() -> Void)?
+  
   private let walletHandler: (BraveNotificationAction.Wallet) -> Void
   
   public func willDismiss(timedout: Bool) {
@@ -212,7 +216,7 @@ public class WalletNotification: NSObject, BraveNotification {
   }
 }
 
-public class BraveNotificationsController: UIViewController {
+public class BraveNotificationsPresenter: UIViewController {
   private var notificationsQueue: [BraveNotification] = []
   private var widthAnchor: NSLayoutConstraint?
   private var displayedNotifications: [BraveNotification] = []
@@ -237,18 +241,18 @@ public class BraveNotificationsController: UIViewController {
       }
     }
     
-    presentingController.addChild(self)
-    presentingController.view.addSubview(view)
-    didMove(toParent: presentingController)
+    if parent == nil {
+      presentingController.addChild(self)
+      presentingController.view.addSubview(view)
+      didMove(toParent: presentingController)
+    }
     
     view.snp.makeConstraints {
       $0.edges.equalTo(presentingController.view.safeAreaLayoutGuide.snp.edges)
     }
     
     let notificationView = notification.view
-    
     view.addSubview(notificationView)
-    
     notificationView.snp.makeConstraints {
       $0.leading.greaterThanOrEqualTo(view).inset(8)
       $0.trailing.lessThanOrEqualTo(view).inset(8)
@@ -280,6 +284,7 @@ public class BraveNotificationsController: UIViewController {
     visibleNotification = notification
     displayedNotifications.append(notification)
     
+    // Add common swip gesture (swip-up to dismiss)
     let dismissPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dismissPannedAdView(_:)))
     dismissPanGesture.delegate = self
     notificationView.addGestureRecognizer(dismissPanGesture)
@@ -295,12 +300,7 @@ public class BraveNotificationsController: UIViewController {
   }
   
   public func removeRewardsNotification(with id: String) {
-    if let index = notificationsQueue.firstIndex(where: { notification in
-      if let rewards = notification as? RewardsNotification {
-        return rewards.ad.uuid == id
-      }
-      return false
-    }) {
+    if let index = notificationsQueue.firstIndex(where: { $0.id == id }) {
       notificationsQueue.remove(at: index)
     }
   }
@@ -430,7 +430,7 @@ public class BraveNotificationsController: UIViewController {
   }
 }
 
-extension BraveNotificationsController {
+extension BraveNotificationsPresenter {
   class View: UIView {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
       // Only allow tapping the ad part of this VC
@@ -444,7 +444,7 @@ extension BraveNotificationsController {
   }
 }
 
-extension BraveNotificationsController: UIGestureRecognizerDelegate {
+extension BraveNotificationsPresenter: UIGestureRecognizerDelegate {
   
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
@@ -465,11 +465,11 @@ extension BraveNotificationsController: UIGestureRecognizerDelegate {
   }
 }
 
-extension BraveNotificationsController {
+extension BraveNotificationsPresenter {
   
   /// Display a "My First Ad" on a presenting controller and be notified if they tap it
   public static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (BraveNotificationAction.Rewards, URL) -> Void) {
-    let notificationPresenter = BraveNotificationsController()
+    let notificationPresenter = BraveNotificationsPresenter()
     let notification = AdNotification.customAd(
         title: Strings.Ads.myFirstAdTitle,
         body: Strings.Ads.myFirstAdBody,

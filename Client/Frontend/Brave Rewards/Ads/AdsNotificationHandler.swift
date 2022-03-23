@@ -20,7 +20,7 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
   /// The controller which we will show notifications on top of
   public private(set) weak var presentingController: UIViewController?
   /// The controller that display, hide and manage notifications
-  private let notificationPresenter: BraveNotificationsController
+  private let notificationsPresenter: BraveNotificationsPresenter
 
   /// Create a handler instance with the given ads instance.
   ///
@@ -29,18 +29,16 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
   public init(
     ads: BraveAds,
     presentingController: UIViewController,
-    notificationPresenter: BraveNotificationsController
+    notificationsPresenter: BraveNotificationsPresenter
   ) {
     self.ads = ads
-    self.notificationPresenter = notificationPresenter
-    self.ads.notificationsHandler = self
+    self.notificationsPresenter = notificationsPresenter
     self.presentingController = presentingController
+    self.ads.notificationsHandler = self
   }
     
   public func showNotification(_ notification: AdNotification) {
-    guard let presentingController = presentingController else {
-      return
-  }
+    guard let presentingController = presentingController else { return }
   
     let rewardsNotification = RewardsNotification(ad: notification) { [weak self] action in
       guard let self = self else { return }
@@ -59,11 +57,11 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     }
     
     ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
-    notificationPresenter.display(notification: rewardsNotification, presentingController: presentingController)
+    notificationsPresenter.display(notification: rewardsNotification, presentingController: presentingController)
   }
 
   public func clearNotification(withIdentifier identifier: String) {
-    notificationPresenter.removeRewardsNotification(with: identifier)
+    notificationsPresenter.removeRewardsNotification(with: identifier)
   }
 
   public func shouldShowNotifications() -> Bool {
