@@ -8,231 +8,24 @@ import BraveShared
 import Shared
 import pop
 
-public enum BraveNotificationAction {
-  public enum Rewards {
-    /// The user opened the ad by either clicking on it directly or by swiping and clicking the "view" button
-    case opened
-    /// The user swiped the ad away
-    case dismissed
-    /// The user ignored the ad for a given amount of time for it to automatically dismiss
-    case timedOut
-    /// The user clicked the thumbs down button by swiping on the ad
-    case disliked
-  }
-  public enum Wallet {
-    /// The user clicked the wallet connection notification
-    case connectWallet
-    /// The user swiped the notification away
-    case dismissed
-    /// The user ignored the wallet connection notification for a given amount of time for it to automatically dismiss
-    case timedOut
-  }
-  
-  case rewards(Rewards)
-  case wallet(Wallet)
-}
-
-public enum BraveNotificationPriority: Int, Comparable {
-  case high = 1
-  case low = 0
-  
-  public static func < (lhs: BraveNotificationPriority, rhs: BraveNotificationPriority) -> Bool {
-    lhs.rawValue < rhs.rawValue
-  }
-}
-
-public enum DismissPolicy {
-  case automatic(after: TimeInterval = 30)
-  case explicit
-}
-
-public protocol BraveNotification: AnyObject {
-  var priority: BraveNotificationPriority { get }
-  var view: UIView { get }
-  var dismissAction: (() -> Void)? { get set }
-  var dismissPolicy: DismissPolicy { get }
-  var id: String { get }
-  
-  func willDismiss(timedout: Bool)
-}
-
-extension BraveNotification {
-  public var dismissPolicy: DismissPolicy { .automatic() }
-  public var priority: BraveNotificationPriority { .high }
-}
-
-public class RewardsNotification: NSObject, BraveNotification {
-  public var view: UIView
-  public var dismissAction: (() -> Void)?
-  public var id: String
-  public let ad: AdNotification
-  
-  private let rewardsHandler: (BraveNotificationAction.Rewards) -> Void
-
-  public func willDismiss(timedout: Bool) {
-    guard let adView = view as? AdView else { return }
-    adView.setSwipeTranslation(0, animated: true)
-    rewardsHandler(timedout ? .timedOut : .dismissed)
-  }
-  
-  init(
-    ad: AdNotification,
-    rewardsHandler: @escaping (BraveNotificationAction.Rewards) -> Void
-  ) {
-    self.ad = ad
-    self.view = AdView()
-    self.rewardsHandler = rewardsHandler
-    self.id = ad.uuid
-    super.init()
-    self.setup()
-  }
-  
-  private func setup() {
-    guard let adView = view as? AdView else { return }
-    
-    adView.adContentButton.titleLabel.text = ad.title
-    adView.adContentButton.bodyLabel.text = ad.body
-
-    adView.adContentButton.addTarget(self, action: #selector(tappedAdView(_:)), for: .touchUpInside)
-    adView.openSwipeButton.addTarget(self, action: #selector(tappedOpen(_:)), for: .touchUpInside)
-    adView.dislikeSwipeButton.addTarget(self, action: #selector(tappedDisliked(_:)), for: .touchUpInside)
-    
-    let swipePanGesture = UIPanGestureRecognizer(target: self, action: #selector(swipePannedAdView(_:)))
-    swipePanGesture.delegate = self
-    adView.addGestureRecognizer(swipePanGesture)
-  }
-  
-  @objc private func tappedAdView(_ sender: AdContentButton) {
-    guard let adView = sender.superview as? AdView else { return }
-    if sender.transform.tx != 0 {
-      adView.setSwipeTranslation(0)
-      return
-    }
-    dismissAction?()
-    rewardsHandler(.opened)
-  }
-  
-  @objc private func tappedOpen(_ sender: AdSwipeButton) {
-    dismissAction?()
-    rewardsHandler(.opened)
-  }
-  
-  @objc private func tappedDisliked(_ sender: AdSwipeButton) {
-    dismissAction?()
-    rewardsHandler(.disliked)
-  }
-  
-  // Distance travelled after decelerating to zero velocity at a constant rate
-  private func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
-    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
-  }
-  
-  private let actionTriggerThreshold: CGFloat = 180.0
-  private let actionRestThreshold: CGFloat = 90.0
-  
-  private var swipeState: CGFloat = 0
-  @objc private func swipePannedAdView(_ pan: UIPanGestureRecognizer) {
-    guard let adView = pan.view as? AdView else { return }
-    switch pan.state {
-    case .began:
-      swipeState = adView.adContentButton.transform.tx
-    case .changed:
-      let tx = swipeState + pan.translation(in: adView).x
-      if tx < -actionTriggerThreshold && !adView.dislikeSwipeButton.isHighlighted {
-        UIImpactFeedbackGenerator(style: .medium).bzzt()
-      }
-      adView.dislikeSwipeButton.isHighlighted = tx < -actionTriggerThreshold
-      adView.adContentButton.transform.tx = min(0, tx)
-      adView.setNeedsLayout()
-    case .ended:
-      let velocity = pan.velocity(in: adView).x
-      let tx = swipeState + pan.translation(in: adView).x
-      let projected = project(initialVelocity: velocity, decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
-      if /*tx > actionTriggerThreshold ||*/ tx < -actionTriggerThreshold {
-        adView.setSwipeTranslation(0, animated: true, panVelocity: velocity)
-        dismissAction?()
-        rewardsHandler(tx > 0 ? .opened : .disliked)
-        break
-      } else if /*tx + projected > actionRestThreshold ||*/ tx + projected < -actionRestThreshold {
-        adView.setSwipeTranslation((tx + projected) > 0 ? actionRestThreshold : -actionRestThreshold, animated: true, panVelocity: velocity)
-        break
-      }
-      fallthrough
-    case .cancelled:
-      adView.setSwipeTranslation(0, animated: true)
-    default:
-      break
-    }
-  }
-}
-
-extension RewardsNotification: UIGestureRecognizerDelegate {
-  
-  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    if let pan = gestureRecognizer as? UIPanGestureRecognizer {
-      let velocity = pan.velocity(in: pan.view)
-      // Horizontal only
-      return abs(velocity.x) > abs(velocity.y)
-    }
-    return false
-  }
-}
-
-public class WalletNotification: NSObject, BraveNotification {
-  struct Constant {
-    static let id = "wallet-notification"
-  }
-  
-  public var priority: BraveNotificationPriority
-  public var view: UIView
-  public var id: String { WalletNotification.Constant.id }
-  public var dismissAction: (() -> Void)?
-  
-  private let walletHandler: (BraveNotificationAction.Wallet) -> Void
-  
-  public func willDismiss(timedout: Bool) {
-    walletHandler(timedout ? .timedOut : .dismissed)
-  }
-  
-  init(
-    priority: BraveNotificationPriority,
-    walletHandler: @escaping (BraveNotificationAction.Wallet) -> Void
-  ) {
-    self.priority = priority
-    self.view = WalletConnectionView()
-    self.walletHandler = walletHandler
-    super.init()
-    self.setup()
-  }
-  
-  private func setup() {
-    guard let walletPanel = view as? WalletConnectionView else { return }
-    walletPanel.addTarget(self, action: #selector(tappedWalletConnectionView(_:)), for: .touchUpInside)
-  }
-  
-  @objc private func tappedWalletConnectionView(_ sender: WalletConnectionView) {
-    dismissAction?()
-    walletHandler(.connectWallet)
-  }
-}
-
 public class BraveNotificationsPresenter: UIViewController {
   private var notificationsQueue: [BraveNotification] = []
   private var widthAnchor: NSLayoutConstraint?
-  private var displayedNotifications: [BraveNotification] = []
   private var visibleNotification: BraveNotification?
   
   public override func loadView() {
-    view = View(frame: UIScreen.main.bounds)
+    let view = PresenterView(frame: UIScreen.main.bounds)
+    view.viewController = self
+    self.view = view
   }
   
-  public func display(notification: BraveNotification, presentingController: UIViewController) {
+  public func display(notification: BraveNotification, from presentingController: UIViewController) {
     // check the priority of the notification
     if let visibleNotification = visibleNotification {
       if notification.priority <= visibleNotification.priority {
         // won't display if the incoming notification has the same or lower priority
         // put it in queue
-        safeInsert(notification: notification)
+        enqueueNotification(notification)
         return
       } else {
         // will hide the current visible notification and display the incoming notification
@@ -282,7 +75,6 @@ public class BraveNotificationsPresenter: UIViewController {
       setupTimeoutTimer(for: notification, interval: interval)
     }
     visibleNotification = notification
-    displayedNotifications.append(notification)
     
     // Add common swip gesture (swip-up to dismiss)
     let dismissPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dismissPannedAdView(_:)))
@@ -321,21 +113,24 @@ public class BraveNotificationsPresenter: UIViewController {
           self.removeFromParent()
         } else {
           guard let presentingController = self.parent else { return }
-          self.display(notification: self.notificationsQueue.popLast()!, presentingController: presentingController)
+          self.display(notification: self.notificationsQueue.popLast()!, from: presentingController)
         }
       }
     }
   }
   
-  private func safeInsert(notification: BraveNotification) {
+  private func enqueueNotification(_ notification: BraveNotification) {
     // We will skip duplication checking for notifications that have empty id. These notifications are usually custom ads
     if !notification.id.isEmpty,
        notificationsQueue.contains(where: { $0.id == notification.id }) {
       return
     }
-    // Kepp wallet notification alway the last to display
-    let index: Int = notificationsQueue.first?.id == WalletNotification.Constant.id ? 1 : 0
-    notificationsQueue.insert(notification, at: index)
+    
+    if let index = notificationsQueue.firstIndex(where: { $0.priority < notification.priority }) {
+      notificationsQueue.insert(notification, at: index + 1)
+    } else {
+      notificationsQueue.insert(notification, at: 0)
+    }
   }
   
   deinit {
@@ -344,21 +139,17 @@ public class BraveNotificationsPresenter: UIViewController {
   
   // MARK: - Actions
   
-  private var dismissTimers: [UIView: Timer] = [:]
+  private var dismissTimers: [String: Timer] = [:]
   
   private func setupTimeoutTimer(for notification: BraveNotification, interval: TimeInterval) {
-    if let timer = dismissTimers[notification.view] {
+    if let timer = dismissTimers[notification.id] {
       // Invalidate and reschedule
       timer.invalidate()
     }
-    var dismissInterval = interval
-    if !AppConstants.buildChannel.isPublic, let override = Preferences.Rewards.adsDurationOverride.value, override > 0 {
-      dismissInterval = TimeInterval(override)
-    }
-    dismissTimers[notification.view] = Timer.scheduledTimer(withTimeInterval: dismissInterval, repeats: false, block: { [weak self] _ in
+    dismissTimers[notification.id] = Timer.scheduledTimer(withTimeInterval: interval, repeats: false, block: { [weak self] _ in
       guard let self = self else { return }
       self.hide(notification)
-      notification.willDismiss(timedout: true)
+      notification.willDismiss(timedOut: true)
     })
   }
   
@@ -374,8 +165,12 @@ public class BraveNotificationsPresenter: UIViewController {
     switch pan.state {
     case .began:
       panState = notificationView.center
+      // must be the current visible notification
+      guard let notification = visibleNotification, notification.view == notificationView else {
+        return
+      }
       // Make sure to stop the dismiss timer
-      dismissTimers[notificationView]?.invalidate()
+      dismissTimers[notification.id]?.invalidate()
     case .changed:
       notificationView.transform.ty = min(0, pan.translation(in: notificationView).y)
     case .ended:
@@ -383,15 +178,21 @@ public class BraveNotificationsPresenter: UIViewController {
       let y = min(panState.y, panState.y + pan.translation(in: notificationView).y)
       let projected = project(initialVelocity: velocity, decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
       if y + projected < 0 {
-        guard let notification = self.displayedNotifications.first(where: { $0.view == notificationView }) else { return }
+        // must be the current visible notification
+        guard let notification = visibleNotification, notification.view == notificationView else {
+          return
+        }
         hide(notificationView: notificationView, velocity: velocity)
-        notification.willDismiss(timedout: false)
+        notification.willDismiss(timedOut: false)
         break
       }
       fallthrough
     case .cancelled:
+      // must be the current visible notification
+      guard let notification = visibleNotification, notification.view == notificationView else {
+        return
+      }
       // Re-setup timeout timer
-      guard let notification = self.displayedNotifications.first(where: { $0.view == notificationView }) else { return }
       if case .automatic(let interval) = notification.dismissPolicy {
         setupTimeoutTimer(for: notification, interval: interval)
       }
@@ -431,12 +232,13 @@ public class BraveNotificationsPresenter: UIViewController {
 }
 
 extension BraveNotificationsPresenter {
-  class View: UIView {
+  class PresenterView: UIView {
+    weak var viewController: BraveNotificationsPresenter?
+    
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+      guard let view = super.hitTest(point, with: event) else { return nil }
       // Only allow tapping the ad part of this VC
-      if let view = super.hitTest(point, with: event), view.superview is AdView {
-        return view
-      } else if let view = super.hitTest(point, with: event), view is WalletConnectionView {
+      if view.superview == viewController?.visibleNotification?.view || view == viewController?.visibleNotification?.view {
         return view
       }
       return nil
@@ -449,41 +251,16 @@ extension BraveNotificationsPresenter: UIGestureRecognizerDelegate {
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
       let velocity = pan.velocity(in: pan.view)
-      if let adView = pan.view as? AdView, adView.swipeTranslation != 0 {
+      guard let notification = visibleNotification else { return false }
+      if notification.view == pan.view, notification.isHorizontalSwipe {
         // dislike mode but swip vertically
-        if let notification = displayedNotifications.first(where: { $0.view == adView }) {
-          if case .automatic(let interval) = notification.dismissPolicy {
-            setupTimeoutTimer(for: notification, interval: interval)
-          }
+        if case .automatic(let interval) = notification.dismissPolicy {
+          setupTimeoutTimer(for: notification, interval: interval)
         }
-        // Vertical only and only if the user isn't in a swipe transform for a Rewards notification
         return false
       }
       return abs(velocity.y) > abs(velocity.x)
     }
     return false
-  }
-}
-
-extension BraveNotificationsPresenter {
-  
-  /// Display a "My First Ad" on a presenting controller and be notified if they tap it
-  public static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (BraveNotificationAction.Rewards, URL) -> Void) {
-    let notificationPresenter = BraveNotificationsPresenter()
-    let notification = AdNotification.customAd(
-        title: Strings.Ads.myFirstAdTitle,
-        body: Strings.Ads.myFirstAdBody,
-      url: "https://brave.com/my-first-ad"
-    )
-    
-    guard let targetURL = URL(string: notification.targetURL) else {
-      assertionFailure("My First Ad URL is not valid: \(notification.targetURL)")
-      return
-    }
-    
-    let rewardsNotification = RewardsNotification(ad: notification) { action in
-      completion(action, targetURL)
-    }
-    notificationPresenter.display(notification: rewardsNotification, presentingController: presentingController)
   }
 }

@@ -497,16 +497,16 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   }
 
   private func setupAdsNotificationHandler() {
-        notificationsHandler = AdsNotificationHandler(ads: rewards.ads,
-                                                      presentingController: self,
-                                                      notificationsPresenter: notificationsPresenter)
+    notificationsHandler = AdsNotificationHandler(ads: rewards.ads,
+                                                  presentingController: self,
+                                                  notificationsPresenter: notificationsPresenter)
     notificationsHandler?.canShowNotifications = { [weak self] in
       guard let self = self else { return false }
       return !PrivateBrowsingManager.shared.isPrivateBrowsing && !self.topToolbar.inOverlayMode
     }
     notificationsHandler?.actionOccured = { [weak self] ad, action in
       guard let self = self, let ad = ad else { return }
-      if case .rewards(let rewardsAction) = action, rewardsAction == .opened {
+      if action == .opened {
         var url = URL(string: ad.targetURL)
         if url == nil,
            let percentEncodedURLString =

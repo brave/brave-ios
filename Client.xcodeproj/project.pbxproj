@@ -948,6 +948,9 @@
 		7DCA34D427555E96001B0555 /* CryptoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DCA34D327555E96001B0555 /* CryptoStore.swift */; };
 		7DE5B6E427BEBA86000DA8E4 /* MockEthTxManagerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE5B6E327BEBA86000DA8E4 /* MockEthTxManagerProxy.swift */; };
 		7DE5B78C27D4188E000DA8E4 /* EditNonceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE5B78B27D4188E000DA8E4 /* EditNonceView.swift */; };
+		7DEF29EA27EBF9E500C2CA97 /* RewardsNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEF29E927EBF9E500C2CA97 /* RewardsNotification.swift */; };
+		7DEF29EC27EBFA4900C2CA97 /* WalletNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEF29EB27EBFA4900C2CA97 /* WalletNotification.swift */; };
+		7DEF29EE27EC234600C2CA97 /* BraveNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DEF29ED27EC234600C2CA97 /* BraveNotification.swift */; };
 		7DF9113D275AC86100EF0D8B /* WalletLoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF9113C275AC86100EF0D8B /* WalletLoadingButton.swift */; };
 		7DF911C0276A8D1600EF0D8B /* SwapTokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF911BF276A8D1600EF0D8B /* SwapTokenStoreTests.swift */; };
 		7DF911DF27726E5E00EF0D8B /* BuyTokenStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF911DE27726E5E00EF0D8B /* BuyTokenStoreTest.swift */; };
@@ -1852,7 +1855,7 @@
 		27036F9325684F9F004EF6B6 /* BraveNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveNotificationsPresenter.swift; sourceTree = "<group>"; };
 		27036F9425684F9F004EF6B6 /* AdSwipeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdSwipeButton.swift; sourceTree = "<group>"; };
 		27036F9525684F9F004EF6B6 /* AdView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdView.swift; sourceTree = "<group>"; };
-		27036F9625684F9F004EF6B6 /* AdsNotificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = AdsNotificationHandler.swift; sourceTree = "<group>"; tabWidth = 2; };
+		27036F9625684F9F004EF6B6 /* AdsNotificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdsNotificationHandler.swift; sourceTree = "<group>"; };
 		27036F9725684F9F004EF6B6 /* AdContentButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdContentButton.swift; sourceTree = "<group>"; };
 		2703BE8A24F4508E00CBE6CD /* CreatePDFActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePDFActivity.swift; sourceTree = "<group>"; };
 		270697092766F677005B44D2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/BraveWallet.strings; sourceTree = "<group>"; };
@@ -2917,6 +2920,9 @@
 		7DE5B6E327BEBA86000DA8E4 /* MockEthTxManagerProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEthTxManagerProxy.swift; sourceTree = "<group>"; };
 		7DE5B73227C994B7000DA8E4 /* Model15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model15.xcdatamodel; sourceTree = "<group>"; };
 		7DE5B78B27D4188E000DA8E4 /* EditNonceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNonceView.swift; sourceTree = "<group>"; };
+		7DEF29E927EBF9E500C2CA97 /* RewardsNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsNotification.swift; sourceTree = "<group>"; };
+		7DEF29EB27EBFA4900C2CA97 /* WalletNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletNotification.swift; sourceTree = "<group>"; };
+		7DEF29ED27EC234600C2CA97 /* BraveNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveNotification.swift; sourceTree = "<group>"; };
 		7DF9113C275AC86100EF0D8B /* WalletLoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletLoadingButton.swift; sourceTree = "<group>"; };
 		7DF911BF276A8D1600EF0D8B /* SwapTokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapTokenStoreTests.swift; sourceTree = "<group>"; };
 		7DF911DE27726E5E00EF0D8B /* BuyTokenStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyTokenStoreTest.swift; sourceTree = "<group>"; };
@@ -5742,6 +5748,7 @@
 			isa = PBXGroup;
 			children = (
 				7D1B136827DC12FA00BC6F5B /* WalletConnectionView.swift */,
+				7DEF29EB27EBFA4900C2CA97 /* WalletNotification.swift */,
 			);
 			path = "Brave Wallet";
 			sourceTree = "<group>";
@@ -5749,7 +5756,9 @@
 		7D9D0AB427EBA0740099FC46 /* Brave Notifications */ = {
 			isa = PBXGroup;
 			children = (
+				7DEF29DE27EBF9C800C2CA97 /* Brave Rewards */,
 				7D1B135D27DC12D300BC6F5B /* Brave Wallet */,
+				7DEF29ED27EC234600C2CA97 /* BraveNotification.swift */,
 				27036F9325684F9F004EF6B6 /* BraveNotificationsPresenter.swift */,
 			);
 			path = "Brave Notifications";
@@ -5761,6 +5770,14 @@
 				7DAC597A2726524E00E735A2 /* AddressQRCodeScannerView.swift */,
 			);
 			path = Scanner;
+			sourceTree = "<group>";
+		};
+		7DEF29DE27EBF9C800C2CA97 /* Brave Rewards */ = {
+			isa = PBXGroup;
+			children = (
+				7DEF29E927EBF9E500C2CA97 /* RewardsNotification.swift */,
+			);
+			path = "Brave Rewards";
 			sourceTree = "<group>";
 		};
 		A104E190210A380E00D2323E /* Shields */ = {
@@ -8614,6 +8631,7 @@
 				27448538245B67B2001920B5 /* NewTabPageBackgroundButtonsView.swift in Sources */,
 				C8F457A81F1FD75A000CB895 /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				5E612A8F234B7FCA007D12B5 /* OnboardingRewardsAgreementViewController.swift in Sources */,
+				7DEF29EE27EC234600C2CA97 /* BraveNotification.swift in Sources */,
 				E6927EC01C7B6FB800D03F75 /* ErrorToast.swift in Sources */,
 				2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */,
 				27C647832550AF34006D72FC /* WalletTransferCompleteView.swift in Sources */,
@@ -8745,6 +8763,7 @@
 				CA8D5C1826D7CE2E009BF13D /* PlaylistViewController+AVDelegates.swift in Sources */,
 				5D24AF8221BA459000F9506A /* BlocklistName.swift in Sources */,
 				277223762469E7290059A7EB /* LargeFaviconView.swift in Sources */,
+				7DEF29EC27EBFA4900C2CA97 /* WalletNotification.swift in Sources */,
 				D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */,
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				27448522245A1A1C001920B5 /* FavoritesViewController.swift in Sources */,
@@ -8828,6 +8847,7 @@
 				CAC5342927A9B87600013056 /* PlaylistFolderController.swift in Sources */,
 				2F198EE82603FDD900945AB3 /* AddSearchEngineActivity.swift in Sources */,
 				EB11A1052044A90E0018F749 /* TrackingProtectionPageStats.swift in Sources */,
+				7DEF29EA27EBF9E500C2CA97 /* RewardsNotification.swift in Sources */,
 				0A93F1802264C2D200A3571B /* FolderDetailsView.swift in Sources */,
 				0A0A07CE247518B100591DFB /* BraveVPNContactFormViewController.swift in Sources */,
 				5E99D02025E56C15003F30B4 /* PlaylistDownloadManager.swift in Sources */,

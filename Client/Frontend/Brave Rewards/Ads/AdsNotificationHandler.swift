@@ -11,7 +11,7 @@ import BraveShared
 
 public class AdsNotificationHandler: BraveAdsNotificationHandler {
   /// An ad was tapped and a URL should be opened
-  public var actionOccured: ((AdNotification?, BraveNotificationAction) -> Void)?
+  public var actionOccured: ((AdNotification?, RewardsNotificationAction) -> Void)?
   /// The ads object
   public let ads: BraveAds
   /// Whether or not we should currently show ads currently based on exteranl
@@ -53,11 +53,11 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
         self.ads.reportAdNotificationEvent(notification.uuid, eventType: .dismissed)
         self.ads.toggleThumbsDown(forAd: notification.uuid, advertiserId: notification.advertiserID)
       }
-      self.actionOccured?(notification, .rewards(action))
+      self.actionOccured?(notification, action)
     }
     
     ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
-    notificationsPresenter.display(notification: rewardsNotification, presentingController: presentingController)
+    notificationsPresenter.display(notification: rewardsNotification, from: presentingController)
   }
 
   public func clearNotification(withIdentifier identifier: String) {
