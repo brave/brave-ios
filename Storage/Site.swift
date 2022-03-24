@@ -66,9 +66,9 @@ open class Site: Identifiable, Hashable {
         case .history:
           return UIImage(systemName: "clock.fill")
         case .bookmark:
-          return UIImage(systemName: "star.fill")
+          return UIImage(systemName: "book.fill")
         case .tab:
-          return UIImage(systemName: "folder.fill")
+          return UIImage(systemName: "square.filled.on.square")
         default:
           return nil
       }

@@ -13,6 +13,7 @@ import Data
 protocol SearchViewControllerDelegate: AnyObject {
   func searchViewController(_ searchViewController: SearchViewController, didSubmit query: String)
   func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL)
+  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTabURL url: URL)
   func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String)
   func presentSearchSettingsController()
   func searchViewController(_ searchViewController: SearchViewController, didHighlightText text: String, search: Bool)
@@ -40,7 +41,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     static let faviconSize: CGFloat = 29
     static let iconBorderColor = UIColor(white: 0, alpha: 0.1)
     static let iconBorderWidth: CGFloat = 0.5
-    static let maxSearchSuggestions = 6
+    static let maxSearchSuggestions = 5
   }
 
   // MARK: SearchListSection
@@ -49,7 +50,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     case searchSuggestionsOptIn
     case searchSuggestions
     case findInPage
-    case bookmarksAndHistoryAndTabs
+    case openTabsAndHistoryAndBookmarks
   }
 
   // MARK: Properties
@@ -141,7 +142,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       sections.append(.searchSuggestions)
     }
     sections.append(.findInPage)
-    sections.append(.bookmarksAndHistoryAndTabs)
+    sections.append(.openTabsAndHistoryAndBookmarks)
     return sections
   }
 
@@ -437,13 +438,16 @@ class SearchViewController: SiteTableViewController, LoaderListener {
           }
           searchDelegate?.searchViewController(self, didSelectURL: url)
         }
-      case .bookmarksAndHistoryAndTabs:
+      case .openTabsAndHistoryAndBookmarks:
         let site = data[indexPath.row]
         
-        //TODO: For Tab selection add open tab
-        
+
         if let url = URL(string: site.url) {
-          searchDelegate?.searchViewController(self, didSelectURL: url)
+          if site.siteType == .tab {
+            searchDelegate?.searchViewController(self, didSelectOpenTabURL: url)
+          } else {
+            searchDelegate?.searchViewController(self, didSelectURL: url)
+          }
         }
       case .findInPage:
         let localSearchQuery = searchQuery.lowercased()
@@ -460,7 +464,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
           return 100.0
         case .searchSuggestions:
           return 44.0
-        case .bookmarksAndHistoryAndTabs:
+        case .openTabsAndHistoryAndBookmarks:
           return super.tableView(tableView, heightForRowAt: indexPath)
         case .findInPage:
           return super.tableView(tableView, heightForRowAt: indexPath)
@@ -484,7 +488,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
           return String(format: Strings.searchSuggestionSectionTitleFormat, defaultSearchEngine.displayName)
         }
         return Strings.searchSuggestionsSectionHeader
-      case .bookmarksAndHistoryAndTabs: return Strings.searchHistorySectionHeader
+      case .openTabsAndHistoryAndBookmarks: return Strings.searchHistorySectionHeader
       case .findInPage: return Strings.findOnPageSectionHeader
     }
   }
@@ -506,7 +510,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         return 0.0
       case .searchSuggestions:
         return suggestions.isEmpty ? 0 : headerHeight * 2.0
-      case .bookmarksAndHistoryAndTabs: return data.isEmpty ? 0 : headerHeight
+      case .openTabsAndHistoryAndBookmarks: return data.isEmpty ? 0 : 2.0 * headerHeight
       case .findInPage:
         if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
           return headerHeight
@@ -529,8 +533,8 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       case .searchSuggestionsOptIn:
         return footerHeight
       case .searchSuggestions:
-        return suggestions.isEmpty ? CGFloat.leastNormalMagnitude : footerHeight
-      case .bookmarksAndHistoryAndTabs: return footerHeight
+        return CGFloat.leastNormalMagnitude
+      case .openTabsAndHistoryAndBookmarks: return footerHeight
       case .findInPage:
         return CGFloat.leastNormalMagnitude
     }
@@ -583,12 +587,35 @@ class SearchViewController: SiteTableViewController, LoaderListener {
         }
         return cell
         
-      case .bookmarksAndHistoryAndTabs:
+      case .openTabsAndHistoryAndBookmarks:
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let site = data[indexPath.row]
+        
+        let detailTextForTabSuggestions = NSMutableAttributedString()
+        
+        detailTextForTabSuggestions.append(
+          NSAttributedString(
+            string: Strings.searchSuggestionOpenTabActionTitle,
+            attributes: [
+              .font: DynamicFontHelper.defaultHelper.SmallSizeBoldWeightAS,
+              .foregroundColor: UIColor.braveLabel
+            ]))
+
+        detailTextForTabSuggestions.append(
+          NSAttributedString(
+            string: " · \(site.url)",
+            attributes: [
+              .font: DynamicFontHelper.defaultHelper.SmallSizeRegularWeightAS,
+              .foregroundColor: UIColor.secondaryBraveLabel
+            ]))
+        
         if let cell = cell as? TwoLineTableViewCell {
           cell.textLabel?.textColor = .bravePrimary
-          cell.setLines(site.title, detailText: site.url)
+          if site.siteType == .tab {
+            cell.setLines(site.title, detailText: nil, detailAttributedText: detailTextForTabSuggestions)
+          } else {
+            cell.setLines(site.title, detailText: site.url)
+          }
           cell.setRightBadge(site.siteType.icon?.template ?? nil)
           cell.accessoryView?.tintColor = .secondaryButtonTint
           
@@ -627,7 +654,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       case .searchSuggestions:
         guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else { return 0 }
         return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
-      case .bookmarksAndHistoryAndTabs:
+      case .openTabsAndHistoryAndBookmarks:
         return data.count
       case .findInPage:
         if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
@@ -646,7 +673,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       return
     }
     
-    if section == .bookmarksAndHistoryAndTabs {
+    if section == .openTabsAndHistoryAndBookmarks {
       let suggestion = data[indexPath.item]
       searchDelegate?.searchViewController(self, didHighlightText: suggestion.url, search: false)
     }
@@ -669,7 +696,7 @@ extension SearchViewController: KeyboardHelperDelegate {
 
 extension SearchViewController {
   func handleKeyCommands(sender: UIKeyCommand) {
-    let initialSection = SearchListSection.bookmarksAndHistoryAndTabs.rawValue
+    let initialSection = SearchListSection.openTabsAndHistoryAndBookmarks.rawValue
     
     guard let current = tableView.indexPathForSelectedRow else {
       let numberOfRows = tableView(tableView, numberOfRowsInSection: initialSection)

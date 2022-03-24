@@ -28,7 +28,7 @@ class SearchLoader: Loader<[Site], SearchViewController> {
       frequencyQuery.sitesByFrequency(containing: query) { [weak self] result in
         guard let self = self else { return }
 
-        self.load(result)
+        self.load(Array(result))
 
         // If the new search string is not longer than the previous
         // we don't need to find an autocomplete suggestion.

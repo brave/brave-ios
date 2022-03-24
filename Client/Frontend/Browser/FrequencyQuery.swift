@@ -28,33 +28,28 @@ class FrequencyQuery {
     task?.cancel()
   }
 
-  public func sitesByFrequency(containing query: String, completion: @escaping ([Site]) -> Void) {
-    task?.cancel()
-
-    var searchResult = [Site]()
-
+  public func sitesByFrequency(containing query: String, completion: @escaping (Set<Site>) -> Void) {
     task = DispatchWorkItem {
       // brave-core fetch can be slow over 200ms per call,
       // a cancellable serial queue is used for it.
       DispatchQueue.main.async {
         // Tab Fetch
-        let tabFetched = self.tabManager.tabsForCurrentMode(for: query)
-        searchResult += self.fetchSitesFromTabs(tabFetched)
+        let fetchedTabs = self.tabManager.tabsForCurrentMode(for: query)
+        let openTabSites = self.fetchSitesFromTabs(fetchedTabs)
 
+        // Bookmarks Fetch
+        self.bookmarkManager.byFrequency(query: query) { sites in
+          let bookmarkSites = sites.map { Site(url: $0.url ?? "", title: $0.title ?? "", siteType: .bookmark) }
+          
           // History Fetch
           self.historyAPI.byFrequency(query: query) { historyList in
             let historySites = historyList.map { Site(url: $0.url.absoluteString, title: $0.title ?? "", siteType: .history) }
-            searchResult += historySites
-                    
-            // Bookmarks Fetch
-            self.bookmarkManager.byFrequency(query: query) { sites in
-              let bookmarkSites = sites.map { Site(url: $0.url ?? "", title: $0.title ?? "", siteType: .bookmark) }
-              searchResult += bookmarkSites
 
-              completion(searchResult)
-            }
+            let result = Set<Site>(openTabSites + historySites + bookmarkSites)
+            completion(result)
           }
         }
+      }
     }
         
     if let task = self.task {
