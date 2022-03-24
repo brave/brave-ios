@@ -27,6 +27,13 @@ class FarblingProtectionHelper {
     "plug-in", "plug in", "extension", nil
   ]
 
+  /// A list of fake voice names to be used to generate a fake `SpeechSynthesizer` voice
+  private static let fakeVoiceNames: [String] = [
+    "Hubert", "Vernon", "Rudolph", "Clayton", "Irving",
+    "Wilson", "Alva", "Harley", "Beauregard", "Cleveland",
+    "Cecil", "Reuben", "Sylvester", "Jasper"
+  ]
+
   /// Generate fake plugin data to be injected into the farbling protection script
   static func makeFakePluginData(from randomManager: RandomManager) -> String {
     var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
@@ -54,8 +61,14 @@ class FarblingProtectionHelper {
     }
 
     // Convert the object into a string and return it
-    let fakeData: JSDataType = .array(fakePlugins)
-    return String(describing: fakeData)
+    return String(describing: JSDataType.array(fakePlugins))
+  }
+
+  /// Generate a fake voice name
+  static func makeFakeVoiceName(from randomManager: RandomManager) -> String {
+    var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
+    let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
+    return String(describing: JSDataType.string(fakeName))
   }
 
   /// Generate a random string using a prefix, middle and suffix where any of those may be empty.

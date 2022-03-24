@@ -25,6 +25,9 @@ enum ScriptSourceType {
   ///
   /// This script has the following dynamic variables:
   /// - `$<fudge_factor>`: A random value between 0.99 and 1
+  /// - `$<fake_plugin_data>`: A randomized array of fake plugin information
+  /// - `$<fake_voice_name>`: A randomized name used as a voice in the speech synthesizer
+  /// - `$<random_voice_index_scale>`: A random value between 0 and 1 used to get a random object in an array of an unknown size.
   case farblingProtection
   
   /// A YouTube ad blocking script
@@ -188,15 +191,21 @@ class ScriptFactory {
       let randomSource = GKMersenneTwisterRandomSource(seed: seed)
       let fudgeFactor = 0.99 + (randomSource.nextUniform() / 100)
       let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomManager)
+      let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomManager)
+      let randomVoiceIndexScale = randomSource.nextUniform()
 
       print("[ScriptFactory] eTLD+1: \(etld)")
-      print("[ScriptFactory] String: \(fakePluginData)")
       print("[ScriptFactory] Seed:   \(seed)")
       print("[ScriptFactory] Fudge:  \(fudgeFactor)")
+      print("[ScriptFactory] Voice:  \(fakeVoice)")
+      print("[ScriptFactory] Scale:  \(randomVoiceIndexScale)")
+      print("[ScriptFactory] Plgins: \(fakePluginData)")
       
       source = source
         .replacingOccurrences(of: "$<fudge_factor>", with: "\(fudgeFactor)", options: .literal)
         .replacingOccurrences(of: "$<fake_plugin_data>", with: "\(fakePluginData)", options: .literal)
+        .replacingOccurrences(of: "$<fake_voice_name>", with: "\(fakeVoice)", options: .literal)
+        .replacingOccurrences(of: "$<random_voice_index_scale>", with: "\(randomVoiceIndexScale)", options: .literal)
       
     case .nacl:
       // No modifications needed

@@ -210,4 +210,95 @@
       return plugins[index]
     }
   }
+
+  // 4. Farble speech synthesizer
+  console.log('Farbling voices')
+  const fakeVoiceName = $<fake_voice_name>
+  // A value representing a random value between 0 and 1.
+  // This value is used to get a random index between 0 and voices.length
+  const randomVoiceScale = $<random_voice_index_scale>
+
+  function makeFakeVoiceFromVoice(voice) {
+    const voicePrototype = Object.getPrototypeOf(voice)
+
+    const newVoice = Object.create(voicePrototype, {
+      name: {
+        get: function () {
+          return fakeVoiceName
+        }
+      },
+      voiceURI: {
+        get: function () {
+          return voice.voiceURI
+        }
+      },
+      lang: {
+        get: function () {
+          return voice.lang
+        }
+      },
+      localService: {
+        get: function () {
+          return voice.localService
+        }
+      },
+      default: {
+        get: function () {
+          return false
+        }
+      }
+    })
+
+    return newVoice
+  }
+
+  let originalVoice
+  let fakeVoice
+  let passedFakeVoice
+
+  // We need to override the voice property to allow our fake voice to work
+  const descriptor = Reflect.getOwnPropertyDescriptor(SpeechSynthesisUtterance.prototype, 'voice')
+  Reflect.defineProperty(SpeechSynthesisUtterance.prototype, 'voice', {
+    get: function () {
+      if (passedFakeVoice === undefined) {
+        // We didn't set a fake voice
+        return Reflect.apply(descriptor.get, this, arguments)
+      } else {
+        // We set a fake voice, return that instead
+        return passedFakeVoice
+      }
+    },
+    set: function (passedVoice) {
+      if (passedVoice === fakeVoice && originalVoice !== undefined) {
+        // If we passed a fake voice, ignore it. We need to use the real voice
+        // The fake voice will not work.
+        passedFakeVoice = passedVoice
+        Reflect.apply(descriptor.set, this, [originalVoice])
+      } else {
+        // Otherwise, if we set a real voice, use a real voice instead.
+        passedFakeVoice = undefined
+        Reflect.apply(descriptor.set, this, arguments)
+      }
+    }
+  })
+
+  // Patch get voices to return an extra fake voice
+  const getVoices = window.speechSynthesis.getVoices
+  const getVoicesPrototype = Object.getPrototypeOf(window.speechSynthesis)
+  getVoicesPrototype.getVoices = function () {
+    const voices = Reflect.apply(getVoices, this, arguments)
+
+    if (fakeVoice === undefined) {
+      const randomVoiceIndex = Math.round(randomVoiceScale * voices.length)
+      originalVoice = voices[randomVoiceIndex]
+      fakeVoice = makeFakeVoiceFromVoice(originalVoice)
+
+      if (fakeVoice !== undefined) {
+        voices.push(fakeVoice)
+      }
+    } else {
+      voices.push(fakeVoice)
+    }
+    return voices
+  }
 })()
