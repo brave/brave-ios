@@ -29,6 +29,34 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
               cryptoStore: cryptoStore,
               onDismiss: onDismiss
             )
+          case .switchChain(let request):
+            SuggestedNetworkView(
+              mode: .switchNetworks(chainId: request.chainId, origin: request.origin),
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onApprove: {
+                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: true, origin: request.origin))
+                onDismiss()
+              },
+              onCancel: {
+                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: false, origin: request.origin))
+                onDismiss()
+              }
+            )
+          case .addChain(let chain):
+            SuggestedNetworkView(
+              mode: .addNetwork(chain),
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onApprove: {
+                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: true, chainId: chain.chainId))
+                onDismiss()
+              },
+              onCancel: {
+                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: false, chainId: chain.chainId))
+                onDismiss()
+              }
+            )
           default:
             EmptyView()
           }
@@ -39,7 +67,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
       }
     }
     .onAppear {
-      // TODO: Fetch pending requests
+      cryptoStore.fetchPendingRequests()
     }
   }
 }
