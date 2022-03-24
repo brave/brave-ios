@@ -82,7 +82,7 @@ struct AssetIconView_Previews: PreviewProvider {
         decimals: 18,
         visible: false,
         tokenId: "",
-        coingeckoId: ""
+        coingeckoId: "", chainId: ""
       )
     )
     .previewLayout(.sizeThatFits)

@@ -11,6 +11,14 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``CryptoKeyringStore.previewStore``
 class MockKeyringService: BraveWalletKeyringService {
+  func validatePassword(_ password: String, completion: @escaping (Bool) -> Void) {
+    
+  }
+  
+  func validatePassword(_ password: String) -> Bool {
+    true
+  }
+  
   private var keyrings: [BraveWallet.KeyringInfo] = [.init(id: BraveWallet.DefaultKeyringId, isKeyringCreated: true, isLocked: false, isBackedUp: true, accountInfos: [])]
   private var privateKeys: [String: String] = [:]
   private var password = ""

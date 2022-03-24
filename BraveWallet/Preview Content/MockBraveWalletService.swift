@@ -11,6 +11,18 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class MockBraveWalletService: BraveWalletBraveWalletService {
+  func notifyGetPublicKeyRequestProcessed(_ approved: Bool, origin: URL) {
+    
+  }
+  
+  func pendingGetEncryptionPublicKeyRequests(_ completion: @escaping ([BraveWallet.GetEncryptionPublicKeyRequest]) -> Void) {
+    
+  }
+  
+  func getPendingGetEncryptionPublicKeyRequests() -> [BraveWallet.GetEncryptionPublicKeyRequest] {
+    return []
+  }
+  
 
   private var assets: [String: [BraveWallet.BlockchainToken]] = [
     BraveWallet.MainnetChainId: [.previewToken],

@@ -19,7 +19,7 @@ extension BraveWallet.BlockchainToken {
     decimals: 18,
     visible: false,
     tokenId: "",
-    coingeckoId: ""
+    coingeckoId: "", chainId: ""
   )
 }
 
