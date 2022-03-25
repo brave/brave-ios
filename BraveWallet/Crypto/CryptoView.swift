@@ -72,20 +72,24 @@ public struct CryptoView: View {
           Group {
             switch presentingContext {
             case .`default`:
-          CryptoContainerView(
-            keyringStore: keyringStore,
-            cryptoStore: store,
-            toolbarDismissContent: dismissButtonToolbarContents
-          )
+              CryptoContainerView(
+                keyringStore: keyringStore,
+                cryptoStore: store,
+                toolbarDismissContent: dismissButtonToolbarContents
+              )
             case .webpageRequests:
               WebpageRequestContainerView(
+                keyringStore: keyringStore,
                 cryptoStore: store,
                 toolbarDismissContent: dismissButtonToolbarContents
               )
             case .requestEthererumPermissions(let handler):
               NewSiteConnectionView(
                 keyringStore: keyringStore,
-                onConnect: { handler(.granted(accounts: $0)) },
+                onConnect: {
+                  handler(.granted(accounts: $0))
+                  dismissAction?()
+                },
                 onDismiss: {
                   handler(.rejected)
                   dismissAction?()

@@ -10,7 +10,8 @@ import BraveUI
 /// A container to present when a webpage wants to present some request to the user such as adding a suggested
 /// token, change networks, authorize a transaction, etc.
 struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
-  var cryptoStore: CryptoStore
+  @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
   
   var body: some View {

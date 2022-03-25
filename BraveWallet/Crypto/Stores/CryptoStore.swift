@@ -5,12 +5,19 @@
 
 import BraveCore
 
-enum PendingWebpageRequest {
+enum PendingWebpageRequest: Equatable {
   case requestEthereumPermissions(URL)
   case addChain(BraveWallet.NetworkInfo)
   case switchChain(BraveWallet.SwitchChainRequest)
   case addSuggestedToken(BraveWallet.AddSuggestTokenRequest)
   case signMessage(BraveWallet.SignMessageRequest)
+}
+
+enum WebpageRequestResponse: Equatable {
+  case switchChain(approved: Bool, origin: URL)
+  case addNetwork(approved: Bool, chainId: String)
+  case addSuggestedToken(approved: Bool, contractAddresses: [String])
+  case signMessage(approved: Bool, id: Int32)
 }
 
 public class CryptoStore: ObservableObject {
@@ -238,6 +245,23 @@ public class CryptoStore: ObservableObject {
       } else if let addTokenRequest = await walletService.pendingAddSuggestTokenRequests().first {
         pendingWebpageRequest = .addSuggestedToken(addTokenRequest)
       }
+    }
+  }
+
+  func handleWebpageRequestResponse(_ response: WebpageRequestResponse) {
+    switch response {
+    case let .switchChain(approved, origin):
+      rpcService.notifySwitchChainRequestProcessed(approved, origin: origin)
+      pendingWebpageRequest = nil
+    case let .addNetwork(approved, chainId):
+      rpcService.addEthereumChainRequestCompleted(chainId, approved: approved)
+      pendingWebpageRequest = nil
+    case let .addSuggestedToken(approved, contractAddresses):
+      walletService.notifyAddSuggestTokenRequestsProcessed(approved, contractAddresses: contractAddresses)
+      pendingWebpageRequest = nil
+    case let .signMessage(approved, id):
+      walletService.notifySignMessageRequestProcessed(approved, id: id)
+      pendingWebpageRequest = nil
     }
   }
 }

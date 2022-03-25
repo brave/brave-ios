@@ -96,6 +96,7 @@ public struct WalletPanelContainerView: View {
         if let cryptoStore = walletStore.cryptoStore {
           WalletPanelView(
             keyringStore: keyringStore,
+            cryptoStore: cryptoStore,
             networkStore: cryptoStore.networkStore,
             presentWalletWithContext: { context in
               self.presentWalletWithContext?(context)
@@ -126,6 +127,7 @@ public struct WalletPanelContainerView: View {
 
 struct WalletPanelView: View {
   @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var networkStore: NetworkStore
   var presentWalletWithContext: (PresentingContext) -> Void
   
@@ -268,6 +270,14 @@ struct WalletPanelView: View {
       )
       .ignoresSafeArea()
     )
+    .onChange(of: cryptoStore.pendingWebpageRequest) { newValue in
+      if newValue != nil {
+        presentWalletWithContext(.webpageRequests)
+      }
+    }
+    .onAppear {
+      cryptoStore.fetchPendingRequests()
+    }
   }
 }
 
@@ -277,11 +287,13 @@ struct WalletPanelView_Previews: PreviewProvider {
     Group {
       WalletPanelView(
         keyringStore: .previewStoreWithWalletCreated,
+        cryptoStore: .previewStore,
         networkStore: .previewStore,
         presentWalletWithContext: { _ in }
       )
       WalletPanelView(
         keyringStore: .previewStore,
+        cryptoStore: .previewStore,
         networkStore: .previewStore,
         presentWalletWithContext: { _ in }
       )
@@ -291,6 +303,7 @@ struct WalletPanelView_Previews: PreviewProvider {
           store.lock()
           return store
         }(),
+        cryptoStore: .previewStore,
         networkStore: .previewStore,
         presentWalletWithContext: { _ in }
       )
