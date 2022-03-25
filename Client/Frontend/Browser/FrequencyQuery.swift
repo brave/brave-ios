@@ -40,7 +40,7 @@ class FrequencyQuery {
         // Bookmarks Fetch
         self.bookmarkManager.byFrequency(query: query) { sites in
           let bookmarkSites = sites.map { Site(url: $0.url ?? "", title: $0.title ?? "", siteType: .bookmark) }
-          
+
           // History Fetch
           self.historyAPI.byFrequency(query: query) { historyList in
             let historySites = historyList.map { Site(url: $0.url.absoluteString, title: $0.title ?? "", siteType: .history) }
@@ -78,5 +78,4 @@ class FrequencyQuery {
         
     return tabList
   }
-  
 }
