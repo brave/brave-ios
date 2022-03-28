@@ -172,36 +172,56 @@ extension BrowserViewController: BraveWalletProviderDelegate {
     }
 }
 
-extension Tab {
-    func updateEthereumProperties() {
-        Task { @MainActor in
-            guard let webView = webView, let provider = walletProvider else {
-                return
-            }
-            let chainId = await provider.chainId()
-            webView.evaluateSafeJavaScript(
-                functionName: "window.ethereum.chainId = \"\(chainId)\"",
-                contentWorld: .page,
-                asFunction: false,
-                completion: nil
-            )
-            if let networkVersion = Int(chainId.removingHexPrefix, radix: 16) {
-                webView.evaluateSafeJavaScript(
-                    functionName: "window.ethereum.networkVersion = \(networkVersion)",
-                    contentWorld: .page,
-                    asFunction: false,
-                    completion: nil
-                )
-            }
-//            let (accounts, _, _) = await provider.allowedAccounts(false)
-//            if let account = accounts.first {
-//                webView.evaluateSafeJavaScript(
-//                    functionName: "window.ethereum.selectedAccount = \"\(account)\"",
-//                    contentWorld: .page,
-//                    asFunction: false,
-//                    completion: nil
-//                )
-//            }
-        }
+extension Tab: BraveWalletEventsListener {
+  func chainChangedEvent(_ chainId: String) {
+    webView?.evaluateSafeJavaScript(
+      functionName: "window.ethereum.emit",
+      args: ["chainChanged", chainId],
+      contentWorld: .page,
+      completion: nil
+    )
+    updateEthereumProperties()
+  }
+  
+  func accountsChangedEvent(_ accounts: [String]) {
+    webView?.evaluateSafeJavaScript(
+      functionName: "window.ethereum.emit",
+      args: ["accountsChanged", accounts],
+      contentWorld: .page,
+      completion: nil
+    )
+    updateEthereumProperties()
+  }
+  
+  func updateEthereumProperties() {
+    Task { @MainActor in
+      guard let webView = webView, let provider = walletProvider else {
+        return
+      }
+      let chainId = await provider.chainId()
+      webView.evaluateSafeJavaScript(
+        functionName: "window.ethereum.chainId = \"\(chainId)\"",
+        contentWorld: .page,
+        asFunction: false,
+        completion: nil
+      )
+      if let networkVersion = Int(chainId.removingHexPrefix, radix: 16) {
+        webView.evaluateSafeJavaScript(
+          functionName: "window.ethereum.networkVersion = \(networkVersion)",
+          contentWorld: .page,
+          asFunction: false,
+          completion: nil
+        )
+      }
+//      let (accounts, _, _) = await provider.allowedAccounts(false)
+//      if let account = accounts.first {
+//          webView.evaluateSafeJavaScript(
+//              functionName: "window.ethereum.selectedAccount = \"\(account)\"",
+//              contentWorld: .page,
+//              asFunction: false,
+//              completion: nil
+//          )
+//      }
     }
+  }
 }
