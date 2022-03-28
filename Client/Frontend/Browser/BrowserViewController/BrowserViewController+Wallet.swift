@@ -174,13 +174,18 @@ extension BrowserViewController: BraveWalletProviderDelegate {
 
 extension Tab: BraveWalletEventsListener {
   func chainChangedEvent(_ chainId: String) {
-    webView?.evaluateSafeJavaScript(
-      functionName: "window.ethereum.emit",
-      args: ["chainChanged", chainId],
-      contentWorld: .page,
-      completion: nil
-    )
-    updateEthereumProperties()
+    Task { @MainActor in
+      guard let provider = walletProvider,
+            case let currentChainId = await provider.chainId(),
+            chainId != currentChainId else { return }
+      webView?.evaluateSafeJavaScript(
+        functionName: "window.ethereum.emit",
+        args: ["chainChanged", chainId],
+        contentWorld: .page,
+        completion: nil
+      )
+      updateEthereumProperties()
+    }
   }
   
   func accountsChangedEvent(_ accounts: [String]) {
