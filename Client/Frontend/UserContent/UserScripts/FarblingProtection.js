@@ -183,36 +183,39 @@ window.braveFarble = (args) => {
     return newPlugin
   }
 
-  // We need the original length so we can reference it (as we will change it)
-  const plugins = window.navigator.plugins
-  const originalPluginsLength = plugins.length
-  const originalItemFunction = plugins.item
+  if (window.navigator.plugins !== undefined) {
+    // We need the original length so we can reference it (as we will change it)
+    const plugins = window.navigator.plugins
+    const originalPluginsLength = plugins.length
+    const originalItemFunction = plugins.item
 
-  // Adds a fake plugin for the given index on fakePluginData
-  const addPluginAtIndex = (newPlugin, index) => {
-    const pluginPosition = originalPluginsLength + index
-    window.navigator.plugins[pluginPosition] = newPlugin
-    window.navigator.plugins[newPlugin.name] = newPlugin
-  }
-
-  for (const [index, pluginData] of fakePluginData.entries()) {
-    const newPlugin = makeFakePlugin(pluginData)
-    addPluginAtIndex(newPlugin, index)
-  }
-
-  // Adjust the length of the original plugin array
-  Reflect.defineProperty(window.navigator.plugins, 'length', {
-    get: function () {
-      return originalPluginsLength + fakePluginData.length
+    // Adds a fake plugin for the given index on fakePluginData
+    const addPluginAtIndex = (newPlugin, index) => {
+      const pluginPosition = originalPluginsLength + index
+      window.navigator.plugins[pluginPosition] = newPlugin
+      window.navigator.plugins[newPlugin.name] = newPlugin
     }
-  })
 
-  // Fix .item() function to return the correct item
-  window.PluginArray.prototype.item = function (index) {
-    if (index < originalPluginsLength) {
-      return Reflect.apply(originalItemFunction, plugins, arguments)
-    } else {
-      return plugins[index]
+    for (const [index, pluginData] of fakePluginData.entries()) {
+      const newPlugin = makeFakePlugin(pluginData)
+      addPluginAtIndex(newPlugin, index)
+    }
+
+    // Adjust the length of the original plugin array
+    Reflect.defineProperty(window.navigator.plugins, 'length', {
+      get: function () {
+        return originalPluginsLength + fakePluginData.length
+      }
+    })
+
+    // Patch `PluginArray.item(index)` function to return the correct item 
+    // otherwise it returns `undefined`
+    window.PluginArray.prototype.item = function (index) {
+      if (index < originalPluginsLength) {
+        return Reflect.apply(originalItemFunction, plugins, arguments)
+      } else {
+        return plugins[index]
+      }
     }
   }
 
@@ -259,7 +262,7 @@ window.braveFarble = (args) => {
   const descriptor = Reflect.getOwnPropertyDescriptor(SpeechSynthesisUtterance.prototype, 'voice')
   Reflect.defineProperty(SpeechSynthesisUtterance.prototype, 'voice', {
     get: function () {
-      if (passedFakeVoice === undefined) {
+      if (!passedFakeVoice) {
         // We didn't set a fake voice
         return Reflect.apply(descriptor.get, this, arguments)
       } else {

@@ -119,9 +119,9 @@ class FarblingProtectionHelper {
   /// - Note: May result in an empty string.
   private static func randomPluginName<T: RandomNumberGenerator>(from generator: inout T) -> String {
     return [
-      pluginNameFirstParts.randomElement(using: &generator) ?? nil,
-      pluginNameSecondParts.randomElement(using: &generator) ?? nil,
-      pluginNameThirdParts.randomElement(using: &generator) ?? nil
-    ].compactMap({ $0 }).joined(separator: " ")
+      pluginNameFirstParts.randomElement(using: &generator),
+      pluginNameSecondParts.randomElement(using: &generator),
+      pluginNameThirdParts.randomElement(using: &generator)
+    ].compactMap({ $0 ?? nil }).joined(separator: " ")
   }
 }

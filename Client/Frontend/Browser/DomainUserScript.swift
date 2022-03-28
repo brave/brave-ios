@@ -34,7 +34,7 @@ enum DomainUserScript: CaseIterable {
   }
 
   /// Returns a shield type for a given user script domain.
-  /// Returns nil if the domain's user script can't be turned off via a shield toggle. (i.e. it's alwasy enabled)
+  /// Returns nil if the domain's user script can't be turned off via a shield toggle. (i.e. it's always enabled)
   var shieldType: BraveShield? {
     switch self {
     case .youtubeAdBlock:
@@ -48,13 +48,13 @@ enum DomainUserScript: CaseIterable {
   var associatedDomains: Set<String> {
     switch self {
     case .youtubeAdBlock:
-      return .init(arrayLiteral: "youtube.com")
+      return Set(arrayLiteral: "youtube.com")
     case .archive:
-      return .init(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
+      return Set(arrayLiteral: "archive.is", "archive.today", "archive.vn", "archive.fo")
     case .braveSearchHelper:
-      return .init(arrayLiteral: "search.brave.com", "search-dev.brave.com")
+      return Set(arrayLiteral: "search.brave.com", "search-dev.brave.com")
     case .braveTalkHelper:
-      return .init(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
+      return Set(arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
                    "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
                    "dev.talk.brave.software", "beta.talk.brave.software",
                    "talk.brave.software")

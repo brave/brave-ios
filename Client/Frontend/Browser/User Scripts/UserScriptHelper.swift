@@ -17,7 +17,7 @@ class UserScriptHelper {
     static let persistShieldSettings = DomainScriptOptions(rawValue: 1 << 0)
 
     /// These settings are tuned for a regular browsing session:
-    /// - Persist sheied settings
+    /// - Persist shield settings
     static let `default`: DomainScriptOptions = [persistShieldSettings]
 
     /// These settings are tuned for a private browsing session:
@@ -62,9 +62,6 @@ class UserScriptHelper {
       // Note: The added farbling protection script based on the document url, not the frame's url.
       // It is also added for every frame, including subframes.
       if let etldP1 = mainDocumentURL.baseDomain, isFPProtectionOn {
-        #if DEBUG
-        print("[NAV] Doc eTLD+1:  \(etldP1)")
-        #endif
         userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
         userScriptTypes.insert(.farblingProtection(etld: etldP1))
       }

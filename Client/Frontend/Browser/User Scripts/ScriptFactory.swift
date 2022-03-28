@@ -70,13 +70,6 @@ class ScriptFactory {
     case .farblingProtection(let etld):
       let randomConfiguration = RandomConfiguration(etld: etld)
       let fakeParams = try FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)
-
-      #if DEBUG
-      print("[ScriptFactory] eTLD+1: \(etld)")
-      print("[ScriptFactory] Seed:   \(randomConfiguration.seed)")
-      print("[ScriptFactory] Params: \(fakeParams)")
-      #endif
-      
       source = "\(source)\nwindow.braveFarble(\(fakeParams))\ndelete window.braveFarble"
       
     case .nacl:

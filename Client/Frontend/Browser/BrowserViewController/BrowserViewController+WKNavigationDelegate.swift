@@ -185,15 +185,6 @@ extension BrowserViewController: WKNavigationDelegate {
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let tab = tabManager[webView]
 
-    #if DEBUG
-    print("[NAV] -------------------------------")
-    print("[NAV] Tab URL:     \(tab?.url?.absoluteString ?? "nil")")
-    print("[NAV] MD URL:      \(navigationAction.request.mainDocumentURL?.absoluteString ?? "nil")")
-    print("[NAV] WebView URL: \(webView.url?.absoluteString ?? "nil")")
-    print("[NAV] Next URL:    \(url.absoluteString)")
-    print("[NAV] type:        \(String(reflecting: navigationAction.navigationType))")
-    #endif
-
     // Check if custom user scripts must be added to or removed from the web view.
     tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
       for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
