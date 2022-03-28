@@ -5,21 +5,21 @@
 
 "use strict";
 
-((params) => {
+window.braveFarble = (args) => {
   // A value between 0.99 and 1 to fudge the audio data
   // A value between 0.99 to 1 means the values in the destination will 
   // always be within the expected range of -1 and 1.
   // This small decrease should not affect affect legitimite users of this api.
   // But will affect fingerprinters by introducing a small random change.
-  const fudgeFactor = params['fudgeFactor']
+  const fudgeFactor = args['fudgeFactor']
   // Fake data that is to be used to construct fake plugins
-  const fakePluginData = params['fakePluginData']
+  const fakePluginData = args['fakePluginData']
   // A value representing a fake voice name that will be used to add a fake voice
-  const fakeVoiceName = params['fakeVoiceName']
+  const fakeVoiceName = args['fakeVoiceName']
   // This value is used to get a random index between 0 and voices.length
   // It's important to have a value between 0 - 1 in order to be within the 
   // array bounds
-  const randomVoiceIndexScale = params['randomVoiceIndexScale']
+  const randomVoiceIndexScale = args['randomVoiceIndexScale']
 
   const farbledChannels = new WeakMap()
   const braveNacl = window.nacl
@@ -300,5 +300,6 @@
     }
     return voices
   }
-})
-// Attach parameters here as JSON data
+}
+
+// Invoke window.braveFarble then delete the function

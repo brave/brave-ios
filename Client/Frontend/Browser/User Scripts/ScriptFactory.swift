@@ -77,7 +77,7 @@ class ScriptFactory {
       print("[ScriptFactory] Params: \(fakeParams)")
       #endif
       
-      source = "\(source)\n(\(String(describing: fakeParams)))"
+      source = "\(source)\nwindow.braveFarble(\(fakeParams))\ndelete window.braveFarble"
       
     case .nacl:
       // No modifications needed

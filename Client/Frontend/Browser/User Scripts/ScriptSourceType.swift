@@ -12,17 +12,9 @@ enum ScriptSourceType {
     /// A simple encryption library found here:
     /// https://www.npmjs.com/package/tweetnacl
     case nacl
-
     /// This script farbles certian system methods to output slightly randomized output.
     /// This script has a dependency on `nacl`.
-    ///
-    /// This script has the following dynamic variables:
-    /// - `$<fudge_factor>`: A random value between 0.99 and 1
-    /// - `$<fake_plugin_data>`: A randomized array of fake plugin information
-    /// - `$<fake_voice_name>`: A randomized name used as a voice in the speech synthesizer
-    /// - `$<random_voice_index_scale>`: A random value between 0 and 1 used to get a random object in an array of an unknown size.
     case farblingProtection
-
     /// A YouTube ad blocking script
     case youtubeAdBlock
     case archive
