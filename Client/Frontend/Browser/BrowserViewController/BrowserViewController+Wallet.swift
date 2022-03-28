@@ -117,16 +117,16 @@ extension BrowserViewController: BraveWalletProviderDelegate {
             
             let permissions = WalletHostingViewController(
                 walletStore: walletStore,
-                presentingContext: .requestEthererumPermissions { [weak self] response in
-                    guard let self = self else { return }
-                    switch response {
-                    case .granted(let accounts):
-                        Domain.setEthereumPermissions(forUrl: self.getOrigin(), accounts: accounts, grant: true)
-                        completion(accounts, .success, "")
-                    case .rejected:
-                        completion([], .userRejectedRequest, "User rejected request")
-                    }
-                },
+                presentingContext: .requestEthererumPermissions(origin: self.getOrigin(), handler: { [weak self] response in
+                  guard let self = self else { return }
+                  switch response {
+                  case .granted(let accounts):
+                    Domain.setEthereumPermissions(forUrl: self.getOrigin(), accounts: accounts, grant: true)
+                    completion(accounts, .success, "")
+                  case .rejected:
+                    completion([], .userRejectedRequest, "User rejected request")
+                  }
+                }),
                 onUnlock: {
                     Task { @MainActor in
                         // If the user unlocks their wallet and we already have permissions setup they do not
