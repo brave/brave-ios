@@ -256,6 +256,7 @@ public class CryptoStore: ObservableObject {
     case let .addNetwork(approved, chainId):
       rpcService.addEthereumChainRequestCompleted(chainId, approved: approved)
       pendingWebpageRequest = nil
+      fetchPendingRequests() // after adding a network we should get a switch network request
     case let .addSuggestedToken(approved, contractAddresses):
       walletService.notifyAddSuggestTokenRequestsProcessed(approved, contractAddresses: contractAddresses)
       pendingWebpageRequest = nil
