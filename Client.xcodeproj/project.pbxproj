@@ -967,6 +967,8 @@
 		8CB0FE5427EB570D00707490 /* JSDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5327EB570D00707490 /* JSDataType.swift */; };
 		8CB0FE5627EB596B00707490 /* RandomConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */; };
 		8CB0FE5827EB5F5100707490 /* FarblingProtectionHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */; };
+		8CFEF62427F220E700CF3235 /* ScriptSourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */; };
+		8CFEF62627F2213A00CF3235 /* UserScriptType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFEF62527F2213900CF3235 /* UserScriptType.swift */; };
 		A104E199210A384400D2323E /* ShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104E198210A384400D2323E /* ShieldsViewController.swift */; };
 		A134B88A20DA98BB00A581D0 /* ClientPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134B88920DA98BB00A581D0 /* ClientPreferences.swift */; };
 		A13AC72520EC12360040D4BB /* Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13AC72420EC12360040D4BB /* Migration.swift */; };
@@ -2941,6 +2943,8 @@
 		8CB0FE5327EB570D00707490 /* JSDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSDataType.swift; sourceTree = "<group>"; };
 		8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomConfigurationTests.swift; sourceTree = "<group>"; };
 		8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FarblingProtectionHelperTests.swift; sourceTree = "<group>"; };
+		8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptSourceType.swift; sourceTree = "<group>"; };
+		8CFEF62527F2213900CF3235 /* UserScriptType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserScriptType.swift; sourceTree = "<group>"; };
 		A104E198210A384400D2323E /* ShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsViewController.swift; sourceTree = "<group>"; };
 		A134B88920DA98BB00A581D0 /* ClientPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPreferences.swift; sourceTree = "<group>"; };
 		A13AC72420EC12360040D4BB /* Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migration.swift; sourceTree = "<group>"; };
@@ -5777,6 +5781,8 @@
 				8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */,
 				8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */,
 				8CB0FE5327EB570D00707490 /* JSDataType.swift */,
+				8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */,
+				8CFEF62527F2213900CF3235 /* UserScriptType.swift */,
 			);
 			path = "User Scripts";
 			sourceTree = "<group>";
@@ -8411,6 +8417,7 @@
 				4422D4B921BFFB7600BF1855 /* crc32c.cc in Sources */,
 				0A39FE932486604D00290ABC /* GRDVPNHelper.m in Sources */,
 				592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */,
+				8CFEF62427F220E700CF3235 /* ScriptSourceType.swift in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
 				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
 				27C626CB25BA198700418F40 /* WalletTransferExpiredViewController.swift in Sources */,
@@ -8919,6 +8926,7 @@
 				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,
 				4422D4B421BFFB7600BF1855 /* hash.cc in Sources */,
 				2F1A835A274C35340089A8A9 /* RetentionPreferencesDebugMenuViewController.swift in Sources */,
+				8CFEF62627F2213A00CF3235 /* UserScriptType.swift in Sources */,
 				0A5CBD3823D4905D00362CC8 /* NTPNotificationView.swift in Sources */,
 				27D114D62358FCA400166534 /* SettingsRowViews.swift in Sources */,
 				4422D56621BFFB7F00BF1855 /* tostring.cc in Sources */,
