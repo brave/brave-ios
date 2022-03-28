@@ -4,10 +4,43 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import GameplayKit
 
 /// A class that helps in creating farbling data
 class FarblingProtectionHelper {
+  /// Represents `JSON` data that needs to be passed to `FarblingProtection.js`
+  struct FarblingData: Encodable {
+    /// Represents the `JSON` data that is needed to construct a fake WebKit `Plugin`
+    struct FakePluginData: Encodable {
+      let name: String
+      let filename: String
+      let description: String
+      let mimeTypes: [FakeMimeTypeData]
+    }
+
+    /// Represents the `JSON` data that is needed to construct a fake WebKit `MimeType`
+    struct FakeMimeTypeData: Encodable {
+      let suffixes: String
+      let type: String
+      let description: String
+    }
+
+    /// A value between 0.99 and 1 to fudge audio data
+    ///
+    /// A value between 0.99 to 1 means the values in the destination will
+    /// always be within the expected range of -1 and 1.
+    /// This small decrease should not affect affect legitimite users of this api.
+    /// But will affect fingerprinters by introducing a small random change.
+    let fudgeFactor: Float
+    /// A value representing a fake voice name that will be used to add a fake voice
+    let fakeVoiceName: String
+    /// Fake data that is to be used to construct fake plugins
+    let fakePluginData: [FakePluginData]
+    /// This value is used to get a random index between 0 and an unknown count
+    ///
+    /// It's important to have a value between 0 - 1 in order to be within the array bounds
+    let randomVoiceIndexScale: Float
+  }
+
   /// Variables representing the prefix of a randomly generated strings used as the plugin name
   private static let pluginNameFirstParts: [String?] = [
     "Chrome", "Chromium", "Brave", "Web", "Browser",
@@ -35,56 +68,56 @@ class FarblingProtectionHelper {
     "Cecil", "Reuben", "Sylvester", "Jasper"
   ]
 
-  static func makeFarblingParams(from randomConfiguration: RandomConfiguration) -> JSDataType {
-    let randomSource = GKMersenneTwisterRandomSource(seed: randomConfiguration.seed)
-    let fudgeFactor = JSDataType.number(0.99 + (randomSource.nextUniform() / 100))
-    let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomConfiguration)
-    let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomConfiguration)
-    let randomVoiceIndexScale = JSDataType.number(randomSource.nextUniform())
+  static func makeFarblingParams(from randomConfiguration: RandomConfiguration) throws -> String {
+    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
 
-    return JSDataType.object([
-      "fudgeFactor": fudgeFactor,
-      "fakePluginData": fakePluginData,
-      "fakeVoiceName": fakeVoice,
-      "randomVoiceIndexScale": randomVoiceIndexScale
-    ])
+    let farblingData = FarblingData(
+      fudgeFactor: Float.random(in: 0.99...1, using: &generator),
+      fakeVoiceName: FarblingProtectionHelper.makeFakeVoiceName(from: randomConfiguration),
+      fakePluginData: FarblingProtectionHelper.makeFakePluginData(from: randomConfiguration),
+      randomVoiceIndexScale: Float.random(in: 0...1, using: &generator)
+    )
+
+    let encoder = JSONEncoder()
+    let data = try encoder.encode(farblingData)
+    return String(data: data, encoding: .utf8)!
   }
 
   /// Generate fake plugin data to be injected into the farbling protection script
-  private static func makeFakePluginData(from randomConfiguration: RandomConfiguration) -> JSDataType {
+  private static func makeFakePluginData(from randomConfiguration: RandomConfiguration) -> [FarblingData.FakePluginData] {
     var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
     let pluginCount = Int.random(in: 1...3, using: &generator)
 
     // Generate 1 to 3 fake plugins
-    let fakePlugins = (0..<pluginCount).map { pluginIndex -> JSDataType in
+    let fakePlugins = (0..<pluginCount).map { pluginIndex -> FarblingData.FakePluginData in
       let mimeTypesCount = Int.random(in: 1...3, using: &generator)
 
       // Generate 1 to 3 fake mime types
-      let mimeTypes = (0..<mimeTypesCount).map { mimeTypeIndex -> JSDataType in
-        return .object([
-          "suffixes": .string("pdf"),
-          "type": .string("application/pdf"),
-          "description": .string(randomPluginName(from: &generator))
-        ])
+      let mimeTypes = (0..<mimeTypesCount).map { mimeTypeIndex -> FarblingData.FakeMimeTypeData in
+        return FarblingData.FakeMimeTypeData(
+          suffixes: "pdf",
+          type: "application/pdf",
+          description: randomPluginName(from: &generator)
+        )
       }
 
-      return .object([
-        "name": .string(randomPluginName(from: &generator)),
-        "filename": .string(""),
-        "description": .string(randomPluginName(from: &generator)),
-        "mimeTypes": .array(mimeTypes)
-      ])
+      return FarblingData.FakePluginData(
+        name: randomPluginName(from: &generator),
+        filename: "",
+        description: randomPluginName(from: &generator),
+        mimeTypes: mimeTypes
+      )
     }
 
     // Convert the object into a string and return it
-    return JSDataType.array(fakePlugins)
+    return fakePlugins
   }
 
   /// Generate a fake voice name
-  private static func makeFakeVoiceName(from randomConfiguration: RandomConfiguration) -> JSDataType {
+  private static func makeFakeVoiceName(from randomConfiguration: RandomConfiguration) -> String {
     var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
     let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
-    return JSDataType.string(fakeName)
+    return fakeName
   }
 
   /// Generate a random string using a prefix, middle and suffix where any of those may be empty.

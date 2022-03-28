@@ -17,8 +17,8 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Then
     // Same results
     XCTAssertEqual(
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)),
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration))
+      try FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration),
+      try FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)
     )
   }
 
@@ -32,8 +32,8 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Then
     // Different results
     XCTAssertNotEqual(
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: firstRandomConfiguration)),
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: secondRandomConfiguration))
+      try FarblingProtectionHelper.makeFarblingParams(from: firstRandomConfiguration),
+      try FarblingProtectionHelper.makeFarblingParams(from: secondRandomConfiguration)
     )
   }
 }

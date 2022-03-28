@@ -69,13 +69,14 @@ class ScriptFactory {
     switch domainType {
     case .farblingProtection(let etld):
       let randomConfiguration = RandomConfiguration(etld: etld)
-      let fakeParams = FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)
+      let fakeParams = try FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)
 
       #if DEBUG
       print("[ScriptFactory] eTLD+1: \(etld)")
       print("[ScriptFactory] Seed:   \(randomConfiguration.seed)")
       print("[ScriptFactory] Params: \(fakeParams)")
       #endif
+      
       source = "\(source)\n(\(String(describing: fakeParams)))"
       
     case .nacl:
