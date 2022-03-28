@@ -962,10 +962,10 @@
 		8CB0FDD627E12DA100707490 /* ScriptFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FDD527E12DA100707490 /* ScriptFactoryTests.swift */; };
 		8CB0FDD827E652B700707490 /* nacl.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 8CB0FDD727E652B500707490 /* nacl.min.js */; };
 		8CB0FE4427EA69E200707490 /* FarblingProtectionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */; };
-		8CB0FE5027EB528200707490 /* RandomManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE4F27EB528200707490 /* RandomManager.swift */; };
+		8CB0FE5027EB528200707490 /* RandomConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */; };
 		8CB0FE5227EB56A700707490 /* ARC4RandomNumberGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */; };
 		8CB0FE5427EB570D00707490 /* JSDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5327EB570D00707490 /* JSDataType.swift */; };
-		8CB0FE5627EB596B00707490 /* RandomManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5527EB596B00707490 /* RandomManagerTests.swift */; };
+		8CB0FE5627EB596B00707490 /* RandomConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */; };
 		8CB0FE5827EB5F5100707490 /* FarblingProtectionHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */; };
 		A104E199210A384400D2323E /* ShieldsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104E198210A384400D2323E /* ShieldsViewController.swift */; };
 		A134B88A20DA98BB00A581D0 /* ClientPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A134B88920DA98BB00A581D0 /* ClientPreferences.swift */; };
@@ -2936,10 +2936,10 @@
 		8CB0FDD527E12DA100707490 /* ScriptFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptFactoryTests.swift; sourceTree = "<group>"; };
 		8CB0FDD727E652B500707490 /* nacl.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = nacl.min.js; sourceTree = "<group>"; };
 		8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = FarblingProtectionHelper.swift; sourceTree = "<group>"; tabWidth = 2; };
-		8CB0FE4F27EB528200707490 /* RandomManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomManager.swift; sourceTree = "<group>"; };
+		8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomConfiguration.swift; sourceTree = "<group>"; };
 		8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARC4RandomNumberGenerator.swift; sourceTree = "<group>"; };
 		8CB0FE5327EB570D00707490 /* JSDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSDataType.swift; sourceTree = "<group>"; };
-		8CB0FE5527EB596B00707490 /* RandomManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomManagerTests.swift; sourceTree = "<group>"; };
+		8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomConfigurationTests.swift; sourceTree = "<group>"; };
 		8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FarblingProtectionHelperTests.swift; sourceTree = "<group>"; };
 		A104E198210A384400D2323E /* ShieldsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsViewController.swift; sourceTree = "<group>"; };
 		A134B88920DA98BB00A581D0 /* ClientPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPreferences.swift; sourceTree = "<group>"; };
@@ -5774,7 +5774,7 @@
 				8CB0FDA727DB9D5300707490 /* ScriptFactory.swift */,
 				8CB0FDB927E0EC1B00707490 /* UserScriptHelper.swift */,
 				8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */,
-				8CB0FE4F27EB528200707490 /* RandomManager.swift */,
+				8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */,
 				8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */,
 				8CB0FE5327EB570D00707490 /* JSDataType.swift */,
 			);
@@ -5786,7 +5786,7 @@
 			children = (
 				8CB0FDD327E12D7700707490 /* UserScriptHelperTests.swift */,
 				8CB0FDD527E12DA100707490 /* ScriptFactoryTests.swift */,
-				8CB0FE5527EB596B00707490 /* RandomManagerTests.swift */,
+				8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */,
 				8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */,
 			);
 			path = "User Scripts";
@@ -8724,7 +8724,7 @@
 				2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
 				4422D4B721BFFB7600BF1855 /* filter_policy.cc in Sources */,
-				8CB0FE5027EB528200707490 /* RandomManager.swift in Sources */,
+				8CB0FE5027EB528200707490 /* RandomConfiguration.swift in Sources */,
 				2F12744027DA56C7007EE7B7 /* LoginInfoViewController.swift in Sources */,
 				CA0EE175273C248C00F269DA /* OnboardingPulseAnimationView.swift in Sources */,
 				27036EA325671817004EF6B6 /* FeedCardFooterButton.swift in Sources */,
@@ -8952,7 +8952,7 @@
 				5953AAEF2226E9D800A92DE1 /* HttpCookieExtensionTest.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
 				281B2BEA1ADF4D90002917DC /* MockProfile.swift in Sources */,
-				8CB0FE5627EB596B00707490 /* RandomManagerTests.swift in Sources */,
+				8CB0FE5627EB596B00707490 /* RandomConfigurationTests.swift in Sources */,
 				2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */,
 				27C46201211CD8D20088A441 /* DeferredTestUtils.swift in Sources */,
 				2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */,

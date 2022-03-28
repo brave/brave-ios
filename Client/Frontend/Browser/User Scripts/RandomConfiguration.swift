@@ -11,7 +11,7 @@ import CryptoKit
 /// Constructing this class the same eTLD+1 will result in the same random values
 /// (provided the same `sessionKey` is used)
 /// - Note: Any string can actually be used and this class can be used for more general purpose applications
-class RandomManager {
+class RandomConfiguration {
     /// This is used to encode the domain key (i.e. the eTLD+1).
     ///
     /// For farbling, this key should be the same for the lifecycle of the app. Hence we use a static variable.
@@ -44,7 +44,7 @@ class RandomManager {
     /// If no sessionKey is provided, a shared session key will be used.
     /// The shared session key is lost when the application terminates.
     /// - Note: This is what we want for farbling.
-    init(etld: String, sessionKey: SymmetricKey = RandomManager.sessionKey) {
+    init(etld: String, sessionKey: SymmetricKey = RandomConfiguration.sessionKey) {
         self.etld = etld
         self.sessionKey = sessionKey
     }

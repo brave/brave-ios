@@ -35,11 +35,11 @@ class FarblingProtectionHelper {
     "Cecil", "Reuben", "Sylvester", "Jasper"
   ]
 
-  static func makeFarblingParams(from randomManager: RandomManager) -> JSDataType {
-    let randomSource = GKMersenneTwisterRandomSource(seed: randomManager.seed)
+  static func makeFarblingParams(from randomConfiguration: RandomConfiguration) -> JSDataType {
+    let randomSource = GKMersenneTwisterRandomSource(seed: randomConfiguration.seed)
     let fudgeFactor = JSDataType.number(0.99 + (randomSource.nextUniform() / 100))
-    let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomManager)
-    let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomManager)
+    let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomConfiguration)
+    let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomConfiguration)
     let randomVoiceIndexScale = JSDataType.number(randomSource.nextUniform())
 
     return JSDataType.object([
@@ -51,8 +51,8 @@ class FarblingProtectionHelper {
   }
 
   /// Generate fake plugin data to be injected into the farbling protection script
-  private static func makeFakePluginData(from randomManager: RandomManager) -> JSDataType {
-    var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
+  private static func makeFakePluginData(from randomConfiguration: RandomConfiguration) -> JSDataType {
+    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
     let pluginCount = Int.random(in: 1...3, using: &generator)
 
     // Generate 1 to 3 fake plugins
@@ -81,8 +81,8 @@ class FarblingProtectionHelper {
   }
 
   /// Generate a fake voice name
-  private static func makeFakeVoiceName(from randomManager: RandomManager) -> JSDataType {
-    var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
+  private static func makeFakeVoiceName(from randomConfiguration: RandomConfiguration) -> JSDataType {
+    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
     let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
     return JSDataType.string(fakeName)
   }

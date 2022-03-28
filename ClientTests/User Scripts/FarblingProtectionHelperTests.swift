@@ -12,13 +12,13 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Given
     // Same random manager
     let sessionKey = SymmetricKey(size: .bits256)
-    let randomManager = RandomManager(etld: "example.com", sessionKey: sessionKey)
+    let randomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
 
     // Then
     // Same results
     XCTAssertEqual(
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomManager)),
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomManager))
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)),
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration))
     )
   }
 
@@ -26,14 +26,14 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Given
     // Different random manager
     let sessionKey = SymmetricKey(size: .bits256)
-    let firstRandomManager = RandomManager(etld: "example.com", sessionKey: sessionKey)
-    let secondRandomManager = RandomManager(etld: "brave.com", sessionKey: sessionKey)
+    let firstRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let secondRandomConfiguration = RandomConfiguration(etld: "brave.com", sessionKey: sessionKey)
 
     // Then
     // Different results
     XCTAssertNotEqual(
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: firstRandomManager)),
-      String(describing: FarblingProtectionHelper.makeFarblingParams(from: secondRandomManager))
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: firstRandomConfiguration)),
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: secondRandomConfiguration))
     )
   }
 }

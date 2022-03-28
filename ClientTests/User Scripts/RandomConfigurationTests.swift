@@ -7,13 +7,13 @@ import XCTest
 import CryptoKit
 @testable import Client
 
-class RandomManagerTests: XCTestCase {
+class RandomConfigurationTests: XCTestCase {
   func testSameResultsForSameETLDAndSessionKey() throws {
     // Given
     // Different session keys and same eTLD+1
     let sessionKey = SymmetricKey(size: .bits256)
-    let firstRandomManager = RandomManager(etld: "example.com", sessionKey: sessionKey)
-    let secondRandomManager = RandomManager(etld: "example.com", sessionKey: sessionKey)
+    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let secondRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
 
     // Then
     // Everything should equal
@@ -37,8 +37,8 @@ class RandomManagerTests: XCTestCase {
     // Given
     // Same session keys but different eTLD+1
     let sessionKey = SymmetricKey(size: .bits256)
-    let firstRandomManager = RandomManager(etld: "example.com", sessionKey: sessionKey)
-    let secondRandomManager = RandomManager(etld: "brave.com", sessionKey: sessionKey)
+    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let secondRandomManager = RandomConfiguration(etld: "brave.com", sessionKey: sessionKey)
 
     // Then
     // Nothing should equal
@@ -59,8 +59,8 @@ class RandomManagerTests: XCTestCase {
   func testDifferentResultsForSameETLDAndDifferentSessionKey() throws {
     // Given
     // Different session keys but same eTLD+1
-    let firstRandomManager = RandomManager(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
-    let secondRandomManager = RandomManager(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
+    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
+    let secondRandomManager = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
 
     // Then
     // Nothing should equal
