@@ -17,8 +17,8 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Then
     // Same results
     XCTAssertEqual(
-      FarblingProtectionHelper.makeFakePluginData(from: randomManager),
-      FarblingProtectionHelper.makeFakePluginData(from: randomManager)
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomManager)),
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: randomManager))
     )
   }
 
@@ -32,8 +32,8 @@ class FarblingProtectionHelperTests: XCTestCase {
     // Then
     // Different results
     XCTAssertNotEqual(
-      FarblingProtectionHelper.makeFakePluginData(from: firstRandomManager),
-      FarblingProtectionHelper.makeFakePluginData(from: secondRandomManager)
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: firstRandomManager)),
+      String(describing: FarblingProtectionHelper.makeFarblingParams(from: secondRandomManager))
     )
   }
 }

@@ -16,6 +16,7 @@ import Foundation
 /// ```
 enum JSDataType: CustomStringConvertible {
     case string(String)
+    case number(Float)
     case object([String: JSDataType])
     case array([JSDataType])
 
@@ -41,6 +42,9 @@ enum JSDataType: CustomStringConvertible {
 
         case .string(let value):
             return "\"\(value)\""
+
+        case .number(let value):
+            return "\(value)"
         }
     }
 }

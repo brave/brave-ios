@@ -5,7 +5,6 @@
 
 import Foundation
 import WebKit
-import GameplayKit
 
 /// An error representing failures in loading scripts
 enum ScriptLoadFailure: Error {
@@ -179,33 +178,14 @@ class ScriptFactory {
     switch domainType {
     case .farblingProtection(let etld):
       let randomManager = RandomManager(etld: etld)
-      let seed = randomManager.seed
+      let fakeParams = FarblingProtectionHelper.makeFarblingParams(from: randomManager)
 
-      // From the seed, let's generate a fudge factor between 0.99 and 1
-      // `GKMersenneTwisterRandomSource` gives us a value between 0.0 and 1.0,
-      // so we convert it to a value between 0.99 and 1.
-      // It's important that this value is between 0.99 and 1 (especially less than 1)
-      // As we are multiplying it by values betwen -1 and 1 and if the value is too small
-      // It will manipulate the values too much and make it noticible to the user and if
-      // it is greater than 1 it has the potential to be out of the appropriate range giving us JS errors.
-      let randomSource = GKMersenneTwisterRandomSource(seed: seed)
-      let fudgeFactor = 0.99 + (randomSource.nextUniform() / 100)
-      let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomManager)
-      let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomManager)
-      let randomVoiceIndexScale = randomSource.nextUniform()
-
+      #if DEBUG
       print("[ScriptFactory] eTLD+1: \(etld)")
-      print("[ScriptFactory] Seed:   \(seed)")
-      print("[ScriptFactory] Fudge:  \(fudgeFactor)")
-      print("[ScriptFactory] Voice:  \(fakeVoice)")
-      print("[ScriptFactory] Scale:  \(randomVoiceIndexScale)")
-      print("[ScriptFactory] Plgins: \(fakePluginData)")
-      
-      source = source
-        .replacingOccurrences(of: "$<fudge_factor>", with: "\(fudgeFactor)", options: .literal)
-        .replacingOccurrences(of: "$<fake_plugin_data>", with: "\(fakePluginData)", options: .literal)
-        .replacingOccurrences(of: "$<fake_voice_name>", with: "\(fakeVoice)", options: .literal)
-        .replacingOccurrences(of: "$<random_voice_index_scale>", with: "\(randomVoiceIndexScale)", options: .literal)
+      print("[ScriptFactory] Seed:   \(randomManager.seed)")
+      print("[ScriptFactory] Params: \(fakeParams)")
+      #endif
+      source = "\(source)\n(\(String(describing: fakeParams)))"
       
     case .nacl:
       // No modifications needed

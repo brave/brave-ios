@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import GameplayKit
 
 /// A class that helps in creating farbling data
 class FarblingProtectionHelper {
@@ -34,8 +35,23 @@ class FarblingProtectionHelper {
     "Cecil", "Reuben", "Sylvester", "Jasper"
   ]
 
+  static func makeFarblingParams(from randomManager: RandomManager) -> JSDataType {
+    let randomSource = GKMersenneTwisterRandomSource(seed: randomManager.seed)
+    let fudgeFactor = JSDataType.number(0.99 + (randomSource.nextUniform() / 100))
+    let fakePluginData = FarblingProtectionHelper.makeFakePluginData(from: randomManager)
+    let fakeVoice = FarblingProtectionHelper.makeFakeVoiceName(from: randomManager)
+    let randomVoiceIndexScale = JSDataType.number(randomSource.nextUniform())
+
+    return JSDataType.object([
+      "fudgeFactor": fudgeFactor,
+      "fakePluginData": fakePluginData,
+      "fakeVoiceName": fakeVoice,
+      "randomVoiceIndexScale": randomVoiceIndexScale
+    ])
+  }
+
   /// Generate fake plugin data to be injected into the farbling protection script
-  static func makeFakePluginData(from randomManager: RandomManager) -> String {
+  private static func makeFakePluginData(from randomManager: RandomManager) -> JSDataType {
     var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
     let pluginCount = Int.random(in: 1...3, using: &generator)
 
@@ -61,19 +77,19 @@ class FarblingProtectionHelper {
     }
 
     // Convert the object into a string and return it
-    return String(describing: JSDataType.array(fakePlugins))
+    return JSDataType.array(fakePlugins)
   }
 
   /// Generate a fake voice name
-  static func makeFakeVoiceName(from randomManager: RandomManager) -> String {
+  private static func makeFakeVoiceName(from randomManager: RandomManager) -> JSDataType {
     var generator = ARC4RandomNumberGenerator(seed: randomManager.seed)
     let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
-    return String(describing: JSDataType.string(fakeName))
+    return JSDataType.string(fakeName)
   }
 
   /// Generate a random string using a prefix, middle and suffix where any of those may be empty.
   /// - Note: May result in an empty string.
-  static func randomPluginName<T: RandomNumberGenerator>(from generator: inout T) -> String {
+  private static func randomPluginName<T: RandomNumberGenerator>(from generator: inout T) -> String {
     return [
       pluginNameFirstParts.randomElement(using: &generator) ?? nil,
       pluginNameSecondParts.randomElement(using: &generator) ?? nil,

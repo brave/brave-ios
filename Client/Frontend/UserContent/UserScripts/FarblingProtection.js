@@ -3,18 +3,29 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// In this method we will decrease the weight of the destination value by our fudge factor.
-// Our fudge factor is a random value between 0.99 and 1.
-// This means the values in the destination will always be within the expected range of -1 and 1.
-// This small decrease should not affect affect legitimite users of this api.
-// But will affect fingerprinters by introducing a small random change.
-(function () {
-  const fudgeFactor = $<fudge_factor>
+"use strict";
+
+((params) => {
+  // A value between 0.99 and 1 to fudge the audio data
+  // A value between 0.99 to 1 means the values in the destination will 
+  // always be within the expected range of -1 and 1.
+  // This small decrease should not affect affect legitimite users of this api.
+  // But will affect fingerprinters by introducing a small random change.
+  const fudgeFactor = params['fudgeFactor']
+  // Fake data that is to be used to construct fake plugins
+  const fakePluginData = params['fakePluginData']
+  // A value representing a fake voice name that will be used to add a fake voice
+  const fakeVoiceName = params['fakeVoiceName']
+  // This value is used to get a random index between 0 and voices.length
+  // It's important to have a value between 0 - 1 in order to be within the 
+  // array bounds
+  const randomVoiceIndexScale = params['randomVoiceIndexScale']
+
   const farbledChannels = new WeakMap()
   const braveNacl = window.nacl
   delete window.nacl
 
-  function farbleArrayData (destination) {
+  const farbleArrayData = (destination) => {
     // Let's fudge the data by our fudge factor.
     for (const index in destination) {
       destination[index] = destination[index] * fudgeFactor
@@ -23,7 +34,7 @@
 
   // Convert an unsinged byte (Uint8) to a hex character
   // Unsigned bytes must be between 0 and 255
-  function byteToHex (unsignedByte) {
+  const byteToHex = (unsignedByte) => {
     // convert the possibly signed byte (-128 to 127) to an unsigned byte (0 to 255).
     // if you know, that you only deal with unsigned bytes (Uint8Array), you can omit this line
     // const unsignedByte = byte & 0xff
@@ -40,23 +51,24 @@
   // Convert an array of unsigned bytes (Uint8Array) to a hex string.
   // Each value in the array must be between 0 and 255,
   // resulting in hex values between 0 to f (i.e. 0 to 15)
-  function toHexString (unsignedBytes) {
+  const toHexString = (unsignedBytes) => {
     return Array.from(unsignedBytes)
       .map(byte => byteToHex(byte))
       .join('')
   }
 
   // Hash an array
-  function hashArray (a) {
+  const hashArray = (a) => {
     const byteArray = new Uint8Array(a.buffer)
     const hexArray = braveNacl.hash(byteArray)
     return toHexString(hexArray)
   }
 
   // 1. Farble `getChannelData`
+  // This will also result in a farbled `copyFromChannel`
   const getChannelData = window.AudioBuffer.prototype.getChannelData
   window.AudioBuffer.prototype.getChannelData = function () {
-    const channelData = getChannelData.apply(this, arguments)
+    const channelData = Reflect.apply(getChannelData, this, arguments)
     let hashes = farbledChannels.get(channelData)
 
     // First let's check if we already farbled this set
@@ -64,7 +76,7 @@
       // We had this data set farbled already.
       // Lets see if it changed it's shape since then.
       const hash = hashArray(channelData)
-
+      console.log(hash)
       if (hashes.has(hash)) {
         // We already farbled this version of the channel data
         // Let's not farble it again
@@ -102,11 +114,9 @@
     }
   }
 
-  // An array of fake data that will be used to make fake plugins
-  const fakePluginData = $<fake_plugin_data>
-
+  // 3. Farble plugin data
   // Function that create a fake mime-type based on the given fake data
-  function makeFakeMimeType (fakeData) {
+  const makeFakeMimeType = (fakeData) => {
     return Object.create(window.MimeType.prototype, {
       suffixes: {
         get: function () {
@@ -127,7 +137,7 @@
   }
 
   // Create a fake plugin given the plugin data
-  function makeFakePlugin (pluginData) {
+  const makeFakePlugin = (pluginData) => {
     const newPlugin = Object.create(window.Plugin.prototype, {
       description: {
         get: function () {
@@ -152,8 +162,8 @@
     })
 
     // Create mime-types and link them to the new plugin
-    for (let index = 0; index < pluginData.mimeTypes.length; index++) {
-      const newMimeType = makeFakeMimeType(pluginData.mimeTypes[index])
+    for (const [index, mimeType] of pluginData.mimeTypes.entries()) {
+      const newMimeType = makeFakeMimeType(mimeType)
 
       newPlugin[index] = newMimeType
       newPlugin[newMimeType.type] = newMimeType
@@ -189,8 +199,7 @@
     window.navigator.plugins[newPlugin.name] = newPlugin
   }
 
-  for (let index = 0; index < fakePluginData.length; index++) {
-    const pluginData = fakePluginData[index]
+  for (const [index, pluginData] of fakePluginData.entries()) {
     const newPlugin = makeFakePlugin(pluginData)
     addPluginAtIndex(newPlugin, index)
   }
@@ -212,12 +221,6 @@
   }
 
   // 4. Farble speech synthesizer
-  console.log('Farbling voices')
-  const fakeVoiceName = $<fake_voice_name>
-  // A value representing a random value between 0 and 1.
-  // This value is used to get a random index between 0 and voices.length
-  const randomVoiceScale = $<random_voice_index_scale>
-
   function makeFakeVoiceFromVoice(voice) {
     const voicePrototype = Object.getPrototypeOf(voice)
 
@@ -289,7 +292,7 @@
     const voices = Reflect.apply(getVoices, this, arguments)
 
     if (fakeVoice === undefined) {
-      const randomVoiceIndex = Math.round(randomVoiceScale * voices.length)
+      const randomVoiceIndex = Math.round(randomVoiceIndexScale * voices.length)
       originalVoice = voices[randomVoiceIndex]
       fakeVoice = makeFakeVoiceFromVoice(originalVoice)
 
@@ -301,4 +304,5 @@
     }
     return voices
   }
-})()
+})
+// Attach parameters here as JSON data
