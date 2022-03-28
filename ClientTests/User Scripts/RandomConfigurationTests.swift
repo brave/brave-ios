@@ -12,24 +12,26 @@ class RandomConfigurationTests: XCTestCase {
     // Given
     // Different session keys and same eTLD+1
     let sessionKey = SymmetricKey(size: .bits256)
-    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
-    let secondRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let firstRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let secondRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
 
     // Then
     // Everything should equal
-    XCTAssertEqual(firstRandomManager.seed, secondRandomManager.seed)
-    XCTAssertEqual(firstRandomManager.domainKey, secondRandomManager.domainKey)
+    XCTAssertEqual(
+      firstRandomConfiguration.domainKey,
+      secondRandomConfiguration.domainKey
+    )
 
     XCTAssertEqual(
-      firstRandomManager.domainSignedKey(for: "TEST"),
-      secondRandomManager.domainSignedKey(for: "TEST")
+      firstRandomConfiguration.domainSignedKey(for: "TEST"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST")
     )
 
     // Except
     // When signing different strings
     XCTAssertNotEqual(
-      firstRandomManager.domainSignedKey(for: "TEST1"),
-      secondRandomManager.domainSignedKey(for: "TEST2")
+      firstRandomConfiguration.domainSignedKey(for: "TEST1"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST2")
     )
   }
 
@@ -37,44 +39,58 @@ class RandomConfigurationTests: XCTestCase {
     // Given
     // Same session keys but different eTLD+1
     let sessionKey = SymmetricKey(size: .bits256)
-    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
-    let secondRandomManager = RandomConfiguration(etld: "brave.com", sessionKey: sessionKey)
+    let firstRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: sessionKey)
+    let secondRandomConfiguration = RandomConfiguration(etld: "brave.com", sessionKey: sessionKey)
 
     // Then
     // Nothing should equal
-    XCTAssertNotEqual(firstRandomManager.seed, secondRandomManager.seed)
-    XCTAssertNotEqual(firstRandomManager.domainKey, secondRandomManager.domainKey)
-
     XCTAssertNotEqual(
-      firstRandomManager.domainSignedKey(for: "TEST"),
-      secondRandomManager.domainSignedKey(for: "TEST")
+      firstRandomConfiguration.domainKey,
+      secondRandomConfiguration.domainKey
     )
 
     XCTAssertNotEqual(
-      firstRandomManager.domainSignedKey(for: "TEST1"),
-      secondRandomManager.domainSignedKey(for: "TEST2")
+      firstRandomConfiguration.domainSignedKey(for: "TEST"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST")
+    )
+
+    XCTAssertNotEqual(
+      firstRandomConfiguration.domainSignedKey(for: "TEST1"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST2")
     )
   }
 
   func testDifferentResultsForSameETLDAndDifferentSessionKey() throws {
     // Given
     // Different session keys but same eTLD+1
-    let firstRandomManager = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
-    let secondRandomManager = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
+    let firstRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
+    let secondRandomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
 
     // Then
     // Nothing should equal
-    XCTAssertNotEqual(firstRandomManager.seed, secondRandomManager.seed)
-    XCTAssertNotEqual(firstRandomManager.domainKey, secondRandomManager.domainKey)
-
     XCTAssertNotEqual(
-      firstRandomManager.domainSignedKey(for: "TEST"),
-      secondRandomManager.domainSignedKey(for: "TEST")
+      firstRandomConfiguration.domainKey,
+      secondRandomConfiguration.domainKey
     )
 
     XCTAssertNotEqual(
-      firstRandomManager.domainSignedKey(for: "TEST1"),
-      secondRandomManager.domainSignedKey(for: "TEST2")
+      firstRandomConfiguration.domainSignedKey(for: "TEST"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST")
     )
+
+    XCTAssertNotEqual(
+      firstRandomConfiguration.domainSignedKey(for: "TEST1"),
+      secondRandomConfiguration.domainSignedKey(for: "TEST2")
+    )
+  }
+
+  func testByteSizeOfDomainKeyDataIs256Bytes() throws {
+    // Given
+    // A random configuration
+    let randomConfiguration = RandomConfiguration(etld: "example.com", sessionKey: SymmetricKey(size: .bits256))
+
+    // Then
+    // Nothing should equal
+    XCTAssertNotEqual(randomConfiguration.domainKeyData.getBytes().count, 256)
   }
 }

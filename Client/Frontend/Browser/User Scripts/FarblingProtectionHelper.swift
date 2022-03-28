@@ -69,12 +69,12 @@ class FarblingProtectionHelper {
   ]
 
   static func makeFarblingParams(from randomConfiguration: RandomConfiguration) throws -> String {
-    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
+    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.domainKeyData.getBytes())
 
     let farblingData = FarblingData(
       fudgeFactor: Float.random(in: 0.99...1, using: &generator),
-      fakeVoiceName: FarblingProtectionHelper.makeFakeVoiceName(from: randomConfiguration),
-      fakePluginData: FarblingProtectionHelper.makeFakePluginData(from: randomConfiguration),
+      fakeVoiceName: FarblingProtectionHelper.makeFakeVoiceName(from: &generator),
+      fakePluginData: FarblingProtectionHelper.makeFakePluginData(from: &generator),
       randomVoiceIndexScale: Float.random(in: 0...1, using: &generator)
     )
 
@@ -84,8 +84,7 @@ class FarblingProtectionHelper {
   }
 
   /// Generate fake plugin data to be injected into the farbling protection script
-  private static func makeFakePluginData(from randomConfiguration: RandomConfiguration) -> [FarblingData.FakePluginData] {
-    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
+  private static func makeFakePluginData<T: RandomNumberGenerator>(from generator: inout T) -> [FarblingData.FakePluginData] {
     let pluginCount = Int.random(in: 1...3, using: &generator)
 
     // Generate 1 to 3 fake plugins
@@ -114,8 +113,7 @@ class FarblingProtectionHelper {
   }
 
   /// Generate a fake voice name
-  private static func makeFakeVoiceName(from randomConfiguration: RandomConfiguration) -> String {
-    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.seed)
+  private static func makeFakeVoiceName<T: RandomNumberGenerator>(from generator: inout T) -> String {
     let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
     return fakeName
   }

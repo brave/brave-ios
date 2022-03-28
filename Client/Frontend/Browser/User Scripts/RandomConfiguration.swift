@@ -24,6 +24,8 @@ class RandomConfiguration {
     private let sessionKey: SymmetricKey
 
     /// The 64-character hex domain key for the provided eTLD+1
+    ///
+    /// - Note: A 64 character hex is represented by 256 bits
     private(set) lazy var domainKeyData: Data = {
         let signature = HMAC<SHA256>.authenticationCode(for: Data(etld.utf8), using: sessionKey)
         return Data(signature)
@@ -32,11 +34,6 @@ class RandomConfiguration {
     /// The domain key as a `SymmetricKey`
     private(set) lazy var domainKey: SymmetricKey = {
         return SymmetricKey(data: domainKeyData)
-    }()
-
-    /// The seed value for this domain key. Can be used for RND.
-    private(set) lazy var seed: UInt64 = {
-        return seed(from: self.domainKeyData.hexString)
     }()
 
     /// Initialize this class with an eTLD+1 and a sessionKey.
@@ -53,20 +50,6 @@ class RandomConfiguration {
     func domainSignedKey(for value: String) -> String {
         let signature = HMAC<SHA256>.authenticationCode(for: Data(value.utf8), using: domainKey)
         return Data(signature).hexString
-    }
-
-    /// Hash the string value into a `UInt64` representation to be used as a seed.
-    private func seed(from value: String) -> UInt64 {
-        // First we hash the string to have an `Int` value
-        let hashValue = value.hashValue
-
-        // And then we reinterpret cast it into a UInt64
-        // This works because Int uses 64 bits so their capacities are the same.
-        return withUnsafePointer(to: hashValue) {
-            $0.withMemoryRebound(to: UInt64.self, capacity: 1) {
-                $0.pointee
-            }
-        }
     }
 }
 
