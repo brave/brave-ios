@@ -25,7 +25,7 @@ class RandomConfiguration {
 
     /// The 64-character hex domain key for the provided eTLD+1
     ///
-    /// - Note: A 64 character hex is represented by 256 bits
+    /// - Note: A 64 character hex is represented by 256 bits. This means we can use it directly in our `ARC4RandomNumberGenerator`.
     private(set) lazy var domainKeyData: Data = {
         let signature = HMAC<SHA256>.authenticationCode(for: Data(etld.utf8), using: sessionKey)
         return Data(signature)

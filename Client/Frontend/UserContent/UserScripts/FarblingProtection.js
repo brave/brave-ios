@@ -76,7 +76,7 @@
       // We had this data set farbled already.
       // Lets see if it changed it's shape since then.
       const hash = hashArray(channelData)
-      console.log(hash)
+
       if (hashes.has(hash)) {
         // We already farbled this version of the channel data
         // Let's not farble it again
@@ -188,12 +188,8 @@
   const originalPluginsLength = plugins.length
   const originalItemFunction = plugins.item
 
-  // for (let index = 0; index < originalPluginsLength; index++) {
-  //   originalPlugins.push(plugins.item(index))
-  // }
-
   // Adds a fake plugin for the given index on fakePluginData
-  function addPluginAtIndex (newPlugin, index) {
+  const addPluginAtIndex = (newPlugin, index) => {
     const pluginPosition = originalPluginsLength + index
     window.navigator.plugins[pluginPosition] = newPlugin
     window.navigator.plugins[newPlugin.name] = newPlugin
@@ -221,7 +217,7 @@
   }
 
   // 4. Farble speech synthesizer
-  function makeFakeVoiceFromVoice(voice) {
+  const makeFakeVoiceFromVoice = (voice) => {
     const voicePrototype = Object.getPrototypeOf(voice)
 
     const newVoice = Object.create(voicePrototype, {

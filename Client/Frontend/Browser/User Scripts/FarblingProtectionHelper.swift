@@ -88,7 +88,7 @@ class FarblingProtectionHelper {
     let pluginCount = Int.random(in: 1...3, using: &generator)
 
     // Generate 1 to 3 fake plugins
-    let fakePlugins = (0..<pluginCount).map { pluginIndex -> FarblingData.FakePluginData in
+    return (0..<pluginCount).map { pluginIndex -> FarblingData.FakePluginData in
       let mimeTypesCount = Int.random(in: 1...3, using: &generator)
 
       // Generate 1 to 3 fake mime types
@@ -107,9 +107,6 @@ class FarblingProtectionHelper {
         mimeTypes: mimeTypes
       )
     }
-
-    // Convert the object into a string and return it
-    return fakePlugins
   }
 
   /// Generate a fake voice name
