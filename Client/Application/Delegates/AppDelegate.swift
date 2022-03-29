@@ -17,6 +17,7 @@ import Data
 import StoreKit
 import BraveCore
 import Combine
+import os.log
 
 private let log = LegacyLogger.browserLogger
 
@@ -75,23 +76,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Brave Core Initialization
     BraveCoreMain.setLogHandler { severity, file, line, messageStartIndex, message in
       if !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        let level: XCGLogger.Level = {
+        let level: OSLogType = {
           switch -severity {
           case 0: return .error
           case 1: return .info
           case 2..<7: return .debug
-          default: return .verbose
+          default: return .debug
           }
         }()
-
-        LegacyLogger.braveCoreLogger.logln(
-          level,
-          fileName: file,
-          lineNumber: Int(line),
-          // Only print the actual message content, and drop the final character which is
-          // a new line as it will be handled by logln
-          closure: { message.dropFirst(messageStartIndex).dropLast() }
-        )
+        
+        LegacyLogger.braveCoreLogger.log(level: level, "\(message.dropFirst(messageStartIndex).dropLast())")
       }
       return true
     }

@@ -208,7 +208,7 @@ extension BrowserViewController {
       }
       try confirmations.write(toFile: adsConfirmations.path, atomically: true, encoding: .utf8)
     } catch {
-      log.error("Failed to migrate confirmations.json to ads folder: \(error)")
+      log.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
     }
   }
 

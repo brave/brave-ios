@@ -74,7 +74,7 @@ class RewardsReporting: TabContentScript {
         }
       }
     } catch {
-      log.error("Failed to parse message from rewards reporting JS: \(error)")
+      log.error("Failed to parse message from rewards reporting JS: \(error.localizedDescription)")
     }
   }
 }

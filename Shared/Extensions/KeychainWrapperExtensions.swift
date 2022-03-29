@@ -6,7 +6,7 @@ import Foundation
 import XCGLogger
 import SwiftKeychainWrapper
 
-private let log = LegacyLogger.keychainLogger
+private let log = LegacyLogger.legacyLogger
 
 public extension KeychainWrapper {
   static var sharedAppContainerKeychain: KeychainWrapper {
@@ -21,7 +21,7 @@ public extension KeychainWrapper {
   func ensureStringItemAccessibility(_ accessibility: SwiftKeychainWrapper.KeychainItemAccessibility, forKey key: String) {
     if self.hasValue(forKey: key) {
       if self.accessibilityOfKey(key) != .afterFirstUnlock {
-        log.debug("updating item \(key) with \(accessibility)")
+        log.debug("updating item \(key) with \(String(describing: accessibility))")
 
         guard let value = self.string(forKey: key) else {
           log.error("failed to get item \(key)")
@@ -42,7 +42,7 @@ public extension KeychainWrapper {
   func ensureObjectItemAccessibility(_ accessibility: SwiftKeychainWrapper.KeychainItemAccessibility, forKey key: String) {
     if self.hasValue(forKey: key) {
       if self.accessibilityOfKey(key) != .afterFirstUnlock {
-        log.debug("updating item \(key) with \(accessibility)")
+        log.debug("updating item \(key) with \(String(describing: accessibility))")
 
         guard let value = self.object(forKey: key) else {
           log.error("failed to get item \(key)")

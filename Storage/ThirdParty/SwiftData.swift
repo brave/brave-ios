@@ -37,7 +37,7 @@ import Shared
 import XCGLogger
 
 private let DatabaseBusyTimeout: Int32 = 3 * 1000
-private let log = LegacyLogger.syncLogger
+private let log = LegacyLogger.legacyLogger
 
 public class DBOperationCancelled: MaybeErrorType {
   public var description: String {
@@ -1011,7 +1011,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
     if let error = error {
       // Special case: Write additional info to the database log in the case of a database corruption.
       if error.code == Int(SQLITE_CORRUPT) {
-        writeCorruptionInfoForDBNamed(filename, toLogger: LegacyLogger.corruptLogger)
+        log.error("Corrupt DB detected!")
       }
 
       log.error("SQL Error code: \(error.code), \(error) for SQL \(String(sqlStr.prefix(500))).")
@@ -1062,7 +1062,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
     if let error = error {
       // Special case: Write additional info to the database log in the case of a database corruption.
       if error.code == Int(SQLITE_CORRUPT) {
-        writeCorruptionInfoForDBNamed(filename, toLogger: LegacyLogger.corruptLogger)
+        log.error("Corrupt DB detected!")
       }
       log.error("SQL Error code: \(error.code), \(error) for SQL \(String(sqlStr.prefix(500))).")
       return Cursor<T>(err: error)
@@ -1078,49 +1078,6 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
     }
 
     return FilledSQLiteCursor<T>(statement: statement!, factory: factory)
-  }
-
-  func writeCorruptionInfoForDBNamed(_ dbFilename: String, toLogger logger: XCGLogger) {
-    DispatchQueue.global(qos: DispatchQoS.default.qosClass).sync {
-      guard !SwiftData.corruptionLogsWritten.contains(dbFilename) else { return }
-
-      logger.error("Corrupt DB detected! DB filename: \(dbFilename)")
-
-      let dbFileSize = ("file://\(dbFilename)".asURL)?.allocatedFileSize() ?? 0
-      logger.error("DB file size: \(dbFileSize) bytes")
-
-      logger.error("Integrity check:")
-
-      let args: [Any?]? = nil
-      let messages = self.executeQueryUnsafe("PRAGMA integrity_check", factory: stringFactory, withArgs: args)
-      defer { messages.close() }
-
-      if messages.status == CursorStatus.success {
-        for message in messages {
-          logger.error(message)
-        }
-        logger.error("----")
-      } else {
-        logger.error("Couldn't run integrity check: \(messages.statusMessage).")
-      }
-
-      // Write call stack.
-      logger.error("Call stack: ")
-      for message in Thread.callStackSymbols {
-        logger.error(" >> \(message)")
-      }
-      logger.error("----")
-
-      // Write open file handles.
-      let openDescriptors = FSUtils.openFileDescriptors()
-      logger.error("Open file descriptors: ")
-      for (k, v) in openDescriptors {
-        logger.error("  \(k): \(v)")
-      }
-      logger.error("----")
-
-      SwiftData.corruptionLogsWritten.insert(dbFilename)
-    }
   }
 
   /**
@@ -1169,7 +1126,7 @@ open class ConcreteSQLiteDBConnection: SQLiteDBConnection {
       throw err
     }
 
-    log.verbose("Op in transaction succeeded. Committing.")
+    log.debug("Op in transaction succeeded. Committing.")
 
     do {
       try executeChange("COMMIT")

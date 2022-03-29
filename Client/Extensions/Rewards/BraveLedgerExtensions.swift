@@ -134,21 +134,21 @@ extension BraveLedger {
     client.generateToken { [weak self] (token, error) in
       guard let self = self else { return }
       if let error = error {
-        log.error("Failed to generate DeviceCheck token: \(error)")
+        log.error("Failed to generate DeviceCheck token: \(error.localizedDescription)")
         completion()
         return
       }
       let paymentId = self.paymentId ?? ""
       client.generateEnrollment(paymentId: paymentId, token: token) { registration, error in
         if let error = error {
-          log.error("Failed to enroll in DeviceCheck: \(error)")
+          log.error("Failed to enroll in DeviceCheck: \(error.localizedDescription)")
           completion()
           return
         }
         guard let registration = registration else { return }
         client.registerDevice(enrollment: registration) { error in
           if let error = error {
-            log.error("Failed to register device with mobile attestation server: \(error)")
+            log.error("Failed to register device with mobile attestation server: \(error.localizedDescription)")
             completion()
             return
           }

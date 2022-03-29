@@ -17,7 +17,7 @@ import SwiftKeychainWrapper
 import SwiftyJSON
 #endif
 
-private let log = LegacyLogger.syncLogger
+private let log = LegacyLogger.legacyLogger
 
 public let ProfileRemoteTabsSyncDelay: TimeInterval = 0.1
 
@@ -133,7 +133,7 @@ open class BrowserProfile: Profile {
         // …then remove the directory itself.
         try self.files.remove("")
       } catch {
-        log.info("Cannot clear profile: \(error)")
+        log.info("Cannot clear profile: \(error.localizedDescription)")
       }
     }
 

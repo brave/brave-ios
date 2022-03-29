@@ -77,7 +77,7 @@ struct BraveSyncQRCodeModel: Codable {
     do {
       return try JSONEncoder().encode(self)
     } catch {
-      log.error("Error converting QR Code to JSON: \(error)")
+      log.error("Error converting QR Code to JSON: \(error.localizedDescription)")
     }
     return nil
   }
@@ -94,7 +94,7 @@ struct BraveSyncQRCodeModel: Codable {
       do {
         return try JSONDecoder().decode(Self.self, from: data)
       } catch {
-        log.error("Error converting QR Code to BraveSyncQRCodeModel: \(error)")
+        log.error("Error converting QR Code to BraveSyncQRCodeModel: \(error.localizedDescription)")
       }
     }
     return nil

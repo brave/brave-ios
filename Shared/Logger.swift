@@ -13,54 +13,10 @@ public extension LegacyLogger {
 
   /// Logger used for recording frontend/browser happenings
   static let browserLogger = Logger(subsystem: "com.brave.ios", category: "main")
-
-  /// Logger used for things recorded on BraveRewards framework.
-  static let braveCoreLogger: RollingFileLogger = {
-    let logger = RollingFileLogger(filenameRoot: "bravecore", logDirectoryPath: nil)
-    logger.identifier = "BraveCore"
-    logger.newLogWithDate(
-      Date(),
-      configureDestination: { destination in
-        // Same as debug log, Rewards framework handles function names in message
-        destination.showFunctionName = false
-        destination.showThreadName = false
-      })
-
-    if !AppConstants.buildChannel.isPublic {
-      // For rewards logs we want to show it only using the Apple System Log to make it visible
-      // via console.app
-      logger.destinations.removeAll(where: { ($0 is ConsoleDestination) })
-
-      // Create a destination for the system console log (via NSLog)
-      let systemDestination = AppleSystemLogDestination(identifier: "com.brave.ios.logs")
-
-      systemDestination.outputLevel = .debug
-      systemDestination.showLogIdentifier = true
-      systemDestination.showLevel = true
-
-      // Since we redirect from Rewards framework we don't have function
-      // name's or thread names
-      systemDestination.showFunctionName = false
-      systemDestination.showThreadName = false
-
-      logger.add(destination: systemDestination)
-    }
-
-    return logger
-  }()
+  static let braveCoreLogger = Logger(subsystem: "com.brave.ios", category: "brave-core")
   
-  /// Legacy logger, user browserLogger instead
-  static let syncLogger = RollingFileLogger(filenameRoot: "sync", logDirectoryPath: nil)
-
-  /// Legacy logger, user browserLogger instead
-  static let keychainLogger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: nil)
-
-  /// Legacy logger, user browserLogger instead
-  static let corruptLogger: RollingFileLogger = {
-    let logger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: nil)
-    logger.newLogWithDate(Date())
-    return logger
-  }()
+  /// Logger used in legacy places, in code we inherited from Firefox, should not be used elsewhere.
+  static let legacyLogger = Logger(subsystem: "com.brave.ios", category: "legacy")
   
   static func removeExistingLogs() {
     let fileManager = FileManager.default

@@ -10,7 +10,7 @@ import BraveShared
 import CoreData
 import Shared
 
-private var log = LegacyLogger.syncLogger
+private var log = LegacyLogger.legacyLogger
 
 typealias Credential = (username: String, password: String)
 
