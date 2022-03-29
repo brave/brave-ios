@@ -146,15 +146,6 @@
         }
       },
       {
-        "package": "XCGLogger",
-        "repositoryURL": "https://github.com/DaveWoodCom/XCGLogger",
-        "state": {
-          "branch": null,
-          "revision": "a9c4667b247928a29bdd41be2ec2c8d304215a54",
-          "version": "7.0.1"
-        }
-      },
-      {
         "package": "ZIPFoundation",
         "repositoryURL": "https://github.com/weichsel/ZIPFoundation",
         "state": {

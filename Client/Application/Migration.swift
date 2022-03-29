@@ -179,10 +179,10 @@ class Migration {
       movePlaylistV2Items()
     }
     
-    if !Preferences.Migration.xcloggerFilesRemovalCompleted.value {
+    if !Preferences.Migration.xcgloggerFilesRemovalCompleted.value {
       Log.removeLegacyLogs()
       
-      Preferences.Migration.xcloggerFilesRemovalCompleted.value = true
+      Preferences.Migration.xcgloggerFilesRemovalCompleted.value = true
     }
     
     if Preferences.Migration.coreDataCompleted.value { return }
@@ -225,8 +225,8 @@ fileprivate extension Preferences {
       key: "migration.cd-completed",
       default: Preferences.Migration.completed.value)
     
-    static let xcloggerFilesRemovalCompleted =
-      Option<Bool>(key: "migration.xclogger-file-removal-completed", default: false)
+    static let xcgloggerFilesRemovalCompleted =
+      Option<Bool>(key: "migration.xcglogger-file-removal-completed", default: false)
   }
 
   /// Migrate the users preferences from prior versions of the app (<2.0)
