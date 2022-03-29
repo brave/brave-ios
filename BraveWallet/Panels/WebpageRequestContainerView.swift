@@ -13,12 +13,31 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
-  
+
+  @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
+  var onDismiss: () -> Void
+
   var body: some View {
     UIKitNavigationView {
       Group {
         if let pendingRequest = cryptoStore.pendingWebpageRequest {
-
+          switch pendingRequest {
+          case .addSuggestedToken(let request):
+            AddSuggestedTokenView(
+              token: request.token,
+              networkStore: cryptoStore.networkStore,
+              onApprove: {
+                cryptoStore.handleWebpageRequestResponse(.addSuggestedToken(approved: true, contractAddresses: [request.token.contractAddress]))
+                onDismiss()
+              },
+              onCancel: {
+                cryptoStore.handleWebpageRequestResponse(.addSuggestedToken(approved: false, contractAddresses: [request.token.contractAddress]))
+                onDismiss()
+              }
+            )
+          default:
+            EmptyView()
+          }
         }
       }
       .toolbar {
