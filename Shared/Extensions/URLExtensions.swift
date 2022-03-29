@@ -432,6 +432,18 @@ extension URL {
 
     return siteList.contains(where: domain.contains)
   }
+  
+  // Check if the website is a night mode blocked site
+  public var isNightModeBlockedURL: Bool {
+    guard let domain = self.baseDomain else {
+      return false
+    }
+
+    /// Site domains that should not inject night mode
+    let siteList = ["twitter", "youtube", "amazon"]
+
+    return siteList.contains(where: domain.contains)
+  }
 
   // Check if the website is supporting showing Add To playlist toast
   public var isPlaylistSupportedSiteURL: Bool {

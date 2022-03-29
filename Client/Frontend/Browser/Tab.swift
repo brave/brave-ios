@@ -212,10 +212,12 @@ class Tab: NSObject {
 
   var nightMode: Bool {
     didSet {
-      guard nightMode != oldValue else {
-        return
+      var isNightModeEnabled = false
+      
+      if let fetchedTabURL = fetchedURL, !fetchedTabURL.isNightModeBlockedURL, nightMode {
+        isNightModeEnabled = true
       }
-
+      
       webView?.evaluateSafeJavaScript(
         functionName: "window.__firefox__.NightMode.setEnabled",
         args: [nightMode],
@@ -227,7 +229,7 @@ class Tab: NSObject {
         }
       }
 
-      userScriptManager?.isNightModeEnabled = nightMode
+      userScriptManager?.isNightModeEnabled = isNightModeEnabled
     }
   }
 
@@ -468,6 +470,24 @@ class Tab: NSObject {
 
   var canGoForward: Bool {
     return webView?.canGoForward ?? false
+  }
+  
+  var fetchedURL: URL? {
+    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+      if let url = url, url.isWebPage() {
+        return url
+      }
+    } else {
+      if let tabID = id {
+        let fetchedTab = TabMO.get(fromId: tabID)
+        
+        if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage() {
+          return url
+        }
+      }
+    }
+    
+    return nil
   }
 
   func goBack() {
