@@ -75,28 +75,13 @@ extension BrowserViewController: BraveWalletDelegate {
 }
 
 extension BrowserViewController: BraveWalletProviderDelegate {
-  private func filterAccounts(
-    _ accounts: [String],
-    selectedAccount: String?
-  ) -> [String] {
-    if let selectedAccount = selectedAccount, accounts.contains(selectedAccount) {
-      return [selectedAccount]
-    }
-    return accounts
-  }
-
-  private var selectedTabOrigin: URL? {
-    guard let tab = tabManager.selectedTab, let origin = tab.url?.origin else { return nil }
-    return URL(string: origin)
-  }
-
   func showPanel() {
     // TODO: Show ad-like notification prompt before calling `presentWalletPanel`
     presentWalletPanel()
   }
 
   func getOrigin() -> URL {
-    guard let origin = selectedTabOrigin else {
+    guard let origin = tabManager.selectedTab?.url?.origin?.asURL else {
       assert(false, "We should have a valid origin to get to this point")
       return NSURL() as URL // We can't make an "empty" URL like you can with NSURL
     }
@@ -151,25 +136,11 @@ extension BrowserViewController: BraveWalletProviderDelegate {
   }
 
   func allowedAccounts(_ includeAccountsWhenLocked: Bool) async -> ([String], BraveWallet.ProviderError, String) {
-    // This method is called immediately upon creation of the wallet provider, which happens at tab
-    // configuration, which means it may not be selected or ready yet.
-    guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
-          selectedTabOrigin != nil else {
+    guard let selectedTab = tabManager.selectedTab else {
       return ([], .internalError, "Internal error")
     }
     updateURLBarWalletButton()
-    let origin = getOrigin()
-    let isLocked = await keyringService.isLocked()
-    if !includeAccountsWhenLocked && isLocked {
-      return ([], .success, "")
-    }
-    let selectedAccount = await keyringService.selectedAccount(.eth)
-    let permissions = Domain.ethereumPermissions(forUrl: origin)
-    return (
-      filterAccounts(permissions ?? [], selectedAccount: selectedAccount),
-      .success,
-      ""
-    )
+    return await selectedTab.allowedAccounts(includeAccountsWhenLocked)
   }
 
   func updateURLBarWalletButton() {
@@ -203,9 +174,50 @@ extension Tab: BraveWalletEventsListener {
     )
     updateEthereumProperties()
   }
+
+  @MainActor func allowedAccounts(_ includeAccountsWhenLocked: Bool) async -> ([String], BraveWallet.ProviderError, String) {
+    func filterAccounts(
+      _ accounts: [String],
+      selectedAccount: String?
+    ) -> [String] {
+      if let selectedAccount = selectedAccount, accounts.contains(selectedAccount) {
+        return [selectedAccount]
+      }
+      return accounts
+    }
+    // This method is called immediately upon creation of the wallet provider, which happens at tab
+    // configuration, which means it may not be selected or ready yet.
+    guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
+          let origin = url?.origin?.asURL else {
+      return ([], .internalError, "Internal error")
+    }
+    let isLocked = await keyringService.isLocked()
+    if !includeAccountsWhenLocked && isLocked {
+      return ([], .success, "")
+    }
+    let selectedAccount = await keyringService.selectedAccount(.eth)
+    let permissions = Domain.ethereumPermissions(forUrl: origin)
+    return (
+      filterAccounts(permissions ?? [], selectedAccount: selectedAccount),
+      .success,
+      ""
+    )
+  }
   
   func updateEthereumProperties() {
     Task { @MainActor in
+      /// Turn an optional value into a string (or quoted string in case of the value being a string) or
+      /// return `undefined`
+      func valueOrUndefined<T>(_ value: T?) -> String {
+        switch value {
+        case .some(let string as String):
+          return "\"\(string)\""
+        case .some(let value):
+          return "\(value)"
+        case .none:
+          return "undefined"
+        }
+      }
       guard let webView = webView, let provider = walletProvider else {
         return
       }
@@ -216,23 +228,20 @@ extension Tab: BraveWalletEventsListener {
         asFunction: false,
         completion: nil
       )
-      if let networkVersion = Int(chainId.removingHexPrefix, radix: 16) {
-        webView.evaluateSafeJavaScript(
-          functionName: "window.ethereum.networkVersion = \(networkVersion)",
-          contentWorld: .page,
-          asFunction: false,
-          completion: nil
-        )
-      }
-//      let (accounts, _, _) = await provider.allowedAccounts(false)
-//      if let account = accounts.first {
-//        webView.evaluateSafeJavaScript(
-//          functionName: "window.ethereum.selectedAccount = \"\(account)\"",
-//          contentWorld: .page,
-//          asFunction: false,
-//          completion: nil
-//        )
-//      }
+      let networkVersion = valueOrUndefined(Int(chainId.removingHexPrefix, radix: 16))
+      webView.evaluateSafeJavaScript(
+        functionName: "window.ethereum.networkVersion = \(networkVersion)",
+        contentWorld: .page,
+        asFunction: false,
+        completion: nil
+      )
+      let selectedAccount = valueOrUndefined(await allowedAccounts(false).0)
+      webView.evaluateSafeJavaScript(
+        functionName: "window.ethereum.selectedAccount = \(selectedAccount)",
+        contentWorld: .page,
+        asFunction: false,
+        completion: nil
+      )
     }
   }
 }
