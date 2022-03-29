@@ -180,7 +180,13 @@ class Migration {
     if !Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value {
       movePlaylistV2Items()
     }
-
+    
+    if !Preferences.Migration.xcloggerFilesRemovalCompleted.value {
+      Logger.removeExistingLogs()
+      
+      Preferences.Migration.xcloggerFilesRemovalCompleted.value = true
+    }
+    
     if Preferences.Migration.coreDataCompleted.value { return }
 
     // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
@@ -220,6 +226,9 @@ fileprivate extension Preferences {
     static let coreDataCompleted = Option<Bool>(
       key: "migration.cd-completed",
       default: Preferences.Migration.completed.value)
+    
+    static let xcloggerFilesRemovalCompleted =
+      Option<Bool>(key: "migration.xclogger-file-removal-completed", default: false)
   }
 
   /// Migrate the users preferences from prior versions of the app (<2.0)

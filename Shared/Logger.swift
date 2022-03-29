@@ -9,13 +9,9 @@ public struct Logger {}
 
 // MARK: - Singleton Logger Instances
 public extension Logger {
-  static let logPII = false
-
-  /// Logger used for recording happenings with Sync, Accounts, Providers, Storage, and Profiles
-  static let syncLogger = RollingFileLogger(filenameRoot: "sync", logDirectoryPath: Logger.logFileDirectoryPath())
 
   /// Logger used for recording frontend/browser happenings
-  static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: Logger.logFileDirectoryPath())
+  static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: nil)
 
   /// Logger used for things recorded on BraveRewards framework.
   static let braveCoreLogger: RollingFileLogger = {
@@ -51,82 +47,37 @@ public extension Logger {
 
     return logger
   }()
+  
+  /// Legacy logger, user browserLogger instead
+  static let syncLogger = RollingFileLogger(filenameRoot: "sync", logDirectoryPath: nil)
 
-  static let braveSyncLogger = RollingFileLogger(filenameRoot: "bravesync", logDirectoryPath: Logger.logFileDirectoryPath())
+  /// Legacy logger, user browserLogger instead
+  static let keychainLogger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: nil)
 
-  /// Logger used for recording interactions with the keychain
-  static let keychainLogger: XCGLogger = Logger.fileLoggerWithName("keychain")
-
-  /// Logger used for logging database errors such as corruption
+  /// Legacy logger, user browserLogger instead
   static let corruptLogger: RollingFileLogger = {
-    let logger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: Logger.logFileDirectoryPath())
+    let logger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: nil)
     logger.newLogWithDate(Date())
     return logger
   }()
+  
+  static func removeExistingLogs() {
+    let fileManager = FileManager.default
+    
+    guard let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+      return
+    }
+    
+    let logDir = cacheDir.appendingPathComponent("Logs")
 
-  /**
-    Return the log file directory path. If the directory doesn't exist, make sure it exist first before returning the path.
-
-    :returns: Directory path where log files are stored
-    */
-  static func logFileDirectoryPath() -> String? {
-    if let cacheDir = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first {
-      let logDir = "\(cacheDir)/Logs"
-      if !FileManager.default.fileExists(atPath: logDir) {
-        do {
-          try FileManager.default.createDirectory(atPath: logDir, withIntermediateDirectories: false, attributes: nil)
-          return logDir
-        } catch _ as NSError {
-          return nil
-        }
-      } else {
-        return logDir
-      }
+    if !fileManager.fileExists(atPath: logDir.path) {
+      return
     }
 
-    return nil
-  }
-
-  static private func fileLoggerWithName(_ name: String) -> XCGLogger {
-    let log = XCGLogger()
-    if let logFileURL = urlForLogNamed(name) {
-      let fileDestination = FileDestination(
-        owner: log,
-        writeToFile: logFileURL.absoluteString,
-        identifier: "com.mozilla.firefox.filelogger.\(name)"
-      )
-      log.add(destination: fileDestination)
-    }
-    return log
-  }
-
-  static private func urlForLogNamed(_ name: String) -> URL? {
-    guard let logDir = Logger.logFileDirectoryPath() else {
-      return nil
-    }
-
-    return URL(string: "\(logDir)/\(name).log")
-  }
-
-  /**
-     Grabs all of the configured logs that write to disk and returns them in NSData format along with their
-     associated filename.
-
-     - returns: Tuples of filenames to each file's contexts in a NSData object
-     */
-  static func diskLogFilenamesAndData() throws -> [(String, Data?)] {
-    var filenamesAndURLs = [(String, URL)]()
-    filenamesAndURLs.append(("browser", urlForLogNamed("browser")!))
-    filenamesAndURLs.append(("keychain", urlForLogNamed("keychain")!))
-
-    // Grab all sync log files
     do {
-      filenamesAndURLs += try syncLogger.logFilenamesAndURLs()
-      filenamesAndURLs += try corruptLogger.logFilenamesAndURLs()
-      filenamesAndURLs += try browserLogger.logFilenamesAndURLs()
-    } catch _ {
+      try fileManager.removeItem(at: logDir)
+    } catch {
+      browserLogger.error(error)
     }
-
-    return filenamesAndURLs.map { ($0, try? Data(contentsOf: URL(fileURLWithPath: $1.absoluteString))) }
   }
 }

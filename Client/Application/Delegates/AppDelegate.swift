@@ -139,11 +139,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     SDImageCodersManager.shared.addCoder(PrivateCDNImageCoder())
 
-    let logDate = Date()
-    // Create a new sync log file on cold app launch. Note that this doesn't roll old logs.
-    Logger.syncLogger.newLogWithDate(logDate)
-    Logger.browserLogger.newLogWithDate(logDate)
-
     // Setup Profile
     let profile = BrowserProfile(localName: "profile")
 
@@ -245,13 +240,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if Preferences.Rewards.isUsingBAP.value == nil {
       Preferences.Rewards.isUsingBAP.value = Locale.current.regionCode == "JP"
     }
-
-    // Now roll logs.
-    DispatchQueue.global(qos: DispatchQoS.background.qosClass).async {
-      Logger.syncLogger.deleteOldLogsDownToSizeLimit()
-      Logger.browserLogger.deleteOldLogsDownToSizeLimit()
-    }
-
+    
     // If a shortcut was launched, display its information and take the appropriate action
     if let shortcutItem = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
 
