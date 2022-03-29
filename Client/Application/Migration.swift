@@ -9,7 +9,7 @@ import SwiftKeychainWrapper
 import Data
 import BraveCore
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class Migration {
 
@@ -182,7 +182,7 @@ class Migration {
     }
     
     if !Preferences.Migration.xcloggerFilesRemovalCompleted.value {
-      LegacyLogger.removeExistingLogs()
+      Log.removeLegacyLogs()
       
       Preferences.Migration.xcloggerFilesRemovalCompleted.value = true
     }

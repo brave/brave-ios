@@ -10,7 +10,7 @@ import AVFoundation
 import Shared
 import Data
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class PlaylistPlayerStatusObserver: NSObject {
   private weak var player: AVPlayer?

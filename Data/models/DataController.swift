@@ -3,10 +3,9 @@
 import UIKit
 import CoreData
 import Shared
-import XCGLogger
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// A helper structure for `DataController.perform()` method
 /// to decide whether a new or existing context should be used

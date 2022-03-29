@@ -6,12 +6,11 @@ import Foundation
 import Shared
 import BraveShared
 import Storage
-import XCGLogger
 import WebKit
 import SwiftyJSON
 import BraveCore
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class LoginsHelper: TabContentScript {
   private weak var tab: Tab?

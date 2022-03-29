@@ -11,7 +11,7 @@ import SDWebImage
 import Shared
 import Data
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 public class PlaylistThumbnailRenderer {
   private let timeout: TimeInterval = 3

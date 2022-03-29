@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import Storage
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class Authenticator {
   fileprivate static let maxAuthenticationAttempts = 3

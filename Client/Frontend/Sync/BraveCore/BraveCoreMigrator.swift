@@ -11,7 +11,7 @@ import Data
 import CoreData
 import Storage
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class BraveCoreMigrator {
 

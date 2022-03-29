@@ -3,22 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
-import XCGLogger
 import os.log
 
-public struct LegacyLogger {}
+//public let log = Log.main
+
+public struct Log {}
 
 // MARK: - Singleton Logger Instances
-public extension LegacyLogger {
+public extension Log {
+  
+  static let braveCore = Logger(subsystem: "com.brave.ios", category: "brave-core")
 
-  /// Logger used for recording frontend/browser happenings
-  static let browserLogger = Logger(subsystem: "com.brave.ios", category: "main")
-  static let braveCoreLogger = Logger(subsystem: "com.brave.ios", category: "brave-core")
+  static let main = Logger(subsystem: "com.brave.ios", category: "main")
   
   /// Logger used in legacy places, in code we inherited from Firefox, should not be used elsewhere.
-  static let legacyLogger = Logger(subsystem: "com.brave.ios", category: "legacy")
+  static let legacy = Logger(subsystem: "com.brave.ios", category: "legacy")
   
-  static func removeExistingLogs() {
+  static func removeLegacyLogs() {
     let fileManager = FileManager.default
     
     guard let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
@@ -35,7 +36,7 @@ public extension LegacyLogger {
       try fileManager.removeItem(at: logDir)
     } catch {
       
-      browserLogger.error("\(error.localizedDescription, privacy: .public)")
+      Log.main.error("\(error.localizedDescription, privacy: .public)")
     }
   }
 }

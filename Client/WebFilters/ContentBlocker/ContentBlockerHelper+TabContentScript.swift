@@ -7,8 +7,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = LegacyLogger.braveCoreLogger
-
 extension ContentBlockerHelper: TabContentScript {
   class func name() -> String {
     return "TrackingProtectionStats"
@@ -30,7 +28,7 @@ extension ContentBlockerHelper: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.braveCore.debug("Missing required security token.")
       return
     }
 

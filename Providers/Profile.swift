@@ -9,15 +9,12 @@
 // increased startup times which may lead to termination by the OS.
 import Shared
 import Storage
-import XCGLogger
 import SwiftKeychainWrapper
 
 // Import these dependencies ONLY for the main `Client` application target.
 #if MOZ_TARGET_CLIENT
 import SwiftyJSON
 #endif
-
-private let log = LegacyLogger.legacyLogger
 
 public let ProfileRemoteTabsSyncDelay: TimeInterval = 0.1
 
@@ -35,7 +32,7 @@ class ProfileFileAccessor: FileAccessor {
     if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: sharedContainerIdentifier) {
       rootPath = url.path
     } else {
-      log.error("Unable to find the shared container. Defaulting profile location to ~/Library/Application Support/ instead.")
+      Log.legacy.error("Unable to find the shared container. Defaulting profile location to ~/Library/Application Support/ instead.")
       rootPath =
         (NSSearchPathForDirectoriesInDomains(
           .applicationSupportDirectory,
@@ -121,7 +118,7 @@ open class BrowserProfile: Profile {
      * and initialize the logins.db.
      */
   init(localName: String, clear: Bool = false) {
-    log.debug("Initing profile \(localName) on thread \(Thread.current).")
+    Log.legacy.debug("Initing profile \(localName) on thread \(Thread.current).")
     self.name = localName
     self.files = ProfileFileAccessor(localName: localName)
     self.keychain = KeychainWrapper.sharedAppContainerKeychain
@@ -133,7 +130,7 @@ open class BrowserProfile: Profile {
         // …then remove the directory itself.
         try self.files.remove("")
       } catch {
-        log.info("Cannot clear profile: \(error.localizedDescription)")
+        Log.legacy.info("Cannot clear profile: \(error.localizedDescription)")
       }
     }
 
@@ -145,7 +142,7 @@ open class BrowserProfile: Profile {
     self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
 
     if isNewProfile {
-      log.info("New profile. Removing old account metadata.")
+      Log.legacy.info("New profile. Removing old account metadata.")
       prefs.clearAll()
     }
 
@@ -156,21 +153,21 @@ open class BrowserProfile: Profile {
   }
 
   func reopen() {
-    log.debug("Reopening profile.")
+    Log.legacy.debug("Reopening profile.")
     isShutdown = false
 
     loginsDB.reopenIfClosed()
   }
 
   func shutdown() {
-    log.debug("Shutting down profile.")
+    Log.legacy.debug("Shutting down profile.")
     isShutdown = true
 
     loginsDB.forceClose()
   }
 
   deinit {
-    log.debug("Deiniting profile \(self.localName()).")
+    Log.legacy.debug("Deiniting profile \(self.localName()).")
   }
 
   func localName() -> String {

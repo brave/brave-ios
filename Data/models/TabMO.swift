@@ -5,7 +5,6 @@ import CoreData
 import Foundation
 import Shared
 import WebKit
-import XCGLogger
 
 /// Properties we want to extract from Tab/TabManager and save in TabMO
 public struct SavedTab {
@@ -38,7 +37,7 @@ public struct SavedTab {
   }
 }
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 public final class TabMO: NSManagedObject, CRUD {
 

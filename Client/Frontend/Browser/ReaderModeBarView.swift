@@ -5,9 +5,8 @@
 import UIKit
 import SnapKit
 import Shared
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 protocol ReaderModeBarViewDelegate: AnyObject {
   func readerModeSettingsTapped(_ view: UIView)

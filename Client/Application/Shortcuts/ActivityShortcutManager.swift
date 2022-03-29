@@ -10,7 +10,7 @@ import Intents
 import CoreSpotlight
 import MobileCoreServices
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// Shortcut Activity Types and detailed information to create and perform actions
 enum ActivityType: String {

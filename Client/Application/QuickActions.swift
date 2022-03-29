@@ -4,9 +4,7 @@
 
 import Foundation
 import Storage
-
 import Shared
-import XCGLogger
 
 enum ShortcutType: String {
   case newTab = "NewTab"
@@ -30,7 +28,7 @@ protocol QuickActionHandlerDelegate {
 
 class QuickActions: NSObject {
 
-  fileprivate let log = LegacyLogger.browserLogger
+  fileprivate let log = Log.main
 
   static let quickActionsVersion = "1.0"
   static let quickActionsVersionKey = "dynamicQuickActionsVersion"

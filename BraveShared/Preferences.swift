@@ -266,7 +266,7 @@ extension Preferences {
       }
       userDefaults?.removeObject(forKey: profileKey)
     } else {
-      LegacyLogger.browserLogger.info("Could not migrate legacy pref with key: \"\(profileKey)\".")
+      Log.main.info("Could not migrate legacy pref with key: \"\(profileKey)\".")
     }
   }
 

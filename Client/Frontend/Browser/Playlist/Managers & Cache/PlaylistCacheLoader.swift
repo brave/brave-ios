@@ -12,7 +12,7 @@ import Shared
 import BraveShared
 import Storage
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // IANA List of Audio types: https://www.iana.org/assignments/media-types/media-types.xhtml#audio
 // IANA List of Video types: https://www.iana.org/assignments/media-types/media-types.xhtml#video

@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class LocalRequestHelper: TabContentScript {
   func scriptMessageHandlerName() -> String? {

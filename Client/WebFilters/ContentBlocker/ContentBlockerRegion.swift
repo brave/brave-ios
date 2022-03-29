@@ -7,7 +7,7 @@ import Shared
 import Data
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class ContentBlockerRegion: BlocklistName {
   /// Static content blocker stores rule lists for regional ad blocking.

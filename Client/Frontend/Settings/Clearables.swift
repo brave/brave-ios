@@ -9,7 +9,7 @@ import BraveShared
 import WebKit
 import BraveCore
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // A base protocol for something that can be cleared.
 protocol Clearable {

@@ -10,7 +10,7 @@ import Storage
 import Data
 import BraveCore
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class LoginListViewController: LoginAuthViewController {
 

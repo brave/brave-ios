@@ -5,7 +5,7 @@
 import Foundation
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// A javascript file stored in app's Bundle.
 /// The file does not need to be statically copied into the app.

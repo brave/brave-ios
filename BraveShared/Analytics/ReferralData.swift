@@ -4,7 +4,7 @@ import Foundation
 import Shared
 import SwiftyJSON
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 struct ReferralData {
 

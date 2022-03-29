@@ -9,7 +9,7 @@ import Data
 import BraveShared
 import CoreServices
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
 

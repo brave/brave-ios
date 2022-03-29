@@ -7,7 +7,7 @@ import AVFoundation
 import SnapKit
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private struct QRCodeViewControllerUX {
   static let maskViewBackgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)

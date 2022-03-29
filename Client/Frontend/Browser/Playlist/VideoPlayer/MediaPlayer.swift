@@ -10,7 +10,7 @@ import Combine
 import MediaPlayer
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 enum MediaPlaybackError: Error {
   case cancelled

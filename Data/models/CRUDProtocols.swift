@@ -5,9 +5,8 @@
 import Foundation
 import CoreData
 import Shared
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // TODO: Creatable, Updateable. Those are not needed at the moment.
 typealias CRUD = Readable & Deletable

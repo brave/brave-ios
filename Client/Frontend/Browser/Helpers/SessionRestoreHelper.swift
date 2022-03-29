@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 protocol SessionRestoreHelperDelegate: AnyObject {
   func sessionRestoreHelper(_ helper: SessionRestoreHelper, didRestoreSessionForTab tab: Tab)

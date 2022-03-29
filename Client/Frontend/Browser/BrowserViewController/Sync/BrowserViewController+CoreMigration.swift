@@ -8,9 +8,8 @@ import BraveShared
 import Storage
 import UIKit
 import WebKit
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // MARK: - Core Migration Browser Extension
 

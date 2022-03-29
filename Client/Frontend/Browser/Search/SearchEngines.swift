@@ -6,9 +6,8 @@ import Foundation
 import Shared
 import BraveShared
 import Storage
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private let customSearchEnginesFileName = "customEngines.plist"
 

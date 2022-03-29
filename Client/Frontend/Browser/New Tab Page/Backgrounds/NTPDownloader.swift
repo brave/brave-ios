@@ -7,7 +7,7 @@ import Shared
 import BraveShared
 import BraveCore
 
-private let logger = LegacyLogger.browserLogger
+private let logger = Log.main
 
 protocol NTPDownloaderDelegate: AnyObject {
   func onSponsorUpdated(sponsor: NTPSponsor?)

@@ -4,7 +4,7 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class AdBlockStats: LocalAdblockResourceProtocol {
   static let shared = AdBlockStats()

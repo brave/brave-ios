@@ -5,10 +5,9 @@
 import Foundation
 import Shared
 import Storage
-import XCGLogger
 import WebKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class MetadataParserHelper: TabEventHandler {
   private var tabObservers: TabObservers!

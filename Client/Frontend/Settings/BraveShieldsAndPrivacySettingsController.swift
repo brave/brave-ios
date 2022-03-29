@@ -10,7 +10,7 @@ import BraveShared
 import BraveCore
 import class SwiftUI.UIHostingController
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class BraveShieldsAndPrivacySettingsController: TableViewController {
   let profile: Profile

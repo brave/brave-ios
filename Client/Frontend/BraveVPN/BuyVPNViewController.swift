@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import StoreKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class BuyVPNViewController: UIViewController {
 

@@ -4,7 +4,7 @@
 
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class HttpsEverywhereStats: LocalAdblockResourceProtocol {
   static let shared = HttpsEverywhereStats()

@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import Data
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class SafeBrowsing {
   static func isSafeBrowsingEnabledForURL(_ url: URL) -> Bool {

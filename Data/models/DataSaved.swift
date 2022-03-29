@@ -7,7 +7,7 @@ import Foundation
 import CoreData
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 public final class DataSaved: NSManagedObject, CRUD {
   @NSManaged public var savedUrl: String

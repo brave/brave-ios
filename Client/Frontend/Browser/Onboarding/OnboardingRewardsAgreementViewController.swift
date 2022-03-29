@@ -8,7 +8,7 @@ import BraveShared
 import BraveCore
 import Lottie
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 enum OnboardingRewardsState {
   case skipped

@@ -9,7 +9,6 @@ import WebKit
 import Shared
 import Storage
 import SnapKit
-import XCGLogger
 import MobileCoreServices
 import SwiftyJSON
 import Data
@@ -25,7 +24,7 @@ import FeedKit
 import SwiftUI
 import class Combine.AnyCancellable
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,

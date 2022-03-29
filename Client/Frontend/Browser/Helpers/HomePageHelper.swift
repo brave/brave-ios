@@ -4,9 +4,8 @@
 
 import Foundation
 import Shared
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 struct HomePageConstants {
   static let homePageURLPrefKey = "HomePageURLPref"

@@ -8,7 +8,7 @@ import UIKit
 import CarPlay
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class CarplayTemplateApplicationSceneDelegate: NSObject {
   private static let configurationName = "CPTemplateSceneConfiguration"

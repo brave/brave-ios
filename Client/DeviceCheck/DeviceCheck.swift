@@ -8,7 +8,7 @@ import BraveCore
 import BraveShared
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// A structure used to register a device for Brave's DeviceCheck enrollment
 public struct DeviceCheckRegistration: Codable {

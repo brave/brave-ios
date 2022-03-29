@@ -10,7 +10,7 @@ import Data
 import BraveShared
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 enum PlaylistItemAddedState {
   case none

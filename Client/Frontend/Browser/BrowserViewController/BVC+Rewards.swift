@@ -9,10 +9,7 @@ import Shared
 import BraveShared
 import BraveUI
 import Storage
-import XCGLogger
 import WebKit
-
-private let log = LegacyLogger.braveCoreLogger
 
 extension BrowserViewController {
   func updateRewardsButtonState() {
@@ -135,7 +132,7 @@ extension BrowserViewController {
     ledger.pendingPromotions.forEach { promo in
       if promo.status == .active {
         ledger.claimPromotion(promo) { success in
-          log.info("[BraveRewards] Auto-Claim Promotion - \(success) for \(promo.approximateValue)")
+          Log.braveCore.info("[BraveRewards] Auto-Claim Promotion - \(success) for \(promo.approximateValue)")
         }
       }
     }
@@ -203,12 +200,12 @@ extension BrowserViewController {
     do {
       let contents = NSDictionary(contentsOfFile: ledgerStateContainer.path)
       guard let confirmations = contents?["confirmations.json"] as? String else {
-        log.debug("No confirmations found to migrate in ledger's state container")
+        Log.braveCore.debug("No confirmations found to migrate in ledger's state container")
         return
       }
       try confirmations.write(toFile: adsConfirmations.path, atomically: true, encoding: .utf8)
     } catch {
-      log.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
+      Log.braveCore.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
     }
   }
 
@@ -308,7 +305,7 @@ extension Tab {
     group.notify(queue: .main) {
       let faviconURL = URL(string: self.displayFavicon?.url ?? "")
       if faviconURL == nil {
-        log.warning("No favicon found in \(self) to report to rewards panel")
+        Log.braveCore.warning("No favicon found in \(self) to report to rewards panel")
       }
       rewards.reportLoadedPage(
         url: url, redirectionURLs: urls.isEmpty ? [url] : urls,

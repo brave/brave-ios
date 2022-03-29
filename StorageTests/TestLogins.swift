@@ -5,11 +5,10 @@
 import Foundation
 import Shared
 @testable import Storage
-import XCGLogger
 
 import XCTest
 
-private let log = XCGLogger.default
+private let log = Log.legacy
 
 class TestSQLiteLogins: XCTestCase {
   var db: BrowserDB!
@@ -31,7 +30,7 @@ class TestSQLiteLogins: XCTestCase {
   }
 
   func testAddLogin() {
-    log.debug("Created \(self.login)")
+    log.debug("Created login")
     let expectation = self.expectation(description: "Add login")
 
     addLogin(login)
@@ -266,12 +265,12 @@ class TestSQLiteLogins: XCTestCase {
 
   // Note: These functions are all curried so that we pass arguments, but still chain them below
   func addLogin(_ login: LoginData) -> Success {
-    log.debug("Add \(login)")
+    log.debug("Add login")
     return logins.addLogin(login)
   }
 
   func updateLogin(_ login: LoginData) -> Success {
-    log.debug("Update \(login)")
+    log.debug("Update login")
     return logins.updateLoginByGUID(login.guid, new: login, significant: true)
   }
 
@@ -316,7 +315,7 @@ class TestSQLiteLogins: XCTestCase {
     */
 
   func removeLogin(_ login: LoginData) -> Success {
-    log.debug("Remove \(login)")
+    log.debug("Remove login")
     return logins.removeLoginByGUID(login.guid)
   }
 

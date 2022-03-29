@@ -5,7 +5,7 @@
 import Foundation
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 protocol LocalAdblockResourceProtocol {
   func loadLocalData(name: String, type: String, completion: ((Data) -> Void))

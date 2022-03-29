@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private struct AdBlockNetworkResource {
   let resource: CachedNetworkResource

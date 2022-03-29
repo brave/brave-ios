@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class FocusHelper: TabContentScript {
   fileprivate weak var tab: Tab?

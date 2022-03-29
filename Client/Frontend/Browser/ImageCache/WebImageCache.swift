@@ -8,7 +8,7 @@ import Data
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 final class WebImageCache: ImageCacheProtocol {
 

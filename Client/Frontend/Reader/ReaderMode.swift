@@ -7,7 +7,7 @@ import Shared
 import WebKit
 import SwiftyJSON
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 let ReaderModeProfileKeyStyle = "readermode.style"
 

@@ -7,7 +7,7 @@ import CoreData
 import Data
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class AddEditBookmarkTableViewController: UITableViewController {
 

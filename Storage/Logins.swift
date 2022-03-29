@@ -5,9 +5,6 @@
 import Foundation
 import WebKit
 import Shared
-import XCGLogger
-
-private var log = LegacyLogger.legacyLogger
 
 /**
  * LoginData is a wrapper around NSURLCredential and NSURLProtectionSpace to allow us to add extra fields where needed.
@@ -83,7 +80,7 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
       let url1 = URL(string: value)
 
       if url1?.host != url2?.host {
-        log.warning("Form submit URL domain doesn't match login's domain.")
+        Log.legacy.warning("Form submit URL domain doesn't match login's domain.")
       }
 
       self._formSubmitURL = value
@@ -246,7 +243,7 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
     } else {
       // bug 159484 - disallow url types that don't support a hostPort.
       // (although we handle "javascript:..." as a special case above.)
-      log.debug("Couldn't parse origin for \(uriString)")
+      Log.legacy.debug("Couldn't parse origin for \(uriString)")
       realm = nil
     }
     return realm

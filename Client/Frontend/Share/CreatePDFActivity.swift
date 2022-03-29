@@ -7,7 +7,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 #if compiler(>=5.3)
 

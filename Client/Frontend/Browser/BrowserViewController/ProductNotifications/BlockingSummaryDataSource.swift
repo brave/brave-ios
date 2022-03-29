@@ -7,7 +7,7 @@ import UIKit
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // MARK: - BlockingSummary
 

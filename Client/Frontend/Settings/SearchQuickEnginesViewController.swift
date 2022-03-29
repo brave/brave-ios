@@ -6,7 +6,7 @@
 import UIKit
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // MARK: - SearchQuickEnginesViewController
 

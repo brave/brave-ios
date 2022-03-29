@@ -5,7 +5,6 @@
 import Shared
 import Storage
 import AVFoundation
-import XCGLogger
 import MessageUI
 import SDWebImage
 import SwiftKeychainWrapper
@@ -19,7 +18,7 @@ import BraveCore
 import Combine
 import os.log
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private let InitialPingSentKey = "initialPingSent"
 
@@ -85,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           }
         }()
         
-        LegacyLogger.braveCoreLogger.log(level: level, "\(message.dropFirst(messageStartIndex).dropLast())")
+        Log.braveCore.log(level: level, "\(message.dropFirst(messageStartIndex).dropLast())")
       }
       return true
     }

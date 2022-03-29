@@ -7,7 +7,7 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 struct CosmeticFilterModel: Codable {
   let hideSelectors: [String]

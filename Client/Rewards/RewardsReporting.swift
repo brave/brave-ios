@@ -5,10 +5,7 @@
 import Foundation
 import WebKit
 import BraveCore
-import XCGLogger
 import Shared
-
-private let log = LegacyLogger.braveCoreLogger
 
 class RewardsReporting: TabContentScript {
   let rewards: BraveRewards
@@ -46,7 +43,7 @@ class RewardsReporting: TabContentScript {
       }
 
       if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-        log.debug("Missing required security token.")
+        Log.braveCore.debug("Missing required security token.")
         return
       }
 
@@ -74,7 +71,7 @@ class RewardsReporting: TabContentScript {
         }
       }
     } catch {
-      log.error("Failed to parse message from rewards reporting JS: \(error.localizedDescription)")
+      Log.braveCore.error("Failed to parse message from rewards reporting JS: \(error.localizedDescription)")
     }
   }
 }

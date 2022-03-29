@@ -8,7 +8,7 @@ import AVFoundation
 import Shared
 import Data
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 protocol PlaylistDownloadManagerDelegate: AnyObject {
   func onDownloadProgressUpdate(id: String, percentComplete: Double)

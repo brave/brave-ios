@@ -9,10 +9,9 @@ import Shared
 import BraveCore
 import BraveShared
 import SwiftyJSON
-import XCGLogger
 import Data
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 protocol TabContentScript {
   static func name() -> String

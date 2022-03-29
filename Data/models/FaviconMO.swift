@@ -7,7 +7,7 @@ import Storage
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 public final class FaviconMO: NSManagedObject, CRUD {
 

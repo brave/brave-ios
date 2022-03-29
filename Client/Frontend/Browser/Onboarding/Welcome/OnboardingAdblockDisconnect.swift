@@ -6,7 +6,7 @@
 import Foundation
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 struct OnboardingDisconnectItem: Codable {
   let properties: [String]

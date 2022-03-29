@@ -5,7 +5,7 @@ import SafariServices
 import Shared
 import SwiftyJSON
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 enum UrpError {
   case networkError, downloadIdNotFound, ipNotFound, endpointError

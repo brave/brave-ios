@@ -9,7 +9,7 @@ import Shared
 import SwiftKeychainWrapper
 import BraveCore
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class LoginInfoViewController: LoginAuthViewController {
 

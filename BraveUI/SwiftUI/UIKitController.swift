@@ -5,9 +5,9 @@
 
 import Foundation
 import SwiftUI
-import struct Shared.LegacyLogger
+import struct Shared.Log
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 public struct UIKitController: View {
   private var makeVC: () -> UIViewController

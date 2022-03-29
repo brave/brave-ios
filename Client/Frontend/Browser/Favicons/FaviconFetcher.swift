@@ -12,7 +12,7 @@ import Fuzi
 import SDWebImage
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// Handles obtaining favicons for URLs from local files, database or internet
 class FaviconFetcher {

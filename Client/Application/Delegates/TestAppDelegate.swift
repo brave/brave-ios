@@ -4,9 +4,8 @@
 
 import Foundation
 import Shared
-import XCGLogger
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // swiftlint:disable force_try force_cast
 

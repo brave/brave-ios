@@ -10,7 +10,7 @@ import BraveShared
 import BraveUI
 import CoreData
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 private class FavoritesHeaderView: UICollectionReusableView {
   let label = UILabel().then {

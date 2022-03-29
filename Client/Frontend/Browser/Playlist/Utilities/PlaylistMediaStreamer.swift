@@ -12,7 +12,7 @@ import MediaPlayer
 import Shared
 import Storage
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 class PlaylistMediaStreamer {
   private weak var playerView: UIView?

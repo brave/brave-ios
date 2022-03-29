@@ -5,7 +5,7 @@
 import Foundation
 import Shared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 // Taken from: https://github.com/Brandon-T/Jarvis and modified to simplify
 

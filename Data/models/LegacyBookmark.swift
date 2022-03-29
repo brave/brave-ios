@@ -8,7 +8,7 @@ import CoreData
 import Shared
 import BraveShared
 
-private let log = LegacyLogger.browserLogger
+private let log = Log.main
 
 /// Naming note:
 /// Before sync v2 `Favorite` was named `Bookmark` and contained logic for both bookmarks and favorites.
