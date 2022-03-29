@@ -49,6 +49,7 @@ extension BrowserViewController {
       return
     }
     let controller = WalletPanelHostingController(walletStore: walletStore)
+    controller.delegate = self
     let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
     popover.present(from: topToolbar.locationView.walletButton, on: self, completion: nil)
   }
@@ -58,6 +59,10 @@ extension WalletPanelHostingController: PopoverContentComponent {}
 
 extension BrowserViewController: BraveWalletDelegate {
   func openWalletURL(_ destinationURL: URL) {
+    if presentedViewController != nil {
+      // dismiss to show the new tab
+      self.dismiss(animated: true)
+    }
     if let url = tabManager.selectedTab?.url, InternalURL.isValid(url: url) {
       select(url: destinationURL, visitType: .link)
     } else {
@@ -140,6 +145,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
           }
         }
       )
+      permissions.delegate = self
       present(permissions, animated: true)
     }
   }

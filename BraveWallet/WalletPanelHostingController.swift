@@ -10,6 +10,9 @@ import SwiftUI
 /// Displays a summary of the users wallet when they are visiting a webpage that wants to connect with the
 /// users wallet
 public class WalletPanelHostingController: UIHostingController<WalletPanelContainerView> {
+
+  public weak var delegate: BraveWalletDelegate?
+
   public init(
     walletStore: WalletStore
   ) {
@@ -22,7 +25,9 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
     ))
     rootView.presentWalletWithContext = { [weak self] context in
       guard let self = self else { return }
-      self.present(WalletHostingViewController(walletStore: walletStore, presentingContext: context), animated: true)
+      let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: context)
+      walletHostingController.delegate = self.delegate
+      self.present(walletHostingController, animated: true)
     }
   }
   
