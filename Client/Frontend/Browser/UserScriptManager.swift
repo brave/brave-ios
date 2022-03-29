@@ -414,12 +414,14 @@ class UserScriptManager {
         }
       }
 
+      #if WALLET_DAPPS_ENABLED
       if let script = walletProviderScript {
         $0.addUserScript(script)
         if let providerJS = walletProviderJS {
           $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
         }
       }
+      #endif
     }
   }
 }
