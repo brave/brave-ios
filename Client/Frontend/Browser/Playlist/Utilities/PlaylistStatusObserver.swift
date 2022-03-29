@@ -10,8 +10,6 @@ import AVFoundation
 import Shared
 import Data
 
-private let log = Log.main
-
 class PlaylistPlayerStatusObserver: NSObject {
   private weak var player: AVPlayer?
   private var item: AVPlayerItem?
@@ -39,13 +37,13 @@ class PlaylistPlayerStatusObserver: NSObject {
               let status = change.newValue ?? .unknown
               switch status {
               case .readyToPlay:
-                log.debug("Player Item Status: Ready")
+                Log.main.debug("Player Item Status: Ready")
                 self.onStatusChanged(.readyToPlay)
               case .failed:
-                log.debug("Player Item Status: Failed")
+                Log.main.debug("Player Item Status: Failed")
                 self.onStatusChanged(.failed)
               case .unknown:
-                log.debug("Player Item Status: Unknown")
+                Log.main.debug("Player Item Status: Unknown")
                 self.onStatusChanged(.unknown)
               @unknown default:
                 assertionFailure("Unknown Switch Case for AVPlayerItemStatus")

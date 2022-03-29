@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 /// A javascript file stored in app's Bundle.
 /// The file does not need to be statically copied into the app.
 /// You can get a javacsript file using a package manager like npm
@@ -30,7 +28,7 @@ public extension BundledJSProtocol {
 
       return try String(contentsOfFile: filePath, encoding: String.Encoding.utf8)
     } catch {
-      log.error("Could not find or parse script named: \(name)")
+      Log.main.error("Could not find or parse script named: \(name)")
       return nil
     }
   }

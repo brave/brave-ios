@@ -8,8 +8,6 @@ import AVFoundation
 import Shared
 import Data
 
-private let log = Log.main
-
 protocol PlaylistDownloadManagerDelegate: AnyObject {
   func onDownloadProgressUpdate(id: String, percentComplete: Double)
   func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?)
@@ -177,7 +175,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
 
       return AVURLAsset(url: url)
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }
@@ -351,7 +349,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         do {
           try FileManager.default.removeItem(at: location)
         } catch {
-          log.error("Error Deleting Playlist Item: \(error.localizedDescription)")
+          Log.main.error("Error Deleting Playlist Item: \(error.localizedDescription)")
         }
       }
 
@@ -371,14 +369,14 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
           do {
             try FileManager.default.removeItem(at: cacheLocation)
           } catch {
-            log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
+            Log.main.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
           }
         }
 
         do {
           try FileManager.default.removeItem(atPath: assetUrl.path)
         } catch {
-          log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
+          Log.main.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
         }
 
         // Update the asset state, but do not propagate the error
@@ -419,11 +417,11 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
             self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
           }
         } catch {
-          log.error("Failed to create bookmarkData for download URL.")
+          Log.main.error("Failed to create bookmarkData for download URL.")
           cleanupAndFailDownload(path, error)
         }
       } catch {
-        log.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
+        Log.main.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
         cleanupAndFailDownload(assetUrl, error)
       }
     }
@@ -524,7 +522,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             try FileManager.default.removeItem(at: cacheLocation)
             PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
           } catch {
-            log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
+            Log.main.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
           }
         }
 
@@ -587,7 +585,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         do {
           try FileManager.default.removeItem(at: location)
         } catch {
-          log.error("Error Deleting Playlist Item: \(error.localizedDescription)")
+          Log.main.error("Error Deleting Playlist Item: \(error.localizedDescription)")
         }
       }
 
@@ -622,7 +620,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             detectedFileExtension = detectedExtension
           }
         } catch {
-          log.error("Error mapping downloaded playlist file to virtual memory: \(error.localizedDescription)")
+          Log.main.error("Error mapping downloaded playlist file to virtual memory: \(error.localizedDescription)")
         }
       }
 
@@ -648,11 +646,11 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
           }
         } catch {
-          log.error("Failed to create bookmarkData for download URL.")
+          Log.main.error("Failed to create bookmarkData for download URL.")
           cleanupAndFailDownload(location: path, error: error)
         }
       } catch {
-        log.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
+        Log.main.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
         cleanupAndFailDownload(location: location, error: error)
       }
     } else {

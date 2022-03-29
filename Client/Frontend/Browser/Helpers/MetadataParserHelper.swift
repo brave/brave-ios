@@ -7,8 +7,6 @@ import Shared
 import Storage
 import WebKit
 
-private let log = Log.main
-
 class MetadataParserHelper: TabEventHandler {
   private var tabObservers: TabObservers!
 
@@ -43,7 +41,7 @@ class MetadataParserHelper: TabEventHandler {
       guard let dict = result as? [String: Any],
         let data = try? JSONSerialization.data(withJSONObject: dict, options: [])
       else {
-        log.debug("Page contains no metadata!")
+        Log.main.debug("Page contains no metadata!")
         //                TabEvent.post(.pageMetadataNotAvailable, for: tab)
         tab.pageMetadata = nil
         return
@@ -54,7 +52,7 @@ class MetadataParserHelper: TabEventHandler {
         tab.pageMetadata = pageMetadata
         TabEvent.post(.didLoadPageMetadata(pageMetadata), for: tab)
       } catch {
-        log.error("Failed to parse metadata: \(error.localizedDescription)")
+        Log.main.error("Failed to parse metadata: \(error.localizedDescription)")
         // To avoid issues where `pageMetadata` points to the last website to successfully
         // parse metadata, set to nil
         tab.pageMetadata = nil

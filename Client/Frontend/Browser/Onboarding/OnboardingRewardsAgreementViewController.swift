@@ -8,8 +8,6 @@ import BraveShared
 import BraveCore
 import Lottie
 
-private let log = Log.main
-
 enum OnboardingRewardsState {
   case skipped
   case complete

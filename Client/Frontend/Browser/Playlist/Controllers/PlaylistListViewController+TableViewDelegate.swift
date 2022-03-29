@@ -11,8 +11,6 @@ import Shared
 import Data
 import MediaPlayer
 
-private let log = Log.main
-
 private extension PlaylistListViewController {
   func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {
     guard let url = URL(string: item.pageSrc) else {
@@ -351,7 +349,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
         switch error {
         case .other(let err):
-          log.error("\(err.localizedDescription)")
+          Log.main.error("\(err.localizedDescription)")
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
           self.delegate?.displayLoadingResourceError()
         case .expired:
@@ -364,7 +362,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           self.delegate?.updateLastPlayedItem(item: item)
         case .cancelled:
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          log.debug("User cancelled Playlist Playback")
+          Log.main.debug("User cancelled Playlist Playback")
         }
       }
     }

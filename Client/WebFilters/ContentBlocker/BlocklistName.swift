@@ -7,8 +7,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 class BlocklistName: CustomStringConvertible, ContentBlocker {
 
   static let ad = BlocklistName(filename: "block-ads")
@@ -106,7 +104,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
   ) async {
 
     guard let data = data, let dataString = String(data: data, encoding: .utf8) else {
-      log.error("Could not read data for content blocker compilation.")
+      Log.main.error("Could not read data for content blocker compilation.")
       return
     }
 
@@ -117,7 +115,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
       self.rule = rule
     } catch {
       // TODO #382: Potential telemetry location
-      log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
+      Log.main.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
     }
   }
 }

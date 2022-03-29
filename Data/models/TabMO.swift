@@ -37,8 +37,6 @@ public struct SavedTab {
   }
 }
 
-private let log = Log.main
-
 public final class TabMO: NSManagedObject, CRUD {
 
   @NSManaged public var title: String?
@@ -174,7 +172,7 @@ public final class TabMO: NSManagedObject, CRUD {
     DataController.perform { context in
       for (i, tabId) in tabIds.enumerated() {
         guard let managedObject = getInternal(fromId: tabId, context: context) else {
-          log.error("Error: Tab missing managed object")
+          Log.main.error("Error: Tab missing managed object")
           continue
         }
         managedObject.order = Int16(i)

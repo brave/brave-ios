@@ -8,8 +8,6 @@ import Shared
 import BraveShared
 import NetworkExtension
 
-private let log = Log.main
-
 /// A static class to handle all things related to the Brave VPN service.
 class BraveVPN {
 
@@ -50,7 +48,7 @@ class BraveVPN {
         if isConnected {
           GRDGatewayAPI.shared().getServerStatus { completion in
             if completion.responseStatus == .serverOK {
-              log.debug("VPN server status OK")
+              Log.main.debug("VPN server status OK")
               return
             }
 
@@ -215,7 +213,7 @@ class BraveVPN {
   /// This can be further used for a customer support form.
   private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
     if printToConsole {
-      log.error("\(message)")
+      Log.main.error("\(message)")
     }
 
     // Extra safety here in case the log is spammed by many messages.
@@ -263,7 +261,7 @@ class BraveVPN {
         switch status {
         case .success:
           connectOrMigrateToNewNode { completion in
-            log.debug("vpn configuration status: \(String(describing: completion))")
+            Log.main.debug("vpn configuration status: \(String(describing: completion))")
             reconnectPending = false
           }
         case .error:
@@ -277,7 +275,7 @@ class BraveVPN {
         case .error(let type):
           logAndStoreError("Failed to reconnect, error: \(type)")
         case .success:
-          log.debug("Reconnected to the VPN")
+          Log.main.debug("Reconnected to the VPN")
         }
 
         reconnectPending = false
@@ -572,12 +570,12 @@ class BraveVPN {
 
       center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
         if let error = error {
-          log.error("Failed to request notifications permissions: \(error.localizedDescription)")
+          Log.main.error("Failed to request notifications permissions: \(error.localizedDescription)")
           return
         }
 
         if !granted {
-          log.info("Not authorized to schedule a notification")
+          Log.main.info("Not authorized to schedule a notification")
           return
         }
 
@@ -599,7 +597,7 @@ class BraveVPN {
 
           center.add(request) { error in
             if let error = error {
-              log.error("Failed to add notification: \(error.localizedDescription)")
+              Log.main.error("Failed to add notification: \(error.localizedDescription)")
               return
             }
 

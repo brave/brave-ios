@@ -6,8 +6,6 @@ import Foundation
 import Shared
 import Storage
 
-private let log = Log.main
-
 class Authenticator {
   fileprivate static let maxAuthenticationAttempts = 3
 
@@ -72,7 +70,7 @@ class Authenticator {
           }
           return nil
         }
-        loginsProvider.removeLoginsWithGUIDs(malformedGUIDs).upon { log.debug("Removed malformed logins. Success :\($0.isSuccess)") }
+        loginsProvider.removeLoginsWithGUIDs(malformedGUIDs).upon { Log.main.debug("Removed malformed logins. Success :\($0.isSuccess)") }
       }
 
       // Found a single entry but the schemes don't match. This is a result of a schemeless entry that we

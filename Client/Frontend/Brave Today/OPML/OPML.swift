@@ -7,8 +7,6 @@ import Foundation
 import Fuzi
 import Shared
 
-private let log = Log.main
-
 /// A set of subscription RSS feed URLs defined through Outline Processor Markup Language
 struct OPML: Equatable {
   /// A node contains a set of named attributes describing an XML feed
@@ -35,7 +33,7 @@ class OPMLParser {
     guard let document = try? XMLDocument(data: data),
       let _ = document.firstChild(xpath: "//opml")
     else {
-      log.warning("Failed to parse XML document")
+      Log.main.warning("Failed to parse XML document")
       return nil
     }
     let title = document.firstChild(xpath: "//head/title")?.stringValue

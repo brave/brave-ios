@@ -12,8 +12,6 @@ import BraveShared
 import Shared
 import CoreData
 
-private let log = Log.main
-
 private enum PlaylistCarPlayTemplateID: String {
   case folders
   case itemsList
@@ -68,7 +66,7 @@ class PlaylistCarplayController: NSObject {
         guard let self = self else { return }
         self.interfaceController.popToRootTemplate(animated: true) { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         }
       }.store(in: &playlistObservers)
@@ -162,7 +160,7 @@ class PlaylistCarplayController: NSObject {
       if self.interfaceController.topTemplate != CPNowPlayingTemplate.shared {
         self.interfaceController.pushTemplate(CPNowPlayingTemplate.shared, animated: true) { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         }
       }
@@ -180,7 +178,7 @@ class PlaylistCarplayController: NSObject {
       if self.interfaceController.topTemplate == CPNowPlayingTemplate.shared {
         self.interfaceController.popTemplate(animated: false) { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         }
       }
@@ -232,7 +230,7 @@ class PlaylistCarplayController: NSObject {
     do {
       try frc.performFetch()
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       displayErrorAlert(error: error)
     }
 
@@ -277,7 +275,7 @@ class PlaylistCarplayController: NSObject {
     do {
       try frc.performFetch()
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
 
     // FOLDERS TEMPLATE
@@ -295,7 +293,7 @@ class PlaylistCarplayController: NSObject {
     // If we have any controllers presented, we need to remove them.
     interfaceController.popToRootTemplate(animated: true) { success, error in
       if !success, let error = error {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
 
@@ -385,7 +383,7 @@ class PlaylistCarplayController: NSObject {
           }
 
           if let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
 
           listItem.accessoryType = PlaylistManager.shared.state(for: itemId) != .downloaded ? .cloud : .none
@@ -406,7 +404,7 @@ class PlaylistCarplayController: NSObject {
             self.interfaceController.pushTemplate(CPNowPlayingTemplate.shared, animated: true) { success, error in
 
               if !success, let error = error {
-                log.error("\(error.localizedDescription)")
+                Log.main.error("\(error.localizedDescription)")
               }
             }
           }
@@ -479,7 +477,7 @@ class PlaylistCarplayController: NSObject {
             animated: true,
             completion: { success, error in
               if !success, let error = error {
-                log.error("\(error.localizedDescription)")
+                Log.main.error("\(error.localizedDescription)")
               }
             })
         }
@@ -489,7 +487,7 @@ class PlaylistCarplayController: NSObject {
           animated: true,
           completion: { success, error in
             if !success, let error = error {
-              log.error("\(error.localizedDescription)")
+              Log.main.error("\(error.localizedDescription)")
             }
           }
         )
@@ -518,7 +516,7 @@ class PlaylistCarplayController: NSObject {
 
 extension PlaylistCarplayController: CPInterfaceControllerDelegate {
   func templateWillAppear(_ aTemplate: CPTemplate, animated: Bool) {
-    log.debug("Template \(aTemplate.classForCoder) will appear.")
+    Log.main.debug("Template \(aTemplate.classForCoder) will appear.")
 
     if interfaceController.topTemplate != CPNowPlayingTemplate.shared,
       (aTemplate.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.folders.rawValue {
@@ -529,15 +527,15 @@ extension PlaylistCarplayController: CPInterfaceControllerDelegate {
   }
 
   func templateDidAppear(_ aTemplate: CPTemplate, animated: Bool) {
-    log.debug("Template \(aTemplate.classForCoder) did appear.")
+    Log.main.debug("Template \(aTemplate.classForCoder) did appear.")
   }
 
   func templateWillDisappear(_ aTemplate: CPTemplate, animated: Bool) {
-    log.debug("Template \(aTemplate.classForCoder) will disappear.")
+    Log.main.debug("Template \(aTemplate.classForCoder) will disappear.")
   }
 
   func templateDidDisappear(_ aTemplate: CPTemplate, animated: Bool) {
-    log.debug("Template \(aTemplate.classForCoder) did disappear.")
+    Log.main.debug("Template \(aTemplate.classForCoder) did disappear.")
   }
 }
 
@@ -615,7 +613,7 @@ extension PlaylistCarplayController {
 
       switch error {
       case .other(let error):
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
         self.displayLoadingResourceError()
         completionHandler(error)
       case .expired:
@@ -626,7 +624,7 @@ extension PlaylistCarplayController {
         PlaylistCarplayManager.shared.currentPlaylistItem = item
         completionHandler(nil)
       case .cancelled:
-        log.debug("User Cancelled Playlist playback")
+        Log.main.debug("User Cancelled Playlist playback")
         completionHandler("User Cancelled")
       }
 
@@ -657,7 +655,7 @@ extension PlaylistCarplayController {
 
         switch error {
         case .other(let err):
-          log.error("\(err.localizedDescription)")
+          Log.main.error("\(err.localizedDescription)")
           self.displayLoadingResourceError()
         case .expired:
           self.displayExpiredResourceError(item: item)
@@ -666,7 +664,7 @@ extension PlaylistCarplayController {
           PlaylistCarplayManager.shared.currentPlaylistItem = item
           self.updateLastPlayedItem(item: item)
         case .cancelled:
-          log.debug("User Cancelled Playlist Playback")
+          Log.main.debug("User Cancelled Playlist Playback")
         }
       }
     }
@@ -706,7 +704,7 @@ extension PlaylistCarplayController {
 
         switch error {
         case .other(let err):
-          log.error("\(err.localizedDescription)")
+          Log.main.error("\(err.localizedDescription)")
           self.displayLoadingResourceError()
         case .expired:
           if isUserInitiated || self.player.repeatState == .repeatOne || assetCount <= 1 {
@@ -722,7 +720,7 @@ extension PlaylistCarplayController {
           PlaylistCarplayManager.shared.currentPlaylistItem = item
           self.updateLastPlayedItem(item: item)
         case .cancelled:
-          log.debug("User Cancelled Playlist Playback")
+          Log.main.debug("User Cancelled Playlist Playback")
         }
       }
     }
@@ -962,7 +960,7 @@ extension PlaylistCarplayController {
                   completion?(.none)
                 }
               ).store(in: &self.assetLoadingStateObservers)
-            log.debug("Playing Live Video: \(self.player.isLiveMedia)")
+            Log.main.debug("Playing Live Video: \(self.player.isLiveMedia)")
           } else {
             if !isPlaying {
               PlaylistMediaStreamer.clearNowPlayingInfo()
@@ -1002,7 +1000,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1012,7 +1010,7 @@ extension PlaylistCarplayController {
         alert, animated: true,
         completion: { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         })
     } else {
@@ -1027,7 +1025,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1037,7 +1035,7 @@ extension PlaylistCarplayController {
         alert, animated: true,
         completion: { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         })
     }
@@ -1057,7 +1055,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1067,7 +1065,7 @@ extension PlaylistCarplayController {
         alert, animated: true,
         completion: { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         })
     } else {
@@ -1083,7 +1081,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1093,7 +1091,7 @@ extension PlaylistCarplayController {
         alert, animated: true,
         completion: { success, error in
           if !success, let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         })
     }
@@ -1113,7 +1111,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1124,7 +1122,7 @@ extension PlaylistCarplayController {
           alert, animated: true,
           completion: { success, error in
             if !success, let error = error {
-              log.error("\(error.localizedDescription)")
+              Log.main.error("\(error.localizedDescription)")
             }
           })
       }
@@ -1141,7 +1139,7 @@ extension PlaylistCarplayController {
                 animated: true,
                 completion: { success, error in
                   if !success, let error = error {
-                    log.error("\(error.localizedDescription)")
+                    Log.main.error("\(error.localizedDescription)")
                   }
                 })
             })
@@ -1152,7 +1150,7 @@ extension PlaylistCarplayController {
           alert, animated: true,
           completion: { success, error in
             if !success, let error = error {
-              log.error("\(error.localizedDescription)")
+              Log.main.error("\(error.localizedDescription)")
             }
           })
       }

@@ -12,8 +12,6 @@ import MediaPlayer
 import Shared
 import Storage
 
-private let log = Log.main
-
 class PlaylistMediaStreamer {
   private weak var playerView: UIView?
   private weak var certStore: CertStore?
@@ -208,7 +206,7 @@ class PlaylistMediaStreamer {
     session.dataTask(with: request) { data, response, error in
       DispatchQueue.main.async {
         if let error = error {
-          log.error("Error fetching MimeType: \(error.localizedDescription)")
+          Log.main.error("Error fetching MimeType: \(error.localizedDescription)")
           return completion(nil)
         }
 

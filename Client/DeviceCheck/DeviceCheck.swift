@@ -8,8 +8,6 @@ import BraveCore
 import BraveShared
 import Shared
 
-private let log = Log.main
-
 /// A structure used to register a device for Brave's DeviceCheck enrollment
 public struct DeviceCheckRegistration: Codable {
   // The enrollment blob is a Base64 Encoded `DeviceCheckEnrollment` structure
@@ -160,7 +158,7 @@ public class DeviceCheckClient {
   public class func resetDeviceEnrollment() {
     Preferences.Rewards.didEnrollDeviceCheck.value = false
     if let error = Cryptography.delete(id: DeviceCheckClient.privateKeyId) {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
   }
 

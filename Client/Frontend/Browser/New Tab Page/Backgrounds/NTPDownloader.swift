@@ -7,8 +7,6 @@ import Shared
 import BraveShared
 import BraveCore
 
-private let logger = Log.main
-
 protocol NTPDownloaderDelegate: AnyObject {
   func onSponsorUpdated(sponsor: NTPSponsor?)
   func onThemeUpdated(theme: CustomTheme?)
@@ -142,12 +140,12 @@ class NTPDownloader {
       startNTPTimer()
 
       if let cacheInfo = cacheInfo, cacheInfo.statusCode == 304 {
-        logger.debug("NTPDownloader Cache is still valid")
+        Log.main.debug("NTPDownloader Cache is still valid")
         return loadNTPResource(for: type)
       }
 
       guard let url = url else {
-        logger.error("Invalid NTP Temporary Downloads URL")
+        Log.main.error("Invalid NTP Temporary Downloads URL")
         return loadNTPResource(for: type)
       }
 
@@ -175,13 +173,13 @@ class NTPDownloader {
         do {
           try removeCampaign(type: type)
         } catch {
-          logger.error("\(error.localizedDescription)")
+          Log.main.error("\(error.localizedDescription)")
         }
         return nil
       }
 
       if let error = (error as? NTPError)?.underlyingError() {
-        logger.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
 
@@ -208,7 +206,7 @@ class NTPDownloader {
           self.delegate?.onSponsorUpdated(sponsor: item as? NTPSponsor)
         }
       } catch {
-        logger.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }
@@ -333,7 +331,7 @@ class NTPDownloader {
           logo: logo, topSites: customTheme.topSites, refCode: code)
       }
     } catch {
-      logger.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
 
     return nil
@@ -366,7 +364,7 @@ class NTPDownloader {
 
       return try? String(contentsOfFile: etagFileURL.path, encoding: .utf8)
     } catch {
-      logger.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }
@@ -376,7 +374,7 @@ class NTPDownloader {
       let etagFileURL = try self.ntpETagFileURL(type: type)
       try etag.write(to: etagFileURL, atomically: true, encoding: .utf8)
     } catch {
-      logger.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
   }
 

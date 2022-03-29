@@ -8,8 +8,6 @@ import Shared
 import BraveShared
 import WebKit
 
-private let log = Log.main
-
 enum DomainUserScript: CaseIterable {
   case youtube
   case archive
@@ -140,7 +138,7 @@ enum DomainUserScript: CaseIterable {
     guard let path = Bundle.main.path(forResource: scriptName, ofType: "js"),
       let source = try? String(contentsOfFile: path)
     else {
-      log.error("Failed to load \(scriptName).js")
+      Log.main.error("Failed to load \(scriptName).js")
       return nil
     }
 

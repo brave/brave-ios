@@ -8,8 +8,6 @@ import Static
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 class RetentionPreferencesDebugMenuViewController: TableViewController {
 
   init() {

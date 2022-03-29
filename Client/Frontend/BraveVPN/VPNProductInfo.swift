@@ -7,8 +7,6 @@ import Foundation
 import StoreKit
 import Shared
 
-private let log = Log.main
-
 class VPNProductInfo: NSObject {
   // Prices are fetched once per launch and kept in memory.
   // If the prices could not be fetched, we retry after user tries to go to buy-vpn screen.
@@ -68,6 +66,6 @@ extension VPNProductInfo: SKProductsRequestDelegate {
   }
 
   func request(_ request: SKRequest, didFailWithError error: Error) {
-    log.error("SKProductsRequestDelegate error: \(error.localizedDescription)")
+    Log.main.error("SKProductsRequestDelegate error: \(error.localizedDescription)")
   }
 }

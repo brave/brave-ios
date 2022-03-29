@@ -11,8 +11,6 @@ import Shared
 import Storage
 import Data
 
-private let log = Log.main
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   // This property must be non-null because even though it's optional,
@@ -203,13 +201,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let scene = scene as? UIWindowScene else {
-      log.debug("Invalid Scene - Scene is not a UIWindowScene")
+      Log.main.debug("Invalid Scene - Scene is not a UIWindowScene")
       return
     }
 
     URLContexts.forEach({
       guard let routerpath = NavigationPath(url: $0.url) else {
-        log.debug("Invalid Navigation Path: \($0.url)")
+        Log.main.debug("Invalid Navigation Path: \($0.url)")
         return
       }
 

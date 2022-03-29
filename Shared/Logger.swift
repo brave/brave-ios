@@ -5,8 +5,6 @@
 import Foundation
 import os.log
 
-//public let log = Log.main
-
 public struct Log {}
 
 // MARK: - Singleton Logger Instances

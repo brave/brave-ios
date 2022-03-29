@@ -6,8 +6,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 public class WebcompatReporter {
   private struct BaseURL {
     static let staging = "laptop-updates.bravesoftware.com"
@@ -38,7 +36,7 @@ public class WebcompatReporter {
       let key = apiKey,
       let endpoint = components.url
     else {
-      log.error("Failed to setup webcompat request")
+      Log.main.error("Failed to setup webcompat request")
       deferred.fill(false)
       return deferred
     }
@@ -65,19 +63,19 @@ public class WebcompatReporter {
       let task = session.dataTask(with: request) { data, response, error in
         var success: Bool = true
         if let error = error {
-          log.error("Failed to report webcompat issue: \(error.localizedDescription)")
+          Log.main.error("Failed to report webcompat issue: \(error.localizedDescription)")
           success = false
         }
         if let response = response as? HTTPURLResponse {
           success = response.statusCode >= 200 && response.statusCode < 300
-          log.error("Failed to report webcompat issue: Status Code \(response.statusCode)")
+          Log.main.error("Failed to report webcompat issue: Status Code \(response.statusCode)")
         }
         deferred.fill(success)
       }
       task.resume()
       return deferred
     } catch {
-      log.error("Failed to setup webcompat request payload: \(error.localizedDescription)")
+      Log.main.error("Failed to setup webcompat request payload: \(error.localizedDescription)")
       deferred.fill(false)
     }
     return deferred

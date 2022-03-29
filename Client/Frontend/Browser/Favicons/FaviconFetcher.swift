@@ -12,8 +12,6 @@ import Fuzi
 import SDWebImage
 import BraveShared
 
-private let log = Log.main
-
 /// Handles obtaining favicons for URLs from local files, database or internet
 class FaviconFetcher {
   private static let queue = DispatchQueue(
@@ -208,7 +206,7 @@ class FaviconFetcher {
   private static let multiRegionDomains = ["craigslist", "google", "amazon"]
   private static let bundledIcons: [String: (color: UIColor, url: String)] = {
     guard let filePath = Bundle.main.path(forResource: "top_sites", ofType: "json") else {
-      log.error("Failed to get bundle path for \"top_sites.json\"")
+      Log.main.error("Failed to get bundle path for \"top_sites.json\"")
       return [:]
     }
     do {
@@ -233,7 +231,7 @@ class FaviconFetcher {
       })
       return icons
     } catch {
-      log.error("Failed to get default icons at \(filePath): \(error.localizedDescription)")
+      Log.main.error("Failed to get default icons at \(filePath): \(error.localizedDescription)")
       return [:]
     }
   }()

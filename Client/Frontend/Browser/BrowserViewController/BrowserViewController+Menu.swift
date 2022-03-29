@@ -12,8 +12,6 @@ import Data
 import BraveWallet
 import BraveCore
 
-private let log = Log.main
-
 extension BrowserViewController {
   func featuresMenuSection(_ menuController: MenuViewController) -> some View {
     VStack(spacing: 0) {
@@ -188,7 +186,7 @@ extension BrowserViewController {
       let txService = BraveWallet.TxServiceFactory.get(privateMode: privateMode),
       let ethTxManagerProxy = BraveWallet.EthTxManagerProxyFactory.get(privateMode: privateMode)
     else {
-      log.error("Failed to load wallet. One or more services were unavailable")
+      Log.main.error("Failed to load wallet. One or more services were unavailable")
       return
     }
 
@@ -255,7 +253,7 @@ extension BrowserViewController {
               if !isPlaylistItemAdded {
                 // Add to playlist
                 browserViewController.addToPlaylist(item: item) { didAddItem in
-                  log.debug("Playlist Item Added")
+                  Log.main.debug("Playlist Item Added")
                   if didAddItem {
                     playlistItemAdded = true
                   }

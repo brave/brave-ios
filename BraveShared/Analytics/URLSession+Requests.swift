@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 extension URLSession {
   @discardableResult
   public func request(
@@ -41,7 +39,7 @@ extension URLSession {
       task.resume()
       return task
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }

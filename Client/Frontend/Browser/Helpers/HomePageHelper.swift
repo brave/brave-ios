@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 struct HomePageConstants {
   static let homePageURLPrefKey = "HomePageURLPref"
 }
@@ -37,7 +35,7 @@ class HomePageHelper {
   func openHomePage(_ tab: Tab) {
     guard let url = currentURL else {
       // this should probably never happen.
-      log.error("User requested a homepage that wasn't a valid URL")
+      Log.main.error("User requested a homepage that wasn't a valid URL")
       return
     }
     tab.loadRequest(URLRequest(url: url))

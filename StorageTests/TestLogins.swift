@@ -30,7 +30,7 @@ class TestSQLiteLogins: XCTestCase {
   }
 
   func testAddLogin() {
-    log.debug("Created login")
+    Log.main.debug("Created login")
     let expectation = self.expectation(description: "Add login")
 
     addLogin(login)
@@ -85,7 +85,7 @@ class TestSQLiteLogins: XCTestCase {
   }
 
   func testRemoveManyLogins() {
-    log.debug("Remove a large number of logins at once")
+    Log.main.debug("Remove a large number of logins at once")
     var guids: [GUID] = []
     for i in 0..<2000 {
       let login = Login.createWithHostname("mozilla.org", username: "Fire", password: "fox", formSubmitURL: formSubmitURL)
@@ -265,12 +265,12 @@ class TestSQLiteLogins: XCTestCase {
 
   // Note: These functions are all curried so that we pass arguments, but still chain them below
   func addLogin(_ login: LoginData) -> Success {
-    log.debug("Add login")
+    Log.main.debug("Add login")
     return logins.addLogin(login)
   }
 
   func updateLogin(_ login: LoginData) -> Success {
-    log.debug("Update login")
+    Log.main.debug("Update login")
     return logins.updateLoginByGUID(login.guid, new: login, significant: true)
   }
 
@@ -284,7 +284,7 @@ class TestSQLiteLogins: XCTestCase {
 
   func getLoginsFor(_ protectionSpace: URLProtectionSpace, expected: [LoginData]) -> (() -> Success) {
     return {
-      log.debug("Get logins for \(protectionSpace)")
+      Log.main.debug("Get logins for \(protectionSpace)")
       return self.logins.getLoginsForProtectionSpace(protectionSpace) >>== { results in
         XCTAssertEqual(expected.count, results.count)
         for (index, login) in expected.enumerated() {
@@ -300,11 +300,11 @@ class TestSQLiteLogins: XCTestCase {
   /*
     func getLoginDetailsFor(login: LoginData, expected: LoginUsageData) -> (() -> Success) {
         return {
-            log.debug("Get details for \(login)")
+            Log.main.debug("Get details for \(login)")
             let deferred = self.logins.getUsageDataForLogin(login)
-            log.debug("Final result \(deferred)")
+            Log.main.debug("Final result \(deferred)")
             return deferred >>== { l in
-                log.debug("Got cursor")
+                Log.main.debug("Got cursor")
                 XCTAssertLessThan(expected.timePasswordChanged - l.timePasswordChanged, 10)
                 XCTAssertLessThan(expected.timeLastUsed - l.timeLastUsed, 10)
                 XCTAssertLessThan(expected.timeCreated - l.timeCreated, 10)
@@ -315,12 +315,12 @@ class TestSQLiteLogins: XCTestCase {
     */
 
   func removeLogin(_ login: LoginData) -> Success {
-    log.debug("Remove login")
+    Log.main.debug("Remove login")
     return logins.removeLoginByGUID(login.guid)
   }
 
   func removeAllLogins() -> Success {
-    log.debug("Remove All")
+    Log.main.debug("Remove All")
     // Because we don't want to just mark them as deleted.
     return self.db.run("DELETE FROM loginsM") >>> { self.db.run("DELETE FROM loginsL") }
   }
@@ -391,7 +391,7 @@ class TestSQLiteLoginsPerf: XCTestCase {
   }
 
   func removeAllLogins() -> Success {
-    log.debug("Remove All")
+    Log.main.debug("Remove All")
     // Because we don't want to just mark them as deleted.
     return self.db.run("DELETE FROM loginsM") >>> { self.db.run("DELETE FROM loginsL") }
   }
@@ -414,7 +414,7 @@ class TestSyncableLogins: XCTestCase {
   }
 
   func removeAllLogins() -> Success {
-    log.debug("Remove All")
+    Log.main.debug("Remove All")
     // Because we don't want to just mark them as deleted.
     return self.db.run("DELETE FROM loginsM") >>> { self.db.run("DELETE FROM loginsL") }
   }

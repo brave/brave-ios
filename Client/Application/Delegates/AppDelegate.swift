@@ -18,8 +18,6 @@ import BraveCore
 import Combine
 import os.log
 
-private let log = Log.main
-
 private let InitialPingSentKey = "initialPingSent"
 
 extension AppDelegate {
@@ -119,7 +117,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   @discardableResult
   fileprivate func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
-    log.info("startApplication begin")
+    Log.main.info("startApplication begin")
 
     // Set the Safari UA for browsing.
     setUserAgent()
@@ -143,7 +141,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           namespace: "TabManagerScreenshots",
           quality: UIConstants.screenshotQuality)
       } catch {
-        log.error("Failed to create an image store for files: \(profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
+        Log.main.error("Failed to create an image store for files: \(profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
         assertionFailure()
       }
       return nil
@@ -188,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Schedule Brave Core Priority Tasks
     braveCore.scheduleLowPriorityStartupTasks()
 
-    log.info("startApplication end")
+    Log.main.info("startApplication end")
     return true
   }
 
@@ -217,7 +215,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let baseDomain = url.baseDomain,
         let range = urlString.range(of: baseDomain)
       else {
-        log.error("Failed to resolve domain ")
+        Log.main.error("Failed to resolve domain ")
         return
       }
 
@@ -299,7 +297,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
       SceneDelegate.shouldHandleUrpLookup = true
     } else {
-      log.error("Failed to initialize user referral program")
+      Log.main.error("Failed to initialize user referral program")
       UrpLog.log("Failed to initialize user referral program")
     }
 

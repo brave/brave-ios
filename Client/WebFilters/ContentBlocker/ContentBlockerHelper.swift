@@ -7,8 +7,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 enum BlockerStatus: String {
   case Disabled
   case NoBlockedURLs  // When TP is enabled but nothing is being blocked
@@ -112,7 +110,7 @@ class ContentBlockerHelper {
       ContentBlockerHelper.ruleStore.lookUpContentRuleList(forIdentifier: name) { rule, error in
         guard let rule = rule else {
           let msg = "lookUpContentRuleList for \(name):  \(error?.localizedDescription ?? "empty rules")"
-          log.error("Content blocker error: \(msg)")
+          Log.main.error("Content blocker error: \(msg)")
           return
         }
         self.addToTab(contentRuleList: rule)

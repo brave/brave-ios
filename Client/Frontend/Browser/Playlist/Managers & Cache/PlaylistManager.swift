@@ -12,8 +12,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 class PlaylistManager: NSObject {
   static let shared = PlaylistManager()
 
@@ -166,7 +164,7 @@ class PlaylistManager: NSObject {
       do {
         try self.frc.managedObjectContext.save()
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }
@@ -229,7 +227,7 @@ class PlaylistManager: NSObject {
     do {
       try frc.performFetch()
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
   }
 
@@ -355,7 +353,7 @@ class PlaylistManager: NSObject {
         }
         return true
       } catch {
-        log.error("An error occured deleting Playlist Cached Item \(item.name): \(error.localizedDescription)")
+        Log.main.error("An error occured deleting Playlist Cached Item \(item.name): \(error.localizedDescription)")
         return false
       }
     }
@@ -372,7 +370,7 @@ class PlaylistManager: NSObject {
     PlaylistCarplayManager.shared.playlistController = nil
 
     guard let playlistItems = frc.fetchedObjects else {
-      log.error("An error occured while fetching Playlist Objects")
+      Log.main.error("An error occured while fetching Playlist Objects")
       return
     }
 
@@ -399,7 +397,7 @@ class PlaylistManager: NSObject {
       do {
         try FileManager.default.removeItem(at: playlistDirectory)
       } catch {
-        log.error("Failed to delete Playlist Directory: \(error.localizedDescription)")
+        Log.main.error("Failed to delete Playlist Directory: \(error.localizedDescription)")
       }
     }
 
@@ -429,17 +427,17 @@ class PlaylistManager: NSObject {
               }
             })
           } catch {
-            log.error("Failed to update Playlist item cached state: \(error.localizedDescription)")
+            Log.main.error("Failed to update Playlist item cached state: \(error.localizedDescription)")
           }
 
           do {
             try FileManager.default.removeItem(at: url)
           } catch {
-            log.error("Deleting Playlist Item for \(url.absoluteString) failed: \(error.localizedDescription)")
+            Log.main.error("Deleting Playlist Item for \(url.absoluteString) failed: \(error.localizedDescription)")
           }
         }
       } catch {
-        log.error("Deleting Playlist Incomplete Items failed: \(error.localizedDescription)")
+        Log.main.error("Deleting Playlist Incomplete Items failed: \(error.localizedDescription)")
       }
     }
   }
@@ -474,7 +472,7 @@ class PlaylistManager: NSObject {
     do {
       return try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage
     } catch {
-      log.error("Error Retrieving Disk Space: \(error.localizedDescription)")
+      Log.main.error("Error Retrieving Disk Space: \(error.localizedDescription)")
     }
     return nil
   }
@@ -485,7 +483,7 @@ class PlaylistManager: NSObject {
         return Int64(result)
       }
     } catch {
-      log.error("Error Retrieving Disk Space: \(error.localizedDescription)")
+      Log.main.error("Error Retrieving Disk Space: \(error.localizedDescription)")
     }
     return nil
   }
@@ -581,7 +579,7 @@ extension PlaylistManager {
     var error: NSError?
     let trackStatus = asset.statusOfValue(forKey: "tracks", error: &error)
     if let error = error {
-      log.error("AVAsset.statusOfValue error occurred: \(error)")
+      Log.main.error("AVAsset.statusOfValue error occurred: \(error)")
     }
 
     if trackStatus == .loaded {
@@ -595,14 +593,14 @@ extension PlaylistManager {
         return
       }
     } else if trackStatus != .loading {
-      log.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: trackStatus))")
+      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: trackStatus))")
     }
 
     // Accessing duration or commonMetadata blocks the main-thread if not already loaded
     // So we first need to check the track status before attempting to access it!
     let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
     if let error = error {
-      log.error("AVAsset.statusOfValue error occurred: \(error)")
+      Log.main.error("AVAsset.statusOfValue error occurred: \(error)")
     }
 
     if durationStatus == .loaded {
@@ -618,7 +616,7 @@ extension PlaylistManager {
         return
       }
     } else if durationStatus != .loading {
-      log.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: durationStatus))")
+      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: durationStatus))")
     }
 
     switch Reach().connectionStatus() {
@@ -636,16 +634,16 @@ extension PlaylistManager {
         var error: NSError?
         let trackStatus = asset.statusOfValue(forKey: "tracks", error: &error)
         if let error = error {
-          log.error("AVAsset.statusOfValue error occurred: \(error)")
+          Log.main.error("AVAsset.statusOfValue error occurred: \(error)")
         }
 
         let durationStatus = asset.statusOfValue(forKey: "tracks", error: &error)
         if let error = error {
-          log.error("AVAsset.statusOfValue error occurred: \(error)")
+          Log.main.error("AVAsset.statusOfValue error occurred: \(error)")
         }
 
         if trackStatus == .cancelled || durationStatus == .cancelled {
-          log.error("Asset Duration Fetch Cancelled")
+          Log.main.error("Asset Duration Fetch Cancelled")
 
           ensureMainThread {
             completion(nil)
@@ -656,13 +654,13 @@ extension PlaylistManager {
         if trackStatus == .failed && durationStatus == .failed, let error = error {
           if error.code == NSURLErrorNoPermissionsToReadFile {
             // Media item is expired.. permission is denied
-            log.debug("Playlist Media Item Expired: \(item.pageSrc)")
+            Log.main.debug("Playlist Media Item Expired: \(item.pageSrc)")
 
             ensureMainThread {
               completion(nil)
             }
           } else {
-            log.error("An unknown error occurred while attempting to fetch track and duration information: \(error)")
+            Log.main.error("An unknown error occurred while attempting to fetch track and duration information: \(error)")
 
             ensureMainThread {
               completion(nil)

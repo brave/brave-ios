@@ -10,8 +10,6 @@ import Intents
 import CoreSpotlight
 import MobileCoreServices
 
-private let log = Log.main
-
 /// Shortcut Activity Types and detailed information to create and perform actions
 enum ActivityType: String {
   case newTab = "NewTab"
@@ -210,7 +208,7 @@ class ActivityShortcutManager: NSObject {
         return
       }
 
-      log.error("Failed to donate shortcut open website, error: \(error.localizedDescription)")
+      Log.main.error("Failed to donate shortcut open website, error: \(error.localizedDescription)")
     }
   }
 }

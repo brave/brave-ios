@@ -13,8 +13,6 @@ import Fuzi
 import Storage
 import Data
 
-private let log = Log.main
-
 class SearchCustomEngineViewController: UIViewController {
 
   // MARK: AddButtonType
@@ -164,7 +162,7 @@ class SearchCustomEngineViewController: UIViewController {
       alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
     }
 
-    log.error("\(error.localizedDescription)")
+    Log.main.error("\(error.localizedDescription)")
     present(alert, animated: true, completion: nil)
   }
 
@@ -300,7 +298,7 @@ extension SearchCustomEngineViewController {
           }
         }
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }

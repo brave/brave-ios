@@ -7,8 +7,6 @@ import Shared
 import BraveShared
 import Storage
 
-private let log = Log.main
-
 private let customSearchEnginesFileName = "customEngines.plist"
 
 // MARK: - SearchEngineError
@@ -250,7 +248,7 @@ class SearchEngines {
       let data = try Data(contentsOf: URL(fileURLWithPath: customEngineFilePath()))
       return (try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [OpenSearchEngine]) ?? []
     } catch {
-      log.error("Failed to load custom search engines: \(error.localizedDescription)")
+      Log.main.error("Failed to load custom search engines: \(error.localizedDescription)")
       return []
     }
   }()
@@ -260,7 +258,7 @@ class SearchEngines {
       let data = try NSKeyedArchiver.archivedData(withRootObject: customEngines, requiringSecureCoding: true)
       try data.write(to: URL(fileURLWithPath: customEngineFilePath()))
     } catch {
-      log.error("Failed to save custom engines: \(self.customEngines.description) - \(error.localizedDescription)")
+      Log.main.error("Failed to save custom engines: \(self.customEngines.description) - \(error.localizedDescription)")
     }
   }
 
@@ -423,7 +421,7 @@ class SearchEngines {
       do {
         try addSearchEngine(searchEngine)
       } catch {
-        log.error("Search Engine migration Failed for \(engineDetails.engineName)")
+        Log.main.error("Search Engine migration Failed for \(engineDetails.engineName)")
       }
     }
 

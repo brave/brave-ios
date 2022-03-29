@@ -8,8 +8,6 @@ import Static
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 class BraveVPNSettingsViewController: TableViewController {
 
   var faqButtonTapped: (() -> Void)?
@@ -183,7 +181,7 @@ class BraveVPNSettingsViewController: TableViewController {
   private func fetchRegionList() {
     BraveVPN.requestAllServerRegions() { [weak self] regionList in
       guard let regionList = regionList else {
-        log.error("Failed to fetch vpn region list")
+        Log.main.error("Failed to fetch vpn region list")
         return
       }
 
@@ -252,10 +250,10 @@ class BraveVPNSettingsViewController: TableViewController {
         self.vpnReconfigurationPending = true
         self.lastTimeVPNWasResetted = Date()
         self.isLoading = true
-        log.debug("Reconfiguring the vpn")
+        Log.main.debug("Reconfiguring the vpn")
 
         BraveVPN.reconfigureVPN() { success in
-          log.debug("Reconfiguration suceedeed: \(success)")
+          Log.main.debug("Reconfiguration suceedeed: \(success)")
           // Small delay before unlocking UI because enabling vpn
           // takes a moment after we call to connect to the vpn.
           DispatchQueue.main.asyncAfter(deadline: .now() + 1) {

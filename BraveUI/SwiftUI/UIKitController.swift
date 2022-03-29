@@ -7,8 +7,6 @@ import Foundation
 import SwiftUI
 import struct Shared.Log
 
-private let log = Log.main
-
 public struct UIKitController: View {
   private var makeVC: () -> UIViewController
 
@@ -40,7 +38,7 @@ public struct UIKitController: View {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
     static func dismantleUIViewController(_ uiViewController: UIViewController, coordinator: ()) {
-      log.debug("Dismantled \(uiViewController)")
+      Shared.Log.main.debug("Dismantled \(uiViewController)")
     }
   }
 }

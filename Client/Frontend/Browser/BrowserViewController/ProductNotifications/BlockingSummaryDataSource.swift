@@ -7,8 +7,6 @@ import UIKit
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 // MARK: - BlockingSummary
 
 struct BlockingSummary: Codable {
@@ -86,7 +84,7 @@ class BlockingSummaryDataSource {
     do {
       blockingSummaryList = try JSONDecoder().decode([BlockingSummary].self, from: blockSummaryData)
     } catch {
-      log.error("Failed to decode blockign summary object from json Data \(error.localizedDescription)")
+      Log.main.error("Failed to decode blockign summary object from json Data \(error.localizedDescription)")
     }
 
     return blockingSummaryList
@@ -101,7 +99,7 @@ class BlockingSummaryDataSource {
     do {
       return try Data(contentsOf: URL(fileURLWithPath: filePath))
     } catch {
-      log.error("Failed to get bundle path for \(fileName)")
+      Log.main.error("Failed to get bundle path for \(fileName)")
     }
 
     return nil

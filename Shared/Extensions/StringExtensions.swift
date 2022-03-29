@@ -4,8 +4,6 @@
 
 import UIKit
 
-private let log = Log.main
-
 extension String {
   public func escape() -> String? {
     // We can't guaruntee that strings have a valid string encoding, as this is an entry point for tainted data,
@@ -176,7 +174,7 @@ extension String {
       let encodedString = String(decoding: data, as: UTF8.self)
       return String(encodedString.dropLast().dropFirst())
     } catch {
-      log.error("Failed to escape a string containing javascript: \(error.localizedDescription)")
+      Log.main.error("Failed to escape a string containing javascript: \(error.localizedDescription)")
       return nil
     }
   }

@@ -6,8 +6,6 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Log.main
-
 class FocusHelper: TabContentScript {
   fileprivate weak var tab: Tab?
 
@@ -27,22 +25,22 @@ class FocusHelper: TabContentScript {
     defer { replyHandler(nil, nil) }
 
     guard let body = message.body as? [String: AnyObject] else {
-      return log.error("FocusHelper.js sent wrong type of message")
+      return Log.main.error("FocusHelper.js sent wrong type of message")
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 
     guard let data = body["data"] as? [String: String] else {
-      return log.error("FocusHelper.js sent wrong type of message")
+      return Log.main.error("FocusHelper.js sent wrong type of message")
     }
 
     guard let _ = data["elementType"],
       let eventType = data["eventType"]
     else {
-      return log.error("FocusHelper.js sent wrong keys for message")
+      return Log.main.error("FocusHelper.js sent wrong keys for message")
     }
 
     switch eventType {
@@ -51,7 +49,7 @@ class FocusHelper: TabContentScript {
     case "blur":
       tab?.isEditing = false
     default:
-      return log.error("FocusHelper.js sent unhandled eventType")
+      return Log.main.error("FocusHelper.js sent unhandled eventType")
     }
   }
 }

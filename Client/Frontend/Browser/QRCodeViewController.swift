@@ -7,8 +7,6 @@ import AVFoundation
 import SnapKit
 import Shared
 
-private let log = Log.main
-
 private struct QRCodeViewControllerUX {
   static let maskViewBackgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
   static let isLightingNavigationItemColor = UIColor(red: 0.45, green: 0.67, blue: 0.84, alpha: 1)
@@ -221,7 +219,7 @@ class QRCodeViewController: UIViewController {
         navigationItem.leftBarButtonItem?.image = #imageLiteral(resourceName: "qrcode-light")
         navigationItem.leftBarButtonItem?.tintColor = .bravePrimary
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     } else {
       do {
@@ -231,7 +229,7 @@ class QRCodeViewController: UIViewController {
         navigationItem.leftBarButtonItem?.image = #imageLiteral(resourceName: "qrcode-isLighting")
         navigationItem.leftBarButtonItem?.tintColor = .braveOrange
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
     isLightOn = !isLightOn
@@ -247,7 +245,7 @@ class QRCodeViewController: UIViewController {
       let input = try AVCaptureDeviceInput(device: captureDevice)
       captureSession.addInput(input)
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
 
     let output = AVCaptureMetadataOutput()
@@ -314,7 +312,7 @@ extension QRCodeViewController: AVCaptureMetadataOutputObjectsDelegate {
         animated: true,
         completion: {
           guard let metaData = metadataObjects.first as? AVMetadataMachineReadableCodeObject, let qrCodeDelegate = self.qrCodeDelegate, let text = metaData.stringValue else {
-            log.debug("Unable to scan QR code")
+            Log.main.debug("Unable to scan QR code")
             return
           }
 

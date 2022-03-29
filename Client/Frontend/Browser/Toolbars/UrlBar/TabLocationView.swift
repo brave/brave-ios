@@ -7,8 +7,6 @@ import Shared
 import SnapKit
 import BraveShared
 
-private let log = Log.main
-
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
   func tabLocationViewDidLongPressLocation(_ tabLocationView: TabLocationView)

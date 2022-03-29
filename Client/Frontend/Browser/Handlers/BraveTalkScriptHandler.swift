@@ -9,8 +9,6 @@ import Shared
 import BraveShared
 import BraveCore
 
-private let log = Log.main
-
 class BraveTalkScriptHandler: TabContentScript {
   private weak var tab: Tab?
   private weak var rewards: BraveRewards?
@@ -40,7 +38,7 @@ class BraveTalkScriptHandler: TabContentScript {
       allowedHosts.contains(requestHost),
       message.frameInfo.isMainFrame
     else {
-      log.error("Backup search request called from disallowed host")
+      Log.main.error("Backup search request called from disallowed host")
       return
     }
 
@@ -75,7 +73,7 @@ class BraveTalkScriptHandler: TabContentScript {
     // swiftlint:disable:next safe_javascript
     tab?.webView?.evaluateJavaScript(functionName + "(1, \(result))") { _, error in
       if let error = error {
-        log.error("BraveTalk api error: \(error.localizedDescription)")
+        Log.main.error("BraveTalk api error: \(error.localizedDescription)")
       }
     }
   }

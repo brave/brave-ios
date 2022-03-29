@@ -8,8 +8,6 @@ import SDWebImage
 import Shared
 import WidgetKit
 
-private let log = Log.main
-
 public struct WidgetFavorite: Codable {
   public var url: URL
   public var favicon: FaviconAttributes?
@@ -40,7 +38,7 @@ public class FavoritesWidgetData {
       let jsonData = try Data(contentsOf: dataPath)
       return try JSONDecoder().decode([WidgetFavorite].self, from: jsonData)
     } catch {
-      log.error("loadWidgetData error: \(error.localizedDescription)")
+      Log.main.error("loadWidgetData error: \(error.localizedDescription)")
       return nil
     }
   }
@@ -53,7 +51,7 @@ public class FavoritesWidgetData {
       try widgetData.write(to: dataPath)
       WidgetCenter.shared.reloadTimelines(ofKind: "FavoritesWidget")
     } catch {
-      log.error("updateWidgetData error: \(error.localizedDescription)")
+      Log.main.error("updateWidgetData error: \(error.localizedDescription)")
     }
   }
 }

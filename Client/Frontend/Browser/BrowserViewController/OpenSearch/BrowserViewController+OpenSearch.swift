@@ -8,8 +8,6 @@ import Storage
 import UIKit
 import WebKit
 
-private let log = Log.main
-
 // MARK: - OpenSearch
 
 public struct OpenSearchReference: Codable {
@@ -138,7 +136,7 @@ extension BrowserViewController {
     guard let scheme = tabManager.selectedTab?.webView?.url?.scheme,
       let host = tabManager.selectedTab?.webView?.url?.host
     else {
-      log.error("Selected Tab doesn't have URL")
+      Log.main.error("Selected Tab doesn't have URL")
       return
     }
 
@@ -211,7 +209,7 @@ extension BrowserViewController {
           self?.addSearchEngine(openSearchEngine)
         }
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }

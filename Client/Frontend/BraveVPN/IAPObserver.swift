@@ -8,8 +8,6 @@ import StoreKit
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 protocol IAPObserverDelegate: AnyObject {
   func purchasedOrRestoredProduct()
   func purchaseFailed(error: IAPObserver.PurchaseError)
@@ -28,7 +26,7 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
     transactions.forEach { transaction in
       switch transaction.transactionState {
       case .purchased, .restored:
-        log.debug("Received transaction state: purchased or restored")
+        Log.main.debug("Received transaction state: purchased or restored")
         BraveVPN.validateReceipt() { [weak self] expired in
           guard let self = self else { return }
           // This should be always called, no matter if transaction is successful or not.
@@ -42,9 +40,9 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
           }
         }
       case .purchasing, .deferred:
-        log.debug("Received transaction state: purchasing")
+        Log.main.debug("Received transaction state: purchasing")
       case .failed:
-        log.debug("Received transaction state: failed")
+        Log.main.debug("Received transaction state: failed")
         self.delegate?.purchaseFailed(
           error: .transactionError(error: transaction.error as? SKError))
         SKPaymentQueue.default().finishTransaction(transaction)
@@ -55,7 +53,7 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
   }
 
   func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
-    log.debug("Restoring transaction failed")
+    Log.main.debug("Restoring transaction failed")
     self.delegate?.purchaseFailed(error: .transactionError(error: error as? SKError))
   }
 }

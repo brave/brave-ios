@@ -6,8 +6,6 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Log.main
-
 class PrintHelper: TabContentScript {
   private weak var browserController: BrowserViewController?
   private weak var tab: Tab?
@@ -36,7 +34,7 @@ class PrintHelper: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 

@@ -9,8 +9,6 @@ import Shared
 import GCDWebServers
 import BraveShared
 
-private let log = Log.main
-
 class BookmarksInterstitialPageHandler {
 
   class func showBookmarksPage(tabManager: TabManager, url: URL) -> Bool {
@@ -81,7 +79,7 @@ extension BookmarksInterstitialPageHandler {
 
   private static func buildResponse(asset: String?, variables: [String: String]) -> GCDWebServerResponse? {
     guard let unwrappedAsset = asset else {
-      log.error("Asset is nil")
+      Log.main.error("Asset is nil")
       return GCDWebServerResponse(statusCode: 404)
     }
 

@@ -18,8 +18,6 @@ import Shared
 import Data
 import SwiftUI
 
-private let log = Log.main
-
 // MARK: - PlaylistListViewController
 
 class PlaylistListViewController: UIViewController {
@@ -282,7 +280,7 @@ class PlaylistListViewController: UIViewController {
             at: indexPath,
             isExpired: false)
         case .other(let err):
-          log.error("\(err.localizedDescription)")
+          Log.main.error("\(err.localizedDescription)")
           self.commitPlayerItemTransaction(
             at: indexPath,
             isExpired: false)
@@ -792,7 +790,7 @@ extension PlaylistListViewController {
     }
 
     // Some sort of error happened while downloading the playlist item
-    log.error("Error downloading playlist item: \(error.localizedDescription)")
+    Log.main.error("Error downloading playlist item: \(error.localizedDescription)")
 
     guard let item = PlaylistManager.shared.itemAtIndex(index) else {
       return

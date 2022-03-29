@@ -28,8 +28,6 @@ protocol QuickActionHandlerDelegate {
 
 class QuickActions: NSObject {
 
-  fileprivate let log = Log.main
-
   static let quickActionsVersion = "1.0"
   static let quickActionsVersionKey = "dynamicQuickActionsVersion"
 

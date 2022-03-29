@@ -24,8 +24,6 @@ import FeedKit
 import SwiftUI
 import class Combine.AnyCancellable
 
-private let log = Log.main
-
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
   .loading,
@@ -331,7 +329,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
       BraveLedger.environment = config.ledgerEnvironment
       return BraveLedger(stateStoragePath: legacyLedger.path)
     } catch {
-      log.error("Failed to migrate legacy wallet into a new folder: \(error.localizedDescription)")
+      Log.main.error("Failed to migrate legacy wallet into a new folder: \(error.localizedDescription)")
       return nil
     }
   }
@@ -749,7 +747,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
 
     LegacyBookmarksHelper.restore_1_12_Bookmarks() {
-      log.info("Bookmarks from old database were successfully restored")
+      Log.main.info("Bookmarks from old database were successfully restored")
     }
 
     vpnProductInfo.load()
@@ -788,12 +786,12 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
     center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
       if let error = error {
-        log.error("Failed to request notifications permissions: \(error.localizedDescription)")
+        Log.main.error("Failed to request notifications permissions: \(error.localizedDescription)")
         return
       }
 
       if !granted {
-        log.info("Not authorized to schedule a notification")
+        Log.main.info("Not authorized to schedule a notification")
         return
       }
 
@@ -819,7 +817,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
         center.add(request) { error in
           if let error = error {
-            log.error("Failed to add notification: \(error.localizedDescription)")
+            Log.main.error("Failed to add notification: \(error.localizedDescription)")
             return
           }
 
@@ -1244,7 +1242,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
           asFunction: false
         ) { _, error in
           if let error = error {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
           }
         }
       }
@@ -1280,13 +1278,13 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
 
     guard let webView = object as? WKWebView else {
-      log.error("An object of type: \(String(describing: object)) is being observed instead of a WKWebView")
+      Log.main.error("An object of type: \(String(describing: object)) is being observed instead of a WKWebView")
       return  // False alarm.. the source MUST be a web view.
     }
 
     // WebView is a zombie and somehow still has an observer attached to it
     guard let tab = tabManager[webView] else {
-      log.error("WebView: \(webView) has been removed from TabManager but still has attached observers")
+      Log.main.error("WebView: \(webView) has been removed from TabManager but still has attached observers")
       return
     }
 
@@ -1679,7 +1677,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             }
             self.present(pdfActivityController, animated: true)
           } catch {
-            log.error("Failed to write PDF to disk: \(error.localizedDescription)")
+            Log.main.error("Failed to write PDF to disk: \(error.localizedDescription)")
           }
         }
         activities.append(createPDFActivity)
@@ -3071,7 +3069,7 @@ extension BrowserViewController: PreferencesObserver {
         state: selectedTab?.playlistItemState ?? .none,
         item: selectedTab?.playlistItem)
     default:
-      log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
+      Log.main.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break
     }
   }
@@ -3095,7 +3093,7 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
   func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     if response.notification.request.identifier == defaultBrowserNotificationId {
       guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-        log.error("Failed to unwrap iOS settings URL")
+        Log.main.error("Failed to unwrap iOS settings URL")
         return
       }
       UIApplication.shared.open(settingsUrl)

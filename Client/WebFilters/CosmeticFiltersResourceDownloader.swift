@@ -7,8 +7,6 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 struct CosmeticFilterModel: Codable {
   let hideSelectors: [String]
   let styleSelectors: [String: [String]]
@@ -73,7 +71,7 @@ class CosmeticFiltersResourceDownloader {
             try await self.loadDownloadedFiles(into: self.engine)
             self.didInitialLoad = true
           } catch {
-            log.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
+            Log.main.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
           }
         }
       }
@@ -104,10 +102,10 @@ class CosmeticFiltersResourceDownloader {
             // Once the new engine is setup, we can replace the old engine with the new one.
             self.engine = newEngine
           } catch {
-            log.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
+            Log.main.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
           }
         } catch {
-          log.error("Failed to Download Cosmetic-Filters: \(error.localizedDescription)")
+          Log.main.error("Failed to Download Cosmetic-Filters: \(error.localizedDescription)")
         }
       }
     }
@@ -120,7 +118,7 @@ class CosmeticFiltersResourceDownloader {
   private func loadDownloadedFiles(into engine: AdblockRustEngine) async throws {
     let fm = FileManager.default
     guard let folderUrl = fm.getOrCreateFolder(name: CosmeticFiltersResourceDownloader.folderName) else {
-      log.error("Could not get directory with .dat and .json files")
+      Log.main.error("Could not get directory with .dat and .json files")
       return
     }
 
@@ -146,13 +144,13 @@ class CosmeticFiltersResourceDownloader {
 
   private func downloadCosmeticSamples(with engine: AdblockRustEngine) async throws {
     try await downloadResources(for: engine, type: .cosmeticSample)
-    log.debug("Downloaded Cosmetic Filters CSS Samples")
+    Log.main.debug("Downloaded Cosmetic Filters CSS Samples")
     Preferences.Debug.lastCosmeticFiltersCSSUpdate.value = Date()
   }
 
   private func downloadResourceSamples(with engine: AdblockRustEngine) async throws {
     try await downloadResources(for: engine, type: .resourceSample)
-    log.debug("Downloaded Cosmetic Filters Scriptlets Samples")
+    Log.main.debug("Downloaded Cosmetic Filters Scriptlets Samples")
     Preferences.Debug.lastCosmeticFiltersScripletsUpdate.value = Date()
   }
 
@@ -211,7 +209,7 @@ class CosmeticFiltersResourceDownloader {
 
   private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
     guard let folderUrl = FileManager.default.getOrCreateFolder(name: folder) else {
-      log.error("Failed to get folder: \(folder)")
+      Log.main.error("Failed to get folder: \(folder)")
       return nil
     }
 
@@ -331,10 +329,10 @@ class CosmeticFiltersResourceDownloader {
         return value.count > 0
       }
       
-      log.error("JSON Must have a top-level type of Array of Dictionary.")
+      Log.main.error("JSON Must have a top-level type of Array of Dictionary.")
       return false
     } catch {
-      log.error("JSON Deserialization Failed: \(error.localizedDescription)")
+      Log.main.error("JSON Deserialization Failed: \(error.localizedDescription)")
       return false
     }
   }

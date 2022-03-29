@@ -5,8 +5,6 @@ import CoreData
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 /// A helper structure for `DataController.perform()` method
 /// to decide whether a new or existing context should be used
 /// to perform a database write operation.
@@ -198,7 +196,7 @@ public class DataController {
   private func storeURL(for directory: FileManager.SearchPathDirectory) -> URL {
     let urls = FileManager.default.urls(for: directory, in: .userDomainMask)
     guard let docURL = urls.last else {
-      log.error("Could not load url for: \(directory.rawValue)")
+      Log.main.error("Could not load url for: \(directory.rawValue)")
       fatalError()
     }
 
@@ -238,7 +236,7 @@ public class DataController {
             assert(!Thread.isMainThread)
             try backgroundContext.save()
           } catch {
-            log.error("performTask save error: \(error.localizedDescription)")
+            Log.main.error("performTask save error: \(error.localizedDescription)")
           }
         }
       })

@@ -11,9 +11,6 @@ import BraveShared
 import FeedKit
 import BraveCore
 
-// Named `logger` because we are using math function `log`
-private let logger = Log.main
-
 /// Powers the Brave News feed.
 class FeedDataSource {
   /// The current view state of the data source
@@ -260,7 +257,7 @@ class FeedDataSource {
             let decodedResource = try self.decoder.decode(DataType.self, from: data)
             if !data.isEmpty {
               if !FileManager.default.writeToDiskInFolder(data, fileName: filename, folderName: Self.cacheFolderName) {
-                logger.error("Failed to write sources to disk")
+                Log.main.error("Failed to write sources to disk")
               }
             }
             return .success(decodedResource)
@@ -284,7 +281,7 @@ class FeedDataSource {
       } catch {
         // Could be a source type change, so may not be a big issue. If the user goes to download
         // updated lists and it still fails it will show an error on the feed
-        logger.debug("Failed to decode previously cached sources: \(error.localizedDescription)")
+        Log.main.debug("Failed to decode previously cached sources: \(error.localizedDescription)")
       }
     }
   }
@@ -452,7 +449,7 @@ class FeedDataSource {
         }
       }
     } catch {
-      logger.error("Could not remove cached files")
+      Log.main.error("Could not remove cached files")
       return false
     }
     return true
@@ -688,7 +685,7 @@ class FeedDataSource {
                 contentAd = ad
               } else {
                 contentAdsQueryFailed = true
-                logger.debug("Inline content ads could not be filled; Skipping for the rest of this feed generation")
+                Log.main.debug("Inline content ads could not be filled; Skipping for the rest of this feed generation")
               }
               group.leave()
             })

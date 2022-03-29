@@ -8,8 +8,6 @@ import WebKit
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 class AdblockDebugMenuTableViewController: TableViewController {
 
   private let fm = FileManager.default

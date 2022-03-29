@@ -10,8 +10,6 @@ import WebKit
 import SwiftyJSON
 import BraveCore
 
-private let log = Log.main
-
 class LoginsHelper: TabContentScript {
   private weak var tab: Tab?
   private let profile: Profile
@@ -45,7 +43,7 @@ class LoginsHelper: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 
@@ -88,7 +86,7 @@ class LoginsHelper: TabContentScript {
 
   func setCredentials(_ login: LoginData) {
     if login.password.isEmpty {
-      log.debug("Empty password")
+      Log.main.debug("Empty password")
       return
     }
 
@@ -96,7 +94,7 @@ class LoginsHelper: TabContentScript {
       .getLoginsForProtectionSpace(login.protectionSpace, withUsername: login.username)
       .uponQueue(.main) { res in
         if let data = res.successValue {
-          log.debug("Found \(data.count) logins.")
+          Log.main.debug("Found \(data.count) logins.")
           for saved in data {
             if let saved = saved {
               if saved.password == login.password {
@@ -187,12 +185,12 @@ class LoginsHelper: TabContentScript {
       let password = scriptCredentials.passwordValue,
       scriptCredentials.passwordElement != nil
     else {
-      log.debug("Missing Credentials from script")
+      Log.main.debug("Missing Credentials from script")
       return
     }
 
     if password.isEmpty {
-      log.debug("Empty Password")
+      Log.main.debug("Empty Password")
       return
     }
 
@@ -331,7 +329,7 @@ class LoginsHelper: TabContentScript {
       escapeArgs: false
     ) { (object, error) -> Void in
       if let error = error {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }

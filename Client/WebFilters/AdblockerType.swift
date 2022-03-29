@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 enum FileType: String {
   case dat, json, tgz
 }

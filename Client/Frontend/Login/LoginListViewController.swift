@@ -10,8 +10,6 @@ import Storage
 import Data
 import BraveCore
 
-private let log = Log.main
-
 class LoginListViewController: LoginAuthViewController {
 
   // MARK: UX

@@ -11,8 +11,6 @@ public protocol WebsitePresentable {
   var url: String? { get }
 }
 
-private let log = Log.main
-
 /// Note: This class is named as `Bookmark` in our core data model due to sync v1 legacy..
 public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
   @NSManaged public var title: String?
@@ -148,7 +146,7 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
     isInteractiveDragReorder: Bool = false
   ) {
     if destinationIndexPath.row == sourceIndexPath.row {
-      log.error("Source and destination bookmarks are the same!")
+      Log.main.error("Source and destination bookmarks are the same!")
       return
     }
 
@@ -181,7 +179,7 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
           assert(Thread.isMainThread)
           try context.save()
         } catch {
-          log.error("performTask save error: \(error.localizedDescription)")
+          Log.main.error("performTask save error: \(error.localizedDescription)")
         }
       }
     }

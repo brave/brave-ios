@@ -8,8 +8,6 @@ import BraveUI
 import UIKit
 import Shared
 
-private let log = Log.main
-
 extension TabTrayController: UIViewControllerTransitioningDelegate {
   func animationController(
     forPresented presented: UIViewController,
@@ -32,7 +30,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
       let bvc = containerController.topViewController as? BrowserViewController,
       let destinationController = context.viewController(forKey: .to)
     else {
-      log.error(
+      Log.main.error(
         """
             Attempted to present the tab tray on something that is not a BrowserViewController which is
             currently unsupported.
@@ -42,7 +40,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
     }
 
     guard let selectedTab = tabManager.selectedTab else {
-      log.error("Attempted to present the tab tray without having a selected tab")
+      Log.main.error("Attempted to present the tab tray without having a selected tab")
       context.completeTransition(true)
       return
     }
@@ -153,7 +151,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
     guard let toViewController = context.viewController(forKey: .to),
       let toView = context.view(forKey: .to)
     else {
-      log.error(
+      Log.main.error(
         """
             Attempted to dismiss the tab tray without a view to dismiss from.
 
@@ -167,7 +165,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
     guard let containerController = toViewController as? UINavigationController,
       let bvc = containerController.topViewController as? BrowserViewController
     else {
-      log.error(
+      Log.main.error(
         """
             Attempted to dismiss the tab tray from something that is not a BrowserViewController which is
             currently unsupported.

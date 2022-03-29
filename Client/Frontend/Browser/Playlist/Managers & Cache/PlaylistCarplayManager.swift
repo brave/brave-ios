@@ -11,8 +11,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 /// Lightweight class that manages a single MediaPlayer item
 /// The MediaPlayer is then passed to any controller that needs to use it.
 class PlaylistCarplayManager: NSObject {
@@ -169,7 +167,7 @@ class PlaylistCarplayManager: NSObject {
 
     // Sometimes the `endpointAvailable` WILL RETURN TRUE!
     // Even when the car is NOT connected.
-    log.debug("CARPLAY CONNECTED: \(isCarPlayAvailable)")
+    Log.main.debug("CARPLAY CONNECTED: \(isCarPlayAvailable)")
   }
 }
 
@@ -199,6 +197,6 @@ extension PlaylistCarplayManager: CPSessionConfigurationDelegate {
     _ sessionConfiguration: CPSessionConfiguration,
     limitedUserInterfacesChanged limitedUserInterfaces: CPLimitableUserInterface
   ) {
-    log.debug("Limited UI changed: \(String(describing: limitedUserInterfaces))")
+    Log.main.debug("Limited UI changed: \(String(describing: limitedUserInterfaces))")
   }
 }

@@ -7,8 +7,6 @@ import Foundation
 import CoreData
 import Shared
 
-private let log = Log.main
-
 @objc(PlaylistItem)
 final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var cachedData: Data?
@@ -227,7 +225,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
 
   private static func saveContext(_ context: NSManagedObjectContext) {
     if context.concurrencyType == .mainQueueConcurrencyType {
-      log.warning("Writing to view context, this should be avoided.")
+      Log.main.warning("Writing to view context, this should be avoided.")
     }
 
     if context.hasChanges {

@@ -6,8 +6,6 @@
 import UIKit
 import Shared
 
-private let log = Log.main
-
 // MARK: - SearchQuickEnginesViewController
 
 class SearchQuickEnginesViewController: UITableViewController {

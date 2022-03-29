@@ -6,8 +6,6 @@ import Foundation
 import BraveShared
 import Shared
 
-private let log = Log.main
-
 public final class Domain: NSManagedObject, CRUD {
 
   @NSManaged public var url: String?
@@ -187,7 +185,7 @@ extension Domain {
         do {
           try writeContext.save()
         } catch {
-          log.error("Domain save error: \(error.localizedDescription)")
+          Log.main.error("Domain save error: \(error.localizedDescription)")
         }
       }
     }

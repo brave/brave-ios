@@ -8,8 +8,6 @@ import Data
 import Shared
 import WebKit
 
-private let log = Log.main
-
 class PaymentRequestExtension: NSObject {
   typealias PaymentRequestHandler = (
     PaymentRequest,
@@ -51,7 +49,7 @@ extension PaymentRequestExtension: TabContentScript {
     ensureMainThread {
       self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage], contentWorld: .page) { _, error in
         if let error = error {
-          log.error("\(error.localizedDescription)")
+          Log.main.error("\(error.localizedDescription)")
         }
       }
     }
@@ -97,7 +95,7 @@ extension PaymentRequestExtension: TabContentScript {
           ensureMainThread {
             self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""], contentWorld: .page) { _, error in
               if let error = error {
-                log.error("\(error.localizedDescription)")
+                Log.main.error("\(error.localizedDescription)")
               }
             }
           }

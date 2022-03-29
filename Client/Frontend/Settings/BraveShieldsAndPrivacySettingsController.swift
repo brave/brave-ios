@@ -10,8 +10,6 @@ import BraveShared
 import BraveCore
 import class SwiftUI.UIHostingController
 
-private let log = Log.main
-
 class BraveShieldsAndPrivacySettingsController: TableViewController {
   let profile: Profile
   let tabManager: TabManager
@@ -308,7 +306,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     func _clear(_ clearables: [Clearable], secondAttempt: Bool = false) -> Deferred<Void> {
       let deferred = Deferred<Void>()
       clearables.enumerated().map { clearable in
-        log.debug("Clearing \(clearable.element.label).")
+        Log.main.debug("Clearing \(clearable.element.label).")
 
         let res = Success()
         succeed().upon() { _ in  // move off main thread
@@ -321,7 +319,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       .allSucceed()
       .upon { result in
         if !result.isSuccess && !secondAttempt {
-          log.error("Private data NOT cleared successfully")
+          Log.main.error("Private data NOT cleared successfully")
           DispatchQueue.main.asyncAfter(
             deadline: .now() + 0.5,
             execute: {
@@ -334,7 +332,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         }
 
         if !result.isSuccess {
-          log.error("Private data NOT cleared after 2 attempts")
+          Log.main.error("Private data NOT cleared after 2 attempts")
         }
         deferred.fill(())
       }

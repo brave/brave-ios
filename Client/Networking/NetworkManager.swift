@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 class NetworkManager {
   private let session: NetworkSession
 

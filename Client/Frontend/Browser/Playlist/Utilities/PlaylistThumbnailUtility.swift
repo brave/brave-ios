@@ -11,8 +11,6 @@ import SDWebImage
 import Shared
 import Data
 
-private let log = Log.main
-
 public class PlaylistThumbnailRenderer {
   private let timeout: TimeInterval = 3
   private var hlsGenerator: HLSThumbnailGenerator?
@@ -47,7 +45,7 @@ public class PlaylistThumbnailRenderer {
       chainedGenerator.receive(on: RunLoop.main).sink(
         receiveCompletion: {
           if case .failure(let error) = $0 {
-            log.error("\(error.localizedDescription)")
+            Log.main.error("\(error.localizedDescription)")
             completion(nil)
           }
         },
@@ -92,7 +90,7 @@ public class PlaylistThumbnailRenderer {
       url: url, time: timeout,
       completion: { image, error in
         if let error = error {
-          log.error("\(error.localizedDescription)")
+          Log.main.error("\(error.localizedDescription)")
         }
 
         if let image = image {
@@ -111,7 +109,7 @@ public class PlaylistThumbnailRenderer {
     assetGenerator?.appliesPreferredTrackTransform = false
     assetGenerator?.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
       if let error = error {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
 
       if result == .succeeded, let cgImage = cgImage {

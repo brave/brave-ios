@@ -12,8 +12,6 @@ import BraveShared
 import BraveUI
 import SwiftKeychainWrapper
 
-private let log = Log.main
-
 class WindowProtection {
 
   private class LockedViewController: UIViewController {
@@ -156,7 +154,7 @@ class WindowProtection {
         } else {
           lockedViewController.unlockButton.isHidden = false
           if let error = error {
-            log.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
+            Log.main.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
           }
         }
       }

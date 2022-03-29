@@ -7,8 +7,6 @@ import Shared
 import WebKit
 import SwiftyJSON
 
-private let log = Log.main
-
 let ReaderModeProfileKeyStyle = "readermode.style"
 
 enum ReaderModeMessageType: String {
@@ -281,7 +279,7 @@ class ReaderMode: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 

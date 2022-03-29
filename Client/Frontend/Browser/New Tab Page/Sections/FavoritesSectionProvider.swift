@@ -9,8 +9,6 @@ import Data
 import CoreData
 import Shared
 
-private let log = Log.main
-
 enum BookmarksAction {
   case opened(inNewTab: Bool = false, switchingToPrivateMode: Bool = false)
   case edited
@@ -42,7 +40,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     do {
       try frc.performFetch()
     } catch {
-      log.error("Favorites fetch error")
+      Log.main.error("Favorites fetch error")
     }
   }
 

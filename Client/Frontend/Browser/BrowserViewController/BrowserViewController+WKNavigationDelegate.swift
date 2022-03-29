@@ -9,8 +9,6 @@ import Data
 import BraveShared
 import BraveCore
 
-private let log = Log.main
-
 extension WKNavigationAction {
   /// Allow local requests only if the request is privileged.
   /// If the request is internal or unprivileged, we should deny it.
@@ -118,7 +116,7 @@ extension BrowserViewController: WKNavigationDelegate {
 
     if InternalURL.isValid(url: url) {
       if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged {
-        log.warning("Denying unprivileged request: \(navigationAction.request)")
+        Log.main.warning("Denying unprivileged request: \(navigationAction.request)")
         decisionHandler(.cancel, preferences)
         return
       }
@@ -497,11 +495,11 @@ extension BrowserViewController: WKNavigationDelegate {
         let cosmeticFiltersScript = try AdBlockStats.shared.cosmeticFiltersScript(for: url) {
         // Execute the cosmetic filters script in the cosmetic filters sandbox world
         webView.evaluateSafeJavaScript(functionName: cosmeticFiltersScript, args: [], contentWorld: .cosmeticFiltersSandbox, asFunction: false) { _, error in
-          log.error("AdblockRustInjector error: \(String(describing: error))")
+          Log.main.error("AdblockRustInjector error: \(String(describing: error))")
         }
       }
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
 
     // Added this method to determine long press menu actions better

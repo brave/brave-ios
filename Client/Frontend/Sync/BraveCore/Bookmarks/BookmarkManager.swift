@@ -10,8 +10,6 @@ import BraveShared
 import CoreData
 import Shared
 
-private let log = Log.main
-
 class BookmarkManager {
 
   // MARK: Lifecycle
@@ -259,10 +257,10 @@ class BookmarkManager {
       if let url = url, !bookmarkItem.bookmarkNode.isFolder {
         bookmarkItem.bookmarkNode.url = url
       } else if url != nil {
-        log.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
+        Log.main.error("Error: Moving bookmark - Cannot convert a folder into a bookmark with url.")
       }
     } else {
-      log.error("Error: Moving bookmark - Cannot move a bookmark to Root.")
+      Log.main.error("Error: Moving bookmark - Cannot move a bookmark to Root.")
     }
   }
 

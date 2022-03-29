@@ -5,8 +5,6 @@
 import UIKit
 import Shared
 
-private let log = Log.main
-
 // MARK: - SearchEnginePickerDelegate
 
 protocol SearchEnginePickerDelegate: AnyObject {
@@ -317,7 +315,7 @@ class SearchSettingsTableViewController: UITableViewController {
         try searchEngines.deleteCustomEngine(engine)
         tableView.deleteRows(at: [indexPath], with: .right)
       } catch {
-        log.error("Search Engine Error while deleting")
+        Log.main.error("Search Engine Error while deleting")
       }
     }
   }

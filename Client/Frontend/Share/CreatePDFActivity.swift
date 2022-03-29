@@ -7,8 +7,6 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Log.main
-
 #if compiler(>=5.3)
 
 /// An activity that will create a PDF of a given web page
@@ -41,7 +39,7 @@ class CreatePDFActivity: UIActivity {
         self.callback(data)
         self.activityDidFinish(true)
       case .failure(let error):
-        log.error("Failed to create PDF with error: \(error.localizedDescription)")
+        Log.main.error("Failed to create PDF with error: \(error.localizedDescription)")
         self.activityDidFinish(false)
       }
     }

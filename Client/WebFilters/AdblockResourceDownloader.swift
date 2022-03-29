@@ -6,8 +6,6 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 private struct AdBlockNetworkResource {
   let resource: CachedNetworkResource
   let fileType: FileType
@@ -28,7 +26,7 @@ class AdblockResourceDownloader {
 
   init(networkManager: NetworkManager = NetworkManager(), locale: String? = Locale.current.languageCode) {
     if locale == nil {
-      log.warning("No locale provided, using default one(\"en\")")
+      Log.main.warning("No locale provided, using default one(\"en\")")
     }
     self.locale = locale ?? "en"
     self.networkManager = networkManager
@@ -55,7 +53,7 @@ class AdblockResourceDownloader {
             try await group.waitForAll()
           }
         } catch {
-          log.error("Failed to Download Adblock-Resources: \(error.localizedDescription)")
+          Log.main.error("Failed to Download Adblock-Resources: \(error.localizedDescription)")
         }
       }
     }
@@ -63,14 +61,14 @@ class AdblockResourceDownloader {
 
   func regionalAdblockResourcesSetup() async throws {
     if !Preferences.Shields.useRegionAdBlock.value {
-      log.debug("Regional adblocking disabled, aborting attempt to download regional resources")
+      Log.main.debug("Regional adblocking disabled, aborting attempt to download regional resources")
       return
     }
 
     try await downloadResources(
       type: .regional(locale: locale),
       queueName: "Regional adblock setup")
-    log.debug("Regional blocklists download and setup completed.")
+    Log.main.debug("Regional blocklists download and setup completed.")
     Preferences.Debug.lastRegionalAdblockUpdate.value = Date()
   }
 
@@ -78,7 +76,7 @@ class AdblockResourceDownloader {
     try await downloadResources(
       type: .general,
       queueName: "General adblock setup")
-    log.debug("General blocklists download and setup completed.")
+    Log.main.debug("General blocklists download and setup completed.")
     Preferences.Debug.lastGeneralAdblockUpdate.value = Date()
   }
 
@@ -136,7 +134,7 @@ class AdblockResourceDownloader {
 
   private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
     guard let folderUrl = FileManager.default.getOrCreateFolder(name: folder) else {
-      log.error("Failed to get folder: \(folder)")
+      Log.main.error("Failed to get folder: \(folder)")
       return nil
     }
 
@@ -214,7 +212,7 @@ extension AdblockResourceDownloader: PreferencesObserver {
         do {
           try await regionalAdblockResourcesSetup()
         } catch {
-          log.error("\(error.localizedDescription)")
+          Log.main.error("\(error.localizedDescription)")
         }
       }
     }

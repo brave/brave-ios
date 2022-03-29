@@ -6,8 +6,6 @@ import Foundation
 import CoreData
 import Shared
 
-private let log = Log.main
-
 // TODO: Creatable, Updateable. Those are not needed at the moment.
 typealias CRUD = Readable & Deletable
 
@@ -79,7 +77,7 @@ extension Deletable {
           NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: contextsToUpdate)
         }
       } catch {
-        log.error("Delete all error: \(error.localizedDescription)")
+        Log.main.error("Delete all error: \(error.localizedDescription)")
       }
     }
   }
@@ -97,7 +95,7 @@ extension Readable {
     do {
       return try context.count(for: request)
     } catch {
-      log.error("Count error: \(error.localizedDescription)")
+      Log.main.error("Count error: \(error.localizedDescription)")
     }
 
     return nil
@@ -127,7 +125,7 @@ extension Readable {
     do {
       return try context.fetch(request)
     } catch {
-      log.error("Fetch error: \(error.localizedDescription)")
+      Log.main.error("Fetch error: \(error.localizedDescription)")
     }
 
     return nil

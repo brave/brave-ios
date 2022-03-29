@@ -4,8 +4,6 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = Log.main
-
 class AdBlockStats: LocalAdblockResourceProtocol {
   static let shared = AdBlockStats()
 
@@ -38,7 +36,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
   private func parseBundledGeneralBlocklist() {
     guard let path = Bundle.main.path(forResource: bundledGeneralBlocklist, ofType: "dat") else {
-      log.error("Can't find path for bundled general blocklist")
+      Log.main.error("Can't find path for bundled general blocklist")
       return
     }
     let fileUrl = URL(fileURLWithPath: path)
@@ -49,7 +47,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         self.generalAdblockEngine.set(data: data)
       }
     } catch {
-      log.error("Failed to parse bundled general blocklist: \(error.localizedDescription)")
+      Log.main.error("Failed to parse bundled general blocklist: \(error.localizedDescription)")
     }
   }
 
@@ -57,7 +55,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
     let fm = FileManager.default
 
     guard let folderUrl = fm.getOrCreateFolder(name: AdblockResourceDownloader.folderName) else {
-      log.error("Could not get directory with .dat files")
+      Log.main.error("Could not get directory with .dat files")
       return
     }
 
@@ -75,7 +73,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
           try await self.setDataFile(data: data, id: fileName)
         }
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     }
   }
@@ -101,7 +99,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         if let checkedItem = checkedItem as? Bool {
           return checkedItem
         } else {
-          log.error("Can't cast checkedItem to Bool")
+          Log.main.error("Can't cast checkedItem to Bool")
           return false
         }
       }
@@ -156,7 +154,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         }
 
         if engine.set(data: data) {
-          log.debug("Adblock file with id: \(id) deserialized successfully")
+          Log.main.debug("Adblock file with id: \(id) deserialized successfully")
           // Clearing the cache or checked urls.
           // The new list can bring blocked resource that were previously set as not-blocked.
           self.fifoCacheOfUrlsChecked = FifoDict()

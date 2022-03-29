@@ -11,8 +11,6 @@ import MessageUI
 // To get cellular carrier name
 import CoreTelephony
 
-private let log = Log.main
-
 class BraveVPNContactFormViewController: TableViewController {
 
   private let supportEmail = "brave@guardianapp.com"
@@ -221,7 +219,7 @@ class BraveVPNContactFormViewController: TableViewController {
       selection: { [weak self] in
         guard let self = self else { return }
         if !MFMailComposeViewController.canSendMail() {
-          log.error("Can't send email on this device")
+          Log.main.error("Can't send email on this device")
           let alert = UIAlertController(
             title: Strings.genericErrorTitle,
             message: Strings.VPN.contactFormEmailNotConfiguredBody,
@@ -265,7 +263,7 @@ class BraveVPNContactFormViewController: TableViewController {
     do {
       return try Data(contentsOf: receiptUrl).base64EncodedString()
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }

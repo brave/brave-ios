@@ -11,8 +11,6 @@ import Data
 import Shared
 import BraveUI
 
-private let log = Log.main
-
 // MARK: UITableViewDataSource
 
 extension PlaylistListViewController: UITableViewDataSource {

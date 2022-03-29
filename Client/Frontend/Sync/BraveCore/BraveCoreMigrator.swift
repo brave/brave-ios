@@ -11,8 +11,6 @@ import Data
 import CoreData
 import Storage
 
-private let log = Log.main
-
 class BraveCoreMigrator {
 
   // MARK: Migration State
@@ -193,11 +191,11 @@ extension BraveCoreMigrator {
   }
 
   private func performBookmarkMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
-    log.info("Migrating to Chromium Bookmarks v1 - Exporting")
+    Log.main.info("Migrating to Chromium Bookmarks v1 - Exporting")
     exportBookmarks { [weak self] success in
       guard let self = self else { return }
       if success {
-        log.info("Migrating to Chromium Bookmarks v1 - Start")
+        Log.main.info("Migrating to Chromium Bookmarks v1 - Start")
         self.migrateBookmarks() { success in
           Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
 
@@ -205,14 +203,14 @@ extension BraveCoreMigrator {
             do {
               try FileManager.default.removeItem(at: url)
             } catch {
-              log.error("Failed to delete Bookmarks.html backup during Migration")
+              Log.main.error("Failed to delete Bookmarks.html backup during Migration")
             }
           }
 
           completion?(success)
         }
       } else {
-        log.info("Migrating to Chromium Bookmarks v1 failed: Exporting")
+        Log.main.info("Migrating to Chromium Bookmarks v1 failed: Exporting")
         completion?(success)
       }
     }
@@ -221,7 +219,7 @@ extension BraveCoreMigrator {
   private func migrateBookmarks(_ completion: @escaping (_ success: Bool) -> Void) {
     // Migrate to the mobile folder by default..
     guard let rootFolder = bookmarksAPI.mobileNode else {
-      log.error("Invalid Root Folder - Mobile Node")
+      Log.main.error("Invalid Root Folder - Mobile Node")
       DispatchQueue.main.async {
         completion(false)
       }
@@ -246,14 +244,14 @@ extension BraveCoreMigrator {
 
   private func migrateChromiumBookmarks(context: NSManagedObjectContext, bookmark: LegacyBookmark, chromiumBookmark: BookmarkNode) -> Bool {
     guard let title = bookmark.isFolder ? bookmark.customTitle : bookmark.title else {
-      log.error("Invalid Bookmark Title")
+      Log.main.error("Invalid Bookmark Title")
       return false
     }
 
     if bookmark.isFolder {
       // Create a folder..
       guard let folder = chromiumBookmark.addChildFolder(withTitle: title) else {
-        log.error("Error Creating Bookmark Folder")
+        Log.main.error("Error Creating Bookmark Folder")
         return false
       }
 
@@ -274,7 +272,7 @@ extension BraveCoreMigrator {
     } else if let absoluteUrl = bookmark.url, let url = URL(string: absoluteUrl) {
       // Migrate URLs..
       if chromiumBookmark.addChildBookmark(withTitle: title, url: url) == nil {
-        log.error("Failed to Migrate Bookmark URL")
+        Log.main.error("Failed to Migrate Bookmark URL")
         return false
       }
 
@@ -317,7 +315,7 @@ extension BraveCoreMigrator {
   }
 
   private func performHistoryMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
-    log.info("Migrating to Chromium History v1 - Start")
+    Log.main.info("Migrating to Chromium History v1 - Start")
     migrateHistory() { success in
       Preferences.Chromium.syncV2HistoryMigrationCompleted.value = success
       completion?(success)
@@ -347,7 +345,7 @@ extension BraveCoreMigrator {
       let absoluteUrl = history.url, let url = URL(string: absoluteUrl),
       let dateAdded = history.visitedOn
     else {
-      log.error("Invalid History Specifics")
+      Log.main.error("Invalid History Specifics")
       return false
     }
 
@@ -375,7 +373,7 @@ extension BraveCoreMigrator {
   }
 
   private func performPasswordMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
-    log.info("Migrating to Chromium Password v1 - Start")
+    Log.main.info("Migrating to Chromium Password v1 - Start")
     migratePasswords() { success in
       Preferences.Chromium.syncV2PasswordMigrationCompleted.value = success
       completion?(success)
@@ -392,7 +390,7 @@ extension BraveCoreMigrator {
             DispatchQueue.main.async {
               if !result.isSuccess {
                 completion(false)
-                log.error("Error while updating a login entry. Error Reason: \(result.failureValue?.localizedDescription ?? "")")
+                Log.main.error("Error while updating a login entry. Error Reason: \(result.failureValue?.localizedDescription ?? "")")
               }
             }
           }
@@ -444,12 +442,12 @@ extension BraveCoreMigrator {
   public var bookmarksURL: URL? {
     let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     guard let documentsDirectory = paths.first else {
-      log.error("Unable to access documents directory")
+      Log.main.error("Unable to access documents directory")
       return nil
     }
 
     guard let url = URL(string: "\(documentsDirectory)/Bookmarks.html") else {
-      log.error("Unable to access Bookmarks.html")
+      Log.main.error("Unable to access Bookmarks.html")
       return nil
     }
 
@@ -459,7 +457,7 @@ extension BraveCoreMigrator {
   public var datedBookmarksURL: URL? {
     let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     guard let documentsDirectory = paths.first else {
-      log.error("Unable to access documents directory")
+      Log.main.error("Unable to access documents directory")
       return nil
     }
 
@@ -470,7 +468,7 @@ extension BraveCoreMigrator {
     let dateString = dateFormatter.string(from: Date()).escape() ?? "\(Date().timeIntervalSince1970)"
 
     guard let url = URL(string: "\(documentsDirectory)/Bookmarks_\(dateString).html") else {
-      log.error("Unable to access Bookmarks_\(dateString).html")
+      Log.main.error("Unable to access Bookmarks_\(dateString).html")
       return nil
     }
 

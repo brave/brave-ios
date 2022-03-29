@@ -6,8 +6,6 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Log.main
-
 protocol FindInPageHelperDelegate: AnyObject {
   func findInPageHelper(_ findInPageHelper: FindInPageHelper, didUpdateCurrentResult currentResult: Int)
   func findInPageHelper(_ findInPageHelper: FindInPageHelper, didUpdateTotalResults totalResults: Int)
@@ -36,12 +34,12 @@ class FindInPageHelper: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 
     guard let data = body["data"] as? [String: Int] else {
-      log.error("Could not find a message body or the data did not meet expectations: \(String(describing: message.body))")
+      Log.main.error("Could not find a message body or the data did not meet expectations: \(String(describing: message.body))")
       return
     }
 

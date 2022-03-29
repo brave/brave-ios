@@ -9,8 +9,6 @@ import Shared
 import SwiftKeychainWrapper
 import BraveCore
 
-private let log = Log.main
-
 class LoginInfoViewController: LoginAuthViewController {
 
   // MARK: UX

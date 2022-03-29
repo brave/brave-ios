@@ -7,8 +7,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 protocol ContentBlocker: AnyObject, Hashable {
   // Make constant `let
   var filename: String { get }
@@ -33,7 +31,7 @@ extension ContentBlocker {
         self.fileVersionPref?.value = self.fileVersion
       } catch {
         // TODO #382: Potential telemetry location
-        log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
+        Log.main.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
         assert(false)
       }
     }
@@ -49,7 +47,7 @@ extension ContentBlocker {
       rule = try await ruleStore.contentRuleList(forIdentifier: filename)
       return false
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
       return true
     }
   }

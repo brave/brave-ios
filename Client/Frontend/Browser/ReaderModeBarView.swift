@@ -6,8 +6,6 @@ import UIKit
 import SnapKit
 import Shared
 
-private let log = Log.main
-
 protocol ReaderModeBarViewDelegate: AnyObject {
   func readerModeSettingsTapped(_ view: UIView)
 }

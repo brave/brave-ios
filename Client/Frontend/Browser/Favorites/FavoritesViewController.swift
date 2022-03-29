@@ -10,8 +10,6 @@ import BraveShared
 import BraveUI
 import CoreData
 
-private let log = Log.main
-
 private class FavoritesHeaderView: UICollectionReusableView {
   let label = UILabel().then {
     $0.text = Strings.recentSearchFavorites
@@ -208,7 +206,7 @@ class FavoritesViewController: UIViewController {
       do {
         try recentSearchesFRC.performFetch()
       } catch {
-        log.error("Recent Searches fetch error: \(String(describing: error))")
+        Log.main.error("Recent Searches fetch error: \(String(describing: error))")
       }
     }
   }
@@ -556,7 +554,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     do {
       try favoritesFRC.performFetch()
     } catch {
-      log.error("Favorites fetch error: \(String(describing: error))")
+      Log.main.error("Favorites fetch error: \(String(describing: error))")
     }
 
     fetchRecentSearches()

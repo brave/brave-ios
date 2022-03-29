@@ -9,8 +9,6 @@ import Shared
 import BraveShared
 import BraveUI
 
-private let log = Log.main
-
 extension BrowserViewController: PlaylistHelperDelegate {
 
   private func createPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) -> PopoverController {
@@ -174,7 +172,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
             self.addToPlaylist(item: item) { [weak self] didAddItem in
               guard let self = self else { return }
 
-              log.debug("Playlist Item Added")
+              Log.main.debug("Playlist Item Added")
               self.pendingToast = nil
 
               if didAddItem {

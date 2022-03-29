@@ -9,8 +9,6 @@ import SwiftKeychainWrapper
 import Data
 import BraveCore
 
-private let log = Log.main
-
 class Migration {
 
   private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
@@ -66,7 +64,7 @@ class Migration {
     do {
       try DataController.shared.migrateToNewPathIfNeeded()
     } catch {
-      log.error("\(error.localizedDescription)")
+      Log.main.error("\(error.localizedDescription)")
     }
 
     // Regardless of what happened, we attemtped a migration and document it:
@@ -75,7 +73,7 @@ class Migration {
 
   @objc private func enableUserSelectedTypesForSync() {
     guard braveCore.syncAPI.isInSyncGroup else {
-      log.info("Sync is not active")
+      Log.main.info("Sync is not active")
       return
     }
 
@@ -128,22 +126,22 @@ class Migration {
                 try FileManager.default.moveItem(at: $0, to: destination)
                 try PlaylistItem.updateCache(pageSrc: pageSrc, cachedData: destination.bookmarkData())
               } catch {
-                log.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
+                Log.main.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
               }
             }
           })
         } catch {
-          log.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
+          Log.main.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
         }
 
         do {
           try FileManager.default.removeItem(at: url)
         } catch {
-          log.error("Deleting Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
+          Log.main.error("Deleting Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
         }
       }
     } catch {
-      log.error("Moving Playlist Files for \(errorPath) failed: \(error.localizedDescription)")
+      Log.main.error("Moving Playlist Files for \(errorPath) failed: \(error.localizedDescription)")
     }
   }
 
@@ -165,7 +163,7 @@ class Migration {
         if PlaylistFolder.getFolder(uuid: uuid) != nil {
           migrateItemsToSavedFolder(folderUUID: uuid)
         } else {
-          log.error("Failed Moving Playlist items to Saved Folder - Unknown Error")
+          Log.main.error("Failed Moving Playlist items to Saved Folder - Unknown Error")
         }
       }
     }
@@ -265,7 +263,7 @@ fileprivate extension Preferences {
       do {
         try FileManager.default.setAttributes([.posixPermissions: NSNumber(value: 0o755 as Int16)], ofItemAtPath: $0)
       } catch {
-        log.error("Failed setting the directory attributes for \($0)")
+        Log.main.error("Failed setting the directory attributes for \($0)")
       }
     }
 

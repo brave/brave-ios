@@ -3,8 +3,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 public class DAU {
 
   /// Default installation date for legacy woi version.
@@ -47,7 +45,7 @@ public class DAU {
   /// A user needs to be active for a certain amount of time before we ping the server.
   @discardableResult public func sendPingToServer() -> Bool {
     if AppConstants.buildChannel == .debug || AppConstants.buildChannel == .enterprise {
-      log.info("Development build detected, no server ping.")
+      Log.main.info("Development build detected, no server ping.")
       return false
     }
 
@@ -70,12 +68,12 @@ public class DAU {
 
   @objc public func sendPingToServerInternal() {
     guard let paramsAndPrefs = paramsAndPrefsSetup() else {
-      log.debug("dau, no changes detected, no server ping")
+      Log.main.debug("dau, no changes detected, no server ping")
       return
     }
 
     if processingPing {
-      log.info("Currently processing a ping, blocking ping re-attempt")
+      Log.main.info("Currently processing a ping, blocking ping re-attempt")
       return
     }
     processingPing = true
@@ -85,11 +83,11 @@ public class DAU {
     pingRequest?.queryItems = paramsAndPrefs.queryParams
 
     guard let pingRequestUrl = pingRequest?.url else {
-      log.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
+      Log.main.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
       return
     }
 
-    log.debug("send ping to server, url: \(pingRequestUrl)")
+    Log.main.debug("send ping to server, url: \(pingRequestUrl)")
 
     var request = URLRequest(url: pingRequestUrl)
     for (key, value) in paramsAndPrefs.headers {
@@ -102,7 +100,7 @@ public class DAU {
       }
 
       if let e = error {
-        log.error("status update error: \(e.localizedDescription)")
+        Log.main.error("status update error: \(e.localizedDescription)")
         return
       }
 
@@ -214,7 +212,7 @@ public class DAU {
 
       return match != nil
     } catch {
-      log.error("Version regex pattern error")
+      Log.main.error("Version regex pattern error")
       return false
     }
   }
@@ -230,7 +228,7 @@ public class DAU {
     // This _should_ be set all the time
     if woi == nil {
       woi = DAU.defaultWoiDate
-      log.error("woi, is nil, using default: \(woi ?? "")")
+      Log.main.error("woi, is nil, using default: \(woi ?? "")")
     }
     return URLQueryItem(name: "woi", value: woi)
   }
@@ -301,12 +299,12 @@ public class DAU {
     }
 
     guard let stat = dauStat?.compactMap({ $0 }) else {
-      log.error("Cannot cast dauStat to [Int]")
+      Log.main.error("Cannot cast dauStat to [Int]")
       return nil
     }
 
     guard let lastPingStat = stat.first else {
-      log.error("Can't get last ping timestamp from dauStats")
+      Log.main.error("Can't get last ping timestamp from dauStats")
       return nil
     }
 

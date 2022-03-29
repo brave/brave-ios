@@ -5,8 +5,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 // Taken from: https://github.com/Brandon-T/Jarvis and modified to simplify
 
 public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
@@ -67,7 +65,7 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
           try evaluate(serverTrust, forHost: host)
           return completionHandler(.useCredential, URLCredential(trust: serverTrust))
         } catch {
-          log.error("\(error.localizedDescription)")
+          Log.main.error("\(error.localizedDescription)")
           fatalErrorInDebugModeIfPinningFailed()
           return completionHandler(.cancelAuthenticationChallenge, nil)
         }

@@ -7,8 +7,6 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Log.main
-
 class ContentBlockerRegion: BlocklistName {
   /// Static content blocker stores rule lists for regional ad blocking.
   private static var regionalContentBlocker: ContentBlockerRegion?
@@ -26,7 +24,7 @@ extension ContentBlockerRegion {
   /// Get a `ContentBlockerRegion` for a given locale if one exists for that region
   static func with(localeCode code: String?) -> ContentBlockerRegion? {
     guard let code = code else {
-      log.error("No locale string was provided")
+      Log.main.error("No locale string was provided")
       return nil
     }
 

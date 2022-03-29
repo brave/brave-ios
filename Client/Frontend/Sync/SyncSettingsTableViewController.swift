@@ -7,8 +7,6 @@ import Data
 import BraveShared
 import BraveCore
 
-private let log = Log.main
-
 class SyncSettingsTableViewController: UITableViewController {
 
   // MARK: Lifecycle
@@ -298,14 +296,14 @@ extension SyncSettingsTableViewController {
 
   private func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
     if devices.isEmpty {
-      log.error("No sync devices to configure.")
+      Log.main.error("No sync devices to configure.")
       return
     }
 
     switch indexPath.section {
     case Sections.deviceList.rawValue:
       guard let device = devices[safe: indexPath.row] else {
-        log.error("Invalid device to configure.")
+        Log.main.error("Invalid device to configure.")
         return
       }
 
@@ -319,7 +317,7 @@ extension SyncSettingsTableViewController {
     case Sections.syncTypes.rawValue:
       configureToggleCell(cell, for: SyncDataTypes(rawValue: indexPath.row) ?? .bookmarks)
     default:
-      log.error("Section index out of bounds.")
+      Log.main.error("Section index out of bounds.")
     }
   }
 
@@ -407,10 +405,10 @@ extension SyncSettingsTableViewController {
           self.tableView.reloadData()
         }
       } catch {
-        log.error("\(error.localizedDescription)")
+        Log.main.error("\(error.localizedDescription)")
       }
     } else {
-      log.error("Something went wrong while retrieving Sync Devices..")
+      Log.main.error("Something went wrong while retrieving Sync Devices..")
     }
   }
 

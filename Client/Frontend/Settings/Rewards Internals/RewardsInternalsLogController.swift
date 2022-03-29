@@ -8,8 +8,6 @@ import Shared
 import BraveUI
 import BraveCore
 
-private let browserLogger = Log.main
-
 fileprivate class LogLineCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)

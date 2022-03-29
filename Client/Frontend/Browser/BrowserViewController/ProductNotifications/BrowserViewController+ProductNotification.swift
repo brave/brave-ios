@@ -8,8 +8,6 @@ import BraveUI
 import Shared
 import Data
 
-private let log = Log.main
-
 // MARK: - ProductNotification
 
 extension BrowserViewController {
@@ -79,7 +77,7 @@ extension BrowserViewController {
     }
 
     guard let onboardingList = OnboardingDisconnectList.loadFromFile() else {
-      log.error("CANNOT LOAD ONBOARDING DISCONNECT LIST")
+      Log.main.error("CANNOT LOAD ONBOARDING DISCONNECT LIST")
       return
     }
 

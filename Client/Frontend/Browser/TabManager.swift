@@ -10,8 +10,6 @@ import BraveShared
 import Data
 import CoreData
 
-private let log = Log.main
-
 protocol TabManagerDelegate: AnyObject {
   func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?)
   func tabManager(_ tabManager: TabManager, willAddTab tab: Tab)
@@ -281,7 +279,7 @@ class TabManager: NSObject {
     }
 
     guard tab === selectedTab else {
-      log.error("Expected tab (\(String(describing: tab?.url))) is not selected. Selected index: \(self.selectedIndex)")
+      Log.main.error("Expected tab (\(String(describing: tab?.url))) is not selected. Selected index: \(self.selectedIndex)")
       return
     }
 
@@ -537,15 +535,15 @@ class TabManager: NSObject {
       let forwardListMap = forwardList.map { $0.url }
       let currentItem = currentItem.url
 
-      log.debug("backList: \(backListMap)")
-      log.debug("forwardList: \(forwardListMap)")
-      log.debug("currentItem: \(currentItem)")
+      Log.main.debug("backList: \(backListMap)")
+      Log.main.debug("forwardList: \(forwardListMap)")
+      Log.main.debug("currentItem: \(currentItem)")
 
       // Business as usual.
       urls = backListMap + [currentItem] + forwardListMap
       currentPage = -forwardList.count
 
-      log.debug("---stack: \(urls)")
+      Log.main.debug("---stack: \(urls)")
     }
     if let id = TabMO.get(fromId: tab.id)?.syncUUID {
       let displayTitle = tab.displayTitle
@@ -570,7 +568,7 @@ class TabManager: NSObject {
     assert(Thread.isMainThread)
 
     guard let removalIndex = allTabs.firstIndex(where: { $0 === tab }) else {
-      log.debug("Could not find index of tab to remove")
+      Log.main.debug("Could not find index of tab to remove")
       return
     }
 
@@ -803,10 +801,10 @@ class TabManager: NSObject {
       return
     }
 
-    log.info("Migrating tabsState.archive from ~/Documents to shared container")
+    Log.main.info("Migrating tabsState.archive from ~/Documents to shared container")
 
     guard let profilePath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("profile.profile").path else {
-      log.error("Unable to get profile path in shared container to move tabsState.archive")
+      Log.main.error("Unable to get profile path in shared container to move tabsState.archive")
       return
     }
 
@@ -816,9 +814,9 @@ class TabManager: NSObject {
       try FileManager.default.createDirectory(atPath: profilePath, withIntermediateDirectories: true, attributes: nil)
       try FileManager.default.moveItem(atPath: oldPath, toPath: newPath)
 
-      log.info("Migrated tabsState.archive to shared container successfully")
+      Log.main.info("Migrated tabsState.archive to shared container successfully")
     } catch let error as NSError {
-      log.error("Unable to move tabsState.archive to shared container: \(error.localizedDescription)")
+      Log.main.error("Unable to move tabsState.archive to shared container: \(error.localizedDescription)")
     }
   }
 

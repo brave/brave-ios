@@ -6,8 +6,6 @@
 import Foundation
 import Shared
 
-private let log = Log.main
-
 struct OnboardingDisconnectItem: Codable {
   let properties: [String]
   let resources: [String]
@@ -24,7 +22,7 @@ struct OnboardingDisconnectList: Codable {
         return try JSONDecoder().decode(OnboardingDisconnectList.self, from: contents)
       }
     } catch {
-      log.error("Error Decoding OnboardingDisconectList: \(error.localizedDescription)")
+      Log.main.error("Error Decoding OnboardingDisconectList: \(error.localizedDescription)")
     }
     return nil
   }

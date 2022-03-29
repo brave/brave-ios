@@ -8,8 +8,6 @@ import Shared
 import BraveShared
 import StoreKit
 
-private let log = Log.main
-
 class BuyVPNViewController: UIViewController {
 
   private var buyVPNView: View {
@@ -100,7 +98,7 @@ class BuyVPNViewController: UIViewController {
   // MARK: - Button actions
   @objc func monthlySubscriptionAction() {
     guard let monthlySub = VPNProductInfo.monthlySubProduct else {
-      log.error("Failed to retrieve monthly subcription product")
+      Log.main.error("Failed to retrieve monthly subcription product")
       return
     }
     isLoading = true
@@ -114,7 +112,7 @@ class BuyVPNViewController: UIViewController {
 
   @objc func yearlySubscriptionAction() {
     guard let yearlySub = VPNProductInfo.yearlySubProduct else {
-      log.error("Failed to retrieve yearly subcription product")
+      Log.main.error("Failed to retrieve yearly subcription product")
       return
     }
     isLoading = true
