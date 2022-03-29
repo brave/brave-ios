@@ -137,6 +137,10 @@ class MockKeyringService: BraveWalletKeyringService {
     }
     completion(true)
   }
+  
+  func validatePassword(_ password: String, completion: @escaping (Bool) -> Void) {
+    completion(password == self.password)
+  }
 
   // To ensure previews are consistent, use the same set of addresses per run
   private var importedTestAddresses = [

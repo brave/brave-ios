@@ -110,7 +110,8 @@ extension BraveWallet.NetworkInfo: Identifiable {
       decimals: decimals,
       visible: false,
       tokenId: "",
-      coingeckoId: ""
+      coingeckoId: "",
+      chainId: ""
     )
   }
 
