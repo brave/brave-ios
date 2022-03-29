@@ -6,7 +6,7 @@
 import Foundation
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public class WebcompatReporter {
   private struct BaseURL {

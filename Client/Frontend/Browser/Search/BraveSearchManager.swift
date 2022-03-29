@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // A helper class to handle Brave Search fallback needs.
 class BraveSearchManager: NSObject {

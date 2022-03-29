@@ -7,7 +7,7 @@ import Foundation
 import CoreData
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public enum RecentSearchType: Int32 {
   case qrCode = 0

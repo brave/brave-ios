@@ -12,7 +12,7 @@ import BraveShared
 import BraveUI
 import SwiftKeychainWrapper
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class WindowProtection {
 

@@ -7,7 +7,7 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 extension ContentBlockerHelper: TabContentScript {
   class func name() -> String {

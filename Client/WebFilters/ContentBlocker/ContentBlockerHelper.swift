@@ -7,7 +7,7 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 enum BlockerStatus: String {
   case Disabled

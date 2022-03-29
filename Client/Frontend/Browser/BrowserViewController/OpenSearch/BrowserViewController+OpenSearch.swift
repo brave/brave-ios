@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 import XCGLogger
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // MARK: - OpenSearch
 

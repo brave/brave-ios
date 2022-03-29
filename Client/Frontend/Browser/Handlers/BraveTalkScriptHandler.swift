@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import BraveCore
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class BraveTalkScriptHandler: TabContentScript {
   private weak var tab: Tab?

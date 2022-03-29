@@ -11,7 +11,7 @@ import WebKit
 import SwiftyJSON
 import BraveCore
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class LoginsHelper: TabContentScript {
   private weak var tab: Tab?

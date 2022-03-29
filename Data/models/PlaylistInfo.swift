@@ -7,7 +7,7 @@ import Foundation
 import WebKit
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public struct PlaylistInfo: Codable {
   public let name: String

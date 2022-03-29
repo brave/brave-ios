@@ -11,7 +11,7 @@ import Data
 import Shared
 import BraveUI
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // MARK: UITableViewDataSource
 

@@ -7,7 +7,7 @@ import Data
 import BraveShared
 import BraveCore
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class SyncSettingsTableViewController: UITableViewController {
 

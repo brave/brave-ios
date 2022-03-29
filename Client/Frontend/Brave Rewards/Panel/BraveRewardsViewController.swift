@@ -10,7 +10,7 @@ import BraveShared
 import Shared
 import Combine
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 class BraveRewardsViewController: UIViewController, PopoverContentComponent {
   enum Action {

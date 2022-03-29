@@ -7,7 +7,7 @@ import Foundation
 import WebKit
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 /// List of Find Options used by WebKit to `Find-In-Page`
 /// Typically we use `caseInsensitive`, `wrapAround`, `backwards`, `showHighlight`

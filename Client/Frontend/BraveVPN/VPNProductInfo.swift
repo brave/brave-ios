@@ -7,7 +7,7 @@ import Foundation
 import StoreKit
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class VPNProductInfo: NSObject {
   // Prices are fetched once per launch and kept in memory.

@@ -5,10 +5,10 @@
 import Foundation
 import XCGLogger
 
-public struct Logger {}
+public struct LegacyLogger {}
 
 // MARK: - Singleton Logger Instances
-public extension Logger {
+public extension LegacyLogger {
 
   /// Logger used for recording frontend/browser happenings
   static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: nil)

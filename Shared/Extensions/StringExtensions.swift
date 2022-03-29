@@ -4,7 +4,7 @@
 
 import UIKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 extension String {
   public func escape() -> String? {

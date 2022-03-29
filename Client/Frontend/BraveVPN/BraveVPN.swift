@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import NetworkExtension
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 /// A static class to handle all things related to the Brave VPN service.
 class BraveVPN {

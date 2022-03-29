@@ -8,7 +8,7 @@ import BraveCore
 import XCGLogger
 import Shared
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 class RewardsReporting: TabContentScript {
   let rewards: BraveRewards

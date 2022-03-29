@@ -7,7 +7,7 @@ import Foundation
 import Fuzi
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 /// A set of subscription RSS feed URLs defined through Outline Processor Markup Language
 struct OPML: Equatable {

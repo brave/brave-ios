@@ -6,7 +6,7 @@ import Foundation
 import BraveShared
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public final class Domain: NSManagedObject, CRUD {
 

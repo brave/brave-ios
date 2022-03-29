@@ -11,7 +11,7 @@ import MessageUI
 // To get cellular carrier name
 import CoreTelephony
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class BraveVPNContactFormViewController: TableViewController {
 

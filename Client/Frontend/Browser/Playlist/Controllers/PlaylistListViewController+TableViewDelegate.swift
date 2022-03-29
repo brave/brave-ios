@@ -11,7 +11,7 @@ import Shared
 import Data
 import MediaPlayer
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private extension PlaylistListViewController {
   func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {

@@ -12,7 +12,7 @@ import Storage
 import XCGLogger
 import WebKit
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 extension BrowserViewController {
   func updateRewardsButtonState() {

@@ -9,7 +9,7 @@ import Shared
 import GCDWebServers
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class BookmarksInterstitialPageHandler {
 

@@ -11,7 +11,7 @@ public protocol WebsitePresentable {
   var url: String? { get }
 }
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 /// Note: This class is named as `Bookmark` in our core data model due to sync v1 legacy..
 public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {

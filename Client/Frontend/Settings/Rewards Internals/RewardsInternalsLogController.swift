@@ -9,8 +9,8 @@ import XCGLogger
 import BraveUI
 import BraveCore
 
-private let braveCoreLogger = Logger.braveCoreLogger
-private let browserLogger = Logger.browserLogger
+private let braveCoreLogger = LegacyLogger.braveCoreLogger
+private let browserLogger = LegacyLogger.browserLogger
 
 fileprivate class LogLineCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

@@ -5,7 +5,7 @@
 import UIKit
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // MARK: - SearchEnginePickerDelegate
 

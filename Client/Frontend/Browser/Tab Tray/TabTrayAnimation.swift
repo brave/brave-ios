@@ -8,7 +8,7 @@ import BraveUI
 import UIKit
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 extension TabTrayController: UIViewControllerTransitioningDelegate {
   func animationController(

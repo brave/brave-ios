@@ -8,7 +8,7 @@ import Static
 import Shared
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class RetentionPreferencesDebugMenuViewController: TableViewController {
 

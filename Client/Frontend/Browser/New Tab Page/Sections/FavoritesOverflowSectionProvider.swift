@@ -9,7 +9,7 @@ import Data
 import CoreData
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class FavoritesOverflowButton: SpringButton {
   private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .light)).then {

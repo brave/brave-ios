@@ -18,7 +18,7 @@ import StoreKit
 import BraveCore
 import Combine
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private let InitialPingSentKey = "initialPingSent"
 
@@ -84,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           }
         }()
 
-        Logger.braveCoreLogger.logln(
+        LegacyLogger.braveCoreLogger.logln(
           level,
           fileName: file,
           lineNumber: Int(line),

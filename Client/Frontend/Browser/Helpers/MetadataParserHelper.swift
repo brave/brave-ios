@@ -8,7 +8,7 @@ import Storage
 import XCGLogger
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class MetadataParserHelper: TabEventHandler {
   private var tabObservers: TabObservers!

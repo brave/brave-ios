@@ -11,7 +11,7 @@ import Shared
 import ZIPFoundation
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private class RewardsInternalsSharableCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

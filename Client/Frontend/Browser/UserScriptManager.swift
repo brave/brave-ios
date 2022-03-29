@@ -6,7 +6,7 @@ import WebKit
 import Shared
 import Data
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class UserScriptManager {
 

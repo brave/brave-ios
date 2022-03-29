@@ -8,7 +8,7 @@ import Shared
 import BraveShared
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 enum DomainUserScript: CaseIterable {
   case youtube

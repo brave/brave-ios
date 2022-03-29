@@ -16,7 +16,7 @@ private let AllTables: [String] = [
   TableLoginsLocal,
 ]
 
-private let log = Logger.syncLogger
+private let log = LegacyLogger.syncLogger
 
 open class LoginsSchema: Schema {
   public enum SyncStatus: Int {

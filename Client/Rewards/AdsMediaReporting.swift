@@ -7,7 +7,7 @@ import Shared
 import WebKit
 import BraveCore
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 class AdsMediaReporting: TabContentScript {
   let rewards: BraveRewards

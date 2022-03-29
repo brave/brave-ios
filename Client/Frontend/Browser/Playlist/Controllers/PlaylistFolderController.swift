@@ -11,7 +11,7 @@ import Data
 import SwiftUI
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private enum Section: Int, CaseIterable {
   case savedItems

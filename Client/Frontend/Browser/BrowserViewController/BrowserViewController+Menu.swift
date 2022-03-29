@@ -12,7 +12,7 @@ import Data
 import BraveWallet
 import BraveCore
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 extension BrowserViewController {
   func featuresMenuSection(_ menuController: MenuViewController) -> some View {

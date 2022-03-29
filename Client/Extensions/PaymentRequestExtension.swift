@@ -8,7 +8,7 @@ import Data
 import Shared
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class PaymentRequestExtension: NSObject {
   typealias PaymentRequestHandler = (

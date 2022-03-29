@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class PrintHelper: TabContentScript {
   private weak var browserController: BrowserViewController?

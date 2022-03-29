@@ -7,7 +7,7 @@ import GCDWebServers
 import Shared
 
 class WebServer {
-  private let log = Logger.browserLogger
+  private let log = LegacyLogger.browserLogger
 
   static let webServerSharedInstance = WebServer()
 

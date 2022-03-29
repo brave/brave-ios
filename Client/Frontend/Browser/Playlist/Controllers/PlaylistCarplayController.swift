@@ -12,7 +12,7 @@ import BraveShared
 import Shared
 import CoreData
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private enum PlaylistCarPlayTemplateID: String {
   case folders

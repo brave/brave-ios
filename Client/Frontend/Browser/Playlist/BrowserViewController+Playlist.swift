@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import BraveUI
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 extension BrowserViewController: PlaylistHelperDelegate {
 

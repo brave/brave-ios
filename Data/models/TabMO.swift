@@ -38,7 +38,7 @@ public struct SavedTab {
   }
 }
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public final class TabMO: NSManagedObject, CRUD {
 

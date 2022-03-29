@@ -11,7 +11,7 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 /// Lightweight class that manages a single MediaPlayer item
 /// The MediaPlayer is then passed to any controller that needs to use it.

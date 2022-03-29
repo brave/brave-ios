@@ -4,7 +4,7 @@
 
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // Workaround for bug 1417152, whereby NaN bounds are being set on the scrollview when viewing PDFs in the web view.
 // Is fixed in WebKit, remove this file when the fix arrives in iOS release.

@@ -8,7 +8,7 @@ import SnapKit
 import XCGLogger
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)

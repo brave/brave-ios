@@ -12,7 +12,7 @@ import Shared
 import Data
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class PlaylistManager: NSObject {
   static let shared = PlaylistManager()

@@ -4,7 +4,7 @@ import Foundation
 import Shared
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 typealias FavoriteSite = (url: URL, title: String)
 

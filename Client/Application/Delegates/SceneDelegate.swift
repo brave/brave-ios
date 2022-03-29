@@ -11,7 +11,7 @@ import Shared
 import Storage
 import Data
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

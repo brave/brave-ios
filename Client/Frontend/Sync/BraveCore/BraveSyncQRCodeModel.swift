@@ -8,7 +8,7 @@ import BraveShared
 import Shared
 import BraveCore
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 enum BraveSyncQRCodeError {
   case none

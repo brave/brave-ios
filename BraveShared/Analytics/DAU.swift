@@ -4,7 +4,7 @@ import Foundation
 import Shared
 import XCGLogger
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public class DAU {
 

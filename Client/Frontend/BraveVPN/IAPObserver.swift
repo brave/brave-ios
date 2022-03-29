@@ -8,7 +8,7 @@ import StoreKit
 import Shared
 import BraveShared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 protocol IAPObserverDelegate: AnyObject {
   func purchasedOrRestoredProduct()

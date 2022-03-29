@@ -8,7 +8,7 @@ import BraveCore
 import Shared
 import BraveShared
 
-private let log = Logger.braveCoreLogger
+private let log = LegacyLogger.braveCoreLogger
 
 extension BraveLedger {
 

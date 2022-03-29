@@ -11,8 +11,8 @@ import XCGLogger
 import Data
 import CoreData
 
-private let log = Logger.browserLogger
-private let rewardsLog = Logger.braveCoreLogger
+private let log = LegacyLogger.browserLogger
+private let rewardsLog = LegacyLogger.braveCoreLogger
 
 protocol TabManagerDelegate: AnyObject {
   func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?)

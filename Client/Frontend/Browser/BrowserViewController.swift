@@ -25,7 +25,7 @@ import FeedKit
 import SwiftUI
 import class Combine.AnyCancellable
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,

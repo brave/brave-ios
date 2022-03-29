@@ -9,7 +9,7 @@ import Data
 import CoreData
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 enum BookmarksAction {
   case opened(inNewTab: Bool = false, switchingToPrivateMode: Bool = false)

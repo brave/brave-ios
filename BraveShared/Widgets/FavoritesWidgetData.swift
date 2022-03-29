@@ -8,7 +8,7 @@ import SDWebImage
 import Shared
 import WidgetKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 public struct WidgetFavorite: Codable {
   public var url: URL

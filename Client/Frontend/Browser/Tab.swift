@@ -12,7 +12,7 @@ import SwiftyJSON
 import XCGLogger
 import Data
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 protocol TabContentScript {
   static func name() -> String

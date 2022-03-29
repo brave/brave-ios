@@ -8,7 +8,7 @@ import BraveShared
 import Storage
 import XCGLogger
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 private let customSearchEnginesFileName = "customEngines.plist"
 

@@ -7,7 +7,7 @@ import Foundation
 import CoreData
 import Shared
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 @objc(PlaylistItem)
 final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {

@@ -17,7 +17,7 @@ import SDWebImage
 import CoreData
 import Data
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // MARK: PlaylistViewControllerDelegate
 protocol PlaylistViewControllerDelegate: AnyObject {

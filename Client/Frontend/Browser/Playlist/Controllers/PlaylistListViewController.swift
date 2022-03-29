@@ -18,7 +18,7 @@ import Shared
 import Data
 import SwiftUI
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 // MARK: - PlaylistListViewController
 

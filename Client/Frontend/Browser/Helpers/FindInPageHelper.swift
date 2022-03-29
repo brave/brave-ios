@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import WebKit
 
-private let log = Logger.browserLogger
+private let log = LegacyLogger.browserLogger
 
 protocol FindInPageHelperDelegate: AnyObject {
   func findInPageHelper(_ findInPageHelper: FindInPageHelper, didUpdateCurrentResult currentResult: Int)

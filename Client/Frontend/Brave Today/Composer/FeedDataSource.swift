@@ -12,7 +12,7 @@ import FeedKit
 import BraveCore
 
 // Named `logger` because we are using math function `log`
-private let logger = Logger.browserLogger
+private let logger = LegacyLogger.browserLogger
 
 /// Powers the Brave News feed.
 class FeedDataSource {
