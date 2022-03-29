@@ -215,30 +215,14 @@ struct SuggestedNetworkView: View {
   }
 
   @ViewBuilder private var actionButtons: some View {
-    Button(action: {
-      onCancel()
-    }) {
+    Button(action: onCancel) {
       HStack {
         Image(systemName: "xmark")
         Text(Strings.cancelButtonTitle)
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: {
-      switch mode {
-      case let .switchNetworks(chainId, _):
-        networkStore.setSelectedChain(chainId: chainId)
-        onApprove()
-      case let .addNetwork(chain):
-        networkStore.addCustomNetwork(chain) { accepted, errMsg in
-          guard accepted else {
-            customNetworkError = .failed(errMsg: errMsg)
-            return
-          }
-          onApprove()
-        }
-      }
-    }) {
+    Button(action: onApprove) {
       HStack {
         Image("brave.checkmark.circle.fill")
         Text(actionButtonTitle)
