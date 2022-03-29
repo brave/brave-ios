@@ -265,7 +265,7 @@ class BraveVPNContactFormViewController: TableViewController {
     do {
       return try Data(contentsOf: receiptUrl).base64EncodedString()
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
       return nil
     }
   }

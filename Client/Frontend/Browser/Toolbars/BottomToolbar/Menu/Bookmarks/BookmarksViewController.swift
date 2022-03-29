@@ -293,7 +293,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       }
       try self.bookmarksFRC?.performFetch()
     } catch let error as NSError {
-      log.error(error.description)
+      log.error("\(error.description)")
     }
   }
 

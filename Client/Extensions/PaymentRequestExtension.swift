@@ -50,8 +50,8 @@ extension PaymentRequestExtension: TabContentScript {
   private func sendPaymentRequestError(errorName: String, errorMessage: String) {
     ensureMainThread {
       self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage], contentWorld: .page) { _, error in
-        if error != nil {
-          log.error(error)
+        if let error = error {
+          log.error("\(error.localizedDescription)")
         }
       }
     }
@@ -96,8 +96,8 @@ extension PaymentRequestExtension: TabContentScript {
         case .completed(let orderId):
           ensureMainThread {
             self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""], contentWorld: .page) { _, error in
-              if error != nil {
-                log.error(error)
+              if let error = error {
+                log.error("\(error.localizedDescription)")
               }
             }
           }

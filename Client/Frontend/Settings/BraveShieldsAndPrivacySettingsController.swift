@@ -308,7 +308,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     func _clear(_ clearables: [Clearable], secondAttempt: Bool = false) -> Deferred<Void> {
       let deferred = Deferred<Void>()
       clearables.enumerated().map { clearable in
-        log.info("Clearing \(clearable.element).")
+        log.debug("Clearing \(clearable.element.label).")
 
         let res = Success()
         succeed().upon() { _ in  // move off main thread

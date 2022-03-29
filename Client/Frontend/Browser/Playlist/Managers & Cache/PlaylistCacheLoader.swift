@@ -548,7 +548,7 @@ class PlaylistWebLoader: UIView {
         let data = try JSONSerialization.data(withJSONObject: message.body, options: [.fragmentsAllowed])
         return try JSONDecoder().decode(PageInfo.self, from: data)
       } catch {
-        log.error("Error Decoding PageInfo: \(error)")
+        log.error("Error Decoding PageInfo: \(error.localizedDescription)")
       }
 
       return nil

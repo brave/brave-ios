@@ -284,7 +284,7 @@ class FeedDataSource {
       } catch {
         // Could be a source type change, so may not be a big issue. If the user goes to download
         // updated lists and it still fails it will show an error on the feed
-        logger.debug("Failed to decode previously cached sources: \(error)")
+        logger.debug("Failed to decode previously cached sources: \(error.localizedDescription)")
       }
     }
   }

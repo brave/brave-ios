@@ -110,7 +110,7 @@ final public class RecentSearch: NSManagedObject, CRUD {
     do {
       return try DataController.viewContext.count(for: request)
     } catch {
-      log.error("Count error: \(error)")
+      log.error("Count error: \(error.localizedDescription)")
     }
     return 0
   }

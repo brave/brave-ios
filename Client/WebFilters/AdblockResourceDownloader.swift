@@ -55,7 +55,7 @@ class AdblockResourceDownloader {
             try await group.waitForAll()
           }
         } catch {
-          log.error("Failed to Download Adblock-Resources: \(error)")
+          log.error("Failed to Download Adblock-Resources: \(error.localizedDescription)")
         }
       }
     }
@@ -214,7 +214,7 @@ extension AdblockResourceDownloader: PreferencesObserver {
         do {
           try await regionalAdblockResourcesSetup()
         } catch {
-          log.error(error)
+          log.error("\(error.localizedDescription)")
         }
       }
     }

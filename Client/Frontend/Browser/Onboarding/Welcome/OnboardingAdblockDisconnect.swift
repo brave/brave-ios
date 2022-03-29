@@ -24,7 +24,7 @@ struct OnboardingDisconnectList: Codable {
         return try JSONDecoder().decode(OnboardingDisconnectList.self, from: contents)
       }
     } catch {
-      log.error("Error Decoding OnboardingDisconectList: \(error)")
+      log.error("Error Decoding OnboardingDisconectList: \(error.localizedDescription)")
     }
     return nil
   }

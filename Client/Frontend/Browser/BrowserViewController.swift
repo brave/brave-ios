@@ -332,7 +332,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
       BraveLedger.environment = config.ledgerEnvironment
       return BraveLedger(stateStoragePath: legacyLedger.path)
     } catch {
-      log.error("Failed to migrate legacy wallet into a new folder: \(error)")
+      log.error("Failed to migrate legacy wallet into a new folder: \(error.localizedDescription)")
       return nil
     }
   }
@@ -789,7 +789,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
     center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
       if let error = error {
-        log.error("Failed to request notifications permissions: \(error)")
+        log.error("Failed to request notifications permissions: \(error.localizedDescription)")
         return
       }
 
@@ -820,7 +820,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
         center.add(request) { error in
           if let error = error {
-            log.error("Failed to add notification: \(error)")
+            log.error("Failed to add notification: \(error.localizedDescription)")
             return
           }
 
@@ -1245,7 +1245,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
           asFunction: false
         ) { _, error in
           if let error = error {
-            log.error(error)
+            log.error("\(error.localizedDescription)")
           }
         }
       }
@@ -1680,7 +1680,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             }
             self.present(pdfActivityController, animated: true)
           } catch {
-            log.error("Failed to write PDF to disk: \(error)")
+            log.error("Failed to write PDF to disk: \(error.localizedDescription)")
           }
         }
         activities.append(createPDFActivity)

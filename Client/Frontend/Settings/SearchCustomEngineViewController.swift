@@ -164,7 +164,7 @@ class SearchCustomEngineViewController: UIViewController {
       alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
     }
 
-    log.error(error)
+    log.error("\(error.localizedDescription)")
     present(alert, animated: true, completion: nil)
   }
 
@@ -300,7 +300,7 @@ extension SearchCustomEngineViewController {
           }
         }
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
   }

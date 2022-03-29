@@ -351,7 +351,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
         switch error {
         case .other(let err):
-          log.error(err)
+          log.error("\(err.localizedDescription)")
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
           self.delegate?.displayLoadingResourceError()
         case .expired:

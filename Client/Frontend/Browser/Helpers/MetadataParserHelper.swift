@@ -55,7 +55,7 @@ class MetadataParserHelper: TabEventHandler {
         tab.pageMetadata = pageMetadata
         TabEvent.post(.didLoadPageMetadata(pageMetadata), for: tab)
       } catch {
-        log.error("Failed to parse metadata: \(error)")
+        log.error("Failed to parse metadata: \(error.localizedDescription)")
         // To avoid issues where `pageMetadata` points to the last website to successfully
         // parse metadata, set to nil
         tab.pageMetadata = nil

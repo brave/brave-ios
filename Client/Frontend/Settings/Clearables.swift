@@ -212,7 +212,7 @@ class PlayListCacheClearable: Clearable {
         do {
           try FileManager.default.removeItem(at: playlistDirectory)
         } catch {
-          log.error("Error Deleting Playlist directory: \(error)")
+          log.error("Error Deleting Playlist directory: \(error.localizedDescription)")
         }
       }
       result.fill(Maybe(success: Void()))
@@ -239,7 +239,7 @@ class PlayListDataClearable: Clearable {
         do {
           try FileManager.default.removeItem(at: playlistDirectory)
         } catch {
-          log.error("Error Deleting Playlist directory: \(error)")
+          log.error("Error Deleting Playlist directory: \(error.localizedDescription)")
         }
       }
       result.fill(Maybe(success: Void()))

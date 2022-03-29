@@ -212,7 +212,7 @@ extension BrowserViewController {
           self?.addSearchEngine(openSearchEngine)
         }
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
   }

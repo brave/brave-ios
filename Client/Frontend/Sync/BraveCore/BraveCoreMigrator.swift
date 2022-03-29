@@ -392,7 +392,7 @@ extension BraveCoreMigrator {
             DispatchQueue.main.async {
               if !result.isSuccess {
                 completion(false)
-                log.error("Error while updating a login entry. Error Reason: \(result.failureValue ?? "")")
+                log.error("Error while updating a login entry. Error Reason: \(result.failureValue?.localizedDescription ?? "")")
               }
             }
           }

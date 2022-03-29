@@ -67,7 +67,7 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
           try evaluate(serverTrust, forHost: host)
           return completionHandler(.useCredential, URLCredential(trust: serverTrust))
         } catch {
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           fatalErrorInDebugModeIfPinningFailed()
           return completionHandler(.cancelAuthenticationChallenge, nil)
         }

@@ -73,7 +73,7 @@ class CosmeticFiltersResourceDownloader {
             try await self.loadDownloadedFiles(into: self.engine)
             self.didInitialLoad = true
           } catch {
-            log.error("Error Loading Cosmetic-Filters: \(error)")
+            log.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
           }
         }
       }
@@ -104,10 +104,10 @@ class CosmeticFiltersResourceDownloader {
             // Once the new engine is setup, we can replace the old engine with the new one.
             self.engine = newEngine
           } catch {
-            log.error("Error Loading Cosmetic-Filters: \(error)")
+            log.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
           }
         } catch {
-          log.error("Failed to Download Cosmetic-Filters: \(error)")
+          log.error("Failed to Download Cosmetic-Filters: \(error.localizedDescription)")
         }
       }
     }
@@ -334,7 +334,7 @@ class CosmeticFiltersResourceDownloader {
       log.error("JSON Must have a top-level type of Array of Dictionary.")
       return false
     } catch {
-      log.error("JSON Deserialization Failed: \(error)")
+      log.error("JSON Deserialization Failed: \(error.localizedDescription)")
       return false
     }
   }

@@ -41,7 +41,7 @@ public extension HTTPCookie {
         try data.write(to: baseDir.appendingPathComponent(filename))
         completion?(true)
       } catch {
-        log.error("Failed to write cookies to disk with error: \(error)")
+        log.error("Failed to write cookies to disk with error: \(error.localizedDescription)")
         completion?(false)
       }
     }
@@ -63,7 +63,7 @@ public extension HTTPCookie {
         log.error("Failed to load cookies from disk with error: Invalid data type")
       }
     } catch {
-      log.error("Failed to load cookies from disk with error: \(error)")
+      log.error("Failed to load cookies from disk with error: \(error.localizedDescription)")
     }
     completion?(false)
   }
@@ -90,7 +90,7 @@ public extension HTTPCookie {
     do {
       try FileManager.default.removeItem(at: url)
     } catch {
-      log.error("Failed to delete local cookie file with error: \(error)")
+      log.error("Failed to delete local cookie file with error: \(error.localizedDescription)")
     }
   }
 }

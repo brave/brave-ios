@@ -181,7 +181,7 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
           assert(Thread.isMainThread)
           try context.save()
         } catch {
-          log.error("performTask save error: \(error)")
+          log.error("performTask save error: \(error.localizedDescription)")
         }
       }
     }

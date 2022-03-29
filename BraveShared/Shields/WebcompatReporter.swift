@@ -65,7 +65,7 @@ public class WebcompatReporter {
       let task = session.dataTask(with: request) { data, response, error in
         var success: Bool = true
         if let error = error {
-          log.error("Failed to report webcompat issue: \(error)")
+          log.error("Failed to report webcompat issue: \(error.localizedDescription)")
           success = false
         }
         if let response = response as? HTTPURLResponse {
@@ -77,7 +77,7 @@ public class WebcompatReporter {
       task.resume()
       return deferred
     } catch {
-      log.error("Failed to setup webcompat request payload: \(error)")
+      log.error("Failed to setup webcompat request payload: \(error.localizedDescription)")
       deferred.fill(false)
     }
     return deferred

@@ -125,7 +125,7 @@ class RewardsInternalsShareController: UITableViewController {
         try FileManager.default.removeItem(at: zipPath)
       }
     } catch {
-      log.warning("Failed to cleanup sharing Rewards Internals files: \(error)")
+      log.warning("Failed to cleanup sharing Rewards Internals files: \(error.localizedDescription)")
     }
   }
 
@@ -160,7 +160,7 @@ class RewardsInternalsShareController: UITableViewController {
         sharable.generator.generateFiles(at: sharableFolder.path, using: builder) { error in
           defer { group.leave() }
           if let error = error {
-            log.error("Failed to generate files for the Rewards Intenrnals sharable with ID: \(sharable.id). Error: \(error)")
+            log.error("Failed to generate files for the Rewards Intenrnals sharable with ID: \(sharable.id). Error: \(error.localizedDescription)")
           }
         }
       }
@@ -181,12 +181,12 @@ class RewardsInternalsShareController: UITableViewController {
             self.present(controller, animated: true)
           }
         } catch {
-          log.error("Failed to zip directory: \(error)")
+          log.error("Failed to zip directory: \(error.localizedDescription)")
           self.cleanup()
         }
       }
     } catch {
-      log.error("Failed to make temporary directory for rewards internals sharing: \(error)")
+      log.error("Failed to make temporary directory for rewards internals sharing: \(error.localizedDescription)")
       self.cleanup()
     }
   }

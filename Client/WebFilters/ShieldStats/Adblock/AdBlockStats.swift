@@ -49,7 +49,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         self.generalAdblockEngine.set(data: data)
       }
     } catch {
-      log.error("Failed to parse bundled general blocklist: \(error)")
+      log.error("Failed to parse bundled general blocklist: \(error.localizedDescription)")
     }
   }
 
@@ -75,7 +75,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
           try await self.setDataFile(data: data, id: fileName)
         }
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
   }

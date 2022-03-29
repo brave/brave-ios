@@ -103,7 +103,7 @@ public class DAU {
       }
 
       if let e = error {
-        log.error("status update error: \(e)")
+        log.error("status update error: \(e.localizedDescription)")
         return
       }
 

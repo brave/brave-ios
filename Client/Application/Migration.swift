@@ -66,7 +66,7 @@ class Migration {
     do {
       try DataController.shared.migrateToNewPathIfNeeded()
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
 
     // Regardless of what happened, we attemtped a migration and document it:
@@ -128,22 +128,22 @@ class Migration {
                 try FileManager.default.moveItem(at: $0, to: destination)
                 try PlaylistItem.updateCache(pageSrc: pageSrc, cachedData: destination.bookmarkData())
               } catch {
-                log.error("Moving Playlist Item for \(errorPath) failed: \(error)")
+                log.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
               }
             }
           })
         } catch {
-          log.error("Moving Playlist Item for \(errorPath) failed: \(error)")
+          log.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
         }
 
         do {
           try FileManager.default.removeItem(at: url)
         } catch {
-          log.error("Deleting Playlist Item for \(errorPath) failed: \(error)")
+          log.error("Deleting Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
         }
       }
     } catch {
-      log.error("Moving Playlist Files for \(errorPath) failed: \(error)")
+      log.error("Moving Playlist Files for \(errorPath) failed: \(error.localizedDescription)")
     }
   }
 

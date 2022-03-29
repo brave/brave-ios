@@ -221,7 +221,7 @@ class Tab: NSObject {
         asFunction: true
       ) { _, error in
         if let error = error {
-          log.error("Error executing script: \(error)")
+          log.error("Error executing script: \(error.localizedDescription)")
         }
       }
 
@@ -844,7 +844,7 @@ extension Tab {
         result, error in
 
         if let error = error {
-          log.error("onFetchedBackupResults existence check error: \(error)")
+          log.error("onFetchedBackupResults existence check error: \(error.localizedDescription)")
         }
 
         guard let methodUndefined = result as? Bool else {

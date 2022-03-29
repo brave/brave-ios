@@ -56,7 +56,7 @@ class BraveCoreImportExportUtility {
           }
         } catch {
           self.state = .none
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           DispatchQueue.main.async {
             completion(false)
           }
@@ -91,7 +91,7 @@ class BraveCoreImportExportUtility {
           }
         } catch {
           self.state = .none
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           DispatchQueue.main.async {
             completion(false, [])
           }
@@ -126,7 +126,7 @@ class BraveCoreImportExportUtility {
           }
         } catch {
           self.state = .none
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           DispatchQueue.main.async {
             completion(false)
           }
@@ -162,7 +162,7 @@ class BraveCoreImportExportUtility {
           }
         } catch {
           self.state = .none
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           DispatchQueue.main.async {
             completion(false)
           }

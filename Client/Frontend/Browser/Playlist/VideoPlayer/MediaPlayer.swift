@@ -96,7 +96,7 @@ class MediaPlayer: NSObject {
       try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
       try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
   }
 
@@ -113,7 +113,7 @@ class MediaPlayer: NSObject {
       try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .default, options: [])
       try AVAudioSession.sharedInstance().setActive(false)
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
 
     // Stop receiving remote commands

@@ -214,7 +214,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
       webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, asFunction: true) { _, error in
 
         if let error = error {
-          log.error("Error executing onLongPressActivated: \(error)")
+          log.error("Error executing onLongPressActivated: \(error.localizedDescription)")
         }
       }
     }
@@ -244,7 +244,7 @@ extension PlaylistHelper {
     webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, asFunction: true) { value, error in
 
       if let error = error {
-        log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
+        log.error("Error Retrieving Playlist Page Media Current Time: \(error.localizedDescription)")
       }
 
       DispatchQueue.main.async {
@@ -267,7 +267,7 @@ extension PlaylistHelper {
       functionName: javascript, contentWorld: .page,
       completion: { value, error in
         if let error = error {
-          log.error("Error Retrieving Stopping Media Playback: \(error)")
+          log.error("Error Retrieving Stopping Media Playback: \(error.localizedDescription)")
         }
       })
   }

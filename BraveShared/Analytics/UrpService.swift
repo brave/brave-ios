@@ -57,7 +57,7 @@ struct UrpService {
     sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
       switch response {
       case .success(let data):
-        log.debug("Referral code lookup response: \(data)")
+        log.debug("Referral code lookup response: \(String(describing: data))")
         UrpLog.log("Referral code lookup response: \(data)")
 
         let json = JSON(data)
@@ -65,7 +65,7 @@ struct UrpService {
         completion(referral, nil)
 
       case .failure(let error):
-        log.error("Referral code lookup response: \(error)")
+        log.error("Referral code lookup response: \(error.localizedDescription)")
         UrpLog.log("Referral code lookup response: \(error)")
 
         completion(nil, .endpointError)
@@ -88,12 +88,12 @@ struct UrpService {
     sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
       switch response {
       case .success(let data):
-        log.debug("Check if authorized for grant response: \(data)")
+        log.debug("Check if authorized for grant response: \(String(describing: data))")
         let json = JSON(data)
         completion(json["finalized"].boolValue, nil)
 
       case .failure(let error):
-        log.error("Check if authorized for grant response: \(error)")
+        log.error("Check if authorized for grant response: \(error.localizedDescription)")
         completion(nil, .endpointError)
       }
     }

@@ -407,7 +407,7 @@ extension SyncSettingsTableViewController {
           self.tableView.reloadData()
         }
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     } else {
       log.error("Something went wrong while retrieving Sync Devices..")

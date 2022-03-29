@@ -166,7 +166,7 @@ class PlaylistManager: NSObject {
       do {
         try self.frc.managedObjectContext.save()
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
   }
@@ -229,7 +229,7 @@ class PlaylistManager: NSObject {
     do {
       try frc.performFetch()
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
   }
 
@@ -355,7 +355,7 @@ class PlaylistManager: NSObject {
         }
         return true
       } catch {
-        log.error("An error occured deleting Playlist Cached Item \(item.name): \(error)")
+        log.error("An error occured deleting Playlist Cached Item \(item.name): \(error.localizedDescription)")
         return false
       }
     }
@@ -399,7 +399,7 @@ class PlaylistManager: NSObject {
       do {
         try FileManager.default.removeItem(at: playlistDirectory)
       } catch {
-        log.error("Failed to delete Playlist Directory: \(error)")
+        log.error("Failed to delete Playlist Directory: \(error.localizedDescription)")
       }
     }
 
@@ -429,17 +429,17 @@ class PlaylistManager: NSObject {
               }
             })
           } catch {
-            log.error("Failed to update Playlist item cached state: \(error)")
+            log.error("Failed to update Playlist item cached state: \(error.localizedDescription)")
           }
 
           do {
             try FileManager.default.removeItem(at: url)
           } catch {
-            log.error("Deleting Playlist Item for \(url.absoluteString) failed: \(error)")
+            log.error("Deleting Playlist Item for \(url.absoluteString) failed: \(error.localizedDescription)")
           }
         }
       } catch {
-        log.error("Deleting Playlist Incomplete Items failed: \(error)")
+        log.error("Deleting Playlist Incomplete Items failed: \(error.localizedDescription)")
       }
     }
   }
@@ -474,7 +474,7 @@ class PlaylistManager: NSObject {
     do {
       return try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage
     } catch {
-      log.error("Error Retrieving Disk Space: \(error)")
+      log.error("Error Retrieving Disk Space: \(error.localizedDescription)")
     }
     return nil
   }
@@ -485,7 +485,7 @@ class PlaylistManager: NSObject {
         return Int64(result)
       }
     } catch {
-      log.error("Error Retrieving Disk Space: \(error)")
+      log.error("Error Retrieving Disk Space: \(error.localizedDescription)")
     }
     return nil
   }
@@ -595,7 +595,7 @@ extension PlaylistManager {
         return
       }
     } else if trackStatus != .loading {
-      log.debug("AVAsset.statusOfValue not loaded. Status: \(trackStatus)")
+      log.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: trackStatus))")
     }
 
     // Accessing duration or commonMetadata blocks the main-thread if not already loaded
@@ -618,7 +618,7 @@ extension PlaylistManager {
         return
       }
     } else if durationStatus != .loading {
-      log.debug("AVAsset.statusOfValue not loaded. Status: \(durationStatus)")
+      log.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: durationStatus))")
     }
 
     switch Reach().connectionStatus() {

@@ -80,7 +80,7 @@ extension Deletable {
           NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: contextsToUpdate)
         }
       } catch {
-        log.error("Delete all error: \(error)")
+        log.error("Delete all error: \(error.localizedDescription)")
       }
     }
   }
@@ -98,7 +98,7 @@ extension Readable {
     do {
       return try context.count(for: request)
     } catch {
-      log.error("Count error: \(error)")
+      log.error("Count error: \(error.localizedDescription)")
     }
 
     return nil
@@ -128,7 +128,7 @@ extension Readable {
     do {
       return try context.fetch(request)
     } catch {
-      log.error("Fetch error: \(error)")
+      log.error("Fetch error: \(error.localizedDescription)")
     }
 
     return nil

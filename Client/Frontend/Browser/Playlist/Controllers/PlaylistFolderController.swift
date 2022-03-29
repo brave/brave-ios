@@ -44,7 +44,7 @@ class PlaylistFolderController: UIViewController {
     do {
       try othersFRC.performFetch()
     } catch {
-      log.error("Error: \(error)")
+      log.error("Error: \(error.localizedDescription)")
     }
 
     toolbarItems = [
@@ -165,7 +165,7 @@ extension PlaylistFolderController: UITableViewDelegate {
     do {
       try self.othersFRC.performFetch()
     } catch {
-      log.error("Error: \(error)")
+      log.error("Error: \(error.localizedDescription)")
     }
 
     tableView.reloadData()
@@ -189,7 +189,7 @@ extension PlaylistFolderController: UITableViewDelegate {
       PlaylistFolder.updateFolder(folderID: folderID) { result in
         switch result {
         case .failure(let error):
-          log.error("Error Saving Folder Title: \(error)")
+          log.error("Error Saving Folder Title: \(error.localizedDescription)")
 
           DispatchQueue.main.async {
             let alert = UIAlertController(title: Strings.genericErrorTitle, message: Strings.PlaylistFolders.playlistFolderErrorSavingMessage, preferredStyle: .alert)
@@ -240,7 +240,7 @@ extension PlaylistFolderController: UITableViewDelegate {
           do {
             try self.othersFRC.performFetch()
           } catch {
-            log.error("Error Reloading Table: \(error)")
+            log.error("Error Reloading Table: \(error.localizedDescription)")
           }
 
           self.tableView.reloadData()
@@ -490,7 +490,7 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
       do {
         try self.othersFRC.performFetch()
       } catch {
-        log.error("Error Reloading Data: \(error)")
+        log.error("Error Reloading Data: \(error.localizedDescription)")
       }
     }
   }
@@ -605,7 +605,7 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
       do {
         try self.othersFRC.managedObjectContext.save()
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
   }

@@ -187,7 +187,7 @@ extension Domain {
         do {
           try writeContext.save()
         } catch {
-          log.error("Domain save error: \(error)")
+          log.error("Domain save error: \(error.localizedDescription)")
         }
       }
     }

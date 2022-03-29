@@ -282,7 +282,7 @@ class PlaylistListViewController: UIViewController {
             at: indexPath,
             isExpired: false)
         case .other(let err):
-          log.error(err)
+          log.error("\(err.localizedDescription)")
           self.commitPlayerItemTransaction(
             at: indexPath,
             isExpired: false)
@@ -792,7 +792,7 @@ extension PlaylistListViewController {
     }
 
     // Some sort of error happened while downloading the playlist item
-    log.error("Error downloading playlist item: \(error)")
+    log.error("Error downloading playlist item: \(error.localizedDescription)")
 
     guard let item = PlaylistManager.shared.itemAtIndex(index) else {
       return

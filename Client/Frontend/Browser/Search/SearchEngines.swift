@@ -251,7 +251,7 @@ class SearchEngines {
       let data = try Data(contentsOf: URL(fileURLWithPath: customEngineFilePath()))
       return (try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [OpenSearchEngine]) ?? []
     } catch {
-      log.error("Failed to load custom search engines: \(error)")
+      log.error("Failed to load custom search engines: \(error.localizedDescription)")
       return []
     }
   }()
@@ -261,7 +261,7 @@ class SearchEngines {
       let data = try NSKeyedArchiver.archivedData(withRootObject: customEngines, requiringSecureCoding: true)
       try data.write(to: URL(fileURLWithPath: customEngineFilePath()))
     } catch {
-      log.error("Failed to save custom engines: \(customEngines) - \(error.localizedDescription)")
+      log.error("Failed to save custom engines: \(self.customEngines.description) - \(error.localizedDescription)")
     }
   }
 

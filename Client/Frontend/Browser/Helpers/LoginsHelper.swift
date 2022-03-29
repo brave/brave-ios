@@ -331,8 +331,8 @@ class LoginsHelper: TabContentScript {
       contentWorld: .defaultClient,
       escapeArgs: false
     ) { (object, error) -> Void in
-      if error != nil {
-        log.error(error)
+      if let error = error {
+        log.error("\(error.localizedDescription)")
       }
     }
   }

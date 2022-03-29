@@ -67,7 +67,7 @@ public struct PlaylistInfo: Codable {
       let data = try JSONSerialization.data(withJSONObject: message.body, options: [.fragmentsAllowed])
       return try JSONDecoder().decode(PlaylistInfo.self, from: data)
     } catch {
-      log.error("Error Decoding PlaylistInfo: \(error)")
+      log.error("Error Decoding PlaylistInfo: \(error.localizedDescription)")
     }
 
     return nil

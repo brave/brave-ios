@@ -41,7 +41,7 @@ extension URLSession {
       task.resume()
       return task
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
       return nil
     }
   }

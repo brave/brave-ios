@@ -177,7 +177,7 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
 
       return AVURLAsset(url: url)
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
       return nil
     }
   }
@@ -351,7 +351,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         do {
           try FileManager.default.removeItem(at: location)
         } catch {
-          log.error("Error Deleting Playlist Item: \(error)")
+          log.error("Error Deleting Playlist Item: \(error.localizedDescription)")
         }
       }
 
@@ -371,14 +371,14 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
           do {
             try FileManager.default.removeItem(at: cacheLocation)
           } catch {
-            log.error("Could not delete asset cache \(asset.name): \(error)")
+            log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
           }
         }
 
         do {
           try FileManager.default.removeItem(atPath: assetUrl.path)
         } catch {
-          log.error("Could not delete asset cache \(asset.name): \(error)")
+          log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
         }
 
         // Update the asset state, but do not propagate the error
@@ -401,7 +401,6 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
       }
 
       DispatchQueue.main.async {
-        log.debug(PlaylistItem.getItem(pageSrc: asset.id))
         PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
         self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
       }
@@ -424,7 +423,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
           cleanupAndFailDownload(path, error)
         }
       } catch {
-        log.error("An error occurred attempting to download a playlist item: \(error)")
+        log.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
         cleanupAndFailDownload(assetUrl, error)
       }
     }
@@ -525,7 +524,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             try FileManager.default.removeItem(at: cacheLocation)
             PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
           } catch {
-            log.error("Could not delete asset cache \(asset.name): \(error)")
+            log.error("Could not delete asset cache \(asset.name): \(error.localizedDescription)")
           }
         }
 
@@ -588,7 +587,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         do {
           try FileManager.default.removeItem(at: location)
         } catch {
-          log.error("Error Deleting Playlist Item: \(error)")
+          log.error("Error Deleting Playlist Item: \(error.localizedDescription)")
         }
       }
 
@@ -623,7 +622,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
             detectedFileExtension = detectedExtension
           }
         } catch {
-          log.error("Error mapping downloaded playlist file to virtual memory: \(error)")
+          log.error("Error mapping downloaded playlist file to virtual memory: \(error.localizedDescription)")
         }
       }
 
@@ -653,7 +652,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
           cleanupAndFailDownload(location: path, error: error)
         }
       } catch {
-        log.error("An error occurred attempting to download a playlist item: \(error)")
+        log.error("An error occurred attempting to download a playlist item: \(error.localizedDescription)")
         cleanupAndFailDownload(location: location, error: error)
       }
     } else {

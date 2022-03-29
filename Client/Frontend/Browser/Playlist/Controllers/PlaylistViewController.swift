@@ -608,7 +608,7 @@ extension PlaylistViewController: VideoViewDelegate {
 
           switch error {
           case .other(let err):
-            log.error(err)
+            log.error("\(err.localizedDescription)")
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             self.displayLoadingResourceError()
           case .expired:
@@ -675,7 +675,7 @@ extension PlaylistViewController: VideoViewDelegate {
 
           switch error {
           case .other(let err):
-            log.error(err)
+            log.error("\(err.localizedDescription)")
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             self.displayLoadingResourceError()
           case .expired:

@@ -176,7 +176,7 @@ extension String {
       let encodedString = String(decoding: data, as: UTF8.self)
       return String(encodedString.dropLast().dropFirst())
     } catch {
-      log.error("Failed to escape a string containing javascript: \(error)")
+      log.error("Failed to escape a string containing javascript: \(error.localizedDescription)")
       return nil
     }
   }

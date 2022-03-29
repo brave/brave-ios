@@ -41,7 +41,7 @@ class CreatePDFActivity: UIActivity {
         self.callback(data)
         self.activityDidFinish(true)
       case .failure(let error):
-        log.error("Failed to create PDF with error: \(error)")
+        log.error("Failed to create PDF with error: \(error.localizedDescription)")
         self.activityDidFinish(false)
       }
     }

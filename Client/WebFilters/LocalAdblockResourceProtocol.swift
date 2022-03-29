@@ -24,7 +24,7 @@ extension LocalAdblockResourceProtocol {
       let data = try Data(contentsOf: url)
       completion(data)
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
   }
 }

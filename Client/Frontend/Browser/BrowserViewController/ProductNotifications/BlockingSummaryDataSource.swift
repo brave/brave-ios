@@ -86,7 +86,7 @@ class BlockingSummaryDataSource {
     do {
       blockingSummaryList = try JSONDecoder().decode([BlockingSummary].self, from: blockSummaryData)
     } catch {
-      log.error("Failed to decode blockign summary object from json Data \(error)")
+      log.error("Failed to decode blockign summary object from json Data \(error.localizedDescription)")
     }
 
     return blockingSummaryList

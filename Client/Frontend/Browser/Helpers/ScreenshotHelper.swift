@@ -43,7 +43,7 @@ class ScreenshotHelper {
         if let image = image {
           tab.setScreenshot(image)
         } else if let error = error {
-          log.error(error)
+          log.error("\(error.localizedDescription)")
           tab.setScreenshot(nil)
         } else {
           log.error("Cannot snapshot Tab Screenshot - No error description")

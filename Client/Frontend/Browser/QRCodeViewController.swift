@@ -221,7 +221,7 @@ class QRCodeViewController: UIViewController {
         navigationItem.leftBarButtonItem?.image = #imageLiteral(resourceName: "qrcode-light")
         navigationItem.leftBarButtonItem?.tintColor = .bravePrimary
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     } else {
       do {
@@ -231,7 +231,7 @@ class QRCodeViewController: UIViewController {
         navigationItem.leftBarButtonItem?.image = #imageLiteral(resourceName: "qrcode-isLighting")
         navigationItem.leftBarButtonItem?.tintColor = .braveOrange
       } catch {
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
     isLightOn = !isLightOn
@@ -247,7 +247,7 @@ class QRCodeViewController: UIViewController {
       let input = try AVCaptureDeviceInput(device: captureDevice)
       captureSession.addInput(input)
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
 
     let output = AVCaptureMetadataOutput()

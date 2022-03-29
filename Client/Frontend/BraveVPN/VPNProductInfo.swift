@@ -68,6 +68,6 @@ extension VPNProductInfo: SKProductsRequestDelegate {
   }
 
   func request(_ request: SKRequest, didFailWithError error: Error) {
-    log.error("SKProductsRequestDelegate error: \(error)")
+    log.error("SKProductsRequestDelegate error: \(error.localizedDescription)")
   }
 }

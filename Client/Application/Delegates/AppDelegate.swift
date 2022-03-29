@@ -150,7 +150,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           namespace: "TabManagerScreenshots",
           quality: UIConstants.screenshotQuality)
       } catch {
-        log.error("Failed to create an image store for files: \(profile.files) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
+        log.error("Failed to create an image store for files: \(profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
         assertionFailure()
       }
       return nil

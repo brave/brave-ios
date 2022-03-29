@@ -208,7 +208,7 @@ class PlaylistMediaStreamer {
     session.dataTask(with: request) { data, response, error in
       DispatchQueue.main.async {
         if let error = error {
-          log.error("Error fetching MimeType: \(error)")
+          log.error("Error fetching MimeType: \(error.localizedDescription)")
           return completion(nil)
         }
 

@@ -175,13 +175,13 @@ class NTPDownloader {
         do {
           try removeCampaign(type: type)
         } catch {
-          logger.error(error)
+          logger.error("\(error.localizedDescription)")
         }
         return nil
       }
 
       if let error = (error as? NTPError)?.underlyingError() {
-        logger.error(error)
+        logger.error("\(error.localizedDescription)")
       }
     }
 
@@ -208,7 +208,7 @@ class NTPDownloader {
           self.delegate?.onSponsorUpdated(sponsor: item as? NTPSponsor)
         }
       } catch {
-        logger.error(error)
+        logger.error("\(error.localizedDescription)")
       }
     }
   }
@@ -333,7 +333,7 @@ class NTPDownloader {
           logo: logo, topSites: customTheme.topSites, refCode: code)
       }
     } catch {
-      logger.error(error)
+      logger.error("\(error.localizedDescription)")
     }
 
     return nil
@@ -366,7 +366,7 @@ class NTPDownloader {
 
       return try? String(contentsOfFile: etagFileURL.path, encoding: .utf8)
     } catch {
-      logger.error(error)
+      logger.error("\(error.localizedDescription)")
       return nil
     }
   }
@@ -376,7 +376,7 @@ class NTPDownloader {
       let etagFileURL = try self.ntpETagFileURL(type: type)
       try etag.write(to: etagFileURL, atomically: true, encoding: .utf8)
     } catch {
-      logger.error(error)
+      logger.error("\(error.localizedDescription)")
     }
   }
 

@@ -75,7 +75,7 @@ class BraveTalkScriptHandler: TabContentScript {
     // swiftlint:disable:next safe_javascript
     tab?.webView?.evaluateJavaScript(functionName + "(1, \(result))") { _, error in
       if let error = error {
-        log.error("BraveTalk api error: \(error)")
+        log.error("BraveTalk api error: \(error.localizedDescription)")
       }
     }
   }

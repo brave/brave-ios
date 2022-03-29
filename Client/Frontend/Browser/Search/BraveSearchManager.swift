@@ -147,7 +147,7 @@ class BraveSearchManager: NSObject {
         receiveCompletion: { status in
           switch status {
           case .failure(let error):
-            log.error("shouldUseFallback error: \(error)")
+            log.error("shouldUseFallback error: \(error.localizedDescription)")
             // No subsequent call to backup search engine is made in case of error.
             // The pending status has to be cancelled.
             completion(nil)
@@ -231,7 +231,7 @@ class BraveSearchManager: NSObject {
         receiveCompletion: { status in
           switch status {
           case .failure(let error):
-            log.error("Error: \(error)")
+            log.error("Error: \(error.localizedDescription)")
           case .finished:
             break
           }

@@ -215,7 +215,7 @@ class BraveVPN {
   /// This can be further used for a customer support form.
   private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
     if printToConsole {
-      log.error(message)
+      log.error("\(message)")
     }
 
     // Extra safety here in case the log is spammed by many messages.
@@ -263,7 +263,7 @@ class BraveVPN {
         switch status {
         case .success:
           connectOrMigrateToNewNode { completion in
-            log.debug("vpn configuration status: \(completion)")
+            log.debug("vpn configuration status: \(String(describing: completion))")
             reconnectPending = false
           }
         case .error:
@@ -572,7 +572,7 @@ class BraveVPN {
 
       center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
         if let error = error {
-          log.error("Failed to request notifications permissions: \(error)")
+          log.error("Failed to request notifications permissions: \(error.localizedDescription)")
           return
         }
 
@@ -599,7 +599,7 @@ class BraveVPN {
 
           center.add(request) { error in
             if let error = error {
-              log.error("Failed to add notification: \(error)")
+              log.error("Failed to add notification: \(error.localizedDescription)")
               return
             }
 

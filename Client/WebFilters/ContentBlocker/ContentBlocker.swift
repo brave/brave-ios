@@ -49,7 +49,7 @@ extension ContentBlocker {
       rule = try await ruleStore.contentRuleList(forIdentifier: filename)
       return false
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
       return true
     }
   }

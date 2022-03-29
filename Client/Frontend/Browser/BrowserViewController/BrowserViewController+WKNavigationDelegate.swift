@@ -502,7 +502,7 @@ extension BrowserViewController: WKNavigationDelegate {
         }
       }
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
 
     // Added this method to determine long press menu actions better

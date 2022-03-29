@@ -74,7 +74,7 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
       if fm.fileExists(atPath: dir + "/" + HttpsEverywhereStats.levelDbFileName) {
         do {
           try FileManager.default.removeItem(atPath: dir + "/" + HttpsEverywhereStats.levelDbFileName)
-        } catch { log.error("failed to remove leveldb file before unzip \(error)") }
+        } catch { log.error("failed to remove leveldb file before unzip \(error.localizedDescription)") }
       }
 
       self.unzipFile(dir: dir, data: data)
@@ -96,7 +96,7 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
         progress: { _ in
         })
     } catch {
-      log.error("unzip file error: \(error)")
+      log.error("unzip file error: \(error.localizedDescription)")
     }
   }
 }

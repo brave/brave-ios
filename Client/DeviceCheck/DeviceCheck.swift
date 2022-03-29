@@ -160,7 +160,7 @@ public class DeviceCheckClient {
   public class func resetDeviceEnrollment() {
     Preferences.Rewards.didEnrollDeviceCheck.value = false
     if let error = Cryptography.delete(id: DeviceCheckClient.privateKeyId) {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
   }
 

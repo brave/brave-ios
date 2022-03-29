@@ -4,6 +4,7 @@
 
 import Foundation
 import XCGLogger
+import os.log
 
 public struct LegacyLogger {}
 
@@ -11,7 +12,7 @@ public struct LegacyLogger {}
 public extension LegacyLogger {
 
   /// Logger used for recording frontend/browser happenings
-  static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: nil)
+  static let browserLogger = Logger(subsystem: "com.brave.ios", category: "main")
 
   /// Logger used for things recorded on BraveRewards framework.
   static let braveCoreLogger: RollingFileLogger = {
@@ -77,7 +78,8 @@ public extension LegacyLogger {
     do {
       try fileManager.removeItem(at: logDir)
     } catch {
-      browserLogger.error(error)
+      
+      browserLogger.error("\(error.localizedDescription, privacy: .public)")
     }
   }
 }
