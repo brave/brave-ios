@@ -5,11 +5,12 @@
 
 (function() {
 
-function post(from, payload) {
+function post(method, payload) {
   return new Promise((resolve, reject) => {
-    webkit.messageHandlers.walletEthereumProvider.postMessage({
-      name: from,
-      args: JSON.stringify(payload)
+    webkit.messageHandlers.$<handler>.postMessage({
+      "securitytoken": "$<security_token>",
+      "method": method,
+      "args": JSON.stringify(payload)
     })
     .then(resolve, (errorJSON) => {
       try {

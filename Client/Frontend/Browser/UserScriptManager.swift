@@ -355,7 +355,19 @@ class UserScriptManager {
           let source = try? String(contentsOfFile: path) else {
       return nil
     }
-    return WKUserScript(source: source,
+    
+    var alteredSource = source
+    
+    let replacements = [
+      "$<security_token>": UserScriptManager.securityTokenString,
+      "$<handler>": "walletEthereumProvider_\(messageHandlerTokenString)",
+    ]
+    
+    replacements.forEach({
+      alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+    })
+    
+    return WKUserScript(source: alteredSource,
                         injectionTime: .atDocumentStart,
                         forMainFrameOnly: true,
                         in: .page)
@@ -415,7 +427,7 @@ class UserScriptManager {
       }
 
       #if WALLET_DAPPS_ENABLED
-      if let script = walletProviderScript {
+      if let script = walletProviderScript, !PrivateBrowsingManager.shared.isPrivateBrowsing {
         $0.addUserScript(script)
         if let providerJS = walletProviderJS {
           $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))

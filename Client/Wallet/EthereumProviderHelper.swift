@@ -6,6 +6,9 @@
 import Foundation
 import WebKit
 import BraveCore
+import struct Shared.Logger
+
+private let log = Logger.browserLogger
 
 class EthereumProviderHelper: TabContentScript {
   private static let supportedSingleArgMethods = [
@@ -28,7 +31,7 @@ class EthereumProviderHelper: TabContentScript {
   }
   
   func scriptMessageHandlerName() -> String? {
-    return "walletEthereumProvider"
+    return "walletEthereumProvider_\(UserScriptManager.messageHandlerTokenString)"
   }
   
   static func shouldInjectWalletProvider(_ completion: @escaping (Bool) -> Void) {
@@ -38,12 +41,8 @@ class EthereumProviderHelper: TabContentScript {
       })
   }
   
-  func userContentController(
-    _ userContentController: WKUserContentController,
-    didReceiveScriptMessage message: WKScriptMessage,
-    replyHandler: @escaping (Any?, String?) -> Void
-  ) {
-    enum MessageAction: String {
+  private struct MessageBody: Decodable {
+    enum Method: String, Decodable {
       case request
       case isConnected
       case enable
@@ -51,15 +50,31 @@ class EthereumProviderHelper: TabContentScript {
       case sendAsync
       case isUnlocked
     }
+    var securityToken: String
+    var method: Method
+    var args: String
     
+    private enum CodingKeys: String, CodingKey {
+      case securityToken = "securitytoken"
+      case method
+      case args
+    }
+  }
+  
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: @escaping (Any?, String?) -> Void
+  ) {
     guard let provider = tab.walletProvider,
           !message.frameInfo.securityOrigin.host.isEmpty, // Fail if there is no last committed URL yet
           message.frameInfo.isMainFrame, // Fail the request came from 3p origin
           JSONSerialization.isValidJSONObject(message.body),
-          let body = message.body as? NSDictionary,
-          let name = body["name"] as? String,
-          let jsonPayload = body["args"] as? String,
-          let action = MessageAction(rawValue: name) else {
+          let messageData = try? JSONSerialization.data(withJSONObject: message.body, options: []),
+          let body = try? JSONDecoder().decode(MessageBody.self, from: messageData),
+          body.securityToken == UserScriptManager.securityTokenString
+    else {
+      log.error("Failed to handle ethereum provider communication")
       return
     }
     
@@ -86,9 +101,9 @@ class EthereumProviderHelper: TabContentScript {
       }
     }
     
-    switch action {
+    switch body.method {
     case .request:
-      guard let requestPayload = MojoBase.Value(jsonString: jsonPayload) else {
+      guard let requestPayload = MojoBase.Value(jsonString: body.args) else {
         replyHandler(nil, "Invalid args")
         return
       }
@@ -98,7 +113,7 @@ class EthereumProviderHelper: TabContentScript {
     case .enable:
       provider.enable(handleResponse)
     case .sendAsync:
-      guard let requestPayload = MojoBase.Value(jsonString: jsonPayload) else {
+      guard let requestPayload = MojoBase.Value(jsonString: body.args) else {
         replyHandler(nil, "Invalid args")
         return
       }
@@ -115,7 +130,7 @@ class EthereumProviderHelper: TabContentScript {
           self.params = jsonValue["params"] // can be undefined in JS
         }
       }
-      guard let sendPayload = SendPayload(payload: jsonPayload) else {
+      guard let sendPayload = SendPayload(payload: body.args) else {
         replyHandler(nil, "Invalid args")
         return
       }
