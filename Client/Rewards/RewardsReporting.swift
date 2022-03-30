@@ -43,7 +43,7 @@ class RewardsReporting: TabContentScript {
       }
 
       if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-        Log.braveCore.debug("Missing required security token.")
+        Log.braveRewards.debug("Missing required security token.")
         return
       }
 
@@ -71,7 +71,7 @@ class RewardsReporting: TabContentScript {
         }
       }
     } catch {
-      Log.braveCore.error("Failed to parse message from rewards reporting JS: \(error.localizedDescription)")
+      Log.braveRewards.error("Failed to parse message from rewards reporting JS: \(error.localizedDescription)")
     }
   }
 }

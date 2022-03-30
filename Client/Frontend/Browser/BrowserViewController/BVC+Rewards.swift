@@ -132,7 +132,7 @@ extension BrowserViewController {
     ledger.pendingPromotions.forEach { promo in
       if promo.status == .active {
         ledger.claimPromotion(promo) { success in
-          Log.braveCore.info("[BraveRewards] Auto-Claim Promotion - \(success) for \(promo.approximateValue)")
+          Log.braveRewards.info("[BraveRewards] Auto-Claim Promotion - \(success) for \(promo.approximateValue)")
         }
       }
     }
@@ -200,12 +200,12 @@ extension BrowserViewController {
     do {
       let contents = NSDictionary(contentsOfFile: ledgerStateContainer.path)
       guard let confirmations = contents?["confirmations.json"] as? String else {
-        Log.braveCore.debug("No confirmations found to migrate in ledger's state container")
+        Log.braveRewards.debug("No confirmations found to migrate in ledger's state container")
         return
       }
       try confirmations.write(toFile: adsConfirmations.path, atomically: true, encoding: .utf8)
     } catch {
-      Log.braveCore.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
+      Log.braveRewards.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
     }
   }
 
@@ -305,7 +305,7 @@ extension Tab {
     group.notify(queue: .main) {
       let faviconURL = URL(string: self.displayFavicon?.url ?? "")
       if faviconURL == nil {
-        Log.braveCore.warning("No favicon found in \(self) to report to rewards panel")
+        Log.braveRewards.warning("No favicon found in \(self) to report to rewards panel")
       }
       rewards.reportLoadedPage(
         url: url, redirectionURLs: urls.isEmpty ? [url] : urls,

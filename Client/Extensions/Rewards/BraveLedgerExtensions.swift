@@ -132,21 +132,21 @@ extension BraveLedger {
     client.generateToken { [weak self] (token, error) in
       guard let self = self else { return }
       if let error = error {
-        Log.braveCore.error("Failed to generate DeviceCheck token: \(error.localizedDescription)")
+        Log.braveRewards.error("Failed to generate DeviceCheck token: \(error.localizedDescription)")
         completion()
         return
       }
       let paymentId = self.paymentId ?? ""
       client.generateEnrollment(paymentId: paymentId, token: token) { registration, error in
         if let error = error {
-          Log.braveCore.error("Failed to enroll in DeviceCheck: \(error.localizedDescription)")
+          Log.braveRewards.error("Failed to enroll in DeviceCheck: \(error.localizedDescription)")
           completion()
           return
         }
         guard let registration = registration else { return }
         client.registerDevice(enrollment: registration) { error in
           if let error = error {
-            Log.braveCore.error("Failed to register device with mobile attestation server: \(error.localizedDescription)")
+            Log.braveRewards.error("Failed to register device with mobile attestation server: \(error.localizedDescription)")
             completion()
             return
           }
@@ -198,7 +198,7 @@ extension BraveLedger {
             do {
               solution.blob = try verification.attestationBlob.bsonData().base64EncodedString()
             } catch {
-              Log.braveCore.error("Couldn't serialize attestation blob. The attest promotion will fail")
+              Log.braveRewards.error("Couldn't serialize attestation blob. The attest promotion will fail")
             }
 
             self.attestPromotion(promotion.id, solution: solution) { result, promotion in

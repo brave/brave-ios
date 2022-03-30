@@ -28,7 +28,7 @@ extension ContentBlockerHelper: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      Log.braveCore.debug("Missing required security token.")
+      Log.braveRewards.debug("Missing required security token.")
       return
     }
 

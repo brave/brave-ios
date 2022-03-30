@@ -5,18 +5,27 @@
 import Foundation
 import os.log
 
+/// A logging system used in the app. Based on os.log classes.
 public struct Log {}
 
 // MARK: - Singleton Logger Instances
 public extension Log {
   
-  static let braveCore = Logger(subsystem: "com.brave.ios", category: "brave-core")
-
+  /// Main logger of the app. Should be used for most things you want to log.
   static let main = Logger(subsystem: "com.brave.ios", category: "main")
   
-  /// Logger used in legacy places, in code we inherited from Firefox, should not be used elsewhere.
+  /// Captures Brave Rewards & Ads related logs.
+  static let braveRewards = Logger(subsystem: "com.brave.ios", category: "brave-rewards")
+  
+  /// This log category is used to capture logs from the Brave-Core framework.
+  /// Avoid calling this log from other places unless the code belongs close to the Brave-Core framework functionality.
+  static let braveCore = Logger(subsystem: "com.brave.ios", category: "brave-core")
+  
+  /// Used in legacy places, in code we inherited from Firefox, should not be used elsewhere.
   static let legacy = Logger(subsystem: "com.brave.ios", category: "legacy")
   
+  /// The old log system was based on XCGLogger with a rolling file saving to disk.
+  /// This method removes old entries of the legacy log implementation.
   static func removeLegacyLogs() {
     let fileManager = FileManager.default
     
