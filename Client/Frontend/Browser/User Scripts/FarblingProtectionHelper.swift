@@ -39,6 +39,19 @@ class FarblingProtectionHelper {
     ///
     /// It's important to have a value between 0 - 1 in order to be within the array bounds
     let randomVoiceIndexScale: Float
+    /// This value is used to perturb image data.
+    ///
+    /// A set of bytes used to mask the values of our image data
+    /// Each bit in the canvas key is used one to perturb each random pixel
+    /// - Note: Increasing the count will perturb the pixels more
+    let canvasKey: [UInt8]
+    /// This value is used to perturb image data.
+    ///
+    /// A set of random values used select a random index in our image data array
+    /// These values are combined with the canvas key values and used to select the next random index.
+    /// Ideally the count of these numbers should be in multiples of 8 to use up all the bits in the canvas key.
+    /// - Note: Increasing the count of these items will perturb the pixels more
+    let imageDataRandoms: [UInt32]
   }
 
   /// Variables representing the prefix of a randomly generated strings used as the plugin name
@@ -75,7 +88,9 @@ class FarblingProtectionHelper {
       fudgeFactor: Float.seededRandom(in: 0.99...1),
       fakeVoiceName: fakeVoiceNames.seededRandom() ?? "",
       fakePluginData: FarblingProtectionHelper.makeFakePluginData(),
-      randomVoiceIndexScale: Float(drand48())
+      randomVoiceIndexScale: Float(drand48()),
+      canvasKey: Self.makeRandomBytes(from: &generator, count: 32),
+      imageDataRandoms: Self.makeRandomsUInt32BitValues(from: &generator, count: 16)
     )
 
     let encoder = JSONEncoder()
@@ -117,6 +132,20 @@ class FarblingProtectionHelper {
       pluginNameSecondParts.seededRandom(),
       pluginNameThirdParts.seededRandom()
     ].compactMap({ $0 ?? nil }).joined(separator: " ")
+  }
+
+  /// Generate a random list of bytes (UInt8)
+  private static func makeRandomBytes<T: RandomNumberGenerator>(from generator: inout T, count: Int) -> [UInt8] {
+    return (0..<count).map { _ in
+      return UInt8.random(in: UInt8.min...UInt8.max, using: &generator)
+    }
+  }
+
+  /// Generate a list of random list of 32-bit values
+  private static func makeRandomsUInt32BitValues<T: RandomNumberGenerator>(from generator: inout T, count: Int) -> [UInt32] {
+    return (0..<count).map { _ in
+      return UInt32.random(in: UInt32.min...UInt32.max, using: &generator)
+    }
   }
 }
 
