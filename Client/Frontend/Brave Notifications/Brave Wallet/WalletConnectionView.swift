@@ -39,7 +39,7 @@ class WalletConnectionView: UIControl {
 
     addSubview(stackView)
     stackView.snp.makeConstraints {
-      $0.edges.equalToSuperview().inset(21)
+      $0.edges.equalToSuperview().inset(20)
     }
     stackView.addArrangedSubview(iconImageView)
     stackView.addArrangedSubview(titleLabel)
