@@ -8,18 +8,18 @@ import BraveShared
 import Shared
 import pop
 
-public class BraveNotificationsPresenter: UIViewController {
+class BraveNotificationsPresenter: UIViewController {
   private var notificationsQueue: [BraveNotification] = []
   private var widthAnchor: NSLayoutConstraint?
   private var visibleNotification: BraveNotification?
   
-  public override func loadView() {
+  override func loadView() {
     let view = PresenterView(frame: UIScreen.main.bounds)
     view.viewController = self
     self.view = view
   }
   
-  public func display(notification: BraveNotification, from presentingController: UIViewController) {
+  func display(notification: BraveNotification, from presentingController: UIViewController) {
     // check the priority of the notification
     if let visibleNotification = visibleNotification {
       if notification.priority <= visibleNotification.priority {
@@ -82,7 +82,7 @@ public class BraveNotificationsPresenter: UIViewController {
     notificationView.addGestureRecognizer(dismissPanGesture)
   }
   
-  public override func viewWillLayoutSubviews() {
+  override func viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
     
     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -91,13 +91,13 @@ public class BraveNotificationsPresenter: UIViewController {
     }
   }
   
-  public func removeRewardsNotification(with id: String) {
+  func removeRewardsNotification(with id: String) {
     if let index = notificationsQueue.firstIndex(where: { $0.id == id }) {
       notificationsQueue.remove(at: index)
     }
   }
   
-  public func hide(_ notification: BraveNotification) {
+  func hide(_ notification: BraveNotification) {
     hide(notificationView: notification.view, velocity: nil)
   }
   
@@ -148,8 +148,8 @@ public class BraveNotificationsPresenter: UIViewController {
     }
     dismissTimers[notification.id] = Timer.scheduledTimer(withTimeInterval: interval, repeats: false, block: { [weak self] _ in
       guard let self = self else { return }
-      self.hide(notification)
       notification.willDismiss(timedOut: true)
+      self.hide(notification)
     })
   }
   
@@ -237,8 +237,8 @@ extension BraveNotificationsPresenter {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
       guard let view = super.hitTest(point, with: event) else { return nil }
-      // Only allow tapping the ad part of this VC
-      if view.superview == viewController?.visibleNotification?.view || view == viewController?.visibleNotification?.view {
+      // Only allow tapping the nitification part of this VC
+      if let notificationView = viewController?.visibleNotification?.view, view.isDescendant(of: notificationView) {
         return view
       }
       return nil
@@ -248,7 +248,7 @@ extension BraveNotificationsPresenter {
 
 extension BraveNotificationsPresenter: UIGestureRecognizerDelegate {
   
-  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
       let velocity = pan.velocity(in: pan.view)
       guard let notification = visibleNotification else { return false }

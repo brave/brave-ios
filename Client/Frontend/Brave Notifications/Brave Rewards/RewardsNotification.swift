@@ -8,27 +8,27 @@ import BraveCore
 import BraveShared
 import Shared
 
-public enum RewardsNotificationAction {
-  /// The user opened the ad by either clicking on it directly or by swiping and clicking the "view" button
-  case opened
-  /// The user swiped the ad away
-  case dismissed
-  /// The user ignored the ad for a given amount of time for it to automatically dismiss
-  case timedOut
-  /// The user clicked the thumbs down button by swiping on the ad
-  case disliked
-}
-
-public class RewardsNotification: NSObject, BraveNotification {
-  public var view: UIView
-  public var dismissAction: (() -> Void)?
-  public var id: String { ad.uuid }
-  public let ad: AdNotification
-  public var isHorizontalSwipe: Bool {
+class RewardsNotification: NSObject, BraveNotification {
+  enum Action {
+    /// The user opened the ad by either clicking on it directly or by swiping and clicking the "view" button
+    case opened
+    /// The user swiped the ad away
+    case dismissed
+    /// The user ignored the ad for a given amount of time for it to automatically dismiss
+    case timedOut
+    /// The user clicked the thumbs down button by swiping on the ad
+    case disliked
+  }
+  
+  var view: UIView
+  var dismissAction: (() -> Void)?
+  var id: String { ad.uuid }
+  let ad: AdNotification
+  var isHorizontalSwipe: Bool {
     guard let adView = view as? AdView else { return false }
     return adView.swipeTranslation != 0
   }
-  public var dismissPolicy: DismissPolicy = {
+  var dismissPolicy: DismissPolicy = {
     var dismissTimeInterval: TimeInterval = 30
     if !AppConstants.buildChannel.isPublic, let override = Preferences.Rewards.adsDurationOverride.value, override > 0 {
       dismissTimeInterval = TimeInterval(override)
@@ -36,21 +36,21 @@ public class RewardsNotification: NSObject, BraveNotification {
     return .automatic(after: dismissTimeInterval)
   }()
   
-  private let rewardsHandler: (RewardsNotificationAction) -> Void
+  private let handler: (Action) -> Void
   
-  public func willDismiss(timedOut: Bool) {
+  func willDismiss(timedOut: Bool) {
     guard let adView = view as? AdView else { return }
     adView.setSwipeTranslation(0, animated: true)
-    rewardsHandler(timedOut ? .timedOut : .dismissed)
+    handler(timedOut ? .timedOut : .dismissed)
   }
   
   init(
     ad: AdNotification,
-    rewardsHandler: @escaping (RewardsNotificationAction) -> Void
+    handler: @escaping (Action) -> Void
   ) {
     self.ad = ad
     self.view = AdView()
-    self.rewardsHandler = rewardsHandler
+    self.handler = handler
     super.init()
     self.setup()
   }
@@ -77,17 +77,17 @@ public class RewardsNotification: NSObject, BraveNotification {
       return
     }
     dismissAction?()
-    rewardsHandler(.opened)
+    handler(.opened)
   }
   
   @objc private func tappedOpen(_ sender: AdSwipeButton) {
     dismissAction?()
-    rewardsHandler(.opened)
+    handler(.opened)
   }
   
   @objc private func tappedDisliked(_ sender: AdSwipeButton) {
     dismissAction?()
-    rewardsHandler(.disliked)
+    handler(.disliked)
   }
   
   // Distance travelled after decelerating to zero velocity at a constant rate
@@ -119,7 +119,7 @@ public class RewardsNotification: NSObject, BraveNotification {
       if /*tx > actionTriggerThreshold ||*/ tx < -actionTriggerThreshold {
         adView.setSwipeTranslation(0, animated: true, panVelocity: velocity)
         dismissAction?()
-        rewardsHandler(tx > 0 ? .opened : .disliked)
+        handler(tx > 0 ? .opened : .disliked)
         break
       } else if /*tx + projected > actionRestThreshold ||*/ tx + projected < -actionRestThreshold {
         adView.setSwipeTranslation((tx + projected) > 0 ? actionRestThreshold : -actionRestThreshold, animated: true, panVelocity: velocity)
@@ -136,7 +136,7 @@ public class RewardsNotification: NSObject, BraveNotification {
 
 extension RewardsNotification: UIGestureRecognizerDelegate {
   
-  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+  func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
       let velocity = pan.velocity(in: pan.view)
       // Horizontal only
@@ -148,7 +148,7 @@ extension RewardsNotification: UIGestureRecognizerDelegate {
 
 extension RewardsNotification {
   /// Display a "My First Ad" on a presenting controller and be notified if they tap it
-  public static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (RewardsNotificationAction, URL) -> Void) {
+  static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (RewardsNotification.Action, URL) -> Void) {
     let notificationPresenter = BraveNotificationsPresenter()
     let notification = AdNotification.customAd(
       title: Strings.Ads.myFirstAdTitle,

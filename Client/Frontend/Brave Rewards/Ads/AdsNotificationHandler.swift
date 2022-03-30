@@ -9,24 +9,24 @@ import pop
 import SnapKit
 import BraveShared
 
-public class AdsNotificationHandler: BraveAdsNotificationHandler {
+class AdsNotificationHandler: BraveAdsNotificationHandler {
   /// An ad was tapped and a URL should be opened
-  public var actionOccured: ((AdNotification?, RewardsNotificationAction) -> Void)?
+  var actionOccured: ((AdNotification?, RewardsNotification.Action) -> Void)?
   /// The ads object
-  public let ads: BraveAds
+  let ads: BraveAds
   /// Whether or not we should currently show ads currently based on exteranl
   /// factors such as private mode
-  public var canShowNotifications: (() -> Bool)?
+  var canShowNotifications: (() -> Bool)?
   /// The controller which we will show notifications on top of
-  public private(set) weak var presentingController: UIViewController?
+  private(set) weak var presentingController: UIViewController?
   /// The controller that display, hide and manage notifications
-  private let notificationsPresenter: BraveNotificationsPresenter
+  private weak var notificationsPresenter: BraveNotificationsPresenter?
 
   /// Create a handler instance with the given ads instance.
   ///
   /// - note: This method automatically sets `notificationsHandler` on BATBraveAds
   /// to itself
-  public init(
+  init(
     ads: BraveAds,
     presentingController: UIViewController,
     notificationsPresenter: BraveNotificationsPresenter
@@ -37,7 +37,7 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     self.ads.notificationsHandler = self
   }
     
-  public func showNotification(_ notification: AdNotification) {
+  func showNotification(_ notification: AdNotification) {
     guard let presentingController = presentingController else { return }
   
     let rewardsNotification = RewardsNotification(ad: notification) { [weak self] action in
@@ -57,14 +57,14 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     }
     
     ads.reportAdNotificationEvent(notification.uuid, eventType: .viewed)
-    notificationsPresenter.display(notification: rewardsNotification, from: presentingController)
+    notificationsPresenter?.display(notification: rewardsNotification, from: presentingController)
   }
 
-  public func clearNotification(withIdentifier identifier: String) {
-    notificationsPresenter.removeRewardsNotification(with: identifier)
+  func clearNotification(withIdentifier identifier: String) {
+    notificationsPresenter?.removeRewardsNotification(with: identifier)
   }
 
-  public func shouldShowNotifications() -> Bool {
+  func shouldShowNotifications() -> Bool {
     guard let presentingController = presentingController,
       let rootVC = presentingController.currentScene?.browserViewController
     else { return false }

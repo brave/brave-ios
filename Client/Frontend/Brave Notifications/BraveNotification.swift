@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct BraveNotificationPriority: Comparable {
+struct BraveNotificationPriority: Comparable {
   var value: Int
   static let low: Self = .init(value: 0)
   static let high: Self = .init(value: 1)
@@ -15,12 +15,12 @@ public struct BraveNotificationPriority: Comparable {
   }
 }
 
-public enum DismissPolicy {
+enum DismissPolicy {
   case automatic(after: TimeInterval = 30)
   case explicit
 }
 
-public protocol BraveNotification: AnyObject {
+protocol BraveNotification: AnyObject {
   var priority: BraveNotificationPriority { get }
   var view: UIView { get }
   var dismissAction: (() -> Void)? { get set }

@@ -5,43 +5,43 @@
 
 import Foundation
 
-public enum WalletNotificationAction {
-  /// The user clicked the wallet connection notification
-  case connectWallet
-  /// The user swiped the notification away
-  case dismissed
-  /// The user ignored the wallet connection notification for a given amount of time for it to automatically dismiss
-  case timedOut
-}
-
-public class WalletNotification: BraveNotification {
+class WalletNotification: BraveNotification {
   private struct Constant {
     static let id = "wallet-notification"
   }
   
-  public var priority: BraveNotificationPriority
-  public var view: UIView
-  public var id: String { WalletNotification.Constant.id }
-  public var dismissAction: (() -> Void)?
-  public var isHorizontalSwipe: Bool = false
-  
-  private let walletHandler: (WalletNotificationAction) -> Void
-  
-  public func willDismiss(timedOut: Bool) {
-    walletHandler(timedOut ? .timedOut : .dismissed)
+  enum Action {
+    /// The user clicked the wallet connection notification
+    case connectWallet
+    /// The user swiped the notification away
+    case dismissed
+    /// The user ignored the wallet connection notification for a given amount of time for it to automatically dismiss
+    case timedOut
   }
   
-  public func isSwipeToLeft() -> Bool {
+  var priority: BraveNotificationPriority
+  var view: UIView
+  var id: String { WalletNotification.Constant.id }
+  var dismissAction: (() -> Void)?
+  var isHorizontalSwipe: Bool = false
+  
+  private let handler: (Action) -> Void
+  
+  func willDismiss(timedOut: Bool) {
+    handler(timedOut ? .timedOut : .dismissed)
+  }
+  
+  func isSwipeToLeft() -> Bool {
     return false
   }
   
   init(
     priority: BraveNotificationPriority,
-    walletHandler: @escaping (WalletNotificationAction) -> Void
+    handler: @escaping (Action) -> Void
   ) {
     self.priority = priority
     self.view = WalletConnectionView()
-    self.walletHandler = walletHandler
+    self.handler = handler
     self.setup()
   }
   
@@ -52,6 +52,6 @@ public class WalletNotification: BraveNotification {
   
   @objc private func tappedWalletConnectionView(_ sender: WalletConnectionView) {
     dismissAction?()
-    walletHandler(.connectWallet)
+    handler(.connectWallet)
   }
 }
