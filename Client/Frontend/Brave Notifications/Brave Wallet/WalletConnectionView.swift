@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 import Shared
+import BraveUI
 
 class WalletConnectionView: UIControl {
   private let stackView: UIStackView = {
@@ -26,7 +27,8 @@ class WalletConnectionView: UIControl {
   private let titleLabel: UILabel = {
     let result = UILabel()
     result.textColor = .white
-    result.font = .systemFont(ofSize: 15, weight: .semibold)
+    result.font = .preferredFont(forTextStyle: .subheadline, weight: .semibold)
+    result.adjustsFontForContentSizeCategory = true
     result.numberOfLines = 0
     result.text = Strings.Wallet.dappsConnectionNotificationTitle
     return result
