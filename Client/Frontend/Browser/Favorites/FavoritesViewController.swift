@@ -206,7 +206,7 @@ class FavoritesViewController: UIViewController {
       do {
         try recentSearchesFRC.performFetch()
       } catch {
-        Log.main.error("Recent Searches fetch error: \(String(describing: error))")
+        Log.main.error("Recent Searches fetch error: \(error.localizedDescription)")
       }
     }
   }
@@ -554,7 +554,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
     do {
       try favoritesFRC.performFetch()
     } catch {
-      Log.main.error("Favorites fetch error: \(String(describing: error))")
+      Log.main.error("Favorites fetch error: \(error.localizedDescription)")
     }
 
     fetchRecentSearches()

@@ -39,7 +39,7 @@ class FindInPageHelper: TabContentScript {
     }
 
     guard let data = body["data"] as? [String: Int] else {
-      Log.main.error("Could not find a message body or the data did not meet expectations: \(String(describing: message.body))")
+      Log.main.error("Could not find a message body or the data did not meet expectations")
       return
     }
 

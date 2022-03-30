@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           }
         }()
         
-        Log.braveCore.log(level: level, "\(message.dropFirst(messageStartIndex).dropLast())")
+        Log.braveCore.log(level: level, "\(message.dropFirst(messageStartIndex).dropLast(), privacy: .public)")
       }
       return true
     }

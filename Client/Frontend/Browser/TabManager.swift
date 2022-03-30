@@ -279,7 +279,7 @@ class TabManager: NSObject {
     }
 
     guard tab === selectedTab else {
-      Log.main.error("Expected tab (\(String(describing: tab?.url))) is not selected. Selected index: \(self.selectedIndex)")
+      Log.main.error("Expected tab (\(tab?.url?.absoluteString ?? "-")) is not selected. Selected index: \(self.selectedIndex)")
       return
     }
 

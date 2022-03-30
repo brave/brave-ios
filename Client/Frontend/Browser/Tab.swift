@@ -366,7 +366,7 @@ class Tab: NSObject {
     } else if let request = lastRequest {
       webView.load(request)
     } else {
-      Log.main.warning("creating webview with no lastRequest and no session data: \(String(describing: self.url))")
+      Log.main.warning("creating webview with no lastRequest and no session data: \(self.url?.absoluteString ?? "-"))")
     }
 
   }

@@ -593,7 +593,7 @@ extension PlaylistManager {
         return
       }
     } else if trackStatus != .loading {
-      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: trackStatus))")
+      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(trackStatus.rawValue, privacy: .public)")
     }
 
     // Accessing duration or commonMetadata blocks the main-thread if not already loaded
@@ -616,7 +616,7 @@ extension PlaylistManager {
         return
       }
     } else if durationStatus != .loading {
-      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: durationStatus))")
+      Log.main.debug("AVAsset.statusOfValue not loaded. Status: \(durationStatus.rawValue, privacy: .public)")
     }
 
     switch Reach().connectionStatus() {

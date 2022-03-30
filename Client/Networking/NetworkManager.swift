@@ -61,7 +61,7 @@ class NetworkManager {
     case 400...499:
       let error = """
         Failed to download, status code: \(response.statusCode),\
-        URL:\(String(describing: response.url))
+        URL:\(response.url?.absoluteString ?? "-")
         """
       throw error
 

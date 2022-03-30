@@ -197,6 +197,6 @@ extension PlaylistCarplayManager: CPSessionConfigurationDelegate {
     _ sessionConfiguration: CPSessionConfiguration,
     limitedUserInterfacesChanged limitedUserInterfaces: CPLimitableUserInterface
   ) {
-    Log.main.debug("Limited UI changed: \(String(describing: limitedUserInterfaces))")
+    Log.main.debug("Limited UI changed: \(limitedUserInterfaces.rawValue, privacy: .public)")
   }
 }
