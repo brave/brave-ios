@@ -11,7 +11,7 @@ module Fastlane
 
         git_command = ""
         if File.directory?(directory)
-          Helper.Log.main.info("Fetching latest version of build tools from #{directory}")
+          Helper.log.info("Fetching latest version of build tools from #{directory}")
           branch_option = ""
           branch_option = "git checkout #{params[:branch]}\n" if params[:branch] != 'HEAD'
           git_command = "cd #{directory}\n \
@@ -20,7 +20,7 @@ module Fastlane
           #{branch_option} \
           git pull"
         else
-          Helper.Log.main.info("Cloning build tools repository")
+          Helper.log.info("Cloning build tools repository")
           #import from git into subdir
           branch_option = ""
           branch_option = "--branch #{params[:branch]}" if params[:branch] != 'HEAD'
@@ -28,7 +28,7 @@ module Fastlane
           git_command = "git clone '#{params[:url]}' '#{directory}' #{branch_option}"
         end
 
-        Helper.Log.main.info("Excuting #{git_command}")
+        Helper.log.info("Excuting #{git_command}")
         Actions.sh(git_command)
       end
 
