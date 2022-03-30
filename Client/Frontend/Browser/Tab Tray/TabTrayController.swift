@@ -54,6 +54,7 @@ class TabTrayController: LoadingViewController {
   private var isTabTrayBeingSearched = false
   private let tabTraySearchController = UISearchController(searchResultsController: nil)
   private var tabTraySearchQuery = ""
+  private var searchBarView: TabTraySearchBar?
 
   private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
 
@@ -79,7 +80,7 @@ class TabTrayController: LoadingViewController {
 
     definesPresentationContext = true
 
-    let searchBarView = TabTraySearchBar(searchBar: tabTraySearchController.searchBar).then {
+    searchBarView = TabTraySearchBar(searchBar: tabTraySearchController.searchBar).then {
       $0.searchBar.autocapitalizationType = .none
       $0.searchBar.autocorrectionType = .no
       $0.searchBar.placeholder = Strings.tabTraySearchBarTitle
@@ -94,8 +95,6 @@ class TabTrayController: LoadingViewController {
     }
 
     navigationItem.do {
-      // Place the search bar in the navigation item's title view.
-      $0.titleView = searchBarView
       $0.hidesSearchBarWhenScrolling = true
     }
 
@@ -127,6 +126,10 @@ class TabTrayController: LoadingViewController {
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
       UIBarButtonItem(customView: tabTrayView.doneButton),
     ]
+    
+    // Place the search bar in the navigation item's title view.
+    searchBarView?.frame = navigationController?.navigationBar.frame ?? .zero
+    navigationItem.titleView = searchBarView
   }
 
   private var initialScrollCompleted = false
@@ -145,6 +148,16 @@ class TabTrayController: LoadingViewController {
 
       initialScrollCompleted = true
     }
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+
+    searchBarView?.frame = navigationController?.navigationBar.frame ?? .zero
+    navigationItem.titleView = searchBarView
+    
+    searchBarView?.setNeedsLayout()
+    searchBarView?.layoutIfNeeded()
   }
 
   // MARK: Snapshot handling
@@ -472,7 +485,19 @@ class TabTraySearchBar: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    searchBar.frame = bounds
+    
+    var adjustedFrame = bounds
+    
+    // Adjusting search bar bounds here for landscape iPhones, needs padding from top and bottom
+    if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .compact {
+      adjustedFrame = CGRect(
+        x: adjustedFrame.origin.x,
+        y: adjustedFrame.origin.y + 2,
+        width: adjustedFrame.size.width,
+        height: adjustedFrame.size.height - 4)
+    }
+    
+    searchBar.frame = adjustedFrame
   }
 
   override func sizeThatFits(_ size: CGSize) -> CGSize {
