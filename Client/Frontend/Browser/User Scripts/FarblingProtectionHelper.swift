@@ -69,13 +69,13 @@ class FarblingProtectionHelper {
   ]
 
   static func makeFarblingParams(from randomConfiguration: RandomConfiguration) throws -> String {
-    var generator = ARC4RandomNumberGenerator(seed: randomConfiguration.domainKeyData.getBytes())
+    srand48(randomConfiguration.domainKeyHEX.hashValue)
 
     let farblingData = FarblingData(
-      fudgeFactor: Float.random(in: 0.99...1, using: &generator),
-      fakeVoiceName: FarblingProtectionHelper.makeFakeVoiceName(from: &generator),
-      fakePluginData: FarblingProtectionHelper.makeFakePluginData(from: &generator),
-      randomVoiceIndexScale: Float.random(in: 0...1, using: &generator)
+      fudgeFactor: Float.seededRandom(in: 0.99...1),
+      fakeVoiceName: fakeVoiceNames.seededRandom() ?? "",
+      fakePluginData: FarblingProtectionHelper.makeFakePluginData(),
+      randomVoiceIndexScale: Float(drand48())
     )
 
     let encoder = JSONEncoder()
@@ -84,44 +84,75 @@ class FarblingProtectionHelper {
   }
 
   /// Generate fake plugin data to be injected into the farbling protection script
-  private static func makeFakePluginData<T: RandomNumberGenerator>(from generator: inout T) -> [FarblingData.FakePluginData] {
-    let pluginCount = Int.random(in: 1...3, using: &generator)
+  private static func makeFakePluginData() -> [FarblingData.FakePluginData] {
+    let pluginCount = UInt8.seededRandom(in: 1...3)
 
     // Generate 1 to 3 fake plugins
     return (0..<pluginCount).map { pluginIndex -> FarblingData.FakePluginData in
-      let mimeTypesCount = Int.random(in: 1...3, using: &generator)
+      let mimeTypesCount = UInt8.seededRandom(in: 1...3)
 
       // Generate 1 to 3 fake mime types
       let mimeTypes = (0..<mimeTypesCount).map { mimeTypeIndex -> FarblingData.FakeMimeTypeData in
         return FarblingData.FakeMimeTypeData(
           suffixes: "pdf",
           type: "application/pdf",
-          description: randomPluginName(from: &generator)
+          description: randomPluginName()
         )
       }
 
       return FarblingData.FakePluginData(
-        name: randomPluginName(from: &generator),
+        name: randomPluginName(),
         filename: "",
-        description: randomPluginName(from: &generator),
+        description: randomPluginName(),
         mimeTypes: mimeTypes
       )
     }
   }
 
-  /// Generate a fake voice name
-  private static func makeFakeVoiceName<T: RandomNumberGenerator>(from generator: inout T) -> String {
-    let fakeName = fakeVoiceNames.randomElement(using: &generator) ?? fakeVoiceNames.first!
-    return fakeName
-  }
-
   /// Generate a random string using a prefix, middle and suffix where any of those may be empty.
   /// - Note: May result in an empty string.
-  private static func randomPluginName<T: RandomNumberGenerator>(from generator: inout T) -> String {
+  private static func randomPluginName() -> String {
     return [
-      pluginNameFirstParts.randomElement(using: &generator),
-      pluginNameSecondParts.randomElement(using: &generator),
-      pluginNameThirdParts.randomElement(using: &generator)
+      pluginNameFirstParts.seededRandom(),
+      pluginNameSecondParts.seededRandom(),
+      pluginNameThirdParts.seededRandom()
     ].compactMap({ $0 ?? nil }).joined(separator: " ")
+  }
+}
+
+private extension FixedWidthInteger {
+  /// Return a random value in the given range.
+  ///
+  /// Uses `drand48`, hence you need to seed it before using this function using `srand48`
+  static func seededRandom(in range: ClosedRange<Self>) -> Self {
+    let size = Double(range.upperBound - range.lowerBound)
+    let offset = drand48() * size
+    let value = Self(Double(range.lowerBound) + offset)
+    return value
+  }
+}
+
+private extension Float {
+  /// Return a random float in the given range.
+  ///
+  /// Uses `drand48`, hence you need to seed it before using this function using `srand48`
+  static func seededRandom(in range: ClosedRange<Self>) -> Self {
+    let size = Double(range.upperBound - range.lowerBound)
+    let offset = drand48() * size
+    let value = Self(Double(range.lowerBound) + offset)
+    return value
+  }
+}
+
+private extension Array {
+  /// Return a random value in the given range.
+  ///
+  /// Uses `drand48`, hence you need to seed it before using this function using `srand48`
+  /// - Note: Will return a `nil` value only if the array is empty. You can safely force unswrap the result
+  /// in cases where the array is not empty
+  func seededRandom() -> Element? {
+    guard !isEmpty else { return nil }
+    let randomIndex = Int(UInt.seededRandom(in: 0...UInt(count - 1)))
+    return self[randomIndex]
   }
 }

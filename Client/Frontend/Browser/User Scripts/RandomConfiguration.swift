@@ -12,49 +12,54 @@ import CryptoKit
 /// (provided the same `sessionKey` is used)
 /// - Note: Any string can actually be used and this class can be used for more general purpose applications
 class RandomConfiguration {
-    /// This is used to encode the domain key (i.e. the eTLD+1).
-    ///
-    /// For farbling, this key should be the same for the lifecycle of the app. Hence we use a static variable.
-    private static let sessionKey = SymmetricKey(size: .bits256)
+  /// This is used to encode the domain key (i.e. the eTLD+1).
+  ///
+  /// For farbling, this key should be the same for the lifecycle of the app. Hence we use a static variable.
+  private static let sessionKey = SymmetricKey(size: .bits256)
 
-    /// The eTLD+1 this random manager was created with
-    private let etld: String
+  /// The eTLD+1 this random manager was created with
+  private let etld: String
 
-    /// The session key this random manager was created with
-    private let sessionKey: SymmetricKey
+  /// The session key this random manager was created with
+  private let sessionKey: SymmetricKey
 
-    /// The 64-character hex domain key for the provided eTLD+1
-    ///
-    /// - Note: A 64 character hex is represented by 256 bits. This means we can use it directly in our `ARC4RandomNumberGenerator`.
-    private(set) lazy var domainKeyData: Data = {
-        let signature = HMAC<SHA256>.authenticationCode(for: Data(etld.utf8), using: sessionKey)
-        return Data(signature)
-    }()
+  /// The 64-character hex domain key for the provided eTLD+1
+  ///
+  /// - Note: A 64 character hex is represented by 256 bits. This means we can use it directly in our `ARC4RandomNumberGenerator`.
+  private(set) lazy var domainKeyData: Data = {
+    let signature = HMAC<SHA256>.authenticationCode(for: Data(etld.utf8), using: sessionKey)
+    return Data(signature)
+  }()
 
-    /// The domain key as a `SymmetricKey`
-    private(set) lazy var domainKey: SymmetricKey = {
-        return SymmetricKey(data: domainKeyData)
-    }()
+  /// The domain key as hex `String`
+  private(set) lazy var domainKeyHEX: String = {
+    domainKeyData.hexString
+  }()
 
-    /// Initialize this class with an eTLD+1 and a sessionKey.
-    ///
-    /// If no sessionKey is provided, a shared session key will be used.
-    /// The shared session key is lost when the application terminates.
-    /// - Note: This is what we want for farbling.
-    init(etld: String, sessionKey: SymmetricKey = RandomConfiguration.sessionKey) {
-        self.etld = etld
-        self.sessionKey = sessionKey
-    }
+  /// The domain key as a `SymmetricKey`
+  private(set) lazy var domainKey: SymmetricKey = {
+    return SymmetricKey(data: domainKeyData)
+  }()
 
-    /// Signs this given value using the `domainKey`
-    func domainSignedKey(for value: String) -> String {
-        let signature = HMAC<SHA256>.authenticationCode(for: Data(value.utf8), using: domainKey)
-        return Data(signature).hexString
-    }
+  /// Initialize this class with an eTLD+1 and a sessionKey.
+  ///
+  /// If no sessionKey is provided, a shared session key will be used.
+  /// The shared session key is lost when the application terminates.
+  /// - Note: This is what we want for farbling.
+  init(etld: String, sessionKey: SymmetricKey = RandomConfiguration.sessionKey) {
+    self.etld = etld
+    self.sessionKey = sessionKey
+  }
+
+  /// Signs this given value using the `domainKey`
+  func domainSignedKey(for value: String) -> String {
+    let signature = HMAC<SHA256>.authenticationCode(for: Data(value.utf8), using: domainKey)
+    return Data(signature).hexString
+  }
 }
 
 private extension Data {
-    var hexString: String {
-        map({ String(format: "%02hhx", $0) }).joined()
-    }
+  var hexString: String {
+    map({ String(format: "%02hhx", $0) }).joined()
+  }
 }

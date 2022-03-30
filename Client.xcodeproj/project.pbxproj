@@ -963,7 +963,6 @@
 		8CB0FDD827E652B700707490 /* nacl.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 8CB0FDD727E652B500707490 /* nacl.min.js */; };
 		8CB0FE4427EA69E200707490 /* FarblingProtectionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */; };
 		8CB0FE5027EB528200707490 /* RandomConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */; };
-		8CB0FE5227EB56A700707490 /* ARC4RandomNumberGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */; };
 		8CB0FE5627EB596B00707490 /* RandomConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */; };
 		8CB0FE5827EB5F5100707490 /* FarblingProtectionHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */; };
 		8CFEF62427F220E700CF3235 /* ScriptSourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */; };
@@ -2938,7 +2937,6 @@
 		8CB0FDD727E652B500707490 /* nacl.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = nacl.min.js; sourceTree = "<group>"; };
 		8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = FarblingProtectionHelper.swift; sourceTree = "<group>"; tabWidth = 2; };
 		8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomConfiguration.swift; sourceTree = "<group>"; };
-		8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARC4RandomNumberGenerator.swift; sourceTree = "<group>"; };
 		8CB0FE5527EB596B00707490 /* RandomConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomConfigurationTests.swift; sourceTree = "<group>"; };
 		8CB0FE5727EB5F5000707490 /* FarblingProtectionHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FarblingProtectionHelperTests.swift; sourceTree = "<group>"; };
 		8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptSourceType.swift; sourceTree = "<group>"; };
@@ -5777,7 +5775,6 @@
 				8CB0FDB927E0EC1B00707490 /* UserScriptHelper.swift */,
 				8CB0FE4327EA69E100707490 /* FarblingProtectionHelper.swift */,
 				8CB0FE4F27EB528200707490 /* RandomConfiguration.swift */,
-				8CB0FE5127EB56A600707490 /* ARC4RandomNumberGenerator.swift */,
 				8CFEF62327F220E700CF3235 /* ScriptSourceType.swift */,
 				8CFEF62527F2213900CF3235 /* UserScriptType.swift */,
 			);
@@ -8529,7 +8526,6 @@
 				27201F022458879700C19DD1 /* NewTabPageBackgroundView.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				27EB6020244607DA00265C1B /* NewTabPageViewController.swift in Sources */,
-				8CB0FE5227EB56A700707490 /* ARC4RandomNumberGenerator.swift in Sources */,
 				CA29F2F3273DAEA100C391C3 /* PlaylistOnboardingView.swift in Sources */,
 				7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */,
 				27448532245B5EC2001920B5 /* CustomTheme.swift in Sources */,
