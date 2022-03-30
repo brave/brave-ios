@@ -154,6 +154,13 @@ public class KeyringStore: ObservableObject {
       self?.updateKeyringInfo()
     }
   }
+  
+  func validate(password: String, completion: @escaping (Bool) -> Void) {
+    if !keyring.isKeyringCreated {
+      return
+    }
+    keyringService.validatePassword(password, completion: completion)
+  }
 
   func isStrongPassword(_ password: String, completion: @escaping (Bool) -> Void) {
     keyringService.isStrongPassword(password, completion: completion)
