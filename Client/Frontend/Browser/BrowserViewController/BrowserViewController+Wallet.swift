@@ -237,7 +237,7 @@ extension Tab: BraveWalletEventsListener {
       )
       let selectedAccount = valueOrUndefined(await allowedAccounts(false).0)
       webView.evaluateSafeJavaScript(
-        functionName: "window.ethereum.selectedAccount = \(selectedAccount)",
+        functionName: "window.ethereum.selectedAddress = \(selectedAccount)",
         contentWorld: .page,
         asFunction: false,
         completion: nil

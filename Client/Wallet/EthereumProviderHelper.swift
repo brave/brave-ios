@@ -20,7 +20,7 @@ class EthereumProviderHelper: TabContentScript {
     "eth_newPendingTransactionFilter"
   ]
   
-  let tab: Tab
+  private weak var tab: Tab?
   
   init(tab: Tab) {
     self.tab = tab
@@ -66,7 +66,8 @@ class EthereumProviderHelper: TabContentScript {
     didReceiveScriptMessage message: WKScriptMessage,
     replyHandler: @escaping (Any?, String?) -> Void
   ) {
-    guard let provider = tab.walletProvider,
+    guard let tab = tab,
+          let provider = tab.walletProvider,
           !message.frameInfo.securityOrigin.host.isEmpty, // Fail if there is no last committed URL yet
           message.frameInfo.isMainFrame, // Fail the request came from 3p origin
           JSONSerialization.isValidJSONObject(message.body),

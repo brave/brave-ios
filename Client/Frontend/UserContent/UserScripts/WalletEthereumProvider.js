@@ -27,7 +27,7 @@ Object.defineProperty(window, 'ethereum', {
   value: {
     chainId: undefined,
     networkVersion: undefined,
-    selectedAccount: undefined,
+    selectedAddress: undefined,
     request: function (args) /* -> Promise<unknown> */  {
       return post('request', args)
     },
