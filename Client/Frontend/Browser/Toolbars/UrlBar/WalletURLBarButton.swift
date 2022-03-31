@@ -16,7 +16,8 @@ class WalletURLBarButton: UIButton {
   var buttonState: ButtonState = .inactive {
     didSet {
       isHidden = buttonState == .inactive
-      tintColor = buttonState == .active ? .braveLabel : .braveLabel
+      // We may end up having different states here where active is actually blurple
+      tintColor = .braveLabel
     }
   }
   
