@@ -195,8 +195,6 @@ class Tab: NSObject {
   var screenshotUUID: UUID? {
     didSet { TabMO.saveScreenshotUUID(screenshotUUID, tabId: id) }
   }
-  
-  var onPageReadyStateChanged: ((ReadyState.State) -> Void)?
 
   // If this tab has been opened from another, its parent will point to the tab from which it was opened
   var parent: Tab?
