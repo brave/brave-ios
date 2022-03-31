@@ -56,7 +56,7 @@ public struct WalletSettingsView: View {
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
-      if settingsStore.isBiometricsAvailable, keyringStore.keyring.isKeyringCreated, !keyringStore.keyring.isLocked {
+      if settingsStore.isBiometricsAvailable, keyringStore.keyring.isKeyringCreated {
         Section(
           footer: Text(Strings.Wallet.settingsEnableBiometricsFooter)
             .foregroundColor(Color(.secondaryBraveLabel))

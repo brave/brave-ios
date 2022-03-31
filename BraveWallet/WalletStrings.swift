@@ -1965,7 +1965,7 @@ extension Strings {
       "wallet.enterPasswordForBiometricsTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Enter passcode to enable biometrics for wallet (you'll only be asked for this once)",
+      value: "Enter your wallet password to enable biometrics for wallet (you'll only be asked for this once)",
       comment: "The title displayed on the screen to enter password to enable biometrics unlock from wallet settings."
     )
   }
