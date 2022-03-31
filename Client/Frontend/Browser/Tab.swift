@@ -472,6 +472,9 @@ class Tab: NSObject {
     return webView?.canGoForward ?? false
   }
   
+  /// This property is for fetching the actual URL for the Tab
+  /// In private browsing the URL is in memory but this is not the case for normal mode
+  /// For Normal  Mode Tab information is fetched using Tab ID from 
   var fetchedURL: URL? {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
       if let url = url, url.isWebPage() {
@@ -546,6 +549,7 @@ class Tab: NSObject {
     }
 
     if let _ = webView?.reloadFromOrigin() {
+      nightMode = Preferences.General.nightModeEnabled.value
       log.debug("reloaded zombified tab from origin")
       return
     }
