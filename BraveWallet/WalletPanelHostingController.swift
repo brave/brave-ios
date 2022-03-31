@@ -14,14 +14,16 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
   public weak var delegate: BraveWalletDelegate?
 
   public init(
-    walletStore: WalletStore
+    walletStore: WalletStore,
+    origin: URL
   ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
     )
     super.init(rootView: WalletPanelContainerView(
       walletStore: walletStore,
-      keyringStore: walletStore.keyringStore
+      keyringStore: walletStore.keyringStore,
+      origin: origin
     ))
     rootView.presentWalletWithContext = { [weak self] context in
       guard let self = self else { return }

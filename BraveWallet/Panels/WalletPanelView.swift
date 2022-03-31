@@ -18,6 +18,7 @@ public protocol WalletSiteConnectionDelegate {
 public struct WalletPanelContainerView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
+  var origin: URL
   var presentWalletWithContext: ((PresentingContext) -> Void)?
   
   // When the screen first apperas the keyring is set as the default value
@@ -98,6 +99,7 @@ public struct WalletPanelContainerView: View {
             keyringStore: keyringStore,
             cryptoStore: cryptoStore,
             networkStore: cryptoStore.networkStore,
+            origin: origin,
             presentWalletWithContext: { context in
               self.presentWalletWithContext?(context)
             }
@@ -129,6 +131,7 @@ struct WalletPanelView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var networkStore: NetworkStore
+  var origin: URL
   var presentWalletWithContext: (PresentingContext) -> Void
   
   @Environment(\.pixelLength) private var pixelLength
@@ -276,7 +279,12 @@ struct WalletPanelView: View {
       }
     }
     .onAppear {
-      cryptoStore.fetchPendingRequests()
+      let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
+      if let request = permissionRequestManager.pendingRequests(for: origin).first {
+        presentWalletWithContext(.requestEthererumPermissions(request))
+      } else {
+        cryptoStore.fetchPendingRequests()
+      }
     }
   }
 }
@@ -289,12 +297,14 @@ struct WalletPanelView_Previews: PreviewProvider {
         keyringStore: .previewStoreWithWalletCreated,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
+        origin: URL(string: "https://app.uniswap.org")!,
         presentWalletWithContext: { _ in }
       )
       WalletPanelView(
         keyringStore: .previewStore,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
+        origin: URL(string: "https://app.uniswap.org")!,
         presentWalletWithContext: { _ in }
       )
       WalletPanelView(
@@ -305,6 +315,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         }(),
         cryptoStore: .previewStore,
         networkStore: .previewStore,
+        origin: URL(string: "https://app.uniswap.org")!,
         presentWalletWithContext: { _ in }
       )
     }

@@ -6,7 +6,6 @@
 import BraveCore
 
 enum PendingWebpageRequest: Equatable {
-  case requestEthereumPermissions(URL)
   case addChain(BraveWallet.NetworkInfo)
   case switchChain(BraveWallet.SwitchChainRequest)
   case addSuggestedToken(BraveWallet.AddSuggestTokenRequest)

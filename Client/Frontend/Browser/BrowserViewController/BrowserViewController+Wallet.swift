@@ -48,7 +48,7 @@ extension BrowserViewController {
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
     }
-    let controller = WalletPanelHostingController(walletStore: walletStore)
+    let controller = WalletPanelHostingController(walletStore: walletStore, origin: getOrigin())
     controller.delegate = self
     let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
     popover.present(from: topToolbar.locationView.walletButton, on: self, completion: nil)
@@ -90,6 +90,14 @@ extension BrowserViewController: BraveWalletProviderDelegate {
 
   func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
     Task { @MainActor in
+      let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
+      let origin = getOrigin()
+      
+      if permissionRequestManager.hasPendingRequest(for: origin, coinType: .eth) {
+        completion([], .userRejectedRequest, "A request is already in progress")
+        return
+      }
+      
       let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
       guard let walletStore = WalletStore.from(privateMode: isPrivate) else {
         completion([], .internalError, "")
@@ -104,19 +112,19 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         completion(accounts, .success, "")
         return
       }
+      
+      let request = permissionRequestManager.beginRequest(for: origin, coinType: .eth, completion: { response in
+        switch response {
+        case .granted(let accounts):
+          completion(accounts, .success, "")
+        case .rejected:
+          completion([], .userRejectedRequest, "User rejected request")
+        }
+      })
 
       let permissions = WalletHostingViewController(
         walletStore: walletStore,
-        presentingContext: .requestEthererumPermissions(origin: self.getOrigin(), handler: { [weak self] response in
-          guard let self = self else { return }
-          switch response {
-          case .granted(let accounts):
-            Domain.setEthereumPermissions(forUrl: self.getOrigin(), accounts: accounts, grant: true)
-            completion(accounts, .success, "")
-          case .rejected:
-            completion([], .userRejectedRequest, "User rejected request")
-          }
-        }),
+        presentingContext: .requestEthererumPermissions(request),
         onUnlock: {
           Task { @MainActor in
             // If the user unlocks their wallet and we already have permissions setup they do not

@@ -489,6 +489,7 @@
 		27F3AEF4271DDE0C00F75B7F /* OpenWalletURLAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F3AEF3271DDE0C00F75B7F /* OpenWalletURLAction.swift */; };
 		27F4439F2135E11200296C58 /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
+		27F6CEF427F63A02003C1BE5 /* WalletProviderPermissionRequestsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F6CEF327F63A02003C1BE5 /* WalletProviderPermissionRequestsManager.swift */; };
 		27F94A3A21909A5900F4FADF /* SearchSuggestionsPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */; };
 		27FCA8E02447708300A8CA48 /* FavoritesSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */; };
 		27FCA8E3244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */; };
@@ -2301,6 +2302,7 @@
 		27F443952135E11200296C58 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27F4439C2135E11200296C58 /* ShareExtension.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ShareExtension.plist; sourceTree = "<group>"; };
 		27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToBraveViewController.swift; sourceTree = "<group>"; };
+		27F6CEF327F63A02003C1BE5 /* WalletProviderPermissionRequestsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletProviderPermissionRequestsManager.swift; sourceTree = "<group>"; };
 		27F94A3921909A5900F4FADF /* SearchSuggestionsPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsPromptView.swift; sourceTree = "<group>"; };
 		27FCA8DF2447708300A8CA48 /* FavoritesSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSectionProvider.swift; sourceTree = "<group>"; };
 		27FCA8E2244770AB00A8CA48 /* FavoritesOverflowSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesOverflowSectionProvider.swift; sourceTree = "<group>"; };
@@ -3947,6 +3949,7 @@
 			children = (
 				271F68F726EBE92900AA2A50 /* WalletHostingViewController.swift */,
 				27D63D7527E53AA2002A6D85 /* WalletPanelHostingController.swift */,
+				27F6CEF327F63A02003C1BE5 /* WalletProviderPermissionRequestsManager.swift */,
 				27BC117F27A9A5430097ADCD /* Panels */,
 				271F688926EBD27D00AA2A50 /* Blockies */,
 				271F688B26EBD27D00AA2A50 /* Chart */,
@@ -8243,6 +8246,7 @@
 				D5A691EC27DF93AD000CC4B3 /* TransactionDetailsView.swift in Sources */,
 				7D4C4914278E31E40073C37E /* WebImageReader.swift in Sources */,
 				271F68AB26EBD27E00AA2A50 /* AssetDetailView.swift in Sources */,
+				27F6CEF427F63A02003C1BE5 /* WalletProviderPermissionRequestsManager.swift in Sources */,
 				271F68C026EBD27E00AA2A50 /* WalletTableViewHeaderView.swift in Sources */,
 				27BC119327A9C90E0097ADCD /* WalletPanelView.swift in Sources */,
 				271F68A726EBD27E00AA2A50 /* BackupNotifyView.swift in Sources */,

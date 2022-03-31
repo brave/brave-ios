@@ -17,13 +17,6 @@ public protocol BraveWalletDelegate: AnyObject {
   func openWalletURL(_ url: URL)
 }
 
-public enum EthereumPermissionResponse {
-  /// The user rejected the prompt by dismissing the screen
-  case rejected
-  /// The user granted access to a set of accounts
-  case granted(accounts: [String])
-}
-
 /// The context of which wallet is being presented. Controls what content is shown when the wallet is unlocked
 public enum PresentingContext {
   /// The default context shows the main wallet view which includes portfolio, buy/send/swap, etc.
@@ -31,7 +24,7 @@ public enum PresentingContext {
   /// Shows the user any pending requests made by webpages such as new adding networks, tokens, etc.
   case webpageRequests
   /// Shows when a webpage wants to connect with the users wallet
-  case requestEthererumPermissions(origin: URL, handler: (EthereumPermissionResponse) -> Void)
+  case requestEthererumPermissions(_ request: WebpagePermissionRequest)
   /// Shows the user only the unlock/setup screen then dismisses to view an unlocked panel
   case panelUnlockOrSetup
 }
