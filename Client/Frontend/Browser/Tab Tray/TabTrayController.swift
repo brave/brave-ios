@@ -95,6 +95,8 @@ class TabTrayController: LoadingViewController {
     }
 
     navigationItem.do {
+      // Place the search bar in the navigation item's title view.
+      $0.titleView = searchBarView
       $0.hidesSearchBarWhenScrolling = true
     }
 
@@ -126,10 +128,6 @@ class TabTrayController: LoadingViewController {
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
       UIBarButtonItem(customView: tabTrayView.doneButton),
     ]
-    
-    // Place the search bar in the navigation item's title view.
-    searchBarView?.frame = navigationController?.navigationBar.frame ?? .zero
-    navigationItem.titleView = searchBarView
   }
 
   private var initialScrollCompleted = false
