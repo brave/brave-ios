@@ -1955,7 +1955,7 @@ extension Strings {
       comment: "The footer beneath the toggle for allowing biometrics to unlock the wallet in wallet settings."
     )
     public static let enterPasswordForBiometricsNavTitle = NSLocalizedString(
-      "wallet.enterPasswordForBiometricsTitle",
+      "wallet.enterPasswordForBiometricsNavTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Enable Biometrics",
