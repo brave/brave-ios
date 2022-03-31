@@ -440,7 +440,9 @@ extension URL {
     }
 
     /// Site domains that should not inject night mode
-    let siteList = ["twitter", "youtube", "amazon"]
+    let siteList = ["twitter", "youtube", "twitch",
+                    "macrumors", "9to5mac", "soundcloud",
+                    "netflix", "github", "developer.apple"]
 
     return siteList.contains(where: domain.contains)
   }
