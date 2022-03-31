@@ -8,32 +8,76 @@ import BraveCore
 import struct Shared.Strings
 import BraveShared
 import BraveUI
+import Data
 
 struct EditSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
+  var originURL: URL
+  var onDismiss: ([String]) -> Void
   
   @ScaledMetric private var faviconSize = 48
   
-  private func actionTitle(for account: BraveWallet.AccountInfo) -> String {
-    // Disconnect - Connected and selected account
-    // Connect - Not connected
-    // Switch - Connected but not selected account
-    if keyringStore.selectedAccount.id == account.id {
-      return "Disconnect"
+  @State private var permittedAccounts: [String] = []
+  
+  enum EditAction {
+    case connect
+    case disconnect
+    case `switch`
+    
+    var title: String {
+      switch self {
+      case .connect:
+        return Strings.Wallet.editSiteConnectionAccountActionConnect
+      case .disconnect:
+        return Strings.Wallet.editSiteConnectionAccountActionDisconnect
+      case .switch:
+        return Strings.Wallet.editSiteConnectionAccountActionSwitch
+      }
     }
-    return "Switch"
+  }
+  
+  private func editAction(for account: BraveWallet.AccountInfo) -> EditAction {
+    if permittedAccounts.contains(account.address) {
+      if keyringStore.selectedAccount.id == account.id {
+        // Disconnect - Connected and selected account
+        return .disconnect
+      } else {
+        // Switch - Connected but not selected account
+        return .`switch`
+      }
+    } else {
+      // Connect - Not connected
+      return .connect
+    }
   }
   
   var body: some View {
     NavigationView {
       Form {
         Section {
-          ForEach(keyringStore.keyring.accountInfos) { account in
+          ForEach(keyringStore.keyring.accountInfos, id: \.self) { account in
+            let action = editAction(for: account)
             HStack {
               AccountView(address: account.address, name: account.name)
               Spacer()
-              Button { } label: {
-                Text(actionTitle(for: account))
+              Button {
+                switch action {
+                case .connect:
+                  Domain.setEthereumPermissions(forUrl: originURL, account: account.address, grant: true)
+                  permittedAccounts.append(account.address)
+                  keyringStore.selectedAccount = account
+                case .disconnect:
+                  Domain.setEthereumPermissions(forUrl: originURL, account: account.address, grant: false)
+                  permittedAccounts.removeAll(where: { $0 == account.address })
+                  
+                  if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
+                    keyringStore.selectedAccount = firstAllowedAccount
+                  }
+                case .switch:
+                  keyringStore.selectedAccount = account
+                }
+              } label: {
+                Text(action.title)
                   .foregroundColor(Color(.braveBlurpleTint))
                   .font(.footnote.weight(.semibold))
               }
@@ -46,10 +90,10 @@ struct EditSiteConnectionView: View {
               .background(Color(.braveDisabled))
               .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
-              Text(verbatim: "https://app.uniswap.org")
+              Text(verbatim: originURL.absoluteDisplayString)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(Color(.bravePrimary))
-              Text("2 accounts connected")
+              Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
                 .font(.footnote)
                 .foregroundColor(Color(.braveLabel))
             }
@@ -60,16 +104,21 @@ struct EditSiteConnectionView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
-      .navigationTitle("Connections")
+      .navigationTitle(Strings.Wallet.editSiteConnectionScreenTitle)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .confirmationAction) {
           Button {
-            
+            onDismiss(permittedAccounts)
           } label: {
             Text(Strings.done)
               .foregroundColor(Color(.braveOrange))
           }
+        }
+      }
+      .onAppear {
+        if let accounts = Domain.ethereumPermissions(forUrl: originURL) {
+          permittedAccounts = accounts
         }
       }
     }
@@ -85,7 +134,9 @@ struct EditSiteConnectionView_Previews: PreviewProvider {
         store.addPrimaryAccount("Account 2", completion: nil)
         store.addPrimaryAccount("Account 3", completion: nil)
         return store
-      }()
+      }(),
+      originURL: URL(string: "https://app.uniswap.org")!,
+      onDismiss: { _ in }
     )
   }
 }

@@ -164,6 +164,17 @@ public struct CryptoView: View {
                   dismissButtonToolbarContents
                 }
               }
+            case .editSiteConnection(let origin, let handler):
+              if let url = origin.url {
+                EditSiteConnectionView(
+                  keyringStore: keyringStore,
+                  originURL: url,
+                  onDismiss: { accounts in
+                    handler(accounts)
+                    dismissAction?()
+                  }
+                )
+              }
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))

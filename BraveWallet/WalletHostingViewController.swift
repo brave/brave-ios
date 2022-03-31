@@ -35,6 +35,8 @@ public enum PresentingContext {
   case buySendSwap(_ destination: BuySendSwapDestination)
   /// Shows the user the wallet settings screen
   case settings
+  /// Shows when the users want to edit connected account the the webpage
+  case editSiteConnection(_ origin: URLOrigin, handler: ([String]) -> Void)
 }
 
 /// The initial wallet controller to present when the user wants to view their wallet
