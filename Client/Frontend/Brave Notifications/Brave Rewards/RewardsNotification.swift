@@ -24,17 +24,15 @@ class RewardsNotification: NSObject, BraveNotification {
   var dismissAction: (() -> Void)?
   var id: String { ad.uuid }
   let ad: AdNotification
-  var isHorizontalSwipe: Bool {
-    guard let adView = view as? AdView else { return false }
-    return adView.swipeTranslation != 0
-  }
-  var dismissPolicy: DismissPolicy = {
+  var dismissPolicy: DismissPolicy {
+    guard let adView = view as? AdView else { return .automatic() }
+    
     var dismissTimeInterval: TimeInterval = 30
     if !AppConstants.buildChannel.isPublic, let override = Preferences.Rewards.adsDurationOverride.value, override > 0 {
       dismissTimeInterval = TimeInterval(override)
     }
-    return .automatic(after: dismissTimeInterval)
-  }()
+    return adView.swipeTranslation != 0 ? .explicit : .automatic(after: dismissTimeInterval)
+  }
   
   private let handler: (Action) -> Void
   

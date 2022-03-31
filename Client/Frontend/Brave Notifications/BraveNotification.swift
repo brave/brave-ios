@@ -26,7 +26,6 @@ protocol BraveNotification: AnyObject {
   var dismissAction: (() -> Void)? { get set }
   var dismissPolicy: DismissPolicy { get }
   var id: String { get }
-  var isHorizontalSwipe: Bool { get }
   
   func willDismiss(timedOut: Bool)
 }

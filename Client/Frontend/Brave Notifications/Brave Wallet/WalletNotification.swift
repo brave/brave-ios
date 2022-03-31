@@ -23,16 +23,11 @@ class WalletNotification: BraveNotification {
   var view: UIView
   var id: String { WalletNotification.Constant.id }
   var dismissAction: (() -> Void)?
-  var isHorizontalSwipe: Bool = false
   
   private let handler: (Action) -> Void
   
   func willDismiss(timedOut: Bool) {
     handler(timedOut ? .timedOut : .dismissed)
-  }
-  
-  func isSwipeToLeft() -> Bool {
-    return false
   }
   
   init(

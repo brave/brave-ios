@@ -8,6 +8,38 @@ import BraveShared
 import Shared
 import pop
 
+class BraveNotificationGesture: UIGestureRecognizer {
+  var onBegan: () -> Void
+  var onEnded: () -> Void
+  
+  init(
+    onBegan: @escaping () -> Void,
+    onEnded: @escaping () -> Void
+  ) {
+    self.onBegan = onBegan
+    self.onEnded = onEnded
+    super.init(target: nil, action: nil)
+    cancelsTouchesInView = false
+    delaysTouchesBegan = false
+    delaysTouchesEnded = false
+  }
+  
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+    super.touchesBegan(touches, with: event)
+    onBegan()
+  }
+  
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+    super.touchesEnded(touches, with: event)
+    onEnded()
+  }
+  
+  override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+    super.touchesCancelled(touches, with: event)
+    onEnded()
+  }
+}
+
 class BraveNotificationsPresenter: UIViewController {
   private var notificationsQueue: [BraveNotification] = []
   private var widthAnchor: NSLayoutConstraint?
@@ -80,6 +112,22 @@ class BraveNotificationsPresenter: UIViewController {
     let dismissPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dismissPannedAdView(_:)))
     dismissPanGesture.delegate = self
     notificationView.addGestureRecognizer(dismissPanGesture)
+    
+    let customGesture = BraveNotificationGesture(
+      onBegan: { [weak self] in
+        if let visibleNotification = self?.visibleNotification {
+          self?.dismissTimers[visibleNotification.id]?.invalidate()
+        }
+      },
+      onEnded: { [weak self] in
+        if let visibleNotification = self?.visibleNotification,
+           case .automatic(let interval) = visibleNotification.dismissPolicy {
+          self?.setupTimeoutTimer(for: visibleNotification, interval: interval)
+        }
+      }
+    )
+    customGesture.delegate = self
+    notificationView.addGestureRecognizer(customGesture)
   }
   
   override func viewWillLayoutSubviews() {
@@ -147,7 +195,7 @@ class BraveNotificationsPresenter: UIViewController {
       timer.invalidate()
     }
     dismissTimers[notification.id] = Timer.scheduledTimer(withTimeInterval: interval, repeats: false, block: { [weak self] _ in
-      guard let self = self else { return }
+      guard let self = self, case .automatic(_) = notification.dismissPolicy else { return }
       notification.willDismiss(timedOut: true)
       self.hide(notification)
     })
@@ -251,14 +299,6 @@ extension BraveNotificationsPresenter: UIGestureRecognizerDelegate {
   func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
       let velocity = pan.velocity(in: pan.view)
-      guard let notification = visibleNotification else { return false }
-      if notification.view == pan.view, notification.isHorizontalSwipe {
-        // dislike mode but swip vertically
-        if case .automatic(let interval) = notification.dismissPolicy {
-          setupTimeoutTimer(for: notification, interval: interval)
-        }
-        return false
-      }
       return abs(velocity.y) > abs(velocity.x)
     }
     return false
