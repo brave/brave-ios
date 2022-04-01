@@ -141,7 +141,6 @@
 		0AE5086A261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE50869261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift */; };
 		0AE5C09922CAA01E00DFF3EE /* RewardsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */; };
 		0AEF16C723CDE4B800158AD9 /* BottomSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */; };
-		0AEF99B222E22D2200294C76 /* DateGroupedTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF99B122E22D2200294C76 /* DateGroupedTableData.swift */; };
 		0AEFB84922244135007AF600 /* AdblockDebugMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */; };
 		0AEFB8532226D7C5007AF600 /* AdblockResourcesMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */; };
 		0AEFB88722299E6A007AF600 /* AdblockerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEFB88622299E6A007AF600 /* AdblockerType.swift */; };
@@ -1810,7 +1809,6 @@
 		0AE50869261C6F2E0099C6A3 /* BraveSearchScriptHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchScriptHandler.swift; sourceTree = "<group>"; };
 		0AE5C09822CAA01E00DFF3EE /* RewardsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsButton.swift; sourceTree = "<group>"; };
 		0AEF16C523CDE4B800158AD9 /* BottomSheetViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomSheetViewController.swift; sourceTree = "<group>"; };
-		0AEF99B122E22D2200294C76 /* DateGroupedTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateGroupedTableData.swift; sourceTree = "<group>"; };
 		0AEFB84822244135007AF600 /* AdblockDebugMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockDebugMenuTableViewController.swift; sourceTree = "<group>"; };
 		0AEFB8522226D7C5007AF600 /* AdblockResourcesMappings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockResourcesMappings.swift; sourceTree = "<group>"; };
 		0AEFB88622299E6A007AF600 /* AdblockerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdblockerType.swift; sourceTree = "<group>"; };
@@ -6273,7 +6271,6 @@
 				0ADCD4512319640F0078CC67 /* UserAgentBuilder.swift */,
 				E65075911E37F7AB006961AC /* WeakList.swift */,
 				2760D2BE215ACCE20068E131 /* BundleExtensions.swift */,
-				0AEF99B122E22D2200294C76 /* DateGroupedTableData.swift */,
 				5EAB745B230456F0006055F5 /* BookmarkValidation.swift */,
 				CAA0BD8F26F2562D00F14212 /* PrivilegedRequest.swift */,
 				D3C744CC1A687D6C004CE85D /* URIFixup.swift */,
@@ -8155,7 +8152,6 @@
 				E65075941E37F7AB006961AC /* AppInfo.swift in Sources */,
 				E65075A41E37F7AB006961AC /* NSCharacterSetExtensions.swift in Sources */,
 				E65075B71E37F7AB006961AC /* Logger.swift in Sources */,
-				0AEF99B222E22D2200294C76 /* DateGroupedTableData.swift in Sources */,
 				E65075961E37F7AB006961AC /* AsyncReducer.swift in Sources */,
 				5EAB745C230456F0006055F5 /* BookmarkValidation.swift in Sources */,
 				0A5EBA5A24DD8CD900D605FC /* ReadWriteLock.swift in Sources */,
