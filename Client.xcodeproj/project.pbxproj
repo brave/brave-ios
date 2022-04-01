@@ -302,7 +302,6 @@
 		275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275965E124EEC4EA0051A827 /* FeedFillStrategyTests.swift */; };
 		275C6FBF2731D1A500AB2FC7 /* RpcServiceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C6FB32731D1A500AB2FC7 /* RpcServiceExtensions.swift */; };
 		2760056625D1FFF500D47A75 /* AddFeedToBraveNewsActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2760056525D1FFF500D47A75 /* AddFeedToBraveNewsActivity.swift */; };
-		2760D2BF215ACCE20068E131 /* BundleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2760D2BE215ACCE20068E131 /* BundleExtensions.swift */; };
 		2762FF30271A054A001EF41D /* AssetIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2762FF2F271A054A001EF41D /* AssetIconView.swift */; };
 		2762FF32271A2448001EF41D /* BuySendSwapDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2762FF31271A2448001EF41D /* BuySendSwapDestination.swift */; };
 		2765825D2171263A00754B2F /* UserReferralProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2765825C2171263A00754B2F /* UserReferralProgram.swift */; };
@@ -1963,7 +1962,6 @@
 		275AF3342766F4A0004F2993 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BraveWallet.strings; sourceTree = "<group>"; };
 		275C6FB32731D1A500AB2FC7 /* RpcServiceExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RpcServiceExtensions.swift; sourceTree = "<group>"; };
 		2760056525D1FFF500D47A75 /* AddFeedToBraveNewsActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFeedToBraveNewsActivity.swift; sourceTree = "<group>"; };
-		2760D2BE215ACCE20068E131 /* BundleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtensions.swift; sourceTree = "<group>"; };
 		2762FF2F271A054A001EF41D /* AssetIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetIconView.swift; sourceTree = "<group>"; };
 		2762FF31271A2448001EF41D /* BuySendSwapDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuySendSwapDestination.swift; sourceTree = "<group>"; };
 		2765825C2171263A00754B2F /* UserReferralProgram.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReferralProgram.swift; sourceTree = "<group>"; };
@@ -6248,7 +6246,6 @@
 				E650758F1E37F7AB006961AC /* TimeConstants.swift */,
 				0ADCD4512319640F0078CC67 /* UserAgentBuilder.swift */,
 				E65075911E37F7AB006961AC /* WeakList.swift */,
-				2760D2BE215ACCE20068E131 /* BundleExtensions.swift */,
 				5EAB745B230456F0006055F5 /* BookmarkValidation.swift */,
 				CAA0BD8F26F2562D00F14212 /* PrivilegedRequest.swift */,
 				D3C744CC1A687D6C004CE85D /* URIFixup.swift */,
@@ -8078,7 +8075,6 @@
 				E65075BE1E37F7AB006961AC /* TimeConstants.swift in Sources */,
 				E65075B21E37F7AB006961AC /* Functions.swift in Sources */,
 				E65075BA1E37F7AB006961AC /* Prefs.swift in Sources */,
-				2760D2BF215ACCE20068E131 /* BundleExtensions.swift in Sources */,
 				7B10AABB1E3A1F650002DD08 /* URLRequestExtensions.swift in Sources */,
 				E693F0D91E9D64BD0086DC17 /* OptionalExtensions.swift in Sources */,
 				E65075A01E37F7AB006961AC /* ArrayExtensions.swift in Sources */,
