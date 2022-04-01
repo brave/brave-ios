@@ -26,12 +26,10 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
             AddSuggestedTokenView(
               token: request.token,
               networkStore: cryptoStore.networkStore,
-              onApprove: {
-                cryptoStore.handleWebpageRequestResponse(.addSuggestedToken(approved: true, contractAddresses: [request.token.contractAddress]))
-                onDismiss()
-              },
-              onCancel: {
-                cryptoStore.handleWebpageRequestResponse(.addSuggestedToken(approved: false, contractAddresses: [request.token.contractAddress]))
+              onDismiss: { approved in
+                cryptoStore.handleWebpageRequestResponse(
+                  .addSuggestedToken(approved: approved, contractAddresses: [request.token.contractAddress])
+                )
                 onDismiss()
               }
             )

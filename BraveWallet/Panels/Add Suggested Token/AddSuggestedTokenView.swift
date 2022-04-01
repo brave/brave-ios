@@ -12,8 +12,7 @@ struct AddSuggestedTokenView: View {
   var token: BraveWallet.BlockchainToken
   var networkStore: NetworkStore
   
-  var onApprove: () -> Void
-  var onCancel: () -> Void
+  var onDismiss: (_ approved: Bool) -> Void
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -67,14 +66,14 @@ struct AddSuggestedTokenView: View {
   }
 
   @ViewBuilder private var actionButtons: some View {
-    Button(action: onCancel) {
+    Button(action: { onDismiss(false) }) {
       HStack {
         Image(systemName: "xmark")
         Text(Strings.cancelButtonTitle)
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: onApprove) {
+    Button(action: { onDismiss(true) }) {
       HStack {
         Image("brave.checkmark.circle.fill")
         Text(Strings.Wallet.add)
@@ -91,8 +90,7 @@ struct AddSuggestedTokenView_Previews: PreviewProvider {
     AddSuggestedTokenView(
       token: .previewToken,
       networkStore: .previewStore,
-      onApprove: {},
-      onCancel: {}
+      onDismiss: { _ in }
     )
   }
 }
