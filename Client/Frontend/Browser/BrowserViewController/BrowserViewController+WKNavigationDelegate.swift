@@ -185,6 +185,36 @@ extension BrowserViewController: WKNavigationDelegate {
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let tab = tabManager[webView]
 
+    let domainForRequestURL = Domain.getOrCreate(
+      forUrl: url,
+      persistent: !isPrivateBrowsing
+    )
+
+    // Debouncing logic
+    // Handle debouncing for main frame only and only if the site (etld+1) changes
+    // We also only handle `http` and `https` requests
+    if url.isWebPage(includeDataURIs: false),
+       let currentURL = tab?.webView?.url, currentURL.baseDomain != url.baseDomain,
+       domainForRequestURL.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
+       navigationAction.targetFrame?.isMainFrame == true,
+       let redirectURL = DebouncingResourceDownloader.shared.redirectURL(for: url) {
+      // Cancel the original request. We don't want it to load as it's tracking us
+      decisionHandler(.cancel, preferences)
+
+      // We only include trusted headers on cross origin requests
+      // TODO: @JS Look at possibly getting a list of trusted headers from brave-core
+      // For now we only allow the `Referrer`. The browser will add the rest.
+      var modifiedRequest = URLRequest(url: redirectURL)
+      let trustedHeaderKeys = Set(["Referer"])
+
+      for (headerKey, headerValue) in navigationAction.request.allHTTPHeaderFields ?? [:] {
+        guard trustedHeaderKeys.contains(headerKey) else { continue }
+        modifiedRequest.setValue(headerValue, forHTTPHeaderField: headerKey)
+      }
+
+      tab?.loadRequest(modifiedRequest)
+    }
+
     // Check if custom user scripts must be added to or removed from the web view.
     tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
       for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
