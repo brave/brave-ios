@@ -43,6 +43,8 @@ struct AddSuggestedTokenView: View {
           }
         }
         actionButtonContainer
+          .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
+          .accessibility(hidden: sizeCategory.isAccessibilityCategory)
       }
       .frame(maxWidth: .infinity)
       .padding(.top, 64)
@@ -51,6 +53,29 @@ struct AddSuggestedTokenView: View {
     .background(Color(.braveGroupedBackground).ignoresSafeArea())
     .navigationTitle(Strings.Wallet.addSuggestedTokenTitle)
     .navigationBarTitleDisplayMode(.inline)
+    .overlay(
+      Group {
+        if sizeCategory.isAccessibilityCategory {
+          actionButtonContainer
+            .frame(maxWidth: .infinity)
+            .padding(.top)
+            .background(
+              LinearGradient(
+                stops: [
+                  .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
+                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
+                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+              )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            )
+        }
+      },
+      alignment: .bottom
+    )
   }
   
   @ViewBuilder private var actionButtonContainer: some View {
