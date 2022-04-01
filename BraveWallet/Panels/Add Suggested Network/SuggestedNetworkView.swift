@@ -155,9 +155,34 @@ struct SuggestedNetworkView: View {
       }
       .listRowBackground(Color(.braveGroupedBackground))
       .listRowInsets(.zero)
+      .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
+      .accessibility(hidden: sizeCategory.isAccessibilityCategory)
     }
     .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
+    .overlay(
+      Group {
+        if sizeCategory.isAccessibilityCategory {
+          actionButtonContainer
+            .frame(maxWidth: .infinity)
+            .padding(.top)
+            .background(
+              LinearGradient(
+                stops: [
+                  .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
+                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
+                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+              )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            )
+        }
+      },
+      alignment: .bottom
+    )
     .background(
       Color.clear
         .sheet(item: $isPresentingNetworkDetails) { detailsModel in
