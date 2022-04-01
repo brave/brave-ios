@@ -8,7 +8,7 @@ import BraveCore
 import Data
 
 /// A permission request for a specific dapp
-public struct WebpagePermissionRequest {
+public struct WebpagePermissionRequest: Equatable {
   /// A users response type
   public enum Response {
     /// The user rejected the prompt by dismissing the screen
@@ -22,6 +22,10 @@ public struct WebpagePermissionRequest {
   let coinType: BraveWallet.CoinType
   /// A handler to be called when the user either approves or rejects the connection request
   let decisionHandler: (Response) -> Void
+  
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    lhs.requestingOrigin == rhs.requestingOrigin && lhs.coinType == rhs.coinType
+  }
 }
 
 /// Handles dapp permission requests when connecting your wallet for the current session.
@@ -64,5 +68,10 @@ public class WalletProviderPermissionRequestsManager {
   /// Returns a list of pending requests waiting for a given origin
   public func pendingRequests(for origin: URL) -> [WebpagePermissionRequest] {
     requests.filter({ $0.requestingOrigin == origin })
+  }
+  
+  /// Cancels an in-flight request without executing any decision
+  public func cancelRequest(_ request: WebpagePermissionRequest) {
+    requests.removeAll(where: { $0 == request })
   }
 }

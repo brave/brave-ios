@@ -131,6 +131,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
             // go through the regular flow
             let (accounts, status, _) = await self.allowedAccounts(false)
             if status == .success, !accounts.isEmpty {
+              permissionRequestManager.cancelRequest(request)
               completion(accounts, .success, "")
               self.dismiss(animated: true)
               return
