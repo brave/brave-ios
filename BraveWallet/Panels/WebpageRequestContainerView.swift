@@ -34,12 +34,10 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
               mode: .switchNetworks(chainId: request.chainId, origin: request.origin),
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              onApprove: {
-                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: true, origin: request.origin))
-                onDismiss()
-              },
-              onCancel: {
-                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: false, origin: request.origin))
+              onDismiss: { approved in
+                cryptoStore.handleWebpageRequestResponse(
+                  .switchChain(approved: approved, origin: request.origin)
+                )
                 onDismiss()
               }
             )
@@ -48,12 +46,10 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
               mode: .addNetwork(chain),
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              onApprove: {
-                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: true, chainId: chain.chainId))
-                onDismiss()
-              },
-              onCancel: {
-                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: false, chainId: chain.chainId))
+              onDismiss: { approved in
+                cryptoStore.handleWebpageRequestResponse(
+                  .addNetwork(approved: approved, chainId: chain.chainId)
+                )
                 onDismiss()
               }
             )

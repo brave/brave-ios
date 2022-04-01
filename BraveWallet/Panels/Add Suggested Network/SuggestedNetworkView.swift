@@ -28,21 +28,18 @@ struct SuggestedNetworkView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
   
-  var onApprove: () -> Void
-  var onCancel: () -> Void
+  var onDismiss: (_ approved: Bool) -> Void
   
   init(
     mode: Mode,
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
-    onApprove: @escaping () -> Void,
-    onCancel: @escaping () -> Void
+    onDismiss: @escaping (_ approved: Bool) -> Void
   ) {
     self.mode = mode
     self.keyringStore = keyringStore
     self.networkStore = networkStore
-    self.onApprove = onApprove
-    self.onCancel = onCancel
+    self.onDismiss = onDismiss
   }
   
   private var chain: BraveWallet.NetworkInfo? {
@@ -215,14 +212,14 @@ struct SuggestedNetworkView: View {
   }
 
   @ViewBuilder private var actionButtons: some View {
-    Button(action: onCancel) {
+    Button(action: { onDismiss(false) }) {
       HStack {
         Image(systemName: "xmark")
         Text(Strings.cancelButtonTitle)
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: onApprove) {
+    Button(action: { onDismiss(true) }) {
       HStack {
         Image("brave.checkmark.circle.fill")
         Text(actionButtonTitle)
@@ -241,8 +238,7 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
         mode: .addNetwork(.mockRopsten),
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
-        onApprove: { },
-        onCancel: { }
+        onDismiss: { _ in }
       )
       SuggestedNetworkView(
         mode: .switchNetworks(
@@ -250,8 +246,7 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
           origin: URL(string: "https://app.uniswap.org")!),
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
-        onApprove: { },
-        onCancel: { }
+        onDismiss: { _ in }
       )
     }
   }
