@@ -212,7 +212,7 @@ struct WalletPanelView: View {
           }
           VStack(spacing: 12) {
             Button {
-              
+              presentWalletWithContext(.accountSelection)
             } label: {
               Blockie(address: keyringStore.selectedAccount.address)
                 .frame(width: blockieSize, height: blockieSize)

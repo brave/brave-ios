@@ -105,6 +105,8 @@ public struct CryptoView: View {
               )
             case .panelUnlockOrSetup:
               EmptyView()
+            case .accountSelection:
+              AccountListView(keyringStore: keyringStore)
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
