@@ -13,8 +13,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
-
-  @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
+  
   var onDismiss: () -> Void
 
   var body: some View {
@@ -46,6 +45,15 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
               onDismiss: onDismiss
+            )
+          case let .signMessage(request):
+            SignatureRequestView(
+              request: request,
+              keyringStore: keyringStore,
+              onDismiss: { approved in
+                cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: request.id))
+                onDismiss()
+              }
             )
           default:
             EmptyView()
