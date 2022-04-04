@@ -8,6 +8,7 @@ import Shared
 import Storage
 import Data
 import BraveCore
+import OrderedCollections
 
 class FrequencyQuery {
 
@@ -28,7 +29,9 @@ class FrequencyQuery {
     task?.cancel()
   }
 
-  public func sitesByFrequency(containing query: String, completion: @escaping (Set<Site>) -> Void) {
+  public func sitesByFrequency(containing query: String, completion: @escaping (OrderedSet<Site>) -> Void) {
+    task?.cancel()
+
     task = DispatchWorkItem {
       // brave-core fetch can be slow over 200ms per call,
       // a cancellable serial queue is used for it.
@@ -45,7 +48,7 @@ class FrequencyQuery {
           self.historyAPI.byFrequency(query: query) { historyList in
             let historySites = historyList.map { Site(url: $0.url.absoluteString, title: $0.title ?? "", siteType: .history) }
 
-            let result = Set<Site>(openTabSites + historySites + bookmarkSites)
+            let result = OrderedSet<Site>(openTabSites + historySites + bookmarkSites)
             completion(result)
           }
         }
@@ -61,17 +64,36 @@ class FrequencyQuery {
     var tabList = [Site]()
         
     for tab in tabs {
+        
       if PrivateBrowsingManager.shared.isPrivateBrowsing {
         if let url = tab.url, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
+          
+          if let selectedTabID = tabManager.selectedTab?.id, let tabID = tab.id, selectedTabID == tabID {
+            continue
+          }
+          
           tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab))
         }
       } else {
-        if let tabID = tab.id {
+        var tabURL: URL?
+        
+        if let url = tab.url {
+          tabURL = url
+        } else if let tabID = tab.id {
           let fetchedTab = TabMO.get(fromId: tabID)
-
-          if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-            tabList.append(Site(url: url.absoluteString, title: fetchedTab?.title ?? tab.displayTitle, siteType: .tab))
+          
+          if let urlString = fetchedTab?.url, let url = URL(string: urlString) {
+            tabURL = url
           }
+        }
+        
+        if let url = tabURL, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
+          
+          if let selectedTabID = tabManager.selectedTab?.id, let tabID = tab.id, selectedTabID == tabID {
+            continue
+          }
+          
+          tabList.append(Site(url: url.absoluteString, title: tab.title ?? tab.displayTitle, siteType: .tab))
         }
       }
     }

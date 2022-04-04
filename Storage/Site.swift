@@ -68,7 +68,11 @@ open class Site: Identifiable, Hashable {
         case .bookmark:
           return UIImage(systemName: "book.fill")
         case .tab:
-          return UIImage(systemName: "square.filled.on.square")
+          if #available(iOS 15, *) {
+            return UIImage(systemName: "square.filled.on.square")
+          } else {
+            return UIImage(systemName: "square.stack.3d.down.right.fill")
+          }
         default:
           return nil
       }
