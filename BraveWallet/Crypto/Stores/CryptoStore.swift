@@ -179,6 +179,7 @@ public class CryptoStore: ObservableObject {
     }
     let store = AccountActivityStore(
       account: account,
+      keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
