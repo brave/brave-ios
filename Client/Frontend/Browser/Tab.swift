@@ -220,7 +220,7 @@ class Tab: NSObject {
       
       webView?.evaluateSafeJavaScript(
         functionName: "window.__firefox__.NightMode.setEnabled",
-        args: [nightMode],
+        args: [isNightModeEnabled],
         contentWorld: .defaultClient,
         asFunction: true
       ) { _, error in
@@ -481,7 +481,9 @@ class Tab: NSObject {
         return url
       }
     } else {
-      if let tabID = id {
+      if let tabUrl = url, tabUrl.isWebPage() {
+        return tabUrl
+      } else if let tabID = id {
         let fetchedTab = TabMO.get(fromId: tabID)
         
         if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage() {
