@@ -46,13 +46,16 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
               networkStore: cryptoStore.networkStore,
               onDismiss: onDismiss
             )
-          case let .signMessage(request):
+          case let .signMessage(requests):
             SignatureRequestView(
-              request: request,
+              requests: requests,
               keyringStore: keyringStore,
-              onDismiss: { approved in
-                cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: request.id))
-                onDismiss()
+              handler: { approved, requestId in
+                cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: requestId))
+                if requestId == requests.last?.id {
+                  // dismiss when handling action for last request
+                  onDismiss()
+                }
               }
             )
           default:

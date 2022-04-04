@@ -10,22 +10,50 @@ import BraveShared
 import BraveUI
 
 struct SignatureRequestView: View {
-  var request: BraveWallet.SignMessageRequest
+  @State var requests: [BraveWallet.SignMessageRequest]
   @ObservedObject var keyringStore: KeyringStore
   
-  var onDismiss: (_ approved: Bool) -> Void
+  var handler: (_ approved: Bool, _ id: Int32) -> Void
 
+  @State private var requestIndex: Int = 0
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
   @ScaledMetric private var blockieSize = 54
   
+  private var currentRequest: BraveWallet.SignMessageRequest {
+    requests[requestIndex]
+  }
+  
   private var account: BraveWallet.AccountInfo {
-    keyringStore.keyring.accountInfos.first(where: { $0.address == request.address }) ?? keyringStore.selectedAccount
+    keyringStore.keyring.accountInfos.first(where: { $0.address == currentRequest.address }) ?? keyringStore.selectedAccount
+  }
+  
+  init(
+    requests: [BraveWallet.SignMessageRequest],
+    keyringStore: KeyringStore,
+    handler: @escaping (_ approved: Bool, _ id: Int32) -> Void
+  ) {
+    assert(!requests.isEmpty)
+    self._requests = State(initialValue: requests)
+    self.keyringStore = keyringStore
+    self.handler = handler
   }
   
   var body: some View {
     ScrollView(.vertical) {
       VStack {
+        if requests.count > 1 {
+          HStack {
+            Spacer()
+            Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, requestIndex + 1, requests.count))
+              .fontWeight(.semibold)
+            Button(action: next) {
+              Text(Strings.Wallet.next)
+                .fontWeight(.semibold)
+                .foregroundColor(Color(.braveBlurpleTint))
+            }
+          }
+        }
         VStack(spacing: 8) {
           Blockie(address: account.address)
             .frame(width: blockieSize, height: blockieSize)
@@ -37,7 +65,7 @@ struct SignatureRequestView: View {
         }
         .padding(.vertical, 32)
         VStack(spacing: 12) {
-          StaticTextView(text: request.message, isMonospaced: false)
+          StaticTextView(text: currentRequest.message, isMonospaced: false)
             .frame(maxWidth: .infinity)
             .frame(height: 200)
             .background(Color(.tertiaryBraveGroupedBackground))
@@ -93,6 +121,10 @@ struct SignatureRequestView: View {
     }
   }
   
+  private var isButtonsDisabled: Bool {
+    requestIndex != 0
+  }
+  
   @ViewBuilder private var buttonsContainer: some View {
     if sizeCategory.isAccessibilityCategory {
       VStack {
@@ -106,16 +138,36 @@ struct SignatureRequestView: View {
   }
   
   @ViewBuilder private var buttons: some View {
-    Button(action: { onDismiss(false) }) {
+    Button(action: {
+      handler(false, currentRequest.id)
+      if requests.count > 1 {
+        requests.removeFirst()
+      }
+    }) {
       Label(Strings.cancelButtonTitle, systemImage: "xmark")
         .imageScale(.large)
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: { onDismiss(true) }) {
+    .disabled(isButtonsDisabled)
+    Button(action: {
+      handler(true, currentRequest.id)
+      if requests.count > 1 {
+        requests.removeFirst()
+      }
+    }) {
       Label(Strings.Wallet.sign, image: "brave.key")
         .imageScale(.large)
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
+    .disabled(isButtonsDisabled)
+  }
+  
+  private func next() {
+    if requestIndex + 1 < requests.count {
+      requestIndex += 1
+    } else {
+      requestIndex = 0
+    }
   }
 }
 
@@ -123,9 +175,9 @@ struct SignatureRequestView: View {
 struct SignatureRequestView_Previews: PreviewProvider {
   static var previews: some View {
     SignatureRequestView(
-      request: .previewRequest,
+      requests: [.previewRequest],
       keyringStore: .previewStoreWithWalletCreated,
-      onDismiss: { _ in }
+      handler: { _, _ in }
     )
   }
 }
