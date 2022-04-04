@@ -83,7 +83,7 @@ class NSURLExtensionsTests: XCTestCase {
     XCTAssertEqual(url?.baseDomain, "domain.com")
 
     url = URL(string: "https://test.domain.com.")
-    XCTAssertEqual(url?.baseDomain, "domain.com")
+    XCTAssertEqual(url?.baseDomain, "domain.com.")
 
     url = URL(string: "https://test.domain.com..")
     XCTAssertEqual(url?.baseDomain, nil)
@@ -92,42 +92,42 @@ class NSURLExtensionsTests: XCTestCase {
     XCTAssertEqual(url?.baseDomain, "foo")
 
     url = URL(string: "https://foo.")
-    XCTAssertEqual(url?.baseDomain, ".foo")
+    XCTAssertEqual(url?.baseDomain, nil)
 
     url = URL(string: "https://.")
-    XCTAssertEqual(url?.baseDomain, "")
+    XCTAssertEqual(url?.baseDomain, nil)
   }
 
   func testCanadaComputers() {
     let url = "http://m.canadacomputers.com".asURL!
-    let actual = url.baseDomain!
+    let actual = url.baseDomain
     XCTAssertEqual("canadacomputers.com", actual)
   }
 
   func testMultipleSuffixesInsideURL() {
     let url = "http://com:org@m.canadacomputers.co.uk".asURL!
-    let actual = url.baseDomain!
+    let actual = url.baseDomain
     XCTAssertEqual("canadacomputers.co.uk", actual)
   }
 
   func testNormalBaseDomainWithManySubdomains() {
     // TLD Entry: co.uk
     let url = "http://a.b.c.d.bbc.co.uk".asURL!
-    let expected = url.publicSuffix!
+    let expected = url.publicSuffix
     XCTAssertEqual("co.uk", expected)
   }
 
   func testWildCardDomainWithSingleSubdomain() {
     // TLD Entry: *.kawasaki.jp
     let url = "http://a.kawasaki.jp".asURL!
-    let expected = url.publicSuffix!
-    XCTAssertEqual("a.kawasaki.jp", expected)
+    let expected = url.publicSuffix
+    XCTAssertEqual(expected, nil)
   }
 
   func testWildCardDomainWithManySubdomains() {
     // TLD Entry: *.kawasaki.jp
     let url = "http://a.b.c.d.kawasaki.jp".asURL!
-    let expected = url.publicSuffix!
+    let expected = url.publicSuffix
     XCTAssertEqual("d.kawasaki.jp", expected)
   }
 

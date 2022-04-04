@@ -261,8 +261,9 @@ extension URL {
     if !host.contains(".") {
       return host
     }
-
-    return (self as NSURL).domainAndRegistry
+    
+    let registry = (self as NSURL).domainAndRegistry
+    return registry.isEmpty ? nil : registry
   }
 
   /**
@@ -321,7 +322,8 @@ extension URL {
     :returns: The public suffix for within the given hostname.
     */
   public var publicSuffix: String? {
-    return (self as NSURL).registry
+    let registry = (self as NSURL).registry
+    return registry.isEmpty ? nil : registry
   }
 
   public func isWebPage(includeDataURIs: Bool = true) -> Bool {
@@ -736,7 +738,7 @@ public struct InternalURL {
 
 // MARK: Private Helpers
 private extension URL {
-  @available(*, deprecated, message: "Use NSURL.registry or NSURL.domainAndRegistry depending on your needs")
+  @available(*, deprecated, message: "Use URL.publicSuffix or URL.baseDomain depending on your needs")
   func publicSuffixFromHost(_ host: String, withAdditionalParts additionalPartCount: Int) -> String? {
     if host.isEmpty {
       return nil
