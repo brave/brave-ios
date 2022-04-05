@@ -58,22 +58,6 @@ class BrowserNavigationHelper {
     FileManager.default.openBraveDownloadsFolder(completion)
   }
 
-  func openAddBookmark() {
-    guard let bvc = bvc,
-      let tab = bvc.tabManager.selectedTab,
-      let url = tab.url
-    else { return }
-
-    let bookmarkUrl = url.decodeReaderModeURL ?? url
-
-    let mode = BookmarkEditMode.addBookmark(title: tab.displayTitle, url: bookmarkUrl.absoluteString)
-
-    let vc = AddEditBookmarkTableViewController(bookmarkManager: bvc.bookmarkManager, mode: mode)
-
-    open(vc, doneButton: DoneButton(style: .cancel, position: .left))
-
-  }
-
   func openHistory() {
     guard let bvc = bvc else { return }
     let vc = HistoryViewController(
