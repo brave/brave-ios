@@ -85,21 +85,6 @@ class BrowserNavigationHelper {
     open(vc, doneButton: DoneButton(style: .done, position: .right))
   }
 
-  func openSettings() {
-    guard let bvc = bvc else { return }
-    let vc = SettingsViewController(
-      profile: bvc.profile,
-      tabManager: bvc.tabManager,
-      feedDataSource: bvc.feedDataSource,
-      rewards: bvc.rewards,
-      windowProtection: bvc.windowProtection,
-      braveCore: bvc.braveCore)
-    vc.settingsDelegate = bvc
-    open(
-      vc, doneButton: DoneButton(style: .done, position: .right),
-      allowSwipeToDismiss: false)
-  }
-
   func openShareSheet() {
     guard let bvc = bvc else { return }
     dismissView()
