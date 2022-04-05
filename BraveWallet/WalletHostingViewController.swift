@@ -29,6 +29,8 @@ public enum PresentingContext {
   case panelUnlockOrSetup
   /// Shows the user available wallet accounts to use
   case accountSelection
+  /// Shows the user transaction history of current selected account and network
+  case transactionHistory
 }
 
 /// The initial wallet controller to present when the user wants to view their wallet

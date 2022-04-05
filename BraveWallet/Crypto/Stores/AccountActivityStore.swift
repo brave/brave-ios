@@ -111,6 +111,12 @@ class AccountActivityStore: ObservableObject {
         .sorted(by: { $0.createdTime > $1.createdTime })
     }
   }
+  
+  #if DEBUG
+  func previewTransactions() {
+    transactions = [.previewConfirmedSwap, .previewConfirmedSend, .previewConfirmedERC20Approve]
+  }
+  #endif
 }
 
 extension AccountActivityStore: BraveWalletKeyringServiceObserver {

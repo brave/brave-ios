@@ -107,6 +107,12 @@ public struct CryptoView: View {
               EmptyView()
             case .accountSelection:
               AccountListView(keyringStore: keyringStore)
+            case .transactionHistory:
+              AccountTransactionListView(
+                keyringStore: walletStore.keyringStore,
+                activityStore: store.accountActivityStore(for: walletStore.keyringStore.selectedAccount),
+                networkStore: store.networkStore
+              )
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
