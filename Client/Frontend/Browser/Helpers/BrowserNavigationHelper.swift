@@ -22,15 +22,11 @@ class BrowserNavigationHelper {
     _ viewController: UIViewController, doneButton: DoneButton,
     allowSwipeToDismiss: Bool = true
   ) {
-    let nav = SettingsNavigationController(rootViewController: viewController)
-
-    // All menu views should be opened in portrait on iPhones.
-    UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
-
-    nav.isModalInPresentation = !allowSwipeToDismiss
-
-    nav.modalPresentationStyle =
-      UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+    let nav = SettingsNavigationController(rootViewController: viewController).then {
+      $0.isModalInPresentation = !allowSwipeToDismiss
+      $0.modalPresentationStyle =
+        UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
+    }
 
     let button = UIBarButtonItem(barButtonSystemItem: doneButton.style, target: nav, action: #selector(nav.done))
 
