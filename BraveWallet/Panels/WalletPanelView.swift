@@ -21,6 +21,7 @@ public struct WalletPanelContainerView: View {
   @ObservedObject var keyringStore: KeyringStore
   var origin: URLOrigin
   var presentWalletWithContext: ((PresentingContext) -> Void)?
+  var presentBuySendSwap: (() -> Void)?
   
   // When the screen first apperas the keyring is set as the default value
   // which causes an unnessary animation
@@ -104,6 +105,9 @@ public struct WalletPanelContainerView: View {
             origin: origin,
             presentWalletWithContext: { context in
               self.presentWalletWithContext?(context)
+            },
+            presentBuySendSwap: {
+              self.presentBuySendSwap?()
             }
           )
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
@@ -139,6 +143,7 @@ struct WalletPanelView: View {
   @ObservedObject var accountActivityStore: AccountActivityStore
   var origin: URLOrigin
   var presentWalletWithContext: (PresentingContext) -> Void
+  var presentBuySendSwap: () -> Void
   
   @Environment(\.pixelLength) private var pixelLength
   @Environment(\.sizeCategory) private var sizeCategory
@@ -250,7 +255,7 @@ struct WalletPanelView: View {
           .padding(.vertical)
           HStack(spacing: 0) {
             Button {
-              
+              presentBuySendSwap()
             } label: {
               Image("brave.arrow.left.arrow.right")
                 .imageScale(.large)
@@ -307,9 +312,9 @@ struct WalletPanelView_Previews: PreviewProvider {
         keyringStore: .previewStoreWithWalletCreated,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
-        accountActivityStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
-        presentWalletWithContext: { _ in }
+        presentWalletWithContext: { _ in },
+        presentBuySendSwap: {}
       )
       WalletPanelView(
         keyringStore: .previewStore,
@@ -317,7 +322,8 @@ struct WalletPanelView_Previews: PreviewProvider {
         networkStore: .previewStore,
         accountActivityStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
-        presentWalletWithContext: { _ in }
+        presentWalletWithContext: { _ in },
+        presentBuySendSwap: {}
       )
       WalletPanelView(
         keyringStore: {
@@ -329,7 +335,8 @@ struct WalletPanelView_Previews: PreviewProvider {
         networkStore: .previewStore,
         accountActivityStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
-        presentWalletWithContext: { _ in }
+        presentWalletWithContext: { _ in },
+        presentBuySendSwap: {}
       )
     }
     .fixedSize(horizontal: false, vertical: true)

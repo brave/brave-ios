@@ -113,6 +113,27 @@ public struct CryptoView: View {
                 activityStore: store.accountActivityStore(for: walletStore.keyringStore.selectedAccount),
                 networkStore: store.networkStore
               )
+            case .buySendSwap(let destination):
+              switch destination.kind {
+              case .buy:
+                BuyTokenView(
+                  keyringStore: keyringStore,
+                  networkStore: store.networkStore,
+                  buyTokenStore: store.openBuyTokenStore(destination.initialToken)
+                )
+              case .send:
+                SendTokenView(
+                  keyringStore: keyringStore,
+                  networkStore: store.networkStore,
+                  sendTokenStore: store.openSendTokenStore(destination.initialToken)
+                )
+              case .swap:
+                SwapCryptoView(
+                  keyringStore: keyringStore,
+                  ethNetworkStore: store.networkStore,
+                  swapTokensStore: store.openSwapTokenStore(destination.initialToken)
+                )
+              }
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
