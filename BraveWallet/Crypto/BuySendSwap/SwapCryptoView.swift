@@ -172,6 +172,8 @@ struct SwapCryptoView: View {
 
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
+  
+  var completion: ((_ success: Bool) -> Void)?
 
   @ViewBuilder var unsupportedSwapChainSection: some View {
     Section {
@@ -402,7 +404,9 @@ struct SwapCryptoView: View {
           WalletLoadingButton(
             isLoading: swapTokensStore.isMakingTx,
             action: {
-              swapTokensStore.prepareSwap()
+              swapTokensStore.prepareSwap { success in
+                completion?(success)
+              }
             },
             label: {
               Text(swapButtonTitle)

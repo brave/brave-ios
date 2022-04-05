@@ -19,6 +19,8 @@ struct SendTokenView: View {
   @State private var isShowingError = false
 
   @ScaledMetric private var length: CGFloat = 16.0
+  
+  var completion: ((_ success: Bool) -> Void)?
 
   private var isSendDisabled: Bool {
     guard let sendAmount = BDouble(sendTokenStore.sendAmount),
@@ -158,6 +160,7 @@ struct SendTokenView: View {
               action: {
                 sendTokenStore.sendToken(amount: sendTokenStore.sendAmount) { success in
                   isShowingError = !success
+                  completion?(success)
                 }
               },
               label: {

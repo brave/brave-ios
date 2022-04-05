@@ -125,13 +125,23 @@ public struct CryptoView: View {
                 SendTokenView(
                   keyringStore: keyringStore,
                   networkStore: store.networkStore,
-                  sendTokenStore: store.openSendTokenStore(destination.initialToken)
+                  sendTokenStore: store.openSendTokenStore(destination.initialToken),
+                  completion: { success in
+                    if success {
+                      dismissAction?()
+                    }
+                  }
                 )
               case .swap:
                 SwapCryptoView(
                   keyringStore: keyringStore,
                   ethNetworkStore: store.networkStore,
-                  swapTokensStore: store.openSwapTokenStore(destination.initialToken)
+                  swapTokensStore: store.openSwapTokenStore(destination.initialToken),
+                  completion: { success in
+                    if success {
+                      dismissAction?()
+                    }
+                  }
                 )
               }
             }

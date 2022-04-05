@@ -169,6 +169,7 @@ extension AccountActivityStore: BraveWalletJsonRpcServiceObserver {
 
 extension AccountActivityStore: BraveWalletTxServiceObserver {
   func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
+    transactions.insert(txInfo, at: 0)
   }
   func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     fetchTransactions()
