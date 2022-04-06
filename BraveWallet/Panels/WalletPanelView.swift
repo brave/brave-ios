@@ -188,7 +188,7 @@ struct WalletPanelView: View {
         if isConnected {
           Image(systemName: "checkmark")
         }
-        Text(isConnected ? "Connected…" : "Connect")
+        Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
           .fontWeight(.bold)
           .lineLimit(1)
       }

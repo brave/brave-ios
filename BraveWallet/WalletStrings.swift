@@ -2409,5 +2409,19 @@ extension Strings {
       value: "Switch",
       comment: "The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen."
     )
+    public static let walletPanelConnected = NSLocalizedString(
+      "wallet.walletPanelConnected",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Connected…",
+      comment: "The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently connected his/her wallet account to the dapp. The title will be displayed to the right of a checkmark."
+    )
+    public static let walletPanelConnect = NSLocalizedString(
+      "wallet.walletPanelConnect",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Connect",
+      comment: "The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected any his/her wallet account to the dapp."
+    )
   }
 }
