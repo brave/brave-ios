@@ -312,23 +312,42 @@ class SearchSettingsTableViewController: UITableViewController {
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       guard let engine = customSearchEngines[safe: indexPath.row] else { return }
+      
+      func deleteCustomEngine() {
+        do {
+          try searchEngines.deleteCustomEngine(engine)
+          tableView.deleteRows(at: [indexPath], with: .right)
+          tableView.reloadData()
+        } catch {
+          log.error("Search Engine Error while deleting")
+        }
+      }
 
-      do {
-        try searchEngines.deleteCustomEngine(engine)
-        tableView.deleteRows(at: [indexPath], with: .right)
-      } catch {
-        log.error("Search Engine Error while deleting")
+      if engine == searchEngines.defaultEngine(forType: .standard) {
+        let alert = UIAlertController(
+          title: "Are you sure you want to delete \(engine.displayName)?",
+          message: "Deleting a custom search engine while it is default will switch default engine to Brave Search.",
+          preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel) { _ in
+          return
+        })
+        
+        alert.addAction(UIAlertAction(title: Strings.delete, style: .destructive) { [weak self] _ in
+          self?.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .standard)
+          deleteCustomEngine()
+        })
+
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
+        present(alert, animated: true, completion: nil)
+      } else {
+        deleteCustomEngine()
       }
     }
   }
 
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    if let engine = customSearchEngines[safe: indexPath.row],
-      engine == searchEngines.defaultEngine(forType: .standard) {
-      return false
-    }
-
-    return true
+    return indexPath.section == Section.customSearch.rawValue
   }
 }
 
