@@ -11,6 +11,7 @@ import BraveCore
 import SwiftUI
 import BraveUI
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -99,6 +100,15 @@ extension BrowserViewController: BraveWalletProviderDelegate {
       }
       
       let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+      
+      // Check if eth permissions already exist for this origin and if they don't, ensure the user allows
+      // ethereum provider access
+      let ethPermissions = Domain.ethereumPermissions(forUrl: origin) ?? []
+      if ethPermissions.isEmpty, !Preferences.Wallet.allowEthereumProviderAccountRequests.value {
+        completion([], .userRejectedRequest, "User rejected request")
+        return
+      }
+      
       guard let walletStore = WalletStore.from(privateMode: isPrivate) else {
         completion([], .internalError, "")
         return

@@ -369,6 +369,7 @@
 		2777274022EB44B300F0214C /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777273F22EB44B300F0214C /* StringExtensionTests.swift */; };
 		2777275A22EB4C7700F0214C /* BraveShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DE7688420B3456C00FF5533 /* BraveShared.framework */; };
 		2777954927E126AB00536D0C /* BraveCoreDebugSwitchesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777954827E126AB00536D0C /* BraveCoreDebugSwitchesView.swift */; };
+		2778964B27FCA852002F4402 /* WalletPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2778964A27FCA852002F4402 /* WalletPreferences.swift */; };
 		277C0A9A273DC0890059AB0A /* NamedAddresses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277C0A99273DC0890059AB0A /* NamedAddresses.swift */; };
 		277C5B21254CAD790032DEF2 /* BraveRewardsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277C5B16254CAD2A0032DEF2 /* BraveRewardsExtensions.swift */; };
 		277E94F225F834240001926E /* VPNMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277E94F125F834240001926E /* VPNMenuButton.swift */; };
@@ -2196,6 +2197,7 @@
 		2777273622EB43A100F0214C /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		2777273F22EB44B300F0214C /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
 		2777954827E126AB00536D0C /* BraveCoreDebugSwitchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveCoreDebugSwitchesView.swift; sourceTree = "<group>"; };
+		2778964A27FCA852002F4402 /* WalletPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPreferences.swift; sourceTree = "<group>"; };
 		277C0A99273DC0890059AB0A /* NamedAddresses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedAddresses.swift; sourceTree = "<group>"; };
 		277C5B16254CAD2A0032DEF2 /* BraveRewardsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveRewardsExtensions.swift; sourceTree = "<group>"; };
 		277E94F125F834240001926E /* VPNMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNMenuButton.swift; sourceTree = "<group>"; };
@@ -3967,6 +3969,7 @@
 				271F683826EBD0E400AA2A50 /* Info.plist */,
 				6185F9402763E3AA00D135E9 /* BraveWallet.strings */,
 				7D4C4913278E31E40073C37E /* WebImageReader.swift */,
+				2778964A27FCA852002F4402 /* WalletPreferences.swift */,
 			);
 			path = BraveWallet;
 			sourceTree = "<group>";
@@ -8232,6 +8235,7 @@
 				27DDE88A26FE1A7700A70C3A /* MockBraveWalletService.swift in Sources */,
 				271F68F826EBE92900AA2A50 /* WalletHostingViewController.swift in Sources */,
 				7D49CDDF271FB359008AB67E /* SendTokenStore.swift in Sources */,
+				2778964B27FCA852002F4402 /* WalletPreferences.swift in Sources */,
 				271F68A326EBD27E00AA2A50 /* AccountView.swift in Sources */,
 				7D758921271F07B800B643C3 /* SendTokenView.swift in Sources */,
 				271F68B526EBD27E00AA2A50 /* TabbedPageViewController.swift in Sources */,
