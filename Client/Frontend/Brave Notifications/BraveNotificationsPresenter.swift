@@ -8,7 +8,7 @@ import BraveShared
 import Shared
 import pop
 
-class BraveNotificationGesture: UIGestureRecognizer {
+private class BraveNotificationGesture: UIGestureRecognizer {
   var onBegan: () -> Void
   var onEnded: () -> Void
   
