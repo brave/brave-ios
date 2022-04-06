@@ -325,8 +325,8 @@ class SearchSettingsTableViewController: UITableViewController {
 
       if engine == searchEngines.defaultEngine(forType: .standard) {
         let alert = UIAlertController(
-          title: "Are you sure you want to delete \(engine.displayName)?",
-          message: "Deleting a custom search engine while it is default will switch default engine to Brave Search.",
+          title: String(format: Strings.CustomSearchEngine.deleteEngineAlertTitle, engine.displayName),
+          message: Strings.CustomSearchEngine.deleteEngineAlertDescription,
           preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel) { _ in
@@ -334,7 +334,12 @@ class SearchSettingsTableViewController: UITableViewController {
         })
         
         alert.addAction(UIAlertAction(title: Strings.delete, style: .destructive) { [weak self] _ in
-          self?.searchEngines.updateDefaultEngine(OpenSearchEngine.EngineNames.brave, forType: .standard)
+          guard let self = self else { return }
+          
+          self.searchEngines.updateDefaultEngine(
+            self.searchEngines.defaultEngine(forType: .privateMode).shortName,
+            forType: .standard)
+          
           deleteCustomEngine()
         })
 
