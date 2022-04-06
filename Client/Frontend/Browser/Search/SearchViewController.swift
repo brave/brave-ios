@@ -13,7 +13,7 @@ import Data
 protocol SearchViewControllerDelegate: AnyObject {
   func searchViewController(_ searchViewController: SearchViewController, didSubmit query: String)
   func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL)
-  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTabURL url: URL)
+  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: String?, url: URL))
   func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String)
   func presentSearchSettingsController()
   func searchViewController(_ searchViewController: SearchViewController, didHighlightText text: String, search: Bool)
@@ -442,7 +442,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       let site = data[indexPath.row]
       if let url = URL(string: site.url) {
         if site.siteType == .tab {
-          searchDelegate?.searchViewController(self, didSelectOpenTabURL: url)
+          searchDelegate?.searchViewController(self, didSelectOpenTab: (site.tabID, url))
         } else {
           searchDelegate?.searchViewController(self, didSelectURL: url)
         }

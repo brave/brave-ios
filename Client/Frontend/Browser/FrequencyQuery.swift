@@ -72,7 +72,7 @@ class FrequencyQuery {
             continue
           }
           
-          tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab))
+          tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab, tabID: tab.id))
         }
       } else {
         var tabURL: URL?
@@ -93,7 +93,7 @@ class FrequencyQuery {
             continue
           }
           
-          tabList.append(Site(url: url.absoluteString, title: tab.title ?? tab.displayTitle, siteType: .tab))
+          tabList.append(Site(url: url.absoluteString, title: tab.title ?? tab.displayTitle, siteType: .tab, tabID: tab.id))
         }
       }
     }

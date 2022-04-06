@@ -81,6 +81,8 @@ open class Site: Identifiable, Hashable {
     
   open var id: Int?
   var guid: String?
+  // The id of associated Tab - Used for Tab Suggestions
+  open var tabID: String?
 
   open var tileURL: URL {
     return URL(string: url)?.domainURL ?? URL(string: "about:blank")!
@@ -94,14 +96,15 @@ open class Site: Identifiable, Hashable {
   open private(set) var siteType: SiteType
 
   public convenience init(url: String, title: String) {
-    self.init(url: url, title: title, siteType: .unknown, guid: nil)
+    self.init(url: url, title: title, siteType: .unknown, guid: nil, tabID: nil)
   }
 
-  public init(url: String, title: String, siteType: SiteType, guid: String? = nil) {
+  public init(url: String, title: String, siteType: SiteType, guid: String? = nil, tabID: String? = nil) {
     self.url = url
     self.title = title
     self.siteType = siteType
     self.guid = guid
+    self.tabID = tabID
   }
 
   open func setBookmarked(_ bookmarked: Bool) {
