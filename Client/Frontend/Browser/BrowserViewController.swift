@@ -808,8 +808,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
         }
       }
       .store(in: &cancellables)
-
-      BraveVPN.scheduleVPNAlertsTask()
   }
 
   fileprivate let defaultBrowserNotificationId = "defaultBrowserNotification"
