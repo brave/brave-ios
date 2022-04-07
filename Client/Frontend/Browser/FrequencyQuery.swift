@@ -29,7 +29,7 @@ class FrequencyQuery {
     task?.cancel()
   }
 
-  public func sitesByFrequency(containing query: String, completion: @escaping (OrderedSet<Site>) -> Void) {
+  public func sitesByFrequency(containing query: String, completion: @escaping (Set<Site>) -> Void) {
     task?.cancel()
 
     task = DispatchWorkItem {
@@ -48,7 +48,7 @@ class FrequencyQuery {
           self.historyAPI.byFrequency(query: query) { historyList in
             let historySites = historyList.map { Site(url: $0.url.absoluteString, title: $0.title ?? "", siteType: .history) }
 
-            let result = OrderedSet<Site>(openTabSites + historySites + bookmarkSites)
+            let result = Set<Site>(openTabSites + historySites + bookmarkSites)
             completion(result)
           }
         }
