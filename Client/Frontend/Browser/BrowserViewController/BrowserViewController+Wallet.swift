@@ -49,10 +49,25 @@ extension BrowserViewController {
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
     }
+    let origin = getOrigin()
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
-      origin: getOrigin(),
-      faviconRenderer: FavIconImageRenderer()
+      origin: origin,
+      faviconRenderer: FavIconImageRenderer(),
+      onUnlock: {
+        Task { @MainActor in
+          let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
+          if permissionRequestManager.hasPendingRequest(for: origin, coinType: .eth) {
+            let pendingRequests = permissionRequestManager.pendingRequests(for: origin)
+            let (accounts, status, _) = await self.allowedAccounts(false)
+            if status == .success, !accounts.isEmpty {
+              for request in pendingRequests {
+                permissionRequestManager.cancelRequest(request)
+              }
+            }
+          }
+        }
+      }
     )
     controller.delegate = self
     let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
@@ -82,8 +97,12 @@ extension BrowserViewController: BraveWalletDelegate {
 
 extension BrowserViewController: BraveWalletProviderDelegate {
   func showPanel() {
-    // TODO: Show ad-like notification prompt before calling `presentWalletPanel`
-    presentWalletPanel()
+    let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
+      if action == .connectWallet {
+        self?.presentWalletPanel()
+      }
+    }
+    notificationsPresenter.display(notification: walletNotificaton, from: self)
   }
 
   func getOrigin() -> URLOrigin {
@@ -114,7 +133,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         return
       }
       
-      guard let walletStore = WalletStore.from(privateMode: isPrivate) else {
+      guard WalletStore.from(privateMode: isPrivate) != nil else {
         completion([], .internalError, "")
         return
       }
@@ -128,7 +147,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         return
       }
       
-      let request = permissionRequestManager.beginRequest(for: origin, coinType: .eth, completion: { response in
+      _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, completion: { response in
         switch response {
         case .granted(let accounts):
           completion(accounts, .success, "")
@@ -136,26 +155,8 @@ extension BrowserViewController: BraveWalletProviderDelegate {
           completion([], .userRejectedRequest, "User rejected request")
         }
       })
-      let permissions = WalletHostingViewController(
-        walletStore: walletStore,
-        presentingContext: .requestEthererumPermissions(request),
-        faviconRenderer: FavIconImageRenderer(),
-        onUnlock: {
-          Task { @MainActor in
-            // If the user unlocks their wallet and we already have permissions setup they do not
-            // go through the regular flow
-            let (accounts, status, _) = await self.allowedAccounts(false)
-            if status == .success, !accounts.isEmpty {
-              permissionRequestManager.cancelRequest(request)
-              completion(accounts, .success, "")
-              self.dismiss(animated: true)
-              return
-            }
-          }
-        }
-      )
-      permissions.delegate = self
-      present(permissions, animated: true)
+
+      showPanel()
     }
   }
 
