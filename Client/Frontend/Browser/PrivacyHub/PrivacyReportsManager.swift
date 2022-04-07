@@ -54,6 +54,9 @@ struct PrivacyReportsManager {
 
   // MARK: - View
   static func prepareView() -> PrivacyReportsView {
+    
+    BlockedResource.consolidateData(olderThan: 30)
+    
     let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
     let allTimeMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
 

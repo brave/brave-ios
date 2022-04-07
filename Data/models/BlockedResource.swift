@@ -19,7 +19,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
   @NSManaged public var domain: String
   @NSManaged public var faviconUrl: String
   @NSManaged public var host: String
-  @NSManaged public var timestamp: Date
+  @NSManaged public var timestamp: Date?
 
   public enum Source {
     case shields
@@ -162,6 +162,57 @@ public final class BlockedResource: NSManagedObject, CRUD {
       log.error(error)
       return []
     }
+  }
+  
+  public static func consolidateData(olderThan days: Int) {
+    
+    struct DomainTrackerPair: Hashable {
+      let domain: String
+      let tracker: String
+      let faviconUrl: String
+      
+      func hash(into hasher: inout Hasher) {
+          hasher.combine(domain)
+          hasher.combine(tracker)
+      }
+    }
+    
+    DataController.perform { context in
+      let predicate = NSPredicate(format: "\(timestampKeyPath) <= %@ AND \(timestampKeyPath) != nil",
+                                  getDate(1) as CVarArg)
+      let oldItems = all(where: predicate, context: context)
+      
+      print("bxx old items: \(oldItems?.count)")
+      
+      guard let entity = entity(in: context) else {
+        log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
+        return
+      }
+      
+      var set = Set<DomainTrackerPair>()
+      oldItems?.forEach {
+        set.insert(DomainTrackerPair(domain: $0.domain, tracker: $0.host, faviconUrl: $0.faviconUrl))
+      }
+      
+      set.forEach {
+        let predicate =
+        NSPredicate(format: "\(domainKeyPath) == %@ AND \(hostKeyPath) == %@ AND \(timestampKeyPath) = nil",
+                    $0.domain, $0.tracker)
+        
+        if first(where: predicate, context: context) == nil {
+          let blockedResource = BlockedResource(entity: entity, insertInto: context)
+          blockedResource.host = $0.tracker
+          blockedResource.domain = $0.domain
+          blockedResource.faviconUrl = $0.faviconUrl
+          blockedResource.timestamp = nil
+        }
+      }
+      
+      oldItems?.forEach {
+        $0.delete(context: .existing(context))
+      }
+    }
+    
   }
 
   /// A helper method for to group up elements and then count them.

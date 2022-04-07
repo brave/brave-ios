@@ -28,13 +28,7 @@ struct PrivacyReportsView: View {
     && allTimeRiskiestWebsite == nil
   }
   
-  @State var showNotificationCallout = false
-  
   @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyHub.shouldShowNotificationPermissionCallout
-  
-  private var vpnAlertsEnabled: Bool {
-    return true
-  }
   
   @State private var correctAuthStatus: Bool = false
   
