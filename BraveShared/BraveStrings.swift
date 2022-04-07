@@ -4620,5 +4620,12 @@ extension Strings {
       value: "Deletes all data captured so far",
       comment: "Footer that explains to the user a button to clear all blocked requests and vpn alerts data that Brave captured for them."
     )
+      
+      public static let clearAllDataPrompt = NSLocalizedString(
+        "privacyHub.clearAllDataPrompt",
+        bundle: .braveShared,
+        value: "Clear all data?",
+        comment: "A prompt message we show to the user if they want to clear all data gathered by the Privacy Reports Feature"
+      )
     }
 }

@@ -193,6 +193,10 @@ public final class BlockedResource: NSManagedObject, CRUD {
     let results = try context.fetch(fetchRequest)
     return results
   }
+  
+  public static func clearData() {
+    deleteAll()
+  }
 
   /// Helper method which returns unique values for a given query.
   /// - Parameters:

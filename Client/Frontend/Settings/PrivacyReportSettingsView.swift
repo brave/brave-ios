@@ -28,7 +28,8 @@ struct PrivacyReportSettingsView: View {
       
       Section(footer: Text(Strings.PrivacyHub.settingsClearDataFooter)) {
         HStack() {
-          Button(action: {}, label: {
+          Button(action: PrivacyReportsManager.clearAllData,
+                 label: {
             Text(Strings.PrivacyHub.settingsSlearDataTitle)
               .frame(maxWidth: .infinity)
           })
@@ -41,8 +42,8 @@ struct PrivacyReportSettingsView: View {
 
 #if DEBUG
 struct PrivacyReportSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        PrivacyReportSettingsView()
-    }
+  static var previews: some View {
+    PrivacyReportSettingsView()
+  }
 }
 #endif

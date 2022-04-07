@@ -10,7 +10,7 @@ import Data
 
 struct PrivacyReportsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
-
+  
   let lastWeekMostFrequentTracker: (String, Int)?
   let lastWeekRiskiestWebsite: (String, Int)?
   let allTimeMostFrequentTracker: (String, Int)?
@@ -18,36 +18,38 @@ struct PrivacyReportsView: View {
   let allTimeListTrackers: [PrivacyReportsItem]
   let allTimeListWebsites: [PrivacyReportsItem]
   let lastVPNAlerts: [BraveVPNAlert]?
-
+  
   var onDismiss: (() -> Void)?
-
+  
   private var noData: Bool {
     return lastWeekMostFrequentTracker == nil
-      && lastWeekRiskiestWebsite == nil
-      && allTimeMostFrequentTracker == nil
-      && allTimeRiskiestWebsite == nil
+    && lastWeekRiskiestWebsite == nil
+    && allTimeMostFrequentTracker == nil
+    && allTimeRiskiestWebsite == nil
   }
-
+  
   @State var showNotificationCallout = false
-
+  
   @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyHub.shouldShowNotificationPermissionCallout
-
+  
   private var vpnAlertsEnabled: Bool {
     return true
   }
-
+  
   @State private var correctAuthStatus: Bool = false
-
+  
+  @State private var showClearDataPrompt: Bool = false
+  
   /// This is to cover a case where user has set up their notifications already, and pressing on 'Enable notifications' would do nothing.
   private func determineNotificationPermissionStatus() {
     UNUserNotificationCenter.current().getNotificationSettings { settings in
       DispatchQueue.main.async {
         correctAuthStatus =
-          settings.authorizationStatus == .notDetermined || settings.authorizationStatus == .provisional
+        settings.authorizationStatus == .notDetermined || settings.authorizationStatus == .provisional
       }
     }
   }
-
+  
   private func dismissView() {
     // Dismiss on presentation mode does not work on iOS 14
     // when using the UIHostingController is parent view.
@@ -58,36 +60,36 @@ struct PrivacyReportsView: View {
       onDismiss?()
     }
   }
-
+  
   var body: some View {
     NavigationView {
       ScrollView(.vertical) {
         VStack(alignment: .leading, spacing: 16) {
-
+          
           if showNotificationPermissionCallout.value && correctAuthStatus {
             NotificationCalloutView()
           }
-
+          
           if noData {
             NoDataCallout()
           }
-
+          
           PrivacyHubLastWeekSection(
             lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
             lastWeekRiskiestWebsite: lastWeekRiskiestWebsite)
-
+          
           Divider()
-
+          
           if Preferences.PrivacyHub.captureVPNAlerts.value, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
             PrivacyHubVPNAlertsSection(
               lastVPNAlerts: lastVPNAlerts,
               onDismiss: {
                 dismissView()
               })
-
+            
             Divider()
           }
-
+          
           PrivacyHubAllTimeSection(
             allTimeMostFrequentTracker: allTimeMostFrequentTracker,
             allTimeRiskiestWebsite: allTimeRiskiestWebsite,
@@ -108,6 +110,29 @@ struct PrivacyReportsView: View {
             }
             .foregroundColor(Color(.braveOrange))
           }
+          
+          ToolbarItem(placement: .cancellationAction) {
+            Button(action: {
+              showClearDataPrompt = true
+            }, label: {
+              Image(systemName: "trash")
+            })
+              .foregroundColor(Color(.braveOrange))
+              .actionSheet(isPresented: $showClearDataPrompt) {
+                // FIXME: Currently .actionSheet does not allow you leave empty title for the sheet.
+                // This could get converted to .confirmationPrompt or Menu with destructive buttons
+                // once iOS 15 is minimum supported version
+                .init(title: Text(Strings.PrivacyHub.clearAllDataPrompt),
+                      buttons: [
+                        .destructive(Text(Strings.yes), action: {
+                          PrivacyReportsManager.clearAllData()
+                          // Dismiss to avoid having to observe for db changes to update the view.
+                          dismissView()
+                        }),
+                        .cancel()
+                      ])
+              }
+          }
         }
       }
       .background(Color(.secondaryBraveBackground).ignoresSafeArea())
@@ -125,7 +150,7 @@ struct PrivacyReports_Previews: PreviewProvider {
     let lastWeekRiskiestWebsite = ("example.com", 13)
     let allTimeMostFrequentTracker = ("scary-analytics", 678)
     let allTimeRiskiestWebsite = ("scary.example.com", 554)
-
+    
     Group {
       ContentView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker, lastWeekRiskiestWebsite: lastWeekRiskiestWebsite, allTimeMostFrequentTracker: allTimeMostFrequentTracker, allTimeRiskiestWebsite: allTimeRiskiestWebsite)
       ContentView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker, lastWeekRiskiestWebsite: lastWeekRiskiestWebsite, allTimeMostFrequentTracker: allTimeMostFrequentTracker, allTimeRiskiestWebsite: allTimeRiskiestWebsite)

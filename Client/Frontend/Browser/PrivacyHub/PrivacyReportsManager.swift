@@ -46,6 +46,11 @@ struct PrivacyReportsManager {
       BraveVPN.processVPNAlerts()
     }
   }
+  
+  static func clearAllData() {
+    BraveVPNAlert.clearData()
+    BlockedResource.clearData()
+  }
 
   // MARK: - View
   static func prepareView() -> PrivacyReportsView {

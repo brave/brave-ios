@@ -155,6 +155,10 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
       return (0, 0, 0)
     }
   }
+  
+  public static func clearData() {
+    deleteAll()
+  }
 
   private static func braveVPNAlertFetchRequest(for context: NSManagedObjectContext) -> NSFetchRequest<NSDictionary> {
     let _fetchRequest = NSFetchRequest<NSDictionary>(entityName: "BraveVPNAlert")
