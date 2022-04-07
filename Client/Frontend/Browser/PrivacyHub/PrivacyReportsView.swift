@@ -98,6 +98,16 @@ struct PrivacyReportsView: View {
             onDismiss: {
               dismissView()
             })
+          
+          // FIXME: EXPERIMENTAL UI
+          Text("These stats are only stored on your device, and are not sent anywhere. Ever.")
+            .font(.caption)
+            .multilineTextAlignment(.center)
+          Text("Learn more about Privacy Reports")
+            .underline()
+            .font(.caption.weight(.bold))
+            .frame(maxWidth: .infinity, alignment: .center)
+
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
