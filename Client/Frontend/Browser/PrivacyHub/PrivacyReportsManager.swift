@@ -117,9 +117,9 @@ struct PrivacyReportsManager {
         dateComponents.hour = hour
         dateComponents.minute = minute + 5
       } else {
-        // Every Sunday at 2 PM
+        // Every Sunday at 11 AM
         dateComponents.weekday = 1
-        dateComponents.hour = 14
+        dateComponents.hour = 11
       }
 
       // Create the trigger as a repeating event.
