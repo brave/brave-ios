@@ -329,9 +329,7 @@ class SearchSettingsTableViewController: UITableViewController {
           message: Strings.CustomSearchEngine.deleteEngineAlertDescription,
           preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel) { _ in
-          return
-        })
+        alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
         
         alert.addAction(UIAlertAction(title: Strings.delete, style: .destructive) { [weak self] _ in
           guard let self = self else { return }
