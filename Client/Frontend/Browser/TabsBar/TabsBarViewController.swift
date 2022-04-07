@@ -60,11 +60,13 @@ class TabsBarViewController: UIViewController {
     }
   }
 
-  fileprivate weak var tabManager: TabManager?
-  fileprivate var tabList = WeakList<Tab>()
+  private weak var tabManager: TabManager?
+  private weak var browserViewController: BrowserViewController?
+  private var tabList = WeakList<Tab>()
 
-  init(tabManager: TabManager) {
+  init(tabManager: TabManager, browserViewController: BrowserViewController) {
     self.tabManager = tabManager
+    self.browserViewController = browserViewController
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -382,15 +384,24 @@ extension TabsBarViewController: UICollectionViewDataSource {
     cell.configure()
 
     cell.closeTabCallback = { [weak self] tab in
-      guard let strongSelf = self, let tabManager = strongSelf.tabManager, let previousIndex = strongSelf.tabList.index(of: tab) else { return }
-
+      guard let self = self,
+              let tabManager = self.tabManager,
+              let bvc = self.browserViewController,
+              let previousIndex = self.tabList.index(of: tab) else {
+        return
+      }
+      
+      if bvc.topToolbar.locationView.readerModeState == .active {
+        bvc.hideReaderModeBar(animated: false)
+      }
+      
       tabManager.removeTab(tab)
-      strongSelf.updateData()
+      self.updateData()
 
       let previousOrNext = max(0, previousIndex - 1)
-      tabManager.selectTab(strongSelf.tabList[previousOrNext])
+      tabManager.selectTab(self.tabList[previousOrNext])
 
-      strongSelf.collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
+      self.collectionView.selectItem(at: IndexPath(row: previousOrNext, section: 0), animated: true, scrollPosition: .centeredHorizontally)
     }
 
     return cell

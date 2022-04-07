@@ -721,7 +721,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
     header.addArrangedSubview(topToolbar)
 
-    tabsBar = TabsBarViewController(tabManager: tabManager)
+    tabsBar = TabsBarViewController(tabManager: tabManager, browserViewController: self)
     tabsBar.delegate = self
     header.addArrangedSubview(tabsBar.view)
 
@@ -2463,8 +2463,12 @@ extension BrowserViewController: TabManagerDelegate {
       image: UIImage(systemName: "xmark"),
       attributes: .destructive,
       handler: UIAction.deferredActionHandler { [unowned self] _ in
-        if let tab = self.tabManager.selectedTab {
-          self.tabManager.removeTab(tab)
+        if let tab = tabManager.selectedTab {
+          if topToolbar.locationView.readerModeState == .active {
+            hideReaderModeBar(animated: false)
+          }
+          
+          tabManager.removeTab(tab)
         }
       })
 
@@ -2675,12 +2679,6 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     return false
-  }
-
-  func webViewDidClose(_ webView: WKWebView) {
-    if let tab = tabManager[webView] {
-      self.tabManager.removeTab(tab)
-    }
   }
 
   func webView(_ webView: WKWebView, contextMenuConfigurationForElement elementInfo: WKContextMenuElementInfo, completionHandler: @escaping (UIContextMenuConfiguration?) -> Void) {
