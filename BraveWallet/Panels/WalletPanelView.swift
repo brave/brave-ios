@@ -123,6 +123,9 @@ public struct WalletPanelContainerView: View {
     }
     .onChange(of: keyringStore.keyring) { newValue in
       fetchingInitialKeyring = false
+      if visibleScreen != .panel {
+        presentWalletWithContext?(.panelUnlockOrSetup)
+      }
     }
   }
 }
