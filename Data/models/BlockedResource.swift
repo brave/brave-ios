@@ -59,7 +59,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var mostFrequentTracker = ("", 0)
 
     do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: days)
+      let results = try groupByFetch(property: hostKeyPath, daysRange: days, includeConsolidatedData: true)
 
       for result in results {
         guard let host = result[hostKeyPath] as? String else {
@@ -84,7 +84,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var maxNumberOfSites = Set<CountableEntity>()
 
     do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
+      let results = try groupByFetch(property: hostKeyPath, daysRange: nil, includeConsolidatedData: true)
 
       for result in results {
         guard let host = result[hostKeyPath] as? String else {
@@ -107,7 +107,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var maxNumberOfSites = ("", 0)
 
     do {
-      let results = try groupByFetch(property: domainKeyPath, daysRange: days)
+      let results = try groupByFetch(property: domainKeyPath, daysRange: days, includeConsolidatedData: false)
 
       for result in results {
         guard let domain = result[domainKeyPath] as? String else {
@@ -179,10 +179,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
     
     DataController.perform { context in
       let predicate = NSPredicate(format: "\(timestampKeyPath) <= %@ AND \(timestampKeyPath) != nil",
-                                  getDate(1) as CVarArg)
+                                  getDate(-days) as CVarArg)
       let oldItems = all(where: predicate, context: context)
-      
-      print("bxx old items: \(oldItems?.count)")
       
       guard let entity = entity(in: context) else {
         log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
@@ -200,11 +198,11 @@ public final class BlockedResource: NSManagedObject, CRUD {
                     $0.domain, $0.tracker)
         
         if first(where: predicate, context: context) == nil {
-          let blockedResource = BlockedResource(entity: entity, insertInto: context)
-          blockedResource.host = $0.tracker
-          blockedResource.domain = $0.domain
-          blockedResource.faviconUrl = $0.faviconUrl
-          blockedResource.timestamp = nil
+          let consolidatedRecord = BlockedResource(entity: entity, insertInto: context)
+          consolidatedRecord.host = $0.tracker
+          consolidatedRecord.domain = $0.domain
+          consolidatedRecord.faviconUrl = $0.faviconUrl
+          consolidatedRecord.timestamp = nil
         }
       }
       
@@ -217,7 +215,9 @@ public final class BlockedResource: NSManagedObject, CRUD {
 
   /// A helper method for to group up elements and then count them.
   /// Note: This query skips single elements(< 1)
-  private static func groupByFetch(property: String, daysRange days: Int?) throws -> [NSDictionary] {
+  private static func groupByFetch(property: String,
+                                   daysRange days: Int?,
+                                   includeConsolidatedData: Bool) throws -> [NSDictionary] {
     let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
     let context = DataController.viewContext
     fetchRequest.entity = BlockedResource.entity(in: context)
@@ -233,12 +233,25 @@ public final class BlockedResource: NSManagedObject, CRUD {
     fetchRequest.propertiesToFetch = [property, expression]
     fetchRequest.propertiesToGroupBy = [property]
     fetchRequest.resultType = .dictionaryResultType
-
+    
+    var latestItemsPredicate: NSPredicate?
     if let days = days {
-      fetchRequest.havingPredicate =
+      latestItemsPredicate =
         NSPredicate(format: "\(timestampKeyPath) >= %@ AND %@ > 1", getDate(-days) as CVarArg, countVariableExpr)
     } else {
-      fetchRequest.havingPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+      latestItemsPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+    }
+    
+    if let latestItemsPredicate = latestItemsPredicate {
+      if includeConsolidatedData {
+        let consolidatedItemsPredicate = NSPredicate(format: "\(timestampKeyPath) = nil")
+        let combinedPredicate = NSCompoundPredicate(type: .or,
+                                                    subpredicates: [latestItemsPredicate, consolidatedItemsPredicate])
+        
+        fetchRequest.havingPredicate = combinedPredicate
+      } else {
+        fetchRequest.havingPredicate = latestItemsPredicate
+      }
     }
 
     let results = try context.fetch(fetchRequest)
