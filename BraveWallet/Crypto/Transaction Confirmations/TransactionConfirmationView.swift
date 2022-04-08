@@ -265,6 +265,7 @@ struct TransactionConfirmationView: View {
                     .font(.callout)
                     .padding()
                     .accessibilityElement(children: .contain)
+                    .foregroundColor(Color(.bravePrimary))
                   } else {
                     HStack {
                       Text(Strings.Wallet.total)
