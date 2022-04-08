@@ -77,7 +77,7 @@ struct VPNAlertCell: View {
         .font(.caption.weight(.semibold))
 
         VStack(alignment: .leading, spacing: 4) {
-          Text(vpnAlert.message)
+          Text(vpnAlert.message ?? "-")
             .font(.callout)
 
           Text(date)

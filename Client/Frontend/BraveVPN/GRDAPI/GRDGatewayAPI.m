@@ -324,7 +324,7 @@
         
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app-location",
-                                @"host":@"api.beaconsinspace.com",
+                                @"host":@"doubleclick.net",
                                 @"message":@"Prevented 'Beacons In Space' from obtaining unknown data from device",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked Location Tracker",
@@ -361,7 +361,7 @@
 }
 
 - (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
-    if (self.dummyDataForDebugging == NO) {
+    if (self.dummyDataForDebugging == YES) {
         if ([self _canMakeApiRequests] == NO) {
             NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
             if (completion) completion(nil, NO, @"cant make API requests");

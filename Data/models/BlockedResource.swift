@@ -19,6 +19,9 @@ public final class BlockedResource: NSManagedObject, CRUD {
   @NSManaged public var domain: String
   @NSManaged public var faviconUrl: String
   @NSManaged public var host: String
+  
+  // FIXME: Better documentation.
+  /// Nil timestamp means it's a consolidated record.
   @NSManaged public var timestamp: Date?
 
   public enum Source {

@@ -37,12 +37,13 @@ struct PrivacyReportsManager {
   }
 
   static func scheduleVPNAlertsTask() {
+    
     vpnAlertsTimer?.invalidate()
-
+    return
     // Because fetching VPN alerts involves making a url request,
     // the time interval to fetch them is longer than the local on-device blocked requests
     let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
-    vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
+    vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
       BraveVPN.processVPNAlerts()
     }
   }
@@ -57,7 +58,8 @@ struct PrivacyReportsManager {
     
     // FIXME: Temporary
     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-      BlockedResource.consolidateData(olderThan: 30)
+      //BlockedResource.consolidateData(olderThan: 30)
+      BraveVPNAlert.consolidateData(olderThan: 30)
     }
     
     let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
