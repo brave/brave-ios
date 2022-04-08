@@ -6,6 +6,7 @@
 import Foundation
 import BraveCore
 import BigNumber
+import struct Shared.Strings
 
 public class TransactionConfirmationStore: ObservableObject {
   struct State {
@@ -18,6 +19,8 @@ public class TransactionConfirmationStore: ObservableObject {
     var gasAssetRatio: Double = 0.0
     var totalFiat: String = ""
     var isBalanceSufficient: Bool = true
+    var isUnlimitedApprovalRequested: Bool = false
+    var origin: URL?
   }
   @Published var state: State = .init()
   @Published var isLoading: Bool = false
@@ -34,6 +37,7 @@ public class TransactionConfirmationStore: ObservableObject {
       }
     }
   }
+  @Published var allTokens: [BraveWallet.BlockchainToken] = []
 
   private var assetRatios: [String: Double] = [:]
 
@@ -132,12 +136,21 @@ public class TransactionConfirmationStore: ObservableObject {
             switch transaction.txType {
             case .erc20Approve:
               // Find token in args
+              let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to ?? ""
               if let token = allTokens.first(where: {
-                $0.contractAddress(in: selectedChain).caseInsensitiveCompare(transaction.txArgs[0]) == .orderedSame
+                $0.contractAddress(in: selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
               }) {
                 self.state.symbol = token.symbol
-                let approvalValue = transaction.txArgs[1].removingHexPrefix
-                self.state.value = formatter.decimalString(for: approvalValue, radix: .hex, decimals: Int(token.decimals)) ?? ""
+                if let approvalValue = transaction.txArgs[safe: 1] {
+                  if approvalValue.caseInsensitiveCompare(WalletConstants.MAX_UINT256) == .orderedSame {
+                    self.state.value = Strings.Wallet.editPermissionsApproveUnlimited
+                  } else {
+                    self.state.value = formatter.decimalString(for: approvalValue.removingHexPrefix, radix: .decimal, decimals: Int(token.decimals)) ?? ""
+                  }
+                }
+              }
+              if let proposedAllowance = transaction.txArgs[safe: 1] {
+                self.state.isUnlimitedApprovalRequested = proposedAllowance.caseInsensitiveCompare(WalletConstants.MAX_UINT256) == .orderedSame
               }
             case .erc20Transfer:
               if let token = allTokens.first(where: {
@@ -295,10 +308,43 @@ public class TransactionConfirmationStore: ObservableObject {
   ) {
     ethTxManagerProxy.setNonceForUnapprovedTransaction(transaction.id, nonce: nonce) { success in
       // not going to refresh unapproved transactions since the tx observer will be
-      // notified `onTransactionStatusChanged` and `ononUnapprovedTxUpdated`
+      // notified `onTransactionStatusChanged` and `onUnapprovedTxUpdated`
       // `transactions` list will be refreshed there.
       completion(success)
     }
+  }
+  
+  func editAllowance(
+    txMetaId: String,
+    spenderAddress: String,
+    amount: String,
+    completion: @escaping (Bool) -> Void
+  ) {
+    ethTxManagerProxy.makeErc20ApproveData(spenderAddress, amount: amount) { [weak self] success, data in
+      guard let self = self else { return }
+      if !success {
+        completion(false)
+        return
+      }
+      self.ethTxManagerProxy.setDataForUnapprovedTransaction(txMetaId, data: data) { success in
+        // not going to refresh unapproved transactions since the tx observer will be
+        // notified `onTransactionStatusChanged` and `onUnapprovedTxUpdated`
+        // `transactions` list will be refreshed there.
+        completion(success)
+      }
+    }
+  }
+  
+  func fetchTokens(in network: BraveWallet.NetworkInfo) {
+    blockchainRegistry.allTokens(network.chainId) { [weak self] tokens in
+      self?.allTokens = tokens
+    }
+  }
+
+  func token(for contractAddress: String, in network: BraveWallet.NetworkInfo) -> BraveWallet.BlockchainToken? {
+    return allTokens.first(where: {
+      $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame
+    })
   }
 }
 

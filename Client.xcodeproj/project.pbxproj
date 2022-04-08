@@ -1170,6 +1170,7 @@
 		D5ACA7DD27FB7D4B002443CE /* BraveCore.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D5ACA7DE27FB7D52002443CE /* MaterialComponents.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D5C51E6C27F4C8AA00E1F2D0 /* BiometricsPasscodeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C51E6B27F4C8AA00E1F2D0 /* BiometricsPasscodeEntryView.swift */; };
+		D5EFCB3927FF81AA00BD151D /* EditPermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5EFCB3827FF81AA00BD151D /* EditPermissionsView.swift */; };
 		D83822001FC7961D00303C12 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83821FF1FC7961D00303C12 /* DispatchQueueExtensions.swift */; };
 		D863C8F21F68BFC20058D95F /* GradientProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D863C8E31F68BFC20058D95F /* GradientProgressBar.swift */; };
 		D8D33A7D1FBD080300A20A28 /* SnapKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D33A7C1FBD080300A20A28 /* SnapKitExtensions.swift */; };
@@ -3159,6 +3160,7 @@
 		D51CD9C627DBC6A600C01104 /* PortfolioStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioStoreTests.swift; sourceTree = "<group>"; };
 		D5A691EB27DF93AD000CC4B3 /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
 		D5C51E6B27F4C8AA00E1F2D0 /* BiometricsPasscodeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricsPasscodeEntryView.swift; sourceTree = "<group>"; };
+		D5EFCB3827FF81AA00BD151D /* EditPermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPermissionsView.swift; sourceTree = "<group>"; };
 		D83821FF1FC7961D00303C12 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		D863C8E31F68BFC20058D95F /* GradientProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientProgressBar.swift; sourceTree = "<group>"; };
 		D8D33A7C1FBD080300A20A28 /* SnapKitExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapKitExtensions.swift; sourceTree = "<group>"; };
@@ -4245,6 +4247,7 @@
 				2701B14B2735B65300BE6FC6 /* EditPriorityFeeView.swift */,
 				27D91E70274D55F0009B1FA3 /* EditGasFeeView.swift */,
 				7DE5B78B27D4188E000DA8E4 /* EditNonceView.swift */,
+				D5EFCB3827FF81AA00BD151D /* EditPermissionsView.swift */,
 			);
 			path = "Transaction Confirmations";
 			sourceTree = "<group>";
@@ -8072,6 +8075,7 @@
 				7D758917271A182800B643C3 /* TokenList.swift in Sources */,
 				271F68C226EBD27E00AA2A50 /* SwapButton.swift in Sources */,
 				27DDE85926FBE09A00A70C3A /* AccountPrivateKeyView.swift in Sources */,
+				D5EFCB3927FF81AA00BD151D /* EditPermissionsView.swift in Sources */,
 				271F68AA26EBD27E00AA2A50 /* TransactionView.swift in Sources */,
 				271F689126EBD27E00AA2A50 /* MockJsonRpcService.swift in Sources */,
 				277C0A9A273DC0890059AB0A /* NamedAddresses.swift in Sources */,
