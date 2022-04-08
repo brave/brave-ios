@@ -182,6 +182,14 @@ class Tab: NSObject {
   var isDesktopSite: Bool {
     webView?.customUserAgent?.lowercased().contains("mobile") == false
   }
+  
+  var containsWebPage: Bool {
+    if let url = url {
+      return url.isWebPage() && !(InternalURL(url)?.isAboutHomeURL ?? false)
+    }
+    
+    return false
+  }
 
   /// In-memory dictionary of websites that were explicitly set to use either desktop or mobile user agent.
   /// Key is url's base domain, value is desktop mode on or off.
