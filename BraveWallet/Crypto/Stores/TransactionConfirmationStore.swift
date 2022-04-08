@@ -299,6 +299,7 @@ public class TransactionConfirmationStore: ObservableObject {
       self.activeTransactionId = firstTx.id
       self.fetchGasEstimation1559()
     }
+    fetchTokens()
   }
 
   func editNonce(
@@ -335,14 +336,16 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  func fetchTokens(in network: BraveWallet.NetworkInfo) {
-    blockchainRegistry.allTokens(network.chainId) { [weak self] tokens in
-      self?.allTokens = tokens
+  func fetchTokens() {
+    rpcService.chainId(.eth) { [weak self] chainId in
+      self?.blockchainRegistry.allTokens(chainId) { tokens in
+        self?.allTokens = tokens
+      }
     }
   }
 
   func token(for contractAddress: String, in network: BraveWallet.NetworkInfo) -> BraveWallet.BlockchainToken? {
-    return allTokens.first(where: {
+    allTokens.first(where: {
       $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame
     })
   }

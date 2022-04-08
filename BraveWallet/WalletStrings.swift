@@ -2014,7 +2014,7 @@ extension Strings {
       "wallet.editPermissionsTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Edit Permission",
+      value: "Edit Permissions",
       comment: "The title of the detail view to edit the permissions / allowance of an ERC 20 Approve transaction."
     )
     public static let editPermissionsApproveUnlimited = NSLocalizedString(

@@ -24,21 +24,15 @@ struct EditPermissionsView: View {
     confirmationStore.transactions.first(where: { $0.id == confirmationStore.activeTransactionId }) ?? (confirmationStore.transactions.first ?? .init())
   }
   
-  private var isCustomAllowanceUnlimited: Bool {
-    customAllowance == Strings.Wallet.editPermissionsApproveUnlimited
-  }
-  
   private var customAllowanceAmountInWei: String {
-    if isCustomAllowanceUnlimited {
+    if customAllowance == Strings.Wallet.editPermissionsApproveUnlimited {
       // when user taps 'Set Unlimited' button we updated `customAllowance` to `Strings.Wallet.editPermissionsApproveUnlimited`
       return WalletConstants.MAX_UINT256
     }
     
-    let decimals: Int
+    var decimals: Int = 18
     if let contractAddress = activeTransaction.txDataUnion.ethTxData1559?.baseData.to, let token = confirmationStore.token(for: contractAddress, in: networkStore.selectedChain) {
       decimals = Int(token.decimals)
-    } else {
-      decimals = 18
     }
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: decimals))
     let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .decimal, decimals: decimals) ?? "0"
@@ -97,7 +91,6 @@ struct EditPermissionsView: View {
             }
           )
             .keyboardType(.decimalPad)
-            .foregroundColor(Color(.braveLabel))
             .foregroundColor(Color(.braveLabel))
           if proposedAllowance.caseInsensitiveCompare(WalletConstants.MAX_UINT256) != .orderedSame {
             Button(action: {

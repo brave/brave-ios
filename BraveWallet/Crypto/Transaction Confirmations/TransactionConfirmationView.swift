@@ -387,7 +387,6 @@ struct TransactionConfirmationView: View {
     .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
       confirmationStore.prepare()
-      confirmationStore.fetchTokens(in: networkStore.selectedChain)
     }
   }
 
