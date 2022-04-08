@@ -291,15 +291,24 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
 
-  func prepare() {
+  func prepare(completion: (() -> Void)? = nil) {
+    let dispatchGroup = DispatchGroup()
+    dispatchGroup.enter()
     fetchTransactions { [weak self] in
+      defer { dispatchGroup.leave() }
       guard let self = self,
         let firstTx = self.transactions.first
       else { return }
       self.activeTransactionId = firstTx.id
       self.fetchGasEstimation1559()
     }
-    fetchTokens()
+    dispatchGroup.enter()
+    fetchTokens() { _ in
+      dispatchGroup.leave()
+    }
+    dispatchGroup.notify(queue: .main) {
+      completion?()
+    }
   }
 
   func editNonce(
@@ -336,10 +345,11 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  func fetchTokens() {
+  func fetchTokens(completion: (([BraveWallet.BlockchainToken]) -> Void)? = nil) {
     rpcService.chainId(.eth) { [weak self] chainId in
       self?.blockchainRegistry.allTokens(chainId) { tokens in
         self?.allTokens = tokens
+        completion?(tokens)
       }
     }
   }
