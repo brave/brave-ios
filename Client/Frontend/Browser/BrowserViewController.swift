@@ -2512,23 +2512,25 @@ extension BrowserViewController: TabManagerDelegate {
       bookmarkMenuChildren.append(bookmarkActiveTab)
     }
     
-    let bookmarkAllTabs = UIAction(
-      title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
-      image: UIImage(systemName: "book"),
-      handler: UIAction.deferredActionHandler { [unowned self] _ in
-        let mode = BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
-        let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
+    if tabManager.tabsForCurrentMode.count > 1 {
+      let bookmarkAllTabs = UIAction(
+        title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
+        image: UIImage(systemName: "book"),
+        handler: UIAction.deferredActionHandler { [unowned self] _ in
+          let mode = BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
+          let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
 
-        presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
-      })
+          presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
+        })
 
-    bookmarkMenuChildren.append(bookmarkAllTabs)
+      bookmarkMenuChildren.append(bookmarkAllTabs)
+    }
     
     var duplicateTabMenuChildren: [UIAction] = []
 
     if containsWebPage, let selectedTab = tabManager.selectedTab, let url = selectedTab.fetchedURL {
       let duplicateActiveTab = UIAction(
-        title: "Duplicate Active Tab",
+        title: Strings.duplicateActiveTab,
         image: UIImage(systemName: "plus.square.on.square"),
         handler: UIAction.deferredActionHandler { _ in
           tabManager.addTabAndSelect(
