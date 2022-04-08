@@ -2042,8 +2042,15 @@ extension Strings {
       "wallet.editPermissionsCustomAllowanceHeader",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Custom allowance (%@)",
-      comment: "The header text shown in the row that selects the custom allowance value. The '%@' becomes the name of the symbol being approved. For example: \"Custom allowance (DAI)\""
+      value: "Set custom allowance",
+      comment: "The header text above the field to input a custom allowance value."
+    )
+    public static let editPermissionsSetUnlimited = NSLocalizedString(
+      "wallet.editPermissionsSetUnlimited",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Set Unlimited",
+      comment: "The title of the button shown beside the custom allowance input field to make the custom allowance value \"Unlimited\"."
     )
   }
 }

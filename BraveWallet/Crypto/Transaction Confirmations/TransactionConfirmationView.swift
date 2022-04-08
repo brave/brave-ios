@@ -136,6 +136,7 @@ struct TransactionConfirmationView: View {
           Text(String.localizedStringWithFormat(Strings.Wallet.confirmationViewAllowSpendSubtitle, confirmationStore.state.symbol))
             .font(.footnote)
         }
+        .multilineTextAlignment(.center)
       }
       if confirmationStore.state.isUnlimitedApprovalRequested {
         Label(Strings.Wallet.confirmationViewUnlimitedWarning, uiImage: #imageLiteral(resourceName: "warning-triangle").template)

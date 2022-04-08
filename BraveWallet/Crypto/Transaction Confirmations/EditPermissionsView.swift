@@ -15,14 +15,7 @@ struct EditPermissionsView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
-  private enum AllowanceKind: Hashable, Equatable {
-    case proposedAllowance
-    case customAllowance
-  }
-  
-  @State private var allowanceKind: AllowanceKind = .proposedAllowance
   @State private var customAllowance: String = "0"
-  @State private var isFieldFocused: Bool = false
   @State private var isShowingAlert = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.sizeCategory) private var sizeCategory
@@ -31,21 +24,25 @@ struct EditPermissionsView: View {
     confirmationStore.transactions.first(where: { $0.id == confirmationStore.activeTransactionId }) ?? (confirmationStore.transactions.first ?? .init())
   }
   
-  private var allowanceAmountInWei: String {
-    switch allowanceKind {
-    case .proposedAllowance:
-      return proposedAllowance
-    case .customAllowance:
-      let decimals: Int
-      if let contractAddress = activeTransaction.txDataUnion.ethTxData1559?.baseData.to, let token = confirmationStore.token(for: contractAddress, in: networkStore.selectedChain) {
-        decimals = Int(token.decimals)
-      } else {
-        decimals = 18
-      }
-      let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: decimals))
-      let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .decimal, decimals: decimals) ?? "0"
-      return customAllowanceInWei.addingHexPrefix
+  private var isCustomAllowanceUnlimited: Bool {
+    customAllowance == Strings.Wallet.editPermissionsApproveUnlimited
+  }
+  
+  private var customAllowanceAmountInWei: String {
+    if isCustomAllowanceUnlimited {
+      // when user taps 'Set Unlimited' button we updated `customAllowance` to `Strings.Wallet.editPermissionsApproveUnlimited`
+      return WalletConstants.MAX_UINT256
     }
+    
+    let decimals: Int
+    if let contractAddress = activeTransaction.txDataUnion.ethTxData1559?.baseData.to, let token = confirmationStore.token(for: contractAddress, in: networkStore.selectedChain) {
+      decimals = Int(token.decimals)
+    } else {
+      decimals = 18
+    }
+    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: decimals))
+    let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .decimal, decimals: decimals) ?? "0"
+    return customAllowanceInWei.addingHexPrefix
   }
   
   private var accountName: String {
@@ -73,46 +70,53 @@ struct EditPermissionsView: View {
           .resetListHeaderStyle()
           .padding(.vertical)
       ) {
-        Picker(selection: $allowanceKind) {
-          VStack(alignment: .leading) {
-            Text(String.localizedStringWithFormat(Strings.Wallet.editPermissionsProposedAllowanceHeader, confirmationStore.state.symbol))
-              .foregroundColor(Color(.bravePrimary))
-              .font(.footnote.weight(.semibold))
-            TextField("", text: Binding(get: { confirmationStore.state.value }, set: { _ in }))
-              .disabled(true)
-          }.tag(AllowanceKind.proposedAllowance)
-          
-          VStack(alignment: .leading) {
-            Text(String.localizedStringWithFormat(Strings.Wallet.editPermissionsCustomAllowanceHeader, confirmationStore.state.symbol))
-              .foregroundColor(Color(.bravePrimary))
-              .font(.footnote.weight(.semibold))
-            TextField("", text: $customAllowance)
-              .keyboardType(.numberPad)
-              .foregroundColor(Color(.braveLabel))
-              .allowsHitTesting(allowanceKind == .customAllowance) // allow user to tap on this entire row in the `Picker`, we'll become first responder when `allowanceKind` changes to `.customAllowance`
-              .foregroundColor(Color(.braveLabel))
-              .introspectTextField { tf in
-                if allowanceKind == .customAllowance && !isFieldFocused && !tf.isFirstResponder {
-                  DispatchQueue.main.async {
-                    isFieldFocused = tf.becomeFirstResponder()
-                  }
-                }
-              }
-          }.tag(AllowanceKind.customAllowance)
-        } label: {
-          EmptyView()
+        VStack(alignment: .leading) {
+          Text(String.localizedStringWithFormat(Strings.Wallet.editPermissionsProposedAllowanceHeader, confirmationStore.state.symbol))
+            .foregroundColor(Color(.bravePrimary))
+            .font(.footnote.weight(.semibold))
+          TextField("", text: Binding(get: { confirmationStore.state.value }, set: { _ in }))
+            .disabled(true)
         }
-        .accentColor(Color(.braveBlurpleTint))
-        .pickerStyle(.inline)
-        .foregroundColor(Color(.braveLabel))
       }
-      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      
+      Section(
+        header: Text(Strings.Wallet.editPermissionsCustomAllowanceHeader)
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .font(.footnote)
+          .resetListHeaderStyle()
+          .padding(.vertical)
+      ) {
+        HStack {
+          TextField(
+            "0.0 \(confirmationStore.state.symbol)",
+            text: $customAllowance,
+            onEditingChanged: { value in
+              if value, customAllowance == Strings.Wallet.editPermissionsApproveUnlimited {
+                customAllowance = ""
+              }
+            }
+          )
+            .keyboardType(.decimalPad)
+            .foregroundColor(Color(.braveLabel))
+            .foregroundColor(Color(.braveLabel))
+          if proposedAllowance.caseInsensitiveCompare(WalletConstants.MAX_UINT256) != .orderedSame {
+            Button(action: {
+              customAllowance = Strings.Wallet.editPermissionsApproveUnlimited
+              resignFirstResponder()
+            }) {
+              Text(Strings.Wallet.editPermissionsSetUnlimited)
+                .foregroundColor(Color(.braveBlurpleTint))
+                .font(.footnote)
+            }
+          }
+        }
+      }
       
       Button(action: {
         confirmationStore.editAllowance(
           txMetaId: activeTransaction.id,
           spenderAddress: activeTransaction.txArgs[safe: 0] ?? "",
-          amount: allowanceAmountInWei) { success in
+          amount: customAllowanceAmountInWei) { success in
             if success {
               presentationMode.dismiss()
             } else {
@@ -137,12 +141,6 @@ struct EditPermissionsView: View {
         message: Text(Strings.Wallet.editTransactionError),
         dismissButton: .default(Text(Strings.OKString))
       )
-    }
-    .onChange(of: allowanceKind) { allowanceKind in
-      if allowanceKind != .customAllowance {
-        isFieldFocused = false
-        resignFirstResponder()
-      }
     }
   }
   
