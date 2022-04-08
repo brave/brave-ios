@@ -58,7 +58,7 @@ extension BrowserViewController {
         Task { @MainActor in
           let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
           if permissionRequestManager.hasPendingRequest(for: origin, coinType: .eth) {
-            let pendingRequests = permissionRequestManager.pendingRequests(for: origin)
+            let pendingRequests = permissionRequestManager.pendingRequests(for: origin, coinType: .eth)
             let (accounts, status, _) = await self.allowedAccounts(false)
             if status == .success, !accounts.isEmpty {
               for request in pendingRequests {
