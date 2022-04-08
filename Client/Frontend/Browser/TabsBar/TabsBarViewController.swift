@@ -13,6 +13,8 @@ protocol TabsBarViewControllerDelegate: AnyObject {
   func tabsBarDidSelectTab(_ tabsBarController: TabsBarViewController, _ tab: Tab)
   func tabsBarDidLongPressAddTab(_ tabsBarController: TabsBarViewController, button: UIButton)
   func tabsBarDidSelectAddNewTab(_ isPrivate: Bool)
+  func tabsBarDidChangeReaderModeVisibility(_ isHidden: Bool)
+
 }
 
 class TabsBarViewController: UIViewController {
@@ -61,12 +63,10 @@ class TabsBarViewController: UIViewController {
   }
 
   private weak var tabManager: TabManager?
-  private weak var browserViewController: BrowserViewController?
   private var tabList = WeakList<Tab>()
 
-  init(tabManager: TabManager, browserViewController: BrowserViewController) {
+  init(tabManager: TabManager) {
     self.tabManager = tabManager
-    self.browserViewController = browserViewController
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -386,14 +386,11 @@ extension TabsBarViewController: UICollectionViewDataSource {
     cell.closeTabCallback = { [weak self] tab in
       guard let self = self,
               let tabManager = self.tabManager,
-              let bvc = self.browserViewController,
               let previousIndex = self.tabList.index(of: tab) else {
         return
       }
       
-      if bvc.topToolbar.locationView.readerModeState == .active {
-        bvc.hideReaderModeBar(animated: false)
-      }
+      self.delegate?.tabsBarDidChangeReaderModeVisibility(true)
       
       tabManager.removeTab(tab)
       self.updateData()

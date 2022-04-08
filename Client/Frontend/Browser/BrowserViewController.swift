@@ -721,7 +721,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
     header.addArrangedSubview(topToolbar)
 
-    tabsBar = TabsBarViewController(tabManager: tabManager, browserViewController: self)
+    tabsBar = TabsBarViewController(tabManager: tabManager)
     tabsBar.delegate = self
     header.addArrangedSubview(tabsBar.view)
 
@@ -1989,6 +1989,16 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
 
   func tabsBarDidLongPressAddTab(_ tabsBarController: TabsBarViewController, button: UIButton) {
     // The actions are carried to menu actions for Tab-Tray Button
+  }
+  
+  func tabsBarDidChangeReaderModeVisibility(_ isHidden: Bool) {
+    if topToolbar.locationView.readerModeState == .active {
+      if isHidden {
+        hideReaderModeBar(animated: false)
+      } else {
+        showReaderModeBar(animated: false)
+      }
+    }
   }
 }
 
