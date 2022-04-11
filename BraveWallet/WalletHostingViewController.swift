@@ -33,6 +33,8 @@ public enum PresentingContext {
   case transactionHistory
   /// Shows the user one of the three transaction action screens 1. Buy 2. Send 3. Swap
   case buySendSwap(_ destination: BuySendSwapDestination)
+  /// Shows the user the wallet settings screen
+  case settings
 }
 
 /// The initial wallet controller to present when the user wants to view their wallet

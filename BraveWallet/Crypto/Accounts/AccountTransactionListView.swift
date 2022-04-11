@@ -46,7 +46,8 @@ struct AccountTransactionListView: View {
                   visibleTokens: activityStore.assets.map(\.token),
                   allTokens: activityStore.allTokens,
                   displayAccountCreator: false,
-                  assetRatios: assetRatios
+                  assetRatios: assetRatios,
+                  currencyCode: activityStore.currencyCode
                 )
               }
               .contextMenu {
@@ -83,7 +84,8 @@ struct AccountTransactionListView: View {
           keyringStore: keyringStore,
           visibleTokens: activityStore.assets.map(\.token),
           allTokens: [],
-          assetRatios: assetRatios
+          assetRatios: assetRatios,
+          currencyCode: activityStore.currencyCode
         )
       }
     }

@@ -50,7 +50,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
             self.dismiss(
               animated: true,
               completion: {
-                let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: .buySendSwap(destination))
+                let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: .buySendSwap(destination), faviconRenderer: faviconRenderer)
                 walletHostingController.delegate = self.delegate
                 self.present(walletHostingController, animated: true)
               })

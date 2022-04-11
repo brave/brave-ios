@@ -55,7 +55,7 @@ public struct WalletPanelContainerView: View {
       } label: {
         HStack(spacing: 4) {
           Image("brave.unlock")
-          Text("Unlock Wallet")
+          Text(Strings.Wallet.walletPanelUnlockWallet)
         }
       }
       .buttonStyle(BraveFilledButtonStyle(size: .normal))
@@ -70,10 +70,10 @@ public struct WalletPanelContainerView: View {
     ScrollView(.vertical) {
       VStack(spacing: 36) {
         VStack(spacing: 4) {
-          Text("Brave Wallet")
+          Text(Strings.Wallet.braveWallet)
             .foregroundColor(Color(.bravePrimary))
             .font(.headline)
-          Text("Use this panel to securely access web3 and all your crypto assets.")
+          Text(Strings.Wallet.walletPanelSetupWalletDescription)
             .foregroundColor(Color(.secondaryBraveLabel))
             .font(.subheadline)
         }
@@ -81,7 +81,7 @@ public struct WalletPanelContainerView: View {
         Button {
           presentWalletWithContext?(.panelUnlockOrSetup)
         } label: {
-          Text("Learn More")
+          Text(Strings.Wallet.learnMoreButton)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .normal))
       }
@@ -188,27 +188,38 @@ struct WalletPanelView: View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
         HStack {
+          Button {
+            presentWalletWithContext(.default)
+          } label: {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+              .rotationEffect(.init(degrees: 90))
+          }
           Spacer()
-          Text("Brave Wallet")
+          Text(Strings.Wallet.braveWallet)
             .font(.headline)
+            .background(
+              Color.clear
+            )
           Spacer()
           if cryptoStore.pendingRequest != nil {
             Button(action: { presentWalletWithContext(.pendingRequests) }) {
               Image(uiImage: UIImage(imageLiteralResourceName: "brave.bell.badge").template)
                 .foregroundColor(.white)
             }
+            Spacer()
+          }
+          Button {
+            presentWalletWithContext(.settings)
+          } label: {
+            Image(systemName: "ellipsis")
           }
         }
-          .padding(16)
-          .frame(maxWidth: .infinity)
-          .overlay(
-            Color.white.opacity(0.3) // Divider
-              .frame(height: pixelLength),
-            alignment: .bottom
-          )
-          .background(
-            Color.clear
-          )
+        .padding(16)
+        .overlay(
+          Color.white.opacity(0.3) // Divider
+            .frame(height: pixelLength),
+          alignment: .bottom
+        )
         VStack {
           if sizeCategory.isAccessibilityCategory {
             VStack {
@@ -280,11 +291,7 @@ struct WalletPanelView: View {
     }
     .foregroundColor(.white)
     .background(
-      LinearGradient(
-        colors: [.green, .blue],
-        startPoint: .top,
-        endPoint: .bottom
-      )
+      Blockies(seed: keyringStore.selectedAccount.id).walletPanelBackground()
       .ignoresSafeArea()
     )
     .onChange(of: cryptoStore.pendingRequest) { newValue in
@@ -312,6 +319,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         keyringStore: .previewStoreWithWalletCreated,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
+        accountActivityStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {}

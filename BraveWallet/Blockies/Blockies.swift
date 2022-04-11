@@ -99,6 +99,16 @@ class Blockies {
     }
     return image
   }
+  
+  func walletPanelBackground() -> LinearGradient {
+    let color = makeColor()
+    let backgroundColor = makeColor()
+    
+    let gradientBackground = LinearGradient(colors: [.init(backgroundColor), .init(color)],
+                                            startPoint: .top,
+                                            endPoint: .bottom)
+    return gradientBackground
+  }
 }
 
 struct Blockie: View {
