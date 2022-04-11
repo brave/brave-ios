@@ -35,7 +35,7 @@ struct EditPermissionsView: View {
       decimals = Int(token.decimals)
     }
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: decimals))
-    let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .decimal, decimals: decimals) ?? "0"
+    let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .hex, decimals: decimals) ?? "0"
     return customAllowanceInWei.addingHexPrefix
   }
   

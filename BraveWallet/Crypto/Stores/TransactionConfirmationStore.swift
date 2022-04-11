@@ -145,7 +145,7 @@ public class TransactionConfirmationStore: ObservableObject {
                   if approvalValue.caseInsensitiveCompare(WalletConstants.MAX_UINT256) == .orderedSame {
                     self.state.value = Strings.Wallet.editPermissionsApproveUnlimited
                   } else {
-                    self.state.value = formatter.decimalString(for: approvalValue.removingHexPrefix, radix: .decimal, decimals: Int(token.decimals)) ?? ""
+                    self.state.value = formatter.decimalString(for: approvalValue.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
                   }
                 }
               }
