@@ -203,10 +203,10 @@ struct TransactionConfirmationView: View {
             Text(networkStore.selectedChain.shortChainName)
             Spacer()
             VStack(alignment: .trailing) {
+              transactionsButton
               if activeTransaction.txType == .erc20Approve {
                 accountView // for other txTypes, account is shown in `TransactionHeader`
               }
-              transactionsButton
             }
           }
           .font(.callout)
