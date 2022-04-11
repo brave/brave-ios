@@ -87,8 +87,10 @@ struct PageZoomView: View {
     }
 }
 
+#if DEBUG
 struct PageZoomView_Previews: PreviewProvider {
     static var previews: some View {
         PageZoomView(currentValue: .constant(1.0), defaultValue: 1.0)
     }
 }
+#endif
