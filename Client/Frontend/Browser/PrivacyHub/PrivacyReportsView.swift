@@ -11,6 +11,7 @@ import Data
 struct PrivacyReportsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   
+  // All data to feed the views.
   let lastWeekMostFrequentTracker: (String, Int)?
   let lastWeekRiskiestWebsite: (String, Int)?
   let allTimeMostFrequentTracker: (String, Int)?
@@ -20,6 +21,7 @@ struct PrivacyReportsView: View {
   let lastVPNAlerts: [BraveVPNAlert]?
   
   var onDismiss: (() -> Void)?
+  var openPrivacyReportsUrl: (() -> Void)?
   
   private var noData: Bool {
     return lastWeekMostFrequentTracker == nil
@@ -47,7 +49,7 @@ struct PrivacyReportsView: View {
   private func dismissView() {
     // Dismiss on presentation mode does not work on iOS 14
     // when using the UIHostingController is parent view.
-    // As a workaround a simple completion handler is used instead.
+    // As a workaround a completion handler is used instead.
     if #available(iOS 15, *) {
       presentationMode.dismiss()
     } else {
@@ -93,15 +95,21 @@ struct PrivacyReportsView: View {
               dismissView()
             })
           
-          // FIXME: EXPERIMENTAL UI
-          Text("These stats are only stored on your device, and are not sent anywhere. Ever.")
-            .font(.caption)
-            .multilineTextAlignment(.center)
-          Text("Learn more about Privacy Reports")
-            .underline()
-            .font(.caption.weight(.bold))
-            .frame(maxWidth: .infinity, alignment: .center)
-
+          VStack {
+            Text(Strings.PrivacyHub.privacyReportsDisclaimer)
+              .font(.caption)
+              .multilineTextAlignment(.center)
+            
+            Button(action: {
+              openPrivacyReportsUrl?()
+              dismissView()
+            }, label: {
+              Text(Strings.learnMore)
+                .underline()
+                .font(.caption.weight(.bold))
+                .frame(maxWidth: .infinity, alignment: .center)
+            })
+          }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()

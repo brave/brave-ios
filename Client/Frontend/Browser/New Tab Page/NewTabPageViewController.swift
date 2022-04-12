@@ -133,6 +133,14 @@ class NewTabPageViewController: UIViewController {
           host?.dismiss(animated: true)
         }
         
+        host.rootView.openPrivacyReportsUrl = { [weak self] in
+          self?.delegate?.navigateToInput(
+            BraveUX.privacyReportsURL.absoluteString,
+            inNewTab: false,
+            switchingToPrivateMode: false
+          )
+        }
+        
         self?.present(host, animated: true)
       }),
       FavoritesSectionProvider(action: { [weak self] bookmark, action in

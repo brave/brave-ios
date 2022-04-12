@@ -13,6 +13,8 @@ public struct BraveUX {
   public static let braveTermsOfUseURL = URL(string: "https://www.brave.com/terms_of_use")!
   public static let batTermsOfUseURL = URL(string: "https://basicattentiontoken.org/user-terms-of-service/")!
   public static let ntpTutorialPageURL = URL(string: "https://brave.com/ja/ntp-tutorial")
+  // FIXME: Use correct url.
+  public static let privacyReportsURL = URL(string: "https://brave.com/privacy/")!
 
   public static let textFieldCornerRadius: CGFloat = 8.0
 
