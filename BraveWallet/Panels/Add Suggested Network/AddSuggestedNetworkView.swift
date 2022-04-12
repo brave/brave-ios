@@ -12,7 +12,7 @@ import BraveCore
 struct AddSuggestedNetworkView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
-  var chain: BraveWallet.EthereumChain
+  var chain: BraveWallet.NetworkInfo
   
   @ScaledMetric private var blockieSize = 24
   @ScaledMetric private var faviconSize = 48

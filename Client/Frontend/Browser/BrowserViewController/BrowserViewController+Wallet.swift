@@ -146,10 +146,11 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         }
         let permissions = WalletHostingViewController(
             walletStore: walletStore,
-            presentingContext: .requestEthererumPermissions { accounts in
-                if let accounts = accounts {
+            presentingContext: .requestEthererumPermissions { response in
+                switch response {
+                case .granted(let accounts):
                     completion(accounts, .success, "")
-                } else {
+                case .rejected:
                     completion([], .userRejectedRequest, "User rejected request")
                 }
             }
@@ -205,15 +206,15 @@ extension Tab {
                     completion: nil
                 )
             }
-            let (accounts, _, _) = await provider.allowedAccounts(false)
-            if let account = accounts.first {
-                webView.evaluateSafeJavaScript(
-                    functionName: "window.ethereum.selectedAccount = \"\(account)\"",
-                    contentWorld: .page,
-                    asFunction: false,
-                    completion: nil
-                )
-            }
+//            let (accounts, _, _) = await provider.allowedAccounts(false)
+//            if let account = accounts.first {
+//                webView.evaluateSafeJavaScript(
+//                    functionName: "window.ethereum.selectedAccount = \"\(account)\"",
+//                    contentWorld: .page,
+//                    asFunction: false,
+//                    completion: nil
+//                )
+//            }
         }
     }
 }

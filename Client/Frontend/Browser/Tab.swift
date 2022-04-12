@@ -67,6 +67,7 @@ class Tab: NSObject {
   var secureContentState: TabSecureContentState = .unknown
 
     var walletProvider: BraveWalletBraveWalletProvider?
+    var walletProviderJS: String?
     var isWalletIconVisible: Bool = false
     
   // PageMetadata is derived from the page content itself, and as such lags behind the
@@ -303,7 +304,9 @@ class Tab: NSObject {
         isPaymentRequestEnabled: webView.hasOnlySecureContent,
         isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
         isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
-        isNightModeEnabled: Preferences.General.nightModeEnabled.value)
+        isNightModeEnabled: Preferences.General.nightModeEnabled.value,
+        walletProviderJS: walletProviderJS
+      )
       tabDelegate?.tab?(self, didCreateWebView: webView)
 
       nightMode = Preferences.General.nightModeEnabled.value

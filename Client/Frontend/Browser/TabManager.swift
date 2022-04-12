@@ -82,7 +82,7 @@ class TabManager: NSObject {
   var selectedIndex: Int { return _selectedIndex }
   var tempTabs: [Tab]?
   private weak var rewards: BraveRewards?
-    var makeWalletProvider: ((Tab) -> BraveWalletBraveWalletProvider?)?
+    var makeWalletProvider: ((Tab) -> (BraveWalletBraveWalletProvider, js: String)?)?
 
   init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?) {
     assert(Thread.isMainThread)
@@ -439,7 +439,10 @@ class TabManager: NSObject {
       tab.id = id ?? TabMO.create()
     }
 
-        tab.walletProvider = makeWalletProvider?(tab)
+        if let (provider, js) = makeWalletProvider?(tab) {
+            tab.walletProvider = provider
+            tab.walletProviderJS = js
+        }
         
     delegates.forEach { $0.get()?.tabManager(self, willAddTab: tab) }
 

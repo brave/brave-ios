@@ -51,7 +51,12 @@ public struct CryptoView: View {
   @ToolbarContentBuilder
   private var dismissButtonToolbarContents: some ToolbarContent {
     ToolbarItemGroup(placement: .cancellationAction) {
-      Button(action: { dismissAction?() }) {
+      Button(action: {
+        if case .requestEthererumPermissions(let handler) = presentingContext {
+          handler(.rejected)
+        }
+        dismissAction?()
+      }) {
         Image("wallet-dismiss")
           .renderingMode(.template)
           .foregroundColor(Color(.braveOrange))
@@ -80,9 +85,9 @@ public struct CryptoView: View {
             case .requestEthererumPermissions(let handler):
               NewSiteConnectionView(
                 keyringStore: keyringStore,
-                onConnect: { handler($0) },
+                onConnect: { handler(.granted(accounts: $0)) },
                 onDismiss: {
-                  handler(nil)
+                  handler(.rejected)
                   dismissAction?()
                 }
               )

@@ -6,7 +6,7 @@
 import BraveCore
 
 enum PendingWebpageRequest {
-  case addChain(BraveWallet.EthereumChain)
+  case addChain(BraveWallet.NetworkInfo)
   case switchChain(BraveWallet.SwitchChainRequest)
   case addSuggestedToken(BraveWallet.AddSuggestTokenRequest)
   case signMessage(BraveWallet.SignMessageRequest)

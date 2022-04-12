@@ -426,7 +426,6 @@
 		27A1AC0924859D0900344503 /* FeedHeadlineViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1AC0824859D0900344503 /* FeedHeadlineViews.swift */; };
 		27A1AC0C2485A1C200344503 /* FeedDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A1AC0B2485A1C200344503 /* FeedDataSource.swift */; };
 		27A586E1214C0DDD000CAE3C /* PreferencesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */; };
-		27A7832027C84B34007A74C7 /* brave_wallet_provider.js in Resources */ = {isa = PBXBuildFile; fileRef = 27A7831527C84B33007A74C7 /* brave_wallet_provider.js */; };
 		27AAE241274FFBA900288E90 /* TransactionConfirmationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AAE240274FFBA900288E90 /* TransactionConfirmationStore.swift */; };
 		27AC169823834510004BE19C /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27AC169623834510004BE19C /* UserNotifications.framework */; };
 		27AC7CFA24C77EBC00441317 /* FeedActionAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AC7CF924C77EBC00441317 /* FeedActionAlertView.swift */; };
@@ -2242,7 +2241,6 @@
 		27A1AC0B2485A1C200344503 /* FeedDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedDataSource.swift; sourceTree = "<group>"; };
 		27A1AC1424884EB300344503 /* Enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Enterprise.xcconfig; sourceTree = "<group>"; };
 		27A586E0214C0DDD000CAE3C /* PreferencesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesTest.swift; sourceTree = "<group>"; };
-		27A7831527C84B33007A74C7 /* brave_wallet_provider.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = brave_wallet_provider.js; sourceTree = "<group>"; };
 		27AAE240274FFBA900288E90 /* TransactionConfirmationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionConfirmationStore.swift; sourceTree = "<group>"; };
 		27AC169623834510004BE19C /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		27AC7CF724C759BE00441317 /* Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enterprise.entitlements; sourceTree = "<group>"; };
@@ -6405,7 +6403,6 @@
 			isa = PBXGroup;
 			children = (
 				CA225DF12795CECE0024C104 /* MainFrame.js */,
-				27A7831527C84B33007A74C7 /* brave_wallet_provider.js */,
 			);
 			path = AtDocumentEnd;
 			sourceTree = "<group>";
@@ -8053,7 +8050,6 @@
 				CA22029B2719292C002D3582 /* Warning.svg in Resources */,
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				CA220291271928A2002D3582 /* NetworkError.html in Resources */,
-				27A7832027C84B34007A74C7 /* brave_wallet_provider.js in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				0AB22A91257EADA900126ADC /* spencer-moore_fern.jpg in Resources */,
 				445CA12A27997F770040F5C4 /* boris_baldinger.jpg in Resources */,

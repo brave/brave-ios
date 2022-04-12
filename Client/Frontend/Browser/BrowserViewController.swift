@@ -389,8 +389,11 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
         tabManager.makeWalletProvider = { [weak self] tab in
-            guard let self = self else { return nil }
-            return self.braveCore.walletProvider(with: self, isPrivateBrowsing: tab.isPrivate)
+            guard let self = self,
+                  let provider = self.braveCore.walletProvider(with: self, isPrivateBrowsing: tab.isPrivate) else {
+                return nil
+            }
+            return (provider, js: self.braveCore.walletProviderJS)
         }
     downloadQueue.delegate = self
 

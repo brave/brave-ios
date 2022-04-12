@@ -8,6 +8,15 @@ import WebKit
 import BraveCore
 
 class WalletProviderHelper: TabContentScript {
+    private static let supportedSingleArgMethods = [
+        "net_listening", "net_peerCount",
+        "net_version", "eth_chainId",
+        "eth_syncing", "eth_coinbase",
+        "eth_mining", "eth_hashrate",
+        "eth_accounts", "eth_newBlockFilter",
+        "eth_newPendingTransactionFilter"
+    ]
+    
     let tab: Tab
     
     init(tab: Tab) {
@@ -57,41 +66,89 @@ class WalletProviderHelper: TabContentScript {
         // The web page has communicated with `window.ethereum`, so we should show the wallet icon
         tab.isWalletIconVisible = true
         
-        print("[WalletProvider] \(name): \(jsonPayload)")
+        let securityOrigin = message.frameInfo.securityOrigin
+        let origin = "\(securityOrigin.protocol)://\(securityOrigin.host):\(securityOrigin.port)"
+        
+        func handleResponse(
+            id: MojoBase.Value,
+            formedResponse: MojoBase.Value,
+            reject: Bool,
+            firstAllowedAccount: String,
+            updateJSProperties: Bool
+        ) {
+            if reject {
+                replyHandler(nil, formedResponse.jsonString)
+            } else {
+                replyHandler(formedResponse.jsonObject, nil)
+            }
+            if updateJSProperties {
+                tab.updateEthereumProperties()
+            }
+        }
         
         switch action {
         case .request:
-            replyHandler(nil, nil)
-            break
-//            provider.request(jsonPayload, autoRetryOnNetworkChange: false) { result, string, response in
-//                print(result, string, response)
-//                replyHandler(string, nil)
-//            }
+            guard let requestPayload = MojoBase.Value(jsonString: jsonPayload) else {
+                replyHandler(nil, "Invalid args")
+                return
+            }
+            provider.request(requestPayload, origin: origin, completion: handleResponse)
         case .isConnected:
             replyHandler(nil, nil)
-            break
         case .enable:
-            provider.requestEthereumPermissions { accounts, error, errorMessage in
-                if error != .success {
-                    replyHandler(nil, errorMessage)
-                    return
-                }
-                
-                if accounts.isEmpty {
-                    replyHandler(nil, "User rejected the request.")
-                } else {
-                    replyHandler(accounts, nil)
+            provider.enable(handleResponse)
+        case .sendAsync:
+            guard let requestPayload = MojoBase.Value(jsonString: jsonPayload) else {
+                replyHandler(nil, "Invalid args")
+                return
+            }
+            provider.request(requestPayload, origin: origin, completion: handleResponse)
+        case .send:
+            struct SendPayload {
+                var method: String
+                var params: MojoBase.Value?
+                init?(payload: String) {
+                    guard let jsonValue = MojoBase.Value(jsonString: payload)?.dictionaryValue,
+                          let method = jsonValue["method"]?.stringValue
+                    else { return nil }
+                    self.method = method
+                    self.params = jsonValue["params"] // can be undefined in JS
                 }
             }
-        case .send:
-            replyHandler(nil, nil)
-            break
-        case .sendAsync:
-            replyHandler(nil, nil)
-            break
+            guard let sendPayload = SendPayload(payload: jsonPayload) else {
+                replyHandler(nil, "Invalid args")
+                return
+            }
+            
+            if sendPayload.method.isEmpty {
+                if let params = sendPayload.params, params.tag != .null {
+                    // Same as sendAsync
+                    provider.request(params, origin: origin, completion: handleResponse)
+                } else {
+                    // Empty method with no params is not valid
+                    replyHandler(nil, "Invalid args")
+                }
+                return
+            }
+            
+            if !Self.supportedSingleArgMethods.contains(sendPayload.method),
+                (sendPayload.params == nil || sendPayload.params?.tag == .null) {
+                // If its not a single arg supported method and there are no parameters then its not a valid
+                // call
+                replyHandler(nil, "Invalid args")
+                return
+            }
+            
+            provider.send(
+                sendPayload.method,
+                params: sendPayload.params ?? .init(listValue: []),
+                origin: origin,
+                completion: handleResponse
+            )
         case .isUnlocked:
-            replyHandler(nil, nil)
-            break
+            provider.isLocked { isLocked in
+                replyHandler(!isLocked, nil)
+            }
         }
     }
 }

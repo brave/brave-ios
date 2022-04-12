@@ -130,7 +130,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
 }
 
 extension BraveWallet.NetworkInfo {
-  static let mockMainnet: BraveWallet.EthereumChain = .init(
+  static let mockMainnet: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.MainnetChainId,
     chainName: "Mainnet",
     blockExplorerUrls: ["https://etherscan.io"],
@@ -142,7 +142,7 @@ extension BraveWallet.NetworkInfo {
     coin: .eth,
     data: .init(ethData: .init(isEip1559: true))
   )
-  static let mockRinkeby: BraveWallet.EthereumChain = .init(
+  static let mockRinkeby: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.RinkebyChainId,
     chainName: "Rinkeby",
     blockExplorerUrls: ["https://rinkeby.etherscan.io"],
@@ -154,7 +154,7 @@ extension BraveWallet.NetworkInfo {
     coin: .eth,
     data: .init(ethData: .init(isEip1559: true))
   )
-  static let mockRopsten: BraveWallet.EthereumChain = .init(
+  static let mockRopsten: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.RopstenChainId,
     chainName: "Ropsten",
     blockExplorerUrls: ["https://ropsten.etherscan.io"],
