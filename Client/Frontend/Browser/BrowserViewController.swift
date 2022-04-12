@@ -1130,16 +1130,8 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
           if finished {
             self.webViewContainer.accessibilityElementsHidden = true
             UIAccessibility.post(notification: .screenChanged, argument: nil)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-              self.showNTPOnboarding()
-            }
           }
         })
-    } else {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-        self.showNTPOnboarding()
-      }
     }
   }
 

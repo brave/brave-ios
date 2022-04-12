@@ -18,7 +18,7 @@ extension BrowserViewController {
     presentOnboardingWelcomeScreen(on: self)
   }
 
-  func presentOnboardingWelcomeScreen(on parentController: UIViewController) {
+  private func presentOnboardingWelcomeScreen(on parentController: UIViewController) {
     if Preferences.DebugFlag.skipOnboardingIntro == true { return }
 
     // 1. Existing user.
@@ -84,7 +84,7 @@ extension BrowserViewController {
     }
   }
 
-  func presentNTPStatsOnboarding() {
+  private func presentNTPStatsOnboarding() {
     // If a controller is already presented (such as menu), do not show onboarding
     guard presentedViewController == nil else {
       return
