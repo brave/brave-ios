@@ -52,8 +52,14 @@ struct PrivacyReportsManager {
     BraveVPNAlert.clearData()
     BlockedResource.clearData()
   }
+  
+  static func consolidateData() {
+    BlockedResource.consolidateData(olderThan: 30)
+    BraveVPNAlert.consolidateData(olderThan: 30)
+  }
 
   // MARK: - View
+  /// Fetches required data to present the privacy reports view and returns the view.
   static func prepareView() -> PrivacyReportsView {
     
     // FIXME: Temporary
@@ -135,17 +141,9 @@ struct PrivacyReportsManager {
         dateComponents.hour = 11
       }
 
-      // Create the trigger as a repeating event.
-      let trigger = UNCalendarNotificationTrigger(
-        dateMatching: dateComponents, repeats: true)
-
-      // Create the request
-      let request = UNNotificationRequest(
-        identifier: notificationID,
-        content: content, trigger: trigger)
-
-      // Schedule the request with the system.
-
+      let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+      let request = UNNotificationRequest(identifier: notificationID, content: content, trigger: trigger)
+      
       notificationCenter.add(request) { error in
         if let error = error {
           log.error("Scheduling privacy reports notification error: \(error)")

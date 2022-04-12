@@ -27,6 +27,7 @@ extension PrivacyReportsView {
 
         DispatchQueue.main.async {
           Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
+          PrivacyReportsManager.scheduleNotification()
         }
       }
     }

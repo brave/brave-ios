@@ -3160,15 +3160,13 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
         return
       }
       UIApplication.shared.open(settingsUrl)
-        } else if response.notification.request.identifier == PrivacyReportsManager.notificationID {
-            DispatchQueue.main.async {
-                let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
-                host.rootView.onDismiss = { [weak host] in
-                    host?.dismiss(animated: true)
-                }
-                
-                self.present(host, animated: true)
-            }
+    } else if response.notification.request.identifier == PrivacyReportsManager.notificationID {
+      let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+      host.rootView.onDismiss = { [weak host] in
+        host?.dismiss(animated: true)
+      }
+      
+      self.present(host, animated: true)
     }
     completionHandler()
   }
