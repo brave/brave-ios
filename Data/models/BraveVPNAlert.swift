@@ -90,35 +90,25 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
   public static var allByHostCount: Set<CountableEntity> {
     let context = DataController.viewContext
     let fetchRequest = braveVPNAlertFetchRequest(for: context)
-
-    let expression = NSExpressionDescription()
-    expression.name = "group_by_count"
-    expression.expression = .init(forFunction: "count:", arguments: [NSExpression(forKeyPath: "host")])
-    expression.expressionResultType = .integer32AttributeType
-
-    fetchRequest.propertiesToFetch = ["host", expression]
+    
+    fetchRequest.propertiesToFetch = ["host"]
     fetchRequest.propertiesToGroupBy = ["host"]
     fetchRequest.resultType = .dictionaryResultType
-
-    var hostsByCount = Set<CountableEntity>()
-
+    
     do {
-      let foundHosts = try context.fetch(fetchRequest)
-
-      for hostWithCount in foundHosts {
-        guard let host = hostWithCount["host"] as? String,
-          let count = hostWithCount["group_by_count"] as? Int
-        else {
-          continue
-        }
-
-        hostsByCount.insert(.init(name: host, count: count))
-      }
-
-      return hostsByCount
+      // Returning 1 count per host here because for the VPN alerts we can't rely on count numbers.
+      // Reason is a tracker is detected and saved multiple times per domain,
+      // we do not have knowledge on what website a given tracker was blocked.
+      // This would lead to inflated stats on the Privacy Reports screen.
+      //
+      // Each tracker is count as one entry, only bump the number slightly
+      // and show a proper UI that this a vpn alert type of tracker blocked.
+      return .init(try context.fetch(fetchRequest)
+                    .compactMap { $0["host"] as? String }
+                    .map { .init(name: $0, count: 1) })
     } catch {
       log.error("allByHostCount error: \(error)")
-      return hostsByCount
+      return .init()
     }
   }
 
@@ -127,7 +117,7 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
     let timestampSort = NSSortDescriptor(keyPath: \BraveVPNAlert.timestamp, ascending: false)
     let nonConsolidatedAlertsPredicate = NSPredicate(format: "\(#keyPath(BraveVPNAlert.timestamp)) > 0")
 
-    return all(where: nil, sortDescriptors: [timestampSort], fetchLimit: count)
+    return all(where: nonConsolidatedAlertsPredicate, sortDescriptors: [timestampSort], fetchLimit: count)
   }
 
   /// Returns amount of alerts blocked for each type.

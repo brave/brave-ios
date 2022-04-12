@@ -39,7 +39,7 @@ struct PrivacyReportsManager {
   static func scheduleVPNAlertsTask() {
     
     vpnAlertsTimer?.invalidate()
-    return
+    //return
     // Because fetching VPN alerts involves making a url request,
     // the time interval to fetch them is longer than the local on-device blocked requests
     let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
