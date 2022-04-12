@@ -7,7 +7,7 @@ import Foundation
 import WebKit
 import BraveCore
 
-class WalletProviderHelper: TabContentScript {
+class EthereumProviderHelper: TabContentScript {
   private static let supportedSingleArgMethods = [
     "net_listening", "net_peerCount",
     "net_version", "eth_chainId",
@@ -24,11 +24,11 @@ class WalletProviderHelper: TabContentScript {
   }
   
   static func name() -> String {
-    return "walletProvider"
+    return "walletEthereumProvider"
   }
   
   func scriptMessageHandlerName() -> String? {
-    return "walletProvider"
+    return "walletEthereumProvider"
   }
   
   static func shouldInjectWalletProvider(_ completion: @escaping (Bool) -> Void) {

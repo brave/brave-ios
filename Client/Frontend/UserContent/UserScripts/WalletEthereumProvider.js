@@ -7,7 +7,7 @@
 
 function post(from, payload) {
   return new Promise((resolve, reject) => {
-    webkit.messageHandlers.walletProvider.postMessage({
+    webkit.messageHandlers.walletEthereumProvider.postMessage({
       name: from,
       args: JSON.stringify(payload)
     })

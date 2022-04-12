@@ -351,7 +351,7 @@ class UserScriptManager {
   }()
 
   private let walletProviderScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "WalletProvider", ofType: "js"),
+    guard let path = Bundle.main.path(forResource: "WalletEthereumProvider", ofType: "js"),
           let source = try? String(contentsOfFile: path) else {
       return nil
     }

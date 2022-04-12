@@ -258,8 +258,8 @@
 		271F68EA26EBD59F00AA2A50 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 271F68E926EBD59F00AA2A50 /* Algorithms */; };
 		271F68F026EBDC3600AA2A50 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 271F68EF26EBDC3600AA2A50 /* Then */; };
 		271F68F826EBE92900AA2A50 /* WalletHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271F68F726EBE92900AA2A50 /* WalletHostingViewController.swift */; };
-		271FD0FB27C7E2FF0037DCC5 /* WalletProvider.js in Resources */ = {isa = PBXBuildFile; fileRef = 271FD0F027C7E2FF0037DCC5 /* WalletProvider.js */; };
-		271FD0FE27C7E6A80037DCC5 /* WalletProviderHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271FD0FD27C7E6A80037DCC5 /* WalletProviderHelper.swift */; };
+		271FD0FB27C7E2FF0037DCC5 /* WalletEthereumProvider.js in Resources */ = {isa = PBXBuildFile; fileRef = 271FD0F027C7E2FF0037DCC5 /* WalletEthereumProvider.js */; };
+		271FD0FE27C7E6A80037DCC5 /* EthereumProviderHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271FD0FD27C7E6A80037DCC5 /* EthereumProviderHelper.swift */; };
 		27201EF924535A9500C19DD1 /* NewTabCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201EF824535A9500C19DD1 /* NewTabCollectionViewCell.swift */; };
 		27201EFC24535C2F00C19DD1 /* NewTabPageFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201EFB24535C2F00C19DD1 /* NewTabPageFlowLayout.swift */; };
 		27201EFE24539B5500C19DD1 /* NewTabPageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27201EFD24539B5500C19DD1 /* NewTabPageBackground.swift */; };
@@ -1990,8 +1990,8 @@
 		271F68D126EBD35100AA2A50 /* PopupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupView.swift; sourceTree = "<group>"; };
 		271F68D326EBD3FC00AA2A50 /* UIFontExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIFontExtensions.swift; sourceTree = "<group>"; };
 		271F68F726EBE92900AA2A50 /* WalletHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletHostingViewController.swift; sourceTree = "<group>"; };
-		271FD0F027C7E2FF0037DCC5 /* WalletProvider.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = WalletProvider.js; sourceTree = "<group>"; };
-		271FD0FD27C7E6A80037DCC5 /* WalletProviderHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletProviderHelper.swift; sourceTree = "<group>"; };
+		271FD0F027C7E2FF0037DCC5 /* WalletEthereumProvider.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = WalletEthereumProvider.js; sourceTree = "<group>"; };
+		271FD0FD27C7E6A80037DCC5 /* EthereumProviderHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumProviderHelper.swift; sourceTree = "<group>"; };
 		27201EF824535A9500C19DD1 /* NewTabCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabCollectionViewCell.swift; sourceTree = "<group>"; };
 		27201EFB24535C2F00C19DD1 /* NewTabPageFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageFlowLayout.swift; sourceTree = "<group>"; };
 		27201EFD24539B5500C19DD1 /* NewTabPageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabPageBackground.swift; sourceTree = "<group>"; };
@@ -4151,7 +4151,7 @@
 		271FD0FC27C7E67C0037DCC5 /* Wallet */ = {
 			isa = PBXGroup;
 			children = (
-				271FD0FD27C7E6A80037DCC5 /* WalletProviderHelper.swift */,
+				271FD0FD27C7E6A80037DCC5 /* EthereumProviderHelper.swift */,
 			);
 			path = Wallet;
 			sourceTree = "<group>";
@@ -6358,7 +6358,7 @@
 				CA2CA1B027F4B50300B25646 /* ReadyState.js */,
 				8CB0FDD727E652B500707490 /* nacl.min.js */,
 				8CB0FD9927DAB06E00707490 /* FarblingProtection.js */,
-				271FD0F027C7E2FF0037DCC5 /* WalletProvider.js */,
+				271FD0F027C7E2FF0037DCC5 /* WalletEthereumProvider.js */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -7946,7 +7946,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F979BE2F25BCC54E009B6ACF /* AllFramesAtDocumentStart.js in Resources */,
-				271FD0FB27C7E2FF0037DCC5 /* WalletProvider.js in Resources */,
+				271FD0FB27C7E2FF0037DCC5 /* WalletEthereumProvider.js in Resources */,
 				445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */,
 				445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */,
 				CA2202A227192A9B002D3582 /* NetworkError.css in Resources */,
@@ -8752,7 +8752,7 @@
 				CAA7DC6A26332C5900E3910E /* CertificateViewController.swift in Sources */,
 				4422D4DC21BFFB7600BF1855 /* block_builder.cc in Sources */,
 				27201EFE24539B5500C19DD1 /* NewTabPageBackground.swift in Sources */,
-				271FD0FE27C7E6A80037DCC5 /* WalletProviderHelper.swift in Sources */,
+				271FD0FE27C7E6A80037DCC5 /* EthereumProviderHelper.swift in Sources */,
 				0BF0DB941A8545800039F300 /* TopToolbarView.swift in Sources */,
 				4422D4C321BFFB7600BF1855 /* coding.cc in Sources */,
 				595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */,

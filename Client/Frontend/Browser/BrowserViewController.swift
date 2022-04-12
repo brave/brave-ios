@@ -2045,7 +2045,7 @@ extension BrowserViewController: TabDelegate {
       let logins = LoginsHelper(tab: tab, profile: profile, passwordAPI: braveCore.passwordAPI)
       tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
       #if WALLET_DAPPS_ENABLED
-      tab.addContentScript(WalletProviderHelper(tab: tab), name: WalletProviderHelper.name(), contentWorld: .page)
+      tab.addContentScript(EthereumProviderHelper(tab: tab), name: EthereumProviderHelper.name(), contentWorld: .page)
       #endif
     }
 
