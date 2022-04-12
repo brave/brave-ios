@@ -99,16 +99,6 @@ class Blockies {
     }
     return image
   }
-  
-  func walletPanelBackground() -> LinearGradient {
-    let color = makeColor()
-    let backgroundColor = makeColor()
-    
-    let gradientBackground = LinearGradient(colors: [.init(backgroundColor), .init(color)],
-                                            startPoint: .top,
-                                            endPoint: .bottom)
-    return gradientBackground
-  }
 }
 
 struct Blockie: View {
@@ -119,6 +109,21 @@ struct Blockie: View {
       .resizable()
       .blur(radius: 8, opaque: true)
       .clipShape(Circle())
+  }
+}
+
+struct BlockieMaterial {
+  var address: String
+  
+  var material: LinearGradient {
+    let blockies = Blockies(seed: address)
+    let color = blockies.makeColor()
+    let backgroundColor = blockies.makeColor()
+    
+    let gradientBackground = LinearGradient(colors: [.init(backgroundColor), .init(color)],
+                                            startPoint: .top,
+                                            endPoint: .bottom)
+    return gradientBackground
   }
 }
 
