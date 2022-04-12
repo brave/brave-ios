@@ -15,6 +15,8 @@ struct TransactionConfirmationView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
 
+  var onDismiss: () -> Void
+
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
 
@@ -174,7 +176,6 @@ struct TransactionConfirmationView: View {
   }
 
   var body: some View {
-    NavigationView {
       ScrollView(.vertical) {
         VStack {
           // Header
@@ -374,8 +375,6 @@ struct TransactionConfirmationView: View {
           }
         }
       }
-    }
-    .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
       confirmationStore.prepare()
     }
@@ -395,13 +394,21 @@ struct TransactionConfirmationView: View {
 
   @ViewBuilder private var rejectConfirmButtons: some View {
     Button(action: {
-      confirmationStore.reject(transaction: confirmationStore.activeTransaction)
+      confirmationStore.reject(transaction: confirmationStore.activeTransaction) { success in
+        if confirmationStore.transactions.count == 1 {
+          onDismiss()
+        }
+      }
     }) {
       Label(Strings.Wallet.rejectTransactionButtonTitle, systemImage: "xmark")
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
     Button(action: {
-      confirmationStore.confirm(transaction: confirmationStore.activeTransaction)
+      confirmationStore.confirm(transaction: confirmationStore.activeTransaction) { error in
+        if confirmationStore.transactions.count == 1 {
+          onDismiss()
+        }
+      }
     }) {
       Label(Strings.Wallet.confirm, systemImage: "checkmark.circle.fill")
     }
@@ -444,7 +451,8 @@ struct TransactionConfirmationView_Previews: PreviewProvider {
     TransactionConfirmationView(
       confirmationStore: .previewStore,
       networkStore: .previewStore,
-      keyringStore: .previewStoreWithWalletCreated
+      keyringStore: .previewStoreWithWalletCreated,
+      onDismiss: { }
     )
     .previewLayout(.sizeThatFits)
   }

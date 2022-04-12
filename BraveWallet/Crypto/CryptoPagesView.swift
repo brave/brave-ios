@@ -23,8 +23,8 @@ struct CryptoPagesView: View {
     _CryptoPagesView(
       keyringStore: keyringStore,
       cryptoStore: cryptoStore,
-      isShowingTransactions: $cryptoStore.isPresentingTransactionConfirmations,
-      isConfirmationsButtonVisible: cryptoStore.hasUnapprovedTransactions
+      isShowingPendingRequest: $cryptoStore.isPresentingPendingRequest,
+      isConfirmationsButtonVisible: cryptoStore.pendingRequest != nil
     )
     .onAppear {
       // If a user chooses not to confirm/reject their transactions we shouldn't
@@ -33,7 +33,7 @@ struct CryptoPagesView: View {
         // Give the animation time
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
           self.fetchedUnapprovedTransactionsThisSession = true
-          self.cryptoStore.fetchUnapprovedTransactions()
+          self.cryptoStore.prepare()
         }
       }
     }
@@ -122,7 +122,7 @@ struct CryptoPagesView: View {
   private struct _CryptoPagesView: UIViewControllerRepresentable {
     var keyringStore: KeyringStore
     var cryptoStore: CryptoStore
-    var isShowingTransactions: Binding<Bool>
+    var isShowingPendingRequest: Binding<Bool>
     var isConfirmationsButtonVisible: Bool
 
     func makeUIViewController(context: Context) -> CryptoPagesViewController {
@@ -130,7 +130,7 @@ struct CryptoPagesView: View {
         keyringStore: keyringStore,
         cryptoStore: cryptoStore,
         buySendSwapDestination: context.environment.buySendSwapDestination,
-        isShowingTransactions: isShowingTransactions
+        isShowingPendingRequest: isShowingPendingRequest
       )
     }
     func updateUIViewController(_ uiViewController: CryptoPagesViewController, context: Context) {
@@ -146,18 +146,18 @@ private class CryptoPagesViewController: TabbedPageViewController {
   let confirmationsButton = ConfirmationsButton()
 
   @Binding private var buySendSwapDestination: BuySendSwapDestination?
-  @Binding private var isShowingTransactions: Bool
+  @Binding private var isShowingPendingRequest: Bool
 
   init(
     keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
     buySendSwapDestination: Binding<BuySendSwapDestination?>,
-    isShowingTransactions: Binding<Bool>
+    isShowingPendingRequest: Binding<Bool>
   ) {
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
     self._buySendSwapDestination = buySendSwapDestination
-    self._isShowingTransactions = isShowingTransactions
+    self._isShowingPendingRequest = isShowingPendingRequest
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -217,7 +217,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
   }
 
   @objc private func tappedConfirmationsButton() {
-    isShowingTransactions = true
+    isShowingPendingRequest = true
   }
 
   @objc private func tappedSwapButton() {

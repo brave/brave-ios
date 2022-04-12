@@ -283,13 +283,15 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
 
-  func confirm(transaction: BraveWallet.TransactionInfo) {
+  func confirm(transaction: BraveWallet.TransactionInfo, completion: @escaping (_ error: String?) -> Void) {
     txService.approveTransaction(.eth, txMetaId: transaction.id) { success, error, message in
+      completion(success ? nil : message)
     }
   }
 
-  func reject(transaction: BraveWallet.TransactionInfo) {
+  func reject(transaction: BraveWallet.TransactionInfo, completion: @escaping (Bool) -> Void) {
     txService.rejectTransaction(.eth, txMetaId: transaction.id) { success in
+      completion(success)
     }
   }
 
