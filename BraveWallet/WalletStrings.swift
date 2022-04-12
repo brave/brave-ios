@@ -2035,8 +2035,8 @@ extension Strings {
       "wallet.editPermissionsProposedAllowanceHeader",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Proposed allowance (%@)",
-      comment: "The header text shown in the row that selects the proposed allowance value. The '%@' becomes the name of the symbol being approved.  For example: \"Proposed allowance (DAI)\""
+      value: "Proposed allowance",
+      comment: "The header text shown in the row that selects the proposed allowance value."
     )
     public static let editPermissionsCustomAllowanceHeader = NSLocalizedString(
       "wallet.editPermissionsCustomAllowanceHeader",

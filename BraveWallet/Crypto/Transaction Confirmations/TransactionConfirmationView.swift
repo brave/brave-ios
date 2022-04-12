@@ -139,12 +139,13 @@ struct TransactionConfirmationView: View {
         .multilineTextAlignment(.center)
       }
       if confirmationStore.state.isUnlimitedApprovalRequested {
-        Label(Strings.Wallet.confirmationViewUnlimitedWarning, uiImage: #imageLiteral(resourceName: "warning-triangle").template)
-          .padding()
+        Label(Strings.Wallet.confirmationViewUnlimitedWarning, systemImage: "exclamationmark.triangle")
+          .padding(12)
           .foregroundColor(Color(.braveErrorLabel))
+          .font(.subheadline)
           .background(
             Color(.braveErrorBackground)
-              .cornerRadius(10)
+              .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
           )
       }
       NavigationLink(

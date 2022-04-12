@@ -15,7 +15,7 @@ struct EditPermissionsView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
-  @State private var customAllowance: String = "0"
+  @State private var customAllowance: String = ""
   @State private var isShowingAlert = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.sizeCategory) private var sizeCategory
@@ -64,13 +64,15 @@ struct EditPermissionsView: View {
           .resetListHeaderStyle()
           .padding(.vertical)
       ) {
-        VStack(alignment: .leading) {
-          Text(String.localizedStringWithFormat(Strings.Wallet.editPermissionsProposedAllowanceHeader, confirmationStore.state.symbol))
+        VStack(alignment: .leading, spacing: 2) {
+          Text(Strings.Wallet.editPermissionsProposedAllowanceHeader)
             .foregroundColor(Color(.bravePrimary))
-            .font(.footnote.weight(.semibold))
-          TextField("", text: Binding(get: { confirmationStore.state.value }, set: { _ in }))
-            .disabled(true)
+            .fontWeight(.semibold)
+          Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
+            .foregroundColor(Color(.secondaryBraveLabel))
         }
+        .font(.footnote)
+        .padding(.vertical, 6)
       }
       
       Section(
@@ -121,6 +123,7 @@ struct EditPermissionsView: View {
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       .frame(maxWidth: .infinity)
+      .disabled(customAllowance.isEmpty)
       .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
       .accessibility(hidden: sizeCategory.isAccessibilityCategory)
       .listRowBackground(Color(.braveGroupedBackground))

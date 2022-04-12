@@ -264,7 +264,7 @@ private extension BraveWallet.BlockchainToken {
   
   /// DAI token with contract address matching `BraveWallet.TransactionInfo.previewConfirmedERC20Approve`
   static let daiToken: BraveWallet.BlockchainToken = .init(
-    contractAddress: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    contractAddress: "0xad6d458402f60fd3bd25163575031acdce07538d",
     name: "DAI",
     logo: "",
     isErc20: true,
