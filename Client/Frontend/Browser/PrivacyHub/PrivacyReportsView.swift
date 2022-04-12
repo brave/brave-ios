@@ -77,11 +77,7 @@ struct PrivacyReportsView: View {
           Divider()
           
           if Preferences.PrivacyHub.captureVPNAlerts.value, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
-            PrivacyHubVPNAlertsSection(
-              lastVPNAlerts: lastVPNAlerts,
-              onDismiss: {
-                dismissView()
-              })
+            PrivacyHubVPNAlertsSection(lastVPNAlerts: lastVPNAlerts, onDismiss: dismissView)
             
             Divider()
           }
@@ -91,9 +87,7 @@ struct PrivacyReportsView: View {
             allTimeRiskiestWebsite: allTimeRiskiestWebsite,
             allTimeListTrackers: allTimeListTrackers,
             allTimeListWebsites: allTimeListWebsites,
-            onDismiss: {
-              dismissView()
-            })
+            onDismiss: dismissView)
           
           VStack {
             Text(Strings.PrivacyHub.privacyReportsDisclaimer)
@@ -117,9 +111,7 @@ struct PrivacyReportsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .confirmationAction) {
-            Button(Strings.done) {
-              dismissView()
-            }
+            Button(Strings.done, action: dismissView)
             .foregroundColor(Color(.braveOrange))
           }
           
