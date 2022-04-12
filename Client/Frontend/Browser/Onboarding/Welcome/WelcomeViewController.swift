@@ -72,7 +72,7 @@ class WelcomeViewController: UIViewController {
     $0.isLayoutMarginsRelativeArrangement = true
   }
 
-  private let calloutView = WelcomeViewCallout(pointsUp: false)
+  private let calloutView = WelcomeViewCallout()
 
   private let iconView = UIImageView().then {
     $0.image = #imageLiteral(resourceName: "welcome-view-icon")
@@ -296,61 +296,6 @@ class WelcomeViewController: UIViewController {
         $0.height.equalTo(200.0)
       }
       calloutView.setState(state: state)
-
-    case .ready:
-      let topTransform = { () -> CGAffineTransform in
-        var transformation = CGAffineTransform.identity
-        transformation = transformation.scaledBy(x: 2.0, y: 2.0)
-        transformation = transformation.translatedBy(x: 0.0, y: -70.0)
-        return transformation
-      }()
-
-      let bottomTransform = { () -> CGAffineTransform in
-        var transformation = CGAffineTransform.identity
-        transformation = transformation.scaledBy(x: 2.0, y: 2.0)
-        transformation = transformation.translatedBy(x: 0.0, y: 40.0)
-        return transformation
-      }()
-
-      topImageView.transform = topTransform
-      bottomImageView.transform = bottomTransform
-      iconView.image = #imageLiteral(resourceName: "welcome-view-icon")
-      contentContainer.spacing = 0.0
-      iconBackgroundView.alpha = 1.0
-      iconView.snp.remakeConstraints {
-        $0.height.equalTo(traitCollection.horizontalSizeClass == .regular ? 250 : 150)
-      }
-      skipButton.alpha = 1.0
-
-      contentContainer.arrangedSubviews.forEach {
-        $0.removeFromSuperview()
-      }
-
-      [iconView, calloutView, searchView].forEach {
-        contentContainer.addArrangedSubview($0)
-        $0.isHidden = false
-      }
-
-      iconBackgroundView.snp.makeConstraints {
-        $0.center.equalTo(iconView.snp.center)
-        $0.width.equalTo(iconView.snp.width).multipliedBy(2.25)
-        $0.height.equalTo(iconView.snp.height).multipliedBy(2.25)
-      }
-
-      websitesForRegion().forEach { item in
-        searchView.addButton(icon: item.icon, title: item.title) { [unowned self] in
-          self.onWebsiteSelected(item)
-        }
-      }
-
-      searchView.addButton(
-        icon: #imageLiteral(resourceName: "welcome-view-search-view-generic"),
-        title: Strings.Onboarding.searchViewEnterWebsiteRowTitle
-      ) { [unowned self] in
-        self.onEnterCustomWebsite()
-      }
-
-      calloutView.setState(state: state)
     }
   }
 
@@ -390,25 +335,10 @@ class WelcomeViewController: UIViewController {
           nextController.onSetDefaultBrowser()
         },
         secondaryAction: {
-          nextController.animateToReadyState()
+          // TODO: Show NTP Page Changes
         }
       )
     )
-    nextController.setLayoutState(state: state)
-    self.present(nextController, animated: true, completion: nil)
-  }
-
-  private func animateToReadyState() {
-    let nextController = WelcomeViewController(
-      profile: profile,
-      rewards: rewards,
-      state: nil)
-    nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-    nextController.onSkipSelected = onSkipSelected
-    let state = WelcomeViewCalloutState.ready(
-      title: Strings.Onboarding.readyScreenTitle,
-      details: Strings.Onboarding.readyScreenDescription,
-      moreDetails: Strings.Onboarding.readyScreenAdditionalDescription)
     nextController.setLayoutState(state: state)
     self.present(nextController, animated: true, completion: nil)
   }
@@ -436,7 +366,8 @@ class WelcomeViewController: UIViewController {
       return
     }
     UIApplication.shared.open(settingsUrl)
-    animateToReadyState()
+    
+    // TODO: The new Brave URL Bar Callout Begin
   }
 
   private func close() {
