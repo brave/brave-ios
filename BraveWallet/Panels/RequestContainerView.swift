@@ -7,8 +7,8 @@ import Foundation
 import SwiftUI
 import BraveUI
 
-/// A container to present when a webpage wants to present some request to the user such as adding a suggested
-/// token, change networks, authorize a transaction, etc.
+/// A container to present when a webpage wants to present some request to the user such as transaction
+/// confirmations, adding networks, switch networks, add tokens, sign message, etc.
 struct RequestContainerView<DismissContent: ToolbarContent>: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
