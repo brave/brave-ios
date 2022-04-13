@@ -6,6 +6,7 @@
 import Foundation
 import BraveCore
 import Shared
+import BigNumber
 
 /// A store contains data for sending tokens
 public class SendTokenStore: ObservableObject {
@@ -18,7 +19,7 @@ public class SendTokenStore: ObservableObject {
     }
   }
   /// The current selected token balance. Default with nil value.
-  @Published var selectedSendTokenBalance: Double?
+  @Published var selectedSendTokenBalance: BDouble?
   /// A boolean indicates if this store is making an unapproved tx
   @Published var isMakingTx = false
   /// The destination account address
@@ -34,6 +35,8 @@ public class SendTokenStore: ObservableObject {
   }
   /// An error for input send address. Nil for no error.
   @Published var addressError: AddressError?
+  /// The amount the user inputs to send
+  @Published var sendAmount = ""
 
   enum AddressError: LocalizedError {
     case sameAsFromAddress
@@ -110,6 +113,16 @@ public class SendTokenStore: ObservableObject {
       }
     }
   }
+  
+  func suggestedAmountTapped(_ amount: ShortcutAmountGrid.Amount) {
+    var decimalPoint = 6
+    var rounded = true
+    if amount == .all {
+      decimalPoint = Int(selectedSendToken?.decimals ?? 18)
+      rounded = false
+    }
+    sendAmount = ((selectedSendTokenBalance ?? 0) * amount.rawValue).decimalExpansion(precisionAfterDecimalPoint: decimalPoint, rounded: rounded)
+  }
 
   private func fetchAssetBalance() {
     guard let token = selectedSendToken else {
@@ -135,14 +148,14 @@ public class SendTokenStore: ObservableObject {
         return
       }
 
-      let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
+      let balanceFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
       func updateBalance(_ status: BraveWallet.ProviderError, _ balance: String) {
         guard status == .success,
           let decimalString = balanceFormatter.decimalString(
             for: balance.removingHexPrefix,
             radix: .hex,
             decimals: Int(token.decimals)
-          ), !decimalString.isEmpty, let decimal = Double(decimalString)
+          ), !decimalString.isEmpty, let decimal = BDouble(decimalString)
         else {
           return
         }
