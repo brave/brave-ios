@@ -158,6 +158,32 @@ public final class Domain: NSManagedObject, CRUD {
     }
     return false
   }
+  
+  public static func clearAllEthereumPermissions(_ completionOnMain: (() -> Void)? = nil) {
+    DataController.perform { context in
+      let fetchRequest = NSFetchRequest<Domain>()
+      fetchRequest.entity = Domain.entity(context)
+      do {
+        let results = try context.fetch(fetchRequest)
+        results.forEach {
+          if let bms = $0.bookmarks, bms.count > 0 {
+            // reset eth permissions only
+            $0.wallet_permittedAccounts = nil
+          } else {
+            // Delete
+            context.delete($0)
+          }
+        }
+      } catch {
+        let fetchError = error as NSError
+        print(fetchError)
+      }
+
+      DispatchQueue.main.async {
+        completionOnMain?()
+      }
+    }
+  }
 }
 
 // MARK: - Internal implementations

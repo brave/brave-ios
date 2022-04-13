@@ -395,6 +395,10 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
             let provider = self.braveCore.walletProvider(with: self, isPrivateBrowsing: tab.isPrivate) else {
         return nil
       }
+      if let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: tab.isPrivate) {
+        tab.walletKeyringService = keyringService
+        keyringService.add(tab)
+      }
       return (provider, js: self.braveCore.walletProviderJS)
     }
     #endif
