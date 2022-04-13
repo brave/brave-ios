@@ -5,12 +5,15 @@
 import SwiftUI
 import Shared
 import BraveShared
+import Data
 
 private struct FaviconImage: View {
   let url: URL?
-
+  
+  // FIXME: Generalize the playlist favicon loader.
+  // Probably by a followup ticket.
   @StateObject private var faviconLoader = PlaylistFolderImageLoader()
-
+  
   init(url: String?) {
     if let url = url {
       self.url = URL(string: url)
@@ -18,7 +21,7 @@ private struct FaviconImage: View {
       self.url = nil
     }
   }
-
+  
   var body: some View {
     Image(uiImage: faviconLoader.image ?? .init(imageLiteralResourceName: "defaultFavicon"))
       .resizable()
@@ -35,19 +38,19 @@ private struct FaviconImage: View {
 struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
-
+  
   let allTimeListTrackers: [PrivacyReportsItem]
   let allTimeListWebsites: [PrivacyReportsItem]
-
+  
   private(set) var onDismiss: () -> Void
-
+  
   enum Page: CaseIterable, Identifiable {
     case trackersAndAds, websites
-
+    
     var id: String {
       displayString
     }
-
+    
     var displayString: String {
       switch self {
       case .trackersAndAds: return Strings.PrivacyHub.allTimeListsTrackersView
@@ -55,29 +58,9 @@ struct PrivacyReportAllTimeListsView: View {
       }
     }
   }
-
+  
   @State private var currentPage: Page = .trackersAndAds
-
-  func blockedByLabels(i: Int) -> some View {
-    Group {
-      if horizontalSizeClass == .compact {
-        VStack(alignment: .leading) {
-          PrivacyReportsView.BlockedByShieldsLabel()
-          if i % 2 == 0 {
-            PrivacyReportsView.BlockedByVPNLabel()
-          }
-        }
-      } else {
-        HStack {
-          PrivacyReportsView.BlockedByShieldsLabel()
-          if i % 2 == 0 {
-            PrivacyReportsView.BlockedByVPNLabel()
-          }
-        }
-      }
-    }
-  }
-
+  
   private var selectionPicker: some View {
     Picker("", selection: $currentPage) {
       ForEach(Page.allCases) {
@@ -89,61 +72,63 @@ struct PrivacyReportAllTimeListsView: View {
     .padding(.horizontal, 20)
     .padding(.vertical, 12)
   }
-
+  
+  private func blockedLabels(by source: BlockedResource.Source?) -> some View {
+    Group {
+      switch source {
+      case .shields:
+        PrivacyReportsView.BlockedByShieldsLabel()
+      case .vpn:
+        PrivacyReportsView.BlockedByVPNLabel()
+      case .both:
+        PrivacyReportsView.BlockedByShieldsLabel()
+        PrivacyReportsView.BlockedByVPNLabel()
+      case .none:
+        EmptyView()
+      }
+    }
+  }
+  
   private var trackersList: some View {
     List {
       Section {
         ForEach(allTimeListTrackers) { item in
           HStack {
             VStack(alignment: .leading, spacing: 4) {
-
+              
               VStack(alignment: .leading, spacing: 0) {
                 Text(item.domainOrTracker)
                   .font(.callout)
                   .foregroundColor(Color(.bravePrimary))
-
+                
                 if let url = URL(string: item.domainOrTracker),
-                  let humanFriendlyTrackerName =
-                    BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false)
-                {
+                   let humanFriendlyTrackerName = BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
                   Text(humanFriendlyTrackerName)
                     .font(.footnote)
                     .foregroundColor(Color(.braveLabel))
                 }
               }
-
+              
               Group {
                 if sizeCategory.isAccessibilityCategory {
                   VStack(alignment: .leading, spacing: 4) {
                     Text(Strings.PrivacyHub.blockedBy)
                       .foregroundColor(Color(.secondaryBraveLabel))
-
-                    blockedByLabels(i: item.count)  // FIXME: count not needed here, was for tests.
+                    
+                    blockedLabels(by: item.source)
                   }
                 } else {
                   HStack(spacing: 4) {
                     Text(Strings.PrivacyHub.blockedBy)
                       .foregroundColor(Color(.secondaryBraveLabel))
-
-                    if let source = item.source {
-                      Group {
-                        switch source {
-                        case .shields:
-                          PrivacyReportsView.BlockedByShieldsLabel()
-                        case .vpn:
-                          PrivacyReportsView.BlockedByVPNLabel()
-                        case .both:
-                          PrivacyReportsView.BlockedByShieldsLabel()
-                          PrivacyReportsView.BlockedByVPNLabel()
-                        }
-                      }
-                    }
+                    
+                    blockedLabels(by: item.source)
                   }
                 }
               }
               .font(.caption)
             }
-
+            
             Spacer()
             Text("\(item.count)")
               .font(.headline.weight(.semibold))
@@ -159,7 +144,7 @@ struct PrivacyReportAllTimeListsView: View {
     }
     .listStyle(.insetGrouped)
   }
-
+  
   private var websitesList: some View {
     List {
       Section {
@@ -182,21 +167,19 @@ struct PrivacyReportAllTimeListsView: View {
     }
     .listStyle(.insetGrouped)
   }
-
+  
   var body: some View {
     VStack(spacing: 0) {
       if #available(iOS 15.0, *) {
         selectionPicker
-          .accessibilityShowsLargeContentViewer()
+          .modifier(LargeContentPickerViewerModifier_FB9812596())
       } else {
         selectionPicker
       }
-
+      
       switch currentPage {
-      case .trackersAndAds:
-        trackersList
-      case .websites:
-        websitesList
+      case .trackersAndAds: trackersList
+      case .websites: websitesList
       }
     }
     .background(Color(.braveGroupedBackground).ignoresSafeArea())
@@ -204,12 +187,20 @@ struct PrivacyReportAllTimeListsView: View {
     .navigationTitle(Strings.PrivacyHub.allTimeListsButtonText)
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-        Button(Strings.done) {
-          onDismiss()
-        }
-        .foregroundColor(Color(.braveOrange))
+        Button(Strings.done, action: onDismiss)
+          .foregroundColor(Color(.braveOrange))
       }
     }
+  }
+}
+
+// Modifier workaround for FB9812596 to avoid crashing on iOS 14 on Release builds
+@available(iOS 15.0, *)
+private struct LargeContentPickerViewerModifier_FB9812596: ViewModifier {
+  
+  func body(content: Content) -> some View {
+    content
+      .accessibilityShowsLargeContentViewer()
   }
 }
 

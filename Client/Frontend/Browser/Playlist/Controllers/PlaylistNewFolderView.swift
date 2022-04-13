@@ -38,8 +38,6 @@ class PlaylistFolderImageLoader: ObservableObject {
   }
 
   func load(domainUrl: URL) {
-    //loadImage(url: domainUrl, isFavIcon: true)
-
     let fetcher = FavIconImageRenderer()
     fetcher.loadIcon(siteURL: domainUrl) { [weak self] image in
       self?.image = image

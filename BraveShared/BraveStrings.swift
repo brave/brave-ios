@@ -4628,6 +4628,13 @@ extension Strings {
       comment: "A prompt message we show to the user if they want to clear all data gathered by the Privacy Reports Feature"
     )
     
+    public static let clearAllDataAccessibility = NSLocalizedString(
+      "privacyHub.clearAllDataAccessibility",
+      bundle: .braveShared,
+      value: "Clear Privacy Reports data",
+      comment: "Accessibility label for the 'clear all data' button."
+    )
+    
     public static let privacyReportsDisclaimer = NSLocalizedString(
       "privacyHub.privacyReportsDisclaimer",
       bundle: .braveShared,

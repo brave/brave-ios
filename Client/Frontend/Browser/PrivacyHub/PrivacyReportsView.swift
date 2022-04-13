@@ -121,6 +121,7 @@ struct PrivacyReportsView: View {
             }, label: {
               Image(systemName: "trash")
             })
+              .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
               .foregroundColor(Color(.braveOrange))
               .actionSheet(isPresented: $showClearDataPrompt) {
                 // FIXME: Currently .actionSheet does not allow you leave empty title for the sheet.

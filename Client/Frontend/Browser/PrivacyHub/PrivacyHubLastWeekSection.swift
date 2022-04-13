@@ -29,8 +29,7 @@ extension PrivacyReportsView {
                 .foregroundColor(.init(.secondaryBraveLabel))
               if let lastWeekMostFrequentTracker = lastWeekMostFrequentTracker {
                 Text(
-                  markdown: String(
-                    format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
+                  markdown: String.localizedStringWithFormat(Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
                     lastWeekMostFrequentTracker.name, lastWeekMostFrequentTracker.count)
                 )
                 .font(.callout)
@@ -49,15 +48,13 @@ extension PrivacyReportsView {
           HStack {
             Image("creepy_website")
             VStack(alignment: .leading) {
-
               Text(Strings.PrivacyHub.riskiestWebsiteTitle.uppercased())
                 .font(.caption)
                 .foregroundColor(Color(.secondaryBraveLabel))
 
               if let lastWeekRiskiestWebsite = lastWeekRiskiestWebsite {
                 Text(
-                  markdown: String(
-                    format: Strings.PrivacyHub.riskiestWebsiteBody,
+                  markdown: String.localizedStringWithFormat(Strings.PrivacyHub.riskiestWebsiteBody,
                     lastWeekRiskiestWebsite.name, lastWeekRiskiestWebsite.count)
                 )
                 .font(.callout)
