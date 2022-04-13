@@ -194,10 +194,14 @@ class WelcomeViewCallout: UIView {
 
     switch state {
     case .welcome(let title):
+      backgroundView.isHidden = true
+      arrowView.isHidden = true
+        
       titleLabel.do {
         $0.text = title
         $0.textAlignment = .center
-        $0.font = .preferredFont(for: .title1, weight: .semibold)
+        $0.font = .preferredFont(for: .largeTitle, weight: .semibold)
+        $0.textColor = .bravePrimary
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -228,9 +232,13 @@ class WelcomeViewCallout: UIView {
       }
 
     case .privacy(let title, let details, let buttonTitle, let action):
+      backgroundView.isHidden = false
+        arrowView.isHidden = false
+
       titleLabel.do {
         $0.text = title
         $0.textAlignment = .left
+        $0.textColor = .bravePrimary
         $0.font = .preferredFont(for: .title3, weight: .bold)
         $0.alpha = 1.0
         $0.isHidden = false

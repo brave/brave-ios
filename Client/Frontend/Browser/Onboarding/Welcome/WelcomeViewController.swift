@@ -214,7 +214,8 @@ class WelcomeViewController: UIViewController {
       topImageView.transform = .identity
       bottomImageView.transform = .identity
       iconView.transform = .identity
-      contentContainer.spacing = 25.0
+      contentContainer.spacing = 0.0
+      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
         $0.height.equalTo(150.0)
@@ -240,6 +241,7 @@ class WelcomeViewController: UIViewController {
       bottomImageView.transform = bottomTransform
       skipButton.alpha = 0.0
       contentContainer.spacing = 25.0
+      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
         $0.height.equalTo(150.0)
