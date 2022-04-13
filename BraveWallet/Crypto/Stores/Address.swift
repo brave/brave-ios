@@ -28,7 +28,7 @@ extension String {
   }
 
   /// Adds the `0x` prefix that if it does not exist on the string
-  public var addingHexPrefix: String {
+  var addingHexPrefix: String {
     hasPrefix("0x") ? self : "0x\(self)"
   }
 
