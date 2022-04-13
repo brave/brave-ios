@@ -35,31 +35,6 @@ extension BrowserViewController {
         profile: profile,
         rewards: rewards)
       onboardingController.modalPresentationStyle = .fullScreen
-      onboardingController.onAdsWebsiteSelected = { [weak self] url in
-        guard let self = self else { return }
-
-        if let url = url {
-          self.topToolbar.leaveOverlayMode()
-          self.addNTPTutorialPage()
-
-          let tab = self.tabManager.addTab(
-            PrivilegedRequest(url: url) as URLRequest,
-            afterTab: self.tabManager.selectedTab,
-            isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
-          self.tabManager.selectTab(tab)
-        } else {
-          self.addNTPTutorialPage()
-
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
-          }
-        }
-      }
-      onboardingController.onSkipSelected = { [weak self] in
-        guard let self = self else { return }
-        self.addNTPTutorialPage()
-      }
-
       parentController.present(onboardingController, animated: false)
       isOnboardingOrFullScreenCalloutPresented = true
     }
