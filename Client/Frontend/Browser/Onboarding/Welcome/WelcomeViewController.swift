@@ -34,7 +34,7 @@ class WelcomeViewController: UIViewController {
     self.init(
       profile: profile,
       rewards: rewards,
-      state: .welcome(title: Strings.Onboarding.welcomeScreenTitle))
+      state: .loading)
   }
 
   init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
@@ -122,11 +122,18 @@ class WelcomeViewController: UIViewController {
     super.viewDidAppear(animated)
 
     Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
-
-    if case .welcome = self.state {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-        self.animateToPrivacyState()
+    
+    switch state {
+    case .loading:
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        self.animateToWelcomeState()
       }
+    case .welcome:
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        self.animateToDefaultBrowserState()
+      }
+    default:
+      break
     }
   }
 
@@ -210,19 +217,19 @@ class WelcomeViewController: UIViewController {
     self.state = state
 
     switch state {
-    case .welcome:
+    case .loading:
       topImageView.transform = .identity
       bottomImageView.transform = .identity
       iconView.transform = .identity
+      skipButton.alpha = 0.0
       contentContainer.spacing = 0.0
-      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(150.0)
+        $0.height.equalTo(225.0)
       }
       calloutView.setState(state: state)
-
-    case .privacy:
+      
+    case .welcome:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
         transformation = transformation.scaledBy(x: 1.3, y: 1.3)
@@ -239,12 +246,12 @@ class WelcomeViewController: UIViewController {
 
       topImageView.transform = topTransform
       bottomImageView.transform = bottomTransform
-      skipButton.alpha = 0.0
-      contentContainer.spacing = 25.0
-      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
+      iconView.transform = .identity
+      contentContainer.spacing = 0.0
+      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(150.0)
+        $0.height.equalTo(175.0)
       }
       calloutView.setState(state: state)
 
@@ -265,12 +272,12 @@ class WelcomeViewController: UIViewController {
 
       topImageView.transform = topTransform
       bottomImageView.transform = bottomTransform
-      iconView.image = #imageLiteral(resourceName: "welcome-view-phone")
-      skipButton.alpha = 1.0
-      contentContainer.spacing = 0.0
-      iconBackgroundView.alpha = 0.0
+      skipButton.alpha = 0.0
+      contentContainer.spacing = 25.0
+      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
+      iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(200.0)
+        $0.height.equalTo(175.0)
       }
       calloutView.setState(state: state)
 
@@ -301,22 +308,16 @@ class WelcomeViewController: UIViewController {
     }
   }
 
-  private func animateToPrivacyState() {
+  private func animateToWelcomeState() {
     let nextController = WelcomeViewController(
       profile: profile,
       rewards: rewards,
       state: nil)
     nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
     nextController.onSkipSelected = onSkipSelected
-    let state = WelcomeViewCalloutState.privacy(
-      title: Strings.Onboarding.privacyScreenTitle,
-      details: Strings.Onboarding.privacyScreenDescription,
-      primaryButtonTitle: Strings.Onboarding.privacyScreenButtonTitle,
-      primaryAction: {
-        nextController.animateToDefaultBrowserState()
-      }
-    )
+    let state = WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle)
     nextController.setLayoutState(state: state)
+
     self.present(nextController, animated: true, completion: nil)
   }
 
