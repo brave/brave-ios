@@ -7,11 +7,12 @@ import SwiftUI
 import Shared
 import BraveShared
 import BraveUI
+import Data
 
 extension PrivacyReportsView {
   struct PrivacyHubLastWeekSection: View {
-    let lastWeekMostFrequentTracker: (String, Int)?
-    let lastWeekRiskiestWebsite: (String, Int)?
+    let lastWeekMostFrequentTracker: CountableEntity?
+    let lastWeekRiskiestWebsite: CountableEntity?
 
     var body: some View {
       Group {
@@ -30,7 +31,7 @@ extension PrivacyReportsView {
                 Text(
                   markdown: String(
                     format: Strings.PrivacyHub.mostFrequentTrackerAndAdBody,
-                    lastWeekMostFrequentTracker.0, lastWeekMostFrequentTracker.1)
+                    lastWeekMostFrequentTracker.name, lastWeekMostFrequentTracker.count)
                 )
                 .font(.callout)
               } else {
@@ -57,7 +58,7 @@ extension PrivacyReportsView {
                 Text(
                   markdown: String(
                     format: Strings.PrivacyHub.riskiestWebsiteBody,
-                    lastWeekRiskiestWebsite.0, lastWeekRiskiestWebsite.1)
+                    lastWeekRiskiestWebsite.name, lastWeekRiskiestWebsite.count)
                 )
                 .font(.callout)
               } else {

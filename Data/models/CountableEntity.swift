@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// A helper data structure to help with counting aggregated data.
 public struct CountableEntity: Hashable, Equatable {
   public let name: String
   public let count: Int

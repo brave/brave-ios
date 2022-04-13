@@ -6,14 +6,15 @@
 import SwiftUI
 import Shared
 import BraveShared
+import Data
 
 extension PrivacyReportsView {
   struct PrivacyHubAllTimeSection: View {
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    let allTimeMostFrequentTracker: (String, Int)?
-    let allTimeRiskiestWebsite: (String, Int)?
+    let allTimeMostFrequentTracker: CountableEntity?
+    let allTimeRiskiestWebsite: CountableEntity?
 
     let allTimeListTrackers: [PrivacyReportsItem]
     let allTimeListWebsites: [PrivacyReportsItem]
@@ -29,12 +30,12 @@ extension PrivacyReportsView {
 
         if let allTimeMostFrequentTracker = allTimeMostFrequentTracker {
           VStack(alignment: .leading) {
-            Text(allTimeMostFrequentTracker.0)
+            Text(allTimeMostFrequentTracker.name)
 
             Text(
               String(
                 format: Strings.PrivacyHub.allTimeSitesCount,
-                allTimeMostFrequentTracker.1))
+                allTimeMostFrequentTracker.count))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .font(.subheadline)
@@ -61,11 +62,11 @@ extension PrivacyReportsView {
 
         if let allTimeRiskiestWebsite = allTimeRiskiestWebsite {
           VStack(alignment: .leading) {
-            Text(allTimeRiskiestWebsite.0)
+            Text(allTimeRiskiestWebsite.name)
             Text(
               String(
                 format: Strings.PrivacyHub.allTimeTrackersCount,
-                allTimeRiskiestWebsite.1))
+                allTimeRiskiestWebsite.count))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .font(.subheadline)

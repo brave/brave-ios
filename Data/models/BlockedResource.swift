@@ -57,9 +57,9 @@ public final class BlockedResource: NSManagedObject, CRUD {
     }
   }
 
-  public static func mostBlockedTracker(inLastDays days: Int?) -> (String, Int)? {
+  public static func mostBlockedTracker(inLastDays days: Int?) -> CountableEntity? {
 
-    var mostFrequentTracker = ("", 0)
+    var mostFrequentTracker = CountableEntity(name: "", count: 0)
 
     do {
       let results = try groupByFetch(property: hostKeyPath, daysRange: days, includeConsolidatedData: true)
@@ -71,12 +71,12 @@ public final class BlockedResource: NSManagedObject, CRUD {
 
         let result = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: days).count
 
-        if result > mostFrequentTracker.1 {
-          mostFrequentTracker = (host, result)
+        if result > mostFrequentTracker.count {
+          mostFrequentTracker = .init(name: host, count: result)
         }
       }
 
-      return mostFrequentTracker.1 > 0 ? mostFrequentTracker : nil
+      return mostFrequentTracker.count > 0 ? mostFrequentTracker : nil
     } catch {
       log.error(error)
       return nil
@@ -106,8 +106,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
     }
   }
 
-  public static func riskiestWebsite(inLastDays days: Int?) -> (String, Int)? {
-    var maxNumberOfSites = ("", 0)
+  public static func riskiestWebsite(inLastDays days: Int?) -> CountableEntity? {
+    var maxNumberOfSites = CountableEntity(name: "", count: 0)
 
     do {
       let results = try groupByFetch(property: domainKeyPath, daysRange: days, includeConsolidatedData: false)
@@ -119,12 +119,12 @@ public final class BlockedResource: NSManagedObject, CRUD {
 
         let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
 
-        if result > maxNumberOfSites.1 {
-          maxNumberOfSites = (domain, result)
+        if result > maxNumberOfSites.count {
+          maxNumberOfSites = .init(name: domain, count: result)
         }
       }
 
-      return maxNumberOfSites.1 > 0 ? maxNumberOfSites : nil
+      return maxNumberOfSites.count > 0 ? maxNumberOfSites : nil
     } catch {
       log.error(error)
       return nil

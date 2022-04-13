@@ -11,11 +11,11 @@ import Data
 struct PrivacyReportsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  // All data to feed the views.
-  let lastWeekMostFrequentTracker: (String, Int)?
-  let lastWeekRiskiestWebsite: (String, Int)?
-  let allTimeMostFrequentTracker: (String, Int)?
-  let allTimeRiskiestWebsite: (String, Int)?
+  // All the data to feed the views.
+  let lastWeekMostFrequentTracker: CountableEntity?
+  let lastWeekRiskiestWebsite: CountableEntity?
+  let allTimeMostFrequentTracker: CountableEntity?
+  let allTimeRiskiestWebsite: CountableEntity?
   let allTimeListTrackers: [PrivacyReportsItem]
   let allTimeListWebsites: [PrivacyReportsItem]
   let lastVPNAlerts: [BraveVPNAlert]?
