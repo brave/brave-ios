@@ -17,17 +17,13 @@ private enum WelcomeViewID: Int {
   case iconView = 5
   case searchView = 6
   case bottomImage = 7
-  case skipButton = 8
-  case iconBackground = 9
+  case iconBackground = 8
 }
 
 class WelcomeViewController: UIViewController {
   private let profile: Profile?
   private let rewards: BraveRewards?
   private var state: WelcomeViewCalloutState?
-
-  var onAdsWebsiteSelected: ((URL?) -> Void)?
-  var onSkipSelected: (() -> Void)?
 
   convenience init(profile: Profile?, rewards: BraveRewards?) {
     self.init(
@@ -99,14 +95,6 @@ class WelcomeViewController: UIViewController {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
 
-  private let skipButton = UIButton(type: .custom).then {
-    $0.setTitle(Strings.OBSkipButton, for: .normal)
-    $0.setTitleColor(.white, for: .normal)
-    $0.alpha = 0.0
-    $0.setContentHuggingPriority(.required, for: .vertical)
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
-  }
-
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -144,10 +132,7 @@ class WelcomeViewController: UIViewController {
     iconView.tag = WelcomeViewID.iconView.rawValue
     searchView.tag = WelcomeViewID.searchView.rawValue
     bottomImageView.tag = WelcomeViewID.bottomImage.rawValue
-    skipButton.tag = WelcomeViewID.skipButton.rawValue
     iconBackgroundView.tag = WelcomeViewID.iconBackground.rawValue
-
-    skipButton.addTarget(self, action: #selector(onSkipButtonPressed(_:)), for: .touchUpInside)
 
     let stack = UIStackView().then {
       $0.distribution = .equalSpacing
@@ -157,7 +142,7 @@ class WelcomeViewController: UIViewController {
 
     let scrollView = UIScrollView()
 
-    [backgroundImageView, topImageView, bottomImageView, scrollView, skipButton].forEach {
+    [backgroundImageView, topImageView, bottomImageView, scrollView].forEach {
       view.addSubview($0)
     }
 
@@ -166,7 +151,7 @@ class WelcomeViewController: UIViewController {
     scrollView.addSubview(stack)
     scrollView.snp.makeConstraints {
       $0.leading.trailing.top.equalToSuperview()
-      $0.bottom.equalTo(skipButton).inset(16)
+      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(16)
     }
 
     scrollView.contentLayoutGuide.snp.makeConstraints {
@@ -201,12 +186,6 @@ class WelcomeViewController: UIViewController {
       $0.leading.trailing.top.equalToSuperview()
     }
 
-    skipButton.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview()
-      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
-      $0.height.equalTo(48.0)
-    }
-
     bottomImageView.snp.makeConstraints {
       $0.leading.trailing.bottom.equalToSuperview()
     }
@@ -220,7 +199,6 @@ class WelcomeViewController: UIViewController {
       topImageView.transform = .identity
       bottomImageView.transform = .identity
       iconView.transform = .identity
-      skipButton.alpha = 0.0
       contentContainer.spacing = 0.0
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
@@ -271,7 +249,6 @@ class WelcomeViewController: UIViewController {
 
       topImageView.transform = topTransform
       bottomImageView.transform = bottomTransform
-      skipButton.alpha = 0.0
       contentContainer.spacing = 25.0
       contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
       iconBackgroundView.alpha = 1.0
@@ -311,13 +288,10 @@ class WelcomeViewController: UIViewController {
     let nextController = WelcomeViewController(
       profile: profile,
       rewards: rewards,
-      state: nil)
-    nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-    nextController.onSkipSelected = onSkipSelected
-    let state = WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle)
-    nextController.setLayoutState(state: state)
-
-    self.present(nextController, animated: true, completion: nil)
+      state: nil).then {
+        $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
+      }
+    present(nextController, animated: true, completion: nil)
   }
 
   private func animateToDefaultBrowserState() {
@@ -325,8 +299,6 @@ class WelcomeViewController: UIViewController {
       profile: profile,
       rewards: rewards,
       state: nil)
-    nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
-    nextController.onSkipSelected = onSkipSelected
     let state = WelcomeViewCalloutState.defaultBrowser(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.defaultBrowserCalloutTitle,
@@ -337,30 +309,12 @@ class WelcomeViewController: UIViewController {
           nextController.onSetDefaultBrowser()
         },
         secondaryAction: {
-          // TODO: Show NTP Page Changes
+          // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
         }
       )
     )
     nextController.setLayoutState(state: state)
-    self.present(nextController, animated: true, completion: nil)
-  }
-
-  @objc
-  private func onSkipButtonPressed(_ button: UIButton) {
-    close()
-    onSkipSelected?()
-  }
-
-  private func onWebsiteSelected(_ item: WebsiteRegion) {
-    close()
-    if let url = URL(string: item.domain) {
-      onAdsWebsiteSelected?(url)
-    }
-  }
-
-  private func onEnterCustomWebsite() {
-    close()
-    onAdsWebsiteSelected?(nil)
+    present(nextController, animated: true, completion: nil)
   }
 
   private func onSetDefaultBrowser() {
@@ -369,7 +323,7 @@ class WelcomeViewController: UIViewController {
     }
     UIApplication.shared.open(settingsUrl)
     
-    // TODO: The new Brave URL Bar Callout Begin
+    // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
   }
 
   private func close() {
@@ -394,98 +348,6 @@ class WelcomeViewController: UIViewController {
       break
     }
     presenting.dismiss(animated: true, completion: nil)
-  }
-
-  private struct WebsiteRegion {
-    let icon: UIImage
-    let title: String
-    let domain: String
-  }
-
-  private func websitesForRegion() -> [WebsiteRegion] {
-    var siteList = [WebsiteRegion]()
-
-    switch Locale.current.regionCode {
-    // Canada
-    case "CA":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-environment-canada"), title: "Environment Canada", domain: "https://weather.gc.ca/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cdn-tire"), title: "Canadian Tire", domain: "https://canadiantire.ca/"),
-      ]
-
-    // United Kingdom
-    case "GB":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-bbc"), title: "BBC", domain: "https://bbc.co.uk/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-sky"), title: "Sky", domain: "https://sky.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
-      ]
-
-    // Germany
-    case "DE":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gmx"), title: "GMX", domain: "https://gmx.net/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-mobilede"), title: "Mobile", domain: "https://mobile.de/"),
-      ]
-
-    // France
-    case "FR":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-jdf"), title: "Les Journal des Femmes", domain: "https://journaldesfemmes.fr/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-programme-tv"), title: "Programme TV", domain: "https://programme-tv.net/"),
-      ]
-
-    // India
-    case "IN":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-hotstar"), title: "Hot Star", domain: "https://hotstar.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cricketbuzz"), title: "Cricket Buzz", domain: "https://cricbuzz.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-flipkart"), title: "Flipkart", domain: "https://flipkart.com/"),
-      ]
-
-    // Australia
-    case "AU":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-news-au"), title: "News", domain: "https://news.com.au/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gumtree"), title: "Gumtree", domain: "https://gumtree.com.au/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-realestate-au"), title: "Real Estate", domain: "https://realestate.com.au/"),
-      ]
-
-    // Ireland
-    case "IE":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-rte"), title: "RTÉ", domain: "https://rte.ie/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-independent"), title: "Independent", domain: "https://independent.ie/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-donedeal"), title: "DoneDeal", domain: "https://donedeal.ie/"),
-      ]
-
-    // Japan
-    case "JP":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "faviconYahoo"), title: "Yahoo! JAPAN", domain: "https://m.yahoo.co.jp/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired(日本版)", domain: "https://wired.jp/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-number-bunshin"), title: "Number Web", domain: "https://number.bunshun.jp/"),
-      ]
-
-    // United States
-    case "US":
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/"),
-      ]
-
-    default:
-      siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/"),
-      ]
-    }
-    return siteList
   }
 }
 
@@ -530,7 +392,6 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let iconBackgroundView: UIView
     let searchEnginesView: UIView
     let bottomImageView: UIView
-    let skipButton: UIView
 
     var allViews: [UIView] {
       return [
@@ -542,7 +403,6 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         iconBackgroundView,
         searchEnginesView,
         bottomImageView,
-        skipButton,
       ]
     }
 
@@ -554,8 +414,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         let iconView = view.subview(with: WelcomeViewID.iconView.rawValue),
         let iconBackgroundView = view.subview(with: WelcomeViewID.iconBackground.rawValue),
         let searchEnginesView = view.subview(with: WelcomeViewID.searchView.rawValue),
-        let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue),
-        let skipButton = view.subview(with: WelcomeViewID.skipButton.rawValue)
+        let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue)
       else {
         return nil
       }
@@ -568,7 +427,6 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
       self.iconBackgroundView = iconBackgroundView
       self.searchEnginesView = searchEnginesView
       self.bottomImageView = bottomImageView
-      self.skipButton = skipButton
     }
   }
 
@@ -660,7 +518,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         continue
       }
 
-      if fromView == fromWelcomeView.topImageView || fromView == fromWelcomeView.bottomImageView || fromView == fromWelcomeView.skipButton {
+      if fromView == fromWelcomeView.topImageView || fromView == fromWelcomeView.bottomImageView {
         UIView.animate(withDuration: totalAnimationTime, delay: 0.0, options: .curveEaseInOut) {
           fromView.transform = toView.transform
         } completion: { finished in
