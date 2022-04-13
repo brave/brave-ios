@@ -270,7 +270,7 @@ extension Strings {
       NSLocalizedString(
         "onboarding.welcomeScreenTitle",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Welcome to Brave!",
+        value: "Welcome to Brave",
         comment: "Title for Welcome Screen in Onboarding")
     public static let privacyScreenTitle =
       NSLocalizedString(
