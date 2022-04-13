@@ -197,7 +197,7 @@ extension Strings {
       NSLocalizedString(
         "callout.defaultBrowserTitle",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Make Brave your default browser",
+        value: "Privacy. Made Simple.",
         comment: "Title for Default Browser Full Screen Callout")
     public static let defaultBrowserCalloutDescription =
       NSLocalizedString(

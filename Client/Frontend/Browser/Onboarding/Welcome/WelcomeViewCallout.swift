@@ -21,8 +21,8 @@ enum WelcomeViewCalloutState {
     var secondaryAction: (() -> Void)
   }
 
+  case loading
   case welcome(title: String)
-  case privacy(title: String, details: String, primaryButtonTitle: String, primaryAction: () -> Void)
   case defaultBrowser(info: WelcomeViewDefaultBrowserDetails)
   case defaultBrowserCallout(info: WelcomeViewDefaultBrowserDetails)
 }
@@ -193,6 +193,38 @@ class WelcomeViewCallout: UIView {
     secondaryButton.removeAction(identifiedBy: .init(rawValue: "secondary.action"), for: .primaryActionTriggered)
 
     switch state {
+    case .loading:
+      backgroundView.isHidden = true
+      arrowView.isHidden = true
+      
+      titleLabel.do {
+        $0.isHidden = true
+      }
+
+      detailsLabel.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      primaryButton.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryLabel.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryButton.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryButtonContentView.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
     case .welcome(let title):
       backgroundView.isHidden = true
       arrowView.isHidden = true
@@ -230,60 +262,6 @@ class WelcomeViewCallout: UIView {
         $0.alpha = 0.0
         $0.isHidden = true
       }
-
-    case .privacy(let title, let details, let buttonTitle, let action):
-      backgroundView.isHidden = false
-        arrowView.isHidden = false
-
-      titleLabel.do {
-        $0.text = title
-        $0.textAlignment = .left
-        $0.textColor = .bravePrimary
-        $0.font = .preferredFont(for: .title3, weight: .bold)
-        $0.alpha = 1.0
-        $0.isHidden = false
-      }
-
-      detailsLabel.do {
-        $0.text = details
-        // Calling .preferredFont(forTextStyle: .body) will freeze the app, and crash!
-        // It creates an Out of Memory exception if the font is not .scaledFont!
-        // This is an OS bug. Fortunately our extension creates a scaled font properly.
-        $0.font = .preferredFont(for: .body, weight: .regular)
-        $0.alpha = 1.0
-        $0.isHidden = false
-      }
-
-      primaryButton.do {
-        $0.setTitle(buttonTitle, for: .normal)
-        $0.titleLabel?.font = .preferredFont(for: .body, weight: .regular)
-        $0.addAction(
-          UIAction(
-            identifier: .init(rawValue: "primary.action"),
-            handler: { _ in
-              action()
-            }), for: .touchUpInside)
-        $0.alpha = 1.0
-        $0.isHidden = false
-      }
-
-      secondaryLabel.do {
-        $0.alpha = 0.0
-        $0.isHidden = true
-      }
-
-      secondaryButton.do {
-        $0.alpha = 0.0
-        $0.isHidden = true
-      }
-
-      secondaryButtonContentView.do {
-        $0.alpha = 0.0
-        $0.isHidden = true
-      }
-
-      contentView.setCustomSpacing(8.0, after: titleLabel)
-      contentView.setCustomSpacing(24.0, after: detailsLabel)
     case .defaultBrowser(let info):
       contentView.do {
         $0.layoutMargins = UIEdgeInsets(top: 30, left: 30, bottom: 15, right: 30)
