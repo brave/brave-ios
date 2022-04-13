@@ -75,7 +75,13 @@ class FeedDataSource {
 
   init() {
     assert(!FeedDataSource.supportedLanguages.isEmpty, "We shouldn't ever have no supported languages")
-    self.languageCode = Locale.preferredLanguages.first?.prefix(2).lowercased() ?? FeedDataSource.supportedLanguages.first!
+    self.languageCode = {
+      if let code = Locale.preferredLanguages.first?.prefix(2).lowercased(),
+         FeedDataSource.supportedLanguages.contains(code) {
+        return code
+      }
+      return FeedDataSource.supportedLanguages.first!
+    }()
     restoreCachedSources()
     
     if !AppConstants.buildChannel.isPublic,
@@ -189,8 +195,7 @@ class FeedDataSource {
   private func resourceFilename(for resource: NewsResource) -> String {
     // "en" is the default language and thus does not get the language code inserted into the
     // file name.
-    if resource.isLocalized, languageCode != "en",
-       (Self.supportedLanguages.contains(String(languageCode)) || !AppConstants.buildChannel.isPublic) {
+    if resource.isLocalized, languageCode != "en" {
       return "\(resource.name).\(languageCode).\(resource.type)"
     }
     return "\(resource.name).\(resource.type)"
