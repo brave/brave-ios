@@ -281,6 +281,8 @@ extension Tab: BraveWalletKeyringServiceObserver {
   }
   
   func locked() {
+    updateEthereumProperties()
+    emitEthereumEvent(.ethereumAccountsChanged(accounts: []))
   }
   
   func unlocked() {
