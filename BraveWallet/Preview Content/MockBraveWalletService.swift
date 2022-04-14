@@ -45,16 +45,16 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion(.braveWallet)
   }
 
-  func hasEthereumPermission(_ origin: String, account: String, completion: @escaping (Bool, Bool) -> Void) {
+  func hasEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool, Bool) -> Void) {
     completion(false, false)
   }
 
-  func resetEthereumPermission(_ origin: String, account: String, completion: @escaping (Bool) -> Void) {
+  func resetEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
 
-  func activeOrigin(_ completion: @escaping (String) -> Void) {
-    completion("")
+  func activeOrigin(_ completion: @escaping (BraveWallet.OriginInfo) -> Void) {
+    completion(.init())
   }
 
   func pendingSignMessageRequests(_ completion: @escaping ([BraveWallet.SignMessageRequest]) -> Void) {
@@ -89,7 +89,7 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion(false)
   }
 
-  func addEthereumPermission(_ origin: String, account: String, completion: @escaping (Bool) -> Void) {
+  func addEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
 

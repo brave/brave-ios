@@ -172,7 +172,7 @@ public class SendTokenStore: ObservableObject {
   ) {
     let eip1559Data = BraveWallet.TxData1559(baseData: baseData, chainId: chainId, maxPriorityFeePerGas: "", maxFeePerGas: "", gasEstimation: nil)
     let txDataUnion = BraveWallet.TxDataUnion(ethTxData1559: eip1559Data)
-    self.txService.addUnapprovedTransaction(txDataUnion, from: address) { success, txMetaId, errorMessage in
+    self.txService.addUnapprovedTransaction(txDataUnion, from: address, origin: nil) { success, txMetaId, errorMessage in
       completion(success)
     }
   }
@@ -234,7 +234,7 @@ public class SendTokenStore: ObservableObject {
           }
         } else {
           let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-          self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress) { success, txMetaId, errorMessage in
+          self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errorMessage in
             self.isMakingTx = false
             completion(success)
           }
@@ -253,7 +253,7 @@ public class SendTokenStore: ObservableObject {
             }
           } else {
             let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-            self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress) { success, txMetaId, errorMessage in
+            self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errorMessage in
               self.isMakingTx = false
               completion(success)
             }

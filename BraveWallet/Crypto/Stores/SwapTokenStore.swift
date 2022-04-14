@@ -292,7 +292,7 @@ public class SwapTokenStore: ObservableObject {
             data: data
           )
           let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-          self.txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address) { success, txMetaId, error in
+          self.txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address, origin: nil) { success, txMetaId, error in
             guard success else {
               self.state = .error(Strings.Wallet.unknownError)
               self.clearAllAmount()
@@ -414,6 +414,7 @@ public class SwapTokenStore: ObservableObject {
           self.txService.addUnapprovedTransaction(
             txDataUnion,
             from: accountInfo.address,
+            origin: nil,
             completion: { success, txMetaId, error in
               guard success else {
                 self.state = .error(Strings.Wallet.unknownError)
@@ -452,7 +453,7 @@ public class SwapTokenStore: ObservableObject {
       }
       let eip1559Data = BraveWallet.TxData1559(baseData: baseData, chainId: chainId, maxPriorityFeePerGas: maxPriorityFeePerGas, maxFeePerGas: maxFeePerGas, gasEstimation: gasEstimation)
       let txDataUnion = BraveWallet.TxDataUnion(ethTxData1559: eip1559Data)
-      self.txService.addUnapprovedTransaction(txDataUnion, from: account.address) { success, txMetaId, errorMessage in
+      self.txService.addUnapprovedTransaction(txDataUnion, from: account.address, origin: nil) { success, txMetaId, errorMessage in
         completion(success)
       }
     }

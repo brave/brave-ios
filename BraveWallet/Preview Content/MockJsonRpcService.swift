@@ -52,6 +52,10 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     observers.add(observer)
   }
   
+  func pendingAddChainRequests(_ completion: @escaping ([BraveWallet.AddChainRequest]) -> Void) {
+    completion([])
+  }
+  
   func pendingChainRequests(_ completion: @escaping ([BraveWallet.NetworkInfo]) -> Void) {
     completion([])
   }
