@@ -147,61 +147,13 @@ public class SendTokenStore: ObservableObject {
         self.selectedSendTokenBalance = nil
         return
       }
-
-      let balanceFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
-      func updateBalance(_ status: BraveWallet.ProviderError, _ balance: String) {
-        guard status == .success,
-          let decimalString = balanceFormatter.decimalString(
-            for: balance.removingHexPrefix,
-            radix: .hex,
-            decimals: Int(token.decimals)
-          ), !decimalString.isEmpty, let decimal = BDouble(decimalString)
-        else {
-          return
-        }
-        selectedSendTokenBalance = decimal
-      }
-
-      self.rpcService.network { network in
-        // Get balance for ETH token
-        if token.symbol == network.symbol {
-          self.rpcService.balance(accountAddress, coin: .eth, chainId: network.chainId) { balance, status, _ in
-            guard status == .success else {
-              self.selectedSendTokenBalance = nil
-              return
-            }
-            updateBalance(status, balance)
-          }
-        }
-        // Get balance for erc20 token
-        else if token.isErc20 {
-          self.rpcService.erc20TokenBalance(
-            token.contractAddress,
-            address: accountAddress,
-            chainId: network.chainId
-          ) { balance, status, _ in
-            guard status == .success else {
-              self.selectedSendTokenBalance = nil
-              return
-            }
-            updateBalance(status, balance)
-          }
-        }
-        // Get balance for erc721 token
-        else if token.isErc721 {
-          self.rpcService.erc721TokenBalance(
-            token.contractAddress,
-            tokenId: token.id,
-            accountAddress: accountAddress,
-            chainId: network.chainId
-          ) { balance, status, _ in
-            guard status == .success else {
-              self.selectedSendTokenBalance = nil
-              return
-            }
-            updateBalance(status, balance)
-          }
-        }
+      
+      rpcService.balance(
+        for: token,
+        in: accountAddress,
+        decimalFormatStyle: .decimals(precision: Int(token.decimals))
+      ) { [weak self] balance in
+        self?.selectedSendTokenBalance = balance
       }
     }
   }

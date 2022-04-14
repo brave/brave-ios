@@ -177,60 +177,12 @@ public class SwapTokenStore: ObservableObject {
       return
     }
     
-    let balanceFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(token.decimals)))
-    func updateBalance(_ status: BraveWallet.ProviderError, _ balance: String) {
-      guard status == .success,
-            let decimalString = balanceFormatter.decimalString(
-              for: balance.removingHexPrefix,
-              radix: .hex,
-              decimals: Int(token.decimals)
-            ), !decimalString.isEmpty, let decimal = BDouble(decimalString)
-      else {
-        completion(nil)
-        return
-      }
-      completion(decimal)
-    }
-    self.rpcService.network { network in
-      // Get balance for ETH token
-      if token.symbol == network.symbol {
-        self.rpcService.balance(account.address, coin: .eth, chainId: network.chainId) { balance, status, _ in
-          guard status == .success else {
-            completion(nil)
-            return
-          }
-          updateBalance(status, balance)
-        }
-      }
-      // Get balance for erc20 token
-      else if token.isErc20 {
-        self.rpcService.erc20TokenBalance(
-          token.contractAddress,
-          address: account.address,
-          chainId: network.chainId
-        ) { balance, status, _ in
-          guard status == .success else {
-            completion(nil)
-            return
-          }
-          updateBalance(status, balance)
-        }
-      }
-      // Get balance for erc721 token
-      else if token.isErc721 {
-        self.rpcService.erc721TokenBalance(
-          token.contractAddress,
-          tokenId: token.id,
-          accountAddress: account.address,
-          chainId: network.chainId
-        ) { balance, status, _ in
-          guard status == .success else {
-            completion(nil)
-            return
-          }
-          updateBalance(status, balance)
-        }
-      }
+    rpcService.balance(
+      for: token,
+      in: account.address,
+      decimalFormatStyle: .decimals(precision: Int(token.decimals))
+    ) { balance in
+      completion(balance)
     }
   }
 
