@@ -36,7 +36,7 @@ public enum PresentingContext {
   /// Shows the user the wallet settings screen
   case settings
   /// Shows when the users want to edit connected account the the webpage
-  case editSiteConnection(_ origin: URLOrigin, handler: ([String]) -> Void)
+  case editSiteConnection(_ origin: URLOrigin, handler: (_ permittedAccounts: [String]) -> Void)
 }
 
 /// The initial wallet controller to present when the user wants to view their wallet

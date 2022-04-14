@@ -2403,7 +2403,7 @@ extension Strings {
       comment: "The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen."
     )
     public static let editSiteConnectionAccountActionSwitch = NSLocalizedString(
-      "wallet.editSiteConnectionAccountActionDisconnect",
+      "wallet.editSiteConnectionAccountActionSwitch",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Switch",
