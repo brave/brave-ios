@@ -6,6 +6,8 @@
 import Foundation
 import Data
 
+/// An item shown in the Privacy Reports screen.
+/// It can be either a tracker name, or a website
 struct PrivacyReportsItem: Identifiable {
   var id: String {
     domainOrTracker

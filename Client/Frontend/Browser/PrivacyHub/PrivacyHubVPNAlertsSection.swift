@@ -29,10 +29,8 @@ extension PrivacyReportsView {
         NavigationLink(
           destination:
             AllVPNAlertsView(
-              trackerCounts: BraveVPNAlert.alertTotals,
-              onDismiss: {
-                onDismiss()
-              })
+              alerts: BraveVPNAlert.alertTotals,
+              onDismiss: onDismiss)
         ) {
           HStack {
             Text(Strings.PrivacyHub.allVPNAlertsButtonText)
@@ -45,7 +43,8 @@ extension PrivacyReportsView {
         .foregroundColor(Color(.braveLabel))
         .overlay(
           RoundedRectangle(cornerRadius: 25)
-            .stroke(Color(.braveLabel), lineWidth: 1))
+            .stroke(Color(.braveLabel), lineWidth: 1)
+        )
       }
     }
   }

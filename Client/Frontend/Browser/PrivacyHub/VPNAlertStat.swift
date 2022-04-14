@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-extension AllVPNAlertsView {
+extension PrivacyReportsView {
   struct VPNAlertStat: View {
 
     private let assetName: String
@@ -50,7 +50,6 @@ extension AllVPNAlertsView {
       .background(Color(.braveBackground))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
       .fixedSize(horizontal: false, vertical: true)
-
     }
   }
 }

@@ -71,7 +71,6 @@ struct PrivacyReportLabels_Previews: PreviewProvider {
         PrivacyReportsView.BlockedByShieldsLabel()
       }
       .preferredColorScheme(.dark)
-
     }
     .previewLayout(.sizeThatFits)
     .padding()
