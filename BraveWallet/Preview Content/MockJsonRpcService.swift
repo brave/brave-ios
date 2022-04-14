@@ -123,7 +123,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   }
   
   func erc721Owner(of contract: String, tokenId: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
-    
+    completion("", .internalError, "erc721Owner error")
   }
 }
 
