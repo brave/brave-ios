@@ -166,13 +166,7 @@ public final class Domain: NSManagedObject, CRUD {
       do {
         let results = try context.fetch(fetchRequest)
         results.forEach {
-          if let bms = $0.bookmarks, bms.count > 0 {
-            // reset eth permissions only
-            $0.wallet_permittedAccounts = nil
-          } else {
-            // Delete
-            context.delete($0)
-          }
+          $0.wallet_permittedAccounts = nil
         }
       } catch {
         let fetchError = error as NSError
