@@ -23,7 +23,9 @@ struct SuggestedNetworkView: View {
   @State private var customNetworkError: CustomNetworkError?
   
   @ScaledMetric private var blockieSize = 24
+  private let maxBlockieSize: CGFloat = 72
   @ScaledMetric private var faviconSize = 48
+  private let maxFaviconSize: CGFloat = 96
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -79,11 +81,13 @@ struct SuggestedNetworkView: View {
         Text(keyringStore.selectedAccount.address.truncatedAddress)
           .fontWeight(.semibold)
         Blockie(address: keyringStore.selectedAccount.address)
-          .frame(width: blockieSize, height: blockieSize)
+          .frame(idealWidth: blockieSize, maxWidth: blockieSize, idealHeight: maxBlockieSize, maxHeight: maxBlockieSize)
+          .aspectRatio(1, contentMode: .fit)
       }
       VStack(spacing: 8) {
         Image(systemName: "globe")
-          .frame(width: faviconSize, height: faviconSize)
+          .frame(idealWidth: faviconSize, maxWidth: maxFaviconSize, idealHeight: faviconSize, maxHeight: maxFaviconSize)
+          .aspectRatio(1, contentMode: .fit)
           .background(Color(.braveDisabled))
           .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         if case let .switchNetworks(_, origin) = mode {
