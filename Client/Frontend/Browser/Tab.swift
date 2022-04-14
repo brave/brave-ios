@@ -185,7 +185,8 @@ class Tab: NSObject {
   
   var containsWebPage: Bool {
     if let url = url {
-      return url.isWebPage() && !(InternalURL(url)?.isAboutHomeURL ?? false)
+      let isHomeURL = InternalURL(url)?.isAboutHomeURL
+      return url.isWebPage() && isHomeURL != true
     }
     
     return false

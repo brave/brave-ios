@@ -2514,7 +2514,7 @@ extension BrowserViewController: TabManagerDelegate {
     
     if tabManager.tabsForCurrentMode.count > 1 {
       let bookmarkAllTabs = UIAction(
-        title: String(format: Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
+        title: String.localizedStringWithFormat(Strings.bookmarkAllTabsTitle, tabManager.tabsForCurrentMode.count),
         image: UIImage(systemName: "book"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
           let mode = BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
