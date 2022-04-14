@@ -312,10 +312,12 @@ extension Preferences {
       Option<Bool>(key: "playlist.enableCarPlayRestartPlayback", default: false)
   }
     
-    final class PrivacyHub {
-        static let shouldShowNotificationPermissionCallout =
-      Option<Bool>(key: "privacy-hub.show-notification-permission-callout", default: true)
+  final class PrivacyHub {
+    static let shouldShowNotificationPermissionCallout =
+    Option<Bool>(key: "privacy-hub.show-notification-permission-callout", default: true)
     static let captureShieldsData = Option<Bool>(key: "privacy-hub.capture-shields-data", default: true)
     static let captureVPNAlerts = Option<Bool>(key: "privacy-hub.capture-vpn-alerts", default: true)
-    }
+    static let nextConsolidationDate =
+    Option<Date>(key: "privacy-hub.capture-vpn-alerts", default: Date().advanced(by: 7.days))
+  }
 }

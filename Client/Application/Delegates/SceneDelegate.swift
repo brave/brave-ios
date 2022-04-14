@@ -130,9 +130,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       QuickActions.sharedInstance.launchedShortcutItem = shortcutItem
     }
         
-        PrivacyReportsManager.scheduleNotification()
-        PrivacyReportsManager.scheduleProcessingBlockedRequests()
-        PrivacyReportsManager.scheduleVPNAlertsTask()
+    PrivacyReportsManager.scheduleNotification()
+    PrivacyReportsManager.consolidateData()
+    PrivacyReportsManager.scheduleProcessingBlockedRequests()
+    PrivacyReportsManager.scheduleVPNAlertsTask()
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
