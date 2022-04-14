@@ -12,15 +12,19 @@ private let log = Logger.browserLogger
 
 struct PrivacyReportsManager {
 
-  // MARK: - Notifications
-
+  // MARK: - Data processing
+  
+  /// For performance reasons the blocked requests are not persisted in the database immediately.
+  /// Instead a periodic timer is run and all requests gathered during this timeframe are saved in one database transaction.
   static var pendingBlockedRequests: [(host: String, domain: URL, date: Date)] = []
-
+  
   static func processBlockedRequests() {
-    if !Preferences.PrivacyHub.captureShieldsData.value { return }
-    
     let itemsToSave = pendingBlockedRequests
     pendingBlockedRequests.removeAll()
+    
+    // To handle any weird edge cases when user disables data capturing while there are pending items to save
+    // we drop them before saving to DB.
+    if !Preferences.PrivacyHub.captureShieldsData.value { return }
 
     BlockedResource.batchInsert(items: itemsToSave)
   }
@@ -30,16 +34,19 @@ struct PrivacyReportsManager {
 
   static func scheduleProcessingBlockedRequests() {
     saveBlockedResourcesTimer?.invalidate()
+    
+    if !Preferences.PrivacyHub.captureShieldsData.value { return }
 
     saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: 1.minutes, repeats: true) { _ in
       processBlockedRequests()
     }
   }
-
+  
   static func scheduleVPNAlertsTask() {
-    
     vpnAlertsTimer?.invalidate()
-    //return
+    
+    if !BraveVPN.shouldProcessVPNAlerts { return }
+    
     // Because fetching VPN alerts involves making a url request,
     // the time interval to fetch them is longer than the local on-device blocked requests
     let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
@@ -61,30 +68,24 @@ struct PrivacyReportsManager {
   // MARK: - View
   /// Fetches required data to present the privacy reports view and returns the view.
   static func prepareView() -> PrivacyReportsView {
-    
-    // FIXME: Temporary
-    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-      //BlockedResource.consolidateData(olderThan: 30)
-      BraveVPNAlert.consolidateData(olderThan: 30)
-    }
-    
+        
     let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
     let allTimeMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
 
     let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
     let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
 
-    let allTimeListTracker = BlockedResource.allTimeMostFrequentTrackers()
+    let allTimeListTrackers = BlockedResource.allTimeMostFrequentTrackers()
 
     // FIXME: VPNAlerts flag
     let allTimeVPN = BraveVPNAlert.allByHostCount
 
     let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
-      PrivacyReportsItem(domainOrTracker: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+      PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
     }
 
-    let allAlerts: [PrivacyReportsItem] =
-      PrivacyReportsItem.merge(shieldItems: allTimeListTracker, vpnItems: allTimeVPN)
+    let allAlerts: [PrivacyReportsTracker] =
+    PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: allTimeVPN)
 
     let last = BraveVPNAlert.last(3)
 

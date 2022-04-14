@@ -105,7 +105,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
       return maxNumberOfSites
     }
   }
-
+  
   public static func riskiestWebsite(inLastDays days: Int?) -> CountableEntity? {
     var maxNumberOfSites = CountableEntity(name: "", count: 0)
 

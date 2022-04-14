@@ -409,6 +409,9 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     }
     Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
     Preferences.Playlist.webMediaSourceCompatibility.observe(from: self)
+    Preferences.PrivacyHub.captureShieldsData.observe(from: self)
+    Preferences.PrivacyHub.captureVPNAlerts.observe(from: self)
+    
     // Lists need to be compiled before attempting tab restoration
     contentBlockListDeferred = Deferred<()>()
     
@@ -3131,6 +3134,10 @@ extension BrowserViewController: PreferencesObserver {
         tab: selectedTab,
         state: selectedTab?.playlistItemState ?? .none,
         item: selectedTab?.playlistItem)
+    case Preferences.PrivacyHub.captureShieldsData.key:
+      PrivacyReportsManager.scheduleProcessingBlockedRequests()
+    case Preferences.PrivacyHub.captureVPNAlerts.key:
+      PrivacyReportsManager.scheduleVPNAlertsTask()
     default:
       log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break

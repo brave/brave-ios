@@ -648,9 +648,22 @@ class BraveVPN {
       }
     }
   }
+  
+  static var shouldProcessVPNAlerts: Bool {
+    if !Preferences.PrivacyHub.captureVPNAlerts.value {
+      return false
+    }
+    
+    switch vpnState {
+    case .installed(let enabled):
+      return enabled
+    default:
+      return false
+    }
+  }
 
   static func processVPNAlerts() {
-    if !Preferences.PrivacyHub.captureVPNAlerts.value { return }
+    if !shouldProcessVPNAlerts { return }
 
     Task {
       let (data, success, error) = await GRDGatewayAPI.shared().events()

@@ -39,8 +39,8 @@ struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
-  let allTimeListTrackers: [PrivacyReportsItem]
-  let allTimeListWebsites: [PrivacyReportsItem]
+  let allTimeListTrackers: [PrivacyReportsTracker]
+  let allTimeListWebsites: [PrivacyReportsWebsite]
   
   private(set) var onDismiss: () -> Void
   
@@ -97,11 +97,11 @@ struct PrivacyReportAllTimeListsView: View {
             VStack(alignment: .leading, spacing: 4) {
               
               VStack(alignment: .leading, spacing: 0) {
-                Text(item.domainOrTracker)
+                Text(item.name)
                   .font(.callout)
                   .foregroundColor(Color(.bravePrimary))
                 
-                if let url = URL(string: item.domainOrTracker),
+                if let url = URL(string: item.name),
                    let humanFriendlyTrackerName = BlockedTrackerParser.parse(url: url, fallbackToDomainURL: false) {
                   Text(humanFriendlyTrackerName)
                     .font(.footnote)
@@ -151,7 +151,7 @@ struct PrivacyReportAllTimeListsView: View {
         ForEach(allTimeListWebsites) { item in
           HStack {
             FaviconImage(url: item.faviconUrl)
-            Text(item.domainOrTracker)
+            Text(item.domain)
             Spacer()
             Text("\(item.count)")
               .font(.headline.weight(.semibold))

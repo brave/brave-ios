@@ -813,11 +813,12 @@
 		44A58CC82693A309005C0879 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CC72693A309005C0879 /* ActivityView.swift */; };
 		44A58CEA26947100005C0879 /* BraveSearchDebugMenuFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */; };
 		44A7883627E351E700AA7CD0 /* PrivacyReportsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */; };
-		44BCBB9927D90B8A00BC6691 /* PrivacyReportsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */; };
+		44BCBB9927D90B8A00BC6691 /* PrivacyReportsTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44BCBB9827D90B8A00BC6691 /* PrivacyReportsTracker.swift */; };
 		44C2364526A05714005A573D /* TabTrayPrivateModeInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */; };
 		44C42CF6268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C42CF7268378B1009572D7 /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 44C42CF9268378B1009572D7 /* BrowserIntents.intentdefinition */; };
 		44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */; };
+		44CE9914280831E400135A2E /* PrivacyReportsWebsite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44CE9913280831E400135A2E /* PrivacyReportsWebsite.swift */; };
 		44FA2F3021F8DB1000EFA86A /* DataPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */; };
 		592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592F521D2217327B0078395E /* HttpCookieExtension.swift */; };
 		59350AFB22612D95004D7445 /* DisplayTextFieldTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59350AFA22612D95004D7445 /* DisplayTextFieldTest.swift */; };
@@ -2651,7 +2652,7 @@
 		44A58CC72693A309005C0879 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		44A58CE926947100005C0879 /* BraveSearchDebugMenuFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchDebugMenuFixture.swift; sourceTree = "<group>"; };
 		44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsManager.swift; sourceTree = "<group>"; };
-		44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsItem.swift; sourceTree = "<group>"; };
+		44BCBB9827D90B8A00BC6691 /* PrivacyReportsTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsTracker.swift; sourceTree = "<group>"; };
 		44BDACB027D6467700DDEE53 /* BraveVPNAlertJSONModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveVPNAlertJSONModel.swift; sourceTree = "<group>"; };
 		44C2364426A05714005A573D /* TabTrayPrivateModeInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayPrivateModeInfoView.swift; sourceTree = "<group>"; };
 		44C42CF8268378B1009572D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
@@ -2673,6 +2674,7 @@
 		44C42D2426837A21009572D7 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C42D2626837A30009572D7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		44C6CCD126DE6CB100E90068 /* DomainUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainUserScriptTests.swift; sourceTree = "<group>"; };
+		44CE9913280831E400135A2E /* PrivacyReportsWebsite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportsWebsite.swift; sourceTree = "<group>"; };
 		44FA2F2F21F8DB1000EFA86A /* DataPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPreferences.swift; sourceTree = "<group>"; };
 		5902D2FF22DCD681002232FB /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveShared.strings; sourceTree = "<group>"; };
 		590913E223268115004625FA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -5180,7 +5182,8 @@
 				4472703A27C96FA50093BFF2 /* VPNAlertCell.swift */,
 				4472703C27C972E20093BFF2 /* PrivacyHubVPNAlertsSection.swift */,
 				4472704027C995350093BFF2 /* PrivacyReportLabels.swift */,
-				44BCBB9827D90B8A00BC6691 /* PrivacyReportsItem.swift */,
+				44BCBB9827D90B8A00BC6691 /* PrivacyReportsTracker.swift */,
+				44CE9913280831E400135A2E /* PrivacyReportsWebsite.swift */,
 				44A7883527E351E700AA7CD0 /* PrivacyReportsManager.swift */,
 			);
 			indentWidth = 2;
@@ -8550,6 +8553,7 @@
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
 				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
 				27C626CB25BA198700418F40 /* WalletTransferExpiredViewController.swift in Sources */,
+				44CE9914280831E400135A2E /* PrivacyReportsWebsite.swift in Sources */,
 				5D5E2361238C386B00AD6FBD /* NTPTableViewController.swift in Sources */,
 				CA19C781275FE26A004235B9 /* OnboardingCommon.swift in Sources */,
 				5E824A34260BC6CA00127F36 /* BrowserViewController+Playlist.swift in Sources */,
@@ -8634,7 +8638,7 @@
 				0BF0DB941A8545800039F300 /* TopToolbarView.swift in Sources */,
 				4422D4C321BFFB7600BF1855 /* coding.cc in Sources */,
 				595E0EE121CAEF5B00813D49 /* FileManagerExtension.swift in Sources */,
-				44BCBB9927D90B8A00BC6691 /* PrivacyReportsItem.swift in Sources */,
+				44BCBB9927D90B8A00BC6691 /* PrivacyReportsTracker.swift in Sources */,
 				C615FAD9212A1E2600A8168C /* WebImageCache.swift in Sources */,
 				2F91AFD325FFA830002DBC4A /* ActivityShortcutManager.swift in Sources */,
 				0A56108424324B2A00B39107 /* BraveVPNSettingsViewController.swift in Sources */,

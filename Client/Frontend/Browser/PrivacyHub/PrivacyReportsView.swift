@@ -16,8 +16,8 @@ struct PrivacyReportsView: View {
   let lastWeekRiskiestWebsite: CountableEntity?
   let allTimeMostFrequentTracker: CountableEntity?
   let allTimeRiskiestWebsite: CountableEntity?
-  let allTimeListTrackers: [PrivacyReportsItem]
-  let allTimeListWebsites: [PrivacyReportsItem]
+  let allTimeListTrackers: [PrivacyReportsTracker]
+  let allTimeListWebsites: [PrivacyReportsWebsite]
   let lastVPNAlerts: [BraveVPNAlert]?
   
   var onDismiss: (() -> Void)?
@@ -119,7 +119,7 @@ struct PrivacyReportsView: View {
             Button(action: {
               showClearDataPrompt = true
             }, label: {
-              Image(systemName: "trash")
+              Image(uiImage: .init(imageLiteralResourceName: "playlist_delete_item").template)
             })
               .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
               .foregroundColor(Color(.braveOrange))

@@ -16,8 +16,8 @@ extension PrivacyReportsView {
     let allTimeMostFrequentTracker: CountableEntity?
     let allTimeRiskiestWebsite: CountableEntity?
     
-    let allTimeListTrackers: [PrivacyReportsItem]
-    let allTimeListWebsites: [PrivacyReportsItem]
+    let allTimeListTrackers: [PrivacyReportsTracker]
+    let allTimeListWebsites: [PrivacyReportsWebsite]
     
     private(set) var onDismiss: () -> Void
     
