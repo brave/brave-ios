@@ -277,8 +277,7 @@ extension Tab: BraveWalletKeyringServiceObserver {
   }
   
   func keyringReset() {
-    emitEthereumEvent(.ethereumAccountsChanged(accounts: []))
-    updateEthereumProperties()
+    reload()
   }
   
   func locked() {
