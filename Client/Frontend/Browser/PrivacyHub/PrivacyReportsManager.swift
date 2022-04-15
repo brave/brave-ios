@@ -60,15 +60,15 @@ struct PrivacyReportsManager {
     BlockedResource.clearData()
   }
   
-  static func consolidateData() {
+  static func consolidateData(dayRange range: Int = 30) {
     if Date() < Preferences.PrivacyHub.nextConsolidationDate.value {
       return
     }
     
     Preferences.PrivacyHub.nextConsolidationDate.value = Date().advanced(by: 7.days)
     
-    BlockedResource.consolidateData(olderThan: 30)
-    BraveVPNAlert.consolidateData(olderThan: 30)
+    BlockedResource.consolidateData(olderThan: range)
+    BraveVPNAlert.consolidateData(olderThan: range)
   }
 
   // MARK: - View
