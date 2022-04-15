@@ -198,13 +198,12 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
       Preferences.BraveVPNAlertTotals.consolidatedLocationPingCount.value += oldLocationPingCount
       Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value += oldEmailTrackerCount
       
-      // 2. Consolidating vpn trackers Brave VPN detected.
+      // 2. Consolidating vpn trackers, they are later used for All Time lists.
       uniqueTrackers.forEach {
-        let predicate =
-        NSPredicate(format: "\(#keyPath(BraveVPNAlert.host)) == %@ AND \(timestampKeyPath) = nil", $0.host)
-        
         let consolidatedRecord = BraveVPNAlert(entity: entity, insertInto: context)
         consolidatedRecord.host = $0.host
+        // Making uuid the same as host, this will result in our table's unique constraints
+        // to prevent adding multiple entires for each tracker.
         consolidatedRecord.uuid = $0.host
         consolidatedRecord.timestamp = -1
       }
