@@ -349,7 +349,7 @@
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app",
                                 @"host":@"google.com",
-                                @"message":@"Prevented Google from forcing shit you don't need down your throat",
+                                @"message":@"Prevented Google from forcing things you don't need down your throat",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked Ad Tracker",
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
@@ -424,8 +424,9 @@
         [task resume];
         
     } else {
-        // Returning dummy data so that we can debug easily in the simulator
-        completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
+        // Returning dummy data so that we can debug easily in the simulator.
+        // Uncomment if needed.
+        // completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
     }
 }
 

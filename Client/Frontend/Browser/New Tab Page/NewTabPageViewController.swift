@@ -127,6 +127,9 @@ class NewTabPageViewController: UIViewController {
 
     sections = [
       StatsSectionProvider(action: { [weak self] in
+        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+          return
+        }
         
         let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
         host.rootView.onDismiss = { [weak host] in
@@ -137,6 +140,7 @@ class NewTabPageViewController: UIViewController {
           self?.delegate?.navigateToInput(
             BraveUX.privacyReportsURL.absoluteString,
             inNewTab: false,
+            // Privacy Reports view is unavailable in private mode.
             switchingToPrivateMode: false
           )
         }
@@ -145,10 +149,9 @@ class NewTabPageViewController: UIViewController {
       }),
       FavoritesSectionProvider(action: { [weak self] bookmark, action in
         self?.handleFavoriteAction(favorite: bookmark, action: action)
-      },
-                               legacyLongPressAction: { [weak self] alertController in
-                                 self?.present(alertController, animated: true)
-                               }),
+      }, legacyLongPressAction: { [weak self] alertController in
+        self?.present(alertController, animated: true)
+      }),
       FavoritesOverflowSectionProvider(action: { [weak self] in
         self?.delegate?.focusURLBar()
       }),

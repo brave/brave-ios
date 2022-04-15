@@ -119,12 +119,12 @@ class BraveShieldStatsView: UIView {
     let image = UIImageView(image: #imageLiteral(resourceName: "privacy_reports_3dots").template)
     image.tintColor = .white
     
-    let bg = UIView()
-    bg.backgroundColor = .init(white: 0, alpha: 0.24)
-    bg.layer.cornerRadius = 12
-    bg.layer.cornerCurve = .continuous
-    insertSubview(bg, at: 0)
-    bg.snp.makeConstraints {
+    let background = UIView()
+    background.backgroundColor = .init(white: 0, alpha: 0.25)
+    background.layer.cornerRadius = 12
+    background.layer.cornerCurve = .continuous
+    insertSubview(background, at: 0)
+    background.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
     

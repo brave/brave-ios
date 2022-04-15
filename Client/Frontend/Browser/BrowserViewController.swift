@@ -3168,7 +3168,6 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
       }
       UIApplication.shared.open(settingsUrl)
     } else if response.notification.request.identifier == PrivacyReportsManager.notificationID {
-      
       openPrivacyReport()
     }
     completionHandler()
@@ -3192,6 +3191,7 @@ extension BrowserViewController {
       let tab = self.tabManager.addTab(
         PrivilegedRequest(url: BraveUX.privacyReportsURL) as URLRequest,
         afterTab: self.tabManager.selectedTab,
+        // Privacy Reports view is unavailable in private mode.
         isPrivate: false)
       self.tabManager.selectTab(tab)
     }

@@ -35,9 +35,9 @@ struct PrivacyReportsManager {
   static func scheduleProcessingBlockedRequests() {
     saveBlockedResourcesTimer?.invalidate()
     
-    if !Preferences.PrivacyReports.captureShieldsData.value { return }
+    let timeInterval = AppConstants.buildChannel.isPublic ? 60.0 : 10.0
 
-    saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+    saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
       processBlockedRequests()
     }
   }
@@ -45,12 +45,10 @@ struct PrivacyReportsManager {
   static func scheduleVPNAlertsTask() {
     vpnAlertsTimer?.invalidate()
     
-    if !BraveVPN.shouldProcessVPNAlerts { return }
-    
     // Because fetching VPN alerts involves making a url request,
-    // the time interval to fetch them is longer than the local on-device blocked requests
+    // the time interval to fetch them is longer than the local on-device blocked request processing.
     let timeInterval = AppConstants.buildChannel.isPublic ? 5.minutes : 1.minutes
-    vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+    vpnAlertsTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
       BraveVPN.processVPNAlerts()
     }
   }

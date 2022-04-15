@@ -80,7 +80,7 @@ extension BrowserViewController {
 
   func showPrivacyReportsOnboardingIfNeeded() {
     if Preferences.PrivacyReports.ntpOnboardingCompleted.value
-        && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+        || !PrivateBrowsingManager.shared.isPrivateBrowsing {
       return
     }
     
