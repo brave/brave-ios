@@ -62,7 +62,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var mostFrequentTracker = CountableEntity(name: "", count: 0)
 
     do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: days, includeConsolidatedData: true)
+      let results = try groupByFetch(property: hostKeyPath, daysRange: days)
 
       for result in results {
         guard let host = result[hostKeyPath] as? String else {
@@ -87,7 +87,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var maxNumberOfSites = Set<CountableEntity>()
 
     do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: nil, includeConsolidatedData: true)
+      let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
 
       for result in results {
         guard let host = result[hostKeyPath] as? String else {
@@ -110,7 +110,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
     var maxNumberOfSites = CountableEntity(name: "", count: 0)
 
     do {
-      let results = try groupByFetch(property: domainKeyPath, daysRange: days, includeConsolidatedData: false)
+      let results = try groupByFetch(property: domainKeyPath, daysRange: days)
 
       for result in results {
         guard let domain = result[domainKeyPath] as? String else {
@@ -217,46 +217,20 @@ public final class BlockedResource: NSManagedObject, CRUD {
   }
 
   /// A helper method for to group up elements and then count them.
-  /// Note: This query skips single elements(< 1)
   private static func groupByFetch(property: String,
-                                   daysRange days: Int?,
-                                   includeConsolidatedData: Bool) throws -> [NSDictionary] {
+                                   daysRange days: Int?) throws -> [NSDictionary] {
     let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
     let context = DataController.viewContext
     fetchRequest.entity = BlockedResource.entity(in: context)
 
-    let expression = NSExpressionDescription()
-    expression.name = "group_by_count"
-    expression.expression = .init(forFunction: "count:", arguments: [NSExpression(forKeyPath: property)])
-    expression.expressionResultType = .integer32AttributeType
-
-    // This expression is required. Otherwise we can not pass this custom expression to the NSPredicate.
-    let countVariableExpr = NSExpression(forVariable: "group_by_count")
-
-    fetchRequest.propertiesToFetch = [property, expression]
-    fetchRequest.propertiesToGroupBy = [property]
+    fetchRequest.propertiesToFetch = [property, "timestamp"]
+    fetchRequest.propertiesToGroupBy = [property, "timestamp"]
     fetchRequest.resultType = .dictionaryResultType
     
-    var latestItemsPredicate: NSPredicate?
     if let days = days {
-      latestItemsPredicate =
-        NSPredicate(format: "\(timestampKeyPath) >= %@ AND %@ > 1", getDate(-days) as CVarArg, countVariableExpr)
-    } else {
-      latestItemsPredicate = NSPredicate(format: "%@ > 1", countVariableExpr)
+      fetchRequest.havingPredicate = NSPredicate(format: "\(timestampKeyPath) >= %@", getDate(-days) as CVarArg)
     }
     
-    if let latestItemsPredicate = latestItemsPredicate {
-      if includeConsolidatedData {
-        let consolidatedItemsPredicate = NSPredicate(format: "\(timestampKeyPath) = nil")
-        let combinedPredicate = NSCompoundPredicate(type: .or,
-                                                    subpredicates: [latestItemsPredicate, consolidatedItemsPredicate])
-        
-        fetchRequest.havingPredicate = combinedPredicate
-      } else {
-        fetchRequest.havingPredicate = latestItemsPredicate
-      }
-    }
-
     let results = try context.fetch(fetchRequest)
     return results
   }
