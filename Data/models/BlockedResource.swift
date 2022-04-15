@@ -15,7 +15,6 @@ public enum BlockedResourceType: Int32 {
 }
 
 public final class BlockedResource: NSManagedObject, CRUD {
-  @NSManaged public var consolidationCount: Int32
   @NSManaged public var domain: String
   @NSManaged public var faviconUrl: String
   @NSManaged public var host: String
