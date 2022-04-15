@@ -4641,5 +4641,12 @@ extension Strings {
       value: "Privacy Reports data is stored locally and never send anywhere.",
       comment: "Text of a disclaimer that explains how the data for generating privacy reprots is stored."
     )
+    
+    public static let onboardingButtonTitle = NSLocalizedString(
+      "privacyHub.onboardingButtonTitle",
+      bundle: .braveShared,
+      value: "Open Privacy Report",
+      comment: "Text of a button that opens up a Privacy Reports screen."
+    )
   }
 }

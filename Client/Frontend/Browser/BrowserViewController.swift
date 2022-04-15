@@ -3169,26 +3169,33 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
       UIApplication.shared.open(settingsUrl)
     } else if response.notification.request.identifier == PrivacyReportsManager.notificationID {
       
-      if PrivateBrowsingManager.shared.isPrivateBrowsing {
-        return
-      }
-            
-      let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
-      host.rootView.onDismiss = { [weak host] in
-        host?.dismiss(animated: true)
-      }
-      
-      host.rootView.openPrivacyReportsUrl = { [weak self] in
-        guard let self = self else { return }
-        let tab = self.tabManager.addTab(
-          PrivilegedRequest(url: BraveUX.privacyReportsURL) as URLRequest,
-          afterTab: self.tabManager.selectedTab,
-          isPrivate: false)
-        self.tabManager.selectTab(tab)
-      }
-      
-      self.present(host, animated: true)
+      openPrivacyReport()
     }
     completionHandler()
+  }
+}
+
+// Privacy reports
+extension BrowserViewController {
+  func openPrivacyReport() {
+    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+      return
+    }
+    
+    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+    host.rootView.onDismiss = { [weak host] in
+      host?.dismiss(animated: true)
+    }
+    
+    host.rootView.openPrivacyReportsUrl = { [weak self] in
+      guard let self = self else { return }
+      let tab = self.tabManager.addTab(
+        PrivilegedRequest(url: BraveUX.privacyReportsURL) as URLRequest,
+        afterTab: self.tabManager.selectedTab,
+        isPrivate: false)
+      self.tabManager.selectTab(tab)
+    }
+    
+    self.present(host, animated: true)
   }
 }

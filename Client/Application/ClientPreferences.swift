@@ -319,5 +319,7 @@ extension Preferences {
     static let captureVPNAlerts = Option<Bool>(key: "privacy-hub.capture-vpn-alerts", default: true)
     static let nextConsolidationDate =
     Option<Date>(key: "privacy-hub.capture-vpn-alerts", default: Date().advanced(by: 7.days))
+    static let privacyReportsOnboardingCompleted =
+    Option<Bool>(key: "privacy-hub.onboarding-completed", default: false)
   }
 }

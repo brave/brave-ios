@@ -75,16 +75,22 @@ extension BrowserViewController {
   }
 
   func showNTPOnboarding() {
-    if Preferences.General.isNewRetentionUser.value == true,
-      Preferences.DebugFlag.skipNTPCallouts != true,
-      !topToolbar.inOverlayMode,
-      topToolbar.currentURL == nil,
-      !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
-      presentNTPStatsOnboarding()
-    }
+    showPrivacyReportsOnboardingIfNeeded()
   }
 
-  func presentNTPStatsOnboarding() {
+  func showPrivacyReportsOnboardingIfNeeded() {
+    if Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value
+        && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      return
+    }
+    
+    let trackerCountThresholdForOnboarding = AppConstants.buildChannel.isPublic ? 100 : 20
+    let trackerAdsTotal = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
+    
+    if trackerAdsTotal < trackerCountThresholdForOnboarding {
+      return
+    }
+    
     // If a controller is already presented (such as menu), do not show onboarding
     guard presentedViewController == nil else {
       return
@@ -98,7 +104,7 @@ extension BrowserViewController {
     }
 
     // Project the statsFrame to the current frame
-    let frame = view.convert(statsFrame, from: ntpController.view).insetBy(dx: -5.0, dy: 15.0)
+    let frame = view.convert(statsFrame, from: ntpController.view)
 
     // Create a border view
     let borderView = UIView().then {
@@ -116,10 +122,13 @@ extension BrowserViewController {
     view.addSubview(borderView)
     borderView.frame = frame
 
-    // Present the popover
+    // Present the popover and mark onboarding as complete
+    Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value = true
+    
     let controller = WelcomeNTPOnboardingController()
     controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
-
+    controller.buttonText = Strings.PrivacyHub.onboardingButtonTitle
+    
     let popover = PopoverController(contentController: controller)
     popover.arrowDistance = 10.0
     popover.present(from: borderView, on: self) { [weak popover, weak self] in
@@ -144,11 +153,17 @@ extension BrowserViewController {
       }
 
       popover.backgroundOverlayView.layer.mask = maskShape
-      popover.popoverDidDismiss = { [weak self] _ in
+      popover.popoverDidDismiss = { _ in
         maskShape.removeFromSuperlayer()
         borderView.removeFromSuperview()
-        Preferences.FullScreenCallout.ntpCalloutCompleted.value = true
-        self?.presentNTPMenuOnboarding()
+      }
+      
+      controller.buttonTapped = { [weak self] in
+        maskShape.removeFromSuperlayer()
+        borderView.removeFromSuperview()
+        DispatchQueue.main.async {
+          self?.openPrivacyReport()
+        }
       }
 
       DispatchQueue.main.async {
@@ -161,32 +176,6 @@ extension BrowserViewController {
             cornerHeight: 12.0)
           return path
         }()
-      }
-    }
-  }
-
-  func presentNTPMenuOnboarding() {
-    guard let menuButton = UIDevice.isIpad ? topToolbar.menuButton : toolbar?.menuButton else { return }
-    let controller = WelcomeNTPOnboardingController()
-    controller.setText(
-      title: Strings.Onboarding.ntpOnboardingPopoverDoneTitle,
-      details: Strings.Onboarding.ntpOnboardingPopoverDoneDescription)
-
-    let popover = PopoverController(contentController: controller)
-    popover.arrowDistance = 7.0
-    popover.present(from: menuButton, on: self)
-
-    if let icon = menuButton.imageView?.image {
-      let maskedView = controller.maskedPointerView(
-        icon: icon,
-        tint: menuButton.imageView?.tintColor)
-      popover.view.insertSubview(maskedView, aboveSubview: popover.backgroundOverlayView)
-      maskedView.frame = CGRect(width: 45.0, height: 45.0)
-      maskedView.center = view.convert(menuButton.center, from: menuButton.superview)
-      maskedView.layer.cornerRadius = max(maskedView.bounds.width, maskedView.bounds.height) / 2.0
-
-      popover.popoverDidDismiss = { _ in
-        maskedView.removeFromSuperview()
       }
     }
   }

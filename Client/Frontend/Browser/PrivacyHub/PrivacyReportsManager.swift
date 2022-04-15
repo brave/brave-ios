@@ -103,6 +103,8 @@ struct PrivacyReportsManager {
       allTimeListTrackers: allAlerts,
       allTimeListWebsites: allTimeListWebsites,
       lastVPNAlerts: last)
+    
+    Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value = true
 
     return view
   }
