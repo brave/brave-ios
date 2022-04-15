@@ -6,15 +6,29 @@
 import Foundation
 import Data
 
+/// Rperesents a blocked ad or tracker.
 struct PrivacyReportsTracker: Identifiable {
   let name: String
   let count: Int
-  let source: BlockedResource.Source?
+  let source: Source?
+  
+  /// Blocked tracker may come in two types:
+  /// Items blocked by Brave Shields, handled by `BlockedResource` model.
+  /// Items blocked by the Brave VPN feature, handled by `BraveVPNAlert` model.
+  /// This data is used to show correct labels on the all-time blocked items list.
+  enum Source {
+    case shields
+    case vpn
+    // The tracker was found by both Brave Shields and the Brave VPN alerts.
+    case both
+  }
   
   var id: String {
     name
   }
   
+  /// Blocked trackers are detected by Brave shields and Brave VPN.
+  /// This method merges those two sources of data and sets proper `Source` for them.
   static func merge(
     shieldItems: Set<CountableEntity>,
     vpnItems: Set<CountableEntity>

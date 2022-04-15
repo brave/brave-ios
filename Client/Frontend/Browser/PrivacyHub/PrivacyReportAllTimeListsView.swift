@@ -73,7 +73,7 @@ struct PrivacyReportAllTimeListsView: View {
     .padding(.vertical, 12)
   }
   
-  private func blockedLabels(by source: BlockedResource.Source?) -> some View {
+  private func blockedLabels(by source: PrivacyReportsTracker.Source?) -> some View {
     Group {
       switch source {
       case .shields:

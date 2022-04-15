@@ -41,10 +41,11 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var message: String?
   /// Currently unused. This is persisted in case we need it in the future.
   @NSManaged public var title: String?
-  /// Unique identifier of the blocked resource.
+  /// Unique identifier of the blocked resource. Must be unique.
   @NSManaged public var uuid: String
 
   /// Category value is stored as a number in the database. This converts it and returns a proper `TrackerType` enum value for it.
+  /// Returns nil if there's no category for a given number.
   public var categoryEnum: TrackerType? {
     return .init(rawValue: Int(category))
   }
@@ -98,10 +99,10 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
     do {
       // Returning 1 count per host here because for the VPN alerts we can't rely on count numbers.
       // Reason is a tracker is detected and saved multiple times per domain,
-      // we do not have knowledge on what website a given tracker was blocked.
+      // we do not have knowledge on what website or app a given tracker was blocked on.
       // This would lead to inflated stats on the Privacy Reports screen.
       //
-      // Each tracker is count as one entry, only bump the number slightly
+      // Each tracker is count as one entry, to only bump the number slightly
       // and show a proper UI that this a vpn alert type of tracker blocked.
       return .init(try context.fetch(fetchRequest)
                     .compactMap { $0["host"] as? String }
@@ -153,7 +154,7 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
   }
   
   public static func consolidateData(olderThan days: Int) {
-    //return
+    
     struct ConsolidatedVPNAlert: Hashable {
       let host: String
       let action: Int32
@@ -169,6 +170,7 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
       
       let date = Int64(Date().timeIntervalSince1970.advanced(by: -days.days))
       
+      // 1. Find all older items.
       let predicate = NSPredicate(format: "\(timestampKeyPath) <= %lld AND \(timestampKeyPath) > 0", date)
       let oldItems = all(where: predicate, context: context)
       
@@ -181,6 +183,7 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
       var oldLocationPingCount = 0
       var oldEmailTrackerCount = 0
       
+      // 2. Insert unique trackers only as we do not care about detection date or their count.
       var uniqueTrackers = Set<ConsolidatedVPNAlert>()
       oldItems?.forEach {
         uniqueTrackers.insert(.init(host: $0.host, action: $0.action, category: $0.category))
@@ -193,21 +196,22 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
         }
       }
       
-      // 1. Consolidating total alerts data.
+      // 3. Consolidating total alerts data.
       Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value += oldTrackerCount
       Preferences.BraveVPNAlertTotals.consolidatedLocationPingCount.value += oldLocationPingCount
       Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value += oldEmailTrackerCount
       
-      // 2. Consolidating vpn trackers, they are later used for All Time lists.
+      // 4. Consolidating vpn trackers, they are later used for all-time lists.
       uniqueTrackers.forEach {
         let consolidatedRecord = BraveVPNAlert(entity: entity, insertInto: context)
         consolidatedRecord.host = $0.host
-        // Making uuid the same as host, this will result in our table's unique constraints
+        // Making uuid the same as host, this will cause our table's unique constraints
         // to prevent adding multiple entires for each tracker.
         consolidatedRecord.uuid = $0.host
         consolidatedRecord.timestamp = -1
       }
       
+      // 5. Remove all old items from the database.
       oldItems?.forEach {
         $0.delete(context: .existing(context))
       }
