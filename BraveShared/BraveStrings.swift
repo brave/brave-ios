@@ -4377,7 +4377,7 @@ extension Strings {
     )
     
     public static let mostFrequentTrackerAndAdBody = NSLocalizedString(
-      "privacyHub.",
+      "privacyHub.mostFrequentTrackerAndAdBody",
       bundle: .braveShared,
       value: "**%@** was blocked by Brave Shields on **%lld** sites",
       comment: "Do NOT localize asterisk('*') characters, they are used to make the text bold in the app. It says which tracker was blocked on how many websites, example usage: 'Google Analytics was blocked by Brave Shields on 42 sites'"

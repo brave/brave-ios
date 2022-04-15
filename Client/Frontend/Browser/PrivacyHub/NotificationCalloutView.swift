@@ -26,7 +26,7 @@ extension PrivacyReportsView {
         }
         
         DispatchQueue.main.async {
-          Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
+          Preferences.PrivacyReports.shouldShowNotificationPermissionCallout.value = false
           PrivacyReportsManager.scheduleNotification()
         }
       }
@@ -35,7 +35,7 @@ extension PrivacyReportsView {
     var closeButton: some View {
       Button(
         action: {
-          Preferences.PrivacyHub.shouldShowNotificationPermissionCallout.value = false
+          Preferences.PrivacyReports.shouldShowNotificationPermissionCallout.value = false
         },
         label: {
           Image(systemName: "xmark")

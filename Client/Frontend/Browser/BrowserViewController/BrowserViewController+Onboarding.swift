@@ -79,7 +79,7 @@ extension BrowserViewController {
   }
 
   func showPrivacyReportsOnboardingIfNeeded() {
-    if Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value
+    if Preferences.PrivacyReports.ntpOnboardingCompleted.value
         && !PrivateBrowsingManager.shared.isPrivateBrowsing {
       return
     }
@@ -123,7 +123,7 @@ extension BrowserViewController {
     borderView.frame = frame
 
     // Present the popover and mark onboarding as complete
-    Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value = true
+    Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
     
     let controller = WelcomeNTPOnboardingController()
     controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)

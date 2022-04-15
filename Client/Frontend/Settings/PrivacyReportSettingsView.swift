@@ -9,8 +9,8 @@ import BraveShared
 
 struct PrivacyReportSettingsView: View {
   
-  @ObservedObject private var shieldsDataEnabled = Preferences.PrivacyHub.captureShieldsData
-  @ObservedObject private var vpnAlertsEnabled = Preferences.PrivacyHub.captureVPNAlerts
+  @ObservedObject private var shieldsDataEnabled = Preferences.PrivacyReports.captureShieldsData
+  @ObservedObject private var vpnAlertsEnabled = Preferences.PrivacyReports.captureVPNAlerts
   
   @State private var clearButtonEnabled: Bool = true
   
@@ -48,7 +48,7 @@ struct PrivacyReportSettingsView: View {
         Section(footer: Text("This will force all data to consolidate. All stats for 'last 7 days' should be cleared and 'all time data' views should be preserved.")) {
           HStack() {
             Button(action: {
-              Preferences.PrivacyHub.nextConsolidationDate.value = Date().advanced(by: -2.days)
+              Preferences.PrivacyReports.nextConsolidationDate.value = Date().advanced(by: -2.days)
               PrivacyReportsManager.consolidateData(dayRange: -10)
             },
                    label: {

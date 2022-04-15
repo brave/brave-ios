@@ -91,7 +91,7 @@ class TPStatsBlocklistChecker {
           request,
           currentTabUrl: currentTabUrl) {
 
-        if Preferences.PrivacyHub.captureShieldsData.value,
+        if Preferences.PrivacyReports.captureShieldsData.value,
           let dom = URL(string: domainUrl),
           let blockedResourceHost = url.baseDomain {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, dom, Date()))

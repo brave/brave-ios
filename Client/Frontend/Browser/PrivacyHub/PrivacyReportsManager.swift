@@ -24,7 +24,7 @@ struct PrivacyReportsManager {
     
     // To handle any weird edge cases when user disables data capturing while there are pending items to save
     // we drop them before saving to DB.
-    if !Preferences.PrivacyHub.captureShieldsData.value { return }
+    if !Preferences.PrivacyReports.captureShieldsData.value { return }
 
     BlockedResource.batchInsert(items: itemsToSave)
   }
@@ -35,9 +35,9 @@ struct PrivacyReportsManager {
   static func scheduleProcessingBlockedRequests() {
     saveBlockedResourcesTimer?.invalidate()
     
-    if !Preferences.PrivacyHub.captureShieldsData.value { return }
+    if !Preferences.PrivacyReports.captureShieldsData.value { return }
 
-    saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: 1.minutes, repeats: true) { _ in
+    saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
       processBlockedRequests()
     }
   }
@@ -61,11 +61,11 @@ struct PrivacyReportsManager {
   }
   
   static func consolidateData(dayRange range: Int = 30) {
-    if Date() < Preferences.PrivacyHub.nextConsolidationDate.value {
+    if Date() < Preferences.PrivacyReports.nextConsolidationDate.value {
       return
     }
     
-    Preferences.PrivacyHub.nextConsolidationDate.value = Date().advanced(by: 7.days)
+    Preferences.PrivacyReports.nextConsolidationDate.value = Date().advanced(by: 7.days)
     
     BlockedResource.consolidateData(olderThan: range)
     BraveVPNAlert.consolidateData(olderThan: range)
@@ -104,7 +104,7 @@ struct PrivacyReportsManager {
       allTimeListWebsites: allTimeListWebsites,
       lastVPNAlerts: last)
     
-    Preferences.PrivacyHub.privacyReportsOnboardingCompleted.value = true
+    Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
 
     return view
   }

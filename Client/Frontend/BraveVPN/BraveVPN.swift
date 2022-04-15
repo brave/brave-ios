@@ -650,7 +650,7 @@ class BraveVPN {
   }
   
   static var shouldProcessVPNAlerts: Bool {
-    if !Preferences.PrivacyHub.captureVPNAlerts.value {
+    if !Preferences.PrivacyReports.captureVPNAlerts.value {
       return false
     }
     

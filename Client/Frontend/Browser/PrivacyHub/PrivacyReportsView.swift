@@ -30,7 +30,7 @@ struct PrivacyReportsView: View {
     && allTimeRiskiestWebsite == nil
   }
   
-  @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyHub.shouldShowNotificationPermissionCallout
+  @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyReports.shouldShowNotificationPermissionCallout
   
   @State private var correctAuthStatus: Bool = false
   
@@ -105,7 +105,7 @@ struct PrivacyReportsView: View {
           
           Divider()
           
-          if Preferences.PrivacyHub.captureVPNAlerts.value, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
+          if Preferences.PrivacyReports.captureVPNAlerts.value, let lastVPNAlerts = lastVPNAlerts, !lastVPNAlerts.isEmpty {
             PrivacyHubVPNAlertsSection(lastVPNAlerts: lastVPNAlerts, onDismiss: dismissView)
             
             Divider()
