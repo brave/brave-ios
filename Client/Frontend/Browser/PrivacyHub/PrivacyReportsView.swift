@@ -57,6 +57,35 @@ struct PrivacyReportsView: View {
     }
   }
   
+  private var clearAllDataButton: some View {
+    Button(action: {
+      showClearDataPrompt = true
+    }, label: {
+      Image(uiImage: .init(imageLiteralResourceName: "playlist_delete_item").template)
+    })
+      .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
+      .foregroundColor(Color(.braveOrange))
+      .actionSheet(isPresented: $showClearDataPrompt) {
+        // FIXME: Currently .actionSheet does not allow you leave empty title for the sheet.
+        // This could get converted to .confirmationPrompt or Menu with destructive buttons
+        // once iOS 15 is minimum supported version
+        .init(title: Text(Strings.PrivacyHub.clearAllDataPrompt),
+              buttons: [
+                .destructive(Text(Strings.yes), action: {
+                  PrivacyReportsManager.clearAllData()
+                  // Dismiss to avoid having to observe for db changes to update the view.
+                  dismissView()
+                }),
+                .cancel()
+              ])
+      }
+  }
+  
+  private var doneButton: some View {
+    Button(Strings.done, action: dismissView)
+      .foregroundColor(Color(.braveOrange))
+  }
+  
   var body: some View {
     NavigationView {
       ScrollView(.vertical) {
@@ -109,34 +138,24 @@ struct PrivacyReportsView: View {
         .padding()
         .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .confirmationAction) {
-            Button(Strings.done, action: dismissView)
-            .foregroundColor(Color(.braveOrange))
-          }
-          
-          ToolbarItem(placement: .cancellationAction) {
-            Button(action: {
-              showClearDataPrompt = true
-            }, label: {
-              Image(uiImage: .init(imageLiteralResourceName: "playlist_delete_item").template)
-            })
-              .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
-              .foregroundColor(Color(.braveOrange))
-              .actionSheet(isPresented: $showClearDataPrompt) {
-                // FIXME: Currently .actionSheet does not allow you leave empty title for the sheet.
-                // This could get converted to .confirmationPrompt or Menu with destructive buttons
-                // once iOS 15 is minimum supported version
-                .init(title: Text(Strings.PrivacyHub.clearAllDataPrompt),
-                      buttons: [
-                        .destructive(Text(Strings.yes), action: {
-                          PrivacyReportsManager.clearAllData()
-                          // Dismiss to avoid having to observe for db changes to update the view.
-                          dismissView()
-                        }),
-                        .cancel()
-                      ])
+        .osAvailabilityModifiers { content in
+          if #available(iOS 15.0, *) {
+            content
+              .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                  doneButton
+                }
+
+                ToolbarItem(placement: .cancellationAction) {
+                  clearAllDataButton
+                }
               }
+          } else {
+            // Bug: On iOS 14 Action Sheets do not work when placed in `.toolbar/ToolbarItem`.
+            // .navigationBarItems is used as a workaround.
+            // This view modifier is deprecated in iOS 15.4+
+            content
+              .navigationBarItems(leading: clearAllDataButton, trailing: doneButton)
           }
         }
       }
