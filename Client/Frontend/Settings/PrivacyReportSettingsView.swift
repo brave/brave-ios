@@ -12,6 +12,8 @@ struct PrivacyReportSettingsView: View {
   @ObservedObject private var shieldsDataEnabled = Preferences.PrivacyHub.captureShieldsData
   @ObservedObject private var vpnAlertsEnabled = Preferences.PrivacyHub.captureVPNAlerts
   
+  @State private var clearButtonEnabled: Bool = true
+  
   var body: some View {
     List {
       Section(footer: Text(Strings.PrivacyHub.settingsEnableShieldsFooter)) {
@@ -28,15 +30,20 @@ struct PrivacyReportSettingsView: View {
       
       Section(footer: Text(Strings.PrivacyHub.settingsClearDataFooter)) {
         HStack() {
-          Button(action: PrivacyReportsManager.clearAllData,
+          Button(action: {
+            PrivacyReportsManager.clearAllData()
+            clearButtonEnabled = false
+          },
                  label: {
             Text(Strings.PrivacyHub.settingsSlearDataTitle)
               .frame(maxWidth: .infinity)
           })
+            .disabled(!clearButtonEnabled)
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
+    .listStyle(.insetGrouped)
   }
 }
 

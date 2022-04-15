@@ -65,10 +65,10 @@ struct PrivacyReportsManager {
       return
     }
     
+    Preferences.PrivacyHub.nextConsolidationDate.value = Date().advanced(by: 7.days)
+    
     BlockedResource.consolidateData(olderThan: 30)
     BraveVPNAlert.consolidateData(olderThan: 30)
-    
-    Preferences.PrivacyHub.nextConsolidationDate.value = Date().advanced(by: 7.days)
   }
 
   // MARK: - View
