@@ -138,9 +138,7 @@ struct SuggestedNetworkView: View {
             .padding(.vertical, 6)
           }
           Button {
-            let networkDetails = CustomNetworkModel()
-            networkDetails.populateDetails(from: chain, mode: .view)
-            self.isPresentingNetworkDetails = networkDetails
+            isPresentingNetworkDetails = .init(from: chain, mode: .view)
           } label: {
             Text(Strings.Wallet.viewDetails)
               .foregroundColor(Color(.braveBlurpleTint))

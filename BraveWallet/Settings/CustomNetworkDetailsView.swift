@@ -189,9 +189,14 @@ class CustomNetworkModel: ObservableObject, Identifiable {
       }
     }
   }
+  
+  /// Creates model for adding a new custom network
+  init() {
+    self.mode = .add
+  }
 
-  /// Updates the details of this class based on a custom network
-  func populateDetails(from network: BraveWallet.NetworkInfo, mode: Mode = .edit) {
+  /// Creates model and populates the details based on a custom network and mode
+  init(from network: BraveWallet.NetworkInfo, mode: Mode = .edit) {
     self.mode = mode
 
     let chainIdInDecimal: String
@@ -286,86 +291,60 @@ struct CustomNetworkDetailsView: View {
             }
           }
       ) {
-        if model.mode.isViewMode {
-          Text(verbatim: model.networkId.input)
-        } else {
-          NetworkTextField(
-            placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
-            item: $model.networkId
-          )
-          .keyboardType(.numberPad)
-          .disabled(model.mode.isEditMode)
-        }
+        networkTextField(
+          placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
+          item: $model.networkId
+        )
+        .keyboardType(.numberPad)
+        .disabled(model.mode.isEditMode)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainNameTitle))
       ) {
-        if model.mode.isViewMode {
-          Text(verbatim: model.networkName.input)
-        } else {
-          NetworkTextField(
-            placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
-            item: $model.networkName
-          )
-        }
+        networkTextField(
+          placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
+          item: $model.networkName
+        )
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolNameTitle))
       ) {
-        if model.mode.isViewMode {
-          Text(verbatim: model.networkSymbolName.input)
-        } else {
-          NetworkTextField(
-            placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
-            item: $model.networkSymbolName
-          )
-        }
+        networkTextField(
+          placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
+          item: $model.networkSymbolName
+        )
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolTitle))
       ) {
-        if model.mode.isViewMode {
-          Text(verbatim: model.networkSymbol.input)
-        } else {
-          NetworkTextField(
-            placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
-            item: $model.networkSymbol
-          )
-        }
+        networkTextField(
+          placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
+          item: $model.networkSymbol
+        )
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkCurrencyDecimalTitle))
       ) {
-        if model.mode.isViewMode {
-          Text(verbatim: model.networkDecimals.input)
-        } else {
-          NetworkTextField(
-            placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
-            item: $model.networkDecimals
-          )
-          .keyboardType(.numberPad)
-        }
+        networkTextField(
+          placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
+          item: $model.networkDecimals
+        )
+        .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       if !model.rpcUrls.isEmpty {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkRpcUrlsTitle))
         ) {
-          if model.mode.isViewMode {
-            ForEach(model.rpcUrls) { url in
-              Text(url.input)
-            }
-          } else {
-            ForEach($model.rpcUrls) { $url in
-              NetworkTextField(
-                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                item: $url
-              )
-            }
+          ForEach($model.rpcUrls) { $url in
+            networkTextField(
+              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+              item: $url
+            )
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -374,17 +353,11 @@ struct CustomNetworkDetailsView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkIconUrlsTitle))
         ) {
-          if model.mode.isViewMode {
-            ForEach(model.iconUrls) { url in
-              Text(url.input)
-            }
-          } else {
-            ForEach($model.iconUrls) { $url in
-              NetworkTextField(
-                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                item: $url
-              )
-            }
+          ForEach($model.iconUrls) { $url in
+            networkTextField(
+              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+              item: $url
+            )
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -393,17 +366,11 @@ struct CustomNetworkDetailsView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle))
         ) {
-          if model.mode.isViewMode {
-            ForEach(model.blockUrls) { url in
-              Text(url.input)
-            }
-          } else {
-            ForEach($model.blockUrls) { $url in
-              NetworkTextField(
-                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-                item: $url
-              )
-            }
+          ForEach($model.blockUrls) { $url in
+            networkTextField(
+              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+              item: $url
+            )
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -447,6 +414,22 @@ struct CustomNetworkDetailsView: View {
             )
           })
     )
+  }
+  
+  @ViewBuilder private func networkTextField(placeholder: String, item: Binding<NetworkInputItem>) -> some View {
+    if model.mode.isViewMode {
+      Text(item.wrappedValue.input)
+        .contextMenu {
+          Button(action: { UIPasteboard.general.string = item.wrappedValue.input }) {
+            Label(Strings.Wallet.copyToPasteboard, image: "brave.clipboard")
+          }
+        }
+    } else {
+      NetworkTextField(
+        placeholder: placeholder,
+        item: item
+      )
+    }
   }
 
   private func validateAllFields() -> Bool {
