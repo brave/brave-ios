@@ -81,13 +81,12 @@ struct SuggestedNetworkView: View {
         Text(keyringStore.selectedAccount.address.truncatedAddress)
           .fontWeight(.semibold)
         Blockie(address: keyringStore.selectedAccount.address)
-          .frame(idealWidth: blockieSize, maxWidth: blockieSize, idealHeight: maxBlockieSize, maxHeight: maxBlockieSize)
+          .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
           .aspectRatio(1, contentMode: .fit)
       }
       VStack(spacing: 8) {
         Image(systemName: "globe")
-          .frame(idealWidth: faviconSize, maxWidth: maxFaviconSize, idealHeight: faviconSize, maxHeight: maxFaviconSize)
-          .aspectRatio(1, contentMode: .fit)
+          .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
           .background(Color(.braveDisabled))
           .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         if case let .switchNetworks(_, origin) = mode {
