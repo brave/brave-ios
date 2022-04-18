@@ -285,65 +285,86 @@ struct CustomNetworkDetailsView: View {
             }
           }
       ) {
-        NetworkTextField(
-          placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
-          item: $model.networkId
-        )
-        .keyboardType(.numberPad)
-        .disabled(model.mode.isEditMode || model.mode.isViewMode)
+        if model.mode.isViewMode {
+          Text(verbatim: model.networkId.input)
+        } else {
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
+            item: $model.networkId
+          )
+          .keyboardType(.numberPad)
+          .disabled(model.mode.isEditMode)
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainNameTitle))
       ) {
-        NetworkTextField(
-          placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
-          item: $model.networkName
-        )
-        .disabled(model.mode.isViewMode)
+        if model.mode.isViewMode {
+          Text(verbatim: model.networkName.input)
+        } else {
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkChainNamePlaceholder,
+            item: $model.networkName
+          )
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolNameTitle))
       ) {
-        NetworkTextField(
-          placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
-          item: $model.networkSymbolName
-        )
-        .disabled(model.mode.isViewMode)
+        if model.mode.isViewMode {
+          Text(verbatim: model.networkSymbolName.input)
+        } else {
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkSymbolNamePlaceholder,
+            item: $model.networkSymbolName
+          )
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkSymbolTitle))
       ) {
-        NetworkTextField(
-          placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
-          item: $model.networkSymbol
-        )
-        .disabled(model.mode.isViewMode)
+        if model.mode.isViewMode {
+          Text(verbatim: model.networkSymbol.input)
+        } else {
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkSymbolPlaceholder,
+            item: $model.networkSymbol
+          )
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkCurrencyDecimalTitle))
       ) {
-        NetworkTextField(
-          placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
-          item: $model.networkDecimals
-        )
-        .keyboardType(.numberPad)
-        .disabled(model.mode.isViewMode)
+        if model.mode.isViewMode {
+          Text(verbatim: model.networkDecimals.input)
+        } else {
+          NetworkTextField(
+            placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
+            item: $model.networkDecimals
+          )
+          .keyboardType(.numberPad)
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       if !model.rpcUrls.isEmpty {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkRpcUrlsTitle))
         ) {
-          ForEach($model.rpcUrls) { $url in
-            NetworkTextField(
-              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-              item: $url
-            )
-            .disabled(model.mode.isViewMode)
+          if model.mode.isViewMode {
+            ForEach(model.rpcUrls) { url in
+              Text(url.input)
+            }
+          } else {
+            ForEach($model.rpcUrls) { $url in
+              NetworkTextField(
+                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+                item: $url
+              )
+            }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -352,12 +373,17 @@ struct CustomNetworkDetailsView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkIconUrlsTitle))
         ) {
-          ForEach($model.iconUrls) { $url in
-            NetworkTextField(
-              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-              item: $url
-            )
-            .disabled(model.mode.isViewMode)
+          if model.mode.isViewMode {
+            ForEach(model.iconUrls) { url in
+              Text(url.input)
+            }
+          } else {
+            ForEach($model.iconUrls) { $url in
+              NetworkTextField(
+                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+                item: $url
+              )
+            }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -366,12 +392,17 @@ struct CustomNetworkDetailsView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkBlockExplorerUrlsTitle))
         ) {
-          ForEach($model.blockUrls) { $url in
-            NetworkTextField(
-              placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
-              item: $url
-            )
-            .disabled(model.mode.isViewMode)
+          if model.mode.isViewMode {
+            ForEach(model.blockUrls) { url in
+              Text(url.input)
+            }
+          } else {
+            ForEach($model.blockUrls) { $url in
+              NetworkTextField(
+                placeholder: Strings.Wallet.customNetworkUrlsPlaceholder,
+                item: $url
+              )
+            }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
