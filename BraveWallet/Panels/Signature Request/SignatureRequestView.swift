@@ -19,6 +19,7 @@ struct SignatureRequestView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
   @ScaledMetric private var blockieSize = 54
+  private let maxBlockieSize: CGFloat = 108
   
   private var currentRequest: BraveWallet.SignMessageRequest {
     requests[requestIndex]
@@ -55,11 +56,14 @@ struct SignatureRequestView: View {
           }
         }
         VStack(spacing: 8) {
-          Blockie(address: account.address)
-            .frame(width: blockieSize, height: blockieSize)
-          Text(account.name)
-            .font(.subheadline.weight(.semibold))
-            .foregroundColor(Color(.secondaryBraveLabel))
+          VStack(spacing: 8) {
+            Blockie(address: account.address)
+              .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
+            Text(account.name)
+              .font(.subheadline.weight(.semibold))
+              .foregroundColor(Color(.secondaryBraveLabel))
+          }
+          .accessibilityElement(children: .combine)
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.headline)
         }
