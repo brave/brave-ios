@@ -2115,5 +2115,12 @@ extension Strings {
       value: "Would you like to import this token?",
       comment: "The subtitle of the view shown over a dapps website that requests the user add / approve a new token, explaining to the user what this request does."
     )
+    public static let contractAddressAccessibilityLabel = NSLocalizedString(
+      "wallet.contractAddressAccessibilityLabel",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Contract Address",
+      comment: "The accessibility label for the contract address of a token / asset."
+    )
   }
 }

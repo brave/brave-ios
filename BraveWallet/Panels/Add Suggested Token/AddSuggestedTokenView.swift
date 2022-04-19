@@ -24,10 +24,13 @@ struct AddSuggestedTokenView: View {
           .foregroundColor(Color(.braveLabel))
           .font(.subheadline)
         VStack {
-          AssetIconView(token: token, length: 64)
-          Text(token.symbol)
-            .font(.headline)
-            .foregroundColor(Color(.bravePrimary))
+          VStack {
+            AssetIconView(token: token, length: 64)
+            Text(token.symbol)
+              .font(.headline)
+              .foregroundColor(Color(.bravePrimary))
+          }
+          .accessibilityElement(children: .combine)
           Button(action: {
             if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
                let url = baseURL?.appendingPathComponent("token/\(token.contractAddress)") {
@@ -41,6 +44,8 @@ struct AddSuggestedTokenView: View {
             .font(.subheadline)
             .foregroundColor(Color(.braveBlurpleTint))
           }
+          .accessibilityLabel(Strings.Wallet.contractAddressAccessibilityLabel)
+          .accessibilityValue(token.contractAddress.truncatedAddress)
         }
         actionButtonContainer
           .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
