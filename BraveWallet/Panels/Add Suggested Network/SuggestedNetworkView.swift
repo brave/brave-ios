@@ -84,7 +84,8 @@ struct SuggestedNetworkView: View {
           .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
           .aspectRatio(1, contentMode: .fit)
       }
-      .accessibilityElement(children: .combine)
+      .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
+      .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
       VStack(spacing: 8) {
         VStack(spacing: 8) {
           Image(systemName: "globe")
