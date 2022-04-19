@@ -4337,8 +4337,8 @@ extension Strings {
     public static let privacyReportsTitle = NSLocalizedString(
       "privacyHub.privacyReportsTitle",
       bundle: .braveShared,
-      value: "Privacy report",
-      comment: "Title of main privacy reports screen."
+      value: "Privacy Hub",
+      comment: "Title of main privacy hub screen. This screen shows various stats caught by Brave's ad blockers."
     )
     
     public static let notificationCalloutBody = NSLocalizedString(
@@ -4359,7 +4359,7 @@ extension Strings {
       "privacyHub.noDataCalloutBody",
       bundle: .braveShared,
       value: "Visit some websites to see data here.",
-      comment: "Text of a callout that tell user they need to browser some websites first in order to see privacy reports data"
+      comment: "Text of a callout that tell user they need to browser some websites first in order to see privacy stats data"
     )
     
     public static let lastWeekHeader = NSLocalizedString(
@@ -4569,14 +4569,14 @@ extension Strings {
       "privacyHub.notificationTitle",
       bundle: .braveShared,
       value: "Your weekly privacy report is ready",
-      comment: "Title of a notification we show to the user, on tapping it, a privacy reports screen will open."
+      comment: "Title of a notification we show to the user, on tapping it, the Privacy Hub screen will open."
     )
     
     public static let notificationMessage = NSLocalizedString(
       "privacyHub.notificationMessage",
       bundle: .braveShared,
       value: "See a report of the ads & trackers Brave blocked this week, plus the riskiest sites you visited.",
-      comment: "Message of a notification we show to the user, on tapping it, a privacy reports screen will open."
+      comment: "Message of a notification we show to the user, on tapping it, the Privacy Hub screen will open."
     )
     
     public static let settingsEnableShieldsTitle = NSLocalizedString(
@@ -4631,21 +4631,21 @@ extension Strings {
     public static let clearAllDataAccessibility = NSLocalizedString(
       "privacyHub.clearAllDataAccessibility",
       bundle: .braveShared,
-      value: "Clear Privacy Reports data",
+      value: "Clear Privacy Hub data",
       comment: "Accessibility label for the 'clear all data' button."
     )
     
     public static let privacyReportsDisclaimer = NSLocalizedString(
       "privacyHub.privacyReportsDisclaimer",
       bundle: .braveShared,
-      value: "Privacy Reports data is stored locally and never send anywhere.",
+      value: "Privacy Hub data is stored locally and never sent anywhere.",
       comment: "Text of a disclaimer that explains how the data for generating privacy reprots is stored."
     )
     
     public static let onboardingButtonTitle = NSLocalizedString(
       "privacyHub.onboardingButtonTitle",
       bundle: .braveShared,
-      value: "Open Privacy Report",
+      value: "Open Privacy Hub",
       comment: "Text of a button that opens up a Privacy Reports screen."
     )
   }
