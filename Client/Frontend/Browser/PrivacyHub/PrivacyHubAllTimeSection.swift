@@ -126,7 +126,7 @@ extension PrivacyReportsView {
 #if DEBUG
 struct PrivacyHubAllTimeSection_Previews: PreviewProvider {
   static var previews: some View {
-    PrivacyHubAllTimeSection()
+    PrivacyReportsView.PrivacyHubAllTimeSection(allTimeMostFrequentTracker: nil, allTimeRiskiestWebsite: nil, allTimeListTrackers: [], allTimeListWebsites: [], onDismiss: {})
   }
 }
 #endif

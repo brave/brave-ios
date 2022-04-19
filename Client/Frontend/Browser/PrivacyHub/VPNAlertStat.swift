@@ -58,11 +58,11 @@ extension PrivacyReportsView {
 struct VPNAlertStat_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      AllVPNAlertsView.VPNAlertStat(type: .data, compact: false)
+      PrivacyReportsView.VPNAlertStat(assetName: "", title: "", count: 1, compact: false)
         .previewLayout(PreviewLayout.sizeThatFits)
-      AllVPNAlertsView.VPNAlertStat(type: .mail, compact: true)
+      PrivacyReportsView.VPNAlertStat(assetName: "", title: "", count: 1, compact: true)
         .previewLayout(PreviewLayout.sizeThatFits)
-      AllVPNAlertsView.VPNAlertStat(type: .location, compact: true)
+      PrivacyReportsView.VPNAlertStat(assetName: "", title: "", count: 1, compact: true)
         .previewLayout(PreviewLayout.sizeThatFits)
     }
 

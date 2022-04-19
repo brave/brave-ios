@@ -170,14 +170,11 @@ struct PrivacyReportsView: View {
 #if DEBUG
 struct PrivacyReports_Previews: PreviewProvider {
   static var previews: some View {
-    let lastWeekMostFrequentTracker = ("google-analytics", 133)
-    let lastWeekRiskiestWebsite = ("example.com", 13)
-    let allTimeMostFrequentTracker = ("scary-analytics", 678)
-    let allTimeRiskiestWebsite = ("scary.example.com", 554)
     
     Group {
-      ContentView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker, lastWeekRiskiestWebsite: lastWeekRiskiestWebsite, allTimeMostFrequentTracker: allTimeMostFrequentTracker, allTimeRiskiestWebsite: allTimeRiskiestWebsite)
-      ContentView(lastWeekMostFrequentTracker: lastWeekMostFrequentTracker, lastWeekRiskiestWebsite: lastWeekRiskiestWebsite, allTimeMostFrequentTracker: allTimeMostFrequentTracker, allTimeRiskiestWebsite: allTimeRiskiestWebsite)
+      PrivacyReportsView(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil, allTimeMostFrequentTracker: nil, allTimeRiskiestWebsite: nil, allTimeListTrackers: [], allTimeListWebsites: [], lastVPNAlerts: nil)
+      
+      PrivacyReportsView(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil, allTimeMostFrequentTracker: nil, allTimeRiskiestWebsite: nil, allTimeListTrackers: [], allTimeListWebsites: [], lastVPNAlerts: nil)
         .preferredColorScheme(.dark)
     }
   }

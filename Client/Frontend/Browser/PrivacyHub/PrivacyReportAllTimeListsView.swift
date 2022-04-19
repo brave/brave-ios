@@ -208,8 +208,8 @@ private struct LargeContentPickerViewerModifier_FB9812596: ViewModifier {
 struct PrivacyReportAllTimeListsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      PrivacyReportAllTimeListsView()
-      PrivacyReportAllTimeListsView()
+      PrivacyReportAllTimeListsView(allTimeListTrackers: [], allTimeListWebsites: [], onDismiss: {})
+      PrivacyReportAllTimeListsView(allTimeListTrackers: [], allTimeListWebsites: [], onDismiss: {})
         .preferredColorScheme(.dark)
     }
   }

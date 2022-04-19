@@ -80,7 +80,7 @@ extension PrivacyReportsView {
 #if DEBUG
 struct PrivacyHubLastWeekSection_Previews: PreviewProvider {
   static var previews: some View {
-    PrivacyHubLastWeekSection(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil)
+    PrivacyReportsView.PrivacyHubLastWeekSection(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil)
   }
 }
 #endif

@@ -53,7 +53,7 @@ extension PrivacyReportsView {
 #if DEBUG
 struct PrivacyHubVPNAlertsSection_Previews: PreviewProvider {
   static var previews: some View {
-    PrivacyHubVPNAlertsSection()
+    PrivacyReportsView.PrivacyHubVPNAlertsSection(lastVPNAlerts: [], onDismiss: { })
   }
 }
 #endif

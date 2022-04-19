@@ -139,8 +139,8 @@ extension PrivacyReportsView {
 struct AllVPNAlertsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      AllVPNAlertsView()
-      AllVPNAlertsView()
+      PrivacyReportsView.AllVPNAlertsView(alerts: (1, 1, 1), onDismiss: {})
+      PrivacyReportsView.AllVPNAlertsView(alerts: (2, 2, 2), onDismiss: {})
         .preferredColorScheme(.dark)
     }
   }
