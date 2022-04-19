@@ -84,17 +84,21 @@ struct SuggestedNetworkView: View {
           .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
           .aspectRatio(1, contentMode: .fit)
       }
+      .accessibilityElement(children: .combine)
       VStack(spacing: 8) {
-        Image(systemName: "globe")
-          .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
-          .background(Color(.braveDisabled))
-          .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        if case let .switchNetworks(_, origin) = mode {
-          Text(verbatim: origin.absoluteDisplayString)
-            .font(.subheadline)
-            .foregroundColor(Color(.braveLabel))
-            .multilineTextAlignment(.center)
+        VStack(spacing: 8) {
+          Image(systemName: "globe")
+            .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+            .background(Color(.braveDisabled))
+            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+          if case let .switchNetworks(_, origin) = mode {
+            Text(verbatim: origin.absoluteDisplayString)
+              .font(.subheadline)
+              .foregroundColor(Color(.braveLabel))
+              .multilineTextAlignment(.center)
+          }
         }
+        .accessibilityElement(children: .combine)
         Text(headerTitle)
           .font(.headline)
           .foregroundColor(Color(.bravePrimary))
@@ -129,6 +133,7 @@ struct SuggestedNetworkView: View {
             Text(chain.chainName)
           }
           .padding(.vertical, 6)
+          .accessibilityElement(children: .combine)
           if let networkURL = chain.rpcUrls.first {
             VStack(alignment: .leading) {
               Text(Strings.Wallet.networkURLTitle)
