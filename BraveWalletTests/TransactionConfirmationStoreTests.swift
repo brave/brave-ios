@@ -35,6 +35,9 @@ class TransactionConfirmationStoreTests: XCTestCase {
     rpcService._balance = { _, _, _, completion in
       completion(mockBalanceWei, .success, "")
     }
+    rpcService._erc20TokenAllowance = { _, _, _, completion in
+      completion("16345785d8a0000", .success, "") // 0.1000
+    }
     let txService = BraveWallet.TestTxService()
     txService._addObserver = { _ in }
     txService._allTransactionInfo = { _, _, completion in
@@ -107,7 +110,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
     let stateExpectation = expectation(description: "state")
     store.$state
       .dropFirst()
-      .collect(7) // collect until isUnlimitedApprovalRequested is set
+      .collect(8) // collect until isUnlimitedApprovalRequested is set
       .first()
       .sink { state in
         defer { stateExpectation.fulfill() }
@@ -118,6 +121,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
         XCTAssertEqual(lastState.gasSymbol, BraveWallet.BlockchainToken.previewToken.symbol)
         XCTAssertEqual(lastState.symbol, BraveWallet.BlockchainToken.daiToken.symbol)
         XCTAssertEqual(lastState.value, "Unlimited")
+        XCTAssertEqual(lastState.currentAllowance, "0.1000")
         XCTAssertTrue(lastState.isUnlimitedApprovalRequested)
       }
       .store(in: &cancellables)

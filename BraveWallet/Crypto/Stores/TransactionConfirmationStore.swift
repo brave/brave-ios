@@ -20,6 +20,7 @@ public class TransactionConfirmationStore: ObservableObject {
     var totalFiat: String = ""
     var isBalanceSufficient: Bool = true
     var isUnlimitedApprovalRequested: Bool = false
+    var currentAllowance: String = ""
     var origin: URL?
   }
   @Published var state: State = .init()
@@ -148,6 +149,12 @@ public class TransactionConfirmationStore: ObservableObject {
                     self.state.value = formatter.decimalString(for: approvalValue.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
                   }
                 }
+                self.rpcService.erc20TokenAllowance(
+                  token.contractAddress(in: selectedChain),
+                  ownerAddress: transaction.fromAddress,
+                  spenderAddress: transaction.txArgs[safe: 0] ?? "") { allowance, status, _ in
+                    self.state.currentAllowance = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+                  }
               }
               if let proposedAllowance = transaction.txArgs[safe: 1] {
                 self.state.isUnlimitedApprovalRequested = proposedAllowance.caseInsensitiveCompare(WalletConstants.MAX_UINT256) == .orderedSame

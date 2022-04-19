@@ -257,15 +257,26 @@ struct TransactionConfirmationView: View {
                   Divider()
                     .padding(.leading)
                   if activeTransaction.txType == .erc20Approve {
-                    HStack {
-                      Text(Strings.Wallet.confirmationViewCurrentAllowance)
-                      Spacer()
-                      Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
-                        .multilineTextAlignment(.trailing)
+                    Group {
+                      HStack {
+                        Text(Strings.Wallet.confirmationViewCurrentAllowance)
+                        Spacer()
+                        Text("\(confirmationStore.state.currentAllowance) \(confirmationStore.state.symbol)")
+                          .multilineTextAlignment(.trailing)
+                      }
+                      .padding()
+                      .accessibilityElement(children: .contain)
+                      Divider()
+                      HStack {
+                        Text(Strings.Wallet.editPermissionsProposedAllowanceHeader)
+                        Spacer()
+                        Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
+                          .multilineTextAlignment(.trailing)
+                      }
+                      .padding()
+                      .accessibilityElement(children: .contain)
                     }
                     .font(.callout)
-                    .padding()
-                    .accessibilityElement(children: .contain)
                     .foregroundColor(Color(.bravePrimary))
                   } else {
                     HStack {
