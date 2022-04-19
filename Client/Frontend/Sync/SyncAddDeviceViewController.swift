@@ -114,9 +114,7 @@ class SyncAddDeviceViewController: SyncViewController {
     super.viewDidAppear(animated)
     
     if !syncAPI.isInSyncGroup {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-        self?.showInitializationError()
-      }
+      showInitializationError()
     }
   }
 
