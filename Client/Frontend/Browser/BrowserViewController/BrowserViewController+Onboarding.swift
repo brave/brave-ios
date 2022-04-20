@@ -53,9 +53,34 @@ extension BrowserViewController {
     if Preferences.General.isNewRetentionUser.value == true,
       Preferences.DebugFlag.skipNTPCallouts != true,
       !topToolbar.inOverlayMode,
-      topToolbar.currentURL == nil,
-      !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
-      presentNTPStatsOnboarding()
+      topToolbar.currentURL == nil {
+      
+      if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value {
+        presentOmniBoxOnboarding()
+      }
+      
+      if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+        presentNTPStatsOnboarding()
+      }
+    }
+  }
+  
+  private func presentOmniBoxOnboarding() {
+    // If a controller is already presented (such as menu), do not show onboarding
+    guard presentedViewController == nil else {
+      return
+    }
+            
+    let frame = view.convert(
+      topToolbar.locationView.urlTextField.frame,
+      from: topToolbar.locationView).insetBy(dx: -7.0, dy: -6.0)
+    
+    // Present the popover
+    let controller = WelcomeOmniBoxOnboardingController()
+    controller.setText(title: "Type a website name or URL", details: "See the Brave Difference:\nNo ads. No trackers. Way faster page load.")
+
+    presentPopoverContent(using: controller, with: frame, cornerRadius: 6.0) {
+      Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
     }
   }
 
@@ -73,8 +98,22 @@ extension BrowserViewController {
     }
 
     // Project the statsFrame to the current frame
-    let frame = view.convert(statsFrame, from: ntpController.view).insetBy(dx: -5.0, dy: 15.0)
+    let frame = view.convert(statsFrame, from: ntpController.view).insetBy(dx: -5.0, dy: 9.0)
 
+    // Present the popover
+    let controller = WelcomeNTPOnboardingController()
+    controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
+
+    presentPopoverContent(using: controller, with: frame, cornerRadius: 12.0) {
+      Preferences.FullScreenCallout.ntpCalloutCompleted.value = true
+    }
+  }
+  
+  private func presentPopoverContent(
+    using contentController: UIViewController & PopoverContentComponent,
+    with frame: CGRect,
+    cornerRadius: CGFloat,
+    completion: @escaping () -> Void) {
     // Create a border view
     let borderView = UIView().then {
       let borderLayer = CAShapeLayer().then {
@@ -83,20 +122,23 @@ extension BrowserViewController {
         $0.fillColor = UIColor.clear.cgColor
         $0.lineWidth = 2.0
         $0.strokeEnd = 1.0
-        $0.path = UIBezierPath(roundedRect: frame, cornerRadius: 12.0).cgPath
+        $0.path = UIBezierPath(roundedRect: frame, cornerRadius: cornerRadius).cgPath
       }
       $0.layer.addSublayer(borderLayer)
     }
 
     view.addSubview(borderView)
     borderView.frame = frame
-
-    // Present the popover
-    let controller = WelcomeNTPOnboardingController()
-    controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
-
-    let popover = PopoverController(contentController: controller)
+      
+    let popover = PopoverController(contentController: contentController)
     popover.arrowDistance = 10.0
+    
+    let maskShape = CAShapeLayer().then {
+      $0.fillRule = .evenOdd
+      $0.fillColor = UIColor.white.cgColor
+      $0.strokeColor = UIColor.clear.cgColor
+    }
+    
     popover.present(from: borderView, on: self) { [weak popover, weak self] in
       guard let popover = popover,
         let self = self
@@ -104,65 +146,40 @@ extension BrowserViewController {
 
       // Mask the shadow
       let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
-      guard !maskFrame.isNull && !maskFrame.isInfinite && !maskFrame.isEmpty && !popover.backgroundOverlayView.bounds.isNull && !popover.backgroundOverlayView.bounds.isInfinite && !popover.backgroundOverlayView.bounds.isEmpty else {
+      guard !maskFrame.isNull &&
+            !maskFrame.isInfinite &&
+            !maskFrame.isEmpty &&
+            !popover.backgroundOverlayView.bounds.isNull &&
+            !popover.backgroundOverlayView.bounds.isInfinite &&
+            !popover.backgroundOverlayView.bounds.isEmpty else {
         return
       }
 
-      guard maskFrame.origin.x.isFinite && maskFrame.origin.y.isFinite && maskFrame.size.width.isFinite && maskFrame.size.height.isFinite && maskFrame.size.width > 0 && maskFrame.size.height > 0 else {
+      guard maskFrame.origin.x.isFinite &&
+            maskFrame.origin.y.isFinite &&
+            maskFrame.size.width.isFinite &&
+            maskFrame.size.height.isFinite &&
+            maskFrame.size.width > 0 &&
+            maskFrame.size.height > 0 else {
         return
-      }
-
-      let maskShape = CAShapeLayer().then {
-        $0.fillRule = .evenOdd
-        $0.fillColor = UIColor.white.cgColor
-        $0.strokeColor = UIColor.clear.cgColor
-      }
-
-      popover.backgroundOverlayView.layer.mask = maskShape
-      popover.popoverDidDismiss = { [weak self] _ in
-        maskShape.removeFromSuperlayer()
-        borderView.removeFromSuperview()
-        Preferences.FullScreenCallout.ntpCalloutCompleted.value = true
-        self?.presentNTPMenuOnboarding()
-      }
-
-      DispatchQueue.main.async {
-        maskShape.path = {
-          let path = CGMutablePath()
-          path.addRect(popover.backgroundOverlayView.bounds)
-          path.addRoundedRect(
-            in: maskFrame,
-            cornerWidth: 12.0,
-            cornerHeight: 12.0)
-          return path
-        }()
       }
     }
-  }
-
-  func presentNTPMenuOnboarding() {
-    guard let menuButton = UIDevice.isIpad ? topToolbar.menuButton : toolbar?.menuButton else { return }
-    let controller = WelcomeNTPOnboardingController()
-    controller.setText(
-      title: Strings.Onboarding.ntpOnboardingPopoverDoneTitle,
-      details: Strings.Onboarding.ntpOnboardingPopoverDoneDescription)
-
-    let popover = PopoverController(contentController: controller)
-    popover.arrowDistance = 7.0
-    popover.present(from: menuButton, on: self)
-
-    if let icon = menuButton.imageView?.image {
-      let maskedView = controller.maskedPointerView(
-        icon: icon,
-        tint: menuButton.imageView?.tintColor)
-      popover.view.insertSubview(maskedView, aboveSubview: popover.backgroundOverlayView)
-      maskedView.frame = CGRect(width: 45.0, height: 45.0)
-      maskedView.center = view.convert(menuButton.center, from: menuButton.superview)
-      maskedView.layer.cornerRadius = max(maskedView.bounds.width, maskedView.bounds.height) / 2.0
-
-      popover.popoverDidDismiss = { _ in
-        maskedView.removeFromSuperview()
-      }
+      
+    popover.backgroundOverlayView.layer.mask = maskShape
+    
+    popover.popoverDidDismiss = { _ in
+      maskShape.removeFromSuperlayer()
+      borderView.removeFromSuperview()
+      
+      completion()
+    }
+    
+    DispatchQueue.main.async {
+      maskShape.path = {
+        let path = CGMutablePath()
+        path.addRect(popover.backgroundOverlayView.bounds)
+        return path
+      }()
     }
   }
 
