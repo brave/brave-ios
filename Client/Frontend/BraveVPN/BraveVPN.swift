@@ -649,10 +649,12 @@ class BraveVPN {
     }
   }
   
-  static var shouldProcessVPNAlerts: Bool {
+  private static func shouldProcessVPNAlerts(considerDummyData: Bool) -> Bool {
     if !Preferences.PrivacyReports.captureVPNAlerts.value {
       return false
     }
+    
+    if considerDummyData { return true }
     
     switch vpnState {
     case .installed(let enabled):
@@ -663,10 +665,10 @@ class BraveVPN {
   }
 
   static func processVPNAlerts() {
-    if !shouldProcessVPNAlerts { return }
+    if !shouldProcessVPNAlerts(considerDummyData: !AppConstants.buildChannel.isPublic) { return }
 
     Task {
-      let (data, success, error) = await GRDGatewayAPI.shared().events()
+      let (data, success, error) = await GRDGatewayAPI.shared().events(withDummyData: !AppConstants.buildChannel.isPublic)
       if !success {
         log.error("VPN getEvents call failed")
         if let error = error {

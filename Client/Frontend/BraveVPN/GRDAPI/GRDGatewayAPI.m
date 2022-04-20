@@ -352,74 +352,74 @@
     return [NSArray arrayWithArray:fakeAlerts];
 }
 
-- (void)getEvents:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
-    if (self.dummyDataForDebugging == YES) {
-        if ([self _canMakeApiRequests] == NO) {
-            NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
-            if (completion) completion(nil, NO, @"cant make API requests");
-            return;
-        }
-        
-        if (!deviceIdentifier) {
-            if (completion) completion(nil, NO, @"An error occured!, Missing device id!");
-            return;
-        }
-        
-        NSString *apiEndpoint = [NSString stringWithFormat:@"/api/v1.1/device/%@/alerts", deviceIdentifier];
-        NSString *finalHost = [NSString stringWithFormat:@"https://%@%@", [self _baseHostname], apiEndpoint];
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: [NSURL URLWithString:finalHost]];
-        NSDictionary *jsonDict = @{kKeychainStr_APIAuthToken:apiAuthToken};
-        [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:jsonDict options:0 error:nil]];
-        [request setHTTPMethod:@"POST"];
-        
-        NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-            if (error != nil) {
-                NSLog(@"Couldn't connect to host: %@", [error localizedDescription]);
-                if (completion) completion(nil, NO, @"Error connecting to host for getEvents");
-                return;
-            }
-            
-            NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
-            if (statusCode == 500) {
-                NSLog(@"Internal server error");
-                if (completion) completion(nil, NO,@"Internal server error" );
-                return;
-                
-            } else if (statusCode == 401) {
-                NSLog(@"Auth failure. Needs to migrate device");
-                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kAppNeedsSelfRepair];
-                if (completion) completion(nil, NO, @"Authentication failed. Server migration required");
-                return;
-                
-            } else if (statusCode == 400) {
-                NSLog(@"Bad Request");
-                if (completion) completion(nil, NO, @"Subscriber credential missing");
-                return;
-                
-            } else if (statusCode == 200) {
-                NSError *jsonError = nil;
-                NSDictionary *dictFromJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-                if (jsonError) {
-                    NSLog(@"Failed to decode JSON with alerts: %@", jsonError);
-                    if (completion) completion(nil, NO, @"Failed to decode JSON");
-                } else {
-                    if (completion) completion(dictFromJSON, YES, nil);
-                }
-                return;
-                
-            } else {
-                NSLog(@"Unknown error: %ld", statusCode);
-                if (completion) completion(nil, NO, [NSString stringWithFormat:@"Unknown error: %ld", statusCode]);
-            }
-        }];
-        [task resume];
-        
-    } else {
-        // Returning dummy data so that we can debug easily in the simulator.
-        // Uncomment if needed.
-        // completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
+- (void)getEventsWithDummyData:(BOOL)useDummyData completion:(void(^)(NSDictionary *response, BOOL success, NSString * _Nullable error))completion {
+  
+  if (useDummyData) {
+    // Returning dummy data so that we can debug easily in the simulator.
+    completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
+    return;
+  }
+  
+  if ([self _canMakeApiRequests] == NO) {
+    NSLog(@"[DEBUG][getEvents] cannot make API requests !!! won't continue");
+    if (completion) completion(nil, NO, @"cant make API requests");
+    return;
+  }
+  
+  if (!deviceIdentifier) {
+    if (completion) completion(nil, NO, @"An error occured!, Missing device id!");
+    return;
+  }
+  
+  NSString *apiEndpoint = [NSString stringWithFormat:@"/api/v1.1/device/%@/alerts", deviceIdentifier];
+  NSString *finalHost = [NSString stringWithFormat:@"https://%@%@", [self _baseHostname], apiEndpoint];
+  
+  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: [NSURL URLWithString:finalHost]];
+  NSDictionary *jsonDict = @{kKeychainStr_APIAuthToken:apiAuthToken};
+  [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:jsonDict options:0 error:nil]];
+  [request setHTTPMethod:@"POST"];
+  
+  NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    if (error != nil) {
+      NSLog(@"Couldn't connect to host: %@", [error localizedDescription]);
+      if (completion) completion(nil, NO, @"Error connecting to host for getEvents");
+      return;
     }
+    
+    NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
+    if (statusCode == 500) {
+      NSLog(@"Internal server error");
+      if (completion) completion(nil, NO,@"Internal server error" );
+      return;
+      
+    } else if (statusCode == 401) {
+      NSLog(@"Auth failure. Needs to migrate device");
+      [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kAppNeedsSelfRepair];
+      if (completion) completion(nil, NO, @"Authentication failed. Server migration required");
+      return;
+      
+    } else if (statusCode == 400) {
+      NSLog(@"Bad Request");
+      if (completion) completion(nil, NO, @"Subscriber credential missing");
+      return;
+      
+    } else if (statusCode == 200) {
+      NSError *jsonError = nil;
+      NSDictionary *dictFromJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+      if (jsonError) {
+        NSLog(@"Failed to decode JSON with alerts: %@", jsonError);
+        if (completion) completion(nil, NO, @"Failed to decode JSON");
+      } else {
+        if (completion) completion(dictFromJSON, YES, nil);
+      }
+      return;
+      
+    } else {
+      NSLog(@"Unknown error: %ld", statusCode);
+      if (completion) completion(nil, NO, [NSString stringWithFormat:@"Unknown error: %ld", statusCode]);
+    }
+  }];
+  [task resume];
 }
 
 

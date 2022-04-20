@@ -4582,7 +4582,7 @@ extension Strings {
     public static let settingsEnableShieldsTitle = NSLocalizedString(
       "privacyHub.settingsEnableShieldsTitle",
       bundle: .braveShared,
-      value: "Capture Shields data",
+      value: "Capture Shields Data",
       comment: "Title of a setting that lets Brave monitor blocked network requests"
     )
     

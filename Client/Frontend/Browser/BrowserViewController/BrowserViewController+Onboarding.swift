@@ -83,12 +83,11 @@ extension BrowserViewController {
   }
   
   func showPrivacyReportsOnboardingIfNeeded() {
-    if Preferences.PrivacyReports.ntpOnboardingCompleted.value
-        || !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if Preferences.PrivacyReports.ntpOnboardingCompleted.value || PrivateBrowsingManager.shared.isPrivateBrowsing {
       return
     }
     
-    let trackerCountThresholdForOnboarding = AppConstants.buildChannel.isPublic ? 100 : 20
+    let trackerCountThresholdForOnboarding = AppConstants.buildChannel.isPublic ? 250 : 20
     let trackerAdsTotal = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
     
     if trackerAdsTotal < trackerCountThresholdForOnboarding {

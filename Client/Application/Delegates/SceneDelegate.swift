@@ -130,7 +130,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       QuickActions.sharedInstance.launchedShortcutItem = shortcutItem
     }
         
-    PrivacyReportsManager.scheduleNotification()
+    PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     PrivacyReportsManager.consolidateData()
     PrivacyReportsManager.scheduleProcessingBlockedRequests()
     PrivacyReportsManager.scheduleVPNAlertsTask()
