@@ -28,7 +28,7 @@ struct PrivacyReportSettingsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       
-      Section() {
+      Section(footer: Text(Strings.PrivacyHub.settingsSlearDataFooter)) {
         HStack() {
           Button(action: {
             PrivacyReportsManager.clearAllData()

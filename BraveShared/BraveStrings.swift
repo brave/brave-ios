@@ -4568,56 +4568,63 @@ extension Strings {
     public static let notificationTitle = NSLocalizedString(
       "privacyHub.notificationTitle",
       bundle: .braveShared,
-      value: "Your weekly privacy report is ready",
+      value: "Weekly Privacy Report",
       comment: "Title of a notification we show to the user, on tapping it, the Privacy Hub screen will open."
     )
     
     public static let notificationMessage = NSLocalizedString(
       "privacyHub.notificationMessage",
       bundle: .braveShared,
-      value: "See a report of the ads & trackers Brave blocked this week, plus the riskiest sites you visited.",
+      value: "A recap of how Brave protected you online this week.",
       comment: "Message of a notification we show to the user, on tapping it, the Privacy Hub screen will open."
     )
     
     public static let settingsEnableShieldsTitle = NSLocalizedString(
       "privacyHub.settingsEnableShieldsTitle",
       bundle: .braveShared,
-      value: "Capture Shields Data",
+      value: "Show Shields Data",
       comment: "Title of a setting that lets Brave monitor blocked network requests"
     )
     
     public static let settingsEnableShieldsFooter = NSLocalizedString(
       "privacyHub.settingsEnableShieldsFooter",
       bundle: .braveShared,
-      value: "This setting will not affect the shield stats counter on the New Tab Page. Shields data is not captured when in Private Browsing Mode",
+      value: "Privacy Hub shows a count of what Shields blocked. Setting will not affect Shields counter on new tab page. Shields data is not counted in private windows.",
       comment: "This text explains a setting that lets Brave monitor blocked network requests"
     )
     
     public static let settingsEnableVPNAlertsTitle = NSLocalizedString(
       "privacyHub.settingsEnableVPNAlertsTitle",
       bundle: .braveShared,
-      value: "Capture VPN Alerts",
+      value: "Show VPN Alerts",
       comment: "Title of a setting that lets Brave monitor blocked network requests captured by Brave VPN"
     )
     
     public static let settingsEnableVPNAlertsFooter = NSLocalizedString(
       "privacyHub.settingsEnableVPNAlertsFooter",
       bundle: .braveShared,
-      value: "This setting has no effect if you have not purchased the Brave VPN",
+      value: "Setting only applies if you've purchased VPN subscription.",
       comment: "This text explains a setting that lets Brave monitor blocked network requests captured by Brave VPN"
     )
     
     public static let settingsSlearDataTitle = NSLocalizedString(
       "privacyHub.settingsSlearDataTitle",
       bundle: .braveShared,
-      value: "Clear Privacy Hub Data",
+      value: "Clear Shields Data",
       comment: "Button that lets user clear all blocked requests and vpn alerts data that Brave captured for them."
+    )
+    
+    public static let settingsSlearDataFooter = NSLocalizedString(
+      "privacyHub.settingsSlearDataFooter",
+      bundle: .braveShared,
+      value: "Resets the count of everything Shields has blocked.",
+      comment: "This text explains what the button to clear datain the Privacy Hub is for."
     )
     
     public static let clearAllDataPrompt = NSLocalizedString(
       "privacyHub.clearAllDataPrompt",
       bundle: .braveShared,
-      value: "Clear all data?",
+      value: "Clear all Shields data?",
       comment: "A prompt message we show to the user if they want to clear all data gathered by the Privacy Reports Feature"
     )
     
