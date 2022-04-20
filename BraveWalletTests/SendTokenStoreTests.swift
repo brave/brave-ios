@@ -177,7 +177,7 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._addObserver = { _ in }
     
     let walletService = BraveWallet.TestBraveWalletService()
-    walletService._userAssets = { $1([.previewToken]) }
+    walletService._userAssets = { $2([.previewToken]) }
     
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._selectedAccount = { $1("account-address") }

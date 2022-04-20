@@ -45,11 +45,11 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion(.braveWallet)
   }
 
-  func hasEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool, Bool) -> Void) {
+  func hasEthereumPermission(_ origin: URLOrigin, account: String, completion: @escaping (Bool, Bool) -> Void) {
     completion(false, false)
   }
 
-  func resetEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool) -> Void) {
+  func resetEthereumPermission(_ origin: URLOrigin, account: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
 
@@ -89,7 +89,7 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion(false)
   }
 
-  func addEthereumPermission(_ origin: URL, account: String, completion: @escaping (Bool) -> Void) {
+  func addEthereumPermission(_ origin: URLOrigin, account: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
 
@@ -115,14 +115,14 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion("", "")
   }
   
-  func notifyGetPublicKeyRequestProcessed(_ approved: Bool, origin: URL) {
+  func notifyGetPublicKeyRequestProcessed(_ approved: Bool, origin: URLOrigin) {
   }
   
   func pendingGetEncryptionPublicKeyRequests() async -> [BraveWallet.GetEncryptionPublicKeyRequest] {
     return []
   }
   
-  func notifyDecryptRequestProcessed(_ approved: Bool, origin: URL) {
+  func notifyDecryptRequestProcessed(_ approved: Bool, origin: URLOrigin) {
   }
   
   func pendingDecryptRequests() async -> [BraveWallet.DecryptRequest] {

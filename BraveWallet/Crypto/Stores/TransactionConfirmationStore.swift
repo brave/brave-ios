@@ -356,8 +356,8 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   func fetchTokens(completion: (([BraveWallet.BlockchainToken]) -> Void)? = nil) {
-    rpcService.chainId(.eth) { [weak self] chainId in
-      self?.blockchainRegistry.allTokens(chainId) { tokens in
+    rpcService.network { [weak self] network in
+      self?.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
         self?.allTokens = tokens
         completion?(tokens)
       }
