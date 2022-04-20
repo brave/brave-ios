@@ -75,7 +75,11 @@ extension BrowserViewController {
   }
   
   func showNTPOnboarding() {
-    showPrivacyReportsOnboardingIfNeeded()
+    if !topToolbar.inOverlayMode,
+       topToolbar.currentURL == nil,
+       Preferences.DebugFlag.skipNTPCallouts != true {
+      showPrivacyReportsOnboardingIfNeeded()
+    }
   }
   
   func showPrivacyReportsOnboardingIfNeeded() {
