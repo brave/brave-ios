@@ -26,6 +26,20 @@ class NewTabCenteredCollectionViewCell<View: UIView>: UICollectionViewCell, Coll
   required init(coder: NSCoder) {
     fatalError()
   }
+  
+  var supportHighlighting = false
+  
+  override var isHighlighted: Bool {
+    didSet {
+      guard supportHighlighting else { return }
+      
+      if isHighlighted {
+        contentView.alpha = 0.6
+      } else {
+        contentView.alpha = 1.0
+      }
+    }
+  }
 
   override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
     // swiftlint:disable:next force_cast

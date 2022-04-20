@@ -12,7 +12,7 @@ extension PrivacyReportsView {
     var body: some View {
       Text(Strings.PrivacyHub.blockedLabel.uppercased())
         .foregroundColor(Color("label_red_foreground"))
-        .padding(.horizontal, 4)
+        .padding(.horizontal, 8)
         .padding(.vertical, 2)
         .background(Color("label_red_background"))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

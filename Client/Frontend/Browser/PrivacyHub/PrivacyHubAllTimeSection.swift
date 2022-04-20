@@ -32,20 +32,22 @@ extension PrivacyReportsView {
         if let entity = trackerOrWebsite {
           VStack(alignment: .leading) {
             Text(entity.name)
+              .font(.subheadline)
             Text(String.localizedStringWithFormat(countableLabel, entity.count))
+              .font(.footnote)
+              .foregroundColor(Color(.secondaryBraveLabel))
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-          .font(.subheadline)
-          
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
         } else {
           Text(Strings.PrivacyHub.noDataToShow)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .font(.subheadline)
             .foregroundColor(Color(.secondaryBraveLabel))
         }
       }
       .frame(maxWidth: .infinity)
-      .padding()
+      .padding(.horizontal)
+      .padding(.vertical, 8)
       .background(Color(.braveBackground))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
