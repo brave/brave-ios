@@ -120,6 +120,10 @@ class WelcomeViewController: UIViewController {
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
         self.animateToDefaultBrowserState()
       }
+    case .settings:
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        self.onSetDefaultBrowser()
+      }
     default:
       break
     }
@@ -210,15 +214,15 @@ class WelcomeViewController: UIViewController {
     case .welcome:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
-        transformation = transformation.scaledBy(x: 1.3, y: 1.3)
-        transformation = transformation.translatedBy(x: 0.0, y: -50.0)
+        transformation = transformation.scaledBy(x: 1.1, y: 1.1)
+        transformation = transformation.translatedBy(x: 0.0, y: -30.0)
         return transformation
       }()
 
       let bottomTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
         transformation = transformation.scaledBy(x: 1.5, y: 1.5)
-        transformation = transformation.translatedBy(x: 0.0, y: 30.0)
+        transformation = transformation.translatedBy(x: 0.0, y: 20.0)
         return transformation
       }()
 
@@ -236,6 +240,30 @@ class WelcomeViewController: UIViewController {
     case .defaultBrowser:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
+        transformation = transformation.scaledBy(x: 1.3, y: 1.3)
+        transformation = transformation.translatedBy(x: 0.0, y: -50.0)
+        return transformation
+      }()
+
+      let bottomTransform = { () -> CGAffineTransform in
+        var transformation = CGAffineTransform.identity
+        transformation = transformation.scaledBy(x: 1.75, y: 1.75)
+        transformation = transformation.translatedBy(x: 0.0, y: 30.0)
+        return transformation
+      }()
+
+      topImageView.transform = topTransform
+      bottomImageView.transform = bottomTransform
+      contentContainer.spacing = 25.0
+      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
+      iconBackgroundView.alpha = 1.0
+      iconView.snp.remakeConstraints {
+        $0.height.equalTo(175.0)
+      }
+      calloutView.setState(state: state)
+    case .settings:
+      let topTransform = { () -> CGAffineTransform in
+        var transformation = CGAffineTransform.identity
         transformation = transformation.scaledBy(x: 1.5, y: 1.5)
         transformation = transformation.translatedBy(x: 0.0, y: -70.0)
         return transformation
@@ -251,13 +279,12 @@ class WelcomeViewController: UIViewController {
       topImageView.transform = topTransform
       bottomImageView.transform = bottomTransform
       contentContainer.spacing = 25.0
-      contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
         $0.height.equalTo(175.0)
       }
       calloutView.setState(state: state)
-
+      
     case .defaultBrowserCallout:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
@@ -292,7 +319,7 @@ class WelcomeViewController: UIViewController {
       state: nil).then {
         $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
       }
-    present(nextController, animated: true, completion: nil)
+    present(nextController, animated: true)
   }
 
   private func animateToDefaultBrowserState() {
@@ -307,16 +334,29 @@ class WelcomeViewController: UIViewController {
         primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
         secondaryButtonTitle: Strings.DefaultBrowserCallout.introSkipButtonText,
         primaryAction: {
-          nextController.onSetDefaultBrowser()
+          nextController.animateToDefaultSettingsState()
         },
         secondaryAction: {
           // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
-          
           self.close()
         }
       )
     )
     nextController.setLayoutState(state: state)
+    present(nextController, animated: true)
+  }
+  
+  private func animateToDefaultSettingsState() {
+    let nextController = WelcomeViewController(
+      profile: profile,
+      rewards: rewards,
+      state: nil).then {
+        $0.setLayoutState(
+          state: WelcomeViewCalloutState.settings(
+            title: "Taking you to Settings...",
+            details: "Look for 'Default Browser App'"))
+      }
+
     present(nextController, animated: true, completion: nil)
   }
 
@@ -327,6 +367,7 @@ class WelcomeViewController: UIViewController {
     UIApplication.shared.open(settingsUrl)
     
     // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
+    self.close()
   }
 
   private func close() {
