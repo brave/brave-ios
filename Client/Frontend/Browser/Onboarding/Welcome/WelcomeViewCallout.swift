@@ -24,6 +24,7 @@ enum WelcomeViewCalloutState {
   case loading
   case welcome(title: String)
   case defaultBrowser(info: WelcomeViewDefaultBrowserDetails)
+  case settings(title: String, details: String)
   case defaultBrowserCallout(info: WelcomeViewDefaultBrowserDetails)
 }
 
@@ -320,6 +321,52 @@ class WelcomeViewCallout: UIView {
       contentView.setCustomSpacing(8.0, after: titleLabel)
       contentView.setCustomSpacing(24.0, after: detailsLabel)
       contentView.setCustomSpacing(10.0, after: primaryButton)
+    case .settings(let title, let details):
+      contentView.do {
+        $0.layoutMargins = UIEdgeInsets(top: 120, left: -30, bottom: -20, right: -30)
+      }
+      
+      backgroundView.isHidden = true
+      arrowView.isHidden = true
+        
+      titleLabel.do {
+        $0.text = title
+        $0.textAlignment = .center
+        $0.font = .preferredFont(for: .title1, weight: .semibold)
+        $0.textColor = .bravePrimary
+        $0.alpha = 1.0
+        $0.isHidden = false
+      }
+
+      detailsLabel.do {
+        $0.text = details
+        $0.textAlignment = .center
+        $0.font = .preferredFont(for: .title3, weight: .regular)
+        $0.alpha = 1.0
+        $0.isHidden = false
+      }
+
+      primaryButton.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryLabel.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryButton.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+
+      secondaryButtonContentView.do {
+        $0.alpha = 0.0
+        $0.isHidden = true
+      }
+      
+      contentView.setCustomSpacing(20.0, after: titleLabel)
     case .defaultBrowserCallout(let info):
       contentView.do {
         $0.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 10, right: 20)
