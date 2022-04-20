@@ -30,7 +30,7 @@ extension PrivacyReportsView {
               .foregroundColor(Color(.secondaryBraveLabel))
               .font(.caption.weight(.semibold))
             Text("\(count)")
-              .font(.headline.weight(.semibold))
+              .font(.headline)
               // Smaller custom padding here to try to display the cell's text in one line
               // on regular font size English language.
               .padding(.trailing, 4)
@@ -41,7 +41,7 @@ extension PrivacyReportsView {
             .font(.caption.weight(.semibold))
           Spacer()
           Text("\(count)")
-            .font(.headline.weight(.semibold))
+            .font(.headline)
             .padding(.trailing)
         }
       }

@@ -86,6 +86,18 @@ struct PrivacyReportsView: View {
       .foregroundColor(Color(.braveOrange))
   }
   
+  private var noDataCalloutView: some View {
+    HStack {
+      Image(systemName: "info.circle.fill")
+      Text(Strings.PrivacyHub.noDataCalloutBody)
+    }
+    .foregroundColor(Color.white)
+    .frame(maxWidth: .infinity)
+    .padding()
+    .background(Color(.braveInfoLabel))
+    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+  }
+  
   var body: some View {
     NavigationView {
       ScrollView(.vertical) {
@@ -96,12 +108,12 @@ struct PrivacyReportsView: View {
           }
           
           if noData {
-            NoDataCallout()
+            noDataCalloutView
           }
           
           PrivacyHubLastWeekSection(
-            lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
-            lastWeekRiskiestWebsite: lastWeekRiskiestWebsite)
+            mostFrequentTracker: lastWeekMostFrequentTracker,
+            riskiestWebsite: lastWeekRiskiestWebsite)
           
           Divider()
           
@@ -112,10 +124,10 @@ struct PrivacyReportsView: View {
           }
           
           PrivacyHubAllTimeSection(
-            allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-            allTimeRiskiestWebsite: allTimeRiskiestWebsite,
-            allTimeListTrackers: allTimeListTrackers,
-            allTimeListWebsites: allTimeListWebsites,
+            mostFrequentTracker: allTimeMostFrequentTracker,
+            riskiestWebsite: allTimeRiskiestWebsite,
+            trackers: allTimeListTrackers,
+            websites: allTimeListWebsites,
             onDismiss: dismissView)
           
           VStack {

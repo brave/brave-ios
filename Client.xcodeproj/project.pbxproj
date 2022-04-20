@@ -785,7 +785,6 @@
 		445CA12C27997F770040F5C4 /* alain_franchette_ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */; };
 		445CA12E279986900040F5C4 /* priyanuch_konkaew.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */; };
 		4472701F27C963CD0093BFF2 /* NotificationCalloutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */; };
-		4472702D27C967030093BFF2 /* NoDataCallout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472702C27C967030093BFF2 /* NoDataCallout.swift */; };
 		4472702F27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */; };
 		4472703127C96A510093BFF2 /* PrivacyHubAllTimeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */; };
 		4472703427C96EC80093BFF2 /* VPNAlertStat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4472703227C96EC80093BFF2 /* VPNAlertStat.swift */; };
@@ -2615,7 +2614,6 @@
 		445CA12427997F770040F5C4 /* alain_franchette_ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = alain_franchette_ocean.jpg; sourceTree = "<group>"; };
 		445CA12D279986900040F5C4 /* priyanuch_konkaew.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = priyanuch_konkaew.jpg; sourceTree = "<group>"; };
 		4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = NotificationCalloutView.swift; sourceTree = "<group>"; tabWidth = 2; };
-		4472702C27C967030093BFF2 /* NoDataCallout.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = NoDataCallout.swift; sourceTree = "<group>"; tabWidth = 2; };
 		4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyHubLastWeekSection.swift; sourceTree = "<group>"; tabWidth = 2; };
 		4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyHubAllTimeSection.swift; sourceTree = "<group>"; tabWidth = 2; };
 		4472703227C96EC80093BFF2 /* VPNAlertStat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNAlertStat.swift; sourceTree = "<group>"; };
@@ -5174,7 +5172,6 @@
 				44029EB327BC101800E6CE18 /* PrivacyReportsView.swift */,
 				44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */,
 				4472701E27C963CD0093BFF2 /* NotificationCalloutView.swift */,
-				4472702C27C967030093BFF2 /* NoDataCallout.swift */,
 				4472702E27C9680C0093BFF2 /* PrivacyHubLastWeekSection.swift */,
 				4472703027C96A510093BFF2 /* PrivacyHubAllTimeSection.swift */,
 				4472703327C96EC80093BFF2 /* AllVPNAlertsView.swift */,
@@ -8656,7 +8653,6 @@
 				CAC2CB4D2644496400BB8D36 /* RecentSearchClipboardHeaderView.swift in Sources */,
 				0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */,
 				FA6B2AC21D41F02D00429414 /* Punycode.swift in Sources */,
-				4472702D27C967030093BFF2 /* NoDataCallout.swift in Sources */,
 				0A8A6225257905E300B035F4 /* UniversalLinkManager.swift in Sources */,
 				0A7B5D702269E72C00AADF22 /* BookmarkSaveLocation.swift in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,

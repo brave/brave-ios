@@ -10,6 +10,8 @@ import Data
 
 extension PrivacyReportsView {
   struct PrivacyHubVPNAlertsSection: View {
+    @Environment(\.pixelLength) private var pixelLength
+    
     let lastVPNAlerts: [BraveVPNAlert]
 
     private(set) var onDismiss: () -> Void
@@ -43,7 +45,7 @@ extension PrivacyReportsView {
         .foregroundColor(Color(.braveLabel))
         .overlay(
           RoundedRectangle(cornerRadius: 25)
-            .stroke(Color(.braveLabel), lineWidth: 1)
+            .stroke(Color(.braveLabel), lineWidth: pixelLength)
         )
       }
     }

@@ -32,7 +32,7 @@ extension PrivacyReportsView {
             .font(.subheadline.weight(.medium))
           Spacer()
           Text("\(alerts.trackerCount + alerts.locationPingCount + alerts.emailTrackerCount)")
-            .font(.headline.weight(.semibold))
+            .font(.headline)
         }
         .padding()
         .background(Color("total_alerts_background"))
@@ -86,39 +86,37 @@ extension PrivacyReportsView {
     }
     
     var body: some View {
-      Group {
-        VStack(alignment: .leading) {
-          
-          if #available(iOS 15, *) {
-            List {
-              Section {
-                ForEach(vpnAlerts) { alert in
-                  cell(for: alert)
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                }
-              } header: {
-                headerView
-                  .listRowInsets(.init())
+      VStack(alignment: .leading) {
+        
+        if #available(iOS 15, *) {
+          List {
+            Section {
+              ForEach(vpnAlerts) { alert in
+                cell(for: alert)
+                  .listRowBackground(Color.clear)
+                  .listRowSeparator(.hidden)
               }
-            }
-            .listStyle(.insetGrouped)
-            
-            Spacer()
-          } else {
-            // Workaround: iOS 14 does not easily support hidden separators for List,
-            // have to use ScrollView > LazyVSack instead.
-            ScrollView {
+            } header: {
               headerView
-              
-              LazyVStack(spacing: 0) {
-                ForEach(vpnAlerts) { alert in
-                  cell(for: alert)
-                }
+                .listRowInsets(.init())
+            }
+          }
+          .listStyle(.insetGrouped)
+          
+          Spacer()
+        } else {
+          // Workaround: iOS 14 does not easily support hidden separators for List,
+          // have to use ScrollView > LazyVSack instead.
+          ScrollView {
+            headerView
+            
+            LazyVStack(spacing: 0) {
+              ForEach(vpnAlerts) { alert in
+                cell(for: alert)
               }
             }
-            .padding(.horizontal)
           }
+          .padding(.horizontal)
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)

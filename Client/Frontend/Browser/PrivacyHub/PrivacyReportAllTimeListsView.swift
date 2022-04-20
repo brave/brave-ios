@@ -39,16 +39,16 @@ struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
-  let allTimeListTrackers: [PrivacyReportsTracker]
-  let allTimeListWebsites: [PrivacyReportsWebsite]
+  let trackers: [PrivacyReportsTracker]
+  let websites: [PrivacyReportsWebsite]
   
   private(set) var onDismiss: () -> Void
   
-  enum Page: CaseIterable, Identifiable {
+  enum Page: String, CaseIterable, Identifiable {
     case trackersAndAds, websites
     
     var id: String {
-      displayString
+      rawValue
     }
     
     var displayString: String {
@@ -73,26 +73,25 @@ struct PrivacyReportAllTimeListsView: View {
     .padding(.vertical, 12)
   }
   
+  @ViewBuilder
   private func blockedLabels(by source: PrivacyReportsTracker.Source?) -> some View {
-    Group {
-      switch source {
-      case .shields:
-        PrivacyReportsView.BlockedByShieldsLabel()
-      case .vpn:
-        PrivacyReportsView.BlockedByVPNLabel()
-      case .both:
-        PrivacyReportsView.BlockedByShieldsLabel()
-        PrivacyReportsView.BlockedByVPNLabel()
-      case .none:
-        EmptyView()
-      }
+    switch source {
+    case .shields:
+      PrivacyReportsView.BlockedByShieldsLabel()
+    case .vpn:
+      PrivacyReportsView.BlockedByVPNLabel()
+    case .both:
+      PrivacyReportsView.BlockedByShieldsLabel()
+      PrivacyReportsView.BlockedByVPNLabel()
+    case .none:
+      EmptyView()
     }
   }
   
   private var trackersList: some View {
     List {
       Section {
-        ForEach(allTimeListTrackers) { item in
+        ForEach(trackers) { item in
           HStack {
             VStack(alignment: .leading, spacing: 4) {
               
@@ -131,7 +130,7 @@ struct PrivacyReportAllTimeListsView: View {
             
             Spacer()
             Text("\(item.count)")
-              .font(.headline.weight(.semibold))
+              .font(.headline)
           }
         }
       } header: {
@@ -148,13 +147,13 @@ struct PrivacyReportAllTimeListsView: View {
   private var websitesList: some View {
     List {
       Section {
-        ForEach(allTimeListWebsites) { item in
+        ForEach(websites) { item in
           HStack {
             FaviconImage(url: item.faviconUrl)
             Text(item.domain)
             Spacer()
             Text("\(item.count)")
-              .font(.headline.weight(.semibold))
+              .font(.headline)
           }
         }
       } header: {
@@ -170,12 +169,15 @@ struct PrivacyReportAllTimeListsView: View {
   
   var body: some View {
     VStack(spacing: 0) {
-      if #available(iOS 15.0, *) {
-        selectionPicker
-          .modifier(LargeContentPickerViewerModifier_FB9812596())
-      } else {
-        selectionPicker
+      Picker("", selection: $currentPage) {
+        ForEach(Page.allCases) {
+          Text($0.displayString)
+            .tag($0)
+        }
       }
+      .pickerStyle(.segmented)
+      .padding(.horizontal, 20)
+      .padding(.vertical, 12)
       
       switch currentPage {
       case .trackersAndAds: trackersList
@@ -194,22 +196,12 @@ struct PrivacyReportAllTimeListsView: View {
   }
 }
 
-// Modifier workaround for FB9812596 to avoid crashing on iOS 14 on Release builds
-@available(iOS 15.0, *)
-private struct LargeContentPickerViewerModifier_FB9812596: ViewModifier {
-  
-  func body(content: Content) -> some View {
-    content
-      .accessibilityShowsLargeContentViewer()
-  }
-}
-
 #if DEBUG
 struct PrivacyReportAllTimeListsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      PrivacyReportAllTimeListsView(allTimeListTrackers: [], allTimeListWebsites: [], onDismiss: {})
-      PrivacyReportAllTimeListsView(allTimeListTrackers: [], allTimeListWebsites: [], onDismiss: {})
+      PrivacyReportAllTimeListsView(trackers: [], websites: [], onDismiss: {})
+      PrivacyReportAllTimeListsView(trackers: [], websites: [], onDismiss: {})
         .preferredColorScheme(.dark)
     }
   }

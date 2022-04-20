@@ -47,20 +47,20 @@ extension PrivacyReportsView {
       Button(
         action: askForNotificationAuthorization,
         label: {
-          ZStack {
+          Group {
+            if sizeCategory.isAccessibilityCategory {
+              Text(Strings.PrivacyHub.notificationCalloutButtonText)
+            } else {
+              Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
+            }
+          }
+          .font(.callout)
+          .padding(.vertical, 12)
+          .frame(maxWidth: .infinity)
+          .background(
             VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
               .edgesIgnoringSafeArea(.all)
-            
-            Group {
-              if sizeCategory.isAccessibilityCategory {
-                Text(Strings.PrivacyHub.notificationCalloutButtonText)
-              } else {
-                Label(Strings.PrivacyHub.notificationCalloutButtonText, image: "brave.bell")
-              }
-            }
-            .font(.callout)
-            .padding(.vertical, 12)
-          }
+          )
           .clipShape(Capsule())
           .fixedSize(horizontal: false, vertical: true)
         })
