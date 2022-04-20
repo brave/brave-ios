@@ -22,7 +22,7 @@ extension PrivacyReportsView {
     
     private(set) var onDismiss: () -> Void
     
-    private func allTimeItemView(trackerOrWebsite: CountableEntity?) -> some View {
+    private func allTimeItemView(trackerOrWebsite: CountableEntity?, countableLabel: String) -> some View {
       VStack {
         Text(Strings.PrivacyHub.allTimeTrackerTitle.uppercased())
           .font(.caption)
@@ -32,9 +32,7 @@ extension PrivacyReportsView {
         if let entity = trackerOrWebsite {
           VStack(alignment: .leading) {
             Text(entity.name)
-            
-            Text(String.localizedStringWithFormat(Strings.PrivacyHub.allTimeSitesCount,
-                                                  entity.count))
+            Text(String.localizedStringWithFormat(countableLabel, entity.count))
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .font(.subheadline)
@@ -60,13 +58,13 @@ extension PrivacyReportsView {
         
         if sizeCategory.isAccessibilityCategory && horizontalSizeClass == .compact {
           VStack {
-            allTimeItemView(trackerOrWebsite: mostFrequentTracker)
-            allTimeItemView(trackerOrWebsite: riskiestWebsite)
+            allTimeItemView(trackerOrWebsite: mostFrequentTracker, countableLabel: Strings.PrivacyHub.allTimeSitesCount)
+            allTimeItemView(trackerOrWebsite: riskiestWebsite, countableLabel: Strings.PrivacyHub.allTimeTrackersCount)
           }
         } else {
           HStack(spacing: 12) {
-            allTimeItemView(trackerOrWebsite: mostFrequentTracker)
-            allTimeItemView(trackerOrWebsite: riskiestWebsite)
+            allTimeItemView(trackerOrWebsite: mostFrequentTracker, countableLabel: Strings.PrivacyHub.allTimeSitesCount)
+            allTimeItemView(trackerOrWebsite: riskiestWebsite, countableLabel: Strings.PrivacyHub.allTimeTrackersCount)
           }
         }
         

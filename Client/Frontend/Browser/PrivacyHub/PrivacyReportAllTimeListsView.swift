@@ -27,6 +27,7 @@ private struct FaviconImage: View {
       .resizable()
       .aspectRatio(contentMode: .fit)
       .frame(width: 30, height: 30)
+      .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
       .onAppear {
         if let url = url {
           faviconLoader.load(domainUrl: url)

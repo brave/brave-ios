@@ -317,7 +317,7 @@
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app",
                                 @"host":@"analytics.localytics.com",
-                                @"message":@"Prevented 'Localytics' from obtaining unknown data from device. Prevented 'Localytics' from obtaining unknown data from device Prevented 'Localytics' from obtaining unknown data from device Prevented 'Localytics' from obtaining unknown",
+                                @"message":@"'OpenX' is known to collect Personal data for advertising purposes",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked Data Tracker",
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
@@ -325,15 +325,15 @@
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app-location",
                                 @"host":@"doubleclick.net",
-                                @"message":@"Prevented 'Beacons In Space' from obtaining unknown data from device",
+                                @"message":@"'DoubleClick' is known to collect device identifiers and other information",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked Location Tracker",
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
         
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-app",
-                                @"host":@"api.phishy-mcphishface-thisisanexampleofalonghostname.com",
-                                @"message":@"Prevented 'Phishy McPhishface' from obtaining unknown data from device",
+                                @"host":@"amazon.com",
+                                @"message":@"'Amazon Adsystem' is known to collect device identifiers and other information",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked Phishing Attempt",
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
@@ -341,17 +341,9 @@
         [fakeAlerts addObject:@{@"action":@"drop",
                                 @"category":@"privacy-tracker-mail",
                                 @"host":@"facebook.com",
-                                @"message":@"Prevented 'Facebook', you're welcome",
+                                @"message":@"'Superhuman' is known to track your receipt of e-mail messages",
                                 @"timestamp":curDateStr,
                                 @"title":@"Blocked MITM",
-                                @"uuid":[[NSUUID UUID] UUIDString] }];
-        
-        [fakeAlerts addObject:@{@"action":@"drop",
-                                @"category":@"privacy-tracker-app",
-                                @"host":@"google.com",
-                                @"message":@"Prevented Google from forcing things you don't need down your throat",
-                                @"timestamp":curDateStr,
-                                @"title":@"Blocked Ad Tracker",
                                 @"uuid":[[NSUUID UUID] UUIDString] }];
     }
     

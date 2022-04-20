@@ -4610,15 +4610,8 @@ extension Strings {
     public static let settingsSlearDataTitle = NSLocalizedString(
       "privacyHub.settingsSlearDataTitle",
       bundle: .braveShared,
-      value: "Clear Data",
+      value: "Clear Privacy Hub Data",
       comment: "Button that lets user clear all blocked requests and vpn alerts data that Brave captured for them."
-    )
-    
-    public static let settingsClearDataFooter = NSLocalizedString(
-      "privacyHub.settingsClearDataFooter",
-      bundle: .braveShared,
-      value: "Deletes all data captured so far",
-      comment: "Footer that explains to the user a button to clear all blocked requests and vpn alerts data that Brave captured for them."
     )
     
     public static let clearAllDataPrompt = NSLocalizedString(

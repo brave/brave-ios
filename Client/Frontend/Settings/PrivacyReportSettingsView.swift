@@ -28,7 +28,7 @@ struct PrivacyReportSettingsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       
-      Section(footer: Text(Strings.PrivacyHub.settingsClearDataFooter)) {
+      Section() {
         HStack() {
           Button(action: {
             PrivacyReportsManager.clearAllData()
@@ -36,7 +36,8 @@ struct PrivacyReportSettingsView: View {
           },
                  label: {
             Text(Strings.PrivacyHub.settingsSlearDataTitle)
-              .frame(maxWidth: .infinity)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .foregroundColor(Color.red)
           })
             .disabled(!clearButtonEnabled)
         }
@@ -53,7 +54,7 @@ struct PrivacyReportSettingsView: View {
             },
                    label: {
               Text("[Debug] - Consolidate data")
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
             })
           }
         }
