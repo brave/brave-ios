@@ -15,7 +15,10 @@ struct EditSiteConnectionView: View {
   var originURL: URL
   var onDismiss: (_ permittedAccounts: [String]) -> Void
   
+  @Environment(\.sizeCategory) private var sizeCategory
+  
   @ScaledMetric private var faviconSize = 48
+  private let maxFaviconSize: CGFloat = 96
   
   @State private var permittedAccounts: [String] = []
   
@@ -57,45 +60,94 @@ struct EditSiteConnectionView: View {
         Section {
           ForEach(keyringStore.keyring.accountInfos, id: \.self) { account in
             let action = editAction(for: account)
-            HStack {
-              AccountView(address: account.address, name: account.name)
-              Spacer()
-              Button {
-                switch action {
-                case .connect:
-                  Domain.setEthereumPermissions(forUrl: originURL, account: account.address, grant: true)
-                  permittedAccounts.append(account.address)
-                  keyringStore.selectedAccount = account
-                case .disconnect:
-                  Domain.setEthereumPermissions(forUrl: originURL, account: account.address, grant: false)
-                  permittedAccounts.removeAll(where: { $0 == account.address })
-                  
-                  if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
-                    keyringStore.selectedAccount = firstAllowedAccount
+            if sizeCategory.isAccessibilityCategory {
+              VStack {
+                AccountView(address: account.address, name: account.name)
+                Spacer()
+                Button {
+                  switch action {
+                  case .connect:
+                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: true)
+                    permittedAccounts.append(account.address)
+                    keyringStore.selectedAccount = account
+                  case .disconnect:
+                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: false)
+                    permittedAccounts.removeAll(where: { $0 == account.address })
+                    
+                    if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
+                      keyringStore.selectedAccount = firstAllowedAccount
+                    }
+                  case .switch:
+                    keyringStore.selectedAccount = account
                   }
-                case .switch:
-                  keyringStore.selectedAccount = account
+                } label: {
+                  Text(action.title)
+                    .foregroundColor(Color(.braveBlurpleTint))
+                    .font(.footnote.weight(.semibold))
                 }
-              } label: {
-                Text(action.title)
-                  .foregroundColor(Color(.braveBlurpleTint))
-                  .font(.footnote.weight(.semibold))
+              }
+            } else {
+              HStack {
+                AccountView(address: account.address, name: account.name)
+                Spacer()
+                Button {
+                  switch action {
+                  case .connect:
+                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: true)
+                    permittedAccounts.append(account.address)
+                    keyringStore.selectedAccount = account
+                  case .disconnect:
+                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: false)
+                    permittedAccounts.removeAll(where: { $0 == account.address })
+                    
+                    if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
+                      keyringStore.selectedAccount = firstAllowedAccount
+                    }
+                  case .switch:
+                    keyringStore.selectedAccount = account
+                  }
+                } label: {
+                  Text(action.title)
+                    .foregroundColor(Color(.braveBlurpleTint))
+                    .font(.footnote.weight(.semibold))
+                }
               }
             }
           }
         } header: {
-          HStack(spacing: 12) {
-            Image(systemName: "globe")
-              .frame(width: faviconSize, height: faviconSize)
-              .background(Color(.braveDisabled))
-              .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            VStack(alignment: .leading, spacing: 2) {
-              Text(verbatim: originURL.absoluteDisplayString)
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(Color(.bravePrimary))
-              Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
-                .font(.footnote)
-                .foregroundColor(Color(.braveLabel))
+          Group {
+            if sizeCategory.isAccessibilityCategory {
+              VStack(spacing: 12) {
+                Image(systemName: "globe")
+                  .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+                  .background(Color(.braveDisabled))
+                  .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                VStack(spacing: 2) {
+                  Text(verbatim: origin.absoluteString)
+                    .font(.subheadline.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color(.bravePrimary))
+                  Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color(.braveLabel))
+                }
+              }
+            } else {
+              HStack(spacing: 12) {
+                Image(systemName: "globe")
+                  .frame(width: faviconSize, height: faviconSize)
+                  .background(Color(.braveDisabled))
+                  .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                VStack(alignment: .leading, spacing: 2) {
+                  Text(verbatim: origin.absoluteString)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(Color(.bravePrimary))
+                  Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
+                    .font(.footnote)
+                    .foregroundColor(Color(.braveLabel))
+                }
+              }
             }
           }
           .frame(maxWidth: .infinity, alignment: .leading)
