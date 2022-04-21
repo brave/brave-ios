@@ -30,9 +30,7 @@ extension PrivacyReportsView {
 
         NavigationLink(
           destination:
-            AllVPNAlertsView(
-              alerts: BraveVPNAlert.alertTotals,
-              onDismiss: onDismiss)
+            AllVPNAlertsView(onDismiss: onDismiss)
         ) {
           HStack {
             Text(Strings.PrivacyHub.allVPNAlertsButtonText)

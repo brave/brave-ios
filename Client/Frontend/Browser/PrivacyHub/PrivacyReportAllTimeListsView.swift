@@ -144,15 +144,17 @@ struct PrivacyReportAllTimeListsView: View {
     }
     .listStyle(.insetGrouped)
     .onAppear {
-      let allTimeVPN = BraveVPNAlert.allByHostCount
-
-      websites = BlockedResource.allTimeMostRiskyWebsites().map {
-        PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+      BlockedResource.allTimeMostFrequentTrackers() { allTimeListTrackers in
+        BraveVPNAlert.allByHostCount { vpnItems in
+          trackers = PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: vpnItems)
+        }
       }
       
-      let allTimeListTrackers = BlockedResource.allTimeMostFrequentTrackers()
-
-      trackers = PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: allTimeVPN)
+      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
+        websites = riskyWebsites.map {
+          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+        }
+      }
     }
   }
   

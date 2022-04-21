@@ -22,8 +22,16 @@ extension PrivacyReportsView {
       predicate: NSPredicate(format: "timestamp > %lld", Int64(Date().timeIntervalSince1970 - 30.days))
     ) private var vpnAlerts: FetchedResults<BraveVPNAlert>
     
-    let alerts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)
+    @State private var alerts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)?
     private(set) var onDismiss: () -> Void
+    
+    private var total: Int {
+      guard let alerts = alerts else {
+        return 0
+      }
+
+      return alerts.trackerCount + alerts.locationPingCount + alerts.emailTrackerCount
+    }
     
     private var headerView: some View {
       VStack {
@@ -31,7 +39,7 @@ extension PrivacyReportsView {
           Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
             .font(.subheadline.weight(.medium))
           Spacer()
-          Text("\(alerts.trackerCount + alerts.locationPingCount + alerts.emailTrackerCount)")
+          Text("\(total)")
             .font(.headline)
         }
         .padding()
@@ -42,34 +50,34 @@ extension PrivacyReportsView {
           VPNAlertStat(
             assetName: "vpn_data_tracker",
             title: Strings.PrivacyHub.vpnAlertRegularTrackerTypePlural,
-            count: alerts.trackerCount,
+            count: alerts?.trackerCount ?? 0,
             compact: true)
           VPNAlertStat(
             assetName: "vpn_location_tracker",
             title: Strings.PrivacyHub.vpnAlertLocationTrackerTypePlural,
-            count: alerts.locationPingCount,
+            count: alerts?.locationPingCount ?? 0,
             compact: true)
           VPNAlertStat(
             assetName: "vpn_mail_tracker",
             title: Strings.PrivacyHub.vpnAlertEmailTrackerTypePlural,
-            count: alerts.emailTrackerCount,
+            count: alerts?.emailTrackerCount ?? 0,
             compact: true)
         } else {
           VPNAlertStat(
             assetName: "vpn_data_tracker",
             title: Strings.PrivacyHub.vpnAlertRegularTrackerTypePlural,
-            count: alerts.trackerCount,
+            count: alerts?.trackerCount ?? 0,
             compact: false)
           HStack {
             VPNAlertStat(
               assetName: "vpn_location_tracker",
               title: Strings.PrivacyHub.vpnAlertLocationTrackerTypePlural,
-              count: alerts.locationPingCount,
+              count: alerts?.locationPingCount ?? 0,
               compact: true)
             VPNAlertStat(
               assetName: "vpn_mail_tracker",
               title: Strings.PrivacyHub.vpnAlertEmailTrackerTypePlural,
-              count: alerts.emailTrackerCount,
+              count: alerts?.emailTrackerCount ?? 0,
               compact: true)
           }
         }
@@ -129,6 +137,11 @@ extension PrivacyReportsView {
             .foregroundColor(Color(.braveOrange))
         }
       }
+      .onAppear {
+        BraveVPNAlert.alertTotals { result in
+          alerts = result
+        }
+      }
     }
   }
 }
@@ -137,8 +150,8 @@ extension PrivacyReportsView {
 struct AllVPNAlertsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      PrivacyReportsView.AllVPNAlertsView(alerts: (1, 1, 1), onDismiss: {})
-      PrivacyReportsView.AllVPNAlertsView(alerts: (2, 2, 2), onDismiss: {})
+      PrivacyReportsView.AllVPNAlertsView(onDismiss: {})
+      PrivacyReportsView.AllVPNAlertsView(onDismiss: {})
         .preferredColorScheme(.dark)
     }
   }

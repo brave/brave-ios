@@ -87,8 +87,13 @@ extension PrivacyReportsView {
       }
       .fixedSize(horizontal: false, vertical: true)
       .onAppear {
-        mostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
-        riskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
+        BlockedResource.mostBlockedTracker(inLastDays: nil) { result in
+          mostFrequentTracker = result
+        }
+        
+        BlockedResource.riskiestWebsite(inLastDays: nil) { result in
+          riskiestWebsite = result
+        }
       }
     }
   }

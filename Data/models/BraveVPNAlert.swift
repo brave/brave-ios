@@ -7,6 +7,7 @@ import Foundation
 import CoreData
 import Shared
 import BraveShared
+import Network
 
 private let log = Logger.browserLogger
 
@@ -88,28 +89,30 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
   /// Note: Unlike `BlockedRequest` we do not know what app/website contained a certain tracker.
   /// Sometimes multiple trackers from the same host are recorded.
   /// For `BlockedRequest` items we count trackers from a single domain only once.
-  public static var allByHostCount: Set<CountableEntity> {
-    let context = DataController.viewContext
-    let fetchRequest = braveVPNAlertFetchRequest(for: context)
+  public static func allByHostCount(completion: @escaping (Set<CountableEntity>) -> Void) {
     
-    fetchRequest.propertiesToFetch = ["host"]
-    fetchRequest.propertiesToGroupBy = ["host"]
-    fetchRequest.resultType = .dictionaryResultType
-    
-    do {
-      // Returning 1 count per host here because for the VPN alerts we can't rely on count numbers.
-      // Reason is a tracker is detected and saved multiple times per domain,
-      // we do not have knowledge on what website or app a given tracker was blocked on.
-      // This would lead to inflated stats on the Privacy Reports screen.
-      //
-      // Each tracker is count as one entry, to only bump the number slightly
-      // and show a proper UI that this a vpn alert type of tracker blocked.
-      return .init(try context.fetch(fetchRequest)
-                    .compactMap { $0["host"] as? String }
-                    .map { .init(name: $0, count: 1) })
-    } catch {
-      log.error("allByHostCount error: \(error)")
-      return .init()
+    DataController.perform { context in
+      let fetchRequest = braveVPNAlertFetchRequest(for: context)
+      
+      fetchRequest.propertiesToFetch = ["host"]
+      fetchRequest.propertiesToGroupBy = ["host"]
+      fetchRequest.resultType = .dictionaryResultType
+      
+      do {
+        // Returning 1 count per host here because for the VPN alerts we can't rely on count numbers.
+        // Reason is a tracker is detected and saved multiple times per domain,
+        // we do not have knowledge on what website or app a given tracker was blocked on.
+        // This would lead to inflated stats on the Privacy Reports screen.
+        //
+        // Each tracker is count as one entry, to only bump the number slightly
+        // and show a proper UI that this a vpn alert type of tracker blocked.
+        completion(.init(try context.fetch(fetchRequest)
+                      .compactMap { $0["host"] as? String }
+                      .map { .init(name: $0, count: 1) }))
+      } catch {
+        log.error("allByHostCount error: \(error)")
+        completion(.init())
+      }
     }
   }
 
@@ -122,30 +125,33 @@ public final class BraveVPNAlert: NSManagedObject, CRUD, Identifiable {
   }
 
   /// Returns amount of alerts blocked for each type.
-  public static var alertTotals: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int) {
-    let context = DataController.viewContext
-    let fetchRequest = braveVPNAlertFetchRequest(for: context)
+  public static func alertTotals(completion:
+                                 @escaping ((trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)) -> Void) {
+    
+    DataController.perform { context in
+      let fetchRequest = braveVPNAlertFetchRequest(for: context)
 
-    do {
-      fetchRequest.predicate = .init(
-        format: "category == %d",
-        BraveVPNAlert.TrackerType.app.rawValue)
-      let trackerCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value
+      do {
+        fetchRequest.predicate = .init(
+          format: "category == %d",
+          BraveVPNAlert.TrackerType.app.rawValue)
+        let trackerCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value
 
-      fetchRequest.predicate = .init(
-        format: "category == %d",
-        BraveVPNAlert.TrackerType.location.rawValue)
-      let locationPingCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedLocationPingCount.value
+        fetchRequest.predicate = .init(
+          format: "category == %d",
+          BraveVPNAlert.TrackerType.location.rawValue)
+        let locationPingCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedLocationPingCount.value
 
-      fetchRequest.predicate = .init(
-        format: "category == %d",
-        BraveVPNAlert.TrackerType.mail.rawValue)
-      let emailTrackerCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value
+        fetchRequest.predicate = .init(
+          format: "category == %d",
+          BraveVPNAlert.TrackerType.mail.rawValue)
+        let emailTrackerCount = try context.count(for: fetchRequest) + Preferences.BraveVPNAlertTotals.consolidatedEmailTrackerCount.value
 
-      return (trackerCount, locationPingCount, emailTrackerCount)
-    } catch {
-      log.error("alertTotals error: \(error)")
-      return (0, 0, 0)
+        completion((trackerCount, locationPingCount, emailTrackerCount))
+      } catch {
+        log.error("alertTotals error: \(error)")
+        completion((0, 0, 0))
+      }
     }
   }
   

@@ -30,25 +30,25 @@ public final class BlockedResource: NSManagedObject, CRUD {
   /// This is to avoid having data heavy database and for privacy reasons.
   /// Consolidated records are view to list all-time blocked items data.
   @NSManaged public var timestamp: Date?
-
+  
   private static let entityName = "BlockedResource"
   private static let hostKeyPath = #keyPath(BlockedResource.host)
   private static let domainKeyPath = #keyPath(BlockedResource.domain)
   private static let timestampKeyPath = #keyPath(BlockedResource.timestamp)
-
+  
   public static func batchInsert(items: [(host: String, domain: URL, date: Date)]) {
-
+    
     DataController.perform { context in
       guard let entity = entity(in: context) else {
         log.error("Error fetching the entity 'BlockedResource' from Managed Object-Model")
         return
       }
-
+      
       items.forEach {
         guard let baseDomain = $0.domain.baseDomain else {
           return
         }
-
+        
         let blockedResource = BlockedResource(entity: entity, insertInto: context)
         blockedResource.host = $0.host
         blockedResource.domain = baseDomain
@@ -57,133 +57,161 @@ public final class BlockedResource: NSManagedObject, CRUD {
       }
     }
   }
-
+  
   /// Returns a name and count of the most blocked tracker for given timeframe.
   /// If the `days` parameter is nil, all data is considered including consolidated records.
   /// /// Returns nil in case of error or if nothing was found.
-  public static func mostBlockedTracker(inLastDays days: Int?) -> CountableEntity? {
-    var mostFrequentTracker = CountableEntity(name: "", count: 0)
-
-    do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: days)
-
-      for result in results {
-        guard let host = result[hostKeyPath] as? String else {
-          continue
+  public static func mostBlockedTracker(inLastDays days: Int?, completion: @escaping (CountableEntity?) -> Void) {
+    
+    DataController.perform { context in
+      var mostFrequentTracker = CountableEntity(name: "", count: 0)
+      
+      do {
+        let results = try groupByFetch(property: hostKeyPath, daysRange: days, context: context)
+        
+        for result in results {
+          guard let host = result[hostKeyPath] as? String else {
+            continue
+          }
+          
+          // Finding on how many websites a given tracker was found.
+          // Due to CD limitations this can't be fetched with a single query.
+          let result = try distinctValues(property: hostKeyPath,
+                                          propertyToFetch: domainKeyPath,
+                                          value: host,
+                                          daysRange: days,
+                                          context: context).count
+          
+          if result > mostFrequentTracker.count {
+            mostFrequentTracker = .init(name: host, count: result)
+          }
         }
-
-        // Finding on how many websites a given tracker was found.
-        // Due to CD limitations this can't be fetched with a single query.
-        let result = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: days).count
-
-        if result > mostFrequentTracker.count {
-          mostFrequentTracker = .init(name: host, count: result)
-        }
+        
+        completion(mostFrequentTracker.count > 0 ? mostFrequentTracker : nil)
+      } catch {
+        log.error(error)
+        completion(nil)
       }
-
-      return mostFrequentTracker.count > 0 ? mostFrequentTracker : nil
-    } catch {
-      log.error(error)
-      return nil
     }
   }
-
+  
   /// Returns a Set of all blocked trackers and on how many websites they were detected.
-  public static func allTimeMostFrequentTrackers() -> Set<CountableEntity> {
-    var allTrackers = Set<CountableEntity>()
-
-    do {
-      let results = try groupByFetch(property: hostKeyPath, daysRange: nil)
-
-      for result in results {
-        guard let host = result[hostKeyPath] as? String else {
-          continue
+  public static func allTimeMostFrequentTrackers(completion: @escaping  (Set<CountableEntity>) -> Void) {
+    
+    DataController.perform { context in
+      var allTrackers = Set<CountableEntity>()
+      
+      do {
+        let results = try groupByFetch(property: hostKeyPath, daysRange: nil, context: context)
+        
+        for result in results {
+          guard let host = result[hostKeyPath] as? String else {
+            continue
+          }
+          
+          // Finding on how many websites a given tracker was found.
+          // Due to CD limitations this can't be fetched with a single query.
+          let shieldsCount = try distinctValues(property: hostKeyPath,
+                                                propertyToFetch: domainKeyPath,
+                                                value: host,
+                                                daysRange: nil,
+                                                context: context).count
+          
+          allTrackers.insert(.init(name: host, count: shieldsCount))
         }
-
-        // Finding on how many websites a given tracker was found.
-        // Due to CD limitations this can't be fetched with a single query.
-        let shieldsCount = try distinctValues(property: hostKeyPath, propertyToFetch: domainKeyPath, value: host, daysRange: nil).count
-
-        allTrackers.insert(.init(name: host, count: shieldsCount))
+        
+        completion(allTrackers)
+      } catch {
+        log.error(error)
+        completion(allTrackers)
       }
-
-      return allTrackers
-    } catch {
-      log.error(error)
-      return allTrackers
     }
   }
   
   /// Returns a name and count of a website that contained the highest number of unique trackers for a given timeframe.
   /// If the `days` parameter is nil, all data is considered including consolidated records.
   /// Returns nil in case of error or if nothing was found.
-  public static func riskiestWebsite(inLastDays days: Int?) -> CountableEntity? {
-    var mostRiskyWebsite = CountableEntity(name: "", count: 0)
-
-    do {
-      let results = try groupByFetch(property: domainKeyPath, daysRange: days)
-
-      for result in results {
-        guard let domain = result[domainKeyPath] as? String else {
-          continue
+  public static func riskiestWebsite(inLastDays days: Int?, completion: @escaping (CountableEntity?) -> Void) {
+    
+    DataController.perform { context in
+      var mostRiskyWebsite = CountableEntity(name: "", count: 0)
+      
+      do {
+        let results = try groupByFetch(property: domainKeyPath, daysRange: days, context: context)
+        
+        for result in results {
+          guard let domain = result[domainKeyPath] as? String else {
+            continue
+          }
+          
+          // Finding how many trackers each website contains.
+          // Due to CD limitations this can't be fetched with a single query.
+          let result = try distinctValues(property: domainKeyPath,
+                                          propertyToFetch: hostKeyPath,
+                                          value: domain,
+                                          daysRange: nil,
+                                          context: context).count
+          
+          if result > mostRiskyWebsite.count {
+            mostRiskyWebsite = .init(name: domain, count: result)
+          }
         }
-
-        // Finding how many trackers each website contains.
-        // Due to CD limitations this can't be fetched with a single query.
-        let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
-
-        if result > mostRiskyWebsite.count {
-          mostRiskyWebsite = .init(name: domain, count: result)
-        }
+        
+        completion(mostRiskyWebsite.count > 0 ? mostRiskyWebsite : nil)
+      } catch {
+        log.error(error)
+        completion(nil)
       }
-
-      return mostRiskyWebsite.count > 0 ? mostRiskyWebsite : nil
-    } catch {
-      log.error(error)
-      return nil
     }
   }
-
+  
   /// Returns an array of websites with detected trackers, and how many unique trackers were detected on it.
-  public static func allTimeMostRiskyWebsites() -> [(domain: String, faviconUrl: String, count: Int)] {
-    var allWebsites = [(domain: String, faviconUrl: String, count: Int)]()
-
-    do {
-      let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
-      let context = DataController.viewContext
-      fetchRequest.entity = BlockedResource.entity(in: context)
-
-      let expression = NSExpressionDescription()
-      expression.name = "favicon"
-      // Hack: Core Data does not allow you to add property to fetch that is not used in GROUP BY sql argument.
-      // The only was to bypass this is to pass a sqlite function like lowercase:, sum: etc.
-      // For this case we do not care about faviconUrl capitalzation and lowercase function is used only
-      // to select additional table field.
-      expression.expression = .init(forFunction: "lowercase:", arguments: [NSExpression(forKeyPath: "faviconUrl")])
-      expression.expressionResultType = .stringAttributeType
-
-      fetchRequest.propertiesToFetch = ["domain", expression]
-      fetchRequest.propertiesToGroupBy = ["domain"]
-      fetchRequest.resultType = .dictionaryResultType
-
-      let results = try context.fetch(fetchRequest)
-
-      for result in results {
-        guard let domain = result[domainKeyPath] as? String, let favicon = result["favicon"] as? String else {
-          continue
+  public static func allTimeMostRiskyWebsites(completion:
+                                              @escaping ([(domain: String, faviconUrl: String, count: Int)]) -> Void) {
+    
+    DataController.perform { context in
+      var allWebsites = [(domain: String, faviconUrl: String, count: Int)]()
+      
+      do {
+        let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
+        fetchRequest.entity = BlockedResource.entity(in: context)
+        
+        let expression = NSExpressionDescription()
+        expression.name = "favicon"
+        // Hack: Core Data does not allow you to add property to fetch that is not used in GROUP BY sql argument.
+        // The only was to bypass this is to pass a sqlite function like lowercase:, sum: etc.
+        // For this case we do not care about faviconUrl capitalzation and lowercase function is used only
+        // to select additional table field.
+        expression.expression = .init(forFunction: "lowercase:", arguments: [NSExpression(forKeyPath: "faviconUrl")])
+        expression.expressionResultType = .stringAttributeType
+        
+        fetchRequest.propertiesToFetch = ["domain", expression]
+        fetchRequest.propertiesToGroupBy = ["domain"]
+        fetchRequest.resultType = .dictionaryResultType
+        
+        let results = try context.fetch(fetchRequest)
+        
+        for result in results {
+          guard let domain = result[domainKeyPath] as? String, let favicon = result["favicon"] as? String else {
+            continue
+          }
+          
+          // Finding how many trackers each website contains.
+          // Due to CD limitations this can't be fetched with a single query.
+          let result = try distinctValues(property: domainKeyPath,
+                                          propertyToFetch: hostKeyPath,
+                                          value: domain,
+                                          daysRange: nil,
+                                          context: context).count
+          
+          allWebsites.append((domain, favicon, result))
         }
-
-        // Finding how many trackers each website contains.
-        // Due to CD limitations this can't be fetched with a single query.
-        let result = try distinctValues(property: domainKeyPath, propertyToFetch: hostKeyPath, value: domain, daysRange: nil).count
-
-        allWebsites.append((domain, favicon, result))
+        
+        completion(allWebsites.sorted(by: { $0.count > $1.count }))
+      } catch {
+        log.error(error)
+        completion([])
       }
-
-      return allWebsites.sorted(by: { $0.count > $1.count })
-    } catch {
-      log.error(error)
-      return []
     }
   }
   
@@ -195,8 +223,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
       let faviconUrl: String
       
       func hash(into hasher: inout Hasher) {
-          hasher.combine(domain)
-          hasher.combine(tracker)
+        hasher.combine(domain)
+        hasher.combine(tracker)
       }
     }
     
@@ -239,17 +267,18 @@ public final class BlockedResource: NSManagedObject, CRUD {
       }
     }
   }
-
+  
   /// A helper method for to group up elements.
   /// - Parameters:
   ///     - property: What property we group by for.
   ///     - daysRange: How old items to look for. If this value is nil, all data is considered including consolidated records.
   private static func groupByFetch(property: String,
-                                   daysRange days: Int?) throws -> [NSDictionary] {
+                                   daysRange days: Int?,
+                                   context: NSManagedObjectContext) throws -> [NSDictionary] {
+    
     let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
-    let context = DataController.viewContext
     fetchRequest.entity = BlockedResource.entity(in: context)
-
+    
     // Due to CD constraints all properties to fetch must be used in GROUP BY statement as well.
     fetchRequest.propertiesToFetch = [property, "timestamp"]
     fetchRequest.propertiesToGroupBy = [property, "timestamp"]
@@ -267,7 +296,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
   public static func clearData() {
     deleteAll()
   }
-
+  
   /// Helper method which returns unique values for a given query.
   /// - Parameters:
   ///     - property: What property do we query for.
@@ -278,7 +307,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
     property: String,
     propertyToFetch: String,
     value: String,
-    daysRange days: Int?
+    daysRange days: Int?,
+    context: NSManagedObjectContext
   ) throws -> [NSFetchRequestResult] {
     var predicate: NSPredicate?
     if let days = days {
@@ -287,11 +317,10 @@ public final class BlockedResource: NSManagedObject, CRUD {
     } else {
       predicate = NSPredicate(format: "\(property) == %@", value)
     }
-
+    
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
-    let context = DataController.viewContext
     fetchRequest.entity = BlockedResource.entity(in: context)
-
+    
     fetchRequest.propertiesToFetch = [propertyToFetch]
     fetchRequest.resultType = .dictionaryResultType
     // Dev note: DISTINCT and GROUP BY achieve similar results but their performance might be different.
@@ -299,11 +328,11 @@ public final class BlockedResource: NSManagedObject, CRUD {
     // If this query feels slow, consider replacing it with `propertiesToGroupBy` and compare performance.
     fetchRequest.returnsDistinctResults = true
     fetchRequest.predicate = predicate
-
+    
     let result = try context.fetch(fetchRequest)
     return result
   }
-
+  
   private class func entity(in context: NSManagedObjectContext) -> NSEntityDescription? {
     NSEntityDescription.entity(forEntityName: entityName, in: context)
   }
