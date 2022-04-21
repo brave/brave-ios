@@ -72,35 +72,8 @@ struct PrivacyReportsManager {
   // MARK: - View
   /// Fetches required data to present the privacy reports view and returns the view.
   static func prepareView() -> PrivacyReportsView {
-        
-    let lastWeekMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
-    let allTimeMostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
-
-    let lastWeekRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
-    let allTimeRiskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
-
-    let allTimeListTrackers = BlockedResource.allTimeMostFrequentTrackers()
-
-    // FIXME: VPNAlerts flag
-    let allTimeVPN = BraveVPNAlert.allByHostCount
-
-    let allTimeListWebsites = BlockedResource.allTimeMostRiskyWebsites().map {
-      PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-    }
-
-    let allAlerts: [PrivacyReportsTracker] =
-    PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: allTimeVPN)
-
     let last = BraveVPNAlert.last(3)
-
-    let view = PrivacyReportsView(
-      lastWeekMostFrequentTracker: lastWeekMostFrequentTracker,
-      lastWeekRiskiestWebsite: lastWeekRiskiestWebsite,
-      allTimeMostFrequentTracker: allTimeMostFrequentTracker,
-      allTimeRiskiestWebsite: allTimeRiskiestWebsite,
-      allTimeListTrackers: allAlerts,
-      allTimeListWebsites: allTimeListWebsites,
-      lastVPNAlerts: last)
+    let view = PrivacyReportsView(lastVPNAlerts: last)
     
     Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
 

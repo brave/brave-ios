@@ -40,8 +40,8 @@ struct PrivacyReportAllTimeListsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
-  let trackers: [PrivacyReportsTracker]
-  let websites: [PrivacyReportsWebsite]
+  @State private var trackers: [PrivacyReportsTracker] = []
+  @State private var websites: [PrivacyReportsWebsite] = []
   
   private(set) var onDismiss: () -> Void
   
@@ -143,6 +143,17 @@ struct PrivacyReportAllTimeListsView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(.insetGrouped)
+    .onAppear {
+      let allTimeVPN = BraveVPNAlert.allByHostCount
+
+      websites = BlockedResource.allTimeMostRiskyWebsites().map {
+        PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+      }
+      
+      let allTimeListTrackers = BlockedResource.allTimeMostFrequentTrackers()
+
+      trackers = PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: allTimeVPN)
+    }
   }
   
   private var websitesList: some View {
@@ -201,8 +212,8 @@ struct PrivacyReportAllTimeListsView: View {
 struct PrivacyReportAllTimeListsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      PrivacyReportAllTimeListsView(trackers: [], websites: [], onDismiss: {})
-      PrivacyReportAllTimeListsView(trackers: [], websites: [], onDismiss: {})
+      PrivacyReportAllTimeListsView(onDismiss: {})
+      PrivacyReportAllTimeListsView(onDismiss: {})
         .preferredColorScheme(.dark)
     }
   }

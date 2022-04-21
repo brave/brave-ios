@@ -11,11 +11,31 @@ import Data
 
 extension PrivacyReportsView {
   struct PrivacyHubLastWeekSection: View {
-    let mostFrequentTracker: CountableEntity?
-    let riskiestWebsite: CountableEntity?
+    @State private var mostFrequentTracker: CountableEntity?
+    @State private var riskiestWebsite: CountableEntity?
+    
+    private var noData: Bool {
+      return mostFrequentTracker == nil && riskiestWebsite == nil
+    }
+    
+    private var noDataCalloutView: some View {
+      HStack {
+        Image(systemName: "info.circle.fill")
+        Text(Strings.PrivacyHub.noDataCalloutBody)
+      }
+      .foregroundColor(Color.white)
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(.braveInfoLabel))
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
     
     var body: some View {
       VStack(alignment: .leading, spacing: 8) {
+        if noData {
+          noDataCalloutView
+        }
+        
         Text(Strings.PrivacyHub.lastWeekHeader.uppercased())
           .font(.footnote.weight(.medium))
           .fixedSize(horizontal: false, vertical: true)
@@ -71,6 +91,10 @@ extension PrivacyReportsView {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
       }
       .fixedSize(horizontal: false, vertical: true)
+      .onAppear {
+        mostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: 7)
+        riskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: 7)
+      }
     }
   }
 }
@@ -78,7 +102,7 @@ extension PrivacyReportsView {
 #if DEBUG
 struct PrivacyHubLastWeekSection_Previews: PreviewProvider {
   static var previews: some View {
-    PrivacyReportsView.PrivacyHubLastWeekSection(mostFrequentTracker: nil, riskiestWebsite: nil)
+    PrivacyReportsView.PrivacyHubLastWeekSection()
   }
 }
 #endif

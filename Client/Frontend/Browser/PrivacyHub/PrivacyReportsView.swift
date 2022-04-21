@@ -11,24 +11,10 @@ import Data
 struct PrivacyReportsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  // All the data to feed the views.
-  let lastWeekMostFrequentTracker: CountableEntity?
-  let lastWeekRiskiestWebsite: CountableEntity?
-  let allTimeMostFrequentTracker: CountableEntity?
-  let allTimeRiskiestWebsite: CountableEntity?
-  let allTimeListTrackers: [PrivacyReportsTracker]
-  let allTimeListWebsites: [PrivacyReportsWebsite]
   let lastVPNAlerts: [BraveVPNAlert]?
   
   var onDismiss: (() -> Void)?
   var openPrivacyReportsUrl: (() -> Void)?
-  
-  private var noData: Bool {
-    return lastWeekMostFrequentTracker == nil
-    && lastWeekRiskiestWebsite == nil
-    && allTimeMostFrequentTracker == nil
-    && allTimeRiskiestWebsite == nil
-  }
   
   @ObservedObject private var showNotificationPermissionCallout = Preferences.PrivacyReports.shouldShowNotificationPermissionCallout
   
@@ -106,14 +92,8 @@ struct PrivacyReportsView: View {
           if showNotificationPermissionCallout.value && correctAuthStatus {
             NotificationCalloutView()
           }
-          
-          if noData {
-            noDataCalloutView
-          }
-          
-          PrivacyHubLastWeekSection(
-            mostFrequentTracker: lastWeekMostFrequentTracker,
-            riskiestWebsite: lastWeekRiskiestWebsite)
+                    
+          PrivacyHubLastWeekSection()
           
           Divider()
           
@@ -123,12 +103,7 @@ struct PrivacyReportsView: View {
             Divider()
           }
           
-          PrivacyHubAllTimeSection(
-            mostFrequentTracker: allTimeMostFrequentTracker,
-            riskiestWebsite: allTimeRiskiestWebsite,
-            trackers: allTimeListTrackers,
-            websites: allTimeListWebsites,
-            onDismiss: dismissView)
+          PrivacyHubAllTimeSection(onDismiss: dismissView)
           
           VStack {
             Text(Strings.PrivacyHub.privacyReportsDisclaimer)
@@ -184,9 +159,9 @@ struct PrivacyReports_Previews: PreviewProvider {
   static var previews: some View {
     
     Group {
-      PrivacyReportsView(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil, allTimeMostFrequentTracker: nil, allTimeRiskiestWebsite: nil, allTimeListTrackers: [], allTimeListWebsites: [], lastVPNAlerts: nil)
+      PrivacyReportsView(lastVPNAlerts: nil)
       
-      PrivacyReportsView(lastWeekMostFrequentTracker: nil, lastWeekRiskiestWebsite: nil, allTimeMostFrequentTracker: nil, allTimeRiskiestWebsite: nil, allTimeListTrackers: [], allTimeListWebsites: [], lastVPNAlerts: nil)
+      PrivacyReportsView(lastVPNAlerts: nil)
         .preferredColorScheme(.dark)
     }
   }

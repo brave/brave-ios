@@ -9,16 +9,14 @@ import BraveShared
 import Data
 
 extension PrivacyReportsView {
+  
   struct PrivacyHubAllTimeSection: View {
     @Environment(\.sizeCategory) private var sizeCategory
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.pixelLength) private var pixelLength
     
-    let mostFrequentTracker: CountableEntity?
-    let riskiestWebsite: CountableEntity?
-    
-    let trackers: [PrivacyReportsTracker]
-    let websites: [PrivacyReportsWebsite]
+    @State private var mostFrequentTracker: CountableEntity?
+    @State private var riskiestWebsite: CountableEntity?
     
     private(set) var onDismiss: () -> Void
     
@@ -71,10 +69,7 @@ extension PrivacyReportsView {
         }
         
         NavigationLink(
-          destination: PrivacyReportAllTimeListsView(
-            trackers: trackers,
-            websites: websites,
-            onDismiss: onDismiss)
+          destination: PrivacyReportAllTimeListsView(onDismiss: onDismiss)
         ) {
           HStack {
             Text(Strings.PrivacyHub.allTimeListsButtonText)
@@ -91,6 +86,10 @@ extension PrivacyReportsView {
         )
       }
       .fixedSize(horizontal: false, vertical: true)
+      .onAppear {
+        mostFrequentTracker = BlockedResource.mostBlockedTracker(inLastDays: nil)
+        riskiestWebsite = BlockedResource.riskiestWebsite(inLastDays: nil)
+      }
     }
   }
 }
@@ -98,7 +97,7 @@ extension PrivacyReportsView {
 #if DEBUG
 struct PrivacyHubAllTimeSection_Previews: PreviewProvider {
   static var previews: some View {
-    PrivacyReportsView.PrivacyHubAllTimeSection(mostFrequentTracker: nil, riskiestWebsite: nil, trackers: [], websites: [], onDismiss: {})
+    PrivacyReportsView.PrivacyHubAllTimeSection(onDismiss: {})
   }
 }
 #endif
