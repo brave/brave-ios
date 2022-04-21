@@ -51,6 +51,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
     walletService._userAssets = { _, _, completion in
       completion([])
     }
+    walletService._defaultBaseCurrency = { $0(CurrencyCode.usd.code) }
     let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
     ethTxManagerProxy._gasEstimation1559 = { completion in
       completion(gasEstimation)
@@ -78,7 +79,8 @@ class TransactionConfirmationStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService
+      keyringService: keyringService,
+      currencyFormatter: .usdCurrencyFormatter
     )
   }
   

@@ -52,6 +52,8 @@ class PortfolioStoreTests: XCTestCase {
     walletService._userAssets = { _, _, completion in
       completion(mockUserAssets)
     }
+    walletService._addObserver = { _ in }
+    walletService._defaultBaseCurrency = { $0(CurrencyCode.usd.code) }
     let assetRatioService = BraveWallet.TestAssetRatioService()
     assetRatioService._price = { _, _, _, completion in
       completion(true, [mockEthAssetPrice])
@@ -65,7 +67,8 @@ class PortfolioStoreTests: XCTestCase {
       rpcService: rpcService,
       walletService: walletService,
       assetRatioService: assetRatioService,
-      blockchainRegistry: BraveWallet.TestBlockchainRegistry()
+      blockchainRegistry: BraveWallet.TestBlockchainRegistry(),
+      currencyFormatter: .usdCurrencyFormatter
     )
     // test that `update()` will assign new value to `userVisibleAssets` publisher
     let userVisibleAssetsException = expectation(description: "update-userVisibleAssets")
