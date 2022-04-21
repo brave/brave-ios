@@ -88,6 +88,7 @@ public class CryptoStore: ObservableObject {
     
     self.keyringService.add(self)
     self.txService.add(self)
+    self.walletService.add(self)
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -306,5 +307,24 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+  }
+}
+
+extension CryptoStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ origin: String) {
+  }
+  
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+  
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyFormatter.currencyCode = currency
+    portfolioStore.update()
+  }
+  
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+  
+  public func onNetworkListChanged() {
   }
 }

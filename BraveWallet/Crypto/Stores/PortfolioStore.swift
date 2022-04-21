@@ -84,7 +84,6 @@ public class PortfolioStore: ObservableObject {
 
     self.rpcService.add(self)
     self.keyringService.add(self)
-    self.walletService.add(self)
 
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
@@ -264,23 +263,5 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-  }
-}
-
-extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ origin: String) {
-  }
-  
-  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultBaseCurrencyChanged(_ currency: String) {
-    currencyCode = CurrencyCode(code: currency)
-  }
-  
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
-  }
-  
-  public func onNetworkListChanged() {
   }
 }
