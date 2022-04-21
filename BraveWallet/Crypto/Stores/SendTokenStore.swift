@@ -42,6 +42,8 @@ public class SendTokenStore: ObservableObject {
     case sameAsFromAddress
     case contractAddress
     case notEthAddress
+    case missingChecksum
+    case invalidChecksum
 
     var errorDescription: String? {
       switch self {
@@ -51,6 +53,10 @@ public class SendTokenStore: ObservableObject {
         return Strings.Wallet.sendWarningAddressIsContract
       case .notEthAddress:
         return Strings.Wallet.sendWarningAddressNotValid
+      case .missingChecksum:
+        return Strings.Wallet.sendWarningAddressMissingChecksumInfo
+      case .invalidChecksum:
+        return Strings.Wallet.sendWarningAddressInvalidChecksum
       }
     }
   }
@@ -185,7 +191,15 @@ public class SendTokenStore: ObservableObject {
       || (allTokens.first(where: { $0.contractAddress.lowercased() == normalizedSendAddress }) != nil) {
       addressError = .contractAddress
     } else {
-      addressError = nil
+      keyringService.checksumEthAddress(sendAddress) { [self] checksumAddress in
+        if sendAddress == checksumAddress {
+          addressError = nil
+        } else if sendAddress.removingHexPrefix.lowercased() == sendAddress.removingHexPrefix || sendAddress.removingHexPrefix.uppercased() == sendAddress.removingHexPrefix {
+          addressError = .missingChecksum
+        } else {
+          addressError = .invalidChecksum
+        }
+      }
     }
   }
 
