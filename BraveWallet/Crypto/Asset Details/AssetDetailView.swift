@@ -147,8 +147,8 @@ struct AssetDetailView: View {
             info: tx,
             networkStore: networkStore,
             keyringStore: keyringStore,
-            visibleTokens: [],
-            allTokens: [],
+            visibleTokens: [assetDetailStore.token],
+            allTokens: [], // AssetDetailView is specific to a single token
             assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue],
             currencyFormatter: assetDetailStore.currencyFormatter
           )
