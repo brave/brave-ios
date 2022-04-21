@@ -325,6 +325,6 @@ extension Preferences {
     Option<Date>(key: "privacy-hub.capture-vpn-alerts", default: Date().advanced(by: 7.days))
     /// Determines whether to show a Privacy Reports onboarding popup on the NTP.
     static let ntpOnboardingCompleted =
-    Option<Bool>(key: "privacy-hub.onboarding-completed", default: false)
+    Option<Bool>(key: "privacy-hub.onboarding-completed", default: true)
   }
 }
