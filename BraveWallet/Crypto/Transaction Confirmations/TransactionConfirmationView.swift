@@ -105,7 +105,7 @@ struct TransactionConfirmationView: View {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, confirmationStore.transactions.count))
           .fontWeight(.semibold)
         Button(action: next) {
-          Text(Strings.Wallet.nextTransaction)
+          Text(Strings.Wallet.next)
             .fontWeight(.semibold)
             .foregroundColor(Color(.braveBlurpleTint))
         }
