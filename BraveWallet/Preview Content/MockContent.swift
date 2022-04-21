@@ -137,4 +137,11 @@ extension BraveWallet.TransactionInfo {
   }
 }
 
+extension NumberFormatter {
+  static let usdCurrencyFormatter = NumberFormatter().then {
+    $0.numberStyle = .currency
+    $0.currencyCode = CurrencyCode.usd.code
+  }
+}
+
 #endif

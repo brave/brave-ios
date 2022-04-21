@@ -52,6 +52,17 @@ public class PortfolioStore: ObservableObject {
     rpcService: self.rpcService,
     assetRatioService: self.assetRatioService
   )
+  
+  var currencyCode: CurrencyCode = .usd {
+    didSet {
+      currencyFormatter.currencyCode = currencyCode.code
+      update()
+    }
+  }
+  let currencyFormatter = NumberFormatter().then {
+    $0.numberStyle = .currency
+    $0.currencyCode = CurrencyCode.usd.code
+  }
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -74,17 +85,16 @@ public class PortfolioStore: ObservableObject {
 
     self.rpcService.add(self)
     self.keyringService.add(self)
+    self.walletService.add(self)
 
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
         update()
       }
     }
-  }
-
-  private let numberFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = "USD"
+    walletService.defaultBaseCurrency { currencyCode in
+      self.currencyCode = CurrencyCode(code: currencyCode)
+    }
   }
 
   /// Fetches the balances for a given list of tokens for each of the given accounts, giving a dictionary with a balance for each token symbol.
@@ -115,7 +125,7 @@ public class PortfolioStore: ObservableObject {
   private func fetchPrices(for symbols: [String], completion: @escaping ([String: String]) -> Void) {
     assetRatioService.price(
       symbols.map { $0.lowercased() },
-      toAssets: ["usd"],
+      toAssets: [currencyCode.code],
       timeframe: timeframe
     ) { success, assetPrices in
       // `success` only refers to finding _all_ prices and if even 1 of N prices
@@ -134,7 +144,7 @@ public class PortfolioStore: ObservableObject {
       group.enter()
       assetRatioService.priceHistory(
         symbol,
-        vsAsset: "usd",
+        vsAsset: currencyCode.code,
         timeframe: timeframe
       ) { success, history in
         defer { group.leave() }
@@ -199,7 +209,7 @@ public class PortfolioStore: ObservableObject {
               return nil
             }
             .reduce(0.0, +)
-          balance = numberFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
+          balance = currencyFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
           // Compute historical balances based on historical prices and current balances
           let assets = userVisibleAssets.filter { !$0.history.isEmpty }  // [[AssetTimePrice]]
           let minCount = assets.map(\.history.count).min() ?? 0  // Shortest array count
@@ -210,7 +220,7 @@ public class PortfolioStore: ObservableObject {
             return .init(
               date: assets.map { $0.history[index].date }.max() ?? .init(),
               price: value,
-              formattedPrice: numberFormatter.string(from: NSNumber(value: value)) ?? "0.00"
+              formattedPrice: currencyFormatter.string(from: NSNumber(value: value)) ?? "0.00"
             )
           }
           isLoadingBalances = false
@@ -255,5 +265,23 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+  }
+}
+
+extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ origin: String) {
+  }
+  
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+  
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyCode = CurrencyCode(code: currency)
+  }
+  
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+  
+  public func onNetworkListChanged() {
   }
 }

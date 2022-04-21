@@ -42,9 +42,37 @@ public class TransactionConfirmationStore: ObservableObject {
 
   private var assetRatios: [String: Double] = [:]
 
-  let numberFormatter = NumberFormatter().then {
+  var currencyCode: CurrencyCode = .usd {
+    didSet {
+      currencyFormatter.currencyCode = currencyCode.code
+      fetchDetails(for: activeTransaction)
+    }
+  }
+  let currencyFormatter = NumberFormatter().then {
     $0.numberStyle = .currency
-    $0.currencyCode = "USD"
+    $0.currencyCode = CurrencyCode.usd.code
+  }
+  
+  var activeTransaction: BraveWallet.TransactionInfo {
+    transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
+  }
+
+  func next() {
+    if let index = transactions.firstIndex(where: { $0.id == activeTransactionId }) {
+      var nextIndex = transactions.index(after: index)
+      if nextIndex == transactions.endIndex {
+        nextIndex = 0
+      }
+      activeTransactionId = transactions[nextIndex].id
+    } else {
+      activeTransactionId = transactions.first!.id
+    }
+  }
+
+  func rejectAll() {
+    for transaction in transactions {
+      reject(transaction: transaction)
+    }
   }
 
   private let assetRatioService: BraveWalletAssetRatioService
@@ -74,6 +102,9 @@ public class TransactionConfirmationStore: ObservableObject {
     self.keyringService = keyringService
 
     self.txService.add(self)
+    walletService.defaultBaseCurrency { currencyCode in
+      self.currencyCode = CurrencyCode(code: currencyCode)
+    }
   }
 
   func updateGasValue(for transaction: BraveWallet.TransactionInfo) {
@@ -187,10 +218,10 @@ public class TransactionConfirmationStore: ObservableObject {
     @discardableResult func updateState() -> Bool {
       if let ratio = assetRatios[symbolKey], let gasRatio = assetRatios[gasKey] {
         let value = (Double(self.state.value) ?? 0.0) * ratio
-        self.state.fiat = numberFormatter.string(from: NSNumber(value: value)) ?? ""
+        self.state.fiat = currencyFormatter.string(from: NSNumber(value: value)) ?? ""
         let gasValue = (Double(self.state.gasValue) ?? 0.0) * gasRatio
-        self.state.gasFiat = numberFormatter.string(from: NSNumber(value: gasValue)) ?? ""
-        self.state.totalFiat = numberFormatter.string(from: NSNumber(value: value + gasValue)) ?? ""
+        self.state.gasFiat = currencyFormatter.string(from: NSNumber(value: gasValue)) ?? ""
+        self.state.totalFiat = currencyFormatter.string(from: NSNumber(value: value + gasValue)) ?? ""
         self.state.gasAssetRatio = gasRatio
         return true
       }
@@ -204,7 +235,7 @@ public class TransactionConfirmationStore: ObservableObject {
       let symbols = symbolKey == gasKey ? [symbolKey] : [symbolKey, gasKey]
       assetRatioService.price(
         symbols,
-        toAssets: ["usd"],
+        toAssets: [currencyCode.code],
         timeframe: .oneDay
       ) { [weak self] success, prices in
         // `success` only refers to finding _all_ prices and if even 1 of N prices
