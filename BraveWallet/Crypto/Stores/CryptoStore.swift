@@ -43,6 +43,11 @@ public class CryptoStore: ObservableObject {
   @Published private(set) var hasUnapprovedTransactions: Bool = false
   @Published private(set) var pendingWebpageRequest: PendingWebpageRequest?
   
+  let currencyFormatter = NumberFormatter().then {
+    $0.numberStyle = .currency
+    $0.currencyCode = CurrencyCode.usd.code
+  }
+  
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
@@ -77,7 +82,8 @@ public class CryptoStore: ObservableObject {
       rpcService: rpcService,
       walletService: walletService,
       assetRatioService: assetRatioService,
-      blockchainRegistry: blockchainRegistry
+      blockchainRegistry: blockchainRegistry,
+      currencyFormatter: currencyFormatter
     )
     
     self.keyringService.add(self)
@@ -148,7 +154,8 @@ public class CryptoStore: ObservableObject {
       walletService: walletService,
       txService: txService,
       blockchainRegistry: blockchainRegistry,
-      token: token
+      token: token,
+      currencyFormatter: currencyFormatter
     )
     assetDetailStore = store
     return store
@@ -171,7 +178,8 @@ public class CryptoStore: ObservableObject {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       txService: txService,
-      blockchainRegistry: blockchainRegistry
+      blockchainRegistry: blockchainRegistry,
+      currencyFormatter: currencyFormatter
     )
     accountActivityStore = store
     return store
@@ -195,7 +203,8 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService
+      keyringService: keyringService,
+      currencyFormatter: currencyFormatter
     )
     confirmationStore = store
     return store

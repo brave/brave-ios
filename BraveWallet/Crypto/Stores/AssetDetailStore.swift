@@ -45,10 +45,7 @@ class AssetDetailStore: ObservableObject {
       update()
     }
   }
-  let currencyFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = CurrencyCode.usd.code
-  }
+  let currencyFormatter: NumberFormatter
 
   private(set) var assetPriceValue: Double = 0.0
 
@@ -68,7 +65,8 @@ class AssetDetailStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    token: BraveWallet.BlockchainToken
+    token: BraveWallet.BlockchainToken,
+    currencyFormatter: NumberFormatter
   ) {
     self.assetRatioService = assetRatioService
     self.keyringService = keyringService
@@ -77,6 +75,7 @@ class AssetDetailStore: ObservableObject {
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.token = token
+    self.currencyFormatter = currencyFormatter
 
     self.keyringService.add(self)
     self.rpcService.add(self)

@@ -96,7 +96,8 @@ extension AssetDetailStore {
       walletService: MockBraveWalletService(),
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
-      token: .previewToken
+      token: .previewToken,
+      currencyFormatter: .usdCurrencyFormatter
     )
   }
 }
@@ -136,7 +137,8 @@ extension AccountActivityStore {
       rpcService: MockJsonRpcService(),
       assetRatioService: MockAssetRatioService(),
       txService: MockTxService(),
-      blockchainRegistry: MockBlockchainRegistry()
+      blockchainRegistry: MockBlockchainRegistry(),
+      currencyFormatter: .usdCurrencyFormatter
     )
   }
 }
@@ -154,7 +156,8 @@ extension TransactionConfirmationStore {
         let service = MockKeyringService()
         service.createWallet("password") { _  in }
         return service
-      }()
+      }(),
+      currencyFormatter: .usdCurrencyFormatter
     )
   }
 }

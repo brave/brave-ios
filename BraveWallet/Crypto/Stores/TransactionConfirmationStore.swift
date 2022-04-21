@@ -48,10 +48,7 @@ public class TransactionConfirmationStore: ObservableObject {
       fetchDetails(for: activeTransaction)
     }
   }
-  let currencyFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = CurrencyCode.usd.code
-  }
+  let currencyFormatter: NumberFormatter
   
   var activeTransaction: BraveWallet.TransactionInfo {
     transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
@@ -91,7 +88,8 @@ public class TransactionConfirmationStore: ObservableObject {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     walletService: BraveWalletBraveWalletService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    keyringService: BraveWalletKeyringService
+    keyringService: BraveWalletKeyringService,
+    currencyFormatter: NumberFormatter
   ) {
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
@@ -100,6 +98,7 @@ public class TransactionConfirmationStore: ObservableObject {
     self.walletService = walletService
     self.ethTxManagerProxy = ethTxManagerProxy
     self.keyringService = keyringService
+    self.currencyFormatter = currencyFormatter
 
     self.txService.add(self)
     walletService.defaultBaseCurrency { currencyCode in
