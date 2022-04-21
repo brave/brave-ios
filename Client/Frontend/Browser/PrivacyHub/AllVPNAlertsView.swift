@@ -23,13 +23,16 @@ extension PrivacyReportsView {
     ) private var vpnAlerts: FetchedResults<BraveVPNAlert>
     
     @State private var alerts: (trackerCount: Int, locationPingCount: Int, emailTrackerCount: Int)?
+    
+    @State private var alertsLoading = true
+    
     private(set) var onDismiss: () -> Void
     
     private var total: Int {
       guard let alerts = alerts else {
         return 0
       }
-
+      
       return alerts.trackerCount + alerts.locationPingCount + alerts.emailTrackerCount
     }
     
@@ -38,6 +41,7 @@ extension PrivacyReportsView {
         HStack {
           Text(Strings.PrivacyHub.vpvnAlertsTotalCount.uppercased())
             .font(.subheadline.weight(.medium))
+            .unredacted()
           Spacer()
           Text("\(total)")
             .font(.headline)
@@ -107,6 +111,7 @@ extension PrivacyReportsView {
             } header: {
               headerView
                 .listRowInsets(.init())
+                .redacted(reason: alertsLoading ? .placeholder : [])
             }
           }
           .listStyle(.insetGrouped)
@@ -140,6 +145,7 @@ extension PrivacyReportsView {
       .onAppear {
         BraveVPNAlert.alertTotals { result in
           alerts = result
+          alertsLoading = false
         }
       }
     }

@@ -23,12 +23,14 @@ extension PrivacyReportsView {
       HStack {
         Image(assetName)
           .padding(.leading)
+          .unredacted()
 
         if compact {
           VStack(alignment: .leading) {
             Text(title)
               .foregroundColor(Color(.secondaryBraveLabel))
               .font(.caption.weight(.semibold))
+              .unredacted()
             Text("\(count)")
               .font(.headline)
               // Smaller custom padding here to try to display the cell's text in one line
@@ -39,6 +41,7 @@ extension PrivacyReportsView {
         } else {
           Text(title)
             .font(.caption.weight(.semibold))
+            .unredacted()
           Spacer()
           Text("\(count)")
             .font(.headline)

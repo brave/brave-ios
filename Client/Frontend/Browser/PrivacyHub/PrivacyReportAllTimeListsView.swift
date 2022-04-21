@@ -43,6 +43,9 @@ struct PrivacyReportAllTimeListsView: View {
   @State private var trackers: [PrivacyReportsTracker] = []
   @State private var websites: [PrivacyReportsWebsite] = []
   
+  @State private var trackersLoading = true
+  @State private var websitesLoading = true
+  
   private(set) var onDismiss: () -> Void
   
   enum Page: String, CaseIterable, Identifiable {
@@ -143,19 +146,6 @@ struct PrivacyReportAllTimeListsView: View {
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(.insetGrouped)
-    .onAppear {
-      BlockedResource.allTimeMostFrequentTrackers() { allTimeListTrackers in
-        BraveVPNAlert.allByHostCount { vpnItems in
-          trackers = PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: vpnItems)
-        }
-      }
-      
-      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
-        websites = riskyWebsites.map {
-          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-        }
-      }
-    }
   }
   
   private var websitesList: some View {
@@ -193,9 +183,14 @@ struct PrivacyReportAllTimeListsView: View {
       .padding(.horizontal, 20)
       .padding(.vertical, 12)
       
-      switch currentPage {
-      case .trackersAndAds: trackersList
-      case .websites: websitesList
+      if trackersLoading || websitesLoading {
+        ProgressView()
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      } else {
+        switch currentPage {
+        case .trackersAndAds: trackersList
+        case .websites: websitesList
+        }
       }
     }
     .background(Color(.braveGroupedBackground).ignoresSafeArea())
@@ -205,6 +200,22 @@ struct PrivacyReportAllTimeListsView: View {
       ToolbarItem(placement: .confirmationAction) {
         Button(Strings.done, action: onDismiss)
           .foregroundColor(Color(.braveOrange))
+      }
+    }
+    .onAppear {
+      BlockedResource.allTimeMostFrequentTrackers() { allTimeListTrackers in
+        BraveVPNAlert.allByHostCount { vpnItems in
+          trackers = PrivacyReportsTracker.merge(shieldItems: allTimeListTrackers, vpnItems: vpnItems)
+          trackersLoading = false
+        }
+      }
+      
+      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
+        websites = riskyWebsites.map {
+          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+        }
+        
+        websitesLoading = false
       }
     }
   }
