@@ -425,7 +425,7 @@ struct TransactionConfirmationView: View {
     Button(action: {
       confirmationStore.confirm(transaction: activeTransaction)
     }) {
-      Label(Strings.Wallet.confirmTransactionButtonTitle, systemImage: "checkmark.circle.fill")
+      Label(Strings.Wallet.confirm, systemImage: "checkmark.circle.fill")
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
     .disabled(!confirmationStore.state.isBalanceSufficient)

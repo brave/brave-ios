@@ -44,7 +44,7 @@ public struct NewSiteConnectionView: View {
         .font(.subheadline)
         .foregroundColor(Color(.braveLabel))
         .multilineTextAlignment(.center)
-      Text("Connect to Brave Wallet")
+      Text(Strings.Wallet.newSiteConnectMessage)
         .font(.headline)
         .foregroundColor(Color(.bravePrimary))
         .multilineTextAlignment(.center)
@@ -53,7 +53,7 @@ public struct NewSiteConnectionView: View {
   }
   
   private var cautionFooterView: some View {
-    Text("Only connect with sites you trust.")
+    Text(Strings.Wallet.newSiteConnectFooter)
       .frame(maxWidth: .infinity)
       .padding(.top)
       .foregroundColor(Color(.braveLabel))
@@ -94,7 +94,7 @@ public struct NewSiteConnectionView: View {
             }
           }
         } header: {
-          WalletListHeaderView(title: Text("Accounts"))
+          WalletListHeaderView(title: Text(Strings.Wallet.accountsPageTitle))
         } footer: {
           cautionFooterView
         }
@@ -103,7 +103,7 @@ public struct NewSiteConnectionView: View {
           Button {
             isConfirmationViewVisible = true
           } label: {
-            Text("Next")
+            Text(Strings.Wallet.next)
           }
           .buttonStyle(BraveFilledButtonStyle(size: .large))
           .disabled(selectedAccounts.isEmpty)
@@ -121,7 +121,7 @@ public struct NewSiteConnectionView: View {
         .listRowBackground(Color(.braveGroupedBackground))
       }
       .navigationBarTitleDisplayMode(.inline)
-      .navigationTitle("Connect")
+      .navigationTitle(Strings.Wallet.newSiteConnectScreenTitle)
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button {
@@ -162,7 +162,7 @@ public struct NewSiteConnectionView: View {
         HStack(spacing: 12) {
           Image("brave.checkmark.circle.fill")
             .imageScale(.large)
-          Text("View the addresses of your permitted accounts (required)")
+          Text(Strings.Wallet.newSiteConnectConfirmationMessage)
             .multilineTextAlignment(.leading)
         }
         .foregroundColor(Color(.braveLabel))
@@ -178,14 +178,14 @@ public struct NewSiteConnectionView: View {
             .map(\.address)
           onConnect(accounts)
         } label: {
-          Text("Confirm")
+          Text(Strings.Wallet.confirm)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
         .frame(maxWidth: .infinity)
       }
       .listRowBackground(Color(.braveGroupedBackground))
     }
-    .navigationTitle("Connect")
+    .navigationTitle(Strings.Wallet.newSiteConnectScreenTitle)
     .navigationBarTitleDisplayMode(.inline)
   }
 }
