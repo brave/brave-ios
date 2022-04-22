@@ -123,17 +123,17 @@ class AuthenticatorTests: XCTestCase {
     return db.runQuery(sql, args: nil, factory: hostnameFactory)
   }
 
-  func testChallengeMatchesLoginEntry() {
+  func testChallengeMatchesLoginEntry() async {
     let login = Login.createWithHostname("https://securesite.com", username: "username", password: "password", formSubmitURL: "https://submit.me")
     logins.addLogin(login).succeeded()
     let challenge = mockChallengeForURL(URL(string: "https://securesite.com")!, username: "username", password: "password")
-    let result = Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins).value.successValue!
+    let result = await Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins)
     XCTAssertNotNil(result)
     XCTAssertEqual(result?.user, "username")
     XCTAssertEqual(result?.password, "password")
   }
 
-  func testChallengeMatchesSingleMalformedLoginEntry() {
+  func testChallengeMatchesSingleMalformedLoginEntry() async {
     // Since Login has been updated to not store schemeless URL, write directly to simulate a malformed URL
     let malformedLogin = MockMalformableLogin.createWithHostname("malformed.com", username: "username", password: "password", formSubmitURL: "https://submit.me")
     logins.addLogin(malformedLogin).succeeded()
@@ -143,7 +143,7 @@ class AuthenticatorTests: XCTestCase {
     XCTAssertEqual(oldHostname, "malformed.com")
 
     let challenge = mockChallengeForURL(URL(string: "https://malformed.com")!, username: "username", password: "password")
-    let result = Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins).value.successValue!
+    let result = await Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins)
     XCTAssertNotNil(result)
     XCTAssertEqual(result?.user, "username")
     XCTAssertEqual(result?.password, "password")
@@ -153,7 +153,7 @@ class AuthenticatorTests: XCTestCase {
     XCTAssertEqual(newHostname, "https://malformed.com")
   }
 
-  func testChallengeMatchesDuplicateLoginEntries() {
+  func testChallengeMatchesDuplicateLoginEntries() async {
     // Since Login has been updated to not store schemeless URL, write directly to simulate a malformed URL
     let malformedLogin = MockMalformableLogin.createWithHostname("malformed.com", username: "malformed_username", password: "malformed_password", formSubmitURL: "https://submit.me")
     logins.addLogin(malformedLogin).succeeded()
@@ -168,7 +168,7 @@ class AuthenticatorTests: XCTestCase {
     XCTAssertEqual(hostnames[1], "malformed.com")
 
     let challenge = mockChallengeForURL(URL(string: "https://malformed.com")!, username: "username", password: "password")
-    let result = Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins).value.successValue!
+    let result = await Authenticator.findMatchingCredentialsForChallenge(challenge, fromLoginsProvider: logins)
     XCTAssertNotNil(result)
     XCTAssertEqual(result?.user, "good_username")
     XCTAssertEqual(result?.password, "good_password")
