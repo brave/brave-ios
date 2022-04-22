@@ -90,6 +90,11 @@ struct PrivacyReportsManager {
     if debugMode {
       cancelNotification()
     }
+    
+    if !Preferences.PrivacyReports.captureShieldsData.value {
+      cancelNotification()
+      return
+    }
 
     notificationCenter.getPendingNotificationRequests { requests in
       if !debugMode && requests.contains(where: { $0.identifier == notificationID }) {

@@ -3136,6 +3136,7 @@ extension BrowserViewController: PreferencesObserver {
         item: selectedTab?.playlistItem)
     case Preferences.PrivacyReports.captureShieldsData.key:
       PrivacyReportsManager.scheduleProcessingBlockedRequests()
+      PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     case Preferences.PrivacyReports.captureVPNAlerts.key:
       PrivacyReportsManager.scheduleVPNAlertsTask()
     default:
