@@ -75,8 +75,16 @@ extension BrowserViewController {
 
     if !trackers.isEmpty, let url = selectedTab.url {
       let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
-      notifyTrackersBlocked(domain: domain, trackers: trackers)
-      Preferences.General.onboardingAdblockPopoverShown.value = true
+      
+      let firstTracker = trackers.popFirst()
+      let trackerCount = ((firstTracker?.value.count ?? 0) - 1) + trackers.reduce(0, { res, values in
+          res + values.value.count
+      })
+      
+      if trackerCount >= 10, !url.isSearchEngineURL {
+        notifyTrackersBlocked(domain: domain, trackerKey: firstTracker?.key, trackerCount: trackerCount)
+        Preferences.General.onboardingAdblockPopoverShown.value = true
+      }
     }
   }
 

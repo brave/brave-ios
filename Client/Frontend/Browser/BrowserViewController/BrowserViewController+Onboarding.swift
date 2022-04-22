@@ -56,9 +56,9 @@ extension BrowserViewController {
       !topToolbar.inOverlayMode,
       topToolbar.currentURL == nil {
       
-      //if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value {
+      if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value {
         presentOmniBoxOnboarding()
-      //}
+      }
       
       if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
         presentNTPStatsOnboarding()
@@ -212,18 +212,9 @@ extension BrowserViewController {
       }
   }
 
-  func notifyTrackersBlocked(domain: String, trackers: [String: [String]]) {
+  func notifyTrackersBlocked(domain: String, trackerKey: String?, trackerCount: Int) {
     let controller = WelcomeBraveBlockedAdsController().then {
-      var trackers = trackers
-      let first = trackers.popFirst()
-      let tracker = first?.key
-      let trackerCount =
-        ((first?.value.count ?? 0) - 1)
-        + trackers.reduce(0, { res, values in
-          res + values.value.count
-        })
-
-      $0.setData(domain: domain, trackerBlocked: tracker ?? "", trackerCount: trackerCount)
+      $0.setData(domain: domain, trackerBlocked: trackerKey ?? "", trackerCount: trackerCount)
     }
 
     let popover = PopoverController(contentController: controller)
