@@ -78,7 +78,9 @@ extension BrowserViewController {
     
     // Present the popover
     let controller = WelcomeOmniBoxOnboardingController()
-    controller.setText(title: "Type a website name or URL", details: "See the Brave Difference:\nNo ads. No trackers. Way faster page load.")
+    controller.setText(
+      title: Strings.Onboarding.omniboxOnboardingPopOverTitle,
+      details: Strings.Onboarding.omniboxOnboardingPopOverDescription)
 
     presentPopoverContent(
       using: controller,
@@ -86,11 +88,14 @@ extension BrowserViewController {
       didDismiss: {
         Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
       },
-      didClickBorderedArea: {
+      didClickBorderedArea: { [weak self] in
+        guard let self = self else { return }
+        
         Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
         
-        print("Boredered bozz leaa")
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+          self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
+        }
       }
     )
   }
