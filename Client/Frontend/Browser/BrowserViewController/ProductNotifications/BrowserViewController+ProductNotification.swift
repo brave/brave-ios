@@ -14,32 +14,6 @@ private let log = Logger.browserLogger
 
 extension BrowserViewController {
 
-  // MARK: BenchmarkTrackerCountTier
-
-  enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
-    case specialTier = 1000
-    case newbieExclusiveTier = 5000
-    case casualExclusiveTier = 10_000
-    case regularExclusiveTier = 25_000
-    case expertExclusiveTier = 75_000
-    case professionalTier = 100_000
-    case primeTier = 250_000
-    case grandTier = 500_000
-    case legendaryTier = 1_000_000
-
-    var nextTier: BenchmarkTrackerCountTier? {
-      guard let indexOfSelf = Self.allCases.firstIndex(where: { self == $0 }) else {
-        return nil
-      }
-
-      return Self.allCases[safe: indexOfSelf + 1]
-    }
-
-    var value: Int {
-      AppConstants.buildChannel.isPublic ? self.rawValue : self.rawValue / 100
-    }
-  }
-
   // MARK: Internal
 
   @objc func updateShieldNotifications() {
@@ -129,39 +103,6 @@ extension BrowserViewController {
       return
     }
 
-    // Step 1: Load a video on a streaming site
-    if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-      selectedTab.url?.isVideoSteamingSiteURL == true {
-
-      notifyVideoAdsBlocked()
-      Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
-
-      return
-    }
-
-    // Step 2: Share Brave Benchmark Tiers
-    let numOfTrackerAds = BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection
-    if numOfTrackerAds > benchmarkCurrentSessionAdCount + 20 {
-      let existingTierList = BenchmarkTrackerCountTier.allCases.filter {
-        Preferences.ProductNotificationBenchmarks.trackerTierCount.value < $0.value
-      }
-
-      if !existingTierList.isEmpty {
-        Preferences.ProductNotificationBenchmarks.trackerTierCount.value = numOfTrackerAds
-
-        guard let firstExistingTier = existingTierList.filter({ numOfTrackerAds > $0.value }).first else {
-          return
-        }
-
-        if numOfTrackerAds > firstExistingTier.value {
-          notifyTrackerAdsCount(
-            firstExistingTier.value,
-            description: Strings.ShieldEducation.benchmarkAnyTierTitle)
-        }
-      }
-    }
-
-    // Step 3: Domain Specific Data Saved
     // Data Saved Pop-Over only exist in JP locale
     if Locale.current.regionCode == "JP" {
       if !benchmarkNotificationPresented,
@@ -181,26 +122,6 @@ extension BrowserViewController {
         return
       }
     }
-  }
-
-  private func notifyVideoAdsBlocked() {
-    let shareTrackersViewController = ShareTrackersController(trackingType: .videoAdBlock)
-
-    dismiss(animated: true)
-    showBenchmarkNotificationPopover(controller: shareTrackersViewController)
-  }
-
-  private func notifyTrackerAdsCount(_ count: Int, description: String) {
-    let shareTrackersViewController = ShareTrackersController(trackingType: .trackerCountShare(count: count, description: description))
-    dismiss(animated: true)
-
-    shareTrackersViewController.actionHandler = { [weak self] action in
-      guard let self = self, action == .shareTheNewsTapped else { return }
-
-      self.showShareScreen()
-    }
-
-    showBenchmarkNotificationPopover(controller: shareTrackersViewController)
   }
 
   private func notifyDomainSpecificDataSaved(_ dataSaved: String) {
@@ -232,23 +153,6 @@ extension BrowserViewController {
       browser: self)
     popover.popoverDidDismiss = { _ in
       pulseAnimation.removeFromSuperview()
-    }
-  }
-
-  // MARK: Actions
-
-  func showShareScreen() {
-    dismiss(animated: true) {
-      let globalShieldsActivityController =
-        ShieldsActivityItemSourceProvider.shared.setupGlobalShieldsActivityController()
-      globalShieldsActivityController.popoverPresentationController?.sourceView = self.view
-
-      globalShieldsActivityController.popoverPresentationController?.sourceRect = self.view.convert(
-        self.topToolbar.locationView.shieldsButton.frame,
-        from: self.topToolbar.locationView.shieldsButton.superview)
-      globalShieldsActivityController.popoverPresentationController?.permittedArrowDirections = [.up]
-
-      self.present(globalShieldsActivityController, animated: true, completion: nil)
     }
   }
 }
