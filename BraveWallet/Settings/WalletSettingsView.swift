@@ -128,7 +128,7 @@ public struct WalletSettingsView: View {
         Toggle(Strings.Wallet.web3PreferencesDisplayWeb3Notifications, isOn: $displayDappsNotifications.value)
           .foregroundColor(Color(.braveLabel))
           .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
-        NavigationLink(destination: EmptyView()) {
+        NavigationLink(destination: ManageSiteConnectionsView(siteConnectionStore: .init())) {
           Text(Strings.Wallet.web3PreferencesManageSiteConnections)
             .foregroundColor(Color(.braveLabel))
         }
