@@ -180,9 +180,7 @@ open class SQLiteLogins: BrowserLogins {
   }
 
   open func addLogin(_ login: LoginData) async throws {
-    if let error = login.isValid.failureValue {
-      throw error
-    }
+    try login.validate()
 
     let nowMicro = Date.nowMicroseconds()
     let nowMilli = nowMicro / 1000
@@ -283,9 +281,7 @@ open class SQLiteLogins: BrowserLogins {
      * without triggering an upload or a conflict.
      */
   open func updateLoginByGUID(_ guid: GUID, new: LoginData, significant: Bool) async throws {
-    if let error = new.isValid.failureValue {
-      throw error
-    }
+    try new.validate()
 
     // Right now this method is only ever called if the password changes at
     // point of use, so we always set `timePasswordChanged` and `timeLastUsed`.

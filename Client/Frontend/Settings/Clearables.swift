@@ -17,7 +17,7 @@ protocol Clearable {
   var label: String { get }
 }
 
-class ClearableError: MaybeErrorType {
+class ClearableError: Error {
   fileprivate let msg: String
   init(msg: String) {
     self.msg = msg
@@ -26,7 +26,7 @@ class ClearableError: MaybeErrorType {
   var description: String { return msg }
 }
 
-struct ClearableErrorType: MaybeErrorType {
+struct ClearableErrorType: Error {
   let err: Error
 
   init(err: Error) {

@@ -8,7 +8,7 @@ import XCGLogger
 
 private var log = XCGLogger.default
 
-private class DiskImageStoreErrorType: MaybeErrorType {
+private class DiskImageStoreErrorType: Error {
   let description: String
   init(description: String) {
     self.description = description

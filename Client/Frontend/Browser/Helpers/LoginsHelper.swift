@@ -115,10 +115,12 @@ class LoginsHelper: TabContentScript {
   }
 
   fileprivate func promptSave(_ login: LoginData) {
-    guard login.isValid.isSuccess else {
+    do {
+      try login.validate()
+    } catch {
       return
     }
-
+    
     let promptMessage: String
     if let username = login.username {
       promptMessage = String(format: Strings.saveLoginUsernamePrompt, username, login.hostname)
@@ -149,10 +151,12 @@ class LoginsHelper: TabContentScript {
   }
 
   private func promptUpdateFromLogin(login old: LoginData, toLogin new: LoginData) {
-    guard new.isValid.isSuccess else {
+    do {
+      try new.validate()
+    } catch {
       return
     }
-
+    
     let guid = old.guid
 
     let formatted: String
