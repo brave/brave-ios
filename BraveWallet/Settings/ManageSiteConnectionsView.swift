@@ -73,8 +73,9 @@ private struct SiteRow: View {
   let siteConnection: SiteConnection
 
   private let maxBlockies = 3
-  @ScaledMetric private var blockieSize: CGFloat = 10
-  private let maxBlockieSize: CGFloat = 20
+  @ScaledMetric private var blockieSize: CGFloat = 16
+  private let maxBlockieSize: CGFloat = 32
+  @ScaledMetric private var blockieDotSize: CGFloat = 2
   
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
@@ -98,17 +99,27 @@ private struct SiteRow: View {
     if siteConnection.connectedAddresses.isEmpty {
       EmptyView()
     } else {
-      HStack(spacing: -5) {
-        ForEach(0...min(maxBlockies, siteConnection.connectedAddresses.count - 1), id: \.self) { index in
+      HStack(spacing: -(min(blockieSize, maxBlockieSize) / 2)) {
+        ForEach(0..<min(maxBlockies, siteConnection.connectedAddresses.count - 1), id: \.self) { index in
           Blockie(address: siteConnection.connectedAddresses[index])
             .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
             .zIndex(Double(siteConnection.connectedAddresses.count - index + 1))
         }
-        if siteConnection.connectedAddresses.count > maxBlockies { // TODO: Fix styling
+        if siteConnection.connectedAddresses.count > maxBlockies {
           Circle()
-            .foregroundColor(Color.pink)
+            .foregroundColor(Color(.braveBlurple))
             .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
-            .overlay(Text("…"))
+            .overlay(
+              HStack(spacing: 1) {
+                Circle()
+                  .frame(width: blockieDotSize, height: blockieDotSize)
+                Circle()
+                  .frame(width: blockieDotSize, height: blockieDotSize)
+                Circle()
+                  .frame(width: blockieDotSize, height: blockieDotSize)
+              }
+                .foregroundColor(.white)
+            )
         }
       }
     }

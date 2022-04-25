@@ -19,7 +19,7 @@ extension Array where Element == SiteConnection {
     filter { siteConnections in
       guard !text.isEmpty else { return true }
       let filterText = text.lowercased()
-      return siteConnections.url.lowercased().contains(filterText) || siteConnections.connectedAddresses.contains(where: { $0.lowercased().contains(filterText) })
+      return siteConnections.url.caseInsensitiveCompare(filterText) == .orderedSame || siteConnections.connectedAddresses.contains(where: { $0.caseInsensitiveCompare(filterText) == .orderedSame })
     }
   }
 }
