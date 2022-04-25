@@ -2227,5 +2227,40 @@ extension Strings {
       value: "Sign",
       comment: "The title of the button used to sign a message request on the signature request view."
     )
+    public static let web3PreferencesSectionTitle = NSLocalizedString(
+      "wallet.web3PreferencesSectionTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Web3 preferences",
+      comment: "The section title for users to set up preferences for interation with web3 sites."
+    )
+    public static let web3PreferencesDefaultWallet = NSLocalizedString(
+      "wallet.web3PreferencesDefaultWallet",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Default Wallet",
+      comment: "The title for the entry displaying the current preferred default wallet is."
+    )
+    public static let web3PreferencesAllowSiteToRequestAccounts = NSLocalizedString(
+      "wallet.web3PreferencesAllowSiteToRequestAccounts",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Allow site to request accounts",
+      comment: "The title for the entry displaying the preferred option to allow web3 sites to rquest account's permission."
+    )
+    public static let web3PreferencesDisplayWeb3Notifications = NSLocalizedString(
+      "wallet.web3PreferencesDisplayWeb3Notifications",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Display Web3 notifications",
+      comment: "The title for the entry displaying the preferred option to display web3 site notifications."
+    )
+    public static let web3PreferencesManageSiteConnections = NSLocalizedString(
+      "wallet.web3PreferencesManageSiteConnections",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Manage site connections",
+      comment: "The title for the entry that by clicking will direct users to the screen to manage web3 sites account connections."
+    )
   }
 }
