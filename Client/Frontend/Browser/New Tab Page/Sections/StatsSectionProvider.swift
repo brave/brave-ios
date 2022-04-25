@@ -16,6 +16,10 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     self.action = action
   }
   
+  @objc private func tappedButton() {
+    action()
+  }
+  
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return 1
   }
@@ -24,13 +28,9 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
     collectionView.register(NewTabCenteredCollectionViewCell<BraveShieldStatsView>.self)
   }
   
-  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    action()
-  }
-  
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(for: indexPath) as NewTabCenteredCollectionViewCell<BraveShieldStatsView>
-    cell.supportHighlighting = true
+    cell.view.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
     return cell
   }
   
@@ -46,7 +46,7 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
   }
 }
 
-class BraveShieldStatsView: UIView {
+class BraveShieldStatsView: SpringButton {
   private lazy var adsStatView: StatView = {
     let statView = StatView(frame: CGRect.zero)
     statView.title = Strings.shieldsAdAndTrackerStats.capitalized
@@ -125,6 +125,7 @@ class BraveShieldStatsView: UIView {
     background.backgroundColor = .init(white: 0, alpha: 0.25)
     background.layer.cornerRadius = 12
     background.layer.cornerCurve = .continuous
+    background.isUserInteractionEnabled = false
     insertSubview(background, at: 0)
     background.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -135,6 +136,7 @@ class BraveShieldStatsView: UIView {
     contentStackView.addStackViewItems(.view(topStackView), .view(statsStackView))
     addSubview(contentStackView)
     
+    contentStackView.isUserInteractionEnabled = false
     update()
     
     contentStackView.snp.makeConstraints {
