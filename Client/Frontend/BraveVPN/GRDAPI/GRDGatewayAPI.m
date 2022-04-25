@@ -356,7 +356,7 @@
   
   if (useDummyData) {
     // Returning dummy data so that we can debug easily in the simulator.
-    completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
+    if (completion) completion([NSDictionary dictionaryWithObject:[self _fakeAlertsArray] forKey:@"alerts"], YES, nil);
     return;
   }
   

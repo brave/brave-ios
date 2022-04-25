@@ -690,7 +690,7 @@ class BraveVPN {
 
         BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
       } catch {
-        log.error("Error: \(error)")
+        log.error("Failed parsing vpn alerts data")
       }
     }
   }
