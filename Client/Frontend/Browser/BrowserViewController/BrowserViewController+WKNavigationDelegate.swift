@@ -202,8 +202,7 @@ extension BrowserViewController: WKNavigationDelegate {
       // Cancel the original request. We don't want it to load as it's tracking us
       decisionHandler(.cancel, preferences)
 
-      // We only include trusted headers on cross origin requests
-      // For now we only allow the `Referer`. The browser will add the rest.
+      // For now we only allow the `Referer`. The browser will other headers during navigation.
       var modifiedRequest = URLRequest(url: redirectURL)
 
       for (headerKey, headerValue) in navigationAction.request.allHTTPHeaderFields ?? [:] {
