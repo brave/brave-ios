@@ -194,7 +194,8 @@ extension BrowserViewController: WKNavigationDelegate {
     // Handle debouncing for main frame only and only if the site (etld+1) changes
     // We also only handle `http` and `https` requests
     if url.isWebPage(includeDataURIs: false),
-       let currentURL = tab?.webView?.url, currentURL.baseDomain != url.baseDomain,
+       let currentURL = tab?.webView?.url,
+       currentURL.baseDomain != url.baseDomain,
        domainForRequestURL.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
        navigationAction.targetFrame?.isMainFrame == true,
        let redirectURL = DebouncingResourceDownloader.shared.redirectURL(for: url) {
@@ -202,13 +203,11 @@ extension BrowserViewController: WKNavigationDelegate {
       decisionHandler(.cancel, preferences)
 
       // We only include trusted headers on cross origin requests
-      // TODO: @JS Look at possibly getting a list of trusted headers from brave-core
-      // For now we only allow the `Referrer`. The browser will add the rest.
+      // For now we only allow the `Referer`. The browser will add the rest.
       var modifiedRequest = URLRequest(url: redirectURL)
-      let trustedHeaderKeys = Set(["Referer"])
 
       for (headerKey, headerValue) in navigationAction.request.allHTTPHeaderFields ?? [:] {
-        guard trustedHeaderKeys.contains(headerKey) else { continue }
+        guard headerKey == "Referer" else { continue }
         modifiedRequest.setValue(headerValue, forHTTPHeaderField: headerKey)
       }
 
