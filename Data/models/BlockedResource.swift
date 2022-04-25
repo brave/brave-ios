@@ -149,7 +149,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
           let result = try distinctValues(property: domainKeyPath,
                                           propertyToFetch: hostKeyPath,
                                           value: domain,
-                                          daysRange: nil,
+                                          daysRange: days,
                                           context: context).count
           
           if result > mostRiskyWebsite.count {
@@ -271,7 +271,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
   /// A helper method for to group up elements.
   /// - Parameters:
   ///     - property: What property we group by for.
-  ///     - daysRange: How old items to look for. If this value is nil, all data is considered including consolidated records.
+  ///     - days: How old items to look for. If this value is nil, all data is considered including consolidated records.
   private static func groupByFetch(property: String,
                                    daysRange days: Int?,
                                    context: NSManagedObjectContext) throws -> [NSDictionary] {
@@ -279,13 +279,12 @@ public final class BlockedResource: NSManagedObject, CRUD {
     let fetchRequest = NSFetchRequest<NSDictionary>(entityName: entityName)
     fetchRequest.entity = BlockedResource.entity(in: context)
     
-    // Due to CD constraints all properties to fetch must be used in GROUP BY statement as well.
-    fetchRequest.propertiesToFetch = [property, "timestamp"]
-    fetchRequest.propertiesToGroupBy = [property, "timestamp"]
+    fetchRequest.propertiesToFetch = [property]
     fetchRequest.resultType = .dictionaryResultType
+    fetchRequest.returnsDistinctResults = true
     
     if let days = days {
-      fetchRequest.havingPredicate = NSPredicate(format: "\(timestampKeyPath) >= %@", getDate(-days) as CVarArg)
+      fetchRequest.predicate = NSPredicate(format: "\(timestampKeyPath) >= %@", getDate(-days) as CVarArg)
     }
     
     let results = try context.fetch(fetchRequest)
@@ -322,11 +321,8 @@ public final class BlockedResource: NSManagedObject, CRUD {
     fetchRequest.entity = BlockedResource.entity(in: context)
     
     fetchRequest.propertiesToFetch = [propertyToFetch]
+    fetchRequest.propertiesToGroupBy = [propertyToFetch]
     fetchRequest.resultType = .dictionaryResultType
-    // Dev note: DISTINCT and GROUP BY achieve similar results but their performance might be different.
-    // Depends on DB implementation and optimizations under the hood.
-    // If this query feels slow, consider replacing it with `propertiesToGroupBy` and compare performance.
-    fetchRequest.returnsDistinctResults = true
     fetchRequest.predicate = predicate
     
     let result = try context.fetch(fetchRequest)
