@@ -96,23 +96,3 @@ extension PrivacyReportsView {
   }
 }
 
-/*
-#if DEBUG
-struct VPNAlertCell_Previews: PreviewProvider {
-  static var previews: some View {
-    
-    Group {
-      
-      
-      PrivacyReportsView.VPNAlertCell(vpnAlert: .init)
-        .previewLayout(PreviewLayout.sizeThatFits)
-      PrivacyReportsView.VPNAlertCell(vpnAlert: .init(date: Date(), text: "‘Branch’ collects location and other geo data.", type: .location))
-        .previewLayout(PreviewLayout.sizeThatFits)
-      PrivacyReportsView.VPNAlertCell(vpnAlert: .init(date: Date(), text: "App Measurement collects app usage, device info, and app activity.", type: .mail))
-        .previewLayout(PreviewLayout.sizeThatFits)
-    }
-    
-  }
-}
-#endif
-*/

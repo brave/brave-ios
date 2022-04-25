@@ -271,7 +271,7 @@ public final class BlockedResource: NSManagedObject, CRUD {
   /// A helper method for to group up elements.
   /// - Parameters:
   ///     - property: What property we group by for.
-  ///     - days: How old items to look for. If this value is nil, all data is considered including consolidated records.
+  ///     - daysRange: How old items to look for. If this value is nil, all data is considered including consolidated records.
   private static func groupByFetch(property: String,
                                    daysRange days: Int?,
                                    context: NSManagedObjectContext) throws -> [NSDictionary] {

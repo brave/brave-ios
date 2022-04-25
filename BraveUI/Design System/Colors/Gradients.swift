@@ -122,9 +122,7 @@ extension BraveGradient {
         .init(color: DesignSystemColor.gradient05_step0.color, position: 0),
         .init(color: DesignSystemColor.gradient05_step1.color, position: 1),
       ],
-      // FIXME: What is figma degrees 😶‍🌫️
-      startPoint: .zero,
-      endPoint: .init(x: 1, y: 1)
+      angle: .figmaDegrees(126)
     )
   }
 }

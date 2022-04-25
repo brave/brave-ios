@@ -93,7 +93,8 @@ class TPStatsBlocklistChecker {
 
         if Preferences.PrivacyReports.captureShieldsData.value,
           let domainUrl = URL(string: domainUrl),
-          let blockedResourceHost = url.baseDomain {
+          let blockedResourceHost = url.baseDomain,
+           !PrivateBrowsingManager.shared.isPrivateBrowsing {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, domainUrl, Date()))
         }
 

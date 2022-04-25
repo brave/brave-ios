@@ -19,6 +19,8 @@ struct PrivacyReportsManager {
   static var pendingBlockedRequests: [(host: String, domain: URL, date: Date)] = []
   
   static func processBlockedRequests() {
+    if PrivateBrowsingManager.shared.isPrivateBrowsing { return }
+    
     let itemsToSave = pendingBlockedRequests
     pendingBlockedRequests.removeAll()
     
@@ -110,8 +112,7 @@ struct PrivacyReportsManager {
       let calendar = Calendar.current
       dateComponents.calendar = calendar
 
-      // For testing purposes, notification launched from the debug menu will show up
-      // in the next 5 minutes of the time it was requested.
+      // For testing purposes, dev and local builds will launch notification few minutes after it's been enabled.
       if debugMode {
         let now = Date()
         let weekday = calendar.component(.weekday, from: now)

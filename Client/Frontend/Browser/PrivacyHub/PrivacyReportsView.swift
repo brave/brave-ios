@@ -52,7 +52,7 @@ struct PrivacyReportsView: View {
       .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
       .foregroundColor(Color(.braveOrange))
       .actionSheet(isPresented: $showClearDataPrompt) {
-        // FIXME: Currently .actionSheet does not allow you leave empty title for the sheet.
+        // Currently .actionSheet does not allow you leave empty title for the sheet.
         // This could get converted to .confirmationPrompt or Menu with destructive buttons
         // once iOS 15 is minimum supported version
         .init(title: Text(Strings.PrivacyHub.clearAllDataPrompt),
