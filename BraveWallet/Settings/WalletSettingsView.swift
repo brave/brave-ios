@@ -111,15 +111,7 @@ public struct WalletSettingsView: View {
           Menu {
             ForEach(Preferences.Wallet.WalletType.allCases) { walletType in
               Button(action: {
-                if defaultWallet.value != walletType.rawValue {
-                  defaultWallet.value = walletType.rawValue
-                  switch walletType {
-                  case .none:
-                    break
-                  case .brave:
-                    break
-                  }
-                }
+                defaultWallet.value = walletType.rawValue
               }) {
                 Text(walletType.name)
               }
