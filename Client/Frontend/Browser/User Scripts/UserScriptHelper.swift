@@ -6,6 +6,9 @@
 import Foundation
 import WebKit
 import Data
+import BraveShared
+import BraveCore
+import Shared
 
 /// A class that helps in handling user scripts.
 class UserScriptHelper {
@@ -64,6 +67,10 @@ class UserScriptHelper {
       if let etldP1 = mainDocumentURL.baseDomain, isFPProtectionOn {
         userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
         userScriptTypes.insert(.farblingProtection(etld: etldP1))
+      }
+
+      if Preferences.Shields.autoRedirectAMPPages.value {
+        userScriptTypes.insert(.deAMP)
       }
     }
 

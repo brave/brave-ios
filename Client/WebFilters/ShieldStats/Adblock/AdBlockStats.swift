@@ -198,6 +198,15 @@ extension AdBlockStats {
       
       cssRules += "\(key){" + subRules + " !important}\n"
     }
+
+    var injectedScript = model.injectedScript
+
+    if !injectedScript.isEmpty, Preferences.Shields.autoRedirectAMPPages.value {
+      injectedScript = [
+        "const deAmpEnabled = true;",
+        injectedScript
+      ].joined(separator: "\n")
+    }
     
     return """
     (function() {
@@ -220,7 +229,7 @@ extension AdBlockStats {
       head.appendChild(style);
       
       (function(){
-        \(model.injectedScript)
+        \(injectedScript)
       })();
     })();
     """
