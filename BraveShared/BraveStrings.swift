@@ -279,66 +279,12 @@ extension Strings {
         tableName: "BraveShared", bundle: .braveShared,
         value: "Welcome to Brave",
         comment: "Title for Welcome Screen in Onboarding")
-    public static let privacyScreenTitle =
-      NSLocalizedString(
-        "onboarding.privacyScreenTitle",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "Privacy made easy",
-        comment: "Title for Privacy Screen in Onboarding")
-    public static let privacyScreenDescription =
-      NSLocalizedString(
-        "onboarding.privacyScreenDescription",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "You're just a step away from the best privacy online. Ready?",
-        comment: "Description for Privacy Screen in Onboarding")
-    public static let privacyScreenButtonTitle =
-      NSLocalizedString(
-        "onboarding.privacyScreenButtonTitle",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "Let's go",
-        comment: "Button Title for Privacy Screen in Onboarding")
-    public static let readyScreenTitle =
-      NSLocalizedString(
-        "onboarding.readyScreenTitle",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "You're ready to browse!",
-        comment: "Title for Ready Screen in Onboarding")
-    public static let readyScreenDescription =
-      NSLocalizedString(
-        "onboarding.readyScreenDescription",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "Select a popular site below or enter your own...",
-        comment: "Description for Ready Screen in Onboarding")
-    public static let readyScreenAdditionalDescription =
-      NSLocalizedString(
-        "onboarding.readyScreenAdditionalDescription",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "...and watch those trackers & ads disappear.",
-        comment: "Additional Description for Ready Screen in Onboarding")
     public static let ntpOnboardingPopOverTrackerDescription =
       NSLocalizedString(
         "onboarding.ntpOnboardingPopOverTrackerDescription",
         tableName: "BraveShared", bundle: .braveShared,
         value: "By blocking trackers & ads, websites use less data and load way faster.",
         comment: "Description for the NTP pop-over that describes the tracking information on NTP")
-    public static let ntpOnboardingPopoverDoneTitle =
-      NSLocalizedString(
-        "onboarding.ntpOnboardingPopoverDoneTitle",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "All set!",
-        comment: "Title for the NTP pop-over that describes the onboarding is done")
-    public static let ntpOnboardingPopoverDoneDescription =
-      NSLocalizedString(
-        "onboarding.ntpOnboardingPopoverDoneDescription",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "Check the menu for settings and more great privacy features!",
-        comment: "DEscription for the NTP pop-over that describes the onboarding is done")
-    public static let searchViewEnterWebsiteRowTitle =
-      NSLocalizedString(
-        "onboarding.searchViewEnterWebsiteRowTitle",
-        tableName: "BraveShared", bundle: .braveShared,
-        value: "Enter a website",
-        comment: "The title of the row asking user to enter a website url")
     public static let blockedAdsOnboardingPopoverSingleTrackerDescription =
       NSLocalizedString(
         "onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription",
