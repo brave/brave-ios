@@ -48,6 +48,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
 
   private let footNoteTextLabel = UILabel().then {
+    $0.textColor = .braveOnboarding
     $0.numberOfLines = 0
     $0.text = Strings.Onboarding.blockedAdsOnboardingFootnoteText
     $0.font = .preferredFont(forTextStyle: .footnote)
@@ -58,6 +59,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
 
   private let informationTextLabel = UILabel().then {
+    $0.textColor = .braveOnboarding
     $0.numberOfLines = 0
     $0.font = .preferredFont(forTextStyle: .title1)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -66,6 +68,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
   
   private let instructionsTextLabel = UILabel().then {
+    $0.textColor = .braveOnboarding
     $0.text = Strings.Onboarding.blockedAdsOnboardingInstructionsText
     $0.numberOfLines = 0
     $0.textAlignment = .right

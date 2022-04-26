@@ -12,6 +12,7 @@ enum DesignSystemColor: String {
   case text01
   case text02
   case text03
+  case text04
 
   case interactive01
   case interactive02
@@ -96,6 +97,9 @@ extension UIColor {
   }
   public static var bravePrimary: UIColor {
     DesignSystemColor.text01.color
+  }
+  public static var braveOnboarding: UIColor {
+    DesignSystemColor.text04.color
   }
   public static var braveLighterOrange: UIColor {
     DesignSystemColor.interactive03.color

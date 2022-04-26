@@ -227,6 +227,9 @@ class WelcomeViewCallout: UIView {
         $0.isHidden = true
       }
     case .welcome(let title):
+      contentView.do {
+        $0.layoutMargins = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: -15)
+      }
       backgroundView.isHidden = true
       arrowView.isHidden = true
         
@@ -234,7 +237,7 @@ class WelcomeViewCallout: UIView {
         $0.text = title
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .largeTitle, weight: .semibold)
-        $0.textColor = .bravePrimary
+        $0.textColor = .braveOnboarding
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -270,6 +273,7 @@ class WelcomeViewCallout: UIView {
       titleLabel.do {
         $0.text = info.title
         $0.textAlignment = .left
+        $0.textColor = .bravePrimary
         $0.font = .preferredFont(for: .title3, weight: .bold)
         $0.alpha = 1.0
         $0.isHidden = false

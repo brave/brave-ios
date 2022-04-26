@@ -135,6 +135,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentCompo
   }
   
   private let titleLabel = UILabel().then {
+    $0.textColor = .braveOnboarding
     $0.numberOfLines = 0
     $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -144,6 +145,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentCompo
   }
 
   private let textLabel = UILabel().then {
+    $0.textColor = .braveOnboarding
     $0.numberOfLines = 0
     $0.font = UIFont.preferredFont(forTextStyle: .title2)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
