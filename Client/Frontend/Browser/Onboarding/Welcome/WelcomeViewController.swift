@@ -352,8 +352,8 @@ class WelcomeViewController: UIViewController {
       state: nil).then {
         $0.setLayoutState(
           state: WelcomeViewCalloutState.settings(
-            title: "Taking you to Settings...",
-            details: "Look for 'Default Browser App'"))
+            title: Strings.Onboarding.navigateSettingsOnboardingScreenTitle,
+            details: Strings.Onboarding.navigateSettingsOnboardingScreenDescription))
       }
 
     present(nextController, animated: true, completion: nil)

@@ -309,6 +309,30 @@ extension Strings {
         tableName: "BraveShared", bundle: .braveShared,
         value: "Tap the Shield from any site to see all the stuff we blocked.",
         comment: "The description of the popover showing trackers that were blocked.")
+    public static let navigateSettingsOnboardingScreenTitle =
+      NSLocalizedString(
+        "onboarding.navigateSettingsOnboardingScreenTitle",
+        tableName: "BraveShared", bundle: .braveShared,
+        value: "Taking you to Settings...",
+        comment: "Title for Navigate Settings Screen in Onboarding")
+    public static let navigateSettingsOnboardingScreenDescription =
+      NSLocalizedString(
+        "onboarding.navigateSettingsOnboardingScreenDescription",
+        tableName: "BraveShared", bundle: .braveShared,
+        value: "Look for 'Default Browser App'",
+        comment: "Description for Navigate Settings Screen in Onboarding. This part indicating navigation ('Default Browser App') should match the option in iPhone Settings in that Language.")
+    public static let omniboxOnboardingPopOverTitle =
+      NSLocalizedString(
+        "onboarding.omniboxOnboardingPopOverTitle",
+        tableName: "BraveShared", bundle: .braveShared,
+        value: "Ber.",
+        comment: "Title for the Omnibox (URL Bar) pop-over that describes faster load times.")
+    public static let omniboxOnboardingPopOverDescription =
+      NSLocalizedString(
+        "onboarding.omniboxOnboardingPopOverDescription",
+        tableName: "BraveShared", bundle: .braveShared,
+        value: "d load way faster.",
+        comment: "Description for the Omnibox (URL Bar) pop-over that describes faster load times.")
   }
 }
 
