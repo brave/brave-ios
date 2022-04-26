@@ -2287,7 +2287,7 @@ extension Strings {
       "wallet.mangeSiteConnectionsConfirmAlertTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Are you sure you wish to remove all permissions?",
+      value: "Remove all permissions?",
       comment: "The title of the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
     )
     public static let mangeSiteConnectionsConfirmAlertMessage = NSLocalizedString(
