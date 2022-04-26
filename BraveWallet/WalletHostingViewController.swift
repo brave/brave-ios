@@ -17,19 +17,33 @@ public protocol BraveWalletDelegate: AnyObject {
   func openWalletURL(_ url: URL)
 }
 
+/// The context of which wallet is being presented. Controls what content is shown when the wallet is unlocked
+public enum PresentingContext {
+  /// The default context shows the main wallet view which includes portfolio, buy/send/swap, etc.
+  case `default`
+  /// Shows the user any pending requests made by webpages such as new adding networks, tokens, etc.
+  case webpageRequests
+  /// Shows when a webpage wants to connect with the users wallet
+  case requestEthererumPermissions(_ handler: ([String]?) -> Void)
+}
+
 /// The initial wallet controller to present when the user wants to view their wallet
 public class WalletHostingViewController: UIHostingController<CryptoView> {
   public weak var delegate: BraveWalletDelegate?
   private var cancellable: AnyCancellable?
-
-  public init(walletStore: WalletStore) {
+  
+  public init(
+    walletStore: WalletStore,
+    presentingContext: PresentingContext = .default
+  ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
     )
     super.init(
       rootView: CryptoView(
         walletStore: walletStore,
-        keyringStore: walletStore.keyringStore
+        keyringStore: walletStore.keyringStore,
+        presentingContext: presentingContext
       )
     )
     rootView.dismissAction = { [unowned self] in
@@ -57,30 +71,30 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         }
       }
   }
-
+  
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
   }
-
+  
   deinit {
     gesture.view?.removeGestureRecognizer(gesture)
   }
-
+  
   private let gesture: WalletInteractionGestureRecognizer
-
+  
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
     UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
   }
-
+  
   // MARK: -
-
+  
   public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     [.portrait, .portraitUpsideDown]
   }
-
+  
   public override var shouldAutorotate: Bool {
     true
   }

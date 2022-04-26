@@ -13,6 +13,7 @@ import BraveUI
 public struct CryptoView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
+  var presentingContext: PresentingContext
 
   // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
   // but for now we'll have to manage this ourselves
@@ -22,10 +23,12 @@ public struct CryptoView: View {
 
   public init(
     walletStore: WalletStore,
-    keyringStore: KeyringStore
+    keyringStore: KeyringStore,
+    presentingContext: PresentingContext
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore
+    self.presentingContext = presentingContext
   }
 
   private enum VisibleScreen: Equatable {
@@ -61,11 +64,30 @@ public struct CryptoView: View {
       switch visibleScreen {
       case .crypto:
         if let store = walletStore.cryptoStore {
+          Group {
+            switch presentingContext {
+            case .`default`:
           CryptoContainerView(
             keyringStore: keyringStore,
             cryptoStore: store,
             toolbarDismissContent: dismissButtonToolbarContents
           )
+            case .webpageRequests:
+              WebpageRequestContainerView(
+                cryptoStore: store,
+                toolbarDismissContent: dismissButtonToolbarContents
+              )
+            case .requestEthererumPermissions(let handler):
+              NewSiteConnectionView(
+                keyringStore: keyringStore,
+                onConnect: { handler($0) },
+                onDismiss: {
+                  handler(nil)
+                  dismissAction?()
+                }
+              )
+            }
+          }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
         }
       case .unlock:

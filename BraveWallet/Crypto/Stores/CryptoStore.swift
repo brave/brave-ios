@@ -5,6 +5,13 @@
 
 import BraveCore
 
+enum PendingWebpageRequest {
+  case addChain(BraveWallet.EthereumChain)
+  case switchChain(BraveWallet.SwitchChainRequest)
+  case addSuggestedToken(BraveWallet.AddSuggestTokenRequest)
+  case signMessage(BraveWallet.SignMessageRequest)
+}
+
 public class CryptoStore: ObservableObject {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
@@ -27,6 +34,7 @@ public class CryptoStore: ObservableObject {
     }
   }
   @Published private(set) var hasUnapprovedTransactions: Bool = false
+  @Published private(set) var pendingWebpageRequest: PendingWebpageRequest?
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -213,6 +221,20 @@ public class CryptoStore: ObservableObject {
           self.hasUnapprovedTransactions = !pendingTransactions.isEmpty
           self.isPresentingTransactionConfirmations = !pendingTransactions.isEmpty
         }
+      }
+    }
+  }
+  
+  func fetchPendingRequests() {
+    Task { @MainActor in
+      if let chainRequest = await rpcService.pendingChainRequests().first {
+        pendingWebpageRequest = .addChain(chainRequest)
+      } else if let signMessageRequest = await walletService.pendingSignMessageRequests().first {
+        pendingWebpageRequest = .signMessage(signMessageRequest)
+      } else if let switchRequest = await rpcService.pendingSwitchChainRequests().first {
+        pendingWebpageRequest = .switchChain(switchRequest)
+      } else if let addTokenRequest = await walletService.pendingAddSuggestTokenRequests().first {
+        pendingWebpageRequest = .addSuggestedToken(addTokenRequest)
       }
     }
   }
