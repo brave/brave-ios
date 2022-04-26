@@ -150,28 +150,31 @@ extension BrowserViewController: BraveWalletProviderDelegate {
 }
 
 extension Tab: BraveWalletEventsListener {
+  func emitEthereumEvent(_ event: Web3ProviderEvent) {
+    var arguments: [Any] = [event.name]
+    if let eventArgs = event.arguments {
+      arguments.append(eventArgs)
+    }
+    webView?.evaluateSafeJavaScript(
+      functionName: "window.ethereum.emit",
+      args: arguments,
+      contentWorld: .page,
+      completion: nil
+    )
+  }
+  
   func chainChangedEvent(_ chainId: String) {
     Task { @MainActor in
       guard let provider = walletProvider,
             case let currentChainId = await provider.chainId(),
             chainId != currentChainId else { return }
-      webView?.evaluateSafeJavaScript(
-        functionName: "window.ethereum.emit",
-        args: ["chainChanged", chainId],
-        contentWorld: .page,
-        completion: nil
-      )
+      emitEthereumEvent(.ethereumChainChanged(chainId: chainId))
       updateEthereumProperties()
     }
   }
   
   func accountsChangedEvent(_ accounts: [String]) {
-    webView?.evaluateSafeJavaScript(
-      functionName: "window.ethereum.emit",
-      args: ["accountsChanged", accounts],
-      contentWorld: .page,
-      completion: nil
-    )
+    emitEthereumEvent(.ethereumAccountsChanged(accounts: accounts))
     updateEthereumProperties()
   }
 

@@ -93,7 +93,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
 
   let profile: Profile
   let braveCore: BraveCoreMain
-    let tabManager: TabManager
+  let tabManager: TabManager
   let migration: Migration?
   let bookmarkManager: BookmarkManager
 
