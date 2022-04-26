@@ -310,6 +310,8 @@ class WelcomeViewController: UIViewController {
         },
         secondaryAction: {
           // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
+          
+          self.close()
         }
       )
     )
