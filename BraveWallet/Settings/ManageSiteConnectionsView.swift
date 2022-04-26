@@ -50,16 +50,16 @@ struct ManageSiteConnectionsView: View {
       }
     }
     .listStyle(.insetGrouped)
-    .navigationTitle("Manage Site Connections")
+    .navigationTitle(Strings.Wallet.mangeSiteConnectionsTitle)
     .navigationBarTitleDisplayMode(.inline)
-    .filterable(text: $filterText, prompt: "Filter")
+    .filterable(text: $filterText, prompt: Strings.Wallet.mangeSiteConnectionsFilterPlaceholder)
     .toolbar {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
         Button(action: {
           isShowingConfirmAlert = true
         }) {
-          Text("Remove All")
+          Text(Strings.Wallet.mangeSiteConnectionsRemoveAll)
             .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
         }
         .disabled(siteConnectionStore.siteConnections.isEmpty)
@@ -68,10 +68,10 @@ struct ManageSiteConnectionsView: View {
     .onAppear(perform: siteConnectionStore.fetchSiteConnections)
     .alert(isPresented: $isShowingConfirmAlert) {
       Alert(
-        title: Text("Are you sure you wish to remove all permissions?"),
-        message: Text("This will remove all Wallet connection permissions for all websites."), // TODO: copy
+        title: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertTitle),
+        message: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertMessage),
         primaryButton: Alert.Button.destructive(
-          Text("Remove"),
+          Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertRemove),
           action: removeAll
         ),
         secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))
@@ -114,13 +114,8 @@ private struct SiteRow: View {
       Text(verbatim: siteConnection.url)
         .foregroundColor(Color(.bravePrimary))
       HStack {
-        if siteConnection.connectedAddresses.count == 1 {
-          Text("1 account")
-            .foregroundColor(Color(.secondaryBraveLabel))
-        } else {
-          Text("\(siteConnection.connectedAddresses.count) accounts")
-            .foregroundColor(Color(.secondaryBraveLabel))
-        }
+        Text(String.localizedStringWithFormat(Strings.Wallet.manageSiteConnectionsAccount, siteConnection.connectedAddresses.count, siteConnection.connectedAddresses.count == 1 ? Strings.Wallet.manageSiteConnectionsAccountSingular : Strings.Wallet.manageSiteConnectionsAccountPlural))
+          .foregroundColor(Color(.secondaryBraveLabel))
         accountBlockies
         Spacer()
       }
@@ -185,7 +180,7 @@ private struct SiteConnectionDetailView: View {
   
   var body: some View {
     List {
-      Section(header: Text("Connected Ethereum Accounts")) {
+      Section(header: Text(Strings.Wallet.manageSiteConnectionsDetailHeader)) {
         ForEach(siteConnection.connectedAddresses, id: \.self) { address in
           AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "")
             .osAvailabilityModifiers { content in
@@ -222,17 +217,17 @@ private struct SiteConnectionDetailView: View {
         Button(action: {
           isShowingConfirmAlert = true
         }) {
-          Text("Remove All")
+          Text(Strings.Wallet.mangeSiteConnectionsRemoveAll)
             .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
         }
       }
     }
     .alert(isPresented: $isShowingConfirmAlert) {
       Alert(
-        title: Text("Are you sure you wish to remove all permissions?"),
-        message: Text("This will remove all Wallet connection permissions for this website."),
+        title: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertTitle),
+        message: Text(Strings.Wallet.mangeSiteConnectionsDetailConfirmAlertMessage),
         primaryButton: Alert.Button.destructive(
-          Text("Remove"),
+          Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertRemove),
           action: {
             siteConnectionStore.removeAllPermissions(from: [siteConnection])
           }

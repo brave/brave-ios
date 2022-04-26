@@ -2262,5 +2262,82 @@ extension Strings {
       value: "Manage site connections",
       comment: "The title for the entry that by clicking will direct users to the screen to manage web3 sites account connections."
     )
+    public static let mangeSiteConnectionsTitle = NSLocalizedString(
+      "wallet.mangeSiteConnectionsTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Manage Site Connections",
+      comment: "The title for the screen to manage web3 sites account connections."
+    )
+    public static let mangeSiteConnectionsFilterPlaceholder = NSLocalizedString(
+      "wallet.mangeSiteConnectionsFilterPlaceholder",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Filter",
+      comment: "The filter in the search bar for the screen to manage web3 sites account connections."
+    )
+    public static let mangeSiteConnectionsRemoveAll = NSLocalizedString(
+      "wallet.mangeSiteConnectionsRemoveAll",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Remove All",
+      comment: "The title of the button on the screen to manage web3 sites account connections that will show an alert to remove all connected website permissions."
+    )
+    public static let mangeSiteConnectionsConfirmAlertTitle = NSLocalizedString(
+      "wallet.mangeSiteConnectionsConfirmAlertTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Are you sure you wish to remove all permissions?",
+      comment: "The title of the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
+    )
+    public static let mangeSiteConnectionsConfirmAlertMessage = NSLocalizedString(
+      "wallet.mangeSiteConnectionsConfirmAlertMessage",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "This will remove all Wallet connection permissions for all websites.",
+      comment: "The message of the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
+    )
+    public static let mangeSiteConnectionsDetailConfirmAlertMessage = NSLocalizedString(
+      "wallet.mangeSiteConnectionsDetailConfirmAlertMessage",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "This will remove all Wallet connection permissions for this website.",
+      comment: "The message of the alert to confirm the users wants to remove all site connections from this specific website, shown after selecting/opening a website on the screen to manage web3 sites account connections."
+    )
+    public static let mangeSiteConnectionsConfirmAlertRemove = NSLocalizedString(
+      "wallet.mangeSiteConnectionsConfirmAlertRemove",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Remove",
+      comment: "The title of the confirmation button in the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
+    )
+    public static let manageSiteConnectionsAccount = NSLocalizedString(
+      "wallet.manageSiteConnectionsAccount",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "%lld %@",
+      comment: "The amount of current permitted wallet accounts to the dapp site. It is displayed below the origin url of the dapp site in manage site connections screen. '%lld' refers to a number, %@ is `account` for singular and `accounts` for plural (for example \"1 account\" or \"2 accounts\")"
+    )
+    public static let manageSiteConnectionsAccountSingular = NSLocalizedString(
+      "wallet.manageSiteConnectionsAccountSingular",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "account",
+      comment: "The singular word that will be used in `manageSiteConnectionsAccount`."
+    )
+    public static let manageSiteConnectionsAccountPlural = NSLocalizedString(
+      "wallet.manageSiteConnectionsAccountPlural",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "accounts",
+      comment: "The plural word that will beused in `manageSiteConnectionsAccount`."
+    )
+    public static let manageSiteConnectionsDetailHeader = NSLocalizedString(
+      "wallet.manageSiteConnectionsDetailHeader",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "Connected Ethereum Accounts",
+      comment: "The header shown above the list of connected accounts for a single website, shown after selecting/opening a website on the screen to manage web3 sites account connections."
+    )
   }
 }
