@@ -13,6 +13,12 @@ private let log = Logger.browserLogger
 // MARK: - ProductNotification
 
 extension BrowserViewController {
+  
+  enum OnboardingAdBlockTracker: String, CaseIterable {
+    case google
+    case facebook
+    case amazon
+  }
 
   // MARK: Internal
 
@@ -82,10 +88,26 @@ extension BrowserViewController {
       })
       
       if trackerCount >= 10, !url.isSearchEngineURL {
-        notifyTrackersBlocked(domain: domain, trackerKey: firstTracker?.key, trackerCount: trackerCount)
+        let displayTrackers = fetchBigTechAdBlockTrackers(trackers: trackers)
+        
+        notifyTrackersBlocked(domain: domain, displayTrackers: displayTrackers, trackerCount: trackerCount)
         Preferences.General.onboardingAdblockPopoverShown.value = true
       }
     }
+  }
+  
+  private func fetchBigTechAdBlockTrackers(trackers: [String: [String]]) -> [OnboardingAdBlockTracker] {
+    var existingBigTechTrackers: [OnboardingAdBlockTracker] = []
+    
+    for adBlockTracker in OnboardingAdBlockTracker.allCases {
+      let bigTechTrackerKey = trackers.first(where: { return $0.key.lowercased().contains(adBlockTracker.rawValue) })
+      
+      if bigTechTrackerKey != nil {
+        existingBigTechTrackers.append(adBlockTracker)
+      }
+    }
+    
+    return existingBigTechTrackers
   }
 
   private func presentEducationalProductNotifications() {

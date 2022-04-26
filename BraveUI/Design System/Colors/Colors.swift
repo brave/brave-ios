@@ -159,6 +159,9 @@ extension UIColor {
   public static var braveDisabled: UIColor {
     DesignSystemColor.disabled.color
   }
+  public static var braveShieldSuccess: UIColor {
+    DesignSystemColor.successBorder.color
+  }
   public static var primaryButtonTint: UIColor {
     DesignSystemColor.interactive07.color
   }
