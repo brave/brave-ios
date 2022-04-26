@@ -46,11 +46,11 @@ public class SettingsStore: ObservableObject {
     self.walletService = walletService
     self.txService = txService
 
-    keyringService.autoLockMinutes { minutes in
+    keyringService.autoLockMinutes { [self] minutes in
       self.autoLockInterval = .init(value: minutes)
     }
     
-    walletService.defaultBaseCurrency { currencyCode in
+    walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = CurrencyCode(code: currencyCode)
     }
   }

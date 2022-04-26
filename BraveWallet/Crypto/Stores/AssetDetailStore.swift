@@ -39,12 +39,6 @@ class AssetDetailStore: ObservableObject {
   @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
   @Published private(set) var isBuySupported: Bool = true
 
-  var currencyCode: CurrencyCode = .usd {
-    didSet {
-      currencyFormatter.currencyCode = currencyCode.code
-      update()
-    }
-  }
   let currencyFormatter: NumberFormatter
 
   private(set) var assetPriceValue: Double = 0.0
@@ -81,8 +75,8 @@ class AssetDetailStore: ObservableObject {
     self.rpcService.add(self)
     self.txService.add(self)
     
-    walletService.defaultBaseCurrency { currencyCode in
-      self.currencyCode = CurrencyCode(code: currencyCode)
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyFormatter.currencyCode = currencyCode
     }
   }
 
@@ -105,13 +99,13 @@ class AssetDetailStore: ObservableObject {
       }
       assetRatioService.price(
         [token.symbol],
-        toAssets: [currencyCode.code, "btc"],
+        toAssets: [currencyFormatter.currencyCode, "btc"],
         timeframe: timeframe
       ) { [weak self] success, prices in
         guard let self = self else { return }
         self.isLoadingPrice = false
         self.isInitialState = false
-        if let assetPrice = prices.first(where: { $0.toAsset.caseInsensitiveCompare(self.currencyCode.code) == .orderedSame }),
+        if let assetPrice = prices.first(where: { $0.toAsset.caseInsensitiveCompare(self.currencyFormatter.currencyCode) == .orderedSame }),
           let value = Double(assetPrice.price) {
           self.assetPriceValue = value
           self.price = self.currencyFormatter.string(from: NSNumber(value: value)) ?? ""
@@ -129,7 +123,7 @@ class AssetDetailStore: ObservableObject {
       }
       assetRatioService.priceHistory(
         token.symbol,
-        vsAsset: currencyCode.code,
+        vsAsset: currencyFormatter.currencyCode,
         timeframe: timeframe
       ) { [weak self] success, history in
         guard let self = self else { return }

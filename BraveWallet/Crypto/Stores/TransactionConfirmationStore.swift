@@ -42,12 +42,6 @@ public class TransactionConfirmationStore: ObservableObject {
 
   private var assetRatios: [String: Double] = [:]
 
-  var currencyCode: CurrencyCode = .usd {
-    didSet {
-      currencyFormatter.currencyCode = currencyCode.code
-      fetchDetails(for: activeTransaction)
-    }
-  }
   let currencyFormatter: NumberFormatter
   
   var activeTransaction: BraveWallet.TransactionInfo {
@@ -101,8 +95,8 @@ public class TransactionConfirmationStore: ObservableObject {
     self.currencyFormatter = currencyFormatter
 
     self.txService.add(self)
-    walletService.defaultBaseCurrency { currencyCode in
-      self.currencyCode = CurrencyCode(code: currencyCode)
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyFormatter.currencyCode = currencyCode
     }
   }
 
@@ -234,7 +228,7 @@ public class TransactionConfirmationStore: ObservableObject {
       let symbols = symbolKey == gasKey ? [symbolKey] : [symbolKey, gasKey]
       assetRatioService.price(
         symbols,
-        toAssets: [currencyCode.code],
+        toAssets: [currencyFormatter.currencyCode],
         timeframe: .oneDay
       ) { [weak self] success, prices in
         // `success` only refers to finding _all_ prices and if even 1 of N prices

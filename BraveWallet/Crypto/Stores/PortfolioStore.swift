@@ -53,12 +53,6 @@ public class PortfolioStore: ObservableObject {
     assetRatioService: self.assetRatioService
   )
   
-  var currencyCode: CurrencyCode = .usd {
-    didSet {
-      currencyFormatter.currencyCode = currencyCode.code
-      update()
-    }
-  }
   let currencyFormatter: NumberFormatter
 
   private let keyringService: BraveWalletKeyringService
@@ -91,7 +85,7 @@ public class PortfolioStore: ObservableObject {
       }
     }
     walletService.defaultBaseCurrency { currencyCode in
-      self.currencyCode = CurrencyCode(code: currencyCode)
+      self.currencyFormatter.currencyCode = currencyCode
     }
   }
 
@@ -123,7 +117,7 @@ public class PortfolioStore: ObservableObject {
   private func fetchPrices(for symbols: [String], completion: @escaping ([String: String]) -> Void) {
     assetRatioService.price(
       symbols.map { $0.lowercased() },
-      toAssets: [currencyCode.code],
+      toAssets: [currencyFormatter.currencyCode],
       timeframe: timeframe
     ) { success, assetPrices in
       // `success` only refers to finding _all_ prices and if even 1 of N prices
@@ -142,7 +136,7 @@ public class PortfolioStore: ObservableObject {
       group.enter()
       assetRatioService.priceHistory(
         symbol,
-        vsAsset: currencyCode.code,
+        vsAsset: currencyFormatter.currencyCode,
         timeframe: timeframe
       ) { success, history in
         defer { group.leave() }

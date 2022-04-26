@@ -12,12 +12,6 @@ class AccountActivityStore: ObservableObject {
   @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
   @Published private(set) var allTokens: [BraveWallet.BlockchainToken] = []
 
-  var currencyCode: CurrencyCode = .usd {
-    didSet {
-      currencyFormatter.currencyCode = currencyCode.code
-      update()
-    }
-  }
   let currencyFormatter: NumberFormatter
 
   private let walletService: BraveWalletBraveWalletService
@@ -46,8 +40,8 @@ class AccountActivityStore: ObservableObject {
     self.rpcService.add(self)
     self.txService.add(self)
     
-    walletService.defaultBaseCurrency { currencyCode in
-      self.currencyCode = CurrencyCode(code: currencyCode)
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyFormatter.currencyCode = currencyCode
     }
   }
 
@@ -72,7 +66,7 @@ class AccountActivityStore: ObservableObject {
         dispatchGroup.enter()
         assetRatioService.price(
           updatedTokens.map { $0.symbol.lowercased() },
-          toAssets: [currencyCode.code],
+          toAssets: [currencyFormatter.currencyCode],
           timeframe: .oneDay) { success, prices in
             defer { dispatchGroup.leave() }
             for price in prices {

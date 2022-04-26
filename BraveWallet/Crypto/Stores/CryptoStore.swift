@@ -319,11 +319,12 @@ extension CryptoStore: BraveWalletBraveWalletServiceObserver {
   
   public func onDefaultBaseCurrencyChanged(_ currency: String) {
     currencyFormatter.currencyCode = currency
-    portfolioStore.currencyCode = CurrencyCode(code: currency)
-    assetDetailStore?.currencyCode = CurrencyCode(code: currency)
-    accountActivityStore?.currencyCode = CurrencyCode(code: currency)
-    confirmationStore?.currencyCode = CurrencyCode(code: currency)
     portfolioStore.update()
+    assetDetailStore?.update()
+    accountActivityStore?.update()
+    if let confirmationStore = confirmationStore {
+      confirmationStore.fetchDetails(for: confirmationStore.activeTransaction)
+    }
   }
   
   public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
