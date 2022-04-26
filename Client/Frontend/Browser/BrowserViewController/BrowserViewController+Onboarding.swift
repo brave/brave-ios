@@ -53,8 +53,49 @@ extension BrowserViewController {
     if !topToolbar.inOverlayMode,
        topToolbar.currentURL == nil,
        Preferences.DebugFlag.skipNTPCallouts != true {
-      showPrivacyReportsOnboardingIfNeeded()
+      
+      if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value {
+        presentOmniBoxOnboarding()
+      }
+      
+      if !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+        showPrivacyReportsOnboardingIfNeeded()
+      }
     }
+  }
+  
+  private func presentOmniBoxOnboarding() {
+    // If a controller is already presented (such as menu), do not show onboarding
+    guard presentedViewController == nil else {
+      return
+    }
+            
+    let frame = view.convert(
+      topToolbar.locationView.urlTextField.frame,
+      from: topToolbar.locationView).insetBy(dx: -7.0, dy: -6.0)
+    
+    // Present the popover
+    let controller = WelcomeOmniBoxOnboardingController()
+    controller.setText(
+      title: Strings.Onboarding.omniboxOnboardingPopOverTitle,
+      details: Strings.Onboarding.omniboxOnboardingPopOverDescription)
+
+    presentPopoverContent(
+      using: controller,
+      with: frame, cornerRadius: 6.0,
+      didDismiss: {
+        Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
+      },
+      didClickBorderedArea: { [weak self] in
+        guard let self = self else { return }
+        
+        Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+          self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
+        }
+      }
+    )
   }
 
   private func showPrivacyReportsOnboardingIfNeeded() {
@@ -73,10 +114,10 @@ extension BrowserViewController {
     guard presentedViewController == nil else {
       return
     }
-
+    
     // We can only show this onboarding on the NTP
     guard let ntpController = tabManager.selectedTab?.newTabPageViewController,
-          let statsFrame = ntpController.ntpStatsOnboardingFrame
+      let statsFrame = ntpController.ntpStatsOnboardingFrame
     else {
       return
     }
@@ -84,79 +125,101 @@ extension BrowserViewController {
     // Project the statsFrame to the current frame
     let frame = view.convert(statsFrame, from: ntpController.view)
 
-    // Create a border view
-    let borderView = UIView().then {
-      let borderLayer = CAShapeLayer().then {
-        let frame = frame.with { $0.origin = .zero }
-        $0.strokeColor = UIColor.white.cgColor
-        $0.fillColor = UIColor.clear.cgColor
-        $0.lineWidth = 2.0
-        $0.strokeEnd = 1.0
-        $0.path = UIBezierPath(roundedRect: frame, cornerRadius: 12.0).cgPath
-      }
-      $0.layer.addSublayer(borderLayer)
-    }
-
-    view.addSubview(borderView)
-    borderView.frame = frame
-
-    // Present the popover and mark onboarding as complete
-    Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
-
+    // Present the popover
     let controller = WelcomeNTPOnboardingController()
     controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
-    controller.buttonText = Strings.PrivacyHub.onboardingButtonTitle
-
-    let popover = PopoverController(contentController: controller)
-    popover.arrowDistance = 10.0
-    popover.present(from: borderView, on: self) { [weak popover, weak self] in
-      guard let popover = popover,
-            let self = self
-      else { return }
-
-      // Mask the shadow
-      let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
-      guard !maskFrame.isNull && !maskFrame.isInfinite && !maskFrame.isEmpty && !popover.backgroundOverlayView.bounds.isNull && !popover.backgroundOverlayView.bounds.isInfinite && !popover.backgroundOverlayView.bounds.isEmpty else {
-        return
+    
+    presentPopoverContent(
+      using: controller,
+      with: frame, cornerRadius: 12.0,
+      didDismiss: {
+        Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
+      },
+      didClickBorderedArea: {
+        Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
       }
-
-      guard maskFrame.origin.x.isFinite && maskFrame.origin.y.isFinite && maskFrame.size.width.isFinite && maskFrame.size.height.isFinite && maskFrame.size.width > 0 && maskFrame.size.height > 0 else {
-        return
+    )
+  }
+  
+  private func presentPopoverContent(
+    using contentController: UIViewController & PopoverContentComponent,
+    with frame: CGRect,
+    cornerRadius: CGFloat,
+    didDismiss: @escaping () -> Void,
+    didClickBorderedArea: @escaping () -> Void) {
+    
+      let popover = PopoverController(contentController: contentController)
+      popover.arrowDistance = 10.0
+      
+      // Create a border / placeholder view
+      let borderView = BorderView(frame: frame, cornerRadius: cornerRadius)
+      let placeholderView = UIView(frame: frame).then {
+        $0.alpha = 0.0
+        $0.frame = frame
       }
+      
+      view.addSubview(placeholderView)
+      popover.view.insertSubview(borderView, aboveSubview: popover.view)
 
       let maskShape = CAShapeLayer().then {
         $0.fillRule = .evenOdd
         $0.fillColor = UIColor.white.cgColor
         $0.strokeColor = UIColor.clear.cgColor
       }
+      
+      popover.present(from: placeholderView, on: self) { [weak popover, weak self] in
+        guard let popover = popover,
+          let self = self
+        else { return }
 
+        // Mask the shadow
+        let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
+        guard !maskFrame.isNull &&
+              !maskFrame.isInfinite &&
+              !maskFrame.isEmpty &&
+              !popover.backgroundOverlayView.bounds.isNull &&
+              !popover.backgroundOverlayView.bounds.isInfinite &&
+              !popover.backgroundOverlayView.bounds.isEmpty else {
+          return
+        }
+
+        guard maskFrame.origin.x.isFinite &&
+              maskFrame.origin.y.isFinite &&
+              maskFrame.size.width.isFinite &&
+              maskFrame.size.height.isFinite &&
+              maskFrame.size.width > 0 &&
+              maskFrame.size.height > 0 else {
+          return
+        }
+      }
+    
       popover.backgroundOverlayView.layer.mask = maskShape
+      
       popover.popoverDidDismiss = { _ in
         maskShape.removeFromSuperlayer()
         borderView.removeFromSuperview()
+
+        didDismiss()
       }
 
-      controller.buttonTapped = { [weak self] in
+      borderView.didClickBorderedArea = {
         maskShape.removeFromSuperlayer()
         borderView.removeFromSuperview()
-        DispatchQueue.main.async {
-          self?.openPrivacyReport()
+        
+        popover.dismissPopover() {
+          didClickBorderedArea()
         }
       }
-
+      
       DispatchQueue.main.async {
         maskShape.path = {
           let path = CGMutablePath()
           path.addRect(popover.backgroundOverlayView.bounds)
-          path.addRoundedRect(
-            in: maskFrame,
-            cornerWidth: 12.0,
-            cornerHeight: 12.0)
           return path
         }()
       }
-    }
   }
+  
 
   func notifyTrackersBlocked(domain: String, trackerName: String, remainingTrackersCount: Int) {
     let controller = WelcomeBraveBlockedAdsController().then {
@@ -205,5 +268,38 @@ extension BrowserViewController {
   func completeOnboarding(_ controller: UIViewController) {
     Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
     controller.dismiss(animated: true)
+  }
+}
+
+// MARK: BorderView
+
+private class BorderView: UIView {
+  
+  public var didClickBorderedArea: (() -> Void)?
+
+  init(frame: CGRect, cornerRadius: CGFloat) {
+    let borderLayer = CAShapeLayer().then {
+      let frame = frame.with { $0.origin = .zero }
+      $0.strokeColor = UIColor.white.cgColor
+      $0.fillColor = UIColor.clear.cgColor
+      $0.lineWidth = 2.0
+      $0.strokeEnd = 1.0
+      $0.path = UIBezierPath(roundedRect: frame, cornerRadius: cornerRadius).cgPath
+    }
+
+    super.init(frame: frame)
+    layer.addSublayer(borderLayer)
+
+    addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onClickBorder(_:))))
+  }
+
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+    fatalError()
+  }
+  
+  @objc
+  private func onClickBorder(_ tap: UITapGestureRecognizer) {
+    didClickBorderedArea?()
   }
 }
