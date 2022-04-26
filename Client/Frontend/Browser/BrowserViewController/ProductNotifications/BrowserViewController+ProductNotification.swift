@@ -52,19 +52,25 @@ extension BrowserViewController {
       return
     }
 
-    let blockedRequests = selectedTab.contentBlocker.blockedRequests
+    let blockedRequestURLs = selectedTab.contentBlocker.blockedRequests
 
-    if !blockedRequests.isEmpty,
-       let url = selectedTab.url,
-       let firstBlockedUrl = blockedRequests.first {
+    if !blockedRequestURLs.isEmpty, let url = selectedTab.url {
+      
       let domain = url.baseDomain ?? url.host ?? url.schemelessAbsoluteString
-      let trackerName = BlockedTrackerParser.parse(url: firstBlockedUrl, fallbackToDomainURL: true) ?? domain
-
-      // Susbstracting 1 here because we show a name of the first tracker, plus all remaining trackers as a number.
+      
+      guard let trackersDetail = BlockedTrackerParser.parse(
+        blockedRequestURLs: blockedRequestURLs,
+        selectedTabURL: url) else {
+        return
+      }
+      
       notifyTrackersBlocked(
-        domain: domain, trackerName: trackerName,
-        remainingTrackersCount: blockedRequests.count - 1)
+        domain: domain,
+        displayTrackers: trackersDetail.displayTrackers,
+        trackerCount: trackersDetail.trackerCount)
+
       Preferences.General.onboardingAdblockPopoverShown.value = true
+      
     }
   }
 
