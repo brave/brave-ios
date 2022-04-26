@@ -18,7 +18,7 @@ extension BrowserViewController {
     presentOnboardingWelcomeScreen(on: self)
   }
 
-  func presentOnboardingWelcomeScreen(on parentController: UIViewController) {
+  private func presentOnboardingWelcomeScreen(on parentController: UIViewController) {
     if Preferences.DebugFlag.skipOnboardingIntro == true { return }
 
     // 1. Existing user.
@@ -82,7 +82,7 @@ extension BrowserViewController {
     }
   }
 
-  func showPrivacyReportsOnboardingIfNeeded() {
+  private func showPrivacyReportsOnboardingIfNeeded() {
     if Preferences.PrivacyReports.ntpOnboardingCompleted.value || PrivateBrowsingManager.shared.isPrivateBrowsing {
       return
     }
