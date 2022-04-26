@@ -66,10 +66,9 @@ class Tab: NSObject {
 
   var secureContentState: TabSecureContentState = .unknown
 
-    var walletProvider: BraveWalletBraveWalletProvider?
-    var walletProviderJS: String?
-    var isWalletIconVisible: Bool = false
-    
+  var walletProvider: BraveWalletBraveWalletProvider?
+  var walletProviderJS: String?
+  var isWalletIconVisible: Bool = false
   // PageMetadata is derived from the page content itself, and as such lags behind the
   // rest of the tab.
   var pageMetadata: PageMetadata?

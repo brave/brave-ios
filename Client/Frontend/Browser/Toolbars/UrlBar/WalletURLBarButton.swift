@@ -7,36 +7,36 @@ import Foundation
 import UIKit
 
 class WalletURLBarButton: UIButton {
-    
-    enum ButtonState {
-        case inactive
-        case active
+  
+  enum ButtonState {
+    case inactive
+    case active
+  }
+  
+  var buttonState: ButtonState = .inactive {
+    didSet {
+      isHidden = buttonState == .inactive
+      tintColor = buttonState == .active ? .braveLabel : .braveLabel
     }
+  }
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     
-    var buttonState: ButtonState = .inactive {
-        didSet {
-            isHidden = buttonState == .inactive
-            tintColor = buttonState == .active ? .braveLabel : .braveLabel
-        }
+    adjustsImageWhenHighlighted = false
+    setImage(UIImage(imageLiteralResourceName: "menu-crypto").template, for: .normal)
+    imageView?.contentMode = .scaleAspectFit
+    imageEdgeInsets = .init(top: 3, left: 3, bottom: 3, right: 3)
+  }
+  
+  override open var isHighlighted: Bool {
+    didSet {
+      self.tintColor = isHighlighted ? .braveOrange : .braveLabel
     }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        adjustsImageWhenHighlighted = false
-        setImage(UIImage(imageLiteralResourceName: "menu-crypto").template, for: .normal)
-        imageView?.contentMode = .scaleAspectFit
-        imageEdgeInsets = .init(top: 3, left: 3, bottom: 3, right: 3)
-    }
-    
-    override open var isHighlighted: Bool {
-        didSet {
-            self.tintColor = isHighlighted ? .braveOrange : .braveLabel
-        }
-    }
-    
-    @available(*, unavailable)
-    required init(coder: NSCoder) {
-        fatalError()
-    }
+  }
+  
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+    fatalError()
+  }
 }
