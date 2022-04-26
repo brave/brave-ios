@@ -26,12 +26,27 @@ struct ManageSiteConnectionsView: View {
           SiteRow(
             siteConnection: siteConnection
           )
+          .osAvailabilityModifiers { content in
+            if #available(iOS 15.0, *) {
+              content
+                .modifier(
+                  SwipeActionsViewModifier_FB9812596 {
+                    withAnimation {
+                      siteConnectionStore.removeAllPermissions(from: [siteConnection])
+                    }
+                  })
+            } else {
+              content
+            }
+          }
         }
       }
       .onDelete { indexes in
         let visibleSiteConnections = siteConnectionStore.siteConnections.filter(by: filterText)
         let siteConnectionsToRemove = indexes.map { visibleSiteConnections[$0] }
-        siteConnectionStore.removeAllPermissions(from: siteConnectionsToRemove)
+        withAnimation {
+          siteConnectionStore.removeAllPermissions(from: siteConnectionsToRemove)
+        }
       }
     }
     .listStyle(.insetGrouped)
