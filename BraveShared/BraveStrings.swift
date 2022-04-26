@@ -285,30 +285,30 @@ extension Strings {
         tableName: "BraveShared", bundle: .braveShared,
         value: "By blocking trackers & ads, websites use less data and load way faster.",
         comment: "Description for the NTP pop-over that describes the tracking information on NTP")
-    public static let blockedAdsOnboardingPopoverSingleTrackerDescription =
+    public static let blockedAdsOnboardingInstructionsText =
       NSLocalizedString(
-        "onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription",
+        "onboarding.blockedAdsOnboardingInstructionsText",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Brave blocked %@ and %d other tracker on: %@.",
-        comment: "The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
-    public static let blockedAdsOnboardingPopoverMultipleTrackerDescription =
+        value: "Tap to view Brave Shields",
+        comment: "The text describing user where they should press in order to open Shield panel")
+    public static let blockedAdsOnboardingFootnoteText =
       NSLocalizedString(
-        "onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription",
+        "onboarding.blockedAdsOnboardingFootnoteText",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Brave blocked %@ and %d other trackers on: %@.",
-        comment: "The description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
-    public static let blockedAdsOnboardingPopoverDescriptionTwo =
+        value: "See all the terrible stuff Brave blocked, on every page, with Shields.",
+        comment: "The footnote indicating what Brave shields is blocking")
+    public static let blockedAdsOnboardingNoBigTechInformationText =
       NSLocalizedString(
-        "onboarding.blockedAdsOnboardingPopoverDescriptionTwo",
+        "onboarding.blockedAdsOnboardingNoBigTechInformationText",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Brave blocked %@ on: %@.",
-        comment: "The alternate description of the popover showing trackers that were blocked. %@ and %d are placeholders for a tracker name and count.")
-    public static let blockedAdsOnboardingPopoverDescriptionThree =
+        value: "Ads & trackers blocked",
+        comment: "The description text shown when there is no big tech tracker among trackers. Example usage: 31 Ads & trackers blocked. The number here is presented separately so it is not in translation.")
+    public static let blockedAdsOnboardingBigTechInformationText =
       NSLocalizedString(
-        "onboarding.blockedAdsOnboardingPopoverDescriptionThree",
+        "onboarding.blockedAdsOnboardingBigTechInformationText",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Tap the Shield from any site to see all the stuff we blocked.",
-        comment: "The description of the popover showing trackers that were blocked.")
+        value: "%@ and %lld other ads & trackers blocked",
+        comment: "The description text shown when there is big tech tracker among trackers. Example usage: Google, Amazon and 32 other trackers blocked")
     public static let navigateSettingsOnboardingScreenTitle =
       NSLocalizedString(
         "onboarding.navigateSettingsOnboardingScreenTitle",
@@ -325,13 +325,13 @@ extension Strings {
       NSLocalizedString(
         "onboarding.omniboxOnboardingPopOverTitle",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Ber.",
+        value: "Type a website name or URL",
         comment: "Title for the Omnibox (URL Bar) pop-over that describes faster load times.")
     public static let omniboxOnboardingPopOverDescription =
       NSLocalizedString(
         "onboarding.omniboxOnboardingPopOverDescription",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "d load way faster.",
+        value: "See the Brave Difference:\nNo ads. No trackers. Way faster page load.",
         comment: "Description for the Omnibox (URL Bar) pop-over that describes faster load times.")
   }
 }
