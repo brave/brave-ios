@@ -5,6 +5,7 @@
 
 import Foundation
 import Data
+import BraveCore
 
 struct SiteConnection: Equatable, Identifiable {
   let url: String
@@ -26,6 +27,12 @@ extension Array where Element == SiteConnection {
 
 class ManageSiteConnectionsStore: ObservableObject {
   @Published var siteConnections: [SiteConnection] = []
+  
+  var keyringStore: KeyringStore
+  
+  init(keyringStore: KeyringStore) {
+    self.keyringStore = keyringStore
+  }
   
   /// Fetch all site connections with 1+ accounts connected
   func fetchSiteConnections() {
@@ -67,5 +74,9 @@ class ManageSiteConnectionsStore: ObservableObject {
       self.siteConnections = updatedSiteConnections
     }
     Domain.setEthereumPermissions(forUrl: url, accounts: accounts, grant: false)
+  }
+  
+  func accountInfo(for address: String) -> BraveWallet.AccountInfo? {
+    return keyringStore.keyring.accountInfos.first(where: { $0.address == address })
   }
 }

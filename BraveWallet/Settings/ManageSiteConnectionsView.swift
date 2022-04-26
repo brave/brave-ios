@@ -144,6 +144,21 @@ private struct SiteRow: View {
   }
 }
 
+// Modifier workaround for FB9812596 to avoid crashing on iOS 14 on Release builds
+@available(iOS 15.0, *)
+private struct SwipeActionsViewModifier_FB9812596: ViewModifier {
+  var action: () -> Void
+  
+  func body(content: Content) -> some View {
+    content
+      .swipeActions(edge: .trailing) {
+        Button(role: .destructive, action: action) {
+          Label(Strings.Wallet.delete, systemImage: "trash")
+        }
+      }
+  }
+}
+
 private struct SiteConnectionDetailView: View {
   
   let siteConnection: SiteConnection
@@ -151,13 +166,64 @@ private struct SiteConnectionDetailView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
+  @State private var isShowingConfirmAlert = false
+  
   var body: some View {
     List {
-      ForEach(siteConnection.connectedAddresses, id: \.self) { address in
-        Text(address)
+      Section(header: Text("Connected Ethereum Accounts")) {
+        ForEach(siteConnection.connectedAddresses, id: \.self) { address in
+          AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "")
+            .osAvailabilityModifiers { content in
+              if #available(iOS 15.0, *) {
+                content
+                  .modifier(
+                    SwipeActionsViewModifier_FB9812596 {
+                      withAnimation(.default) {
+                        if let url = URL(string: siteConnection.url) {
+                          siteConnectionStore.removePermissions(from: [address], url: url)
+                        }
+                      }
+                    })
+              } else {
+                content
+              }
+            }
+        }
+        .onDelete { indexSet in
+          let addressesToRemove = indexSet.map({ siteConnection.connectedAddresses[$0] })
+          withAnimation(.default) {
+            if let url = URL(string: siteConnection.url) {
+              siteConnectionStore.removePermissions(from: addressesToRemove, url: url)
+            }
+          }
+        }
       }
     }
     .navigationTitle(siteConnection.url)
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItemGroup(placement: .bottomBar) {
+        Spacer()
+        Button(action: {
+          isShowingConfirmAlert = true
+        }) {
+          Text("Remove All")
+            .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
+        }
+      }
+    }
+    .alert(isPresented: $isShowingConfirmAlert) {
+      Alert(
+        title: Text("Are you sure you wish to remove all permissions?"),
+        message: Text("This will remove all Wallet connection permissions for this website."),
+        primaryButton: Alert.Button.destructive(
+          Text("Remove"),
+          action: {
+            siteConnectionStore.removeAllPermissions(from: [siteConnection])
+          }
+        ),
+        secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))
+      )
+    }
   }
 }
