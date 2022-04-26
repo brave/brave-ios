@@ -39,10 +39,6 @@ class AccountActivityStore: ObservableObject {
     
     self.rpcService.add(self)
     self.txService.add(self)
-    
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyFormatter.currencyCode = currencyCode
-    }
   }
 
   func update() {

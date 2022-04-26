@@ -93,7 +93,6 @@ extension AssetDetailStore {
       assetRatioService: MockAssetRatioService(),
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
-      walletService: MockBraveWalletService(),
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       token: .previewToken,

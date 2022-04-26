@@ -95,9 +95,6 @@ public class TransactionConfirmationStore: ObservableObject {
     self.currencyFormatter = currencyFormatter
 
     self.txService.add(self)
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyFormatter.currencyCode = currencyCode
-    }
   }
 
   func updateGasValue(for transaction: BraveWallet.TransactionInfo) {

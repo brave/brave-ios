@@ -46,7 +46,6 @@ class AssetDetailStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
-  private let walletService: BraveWalletBraveWalletService
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
 
@@ -56,7 +55,6 @@ class AssetDetailStore: ObservableObject {
     assetRatioService: BraveWalletAssetRatioService,
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
-    walletService: BraveWalletBraveWalletService,
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     token: BraveWallet.BlockchainToken,
@@ -65,7 +63,6 @@ class AssetDetailStore: ObservableObject {
     self.assetRatioService = assetRatioService
     self.keyringService = keyringService
     self.rpcService = rpcService
-    self.walletService = walletService
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.token = token
@@ -74,10 +71,6 @@ class AssetDetailStore: ObservableObject {
     self.keyringService.add(self)
     self.rpcService.add(self)
     self.txService.add(self)
-    
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyFormatter.currencyCode = currencyCode
-    }
   }
 
   private let percentFormatter = NumberFormatter().then {

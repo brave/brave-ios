@@ -84,9 +84,6 @@ public class PortfolioStore: ObservableObject {
         update()
       }
     }
-    walletService.defaultBaseCurrency { currencyCode in
-      self.currencyFormatter.currencyCode = currencyCode
-    }
   }
 
   /// Fetches the balances for a given list of tokens for each of the given accounts, giving a dictionary with a balance for each token symbol.

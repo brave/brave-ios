@@ -89,6 +89,9 @@ public class CryptoStore: ObservableObject {
     self.keyringService.add(self)
     self.txService.add(self)
     self.walletService.add(self)
+    self.walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyFormatter.currencyCode = currencyCode
+    }
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -152,7 +155,6 @@ public class CryptoStore: ObservableObject {
       assetRatioService: assetRatioService,
       keyringService: keyringService,
       rpcService: rpcService,
-      walletService: walletService,
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       token: token,
