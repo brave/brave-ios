@@ -61,7 +61,9 @@ class ManageSiteConnectionsStore: ObservableObject {
       
       var updatedSiteConnections = siteConnections
       updatedSiteConnections.remove(at: index)
-      updatedSiteConnections.insert(updatedSiteConnection, at: index)
+      if !updatedConnectedAddresses.isEmpty {
+        updatedSiteConnections.insert(updatedSiteConnection, at: index)
+      }
       self.siteConnections = updatedSiteConnections
     }
     Domain.setEthereumPermissions(forUrl: url, accounts: accounts, grant: false)
