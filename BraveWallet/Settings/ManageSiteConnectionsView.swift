@@ -6,11 +6,13 @@
 import Foundation
 import BraveUI
 import SwiftUI
+import struct Shared.Strings
 
 struct ManageSiteConnectionsView: View {
 
   @ObservedObject var siteConnectionStore: ManageSiteConnectionsStore
-  @State var filterText: String = ""
+  @State private var filterText: String = ""
+  @State private var isShowingConfirmAlert: Bool = false
   
   var body: some View {
     List {
@@ -40,9 +42,7 @@ struct ManageSiteConnectionsView: View {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
         Button(action: {
-          let visibleSiteConnections = siteConnectionStore.siteConnections.filter(by: filterText)
-          siteConnectionStore.removeAllPermissions(from: visibleSiteConnections)
-          filterText = ""
+          isShowingConfirmAlert = true
         }) {
           Text("Remove All")
             .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
@@ -51,6 +51,23 @@ struct ManageSiteConnectionsView: View {
       }
     }
     .onAppear(perform: siteConnectionStore.fetchSiteConnections)
+    .alert(isPresented: $isShowingConfirmAlert) {
+      Alert(
+        title: Text("Are you sure you wish to remove all permissions?"),
+        message: Text("This will remove all Wallet connection permissions for all websites."), // TODO: copy
+        primaryButton: Alert.Button.destructive(
+          Text("Remove"),
+          action: removeAll
+        ),
+        secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))
+      )
+    }
+  }
+  
+  func removeAll() {
+    let visibleSiteConnections = siteConnectionStore.siteConnections.filter(by: filterText)
+    siteConnectionStore.removeAllPermissions(from: visibleSiteConnections)
+    filterText = ""
   }
 }
 
