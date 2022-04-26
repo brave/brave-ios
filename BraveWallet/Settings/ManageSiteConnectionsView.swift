@@ -117,10 +117,11 @@ private struct SiteRow: View {
       EmptyView()
     } else {
       HStack(spacing: -(min(blockieSize, maxBlockieSize) / 2)) {
-        ForEach(0..<min(maxBlockies, siteConnection.connectedAddresses.count - 1), id: \.self) { index in
+        let numberOfBlockies = min(maxBlockies, siteConnection.connectedAddresses.count)
+        ForEach(0..<numberOfBlockies, id: \.self) { index in
           Blockie(address: siteConnection.connectedAddresses[index])
             .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
-            .zIndex(Double(siteConnection.connectedAddresses.count - index + 1))
+            .zIndex(Double(numberOfBlockies - index))
         }
         if siteConnection.connectedAddresses.count > maxBlockies {
           Circle()
