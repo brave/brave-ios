@@ -20,7 +20,8 @@ extension BraveWallet.BlockchainToken {
     visible: false,
     tokenId: "",
     coingeckoId: "",
-    chainId: ""
+    chainId: "",
+    coin: .eth
   )
 }
 

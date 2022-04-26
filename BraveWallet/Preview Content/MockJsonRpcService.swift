@@ -77,7 +77,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .unknownChain, "Error Message")
   }
   
-  func erc721Owner(of contract: String, tokenId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+  func erc721Owner(of contract: String, tokenId: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     completion("", .unknownChain, "Error Message")
   }
   
@@ -116,11 +116,11 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func setCustomNetworkForTesting(_ chainId: String, coin: BraveWallet.CoinType, providerUrl: URL) {
   }
   
-  func solanaBalance(_ pubkey: String, completion: @escaping (UInt64, BraveWallet.SolanaProviderError, String) -> Void) {
+  func solanaBalance(_ pubkey: String, chainId: String, completion: @escaping (UInt64, BraveWallet.SolanaProviderError, String) -> Void) {
     completion(0, .internalError, "Error Message")
   }
   
-  func splTokenAccountBalance(_ pubkey: String, completion: @escaping (String, UInt8, String, BraveWallet.SolanaProviderError, String) -> Void) {
+  func splTokenAccountBalance(_ walletAddress: String, tokenMintAddress: String, chainId: String, completion: @escaping (String, UInt8, String, BraveWallet.SolanaProviderError, String) -> Void) {
     completion("", 0, "", .internalError, "Error Message")
   }
   

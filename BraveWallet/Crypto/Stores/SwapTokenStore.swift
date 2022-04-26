@@ -636,11 +636,11 @@ public class SwapTokenStore: ObservableObject {
     // All tokens from token registry
     rpcService.network { [weak self] network in
       guard let self = self else { return }
-      self.blockchainRegistry.allTokens(network.chainId) { tokens in
+      self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
         // Native token on the current selected network
         let nativeAsset = network.nativeToken
         // Custom tokens added by users
-        self.walletService.userAssets(network.chainId) { userAssets in
+        self.walletService.userAssets(network.chainId, coin: network.coin) { userAssets in
           let customTokens = userAssets.filter { asset in
             !tokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(asset.contractAddress) == .orderedSame })
           }
