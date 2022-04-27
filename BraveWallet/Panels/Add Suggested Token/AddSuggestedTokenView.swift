@@ -10,6 +10,7 @@ import BraveUI
 
 struct AddSuggestedTokenView: View {
   var token: BraveWallet.BlockchainToken
+  var originInfo: BraveWallet.OriginInfo
   var networkStore: NetworkStore
   
   var onDismiss: (_ approved: Bool) -> Void
@@ -119,6 +120,7 @@ struct AddSuggestedTokenView_Previews: PreviewProvider {
   static var previews: some View {
     AddSuggestedTokenView(
       token: .previewToken,
+      originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
       networkStore: .previewStore,
       onDismiss: { _ in }
     )

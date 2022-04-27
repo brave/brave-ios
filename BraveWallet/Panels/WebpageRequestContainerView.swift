@@ -25,6 +25,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
           case .addSuggestedToken(let request):
             AddSuggestedTokenView(
               token: request.token,
+              originInfo: request.origin,
               networkStore: cryptoStore.networkStore,
               onDismiss: { approved in
                 cryptoStore.handleWebpageRequestResponse(
