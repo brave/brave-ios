@@ -129,8 +129,8 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
     } else {
       let numBigTechTrackers = trackerCount - displayTrackers.count
       var bigTechTrackerNameList = displayTrackers.first?.capitalizeFirstLetter ?? ""
-      for tracker in displayTrackers where displayTrackers.count > 1 {
-        bigTechTrackerNameList = "," + "\(tracker.capitalizeFirstLetter)"
+      for (index, tracker) in displayTrackers.enumerated() where (displayTrackers.count > 1 && index > 0) {
+        bigTechTrackerNameList += ", " + "\(tracker.capitalizeFirstLetter)"
       }
       
       informationTextLabel.text = String.localizedStringWithFormat(

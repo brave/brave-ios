@@ -35,6 +35,7 @@ extension BrowserViewController {
         profile: profile,
         rewards: rewards)
       onboardingController.modalPresentationStyle = .fullScreen
+      onboardingController.delegate = self
       parentController.present(onboardingController, animated: false)
       isOnboardingOrFullScreenCalloutPresented = true
     }
@@ -267,6 +268,14 @@ extension BrowserViewController {
   func completeOnboarding(_ controller: UIViewController) {
     Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
     controller.dismiss(animated: true)
+  }
+}
+
+// MARK: WelcomeViewControllerDelegate
+
+extension BrowserViewController: WelcomeViewControllerDelegate {
+  func welcomeViewControllerDidShowNTPTutorialPage() {
+    addNTPTutorialPage()
   }
 }
 
