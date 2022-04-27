@@ -15,12 +15,11 @@ enum UserScriptType: Hashable {
   case domainUserScript(DomainUserScript)
   /// A symple encryption library to be used by other scripts
   case nacl
-  /// Enables de-amp ad-block rule.
+  /// A script that detects if we're at an amp page and redirects the user to the original (canonical) version if available.
   ///
-  /// Works in conjunction with the injected de-amp script here: https://github.com/brave/adblock-resources/blob/master/resources/de-amp.js
-  ///
-  /// - Note: The de-amp script is injected using ad-block rules here:
-  ///  https://github.com/brave/adblock-lists/blob/master/brave-lists/brave-specific.txt
+  /// - Note: This script is only a smaller part (2 of 3) of de-amping.
+  /// The first part is handled by an ad-block rule and enabled via a `deAmpEnabled` boolean in `AdBlockStats`
+  /// The third part is handled by debouncing amp links and handled by debouncing logic
   case deAMP
 
   /// Return a source typ for this script type
@@ -58,7 +57,7 @@ enum UserScriptType: Hashable {
 
   var injectionTime: WKUserScriptInjectionTime {
     switch self {
-    case .farblingProtection, .deAMP, .domainUserScript, .nacl:
+    case .farblingProtection, .domainUserScript, .nacl, .deAMP:
       return .atDocumentStart
     }
   }
@@ -77,9 +76,7 @@ enum UserScriptType: Hashable {
     case .farblingProtection, .domainUserScript, .nacl:
       return .page
     case .deAMP:
-      // Note: this must have the same content world as the `cosmeticFiltersScript`
-      // executed in the `WKNavigationDelegate`
-      return .cosmeticFiltersSandbox
+      return .defaultClient
     }
   }
 }

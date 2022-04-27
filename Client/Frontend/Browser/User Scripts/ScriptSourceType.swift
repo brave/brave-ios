@@ -15,10 +15,11 @@ enum ScriptSourceType {
   /// This script farbles certian system methods to output slightly randomized output.
   /// This script has a dependency on `nacl`.
   case farblingProtection
-  /// Enables de-amp ad-block rule.
+  /// A script that detects if we're at an amp page and redirects the user to the original (canonical) version if available.
   ///
-  /// Works in conjunction with the injected de-amp script here:
-  /// - Note: The de-amp script is injected using ad-block rules
+  /// - Note: This script is only a smaller part (2 of 3) of de-amping.
+  /// The first part is handled by an ad-block rule and enabled via a `deAmpEnabled` boolean in `AdBlockStats`
+  /// The third part is handled by debouncing amp links and handled by debouncing logic 
   case deAMP
   /// A YouTube ad blocking script
   case youtubeAdBlock
