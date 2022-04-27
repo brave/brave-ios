@@ -20,10 +20,15 @@ private enum WelcomeViewID: Int {
   case iconBackground = 8
 }
 
+protocol WelcomeViewControllerDelegate: AnyObject {
+  func welcomeViewControllerDidShowNTPTutorialPage()
+}
+
 class WelcomeViewController: UIViewController {
   private let profile: Profile?
   private let rewards: BraveRewards?
   private var state: WelcomeViewCalloutState?
+  weak var delegate: WelcomeViewControllerDelegate?
 
   convenience init(profile: Profile?, rewards: BraveRewards?) {
     self.init(
@@ -336,7 +341,7 @@ class WelcomeViewController: UIViewController {
           nextController.animateToDefaultSettingsState()
         },
         secondaryAction: {
-          // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
+          self.delegate?.welcomeViewControllerDidShowNTPTutorialPage()
           self.close()
         }
       )
@@ -364,8 +369,7 @@ class WelcomeViewController: UIViewController {
       return
     }
     UIApplication.shared.open(settingsUrl)
-    
-    // TODO: The new Brave URL Bar Callout Begin / addNTPTutorialPage
+    self.delegate?.welcomeViewControllerDidShowNTPTutorialPage()
     self.close()
   }
 
