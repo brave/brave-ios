@@ -313,7 +313,7 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
 }
 
 extension CryptoStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ origin: String) {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
   }
   
   public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
