@@ -31,24 +31,26 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
             )
           case .switchChain(let request):
             SuggestedNetworkView(
-              mode: .switchNetworks(chainId: request.chainId, origin: request.origin),
+              mode: .switchNetworks(chainId: request.chainId),
+              originInfo: request.originInfo,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
               onDismiss: { approved in
                 cryptoStore.handleWebpageRequestResponse(
-                  .switchChain(approved: approved, origin: request.origin)
+                  .switchChain(approved: approved, originInfo: request.originInfo)
                 )
                 onDismiss()
               }
             )
-          case .addChain(let chain):
+          case .addChain(let request):
             SuggestedNetworkView(
-              mode: .addNetwork(chain),
+              mode: .addNetwork(request.networkInfo),
+              originInfo: request.originInfo,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
               onDismiss: { approved in
                 cryptoStore.handleWebpageRequestResponse(
-                  .addNetwork(approved: approved, chainId: chain.chainId)
+                  .addNetwork(approved: approved, chainId: request.networkInfo.chainId)
                 )
                 onDismiss()
               }

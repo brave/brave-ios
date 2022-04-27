@@ -11,11 +11,12 @@ import BraveCore
 
 struct SuggestedNetworkView: View {
   enum Mode: Equatable {
-    case switchNetworks(chainId: String, origin: URL)
+    case switchNetworks(chainId: String)
     case addNetwork(BraveWallet.NetworkInfo)
   }
   
   var mode: Mode
+  let originInfo: BraveWallet.OriginInfo
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
@@ -34,11 +35,13 @@ struct SuggestedNetworkView: View {
   
   init(
     mode: Mode,
+    originInfo: BraveWallet.OriginInfo,
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
     onDismiss: @escaping (_ approved: Bool) -> Void
   ) {
     self.mode = mode
+    self.originInfo = originInfo
     self.keyringStore = keyringStore
     self.networkStore = networkStore
     self.onDismiss = onDismiss
@@ -48,7 +51,7 @@ struct SuggestedNetworkView: View {
     switch mode {
     case let .addNetwork(chain):
       return chain
-    case let .switchNetworks(chainId, _):
+    case let .switchNetworks(chainId):
       return networkStore.ethereumChains.first(where: { $0.chainId == chainId })
     }
   }
@@ -88,16 +91,14 @@ struct SuggestedNetworkView: View {
       .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
       VStack(spacing: 8) {
         VStack(spacing: 8) {
-          Image(systemName: "globe")
+          Image(systemName: "globe") // TODO: Favicon from originInfo
             .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
             .background(Color(.braveDisabled))
             .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-          if case let .switchNetworks(_, origin) = mode {
-            Text(verbatim: origin.absoluteDisplayString)
-              .font(.subheadline)
-              .foregroundColor(Color(.braveLabel))
-              .multilineTextAlignment(.center)
-          }
+          Text(verbatim: originInfo.origin.url?.absoluteString ?? "") // TODO: Bold etld+1
+            .font(.subheadline)
+            .foregroundColor(Color(.braveLabel))
+            .multilineTextAlignment(.center)
         }
         .accessibilityElement(children: .combine)
         Text(headerTitle)
@@ -268,14 +269,14 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
     Group {
       SuggestedNetworkView(
         mode: .addNetwork(.mockRopsten),
+        originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
         onDismiss: { _ in }
       )
       SuggestedNetworkView(
-        mode: .switchNetworks(
-          chainId: BraveWallet.RopstenChainId,
-          origin: URL(string: "https://app.uniswap.org")!),
+        mode: .switchNetworks(chainId: BraveWallet.RopstenChainId),
+        originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
         onDismiss: { _ in }
