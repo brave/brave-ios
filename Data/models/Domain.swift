@@ -169,8 +169,7 @@ public final class Domain: NSManagedObject, CRUD {
           $0.wallet_permittedAccounts = nil
         }
       } catch {
-        let fetchError = error as NSError
-        print(fetchError)
+        log.error("Clear ethereum permissions error: \(error)")
       }
 
       DispatchQueue.main.async {
