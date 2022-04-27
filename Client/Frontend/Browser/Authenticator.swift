@@ -46,58 +46,56 @@ class Authenticator {
   }
 
   static func findMatchingCredentialsForChallenge(_ challenge: URLAuthenticationChallenge, fromLoginsProvider loginsProvider: BrowserLogins) async -> URLCredential? {
-    return await withCheckedContinuation { continuation in
-      let deferred: Deferred<Maybe<URLCredential?>> = loginsProvider.getLoginsForProtectionSpace(challenge.protectionSpace) >>== { cursor in
-        guard cursor.count >= 1 else {
-          return deferMaybe(nil)
+    guard let cursor = try? await loginsProvider.getLoginsForProtectionSpace(challenge.protectionSpace),
+          cursor.count >= 1 else {
+      return nil
+    }
+    
+    let logins = cursor.asArray()
+    var credentials: URLCredential?
+    
+    // It is possible that we might have duplicate entries since we match against host and scheme://host.
+    // This is a side effect of https://bugzilla.mozilla.org/show_bug.cgi?id=1238103.
+    if logins.count > 1 {
+      credentials =
+      (logins.find { login in
+        (login.protectionSpace.`protocol` == challenge.protectionSpace.`protocol`) && !login.hasMalformedHostname
+      })?.credentials
+      
+      let malformedGUIDs: [GUID] = logins.compactMap { login in
+        if login.hasMalformedHostname {
+          return login.guid
         }
-        
-        let logins = cursor.asArray()
-        var credentials: URLCredential?
-        
-        // It is possible that we might have duplicate entries since we match against host and scheme://host.
-        // This is a side effect of https://bugzilla.mozilla.org/show_bug.cgi?id=1238103.
-        if logins.count > 1 {
-          credentials =
-          (logins.find { login in
-            (login.protectionSpace.`protocol` == challenge.protectionSpace.`protocol`) && !login.hasMalformedHostname
-          })?.credentials
-          
-          let malformedGUIDs: [GUID] = logins.compactMap { login in
-            if login.hasMalformedHostname {
-              return login.guid
-            }
-            return nil
-          }
-          loginsProvider.removeLoginsWithGUIDs(malformedGUIDs).upon { log.debug("Removed malformed logins. Success :\($0.isSuccess)") }
-        }
-        
-        // Found a single entry but the schemes don't match. This is a result of a schemeless entry that we
-        // saved in a previous iteration of the app so we need to migrate it. We only care about the
-        // the username/password so we can rewrite the scheme to be correct.
-        else if logins.count == 1 && logins[0].protectionSpace.`protocol` != challenge.protectionSpace.`protocol` {
-          let login = logins[0]
-          credentials = login.credentials
-          let new = Login(credential: login.credentials, protectionSpace: challenge.protectionSpace)
-          return loginsProvider.updateLoginByGUID(login.guid, new: new, significant: true)
-          >>> { deferMaybe(credentials) }
-        }
-        
-        // Found a single entry that matches the scheme and host - good to go.
-        else {
-          credentials = logins[0].credentials
-        }
-        
-        return deferMaybe(credentials)
+        return nil
       }
-      deferred.uponQueue(.main) { res in
-        if res.isSuccess, let cred = res.successValue {
-          continuation.resume(returning: cred)
-        } else {
-          continuation.resume(returning: nil)
-        }
+      
+      do {
+        try await loginsProvider.removeLoginsWithGUIDs(malformedGUIDs)
+        log.debug("Removed malformed logins.")
+      } catch {
+        log.error("Failed to remove malformed logins.")
       }
     }
+    
+    // Found a single entry but the schemes don't match. This is a result of a schemeless entry that we
+    // saved in a previous iteration of the app so we need to migrate it. We only care about the
+    // the username/password so we can rewrite the scheme to be correct.
+    else if logins.count == 1 && logins[0].protectionSpace.`protocol` != challenge.protectionSpace.`protocol` {
+      let login = logins[0]
+      credentials = login.credentials
+      let new = Login(credential: login.credentials, protectionSpace: challenge.protectionSpace)
+      do {
+        try await loginsProvider.updateLoginByGUID(login.guid, new: new, significant: true)
+        return credentials
+      } catch { }
+    }
+    
+    // Found a single entry that matches the scheme and host - good to go.
+    else {
+      credentials = logins[0].credentials
+    }
+    
+    return credentials
   }
 
   @MainActor fileprivate static func promptForUsernamePassword(_ viewController: UIViewController, credentials: URLCredential?, protectionSpace: URLProtectionSpace, loginsHelper: LoginsHelper?) async throws -> LoginData {

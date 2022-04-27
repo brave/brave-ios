@@ -258,27 +258,22 @@ public func == (lhs: Login, rhs: Login) -> Bool {
 }
 
 public protocol BrowserLogins {
-  func getUsageDataForLoginByGUID(_ guid: GUID) -> Deferred<Maybe<LoginUsageData>>
-  func getLoginDataForGUID(_ guid: GUID) -> Deferred<Maybe<Login>>
-  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace) -> Deferred<Maybe<Cursor<LoginData>>>
-  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?) -> Deferred<Maybe<Cursor<LoginData>>>
-  func getAllLogins() -> Deferred<Maybe<Cursor<Login>>>
-  func getLoginsForQuery(_ query: String) -> Deferred<Maybe<Cursor<Login>>>
-
-  func searchLoginsWithQuery(_ query: String?) -> Deferred<Maybe<Cursor<Login>>>
-
+  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace) async throws -> Cursor<LoginData>
+  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?) async throws -> Cursor<LoginData>
+  func getAllLogins() async throws -> Cursor<Login>
+  
   // Add a new login regardless of whether other logins might match some fields. Callers
   // are responsible for querying first if they care.
-  @discardableResult func addLogin(_ login: LoginData) -> Success
+  func addLogin(_ login: LoginData) async throws
 
-  @discardableResult func updateLoginByGUID(_ guid: GUID, new: LoginData, significant: Bool) -> Success
+  func updateLoginByGUID(_ guid: GUID, new: LoginData, significant: Bool) async throws
 
   // Add the use of a login by GUID.
-  @discardableResult func addUseOfLoginByGUID(_ guid: GUID) -> Success
-  func removeLoginByGUID(_ guid: GUID) -> Success
-  func removeLoginsWithGUIDs(_ guids: [GUID]) -> Success
+  func addUseOfLoginByGUID(_ guid: GUID) async throws
+  func removeLoginByGUID(_ guid: GUID) async throws
+  func removeLoginsWithGUIDs(_ guids: [GUID]) async throws
 
-  func removeAll() -> Success
+  func removeAll() async throws
 }
 
 open class LoginDataError: MaybeErrorType {

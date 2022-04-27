@@ -296,6 +296,11 @@
 		2748626A25AD30A500BC40AA /* sqlcipher.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 2748625C25AD308A00BC40AA /* sqlcipher.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		274AD90A278D455500FDF4D8 /* ManageWebsiteDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274AD909278D455500FDF4D8 /* ManageWebsiteDataView.swift */; };
 		275034E326EF9E6A00CF4C8A /* WalletSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275034E226EF9E6A00CF4C8A /* WalletSettingsView.swift */; };
+		2754EF5228175B6C00A94BAE /* BraveSharedTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */; };
+		2754EF5D28175BE500A94BAE /* BraveSharedTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */; };
+		2754EF5E28175BE600A94BAE /* BraveSharedTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */; };
+		2754EF5F28175BE600A94BAE /* BraveSharedTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */; };
+		2754EF6028175BE700A94BAE /* BraveSharedTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */; };
 		2755AB7D23107BC600F0721F /* AdsReporting.js in Resources */ = {isa = PBXBuildFile; fileRef = 2755AB7C23107BC600F0721F /* AdsReporting.js */; };
 		2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */; };
 		2755EA9C2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */; };
@@ -2030,6 +2035,7 @@
 		2748625C25AD308A00BC40AA /* sqlcipher.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = sqlcipher.xcframework; sourceTree = "<group>"; };
 		274AD909278D455500FDF4D8 /* ManageWebsiteDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageWebsiteDataView.swift; sourceTree = "<group>"; };
 		275034E226EF9E6A00CF4C8A /* WalletSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletSettingsView.swift; sourceTree = "<group>"; };
+		2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSharedTestUtils.swift; sourceTree = "<group>"; };
 		2755AB7C23107BC600F0721F /* AdsReporting.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = AdsReporting.js; sourceTree = "<group>"; };
 		2755AB8523107DBD00F0721F /* AdsMediaReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsMediaReporting.swift; sourceTree = "<group>"; };
 		2755EA9B2551F94B0033C43F /* RewardsInternalsAutoContributeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsInternalsAutoContributeController.swift; sourceTree = "<group>"; };
@@ -5820,6 +5826,7 @@
 				CA39359127E3CBB400D18585 /* CertificateUtilsTest.swift */,
 				27A1AC062485618600344503 /* PrivateCDNTests.swift */,
 				2765D5532810689500D5241D /* URLExtensionTests.swift */,
+				2754EF5128175B6C00A94BAE /* BraveSharedTestUtils.swift */,
 			);
 			path = BraveSharedTests;
 			sourceTree = "<group>";
@@ -8510,6 +8517,7 @@
 				D37DE2C71CA356D800A5EC69 /* CertTests.swift in Sources */,
 				2FCAE2841ABB533A00877008 /* MockFiles.swift in Sources */,
 				A176323920CF2AF200126F25 /* DeferredTestUtils.swift in Sources */,
+				2754EF5D28175BE500A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				0BDA56B01B26B1D5008C9B96 /* TestLogins.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8553,6 +8561,7 @@
 				2798E01D213EFC3F003EDBB1 /* FavoriteTests.swift in Sources */,
 				0AF3B4ED213D8E3300695962 /* CoreDataTestCase.swift in Sources */,
 				0AF3B4EF213D8E3300695962 /* DomainTests.swift in Sources */,
+				2754EF6028175BE700A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				0AF3B4EE213D8E3300695962 /* HistoryTests.swift in Sources */,
 				0AF3B4F1213D8E3300695962 /* DataControllerTests.swift in Sources */,
 				2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */,
@@ -8616,6 +8625,7 @@
 				0A917391231D173C0069A08B /* AppReviewTests.swift in Sources */,
 				5EEB25DE234E667700279091 /* CertificatePinningTest.swift in Sources */,
 				5D6DDF0021428CF0001FF0AE /* DAUTests.swift in Sources */,
+				2754EF5228175B6C00A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				CA2CA21F27F75E4800B25646 /* NSURLExtensionsTests.swift in Sources */,
 				0A42150121AC0E8E006B8E39 /* TimeExtensionTests.swift in Sources */,
 			);
@@ -8644,6 +8654,7 @@
 				28532BEA1C472008000072D9 /* DeferredTests.swift in Sources */,
 				3BB54B311E68EB2B0021DAC4 /* AuthenticationKeychainInfoTests.swift in Sources */,
 				A176323820CF2A6000126F25 /* DeferredTestUtils.swift in Sources */,
+				2754EF5F28175BE600A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				0ADCD45B231973650078CC67 /* UserAgentBuilderTests.swift in Sources */,
 				0AB7FCDF235DEE8F00F1D9F5 /* NumberExtensionTests.swift in Sources */,
 				E4E25CCB1CA99E7400D0F088 /* HexExtensionsTests.swift in Sources */,
@@ -9286,6 +9297,7 @@
 				E696FE511C47F86E00EC007C /* AuthenticatorTests.swift in Sources */,
 				275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */,
 				2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */,
+				2754EF5E28175BE600A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */,
 				F95ED17E25A95426001A432D /* UserScriptManagerTest.swift in Sources */,
 			);

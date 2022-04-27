@@ -123,16 +123,12 @@ class PasswordsClearable: Clearable {
 
   func clear() async throws {
     // Clear our storage
-    return await withCheckedContinuation { continuation in
-      profile.logins.removeAll() >>== { res in
-        let storage = URLCredentialStorage.shared
-        let credentials = storage.allCredentials
-        for (space, credentials) in credentials {
-          for (_, credential) in credentials {
-            storage.remove(credential, for: space)
-          }
-        }
-        continuation.resume()
+    try await profile.logins.removeAll()
+    let storage = URLCredentialStorage.shared
+    let credentials = storage.allCredentials
+    for (space, credentials) in credentials {
+      for (_, credential) in credentials {
+        storage.remove(credential, for: space)
       }
     }
   }

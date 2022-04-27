@@ -16,36 +16,6 @@ extension Sequence {
   }
 }
 
-private func XCTAssertAsyncThrowsError<T>(
-  _ expression: @autoclosure () async throws -> T,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #filePath,
-  line: UInt = #line,
-  _ errorHandler: (_ error: Error) -> Void = { _ in }
-) async {
-  do {
-    _ = try await expression()
-    XCTFail(message(), file: file, line: line)
-  } catch {
-    errorHandler(error)
-  }
-}
-
-private func XCTAssertAsyncNoThrow<T>(
-  _ expression: @autoclosure () async throws -> T,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #filePath,
-  line: UInt = #line
-) async {
-  do {
-    _ = try await expression()
-  } catch {
-    XCTFail(message(), file: file, line: line)
-  }
-}
-
-//func XCTAssertAsyncThrows
-
 class DiskImageStoreTests: XCTestCase {
   var files: FileAccessor!
   var store: DiskImageStore!
