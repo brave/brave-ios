@@ -425,7 +425,7 @@ open class SQLiteLogins: BrowserLogins {
   }
 }
 
-class NoSuchRecordError: MaybeErrorType {
+class NoSuchRecordError: Error {
   let guid: GUID
   init(guid: GUID) {
     self.guid = guid
