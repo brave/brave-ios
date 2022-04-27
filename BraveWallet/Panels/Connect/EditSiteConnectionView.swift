@@ -12,7 +12,7 @@ import Data
 
 struct EditSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
-  var originURL: URL
+  var origin: URLOrigin
   var onDismiss: (_ permittedAccounts: [String]) -> Void
   
   @Environment(\.sizeCategory) private var sizeCategory
@@ -67,11 +67,15 @@ struct EditSiteConnectionView: View {
                 Button {
                   switch action {
                   case .connect:
-                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: true)
+                    if let url = origin.url {
+                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: true)
+                    }
                     permittedAccounts.append(account.address)
                     keyringStore.selectedAccount = account
                   case .disconnect:
-                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: false)
+                    if let url = origin.url {
+                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: false)
+                    }
                     permittedAccounts.removeAll(where: { $0 == account.address })
                     
                     if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
@@ -93,11 +97,15 @@ struct EditSiteConnectionView: View {
                 Button {
                   switch action {
                   case .connect:
-                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: true)
+                    if let url = origin.url {
+                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: true)
+                    }
                     permittedAccounts.append(account.address)
                     keyringStore.selectedAccount = account
                   case .disconnect:
-                    Domain.setEthereumPermissions(forUrl: origin, account: account.address, grant: false)
+                    if let url = origin.url {
+                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: false)
+                    }
                     permittedAccounts.removeAll(where: { $0 == account.address })
                     
                     if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
@@ -123,10 +131,12 @@ struct EditSiteConnectionView: View {
                   .background(Color(.braveDisabled))
                   .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 VStack(spacing: 2) {
-                  Text(verbatim: origin.absoluteString)
-                    .font(.subheadline.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(Color(.bravePrimary))
+                  origin.url.map { url in
+                    Text(verbatim: url.absoluteString)
+                      .font(.subheadline.weight(.semibold))
+                      .multilineTextAlignment(.center)
+                      .foregroundColor(Color(.bravePrimary))
+                  }
                   Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
                     .font(.footnote)
                     .multilineTextAlignment(.center)
@@ -134,15 +144,17 @@ struct EditSiteConnectionView: View {
                 }
               }
             } else {
-              HStack(spacing: 12) {
+              HStack(spacing: 12) {    
                 Image(systemName: "globe")
                   .frame(width: faviconSize, height: faviconSize)
                   .background(Color(.braveDisabled))
                   .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
-                  Text(verbatim: origin.absoluteString)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(Color(.bravePrimary))
+                  origin.url.map { url in
+                    Text(verbatim: url.absoluteString)
+                      .font(.subheadline.weight(.semibold))
+                      .foregroundColor(Color(.bravePrimary))
+                  }
                   Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
                     .font(.footnote)
                     .foregroundColor(Color(.braveLabel))
@@ -169,7 +181,7 @@ struct EditSiteConnectionView: View {
         }
       }
       .onAppear {
-        if let accounts = Domain.ethereumPermissions(forUrl: originURL) {
+        if let url = origin.url, let accounts = Domain.ethereumPermissions(forUrl: url) {
           permittedAccounts = accounts
         }
       }
@@ -187,7 +199,7 @@ struct EditSiteConnectionView_Previews: PreviewProvider {
         store.addPrimaryAccount("Account 3", completion: nil)
         return store
       }(),
-      originURL: URL(string: "https://app.uniswap.org")!,
+      origin: .init(url: URL(string: "https://app.uniswap.org")!),
       onDismiss: { _ in }
     )
   }

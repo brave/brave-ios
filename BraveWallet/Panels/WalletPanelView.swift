@@ -392,7 +392,7 @@ struct WalletPanelView: View {
       } else {
         cryptoStore.prepare()
       }
-      if let url = origin.url, let accounts =  Domain.ethereumPermissions(forUrl: url) {
+      if let url = origin.url, let accounts = Domain.ethereumPermissions(forUrl: url) {
         permittedAccounts = accounts
       }
       accountActivityStore.update()
