@@ -36,7 +36,7 @@ class ManageSiteConnectionsStoreTests: CoreDataTestCase {
   
   func testFetchSiteConnections() {
     // Domains added with Ethereum permissions in `setUp()`
-    let store = ManageSiteConnectionsStore()
+    let store = ManageSiteConnectionsStore(keyringStore: .previewStore)
     
     // verify `siteConnections` is updated when `fetchSiteConnections()` is called
     let siteConnectionsException = expectation(description: "siteConnections")
@@ -60,7 +60,7 @@ class ManageSiteConnectionsStoreTests: CoreDataTestCase {
   /// Test `removeAllPermissions(from:)` will remove all permissions from the given `SiteConnections` array
   func testRemoveAllPermissions() {
     // Domains added with Ethereum permissions in `setUp()`
-    let store = ManageSiteConnectionsStore()
+    let store = ManageSiteConnectionsStore(keyringStore: .previewStore)
     store.fetchSiteConnections()
     XCTAssertEqual(store.siteConnections.count, 2)
     
@@ -81,7 +81,7 @@ class ManageSiteConnectionsStoreTests: CoreDataTestCase {
   /// Test `removePermissions(from:url:)` will remove the given account permissions for the given url
   func testRemovePermissions() {
     // Domains added with Ethereum permissions in `setUp()`
-    let store = ManageSiteConnectionsStore()
+    let store = ManageSiteConnectionsStore(keyringStore: .previewStore)
     store.fetchSiteConnections()
     XCTAssertEqual(store.siteConnections.count, 2)
     
@@ -105,7 +105,7 @@ class ManageSiteConnectionsStoreTests: CoreDataTestCase {
   /// Test `removePermissions(from:url:)` will remove the `SiteConnection` from `siteConnections` when the last connected account is removed
   func testRemovePermissionsLastPermission() {
     // Domains added with Ethereum permissions in `setUp()`
-    let store = ManageSiteConnectionsStore()
+    let store = ManageSiteConnectionsStore(keyringStore: .previewStore)
     store.fetchSiteConnections()
     XCTAssertEqual(store.siteConnections.count, 2)
     
