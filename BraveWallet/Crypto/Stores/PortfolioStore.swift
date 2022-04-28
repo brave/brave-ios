@@ -45,6 +45,13 @@ public class PortfolioStore: ObservableObject {
   @Published private(set) var historicalBalances: [BalanceTimePrice] = []
   /// Whether or not balances are still currently loading
   @Published private(set) var isLoadingBalances: Bool = false
+  /// The current default base currency code
+  @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
+    didSet {
+      currencyFormatter.currencyCode = currencyCode
+      update()
+    }
+  }
 
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
     walletService: self.walletService,
@@ -53,7 +60,7 @@ public class PortfolioStore: ObservableObject {
     assetRatioService: self.assetRatioService
   )
   
-  let currencyFormatter: NumberFormatter
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -66,23 +73,25 @@ public class PortfolioStore: ObservableObject {
     rpcService: BraveWalletJsonRpcService,
     walletService: BraveWalletBraveWalletService,
     assetRatioService: BraveWalletAssetRatioService,
-    blockchainRegistry: BraveWalletBlockchainRegistry,
-    currencyFormatter: NumberFormatter
+    blockchainRegistry: BraveWalletBlockchainRegistry
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
     self.walletService = walletService
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
-    self.currencyFormatter = currencyFormatter
 
     self.rpcService.add(self)
     self.keyringService.add(self)
+    self.walletService.add(self)
 
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
         update()
       }
+    }
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
     }
   }
 
@@ -254,5 +263,23 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+  }
+}
+
+extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
+  }
+
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyCode = currency
+  }
+
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+
+  public func onNetworkListChanged() {
   }
 }

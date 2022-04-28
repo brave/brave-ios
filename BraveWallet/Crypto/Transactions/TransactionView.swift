@@ -18,12 +18,33 @@ struct TransactionView: View {
   var allTokens: [BraveWallet.BlockchainToken]
   var displayAccountCreator: Bool
   var assetRatios: [String: Double]
-  var currencyFormatter: NumberFormatter
+
+  init(
+    info: BraveWallet.TransactionInfo,
+    keyringStore: KeyringStore,
+    networkStore: NetworkStore,
+    visibleTokens: [BraveWallet.BlockchainToken],
+    allTokens: [BraveWallet.BlockchainToken],
+    displayAccountCreator: Bool,
+    assetRatios: [String: Double],
+    currencyCode: String
+  ) {
+    self.info = info
+    self.keyringStore = keyringStore
+    self.networkStore = networkStore
+    self.visibleTokens = visibleTokens
+    self.allTokens = allTokens
+    self.displayAccountCreator = displayAccountCreator
+    self.assetRatios = assetRatios
+    self.currencyFormatter.currencyCode = currencyCode
+  }
 
   private let timeFormatter = RelativeDateTimeFormatter().then {
     $0.unitsStyle = .full
     $0.dateTimeStyle = .numeric
   }
+  
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
   private func namedAddress(for address: String) -> String {
     NamedAddresses.name(for: address, accounts: keyringStore.keyring.accountInfos)
@@ -216,7 +237,7 @@ struct Transaction_Previews: PreviewProvider {
         allTokens: [],
         displayAccountCreator: false,
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
       TransactionView(
         info: .previewConfirmedSwap,
@@ -226,7 +247,7 @@ struct Transaction_Previews: PreviewProvider {
         allTokens: [],
         displayAccountCreator: true,
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
       TransactionView(
         info: .previewConfirmedERC20Approve,
@@ -236,7 +257,7 @@ struct Transaction_Previews: PreviewProvider {
         allTokens: [],
         displayAccountCreator: false,
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
     }
     .padding(12)

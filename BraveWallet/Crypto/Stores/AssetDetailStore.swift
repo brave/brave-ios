@@ -38,13 +38,20 @@ class AssetDetailStore: ObservableObject {
   @Published private(set) var accounts: [AccountAssetViewModel] = []
   @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
   @Published private(set) var isBuySupported: Bool = true
+  @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
+    didSet {
+      currencyFormatter.currencyCode = currencyCode
+      update()
+    }
+  }
 
-  let currencyFormatter: NumberFormatter
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
   private(set) var assetPriceValue: Double = 0.0
 
   private let assetRatioService: BraveWalletAssetRatioService
   private let keyringService: BraveWalletKeyringService
+  private let walletService: BraveWalletBraveWalletService
   private let rpcService: BraveWalletJsonRpcService
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
@@ -55,22 +62,27 @@ class AssetDetailStore: ObservableObject {
     assetRatioService: BraveWalletAssetRatioService,
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
+    walletService: BraveWalletBraveWalletService,
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    token: BraveWallet.BlockchainToken,
-    currencyFormatter: NumberFormatter
+    token: BraveWallet.BlockchainToken
   ) {
     self.assetRatioService = assetRatioService
     self.keyringService = keyringService
     self.rpcService = rpcService
+    self.walletService = walletService
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.token = token
-    self.currencyFormatter = currencyFormatter
 
     self.keyringService.add(self)
     self.rpcService.add(self)
     self.txService.add(self)
+    self.walletService.add(self)
+
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
+    }
   }
 
   private let percentFormatter = NumberFormatter().then {
@@ -241,5 +253,23 @@ extension AssetDetailStore: BraveWalletTxServiceObserver {
   }
   func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     fetchTransactions()
+  }
+}
+
+extension AssetDetailStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
+  }
+
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyCode = currency
+  }
+
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+
+  public func onNetworkListChanged() {
   }
 }

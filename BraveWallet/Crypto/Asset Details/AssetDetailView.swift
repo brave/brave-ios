@@ -91,7 +91,7 @@ struct AssetDetailView: View {
                 allTokens: [], // AssetDetailView is specific to a single token
                 displayAccountCreator: true,
                 assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue],
-                currencyFormatter: assetDetailStore.currencyFormatter
+                currencyCode: assetDetailStore.currencyCode
               )
             }
             .contextMenu {
@@ -150,7 +150,7 @@ struct AssetDetailView: View {
             visibleTokens: [assetDetailStore.token],
             allTokens: [], // AssetDetailView is specific to a single token
             assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue],
-            currencyFormatter: assetDetailStore.currencyFormatter
+            currencyCode: assetDetailStore.currencyCode
           )
         }
     )

@@ -43,11 +43,6 @@ public class CryptoStore: ObservableObject {
   @Published private(set) var hasUnapprovedTransactions: Bool = false
   @Published private(set) var pendingWebpageRequest: PendingWebpageRequest?
   
-  let currencyFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = CurrencyCode.usd.code
-  }
-  
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
@@ -82,16 +77,11 @@ public class CryptoStore: ObservableObject {
       rpcService: rpcService,
       walletService: walletService,
       assetRatioService: assetRatioService,
-      blockchainRegistry: blockchainRegistry,
-      currencyFormatter: currencyFormatter
+      blockchainRegistry: blockchainRegistry
     )
     
     self.keyringService.add(self)
     self.txService.add(self)
-    self.walletService.add(self)
-    self.walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyFormatter.currencyCode = currencyCode
-    }
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -155,10 +145,10 @@ public class CryptoStore: ObservableObject {
       assetRatioService: assetRatioService,
       keyringService: keyringService,
       rpcService: rpcService,
+      walletService: walletService,
       txService: txService,
       blockchainRegistry: blockchainRegistry,
-      token: token,
-      currencyFormatter: currencyFormatter
+      token: token
     )
     assetDetailStore = store
     return store
@@ -181,8 +171,7 @@ public class CryptoStore: ObservableObject {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       txService: txService,
-      blockchainRegistry: blockchainRegistry,
-      currencyFormatter: currencyFormatter
+      blockchainRegistry: blockchainRegistry
     )
     accountActivityStore = store
     return store
@@ -206,8 +195,7 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService,
-      currencyFormatter: currencyFormatter
+      keyringService: keyringService
     )
     confirmationStore = store
     return store
@@ -309,29 +297,5 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-  }
-}
-
-extension CryptoStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
-  }
-  
-  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultBaseCurrencyChanged(_ currency: String) {
-    currencyFormatter.currencyCode = currency
-    portfolioStore.update()
-    assetDetailStore?.update()
-    accountActivityStore?.update()
-    if let confirmationStore = confirmationStore {
-      confirmationStore.fetchDetails(for: confirmationStore.activeTransaction)
-    }
-  }
-  
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
-  }
-  
-  public func onNetworkListChanged() {
   }
 }

@@ -18,14 +18,33 @@ struct TransactionDetailsView: View {
   var visibleTokens: [BraveWallet.BlockchainToken]
   var allTokens: [BraveWallet.BlockchainToken]
   var assetRatios: [String: Double]
-  var currencyFormatter: NumberFormatter
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
   
+  init(
+    info: BraveWallet.TransactionInfo,
+    networkStore: NetworkStore,
+    keyringStore: KeyringStore,
+    visibleTokens: [BraveWallet.BlockchainToken],
+    allTokens: [BraveWallet.BlockchainToken],
+    assetRatios: [String: Double],
+    currencyCode: String
+  ) {
+    self.info = info
+    self.networkStore = networkStore
+    self.keyringStore = keyringStore
+    self.visibleTokens = visibleTokens
+    self.allTokens = allTokens
+    self.assetRatios = assetRatios
+    self.currencyFormatter.currencyCode = currencyCode
+  }
+  
   private let dateFormatter = DateFormatter().then {
     $0.dateFormat = "h:mm a - MMM d, yyyy"
   }
+  
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
   private func token(for contractAddress: String) -> BraveWallet.BlockchainToken? {
     let findToken: (BraveWallet.BlockchainToken) -> Bool = { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame }
@@ -253,7 +272,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         visibleTokens: [.previewToken],
         allTokens: [],
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
         .previewColorSchemes()
       TransactionDetailsView(
@@ -263,7 +282,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         visibleTokens: [.previewToken],
         allTokens: [],
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
         .previewColorSchemes()
       TransactionDetailsView(
@@ -273,7 +292,7 @@ struct TransactionDetailsView_Previews: PreviewProvider {
         visibleTokens: [.previewToken],
         allTokens: [],
         assetRatios: ["eth": 4576.36],
-        currencyFormatter: .usdCurrencyFormatter
+        currencyCode: CurrencyCode.usd.code
       )
         .previewColorSchemes()
     }

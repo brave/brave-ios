@@ -92,7 +92,7 @@ struct AccountActivityView: View {
                 allTokens: activityStore.allTokens,
                 displayAccountCreator: false,
                 assetRatios: assetRatios,
-                currencyFormatter: activityStore.currencyFormatter
+                currencyCode: activityStore.currencyCode
               )
             }
             .contextMenu {
@@ -133,7 +133,7 @@ struct AccountActivityView: View {
             visibleTokens: activityStore.assets.map(\.token),
             allTokens: activityStore.allTokens,
             assetRatios: assetRatios,
-            currencyFormatter: activityStore.currencyFormatter
+            currencyCode: activityStore.currencyCode
           )
         }
     )

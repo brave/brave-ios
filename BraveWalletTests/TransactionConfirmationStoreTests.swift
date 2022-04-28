@@ -79,8 +79,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService,
-      currencyFormatter: .usdCurrencyFormatter
+      keyringService: keyringService
     )
   }
   

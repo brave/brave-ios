@@ -39,10 +39,16 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   @Published var allTokens: [BraveWallet.BlockchainToken] = []
+  @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
+    didSet {
+      currencyFormatter.currencyCode = currencyCode
+      fetchDetails(for: activeTransaction)
+    }
+  }
 
   private var assetRatios: [String: Double] = [:]
 
-  let currencyFormatter: NumberFormatter
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
   var activeTransaction: BraveWallet.TransactionInfo {
     transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
@@ -82,8 +88,7 @@ public class TransactionConfirmationStore: ObservableObject {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     walletService: BraveWalletBraveWalletService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    keyringService: BraveWalletKeyringService,
-    currencyFormatter: NumberFormatter
+    keyringService: BraveWalletKeyringService
   ) {
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
@@ -92,9 +97,13 @@ public class TransactionConfirmationStore: ObservableObject {
     self.walletService = walletService
     self.ethTxManagerProxy = ethTxManagerProxy
     self.keyringService = keyringService
-    self.currencyFormatter = currencyFormatter
 
     self.txService.add(self)
+    self.walletService.add(self)
+    
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
+    }
   }
 
   func updateGasValue(for transaction: BraveWallet.TransactionInfo) {
@@ -411,5 +420,23 @@ extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
         self.fetchDetails(for: txInfo)
       }
     }
+  }
+}
+
+extension TransactionConfirmationStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
+  }
+
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyCode = currency
+  }
+
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+
+  public func onNetworkListChanged() {
   }
 }
