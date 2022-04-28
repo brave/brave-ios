@@ -346,7 +346,7 @@ class WelcomeViewCallout: UIView {
         $0.text = details
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .title3, weight: .regular)
-        $0.alpha = 1.0
+        $0.alpha = 0.0
         $0.isHidden = false
       }
 
@@ -436,6 +436,12 @@ class WelcomeViewCallout: UIView {
       contentView.setCustomSpacing(8.0, after: titleLabel)
       contentView.setCustomSpacing(24.0, after: detailsLabel)
       contentView.setCustomSpacing(10.0, after: primaryButton)
+    }
+  }
+  
+  func animateTitleViewVisibility(alpha: CGFloat, duration: TimeInterval) {
+    UIView.animate(withDuration: duration) {
+      self.detailsLabel.alpha = alpha
     }
   }
 }
