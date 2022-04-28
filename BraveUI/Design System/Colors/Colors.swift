@@ -101,6 +101,9 @@ extension UIColor {
   public static var braveOnboarding: UIColor {
     DesignSystemColor.text04.color
   }
+  public static var braveOnboardingShadow: UIColor {
+    DesignSystemColor.gradient01_step1.color
+  }
   public static var braveLighterOrange: UIColor {
     DesignSystemColor.interactive03.color
   }

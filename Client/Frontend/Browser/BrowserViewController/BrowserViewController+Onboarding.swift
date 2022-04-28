@@ -7,6 +7,7 @@ import BraveShared
 import BraveUI
 import Shared
 import BraveCore
+import UIKit
 
 // MARK: - Onboarding
 
@@ -153,7 +154,7 @@ extension BrowserViewController {
       popover.arrowDistance = 10.0
       
       // Create a border / placeholder view
-      let borderView = BorderView(frame: frame, cornerRadius: cornerRadius)
+      let borderView = BorderView(frame: frame, cornerRadius: cornerRadius, colouredBorder: true)
       let placeholderView = UIView(frame: frame).then {
         $0.alpha = 0.0
         $0.frame = frame
@@ -285,14 +286,20 @@ private class BorderView: UIView {
   
   public var didClickBorderedArea: (() -> Void)?
 
-  init(frame: CGRect, cornerRadius: CGFloat) {
+  init(frame: CGRect, cornerRadius: CGFloat, colouredBorder: Bool = false) {
     let borderLayer = CAShapeLayer().then {
       let frame = frame.with { $0.origin = .zero }
-      $0.strokeColor = UIColor.white.cgColor
+      $0.strokeColor = colouredBorder ? UIColor.braveLighterBlurple.cgColor : UIColor.white.cgColor
       $0.fillColor = UIColor.clear.cgColor
       $0.lineWidth = 2.0
       $0.strokeEnd = 1.0
       $0.path = UIBezierPath(roundedRect: frame, cornerRadius: cornerRadius).cgPath
+      if colouredBorder {
+        $0.shadowColor = UIColor.braveOnboardingShadow.cgColor
+        $0.shadowOpacity = 1
+        $0.shadowOffset = .zero
+        $0.shadowRadius = 10
+      }
     }
 
     super.init(frame: frame)

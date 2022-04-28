@@ -85,12 +85,6 @@ class WelcomeViewController: UIViewController {
     $0.contentMode = .scaleAspectFit
   }
 
-  private let searchView = WelcomeViewSearchView().then {
-    $0.isHidden = true
-    $0.setContentHuggingPriority(.required, for: .vertical)
-    $0.setContentCompressionResistancePriority(.init(rawValue: 800), for: .vertical)
-  }
-
   private let bottomImageView = UIImageView().then {
     $0.image = #imageLiteral(resourceName: "welcome-view-bottom-image")
     $0.contentMode = .scaleAspectFill
@@ -117,15 +111,29 @@ class WelcomeViewController: UIViewController {
     
     switch state {
     case .loading:
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      let animation = CAKeyframeAnimation(keyPath: "transform.scale").then {
+        $0.values = [1.0, 1.025, 1.0]
+        $0.keyTimes = [0, 0.5, 1]
+        $0.duration = 1.0
+      }
+      
+      iconView.layer.add(animation, forKey: nil)
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
         self.animateToWelcomeState()
       }
     case .welcome:
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      UIView.animate(withDuration: 1.5) {
+        self.calloutView.frame.origin.y = self.calloutView.frame.origin.x - 35
+      }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
         self.animateToDefaultBrowserState()
       }
     case .settings:
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+      calloutView.animateTitleViewVisibility(alpha: 1.0, duration: 1.5)
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
         self.onSetDefaultBrowser()
       }
     default:
@@ -139,7 +147,6 @@ class WelcomeViewController: UIViewController {
     contentContainer.tag = WelcomeViewID.contents.rawValue
     calloutView.tag = WelcomeViewID.callout.rawValue
     iconView.tag = WelcomeViewID.iconView.rawValue
-    searchView.tag = WelcomeViewID.searchView.rawValue
     bottomImageView.tag = WelcomeViewID.bottomImage.rawValue
     iconBackgroundView.tag = WelcomeViewID.iconBackground.rawValue
 
@@ -177,7 +184,7 @@ class WelcomeViewController: UIViewController {
       .view(contentContainer),
       .view(UIView.spacer(.vertical, amount: 1)))
 
-    [calloutView, iconView, searchView].forEach {
+    [calloutView, iconView].forEach {
       contentContainer.addArrangedSubview($0)
     }
 
@@ -237,7 +244,7 @@ class WelcomeViewController: UIViewController {
       contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(175.0)
+        $0.height.equalTo(185.0)
       }
       calloutView.setState(state: state)
 
@@ -262,7 +269,7 @@ class WelcomeViewController: UIViewController {
       contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(175.0)
+        $0.height.equalTo(185.0)
       }
       calloutView.setState(state: state)
     case .settings:
