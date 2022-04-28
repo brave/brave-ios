@@ -562,7 +562,6 @@
 		2F9311DA266698E600C6B74D /* DataSavedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9311D8266698E600C6B74D /* DataSavedTests.swift */; };
 		2F9BDB6027B5B6540096EEBE /* PasswordAPIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */; };
 		2F9CE87327CEA0AC008C9C44 /* LoginsHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9CE87227CEA0AC008C9C44 /* LoginsHelperTests.swift */; };
-		2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */; };
 		2FA01E5D25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */; };
 		2FA5A7582649CD9200740035 /* HistoryServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */; };
 		2FB0E26C2653132500B722AF /* BraveServiceStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */; };
@@ -2171,7 +2170,6 @@
 		2F9311D8266698E600C6B74D /* DataSavedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSavedTests.swift; sourceTree = "<group>"; };
 		2F9BDB5F27B5B6540096EEBE /* PasswordAPIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordAPIExtensions.swift; sourceTree = "<group>"; };
 		2F9CE87227CEA0AC008C9C44 /* LoginsHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginsHelperTests.swift; sourceTree = "<group>"; };
-		2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkTierTests.swift; sourceTree = "<group>"; };
 		2FA01E5C25F2C93800103D67 /* ShieldsActivityItemSourceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsActivityItemSourceProvider.swift; sourceTree = "<group>"; };
 		2FA5A7572649CD9200740035 /* HistoryServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryServiceStateObserver.swift; sourceTree = "<group>"; };
 		2FB0E26B2653132500B722AF /* BraveServiceStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveServiceStateObserver.swift; sourceTree = "<group>"; };
@@ -4558,7 +4556,6 @@
 		2F26C42B267B9B7E00E5AD60 /* ProductNotificationTests */ = {
 			isa = PBXGroup;
 			children = (
-				2FA01E2725F29B0900103D67 /* BenchmarkTierTests.swift */,
 				2F26C437267B9F0D00E5AD60 /* BlockSummaryTests.swift */,
 			);
 			name = ProductNotificationTests;
@@ -8697,7 +8694,6 @@
 				A83E5B1D1C1DA8D80026D912 /* UIPasteboardExtensionsTests.swift in Sources */,
 				E696FE511C47F86E00EC007C /* AuthenticatorTests.swift in Sources */,
 				275965E224EEC4EA0051A827 /* FeedFillStrategyTests.swift in Sources */,
-				2FA01E2825F29B0900103D67 /* BenchmarkTierTests.swift in Sources */,
 				2754EF5E28175BE600A94BAE /* BraveSharedTestUtils.swift in Sources */,
 				44C6CCD226DE6CB100E90068 /* DomainUserScriptTests.swift in Sources */,
 				F95ED17E25A95426001A432D /* UserScriptManagerTest.swift in Sources */,
