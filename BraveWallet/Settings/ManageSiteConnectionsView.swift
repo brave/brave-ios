@@ -29,12 +29,15 @@ struct ManageSiteConnectionsView: View {
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
               content
-                .modifier(
-                  SwipeActionsViewModifier_FB9812596 {
+                .swipeActions(edge: .trailing) {
+                  Button(role: .destructive, action: {
                     withAnimation {
                       siteConnectionStore.removeAllPermissions(from: [siteConnection])
                     }
-                  })
+                  }) {
+                    Label(Strings.Wallet.delete, systemImage: "trash")
+                  }
+                }
             } else {
               content
             }
@@ -154,21 +157,6 @@ private struct SiteRow: View {
   }
 }
 
-// Modifier workaround for FB9812596 to avoid crashing on iOS 14 on Release builds
-@available(iOS 15.0, *)
-private struct SwipeActionsViewModifier_FB9812596: ViewModifier {
-  var action: () -> Void
-  
-  func body(content: Content) -> some View {
-    content
-      .swipeActions(edge: .trailing) {
-        Button(role: .destructive, action: action) {
-          Label(Strings.Wallet.delete, systemImage: "trash")
-        }
-      }
-  }
-}
-
 private struct SiteConnectionDetailView: View {
   
   let siteConnection: SiteConnection
@@ -186,14 +174,17 @@ private struct SiteConnectionDetailView: View {
             .osAvailabilityModifiers { content in
               if #available(iOS 15.0, *) {
                 content
-                  .modifier(
-                    SwipeActionsViewModifier_FB9812596 {
+                  .swipeActions(edge: .trailing) {
+                    Button(role: .destructive, action: {
                       withAnimation(.default) {
                         if let url = URL(string: siteConnection.url) {
                           siteConnectionStore.removePermissions(from: [address], url: url)
                         }
                       }
-                    })
+                    }) {
+                      Label(Strings.Wallet.delete, systemImage: "trash")
+                    }
+                  }
               } else {
                 content
               }
