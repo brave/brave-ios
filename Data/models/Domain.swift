@@ -158,22 +158,30 @@ public final class Domain: NSManagedObject, CRUD {
     }
     return false
   }
-
-  public static func clearAllEthereumPermissions() async throws {
-    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-      DataController.perform { context in
-        let fetchRequest = NSFetchRequest<Domain>()
-        fetchRequest.entity = Domain.entity(context)
-        do {
-          let results = try context.fetch(fetchRequest)
-          results.forEach {
-            $0.wallet_permittedAccounts = nil
-          }
-          continuation.resume()
-        } catch {
-          log.error("Clear ethereum permissions error: \(error)")
-          continuation.resume(throwing: error)
+  
+  public static func clearAllEthereumPermissions(_ completionOnMain: (() -> Void)? = nil) {
+    DataController.perform { context in
+      let fetchRequest = NSFetchRequest<Domain>()
+      fetchRequest.entity = Domain.entity(context)
+      do {
+        let results = try context.fetch(fetchRequest)
+        results.forEach {
+          $0.wallet_permittedAccounts = nil
         }
+      } catch {
+        log.error("Clear ethereum permissions error: \(error)")
+      }
+
+      DispatchQueue.main.async {
+        completionOnMain?()
+      }
+    }
+  }
+
+  public static func clearAllEthereumPermissions() async {
+    await withCheckedContinuation { continuation in
+      Domain.clearAllEthereumPermissions {
+        continuation.resume()
       }
     }
   }

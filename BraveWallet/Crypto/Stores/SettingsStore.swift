@@ -45,11 +45,9 @@ public class SettingsStore: ObservableObject {
   }
 
   func reset() {
-    Task { @MainActor in
-      walletService.reset()
-      KeyringStore.resetKeychainStoredPassword()
-      try await Domain.clearAllEthereumPermissions()
-    }
+    walletService.reset()
+    KeyringStore.resetKeychainStoredPassword()
+    Domain.clearAllEthereumPermissions()
   }
 
   func resetTransaction() {
