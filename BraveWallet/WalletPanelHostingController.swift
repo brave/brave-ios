@@ -17,7 +17,6 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
   public init(
     walletStore: WalletStore,
     origin: URLOrigin,
-    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
     faviconRenderer: WalletFavIconRenderer
   ) {
     gesture = WalletInteractionGestureRecognizer(
@@ -33,7 +32,6 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
       let walletHostingController = WalletHostingViewController(
         walletStore: walletStore,
         presentingContext: context,
-        faviconFetcher: faviconFetcher,
         faviconRenderer: faviconRenderer
       )
       walletHostingController.delegate = self.delegate

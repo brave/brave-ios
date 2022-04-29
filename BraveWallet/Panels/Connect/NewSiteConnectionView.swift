@@ -14,7 +14,6 @@ public struct NewSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
   var origin: URLOrigin
   var onConnect: (_ addresses: [String]) -> Void
-  var faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)?
   
   @State private var favicon: UIImage = .init()
   @EnvironmentObject var imageLoader: ImageLoader
@@ -25,13 +24,11 @@ public struct NewSiteConnectionView: View {
   public init(
     origin: URLOrigin,
     keyringStore: KeyringStore,
-    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
     onConnect: @escaping (_ addresses: [String]) -> Void,
     onDismiss: @escaping () -> Void
   ) {
     self.origin = origin
     self.keyringStore = keyringStore
-    self.faviconFetcher = faviconFetcher
     self.onConnect = onConnect
     self.onDismiss = onDismiss
   }
@@ -160,11 +157,6 @@ public struct NewSiteConnectionView: View {
     .navigationViewStyle(.stack)
     .onAppear {
       selectedAccounts.insert(keyringStore.selectedAccount.id)
-      if let url = origin.url {
-        faviconFetcher?(url) { image in
-          favicon = image
-        }
-      }
     }
   }
   
@@ -230,7 +222,6 @@ struct NewSiteConnectionView_Previews: PreviewProvider {
         store.addPrimaryAccount("Account 3", completion: nil)
         return store
       }(),
-      faviconFetcher: nil,
       onConnect: { _ in },
       onDismiss: { }
     )

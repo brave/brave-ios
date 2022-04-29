@@ -49,17 +49,9 @@ extension BrowserViewController {
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
     }
-    let fetcher = FaviconFetcher(siteURL: getOrigin().url!, kind: .largeIcon)
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
       origin: getOrigin(),
-      faviconFetcher: { url, completion in
-        fetcher.load { _, attributes in
-          if let image = attributes.image {
-            completion?(image)
-          }
-        }
-      },
       faviconRenderer: FavIconImageRenderer()
     )
     controller.delegate = self
@@ -144,17 +136,9 @@ extension BrowserViewController: BraveWalletProviderDelegate {
           completion([], .userRejectedRequest, "User rejected request")
         }
       })
-      let fetcher = FaviconFetcher(siteURL: origin.url!, kind: .largeIcon)
       let permissions = WalletHostingViewController(
         walletStore: walletStore,
         presentingContext: .requestEthererumPermissions(request),
-        faviconFetcher: { url, completion in
-          fetcher.load { _, attributes in
-            if let image = attributes.image {
-              completion?(image)
-            }
-          }
-        },
         faviconRenderer: FavIconImageRenderer(),
         onUnlock: {
           Task { @MainActor in

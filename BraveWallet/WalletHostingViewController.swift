@@ -37,7 +37,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public init(
     walletStore: WalletStore,
     presentingContext: PresentingContext = .default,
-    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
     faviconRenderer: WalletFavIconRenderer,
     onUnlock: (() -> Void)? = nil
   ) {
@@ -49,7 +48,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         walletStore: walletStore,
         keyringStore: walletStore.keyringStore,
         presentingContext: presentingContext,
-        faviconFetcher: faviconFetcher,
         faviconRenderer: faviconRenderer
       )
     )
