@@ -68,10 +68,6 @@ class UserScriptHelper {
         userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
         userScriptTypes.insert(.farblingProtection(etld: etldP1))
       }
-
-      if Preferences.Shields.autoRedirectAMPPages.value {
-        userScriptTypes.insert(.deAMP)
-      }
     }
 
     return userScriptTypes

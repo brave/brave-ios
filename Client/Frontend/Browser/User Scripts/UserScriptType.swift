@@ -15,20 +15,12 @@ enum UserScriptType: Hashable {
   case domainUserScript(DomainUserScript)
   /// A symple encryption library to be used by other scripts
   case nacl
-  /// A script that detects if we're at an amp page and redirects the user to the original (canonical) version if available.
-  ///
-  /// - Note: This script is only a smaller part (2 of 3) of de-amping.
-  /// The first part is handled by an ad-block rule and enabled via a `deAmpEnabled` boolean in `AdBlockStats`
-  /// The third part is handled by debouncing amp links and handled by debouncing logic
-  case deAMP
 
   /// Return a source typ for this script type
   var sourceType: ScriptSourceType {
     switch self {
     case .farblingProtection:
       return .farblingProtection
-    case .deAMP:
-      return .deAMP
     case .domainUserScript(let domainUserScript):
       switch domainUserScript {
       case .youtubeAdBlock:
@@ -49,15 +41,14 @@ enum UserScriptType: Hashable {
   var order: Int {
     switch self {
     case .nacl: return 0
-    case .deAMP: return 1
-    case .farblingProtection: return 2
-    case .domainUserScript: return 3
+    case .farblingProtection: return 1
+    case .domainUserScript: return 2
     }
   }
 
   var injectionTime: WKUserScriptInjectionTime {
     switch self {
-    case .farblingProtection, .domainUserScript, .nacl, .deAMP:
+    case .farblingProtection, .domainUserScript, .nacl:
       return .atDocumentStart
     }
   }
@@ -66,8 +57,6 @@ enum UserScriptType: Hashable {
     switch self {
     case .farblingProtection, .domainUserScript, .nacl:
       return false
-    case .deAMP:
-      return true
     }
   }
 
@@ -75,8 +64,6 @@ enum UserScriptType: Hashable {
     switch self {
     case .farblingProtection, .domainUserScript, .nacl:
       return .page
-    case .deAMP:
-      return .defaultClient
     }
   }
 }

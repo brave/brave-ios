@@ -72,7 +72,7 @@ class ScriptFactory {
       let fakeParams = try FarblingProtectionHelper.makeFarblingParams(from: randomConfiguration)
       source = "\(source)\nwindow.braveFarble(\(fakeParams))\ndelete window.braveFarble"
       
-    case .nacl, .deAMP:
+    case .nacl:
       // No modifications needed
       break
       
