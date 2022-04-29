@@ -98,7 +98,6 @@ public struct CryptoView: View {
                 origin: request.requestingOrigin,
                 keyringStore: keyringStore,
                 faviconFetcher: faviconFetcher,
-                faviconRenderer: faviconRenderer,
                 onConnect: {
                   request.decisionHandler(.granted(accounts: $0))
                   dismissAction?()
@@ -141,6 +140,7 @@ public struct CryptoView: View {
       .init(action: { url in
         openWalletURLAction?(url)
       }))
+    .environmentObject(ImageLoader(renderer: faviconRenderer))
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
         dismissAction?()

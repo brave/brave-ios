@@ -15,9 +15,9 @@ public struct NewSiteConnectionView: View {
   var origin: URLOrigin
   var onConnect: (_ addresses: [String]) -> Void
   var faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)?
-  var faviconRenderer: WalletFavIconRenderer
   
   @State private var favicon: UIImage = .init()
+  @EnvironmentObject var imageLoader: ImageLoader
   
   @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void
@@ -26,14 +26,12 @@ public struct NewSiteConnectionView: View {
     origin: URLOrigin,
     keyringStore: KeyringStore,
     faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
-    faviconRenderer: WalletFavIconRenderer,
     onConnect: @escaping (_ addresses: [String]) -> Void,
     onDismiss: @escaping () -> Void
   ) {
     self.origin = origin
     self.keyringStore = keyringStore
     self.faviconFetcher = faviconFetcher
-    self.faviconRenderer = faviconRenderer
     self.onConnect = onConnect
     self.onDismiss = onDismiss
   }
@@ -45,7 +43,7 @@ public struct NewSiteConnectionView: View {
   private var headerView: some View {
     VStack(spacing: 8) {
       FaviconReader(url: origin.url,
-                    imageLoader: ImageLoader(renderer: faviconRenderer)
+                    imageLoader: imageLoader
       ) { image in
         if let image = image {
           Image(uiImage: image)
@@ -223,10 +221,6 @@ public struct NewSiteConnectionView: View {
 
 #if DEBUG
 struct NewSiteConnectionView_Previews: PreviewProvider {
-  class MockRenderer: WalletFavIconRenderer {
-    func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
-    }
-  }
   static var previews: some View {
     NewSiteConnectionView(
       origin: .init(url: URL(string: "https://app.uniswap.org")!),
@@ -237,7 +231,6 @@ struct NewSiteConnectionView_Previews: PreviewProvider {
         return store
       }(),
       faviconFetcher: nil,
-      faviconRenderer: MockRenderer(),
       onConnect: { _ in },
       onDismiss: { }
     )
