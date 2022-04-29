@@ -20,15 +20,22 @@ public struct CryptoView: View {
   var dismissAction: (() -> Void)?
 
   var openWalletURLAction: ((URL) -> Void)?
+  
+  var faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)?
+  var faviconRenderer: WalletFavIconRenderer
 
   public init(
     walletStore: WalletStore,
     keyringStore: KeyringStore,
-    presentingContext: PresentingContext
+    presentingContext: PresentingContext,
+    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
+    faviconRenderer: WalletFavIconRenderer
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore
     self.presentingContext = presentingContext
+    self.faviconFetcher = faviconFetcher
+    self.faviconRenderer = faviconRenderer
   }
 
   private enum VisibleScreen: Equatable {
@@ -90,6 +97,8 @@ public struct CryptoView: View {
               NewSiteConnectionView(
                 origin: request.requestingOrigin,
                 keyringStore: keyringStore,
+                faviconFetcher: faviconFetcher,
+                faviconRenderer: faviconRenderer,
                 onConnect: {
                   request.decisionHandler(.granted(accounts: $0))
                   dismissAction?()

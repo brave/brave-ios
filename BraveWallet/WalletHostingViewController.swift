@@ -37,6 +37,8 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public init(
     walletStore: WalletStore,
     presentingContext: PresentingContext = .default,
+    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
+    faviconRenderer: WalletFavIconRenderer,
     onUnlock: (() -> Void)? = nil
   ) {
     gesture = WalletInteractionGestureRecognizer(
@@ -46,7 +48,9 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
       rootView: CryptoView(
         walletStore: walletStore,
         keyringStore: walletStore.keyringStore,
-        presentingContext: presentingContext
+        presentingContext: presentingContext,
+        faviconFetcher: faviconFetcher,
+        faviconRenderer: faviconRenderer
       )
     )
     rootView.dismissAction = { [unowned self] in

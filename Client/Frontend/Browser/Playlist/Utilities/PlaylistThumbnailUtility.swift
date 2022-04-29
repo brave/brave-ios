@@ -269,11 +269,11 @@ class FavIconImageRenderer {
     task?.cancel()
   }
 
-  func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
+  func loadIcon(siteURL: URL, kind: FaviconFetcher.Kind = .favicon, persistent: Bool, completion: ((UIImage?) -> Void)?) {
     task?.cancel()
     task = DispatchWorkItem {
       let domain = Domain.getOrCreate(forUrl: siteURL, persistent: persistent)
-      var faviconFetcher: FaviconFetcher? = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
+      var faviconFetcher: FaviconFetcher? = FaviconFetcher(siteURL: siteURL, kind: kind, domain: domain)
       faviconFetcher?.load() { [weak self] _, attributes in
         faviconFetcher = nil
 

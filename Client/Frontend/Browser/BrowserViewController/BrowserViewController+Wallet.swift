@@ -49,7 +49,19 @@ extension BrowserViewController {
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
     }
-    let controller = WalletPanelHostingController(walletStore: walletStore, origin: getOrigin())
+    let fetcher = FaviconFetcher(siteURL: getOrigin().url!, kind: .largeIcon)
+    let controller = WalletPanelHostingController(
+      walletStore: walletStore,
+      origin: getOrigin(),
+      faviconFetcher: { url, completion in
+        fetcher.load { _, attributes in
+          if let image = attributes.image {
+            completion?(image)
+          }
+        }
+      },
+      faviconRenderer: FavIconImageRenderer()
+    )
     controller.delegate = self
     let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
     popover.present(from: topToolbar.locationView.walletButton, on: self, completion: nil)
@@ -132,10 +144,18 @@ extension BrowserViewController: BraveWalletProviderDelegate {
           completion([], .userRejectedRequest, "User rejected request")
         }
       })
-
+      let fetcher = FaviconFetcher(siteURL: origin.url!, kind: .largeIcon)
       let permissions = WalletHostingViewController(
         walletStore: walletStore,
         presentingContext: .requestEthererumPermissions(request),
+        faviconFetcher: { url, completion in
+          fetcher.load { _, attributes in
+            if let image = attributes.image {
+              completion?(image)
+            }
+          }
+        },
+        faviconRenderer: FavIconImageRenderer(),
         onUnlock: {
           Task { @MainActor in
             // If the user unlocks their wallet and we already have permissions setup they do not
@@ -296,5 +316,11 @@ extension Tab: BraveWalletKeyringServiceObserver {
   }
   
   func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
+  }
+}
+
+extension FavIconImageRenderer: WalletFavIconRenderer {
+  func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
+    loadIcon(siteURL: siteURL, kind: .largeIcon, completion: completion)
   }
 }

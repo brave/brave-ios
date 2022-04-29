@@ -14,6 +14,10 @@ public struct NewSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
   var origin: URLOrigin
   var onConnect: (_ addresses: [String]) -> Void
+  var faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)?
+  var faviconRenderer: WalletFavIconRenderer
+  
+  @State private var favicon: UIImage = .init()
   
   @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void
@@ -21,11 +25,15 @@ public struct NewSiteConnectionView: View {
   public init(
     origin: URLOrigin,
     keyringStore: KeyringStore,
+    faviconFetcher: ((URL, ((UIImage) -> Void)?) -> Void)? = nil,
+    faviconRenderer: WalletFavIconRenderer,
     onConnect: @escaping (_ addresses: [String]) -> Void,
     onDismiss: @escaping () -> Void
   ) {
     self.origin = origin
     self.keyringStore = keyringStore
+    self.faviconFetcher = faviconFetcher
+    self.faviconRenderer = faviconRenderer
     self.onConnect = onConnect
     self.onDismiss = onDismiss
   }
@@ -36,10 +44,26 @@ public struct NewSiteConnectionView: View {
   
   private var headerView: some View {
     VStack(spacing: 8) {
-      Image(systemName: "globe")
-        .frame(width: faviconSize, height: faviconSize)
-        .background(Color(.braveDisabled))
-        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+      FaviconReader(url: origin.url,
+                    imageLoader: ImageLoader(renderer: faviconRenderer)
+      ) { image in
+        if let image = image {
+          Image(uiImage: image)
+            .resizable()
+            .scaledToFit()
+            .frame(width: faviconSize, height: faviconSize)
+            .background(Color(.braveDisabled))
+            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+        } else {
+          ProgressView()
+        }
+      }
+//      Image(uiImage: favicon)
+//        .resizable()
+//        .scaledToFit()
+//        .frame(width: faviconSize, height: faviconSize)
+//        .background(Color(.braveDisabled))
+//        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
       origin.url.map { url in
         Text(verbatim: url.absoluteString)
           .font(.subheadline)
@@ -138,6 +162,11 @@ public struct NewSiteConnectionView: View {
     .navigationViewStyle(.stack)
     .onAppear {
       selectedAccounts.insert(keyringStore.selectedAccount.id)
+      if let url = origin.url {
+        faviconFetcher?(url) { image in
+          favicon = image
+        }
+      }
     }
   }
   
@@ -194,6 +223,10 @@ public struct NewSiteConnectionView: View {
 
 #if DEBUG
 struct NewSiteConnectionView_Previews: PreviewProvider {
+  class MockRenderer: WalletFavIconRenderer {
+    func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
+    }
+  }
   static var previews: some View {
     NewSiteConnectionView(
       origin: .init(url: URL(string: "https://app.uniswap.org")!),
@@ -203,6 +236,8 @@ struct NewSiteConnectionView_Previews: PreviewProvider {
         store.addPrimaryAccount("Account 3", completion: nil)
         return store
       }(),
+      faviconFetcher: nil,
+      faviconRenderer: MockRenderer(),
       onConnect: { _ in },
       onDismiss: { }
     )
