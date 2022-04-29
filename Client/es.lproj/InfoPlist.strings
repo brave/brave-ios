@@ -1,6 +1,12 @@
 /* (No Comment) */
 "1Password Fill Browser Action" = "Acción de relleno de 1Password en el navegador";
 
+/* Bundle display name */
+"CFBundleDisplayName" = "Brave (raíz)";
+
+/* Bundle name */
+"CFBundleName" = "Cliente";
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */

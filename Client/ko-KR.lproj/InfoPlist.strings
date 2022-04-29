@@ -1,6 +1,12 @@
 /* (No Comment) */
 "1Password Fill Browser Action" = "1Password로 브라우저 작업 채우기";
 
+/* Bundle display name */
+"CFBundleDisplayName" = "Brave (루트)";
+
+/* Bundle name */
+"CFBundleName" = "클라이언트";
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */

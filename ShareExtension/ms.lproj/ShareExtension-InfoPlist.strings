@@ -1,0 +1,6 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Buka dalam Brave";
+
+/* Bundle name */
+"CFBundleName" = "ShareExtension";
+
