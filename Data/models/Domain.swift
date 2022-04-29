@@ -59,6 +59,20 @@ public final class Domain: NSManagedObject, CRUD {
   }
 
   // MARK: - Public interface
+  
+  public class func frc() -> NSFetchedResultsController<Domain> {
+    let context = DataController.viewContext
+    let fetchRequest = NSFetchRequest<Domain>()
+    fetchRequest.entity = Domain.entity(context)
+    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "url", ascending: false)]
+
+    return NSFetchedResultsController(
+      fetchRequest: fetchRequest,
+      managedObjectContext: context,
+      sectionNameKeyPath: nil,
+      cacheName: nil
+    )
+  }
 
   public class func getOrCreate(forUrl url: URL, persistent: Bool) -> Domain {
     let context = persistent ? DataController.viewContext : DataController.viewContextInMemory
