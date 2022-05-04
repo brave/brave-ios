@@ -583,7 +583,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         image: UIImage(systemName: "plus.square.on.square"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
           self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: isPrivateBrowsing)
-          self.dismiss(animated: true)
         })
 
       let newPrivateTabAction = UIAction(
@@ -591,7 +590,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
           self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
-          self.dismiss(animated: true)
         })
 
       let copyAction = UIAction(
