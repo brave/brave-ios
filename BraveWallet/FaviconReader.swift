@@ -4,7 +4,24 @@ public protocol WalletFavIconRenderer {
   func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?)
 }
 
-class ImageLoader: ObservableObject {
+public class UnimplementedFaviconRenderer: WalletFavIconRenderer {
+  public func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
+    fatalError()
+  }
+}
+
+public struct FaviconRendererKey: EnvironmentKey {
+  public static var defaultValue: WalletFavIconRenderer = UnimplementedFaviconRenderer()
+}
+
+public extension EnvironmentValues {
+  var faviconRenderer: WalletFavIconRenderer {
+    get { self[FaviconRendererKey.self] }
+    set { self[FaviconRendererKey.self] = newValue }
+  }
+}
+
+class FaviconLoader: ObservableObject {
   @Published var image: UIImage?
   private var renderer: WalletFavIconRenderer
   
@@ -24,29 +41,27 @@ class ImageLoader: ObservableObject {
 }
 
 struct FaviconReader<Content: View>: View {
-  @ObservedObject private var loader: ImageLoader
+  @ObservedObject private var loader: FaviconLoader
   var url: URL?
-  private let transaction: Transaction
   private var content: (_ image: UIImage?) -> Content
   
   init(
     url: URL?,
-    imageLoader: ImageLoader,
+    loader: FaviconLoader,
     @ViewBuilder content: @escaping (_ image: UIImage?) -> Content
   ) {
-    self.loader = imageLoader
+    self.loader = loader
     self.url = url
-    self.transaction = Transaction()
     self.content = content
   }
   
   var body: some View {
     content(loader.image)
       .onAppear {
-        loader.load(url, transaction: transaction)
+        loader.load(url, transaction: Transaction())
       }
       .onChange(of: url) { newValue in
-        loader.load(newValue, transaction: transaction)
+        loader.load(newValue, transaction: Transaction())
       }
   }
 }

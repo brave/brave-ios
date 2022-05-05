@@ -16,7 +16,7 @@ public struct NewSiteConnectionView: View {
   var onConnect: (_ addresses: [String]) -> Void
   
   @State private var favicon: UIImage = .init()
-  @EnvironmentObject var imageLoader: ImageLoader
+  @Environment(\.faviconRenderer) var renderer: WalletFavIconRenderer
   
   @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void
@@ -39,8 +39,9 @@ public struct NewSiteConnectionView: View {
   
   private var headerView: some View {
     VStack(spacing: 8) {
-      FaviconReader(url: origin.url,
-                    imageLoader: imageLoader
+      FaviconReader(
+        url: origin.url,
+        loader: .init(renderer: renderer)
       ) { image in
         if let image = image {
           Image(uiImage: image)
@@ -53,12 +54,6 @@ public struct NewSiteConnectionView: View {
           ProgressView()
         }
       }
-//      Image(uiImage: favicon)
-//        .resizable()
-//        .scaledToFit()
-//        .frame(width: faviconSize, height: faviconSize)
-//        .background(Color(.braveDisabled))
-//        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
       origin.url.map { url in
         Text(verbatim: url.absoluteString)
           .font(.subheadline)

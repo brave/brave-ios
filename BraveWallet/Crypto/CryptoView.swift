@@ -136,7 +136,10 @@ public struct CryptoView: View {
       .init(action: { url in
         openWalletURLAction?(url)
       }))
-    .environmentObject(ImageLoader(renderer: faviconRenderer))
+    .environment(
+      \.faviconRenderer,
+       faviconRenderer
+    )
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
         dismissAction?()
