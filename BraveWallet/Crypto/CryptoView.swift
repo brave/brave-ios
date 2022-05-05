@@ -21,13 +21,13 @@ public struct CryptoView: View {
 
   var openWalletURLAction: ((URL) -> Void)?
   
-  var faviconRenderer: WalletFavIconRenderer
+  var faviconRenderer: WalletFaviconRenderer
 
   public init(
     walletStore: WalletStore,
     keyringStore: KeyringStore,
     presentingContext: PresentingContext,
-    faviconRenderer: WalletFavIconRenderer
+    faviconRenderer: WalletFaviconRenderer
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore

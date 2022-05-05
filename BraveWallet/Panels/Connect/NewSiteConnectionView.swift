@@ -16,7 +16,7 @@ public struct NewSiteConnectionView: View {
   var onConnect: (_ addresses: [String]) -> Void
   
   @State private var favicon: UIImage = .init()
-  @Environment(\.faviconRenderer) var renderer: WalletFavIconRenderer
+  @Environment(\.faviconRenderer) var renderer: WalletFaviconRenderer
   
   @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void

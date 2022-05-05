@@ -37,7 +37,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public init(
     walletStore: WalletStore,
     presentingContext: PresentingContext = .default,
-    faviconRenderer: WalletFavIconRenderer,
+    faviconRenderer: WalletFaviconRenderer,
     onUnlock: (() -> Void)? = nil
   ) {
     gesture = WalletInteractionGestureRecognizer(

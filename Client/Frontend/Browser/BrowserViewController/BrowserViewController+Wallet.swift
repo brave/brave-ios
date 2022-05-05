@@ -303,8 +303,8 @@ extension Tab: BraveWalletKeyringServiceObserver {
   }
 }
 
-extension FavIconImageRenderer: WalletFavIconRenderer {
+extension FavIconImageRenderer: WalletFaviconRenderer {
   func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
-    loadIcon(siteURL: siteURL, kind: .largeIcon, completion: completion)
+    loadIcon(siteURL: siteURL, kind: .largeIcon, persistent: persistent, completion: completion)
   }
 }

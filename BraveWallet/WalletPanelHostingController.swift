@@ -17,7 +17,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
   public init(
     walletStore: WalletStore,
     origin: URLOrigin,
-    faviconRenderer: WalletFavIconRenderer
+    faviconRenderer: WalletFaviconRenderer
   ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore

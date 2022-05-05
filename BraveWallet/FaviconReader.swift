@@ -1,21 +1,21 @@
 import SwiftUI
 
-public protocol WalletFavIconRenderer {
+public protocol WalletFaviconRenderer {
   func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?)
 }
 
-public class UnimplementedFaviconRenderer: WalletFavIconRenderer {
+public class UnimplementedFaviconRenderer: WalletFaviconRenderer {
   public func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
     fatalError()
   }
 }
 
 public struct FaviconRendererKey: EnvironmentKey {
-  public static var defaultValue: WalletFavIconRenderer = UnimplementedFaviconRenderer()
+  public static var defaultValue: WalletFaviconRenderer = UnimplementedFaviconRenderer()
 }
 
 public extension EnvironmentValues {
-  var faviconRenderer: WalletFavIconRenderer {
+  var faviconRenderer: WalletFaviconRenderer {
     get { self[FaviconRendererKey.self] }
     set { self[FaviconRendererKey.self] = newValue }
   }
@@ -23,9 +23,9 @@ public extension EnvironmentValues {
 
 class FaviconLoader: ObservableObject {
   @Published var image: UIImage?
-  private var renderer: WalletFavIconRenderer
+  private var renderer: WalletFaviconRenderer
   
-  init(renderer: WalletFavIconRenderer) {
+  init(renderer: WalletFaviconRenderer) {
     self.image = nil
     self.renderer = renderer
   }
