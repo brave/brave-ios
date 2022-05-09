@@ -77,6 +77,20 @@ struct SuggestedNetworkView: View {
     }
   }
   
+  @ViewBuilder private var faviconAndOrigin: some View {
+    VStack(spacing: 8) {
+      Image(systemName: "globe") // TODO: Favicon from originInfo
+        .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+        .background(Color(.braveDisabled))
+        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+      originInfo.origin.url?.originWithEtldPlusOne
+      .font(.subheadline)
+      .foregroundColor(Color(.braveLabel))
+      .multilineTextAlignment(.center)
+    }
+    .accessibilityElement(children: .combine)
+  }
+  
   private var headerView: some View {
     VStack {
       HStack(spacing: 8) {
@@ -90,17 +104,7 @@ struct SuggestedNetworkView: View {
       .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
       .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
       VStack(spacing: 8) {
-        VStack(spacing: 8) {
-          Image(systemName: "globe") // TODO: Favicon from originInfo
-            .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
-            .background(Color(.braveDisabled))
-            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-          Text(verbatim: originInfo.origin.url?.absoluteString ?? "") // TODO: Bold etld+1
-            .font(.subheadline)
-            .foregroundColor(Color(.braveLabel))
-            .multilineTextAlignment(.center)
-        }
-        .accessibilityElement(children: .combine)
+        faviconAndOrigin
         Text(headerTitle)
           .font(.headline)
           .foregroundColor(Color(.bravePrimary))
