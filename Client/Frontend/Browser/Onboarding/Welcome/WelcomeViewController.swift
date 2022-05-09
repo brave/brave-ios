@@ -245,7 +245,7 @@ class WelcomeViewController: UIViewController {
       contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(185.0)
+        $0.height.equalTo(175.0)
       }
       calloutView.setState(state: state)
 
@@ -270,7 +270,7 @@ class WelcomeViewController: UIViewController {
       contentContainer.layoutMargins = UIEdgeInsets(top: 0.0, left: 22.0, bottom: 0.0, right: 22.0)
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(185.0)
+        $0.height.equalTo(180.0)
       }
       calloutView.setState(state: state)
     case .settings:
@@ -290,10 +290,10 @@ class WelcomeViewController: UIViewController {
 
       topImageView.transform = topTransform
       bottomImageView.transform = bottomTransform
-      contentContainer.spacing = 25.0
+      contentContainer.spacing = 20.0
       iconBackgroundView.alpha = 1.0
       iconView.snp.remakeConstraints {
-        $0.height.equalTo(175.0)
+        $0.height.equalTo(180.0)
       }
       calloutView.setState(state: state)
       
