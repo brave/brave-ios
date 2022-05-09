@@ -81,9 +81,11 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   
   private let numberOfTrackersTextLabel = UILabel().then {
     $0.text = Strings.Onboarding.blockedAdsOnboardingInstructionsText
+    $0.textColor = .braveOnboarding
     $0.numberOfLines = 1
     $0.textAlignment = .left
-    $0.font = .systemFont(ofSize: 96.0)
+    $0.font = UIFontMetrics(forTextStyle: .headline).scaledFont(for: .systemFont(ofSize: 96.0))
+    $0.adjustsFontForContentSizeCategory = true
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.setContentHuggingPriority(.defaultLow, for: .vertical)

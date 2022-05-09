@@ -335,15 +335,16 @@ class WelcomeViewCallout: UIView {
         
       titleLabel.do {
         $0.text = title
+        $0.textColor = .braveOnboarding
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .title1, weight: .semibold)
-        $0.textColor = .bravePrimary
         $0.alpha = 1.0
         $0.isHidden = false
       }
 
       detailsLabel.do {
         $0.text = details
+        $0.textColor = .braveOnboarding
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .title3, weight: .regular)
         $0.alpha = 0.0
