@@ -55,13 +55,18 @@ struct SignatureRequestView: View {
             }
           }
         }
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
           VStack(spacing: 8) {
             Blockie(address: account.address)
               .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
             Text(account.name)
               .font(.subheadline.weight(.semibold))
               .foregroundColor(Color(.secondaryBraveLabel))
+            
+            currentRequest.originInfo.origin.url?.originWithEtldPlusOne
+            .font(.subheadline)
+            .foregroundColor(Color(.braveLabel))
+            .multilineTextAlignment(.center)
           }
           .accessibilityElement(children: .combine)
           Text(Strings.Wallet.signatureRequestSubtitle)
