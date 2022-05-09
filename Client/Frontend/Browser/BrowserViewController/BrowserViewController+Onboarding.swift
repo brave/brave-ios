@@ -294,12 +294,6 @@ private class BorderView: UIView {
       $0.lineWidth = 2.0
       $0.strokeEnd = 1.0
       $0.path = UIBezierPath(roundedRect: frame, cornerRadius: cornerRadius).cgPath
-      if colouredBorder {
-        $0.shadowColor = UIColor.braveOnboardingShadow.cgColor
-        $0.shadowOpacity = 1
-        $0.shadowOffset = .zero
-        $0.shadowRadius = 10
-      }
     }
 
     super.init(frame: frame)
