@@ -24,7 +24,8 @@ public class PopoverController: UIViewController {
   /// The preferred popover width when using `ContentSizeBehavior.preferredContentSize` or
   /// `ContentSizeBehavior.fixedSize`
   public static let preferredPopoverWidth: CGFloat = 320.0
-
+  /// The preferred popover width when using `ContentSizeBehavior.maxContentWidth`
+  public static let maxPopoverWidth: CGFloat = 400.0
   /// Defines the behavior of the arrow direction and how the popover presents itself
   public enum ArrowDirectionBehavior {
     /// Determines the direction of the popover based on the origin of the popover
@@ -45,6 +46,8 @@ public class PopoverController: UIViewController {
     case preferredContentSize
     /// The popover content view will be fixed to a given size
     case fixedSize(CGSize)
+    /// The popover content view will be fixed to a width as long as it is less than `ContentSizeBehavior.maxContentWidth`
+    case customWidth(CGFloat)
   }
 
   /// Outer margins around the presented popover to the edge of the screen (or safe area)
@@ -171,6 +174,21 @@ public class PopoverController: UIViewController {
       containerViewWidthConstraint = containerView.widthAnchor.constraint(equalToConstant: size.width)
       containerViewWidthConstraint?.priority = .popoverPreferredOrFixedSize
       containerViewWidthConstraint?.isActive = true
+      
+    case .customWidth(let width):
+      contentController.view.snp.makeConstraints { make in
+        autoLayoutTopConstraint =
+          make.top.equalTo(self.containerView.contentView)
+          .constraint.layoutConstraints.first
+        autoLayoutBottomConstraint =
+          make.bottom.equalTo(self.containerView.contentView)
+          .constraint.layoutConstraints.first
+        make.leading.trailing.equalTo(self.containerView.contentView)
+      }
+      
+      containerViewWidthConstraint = containerView.widthAnchor.constraint(equalToConstant: width)
+      containerViewWidthConstraint?.priority = .popoverPreferredOrFixedSize
+      containerViewWidthConstraint?.isActive = true
     }
   }
 
@@ -182,7 +200,7 @@ public class PopoverController: UIViewController {
     super.viewDidLayoutSubviews()
 
     switch contentSizeBehavior {
-    case .preferredContentSize, .fixedSize(_):
+    case .preferredContentSize, .fixedSize(_), .customWidth(_):
       containerView.layoutIfNeeded()
       if contentController.extendEdgeIntoArrow {
         contentController.view.frame = containerView.contentView.bounds
@@ -326,6 +344,8 @@ public class PopoverController: UIViewController {
       contentSize = contentController.preferredContentSize
     case .fixedSize(let size):
       contentSize = size
+    case .customWidth(let width):
+      contentSize = contentController.view.systemLayoutSizeFitting(CGSize(width: width, height: viewController.view.bounds.height - outerMargins.top - outerMargins.bottom))
     }
 
     presentationContext = PresentationContext(

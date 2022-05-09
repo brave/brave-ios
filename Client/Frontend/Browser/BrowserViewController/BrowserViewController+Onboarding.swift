@@ -150,7 +150,9 @@ extension BrowserViewController {
     didDismiss: @escaping () -> Void,
     didClickBorderedArea: @escaping () -> Void) {
     
-      let popover = PopoverController(contentController: contentController)
+      let popover = PopoverController(
+        contentController: contentController,
+        contentSizeBehavior: .customWidth(max(UIScreen.main.bounds.width, PopoverController.maxPopoverWidth)))
       popover.arrowDistance = 10.0
       
       // Create a border / placeholder view

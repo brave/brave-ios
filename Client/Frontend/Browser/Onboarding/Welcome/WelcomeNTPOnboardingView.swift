@@ -127,10 +127,10 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
 
 class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentComponent {
   private let stackView = UIStackView().then {
-    $0.spacing = 8.0
+    $0.spacing = 20.0
     $0.axis = .vertical
     $0.alignment = .top
-    $0.layoutMargins = UIEdgeInsets(equalInset: 20.0)
+    $0.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 32, right: 20)
     $0.isLayoutMarginsRelativeArrangement = true
   }
   
