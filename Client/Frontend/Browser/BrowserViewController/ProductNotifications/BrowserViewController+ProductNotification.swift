@@ -135,7 +135,7 @@ extension BrowserViewController {
   private func showBenchmarkNotificationPopover(controller: (UIViewController & PopoverContentComponent)) {
     benchmarkNotificationPresented = true
 
-    let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
+    let popover = PopoverController(contentController: controller)
     popover.addsConvenientDismissalMargins = false
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
 
