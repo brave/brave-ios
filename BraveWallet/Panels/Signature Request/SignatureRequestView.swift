@@ -64,13 +64,14 @@ struct SignatureRequestView: View {
               .foregroundColor(Color(.secondaryBraveLabel))
             
             currentRequest.originInfo.origin.url?.originWithEtldPlusOne
-            .font(.subheadline)
+            .font(.caption)
             .foregroundColor(Color(.braveLabel))
             .multilineTextAlignment(.center)
           }
           .accessibilityElement(children: .combine)
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.headline)
+            .foregroundColor(Color(.bravePrimary))
         }
         .padding(.vertical, 32)
         VStack(spacing: 12) {
