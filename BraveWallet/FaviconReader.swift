@@ -4,17 +4,17 @@ public protocol WalletFaviconRenderer {
   func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?)
 }
 
-public class UnimplementedFaviconRenderer: WalletFaviconRenderer {
+private class UnimplementedFaviconRenderer: WalletFaviconRenderer {
   public func loadIcon(siteURL: URL, persistent: Bool, completion: ((UIImage?) -> Void)?) {
-    fatalError()
+    assertionFailure("FaviconRenderer not passed into environment, some favicons will fail to load.")
   }
 }
 
-public struct FaviconRendererKey: EnvironmentKey {
+struct FaviconRendererKey: EnvironmentKey {
   public static var defaultValue: WalletFaviconRenderer = UnimplementedFaviconRenderer()
 }
 
-public extension EnvironmentValues {
+extension EnvironmentValues {
   var faviconRenderer: WalletFaviconRenderer {
     get { self[FaviconRendererKey.self] }
     set { self[FaviconRendererKey.self] = newValue }
