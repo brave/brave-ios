@@ -20,10 +20,16 @@ struct AddSuggestedTokenView: View {
   
   var body: some View {
     ScrollView(.vertical) {
-      VStack(spacing: 44) {
-        Text(Strings.Wallet.addSuggestedTokenSubtitle)
-          .foregroundColor(Color(.braveLabel))
-          .font(.subheadline)
+      VStack(spacing: 22) {
+        VStack(spacing: 8) {
+          Text(Strings.Wallet.addSuggestedTokenSubtitle)
+            .font(.headline)
+            .foregroundColor(Color(.bravePrimary))
+          originInfo.origin.url?.originWithEtldPlusOne
+            .font(.footnote)
+            .foregroundColor(Color(.braveLabel))
+        }
+        .padding(.top)
         VStack {
           VStack {
             AssetIconView(token: token, length: 64)
@@ -51,10 +57,10 @@ struct AddSuggestedTokenView: View {
         actionButtonContainer
           .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
           .accessibility(hidden: sizeCategory.isAccessibilityCategory)
+          .padding(.top, 20)
       }
       .frame(maxWidth: .infinity)
-      .padding(.top, 64)
-      .padding([.leading, .trailing, .bottom])
+      .padding()
     }
     .background(Color(.braveGroupedBackground).ignoresSafeArea())
     .navigationTitle(Strings.Wallet.addSuggestedTokenTitle)
