@@ -146,19 +146,3 @@ extension BraveWallet {
   /// The address that is expected when you are swapping ETH via SwapService APIs
   public static let ethSwapAddress: String = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 }
-
-extension URL {
-  /// The origin of the URL, with bold eTLD+1 when available.
-  var originWithEtldPlusOne: Text {
-    let origin = absoluteString
-    let eTldPlusOne = baseDomain ?? ""
-    if let range = origin.range(of: eTldPlusOne) {
-      let originStart = origin[origin.startIndex..<range.lowerBound]
-      let etldPlusOne = origin[range.lowerBound..<range.upperBound]
-      let originEnd = origin[range.upperBound...]
-      return Text(originStart) + Text(etldPlusOne).bold() + Text(originEnd)
-    } else {
-      return Text(origin)
-    }
-  }
-}

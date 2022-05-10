@@ -47,7 +47,7 @@ public class NetworkStore: ObservableObject {
     }
   }
 
-  func setSelectedChain(chainId: String) {
+  private func setSelectedChain(chainId: String) {
     guard self.selectedChainId != chainId else { return }
     self.selectedChainId = chainId
     self.rpcService.setNetwork(chainId) { _ in }
