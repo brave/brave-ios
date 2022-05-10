@@ -56,7 +56,8 @@ extension BrowserViewController {
        topToolbar.currentURL == nil,
        Preferences.DebugFlag.skipNTPCallouts != true {
       
-      if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value {
+      if !Preferences.FullScreenCallout.omniboxCalloutCompleted.value,
+          Preferences.General.isNewRetentionUser.value == true {
         presentOmniBoxOnboarding()
       }
       
@@ -226,7 +227,7 @@ extension BrowserViewController {
   
   func notifyTrackersBlocked(domain: String, displayTrackers: [AdBlockTrackerType], trackerCount: Int) {
     let controller = WelcomeBraveBlockedAdsController().then {
-      $0.setData(displayTrackers: displayTrackers.map { $0.rawValue }, trackerCount: trackerCount)
+      $0.setData(displayTrackers: displayTrackers.map(\.rawValue), trackerCount: trackerCount)
     }
 
     let popover = PopoverController(contentController: controller)
