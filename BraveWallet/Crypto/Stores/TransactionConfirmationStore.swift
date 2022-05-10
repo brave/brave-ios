@@ -68,7 +68,7 @@ public class TransactionConfirmationStore: ObservableObject {
 
   func rejectAll() {
     for transaction in transactions {
-      reject(transaction: transaction)
+      reject(transaction: transaction, completion: { _ in })
     }
   }
 
