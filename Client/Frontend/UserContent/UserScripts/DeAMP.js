@@ -45,8 +45,8 @@
     const targetHref = canonicalLinkElm.getAttribute('href')
     try {
       const destUrl = new URL(targetHref)
-      if (W.location.href == destUrl.href) {
-        // Avoid an infinite loading loop in some cases
+      if (W.location.href == destUrl.href || !(destUrl.protocol === 'http:' || destUrl.protocol === 'https:')) {
+        // Avoid an infinite loading loop in some cases and only handle http/https
         W.clearInterval(intervalId)
         return
       }
