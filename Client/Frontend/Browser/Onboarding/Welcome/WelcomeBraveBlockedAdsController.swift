@@ -14,7 +14,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   
   private struct UX {
     static let detailsViewEdgeInset = UIEdgeInsets(equalInset: 15)
-    static let contentViewEdgeInset = UIEdgeInsets(top: 35, left: 15, bottom: 15, right: 15.0)
+    static let contentViewEdgeInset = UIEdgeInsets(top: 25, left: 15, bottom: 15, right: 15.0)
     static let instructionsEdgeInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 15.0)
   }
   
@@ -97,8 +97,8 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    informationStackView.addBackground(color: .secondaryBraveBackground.withAlphaComponent(0.1), cornerRadius: 6.0)
-    footNoteStackView.addBackground(color: .secondaryBraveBackground.withAlphaComponent(0.1), cornerRadius: 6.0)
+    informationStackView.addBackground(color: .black.withAlphaComponent(0.1), cornerRadius: 6.0)
+    footNoteStackView.addBackground(color: .black.withAlphaComponent(0.1), cornerRadius: 6.0)
 
     view.addSubview(gradientView)
     gradientView.snp.makeConstraints {
