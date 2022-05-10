@@ -14,8 +14,6 @@ public struct NewSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
   var origin: URLOrigin
   var onConnect: (_ addresses: [String]) -> Void
-
-  @Environment(\.faviconRenderer) private var renderer: WalletFaviconRenderer
   
   @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void
@@ -36,29 +34,28 @@ public struct NewSiteConnectionView: View {
   @State private var selectedAccounts: Set<BraveWallet.AccountInfo.ID> = []
   @State private var isConfirmationViewVisible: Bool = false
   
+  @ViewBuilder private func originAndFavicon(url: URL) -> some View {
+    FaviconReader(url: url) { image in
+      if let image = image {
+        Image(uiImage: image)
+          .resizable()
+          .scaledToFit()
+          .frame(width: faviconSize, height: faviconSize)
+          .background(Color(.braveDisabled))
+          .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+      } else {
+        ProgressView()
+      }
+    }
+    Text(verbatim: url.absoluteString)
+      .font(.subheadline)
+      .foregroundColor(Color(.braveLabel))
+      .multilineTextAlignment(.center)
+  }
+  
   private var headerView: some View {
     VStack(spacing: 8) {
-      FaviconReader(
-        url: origin.url,
-        loader: .init(renderer: renderer)
-      ) { image in
-        if let image = image {
-          Image(uiImage: image)
-            .resizable()
-            .scaledToFit()
-            .frame(width: faviconSize, height: faviconSize)
-            .background(Color(.braveDisabled))
-            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        } else {
-          ProgressView()
-        }
-      }
-      origin.url.map { url in
-        Text(verbatim: url.absoluteString)
-          .font(.subheadline)
-          .foregroundColor(Color(.braveLabel))
-          .multilineTextAlignment(.center)
-      }
+      origin.url.map(originAndFavicon(url:))
       Text(Strings.Wallet.newSiteConnectMessage)
         .font(.headline)
         .foregroundColor(Color(.bravePrimary))
