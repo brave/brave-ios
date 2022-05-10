@@ -2532,7 +2532,7 @@ extension BrowserViewController: TabManagerDelegate {
       let duplicateActiveTab = UIAction(
         title: Strings.duplicateActiveTab,
         image: UIImage(systemName: "plus.square.on.square"),
-        handler: UIAction.deferredActionHandler { _ in
+        handler: UIAction.deferredActionHandler { [unowned self] _ in
           tabManager.addTabAndSelect(
                URLRequest(url: url),
                afterTab: selectedTab,
