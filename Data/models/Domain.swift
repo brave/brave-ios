@@ -178,7 +178,7 @@ public final class Domain: NSManagedObject, CRUD {
     }
   }
 
-  public static func clearAllEthereumPermissions() async {
+  @MainActor public static func clearAllEthereumPermissions() async {
     await withCheckedContinuation { continuation in
       Domain.clearAllEthereumPermissions {
         continuation.resume()
