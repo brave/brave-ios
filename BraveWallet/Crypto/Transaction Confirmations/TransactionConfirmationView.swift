@@ -84,7 +84,7 @@ struct TransactionConfirmationView: View {
       HStack {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, confirmationStore.transactions.count))
           .fontWeight(.semibold)
-        Button(action: confirmationStore.next) {
+        Button(action: confirmationStore.nextTransaction) {
           Text(Strings.Wallet.next)
             .fontWeight(.semibold)
             .foregroundColor(Color(.braveBlurpleTint))
@@ -326,7 +326,7 @@ struct TransactionConfirmationView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
           }
           if confirmationStore.transactions.count > 1 {
-            Button(action: confirmationStore.rejectAll) {
+            Button(action: confirmationStore.rejectAllTransactions) {
               Text(String.localizedStringWithFormat(Strings.Wallet.rejectAllTransactions, confirmationStore.transactions.count))
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(Color(.braveBlurpleTint))

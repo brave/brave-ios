@@ -54,24 +54,6 @@ public class TransactionConfirmationStore: ObservableObject {
     transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
   }
 
-  func next() {
-    if let index = transactions.firstIndex(where: { $0.id == activeTransactionId }) {
-      var nextIndex = transactions.index(after: index)
-      if nextIndex == transactions.endIndex {
-        nextIndex = 0
-      }
-      activeTransactionId = transactions[nextIndex].id
-    } else {
-      activeTransactionId = transactions.first!.id
-    }
-  }
-
-  func rejectAll() {
-    for transaction in transactions {
-      reject(transaction: transaction, completion: { _ in })
-    }
-  }
-
   private let assetRatioService: BraveWalletAssetRatioService
   private let rpcService: BraveWalletJsonRpcService
   private let txService: BraveWalletTxService
@@ -103,6 +85,24 @@ public class TransactionConfirmationStore: ObservableObject {
     
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
+    }
+  }
+  
+  func nextTransaction() {
+    if let index = transactions.firstIndex(where: { $0.id == activeTransactionId }) {
+      var nextIndex = transactions.index(after: index)
+      if nextIndex == transactions.endIndex {
+        nextIndex = 0
+      }
+      activeTransactionId = transactions[nextIndex].id
+    } else {
+      activeTransactionId = transactions.first!.id
+    }
+  }
+
+  func rejectAllTransactions() {
+    for transaction in transactions {
+      reject(transaction: transaction, completion: { _ in })
     }
   }
 
