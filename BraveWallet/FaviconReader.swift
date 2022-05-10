@@ -45,7 +45,7 @@ struct FaviconReader<Content: View>: View {
       }
   }
   
-  func load(_ url: URL?, transaction: Transaction, using renderer: WalletFaviconRenderer) {
+  private func load(_ url: URL?, transaction: Transaction, using renderer: WalletFaviconRenderer) {
     guard let url = url else { return }
     renderer.loadIcon(siteURL: url, persistent: true) { image in
       withTransaction(transaction) {
