@@ -210,13 +210,13 @@ extension Strings {
       NSLocalizedString(
         "callout.defaultBrowserCalloutDescription",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "With Brave as default, every link you click opens with Brave's privacy protections.",
+        value: "With Brave as default, every link you tap opens with Brave's privacy protections.",
         comment: "Subtitle - Description for Default Browser Full Screen Callout")
     public static let defaultBrowserCalloutPrimaryButtonTitle =
       NSLocalizedString(
         "callout.defaultBrowserCalloutPrimaryButtonTitle",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "Set as default",
+        value: "Set as default browser",
         comment: "Title for main button in Default Browser Full Screen Callout")
     public static let defaultBrowserCalloutSecondaryButtonTitle =
       NSLocalizedString(
@@ -295,7 +295,7 @@ extension Strings {
       NSLocalizedString(
         "onboarding.blockedAdsOnboardingFootnoteText",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "See all the terrible stuff Brave blocked, on every page, with Shields.",
+        value: "See all the bad stuff Brave blocked, on every page, with Shields.",
         comment: "The footnote indicating what Brave shields is blocking")
     public static let blockedAdsOnboardingNoBigTechInformationText =
       NSLocalizedString(
@@ -331,7 +331,7 @@ extension Strings {
       NSLocalizedString(
         "onboarding.omniboxOnboardingPopOverDescription",
         tableName: "BraveShared", bundle: .braveShared,
-        value: "See the Brave Difference:\nNo ads. No trackers. Way faster page load.",
+        value: "See the Brave difference:\nNo ads. No trackers. Way faster page load.",
         comment: "Description for the Omnibox (URL Bar) pop-over that describes faster load times.")
   }
 }
