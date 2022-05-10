@@ -26,13 +26,8 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
             AddSuggestedTokenView(
               token: request.token,
               originInfo: request.origin,
-              networkStore: cryptoStore.networkStore,
-              onDismiss: { approved in
-                cryptoStore.handleWebpageRequestResponse(
-                  .addSuggestedToken(approved: approved, contractAddresses: [request.token.contractAddress])
-                )
-                onDismiss()
-              }
+              cryptoStore: cryptoStore,
+              onDismiss: onDismiss
             )
           default:
             EmptyView()

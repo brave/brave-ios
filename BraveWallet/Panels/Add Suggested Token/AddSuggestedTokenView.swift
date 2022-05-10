@@ -11,9 +11,8 @@ import BraveUI
 struct AddSuggestedTokenView: View {
   var token: BraveWallet.BlockchainToken
   var originInfo: BraveWallet.OriginInfo
-  var networkStore: NetworkStore
-  
-  var onDismiss: (_ approved: Bool) -> Void
+  var cryptoStore: CryptoStore
+  var onDismiss: () -> Void
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -39,7 +38,7 @@ struct AddSuggestedTokenView: View {
           }
           .accessibilityElement(children: .combine)
           Button(action: {
-            if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+            if let baseURL = cryptoStore.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
                let url = baseURL?.appendingPathComponent("token/\(token.contractAddress)") {
               openWalletURL?(url)
             }
@@ -103,14 +102,24 @@ struct AddSuggestedTokenView: View {
   }
 
   @ViewBuilder private var actionButtons: some View {
-    Button(action: { onDismiss(false) }) {
+    Button(action: { // cancel
+      cryptoStore.handleWebpageRequestResponse(
+        .addSuggestedToken(approved: false, contractAddresses: [token.contractAddress])
+      )
+      onDismiss()
+    }) {
       HStack {
         Image(systemName: "xmark")
         Text(Strings.cancelButtonTitle)
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: { onDismiss(true) }) {
+    Button(action: { // approve
+      cryptoStore.handleWebpageRequestResponse(
+        .addSuggestedToken(approved: true, contractAddresses: [token.contractAddress])
+      )
+      onDismiss()
+    }) {
       HStack {
         Image("brave.checkmark.circle.fill")
         Text(Strings.Wallet.add)
@@ -126,9 +135,13 @@ struct AddSuggestedTokenView_Previews: PreviewProvider {
   static var previews: some View {
     AddSuggestedTokenView(
       token: .previewToken,
-      originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
-      networkStore: .previewStore,
-      onDismiss: { _ in }
+      originInfo: .init(
+        origin: .init(url: URL(string: "https://app.uniswap.org")!),
+        originSpec: "",
+        eTldPlusOne: "uniswap.org"
+      ),
+      cryptoStore: .previewStore,
+      onDismiss: { }
     )
   }
 }
