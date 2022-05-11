@@ -309,8 +309,8 @@ struct WalletPanelView_Previews: PreviewProvider {
         presentWalletWithContext: { _ in }
       )
     }
-      .fixedSize(horizontal: false, vertical: true)
-      .previewLayout(.sizeThatFits)
+    .fixedSize(horizontal: false, vertical: true)
+    .previewLayout(.sizeThatFits)
   }
 }
 #endif

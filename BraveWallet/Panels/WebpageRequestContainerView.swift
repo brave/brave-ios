@@ -57,7 +57,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
       }
     }
     .onAppear {
-      cryptoStore.fetchPendingRequests()
+      // TODO: Fetch pending requests
     }
   }
 }
