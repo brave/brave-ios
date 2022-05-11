@@ -2154,7 +2154,7 @@ extension Strings {
       "wallet.switchNetworkButtonTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Switch network",
+      value: "Switch",
       comment: "The title of the button to approve switching the network on a switch network request from a dapps website."
     )
     public static let addNetworkTitle = NSLocalizedString(

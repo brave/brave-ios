@@ -248,16 +248,8 @@ struct SuggestedNetworkView: View {
     }
   }
   
-  private var verticalActionButtons: Bool {
-    if case .switchNetworks = mode {
-      return true
-    } else {
-      return sizeCategory.isAccessibilityCategory
-    }
-  }
-  
   @ViewBuilder private var actionButtonContainer: some View {
-    if verticalActionButtons {
+    if sizeCategory.isAccessibilityCategory {
       VStack {
         actionButtons
       }
