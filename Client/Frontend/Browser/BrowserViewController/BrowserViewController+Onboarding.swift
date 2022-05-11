@@ -153,7 +153,7 @@ extension BrowserViewController {
     
       let popover = PopoverController(
         contentController: contentController,
-        contentSizeBehavior: .customWidth(max(UIScreen.main.bounds.width, PopoverController.maxPopoverWidth)))
+        contentSizeBehavior: .autoLayout(.phoneWidth))
       popover.arrowDistance = 10.0
       
       // Create a border / placeholder view
