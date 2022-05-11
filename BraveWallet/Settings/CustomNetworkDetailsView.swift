@@ -229,11 +229,11 @@ class CustomNetworkModel: ObservableObject, Identifiable {
 }
 
 enum CustomNetworkError: LocalizedError, Identifiable {
-  case failed(errMsg: String)
+  case failed(errorMessage: String)
   case duplicateId
 
   var id: String {
-    errorDescription
+    errorTitle + errorDescription
   }
 
   var errorTitle: String {
@@ -247,8 +247,8 @@ enum CustomNetworkError: LocalizedError, Identifiable {
 
   var errorDescription: String {
     switch self {
-    case .failed(let errMsg):
-      return errMsg
+    case .failed(let errorMessage):
+      return errorMessage
     case .duplicateId:
       return Strings.Wallet.networkIdDuplicationErrMsg
     }
@@ -509,7 +509,7 @@ struct CustomNetworkDetailsView: View {
     )
     networkStore.addCustomNetwork(network) { accepted, errMsg in
       guard accepted else {
-        customNetworkError = .failed(errMsg: errMsg)
+        customNetworkError = .failed(errorMessage: errMsg)
         return
       }
 
