@@ -50,13 +50,8 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
             SignatureRequestView(
               requests: requests,
               keyringStore: keyringStore,
-              handler: { approved, requestId in
-                cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: requestId))
-                if requestId == requests.last?.id {
-                  // dismiss when handling action for last request
-                  onDismiss()
-                }
-              }
+              cryptoStore: cryptoStore,
+              onDismiss: onDismiss
             )
           default:
             EmptyView()

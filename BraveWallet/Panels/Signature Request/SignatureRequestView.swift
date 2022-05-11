@@ -12,8 +12,9 @@ import BraveUI
 struct SignatureRequestView: View {
   @State var requests: [BraveWallet.SignMessageRequest]
   @ObservedObject var keyringStore: KeyringStore
+  var cryptoStore: CryptoStore
   
-  var handler: (_ approved: Bool, _ id: Int32) -> Void
+  var onDismiss: () -> Void
 
   @State private var requestIndex: Int = 0
   @Environment(\.sizeCategory) private var sizeCategory
@@ -32,12 +33,14 @@ struct SignatureRequestView: View {
   init(
     requests: [BraveWallet.SignMessageRequest],
     keyringStore: KeyringStore,
-    handler: @escaping (_ approved: Bool, _ id: Int32) -> Void
+    cryptoStore: CryptoStore,
+    onDismiss: @escaping () -> Void
   ) {
     assert(!requests.isEmpty)
     self._requests = State(initialValue: requests)
     self.keyringStore = keyringStore
-    self.handler = handler
+    self.cryptoStore = cryptoStore
+    self.onDismiss = onDismiss
   }
   
   var body: some View {
@@ -62,11 +65,10 @@ struct SignatureRequestView: View {
             Text(account.name)
               .font(.subheadline.weight(.semibold))
               .foregroundColor(Color(.secondaryBraveLabel))
-            
-            currentRequest.originInfo.origin.url?.originWithEtldPlusOne
-            .font(.caption)
-            .foregroundColor(Color(.braveLabel))
-            .multilineTextAlignment(.center)
+            OriginText(urlOrigin: currentRequest.originInfo.origin)
+              .font(.caption)
+              .foregroundColor(Color(.braveLabel))
+              .multilineTextAlignment(.center)
           }
           .accessibilityElement(children: .combine)
           Text(Strings.Wallet.signatureRequestSubtitle)
@@ -74,18 +76,16 @@ struct SignatureRequestView: View {
             .foregroundColor(Color(.bravePrimary))
         }
         .padding(.vertical, 32)
-        VStack(spacing: 12) {
-          StaticTextView(text: currentRequest.message, isMonospaced: false)
-            .frame(maxWidth: .infinity)
-            .frame(height: 200)
-            .background(Color(.tertiaryBraveGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .padding()
-          .background(
-            Color(.secondaryBraveGroupedBackground)
-          )
-          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        }
+        StaticTextView(text: currentRequest.message, isMonospaced: false)
+          .frame(maxWidth: .infinity)
+          .frame(height: 200)
+          .background(Color(.tertiaryBraveGroupedBackground))
+          .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+          .padding()
+        .background(
+          Color(.secondaryBraveGroupedBackground)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         buttonsContainer
           .padding(.top)
           .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
@@ -148,10 +148,12 @@ struct SignatureRequestView: View {
   }
   
   @ViewBuilder private var buttons: some View {
-    Button(action: {
-      handler(false, currentRequest.id)
+    Button(action: { // cancel
+      cryptoStore.handleWebpageRequestResponse(.signMessage(approved: false, id: currentRequest.id))
       if requests.count > 1 {
         requests.removeFirst()
+      } else {
+        onDismiss()
       }
     }) {
       Label(Strings.cancelButtonTitle, systemImage: "xmark")
@@ -159,10 +161,12 @@ struct SignatureRequestView: View {
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
     .disabled(isButtonsDisabled)
-    Button(action: {
-      handler(true, currentRequest.id)
+    Button(action: { // approve
+      cryptoStore.handleWebpageRequestResponse(.signMessage(approved: true, id: currentRequest.id))
       if requests.count > 1 {
         requests.removeFirst()
+      } else {
+        onDismiss()
       }
     }) {
       Label(Strings.Wallet.sign, image: "brave.key")
@@ -187,7 +191,8 @@ struct SignatureRequestView_Previews: PreviewProvider {
     SignatureRequestView(
       requests: [.previewRequest],
       keyringStore: .previewStoreWithWalletCreated,
-      handler: { _, _ in }
+      cryptoStore: .previewStore,
+      onDismiss: { }
     )
   }
 }
