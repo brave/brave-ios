@@ -17,6 +17,7 @@ struct SuggestedNetworkView: View {
   
   var mode: Mode
   let originInfo: BraveWallet.OriginInfo
+  var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
@@ -31,17 +32,19 @@ struct SuggestedNetworkView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
   
-  var onDismiss: (_ approved: Bool) -> Void
+  var onDismiss: () -> Void
   
   init(
     mode: Mode,
     originInfo: BraveWallet.OriginInfo,
+    cryptoStore: CryptoStore,
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
-    onDismiss: @escaping (_ approved: Bool) -> Void
+    onDismiss: @escaping () -> Void
   ) {
     self.mode = mode
     self.originInfo = originInfo
+    self.cryptoStore = cryptoStore
     self.keyringStore = keyringStore
     self.networkStore = networkStore
     self.onDismiss = onDismiss
@@ -77,16 +80,33 @@ struct SuggestedNetworkView: View {
     }
   }
   
+  private var globeFavicon: some View {
+    Image(systemName: "globe")
+      .background(Color(.braveDisabled))
+      .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+  }
+  
   @ViewBuilder private var faviconAndOrigin: some View {
     VStack(spacing: 8) {
-      Image(systemName: "globe") // TODO: Favicon from originInfo
-        .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
-        .background(Color(.braveDisabled))
-        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-      originInfo.origin.url?.originWithEtldPlusOne
-      .font(.subheadline)
-      .foregroundColor(Color(.braveLabel))
-      .multilineTextAlignment(.center)
+      Group {
+        if let url = originInfo.origin.url {
+          FaviconReader(url: url) { image in
+            if let image = image {
+              Image(uiImage: image)
+                .resizable()
+            } else {
+              globeFavicon
+            }
+          }
+        } else {
+          globeFavicon
+        }
+      }
+      .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+      OriginText(urlOrigin: originInfo.origin)
+        .font(.subheadline)
+        .foregroundColor(Color(.braveLabel))
+        .multilineTextAlignment(.center)
     }
     .accessibilityElement(children: .combine)
   }
@@ -249,14 +269,18 @@ struct SuggestedNetworkView: View {
   }
 
   @ViewBuilder private var actionButtons: some View {
-    Button(action: { onDismiss(false) }) {
+    Button(action: { // cancel
+      handleAction(approved: false)
+    }) {
       HStack {
         Image(systemName: "xmark")
         Text(Strings.cancelButtonTitle)
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: { onDismiss(true) }) {
+    Button(action: { // approve
+      handleAction(approved: true)
+    }) {
       HStack {
         Image("brave.checkmark.circle.fill")
         Text(actionButtonTitle)
@@ -264,6 +288,20 @@ struct SuggestedNetworkView: View {
       }
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
+  }
+  
+  private func handleAction(approved: Bool) {
+    switch mode {
+    case let .addNetwork(networkInfo):
+      cryptoStore.handleWebpageRequestResponse(
+        .addNetwork(approved: approved, chainId: networkInfo.chainId)
+      )
+    case .switchNetworks:
+      cryptoStore.handleWebpageRequestResponse(
+        .switchChain(approved: approved, originInfo: originInfo)
+      )
+    }
+    onDismiss()
   }
 }
 
@@ -274,16 +312,18 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
       SuggestedNetworkView(
         mode: .addNetwork(.mockRopsten),
         originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
+        cryptoStore: .previewStore,
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
-        onDismiss: { _ in }
+        onDismiss: { }
       )
       SuggestedNetworkView(
         mode: .switchNetworks(chainId: BraveWallet.RopstenChainId),
         originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
+        cryptoStore: .previewStore,
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
-        onDismiss: { _ in }
+        onDismiss: { }
       )
     }
   }

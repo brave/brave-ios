@@ -33,27 +33,19 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
             SuggestedNetworkView(
               mode: .switchNetworks(chainId: request.chainId),
               originInfo: request.originInfo,
+              cryptoStore: cryptoStore,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              onDismiss: { approved in
-                cryptoStore.handleWebpageRequestResponse(
-                  .switchChain(approved: approved, originInfo: request.originInfo)
-                )
-                onDismiss()
-              }
+              onDismiss: onDismiss
             )
           case .addChain(let request):
             SuggestedNetworkView(
               mode: .addNetwork(request.networkInfo),
               originInfo: request.originInfo,
+              cryptoStore: cryptoStore,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              onDismiss: { approved in
-                cryptoStore.handleWebpageRequestResponse(
-                  .addNetwork(approved: approved, chainId: request.networkInfo.chainId)
-                )
-                onDismiss()
-              }
+              onDismiss: onDismiss
             )
           default:
             EmptyView()
