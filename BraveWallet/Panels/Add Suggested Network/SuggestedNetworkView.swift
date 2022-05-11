@@ -83,7 +83,6 @@ struct SuggestedNetworkView: View {
   private var globeFavicon: some View {
     Image(systemName: "globe")
       .background(Color(.braveDisabled))
-      .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
   }
   
   @ViewBuilder private var faviconAndOrigin: some View {
@@ -103,6 +102,7 @@ struct SuggestedNetworkView: View {
         }
       }
       .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+      .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
       OriginText(urlOrigin: originInfo.origin)
         .font(.subheadline)
         .foregroundColor(Color(.braveLabel))
