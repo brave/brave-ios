@@ -10,7 +10,7 @@ import BraveShared
 import BraveUI
 
 struct SignatureRequestView: View {
-  @State var requests: [BraveWallet.SignMessageRequest]
+  var requests: [BraveWallet.SignMessageRequest]
   @ObservedObject var keyringStore: KeyringStore
   var cryptoStore: CryptoStore
   
@@ -37,7 +37,7 @@ struct SignatureRequestView: View {
     onDismiss: @escaping () -> Void
   ) {
     assert(!requests.isEmpty)
-    self._requests = State(initialValue: requests)
+    self.requests = requests
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
     self.onDismiss = onDismiss
@@ -150,9 +150,7 @@ struct SignatureRequestView: View {
   @ViewBuilder private var buttons: some View {
     Button(action: { // cancel
       cryptoStore.handleWebpageRequestResponse(.signMessage(approved: false, id: currentRequest.id))
-      if requests.count > 1 {
-        requests.removeFirst()
-      } else {
+      if requests.count == 1 {
         onDismiss()
       }
     }) {
@@ -163,9 +161,7 @@ struct SignatureRequestView: View {
     .disabled(isButtonsDisabled)
     Button(action: { // approve
       cryptoStore.handleWebpageRequestResponse(.signMessage(approved: true, id: currentRequest.id))
-      if requests.count > 1 {
-        requests.removeFirst()
-      } else {
+      if requests.count == 1 {
         onDismiss()
       }
     }) {

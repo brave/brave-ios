@@ -17,7 +17,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
   var onDismiss: () -> Void
 
   var body: some View {
-    UIKitNavigationView {
+    NavigationView {
       Group {
         if let pendingRequest = cryptoStore.pendingWebpageRequest {
           switch pendingRequest {
@@ -62,6 +62,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
         toolbarDismissContent
       }
     }
+    .navigationViewStyle(.stack)
     .onAppear {
       // TODO: Fetch pending requests
     }
