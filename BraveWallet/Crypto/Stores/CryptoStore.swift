@@ -279,6 +279,7 @@ public class CryptoStore: ObservableObject {
       walletService.notifySignMessageRequestProcessed(approved, id: id)
       pendingRequest = nil
     }
+    prepare()
   }
 }
 
