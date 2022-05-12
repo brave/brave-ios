@@ -19,7 +19,7 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
   var body: some View {
     NavigationView {
       Group {
-        if let pendingRequest = cryptoStore.pendingWebpageRequest {
+        if let pendingRequest = cryptoStore.pendingRequest {
           switch pendingRequest {
           case .transactions:
             TransactionConfirmationView(
@@ -60,8 +60,6 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               cryptoStore: cryptoStore,
               onDismiss: onDismiss
             )
-          default:
-            EmptyView()
           }
         }
       }

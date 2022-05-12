@@ -268,17 +268,14 @@ public class CryptoStore: ObservableObject {
     switch response {
     case let .switchChain(approved, originInfo):
       rpcService.notifySwitchChainRequestProcessed(approved, origin: originInfo.origin)
-      pendingRequest = nil
     case let .addNetwork(approved, chainId):
       rpcService.addEthereumChainRequestCompleted(chainId, approved: approved)
-      pendingRequest = nil
     case let .addSuggestedToken(approved, contractAddresses):
       walletService.notifyAddSuggestTokenRequestsProcessed(approved, contractAddresses: contractAddresses)
-      pendingRequest = nil
     case let .signMessage(approved, id):
       walletService.notifySignMessageRequestProcessed(approved, id: id)
-      pendingRequest = nil
     }
+    pendingRequest = nil
     prepare()
   }
 }
