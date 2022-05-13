@@ -28,6 +28,9 @@
   },
   "testTargets" : [
     {
+      "skippedTests" : [
+        "CertificatePinningTest\/testSelfSignedRootAllowed2()"
+      ],
       "target" : {
         "containerPath" : "container:..",
         "identifier" : "BraveSharedTests",
