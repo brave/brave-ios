@@ -149,80 +149,78 @@ extension BrowserViewController {
     with frame: CGRect,
     cornerRadius: CGFloat,
     didDismiss: @escaping () -> Void,
-    didClickBorderedArea: @escaping () -> Void) {
+    didClickBorderedArea: @escaping () -> Void)
+  {
+    let popover = PopoverController(
+      contentController: contentController,
+      contentSizeBehavior: .autoLayout(.phoneWidth))
+    popover.arrowDistance = 10.0
+      
+    // Create a border / placeholder view
+    let borderView = BorderView(frame: frame, cornerRadius: cornerRadius, colouredBorder: true)
+    let placeholderView = UIView(frame: frame).then {
+      $0.alpha = 0.0
+      $0.frame = frame
+    }
+      
+    view.addSubview(placeholderView)
+    popover.view.insertSubview(borderView, aboveSubview: popover.view)
+
+    let maskShape = CAShapeLayer().then {
+      $0.fillRule = .evenOdd
+      $0.fillColor = UIColor.white.cgColor
+      $0.strokeColor = UIColor.clear.cgColor
+    }
+      
+    popover.present(from: placeholderView, on: self) { [weak popover, weak self] in
+      guard let popover = popover, let self = self else { return }
+
+      // Mask the shadow
+      let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
+      guard !maskFrame.isNull &&
+            !maskFrame.isInfinite &&
+            !maskFrame.isEmpty &&
+            !popover.backgroundOverlayView.bounds.isNull &&
+            !popover.backgroundOverlayView.bounds.isInfinite &&
+            !popover.backgroundOverlayView.bounds.isEmpty else {
+        return
+      }
+
+      guard maskFrame.origin.x.isFinite &&
+            maskFrame.origin.y.isFinite &&
+            maskFrame.size.width.isFinite &&
+            maskFrame.size.height.isFinite &&
+            maskFrame.size.width > 0 &&
+            maskFrame.size.height > 0 else {
+        return
+      }
+    }
     
-      let popover = PopoverController(
-        contentController: contentController,
-        contentSizeBehavior: .autoLayout(.phoneWidth))
-      popover.arrowDistance = 10.0
+    popover.backgroundOverlayView.layer.mask = maskShape
       
-      // Create a border / placeholder view
-      let borderView = BorderView(frame: frame, cornerRadius: cornerRadius, colouredBorder: true)
-      let placeholderView = UIView(frame: frame).then {
-        $0.alpha = 0.0
-        $0.frame = frame
-      }
-      
-      view.addSubview(placeholderView)
-      popover.view.insertSubview(borderView, aboveSubview: popover.view)
+    popover.popoverDidDismiss = { _ in
+      maskShape.removeFromSuperlayer()
+      borderView.removeFromSuperview()
 
-      let maskShape = CAShapeLayer().then {
-        $0.fillRule = .evenOdd
-        $0.fillColor = UIColor.white.cgColor
-        $0.strokeColor = UIColor.clear.cgColor
-      }
-      
-      popover.present(from: placeholderView, on: self) { [weak popover, weak self] in
-        guard let popover = popover,
-          let self = self
-        else { return }
+      didDismiss()
+    }
 
-        // Mask the shadow
-        let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
-        guard !maskFrame.isNull &&
-              !maskFrame.isInfinite &&
-              !maskFrame.isEmpty &&
-              !popover.backgroundOverlayView.bounds.isNull &&
-              !popover.backgroundOverlayView.bounds.isInfinite &&
-              !popover.backgroundOverlayView.bounds.isEmpty else {
-          return
-        }
-
-        guard maskFrame.origin.x.isFinite &&
-              maskFrame.origin.y.isFinite &&
-              maskFrame.size.width.isFinite &&
-              maskFrame.size.height.isFinite &&
-              maskFrame.size.width > 0 &&
-              maskFrame.size.height > 0 else {
-          return
-        }
-      }
-    
-      popover.backgroundOverlayView.layer.mask = maskShape
-      
-      popover.popoverDidDismiss = { _ in
-        maskShape.removeFromSuperlayer()
-        borderView.removeFromSuperview()
-
-        didDismiss()
-      }
-
-      borderView.didClickBorderedArea = {
-        maskShape.removeFromSuperlayer()
-        borderView.removeFromSuperview()
+    borderView.didClickBorderedArea = {
+      maskShape.removeFromSuperlayer()
+      borderView.removeFromSuperview()
         
-        popover.dismissPopover() {
-          didClickBorderedArea()
-        }
+      popover.dismissPopover() {
+        didClickBorderedArea()
       }
+    }
       
-      DispatchQueue.main.async {
-        maskShape.path = {
-          let path = CGMutablePath()
-          path.addRect(popover.backgroundOverlayView.bounds)
-          return path
-        }()
-      }
+    DispatchQueue.main.async {
+      maskShape.path = {
+        let path = CGMutablePath()
+        path.addRect(popover.backgroundOverlayView.bounds)
+        return path
+      }()
+    }
   }
   
   func notifyTrackersBlocked(domain: String, displayTrackers: [AdBlockTrackerType], trackerCount: Int) {

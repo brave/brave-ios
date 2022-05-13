@@ -101,9 +101,6 @@ extension UIColor {
   public static var braveOnboarding: UIColor {
     DesignSystemColor.text04.color
   }
-  public static var braveOnboardingShadow: UIColor {
-    DesignSystemColor.gradient01_step1.color
-  }
   public static var braveLighterOrange: UIColor {
     DesignSystemColor.interactive03.color
   }
@@ -168,9 +165,6 @@ extension UIColor {
   }
   public static var braveDisabled: UIColor {
     DesignSystemColor.disabled.color
-  }
-  public static var braveShieldSuccess: UIColor {
-    DesignSystemColor.successBorder.color
   }
   public static var primaryButtonTint: UIColor {
     DesignSystemColor.interactive07.color
