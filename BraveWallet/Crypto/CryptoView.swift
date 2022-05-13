@@ -193,7 +193,9 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
               keyringStore: keyringStore,
               cryptoStore: cryptoStore,
               toolbarDismissContent: toolbarDismissContent,
-              onDismiss: { }
+              onDismiss: {
+                cryptoStore.isPresentingPendingRequest = false
+              }
             )
           }
         }
