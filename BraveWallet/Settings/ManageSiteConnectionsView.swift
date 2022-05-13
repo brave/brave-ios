@@ -88,20 +88,6 @@ struct ManageSiteConnectionsView: View {
     filterText = ""
   }
 }
-
-/*
-#if DEBUG
-struct ManageSiteConnectionsView_Previews: PreviewProvider {
-  static var previews: some View {
-    NavigationView {
-      ManageSiteConnectionsView(
-        siteConnectionStore: .init()
-      )
-    }
-  }
-}
-#endif
-*/
  
 private struct SiteRow: View {
 
