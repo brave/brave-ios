@@ -228,11 +228,15 @@ public class CryptoStore: ObservableObject {
           self.buySendSwapDestination = nil
         }
         self.pendingRequest = .transactions
-        self.isPresentingPendingRequest = true
       } else { // no pending transactions, check for webpage requests
         let pendingWebpageRequest = await fetchPendingWebpageRequest()
         self.pendingRequest = pendingWebpageRequest
-        self.isPresentingPendingRequest = pendingWebpageRequest != nil
+      }
+      // If we set these before the send or swap screens disappear for some reason it may crash
+      // within the SwiftUI runtime or fail to dismiss. Delaying it to give time for the
+      // animation to complete fixes it.
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        self.isPresentingPendingRequest = self.pendingRequest != nil
       }
     }
   }
