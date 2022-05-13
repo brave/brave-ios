@@ -286,11 +286,11 @@ let package = Package(
       path: "ClientTests",
       resources: [
         .copy("Resources/debouncing.json"),
+        .copy("Resources/google-search-plugin.xml"),
+        .copy("Resources/duckduckgo-search-plugin.xml"),
         .copy("opml-test-files/subscriptionList.opml"),
         .copy("opml-test-files/states.opml"),
         .copy("blocking-summary-test.json"),
-        .copy("image.png"),
-        .copy("image.gif"),
       ]
     )
   ],

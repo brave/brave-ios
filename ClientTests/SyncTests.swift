@@ -15,16 +15,19 @@ class SyncTests: XCTestCase {
   let validDate = Date().addingTimeInterval(BraveSyncQRCodeModel.validityDuration).timeIntervalSince1970
   let invalidDate = Date().timeIntervalSince1970
   var syncAPI: BraveSyncAPI!
-  var braveCore: BraveCoreMain!
+  
+  static var braveCore: BraveCoreMain!
 
   override func setUpWithError() throws {
     continueAfterFailure = false
-    braveCore = BraveCoreMain(userAgent: "")
-    braveCore.scheduleLowPriorityStartupTasks()
-    syncAPI = braveCore.syncAPI
+    if SyncTests.braveCore == nil {
+      SyncTests.braveCore = BraveCoreMain(userAgent: "Test")
+      SyncTests.braveCore.scheduleLowPriorityStartupTasks()
+    }
+    syncAPI = SyncTests.braveCore.syncAPI
     XCTAssertNotNil(syncAPI)
   }
-
+  
   func testOldSyncVersion() throws {
     let result = BraveSyncQRCodeModel(
       version: BraveSyncQRCodeModel.currentlySupportedVersion - 1,

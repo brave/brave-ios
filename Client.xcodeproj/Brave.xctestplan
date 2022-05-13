@@ -42,6 +42,11 @@
       }
     },
     {
+      "skippedTests" : [
+        "NavigationRouterTests",
+        "TabManagerTests",
+        "TabSessionTests"
+      ],
       "target" : {
         "containerPath" : "container:",
         "identifier" : "ClientTests",

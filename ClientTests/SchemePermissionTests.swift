@@ -13,8 +13,6 @@ import BraveCore
 // MARK: SchemePermissionTests
 
 class SchemePermissionTests: XCTestCase {
-  
-  var braveCore: BraveCoreMain!
 
   enum SchemeTestType: String {
     case http
@@ -55,25 +53,25 @@ class SchemePermissionTests: XCTestCase {
   }
 
   // MARK: Lifecycle
+  
+  static var braveCore: BraveCoreMain!
 
   override func setUp() {
     profile = BrowserProfile(localName: "mockProfile")
 
     imageStore = try! DiskImageStore(files: MockFiles(), namespace: "MockTabManagerScreenshots", quality: 1)
-
-//    guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
-//      return
-//    }
     
-    braveCore = BraveCoreMain(userAgent: "")
-    braveCore.scheduleLowPriorityStartupTasks()
+    if Self.braveCore == nil {
+      Self.braveCore = BraveCoreMain(userAgent: "")
+      Self.braveCore.scheduleLowPriorityStartupTasks()
+    }
 
-    let migration = Migration(braveCore: braveCore)
+    let migration = Migration(braveCore: Self.braveCore)
 
     subject = BrowserViewController(
       profile: profile,
       diskImageStore: imageStore,
-      braveCore: braveCore,
+      braveCore: Self.braveCore,
       migration: migration,
       crashedLastSession: false)
   }
