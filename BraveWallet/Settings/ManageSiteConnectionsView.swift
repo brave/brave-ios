@@ -53,16 +53,16 @@ struct ManageSiteConnectionsView: View {
       }
     }
     .listStyle(.insetGrouped)
-    .navigationTitle(Strings.Wallet.mangeSiteConnectionsTitle)
+    .navigationTitle(Strings.Wallet.web3PreferencesManageSiteConnections)
     .navigationBarTitleDisplayMode(.inline)
-    .filterable(text: $filterText, prompt: Strings.Wallet.mangeSiteConnectionsFilterPlaceholder)
+    .filterable(text: $filterText, prompt: Strings.Wallet.manageSiteConnectionsFilterPlaceholder)
     .toolbar {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
         Button(action: {
           isShowingConfirmAlert = true
         }) {
-          Text(Strings.Wallet.mangeSiteConnectionsRemoveAll)
+          Text(Strings.Wallet.manageSiteConnectionsRemoveAll)
             .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
         }
         .disabled(siteConnectionStore.siteConnections.isEmpty)
@@ -71,10 +71,10 @@ struct ManageSiteConnectionsView: View {
     .onAppear(perform: siteConnectionStore.fetchSiteConnections)
     .alert(isPresented: $isShowingConfirmAlert) {
       Alert(
-        title: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertTitle),
-        message: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertMessage),
+        title: Text(Strings.Wallet.manageSiteConnectionsConfirmAlertTitle),
+        message: Text(Strings.Wallet.manageSiteConnectionsConfirmAlertMessage),
         primaryButton: Alert.Button.destructive(
-          Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertRemove),
+          Text(Strings.Wallet.manageSiteConnectionsConfirmAlertRemove),
           action: removeAll
         ),
         secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))
@@ -194,17 +194,17 @@ private struct SiteConnectionDetailView: View {
         Button(action: {
           isShowingConfirmAlert = true
         }) {
-          Text(Strings.Wallet.mangeSiteConnectionsRemoveAll)
+          Text(Strings.Wallet.manageSiteConnectionsRemoveAll)
             .foregroundColor(siteConnectionStore.siteConnections.isEmpty ? Color(.braveDisabled) : .red)
         }
       }
     }
     .alert(isPresented: $isShowingConfirmAlert) {
       Alert(
-        title: Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertTitle),
-        message: Text(Strings.Wallet.mangeSiteConnectionsDetailConfirmAlertMessage),
+        title: Text(Strings.Wallet.manageSiteConnectionsConfirmAlertTitle),
+        message: Text(Strings.Wallet.manageSiteConnectionsDetailConfirmAlertMessage),
         primaryButton: Alert.Button.destructive(
-          Text(Strings.Wallet.mangeSiteConnectionsConfirmAlertRemove),
+          Text(Strings.Wallet.manageSiteConnectionsConfirmAlertRemove),
           action: {
             siteConnectionStore.removeAllPermissions(from: [siteConnection])
           }

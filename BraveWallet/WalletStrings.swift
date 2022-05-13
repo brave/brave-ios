@@ -2245,67 +2245,60 @@ extension Strings {
       "wallet.web3PreferencesAllowSiteToRequestAccounts",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Allow site to request accounts",
+      value: "Allow Sites to Request Accounts",
       comment: "The title for the entry displaying the preferred option to allow web3 sites to rquest account's permission."
     )
     public static let web3PreferencesDisplayWeb3Notifications = NSLocalizedString(
       "wallet.web3PreferencesDisplayWeb3Notifications",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Display Web3 notifications",
+      value: "Display Web3 Notifications",
       comment: "The title for the entry displaying the preferred option to display web3 site notifications."
     )
     public static let web3PreferencesManageSiteConnections = NSLocalizedString(
       "wallet.web3PreferencesManageSiteConnections",
       tableName: "BraveWallet",
       bundle: .braveWallet,
-      value: "Manage site connections",
-      comment: "The title for the entry that by clicking will direct users to the screen to manage web3 sites account connections."
-    )
-    public static let mangeSiteConnectionsTitle = NSLocalizedString(
-      "wallet.mangeSiteConnectionsTitle",
-      tableName: "BraveWallet",
-      bundle: .braveWallet,
       value: "Manage Site Connections",
-      comment: "The title for the screen to manage web3 sites account connections."
+      comment: "The title for the entry that by clicking will direct users to the screen to manage web3 sites account connections, and the title for the Manage Site Connections screen."
     )
-    public static let mangeSiteConnectionsFilterPlaceholder = NSLocalizedString(
-      "wallet.mangeSiteConnectionsFilterPlaceholder",
+    public static let manageSiteConnectionsFilterPlaceholder = NSLocalizedString(
+      "wallet.manageSiteConnectionsFilterPlaceholder",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Filter",
       comment: "The filter in the search bar for the screen to manage web3 sites account connections."
     )
-    public static let mangeSiteConnectionsRemoveAll = NSLocalizedString(
-      "wallet.mangeSiteConnectionsRemoveAll",
+    public static let manageSiteConnectionsRemoveAll = NSLocalizedString(
+      "wallet.manageSiteConnectionsRemoveAll",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Remove All",
       comment: "The title of the button on the screen to manage web3 sites account connections that will show an alert to remove all connected website permissions."
     )
-    public static let mangeSiteConnectionsConfirmAlertTitle = NSLocalizedString(
-      "wallet.mangeSiteConnectionsConfirmAlertTitle",
+    public static let manageSiteConnectionsConfirmAlertTitle = NSLocalizedString(
+      "wallet.manageSiteConnectionsConfirmAlertTitle",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Remove all permissions?",
       comment: "The title of the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
     )
-    public static let mangeSiteConnectionsConfirmAlertMessage = NSLocalizedString(
-      "wallet.mangeSiteConnectionsConfirmAlertMessage",
+    public static let manageSiteConnectionsConfirmAlertMessage = NSLocalizedString(
+      "wallet.manageSiteConnectionsConfirmAlertMessage",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "This will remove all Wallet connection permissions for all websites.",
       comment: "The message of the alert to confirm the users wants to remove all site connections, shown on the screen to manage web3 sites account connections."
     )
-    public static let mangeSiteConnectionsDetailConfirmAlertMessage = NSLocalizedString(
-      "wallet.mangeSiteConnectionsDetailConfirmAlertMessage",
+    public static let manageSiteConnectionsDetailConfirmAlertMessage = NSLocalizedString(
+      "wallet.manageSiteConnectionsDetailConfirmAlertMessage",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "This will remove all Wallet connection permissions for this website.",
       comment: "The message of the alert to confirm the users wants to remove all site connections from this specific website, shown after selecting/opening a website on the screen to manage web3 sites account connections."
     )
-    public static let mangeSiteConnectionsConfirmAlertRemove = NSLocalizedString(
-      "wallet.mangeSiteConnectionsConfirmAlertRemove",
+    public static let manageSiteConnectionsConfirmAlertRemove = NSLocalizedString(
+      "wallet.manageSiteConnectionsConfirmAlertRemove",
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Remove",
