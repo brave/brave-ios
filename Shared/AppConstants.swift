@@ -55,19 +55,7 @@ public struct AppConstants {
   public static let isRunningTest = NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.arguments.contains(LaunchArguments.test)
 
   /// Build Channel.
-  public static let buildChannel: AppBuildChannel = {
-    #if MOZ_CHANNEL_RELEASE
-    return AppBuildChannel.release
-    #elseif MOZ_CHANNEL_BETA
-    return AppBuildChannel.beta
-    #elseif MOZ_CHANNEL_DEV
-    return AppBuildChannel.dev
-    #elseif MOZ_CHANNEL_ENTERPRISE
-    return AppBuildChannel.enterprise
-    #elseif MOZ_CHANNEL_DEBUG
-    return AppBuildChannel.debug
-    #endif
-  }()
+  public static var buildChannel: AppBuildChannel = .release
 
   public static func iOSVersionGreaterThanOrEqual(to version: Int) -> Bool {
     ProcessInfo().operatingSystemVersion.majorVersion >= version

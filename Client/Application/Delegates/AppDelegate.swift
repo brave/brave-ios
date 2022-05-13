@@ -69,6 +69,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Hold references to willFinishLaunching parameters for delayed app launch
     self.application = application
     self.launchOptions = launchOptions
+    
+    let channel: AppBuildChannel
+#if MOZ_CHANNEL_RELEASE
+    channel = AppBuildChannel.release
+#elseif MOZ_CHANNEL_BETA
+    channel = AppBuildChannel.beta
+#elseif MOZ_CHANNEL_DEV
+    channel = AppBuildChannel.dev
+#elseif MOZ_CHANNEL_ENTERPRISE
+    channel = AppBuildChannel.enterprise
+#elseif MOZ_CHANNEL_DEBUG
+    channel = AppBuildChannel.debug
+#endif
+    AppConstants.buildChannel = channel
 
     // Brave Core Initialization
     BraveCoreMain.setLogHandler { severity, file, line, messageStartIndex, message in
