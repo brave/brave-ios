@@ -218,7 +218,7 @@ extension BrowserViewController: WKNavigationDelegate {
     
     // Add de-amp script
     // The user script manager will take care to not reload scripts if this value doesn't change
-    tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value
+    tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value && navigationAction.targetFrame?.isMainFrame == true
 
     // Check if custom user scripts must be added to or removed from the web view.
     tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
