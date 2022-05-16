@@ -141,10 +141,6 @@
 		27AC7CF724C759BE00441317 /* Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enterprise.entitlements; sourceTree = "<group>"; };
 		27AD20C226851C5400889AA7 /* BraveCore.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BraveCore.xcframework; path = "node_modules/brave-core-ios/BraveCore.xcframework"; sourceTree = "<group>"; };
 		27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MaterialComponents.xcframework; path = "node_modules/brave-core-ios/MaterialComponents.xcframework"; sourceTree = "<group>"; };
-		27D08DBD2832B7D500353C2B /* AppPreviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreviewApp.swift; sourceTree = "<group>"; };
-		27D08DBF2832B7D500353C2B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		27D08DC12832B7D700353C2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		27D08DC42832B7D700353C2B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		27D67619282DA10700BCE16E /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Icons.xcassets; path = Application/Icons.xcassets; sourceTree = "<group>"; };
 		27D6761F282DAC8700BCE16E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Client/Shortcuts/Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
 		27D67622282DAD3700BCE16E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Client/Shortcuts/Base.lproj/BrowserIntents.intentdefinition; sourceTree = "<group>"; };
@@ -396,25 +392,6 @@
 			path = Local.templates;
 			sourceTree = "<group>";
 		};
-		27D08DBC2832B7D500353C2B /* AppPreview */ = {
-			isa = PBXGroup;
-			children = (
-				27D08DBD2832B7D500353C2B /* AppPreviewApp.swift */,
-				27D08DBF2832B7D500353C2B /* ContentView.swift */,
-				27D08DC12832B7D700353C2B /* Assets.xcassets */,
-				27D08DC32832B7D700353C2B /* Preview Content */,
-			);
-			path = AppPreview;
-			sourceTree = "<group>";
-		};
-		27D08DC32832B7D700353C2B /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				27D08DC42832B7D700353C2B /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
 		27F443962135E11200296C58 /* ShareExtension */ = {
 			isa = PBXGroup;
 			children = (
@@ -533,7 +510,6 @@
 				27F443962135E11200296C58 /* ShareExtension */,
 				2F6931B5260CFB3700ECEB38 /* BrowserIntents */,
 				CA0391B7271E1023000EB13C /* BraveWidgets */,
-				27D08DBC2832B7D500353C2B /* AppPreview */,
 				7B604FC11C496005006EEEC3 /* Frameworks */,
 				F84B21BF1A090F8100AAB793 /* Products */,
 			);
