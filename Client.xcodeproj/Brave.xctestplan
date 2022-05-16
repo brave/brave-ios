@@ -43,9 +43,7 @@
     },
     {
       "skippedTests" : [
-        "NavigationRouterTests",
-        "TabManagerTests",
-        "TabSessionTests"
+        "NavigationRouterTests"
       ],
       "target" : {
         "containerPath" : "container:",

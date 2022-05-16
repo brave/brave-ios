@@ -111,6 +111,7 @@ class TabManagerTests: XCTestCase {
   override func setUp() {
     super.setUp()
 
+    DataController.shared.initializeOnce()
     let profile = MockProfile()
     manager = TabManager(prefs: profile.prefs, imageStore: nil, rewards: nil)
     PrivateBrowsingManager.shared.isPrivateBrowsing = false

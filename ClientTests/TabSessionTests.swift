@@ -86,6 +86,7 @@ class TabSessionTests: XCTestCase {
   override func setUp() {
     super.setUp()
 
+    DataController.shared.initializeOnce()
     tabManager = { () -> TabManager in
       let profile = BrowserProfile(localName: "profile")
       return TabManager(prefs: profile.prefs, imageStore: nil, rewards: nil)

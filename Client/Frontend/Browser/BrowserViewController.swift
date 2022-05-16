@@ -2496,6 +2496,7 @@ extension BrowserViewController: TabManagerDelegate {
       updateToolbarUsingTabManager(tabManager)
     }
     tab.tabDelegate = self
+    tab.walletKeyringService = BraveWallet.KeyringServiceFactory.get(privateMode: tab.isPrivate)
     updateTabsBarVisibility()
   }
 
