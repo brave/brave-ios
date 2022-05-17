@@ -187,40 +187,43 @@ struct WalletPanelView: View {
   var body: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
-        HStack {
-          Button {
-            presentWalletWithContext(.default)
-          } label: {
-            Image(systemName: "arrow.up.left.and.arrow.down.right")
-              .rotationEffect(.init(degrees: 90))
-          }
-          .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
-          Spacer()
+        ZStack {
           Text(Strings.Wallet.braveWallet)
             .font(.headline)
             .background(
               Color.clear
             )
-          Spacer()
-          if cryptoStore.pendingRequest != nil {
-            Button(action: { presentWalletWithContext(.pendingRequests) }) {
-              Image(uiImage: UIImage(imageLiteralResourceName: "brave.bell.badge").template)
-                .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+          HStack {
+            Button {
+              presentWalletWithContext(.default)
+            } label: {
+              Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .rotationEffect(.init(degrees: 90))
             }
+            .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
             Spacer()
-          }
-          Menu {
-            Button(action: { keyringStore.lock() }) {
-              Label(Strings.Wallet.lock, image: "brave.lock")
+            HStack(spacing: 24) {
+              if cryptoStore.pendingRequest != nil {
+                Button(action: { presentWalletWithContext(.pendingRequests) }) {
+                  Image(uiImage: UIImage(imageLiteralResourceName: "brave.bell.badge").template)
+                    .foregroundColor(.white)
+                }
+              }
+              Menu {
+                Button(action: { keyringStore.lock() }) {
+                  Label(Strings.Wallet.lock, image: "brave.lock")
+                }
+                Divider()
+                Button(action: { presentWalletWithContext(.settings) }) {
+                  Label(Strings.Wallet.settings, image: "brave.gear")
+                }
+              } label: {
+                Image(systemName: "ellipsis")
+              }
+              .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
             }
-            Divider()
-            Button(action: { presentWalletWithContext(.settings) }) {
-              Label(Strings.Wallet.settings, image: "brave.gear")
-            }
-          } label: {
-            Image(systemName: "ellipsis")
           }
-          .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
         }
         .padding(16)
         .overlay(
