@@ -115,6 +115,11 @@ extension BrowserViewController: BraveWalletProviderDelegate {
 
   func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
     Task { @MainActor in
+      if presentedViewController is WalletHostingViewController {
+        completion([], .internalError, "Wallet interaction session is currenty active")
+        return
+      }
+      
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       let origin = getOrigin()
       
