@@ -132,6 +132,8 @@ extension BrowserViewController {
     let controller = WelcomeNTPOnboardingController()
     controller.setText(details: Strings.Onboarding.ntpOnboardingPopOverTrackerDescription)
     
+    controller.buttonText = Strings.PrivacyHub.onboardingButtonTitle
+
     presentPopoverContent(
       using: controller,
       with: frame, cornerRadius: 12.0,
@@ -140,6 +142,11 @@ extension BrowserViewController {
       },
       didClickBorderedArea: {
         Preferences.PrivacyReports.ntpOnboardingCompleted.value = true
+      },
+      didButtonClick: { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+          self?.openPrivacyReport()
+        }
       }
     )
   }
@@ -149,8 +156,8 @@ extension BrowserViewController {
     with frame: CGRect,
     cornerRadius: CGFloat,
     didDismiss: @escaping () -> Void,
-    didClickBorderedArea: @escaping () -> Void)
-  {
+    didClickBorderedArea: @escaping () -> Void,
+    didButtonClick: (() -> Void)? = nil) {
     let popover = PopoverController(
       contentController: contentController,
       contentSizeBehavior: .autoLayout(.phoneWidth))
@@ -211,6 +218,14 @@ extension BrowserViewController {
         
       popover.dismissPopover() {
         didClickBorderedArea()
+      }
+    }
+    
+    if let controller = contentController as? WelcomeNTPOnboardingController {
+      controller.buttonTapped = {
+        maskShape.removeFromSuperlayer()
+        borderView.removeFromSuperview()
+        didButtonClick?()
       }
     }
       

@@ -126,6 +126,11 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
 }
 
 class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentComponent {
+  
+  private struct DesignUX {
+    static let braveOnboardingColor = UIColor(rgb: 0xEEF0FF)
+  }
+  
   private let stackView = UIStackView().then {
     $0.spacing = 20.0
     $0.axis = .vertical
@@ -135,7 +140,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentCompo
   }
   
   private let titleLabel = UILabel().then {
-    $0.textColor = .braveOnboarding
+    $0.textColor = DesignUX.braveOnboardingColor
     $0.numberOfLines = 0
     $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -145,7 +150,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentCompo
   }
 
   private let textLabel = UILabel().then {
-    $0.textColor = .braveOnboarding
+    $0.textColor = DesignUX.braveOnboardingColor
     $0.numberOfLines = 0
     $0.font = UIFont.preferredFont(forTextStyle: .title2)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -154,7 +159,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController & PopoverContentCompo
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
   
-  private var gradientView = BraveGradientView.gradient01
+  private let gradientView = BraveGradientView.gradient01
 
   override func viewDidLoad() {
     super.viewDidLoad()

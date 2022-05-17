@@ -98,9 +98,6 @@ extension UIColor {
   public static var bravePrimary: UIColor {
     DesignSystemColor.text01.color
   }
-  public static var braveOnboarding: UIColor {
-    DesignSystemColor.text04.color
-  }
   public static var braveLighterOrange: UIColor {
     DesignSystemColor.interactive03.color
   }
