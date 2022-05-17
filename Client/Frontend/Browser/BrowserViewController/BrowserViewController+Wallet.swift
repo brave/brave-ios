@@ -44,7 +44,7 @@ extension WalletStore {
 }
 
 extension BrowserViewController {
-  func presentWalletPanel() {
+  func presentWalletPanel(_ completion: BraveWalletProviderResultsCallback? = nil) {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
@@ -56,14 +56,18 @@ extension BrowserViewController {
       faviconRenderer: FavIconImageRenderer(),
       onUnlock: {
         Task { @MainActor in
+          // check domain already has some permitted accouts
           let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
           if permissionRequestManager.hasPendingRequest(for: origin, coinType: .eth) {
             let pendingRequests = permissionRequestManager.pendingRequests(for: origin, coinType: .eth)
             let (accounts, status, _) = await self.allowedAccounts(false)
             if status == .success, !accounts.isEmpty {
+              // cancel the requests if `allowedAccounts` is not empty for this domain
               for request in pendingRequests {
                 permissionRequestManager.cancelRequest(request)
               }
+              // let wallet provider know we have allowed accounts for this domain
+              completion?(accounts, .success, "")
             }
           }
         }
@@ -152,6 +156,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         return
       }
       
+      // add permission request to the queue
       _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, completion: { response in
         switch response {
         case .granted(let accounts):
@@ -161,7 +166,13 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         }
       })
 
-      showPanel()
+      // display notification
+      let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
+        if action == .connectWallet {
+          self?.presentWalletPanel(completion)
+        }
+      }
+      notificationsPresenter.display(notification: walletNotificaton, from: self)
     }
   }
 
