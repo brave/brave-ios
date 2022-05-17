@@ -394,7 +394,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
     #if WALLET_DAPPS_ENABLED
     tabManager.makeWalletProvider = { [weak self] tab in
       guard let self = self,
-            let provider = self.braveCore.walletProvider(with: self, isPrivateBrowsing: tab.isPrivate) else {
+            let provider = self.braveCore.walletProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
         return nil
       }
       return (provider, js: self.braveCore.walletProviderJS)
@@ -2465,7 +2465,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     updateInContentHomePanel(selected?.url as URL?)
-        updateURLBarWalletButton()
+    updateURLBarWalletButton()
   }
 
   func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {

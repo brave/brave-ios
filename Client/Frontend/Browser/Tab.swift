@@ -68,7 +68,11 @@ class Tab: NSObject {
 
   var walletProvider: BraveWalletBraveWalletProvider?
   var walletProviderJS: String?
-  var isWalletIconVisible: Bool = false
+  var isWalletIconVisible: Bool = false {
+    didSet {
+      webView?.currentScene?.browserViewController?.updateURLBarWalletButton()
+    }
+  }
   var walletKeyringService: BraveWalletKeyringService?
   // PageMetadata is derived from the page content itself, and as such lags behind the
   // rest of the tab.
