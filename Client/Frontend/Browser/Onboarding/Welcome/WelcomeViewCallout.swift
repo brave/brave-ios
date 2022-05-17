@@ -32,7 +32,6 @@ class WelcomeViewCallout: UIView {
     static let padding = 20.0
     static let contentPadding = 24.0
     static let cornerRadius = 16.0
-    static let braveOnboardingColor = UIColor(rgb: 0xEEF0FF)
   }
 
   private let backgroundView = RoundedBackgroundView(cornerRadius: DesignUX.cornerRadius)
@@ -222,7 +221,7 @@ class WelcomeViewCallout: UIView {
         $0.text = title
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .largeTitle, weight: .semibold)
-        $0.textColor = DesignUX.braveOnboardingColor
+        $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -320,7 +319,7 @@ class WelcomeViewCallout: UIView {
         
       titleLabel.do {
         $0.text = title
-        $0.textColor = DesignUX.braveOnboardingColor
+        $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .title1, weight: .semibold)
         $0.alpha = 1.0
@@ -329,7 +328,7 @@ class WelcomeViewCallout: UIView {
 
       detailsLabel.do {
         $0.text = details
-        $0.textColor = DesignUX.braveOnboardingColor
+        $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
         $0.textAlignment = .center
         $0.font = .preferredFont(for: .title3, weight: .regular)
         $0.alpha = 0.0

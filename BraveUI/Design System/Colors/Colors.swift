@@ -12,7 +12,6 @@ enum DesignSystemColor: String {
   case text01
   case text02
   case text03
-  case text04
 
   case interactive01
   case interactive02

@@ -16,7 +16,6 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
     static let detailsViewEdgeInset = UIEdgeInsets(equalInset: 15)
     static let contentViewEdgeInset = UIEdgeInsets(top: 25, left: 15, bottom: 15, right: 15.0)
     static let instructionsEdgeInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 15.0)
-    static let braveOnboardingColor = UIColor(rgb: 0xEEF0FF)
   }
   
   let contentStackView = BlockedAdsStackView(edgeInsets: UX.contentViewEdgeInset, spacing: 15.0).then {
@@ -49,7 +48,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
 
   private let footNoteTextLabel = UILabel().then {
-    $0.textColor = UX.braveOnboardingColor
+    $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
     $0.numberOfLines = 0
     $0.text = Strings.Onboarding.blockedAdsOnboardingFootnoteText
     $0.font = .preferredFont(forTextStyle: .footnote)
@@ -60,7 +59,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
 
   private let informationTextLabel = UILabel().then {
-    $0.textColor = UX.braveOnboardingColor
+    $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
     $0.numberOfLines = 0
     $0.font = .preferredFont(forTextStyle: .title1)
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -69,7 +68,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   }
   
   private let instructionsTextLabel = UILabel().then {
-    $0.textColor = UX.braveOnboardingColor
+    $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
     $0.text = Strings.Onboarding.blockedAdsOnboardingInstructionsText
     $0.numberOfLines = 0
     $0.textAlignment = .right
@@ -82,7 +81,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   
   private let numberOfTrackersTextLabel = UILabel().then {
     $0.text = Strings.Onboarding.blockedAdsOnboardingInstructionsText
-    $0.textColor = UX.braveOnboardingColor
+    $0.textColor = .bravePrimary.resolvedColor(with: .init(userInterfaceStyle: .dark))
     $0.numberOfLines = 1
     $0.textAlignment = .left
     $0.font = UIFontMetrics(forTextStyle: .headline).scaledFont(for: .systemFont(ofSize: 96.0))
