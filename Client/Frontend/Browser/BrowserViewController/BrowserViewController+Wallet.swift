@@ -190,13 +190,6 @@ extension Tab: BraveWalletProviderDelegate {
   }
 }
 
-extension BrowserViewController {
-  func updateURLBarWalletButton() {
-    topToolbar.locationView.walletButton.buttonState =
-    tabManager.selectedTab?.isWalletIconVisible == true ? .active : .inactive
-  }
-}
-
 extension Tab: BraveWalletEventsListener {
   func emitEthereumEvent(_ event: Web3ProviderEvent) {
     var arguments: [Any] = [event.name]

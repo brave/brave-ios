@@ -32,6 +32,7 @@ protocol TabDelegate {
   func showRequestRewardsPanel(_ tab: Tab)
   func stopMediaPlayback(_ tab: Tab)
   func showWalletNotification(_ tab: Tab, completion: BraveWalletProviderResultsCallback?)
+  func updateURLBarWalletButton()
 }
 
 @objc
@@ -70,7 +71,7 @@ class Tab: NSObject {
   var walletProviderJS: String?
   var isWalletIconVisible: Bool = false {
     didSet {
-      webView?.currentScene?.browserViewController?.updateURLBarWalletButton()
+      tabDelegate?.updateURLBarWalletButton()
     }
   }
   var walletKeyringService: BraveWalletKeyringService? {

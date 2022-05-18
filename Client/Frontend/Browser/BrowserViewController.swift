@@ -2324,6 +2324,11 @@ extension BrowserViewController: TabDelegate {
     }
     notificationsPresenter.display(notification: walletNotificaton, from: self)
   }
+
+  func updateURLBarWalletButton() {
+    topToolbar.locationView.walletButton.buttonState =
+    tabManager.selectedTab?.isWalletIconVisible == true ? .active : .inactive
+  }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {
