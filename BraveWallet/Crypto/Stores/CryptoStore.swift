@@ -196,6 +196,13 @@ public class CryptoStore: ObservableObject {
     }
   }
   
+  func closeBSSStores() {
+    guard buySendSwapDestination == nil else { return }
+    buyTokenStore = nil
+    sendTokenStore = nil
+    swapTokenStore = nil
+  }
+  
   private var confirmationStore: TransactionConfirmationStore?
   func openConfirmationStore() -> TransactionConfirmationStore {
     if let store = confirmationStore {

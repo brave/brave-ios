@@ -174,6 +174,7 @@ struct SwapCryptoView: View {
   @Environment(\.openWalletURLAction) private var openWalletURL
   
   var completion: ((_ success: Bool) -> Void)?
+  var onDismiss: (() -> Void)?
 
   @ViewBuilder var unsupportedSwapChainSection: some View {
     Section {
@@ -482,6 +483,7 @@ struct SwapCryptoView: View {
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
+            onDismiss?()
             presentationMode.dismiss()
           }) {
             Text(Strings.cancelButtonTitle)
