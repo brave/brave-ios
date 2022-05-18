@@ -76,6 +76,18 @@ class DownloadQueueTests: XCTestCase {
 
     XCTAssertEqual(delegate.receivedMessages, [])
   }
+
+  func test_downloadDidFinishDownloadingTo_whenItHasDownload_removesCorrectDownload() {
+    let (sut, _) = makeSUT()
+    let download1 = Download()
+    let download2 = Download()
+    sut.downloads = [download1, download2]
+
+    let location = URL(string: "https://some-location")!
+    sut.download(download1, didFinishDownloadingTo: location)
+
+    XCTAssertEqual(sut.downloads, [download2])
+  }
 }
 
 // MARK: - Tests Helpers
