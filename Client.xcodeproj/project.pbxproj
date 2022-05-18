@@ -11,19 +11,10 @@
 		0A5E04F923FEADA800E5A3E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A5E04F823FEADA800E5A3E9 /* LaunchScreen.storyboard */; };
 		0A5E04FB23FEB53700E5A3E9 /* LaunchScreen.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A5E04FA23FEB53700E5A3E9 /* LaunchScreen.xcassets */; };
 		272B94D5282AE7B500DCBCCE /* Static in Frameworks */ = {isa = PBXBuildFile; productRef = 272B94D4282AE7B500DCBCCE /* Static */; };
-		279A9BBE2823370100F40FC6 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BBD2823370100F40FC6 /* ZIPFoundation */; };
-		279A9BC02823370100F40FC6 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BBF2823370100F40FC6 /* SnapKit */; };
 		279A9BC22823370100F40FC6 /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BC12823370100F40FC6 /* ObjcExceptionBridging */; };
 		279A9BC42823370100F40FC6 /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BC32823370100F40FC6 /* XCGLogger */; };
-		279A9BC62823370100F40FC6 /* Fuzi in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BC52823370100F40FC6 /* Fuzi */; };
-		279A9BC82823370100F40FC6 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BC72823370100F40FC6 /* SwiftyJSON */; };
-		279A9BCA2823370100F40FC6 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BC92823370100F40FC6 /* Lottie */; };
 		279A9BCC2823370100F40FC6 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BCB2823370100F40FC6 /* SwiftKeychainWrapper */; };
 		279A9BCE2823370100F40FC6 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BCD2823370100F40FC6 /* SDWebImage */; };
-		279A9BD02823370100F40FC6 /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BCF2823370100F40FC6 /* FeedKit */; };
-		279A9BD22823370100F40FC6 /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BD12823370100F40FC6 /* PanModal */; };
-		279A9BD82823370100F40FC6 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BD72823370100F40FC6 /* OrderedCollections */; };
-		279A9BDE2823370100F40FC6 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BDD2823370100F40FC6 /* Then */; };
 		27AD20C326851C5400889AA7 /* BraveCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; };
 		27AD20C426851C5400889AA7 /* BraveCore.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 27AD20C226851C5400889AA7 /* BraveCore.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		27B68DF025C48F39002D0826 /* MaterialComponents.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B68DD625C48EE9002D0826 /* MaterialComponents.xcframework */; };
@@ -306,33 +297,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				279A9BC62823370100F40FC6 /* Fuzi in Frameworks */,
 				27B68DF025C48F39002D0826 /* MaterialComponents.xcframework in Frameworks */,
 				279A9BCC2823370100F40FC6 /* SwiftKeychainWrapper in Frameworks */,
-				279A9BC82823370100F40FC6 /* SwiftyJSON in Frameworks */,
 				27F514D4282C501D00A130EE /* BraveUI in Frameworks */,
 				27F514D8282C501E00A130EE /* Data in Frameworks */,
 				279A9BC42823370100F40FC6 /* XCGLogger in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				279A9BCE2823370100F40FC6 /* SDWebImage in Frameworks */,
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
-				279A9BC02823370100F40FC6 /* SnapKit in Frameworks */,
 				27AD20C326851C5400889AA7 /* BraveCore.xcframework in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				27F514D2282C501D00A130EE /* BraveShared in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,
-				279A9BDE2823370100F40FC6 /* Then in Frameworks */,
 				27F514DC282C501E00A130EE /* Storage in Frameworks */,
 				279A9BC22823370100F40FC6 /* ObjcExceptionBridging in Frameworks */,
 				272B94D5282AE7B500DCBCCE /* Static in Frameworks */,
-				279A9BD22823370100F40FC6 /* PanModal in Frameworks */,
 				27F514D0282C501D00A130EE /* BraveCore in Frameworks */,
-				279A9BD82823370100F40FC6 /* OrderedCollections in Frameworks */,
 				0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */,
-				279A9BD02823370100F40FC6 /* FeedKit in Frameworks */,
 				27F514D6282C501D00A130EE /* BraveWallet in Frameworks */,
-				279A9BBE2823370100F40FC6 /* ZIPFoundation in Frameworks */,
-				279A9BCA2823370100F40FC6 /* Lottie in Frameworks */,
 				27F514DA282C501E00A130EE /* Shared in Frameworks */,
 				27D67618282D9C2900BCE16E /* Brave in Frameworks */,
 			);
@@ -674,19 +656,10 @@
 			);
 			name = Client;
 			packageProductDependencies = (
-				279A9BBD2823370100F40FC6 /* ZIPFoundation */,
-				279A9BBF2823370100F40FC6 /* SnapKit */,
 				279A9BC12823370100F40FC6 /* ObjcExceptionBridging */,
 				279A9BC32823370100F40FC6 /* XCGLogger */,
-				279A9BC52823370100F40FC6 /* Fuzi */,
-				279A9BC72823370100F40FC6 /* SwiftyJSON */,
-				279A9BC92823370100F40FC6 /* Lottie */,
 				279A9BCB2823370100F40FC6 /* SwiftKeychainWrapper */,
 				279A9BCD2823370100F40FC6 /* SDWebImage */,
-				279A9BCF2823370100F40FC6 /* FeedKit */,
-				279A9BD12823370100F40FC6 /* PanModal */,
-				279A9BD72823370100F40FC6 /* OrderedCollections */,
-				279A9BDD2823370100F40FC6 /* Then */,
 				272B94D4282AE7B500DCBCCE /* Static */,
 				27F514CF282C501D00A130EE /* BraveCore */,
 				27F514D1282C501D00A130EE /* BraveShared */,
@@ -775,22 +748,9 @@
 			);
 			mainGroup = F84B21B51A090F8100AAB793;
 			packageReferences = (
-				272736A224A686920096DCB9 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				2775685325ACF6CB00C129AF /* XCRemoteSwiftPackageReference "SnapKit" */,
 				2775685F25ACF6FE00C129AF /* XCRemoteSwiftPackageReference "XCGLogger" */,
-				2775686D25ACF71600C129AF /* XCRemoteSwiftPackageReference "Fuzi" */,
-				2775687925ACF73100C129AF /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
-				2775688525ACF76100C129AF /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */,
-				27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */,
-				277046C02684CD1E001CB097 /* XCRemoteSwiftPackageReference "PanModal" */,
-				2FCE87D3264195EC00B98D7E /* XCRemoteSwiftPackageReference "swift-collections" */,
-				271F68E526EBD55D00AA2A50 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
-				271F68E826EBD59F00AA2A50 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
-				271F68EE26EBDC3600AA2A50 /* XCRemoteSwiftPackageReference "Then" */,
-				277309DA2721DDD2007643F6 /* XCRemoteSwiftPackageReference "Swift-BigInt" */,
-				2710C13527CE87FF00391304 /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
@@ -2788,100 +2748,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2710C13527CE87FF00391304 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-markdown";
-			requirement = {
-				kind = revision;
-				revision = 4f0c76fcd29fea648915f41e2aa896d47608087a;
-			};
-		};
-		271F68E526EBD55D00AA2A50 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.3;
-			};
-		};
-		271F68E826EBD59F00AA2A50 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-algorithms";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		271F68EE26EBDC3600AA2A50 /* XCRemoteSwiftPackageReference "Then" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devxoul/Then";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.0;
-			};
-		};
-		272736A224A686920096DCB9 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.9.11;
-			};
-		};
-		277046C02684CD1E001CB097 /* XCRemoteSwiftPackageReference "PanModal" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/brave/PanModal";
-			requirement = {
-				kind = revision;
-				revision = e4c07f8e6c5df937051fabc47e1e92901e1d068b;
-			};
-		};
-		277309DA2721DDD2007643F6 /* XCRemoteSwiftPackageReference "Swift-BigInt" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mkrd/Swift-BigInt";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		2775685325ACF6CB00C129AF /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.1;
-			};
-		};
 		2775685F25ACF6FE00C129AF /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/DaveWoodCom/XCGLogger";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 7.0.1;
-			};
-		};
-		2775686D25ACF71600C129AF /* XCRemoteSwiftPackageReference "Fuzi" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/cezheng/Fuzi";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.3;
-			};
-		};
-		2775687925ACF73100C129AF /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
-			};
-		};
-		2775688525ACF76100C129AF /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.9;
 			};
 		};
 		2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
@@ -2900,38 +2772,12 @@
 				minimumVersion = 5.10.2;
 			};
 		};
-		27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nmdias/FeedKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.1.2;
-			};
-		};
-		2FCE87D3264195EC00B98D7E /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		272B94D4282AE7B500DCBCCE /* Static */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Static;
-		};
-		279A9BBD2823370100F40FC6 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 272736A224A686920096DCB9 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
-		};
-		279A9BBF2823370100F40FC6 /* SnapKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2775685325ACF6CB00C129AF /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = SnapKit;
 		};
 		279A9BC12823370100F40FC6 /* ObjcExceptionBridging */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -2943,21 +2789,6 @@
 			package = 2775685F25ACF6FE00C129AF /* XCRemoteSwiftPackageReference "XCGLogger" */;
 			productName = XCGLogger;
 		};
-		279A9BC52823370100F40FC6 /* Fuzi */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2775686D25ACF71600C129AF /* XCRemoteSwiftPackageReference "Fuzi" */;
-			productName = Fuzi;
-		};
-		279A9BC72823370100F40FC6 /* SwiftyJSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2775687925ACF73100C129AF /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
-			productName = SwiftyJSON;
-		};
-		279A9BC92823370100F40FC6 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2775688525ACF76100C129AF /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
-		};
 		279A9BCB2823370100F40FC6 /* SwiftKeychainWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
@@ -2967,26 +2798,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
-		};
-		279A9BCF2823370100F40FC6 /* FeedKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 27B68E5B25C88CA7002D0826 /* XCRemoteSwiftPackageReference "FeedKit" */;
-			productName = FeedKit;
-		};
-		279A9BD12823370100F40FC6 /* PanModal */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 277046C02684CD1E001CB097 /* XCRemoteSwiftPackageReference "PanModal" */;
-			productName = PanModal;
-		};
-		279A9BD72823370100F40FC6 /* OrderedCollections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2FCE87D3264195EC00B98D7E /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = OrderedCollections;
-		};
-		279A9BDD2823370100F40FC6 /* Then */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 271F68EE26EBDC3600AA2A50 /* XCRemoteSwiftPackageReference "Then" */;
-			productName = Then;
 		};
 		27D67617282D9C2900BCE16E /* Brave */ = {
 			isa = XCSwiftPackageProductDependency;

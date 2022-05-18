@@ -13,15 +13,9 @@
   },
   "testTargets" : [
     {
-      "selectedTests" : [
-        "UserAgentTests\/testBraveWebViewUserAgentOnPhone()",
-        "UserAgentTests\/testDesktopUserAgent()",
-        "UserAgentTests\/testFirstUAPart()",
-        "UserAgentTests\/testIpadMobileUserAgent()"
-      ],
       "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "F84B21D21A090F8100AAB793",
+        "containerPath" : "container:",
+        "identifier" : "ClientTests",
         "name" : "ClientTests"
       }
     }

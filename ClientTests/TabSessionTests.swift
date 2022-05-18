@@ -9,7 +9,7 @@ import Storage
 import Data
 import WebKit
 import ObjectiveC.runtime
-@testable import Client
+@testable import Brave
 
 private extension WKWebView {
   class func swizzleMe() {

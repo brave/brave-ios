@@ -90,19 +90,6 @@ let package = Package(
         .copy("Assets/SessionRestore.html"),
         .copy("Assets/SpotlightHelper.js"),
         .copy("Assets/top_sites.json"),
-        .copy("Assets/Certificates/AmazonRootCA1.cer"),
-        .copy("Assets/Certificates/AmazonRootCA2.cer"),
-        .copy("Assets/Certificates/AmazonRootCA3.cer"),
-        .copy("Assets/Certificates/AmazonRootCA4.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_E46.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_R1.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_R3.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_R46.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_R5.cer"),
-        .copy("Assets/Certificates/GlobalSignRootCA_R6.cer"),
-        .copy("Assets/Certificates/ISRGRootCA_X1.cer"),
-        .copy("Assets/Certificates/ISRGRootCA_X2.cer"),
-        .copy("Assets/Certificates/SFSRootCAG2.cer"),
         .copy("Assets/Fonts/FiraSans-Bold.ttf"),
         .copy("Assets/Fonts/FiraSans-BoldItalic.ttf"),
         .copy("Assets/Fonts/FiraSans-Book.ttf"),
@@ -208,7 +195,22 @@ let package = Package(
     .target(
       name: "BraveShared",
       dependencies: ["SDWebImage", "Shared", "SnapKit", "XCGLogger"],
-      path: "BraveShared"
+      path: "BraveShared",
+      resources: [
+        .copy("Certificates/AmazonRootCA1.cer"),
+        .copy("Certificates/AmazonRootCA2.cer"),
+        .copy("Certificates/AmazonRootCA3.cer"),
+        .copy("Certificates/AmazonRootCA4.cer"),
+        .copy("Certificates/GlobalSignRootCA_E46.cer"),
+        .copy("Certificates/GlobalSignRootCA_R1.cer"),
+        .copy("Certificates/GlobalSignRootCA_R3.cer"),
+        .copy("Certificates/GlobalSignRootCA_R46.cer"),
+        .copy("Certificates/GlobalSignRootCA_R5.cer"),
+        .copy("Certificates/GlobalSignRootCA_R6.cer"),
+        .copy("Certificates/ISRGRootCA_X1.cer"),
+        .copy("Certificates/ISRGRootCA_X2.cer"),
+        .copy("Certificates/SFSRootCAG2.cer"),
+      ]
     ),
     .target(
       name: "BraveUI",
@@ -278,7 +280,19 @@ let package = Package(
     .testTarget(name: "StorageTests", dependencies: ["Storage", "BraveSharedTestUtils"], path: "StorageTests", resources: [.copy("fixtures/v33.db"), .copy("testcert1.pem"), .copy("testcert2.pem")]),
     .testTarget(name: "DataTests", dependencies: ["Data"], path: "DataTests"),
     .testTarget(name: "SPMLibrariesTests", dependencies: ["GCDWebServers"], path: "SPMLibrariesTests"),
-    .testTarget(name: "ClientTests", dependencies: ["Brave"], path: "ClientTests")
+    .testTarget(
+      name: "ClientTests",
+      dependencies: ["Brave", "BraveSharedTestUtils"],
+      path: "ClientTests",
+      resources: [
+        .copy("Resources/debouncing.json"),
+        .copy("opml-test-files/subscriptionList.opml"),
+        .copy("opml-test-files/states.opml"),
+        .copy("blocking-summary-test.json"),
+        .copy("image.png"),
+        .copy("image.gif"),
+      ]
+    )
   ],
   cxxLanguageStandard: .cxx14
 )

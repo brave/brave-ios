@@ -29,64 +29,51 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "5D1DC51A20AC9AFA00905E5A",
+        "containerPath" : "container:",
+        "identifier" : "BraveSharedTests",
+        "name" : "BraveSharedTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BraveWalletTests",
+        "name" : "BraveWalletTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ClientTests",
+        "name" : "ClientTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "DataTests",
         "name" : "DataTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "E6F9650B1B2F1CF20034B023",
-        "name" : "SharedTests"
-      }
-    },
-    {
-      "skippedTests" : [
-        "NavigationRouterTests\/testNavigationPathInPrivateBrowsingOnlyMode()",
-        "PlaylistTests\/testVideoPlayerTrackBarTimeManualFormatter()"
-      ],
-      "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "F84B21D21A090F8100AAB793",
-        "name" : "ClientTests"
-      }
-    },
-    {
-      "skippedTests" : [
-        "CertificatePinningTest\/testSelfSignedRootAllowed()",
-        "CertificatePinningTest\/testSelfSignedRootAllowed2()"
-      ],
-      "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "5DE7688B20B3456E00FF5533",
-        "name" : "BraveSharedTests"
-      }
-    },
-    {
-      "skippedTests" : [
-        "TestSQLiteLogins",
-        "TestSQLiteLoginsPerf",
-        "TestSyncableLogins"
-      ],
-      "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "2FCAE2231ABB51F800877008",
-        "name" : "StorageTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "27756E9325AF6F5F00C129AF",
+        "containerPath" : "container:",
+        "identifier" : "SPMLibrariesTests",
         "name" : "SPMLibrariesTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:Client.xcodeproj",
-        "identifier" : "277309E42721DF6D007643F6",
-        "name" : "BraveWalletTests"
+        "containerPath" : "container:",
+        "identifier" : "SharedTests",
+        "name" : "SharedTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "StorageTests",
+        "name" : "StorageTests"
       }
     }
   ],

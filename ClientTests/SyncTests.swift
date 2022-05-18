@@ -4,8 +4,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import XCTest
-@testable import BraveCore
-@testable import Client
+import BraveCore
+@testable import Brave
 
 class SyncTests: XCTestCase {
 
@@ -15,10 +15,13 @@ class SyncTests: XCTestCase {
   let validDate = Date().addingTimeInterval(BraveSyncQRCodeModel.validityDuration).timeIntervalSince1970
   let invalidDate = Date().timeIntervalSince1970
   var syncAPI: BraveSyncAPI!
+  var braveCore: BraveCoreMain!
 
   override func setUpWithError() throws {
     continueAfterFailure = false
-    syncAPI = (UIApplication.shared.delegate as? AppDelegate)?.braveCore.syncAPI
+    braveCore = BraveCoreMain(userAgent: "")
+    braveCore.scheduleLowPriorityStartupTasks()
+    syncAPI = braveCore.syncAPI
     XCTAssertNotNil(syncAPI)
   }
 

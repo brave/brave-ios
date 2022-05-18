@@ -43,6 +43,8 @@ class FaviconMOTests: CoreDataTestCase {
   @discardableResult
   private func createAndWait() -> FaviconMO? {
     let favicon = Favicon(url: exampleUrl.absoluteString)
+    favicon.width = 100
+    favicon.height = 100
 
     backgroundSaveAndWaitForExpectation {
       FaviconMO.add(favicon, forSiteUrl: exampleUrl, persistent: true)

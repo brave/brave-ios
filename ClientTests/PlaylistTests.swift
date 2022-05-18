@@ -5,7 +5,7 @@
 
 import XCTest
 import CoreMedia
-@testable import Client
+@testable import Brave
 @testable import Data
 
 class PlaylistTests: XCTestCase {

@@ -8,11 +8,13 @@ import XCTest
 import Storage
 import BraveCore
 
-@testable import Client
+@testable import Brave
 
 // MARK: SchemePermissionTests
 
 class SchemePermissionTests: XCTestCase {
+  
+  var braveCore: BraveCoreMain!
 
   enum SchemeTestType: String {
     case http
@@ -59,16 +61,19 @@ class SchemePermissionTests: XCTestCase {
 
     imageStore = try! DiskImageStore(files: MockFiles(), namespace: "MockTabManagerScreenshots", quality: 1)
 
-    guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
-      return
-    }
+//    guard let appDelegate = UIApplication.shared.delegate as? TestAppDelegate else {
+//      return
+//    }
+    
+    braveCore = BraveCoreMain(userAgent: "")
+    braveCore.scheduleLowPriorityStartupTasks()
 
-    let migration = Migration(braveCore: appDelegate.braveCore)
+    let migration = Migration(braveCore: braveCore)
 
     subject = BrowserViewController(
       profile: profile,
       diskImageStore: imageStore,
-      braveCore: appDelegate.braveCore,
+      braveCore: braveCore,
       migration: migration,
       crashedLastSession: false)
   }

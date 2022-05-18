@@ -5,7 +5,7 @@
 import Foundation
 import XCTest
 import Storage
-@testable import Client
+@testable import Brave
 import Shared
 
 class TestFavicons: ProfileTest {
