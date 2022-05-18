@@ -360,7 +360,6 @@
 		278C467823EDF0060083347F /* SimpleShieldsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C467723EDF0060083347F /* SimpleShieldsView.swift */; };
 		278C467B23EDF0940083347F /* ShieldsSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278C467A23EDF0940083347F /* ShieldsSwitch.swift */; };
 		278C467C23EE2B450083347F /* UIStackViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECBA234CC7EF009DAC37 /* UIStackViewExtensions.swift */; };
-		278C468A23F1E6270083347F /* BraveUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 278C468823F1E6270083347F /* BraveUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; };
 		278C468E23F1E6270083347F /* BraveUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		278C469523F1E8620083347F /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271DECAD234CC7EF009DAC37 /* LoaderView.swift */; };
@@ -951,7 +950,6 @@
 		6185F9422763E3AA00D135E9 /* BraveWallet.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6185F9402763E3AA00D135E9 /* BraveWallet.strings */; };
 		6ABE2E422834714800420474 /* DownloadQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ABE2E412834714800420474 /* DownloadQueueTests.swift */; };
 		744ED5611DBFEB8D00A2B5BE /* MailtoLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */; };
-		7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7479B4ED1C5306A200DF000B /* Reachability.swift */; };
 		74821FFE1DB6D3AC00EEEA72 /* MailSchemes.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */; };
 		7482205C1DBAB56300EEEA72 /* MailProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7482205B1DBAB56300EEEA72 /* MailProviders.swift */; };
 		74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */; };
@@ -1676,7 +1674,6 @@
 		0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandedImageCalloutState.swift; sourceTree = "<group>"; };
 		0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloaderTests.swift; sourceTree = "<group>"; };
 		0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = vpncheckmark.json; sourceTree = "<group>"; };
-		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
 		0A39FE832486604100290ABC /* GRDSubscriberCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDSubscriberCredential.h; sourceTree = "<group>"; };
 		0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDGatewayAPIResponse.h; sourceTree = "<group>"; };
 		0A39FE852486604400290ABC /* GRDServerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDServerManager.h; sourceTree = "<group>"; };
@@ -2010,8 +2007,6 @@
 		278C467723EDF0060083347F /* SimpleShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleShieldsView.swift; sourceTree = "<group>"; };
 		278C467A23EDF0940083347F /* ShieldsSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldsSwitch.swift; sourceTree = "<group>"; };
 		278C468623F1E6270083347F /* BraveUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BraveUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		278C468823F1E6270083347F /* BraveUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BraveUI.h; sourceTree = "<group>"; };
-		278C468923F1E6270083347F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		278C46A223F1EDAB0083347F /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		278C46A823F216CE0083347F /* AdvancedControlsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedControlsBarView.swift; sourceTree = "<group>"; };
 		278C46AB23F499730083347F /* AdvancedShieldsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedShieldsView.swift; sourceTree = "<group>"; };
@@ -2762,7 +2757,6 @@
 		61FB5F932763E42E00F875E3 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/BraveWallet.strings; sourceTree = "<group>"; };
 		6ABE2E412834714800420474 /* DownloadQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadQueueTests.swift; sourceTree = "<group>"; };
 		744ED5601DBFEB8D00A2B5BE /* MailtoLinkHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailtoLinkHandler.swift; sourceTree = "<group>"; };
-		7479B4ED1C5306A200DF000B /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		74821FFD1DB6D3AC00EEEA72 /* MailSchemes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = MailSchemes.plist; sourceTree = "<group>"; };
 		7482205B1DBAB56300EEEA72 /* MailProviders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailProviders.swift; sourceTree = "<group>"; };
 		74C027441B2A348C001B1E88 /* SessionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
@@ -4215,8 +4209,6 @@
 				278C469F23F1ED080083347F /* Text */,
 				278C469423F1E84C0083347F /* Buttons */,
 				276A79072446608100AC9446 /* Extensions */,
-				278C468823F1E6270083347F /* BraveUI.h */,
-				278C468923F1E6270083347F /* Info.plist */,
 			);
 			path = BraveUI;
 			sourceTree = "<group>";
@@ -4492,7 +4484,6 @@
 			children = (
 				445ABC8C2731DCE00089710D /* GCDWebServers */,
 				3B6889C41D66950E002AC85E /* UIImageColors.swift */,
-				7479B4ED1C5306A200DF000B /* Reachability.swift */,
 				272B94D3282AE75A00DCBCCE /* Static */,
 				0AC0D3A4233E86E50091EFA5 /* sqlcipher */,
 			);
@@ -5215,7 +5206,6 @@
 		5D1DC52120AC9AFB00905E5A /* DataTests */ = {
 			isa = PBXGroup;
 			children = (
-				0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */,
 				0AD48EEE24AF6E6200938B3B /* FeedSourceOverrideTests.swift */,
 				0AF3B4E5213D8E3200695962 /* CoreDataTestCase.swift */,
 				0AF3B4E9213D8E3200695962 /* DataControllerTests.swift */,
@@ -6653,7 +6643,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				278C468A23F1E6270083347F /* BraveUI.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7883,7 +7872,6 @@
 				E65075951E37F7AB006961AC /* GeneralUtils.swift in Sources */,
 				E683F0C21E93D4E90035D990 /* DictionaryExtensions.swift in Sources */,
 				E65075A91E37F7AB006961AC /* URLExtensions.swift in Sources */,
-				7479B4EF1C5306A200DF000B /* Reachability.swift in Sources */,
 				E65075B31E37F7AB006961AC /* KeyboardHelper.swift in Sources */,
 				E65075AA1E37F7AB006961AC /* URLProtectionSpaceExtensions.swift in Sources */,
 				F91785DB255F38D6002976F2 /* WKWebViewExtensions.swift in Sources */,

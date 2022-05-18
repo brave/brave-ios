@@ -70,7 +70,7 @@ class DataControllerTests: CoreDataTestCase {
     XCTAssertEqual(result.count, 1)
 
     backgroundSaveAndWaitForExpectation {
-      (result.first as! Favorite).delete()
+      (result.first as? Favorite)?.delete()
     }
 
     let newResult = try! DataController.viewContext.fetch(fetchRequest)
