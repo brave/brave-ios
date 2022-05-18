@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import NetworkExtension
 import Data
+import GuardianConnect
 
 private let log = Logger.browserLogger
 
@@ -27,6 +28,8 @@ class BraveVPN {
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
   static func initialize() {
+    /*
+    
     // The vpn can live outside of the app.
     // When the app loads we should load it from preferences to track its state.
     NEVPNManager.shared().loadFromPreferences { error in
@@ -64,6 +67,7 @@ class BraveVPN {
         }
       }
     }
+     */
   }
 
   // MARK: - STATE
@@ -182,9 +186,12 @@ class BraveVPN {
 
   /// Location of last used server for the vpn configuration.
   static var serverLocation: String? {
+    return nil
+    /*
     guard let serverHostname = hostname else { return nil }
     return Preferences.VPN.vpnHostDisplayName.value
       ?? GRDVPNHelper.serverLocation(forHostname: serverHostname)
+     */
   }
 
   /// Name of the purchased vpn plan.
@@ -330,6 +337,7 @@ class BraveVPN {
       }
     }
 
+    /*
     housekeepingApi.verifyReceipt { validSubscriptions, success, error in
       if !success {
         // Api call for receipt verification failed,
@@ -359,6 +367,7 @@ class BraveVPN {
 
       receiptHasExpired?(false)
     }
+    */
   }
 
   /// Configure the vpn for first time user, or when restoring a purchase on freshly installed app.
@@ -393,7 +402,7 @@ class BraveVPN {
     for hostname: String,
     completion: @escaping ((VPNUserCreationStatus) -> Void)
   ) {
-
+    /*
     housekeepingApi.createNewSubscriberCredential(with: .ValidationMethodAppStoreReceipt) {
       jwtCredential, success, error in
 
@@ -422,15 +431,20 @@ class BraveVPN {
         }
       }
     }
+    */
   }
 
   /// Saves jwt credentials in keychain, returns true if save operation was successful.
   private static func saveJwtCredential(_ credential: String) -> Bool {
+    return true
+    
+    /*
     let status = GRDKeychain.storePassword(
       credential, forAccount: kKeychainStr_SubscriberCredential,
       retry: true)
 
     return status == errSecSuccess
+     */
   }
 
   /// Creates a vpn configuration using Apple's `NEVPN*` api and connects to the vpn if successful.
@@ -473,6 +487,7 @@ class BraveVPN {
     GRDKeychain.removeGuardianKeychainItems()
     Preferences.VPN.vpnHostDisplayName.value = nil
 
+    /*
     // Small delay to disconnect the vpn.
     // Otherwise we might end up with 'no internet connection' error.
     DispatchQueue.global().asyncAfter(
@@ -508,6 +523,7 @@ class BraveVPN {
 
         }
       })
+    */
   }
 
   private static func reconfigure(with host: String, location: String?, completion: ((Bool) -> Void)? = nil) {
@@ -522,6 +538,7 @@ class BraveVPN {
 
     saveHostname(host, displayName: location)
 
+    /*
     helper.createFreshUser(withSubscriberCredential: credentialString) { status, createError in
       if status != .success {
         logAndStoreError("reconfigureVPN createFreshUser failed")
@@ -539,6 +556,7 @@ class BraveVPN {
         }
       }
     }
+    */
   }
 
   /// Clears current vpn configuration and removes it from preferences.
@@ -615,7 +633,7 @@ class BraveVPN {
 
   private static func saveHostname(_ hostname: String, displayName: String?) {
     GRDVPNHelper.saveAll(inOneBoxHostname: hostname)
-    GRDGatewayAPI.shared().apiHostname = hostname
+    //GRDGatewayAPI.shared().apiHostname = hostname
     Preferences.VPN.vpnHostDisplayName.value = displayName
   }
 
@@ -666,7 +684,7 @@ class BraveVPN {
 
   static func processVPNAlerts() {
     if !shouldProcessVPNAlerts(considerDummyData: !AppConstants.buildChannel.isPublic) { return }
-
+    /*
     Task {
       let (data, success, error) = await GRDGatewayAPI.shared().events(withDummyData: !AppConstants.buildChannel.isPublic)
       if !success {
@@ -693,5 +711,6 @@ class BraveVPN {
         log.error("Failed parsing vpn alerts data")
       }
     }
+    */
   }
 }

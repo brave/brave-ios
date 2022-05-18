@@ -13,7 +13,6 @@
 		0A179E282519F97E0014D9E1 /* InitialSearchEngines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A179E272519F97E0014D9E1 /* InitialSearchEngines.swift */; };
 		0A19365423508756002E2B81 /* LinkPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A19365323508756002E2B81 /* LinkPreviewViewController.swift */; };
 		0A1DF468244858CA00541FE4 /* VPNProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1DF467244858CA00541FE4 /* VPNProductInfo.swift */; };
-		0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A1DF48324487AA000541FE4 /* GRDGatewayAPIResponse.m */; };
 		0A1DF486244A2ECB00541FE4 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */; };
 		0A1E843D2190A57F0042F782 /* SyncSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E84332190A57D0042F782 /* SyncSettingsTableViewController.swift */; };
 		0A1E843E2190A57F0042F782 /* SyncCodewordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1E84342190A57D0042F782 /* SyncCodewordsView.swift */; };
@@ -28,21 +27,6 @@
 		0A27ABA123D1B9C400194921 /* BrandedImageCalloutState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A27ABA023D1B9C400194921 /* BrandedImageCalloutState.swift */; };
 		0A2BFB3425F2754600719AA9 /* NTPDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */; };
 		0A2FF33F24A4B75100F88F43 /* vpncheckmark.json in Resources */ = {isa = PBXBuildFile; fileRef = 0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */; };
-		0A39FE902486604D00290ABC /* GRDSubscriberCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE832486604100290ABC /* GRDSubscriberCredential.h */; };
-		0A39FE912486604D00290ABC /* GRDGatewayAPIResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */; };
-		0A39FE922486604D00290ABC /* GRDServerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE852486604400290ABC /* GRDServerManager.h */; };
-		0A39FE932486604D00290ABC /* GRDVPNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE862486604700290ABC /* GRDVPNHelper.m */; };
-		0A39FE942486604D00290ABC /* GRDServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE872486604800290ABC /* GRDServerManager.m */; };
-		0A39FE952486604D00290ABC /* GRDKeychain.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE882486604900290ABC /* GRDKeychain.h */; };
-		0A39FE962486604D00290ABC /* GRDGatewayAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE892486604A00290ABC /* GRDGatewayAPI.h */; };
-		0A39FE972486604D00290ABC /* GRDHousekeepingAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE8A2486604A00290ABC /* GRDHousekeepingAPI.h */; };
-		0A39FE982486604D00290ABC /* GRDHousekeepingAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE8B2486604B00290ABC /* GRDHousekeepingAPI.m */; };
-		0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE8C2486604B00290ABC /* GRDGatewayAPI.m */; };
-		0A39FE9A2486604D00290ABC /* GRDVPNHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE8D2486604B00290ABC /* GRDVPNHelper.h */; };
-		0A39FE9B2486604D00290ABC /* GRDKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE8E2486604C00290ABC /* GRDKeychain.m */; };
-		0A39FE9C2486604D00290ABC /* GRDSubscriberCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE8F2486604C00290ABC /* GRDSubscriberCredential.m */; };
-		0A39FE9F248660EA00290ABC /* VPNConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A39FE9D248660E900290ABC /* VPNConstants.h */; };
-		0A39FEA0248660EA00290ABC /* VPNConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A39FE9E248660EA00290ABC /* VPNConstants.m */; };
 		0A40450C25A47BD6009EC321 /* FrequencyQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A40450B25A47BD6009EC321 /* FrequencyQuery.swift */; };
 		0A4214E921A6EBCF006B8E39 /* SafeBrowsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4214E821A6EBCF006B8E39 /* SafeBrowsingTests.swift */; };
 		0A4214FF21AC0D6C006B8E39 /* TimeExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4214F621AC0AFF006B8E39 /* TimeExtensions.swift */; };
@@ -50,8 +34,6 @@
 		0A42BC43260CEDA3007EBBF3 /* VPNLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */; };
 		0A43293021B1C7F50041625B /* AdBlockStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43292F21B1C7F50041625B /* AdBlockStats.swift */; };
 		0A43293B21B1C8D10041625B /* FifoDict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43293A21B1C8D10041625B /* FifoDict.swift */; };
-		0A47389E25D2DD6F0048201A /* NSPredicate+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A47389C25D2DD6E0048201A /* NSPredicate+Additions.m */; };
-		0A47389F25D2DD6F0048201A /* NSPredicate+Additions.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A47389D25D2DD6F0048201A /* NSPredicate+Additions.h */; };
 		0A4B012020D02EC4004D4011 /* TabsBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B011F20D02EC4004D4011 /* TabsBarViewController.swift */; };
 		0A4B012220D02F26004D4011 /* TabBarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012120D02F26004D4011 /* TabBarCell.swift */; };
 		0A4B012420D0321A004D4011 /* UX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A4B012320D0321A004D4011 /* UX.swift */; };
@@ -112,7 +94,6 @@
 		0AB22A94257EADA900126ADC /* spencer-moore_ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0AB22A85257EADA500126ADC /* spencer-moore_ocean.jpg */; };
 		0AB22A95257EADA900126ADC /* corwin-prescott_beach.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0AB22A86257EADA600126ADC /* corwin-prescott_beach.jpg */; };
 		0AB2442C22AA789B00B4D9DD /* ReaderModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */; };
-		0AB6E25724C5EE290060B052 /* NSLogDisabler.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AB6E25624C5EE290060B052 /* NSLogDisabler.h */; };
 		0AB7FCDC235DED0B00F1D9F5 /* NumberExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */; };
 		0AB7FCDF235DEE8F00F1D9F5 /* NumberExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB7FCDE235DEE8F00F1D9F5 /* NumberExtensionTests.swift */; };
 		0ABA874320E68CF500D2694F /* SessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C027441B2A348C001B1E88 /* SessionData.swift */; };
@@ -790,6 +771,7 @@
 		44331DDC22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */; };
 		4433E15526B996C20023A134 /* BraveTalkRewardsOptInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4433E15426B996C20023A134 /* BraveTalkRewardsOptInViewController.swift */; };
 		4433E15726B999B40023A134 /* BraveTalkRewardsOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4433E15626B999B40023A134 /* BraveTalkRewardsOptInView.swift */; };
+		4445F9792835352C0043586E /* GuardianConnect.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4445F9782835352C0043586E /* GuardianConnect.xcframework */; };
 		44514A5F269745FD004CBF73 /* TabTrayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A5E269745FD004CBF73 /* TabTrayController.swift */; };
 		44514A6C26974917004CBF73 /* TabTrayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44514A6B26974917004CBF73 /* TabTrayView.swift */; };
 		4457123226BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4457123126BAB1D200B60C1A /* BraveTalkOptInSuccessViewController.swift */; };
@@ -1648,7 +1630,6 @@
 		0A179E272519F97E0014D9E1 /* InitialSearchEngines.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialSearchEngines.swift; sourceTree = "<group>"; };
 		0A19365323508756002E2B81 /* LinkPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewViewController.swift; sourceTree = "<group>"; };
 		0A1DF467244858CA00541FE4 /* VPNProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNProductInfo.swift; sourceTree = "<group>"; };
-		0A1DF48324487AA000541FE4 /* GRDGatewayAPIResponse.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GRDGatewayAPIResponse.m; sourceTree = "<group>"; };
 		0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		0A1E84332190A57D0042F782 /* SyncSettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSettingsTableViewController.swift; sourceTree = "<group>"; };
 		0A1E84342190A57D0042F782 /* SyncCodewordsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncCodewordsView.swift; sourceTree = "<group>"; };
@@ -1683,21 +1664,6 @@
 		0A2BFB3325F2754600719AA9 /* NTPDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NTPDownloaderTests.swift; sourceTree = "<group>"; };
 		0A2FF33E24A4B75000F88F43 /* vpncheckmark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = vpncheckmark.json; sourceTree = "<group>"; };
 		0A38EA7F216532DB00142710 /* CRUDProtocolsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUDProtocolsTests.swift; sourceTree = "<group>"; };
-		0A39FE832486604100290ABC /* GRDSubscriberCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDSubscriberCredential.h; sourceTree = "<group>"; };
-		0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDGatewayAPIResponse.h; sourceTree = "<group>"; };
-		0A39FE852486604400290ABC /* GRDServerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDServerManager.h; sourceTree = "<group>"; };
-		0A39FE862486604700290ABC /* GRDVPNHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDVPNHelper.m; sourceTree = "<group>"; };
-		0A39FE872486604800290ABC /* GRDServerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDServerManager.m; sourceTree = "<group>"; };
-		0A39FE882486604900290ABC /* GRDKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDKeychain.h; sourceTree = "<group>"; };
-		0A39FE892486604A00290ABC /* GRDGatewayAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDGatewayAPI.h; sourceTree = "<group>"; };
-		0A39FE8A2486604A00290ABC /* GRDHousekeepingAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDHousekeepingAPI.h; sourceTree = "<group>"; };
-		0A39FE8B2486604B00290ABC /* GRDHousekeepingAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDHousekeepingAPI.m; sourceTree = "<group>"; };
-		0A39FE8C2486604B00290ABC /* GRDGatewayAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDGatewayAPI.m; sourceTree = "<group>"; };
-		0A39FE8D2486604B00290ABC /* GRDVPNHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GRDVPNHelper.h; sourceTree = "<group>"; };
-		0A39FE8E2486604C00290ABC /* GRDKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDKeychain.m; sourceTree = "<group>"; };
-		0A39FE8F2486604C00290ABC /* GRDSubscriberCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GRDSubscriberCredential.m; sourceTree = "<group>"; };
-		0A39FE9D248660E900290ABC /* VPNConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNConstants.h; sourceTree = "<group>"; };
-		0A39FE9E248660EA00290ABC /* VPNConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNConstants.m; sourceTree = "<group>"; };
 		0A40450B25A47BD6009EC321 /* FrequencyQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyQuery.swift; sourceTree = "<group>"; };
 		0A4214E821A6EBCF006B8E39 /* SafeBrowsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeBrowsingTests.swift; sourceTree = "<group>"; };
 		0A4214F621AC0AFF006B8E39 /* TimeExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeExtensions.swift; sourceTree = "<group>"; };
@@ -1705,8 +1671,6 @@
 		0A42BC42260CEDA3007EBBF3 /* VPNLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLogs.swift; sourceTree = "<group>"; };
 		0A43292F21B1C7F50041625B /* AdBlockStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdBlockStats.swift; sourceTree = "<group>"; };
 		0A43293A21B1C8D10041625B /* FifoDict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FifoDict.swift; sourceTree = "<group>"; };
-		0A47389C25D2DD6E0048201A /* NSPredicate+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPredicate+Additions.m"; sourceTree = "<group>"; };
-		0A47389D25D2DD6F0048201A /* NSPredicate+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPredicate+Additions.h"; sourceTree = "<group>"; };
 		0A4B011F20D02EC4004D4011 /* TabsBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsBarViewController.swift; sourceTree = "<group>"; };
 		0A4B012120D02F26004D4011 /* TabBarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCell.swift; sourceTree = "<group>"; };
 		0A4B012320D0321A004D4011 /* UX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UX.swift; sourceTree = "<group>"; };
@@ -1771,7 +1735,6 @@
 		0AB22A85257EADA500126ADC /* spencer-moore_ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "spencer-moore_ocean.jpg"; sourceTree = "<group>"; };
 		0AB22A86257EADA600126ADC /* corwin-prescott_beach.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "corwin-prescott_beach.jpg"; sourceTree = "<group>"; };
 		0AB2442B22AA789B00B4D9DD /* ReaderModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderModeButton.swift; sourceTree = "<group>"; };
-		0AB6E25624C5EE290060B052 /* NSLogDisabler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSLogDisabler.h; sourceTree = "<group>"; };
 		0AB7FCDB235DED0B00F1D9F5 /* NumberExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensions.swift; sourceTree = "<group>"; };
 		0AB7FCDE235DEE8F00F1D9F5 /* NumberExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberExtensionTests.swift; sourceTree = "<group>"; };
 		0AC775FF242A282C00139377 /* BuyVPNViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyVPNViewController.swift; sourceTree = "<group>"; };
@@ -2406,6 +2369,7 @@
 		44331DDB22561F34007E3E93 /* ToolbarUrlActionsDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarUrlActionsDelegate.swift; sourceTree = "<group>"; };
 		4433E15426B996C20023A134 /* BraveTalkRewardsOptInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkRewardsOptInViewController.swift; sourceTree = "<group>"; };
 		4433E15626B999B40023A134 /* BraveTalkRewardsOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveTalkRewardsOptInView.swift; sourceTree = "<group>"; };
+		4445F9782835352C0043586E /* GuardianConnect.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GuardianConnect.xcframework; sourceTree = "<group>"; };
 		44514A5E269745FD004CBF73 /* TabTrayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayController.swift; sourceTree = "<group>"; };
 		44514A6B26974917004CBF73 /* TabTrayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabTrayView.swift; sourceTree = "<group>"; };
 		4452CA392552FC7F0053EFE6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -3263,6 +3227,7 @@
 				2748626925AD30A500BC40AA /* sqlcipher.xcframework in Frameworks */,
 				279A9BC42823370100F40FC6 /* XCGLogger in Frameworks */,
 				442E7FB92731F96300412A36 /* GCDWebservers.xcframework in Frameworks */,
+				4445F9792835352C0043586E /* GuardianConnect.xcframework in Frameworks */,
 				5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */,
 				278C468D23F1E6270083347F /* BraveUI.framework in Frameworks */,
 				279A9BCE2823370100F40FC6 /* SDWebImage in Frameworks */,
@@ -3416,32 +3381,6 @@
 			children = (
 			);
 			path = Lists;
-			sourceTree = "<group>";
-		};
-		0A1DF46A24486D4C00541FE4 /* GRDAPI */ = {
-			isa = PBXGroup;
-			children = (
-				0A39FE892486604A00290ABC /* GRDGatewayAPI.h */,
-				0A39FE8C2486604B00290ABC /* GRDGatewayAPI.m */,
-				0A39FE842486604200290ABC /* GRDGatewayAPIResponse.h */,
-				0A39FE8A2486604A00290ABC /* GRDHousekeepingAPI.h */,
-				0A39FE8B2486604B00290ABC /* GRDHousekeepingAPI.m */,
-				0A39FE882486604900290ABC /* GRDKeychain.h */,
-				0A39FE8E2486604C00290ABC /* GRDKeychain.m */,
-				0A39FE852486604400290ABC /* GRDServerManager.h */,
-				0A39FE872486604800290ABC /* GRDServerManager.m */,
-				0A39FE832486604100290ABC /* GRDSubscriberCredential.h */,
-				0A39FE8F2486604C00290ABC /* GRDSubscriberCredential.m */,
-				0A39FE8D2486604B00290ABC /* GRDVPNHelper.h */,
-				0A39FE862486604700290ABC /* GRDVPNHelper.m */,
-				0A1DF48324487AA000541FE4 /* GRDGatewayAPIResponse.m */,
-				0A39FE9D248660E900290ABC /* VPNConstants.h */,
-				0A39FE9E248660EA00290ABC /* VPNConstants.m */,
-				0AB6E25624C5EE290060B052 /* NSLogDisabler.h */,
-				0A47389D25D2DD6F0048201A /* NSPredicate+Additions.h */,
-				0A47389C25D2DD6E0048201A /* NSPredicate+Additions.m */,
-			);
-			path = GRDAPI;
 			sourceTree = "<group>";
 		};
 		0A1E84322190A4BA0042F782 /* Sync */ = {
@@ -3619,7 +3558,6 @@
 		0AC775FD242A280400139377 /* BraveVPN */ = {
 			isa = PBXGroup;
 			children = (
-				0A1DF46A24486D4C00541FE4 /* GRDAPI */,
 				0AC775FF242A282C00139377 /* BuyVPNViewController.swift */,
 				0AC77601242A6AE000139377 /* BuyVPNView.swift */,
 				0AF6B1E624A0EDC1005417FC /* InstallVPNViewController.swift */,
@@ -4506,6 +4444,7 @@
 		28CE83EF1A1D246900576538 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				4445F9782835352C0043586E /* GuardianConnect.xcframework */,
 				445ABC8C2731DCE00089710D /* GCDWebServers */,
 				3B6889C41D66950E002AC85E /* UIImageColors.swift */,
 				7479B4ED1C5306A200DF000B /* Reachability.swift */,
@@ -6563,8 +6502,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A39FE962486604D00290ABC /* GRDGatewayAPI.h in Headers */,
-				0A39FE9F248660EA00290ABC /* VPNConstants.h in Headers */,
 				4422D50821BFFB7600BF1855 /* port_posix.h in Headers */,
 				4422D4CD21BFFB7600BF1855 /* cache.h in Headers */,
 				4422D50621BFFB7600BF1855 /* port.h in Headers */,
@@ -6580,28 +6517,21 @@
 				4422D56721BFFB7F00BF1855 /* unicode_casefold.h in Headers */,
 				4422D56121BFFB7F00BF1855 /* filtered_re2.h in Headers */,
 				4422D4CA21BFFB7600BF1855 /* status.h in Headers */,
-				0A39FE972486604D00290ABC /* GRDHousekeepingAPI.h in Headers */,
 				4422D42E21BFCF8900BF1855 /* HttpsEverywhere.h in Headers */,
 				4422D56F21BFFB7F00BF1855 /* regexp.h in Headers */,
 				4422D43821BFD29E00BF1855 /* NSData+GZIP.h in Headers */,
 				4422D50921BFFB7600BF1855 /* port_example.h in Headers */,
-				0A47389F25D2DD6F0048201A /* NSPredicate+Additions.h in Headers */,
 				4422D42B21BFCF8900BF1855 /* RecentlyUsedCache.h in Headers */,
 				4422D56021BFFB7F00BF1855 /* prefilter_tree.h in Headers */,
-				0AB6E25724C5EE290060B052 /* NSLogDisabler.h in Headers */,
 				4422D4FE21BFFB7600BF1855 /* log_reader.h in Headers */,
 				4422D4E421BFFB7600BF1855 /* two_level_iterator.h in Headers */,
 				4422D54921BFFB7E00BF1855 /* logging.h in Headers */,
-				0A39FE922486604D00290ABC /* GRDServerManager.h in Headers */,
 				4422D50521BFFB7600BF1855 /* atomic_pointer.h in Headers */,
 				4422D4D021BFFB7600BF1855 /* dumpfile.h in Headers */,
 				4422D4E721BFFB7600BF1855 /* log_format.h in Headers */,
 				4422D4D621BFFB7600BF1855 /* iterator.h in Headers */,
 				4422D4D121BFFB7600BF1855 /* c.h in Headers */,
-				0A39FE952486604D00290ABC /* GRDKeychain.h in Headers */,
-				0A39FE912486604D00290ABC /* GRDGatewayAPIResponse.h in Headers */,
 				4422D4DB21BFFB7600BF1855 /* block_.h in Headers */,
-				0A39FE902486604D00290ABC /* GRDSubscriberCredential.h in Headers */,
 				4422D50321BFFB7600BF1855 /* snapshot.h in Headers */,
 				4422D4E021BFFB7600BF1855 /* block_builder.h in Headers */,
 				4422D4C521BFFB7600BF1855 /* random.h in Headers */,
@@ -6644,7 +6574,6 @@
 				4422D4B221BFFB7600BF1855 /* posix_logger.h in Headers */,
 				4422D4B621BFFB7600BF1855 /* logging.h in Headers */,
 				4422D4BA21BFFB7600BF1855 /* mutexlock.h in Headers */,
-				0A39FE9A2486604D00290ABC /* GRDVPNHelper.h in Headers */,
 				4422D4B321BFFB7600BF1855 /* testharness.h in Headers */,
 				4422D4C721BFFB7600BF1855 /* testutil.h in Headers */,
 				4422D4EC21BFFB7600BF1855 /* skiplist.h in Headers */,
@@ -8133,7 +8062,6 @@
 				2746D27124A2A12700E38852 /* RewardsInternalsPromotionListController.swift in Sources */,
 				0A4BEFDA221EF3360005551A /* NetworkResourceType.swift in Sources */,
 				4422D4B921BFFB7600BF1855 /* crc32c.cc in Sources */,
-				0A39FE932486604D00290ABC /* GRDVPNHelper.m in Sources */,
 				592F521E2217327C0078395E /* HttpCookieExtension.swift in Sources */,
 				8CFEF62427F220E700CF3235 /* ScriptSourceType.swift in Sources */,
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
@@ -8252,7 +8180,6 @@
 				0AADC4CA20D2A66E00FDE368 /* FavoriteCell.swift in Sources */,
 				4422D4C021BFFB7600BF1855 /* options.cc in Sources */,
 				A198E75120C701ED00334C11 /* HistoryViewController.swift in Sources */,
-				0A39FE9B2486604D00290ABC /* GRDKeychain.m in Sources */,
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				0A91598922B834CE00CCC119 /* BVC+Rewards.swift in Sources */,
 				A1F66A7320DD71C400303328 /* SettingsViewController.swift in Sources */,
@@ -8286,7 +8213,6 @@
 				EB11A1062044A90E0018F749 /* ContentBlockerHelper+TabContentScript.swift in Sources */,
 				2755AB8623107DBD00F0721F /* AdsMediaReporting.swift in Sources */,
 				27036EC3256718DA004EF6B6 /* PartnerCardView.swift in Sources */,
-				0A39FE9C2486604D00290ABC /* GRDSubscriberCredential.m in Sources */,
 				FA9293D41D6580E100AC8D33 /* QRCodeViewController.swift in Sources */,
 				2F798390279A09DD001FA4B6 /* LoginListViewController.swift in Sources */,
 				7D1B136927DC12FA00BC6F5B /* WalletConnectionView.swift in Sources */,
@@ -8325,7 +8251,6 @@
 				27C6478F2551CD2B006D72FC /* RewardsInternalsDebugViewController.swift in Sources */,
 				44C2364526A05714005A573D /* TabTrayPrivateModeInfoView.swift in Sources */,
 				4422D43721BFD29E00BF1855 /* NSData+GZIP.m in Sources */,
-				0A47389E25D2DD6F0048201A /* NSPredicate+Additions.m in Sources */,
 				27EF6B8024BF48C7005E034F /* FeedSourceListViewController.swift in Sources */,
 				0A764F31230EE5CA003A1D9B /* OnboardingState.swift in Sources */,
 				D8D33A7D1FBD080300A20A28 /* SnapKitExtensions.swift in Sources */,
@@ -8438,7 +8363,6 @@
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				4422D4AE21BFFB7600BF1855 /* testutil.cc in Sources */,
 				0AE5C09922CAA01E00DFF3EE /* RewardsButton.swift in Sources */,
-				0A39FE982486604D00290ABC /* GRDHousekeepingAPI.m in Sources */,
 				0A8C69B5225DE99700988715 /* BookmarkDetailsView.swift in Sources */,
 				4422D4F121BFFB7600BF1855 /* c.cc in Sources */,
 				A83E5AB71C1D993D0026D912 /* UIPasteboardExtensions.swift in Sources */,
@@ -8465,7 +8389,6 @@
 				4422D4BB21BFFB7600BF1855 /* cache.cc in Sources */,
 				44029EB627BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift in Sources */,
 				CA439A9025E80EE400FE9150 /* VideoPlayerTrackbar.swift in Sources */,
-				0A39FEA0248660EA00290ABC /* VPNConstants.m in Sources */,
 				2FD1C61C2639AE9100E3C25F /* BrowserViewController+Onboarding.swift in Sources */,
 				39455F771FC83F430088A22C /* TabEventHandler.swift in Sources */,
 				4422D4B721BFFB7600BF1855 /* filter_policy.cc in Sources */,
@@ -8653,7 +8576,6 @@
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
 				44331DD222551AFE007E3E93 /* ToolbarButton.swift in Sources */,
 				CAC2CB402644488600BB8D36 /* RecentSearchHeaderView.swift in Sources */,
-				0A39FE942486604D00290ABC /* GRDServerManager.m in Sources */,
 				4422D4BC21BFFB7600BF1855 /* testharness.cc in Sources */,
 				3BE7275D1CCFE8B60099189F /* CustomSearchHandler.swift in Sources */,
 				CABFA8F62728651C00B73E97 /* WelcomeViewController.swift in Sources */,
@@ -8667,8 +8589,6 @@
 				CA7C5CAF2731D022003366F7 /* PrivacyEverywhereView.swift in Sources */,
 				5E9B28EB255047C80072E655 /* BookmarkModelStateObserver.swift in Sources */,
 				4422D55521BFFB7E00BF1855 /* nfa.cc in Sources */,
-				0A39FE992486604D00290ABC /* GRDGatewayAPI.m in Sources */,
-				0A1DF48424487AA000541FE4 /* GRDGatewayAPIResponse.m in Sources */,
 				4422D4B421BFFB7600BF1855 /* hash.cc in Sources */,
 				2F1A835A274C35340089A8A9 /* RetentionPreferencesDebugMenuViewController.swift in Sources */,
 				8CFEF62627F2213A00CF3235 /* UserScriptType.swift in Sources */,
