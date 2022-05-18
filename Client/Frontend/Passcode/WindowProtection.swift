@@ -14,7 +14,7 @@ import SwiftKeychainWrapper
 
 private let log = Logger.browserLogger
 
-class WindowProtection {
+public class WindowProtection {
 
   private class LockedViewController: UIViewController {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
@@ -78,7 +78,7 @@ class WindowProtection {
     return true
   }
 
-  init?(window: UIWindow) {
+  public init?(window: UIWindow) {
     guard let scene = window.windowScene else { return nil }
     protectedWindow = window
 

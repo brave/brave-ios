@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 import SystemConfiguration
 
@@ -36,7 +35,7 @@ public enum ReachabilityType: CustomStringConvertible {
     }
 }
 
-public enum ReachabilityStatus: CustomStringConvertible  {
+public enum ReachabilityStatus: CustomStringConvertible {
     case offline
     case online(ReachabilityType)
     case unknown
@@ -74,7 +73,6 @@ open class Reach {
 
         return ReachabilityStatus(reachabilityFlags: flags)
     }
-
 
     func monitorReachabilityChanges() {
         let host = "google.com"

@@ -76,7 +76,7 @@ extension BraveSyncAPI {
     return deviceStateListener
   }
 
-  func removeAllObservers() {
+  public func removeAllObservers() {
     serviceObservers.objectEnumerator().forEach({
       ($0 as? BraveSyncServiceListener)?.observer = nil
     })

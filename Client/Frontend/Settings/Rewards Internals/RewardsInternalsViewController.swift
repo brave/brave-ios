@@ -8,7 +8,6 @@ import BraveCore
 import Static
 import DeviceCheck
 import Shared
-import UIKit
 
 private class WarningCell: MultilineSubtitleCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

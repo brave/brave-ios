@@ -8,8 +8,8 @@ import BraveCore
 
 private let log = Logger.browserLogger
 
-class AdBlockStats: LocalAdblockResourceProtocol {
-  static let shared = AdBlockStats()
+public class AdBlockStats: LocalAdblockResourceProtocol {
+  public static let shared = AdBlockStats()
 
   /// File name of bundled general blocklist.
   private let bundledGeneralBlocklist = "ABPFilterParserData"
@@ -33,7 +33,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
   static let adblockSerialQueue = DispatchQueue(label: "com.brave.adblock-dispatch-queue")
 
-  func startLoading() {
+  public func startLoading() {
     parseBundledGeneralBlocklist()
     loadDownloadedDatFiles()
   }

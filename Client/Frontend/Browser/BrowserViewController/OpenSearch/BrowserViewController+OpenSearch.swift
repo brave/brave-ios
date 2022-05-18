@@ -246,7 +246,7 @@ extension BrowserViewController {
 // MARK: - KeyboardHelperDelegate
 
 extension BrowserViewController: KeyboardHelperDelegate {
-  func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
+  public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
     keyboardState = state
     updateViewConstraints()
 
@@ -260,7 +260,7 @@ extension BrowserViewController: KeyboardHelperDelegate {
     self.evaluateWebsiteSupportOpenSearchEngine(webView)
   }
 
-  func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
+  public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
     keyboardState = nil
     updateViewConstraints()
 

@@ -168,7 +168,7 @@ extension BrowserViewController {
     searchController.handleKeyCommands(sender: sender)
   }
 
-  override var keyCommands: [UIKeyCommand]? {
+  override public var keyCommands: [UIKeyCommand]? {
     let isEditingText = tabManager.selectedTab?.isEditing ?? false
       
     var navigationCommands = [

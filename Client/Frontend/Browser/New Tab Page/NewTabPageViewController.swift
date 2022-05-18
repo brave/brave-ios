@@ -12,7 +12,6 @@ import BraveShared
 import BraveCore
 import SnapKit
 import SwiftUI
-import UIKit
 
 /// The behavior for sizing sections when the user is in landscape orientation
 enum NTPLandscapeSizingBehavior {

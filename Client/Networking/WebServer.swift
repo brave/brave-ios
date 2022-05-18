@@ -6,16 +6,16 @@ import Foundation
 import GCDWebServers
 import Shared
 
-class WebServer {
+public class WebServer {
   private let log = Logger.browserLogger
 
-  static let webServerSharedInstance = WebServer()
+  public static let webServerSharedInstance = WebServer()
 
-  class var sharedInstance: WebServer {
+  public class var sharedInstance: WebServer {
     return webServerSharedInstance
   }
 
-  let server: GCDWebServer = GCDWebServer()
+  public let server: GCDWebServer = GCDWebServer()
 
   var base: String {
     return "http://localhost:\(server.port)"
@@ -37,7 +37,7 @@ class WebServer {
     credentials = URLCredential(user: sessionToken, password: "", persistence: .forSession)
   }
 
-  @discardableResult func start() throws -> Bool {
+  @discardableResult public func start() throws -> Bool {
     if !server.isRunning {
       try server.start(options: [
         GCDWebServerOption_Port: port,

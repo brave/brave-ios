@@ -14,18 +14,18 @@ enum InternalPageSchemeHandlerError: Error {
   case notAuthorized
 }
 
-protocol InternalSchemeResponse {
+public protocol InternalSchemeResponse {
   func response(forRequest: URLRequest) -> (URLResponse, Data)?
 }
 
-class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
+public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
 
-  static func response(forUrl url: URL) -> URLResponse {
+  public static func response(forUrl url: URL) -> URLResponse {
     return URLResponse(url: url, mimeType: "text/html", expectedContentLength: -1, textEncodingName: "utf-8")
   }
 
   // Responders are looked up based on the path component, for instance responder["about/license"] is used for 'internal://local/about/license'
-  static var responders = [String: InternalSchemeResponse]()
+  public static var responders = [String: InternalSchemeResponse]()
 
   // Unprivileged internal:// urls might be internal resources in the app bundle ( i.e. <link href="errorpage-resource/NetError.css"> )
   func downloadResource(urlSchemeTask: WKURLSchemeTask) -> Bool {
@@ -64,7 +64,7 @@ class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
     return false
   }
 
-  func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
+  public func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
     guard let url = urlSchemeTask.request.url else {
       urlSchemeTask.didFailWithError(InternalPageSchemeHandlerError.badURL)
       return
@@ -97,5 +97,5 @@ class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
     urlSchemeTask.didFinish()
   }
 
-  func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+  public func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
 }

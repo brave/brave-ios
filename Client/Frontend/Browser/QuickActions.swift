@@ -28,7 +28,7 @@ protocol QuickActionHandlerDelegate {
   func handleShortCutItemType(_ type: ShortcutType, userData: [String: NSSecureCoding]?)
 }
 
-class QuickActions: NSObject {
+public class QuickActions: NSObject {
 
   fileprivate let log = Logger.browserLogger
 
@@ -38,12 +38,12 @@ class QuickActions: NSObject {
   static let tabURLKey = "url"
   static let tabTitleKey = "title"
 
-  static var sharedInstance = QuickActions()
+  public static var sharedInstance = QuickActions()
 
-  var launchedShortcutItem: UIApplicationShortcutItem?
+  public var launchedShortcutItem: UIApplicationShortcutItem?
 
   // MARK: Handling Quick Actions
-  @discardableResult func handleShortCutItem(_ shortcutItem: UIApplicationShortcutItem, withBrowserViewController bvc: BrowserViewController) -> Bool {
+  @discardableResult public func handleShortCutItem(_ shortcutItem: UIApplicationShortcutItem, withBrowserViewController bvc: BrowserViewController) -> Bool {
 
     // Verify that the provided `shortcutItem`'s `type` is one handled by the application.
     guard let shortCutType = ShortcutType(fullType: shortcutItem.type) else { return false }

@@ -31,7 +31,7 @@
 		27D67618282D9C2900BCE16E /* Brave in Frameworks */ = {isa = PBXBuildFile; productRef = 27D67617282D9C2900BCE16E /* Brave */; };
 		27D6761A282DA10700BCE16E /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27D67619282DA10700BCE16E /* Icons.xcassets */; };
 		27D6761C282DA8FB00BCE16E /* Brave in Frameworks */ = {isa = PBXBuildFile; productRef = 27D6761B282DA8FB00BCE16E /* Brave */; };
-		27D67623282DAD3700BCE16E /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 27D67621282DAD3700BCE16E /* BrowserIntents.intentdefinition */; };
+		27D67623282DAD3700BCE16E /* BrowserIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 27D67621282DAD3700BCE16E /* BrowserIntents.intentdefinition */; settings = {ATTRIBUTES = (no_codegen, ); }; };
 		27F4439F2135E11200296C58 /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
 		27F514D0282C501D00A130EE /* BraveCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514CF282C501D00A130EE /* BraveCore */; };
@@ -655,7 +655,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F84B21DD1A090F8100AAB793 /* Build configuration list for PBXNativeTarget "Client" */;
 			buildPhases = (
-				F979BE0F25BCC098009B6ACF /* Build packaged javascript files */,
 				2779B7052159297D0044A102 /* Run SwiftLint */,
 				0A43293F21B1CB810041625B /* Headers */,
 				F84B21BA1A090F8100AAB793 /* Sources */,
@@ -898,30 +897,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# MaterialComponents.framework doesn't seem to have a `CFBundleShortVersionString`\n/usr/libexec/PlistBuddy -c 'Add :CFBundleShortVersionString string 1.0' \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MaterialComponents.framework/Info.plist\" || echo \"CFBundleShortVersionString already set\"\n";
-		};
-		F979BE0F25BCC098009B6ACF /* Build packaged javascript files */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Build packaged javascript files";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/Client/Assets/MainFrameAtDocumentStart.js",
-				"$(SRCROOT)/Client/Assets/MainFrameAtDocumentEnd.js",
-				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentStart.js",
-				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentEnd.js",
-				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentStartSandboxed.js",
-				"$(SRCROOT)/Client/Assets/AllFramesAtDocumentEndSandboxed.js",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "npm run build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1269,7 +1244,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = BraveEnt;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Enterprise;
@@ -1459,7 +1433,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -2337,7 +2310,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = "Brave iOS";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Release (AppStore)";
@@ -2481,7 +2453,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Dev;
@@ -2606,7 +2577,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Beta;
@@ -2743,7 +2713,6 @@
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/Client/Application/Client-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;

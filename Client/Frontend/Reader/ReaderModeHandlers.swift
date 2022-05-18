@@ -6,12 +6,12 @@ import Foundation
 import GCDWebServers
 import Shared
 
-struct ReaderModeHandlers {
+public struct ReaderModeHandlers {
   static let readerModeStyleHash = "sha256-L2W8+0446ay9/L1oMrgucknQXag570zwgQrHwE68qbQ="
 
   static var readerModeCache: ReaderModeCache = DiskReaderModeCache.sharedInstance
 
-  static func register(_ webServer: WebServer, profile: Profile) {
+  public static func register(_ webServer: WebServer, profile: Profile) {
     // Register our fonts and css, which we want to expose to web content that we present in the WebView
     webServer.registerMainBundleResourcesOfType("ttf", module: "reader-mode/fonts")
     webServer.registerMainBundleResource("Reader.css", module: "reader-mode/styles")

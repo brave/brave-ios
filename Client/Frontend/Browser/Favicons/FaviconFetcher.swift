@@ -15,7 +15,7 @@ import BraveShared
 private let log = Logger.browserLogger
 
 /// Handles obtaining favicons for URLs from local files, database or internet
-class FaviconFetcher {
+public class FaviconFetcher {
   private static let queue = DispatchQueue(
     label: "faviconfetcher-queue",
     qos: .userInitiated, attributes: .concurrent)
@@ -42,7 +42,7 @@ class FaviconFetcher {
   private let url: URL
   private let domain: Domain
   private let kind: Kind
-  static var htmlParsingUserAgent: String?
+  public static var htmlParsingUserAgent: String?
   private let session: URLSession = {
     let configuration = URLSessionConfiguration.default
     configuration.timeoutIntervalForRequest = 5

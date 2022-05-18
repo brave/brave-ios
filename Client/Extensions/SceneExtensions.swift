@@ -22,7 +22,7 @@ extension UIWindowScene {
   
   /// A scene should only ever have one browserViewController
   /// Returns the first instance of `BrowserViewController` that is found in the current scene
-  var browserViewController: BrowserViewController? {
+  public var browserViewController: BrowserViewController? {
     return browserViewControllers.first
   }
 }

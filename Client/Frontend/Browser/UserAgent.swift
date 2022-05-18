@@ -7,15 +7,15 @@ import Shared
 import BraveShared
 import UIKit
 
-struct UserAgent {
-  static let mobile = UserAgentBuilder().build(desktopMode: false)
-  static let desktop = UserAgentBuilder().build(desktopMode: true)
+public struct UserAgent {
+  public static let mobile = UserAgentBuilder().build(desktopMode: false)
+  public static let desktop = UserAgentBuilder().build(desktopMode: true)
 
-  static var userAgentForDesktopMode: String {
+  public static var userAgentForDesktopMode: String {
     UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile
   }
 
-  static var shouldUseDesktopMode: Bool {
+  public static var shouldUseDesktopMode: Bool {
     if UIDevice.isIpad {
       return Preferences.General.alwaysRequestDesktopSite.value
     }

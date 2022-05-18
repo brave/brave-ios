@@ -56,13 +56,13 @@ enum DefaultEngineType: String {
  * The search engines are backed by a write-through cache into a ProfilePrefs instance.  This class
  * is not thread-safe -- you should only access it on a single thread (usually, the main thread)!
  */
-class SearchEngines {
+public class SearchEngines {
   fileprivate let fileAccessor: FileAccessor
 
   private let initialSearchEngines: InitialSearchEngines
   private let locale: Locale
 
-  init(files: FileAccessor, locale: Locale = .current) {
+  public init(files: FileAccessor, locale: Locale = .current) {
     initialSearchEngines = InitialSearchEngines(locale: locale)
     self.locale = locale
     self.fileAccessor = files
@@ -70,7 +70,7 @@ class SearchEngines {
     self.orderedEngines = getOrderedEngines()
   }
 
-  func searchEngineSetup() {
+  public func searchEngineSetup() {
     let engine = initialSearchEngines.defaultSearchEngine
     setInitialDefaultEngine(engine.legacyName ?? engine.rawValue)
   }
@@ -346,7 +346,7 @@ class SearchEngines {
   /// If Default Search Engine is Yahoo or Yahoo! JAPAN,
   /// the engine will be migrated as Custom Search Engine and set as default
   /// In Private Mode the default engine will be set as Brave Search
-  func migrateDefaultYahooSearchEngines() {
+  public func migrateDefaultYahooSearchEngines() {
     // Checking Standard Tab Engine is Yahoo and create a new custom engine for it
     let standardTabEngineName = Preferences.Search.defaultEngineName.value
     let privateTabEngineName = Preferences.Search.defaultPrivateEngineName.value

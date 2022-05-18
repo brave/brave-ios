@@ -13,11 +13,11 @@ import Storage
 
 private let log = Logger.browserLogger
 
-class BraveCoreMigrator {
+public class BraveCoreMigrator {
 
   // MARK: Migration State
 
-  enum MigrationState {
+  public enum MigrationState {
     case notStarted
     case inProgress
     case failed
@@ -26,7 +26,7 @@ class BraveCoreMigrator {
 
   // MARK: MigrationError
 
-  enum MigrationError: LocalizedError {
+  public enum MigrationError: LocalizedError {
     case failedBookmarksMigration
     case failedHistoryMigration
     case failedPasswordMigration

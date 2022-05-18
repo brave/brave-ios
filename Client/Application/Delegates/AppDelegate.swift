@@ -210,7 +210,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
 
     UIScrollView.doBadSwizzleStuff()
-    UIAppearance.applyAppearanceDefaults()
+    UIView.applyAppearanceDefaults()
 
     if Preferences.Rewards.isUsingBAP.value == nil {
       Preferences.Rewards.isUsingBAP.value = Locale.current.regionCode == "JP"

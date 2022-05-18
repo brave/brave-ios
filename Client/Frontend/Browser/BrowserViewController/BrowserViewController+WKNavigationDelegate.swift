@@ -58,7 +58,7 @@ extension BrowserViewController {
 }
 
 extension BrowserViewController: WKNavigationDelegate {
-  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+  public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
     if tabManager.selectedTab?.webView !== webView {
       return
     }
@@ -115,7 +115,7 @@ extension BrowserViewController: WKNavigationDelegate {
     return url.scheme == "rewards" && url.host == "uphold"
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
     guard let url = navigationAction.request.url else {
       decisionHandler(.cancel, preferences)
       return
@@ -349,7 +349,7 @@ extension BrowserViewController: WKNavigationDelegate {
     decisionHandler(.cancel, preferences)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
     let response = navigationResponse.response
     let responseURL = response.url
 
@@ -417,7 +417,7 @@ extension BrowserViewController: WKNavigationDelegate {
     decisionHandler(.allow)
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+  public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 
     // If this is a certificate challenge, see if the certificate has previously been
     // accepted by the user.
@@ -456,7 +456,7 @@ extension BrowserViewController: WKNavigationDelegate {
     }
   }
 
-  func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+  public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     guard let tab = tabManager[webView] else { return }
 
     tab.url = webView.url
@@ -472,7 +472,7 @@ extension BrowserViewController: WKNavigationDelegate {
     }
   }
 
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     if let tab = tabManager[webView] {
 
       // Second attempt to inject results to the BraveSearch.
@@ -548,7 +548,7 @@ extension BrowserViewController: WKNavigationDelegate {
     updateToolbarUsingTabManager(tabManager)
   }
 
-  func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+  public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
     guard let tab = tabManager[webView], let url = webView.url, rewards.isEnabled else { return }
     tab.redirectURLs.append(url)
   }

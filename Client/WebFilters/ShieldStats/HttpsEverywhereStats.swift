@@ -8,9 +8,9 @@ import HTTPSE
 
 private let log = Logger.browserLogger
 
-class HttpsEverywhereStats: LocalAdblockResourceProtocol {
-  static let shared = HttpsEverywhereStats()
-  static let dataVersion = "6.0"
+public class HttpsEverywhereStats: LocalAdblockResourceProtocol {
+  public static let shared = HttpsEverywhereStats()
+  public static let dataVersion = "6.0"
 
   static let levelDbFileName = "httpse.leveldb"
   let folderName = "https-everywhere-data"
@@ -20,7 +20,7 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
 
   fileprivate init() {}
 
-  func startLoading() {
+  public func startLoading() {
     loadLocalData(name: HttpsEverywhereStats.levelDbFileName, type: "tgz") { data in
       setData(data: data)
     }

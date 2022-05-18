@@ -11,7 +11,7 @@ import BraveCore
 
 private let log = Logger.browserLogger
 
-class Migration {
+public class Migration {
 
   private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
   private let braveCore: BraveCoreMain
@@ -24,7 +24,7 @@ class Migration {
     return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value && Preferences.Chromium.syncV2HistoryMigrationCompleted.value && Preferences.Chromium.syncV2PasswordMigrationCompleted.value
   }
 
-  func launchMigrations(keyPrefix: String, profile: Profile) {
+  public func launchMigrations(keyPrefix: String, profile: Profile) {
     Preferences.migratePreferences(keyPrefix: keyPrefix)
 
     if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
@@ -51,7 +51,7 @@ class Migration {
     )
   }
 
-  func moveDatabaseToApplicationDirectory() {
+  public func moveDatabaseToApplicationDirectory() {
     if Preferences.Database.DocumentToSupportDirectoryMigration.completed.value {
       // Migration has been done in some regard, so drop out.
       return
@@ -171,7 +171,7 @@ class Migration {
     }
   }
 
-  static func postCoreDataInitMigrations() {
+  public static func postCoreDataInitMigrations() {
     if !Preferences.Migration.removeLargeFaviconsMigrationCompleted.value {
       FaviconMO.clearTooLargeFavicons()
       Preferences.Migration.removeLargeFaviconsMigrationCompleted.value = true

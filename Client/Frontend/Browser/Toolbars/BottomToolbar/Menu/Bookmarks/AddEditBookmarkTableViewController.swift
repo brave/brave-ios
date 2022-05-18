@@ -6,7 +6,6 @@ import UIKit
 import CoreData
 import Data
 import Shared
-import UIKit
 
 private let log = Logger.browserLogger
 

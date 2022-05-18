@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Shared
+import UIKit
 
 private var appDelegate: AppDelegate.Type
 

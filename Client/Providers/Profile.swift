@@ -53,7 +53,7 @@ class ProfileFileAccessor: FileAccessor {
 /**
  * A Profile manages access to the user's data.
  */
-protocol Profile: AnyObject {
+public protocol Profile: AnyObject {
   var prefs: Prefs { get }
   var searchEngines: SearchEngines { get }
   var files: FileAccessor { get }
@@ -88,9 +88,9 @@ open class BrowserProfile: Profile {
 
   fileprivate let name: String
   fileprivate let keychain: KeychainWrapper
-  var isShutdown = false
+  public var isShutdown = false
 
-  internal let files: FileAccessor
+  public  let files: FileAccessor
 
   let loginsDB: BrowserDB
 
@@ -121,7 +121,7 @@ open class BrowserProfile: Profile {
      * However, if we provide it here, it's assumed that we're initializing it from the application,
      * and initialize the logins.db.
      */
-  init(localName: String, clear: Bool = false) {
+  public init(localName: String, clear: Bool = false) {
     log.debug("Initing profile \(localName) on thread \(Thread.current).")
     self.name = localName
     self.files = ProfileFileAccessor(localName: localName)
@@ -156,14 +156,14 @@ open class BrowserProfile: Profile {
     prefs.setBool(false, forKey: PrefsKeys.keyTopSitesCacheIsValid)
   }
 
-  func reopen() {
+  public func reopen() {
     log.debug("Reopening profile.")
     isShutdown = false
 
     loginsDB.reopenIfClosed()
   }
 
-  func shutdown() {
+  public func shutdown() {
     log.debug("Shutting down profile.")
     isShutdown = true
 
@@ -174,11 +174,11 @@ open class BrowserProfile: Profile {
     log.debug("Deiniting profile \(self.localName()).")
   }
 
-  func localName() -> String {
+  public func localName() -> String {
     return name
   }
 
-  lazy var searchEngines: SearchEngines = {
+  public lazy var searchEngines: SearchEngines = {
     return SearchEngines(files: self.files)
   }()
 
@@ -186,15 +186,15 @@ open class BrowserProfile: Profile {
     return NSUserDefaultsPrefs(prefix: self.localName())
   }
 
-  lazy var prefs: Prefs = {
+  public lazy var prefs: Prefs = {
     return self.makePrefs()
   }()
 
-  lazy var certStore: CertStore = {
+  public lazy var certStore: CertStore = {
     return CertStore()
   }()
 
-  lazy var logins: BrowserLogins = {
+  public lazy var logins: BrowserLogins = {
     return SQLiteLogins(db: self.loginsDB)
   }()
 }

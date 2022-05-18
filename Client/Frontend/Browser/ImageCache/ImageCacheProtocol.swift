@@ -13,7 +13,7 @@ import UIKit
 ///
 /// The last parameter is the original image URL.
 
-typealias ImageCacheProgress = ((Int, Int, URL) -> Void)?
+public typealias ImageCacheProgress = ((Int, Int, URL) -> Void)?
 
 /// ImageCacheCompletion A block called when the operation has completed.
 ///
@@ -26,9 +26,9 @@ typealias ImageCacheProgress = ((Int, Int, URL) -> Void)?
 ///
 /// The last parameter is the original image URL.
 
-typealias ImageCacheCompletion = ((UIImage?, Data?, Error?, ImageCacheType, URL) -> Void)?
+public typealias ImageCacheCompletion = ((UIImage?, Data?, Error?, ImageCacheType, URL) -> Void)?
 
-protocol ImageCacheProtocol {
+public protocol ImageCacheProtocol {
 
   associatedtype ReturnAssociatedType
 

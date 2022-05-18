@@ -5,6 +5,8 @@
 import Foundation
 import Shared
 import XCGLogger
+import Brave
+import UIKit
 
 private let log = Logger.browserLogger
 

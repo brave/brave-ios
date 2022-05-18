@@ -14,11 +14,11 @@ enum TabBarVisibility: Int, CaseIterable {
 }
 
 extension Preferences {
-  enum AutoCloseTabsOption: Int, CaseIterable, RepresentableOptionType {
+  public enum AutoCloseTabsOption: Int, CaseIterable, RepresentableOptionType {
     case manually
     case oneDay, oneWeek, oneMonth
 
-    var displayString: String {
+    public var displayString: String {
       switch self {
       case .manually: return Strings.Settings.autocloseTabsManualOption
       case .oneDay: return Strings.Settings.autocloseTabsOneDayOption
@@ -28,7 +28,7 @@ extension Preferences {
     }
 
     /// Return time interval when to remove old tabs, or nil if no tabs should be removed.
-    var timeInterval: TimeInterval? {
+    public var timeInterval: TimeInterval? {
       let isPublic = AppConstants.buildChannel.isPublic
       switch self {
       case .manually: return nil
@@ -42,21 +42,21 @@ extension Preferences {
 
 // MARK: - Other Preferences
 extension Preferences {
-  final class AppState {
+  final public class AppState {
     /// A flag for determining if the app exited with user interaction in the previous session
     ///
     /// Value should only be checked on launch
-    static let backgroundedCleanly = Option<Bool>(key: "appstate.backgrounded-cleanly", default: true)
+    public static let backgroundedCleanly = Option<Bool>(key: "appstate.backgrounded-cleanly", default: true)
   }
 }
 
 // MARK: - User Preferences
 extension Preferences {
-  final class General {
+  final public class General {
     /// Whether this is the first time user has ever launched Brave after intalling. *Should never be set to `true` manually!*
-    static let isFirstLaunch = Option<Bool>(key: "general.first-launch", default: true)
+    public static let isFirstLaunch = Option<Bool>(key: "general.first-launch", default: true)
     /// Whether this is a new user who installed the application after onboarding retention updates
-    static let isNewRetentionUser = Option<Bool?>(key: "general.new-retention", default: nil)
+    public static let isNewRetentionUser = Option<Bool?>(key: "general.new-retention", default: nil)
     /// Whether or not to save logins in Brave
     static let saveLogins = Option<Bool>(key: "general.save-logins", default: true)
     /// Whether or not to block popups from websites automaticaly
@@ -69,9 +69,9 @@ extension Preferences {
       default: AutoCloseTabsOption.manually.rawValue)
     /// Defines the user's normal browsing theme
     /// `system`, follows the current OS display mode
-    static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: DefaultTheme.system.rawValue)
+    public static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: DefaultTheme.system.rawValue)
     /// Specifies If Night Mode is enabled
-    static let nightModeEnabled = Option<Bool>(key: "general.night-mode-enabled", default: false)
+    public static let nightModeEnabled = Option<Bool>(key: "general.night-mode-enabled", default: false)
     /// Specifies whether the bookmark button is present on toolbar
     static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
     /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only).
@@ -89,7 +89,7 @@ extension Preferences {
     /// Whether or not new user onboarding has completed.
     /// User skipping(tapping on skip) onboarding does NOT count as completed.
     /// If user kills the app before completing onboarding, it should be treated as unfinished.
-    static let basicOnboardingCompleted = Option<Int>(
+    public static let basicOnboardingCompleted = Option<Int>(
       key: "general.basic-onboarding-completed",
       default: OnboardingState.undetermined.rawValue)
     /// The time until the next on-boarding shows
@@ -98,7 +98,7 @@ extension Preferences {
       default: nil)
 
     /// The progress the user has made with onboarding
-    static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
+    public static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
     /// The preference for determining whether or not to show the adblock onboarding popup
     static let onboardingAdblockPopoverShown = Option<Bool>(key: "general.basic-onboarding-adblock-popover-shown", default: false)
 
@@ -120,7 +120,7 @@ extension Preferences {
     static var defaultPageZoomLevel = Option<Double>(key: "general.default-page-zoom-level", default: 1.0)
   }
 
-  final class FullScreenCallout {
+  final public class FullScreenCallout {
     /// Whether the vpn callout is shown.
     static let vpnCalloutCompleted =
       Option<Bool>(key: "fullScreenCallout.full-screen-vpn-callout-completed", default: false)
@@ -146,7 +146,7 @@ extension Preferences {
       Option<Bool>(key: "fullScreenCallout.full-screen-omnibox-callout-completed", default: false)
   }
 
-  final class DefaultBrowserIntro {
+  final public class DefaultBrowserIntro {
     /// Whether the default browser onboarding completed. This can happen by opening app settings or after the user
     /// dismissed the intro screen enough amount of times.
     static let completed =
@@ -157,7 +157,7 @@ extension Preferences {
       Option<Bool>(key: "general.default-browser-notification-scheduled", default: false)
   }
 
-  final class Search {
+  final public class Search {
     /// Whether or not to show suggestions while the user types
     static let showSuggestions = Option<Bool>(key: "search.show-suggestions", default: false)
     /// If the user should see the show suggetsions opt-in
@@ -167,7 +167,7 @@ extension Preferences {
     /// A list of ordered search engines or nil if they have not been set up yet
     static let orderedEngines = Option<[String]?>(key: "search.ordered-engines", default: nil)
     /// The default selected search engine in regular mode
-    static let defaultEngineName = Option<String?>(key: "search.default.name", default: nil)
+    public static let defaultEngineName = Option<String?>(key: "search.default.name", default: nil)
     /// The default selected search engine in private mode
     static let defaultPrivateEngineName = Option<String?>(key: "search.defaultprivate.name", default: nil)
     /// Whether or not to show recent searches
@@ -178,19 +178,19 @@ extension Preferences {
     static let braveSearchDefaultBrowserPromptCount =
       Option<Int>(key: "search.brave-search-default-website-prompt", default: 0)
     /// Determines Yahoo Search Engine is migration is done
-    static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
+    public static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
 
   }
-  final class Privacy {
+  final public class Privacy {
     static let lockWithPasscode = Option<Bool>(key: "privacy.lock-with-passcode", default: false)
     /// Forces all private tabs
-    static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)
+    public static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)
     /// Blocks all cookies and access to local storage
     static let blockAllCookies = Option<Bool>(key: "privacy.block-all-cookies", default: false)
     /// The toggles states for clear private data screen
     static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
   }
-  final class NewTabPage {
+  final public class NewTabPage {
     /// Whether bookmark image are enabled / shown
     static let backgroundImages = Option<Bool>(key: "newtabpage.background-images", default: true)
     /// Whether sponsored images are included into the background image rotation
@@ -230,11 +230,11 @@ extension Preferences {
       Option<[String]>(key: "newtabpage.installed-custom-themes", default: [])
 
     /// Tells the app whether we should try to fetch super referrer assets again in case of network error.
-    static let superReferrerThemeRetryDeadline =
+    public static let superReferrerThemeRetryDeadline =
       Option<Date?>(key: "newtabpage.superreferrer-retry-deadline", default: nil)
   }
 
-  final class VPN {
+  final public class VPN {
     static let popupShowed = Option<Bool>(key: "vpn.popup-showed", default: false)
     /// We get it from Guardian's servers.
     static let lastPurchaseProductId = Option<String?>(key: "vpn.last-purchase-id", default: nil)
@@ -255,7 +255,7 @@ extension Preferences {
     static let vpnHostDisplayName = Option<String?>(key: "vpn.host-location", default: nil)
   }
 
-  final class Chromium {
+  final public class Chromium {
     /// The boolean determine Bookmark Migration is finished on client side
     static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: false)
     /// The boolean determine History Migration is finished on client side
@@ -278,7 +278,7 @@ extension Preferences {
     static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
   }
 
-  final class Debug {
+  final public class Debug {
     /// When general blocklists were last time updated on the device.
     static let lastGeneralAdblockUpdate = Option<Date?>(key: "last-general-adblock-update", default: nil)
     /// When regional blocklists were last time updated on the device.
@@ -289,7 +289,7 @@ extension Preferences {
     static let lastCosmeticFiltersScripletsUpdate = Option<Date?>(key: "last-cosmetic-filters-scriptlets-update", default: nil)
   }
 
-  final class Playlist {
+  final public class Playlist {
     /// The Option to show video list left or right side
     static let listViewSide = Option<String>(key: "playlist.listViewSide", default: PlayListSide.left.rawValue)
     /// The count of how many times  Add to Playlist URL-Bar onboarding has been shown
@@ -320,7 +320,7 @@ extension Preferences {
       Option<Bool>(key: "playlist.enableCarPlayRestartPlayback", default: false)
   }
     
-  final class PrivacyReports {
+  final public class PrivacyReports {
     /// Used to track whether to prompt user to enable app notifications.
     static let shouldShowNotificationPermissionCallout =
     Option<Bool>(key: "privacy-hub.show-notification-permission-callout", default: true)
@@ -332,7 +332,7 @@ extension Preferences {
     static let nextConsolidationDate =
     Option<Date>(key: "privacy-hub.next-consolidation-date", default: Date().advanced(by: 7.days))
     /// Determines whether to show a Privacy Reports onboarding popup on the NTP.
-    static let ntpOnboardingCompleted =
+    public static let ntpOnboardingCompleted =
     Option<Bool>(key: "privacy-hub.onboarding-completed", default: true)
   }
 }

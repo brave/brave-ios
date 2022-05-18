@@ -13,12 +13,12 @@ import GuardianVPN
 private let log = Logger.browserLogger
 
 /// A static class to handle all things related to the Brave VPN service.
-class BraveVPN {
+public class BraveVPN {
 
   private static let housekeepingApi = GRDHousekeepingAPI()
   private static let helper = GRDVPNHelper()
   private static let serverManager = GRDServerManager()
-  private static let iapObserver = IAPObserver()
+  public static let iapObserver = IAPObserver()
 
   // MARK: - Initialization
 
@@ -557,12 +557,12 @@ class BraveVPN {
     }
   }
 
-  static func clearCredentials() {
+  public static func clearCredentials() {
     GRDKeychain.removeGuardianKeychainItems()
     GRDKeychain.removeKeychanItem(forAccount: kKeychainStr_SubscriberCredential)
   }
 
-  static func sendVPNWorksInBackgroundNotification() {
+  public static func sendVPNWorksInBackgroundNotification() {
 
     switch vpnState {
     case .expired, .notPurchased, .purchased:

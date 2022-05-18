@@ -10,6 +10,7 @@ import BraveShared
 import Shared
 import Storage
 import Data
+import Brave
 
 private let log = Logger.browserLogger
 

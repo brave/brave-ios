@@ -9,21 +9,21 @@ import Intents
 
 // Used by the App to navigate to different views.
 // To open a URL use /open-url or to open a blank tab use /open-url with no params
-enum DeepLink: Equatable {
-  init?(urlString: String) {
+public enum DeepLink: Equatable {
+  public init?(urlString: String) {
     // Currently unused for now
     return nil
   }
 }
 
 // The root navigation for the Router. Look at the tests to see a complete URL
-enum NavigationPath: Equatable {
+public enum NavigationPath: Equatable {
   case url(webURL: URL?, isPrivate: Bool)
   case deepLink(DeepLink)
   case text(String)
   case widgetShortcutURL(WidgetShortcut)
 
-  init?(url: URL) {
+  public init?(url: URL) {
     let urlString = url.absoluteString
     if url.scheme == "http" || url.scheme == "https" {
       self = .url(webURL: url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)

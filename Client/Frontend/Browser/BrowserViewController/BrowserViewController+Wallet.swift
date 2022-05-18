@@ -83,7 +83,7 @@ extension BrowserViewController {
 extension WalletPanelHostingController: PopoverContentComponent {}
 
 extension BrowserViewController: BraveWalletDelegate {
-  func openWalletURL(_ destinationURL: URL) {
+  public func openWalletURL(_ destinationURL: URL) {
     if presentedViewController != nil {
       // dismiss to show the new tab
       self.dismiss(animated: true)
@@ -100,7 +100,7 @@ extension BrowserViewController: BraveWalletDelegate {
 }
 
 extension BrowserViewController: BraveWalletProviderDelegate {
-  func showPanel() {
+  public func showPanel() {
     guard presentedViewController == nil else { return }
     
     let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
@@ -111,7 +111,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
     notificationsPresenter.display(notification: walletNotificaton, from: self)
   }
 
-  func getOrigin() -> URLOrigin {
+  public func getOrigin() -> URLOrigin {
     guard let origin = tabManager.selectedTab?.url?.origin else {
       assert(false, "We should have a valid origin to get to this point")
       return .init()
@@ -119,7 +119,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
     return origin
   }
 
-  func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
+  public func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
     Task { @MainActor in
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       let origin = getOrigin()
@@ -167,7 +167,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
     }
   }
 
-  func allowedAccounts(_ includeAccountsWhenLocked: Bool) async -> ([String], BraveWallet.ProviderError, String) {
+  public func allowedAccounts(_ includeAccountsWhenLocked: Bool) async -> ([String], BraveWallet.ProviderError, String) {
     guard let selectedTab = tabManager.selectedTab else {
       return ([], .internalError, "Internal error")
     }

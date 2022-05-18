@@ -9,9 +9,9 @@ import UIKit
 private let iPadFactor: CGFloat = 1.06
 private let iPhoneFactor: CGFloat = 0.88
 
-class DynamicFontHelper: NSObject {
+public class DynamicFontHelper: NSObject {
 
-  static var defaultHelper: DynamicFontHelper {
+  public static var defaultHelper: DynamicFontHelper {
     struct Singleton {
       static let instance = DynamicFontHelper()
     }
@@ -30,7 +30,7 @@ class DynamicFontHelper: NSObject {
   /**
      * Starts monitoring the ContentSizeCategory chantes
      */
-  func startObserving() {
+  public func startObserving() {
     NotificationCenter.default.addObserver(self, selector: #selector(contentSizeCategoryDidChange), name: UIContentSizeCategory.didChangeNotification, object: nil)
   }
 

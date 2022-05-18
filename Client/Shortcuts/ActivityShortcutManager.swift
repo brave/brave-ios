@@ -14,7 +14,7 @@ import UIKit
 private let log = Logger.browserLogger
 
 /// Shortcut Activity Types and detailed information to create and perform actions
-enum ActivityType: String {
+public enum ActivityType: String {
   case newTab = "NewTab"
   case newPrivateTab = "NewPrivateTab"
   case clearBrowsingHistory = "ClearBrowsingHistory"
@@ -22,12 +22,12 @@ enum ActivityType: String {
   case openBraveNews = "OpenBraveNews"
   case openPlayList = "OpenPlayList"
 
-  var identifier: String {
+  public var identifier: String {
     return "\(Bundle.main.bundleIdentifier ?? "").\(self.rawValue)"
   }
 
   /// The activity title for designated  type
-  var title: String {
+  public var title: String {
     switch self {
     case .newTab:
       return Strings.Shortcuts.activityTypeNewTabTitle
@@ -45,7 +45,7 @@ enum ActivityType: String {
   }
 
   /// The content description for designated activity  type
-  var description: String {
+  public var description: String {
     switch self {
     case .newTab, .newPrivateTab:
       return Strings.Shortcuts.activityTypeTabDescription
@@ -61,7 +61,7 @@ enum ActivityType: String {
   }
 
   /// The phrase suggested to the user when they create a shortcut for the activity
-  var suggestedPhrase: String {
+  public var suggestedPhrase: String {
     switch self {
     case .newTab:
       return Strings.Shortcuts.activityTypeNewTabSuggestedPhrase
@@ -80,10 +80,10 @@ enum ActivityType: String {
 }
 
 /// Singleton Manager handles creation and action for Activities
-class ActivityShortcutManager: NSObject {
+public class ActivityShortcutManager: NSObject {
 
   /// Custom Intent Types
-  enum IntentType {
+  public enum IntentType {
     case openWebsite
     case openHistory
     case openBookmarks
@@ -91,7 +91,7 @@ class ActivityShortcutManager: NSObject {
 
   // MARK: Lifecycle
 
-  static var shared = ActivityShortcutManager()
+  public static var shared = ActivityShortcutManager()
 
   // MARK: Activity Creation Methods
 
