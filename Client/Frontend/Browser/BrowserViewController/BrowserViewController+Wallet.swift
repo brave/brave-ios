@@ -101,6 +101,8 @@ extension BrowserViewController: BraveWalletDelegate {
 
 extension BrowserViewController: BraveWalletProviderDelegate {
   func showPanel() {
+    guard presentedViewController == nil else { return }
+    
     let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
       if action == .connectWallet {
         self?.presentWalletPanel()

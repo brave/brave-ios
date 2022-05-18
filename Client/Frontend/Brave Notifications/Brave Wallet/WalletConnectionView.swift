@@ -14,7 +14,6 @@ class WalletConnectionView: UIControl {
     result.axis = .horizontal
     result.spacing = 20
     result.alignment = .center
-    result.distribution = .fill
     result.isUserInteractionEnabled = false
     return result
   }()
