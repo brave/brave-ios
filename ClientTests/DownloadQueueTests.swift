@@ -65,6 +65,17 @@ class DownloadQueueTests: XCTestCase {
                                                .didDownloadCombinedBytes(bytes: 2000),
                                                .didDownloadCombinedBytes(bytes: 3000)])
   }
+
+  func test_downloadDidFinishDownloadingTo_whenDownloadsAreEmpty_doNothing() {
+    let (sut, delegate) = makeSUT()
+    let download = Download()
+    sut.downloads = []
+
+    let location = URL(string: "https://some-location")!
+    sut.download(download, didFinishDownloadingTo: location)
+
+    XCTAssertEqual(delegate.receivedMessages, [])
+  }
 }
 
 // MARK: - Tests Helpers
