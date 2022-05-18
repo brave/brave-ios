@@ -119,11 +119,6 @@ extension BrowserViewController: BraveWalletProviderDelegate {
 
   func requestEthereumPermissions(_ completion: @escaping BraveWalletProviderResultsCallback) {
     Task { @MainActor in
-      if presentedViewController is WalletHostingViewController {
-        completion([], .internalError, "Wallet interaction session is currenty active")
-        return
-      }
-      
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       let origin = getOrigin()
       
@@ -165,14 +160,16 @@ extension BrowserViewController: BraveWalletProviderDelegate {
           completion([], .userRejectedRequest, "User rejected request")
         }
       })
-
-      // display notification
-      let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
-        if action == .connectWallet {
-          self?.presentWalletPanel(completion)
+      
+      // only display notification when BVC is front and center
+      if presentedViewController == nil {
+        let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
+          if action == .connectWallet {
+            self?.presentWalletPanel(completion)
+          }
         }
+        notificationsPresenter.display(notification: walletNotificaton, from: self)
       }
-      notificationsPresenter.display(notification: walletNotificaton, from: self)
     }
   }
 
