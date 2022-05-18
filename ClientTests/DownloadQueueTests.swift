@@ -53,6 +53,18 @@ class DownloadQueueTests: XCTestCase {
     XCTAssertEqual(delegate.receivedMessages, [.didCompleteWithError(error: .downloadError)])
   }
 
+  func test_downloadDidDownloadBytes_sendsCorrectMessage() {
+    let (sut, delegate) = makeSUT()
+    let download = Download()
+
+    sut.download(download, didDownloadBytes: 1000)
+    sut.download(download, didDownloadBytes: 1000)
+    sut.download(download, didDownloadBytes: 1000)
+
+    XCTAssertEqual(delegate.receivedMessages, [.didDownloadCombinedBytes(bytes: 1000),
+                                               .didDownloadCombinedBytes(bytes: 2000),
+                                               .didDownloadCombinedBytes(bytes: 3000)])
+  }
 }
 
 // MARK: - Tests Helpers
