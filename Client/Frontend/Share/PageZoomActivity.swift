@@ -5,6 +5,7 @@
 
 import Foundation
 import Shared
+import UIKit
 
 class PageZoomActivity: UIActivity {
   fileprivate let callback: () -> Void

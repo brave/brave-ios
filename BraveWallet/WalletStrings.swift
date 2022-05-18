@@ -1761,7 +1761,7 @@ extension Strings {
     public static let viewNetworkDetailsTitle = NSLocalizedString(
       "wallet.viewNetworkDetailsTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Network Details",
       comment: "The title for View Network Details Screen shown when a user views the details of a network they are requested to add or switch to by a dapps website."
     )
@@ -2132,98 +2132,98 @@ extension Strings {
     public static let switchNetworkTitle = NSLocalizedString(
       "wallet.switchNetworkTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Switch Network",
       comment: "The title of the view shown over a dapps website that requests the user change the current network."
     )
     public static let switchNetworkSubtitle = NSLocalizedString(
       "wallet.switchNetworkSubtitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Allow this site to switch the network?",
       comment: "The subtitle of the view shown over a dapps website that requests permission from the user to change the current network."
     )
     public static let switchNetworkDescription = NSLocalizedString(
       "wallet.switchNetworkDescription",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "This will switch the network to a previously added network",
       comment: "The description of the view shown over a dapps website that describes what switching the network will do."
     )
     public static let switchNetworkButtonTitle = NSLocalizedString(
       "wallet.switchNetworkButtonTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Switch",
       comment: "The title of the button to approve switching the network on a switch network request from a dapps website."
     )
     public static let addNetworkTitle = NSLocalizedString(
       "wallet.addNetworkTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Add Network",
       comment: "The title of the view shown over a dapps website that requests the user add a new network."
     )
     public static let addNetworkSubtitle = NSLocalizedString(
       "wallet.addNetworkSubtitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Allow this site to add a network?",
       comment: "The subtitle of the view shown over a dapps website that requests permission from the user to add a new network."
     )
     public static let addNetworkDescription = NSLocalizedString(
       "wallet.addNetworkDescription",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "This will allow this network to be used within Brave Wallet.",
       comment: "The description of the view shown over a dapps website that describes what adding a new network will do."
     )
     public static let approveNetworkButtonTitle = NSLocalizedString(
       "wallet.approveNetworkButtonTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Approve",
       comment: "The title of the button to approve adding a new network on a add new network request from a dapps website."
     )
     public static let networkNameTitle = NSLocalizedString(
       "wallet.networkNameTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Network Name",
       comment: "The title for the label that is shown above the name of the network on a request to switch networks or add a new network from a dapps website."
     )
     public static let networkURLTitle = NSLocalizedString(
       "wallet.networkURLTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Network URL",
       comment: "The label that is shown above the URL for the network on a request to switch networks or add a new network from a dapps website."
     )
     public static let viewDetails = NSLocalizedString(
       "wallet.viewDetails",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "View Details",
       comment: "The title for the button to view details about the network the dapp site is requesting the user switch to, or the network the dapp website is requesting the user add."
     )
     public static let signatureRequestTitle = NSLocalizedString(
       "wallet.signatureRequestTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Signature Requested",
       comment: "A title of the view shown over a dapps website that requests the user sign a message."
     )
     public static let signatureRequestSubtitle = NSLocalizedString(
       "wallet.signatureRequestSubtitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Your signature is being requested",
       comment: "A subtitle of the view shown over a dapps website that requests the user sign a message."
     )
     public static let sign = NSLocalizedString(
       "wallet.sign",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .module,
       value: "Sign",
       comment: "The title of the button used to sign a message request on the signature request view."
     )
