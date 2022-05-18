@@ -2311,6 +2311,19 @@ extension BrowserViewController: TabDelegate {
       PlaylistHelper.stopPlayback(tab: $0)
     })
   }
+  
+  func showWalletNotification(_ tab: Tab, completion: BraveWalletProviderResultsCallback?) {
+    // only display notification when BVC is front and center
+    guard presentedViewController == nil else {
+      return
+    }
+    let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
+      if action == .connectWallet {
+        self?.presentWalletPanel(tab: tab, completion: completion)
+      }
+    }
+    notificationsPresenter.display(notification: walletNotificaton, from: self)
+  }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {

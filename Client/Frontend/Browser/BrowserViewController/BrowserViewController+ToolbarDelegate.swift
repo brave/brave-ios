@@ -329,10 +329,10 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidTapWalletButton(_ urlBar: TopToolbarView) {
-    guard let urlOrigin = tabManager.selectedTab?.url?.origin else {
+    guard let selectedTab = tabManager.selectedTab else {
       return
     }
-    presentWalletPanel(origin: urlOrigin)
+    presentWalletPanel(tab: selectedTab, completion: nil)
   }
     
   private func hideSearchController() {
