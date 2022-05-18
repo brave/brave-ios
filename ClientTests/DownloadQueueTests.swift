@@ -41,6 +41,18 @@ class DownloadQueueTests: XCTestCase {
 
     XCTAssertEqual(delegate.receivedMessages, [])
   }
+
+  func test_downloadDidCompleteWithError_sendsCorrectMessage() {
+    let (sut, delegate) = makeSUT()
+    let download = Download()
+    sut.downloads = [download]
+
+    let error = NSError(domain: "download.error", code: 0)
+    sut.download(download, didCompleteWithError: error)
+
+    XCTAssertEqual(delegate.receivedMessages, [.didCompleteWithError(error: .downloadError)])
+  }
+
 }
 
 // MARK: - Tests Helpers
