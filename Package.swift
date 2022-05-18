@@ -3,12 +3,17 @@
 
 import PackageDescription
 
+// News, Playlist (+JS), Onboarding, Browser (Favicons, Bookmarks, History, Passwords, Reader Mode, Settings, Sync),
+// VPN, Rewards, Shields (Privacy, De-Amp, Downloaders, Content Blockers, ...), NTP, Networking,
+
 let package = Package(
   name: "Brave",
   defaultLocalization: "en",
   platforms: [.iOS(.v14), .macOS(.v11)],
   products: [
     .library(name: "Brave", targets: ["Brave"]),
+    .library(name: "GuardianVPN", targets: ["GuardianVPN"]),
+    .library(name: "HTTPSE", targets: ["HTTPSE"]),
     .library(name: "Shared", targets: ["Shared", "FSUtils"]),
     .library(name: "BraveCore", targets: ["BraveCore", "MaterialComponents"]),
     .library(name: "BraveShared", targets: ["BraveShared"]),
@@ -16,6 +21,7 @@ let package = Package(
     .library(name: "BraveWallet", targets: ["BraveWallet"]),
     .library(name: "Data", targets: ["Data"]),
     .library(name: "Storage", targets: ["Storage", "sqlcipher"]),
+    .library(name: "BrowserIntentsModels", targets: ["BrowserIntentsModels"]),
   ],
   dependencies: [
     .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.11"),
@@ -60,6 +66,7 @@ let package = Package(
         "SwiftKeychainWrapper",
         "SwiftyJSON",
         "XCGLogger",
+        "BrowserIntentsModels",
         .product(name: "Lottie", package: "lottie-ios"),
         .product(name: "Collections", package: "swift-collections"),
       ],
@@ -254,6 +261,7 @@ let package = Package(
       ],
       path: "BraveWallet"
     ),
+    .target(name: "BrowserIntentsModels", path: "BrowserIntentsModels"),
     .target(name: "BraveSharedTestUtils", path: "BraveSharedTestUtils"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"], path: "SharedTests"),
     .testTarget(

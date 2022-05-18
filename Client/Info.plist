@@ -218,5 +218,7 @@
 		<string>A000000527471117</string>
 		<string>A0000006472F0001</string>
 	</array>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 </dict>
 </plist>

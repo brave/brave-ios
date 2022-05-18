@@ -10,6 +10,7 @@ import Intents
 import CoreSpotlight
 import MobileCoreServices
 import UIKit
+import BrowserIntentsModels
 
 private let log = Logger.browserLogger
 

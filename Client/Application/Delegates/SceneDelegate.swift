@@ -11,6 +11,7 @@ import Shared
 import Storage
 import Data
 import Brave
+import BrowserIntentsModels
 
 private let log = Logger.browserLogger
 
