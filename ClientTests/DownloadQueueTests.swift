@@ -8,6 +8,7 @@ import XCTest
 @testable import Client
 
 class DownloadQueueTests: XCTestCase {
+  
     func test_downloadDidCompleteWithError_whenErrorIsEmpty_doNothing() {
         let (sut, delegate) = makeSUT()
         let download = Download()
@@ -25,6 +26,18 @@ class DownloadQueueTests: XCTestCase {
 
         let error = NSError(domain: "download.error", code: 0)
         sut.download(download, didCompleteWithError: error)
+
+        XCTAssertEqual(delegate.receivedMessages, [])
+    }
+
+    func test_downloadDidCompleteWithError_whenItHasMoreThanOneDownload_doNothing() {
+        let (sut, delegate) = makeSUT()
+        let download1 = Download()
+        let download2 = Download()
+        sut.downloads = [download1, download2]
+
+        let error = NSError(domain: "download.error", code: 0)
+        sut.download(download1, didCompleteWithError: error)
 
         XCTAssertEqual(delegate.receivedMessages, [])
     }
