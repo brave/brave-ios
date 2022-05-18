@@ -94,16 +94,26 @@ private struct SiteRow: View {
   let siteConnection: SiteConnection
 
   private let maxBlockies = 3
-  @ScaledMetric private var blockieSize: CGFloat = 16
+  @ScaledMetric private var blockieSize = 16.0
   private let maxBlockieSize: CGFloat = 32
-  @ScaledMetric private var blockieDotSize: CGFloat = 2
+  @ScaledMetric private var blockieDotSize = 2.0
+  
+  private var connectedAddresses: String {
+    let account = Strings.Wallet.manageSiteConnectionsAccountSingular
+    let accounts = Strings.Wallet.manageSiteConnectionsAccountPlural
+    return String.localizedStringWithFormat(
+      Strings.Wallet.manageSiteConnectionsAccount,
+      siteConnection.connectedAddresses.count,
+      siteConnection.connectedAddresses.count == 1 ? account : accounts
+    )
+  }
   
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
       Text(verbatim: siteConnection.url)
         .foregroundColor(Color(.bravePrimary))
       HStack {
-        Text(String.localizedStringWithFormat(Strings.Wallet.manageSiteConnectionsAccount, siteConnection.connectedAddresses.count, siteConnection.connectedAddresses.count == 1 ? Strings.Wallet.manageSiteConnectionsAccountSingular : Strings.Wallet.manageSiteConnectionsAccountPlural))
+        Text(connectedAddresses)
           .foregroundColor(Color(.secondaryBraveLabel))
         accountBlockies
         Spacer()

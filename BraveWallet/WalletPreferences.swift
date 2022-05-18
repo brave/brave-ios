@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import BraveShared
+import struct Shared.Strings
 
 extension Preferences {
   public final class Wallet {
@@ -18,9 +19,9 @@ extension Preferences {
       public var name: String {
         switch self {
         case .none:
-          return "None"
+          return Strings.Wallet.walletTypeNone
         case .brave:
-          return "Brave Wallet"
+          return Strings.Wallet.braveWallet
         }
       }
     }

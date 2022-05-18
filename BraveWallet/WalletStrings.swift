@@ -13,7 +13,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .braveWallet,
       value: "Brave Wallet",
-      comment: "The title shown on the wallet settings page."
+      comment: "The title shown on the wallet settings page, and the value shown when selecting the default wallet as Brave Wallet in wallet settings."
     )
     public static let wallet = NSLocalizedString(
       "wallet.wallet",
@@ -2331,6 +2331,13 @@ extension Strings {
       bundle: .braveWallet,
       value: "Connected Ethereum Accounts",
       comment: "The header shown above the list of connected accounts for a single website, shown after selecting/opening a website on the screen to manage web3 sites account connections."
+    )
+    public static let walletTypeNone = NSLocalizedString(
+      "wallet.walletTypeNone",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "None",
+      comment: "The value shown when selecting the default wallet as none / no wallet in wallet settings."
     )
   }
 }
