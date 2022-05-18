@@ -7,7 +7,6 @@ import UIKit
 import Shared
 import BraveShared
 import NetworkExtension
-import Data
 import GuardianConnect
 
 private let log = Logger.browserLogger
@@ -16,8 +15,12 @@ private let log = Logger.browserLogger
 class BraveVPN {
 
   private static let housekeepingApi = GRDHousekeepingAPI()
-  private static let helper = GRDVPNHelper()
+  private static let helper = GRDVPNHelper.sharedInstance()
   private static let serverManager = GRDServerManager()
+
+  private static let gatewayAPI = GRDGatewayAPI()
+
+  static var regions: [GRDRegion] = []
 
   // MARK: - Initialization
 
@@ -28,17 +31,17 @@ class BraveVPN {
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
   static func initialize() {
-    /*
-    
     // The vpn can live outside of the app.
     // When the app loads we should load it from preferences to track its state.
     NEVPNManager.shared().loadFromPreferences { error in
       if let error = error {
         logAndStoreError("Failed to load vpn conection: \(error)")
       }
-
-      GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
-
+      
+      // fix maybe
+      //GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
+      
+      
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
         BraveVPN.clearConfiguration()
@@ -53,29 +56,26 @@ class BraveVPN {
           return
         }
 
+        // FIXME: Make sure this is correct place to fetch the data.
+        populateRegionDataIfNecessary()
+
         if isConnected {
-          GRDGatewayAPI.shared().getServerStatus { completion in
+          gatewayAPI.getServerStatus(completion: { completion in
             if completion.responseStatus == .serverOK {
               log.debug("VPN server status OK")
               return
             }
-
+            
             logAndStoreError("VPN server status failure, migrating to new host")
             disconnect()
             reconnect()
-          }
+          })
         }
       }
     }
-     */
   }
 
   // MARK: - STATE
-
-  /// How many times we should retry to configure the vpn.
-  private static let configMaxRetryCount = 4
-  /// Current number of retries.
-  private static var configRetryCount = 0
 
   /// Sometimes restoring a purchase is triggered multiple times which leads to calling vpn.configure multiple times.
   /// This flags prevents configuring the vpn more than once.
@@ -188,18 +188,16 @@ class BraveVPN {
   static var serverLocation: String? {
     return nil
     /*
-    guard let serverHostname = hostname else { return nil }
-    return Preferences.VPN.vpnHostDisplayName.value
-      ?? GRDVPNHelper.serverLocation(forHostname: serverHostname)
+     guard let serverHostname = hostname else { return nil }
+     return Preferences.VPN.vpnHostDisplayName.value
+     ?? GRDVPNHelper.serverLocation(forHostname: serverHostname)
      */
   }
 
   /// Name of the purchased vpn plan.
   static var subscriptionName: String {
-    guard
-      let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
-    else {
+    guard let credentialString =
+            GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential) else {
       logAndStoreError("subscriptionName: failed to retrieve subscriber credentials")
       return ""
     }
@@ -249,50 +247,7 @@ class BraveVPN {
 
     reconnectPending = true
 
-    guard
-      let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
-    else {
-      reconnectPending = false
-      logAndStoreError("reconnect: failed to retrieve subscriber credentials")
-      return
-    }
-
-    let credential = GRDSubscriberCredential(subscriberCredential: credentialString)
-
-    let tokenExpirationDate = Date(timeIntervalSince1970: TimeInterval(credential.tokenExpirationDate))
-
-    if Date() > tokenExpirationDate {
-      guard let host = hostname else {
-        reconnectPending = false
-        logAndStoreError("failed to retrieve hostname")
-        return
-      }
-
-      createNewSubscriberCredential(for: host) { status in
-        switch status {
-        case .success:
-          connectOrMigrateToNewNode { completion in
-            log.debug("vpn configuration status: \(completion)")
-            reconnectPending = false
-          }
-        case .error:
-          logAndStoreError("Creating new credentials failed when tried to reconnect to the vpn.")
-          reconnectPending = false
-        }
-      }
-    } else {
-      connectOrMigrateToNewNode { completion in
-        switch completion {
-        case .error(let type):
-          logAndStoreError("Failed to reconnect, error: \(type)")
-        case .success:
-          log.debug("Reconnected to the VPN")
-        }
-
-        reconnectPending = false
-      }
-    }
+    connectToVPN()
   }
 
   /// Disconnects the vpn.
@@ -309,36 +264,13 @@ class BraveVPN {
   /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
-    /// A helper struct to deal with unwrapping receipt json and extracting properites we are interested in.
-    struct _Receipt: Decodable {
-      let expireDate: Date
-      let isTrialPeriod: Bool?
-
-      private enum CodingKeys: String, CodingKey {
-        case expiresDateMs = "expires_date_ms"
-        case isTrialPeriod = "is_trial_period"
-      }
-
-      init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let expireDateString = try container.decode(String.self, forKey: .expiresDateMs)
-        if let expireDateTimeIntervalMs = TimeInterval(expireDateString) {
-          // Expiration date comes in milisecond while the iOS time interval uses seconds.
-          self.expireDate = Date(timeIntervalSince1970: expireDateTimeIntervalMs / 1000.0)
-        } else {
-          throw "Casting `expireDateString` failed"
-        }
-
-        if let isTrialString = try container.decodeIfPresent(String.self, forKey: .isTrialPeriod) {
-          self.isTrialPeriod = Bool(isTrialString)
-        } else {
-          self.isTrialPeriod = nil
-        }
-      }
+    guard let receiptUrl = Bundle.main.appStoreReceiptURL,
+          let receipt = try? Data(contentsOf: receiptUrl).base64EncodedString else {
+      receiptHasExpired?(nil)
+      return
     }
 
-    /*
-    housekeepingApi.verifyReceipt { validSubscriptions, success, error in
+    housekeepingApi.verifyReceipt(receipt, bundleId: "com.brave.ios.browser") { validSubscriptions, success, error in
       if !success {
         // Api call for receipt verification failed,
         // we do not know if the receipt has expired or not.
@@ -347,11 +279,8 @@ class BraveVPN {
         return
       }
 
-      guard let validSubscriptions = validSubscriptions as? [[String: Any]],
-        let data = try? JSONSerialization.data(withJSONObject: validSubscriptions, options: []),
-        let receipts = try? JSONDecoder().decode([_Receipt].self, from: data),
-        let newestReceipt = receipts.sorted(by: { $0.expireDate > $1.expireDate }).first
-      else {
+      guard let validSubscriptions = validSubscriptions,
+            let newestReceipt = validSubscriptions.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
         // Setting super old date to force expiration logic in the UI.
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
         receiptHasExpired?(true)
@@ -359,17 +288,67 @@ class BraveVPN {
         return
       }
 
-      Preferences.VPN.expirationDate.value = newestReceipt.expireDate
-
-      if let isTrial = newestReceipt.isTrialPeriod {
-        Preferences.VPN.freeTrialUsed.value = !isTrial
-      }
+      Preferences.VPN.expirationDate.value = newestReceipt.expiresDate
+      Preferences.VPN.freeTrialUsed.value = !newestReceipt.isTrialPeriod
 
       receiptHasExpired?(false)
     }
-    */
   }
 
+  static func connectToVPN(completion: ((VPNConfigStatus) -> Void)? = nil) {
+    if NEVPNManager.shared().connection.status == .connected {
+      helper.disconnectVPN()
+    }
+
+    // do they have EAP creds
+    if GRDVPNHelper.activeConnectionPossible() {
+      // just configure & connect, no need for 'first user' setup
+      helper.configureAndConnectVPN { error, status in
+        print(error)
+        print(status)
+        if status == .success {
+          populateRegionDataIfNecessary()
+          completion?(.success)
+        } else {
+          completion?(.error(type: .loadConfigError))
+        }
+      }
+      
+    } else {
+      helper.configureFirstTimeUserPostCredential(nil) { success, error in
+        if !success {
+          if let error = error {
+            logAndStoreError("configureFirstTimeUserPostCredential \(error)")
+          }
+          completion?(.error(type: .loadConfigError))
+          return
+        }
+        
+        log.debug("Creating credentials and vpn connection successful")
+        print(success)
+        print(error)
+        populateRegionDataIfNecessary()
+        completion?(.success)
+      }
+    }
+  }
+  
+  static func changeVPNRegion(_ region: GRDRegion, completion: ((Bool) -> Void)? = nil) {
+    // configure first time user based on a specified region.
+    helper.configureFirstTimeUser(with: region) { success, error in
+      print(success)
+      print(error as Any)
+      if (success){
+        print("connected successfully!")
+        completion?(true)
+      } else {
+        //handle error for first time config failure
+        print("connection failed: \(String(describing: error))")
+        completion?(false)
+      }
+    }
+  }
+  
   /// Configure the vpn for first time user, or when restoring a purchase on freshly installed app.
   /// Use `resetConfiguration` if you want to reconfigure the vpn for an existing user.
   /// If IAP is restored we treat it as first user configuration as well.
@@ -377,104 +356,13 @@ class BraveVPN {
     if firstTimeUserConfigPending { return }
     firstTimeUserConfigPending = true
 
-    // Make sure region override is nil on new user creation.
+    GRDSubscriptionManager.setIsPayingUser(true)
+
+    // Make sure region mode is set to automatic
     // This can happen if the vpn has expired and a user has to buy it again.
-    Preferences.VPN.vpnRegionOverride.value = nil
+    useAutomaticRegion()
 
-    serverManager.selectGuardianHost { host, location, error in
-      guard let host = host, error == nil else {
-        firstTimeUserConfigPending = false
-        logAndStoreError("configureFirstTimeUser connection problems")
-        completion?(.error(type: .connectionProblems))
-        return
-      }
-
-      saveHostname(host, displayName: location)
-
-      createNewSubscriberCredential(for: host) { status in
-        firstTimeUserConfigPending = false
-        completion?(status)
-      }
-    }
-  }
-
-  private static func createNewSubscriberCredential(
-    for hostname: String,
-    completion: @escaping ((VPNUserCreationStatus) -> Void)
-  ) {
-    /*
-    housekeepingApi.createNewSubscriberCredential(with: .ValidationMethodAppStoreReceipt) {
-      jwtCredential, success, error in
-
-      if !success {
-        logAndStoreError("createNewSubscriberCredential connection problems")
-        completion(.error(type: .connectionProblems))
-        return
-      }
-
-      if let jwtCredential = jwtCredential {
-
-        helper.createFreshUser(withSubscriberCredential: jwtCredential) { status, createError in
-          if status != .success {
-            logAndStoreError("createFreshUser provisioning problems")
-            completion(.error(type: .provisioning))
-            return
-          }
-
-          if !saveJwtCredential(jwtCredential) {
-            logAndStoreError("createFreshUser save jwt token error")
-            completion(.error(type: .provisioning))
-            return
-          }
-
-          completion(.success)
-        }
-      }
-    }
-    */
-  }
-
-  /// Saves jwt credentials in keychain, returns true if save operation was successful.
-  private static func saveJwtCredential(_ credential: String) -> Bool {
-    return true
-    
-    /*
-    let status = GRDKeychain.storePassword(
-      credential, forAccount: kKeychainStr_SubscriberCredential,
-      retry: true)
-
-    return status == errSecSuccess
-     */
-  }
-
-  /// Creates a vpn configuration using Apple's `NEVPN*` api and connects to the vpn if successful.
-  /// This method does not connect to the Guardian's servers unless there is no EAP credentials stored in keychain yet,
-  /// in this case it tries to reconfigure the vpn before connecting to it.
-  static func connectOrMigrateToNewNode(completion: @escaping ((VPNConfigStatus) -> Void)) {
-    helper.configureAndConnectVPN { message, status in
-      switch status {
-      case .success:
-        completion(.success)
-      case .doesNeedMigration:
-        reconfigureVPN() { success in
-          if success {
-            completion(.success)
-          } else {
-            completion(.error(type: .loadConfigError))
-            logAndStoreError("connectOrMigrateToNewNode doesNeedMigration error")
-          }
-        }
-      case .api_AuthenticationError, .api_ProvisioningError, .app_VpnPrefsLoadError,
-        .app_VpnPrefsSaveError, .coudNotReachAPIError, .fail,
-        .networkConnectionError, .migrating:
-        logAndStoreError("connectOrMigrateToNewNode error: \(status.rawValue)")
-        completion(.error(type: .loadConfigError))
-      @unknown default:
-        assertionFailure()
-        logAndStoreError("connectOrMigrateToNewNode unknown error")
-        completion(.error(type: .loadConfigError))
-      }
-    }
+    completion?(.success)
   }
 
   /// Attempts to reconfigure the vpn by migrating to a new server.
@@ -483,88 +371,32 @@ class BraveVPN {
   /// This method disconnects from the vpn before reconfiguration is happening
   /// and reconnects automatically after reconfiguration is done.
   static func reconfigureVPN(completion: ((Bool) -> Void)? = nil) {
-    disconnect()
-    GRDKeychain.removeGuardianKeychainItems()
-    Preferences.VPN.vpnHostDisplayName.value = nil
+    helper.forceDisconnectVPNIfNecessary()
+    GRDVPNHelper.clearVpnConfiguration()
+    useAutomaticRegion()
 
-    /*
-    // Small delay to disconnect the vpn.
-    // Otherwise we might end up with 'no internet connection' error.
-    DispatchQueue.global().asyncAfter(
-      deadline: .now() + 1,
-      execute: {
-        // Region selected manually by the user.
-        if let regionOverride = Preferences.VPN.vpnRegionOverride.value {
-          serverManager.findBestHost(inRegion: regionOverride) { host, location, error in
-            guard let host = host, error == nil else {
-              completion?(false)
-              logAndStoreError("reconfigureVPN findBestHost host error")
-              return
-            }
-
-            reconfigure(with: host, location: location) { success in
-              completion?(success)
-            }
-          }
-        }
-        // Default behavior, automatic mode, chooses location based on device's timezone.
-        else {
-          serverManager.selectGuardianHost { host, location, error in
-            guard let host = host, error == nil else {
-              completion?(false)
-              logAndStoreError("reconfigureVPN selectGuardianHost host error")
-              return
-            }
-
-            reconfigure(with: host, location: location) { success in
-              completion?(success)
-            }
-          }
-
-        }
-      })
-    */
+    connectToVPN() { status in
+      switch status {
+      case .success:
+        completion?(true)
+      default:
+        completion?(false)
+      }
+      //completion?(status == .success)
+    }
   }
 
-  private static func reconfigure(with host: String, location: String?, completion: ((Bool) -> Void)? = nil) {
-    guard
-      let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
-    else {
-      logAndStoreError("reconfigureVPN failed to retrieve subscriber credentials")
-      completion?(false)
-      return
+  static func populateRegionDataIfNecessary () {
+    serverManager.getRegionsWithCompletion { regions in
+      // FIXME: Perhaps put on a serial queue to avoid concurrency bugs
+      self.regions = regions
     }
-
-    saveHostname(host, displayName: location)
-
-    /*
-    helper.createFreshUser(withSubscriberCredential: credentialString) { status, createError in
-      if status != .success {
-        logAndStoreError("reconfigureVPN createFreshUser failed")
-        completion?(false)
-        return
-      }
-
-      connectOrMigrateToNewNode { status in
-        switch status {
-        case .error:
-          logAndStoreError("reconfigureVPN connectOrMigrateToNewNode failed")
-          completion?(false)
-        case .success:
-          completion?(true)
-        }
-      }
-    }
-    */
   }
 
   /// Clears current vpn configuration and removes it from preferences.
   /// This method does not clear keychain items and jwt token.
   private static func clearConfiguration() {
     GRDVPNHelper.clearVpnConfiguration()
-    Preferences.VPN.vpnRegionOverride.value = nil
-    Preferences.VPN.vpnHostDisplayName.value = nil
 
     NEVPNManager.shared().removeFromPreferences { error in
       if let error = error {
@@ -614,9 +446,8 @@ class BraveVPN {
           content.body = Strings.VPN.vpnBackgroundNotificationBody
 
           // Empty `UNNotificationTrigger` sends the notification right away.
-          let request = UNNotificationRequest(
-            identifier: notificationId, content: content,
-            trigger: nil)
+          let request = UNNotificationRequest(identifier: notificationId, content: content,
+                                              trigger: nil)
 
           center.add(request) { error in
             if let error = error {
@@ -631,40 +462,24 @@ class BraveVPN {
     }
   }
 
-  private static func saveHostname(_ hostname: String, displayName: String?) {
-    GRDVPNHelper.saveAll(inOneBoxHostname: hostname)
-    //GRDGatewayAPI.shared().apiHostname = hostname
-    Preferences.VPN.vpnHostDisplayName.value = displayName
+  static func clearRegionList() {
+    helper.selectedRegion = nil
   }
 
-  // MARK: - Server selection
+  static func selectRegion(_ region: GRDRegion?) {
+    helper.selectedRegion = region
+  }
 
-  /// Returns a list of available vpn regions to switch to.
-  static func requestAllServerRegions(_ completion: @escaping ([VPNRegion]?) -> Void) {
-    housekeepingApi.requestAllServerRegions { regionList, success in
-      if !success {
-        logAndStoreError("requestAllServerRegions call failed")
-        completion(nil)
-        return
-      }
-
-      guard let regionList = regionList,
-        let data = try? JSONSerialization.data(
-          withJSONObject: regionList,
-          options: .fragmentsAllowed)
-      else {
-        logAndStoreError("failed to deserialize server regions data")
-        completion(nil)
-        return
-      }
-
-      do {
-        completion(try JSONDecoder().decode([VPNRegion].self, from: data))
-      } catch {
-        logAndStoreError("Failed to decode VPNRegion JSON: \(error.localizedDescription)")
-        completion(nil)
-      }
-    }
+  static var selectedRegion: GRDRegion? {
+    helper.selectedRegion
+  }
+  
+  static func useAutomaticRegion() {
+    helper.selectedRegion = nil
+  }
+  
+  static var isAutomaticRegion: Bool {
+    helper.selectedRegion == nil
   }
   
   private static func shouldProcessVPNAlerts(considerDummyData: Bool) -> Bool {
@@ -684,33 +499,34 @@ class BraveVPN {
 
   static func processVPNAlerts() {
     if !shouldProcessVPNAlerts(considerDummyData: !AppConstants.buildChannel.isPublic) { return }
+    
     /*
-    Task {
-      let (data, success, error) = await GRDGatewayAPI.shared().events(withDummyData: !AppConstants.buildChannel.isPublic)
-      if !success {
-        log.error("VPN getEvents call failed")
-        if let error = error {
-          log.warning(error)
-        }
+     Task {
+     let (data, success, error) = await GRDGatewayAPI.shared().events(withDummyData: !AppConstants.buildChannel.isPublic)
+     if !success {
+     log.error("VPN getEvents call failed")
+     if let error = error {
+     log.warning(error)
+     }
 
-        return
-      }
+     return
+     }
 
-      guard let alertsData = data["alerts"] else {
-        log.error("Failed to unwrap json for vpn alerts")
-        return
-      }
+     guard let alertsData = data["alerts"] else {
+     log.error("Failed to unwrap json for vpn alerts")
+     return
+     }
 
-      do {
-        let dataAsJSON =
-          try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
-        let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
+     do {
+     let dataAsJSON =
+     try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
+     let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
 
-        BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
-      } catch {
-        log.error("Failed parsing vpn alerts data")
-      }
-    }
-    */
+     BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
+     } catch {
+     log.error("Failed parsing vpn alerts data")
+     }
+     }
+     */
   }
 }
