@@ -8,75 +8,75 @@ import XCTest
 @testable import Client
 
 class DownloadQueueTests: XCTestCase {
-  
-    func test_downloadDidCompleteWithError_whenErrorIsEmpty_doNothing() {
-        let (sut, delegate) = makeSUT()
-        let download = Download()
-        sut.downloads = [download]
 
-        sut.download(download, didCompleteWithError: nil)
+  func test_downloadDidCompleteWithError_whenErrorIsEmpty_doNothing() {
+    let (sut, delegate) = makeSUT()
+    let download = Download()
+    sut.downloads = [download]
 
-        XCTAssertEqual(delegate.receivedMessages, [])
-    }
+    sut.download(download, didCompleteWithError: nil)
 
-    func test_downloadDidCompleteWithError_whenDownloadsAreEmpty_doNothing() {
-        let (sut, delegate) = makeSUT()
-        let download = Download()
-        sut.downloads = []
+    XCTAssertEqual(delegate.receivedMessages, [])
+  }
 
-        let error = NSError(domain: "download.error", code: 0)
-        sut.download(download, didCompleteWithError: error)
+  func test_downloadDidCompleteWithError_whenDownloadsAreEmpty_doNothing() {
+    let (sut, delegate) = makeSUT()
+    let download = Download()
+    sut.downloads = []
 
-        XCTAssertEqual(delegate.receivedMessages, [])
-    }
+    let error = NSError(domain: "download.error", code: 0)
+    sut.download(download, didCompleteWithError: error)
 
-    func test_downloadDidCompleteWithError_whenItHasMoreThanOneDownload_doNothing() {
-        let (sut, delegate) = makeSUT()
-        let download1 = Download()
-        let download2 = Download()
-        sut.downloads = [download1, download2]
+    XCTAssertEqual(delegate.receivedMessages, [])
+  }
 
-        let error = NSError(domain: "download.error", code: 0)
-        sut.download(download1, didCompleteWithError: error)
+  func test_downloadDidCompleteWithError_whenItHasMoreThanOneDownload_doNothing() {
+    let (sut, delegate) = makeSUT()
+    let download1 = Download()
+    let download2 = Download()
+    sut.downloads = [download1, download2]
 
-        XCTAssertEqual(delegate.receivedMessages, [])
-    }
+    let error = NSError(domain: "download.error", code: 0)
+    sut.download(download1, didCompleteWithError: error)
+
+    XCTAssertEqual(delegate.receivedMessages, [])
+  }
 }
 
 // MARK: - Tests Helpers
 
 private func makeSUT() -> (sut: DownloadQueue, delegate: DownloadQueueDelegateSpy) {
-    let delegate = DownloadQueueDelegateSpy()
-    let sut = DownloadQueue()
-    sut.delegate = delegate
+  let delegate = DownloadQueueDelegateSpy()
+  let sut = DownloadQueue()
+  sut.delegate = delegate
 
-    return (sut, delegate)
+  return (sut, delegate)
 }
 
 private class DownloadQueueDelegateSpy: DownloadQueueDelegate {
-    enum DownloadQueueError: Error {
-        case downloadError
-    }
+  enum DownloadQueueError: Error {
+      case downloadError
+  }
 
-    enum Message: Equatable {
-        case didCompleteWithError(error: DownloadQueueError?)
-        case didDownloadCombinedBytes(bytes: Int64)
-        case didFinishDownloadingTo(location: URL)
-    }
+  enum Message: Equatable {
+      case didCompleteWithError(error: DownloadQueueError?)
+      case didDownloadCombinedBytes(bytes: Int64)
+      case didFinishDownloadingTo(location: URL)
+  }
 
-    var receivedMessages: [Message] = []
+  var receivedMessages: [Message] = []
 
-    func downloadQueue(_ downloadQueue: DownloadQueue, didStartDownload download: Download) {}
+  func downloadQueue(_ downloadQueue: DownloadQueue, didStartDownload download: Download) {}
 
-    func downloadQueue(_ downloadQueue: DownloadQueue, didDownloadCombinedBytes combinedBytesDownloaded: Int64, combinedTotalBytesExpected: Int64?) {
-        receivedMessages.append(.didDownloadCombinedBytes(bytes: combinedBytesDownloaded))
-    }
+  func downloadQueue(_ downloadQueue: DownloadQueue, didDownloadCombinedBytes combinedBytesDownloaded: Int64, combinedTotalBytesExpected: Int64?) {
+      receivedMessages.append(.didDownloadCombinedBytes(bytes: combinedBytesDownloaded))
+  }
 
-    func downloadQueue(_ downloadQueue: DownloadQueue, download: Download, didFinishDownloadingTo location: URL) {
-        receivedMessages.append(.didFinishDownloadingTo(location: location))
-    }
+  func downloadQueue(_ downloadQueue: DownloadQueue, download: Download, didFinishDownloadingTo location: URL) {
+      receivedMessages.append(.didFinishDownloadingTo(location: location))
+  }
 
-    func downloadQueue(_ downloadQueue: DownloadQueue, didCompleteWithError error: Error?) {
-        receivedMessages.append(.didCompleteWithError(error: error != nil ? .downloadError : nil))
-    }
+  func downloadQueue(_ downloadQueue: DownloadQueue, didCompleteWithError error: Error?) {
+      receivedMessages.append(.didCompleteWithError(error: error != nil ? .downloadError : nil))
+  }
 }
