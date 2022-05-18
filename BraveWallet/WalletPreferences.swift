@@ -33,6 +33,6 @@ extension Preferences {
       default: true
     )
     /// The option to display web3 notification
-    public static let displayWeb3Notifications = Option<Bool>(key: "wallet.display-web3-notifications", default: false)
+    public static let displayWeb3Notifications = Option<Bool>(key: "wallet.display-web3-notifications", default: true)
   }
 }
