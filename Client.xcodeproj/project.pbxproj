@@ -27,6 +27,7 @@
 		27F29DB7282EF10A009F4F59 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 27F29DB6282EF10A009F4F59 /* Storage */; };
 		27F4439F2135E11200296C58 /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 27F443952135E11200296C58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */; };
+		27F50CD7283699FA0009E407 /* GRDServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 27F50CD6283699FA0009E407 /* GRDServerManager.m */; };
 		27F514D0282C501D00A130EE /* BraveCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514CF282C501D00A130EE /* BraveCore */; };
 		27F514D2282C501D00A130EE /* BraveShared in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514D1282C501D00A130EE /* BraveShared */; };
 		27F514D6282C501D00A130EE /* BraveWallet in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514D5282C501D00A130EE /* BraveWallet */; };
@@ -35,6 +36,9 @@
 		27F514E6282C513100A130EE /* BraveShared in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514E5282C513100A130EE /* BraveShared */; };
 		27F514E8282C513100A130EE /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514E7282C513100A130EE /* Shared */; };
 		27F514EC282C520A00A130EE /* BraveUI in Frameworks */ = {isa = PBXBuildFile; productRef = 27F514EB282C520A00A130EE /* BraveUI */; };
+		27FDCED82835B3D300E78FAD /* SharedStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FDCED72835B3D300E78FAD /* SharedStrings.swift */; };
+		27FDCEDA2835B5AA00E78FAD /* BraveStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FDCED92835B5AA00E78FAD /* BraveStrings.swift */; };
+		27FDCEDC2835B66D00E78FAD /* WalletStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27FDCEDB2835B66D00E78FAD /* WalletStrings.swift */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
@@ -149,7 +153,12 @@
 		27F443952135E11200296C58 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27F4439C2135E11200296C58 /* ShareExtension.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ShareExtension.plist; sourceTree = "<group>"; };
 		27F443AC2135E25300296C58 /* ShareToBraveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareToBraveViewController.swift; sourceTree = "<group>"; };
+		27F50CD6283699FA0009E407 /* GRDServerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GRDServerManager.m; path = Client/Frontend/BraveVPN/GRDAPI/GRDServerManager.m; sourceTree = SOURCE_ROOT; };
 		27F514CE282C4FFB00A130EE /*  */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ""; sourceTree = SOURCE_ROOT; };
+		27FDCE512835AE0800E78FAD /* l10n.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = l10n.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		27FDCED72835B3D300E78FAD /* SharedStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SharedStrings.swift; path = Shared/SharedStrings.swift; sourceTree = SOURCE_ROOT; };
+		27FDCED92835B5AA00E78FAD /* BraveStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveStrings.swift; path = BraveShared/BraveStrings.swift; sourceTree = SOURCE_ROOT; };
+		27FDCEDB2835B66D00E78FAD /* WalletStrings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WalletStrings.swift; path = BraveWallet/WalletStrings.swift; sourceTree = SOURCE_ROOT; };
 		2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrowserIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
 		2F6931B8260CFB3700ECEB38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -289,6 +298,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		27FDCE4E2835AE0800E78FAD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28CE83DE1A1D1E7C00576538 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -402,6 +418,49 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
+		27F50CC2283699790009E407 /* GuardianVPN */ = {
+			isa = PBXGroup;
+			children = (
+				27F50CD6283699FA0009E407 /* GRDServerManager.m */,
+			);
+			name = GuardianVPN;
+			sourceTree = "<group>";
+		};
+		27FDCE522835AE0800E78FAD /* l10n */ = {
+			isa = PBXGroup;
+			children = (
+				27F50CC2283699790009E407 /* GuardianVPN */,
+				27FDCE882835AF5400E78FAD /* BraveWallet */,
+				27FDCE852835AF3500E78FAD /* Shared */,
+				27FDCE842835AF2B00E78FAD /* BraveShared */,
+			);
+			path = l10n;
+			sourceTree = "<group>";
+		};
+		27FDCE842835AF2B00E78FAD /* BraveShared */ = {
+			isa = PBXGroup;
+			children = (
+				27FDCED92835B5AA00E78FAD /* BraveStrings.swift */,
+			);
+			name = BraveShared;
+			sourceTree = "<group>";
+		};
+		27FDCE852835AF3500E78FAD /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				27FDCED72835B3D300E78FAD /* SharedStrings.swift */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		27FDCE882835AF5400E78FAD /* BraveWallet */ = {
+			isa = PBXGroup;
+			children = (
+				27FDCEDB2835B66D00E78FAD /* WalletStrings.swift */,
+			);
+			name = BraveWallet;
+			sourceTree = "<group>";
+		};
 		2F6931B5260CFB3700ECEB38 /* BrowserIntents */ = {
 			isa = PBXGroup;
 			children = (
@@ -510,6 +569,7 @@
 				27F443962135E11200296C58 /* ShareExtension */,
 				2F6931B5260CFB3700ECEB38 /* BrowserIntents */,
 				CA0391B7271E1023000EB13C /* BraveWidgets */,
+				27FDCE522835AE0800E78FAD /* l10n */,
 				7B604FC11C496005006EEEC3 /* Frameworks */,
 				F84B21BF1A090F8100AAB793 /* Products */,
 			);
@@ -525,6 +585,7 @@
 				27F443952135E11200296C58 /* ShareExtension.appex */,
 				2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */,
 				CA0391B2271E1023000EB13C /* BraveWidgetsExtension.appex */,
+				27FDCE512835AE0800E78FAD /* l10n.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -564,6 +625,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		27FDCE4C2835AE0800E78FAD /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -585,6 +653,24 @@
 			productName = BraveShareTo;
 			productReference = 27F443952135E11200296C58 /* ShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		27FDCE502835AE0800E78FAD /* l10n */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27FDCE5F2835AE0800E78FAD /* Build configuration list for PBXNativeTarget "l10n" */;
+			buildPhases = (
+				27FDCE4C2835AE0800E78FAD /* Headers */,
+				27FDCE4D2835AE0800E78FAD /* Sources */,
+				27FDCE4E2835AE0800E78FAD /* Frameworks */,
+				27FDCE4F2835AE0800E78FAD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = l10n;
+			productName = l10n;
+			productReference = 27FDCE512835AE0800E78FAD /* l10n.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		2F6931B3260CFB3700ECEB38 /* BrowserIntents */ = {
 			isa = PBXNativeTarget;
@@ -685,6 +771,10 @@
 						CreatedOnToolsVersion = 10.0;
 						LastSwiftMigration = 1010;
 					};
+					27FDCE502835AE0800E78FAD = {
+						CreatedOnToolsVersion = 13.4;
+						LastSwiftMigration = 1340;
+					};
 					2F6931B3260CFB3700ECEB38 = {
 						CreatedOnToolsVersion = 12.2;
 					};
@@ -755,12 +845,20 @@
 				27F443942135E11200296C58 /* ShareExtension */,
 				2F6931B3260CFB3700ECEB38 /* BrowserIntents */,
 				CA0391B1271E1023000EB13C /* BraveWidgetsExtension */,
+				27FDCE502835AE0800E78FAD /* l10n */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		27F443932135E11200296C58 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		27FDCE4F2835AE0800E78FAD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -859,6 +957,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				27F443AD2135E25300296C58 /* ShareToBraveViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		27FDCE4D2835AE0800E78FAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27F50CD7283699FA0009E407 /* GRDServerManager.m in Sources */,
+				27FDCED82835B3D300E78FAD /* SharedStrings.swift in Sources */,
+				27FDCEDA2835B5AA00E78FAD /* BraveStrings.swift in Sources */,
+				27FDCEDC2835B66D00E78FAD /* WalletStrings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1719,6 +1828,243 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Beta;
+		};
+		27FDCE592835AE0800E78FAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG L10N_EXPORT";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		27FDCE5A2835AE0800E78FAD /* Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Dev;
+		};
+		27FDCE5B2835AE0800E78FAD /* Enterprise */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Enterprise;
+		};
+		27FDCE5C2835AE0800E78FAD /* Release (AppStore) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+				VERSION_INFO_PREFIX = "";
+			};
+			name = "Release (AppStore)";
+		};
+		27FDCE5D2835AE0800E78FAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		27FDCE5E2835AE0800E78FAD /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = l10n/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.l10n;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Beta;
 		};
@@ -2680,6 +3026,19 @@
 				27F443A22135E11200296C58 /* Release (AppStore) */,
 				27EEEDA72507CDF900024038 /* Release */,
 				27F443A32135E11200296C58 /* Beta */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		27FDCE5F2835AE0800E78FAD /* Build configuration list for PBXNativeTarget "l10n" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27FDCE592835AE0800E78FAD /* Debug */,
+				27FDCE5A2835AE0800E78FAD /* Dev */,
+				27FDCE5B2835AE0800E78FAD /* Enterprise */,
+				27FDCE5C2835AE0800E78FAD /* Release (AppStore) */,
+				27FDCE5D2835AE0800E78FAD /* Release */,
+				27FDCE5E2835AE0800E78FAD /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

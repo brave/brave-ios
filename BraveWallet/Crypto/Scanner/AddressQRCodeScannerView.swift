@@ -6,7 +6,7 @@
 import SwiftUI
 import AVFoundation
 import SnapKit
-import Shared
+import Strings
 
 struct AddressQRCodeScannerView: View {
   @Binding var address: String

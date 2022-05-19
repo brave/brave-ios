@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import BraveUI
-import struct Shared.Strings
+import Strings
 import SwiftUI
 
 struct BiometricsPasscodeEntryView: View {

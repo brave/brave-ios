@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import Introspect
 import BraveUI
-import struct Shared.Strings
+import Strings
 
 struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore

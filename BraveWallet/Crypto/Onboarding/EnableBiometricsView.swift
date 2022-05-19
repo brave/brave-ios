@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import LocalAuthentication
 import BraveUI
-import struct Shared.Strings
+import Strings
 
 struct EnableBiometricsView: View {
   var action: (_ enable: Bool) -> Void

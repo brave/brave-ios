@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import BraveCore
 import Swift
-import struct Shared.Strings
+import Strings
 
 /// Displays a summary of a given transaction
 struct TransactionView: View {

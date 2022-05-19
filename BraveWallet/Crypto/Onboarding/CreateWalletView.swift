@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import LocalAuthentication
 import BraveUI
-import struct Shared.Strings
+import Strings
 import struct Shared.AppConstants
 
 struct CreateWalletContainerView: View {

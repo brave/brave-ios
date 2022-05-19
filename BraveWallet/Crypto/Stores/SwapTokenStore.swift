@@ -6,7 +6,7 @@
 import Foundation
 import BraveCore
 import BigNumber
-import Shared
+import Strings
 
 /// A store contains data for swap tokens
 public class SwapTokenStore: ObservableObject {

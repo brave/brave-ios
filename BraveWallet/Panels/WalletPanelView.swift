@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import BraveCore
 import BraveUI
-import struct Shared.Strings
+import Strings
 
 public protocol WalletSiteConnectionDelegate {
   /// A list of accounts connected to this webpage (addresses)

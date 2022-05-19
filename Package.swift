@@ -22,6 +22,7 @@ let package = Package(
     .library(name: "Data", targets: ["Data"]),
     .library(name: "Storage", targets: ["Storage", "sqlcipher"]),
     .library(name: "BrowserIntentsModels", targets: ["BrowserIntentsModels"]),
+    .library(name: "Strings", targets: ["Strings"]),
   ],
   dependencies: [
     .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.11"),
@@ -192,7 +193,16 @@ let package = Package(
     ),
     .target(
       name: "Shared",
-      dependencies: ["BraveCore", "FSUtils", "SDWebImage", "SwiftKeychainWrapper", "SwiftyJSON", "XCGLogger"],
+      dependencies: [
+        "BraveCore",
+        "FSUtils",
+        "Strings",
+        "SDWebImage",
+        "SwiftKeychainWrapper",
+        "SwiftyJSON",
+        "XCGLogger",
+        .product(name: "ObjcExceptionBridging", package: "XCGLogger")
+      ],
       path: "Shared",
       exclude: ["FSUtils"],
       resources: [.copy("effective_tld_names.dat")],
@@ -201,7 +211,7 @@ let package = Package(
     .target(name: "FSUtils", path: "Shared/FSUtils", publicHeadersPath: "."),
     .target(
       name: "BraveShared",
-      dependencies: ["SDWebImage", "Shared", "SnapKit", "XCGLogger"],
+      dependencies: ["SDWebImage", "Shared", "Strings", "SnapKit", "XCGLogger"],
       path: "BraveShared",
       resources: [
         .copy("Certificates/AmazonRootCA1.cer"),
@@ -223,6 +233,7 @@ let package = Package(
       name: "BraveUI",
       dependencies: [
         "BraveShared",
+        "Strings",
         .product(name: "Markdown", package: "swift-markdown"),
         "PanModal",
         "SDWebImage",
@@ -243,7 +254,7 @@ let package = Package(
       path: "Storage",
       cSettings: [.define("SQLITE_HAS_CODEC")]
     ),
-    .target(name: "Data", dependencies: ["BraveShared", "Storage"], path: "Data"),
+    .target(name: "Data", dependencies: ["BraveShared", "Storage", "Strings"], path: "Data"),
     .target(
       name: "BraveWallet",
       dependencies: [
@@ -251,6 +262,7 @@ let package = Package(
         "BraveCore",
         "BraveShared",
         "BraveUI",
+        "Strings",
         "PanModal",
         "SDWebImage",
         "SnapKit",
@@ -300,7 +312,8 @@ let package = Package(
         .copy("opml-test-files/states.opml"),
         .copy("blocking-summary-test.json"),
       ]
-    )
+    ),
+    .target(name: "Strings", path: "l10n", exclude: ["tools"])
   ],
   cxxLanguageStandard: .cxx14
 )

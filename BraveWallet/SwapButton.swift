@@ -6,7 +6,7 @@
 import Foundation
 import UIKit
 import BraveUI
-import struct Shared.Strings
+import Strings
 
 class SwapButton: SpringButton {
   private let gradientView = BraveGradientView.alternateGradient02.then {

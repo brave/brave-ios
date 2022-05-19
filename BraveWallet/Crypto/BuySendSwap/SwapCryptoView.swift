@@ -6,7 +6,7 @@
 import SwiftUI
 import BraveCore
 import BraveUI
-import struct Shared.Strings
+import Strings
 import BigNumber
 
 struct ShortcutAmountGrid: View {
