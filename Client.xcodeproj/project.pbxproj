@@ -763,6 +763,7 @@
 		442E7FB92731F96300412A36 /* GCDWebservers.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; };
 		442E7FBA2731F96300412A36 /* GCDWebservers.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 442E7FA82731E5AA00412A36 /* GCDWebservers.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		442E7FC62731F98A00412A36 /* BraveUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C468623F1E6270083347F /* BraveUI.framework */; platformFilter = ios; };
+		443288DE2836595D005E23ED /* GuardianConnect.xcframework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 4445F9782835352C0043586E /* GuardianConnect.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		44331DD222551AFE007E3E93 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD122551AFE007E3E93 /* ToolbarButton.swift */; };
 		44331DD422551CC0007E3E93 /* ToolbarHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD322551CC0007E3E93 /* ToolbarHelper.swift */; };
 		44331DD622551E15007E3E93 /* ToolbarProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44331DD522551E15007E3E93 /* ToolbarProtocols.swift */; };
@@ -1594,6 +1595,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				443288DE2836595D005E23ED /* GuardianConnect.xcframework in Copy Frameworks */,
 				27B68DF125C48F39002D0826 /* MaterialComponents.xcframework in Copy Frameworks */,
 				5D1DC52920AC9AFB00905E5A /* Data.framework in Copy Frameworks */,
 				E60138661C89EB7D00DF9756 /* Storage.framework in Copy Frameworks */,

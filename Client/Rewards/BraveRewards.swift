@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import BraveShared
 import Combine
+import DeviceCheck
 
 class BraveRewards: NSObject {
 

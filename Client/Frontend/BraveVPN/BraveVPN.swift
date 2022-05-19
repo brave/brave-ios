@@ -38,9 +38,7 @@ class BraveVPN {
         logAndStoreError("Failed to load vpn conection: \(error)")
       }
       
-      // fix maybe
-      //GRDGatewayAPI.shared()._loadCredentialsFromKeychain()
-      
+      helper.tunnelLocalizedDescription = "Brave Firewall + VPN"
       
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
