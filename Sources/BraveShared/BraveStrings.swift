@@ -1041,6 +1041,7 @@ extension Strings {
   public static let settingsMenuItem = NSLocalizedString("SettingsMenuItem", tableName: "BraveShared", bundle: .strings, value: "Settings", comment: "Title for settings menu item")
   public static let passwordsMenuItem = NSLocalizedString("PasswordsMenuItem", tableName: "BraveShared", bundle: .strings, value: "Passwords", comment: "Title for passwords menu item")
   public static let addToMenuItem = NSLocalizedString("AddToMenuItem", tableName: "BraveShared", bundle: .strings, value: "Add Bookmark", comment: "Title for the button to add a new website bookmark.")
+  public static let openTabsMenuItem = NSLocalizedString("OpenTabsMenuItem", tableName: "BraveShared", bundle: .strings, value: "Open Tabs", comment: "Title for open tabs menu item")
   public static let shareWithMenuItem = NSLocalizedString("ShareWithMenuItem", tableName: "BraveShared", bundle: .strings, value: "Share with...", comment: "Title for sharing url menu item")
   public static let openExternalAppURLTitle = NSLocalizedString("ExternalAppURLAlertTitle", tableName: "BraveShared", bundle: .strings, value: "Allow link to switch apps?", comment: "Allow link to switch apps?")
   public static let openExternalAppURLMessage = NSLocalizedString("ExternalAppURLAlertMessage", tableName: "BraveShared", bundle: .strings, value: "%@ will launch an external application", comment: "%@ will launch an external application")

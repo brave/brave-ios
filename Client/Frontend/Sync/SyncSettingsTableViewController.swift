@@ -89,6 +89,7 @@ class SyncSettingsTableViewController: UITableViewController {
     case bookmarks = 0
     case history
     case passwords
+    case openTabs
 
     var title: String {
       switch self {
@@ -98,11 +99,13 @@ class SyncSettingsTableViewController: UITableViewController {
         return Strings.historyMenuItem
       case .passwords:
         return Strings.passwordsMenuItem
+      case .openTabs:
+        return Strings.openTabsMenuItem
       }
     }
 
     static var count: Int {
-      return SyncDataTypes.passwords.rawValue + 1
+      return SyncDataTypes.openTabs.rawValue + 1
     }
   }
 
@@ -181,6 +184,8 @@ class SyncSettingsTableViewController: UITableViewController {
       Preferences.Chromium.syncHistoryEnabled.value = toggle.isOn
     case SyncDataTypes.passwords.rawValue:
       Preferences.Chromium.syncPasswordsEnabled.value = toggle.isOn
+    case SyncDataTypes.openTabs.rawValue:
+      Preferences.Chromium.syncOpenTabsEnabled.value = toggle.isOn
     default:
       return
     }
@@ -371,6 +376,8 @@ extension SyncSettingsTableViewController {
         return Preferences.Chromium.syncHistoryEnabled.value
       case .passwords:
         return Preferences.Chromium.syncPasswordsEnabled.value
+      case .openTabs:
+        return Preferences.Chromium.syncOpenTabsEnabled.value
       }
     }
   }
