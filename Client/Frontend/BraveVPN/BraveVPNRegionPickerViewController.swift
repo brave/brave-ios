@@ -175,7 +175,7 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
 
     self.dispatchGroup = DispatchGroup()
 
-    BraveVPN.changeVPNRegion(region) { [weak self] success in
+    BraveVPN.changeVPNRegion(regionToSwitchTo) { [weak self] success in
       guard let self = self else { return }
 
       func _showError() {

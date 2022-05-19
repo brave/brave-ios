@@ -184,12 +184,8 @@ class BraveVPN {
 
   /// Location of last used server for the vpn configuration.
   static var serverLocation: String? {
-    return nil
-    /*
-     guard let serverHostname = hostname else { return nil }
-     return Preferences.VPN.vpnHostDisplayName.value
-     ?? GRDVPNHelper.serverLocation(forHostname: serverHostname)
-     */
+    // FIXME: Does not work for default region.
+    helper.selectedRegion?.regionName
   }
 
   /// Name of the purchased vpn plan.
@@ -331,7 +327,7 @@ class BraveVPN {
     }
   }
   
-  static func changeVPNRegion(_ region: GRDRegion, completion: ((Bool) -> Void)? = nil) {
+  static func changeVPNRegion(_ region: GRDRegion?, completion: ((Bool) -> Void)? = nil) {
     // configure first time user based on a specified region.
     helper.configureFirstTimeUser(with: region) { success, error in
       print(success)
