@@ -53,6 +53,10 @@ extension BraveSyncAPI {
     if Preferences.Chromium.syncPasswordsEnabled.value {
       syncProfileService.userSelectedTypes.update(with: .PASSWORDS)
     }
+    
+    if Preferences.Chromium.syncOpenTabsEnabled.value {
+      syncProfileService.userSelectedTypes.update(with: .TABS)
+    }
   }
 
   func addServiceStateObserver(_ observer: @escaping () -> Void) -> AnyObject {
