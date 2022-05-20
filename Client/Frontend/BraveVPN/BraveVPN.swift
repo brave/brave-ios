@@ -38,6 +38,9 @@ class BraveVPN {
         logAndStoreError("Failed to load vpn conection: \(error)")
       }
       
+      helper.verifyMainCredentials { _, _ in }
+      GRDCredentialManager.migrateKeychainItemsToGRDCredential()
+      
       helper.tunnelLocalizedDescription = "Brave Firewall + VPN"
       
       if case .notPurchased = vpnState {
@@ -148,10 +151,10 @@ class BraveVPN {
     if hasExpired == true {
       return .expired(enabled: NEVPNManager.shared().isEnabled)
     }
-
+    
     // The app has not expired yet and nothing is in keychain.
     // This means user has reinstalled the app while their vpn plan is still active.
-    if GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential) == nil {
+    if helper.mainCredential?.mainCredential != true {
       return .notPurchased
     }
 
@@ -184,20 +187,17 @@ class BraveVPN {
 
   /// Location of last used server for the vpn configuration.
   static var serverLocation: String? {
-    // FIXME: Does not work for default region.
-    helper.selectedRegion?.regionName
+    helper.mainCredential?.hostnameDisplayValue
   }
 
   /// Name of the purchased vpn plan.
   static var subscriptionName: String {
-    guard let credentialString =
-            GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential) else {
+    guard let credential = GRDSubscriberCredential.current() else {
       logAndStoreError("subscriptionName: failed to retrieve subscriber credentials")
       return ""
     }
-    let credential = GRDSubscriberCredential(subscriberCredential: credentialString)
     let productId = credential.subscriptionType
-
+    
     switch productId {
     case VPNProductInfo.ProductIdentifiers.monthlySub:
       return Strings.VPN.vpnSettingsMonthlySubName
@@ -298,8 +298,6 @@ class BraveVPN {
     if GRDVPNHelper.activeConnectionPossible() {
       // just configure & connect, no need for 'first user' setup
       helper.configureAndConnectVPN { error, status in
-        print(error)
-        print(status)
         if status == .success {
           populateRegionDataIfNecessary()
           completion?(.success)
@@ -319,8 +317,6 @@ class BraveVPN {
         }
         
         log.debug("Creating credentials and vpn connection successful")
-        print(success)
-        print(error)
         populateRegionDataIfNecessary()
         completion?(.success)
       }
@@ -328,16 +324,12 @@ class BraveVPN {
   }
   
   static func changeVPNRegion(_ region: GRDRegion?, completion: ((Bool) -> Void)? = nil) {
-    // configure first time user based on a specified region.
     helper.configureFirstTimeUser(with: region) { success, error in
-      print(success)
-      print(error as Any)
-      if (success){
-        print("connected successfully!")
+      if success{
+        log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
         completion?(true)
       } else {
-        //handle error for first time config failure
-        print("connection failed: \(String(describing: error))")
+        log.debug("connection failed: \(String(describing: error))")
         completion?(false)
       }
     }
