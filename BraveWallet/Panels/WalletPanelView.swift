@@ -187,28 +187,28 @@ struct WalletPanelView: View {
   var body: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
-        ZStack {
-          Text(Strings.Wallet.braveWallet)
-            .font(.headline)
-            .background(
-              Color.clear
-            )
-            .frame(maxWidth: .infinity)
-          HStack {
-            Button {
-              presentWalletWithContext(.default)
-            } label: {
-              Image(systemName: "arrow.up.left.and.arrow.down.right")
-                .rotationEffect(.init(degrees: 90))
-            }
-            .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
-            Spacer()
-            HStack(spacing: 24) {
+        if sizeCategory.isAccessibilityCategory {
+          VStack {
+            Text(Strings.Wallet.braveWallet)
+              .font(.headline)
+              .background(
+                Color.clear
+              )
+            HStack {
+              Button {
+                presentWalletWithContext(.default)
+              } label: {
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                  .rotationEffect(.init(degrees: 90))
+              }
+              .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
+              Spacer()
               if cryptoStore.pendingRequest != nil {
                 Button(action: { presentWalletWithContext(.pendingRequests) }) {
-                  Image(uiImage: UIImage(imageLiteralResourceName: "brave.bell.badge").template)
+                  Image("brave.bell.badge")
                     .foregroundColor(.white)
                 }
+                Spacer()
               }
               Menu {
                 Button(action: { keyringStore.lock() }) {
@@ -224,13 +224,61 @@ struct WalletPanelView: View {
               .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
             }
           }
+          .padding(16)
+          .overlay(
+            Color.white.opacity(0.3) // Divider
+              .frame(height: pixelLength),
+            alignment: .bottom
+          )
+        } else {
+          HStack {
+            Button {
+              presentWalletWithContext(.default)
+            } label: {
+              Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .rotationEffect(.init(degrees: 90))
+            }
+            .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
+            if cryptoStore.pendingRequest != nil {
+              // fake bell icon for layout
+              Button(action: {}) {
+                Image("brave.bell.badge")
+              }
+              .opacity(0)
+            }
+            Spacer()
+            Text(Strings.Wallet.braveWallet)
+              .font(.headline)
+              .background(
+                Color.clear
+              )
+            Spacer()
+            if cryptoStore.pendingRequest != nil {
+              Button(action: { presentWalletWithContext(.pendingRequests) }) {
+                Image("brave.bell.badge")
+                  .foregroundColor(.white)
+              }
+            }
+            Menu {
+              Button(action: { keyringStore.lock() }) {
+                Label(Strings.Wallet.lock, image: "brave.lock")
+              }
+              Divider()
+              Button(action: { presentWalletWithContext(.settings) }) {
+                Label(Strings.Wallet.settings, image: "brave.gear")
+              }
+            } label: {
+              Image(systemName: "ellipsis")
+            }
+            .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
+          }
+          .padding(16)
+          .overlay(
+            Color.white.opacity(0.3) // Divider
+              .frame(height: pixelLength),
+            alignment: .bottom
+          )
         }
-        .padding(16)
-        .overlay(
-          Color.white.opacity(0.3) // Divider
-            .frame(height: pixelLength),
-          alignment: .bottom
-        )
         VStack {
           if sizeCategory.isAccessibilityCategory {
             VStack {
