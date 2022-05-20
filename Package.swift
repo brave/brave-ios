@@ -314,7 +314,7 @@ let package = Package(
         .copy("blocking-summary-test.json"),
       ]
     ),
-    .target(name: "Strings", path: "l10n", exclude: ["tools"])
+    .target(name: "Strings", path: "l10n", exclude: ["tools", "Resources/Info.plist"]),
   ],
   cxxLanguageStandard: .cxx14
 )
