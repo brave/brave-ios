@@ -67,7 +67,7 @@ open class Reach {
             return .unknown
         }
 
-        var flags : SCNetworkReachabilityFlags = []
+        var flags: SCNetworkReachabilityFlags = []
         if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
             return .unknown
         }

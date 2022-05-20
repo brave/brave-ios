@@ -4717,3 +4717,11 @@ extension Strings {
   public static let findPreviousTitle = NSLocalizedString("findPreviousTitle", bundle: Bundle.module, value: "Find Previous", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let shareWithTitle = NSLocalizedString("shareWithTitle", bundle: Bundle.module, value: "Share with...", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
 }
+
+extension Strings {
+  // Errors
+  public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.module, value: "Unsupported payment instruments", comment: "Error message if list of Payment Instruments doesn't include BAT")
+  public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.module, value: "User cancelled", comment: "Error message if the payment workflow is canceled by the user")
+  public static let invalidDetailsMessage = NSLocalizedString("invalidDetailsMessage", tableName: "BraveShared", bundle: Bundle.module, value: "Invalid details in payment request", comment: "Error message if details don't have the right type or values")
+  public static let clientErrorMessage = NSLocalizedString("clientErrorMessage", tableName: "BraveShared", bundle: Bundle.module, value: "Client error", comment: "Client is in an invalid state which caused the error")
+}

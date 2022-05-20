@@ -5,7 +5,18 @@
 import UIKit
 import Social
 import MobileCoreServices
-import BraveShared
+
+extension String {
+  /// The first URL found within this String, or nil if no URL is found
+  var firstURL: URL? {
+    if let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
+       let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.count)),
+       let range = Range(match.range, in: self) {
+      return URL(string: String(self[range]))
+    }
+    return nil
+  }
+}
 
 class ShareToBraveViewController: SLComposeServiceViewController {
   private struct Scheme {

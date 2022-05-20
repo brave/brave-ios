@@ -6,6 +6,7 @@
 import Foundation
 import Shared
 import BraveShared
+import UIKit
 
 struct StatData {
   var name: String
