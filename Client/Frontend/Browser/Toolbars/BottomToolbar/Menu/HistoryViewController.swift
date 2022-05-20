@@ -9,6 +9,7 @@ import Storage
 import Data
 import CoreData
 import BraveCore
+import UIKit
 
 class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
 

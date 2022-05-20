@@ -63,6 +63,7 @@ class SettingsViewController: TableViewController {
   private let historyAPI: BraveHistoryAPI
   private let passwordAPI: BravePasswordAPI
   private let syncAPI: BraveSyncAPI
+  private let syncProfileServices: BraveSyncProfileServiceIOS
   private let walletSettingsStore: SettingsStore?
   private let walletNetworkStore: NetworkStore?
   private let keyringStore: KeyringStore?
@@ -92,6 +93,7 @@ class SettingsViewController: TableViewController {
     self.historyAPI = braveCore.historyAPI
     self.passwordAPI = braveCore.passwordAPI
     self.syncAPI = braveCore.syncAPI
+    self.syncProfileServices = braveCore.syncProfileService
     self.walletSettingsStore = walletSettingsStore
     self.walletNetworkStore = walletNetworkStore
     self.keyringStore = keyringStore
@@ -296,9 +298,9 @@ class SettingsViewController: TableViewController {
               }
 
               self.navigationController?
-                .pushViewController(SyncSettingsTableViewController(syncAPI: syncAPI), animated: true)
+                .pushViewController(SyncSettingsTableViewController(syncAPI: syncAPI, syncProfileService: syncProfileServices), animated: true)
             } else {
-              self.navigationController?.pushViewController(SyncWelcomeViewController(syncAPI: syncAPI), animated: true)
+              self.navigationController?.pushViewController(SyncWelcomeViewController(syncAPI: syncAPI, syncProfileServices: syncProfileServices), animated: true)
             }
           }, image: #imageLiteral(resourceName: "settings-sync").template, accessory: .disclosureIndicator,
           cellClass: MultilineValue1Cell.self),

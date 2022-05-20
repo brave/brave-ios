@@ -5,6 +5,7 @@
 import Foundation
 import BraveShared
 import Shared
+import UIKit
 
 enum DefaultTheme: String, RepresentableOptionType {
   case system = "Z71ED37E-EC3E-436E-AD5F-B22748306A6B"

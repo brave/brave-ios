@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveUI
+import UIKit
 
 /// Defines the view for displaying a specific feed item given a specific layout
 ///

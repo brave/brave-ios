@@ -4,6 +4,7 @@
 
 import Foundation
 import Storage
+import UIKit
 
 @available(iOS 11.0, *)
 extension BrowserViewController: UIDropInteractionDelegate {

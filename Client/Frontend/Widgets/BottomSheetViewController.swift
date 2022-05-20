@@ -4,6 +4,7 @@
 
 import Foundation
 import SnapKit
+import UIKit
 
 /// Presents a sheet with a child view controller of choice.
 /// On iPhones it presents as a bottom drawer style.

@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import SnapKit
+import UIKit
 
 struct DownloadToastUX {
   static let toastBackgroundColor = UIColor.braveInfoBorder

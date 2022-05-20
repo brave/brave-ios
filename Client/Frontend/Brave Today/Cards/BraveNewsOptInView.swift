@@ -7,6 +7,7 @@ import Foundation
 import Lottie
 import BraveUI
 import Shared
+import UIKit
 
 enum OptInCardAction {
   case closedButtonTapped

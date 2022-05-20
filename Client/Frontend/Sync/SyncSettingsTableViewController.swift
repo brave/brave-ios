@@ -13,9 +13,10 @@ class SyncSettingsTableViewController: UITableViewController {
 
   // MARK: Lifecycle
 
-  init(showDoneButton: Bool = false, syncAPI: BraveSyncAPI) {
+  init(showDoneButton: Bool = false, syncAPI: BraveSyncAPI, syncProfileService: BraveSyncProfileServiceIOS) {
     self.showDoneButton = showDoneButton
     self.syncAPI = syncAPI
+    self.syncProfileService = syncProfileService
     super.init(style: .grouped)
   }
 
@@ -33,7 +34,7 @@ class SyncSettingsTableViewController: UITableViewController {
     }
 
     let codeWords = syncAPI.getSyncCode()
-    syncAPI.joinSyncGroup(codeWords: codeWords)
+    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileService)
     syncAPI.syncEnabled = true
 
     self.updateDeviceList()
@@ -59,6 +60,7 @@ class SyncSettingsTableViewController: UITableViewController {
   // MARK: Private
 
   private let syncAPI: BraveSyncAPI
+  private let syncProfileService: BraveSyncProfileServiceIOS
 
   private struct BraveSyncDevice: Codable {
     let chromeVersion: String
@@ -181,7 +183,7 @@ class SyncSettingsTableViewController: UITableViewController {
       return
     }
 
-    syncAPI.enableSyncTypes()
+    syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
   }
 }
 

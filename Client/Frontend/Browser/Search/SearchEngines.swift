@@ -7,6 +7,7 @@ import Shared
 import BraveShared
 import Storage
 import XCGLogger
+import UIKit
 
 private let log = Logger.browserLogger
 

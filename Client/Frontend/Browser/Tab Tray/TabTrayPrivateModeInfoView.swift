@@ -6,6 +6,7 @@
 import Foundation
 import Shared
 import BraveShared
+import UIKit
 
 extension TabTrayController {
   class TabTrayPrivateModeInfoView: UIView {

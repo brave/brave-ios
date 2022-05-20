@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import UIKit
 
 public struct UIConstants {
   static let defaultPadding: CGFloat = 10

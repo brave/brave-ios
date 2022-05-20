@@ -5,6 +5,7 @@
 import Foundation
 import SnapKit
 import Shared
+import UIKit
 import BraveUI
 
 class SnackBarUX {

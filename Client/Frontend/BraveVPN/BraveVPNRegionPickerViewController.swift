@@ -8,6 +8,8 @@ import Shared
 import BraveShared
 import BraveUI
 import Lottie
+import UIKit
+import NetworkExtension
 
 class BraveVPNRegionPickerViewController: UIViewController {
   private let regionList: [VPNRegion]

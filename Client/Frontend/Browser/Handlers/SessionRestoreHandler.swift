@@ -88,7 +88,7 @@ class SessionRestoreHandler: InternalSchemeResponse {
 
     // From here on, handle 'history=' query param
     let response = InternalSchemeHandler.response(forUrl: url.url)
-    guard let sessionRestorePath = Bundle.main.path(forResource: "SessionRestore", ofType: "html"),
+    guard let sessionRestorePath = Bundle.module.path(forResource: "SessionRestore", ofType: "html"),
       var html = try? String(contentsOfFile: sessionRestorePath)
     else {
       assert(false)

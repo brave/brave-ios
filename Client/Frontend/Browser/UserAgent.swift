@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import UIKit
 
 struct UserAgent {
   static let mobile = UserAgentBuilder().build(desktopMode: false)

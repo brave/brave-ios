@@ -17,6 +17,7 @@ import Data
 import StoreKit
 import BraveCore
 import Combine
+import Brave
 
 private let log = Logger.browserLogger
 
@@ -59,9 +60,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   /// Object used to handle server pings
   private(set) lazy var dau = DAU(braveCoreStats: braveCore.braveStats)
-
-  /// Must be added at launch according to Apple's documentation.
-  let iapObserver = IAPObserver()
 
   private var cancellables: Set<AnyCancellable> = []
   private var sceneInfo: SceneInfoModel?
@@ -106,9 +104,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } else {
       HttpsEverywhereStats.shared.startLoading()
     }
-
-    // Setup Application Shortcuts
-    updateShortcutItems(application)
 
     // Must happen before passcode check, otherwise may unnecessarily reset keychain
     migration?.moveDatabaseToApplicationDirectory()
@@ -207,7 +202,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // IAPs can trigger on the app as soon as it launches,
     // for example when a previous transaction was not finished and is in pending state.
-    SKPaymentQueue.default().add(iapObserver)
+    SKPaymentQueue.default().add(BraveVPN.iapObserver)
 
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
@@ -215,7 +210,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
 
     UIScrollView.doBadSwizzleStuff()
-    applyAppearanceDefaults()
+    UIAppearance.applyAppearanceDefaults()
 
     if Preferences.Rewards.isUsingBAP.value == nil {
       Preferences.Rewards.isUsingBAP.value = Locale.current.regionCode == "JP"
@@ -311,7 +306,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // We have only five seconds here, so let's hope this doesn't take too long.
     sceneInfo?.profile.shutdown()
 
-    SKPaymentQueue.default().remove(iapObserver)
+    SKPaymentQueue.default().remove(BraveVPN.iapObserver)
 
     // Clean up BraveCore
     braveCore.syncAPI.removeAllObservers()
@@ -320,31 +315,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     log.debug("Cleanly Terminated the Application")
-  }
-
-  func updateShortcutItems(_ application: UIApplication) {
-    let newTabItem = UIMutableApplicationShortcutItem(
-      type: "\(Bundle.main.bundleIdentifier ?? "").NewTab",
-      localizedTitle: Strings.quickActionNewTab,
-      localizedSubtitle: nil,
-      icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_tab"),
-      userInfo: [:])
-
-    let privateTabItem = UIMutableApplicationShortcutItem(
-      type: "\(Bundle.main.bundleIdentifier ?? "").NewPrivateTab",
-      localizedTitle: Strings.quickActionNewPrivateTab,
-      localizedSubtitle: nil,
-      icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
-      userInfo: [:])
-
-    let scanQRCodeItem = UIMutableApplicationShortcutItem(
-      type: "\(Bundle.main.bundleIdentifier ?? "").ScanQRCode",
-      localizedTitle: Strings.scanQRCodeViewTitle,
-      localizedSubtitle: nil,
-      icon: UIApplicationShortcutIcon(templateImageName: "recent-search-qrcode"),
-      userInfo: [:])
-
-    application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
   }
 
   func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {

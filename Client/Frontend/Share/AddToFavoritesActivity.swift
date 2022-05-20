@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import UIKit
 
 class AddToFavoritesActivity: UIActivity {
   fileprivate let callback: () -> Void

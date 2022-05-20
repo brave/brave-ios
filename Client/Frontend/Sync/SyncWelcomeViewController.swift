@@ -5,6 +5,7 @@ import Shared
 import Data
 import BraveShared
 import BraveCore
+import UIKit
 
 /// Sometimes during heavy operations we want to prevent user from navigating back, changing screen etc.
 protocol NavigationPrevention {
@@ -130,9 +131,11 @@ class SyncWelcomeViewController: SyncViewController {
   }()
 
   private let syncAPI: BraveSyncAPI
+  private let syncProfileServices: BraveSyncProfileServiceIOS
 
-  init(syncAPI: BraveSyncAPI) {
+  init(syncAPI: BraveSyncAPI, syncProfileServices: BraveSyncProfileServiceIOS) {
     self.syncAPI = syncAPI
+    self.syncProfileServices = syncProfileServices
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -234,7 +237,7 @@ class SyncWelcomeViewController: SyncViewController {
         pushAddDeviceVC()
       }
 
-      self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode())
+      self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices)
       self.syncAPI.syncEnabled = true
     }
 
@@ -254,7 +257,7 @@ class SyncWelcomeViewController: SyncViewController {
       return
     }
 
-    let syncSettingsVC = SyncSettingsTableViewController(showDoneButton: true, syncAPI: syncAPI)
+    let syncSettingsVC = SyncSettingsTableViewController(showDoneButton: true, syncAPI: syncAPI, syncProfileService: syncProfileServices)
     navigationController?.pushViewController(syncSettingsVC, animated: true)
   }
 }
@@ -274,7 +277,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
       self.pushSettings()
     }
 
-    syncAPI.joinSyncGroup(codeWords: codeWords)
+    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
     syncAPI.syncEnabled = true
   }
 }

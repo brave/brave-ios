@@ -9,6 +9,7 @@ import BraveUI
 import BraveShared
 import Shared
 import Combine
+import UIKit
 
 private let log = Logger.braveCoreLogger
 

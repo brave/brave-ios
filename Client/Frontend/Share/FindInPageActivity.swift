@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import UIKit
 
 class FindInPageActivity: UIActivity {
   fileprivate let callback: () -> Void

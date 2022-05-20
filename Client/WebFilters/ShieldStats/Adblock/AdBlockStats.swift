@@ -39,7 +39,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
   }
 
   private func parseBundledGeneralBlocklist() {
-    guard let path = Bundle.main.path(forResource: bundledGeneralBlocklist, ofType: "dat") else {
+    guard let path = Bundle.module.path(forResource: bundledGeneralBlocklist, ofType: "dat") else {
       log.error("Can't find path for bundled general blocklist")
       return
     }

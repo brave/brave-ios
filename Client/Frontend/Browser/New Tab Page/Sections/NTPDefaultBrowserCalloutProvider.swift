@@ -7,6 +7,7 @@ import Foundation
 import BraveUI
 import Shared
 import BraveShared
+import UIKit
 
 class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
   var sectionDidChange: (() -> Void)?

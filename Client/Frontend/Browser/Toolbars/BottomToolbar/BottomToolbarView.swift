@@ -7,6 +7,7 @@ import SnapKit
 import Shared
 import BraveShared
 import Combine
+import UIKit
 
 class BottomToolbarView: UIView, ToolbarProtocol {
   weak var tabToolbarDelegate: ToolbarDelegate?

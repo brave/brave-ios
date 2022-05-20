@@ -7,6 +7,7 @@ import SnapKit
 import BraveShared
 import Data
 import Combine
+import UIKit
 
 private struct TopToolbarViewUX {
   static let locationPadding: CGFloat = 8

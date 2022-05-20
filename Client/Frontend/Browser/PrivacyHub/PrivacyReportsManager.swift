@@ -7,6 +7,7 @@ import Foundation
 import Shared
 import BraveShared
 import Data
+import UIKit
 
 private let log = Logger.browserLogger
 

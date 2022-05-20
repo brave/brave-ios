@@ -6,6 +6,7 @@ import Foundation
 import AVFoundation
 import SnapKit
 import Shared
+import UIKit
 
 private let log = Logger.browserLogger
 

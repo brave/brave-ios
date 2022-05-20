@@ -7,6 +7,7 @@ import Foundation
 import BraveShared
 import Shared
 import Data
+import UIKit
 
 class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegate {
 

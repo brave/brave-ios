@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import NetworkExtension
 import Data
+import GuardianVPN
 
 private let log = Logger.browserLogger
 
@@ -17,6 +18,7 @@ class BraveVPN {
   private static let housekeepingApi = GRDHousekeepingAPI()
   private static let helper = GRDVPNHelper()
   private static let serverManager = GRDServerManager()
+  private static let iapObserver = IAPObserver()
 
   // MARK: - Initialization
 
@@ -128,7 +130,7 @@ class BraveVPN {
     /// What view controller to show once user taps on `Enable VPN` button at one of places in the app.
     var enableVPNDestinationVC: UIViewController? {
       switch self {
-      case .notPurchased, .expired: return BuyVPNViewController()
+      case .notPurchased, .expired: return BuyVPNViewController(iapObserver: BraveVPN.iapObserver)
       case .purchased: return InstallVPNViewController()
       // Show nothing, the `Enable` button will now be used to connect and disconnect the vpn.
       case .installed: return nil

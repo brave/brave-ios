@@ -7,6 +7,7 @@ import Foundation
 import BraveUI
 import BraveShared
 import Shared
+import UIKit
 
 class BraveNewsEmptyFeedView: UIView, FeedCardContent {
 

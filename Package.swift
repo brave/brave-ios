@@ -3,25 +3,12 @@
 
 import PackageDescription
 
-let defines: [String]
-
-#if MOZ_CHANNEL_DEBUG
-defines = ["MOZ_CHANNEL_DEBUG"]
-#elseif MOZ_CHANNEL_DEV
-defines = ["MOZ_CHANNEL_DEV"]
-#elseif MOZ_CHANNEL_BETA
-defines = ["MOZ_CHANNEL_BETA"]
-#elseif MOZ_CHANNEL_RELEASE
-defines = ["MOZ_CHANNEL_RELEASE"]
-#else
-defines = ["MOZ_CHANNEL_RELEASE"]
-#endif
-
 let package = Package(
   name: "Brave",
   defaultLocalization: "en",
   platforms: [.iOS(.v14), .macOS(.v11)],
   products: [
+    .library(name: "Brave", targets: ["Brave"]),
     .library(name: "Shared", targets: ["Shared", "FSUtils"]),
     .library(name: "BraveCore", targets: ["BraveCore", "MaterialComponents"]),
     .library(name: "BraveShared", targets: ["BraveShared"]),
@@ -47,15 +34,158 @@ let package = Package(
     .package(url: "https://github.com/devxoul/Then", from: "2.7.0"),
     .package(url: "https://github.com/mkrd/Swift-BigInt", from: "2.0.0"),
     .package(url: "https://github.com/apple/swift-markdown", revision: "4f0c76fcd29fea648915f41e2aa896d47608087a"),
+    .package(name: "Static", path: "ThirdParty/Static"),
   ],
   targets: [
+    .target(
+      name: "Brave",
+      dependencies: [
+        "BraveShared",
+        "Shared",
+        "BraveWallet",
+        "BraveCore",
+        "BraveUI",
+        "Data",
+        "Storage",
+        "GuardianVPN",
+        "GCDWebServers",
+        "HTTPSE",
+        "Fuzi",
+        "SnapKit",
+        "Static",
+        "ZIPFoundation",
+        "SDWebImage",
+        "FeedKit",
+        "Then",
+        "SwiftKeychainWrapper",
+        "SwiftyJSON",
+        "XCGLogger",
+        .product(name: "Lottie", package: "lottie-ios"),
+        .product(name: "Collections", package: "swift-collections"),
+      ],
+      path: "Client",
+      exclude: [
+        "Frontend/BraveVPN/GRDAPI",
+        "WebFilters/ShieldStats/Httpse",
+        "Frontend/UserContent/UserScripts",
+        "Configuration",
+        "Entitlements",
+        "Assets/MainFrameAtDocumentEnd.js.LICENSE.txt",
+        "Assets/MainFrameAtDocumentEndSandboxed.js.LICENSE.txt",
+        "Info.plist",
+        "Application",
+      ],
+      resources: [
+        .copy("Assets/About/Licenses.html"),
+        .copy("Assets/AllFramesAtDocumentEnd.js"),
+        .copy("Assets/AllFramesAtDocumentEndSandboxed.js"),
+        .copy("Assets/AllFramesAtDocumentStart.js"),
+        .copy("Assets/AllFramesAtDocumentStartSandboxed.js"),
+        .copy("Assets/MainFrameAtDocumentEnd.js"),
+        .copy("Assets/MainFrameAtDocumentEndSandboxed.js"),
+        .copy("Assets/MainFrameAtDocumentStart.js"),
+        .copy("Assets/MainFrameAtDocumentStartSandboxed.js"),
+        .copy("Assets/SessionRestore.html"),
+        .copy("Assets/SpotlightHelper.js"),
+        .copy("Assets/top_sites.json"),
+        .copy("Assets/Certificates/AmazonRootCA1.cer"),
+        .copy("Assets/Certificates/AmazonRootCA2.cer"),
+        .copy("Assets/Certificates/AmazonRootCA3.cer"),
+        .copy("Assets/Certificates/AmazonRootCA4.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_E46.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_R1.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_R3.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_R46.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_R5.cer"),
+        .copy("Assets/Certificates/GlobalSignRootCA_R6.cer"),
+        .copy("Assets/Certificates/ISRGRootCA_X1.cer"),
+        .copy("Assets/Certificates/ISRGRootCA_X2.cer"),
+        .copy("Assets/Certificates/SFSRootCAG2.cer"),
+        .copy("Assets/Fonts/FiraSans-Bold.ttf"),
+        .copy("Assets/Fonts/FiraSans-BoldItalic.ttf"),
+        .copy("Assets/Fonts/FiraSans-Book.ttf"),
+        .copy("Assets/Fonts/FiraSans-Italic.ttf"),
+        .copy("Assets/Fonts/FiraSans-Light.ttf"),
+        .copy("Assets/Fonts/FiraSans-Medium.ttf"),
+        .copy("Assets/Fonts/FiraSans-Regular.ttf"),
+        .copy("Assets/Fonts/FiraSans-SemiBold.ttf"),
+        .copy("Assets/Fonts/FiraSans-UltraLight.ttf"),
+        .copy("Assets/Fonts/NewYorkMedium-Bold.otf"),
+        .copy("Assets/Fonts/NewYorkMedium-BoldItalic.otf"),
+        .copy("Assets/Fonts/NewYorkMedium-Regular.otf"),
+        .copy("Assets/Fonts/NewYorkMedium-RegularItalic.otf"),
+        .copy("Assets/Interstitial Pages/Pages/CertificateError.html"),
+        .copy("Assets/Interstitial Pages/Pages/GenericError.html"),
+        .copy("Assets/Interstitial Pages/Pages/NetworkError.html"),
+        .copy("Assets/Interstitial Pages/Images/Carret.png"),
+        .copy("Assets/Interstitial Pages/Images/Clock.svg"),
+        .copy("Assets/Interstitial Pages/Images/Cloud.svg"),
+        .copy("Assets/Interstitial Pages/Images/DarkWarning.svg"),
+        .copy("Assets/Interstitial Pages/Images/Generic.svg"),
+        .copy("Assets/Interstitial Pages/Images/Globe.svg"),
+        .copy("Assets/Interstitial Pages/Images/Info.svg"),
+        .copy("Assets/Interstitial Pages/Images/Warning.svg"),
+        .copy("Assets/Interstitial Pages/Styles/CertificateError.css"),
+        .copy("Assets/Interstitial Pages/Styles/InterstitialStyles.css"),
+        .copy("Assets/Interstitial Pages/Styles/NetworkError.css"),
+        .copy("Assets/SearchPlugins"),
+        .copy("Assets/TopSites"),
+        .copy("Frontend/Reader/Reader.css"),
+        .copy("Frontend/Reader/Reader.html"),
+        .copy("Frontend/Reader/ReaderViewLoading.html"),
+        .copy("MailSchemes.plist"),
+        .copy("Frontend/BraveVPN/vpncheckmark.json"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/ntp-data.json"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/alain_franchette_ocean.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/boris_baldinger.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/caline_beulin.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/corwin-prescott_beach.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/corwin-prescott_canyon.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/corwin-prescott_crestone.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/curt_stump_nature.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/david_malenfant_mountains.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/dylan-malval_sea.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/geran_de_klerk_forest.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/joshn_larson_desert.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/priyanuch_konkaew.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_desert.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_fern.jpg"),
+        .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_ocean.jpg"),
+        .copy("Frontend/Browser/Onboarding/onboarding-ads.json"),
+        .copy("Frontend/Browser/Onboarding/onboarding-rewards.json"),
+        .copy("Frontend/Browser/Onboarding/onboarding-shields.json"),
+        .copy("Frontend/Browser/Onboarding/Welcome/disconnect-entitylist.json"),
+        .copy("Frontend/Browser/BrowserViewController/ProductNotifications/blocking-summary.json"),
+        .copy("Frontend/Brave Today/Lottie Assets/brave-today-welcome-graphic.json"),
+        .copy("WebFilters/ContentBlocker/build-disconnect.py"),
+        .copy("WebFilters/ContentBlocker/Lists/block-ads.json"),
+        .copy("WebFilters/ContentBlocker/Lists/block-cookies.json"),
+        .copy("WebFilters/ContentBlocker/Lists/block-images.json"),
+        .copy("WebFilters/ContentBlocker/Lists/block-trackers.json"),
+        .copy("WebFilters/ContentBlocker/Lists/upgrade-http.json"),
+        .copy("WebFilters/ShieldStats/Adblock/Resources/ABPFilterParserData.dat"),
+        .copy("WebFilters/SafeBrowsing/SafeBrowsingError.html"),
+        .copy("WebFilters/ShieldStats/Httpse/httpse.leveldb.tgz"),
+        .copy("Frontend/Sync/WebFilter/Bookmarks/Bookmarks.html"),
+      ]
+    ),
+    .target(name: "GuardianVPN", path: "Client/Frontend/BraveVPN/GRDAPI", publicHeadersPath: "."),
+    .target(
+      name: "HTTPSE",
+      path: "Client/WebFilters/ShieldStats/Httpse",
+      cxxSettings: [
+        .headerSearchPath("include"),
+        .headerSearchPath("ThirdParty/**"),
+        .headerSearchPath("Cpp")
+      ]
+    ),
     .target(
       name: "Shared",
       dependencies: ["BraveCore", "FSUtils", "SDWebImage", "SwiftKeychainWrapper", "SwiftyJSON", "XCGLogger"],
       path: "Shared",
       exclude: ["FSUtils"],
       resources: [.copy("effective_tld_names.dat")],
-      swiftSettings: defines.map { SwiftSetting.define($0) }
+      swiftSettings: [.define("MOZ_CHANNEL_RELEASE")]
     ),
     .target(name: "FSUtils", path: "Shared/FSUtils", publicHeadersPath: "."),
     .target(
@@ -105,19 +235,17 @@ let package = Package(
       ],
       path: "BraveWallet"
     ),
-    .target(name: "BraveSharedTestUtils", path: "BraveSharedTests", sources: ["BraveSharedTestUtils.swift"]),
+    .target(name: "BraveSharedTestUtils", path: "BraveSharedTestUtils"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"], path: "SharedTests"),
     .testTarget(
       name: "BraveSharedTests",
       dependencies: ["BraveShared", "BraveSharedTestUtils"],
       path: "BraveSharedTests",
-      exclude: ["BraveSharedTestUtils.swift"],
       resources: [
         .copy("Certificates/root.cer"),
         .copy("Certificates/leaf.cer"),
         .copy("Certificates/intermediate.cer"),
         .copy("Certificates/self-signed.cer"),
-        .copy("Certificates/untrusted-badssl.com-root.cer"),
         .copy("Certificates/expired.badssl.com/expired.badssl.com-intermediate-ca-1.cer"),
         .copy("Certificates/expired.badssl.com/expired.badssl.com-intermediate-ca-2.cer"),
         .copy("Certificates/expired.badssl.com/expired.badssl.com-leaf.cer"),
@@ -132,7 +260,9 @@ let package = Package(
     .testTarget(name: "BraveWalletTests", dependencies: ["BraveWallet"], path: "BraveWalletTests"),
     .testTarget(name: "StorageTests", dependencies: ["Storage", "BraveSharedTestUtils"], path: "StorageTests", resources: [.copy("fixtures/v33.db"), .copy("testcert1.pem"), .copy("testcert2.pem")]),
     .testTarget(name: "DataTests", dependencies: ["Data"], path: "DataTests"),
-    .testTarget(name: "SPMLibrariesTests", dependencies: ["GCDWebServers"], path: "SPMLibrariesTests")
-  ]
+    .testTarget(name: "SPMLibrariesTests", dependencies: ["GCDWebServers"], path: "SPMLibrariesTests"),
+    .testTarget(name: "ClientTests", dependencies: ["Brave"], path: "ClientTests")
+  ],
+  cxxLanguageStandard: .cxx14
 )
 

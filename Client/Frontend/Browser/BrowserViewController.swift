@@ -388,6 +388,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   private var rewardsEnabledObserveration: NSKeyValueObservation?
 
   fileprivate func didInit() {
+    updateApplicationShortcuts()
     screenshotHelper = ScreenshotHelper(tabManager: tabManager)
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
@@ -1278,9 +1279,28 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   }
 
   private func updateApplicationShortcuts() {
-    if let delegate = UIApplication.shared.delegate as? AppDelegate {
-      delegate.updateShortcutItems(UIApplication.shared)
-    }
+    let newTabItem = UIMutableApplicationShortcutItem(
+      type: "\(Bundle.main.bundleIdentifier ?? "").NewTab",
+      localizedTitle: Strings.quickActionNewTab,
+      localizedSubtitle: nil,
+      icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_tab"),
+      userInfo: [:])
+    
+    let privateTabItem = UIMutableApplicationShortcutItem(
+      type: "\(Bundle.main.bundleIdentifier ?? "").NewPrivateTab",
+      localizedTitle: Strings.quickActionNewPrivateTab,
+      localizedSubtitle: nil,
+      icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
+      userInfo: [:])
+    
+    let scanQRCodeItem = UIMutableApplicationShortcutItem(
+      type: "\(Bundle.main.bundleIdentifier ?? "").ScanQRCode",
+      localizedTitle: Strings.scanQRCodeViewTitle,
+      localizedSubtitle: nil,
+      icon: UIApplicationShortcutIcon(templateImageName: "recent-search-qrcode"),
+      userInfo: [:])
+    
+    UIApplication.shared.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
   }
 
   func finishEditingAndSubmit(_ url: URL, visitType: VisitType) {

@@ -5,6 +5,7 @@
 
 import Foundation
 import Shared
+import UIKit
 
 class AddSearchEngineActivity: UIActivity {
   fileprivate let callback: () -> Void

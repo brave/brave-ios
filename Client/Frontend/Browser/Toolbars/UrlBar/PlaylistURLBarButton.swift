@@ -5,6 +5,7 @@
 
 import Foundation
 import BraveUI
+import UIKit
 
 class PlaylistURLBarButton: UIButton {
   enum State {

@@ -4,6 +4,7 @@ import AVFoundation
 import Shared
 import BraveShared
 import Data
+import UIKit
 
 class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
   var captureSession: AVCaptureSession?

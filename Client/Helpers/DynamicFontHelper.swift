@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import UIKit
 
 private let iPadFactor: CGFloat = 1.06
 private let iPhoneFactor: CGFloat = 0.88

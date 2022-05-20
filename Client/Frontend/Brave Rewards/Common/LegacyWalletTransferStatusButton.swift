@@ -6,6 +6,7 @@
 import Foundation
 import Shared
 import BraveUI
+import UIKit
 
 class LegacyWalletTransferStatusButton: UIControl {
 

@@ -140,7 +140,7 @@ class UserScriptManager {
     ].compactMap { arg in
       let (injectionTime, mainFrameOnly, sandboxed) = arg
       let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (injectionTime == .atDocumentStart ? "Start" : "End") + (sandboxed ? "Sandboxed" : "")
-      if let path = Bundle.main.path(forResource: name, ofType: "js"),
+      if let path = Bundle.module.path(forResource: name, ofType: "js"),
         let source = try? NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String {
         let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerTokenString)'; \(source) })()"
 
@@ -155,7 +155,7 @@ class UserScriptManager {
   }()
 
   private let cookieControlUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "CookieControl", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "CookieControl", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
       log.error("Failed to load cookie control user script")
       return nil
     }
@@ -188,7 +188,7 @@ class UserScriptManager {
   // PaymentRequestUserScript is injected at document start to handle
   // requests to payment APIs
   private let PaymentRequestUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load PaymentRequest.js")
       return nil
     }
@@ -209,7 +209,7 @@ class UserScriptManager {
   }()
 
   private let resourceDownloadManagerUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load ResourceDownloader.js")
       return nil
     }
@@ -226,7 +226,7 @@ class UserScriptManager {
   }()
 
   private let WindowRenderHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "WindowRenderHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "WindowRenderHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load WindowRenderHelper.js")
       return nil
     }
@@ -247,7 +247,7 @@ class UserScriptManager {
   }()
 
   private let FullscreenHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "FullscreenHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "FullscreenHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load FullscreenHelper.js")
       return nil
     }
@@ -260,7 +260,7 @@ class UserScriptManager {
   }()
 
   private let PlaylistSwizzlerScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "PlaylistSwizzler", ofType: "js"),
+    guard let path = Bundle.module.path(forResource: "PlaylistSwizzler", ofType: "js"),
       let source = try? String(contentsOfFile: path)
     else {
       log.error("Failed to load PlaylistSwizzler.js")
@@ -275,7 +275,7 @@ class UserScriptManager {
   }()
 
   private let PlaylistHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load Playlist.js")
       return nil
     }
@@ -321,7 +321,7 @@ class UserScriptManager {
   }()
 
   private let MediaBackgroundingScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "MediaBackgrounding", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "MediaBackgrounding", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load MediaBackgrounding.js")
       return nil
     }
@@ -354,7 +354,7 @@ class UserScriptManager {
   }()
   
   private let ReadyStateScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "ReadyState", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.module.path(forResource: "ReadyState", ofType: "js"), let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load ReadyState.js")
       return nil
     }
@@ -379,7 +379,7 @@ class UserScriptManager {
   }()
 
   private let walletProviderScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "WalletEthereumProvider", ofType: "js"),
+    guard let path = Bundle.module.path(forResource: "WalletEthereumProvider", ofType: "js"),
           let source = try? String(contentsOfFile: path) else {
       return nil
     }
