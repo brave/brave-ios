@@ -60,7 +60,7 @@ class BraveNewsErrorView: UIView, FeedCardContent {
     }
 
     stackView.addStackViewItems(
-      .view(UIImageView(image: UIImage(imageLiteralResourceName: "brave-today-error"))),
+      .view(UIImageView(image: UIImage(named: "brave-today-error", in: .module, compatibleWith: nil)!)),
       .customSpace(12),
       .view(titleLabel),
       .view(errorMessageLabel),

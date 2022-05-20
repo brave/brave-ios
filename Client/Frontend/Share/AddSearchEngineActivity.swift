@@ -19,7 +19,7 @@ class AddSearchEngineActivity: UIActivity {
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "AddSearch").template
+    return UIImage(named: "AddSearch", in: .module, compatibleWith: nil)!.template
   }
 
   override func perform() {

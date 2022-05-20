@@ -59,7 +59,7 @@ class BraveNewsEmptyFeedView: UIView, FeedCardContent {
     }
 
     stackView.addStackViewItems(
-      .view(UIImageView(image: UIImage(imageLiteralResourceName: "brave-today-error"))),
+      .view(UIImageView(image: UIImage(named: "brave-today-error", in: .module, compatibleWith: nil)!)),
       .customSpace(16),
       .view(titleLabel),
       .view(messageLabel),

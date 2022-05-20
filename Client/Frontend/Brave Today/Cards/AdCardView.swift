@@ -80,7 +80,7 @@ private class BraveAdCalloutView: UIView {
     stackView.isLayoutMarginsRelativeArrangement = true
     stackView.addStackViewItems(
       .view(
-        UIImageView(image: UIImage(imageLiteralResourceName: "bat-small")).then {
+        UIImageView(image: UIImage(named: "bat-small", in: .module, compatibleWith: nil)!).then {
           $0.contentMode = .scaleAspectFit
           $0.snp.makeConstraints {
             $0.size.equalTo(14)

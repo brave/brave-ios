@@ -54,7 +54,7 @@ public class FaviconFetcher {
   private var dataTasks: [URLSessionDataTask] = []
   private var imageOps: [SDWebImageOperation] = []
 
-  static let defaultFaviconImage = #imageLiteral(resourceName: "defaultFavicon")
+  static let defaultFaviconImage = UIImage(named: "defaultFavicon", in: .module, compatibleWith: nil)!
 
   init(siteURL: URL, kind: Kind, domain: Domain? = nil, persistentCheckOverride: Bool? = nil) {
     self.url = siteURL

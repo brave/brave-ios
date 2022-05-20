@@ -25,7 +25,7 @@ class WalletURLBarButton: UIButton {
     super.init(frame: frame)
     
     adjustsImageWhenHighlighted = false
-    setImage(UIImage(imageLiteralResourceName: "menu-crypto").template, for: .normal)
+    setImage(UIImage(named: "menu-crypto", in: .module, compatibleWith: nil)!.template, for: .normal)
     imageView?.contentMode = .scaleAspectFit
     imageEdgeInsets = .init(top: 3, left: 3, bottom: 3, right: 3)
   }

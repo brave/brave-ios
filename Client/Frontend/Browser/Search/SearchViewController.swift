@@ -281,7 +281,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
 
     // search settings icon
     let searchButton = UIButton()
-    searchButton.setImage(#imageLiteral(resourceName: "quickSearch").template, for: [])
+    searchButton.setImage(UIImage(named: "quickSearch", in: .module, compatibleWith: nil)!.template, for: [])
     searchButton.imageView?.contentMode = .center
     searchButton.layer.backgroundColor = SearchViewControllerUX.engineButtonBackgroundColor
     searchButton.addTarget(self, action: #selector(didClickSearchButton), for: .touchUpInside)
@@ -545,7 +545,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       let cell = TwoLineTableViewCell()
       cell.textLabel?.text = searchQuery
       cell.textLabel?.textColor = .bravePrimary
-      cell.imageView?.image = #imageLiteral(resourceName: "search_bar_find_in_page_icon")
+      cell.imageView?.image = UIImage(named: "search_bar_find_in_page_icon", in: .module, compatibleWith: nil)!
       cell.imageView?.contentMode = .center
       cell.backgroundColor = .secondaryBraveBackground
 

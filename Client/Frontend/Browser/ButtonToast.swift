@@ -57,7 +57,7 @@ class ButtonToast: Toast {
     horizontalStackView.spacing = ButtonToastUX.toastPadding
 
     if let imageName = imageName {
-      let icon = UIImageView(image: UIImage(imageLiteralResourceName: imageName).template)
+      let icon = UIImageView(image: UIImage(named: imageName, in: .module, compatibleWith: nil)!.template)
       icon.tintColor = .white
       horizontalStackView.addArrangedSubview(icon)
     }

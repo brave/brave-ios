@@ -30,7 +30,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
   override init(frame: CGRect) {
     super.init(frame: frame)
 
-    cameraOverlayView = UIImageView(image: UIImage(named: "camera-overlay"))
+    cameraOverlayView = UIImageView(image: UIImage(named: "camera-overlay", in: .module, compatibleWith: nil))
     cameraOverlayView.contentMode = .center
     addSubview(cameraOverlayView)
     addSubview(cameraAccessButton)

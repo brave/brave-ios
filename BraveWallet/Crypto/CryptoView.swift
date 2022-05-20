@@ -61,7 +61,7 @@ public struct CryptoView: View {
         }
         dismissAction?()
       }) {
-        Image("wallet-dismiss")
+        Image("wallet-dismiss", bundle: .module)
           .renderingMode(.template)
           .foregroundColor(Color(.braveOrange))
       }

@@ -380,11 +380,11 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
         }
       }
       var openInNewTab: UIAction {
-        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus"), handler: mapDeferredHandler(openInNewTabHandler))
+        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus", in: .module, compatibleWith: nil), handler: mapDeferredHandler(openInNewTabHandler))
       }
 
       var openInNewPrivateTab: UIAction {
-        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades"), handler: mapDeferredHandler(openInNewPrivateTabHandler))
+        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades", in: .module, compatibleWith: nil), handler: mapDeferredHandler(openInNewPrivateTabHandler))
       }
       let openActions: [UIAction] = [
         openInNewTab,
@@ -428,19 +428,19 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       }
 
       var openInNewTab: UIAction {
-        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus"), handler: mapDeferredHandler(openInNewTabHandler))
+        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus", in: .module, compatibleWith: nil), handler: mapDeferredHandler(openInNewTabHandler))
       }
 
       var openInNewPrivateTab: UIAction {
-        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades"), handler: mapDeferredHandler(openInNewPrivateTabHandler))
+        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades", in: .module, compatibleWith: nil), handler: mapDeferredHandler(openInNewPrivateTabHandler))
       }
 
       var disableSource: UIAction {
-        .init(title: String(format: Strings.BraveNews.disablePublisherContent, item.source.name), image: UIImage(named: "disable.feed.source"), attributes: .destructive, handler: mapDeferredHandler(toggleSourceHandler))
+        .init(title: String(format: Strings.BraveNews.disablePublisherContent, item.source.name), image: UIImage(named: "disable.feed.source", in: .module, compatibleWith: nil), attributes: .destructive, handler: mapDeferredHandler(toggleSourceHandler))
       }
 
       var enableSource: UIAction {
-        .init(title: String(format: Strings.BraveNews.enablePublisherContent, item.source.name), image: UIImage(named: "enable.feed.source"), handler: mapDeferredHandler(toggleSourceHandler))
+        .init(title: String(format: Strings.BraveNews.enablePublisherContent, item.source.name), image: UIImage(named: "enable.feed.source", in: .module, compatibleWith: nil), handler: mapDeferredHandler(toggleSourceHandler))
       }
 
       let openActions: [UIAction] = [

@@ -18,7 +18,7 @@ class FindInPageActivity: UIActivity {
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "shareFindInPage")
+    return UIImage(named: "shareFindInPage", in: .module, compatibleWith: nil)!
   }
 
   override func perform() {

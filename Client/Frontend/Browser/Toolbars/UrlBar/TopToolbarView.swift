@@ -116,7 +116,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }()
 
   private var qrCodeButton = UIButton().then {
-    $0.setImage(#imageLiteral(resourceName: "recent-search-qrcode"), for: .normal)
+    $0.setImage(UIImage(named: "recent-search-qrcode", in: .module, compatibleWith: nil)!, for: .normal)
     $0.imageView?.contentMode = .scaleAspectFit
     $0.accessibilityLabel = Strings.quickActionScanQRCode
   }
@@ -152,7 +152,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }()
 
   lazy var bookmarkButton = ToolbarButton(top: true).then {
-    $0.setImage(#imageLiteral(resourceName: "menu_bookmarks").template, for: .normal)
+    $0.setImage(UIImage(named: "menu_bookmarks", in: .module, compatibleWith: nil)!.template, for: .normal)
     $0.accessibilityLabel = Strings.bookmarksMenuItem
     $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
   }
@@ -196,7 +196,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
       shieldIcon = shieldsOffIcon
     }
 
-    locationView.shieldsButton.setImage(UIImage(imageLiteralResourceName: shieldIcon), for: .normal)
+    locationView.shieldsButton.setImage(UIImage(named: shieldIcon, in: .module, compatibleWith: nil)!, for: .normal)
   }
 
   private var privateModeCancellable: AnyCancellable?

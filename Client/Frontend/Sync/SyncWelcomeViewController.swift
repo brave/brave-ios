@@ -59,7 +59,7 @@ class SyncWelcomeViewController: SyncViewController {
   }()
 
   lazy var syncImage: UIImageView = {
-    let imageView = UIImageView(image: UIImage(named: "sync-art"))
+    let imageView = UIImageView(image: UIImage(named: "sync-art", in: .module, compatibleWith: nil))
     // Shrinking image a bit on smaller devices.
     imageView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .vertical)
     imageView.contentMode = .scaleAspectFit

@@ -23,7 +23,7 @@ class WalletTransferExpiredViewController: UIViewController, PopoverContentCompo
   private let textLabel = UILabel().then {
     $0.textColor = .white
     $0.numberOfLines = 0
-    let image = #imageLiteral(resourceName: "warning-triangle").template
+    let image = UIImage(named: "warning-triangle", in: .module, compatibleWith: nil)!.template
     $0.attributedText = {
       let imageAttachment = NSTextAttachment().then {
         $0.image = image

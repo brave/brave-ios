@@ -151,7 +151,7 @@ struct MarketPriceView: View {
       Button(action: {
         swapTokenStore.fetchPriceQuote(base: .perSellAsset)
       }) {
-        Label(Strings.Wallet.refreshMarketPriceLabel, image: "wallet-refresh")
+        Label(Strings.Wallet.refreshMarketPriceLabel, image: "brave.arrow.triangle.2.circlepath")
           .labelStyle(.iconOnly)
           .foregroundColor(Color(.braveBlurpleTint))
           .font(.title3)
@@ -364,7 +364,7 @@ struct SwapCryptoView: View {
           Text(formatSlippage)
             .foregroundColor(Color(.secondaryBraveLabel))
             .font(.subheadline.weight(.semibold))
-          Image("wallet-dismiss")
+          Image("wallet-dismiss", bundle: .module)
             .renderingMode(.template)
             .resizable()
             .foregroundColor(Color(.secondaryBraveLabel))

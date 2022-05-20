@@ -44,7 +44,7 @@ extension PrivacyReportsView {
           .fixedSize(horizontal: false, vertical: true)
         
         HStack {
-          Image("frequent_tracker")
+          Image("frequent_tracker", bundle: .module)
             .unredacted()
           VStack(alignment: .leading) {
             Text(Strings.PrivacyHub.mostFrequentTrackerAndAdTitle.uppercased())

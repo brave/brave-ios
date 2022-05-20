@@ -20,7 +20,7 @@ class RequestDesktopSiteActivity: UIActivity {
   }
 
   override var activityImage: UIImage? {
-    tab?.isDesktopSite == true ? #imageLiteral(resourceName: "shareRequestMobileSite") : #imageLiteral(resourceName: "shareRequestDesktopSite")
+    tab?.isDesktopSite == true ? UIImage(named: "shareRequestMobileSite", in: .module, compatibleWith: nil)! : UIImage(named: "shareRequestDesktopSite", in: .module, compatibleWith: nil)!
   }
 
   override func perform() {

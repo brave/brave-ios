@@ -19,7 +19,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     description: Preferences.Privacy.privateBrowsingOnly.value
       ? Strings.History.historyPrivateModeOnlyStateTitle
       : Strings.History.historyEmptyStateTitle,
-    icon: #imageLiteral(resourceName: "emptyHistory"))
+    icon: UIImage(named: "emptyHistory", in: .module, compatibleWith: nil)!)
 
   private let historyAPI: BraveHistoryAPI
   private let tabManager: TabManager
@@ -69,7 +69,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.searchController = searchController
         $0.hidesSearchBarWhenScrolling = false
         $0.rightBarButtonItem =
-          UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_delete_item").template, style: .done, target: self, action: #selector(performDeleteAll))
+          UIBarButtonItem(image: UIImage(named: "playlist_delete_item", in: .module, compatibleWith: nil)!.template, style: .done, target: self, action: #selector(performDeleteAll))
       }
     }
 
