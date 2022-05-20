@@ -90,7 +90,7 @@
 		</data>
 		<key>Headers/GuardianConnect-Swift.h</key>
 		<data>
-		UevXXKIrTwPD9auH+0OsoANXKkg=
+		zI7YRKZEHx4Y8XP8tIsWGWEXmho=
 		</data>
 		<key>Headers/GuardianConnect.h</key>
 		<data>
@@ -122,39 +122,39 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		TrrHvO62TGDSThYeZyBQmRj2mXY=
+		F4nIfytXwEcZi1o3nY9qPqE0IRE=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo</key>
 		<data>
-		sdrGbtpzOydf0iEF/X4avOv0zbc=
+		/zG7+ivgV90hfkkbBERJ3xpuAnM=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo</key>
 		<data>
-		FrLmVC9pFcC+uXhNr684UMM2SI0=
+		vJvulRBGXFn8R9x1qar63Pj+1ks=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		Hsgxdi9QByrA2yE4HLtnngmZwhQ=
+		xM0JhL2WqLOirFJ5u8kH9yxGpAg=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		rBKPRWL/ALkfYcjDVO9RyRTxZsk=
+		5Y51WJlqyrc7xFD7OSvSfnjjlcQ=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		f6LBVcH0l52XfZdIsFKMSMbvq5g=
+		3iRbIOIUqzoZgxR6hosmeeF9sOU=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		FZETr3Fgc8buldPqg4g6lWvihoc=
+		bGitAUcuvllvJ5mR6WDqA3C3pn4=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		k5ir/no7DdvLALC+2pWhrsbuIzo=
+		DZDqUAVll8E0q2uqDVBebUO6ZYU=
 		</data>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		4k8Rb9wto69IqZ/eu5GmxSPIY24=
+		0OBpcr7q3zHSSXNZgeZppkODc3U=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -314,7 +314,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			JvkyO3Nq45E/pR48XTJZPENQI/bNI8tFrV6VfUttvwo=
+			y9b1oTYNyzfBKjKcDzNoL8gkqkjDrV22fAzYZLAEwsM=
 			</data>
 		</dict>
 		<key>Headers/GuardianConnect.h</key>
@@ -370,56 +370,56 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Iy8GThoQOM3S4g/IEsv1Q+5QjhNj2+6NNnboQ9F7fd8=
+			S1GPNwVu3F2UrQse2CBSbd2mz317vhEJoL40ERhEp8A=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			6pB4twoD7Gtv+wukfIbNSE84611YT0XiAik5l9xqbgU=
+			Ed374e/A8R76Kr0EALn7Rkiun447tLyAToHExXmd/Ak=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			M7bKQgGvn39ppGQYnW1Yl7ephkNb8vdaHN2f+wVbRGI=
+			vZyQ7sdDwNjDhpBv7dHAHSEIIsZac1IRHMI6RJDcsFg=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cRwlEqSQVYJxY6BwjKQp+zKQmpUpWI+mXb+CLx0+/Xs=
+			46/CsNBahOjEcr5jzcaXVeww7ffmLVvQsqnLB7Q9R4o=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			qUl4uaeXs65d21fTZGOFXL3nXH3i3VVjFyM1rpE3WJ0=
+			+gdKY+DKRi1V2U5a1kdRFxP9ZZZshBZBT9EiA1FhUiU=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			nMnh9V0u/3+smIkTDtrOwGJgvkhlbQk3IenfB7tfc5k=
+			XrbYAgk6l417aT6T0ox3CO1BqoNsKhDGqb6xjGselew=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			EZ9wmM9x4tLTd2Qi4oSOtGZzySK9FifbpOaIDh0scpI=
+			Tiqnt5cyblOoex6UWKU0tdcR8tS9+F84T3z3gBEWoZ4=
 			</data>
 		</dict>
 		<key>Modules/GuardianConnect.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			2g7mvkKi+A3/hLXCwIzNHmT7axOXUTECjOKUAzUhzqw=
+			WofCgLGvPgWBb9L/U414IJhB02/wT/h/ZFXWK7yyCxw=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
