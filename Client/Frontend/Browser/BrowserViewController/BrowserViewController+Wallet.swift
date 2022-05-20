@@ -44,7 +44,7 @@ extension WalletStore {
 }
 
 extension BrowserViewController {
-  func presentWalletPanel(_ completion: BraveWalletProviderResultsCallback? = nil) {
+  func presentWalletPanel() {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
@@ -67,7 +67,9 @@ extension BrowserViewController {
                 permissionRequestManager.cancelRequest(request)
               }
               // let wallet provider know we have allowed accounts for this domain
-              completion?(accounts, .success, "")
+              for request in pendingRequests {
+                request.providerHandler?(accounts, .success, "")
+              }
             }
           }
         }
@@ -154,7 +156,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
       }
       
       // add permission request to the queue
-      _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, completion: { response in
+      _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, providerHandler: completion, completion: { response in
         switch response {
         case .granted(let accounts):
           completion(accounts, .success, "")
@@ -163,15 +165,7 @@ extension BrowserViewController: BraveWalletProviderDelegate {
         }
       })
       
-      // only display notification when BVC is front and center
-      if presentedViewController == nil {
-        let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
-          if action == .connectWallet {
-            self?.presentWalletPanel(completion)
-          }
-        }
-        notificationsPresenter.display(notification: walletNotificaton, from: self)
-      }
+      showPanel()
     }
   }
 
