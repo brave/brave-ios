@@ -20,7 +20,6 @@ public struct CryptoView: View {
   var dismissAction: (() -> Void)?
 
   var openWalletURLAction: ((URL) -> Void)?
-  var onBSSShortcutDismiss: (() -> Void)?
   
   var faviconRenderer: WalletFaviconRenderer
 
@@ -122,7 +121,7 @@ public struct CryptoView: View {
                   networkStore: store.networkStore,
                   buyTokenStore: store.openBuyTokenStore(destination.initialToken),
                   onDismiss: {
-                    onBSSShortcutDismiss?()
+                    store.closeBSSStores()
                   }
                 )
               case .send:
@@ -136,7 +135,7 @@ public struct CryptoView: View {
                     }
                   },
                   onDismiss: {
-                    onBSSShortcutDismiss?()
+                    store.closeBSSStores()
                   }
                 )
               case .swap:
@@ -150,7 +149,7 @@ public struct CryptoView: View {
                     }
                   },
                   onDismiss: {
-                    onBSSShortcutDismiss?()
+                    store.closeBSSStores()
                   }
                 )
               }

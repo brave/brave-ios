@@ -67,9 +67,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         self.delegate?.openWalletURL(url)
       }
     }
-    rootView.onBSSShortcutDismiss = {
-      walletStore.cryptoStore?.closeBSSStores()
-    }
     cancellable = walletStore.keyringStore.$keyring
       .dropFirst() // Drop initial value
       .map(\.isLocked)

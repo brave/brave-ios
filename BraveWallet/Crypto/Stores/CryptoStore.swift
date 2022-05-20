@@ -39,9 +39,7 @@ public class CryptoStore: ObservableObject {
   @Published var buySendSwapDestination: BuySendSwapDestination? {
     didSet {
       if buySendSwapDestination == nil {
-        buyTokenStore = nil
-        sendTokenStore = nil
-        swapTokenStore = nil
+        closeBSSStores()
       }
     }
   }
@@ -197,7 +195,6 @@ public class CryptoStore: ObservableObject {
   }
   
   func closeBSSStores() {
-    guard buySendSwapDestination == nil else { return }
     buyTokenStore = nil
     sendTokenStore = nil
     swapTokenStore = nil
