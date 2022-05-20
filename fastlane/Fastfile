@@ -47,9 +47,9 @@ platform :ios do
         "ClientTests/UserAgentTests",
         "DataTests",
         "SPMLibrariesTests/WebServerTests/testWebServerIsServingRequests",
-	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemoveAllPermissions",
-	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissions",
-	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissionsLastPermission"
+      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemoveAllPermissions",
+      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissions",
+      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissionsLastPermission"
       ]
     )
 
