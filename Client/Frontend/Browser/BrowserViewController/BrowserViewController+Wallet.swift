@@ -62,12 +62,10 @@ extension BrowserViewController {
             let pendingRequests = permissionRequestManager.pendingRequests(for: origin, coinType: .eth)
             let (accounts, status, _) = await self.allowedAccounts(false)
             if status == .success, !accounts.isEmpty {
-              // cancel the requests if `allowedAccounts` is not empty for this domain
               for request in pendingRequests {
+                // cancel the requests if `allowedAccounts` is not empty for this domain
                 permissionRequestManager.cancelRequest(request)
-              }
-              // let wallet provider know we have allowed accounts for this domain
-              for request in pendingRequests {
+                // let wallet provider know we have allowed accounts for this domain
                 request.providerHandler?(accounts, .success, "")
               }
             }
