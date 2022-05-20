@@ -82,7 +82,7 @@ let package = Package(
         "Entitlements",
         "Assets/MainFrameAtDocumentEnd.js.LICENSE.txt",
         "Assets/MainFrameAtDocumentEndSandboxed.js.LICENSE.txt",
-        "Info.plist",
+        "Supporting Files",
         "Application",
       ],
       resources: [

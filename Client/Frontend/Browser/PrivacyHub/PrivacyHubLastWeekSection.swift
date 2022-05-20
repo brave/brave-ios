@@ -71,7 +71,7 @@ extension PrivacyReportsView {
         .redacted(reason: mostFrequentTrackerLoading ? .placeholder: [])
         
         HStack {
-          Image("creepy_website")
+          Image("creepy_website", bundle: .module)
             .unredacted()
           VStack(alignment: .leading) {
             Text(Strings.PrivacyHub.riskiestWebsiteTitle.uppercased())
