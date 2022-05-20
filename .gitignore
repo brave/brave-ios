@@ -89,7 +89,7 @@ BraveCore/BraveCore.xcframework
 BraveCore/BraveRewards.xcframework
 BraveCore/MaterialComponents.xcframework
 
-Client/Configuration/Local/
+App/Configuration/Local/
 
 adblock-regions.txt
 yubikit.log

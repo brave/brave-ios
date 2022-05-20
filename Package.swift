@@ -78,12 +78,8 @@ let package = Package(
         "Frontend/UserContent/UserScripts/AllFrames",
         "Frontend/UserContent/UserScripts/MainFrame",
         "Frontend/UserContent/UserScripts/Sandboxed",
-        "Configuration",
-        "Entitlements",
         "Assets/MainFrameAtDocumentEnd.js.LICENSE.txt",
         "Assets/MainFrameAtDocumentEndSandboxed.js.LICENSE.txt",
-        "Supporting Files",
-        "Application",
       ],
       resources: [
         .copy("Assets/About/Licenses.html"),
@@ -314,7 +310,7 @@ let package = Package(
         .copy("blocking-summary-test.json"),
       ]
     ),
-    .target(name: "Strings", path: "l10n", exclude: ["tools", "Resources/Info.plist"]),
+    .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist"]),
   ],
   cxxLanguageStandard: .cxx14
 )

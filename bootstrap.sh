@@ -37,7 +37,7 @@ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 # Sets up local configurations from the tracked .template files
 
 # Checking the `Local` Directory
-CONFIG_PATH="Client/Configuration"
+CONFIG_PATH="App/Configuration"
 if [ ! -d "$CONFIG_PATH/Local/" ]; then
   echo "${COLOR_ORANGE}Creating 'Local' directory${COLOR_NONE}"
 

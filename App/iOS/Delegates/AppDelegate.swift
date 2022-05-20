@@ -21,8 +21,6 @@ import Brave
 
 private let log = Logger.browserLogger
 
-private let InitialPingSentKey = "initialPingSent"
-
 extension AppDelegate {
   // A model that is passed used in every scene
   struct SceneInfoModel {

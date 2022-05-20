@@ -225,6 +225,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     })
   }
 
+  // swiftlint:disable:next cyclomatic_complexity
   func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 
     guard let scene = scene as? UIWindowScene else {

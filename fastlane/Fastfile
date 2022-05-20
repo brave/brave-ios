@@ -6,7 +6,7 @@ fastlane_version "2.86.0"
 
 default_platform :ios
 
-CONFIG_PATH = "../Client/Configuration"
+CONFIG_PATH = "../App/Configuration"
 LOCAL_PATH = "#{CONFIG_PATH}/Local"
 
 platform :ios do
