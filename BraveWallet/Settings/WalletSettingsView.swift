@@ -109,13 +109,13 @@ public struct WalletSettingsView: View {
             .foregroundColor(Color(.braveLabel))
           Spacer()
           Menu {
-            ForEach(Preferences.Wallet.WalletType.allCases) { walletType in
-              Button(action: {
-                defaultWallet.value = walletType.rawValue
-              }) {
+            Picker("", selection: $defaultWallet.value) {
+              ForEach(Preferences.Wallet.WalletType.allCases) { walletType in
                 Text(walletType.name)
+                  .tag(walletType)
               }
             }
+            .pickerStyle(.inline)
           } label: {
             let wallet = Preferences.Wallet.WalletType(rawValue: defaultWallet.value) ?? .none
             Text(wallet.name)

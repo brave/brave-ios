@@ -51,6 +51,7 @@ struct ManageSiteConnectionsView: View {
           siteConnectionStore.removeAllPermissions(from: siteConnectionsToRemove)
         }
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(.insetGrouped)
     .navigationTitle(Strings.Wallet.web3PreferencesManageSiteConnections)
@@ -109,16 +110,19 @@ private struct SiteRow: View {
   }
   
   var body: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: 4) {
       Text(verbatim: siteConnection.url)
-        .foregroundColor(Color(.bravePrimary))
+        .foregroundColor(Color(.braveLabel))
+        .font(.headline)
       HStack {
         Text(connectedAddresses)
+          .font(.subheadline)
           .foregroundColor(Color(.secondaryBraveLabel))
         accountBlockies
-        Spacer()
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
     }
+    .padding(.vertical, 6)
   }
   
   @ViewBuilder private var accountBlockies: some View {
@@ -130,6 +134,7 @@ private struct SiteRow: View {
         ForEach(0..<numberOfBlockies, id: \.self) { index in
           Blockie(address: siteConnection.connectedAddresses[index])
             .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
+            .overlay(Circle().stroke(Color(.secondaryBraveGroupedBackground), lineWidth: 1))
             .zIndex(Double(numberOfBlockies - index))
         }
         if siteConnection.connectedAddresses.count > maxBlockies {
@@ -195,6 +200,7 @@ private struct SiteConnectionDetailView: View {
           }
         }
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .navigationTitle(siteConnection.url)
     .navigationBarTitleDisplayMode(.inline)
