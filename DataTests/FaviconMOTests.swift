@@ -7,6 +7,7 @@ import CoreData
 import Shared
 import Storage
 @testable import Data
+import DataTestsUtils
 
 class FaviconMOTests: CoreDataTestCase {
   let exampleUrl = URL(string: "http://example.com")!

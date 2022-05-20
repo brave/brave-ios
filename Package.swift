@@ -272,6 +272,7 @@ let package = Package(
     ),
     .target(name: "BrowserIntentsModels", path: "BrowserIntentsModels"),
     .target(name: "BraveSharedTestUtils", path: "BraveSharedTestUtils"),
+    .target(name: "DataTestsUtils", dependencies: ["Data", "BraveShared"], path: "DataTestsUtils"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"], path: "SharedTests"),
     .testTarget(
       name: "BraveSharedTests",
@@ -293,9 +294,9 @@ let package = Package(
         .copy("Certificates/certviewer/github.com.cer"),
       ]
     ),
-    .testTarget(name: "BraveWalletTests", dependencies: ["BraveWallet"], path: "BraveWalletTests"),
+    .testTarget(name: "BraveWalletTests", dependencies: ["BraveWallet", "DataTestsUtils"], path: "BraveWalletTests"),
     .testTarget(name: "StorageTests", dependencies: ["Storage", "BraveSharedTestUtils"], path: "StorageTests", resources: [.copy("fixtures/v33.db"), .copy("testcert1.pem"), .copy("testcert2.pem")]),
-    .testTarget(name: "DataTests", dependencies: ["Data"], path: "DataTests"),
+    .testTarget(name: "DataTests", dependencies: ["Data", "DataTestsUtils"], path: "DataTests"),
     .testTarget(name: "SPMLibrariesTests", dependencies: ["GCDWebServers"], path: "SPMLibrariesTests"),
     .testTarget(
       name: "ClientTests",

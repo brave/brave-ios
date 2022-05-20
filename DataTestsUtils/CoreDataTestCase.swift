@@ -7,9 +7,9 @@ import CoreData
 @testable import Data
 @testable import BraveShared
 
-class CoreDataTestCase: XCTestCase {
+open class CoreDataTestCase: XCTestCase {
 
-  override func setUp() {
+  override open func setUp() {
     super.setUp()
 
     NotificationCenter.default.addObserver(
@@ -21,7 +21,7 @@ class CoreDataTestCase: XCTestCase {
     DataController.shared = InMemoryDataController()
   }
 
-  override func tearDown() {
+  override open func tearDown() {
     NotificationCenter.default.removeObserver(self)
     DataController.viewContext.reset()
     contextSaveCompletion = nil
@@ -30,7 +30,7 @@ class CoreDataTestCase: XCTestCase {
 
   // MARK: - Handling background context reads/writes
 
-  var contextSaveCompletion: (() -> Void)?
+  open var contextSaveCompletion: (() -> Void)?
 
   @objc func contextSaved() {
     contextSaveCompletion?()
@@ -41,7 +41,7 @@ class CoreDataTestCase: XCTestCase {
   // after changes are merged into context.
   /// Use `inverted` property if you want to verify that DB save did not happen.
   /// This is useful for early return database checks.
-  func backgroundSaveAndWaitForExpectation(name: String? = nil, inverted: Bool = false, code: () -> Void) {
+  open func backgroundSaveAndWaitForExpectation(name: String? = nil, inverted: Bool = false, code: () -> Void) {
     let saveExpectation: XCTestExpectation? = expectation(description: name ?? UUID().uuidString)
     saveExpectation?.isInverted = inverted
 

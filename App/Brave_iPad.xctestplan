@@ -14,7 +14,7 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "ClientTests",
         "name" : "ClientTests"
       }

@@ -29,52 +29,53 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "BraveSharedTests",
         "name" : "BraveSharedTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "BraveWalletTests",
         "name" : "BraveWalletTests"
       }
     },
     {
       "skippedTests" : [
-        "NavigationRouterTests"
+        "NavigationRouterTests",
+        "SyncTests"
       ],
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "ClientTests",
         "name" : "ClientTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "DataTests",
         "name" : "DataTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "SPMLibrariesTests",
         "name" : "SPMLibrariesTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "SharedTests",
         "name" : "SharedTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:",
+        "containerPath" : "container:..",
         "identifier" : "StorageTests",
         "name" : "StorageTests"
       }
