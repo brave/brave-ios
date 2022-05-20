@@ -117,6 +117,7 @@ class SettingsViewController: TableViewController {
 
     view.backgroundColor = .braveGroupedBackground
     view.tintColor = .braveOrange
+    navigationController?.view.backgroundColor = .braveGroupedBackground
   }
 
   private func displayRewardsDebugMenu() {
