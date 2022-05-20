@@ -170,6 +170,7 @@ let package = Package(
         .copy("Frontend/UserContent/UserScripts/ReadyState.js"),
         .copy("Frontend/UserContent/UserScripts/WalletEthereumProvider.js"),
         .copy("Frontend/UserContent/UserScripts/YoutubeAdblock.js"),
+        .copy("Frontend/UserContent/UserScripts/DeAMP.js"),
         .copy("WebFilters/ContentBlocker/build-disconnect.py"),
         .copy("WebFilters/ContentBlocker/Lists/block-ads.json"),
         .copy("WebFilters/ContentBlocker/Lists/block-cookies.json"),

@@ -5,7 +5,7 @@
 
 import WidgetKit
 import SwiftUI
-import Shared
+import Strings
 import BraveShared
 
 struct FavoritesWidget: Widget {

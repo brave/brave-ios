@@ -5,7 +5,7 @@
 
 import SwiftUI
 import WidgetKit
-import Shared
+import Strings
 import BraveShared
 import Intents
 
