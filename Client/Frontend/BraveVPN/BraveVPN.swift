@@ -7,6 +7,7 @@ import UIKit
 import Shared
 import BraveShared
 import NetworkExtension
+import Data
 import GuardianConnect
 
 private let log = Logger.browserLogger
@@ -40,6 +41,9 @@ class BraveVPN {
       
       helper.verifyMainCredentials { _, _ in }
       GRDCredentialManager.migrateKeychainItemsToGRDCredential()
+      GRDSubscriptionManager.setIsPayingUser(true)
+      
+      helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
       
       helper.tunnelLocalizedDescription = "Brave Firewall + VPN"
       
@@ -147,7 +151,7 @@ class BraveVPN {
     // If vpn plan expired, this preference is not set to nil but the date is set to year 1970
     // to force the UI to show expired state.
     if Preferences.VPN.expirationDate.value == nil { return .notPurchased }
-
+    
     if hasExpired == true {
       return .expired(enabled: NEVPNManager.shared().isEnabled)
     }
@@ -157,7 +161,7 @@ class BraveVPN {
     if helper.mainCredential?.mainCredential != true {
       return .notPurchased
     }
-
+    
     // No VPN config set means the user could buy the vpn but hasn't gone through the second screen
     // to install the vpn and connect to a server.
     if NEVPNManager.shared().connection.status == .invalid { return .purchased }
@@ -168,13 +172,13 @@ class BraveVPN {
   /// Returns true if the user is connected to Brave's vpn at the moment.
   /// This will return true if the user is connected to other VPN.
   static var isConnected: Bool {
-    NEVPNManager.shared().connection.status == .connected
+    helper.isConnected()
   }
 
   /// Returns the last used hostname for the vpn configuration.
   /// Returns nil if the hostname string is empty(due to some error when configuring it for example).
   static var hostname: String? {
-    UserDefaults.standard.string(forKey: kGRDHostnameOverride)
+    helper.mainCredential?.hostname
   }
 
   /// Whether the vpn subscription has expired.
@@ -290,7 +294,7 @@ class BraveVPN {
   }
 
   static func connectToVPN(completion: ((VPNConfigStatus) -> Void)? = nil) {
-    if NEVPNManager.shared().connection.status == .connected {
+    if isConnected {
       helper.disconnectVPN()
     }
 
@@ -325,7 +329,7 @@ class BraveVPN {
   
   static func changeVPNRegion(_ region: GRDRegion?, completion: ((Bool) -> Void)? = nil) {
     helper.configureFirstTimeUser(with: region) { success, error in
-      if success{
+      if success {
         log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
         completion?(true)
       } else {
@@ -341,8 +345,6 @@ class BraveVPN {
   static func configureFirstTimeUser(completion: ((VPNUserCreationStatus) -> Void)?) {
     if firstTimeUserConfigPending { return }
     firstTimeUserConfigPending = true
-
-    GRDSubscriptionManager.setIsPayingUser(true)
 
     // Make sure region mode is set to automatic
     // This can happen if the vpn has expired and a user has to buy it again.
@@ -486,33 +488,31 @@ class BraveVPN {
   static func processVPNAlerts() {
     if !shouldProcessVPNAlerts(considerDummyData: !AppConstants.buildChannel.isPublic) { return }
     
-    /*
-     Task {
-     let (data, success, error) = await GRDGatewayAPI.shared().events(withDummyData: !AppConstants.buildChannel.isPublic)
-     if !success {
-     log.error("VPN getEvents call failed")
-     if let error = error {
-     log.warning(error)
-     }
-
-     return
-     }
-
-     guard let alertsData = data["alerts"] else {
-     log.error("Failed to unwrap json for vpn alerts")
-     return
-     }
-
-     do {
-     let dataAsJSON =
-     try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
-     let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
-
-     BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
-     } catch {
-     log.error("Failed parsing vpn alerts data")
-     }
-     }
-     */
+    Task {
+      let (data, success, error) = await GRDGatewayAPI().events()
+      if !success {
+        log.error("VPN getEvents call failed")
+        if let error = error {
+          log.warning(error)
+        }
+        
+        return
+      }
+      
+      guard let alertsData = data["alerts"] else {
+        log.error("Failed to unwrap json for vpn alerts")
+        return
+      }
+      
+      do {
+        let dataAsJSON =
+        try JSONSerialization.data(withJSONObject: alertsData, options: [.fragmentsAllowed])
+        let decoded = try JSONDecoder().decode([BraveVPNAlertJSONModel].self, from: dataAsJSON)
+        
+        BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
+      } catch {
+        log.error("Failed parsing vpn alerts data")
+      }
+    }
   }
 }
