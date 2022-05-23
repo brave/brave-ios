@@ -25,29 +25,29 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
   weak var delegate: IAPObserverDelegate?
 
   func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    // This helper variable helps to call the IAPObserverDelegate delegate purchased method only once.
+    // Reason is when restoring or sometimes when purchasing a product there's multiple transactions
+    // that are returned in `transactions` array.
+    // Apple advices to call `finishTransaction` for all of them,
+    // but to show the UI we only want to call the delegate method once.
+    var callPurchaseDelegateOnce = true
+    
     transactions.forEach { transaction in
       switch transaction.transactionState {
       case .purchased, .restored:
         log.debug("Received transaction state: purchased or restored")
-        BraveVPN.validateReceipt() { [weak self] expired in
-          guard let self = self else { return }
-          // This should be always called, no matter if transaction is successful or not.
-          SKPaymentQueue.default().finishTransaction(transaction)
-
-          if expired == false {
-            self.delegate?.purchasedOrRestoredProduct()
-          } else {
-            // Receipt either expired or receipt validation returned some error.
-            self.delegate?.purchaseFailed(error: .receiptError)
-          }
+        SKPaymentQueue.default().finishTransaction(transaction)
+        if callPurchaseDelegateOnce {
+          self.delegate?.purchasedOrRestoredProduct()
         }
+        callPurchaseDelegateOnce = false
       case .purchasing, .deferred:
         log.debug("Received transaction state: purchasing")
       case .failed:
         log.debug("Received transaction state: failed")
+        SKPaymentQueue.default().finishTransaction(transaction)
         self.delegate?.purchaseFailed(
           error: .transactionError(error: transaction.error as? SKError))
-        SKPaymentQueue.default().finishTransaction(transaction)
       @unknown default:
         assertionFailure("Unknown transactionState")
       }
