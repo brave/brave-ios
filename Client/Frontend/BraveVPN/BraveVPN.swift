@@ -40,7 +40,6 @@ class BraveVPN {
       }
       
       helper.verifyMainCredentials { _, _ in }
-      GRDCredentialManager.migrateKeychainItemsToGRDCredential()
       GRDSubscriptionManager.setIsPayingUser(true)
       
       helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
@@ -63,19 +62,6 @@ class BraveVPN {
 
         // FIXME: Make sure this is correct place to fetch the data.
         populateRegionDataIfNecessary()
-
-        if isConnected {
-          gatewayAPI.getServerStatus(completion: { completion in
-            if completion.responseStatus == .serverOK {
-              log.debug("VPN server status OK")
-              return
-            }
-            
-            logAndStoreError("VPN server status failure, migrating to new host")
-            disconnect()
-            reconnect()
-          })
-        }
       }
     }
   }
@@ -212,27 +198,7 @@ class BraveVPN {
       return ""
     }
   }
-
-  /// Stores a in-memory list of vpn errors encountered during current browsing session.
-  private(set) static var errorLog = [(date: Date, message: String)]()
-  private static let errorLogQueue = DispatchQueue(label: "com.brave.errorLogQueue")
-
-  /// Prints out the error to the logger and stores it in a in memory array.
-  /// This can be further used for a customer support form.
-  private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
-    if printToConsole {
-      log.error(message)
-    }
-
-    // Extra safety here in case the log is spammed by many messages.
-    // Early logs are more valuable for debugging, we do not rotate them with new entries.
-    errorLogQueue.async {
-      if errorLog.count < 1000 {
-        errorLog.append((Date(), message))
-      }
-    }
-  }
-
+  
   // MARK: - Actions
 
   /// Reconnects to the vpn. Checks for server health first, if it's bad it tries to connect to another host.
@@ -302,6 +268,7 @@ class BraveVPN {
     if GRDVPNHelper.activeConnectionPossible() {
       // just configure & connect, no need for 'first user' setup
       helper.configureAndConnectVPN { error, status in
+        reconnectPending = false
         if status == .success {
           populateRegionDataIfNecessary()
           completion?(.success)
@@ -312,6 +279,7 @@ class BraveVPN {
       
     } else {
       helper.configureFirstTimeUserPostCredential(nil) { success, error in
+        reconnectPending = false
         if !success {
           if let error = error {
             logAndStoreError("configureFirstTimeUserPostCredential \(error)")
@@ -327,14 +295,14 @@ class BraveVPN {
     }
   }
   
-  static func changeVPNRegion(_ region: GRDRegion?, completion: ((Bool) -> Void)? = nil) {
+  static func changeVPNRegion(_ region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
     helper.configureFirstTimeUser(with: region) { success, error in
       if success {
         log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
-        completion?(true)
+        completion(true)
       } else {
         log.debug("connection failed: \(String(describing: error))")
-        completion?(false)
+        completion(false)
       }
     }
   }
@@ -512,6 +480,28 @@ class BraveVPN {
         BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
       } catch {
         log.error("Failed parsing vpn alerts data")
+      }
+    }
+  }
+  
+  // MARK: - Error Handling
+  
+  /// Stores a in-memory list of vpn errors encountered during current browsing session.
+  private(set) static var errorLog = [(date: Date, message: String)]()
+  private static let errorLogQueue = DispatchQueue(label: "com.brave.errorLogQueue")
+
+  /// Prints out the error to the logger and stores it in a in memory array.
+  /// This can be further used for a customer support form.
+  private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
+    if printToConsole {
+      log.error(message)
+    }
+
+    // Extra safety here in case the log is spammed by many messages.
+    // Early logs are more valuable for debugging, we do not rotate them with new entries.
+    errorLogQueue.async {
+      if errorLog.count < 1000 {
+        errorLog.append((Date(), message))
       }
     }
   }
