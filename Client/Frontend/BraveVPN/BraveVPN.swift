@@ -19,8 +19,8 @@ class BraveVPN {
   private static let helper = GRDVPNHelper.sharedInstance()
   private static let serverManager = GRDServerManager()
 
-  private static let gatewayAPI = GRDGatewayAPI()
-
+  /// List of regions the VPN can connect to.
+  /// This list is not static and should be refetched every now and then.
   static var regions: [GRDRegion] = []
   
   private static let connectionName = "Brave Firewall + VPN"
