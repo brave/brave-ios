@@ -33,7 +33,7 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
     var callPurchaseDelegateOnce = true
     
     // For safety let's start processing from the newest transaction.
-    transactions.compactMap { $0.transactionDate == nil ? nil : $0 }
+    transactions
       .sorted(by: { $0.transactionDate ?? Date() > $1.transactionDate ?? Date() })
       .forEach { transaction in
       switch transaction.transactionState {

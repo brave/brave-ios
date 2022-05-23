@@ -164,12 +164,6 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
 
     isLoading = true
 
-    if indexPath.section == Section.automatic.rawValue {
-      BraveVPN.useAutomaticRegion()
-    } else {
-      BraveVPN.selectRegion(region)
-    }
-
     // Implementation detail: nil region means we use an automatic way to connect to the host.
     let regionToSwitchTo = indexPath.section == Section.automatic.rawValue ? nil : region
 
