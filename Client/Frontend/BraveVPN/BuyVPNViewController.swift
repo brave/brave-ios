@@ -131,7 +131,7 @@ class BuyVPNViewController: UIViewController {
 // MARK: - IAPObserverDelegate
 
 extension BuyVPNViewController: IAPObserverDelegate {
-  func purchasedOrRestoredProduct() {
+  func purchasedOrRestoredProduct(validateReceipt: Bool) {
     DispatchQueue.main.async {
       self.isLoading = false
     }
@@ -144,8 +144,9 @@ extension BuyVPNViewController: IAPObserverDelegate {
           true)
     }
     
-    // get the receipt from the server
-    BraveVPN.validateReceipt()
+    if validateReceipt {
+      BraveVPN.validateReceipt()
+    }
   }
 
   func purchaseFailed(error: IAPObserver.PurchaseError) {

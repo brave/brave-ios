@@ -22,6 +22,8 @@ class BraveVPN {
   private static let gatewayAPI = GRDGatewayAPI()
 
   static var regions: [GRDRegion] = []
+  
+  private static let connectionName = "Brave Firewall + VPN"
 
   // MARK: - Initialization
 
@@ -43,8 +45,7 @@ class BraveVPN {
       GRDSubscriptionManager.setIsPayingUser(true)
       
       helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
-      
-      helper.tunnelLocalizedDescription = "Brave Firewall + VPN"
+      helper.tunnelLocalizedDescription = connectionName
       
       if case .notPurchased = vpnState {
         // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
@@ -60,7 +61,6 @@ class BraveVPN {
           return
         }
 
-        // FIXME: Make sure this is correct place to fetch the data.
         populateRegionDataIfNecessary()
       }
     }
@@ -68,40 +68,8 @@ class BraveVPN {
 
   // MARK: - STATE
 
-  /// Sometimes restoring a purchase is triggered multiple times which leads to calling vpn.configure multiple times.
-  /// This flags prevents configuring the vpn more than once.
-  private static var firstTimeUserConfigPending = false
-
   /// Lock to prevent user from spamming connect/disconnect button.
   static var reconnectPending = false
-
-  /// Status of creating vpn credentials on Guardian's servers.
-  enum VPNUserCreationStatus {
-    case success
-    case error(type: VPNUserCreationError)
-  }
-
-  /// Errors that can happen when a vpn's user credentials are created on Guardian's servers.
-  /// Each error has a number associated to it for easier debugging.
-  enum VPNUserCreationError {
-    case connectionProblems
-    case provisioning
-    case unknown
-  }
-
-  enum VPNConfigStatus {
-    case success
-    case error(type: VPNConfigErrorType)
-  }
-
-  /// Errors that can happen when trying to estabilish a vpn connection.
-  /// Each error has a number associated to it for easier debugging.
-  enum VPNConfigErrorType {
-    case saveConfigError
-    case loadConfigError
-    /// User tapped 'Don't allow' when save-vpn-config prompt is shown.
-    case permissionDenied
-  }
 
   enum VPNPurchaseError {
     /// Returned when the receipt sent to the server is expired. This happens for sandbox users only.
@@ -259,7 +227,7 @@ class BraveVPN {
     }
   }
 
-  static func connectToVPN(completion: ((VPNConfigStatus) -> Void)? = nil) {
+  static func connectToVPN(completion: ((Bool) -> Void)? = nil) {
     if isConnected {
       helper.disconnectVPN()
     }
@@ -271,9 +239,9 @@ class BraveVPN {
         reconnectPending = false
         if status == .success {
           populateRegionDataIfNecessary()
-          completion?(.success)
+          completion?(true)
         } else {
-          completion?(.error(type: .loadConfigError))
+          completion?(false)
         }
       }
       
@@ -284,43 +252,17 @@ class BraveVPN {
           if let error = error {
             logAndStoreError("configureFirstTimeUserPostCredential \(error)")
           }
-          completion?(.error(type: .loadConfigError))
+          completion?(false)
           return
         }
         
         log.debug("Creating credentials and vpn connection successful")
         populateRegionDataIfNecessary()
-        completion?(.success)
+        completion?(true)
       }
     }
   }
   
-  static func changeVPNRegion(_ region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
-    helper.configureFirstTimeUser(with: region) { success, error in
-      if success {
-        log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
-        completion(true)
-      } else {
-        log.debug("connection failed: \(String(describing: error))")
-        completion(false)
-      }
-    }
-  }
-  
-  /// Configure the vpn for first time user, or when restoring a purchase on freshly installed app.
-  /// Use `resetConfiguration` if you want to reconfigure the vpn for an existing user.
-  /// If IAP is restored we treat it as first user configuration as well.
-  static func configureFirstTimeUser(completion: ((VPNUserCreationStatus) -> Void)?) {
-    if firstTimeUserConfigPending { return }
-    firstTimeUserConfigPending = true
-
-    // Make sure region mode is set to automatic
-    // This can happen if the vpn has expired and a user has to buy it again.
-    useAutomaticRegion()
-
-    completion?(.success)
-  }
-
   /// Attempts to reconfigure the vpn by migrating to a new server.
   /// The new hostname is chosen randomly.
   /// Depending on user preference this will connect to either manually selected server region or a region closest to the user.
@@ -329,23 +271,10 @@ class BraveVPN {
   static func reconfigureVPN(completion: ((Bool) -> Void)? = nil) {
     helper.forceDisconnectVPNIfNecessary()
     GRDVPNHelper.clearVpnConfiguration()
-    useAutomaticRegion()
+    selectRegion(nil)
 
     connectToVPN() { status in
-      switch status {
-      case .success:
-        completion?(true)
-      default:
-        completion?(false)
-      }
-      //completion?(status == .success)
-    }
-  }
-
-  static func populateRegionDataIfNecessary () {
-    serverManager.getRegionsWithCompletion { regions in
-      // FIXME: Perhaps put on a serial queue to avoid concurrency bugs
-      self.regions = regions
+      completion?(status)
     }
   }
 
@@ -417,13 +346,11 @@ class BraveVPN {
       }
     }
   }
-
-  static func clearRegionList() {
-    helper.selectedRegion = nil
-  }
+  
+  // MARK: - Region selection
 
   static func selectRegion(_ region: GRDRegion?) {
-    helper.selectedRegion = region
+    helper.select(nil)
   }
 
   static var selectedRegion: GRDRegion? {
@@ -431,19 +358,36 @@ class BraveVPN {
   }
   
   static func useAutomaticRegion() {
-    helper.selectedRegion = nil
+    helper.select(nil)
   }
   
   static var isAutomaticRegion: Bool {
     helper.selectedRegion == nil
   }
   
-  private static func shouldProcessVPNAlerts(considerDummyData: Bool) -> Bool {
+  static func changeVPNRegion(_ region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
+    helper.configureFirstTimeUser(with: region) { success, error in
+      if success {
+        log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
+        completion(true)
+      } else {
+        log.debug("connection failed: \(String(describing: error))")
+        completion(false)
+      }
+    }
+  }
+  
+  static func populateRegionDataIfNecessary () {
+    serverManager.getRegionsWithCompletion { regions in
+      self.regions = regions
+    }
+  }
+  
+  // MARK: - VPN Alerts
+  private static func shouldProcessVPNAlerts() -> Bool {
     if !Preferences.PrivacyReports.captureVPNAlerts.value {
       return false
     }
-    
-    if considerDummyData { return true }
     
     switch vpnState {
     case .installed(let enabled):
@@ -454,7 +398,7 @@ class BraveVPN {
   }
 
   static func processVPNAlerts() {
-    if !shouldProcessVPNAlerts(considerDummyData: !AppConstants.buildChannel.isPublic) { return }
+    if !shouldProcessVPNAlerts() { return }
     
     Task {
       let (data, success, error) = await GRDGatewayAPI().events()
