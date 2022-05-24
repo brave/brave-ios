@@ -9,6 +9,7 @@ import Intents
 import Strings
 import BraveShared
 import BraveUI
+import BraveWidgetsModels
 
 struct SingleStatWidget: Widget {
 

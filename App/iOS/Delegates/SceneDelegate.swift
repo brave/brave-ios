@@ -12,6 +12,7 @@ import Storage
 import Data
 import Brave
 import BrowserIntentsModels
+import BraveWidgetsModels
 
 private let log = Logger.browserLogger
 

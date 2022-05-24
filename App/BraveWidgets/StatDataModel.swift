@@ -7,6 +7,7 @@ import Foundation
 import Strings
 import BraveShared
 import UIKit
+import BraveWidgetsModels
 
 struct StatData {
   var name: String

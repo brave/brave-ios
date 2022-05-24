@@ -22,6 +22,7 @@ let package = Package(
     .library(name: "Data", targets: ["Data"]),
     .library(name: "Storage", targets: ["Storage", "sqlcipher"]),
     .library(name: "BrowserIntentsModels", targets: ["BrowserIntentsModels"]),
+    .library(name: "BraveWidgetsModels", targets: ["BraveWidgetsModels"]),
     .library(name: "Strings", targets: ["Strings"]),
   ],
   dependencies: [
@@ -68,6 +69,7 @@ let package = Package(
         "SwiftyJSON",
         "XCGLogger",
         "BrowserIntentsModels",
+        "BraveWidgetsModels",
         .product(name: "Lottie", package: "lottie-ios"),
         .product(name: "Collections", package: "swift-collections"),
       ],
@@ -271,6 +273,7 @@ let package = Package(
       path: "BraveWallet"
     ),
     .target(name: "BrowserIntentsModels", path: "BrowserIntentsModels"),
+    .target(name: "BraveWidgetsModels", path: "BraveWidgetsModels"),
     .target(name: "BraveSharedTestUtils", path: "BraveSharedTestUtils"),
     .target(name: "DataTestsUtils", dependencies: ["Data", "BraveShared"], path: "DataTestsUtils"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"], path: "SharedTests"),

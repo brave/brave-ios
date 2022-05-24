@@ -34,10 +34,29 @@ npm run build
 # Setup local git config
 git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 
+# Generate intent sources
+
+xcrun intentbuilderc generate -input "${PWD}/App/BraveWidgets/Base.lproj/BraveWidgets.intentdefinition" \
+                              -classPrefix "" -output "${PWD}/BraveWidgetsModels" -language Swift -swiftVersion 5.6
+xcrun intentbuilderc generate -input "${PWD}/App/Shortcuts/Base.lproj/BrowserIntents.intentdefinition" \
+                              -classPrefix "" -output "${PWD}/BrowserIntentsModels" -language Swift -swiftVersion 5.6
+
 # Sets up local configurations from the tracked .template files
 
 # Checking the `Local` Directory
 CONFIG_PATH="App/Configuration"
+OLD_CONFIG_PATH="Client/Configuration"
+
+if [ -d "$OLD_CONFIG_PATH/Local" ]; then
+  echo "${COLOR_ORANGE}Copying configurations from old configuration directory${COLOR_NONE}"
+  for CONFIG_FILE in $OLD_CONFIG_PATH/Local/*.xcconfig
+  do
+    if cp -n $CONFIG_FILE $CONFIG_PATH/Local/ ; then
+      rm $CONFIG_FILE
+    fi
+  done
+fi
+
 if [ ! -d "$CONFIG_PATH/Local/" ]; then
   echo "${COLOR_ORANGE}Creating 'Local' directory${COLOR_NONE}"
 
