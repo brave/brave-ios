@@ -2312,14 +2312,15 @@ extension BrowserViewController: TabDelegate {
     })
   }
   
-  func showWalletNotification(_ tab: Tab, completion: BraveWalletProviderResultsCallback?) {
+  func showWalletNotification(_ tab: Tab) {
     // only display notification when BVC is front and center
-    guard presentedViewController == nil else {
+    guard presentedViewController == nil,
+          Preferences.Wallet.displayWeb3Notifications.value else {
       return
     }
     let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
       if action == .connectWallet {
-        self?.presentWalletPanel(tab: tab, completion: completion)
+        self?.presentWalletPanel(tab: tab)
       }
     }
     notificationsPresenter.display(notification: walletNotificaton, from: self)

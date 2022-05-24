@@ -332,7 +332,7 @@ extension BrowserViewController: TopToolbarDelegate {
     guard let selectedTab = tabManager.selectedTab else {
       return
     }
-    presentWalletPanel(tab: selectedTab, completion: nil)
+    presentWalletPanel(tab: selectedTab)
   }
     
   private func hideSearchController() {

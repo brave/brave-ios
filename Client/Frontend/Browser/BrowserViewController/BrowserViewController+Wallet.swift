@@ -44,7 +44,7 @@ extension WalletStore {
 }
 
 extension BrowserViewController {
-  func presentWalletPanel(tab: Tab, completion: BraveWalletProviderResultsCallback? = nil) {
+  func presentWalletPanel(tab: Tab) {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
@@ -101,7 +101,7 @@ extension BrowserViewController: BraveWalletDelegate {
 
 extension Tab: BraveWalletProviderDelegate {
   func showPanel() {
-    tabDelegate?.showWalletNotification(self, completion: nil)
+    tabDelegate?.showWalletNotification(self)
   }
 
   func getOrigin() -> URLOrigin {
@@ -156,7 +156,7 @@ extension Tab: BraveWalletProviderDelegate {
         }
       })
 
-      self.tabDelegate?.showWalletNotification(self, completion: completion)
+      self.tabDelegate?.showWalletNotification(self)
     }
   }
 
