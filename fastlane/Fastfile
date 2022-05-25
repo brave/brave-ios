@@ -32,6 +32,7 @@ platform :ios do
   desc "Run Unit Tests"
   lane :test do |options|
     run_tests(
+      project: "App/Client.xcodeproj",
       scheme: "Debug",
       device: "iPhone 8",
       code_coverage: true,
@@ -54,6 +55,7 @@ platform :ios do
     )
 
     run_tests(
+      project: "App/Client.xcodeproj",
       scheme: "Debug",
       device: "iPad Pro (9.7-inch)",
       code_coverage: true,
@@ -154,6 +156,7 @@ platform :ios do
   desc "Returns the parameters that should be used in any fastlane build"
   lane :gym_params do
     {
+      project: "App/Client.xcodeproj",
       sdk: "iphoneos",
       clean: true,
       output_directory: "build",
@@ -188,7 +191,7 @@ platform :ios do
 
   private_lane :clean_icons do
     # Regardless of git flags, always want to forcefully reset icon changes
-    reset_git_repo(files: ["Client/Assets/Images.xcassets/AppIcon*"], force: true)
+    reset_git_repo(files: ["App/iOS/Icons.xcassets/AppIcon*"], force: true)
   end
 
   override_lane :get_build_number do

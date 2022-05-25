@@ -356,8 +356,9 @@
 				0A24F83E233EB5B4004D2F3A /* DevTeam.xcconfig */,
 				0A24F83F233EB5B4004D2F3A /* BundleId.xcconfig */,
 			);
-			path = Local;
-			sourceTree = "<group>";
+			name = Local;
+			path = Configuration/Local;
+			sourceTree = SOURCE_ROOT;
 		};
 		0A24F840233EB5B4004D2F3A /* Local.templates */ = {
 			isa = PBXGroup;
