@@ -149,9 +149,26 @@ struct WalletPanelView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @ScaledMetric private var blockieSize = 54
   
-  private let currencyFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = "USD"
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+  
+  init(
+    keyringStore: KeyringStore,
+    cryptoStore: CryptoStore,
+    networkStore: NetworkStore,
+    accountActivityStore: AccountActivityStore,
+    origin: URLOrigin,
+    presentWalletWithContext: @escaping (PresentingContext) -> Void,
+    presentBuySendSwap: @escaping () -> Void
+  ) {
+    self.keyringStore = keyringStore
+    self.cryptoStore = cryptoStore
+    self.networkStore = networkStore
+    self.accountActivityStore = accountActivityStore
+    self.origin = origin
+    self.presentWalletWithContext = presentWalletWithContext
+    self.presentBuySendSwap = presentBuySendSwap
+    
+    currencyFormatter.currencyCode = accountActivityStore.currencyCode
   }
   
   private var connectButton: some View {
@@ -184,6 +201,13 @@ struct WalletPanelView: View {
     )
   }
   
+  private var pendingRequestsButton: some View {
+    Button(action: { presentWalletWithContext(.pendingRequests) }) {
+      Image("brave.bell.badge")
+        .foregroundColor(.white)
+    }
+  }
+  
   var body: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
@@ -204,10 +228,7 @@ struct WalletPanelView: View {
               .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
               Spacer()
               if cryptoStore.pendingRequest != nil {
-                Button(action: { presentWalletWithContext(.pendingRequests) }) {
-                  Image("brave.bell.badge")
-                    .foregroundColor(.white)
-                }
+                pendingRequestsButton
                 Spacer()
               }
               Menu {
@@ -241,10 +262,8 @@ struct WalletPanelView: View {
             .accessibilityLabel(Strings.Wallet.walletFullScreenAccessibilityTitle)
             if cryptoStore.pendingRequest != nil {
               // fake bell icon for layout
-              Button(action: {}) {
-                Image("brave.bell.badge")
-              }
-              .opacity(0)
+              pendingRequestsButton
+              .hidden()
             }
             Spacer()
             Text(Strings.Wallet.braveWallet)
@@ -254,10 +273,7 @@ struct WalletPanelView: View {
               )
             Spacer()
             if cryptoStore.pendingRequest != nil {
-              Button(action: { presentWalletWithContext(.pendingRequests) }) {
-                Image("brave.bell.badge")
-                  .foregroundColor(.white)
-              }
+              pendingRequestsButton
             }
             Menu {
               Button(action: { keyringStore.lock() }) {
