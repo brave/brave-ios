@@ -366,7 +366,7 @@ struct WalletPanelView: View {
     }
     .foregroundColor(.white)
     .background(
-      BlockieMaterial(address: keyringStore.selectedAccount.id).material
+      BlockieMaterial(address: keyringStore.selectedAccount.id)
       .ignoresSafeArea()
     )
     .onChange(of: cryptoStore.pendingRequest) { newValue in

@@ -112,18 +112,20 @@ struct Blockie: View {
   }
 }
 
-struct BlockieMaterial {
-  var address: String
+struct BlockieMaterial: View {
   
-  var material: LinearGradient {
-    let blockies = Blockies(seed: address)
-    let color = blockies.makeColor()
-    let backgroundColor = blockies.makeColor()
-    
-    let gradientBackground = LinearGradient(colors: [.init(backgroundColor), .init(color)],
-                                            startPoint: .top,
-                                            endPoint: .bottom)
-    return gradientBackground
+  init(address: String) {
+    self.blockies = Blockies(seed: address)
+  }
+  
+  private let blockies: Blockies
+  
+  var body: some View {
+    LinearGradient(
+      colors: [.init(blockies.makeColor()), .init(blockies.makeColor())],
+      startPoint: .top,
+      endPoint: .bottom
+    )
   }
 }
 
