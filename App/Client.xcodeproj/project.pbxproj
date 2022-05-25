@@ -142,6 +142,7 @@
 		0A6AC4E824484FBC003D1ED7 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		270ECFC628381E270089B8B7 /* brave-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "brave-ios"; path = ..; sourceTree = "<group>"; };
 		27A1AC1424884EB300344503 /* Enterprise.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Enterprise.xcconfig; sourceTree = "<group>"; };
+		27AAA14A283E89AF004C9B5E /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		27AC169623834510004BE19C /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		27AC7CF724C759BE00441317 /* Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Enterprise.entitlements; sourceTree = "<group>"; };
 		27AD20C226851C5400889AA7 /* BraveCore.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = BraveCore.xcframework; path = "../node_modules/brave-core-ios/BraveCore.xcframework"; sourceTree = "<group>"; };
@@ -406,6 +407,7 @@
 		27FDCE522835AE0800E78FAD /* l10n */ = {
 			isa = PBXGroup;
 			children = (
+				27AAA14A283E89AF004C9B5E /* Strings.swift */,
 				27F50CC2283699790009E407 /* GuardianVPN */,
 				27FDCE882835AF5400E78FAD /* BraveWallet */,
 				27FDCE852835AF3500E78FAD /* Shared */,
