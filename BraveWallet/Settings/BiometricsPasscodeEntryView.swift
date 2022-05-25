@@ -59,7 +59,7 @@ struct BiometricsPasscodeEntryView: View {
     NavigationView {
       ScrollView(.vertical) {
         VStack(spacing: 36) {
-          Image("graphic-lock", bundle: .module)
+          Image("graphic-lock", bundle: .current)
             .accessibilityHidden(true)
           VStack {
             Text(Strings.Wallet.enterPasswordForBiometricsTitle)

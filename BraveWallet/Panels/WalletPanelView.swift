@@ -45,7 +45,7 @@ public struct WalletPanelContainerView: View {
   
   private var lockedView: some View {
     VStack(spacing: 36) {
-      Image("graphic-lock", bundle: .module)
+      Image("graphic-lock", bundle: .current)
         .resizable()
         .aspectRatio(contentMode: .fit)
         .frame(maxWidth: 150)

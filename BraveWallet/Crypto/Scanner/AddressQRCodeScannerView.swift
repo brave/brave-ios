@@ -157,7 +157,7 @@ private class AddressQRCodeScannerViewController: UIViewController {
     }
 
     let imageView = UIImageView().then {
-      $0.image = UIImage(named: "camera-overlay")
+      $0.image = UIImage(named: "camera-overlay", in: .current, compatibleWith: nil)
       $0.contentMode = .center
       $0.translatesAutoresizingMaskIntoConstraints = false
       $0.isAccessibilityElement = false

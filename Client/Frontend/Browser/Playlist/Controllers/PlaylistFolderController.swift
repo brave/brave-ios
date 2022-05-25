@@ -328,7 +328,7 @@ extension PlaylistFolderController: UITableViewDelegate {
     editAction.image = UIImage(systemName: "pencil")
     editAction.backgroundColor = .braveBlurple
 
-    deleteAction.image = UIImage(named: "playlist_delete_item", in: .module, compatibleWith: nil)!
+    deleteAction.image = UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil)!
     deleteAction.backgroundColor = .braveErrorLabel
 
     return UISwipeActionsConfiguration(actions: [deleteAction, editAction])

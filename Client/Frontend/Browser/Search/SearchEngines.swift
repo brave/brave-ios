@@ -397,9 +397,9 @@ public class SearchEngines {
       var searchEngineImage: UIImage {
         switch self {
         case .yahooJapan:
-          return UIImage(named: "faviconYahoo", in: .module, compatibleWith: nil)!
+          return UIImage(named: "faviconYahoo", in: .current, compatibleWith: nil)!
         case .yahoo:
-          return UIImage(named: "faviconYahooJP", in: .module, compatibleWith: nil)!
+          return UIImage(named: "faviconYahooJP", in: .current, compatibleWith: nil)!
         }
       }
     }

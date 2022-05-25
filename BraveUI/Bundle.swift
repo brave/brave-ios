@@ -5,14 +5,12 @@
 
 import Foundation
 
-#if DEBUG
 extension Bundle {
-  private class BundleFinder {}
-  
   /// Returns the resource bundle associated with the current Swift module.
-  static var current: Bundle = {
+  static var current: Bundle {
+#if DEBUG
     if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
-      return Bundle.module
+      return .module
     }
     
     let bundleName = "Brave_BraveUI"
@@ -35,12 +33,11 @@ extension Bundle {
       }
     }
     fatalError("unable to find bundle named Brave_BraveUI")
-  }()
-}
 #else
-extension Bundle {
-  static var current: Bundle {
     return .module
-  }
-}
 #endif
+  }
+  
+  private class BundleFinder {}
+  
+}

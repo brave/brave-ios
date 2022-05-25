@@ -55,7 +55,7 @@ class AdContentButton: UIControl {
     stackView.addArrangedSubview(titleLabel)
     stackView.addArrangedSubview(bodyLabel)
 
-    let iconImageView = UIImageView(image: UIImage(named: "bat-small", in: .module, compatibleWith: nil)!)
+    let iconImageView = UIImageView(image: UIImage(named: "bat-small", in: .current, compatibleWith: nil)!)
 
     headerStackView.addArrangedSubview(iconImageView)
     headerStackView.addArrangedSubview(appNameLabel)

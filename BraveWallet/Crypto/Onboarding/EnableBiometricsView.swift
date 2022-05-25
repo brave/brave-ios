@@ -14,7 +14,7 @@ struct EnableBiometricsView: View {
 
   var body: some View {
     VStack {
-      Image("pin-migration-graphic", bundle: .module)
+      Image("pin-migration-graphic", bundle: .current)
         .resizable()
         .aspectRatio(contentMode: .fit)
         .frame(maxWidth: 250)

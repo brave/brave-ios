@@ -32,7 +32,7 @@ class BraveNewsOptInView: UIView, FeedCardContent {
   var optInCardActionHandler: ((OptInCardAction) -> Void)?
 
   private let closeButton = UIButton(type: .system).then {
-    $0.setImage(UIImage(named: "card_close", in: .module, compatibleWith: nil)!.withRenderingMode(.alwaysOriginal), for: .normal)
+    $0.setImage(UIImage(named: "card_close", in: .current, compatibleWith: nil)!.withRenderingMode(.alwaysOriginal), for: .normal)
     $0.accessibilityLabel = Strings.close
   }
 

@@ -14,7 +14,7 @@ struct SetupCryptoView: View {
 
   var body: some View {
     VStack(spacing: 46) {
-      Image("setup-welcome", bundle: .module)
+      Image("setup-welcome", bundle: .current)
       VStack(spacing: 14) {
         Text(Strings.Wallet.setupCryptoTitle)
           .foregroundColor(.primary)

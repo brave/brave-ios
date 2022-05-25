@@ -13,7 +13,7 @@ extension Bundle {
       return .module
     }
     
-    let bundleName = "Brave_BraveShared"
+    let bundleName = "Brave_Brave"
     let candidates = [
       // Bundle should be present here when the package is linked into an App.
       Bundle.main.resourceURL,
@@ -32,7 +32,7 @@ extension Bundle {
         return bundle
       }
     }
-    fatalError("unable to find bundle named Brave_BraveUI")
+    fatalError("unable to find bundle named \(bundleName)")
 #else
     return .module
 #endif

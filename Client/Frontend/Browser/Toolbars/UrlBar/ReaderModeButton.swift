@@ -11,7 +11,7 @@ class ReaderModeButton: UIButton {
   override init(frame: CGRect) {
     super.init(frame: frame)
     adjustsImageWhenHighlighted = false
-    setImage(UIImage(named: "reader", in: .module, compatibleWith: nil)!.template, for: .normal)
+    setImage(UIImage(named: "reader", in: .current, compatibleWith: nil)!.template, for: .normal)
   }
 
   @available(*, unavailable)

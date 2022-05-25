@@ -584,7 +584,7 @@ class NewTabPageViewController: UIViewController {
       feedDataSource.toggleSource(context.item.source, enabled: !isEnabled)
       if isEnabled {
         let alert = FeedActionAlertView(
-          image: UIImage(named: "disable.feed.source.alert", in: .module, compatibleWith: nil)!,
+          image: UIImage(named: "disable.feed.source.alert", in: .current, compatibleWith: nil)!,
           title: Strings.BraveNews.disabledAlertTitle,
           message: String(format: Strings.BraveNews.disabledAlertBody, context.item.source.name)
         )

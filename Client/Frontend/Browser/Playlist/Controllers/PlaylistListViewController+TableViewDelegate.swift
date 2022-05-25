@@ -195,10 +195,10 @@ extension PlaylistListViewController: UITableViewDelegate {
         completionHandler(true)
       })
 
-    cacheAction.image = cacheState == .invalid ? UIImage(named: "playlist_download", in: .module, compatibleWith: nil)! : UIImage(named: "playlist_delete_download", in: .module, compatibleWith: nil)!
+    cacheAction.image = cacheState == .invalid ? UIImage(named: "playlist_download", in: .current, compatibleWith: nil)! : UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)!
     cacheAction.backgroundColor = UIColor.braveDarkerBlurple
 
-    deleteAction.image = UIImage(named: "playlist_delete_item", in: .module, compatibleWith: nil)!
+    deleteAction.image = UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil)!
     deleteAction.backgroundColor = UIColor.braveErrorLabel
 
     shareAction.image = UIImage(systemName: "square.and.arrow.up")
