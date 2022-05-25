@@ -18,7 +18,8 @@ extension WalletStore {
       swapService: MockSwapService(),
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
-      ethTxManagerProxy: MockEthTxManagerProxy()
+      ethTxManagerProxy: MockEthTxManagerProxy(),
+      pendingRequestUpdated: nil
     )
   }
 }
@@ -33,7 +34,8 @@ extension CryptoStore {
       swapService: MockSwapService(),
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
-      ethTxManagerProxy: MockEthTxManagerProxy()
+      ethTxManagerProxy: MockEthTxManagerProxy(),
+      pendingRequestUpdated: nil
     )
   }
 }

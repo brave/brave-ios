@@ -25,7 +25,8 @@ public class WalletStore {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
+    pendingRequestUpdated: (() -> Void)?
   ) {
     self.keyringStore = .init(keyringService: keyringService)
     self.setUp(
@@ -36,7 +37,8 @@ public class WalletStore {
       swapService: swapService,
       blockchainRegistry: blockchainRegistry,
       txService: txService,
-      ethTxManagerProxy: ethTxManagerProxy
+      ethTxManagerProxy: ethTxManagerProxy,
+      pendingRequestUpdated: pendingRequestUpdated
     )
   }
 
@@ -48,7 +50,8 @@ public class WalletStore {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
+    pendingRequestUpdated: (() -> Void)?
   ) {
     self.cancellable = self.keyringStore.$keyring
       .map(\.isKeyringCreated)
@@ -66,7 +69,8 @@ public class WalletStore {
             swapService: swapService,
             blockchainRegistry: blockchainRegistry,
             txService: txService,
-            ethTxManagerProxy: ethTxManagerProxy
+            ethTxManagerProxy: ethTxManagerProxy,
+            pendingRequestUpdated: pendingRequestUpdated
           )
         }
       }

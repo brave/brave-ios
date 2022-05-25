@@ -51,7 +51,12 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
-  @Published private(set) var pendingRequest: PendingRequest?
+  @Published private(set) var pendingRequest: PendingRequest? {
+    didSet {
+      pendingRequestUpdated?()
+    }
+  }
+  private let pendingRequestUpdated: (() -> Void)?
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -70,7 +75,8 @@ public class CryptoStore: ObservableObject {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
+    pendingRequestUpdated: (() -> Void)?
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
@@ -80,6 +86,7 @@ public class CryptoStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.txService = txService
     self.ethTxManagerProxy = ethTxManagerProxy
+    self.pendingRequestUpdated = pendingRequestUpdated
     
     self.networkStore = .init(rpcService: rpcService)
     self.portfolioStore = .init(
@@ -270,6 +277,18 @@ public class CryptoStore: ObservableObject {
       return .addSuggestedToken(addTokenRequest)
     } else {
       return nil
+    }
+  }
+  
+  /// Determines if a pending request is available. We cannot simply check `pendingRequest` as it will be nil when the request is dismissed without accept/reject.
+  @MainActor
+  public func isPendingRequestAvailable() async -> Bool {
+    let pendingTransactions = await fetchPendingTransactions()
+    if !pendingTransactions.isEmpty {
+      return true
+    } else {
+      let pendingRequest = await fetchPendingWebpageRequest()
+      return pendingRequest != nil
     }
   }
 

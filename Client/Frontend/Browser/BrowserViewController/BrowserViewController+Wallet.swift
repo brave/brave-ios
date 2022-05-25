@@ -17,7 +17,7 @@ private let log = Logger.browserLogger
 
 extension WalletStore {
   /// Creates a WalletStore based on whether or not the user is in Private Mode
-  static func from(privateMode: Bool) -> WalletStore? {
+  static func from(privateMode: Bool, pendingRequestUpdated: (() -> Void)?) -> WalletStore? {
     guard
       let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
       let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode),
@@ -38,7 +38,37 @@ extension WalletStore {
       swapService: swapService,
       blockchainRegistry: BraveCoreMain.blockchainRegistry,
       txService: txService,
-      ethTxManagerProxy: ethTxManagerProxy
+      ethTxManagerProxy: ethTxManagerProxy,
+      pendingRequestUpdated: pendingRequestUpdated
+    )
+  }
+}
+
+extension CryptoStore {
+  /// Creates a CryptoStore based on whether or not the user is in Private Mode
+  static func from(privateMode: Bool, pendingRequestUpdated: (() -> Void)? = nil) -> CryptoStore? {
+    guard
+      let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
+      let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode),
+      let assetRatioService = BraveWallet.AssetRatioServiceFactory.get(privateMode: privateMode),
+      let walletService = BraveWallet.ServiceFactory.get(privateMode: privateMode),
+      let swapService = BraveWallet.SwapServiceFactory.get(privateMode: privateMode),
+      let txService = BraveWallet.TxServiceFactory.get(privateMode: privateMode),
+      let ethTxManagerProxy = BraveWallet.EthTxManagerProxyFactory.get(privateMode: privateMode)
+    else {
+      log.error("Failed to load wallet. One or more services were unavailable")
+      return nil
+    }
+    return CryptoStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      assetRatioService: assetRatioService,
+      swapService: swapService,
+      blockchainRegistry: BraveCoreMain.blockchainRegistry,
+      txService: txService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      pendingRequestUpdated: pendingRequestUpdated
     )
   }
 }
@@ -46,7 +76,10 @@ extension WalletStore {
 extension BrowserViewController {
   func presentWalletPanel(tab: Tab) {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    guard let walletStore = WalletStore.from(privateMode: privateMode) else {
+    let pendingRequestUpdated: () -> Void = { [weak self] in
+      self?.updateURLBarWalletButton()
+    }
+    guard let walletStore = WalletStore.from(privateMode: privateMode, pendingRequestUpdated: pendingRequestUpdated) else {
       return
     }
     let origin = tab.getOrigin()
