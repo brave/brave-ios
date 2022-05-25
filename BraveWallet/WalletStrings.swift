@@ -2342,21 +2342,21 @@ extension Strings {
     public static let walletPanelUnlockWallet = NSLocalizedString(
       "wallet.walletPanelUnlockWallet",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .strings,
       value: "Unlock wallet",
       comment: "The title of the button in wallet panel when wallet is locked. Users can click it to open full screen unlock wallet screen."
     )
     public static let walletPanelSetupWalletDescription = NSLocalizedString(
       "wallet.walletPanelSetupWalletDescription",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .strings,
       value: "Use this panel to securely access web3 and all your crypto assets.",
       comment: "The description for wallet panel when users haven't set up a wallet yet."
     )
     public static let walletFullScreenAccessibilityTitle = NSLocalizedString(
       "wallet.walletFullScreenAccessibilityTitle",
       tableName: "BraveWallet",
-      bundle: .braveWallet,
+      bundle: .strings,
       value: "Open wallet in full screen",
       comment: "The label read out when a user is using VoiceOver and highlights the two-arrow button on the wallet panel top left corner."
     )

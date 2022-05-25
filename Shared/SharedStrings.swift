@@ -5,16 +5,6 @@
 import Foundation
 @_exported import Strings
 
-/// Return the main application bundle. Even if called from an extension. If for some reason we cannot find the
-/// application bundle, the current bundle is returned, which will then result in an English base language string.
-private func applicationBundle() -> Bundle {
-  let bundle = Bundle.main
-  guard bundle.bundleURL.pathExtension == "appex", let applicationBundleURL = (bundle.bundleURL as NSURL).deletingLastPathComponent?.deletingLastPathComponent() else {
-    return bundle
-  }
-  return Bundle(url: applicationBundleURL) ?? bundle
-}
-
 extension Strings {
   public static let OKString = NSLocalizedString("OKString", bundle: .strings, value: "OK", comment: "OK button")
   public static let CancelString = NSLocalizedString("CancelString", bundle: .strings, value: "Cancel", comment: "Cancel button")
