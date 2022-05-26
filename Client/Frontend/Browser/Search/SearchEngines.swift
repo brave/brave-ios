@@ -291,7 +291,7 @@ public class SearchEngines {
   ) -> [OpenSearchEngine] {
     let parser = OpenSearchParser(pluginMode: true)
 
-    guard let pluginDirectory = Bundle.module.resourceURL?.appendingPathComponent("SearchPlugins") else {
+    guard let pluginDirectory = Bundle.current.resourceURL?.appendingPathComponent("SearchPlugins") else {
       assertionFailure("Search plugins not found. Check bundle")
       return []
     }

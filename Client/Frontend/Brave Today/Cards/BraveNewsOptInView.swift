@@ -24,7 +24,7 @@ class BraveNewsOptInView: UIView, FeedCardContent {
     $0.spacing = 16
   }
 
-  let graphicAnimationView = AnimationView(name: "brave-today-welcome-graphic", bundle: .module).then {
+  let graphicAnimationView = AnimationView(name: "brave-today-welcome-graphic", bundle: .current).then {
     $0.contentMode = .scaleAspectFit
     $0.loopMode = .loop
   }
