@@ -54,6 +54,53 @@ struct EditSiteConnectionView: View {
     }
   }
   
+  @ViewBuilder private func editButton(action: EditAction, account: BraveWallet.AccountInfo) -> some View {
+    Button {
+      switch action {
+      case .connect:
+        if let url = origin.url {
+          Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: true)
+        }
+        permittedAccounts.append(account.address)
+        keyringStore.selectedAccount = account
+      case .disconnect:
+        if let url = origin.url {
+          Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: false)
+        }
+        permittedAccounts.removeAll(where: { $0 == account.address })
+        
+        if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
+          keyringStore.selectedAccount = firstAllowedAccount
+        }
+      case .switch:
+        keyringStore.selectedAccount = account
+      }
+    } label: {
+      Text(action.title)
+        .foregroundColor(Color(.braveBlurpleTint))
+        .font(.footnote.weight(.semibold))
+    }
+  }
+  
+  @ViewBuilder private var connectionInfo: some View {
+    Image(systemName: "globe")
+      .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
+      .background(Color(.braveDisabled))
+      .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    VStack(alignment: sizeCategory.isAccessibilityCategory ? .center : .leading, spacing: 2) {
+      origin.url.map { url in
+        Text(verbatim: url.absoluteString)
+          .font(.subheadline.weight(.semibold))
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.bravePrimary))
+      }
+      Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
+        .font(.footnote)
+        .multilineTextAlignment(.center)
+        .foregroundColor(Color(.braveLabel))
+    }
+  }
+  
   var body: some View {
     NavigationView {
       Form {
@@ -64,61 +111,13 @@ struct EditSiteConnectionView: View {
               VStack {
                 AccountView(address: account.address, name: account.name)
                 Spacer()
-                Button {
-                  switch action {
-                  case .connect:
-                    if let url = origin.url {
-                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: true)
-                    }
-                    permittedAccounts.append(account.address)
-                    keyringStore.selectedAccount = account
-                  case .disconnect:
-                    if let url = origin.url {
-                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: false)
-                    }
-                    permittedAccounts.removeAll(where: { $0 == account.address })
-                    
-                    if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
-                      keyringStore.selectedAccount = firstAllowedAccount
-                    }
-                  case .switch:
-                    keyringStore.selectedAccount = account
-                  }
-                } label: {
-                  Text(action.title)
-                    .foregroundColor(Color(.braveBlurpleTint))
-                    .font(.footnote.weight(.semibold))
-                }
+                editButton(action: action, account: account)
               }
             } else {
               HStack {
                 AccountView(address: account.address, name: account.name)
                 Spacer()
-                Button {
-                  switch action {
-                  case .connect:
-                    if let url = origin.url {
-                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: true)
-                    }
-                    permittedAccounts.append(account.address)
-                    keyringStore.selectedAccount = account
-                  case .disconnect:
-                    if let url = origin.url {
-                      Domain.setEthereumPermissions(forUrl: url, account: account.address, grant: false)
-                    }
-                    permittedAccounts.removeAll(where: { $0 == account.address })
-                    
-                    if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.keyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
-                      keyringStore.selectedAccount = firstAllowedAccount
-                    }
-                  case .switch:
-                    keyringStore.selectedAccount = account
-                  }
-                } label: {
-                  Text(action.title)
-                    .foregroundColor(Color(.braveBlurpleTint))
-                    .font(.footnote.weight(.semibold))
-                }
+                editButton(action: action, account: account)
               }
             }
           }
@@ -126,39 +125,11 @@ struct EditSiteConnectionView: View {
           Group {
             if sizeCategory.isAccessibilityCategory {
               VStack(spacing: 12) {
-                Image(systemName: "globe")
-                  .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
-                  .background(Color(.braveDisabled))
-                  .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                VStack(spacing: 2) {
-                  origin.url.map { url in
-                    Text(verbatim: url.absoluteString)
-                      .font(.subheadline.weight(.semibold))
-                      .multilineTextAlignment(.center)
-                      .foregroundColor(Color(.bravePrimary))
-                  }
-                  Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
-                    .font(.footnote)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(Color(.braveLabel))
-                }
+                connectionInfo
               }
             } else {
               HStack(spacing: 12) {    
-                Image(systemName: "globe")
-                  .frame(width: faviconSize, height: faviconSize)
-                  .background(Color(.braveDisabled))
-                  .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                VStack(alignment: .leading, spacing: 2) {
-                  origin.url.map { url in
-                    Text(verbatim: url.absoluteString)
-                      .font(.subheadline.weight(.semibold))
-                      .foregroundColor(Color(.bravePrimary))
-                  }
-                  Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
-                    .font(.footnote)
-                    .foregroundColor(Color(.braveLabel))
-                }
+                connectionInfo
               }
             }
           }

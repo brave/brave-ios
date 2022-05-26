@@ -87,7 +87,7 @@ public struct NewSiteConnectionView: View {
   
   public var body: some View {
     NavigationView {
-      List {
+      Form {
         Section {
           headerView
         }
