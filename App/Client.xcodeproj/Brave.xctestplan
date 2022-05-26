@@ -47,6 +47,7 @@
     {
       "skippedTests" : [
         "NavigationRouterTests",
+        "PlaylistTests\/testVideoPlayerTrackBarTimeManualFormatter()",
         "SyncTests"
       ],
       "target" : {
