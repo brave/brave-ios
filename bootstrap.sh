@@ -34,13 +34,6 @@ npm run build
 # Setup local git config
 git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 
-# Generate intent sources
-
-xcrun intentbuilderc generate -input "${PWD}/App/BraveWidgets/Base.lproj/BraveWidgets.intentdefinition" \
-                              -classPrefix "" -output "${PWD}/BraveWidgetsModels" -language Swift -swiftVersion 5.6
-xcrun intentbuilderc generate -input "${PWD}/App/Shortcuts/Base.lproj/BrowserIntents.intentdefinition" \
-                              -classPrefix "" -output "${PWD}/BrowserIntentsModels" -language Swift -swiftVersion 5.6
-
 # Sets up local configurations from the tracked .template files
 
 # Checking the `Local` Directory

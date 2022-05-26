@@ -24,6 +24,7 @@ let package = Package(
     .library(name: "BrowserIntentsModels", targets: ["BrowserIntentsModels"]),
     .library(name: "BraveWidgetsModels", targets: ["BraveWidgetsModels"]),
     .library(name: "Strings", targets: ["Strings"]),
+    .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
   ],
   dependencies: [
     .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.11"),
@@ -200,7 +201,6 @@ let package = Package(
         "SwiftKeychainWrapper",
         "SwiftyJSON",
         "XCGLogger",
-        .product(name: "ObjcExceptionBridging", package: "XCGLogger")
       ],
       path: "Shared",
       exclude: ["FSUtils"],
@@ -272,8 +272,18 @@ let package = Package(
       ],
       path: "BraveWallet"
     ),
-    .target(name: "BrowserIntentsModels", path: "BrowserIntentsModels"),
-    .target(name: "BraveWidgetsModels", path: "BraveWidgetsModels"),
+    .target(
+      name: "BrowserIntentsModels",
+      path: "BrowserIntentsModels",
+      sources: ["BrowserIntents.intentdefinition", "CustomIntentHandler.swift"],
+      plugins: ["IntentBuilderPlugin"]
+    ),
+    .target(
+      name: "BraveWidgetsModels",
+      path: "BraveWidgetsModels",
+      sources: ["BraveWidgets.intentdefinition", "Empty.swift"],
+      plugins: ["IntentBuilderPlugin"]
+    ),
     .target(name: "BraveSharedTestUtils", path: "BraveSharedTestUtils"),
     .target(name: "DataTestsUtils", dependencies: ["Data", "BraveShared"], path: "DataTestsUtils"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"], path: "SharedTests"),
@@ -281,6 +291,7 @@ let package = Package(
       name: "BraveSharedTests",
       dependencies: ["BraveShared", "BraveSharedTestUtils"],
       path: "BraveSharedTests",
+      exclude: [ "Certificates/self-signed.conf" ],
       resources: [
         .copy("Certificates/root.cer"),
         .copy("Certificates/leaf.cer"),
@@ -315,6 +326,7 @@ let package = Package(
       ]
     ),
     .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist"]),
+    .plugin(name: "IntentBuilderPlugin", capability: .buildTool())
   ],
   cxxLanguageStandard: .cxx14
 )
