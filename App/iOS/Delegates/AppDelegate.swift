@@ -111,9 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AdBlockStats.shared.startLoading()
 
     // TODO: Downgrade to 14.5 once api becomes available.
-    if #available(iOS 15, *) {
-      // do nothing, use Apple's https solution.
-    } else {
+    if #unavailable(iOS 15.0) {
       HttpsEverywhereStats.shared.startLoading()
     }
 

@@ -458,7 +458,6 @@ extension URL {
     return siteList.contains(where: host.contains)
   }
 
-
   // Check if the website is supporting showing Add To playlist toast
   public var isPlaylistSupportedSiteURL: Bool {
     let domain = self.baseDomain ?? self.host ?? self.hostSLD
