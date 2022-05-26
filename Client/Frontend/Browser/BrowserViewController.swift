@@ -395,7 +395,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     #if WALLET_DAPPS_ENABLED
     tabManager.makeWalletProvider = { [weak self] tab in
       guard let self = self,
-            let provider = self.braveCore.walletProvider(with: self, isPrivateBrowsing: tab.isPrivate) else {
+            let provider = self.braveCore.walletProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
         return nil
       }
       return (provider, js: self.braveCore.walletProviderJS)
@@ -420,7 +420,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     pageZoomListener = NotificationCenter.default.addObserver(forName: PageZoomView.notificationName, object: nil, queue: .main) { [weak self] _ in
       self?.tabManager.allTabs.forEach({
         guard let url = $0.webView?.url else { return }
-        let zoomLevel = Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+        let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
         $0.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
       })
     }
@@ -838,7 +838,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       .store(in: &cancellables)
   }
 
-  fileprivate let defaultBrowserNotificationId = "defaultBrowserNotification"
+  public static let defaultBrowserNotificationId = "defaultBrowserNotification"
 
   private func scheduleDefaultBrowserNotification() {
     let center = UNUserNotificationCenter.current()
@@ -856,7 +856,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
       center.getPendingNotificationRequests { [weak self] requests in
         guard let self = self else { return }
-        if requests.contains(where: { $0.identifier == self.defaultBrowserNotificationId }) {
+        if requests.contains(where: { $0.identifier == Self.defaultBrowserNotificationId }) {
           // Already has one scheduled no need to schedule again.
           return
         }
@@ -870,7 +870,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         let timeTrigger = UNTimeIntervalNotificationTrigger(timeInterval: timeToShow, repeats: false)
 
         let request = UNNotificationRequest(
-          identifier: self.defaultBrowserNotificationId,
+          identifier: Self.defaultBrowserNotificationId,
           content: content,
           trigger: timeTrigger)
 
@@ -1943,7 +1943,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     if let currentURL = tab.url {
       let domain = Domain.getPersistedDomain(for: currentURL)
       
-      let zoomLevel = domain?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+      let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : domain?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
       tab.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
     }
   }
@@ -2331,6 +2331,25 @@ extension BrowserViewController: TabDelegate {
       PlaylistHelper.stopPlayback(tab: $0)
     })
   }
+  
+  func showWalletNotification(_ tab: Tab) {
+    // only display notification when BVC is front and center
+    guard presentedViewController == nil,
+          Preferences.Wallet.displayWeb3Notifications.value else {
+      return
+    }
+    let walletNotificaton = WalletNotification(priority: .low) { [weak self] action in
+      if action == .connectWallet {
+        self?.presentWalletPanel(tab: tab)
+      }
+    }
+    notificationsPresenter.display(notification: walletNotificaton, from: self)
+  }
+
+  func updateURLBarWalletButton() {
+    topToolbar.locationView.walletButton.buttonState =
+    tabManager.selectedTab?.isWalletIconVisible == true ? .active : .inactive
+  }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {
@@ -2485,7 +2504,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     updateInContentHomePanel(selected?.url as URL?)
-        updateURLBarWalletButton()
+    updateURLBarWalletButton()
   }
 
   func tabManager(_ tabManager: TabManager, willAddTab tab: Tab) {
@@ -3250,7 +3269,7 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.General.defaultPageZoomLevel.key:
       tabManager.allTabs.forEach({
         guard let url = $0.webView?.url else { return }
-        let zoomLevel = Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+        let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
         $0.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
       })
     case Preferences.Shields.httpsEverywhere.key:
@@ -3329,7 +3348,7 @@ extension BrowserViewController {
 
 extension BrowserViewController: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    if response.notification.request.identifier == defaultBrowserNotificationId {
+    if response.notification.request.identifier == Self.defaultBrowserNotificationId {
       guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
         log.error("Failed to unwrap iOS settings URL")
         return
@@ -3344,7 +3363,7 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
 
 // Privacy reports
 extension BrowserViewController {
-  func openPrivacyReport() {
+  public func openPrivacyReport() {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
       return
     }

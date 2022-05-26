@@ -132,6 +132,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     if let shortcutItem = connectionOptions.shortcutItem {
       QuickActions.sharedInstance.launchedShortcutItem = shortcutItem
     }
+    
+    if let response = connectionOptions.notificationResponse {
+      if response.notification.request.identifier == BrowserViewController.defaultBrowserNotificationId {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+          log.error("Failed to unwrap iOS settings URL")
+          return
+        }
+        UIApplication.shared.open(settingsUrl)
+      } else if response.notification.request.identifier == PrivacyReportsManager.notificationID {
+        browserViewController.openPrivacyReport()
+      }
+    }
         
     PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     PrivacyReportsManager.consolidateData()
@@ -226,7 +238,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     })
   }
 
-  // swiftlint:disable:next cyclomatic_complexity
   func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
 
     guard let scene = scene as? UIWindowScene else {
@@ -441,5 +452,64 @@ extension BrowserViewController {
       urp.pingIfEnoughTimePassed()
       self.backgroundDataSource.startFetching()
     }
+  }
+}
+
+extension UIWindowScene {
+  /// A single scene should only have ONE browserViewController
+  /// However, it is possible that someone can create multiple,
+  /// Therefore, we support this possibility if needed
+  var browserViewControllers: [BrowserViewController] {
+    windows.compactMap({
+      $0.rootViewController as? UINavigationController
+    }).flatMap({
+      $0.viewControllers.compactMap({
+        $0 as? BrowserViewController
+      })
+    })
+  }
+
+  /// A scene should only ever have one browserViewController
+  /// Returns the first instance of `BrowserViewController` that is found in the current scene
+  var browserViewController: BrowserViewController? {
+    return browserViewControllers.first
+  }
+}
+
+extension UIView {
+  /// Returns the `Scene` that this view belongs to.
+  /// If the view does not belong to a scene, it returns the scene of its parent
+  /// Otherwise returns nil if no scene is associated with this view.
+  var currentScene: UIWindowScene? {
+    if let scene = window?.windowScene {
+      return scene
+    }
+
+    if let scene = superview?.currentScene {
+      return scene
+    }
+
+    return nil
+  }
+}
+
+extension UIViewController {
+  /// Returns the `Scene` that this controller belongs to.
+  /// If the controller does not belong to a scene, it returns the scene of its presenter or parent.
+  /// Otherwise returns nil if no scene is associated with this controller.
+  var currentScene: UIWindowScene? {
+    if let scene = view.window?.windowScene {
+      return scene
+    }
+
+    if let scene = parent?.currentScene {
+      return scene
+    }
+
+    if let scene = presentingViewController?.currentScene {
+      return scene
+    }
+
+    return nil
   }
 }

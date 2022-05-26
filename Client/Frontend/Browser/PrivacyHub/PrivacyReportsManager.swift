@@ -85,7 +85,7 @@ public struct PrivacyReportsManager {
 
   // MARK: - Notifications
 
-  static let notificationID = "privacy-report-weekly-notification"
+  public static let notificationID = "privacy-report-weekly-notification"
 
   public static func scheduleNotification(debugMode: Bool) {
     let notificationCenter = UNUserNotificationCenter.current()
