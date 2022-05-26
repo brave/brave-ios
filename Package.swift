@@ -328,6 +328,5 @@ let package = Package(
     .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist"]),
     .plugin(name: "IntentBuilderPlugin", capability: .buildTool())
   ],
-  cxxLanguageStandard: .cxx14
+  cxxLanguageStandard: .cxx17
 )
-
