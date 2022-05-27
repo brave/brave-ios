@@ -54,6 +54,16 @@ struct EditSiteConnectionView: View {
     }
   }
   
+  private var connectedAddresses: String {
+    let account = Strings.Wallet.editSiteConnectionAccountSingular
+    let accounts = Strings.Wallet.editSiteConnectionAccountPlural
+    return String.localizedStringWithFormat(
+      Strings.Wallet.editSiteConnectionConnectedAccount,
+      permittedAccounts.count,
+      permittedAccounts.count == 1 ? account : accounts
+    )
+  }
+  
   @ViewBuilder private func editButton(action: EditAction, account: BraveWallet.AccountInfo) -> some View {
     Button {
       switch action {
@@ -94,7 +104,7 @@ struct EditSiteConnectionView: View {
           .multilineTextAlignment(.center)
           .foregroundColor(Color(.bravePrimary))
       }
-      Text(String.localizedStringWithFormat(Strings.Wallet.editSiteConnectionConnectedAccount, permittedAccounts.count, permittedAccounts.count == 1 ? Strings.Wallet.editSiteConnectionAccountSingular : Strings.Wallet.editSiteConnectionAccountPlural))
+      Text(connectedAddresses)
         .font(.footnote)
         .multilineTextAlignment(.center)
         .foregroundColor(Color(.braveLabel))
