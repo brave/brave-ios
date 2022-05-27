@@ -147,7 +147,7 @@ extension Tab: BraveWalletProviderDelegate {
         return
       }
       
-      guard WalletStore.from(privateMode: isPrivate) != nil else {
+      guard WalletStore.from(privateMode: isPrivate, pendingRequestUpdated: nil) != nil else {
         completion(.internal, nil)
         return
       }
@@ -169,6 +169,7 @@ extension Tab: BraveWalletProviderDelegate {
         case .rejected:
           completion(.none, [])
         }
+        self.tabDelegate?.updateURLBarWalletButton()
       })
 
       self.tabDelegate?.showWalletNotification(self)
