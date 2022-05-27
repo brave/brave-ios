@@ -145,6 +145,12 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
     sections.append(.openTabsAndHistoryAndBookmarks)
     return sections
   }
+  
+  private var braveSearchPromotionAvailable: Bool {
+    return !Preferences.General.isFirstLaunch.value &&
+    searchEngines?.defaultEngine().shortName != OpenSearchEngine.EngineNames.brave &&
+    !tabType.isPrivate
+  }
 
   // MARK: Lifecycle
 
@@ -185,6 +191,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       $0.addGestureRecognizer(suggestionLongPressGesture)
       $0.register(SearchSuggestionPromptCell.self, forCellReuseIdentifier: SearchSuggestionPromptCell.identifier)
       $0.register(SuggestionCell.self, forCellReuseIdentifier: SuggestionCell.identifier)
+      $0.register(BraveSearchPromotionCell.self, forCellReuseIdentifier: BraveSearchPromotionCell.identifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: "default")
     }
     NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .dynamicFontChanged, object: nil)
@@ -382,6 +389,15 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
     self.data = Array(data.prefix(5))
     tableView.reloadData()
   }
+  
+  private func isBraveSearchPrompt(for indexPath: IndexPath) -> Bool {
+    switch suggestions.count {
+    case 0...2:
+      return indexPath.row == suggestions.count && braveSearchPromotionAvailable
+    default:
+      return indexPath.row == 2 && braveSearchPromotionAvailable
+    }
+  }
 
   // MARK: Actions
 
@@ -423,20 +439,22 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       searchDelegate?.searchViewController(self, didSubmit: searchQuery)
     case .searchSuggestionsOptIn: return
     case .searchSuggestions:
-      // Assume that only the default search engine can provide search suggestions.
-      let engine = searchEngines?.defaultEngine()
-      let suggestion = suggestions[indexPath.row]
+      if !isBraveSearchPrompt(for: indexPath) {
+        // Assume that only the default search engine can provide search suggestions.
+        let engine = searchEngines?.defaultEngine()
+        let suggestion = suggestions[indexPath.row]
 
-      var url = URIFixup.getURL(suggestion)
-      if url == nil {
-        url = engine?.searchURLForQuery(suggestion)
-      }
-
-      if let url = url {
-        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-          RecentSearch.addItem(type: .website, text: suggestion, websiteUrl: url.absoluteString)
+        var url = URIFixup.getURL(suggestion)
+        if url == nil {
+          url = engine?.searchURLForQuery(suggestion)
         }
-        searchDelegate?.searchViewController(self, didSelectURL: url)
+
+        if let url = url {
+          if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+            RecentSearch.addItem(type: .website, text: suggestion, websiteUrl: url.absoluteString)
+          }
+          searchDelegate?.searchViewController(self, didSelectURL: url)
+        }
       }
     case .openTabsAndHistoryAndBookmarks:
       let site = data[indexPath.row]
@@ -461,7 +479,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       case .searchSuggestionsOptIn:
         return 100.0
       case .searchSuggestions:
-        return 44.0
+        return isBraveSearchPrompt(for: indexPath) ? UITableView.automaticDimension : 44.0
       case .openTabsAndHistoryAndBookmarks:
         return super.tableView(tableView, heightForRowAt: indexPath)
       case .findInPage:
@@ -570,19 +588,31 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
         
       return cell
     case .searchSuggestions:
-      let cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
-      if let suggestionCell = cell as? SuggestionCell {
-        suggestionCell.setTitle(suggestions[indexPath.row])
-        suggestionCell.separatorInset = UIEdgeInsets(top: 0.0, left: view.bounds.width, bottom: 0.0, right: -view.bounds.width)
-        suggestionCell.openButtonActionHandler = { [weak self] in
-          guard let self = self else { return }
+      var cell: UITableViewCell?
 
-          let suggestion = self.suggestions[indexPath.row]
-          self.searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
+      if isBraveSearchPrompt(for: indexPath) {
+        cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
+
+        // TODO: Cell Button Actions
+      } else {
+        cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
+
+        if let suggestionCell = cell as? SuggestionCell {
+          suggestionCell.setTitle(suggestions[indexPath.row])
+          suggestionCell.separatorInset = UIEdgeInsets(top: 0.0, left: view.bounds.width, bottom: 0.0, right: -view.bounds.width)
+          suggestionCell.openButtonActionHandler = { [weak self] in
+            guard let self = self else { return }
+
+            let suggestion = self.suggestions[indexPath.row]
+            self.searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
+          }
         }
       }
-        
-      return cell
+      
+      guard let tableViewCell = cell else { return UITableViewCell() }
+      tableViewCell.separatorInset = .zero
+
+      return tableViewCell
     case .openTabsAndHistoryAndBookmarks:
       let cell = super.tableView(tableView, cellForRowAt: indexPath)
       let site = data[indexPath.row]
@@ -650,9 +680,15 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       return 1
     case .searchSuggestions:
       guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else { return 0 }
+      
+      var searchSuggestionsCount = min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions)
+      if braveSearchPromotionAvailable {
+        searchSuggestionsCount += 1
+      }
+      
       return shouldShowSuggestions &&
         !searchQuery.looksLikeAURL() &&
-        !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
+        !tabType.isPrivate ? searchSuggestionsCount : 0
     case .openTabsAndHistoryAndBookmarks:
       return data.count
     case .findInPage:
