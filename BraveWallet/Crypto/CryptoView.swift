@@ -56,9 +56,9 @@ public struct CryptoView: View {
   private var dismissButtonToolbarContents: some ToolbarContent {
     ToolbarItemGroup(placement: .cancellationAction) {
       Button(action: {
-        if case .requestEthererumPermissions(let request, let handler) = presentingContext {
+        if case .requestEthererumPermissions(let request, let onPermittedAccountsUpdated) = presentingContext {
           request.decisionHandler(.rejected)
-          handler([])
+          onPermittedAccountsUpdated([])
         }
         dismissAction?()
       }) {
@@ -91,18 +91,18 @@ public struct CryptoView: View {
                   dismissAction?()
                 }
               )
-            case .requestEthererumPermissions(let request, let handler):
+            case .requestEthererumPermissions(let request, let onPermittedAccountsUpdated):
               NewSiteConnectionView(
                 origin: request.requestingOrigin,
                 keyringStore: keyringStore,
                 onConnect: {
                   request.decisionHandler(.granted(accounts: $0))
-                  handler($0)
+                  onPermittedAccountsUpdated($0)
                   dismissAction?()
                 },
                 onDismiss: {
                   request.decisionHandler(.rejected)
-                  handler([])
+                  onPermittedAccountsUpdated([])
                   dismissAction?()
                 }
               )

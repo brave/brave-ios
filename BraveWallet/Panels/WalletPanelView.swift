@@ -388,7 +388,7 @@ struct WalletPanelView: View {
     .onAppear {
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       if let request = permissionRequestManager.pendingRequests(for: origin, coinType: .eth).first {
-        presentWalletWithContext(.requestEthererumPermissions(request, handler: { accounts in
+        presentWalletWithContext(.requestEthererumPermissions(request, onPermittedAccountsUpdated: { accounts in
           permittedAccounts = accounts
         }))
       } else {
