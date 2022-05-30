@@ -286,10 +286,9 @@ public class CryptoStore: ObservableObject {
     let pendingTransactions = await fetchPendingTransactions()
     if !pendingTransactions.isEmpty {
       return true
-    } else {
-      let pendingRequest = await fetchPendingWebpageRequest()
-      return pendingRequest != nil
     }
+    let pendingRequest = await fetchPendingWebpageRequest()
+    return pendingRequest != nil
   }
 
   func handleWebpageRequestResponse(_ response: WebpageRequestResponse) {

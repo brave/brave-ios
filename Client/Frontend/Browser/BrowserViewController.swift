@@ -2349,9 +2349,8 @@ extension BrowserViewController: TabDelegate {
       return true
     } else if let selectedTabOrigin = tabManager.selectedTab?.url?.origin {
       return WalletProviderPermissionRequestsManager.shared.hasPendingRequest(for: selectedTabOrigin, coinType: .eth)
-    } else {
-      return false
     }
+    return false
   }
 }
 
