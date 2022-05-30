@@ -51,12 +51,7 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
-  @Published private(set) var pendingRequest: PendingRequest? {
-    didSet {
-      pendingRequestUpdated?()
-    }
-  }
-  private let pendingRequestUpdated: (() -> Void)?
+  @Published private(set) var pendingRequest: PendingRequest?
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -75,8 +70,7 @@ public class CryptoStore: ObservableObject {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    pendingRequestUpdated: (() -> Void)?
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
@@ -86,7 +80,6 @@ public class CryptoStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.txService = txService
     self.ethTxManagerProxy = ethTxManagerProxy
-    self.pendingRequestUpdated = pendingRequestUpdated
     
     self.networkStore = .init(rpcService: rpcService)
     self.portfolioStore = .init(

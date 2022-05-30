@@ -12,10 +12,13 @@ public class WalletStore {
 
   public let keyringStore: KeyringStore
   public var cryptoStore: CryptoStore?
+  
+  public let onPendingRequestUpdated = PassthroughSubject<Void, Never>()
 
   // MARK: -
 
   private var cancellable: AnyCancellable?
+  private var onPendingRequestCancellable: AnyCancellable?
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -25,8 +28,7 @@ public class WalletStore {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    pendingRequestUpdated: (() -> Void)?
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy
   ) {
     self.keyringStore = .init(keyringService: keyringService)
     self.setUp(
@@ -37,8 +39,7 @@ public class WalletStore {
       swapService: swapService,
       blockchainRegistry: blockchainRegistry,
       txService: txService,
-      ethTxManagerProxy: ethTxManagerProxy,
-      pendingRequestUpdated: pendingRequestUpdated
+      ethTxManagerProxy: ethTxManagerProxy
     )
   }
 
@@ -50,8 +51,7 @@ public class WalletStore {
     swapService: BraveWalletSwapService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
-    ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    pendingRequestUpdated: (() -> Void)?
+    ethTxManagerProxy: BraveWalletEthTxManagerProxy
   ) {
     self.cancellable = self.keyringStore.$keyring
       .map(\.isKeyringCreated)
@@ -69,9 +69,12 @@ public class WalletStore {
             swapService: swapService,
             blockchainRegistry: blockchainRegistry,
             txService: txService,
-            ethTxManagerProxy: ethTxManagerProxy,
-            pendingRequestUpdated: pendingRequestUpdated
+            ethTxManagerProxy: ethTxManagerProxy
           )
+          self.onPendingRequestCancellable = self.cryptoStore?.$pendingRequest
+            .sink { [weak self] _ in
+              self?.onPendingRequestUpdated.send()
+            }
         }
       }
   }

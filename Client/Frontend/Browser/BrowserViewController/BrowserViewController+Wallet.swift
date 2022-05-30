@@ -17,7 +17,7 @@ private let log = Logger.browserLogger
 
 extension WalletStore {
   /// Creates a WalletStore based on whether or not the user is in Private Mode
-  static func from(privateMode: Bool, pendingRequestUpdated: (() -> Void)?) -> WalletStore? {
+  static func from(privateMode: Bool) -> WalletStore? {
     guard
       let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
       let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode),
@@ -38,15 +38,14 @@ extension WalletStore {
       swapService: swapService,
       blockchainRegistry: BraveCoreMain.blockchainRegistry,
       txService: txService,
-      ethTxManagerProxy: ethTxManagerProxy,
-      pendingRequestUpdated: pendingRequestUpdated
+      ethTxManagerProxy: ethTxManagerProxy
     )
   }
 }
 
 extension CryptoStore {
   /// Creates a CryptoStore based on whether or not the user is in Private Mode
-  static func from(privateMode: Bool, pendingRequestUpdated: (() -> Void)? = nil) -> CryptoStore? {
+  static func from(privateMode: Bool) -> CryptoStore? {
     guard
       let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
       let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode),
@@ -67,8 +66,7 @@ extension CryptoStore {
       swapService: swapService,
       blockchainRegistry: BraveCoreMain.blockchainRegistry,
       txService: txService,
-      ethTxManagerProxy: ethTxManagerProxy,
-      pendingRequestUpdated: pendingRequestUpdated
+      ethTxManagerProxy: ethTxManagerProxy
     )
   }
 }
@@ -76,12 +74,14 @@ extension CryptoStore {
 extension BrowserViewController {
   func presentWalletPanel(tab: Tab) {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    let pendingRequestUpdated: () -> Void = { [weak self] in
-      self?.updateURLBarWalletButton()
-    }
-    guard let walletStore = WalletStore.from(privateMode: privateMode, pendingRequestUpdated: pendingRequestUpdated) else {
+    guard let walletStore = WalletStore.from(privateMode: privateMode) else {
       return
     }
+    self.onPendingRequestUpdatedCancellable = walletStore.onPendingRequestUpdated
+      .sink { [weak self] _ in
+        self?.updateURLBarWalletButton()
+      }
+    
     let origin = tab.getOrigin()
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
@@ -147,7 +147,7 @@ extension Tab: BraveWalletProviderDelegate {
         return
       }
       
-      guard WalletStore.from(privateMode: isPrivate, pendingRequestUpdated: nil) != nil else {
+      guard WalletStore.from(privateMode: isPrivate) != nil else {
         completion(.internal, nil)
         return
       }

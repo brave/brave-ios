@@ -78,6 +78,7 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
   lazy var mailtoLinkHandler: MailtoLinkHandler = MailtoLinkHandler()
 
   private var privateModeCancellable: AnyCancellable?
+  var onPendingRequestUpdatedCancellable: AnyCancellable?
 
   /// Custom Search Engine
   var openSearchEngine: OpenSearchReference?
