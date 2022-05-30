@@ -341,7 +341,7 @@ class DAUTests: XCTestCase {
   private func dateFrom(string: String, format: String? = nil) -> Date {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = format ?? "yyyy-MM-dd"
-//    dateFormatter.timeZone = TimeZone(abbreviation: "GMT")!
+    dateFormatter.timeZone = TimeZone(abbreviation: "GMT")!
 
     return dateFormatter.date(from: string)!
   }

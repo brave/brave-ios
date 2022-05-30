@@ -29,6 +29,13 @@ else
   npm install
 fi
 
+# Codesign BraveCore + MaterialComponents to pass library validation on unit tests on M1 machines
+echo "${COLOR_ORANGE}Signing BraveCore frameworks…${COLOR_NONE}"
+find "node_modules/brave-core-ios" -name '*.framework' -print0 | while read -d $'\0' framework
+do
+  codesign --force --deep --sign "-" --preserve-metadata=identifier,entitlements --timestamp=none "${framework}"
+done
+
 npm run build
 
 # Setup local git config
