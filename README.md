@@ -54,7 +54,7 @@ Building the code
     sudo ln -s $(which npm) /usr/local/bin/npm
     sudo ln -s $(which node) /usr/local/bin/node
     ```
-1. Open `Client.xcodeproj` in Xcode.
+1. Open `App/Client.xcodeproj` in Xcode.
 1. Build the `Debug` scheme in Xcode.
 
 Updating Rewards
@@ -95,7 +95,7 @@ Some Brave Rewards code is precompiled into a framework in the `BraveRewards` di
 ## Code Signing
 
 1. After running the *bootstrap.sh* script in the setup instructions navigate to:
-<br>`Client/Configuration/Local/DevTeam.xcconfig`
+<br>`App/Configuration/Local/DevTeam.xcconfig`
 1. Add your *Apple Team ID* in this file:
 <br>`LOCAL_DEVELOPMENT_TEAM = KL8N8XSYF4`
 
