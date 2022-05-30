@@ -40,6 +40,12 @@ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 CONFIG_PATH="App/Configuration"
 OLD_CONFIG_PATH="Client/Configuration"
 
+if [ ! -d "$CONFIG_PATH/Local/" ]; then
+  echo "${COLOR_ORANGE}Creating 'Local' directory${COLOR_NONE}"
+
+  (cd $CONFIG_PATH && mkdir Local)
+fi
+
 if [ -d "$OLD_CONFIG_PATH/Local" ]; then
   echo "${COLOR_ORANGE}Copying configurations from old configuration directory${COLOR_NONE}"
   for CONFIG_FILE in $OLD_CONFIG_PATH/Local/*.xcconfig
@@ -48,12 +54,7 @@ if [ -d "$OLD_CONFIG_PATH/Local" ]; then
       rm $CONFIG_FILE
     fi
   done
-fi
-
-if [ ! -d "$CONFIG_PATH/Local/" ]; then
-  echo "${COLOR_ORANGE}Creating 'Local' directory${COLOR_NONE}"
-
-  (cd $CONFIG_PATH && mkdir Local)
+  rm -rf "$OLD_CONFIG_PATH"
 fi
 
 # Copying over any necessary files into `Local`

@@ -81,8 +81,6 @@ let package = Package(
         "Frontend/UserContent/UserScripts/AllFrames",
         "Frontend/UserContent/UserScripts/MainFrame",
         "Frontend/UserContent/UserScripts/Sandboxed",
-        "Assets/MainFrameAtDocumentEnd.js.LICENSE.txt",
-        "Assets/MainFrameAtDocumentEndSandboxed.js.LICENSE.txt",
       ],
       resources: [
         .copy("Assets/About/Licenses.html"),
