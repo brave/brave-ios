@@ -204,8 +204,7 @@ let package = Package(
       ],
       path: "Shared",
       exclude: ["FSUtils"],
-      resources: [.copy("effective_tld_names.dat")],
-      swiftSettings: [.define("MOZ_CHANNEL_RELEASE")]
+      resources: [.copy("effective_tld_names.dat")]
     ),
     .target(name: "FSUtils", path: "Shared/FSUtils", publicHeadersPath: "."),
     .target(
