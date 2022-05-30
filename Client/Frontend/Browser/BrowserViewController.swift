@@ -392,15 +392,15 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     screenshotHelper = ScreenshotHelper(tabManager: tabManager)
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
-    #if WALLET_DAPPS_ENABLED
-    tabManager.makeWalletProvider = { [weak self] tab in
-      guard let self = self,
-            let provider = self.braveCore.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
-        return nil
+    if !AppConstants.buildChannel.isPublic {
+      tabManager.makeWalletProvider = { [weak self] tab in
+        guard let self = self,
+              let provider = self.braveCore.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
+          return nil
+        }
+        return (provider, js: self.braveCore.providerScript(for: .eth))
       }
-      return (provider, js: self.braveCore.providerScript(for: .eth))
     }
-    #endif
     downloadQueue.delegate = self
 
     // Observe some user preferences
@@ -2147,9 +2147,9 @@ extension BrowserViewController: TabDelegate {
     if !tab.isPrivate {
       let logins = LoginsHelper(tab: tab, profile: profile, passwordAPI: braveCore.passwordAPI)
       tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
-      #if WALLET_DAPPS_ENABLED
-      tab.addContentScript(EthereumProviderHelper(tab: tab), name: EthereumProviderHelper.name(), contentWorld: .page)
-      #endif
+      if !AppConstants.buildChannel.isPublic {
+        tab.addContentScript(EthereumProviderHelper(tab: tab), name: EthereumProviderHelper.name(), contentWorld: .page)
+      }
     }
 
     let errorHelper = ErrorPageHelper(certStore: profile.certStore)
