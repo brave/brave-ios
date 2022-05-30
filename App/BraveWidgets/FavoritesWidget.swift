@@ -139,7 +139,7 @@ private struct FavoritesGridView: View {
 
   var body: some View {
     LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4), spacing: 8) {
-      ForEach((0..<itemsCount)) {
+      ForEach((0..<itemsCount), id: \.self) {
         if let favorite = entry.favorites[safe: $0], !placeholderOrPrivacyRedaction {
           Link(
             destination: favorite.url,

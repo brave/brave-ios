@@ -854,8 +854,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         return
       }
 
-      center.getPendingNotificationRequests { [weak self] requests in
-        guard let self = self else { return }
+      center.getPendingNotificationRequests { requests in
         if requests.contains(where: { $0.identifier == Self.defaultBrowserNotificationId }) {
           // Already has one scheduled no need to schedule again.
           return
@@ -2642,7 +2641,7 @@ extension BrowserViewController: TabManagerDelegate {
       let duplicateActiveTab = UIAction(
         title: Strings.duplicateActiveTab,
         image: UIImage(systemName: "plus.square.on.square"),
-        handler: UIAction.deferredActionHandler { [unowned self] _ in
+        handler: UIAction.deferredActionHandler { _ in
           tabManager.addTabAndSelect(
                URLRequest(url: url),
                afterTab: selectedTab,

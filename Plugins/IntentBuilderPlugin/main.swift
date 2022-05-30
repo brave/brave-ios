@@ -10,7 +10,10 @@ import Foundation
 struct IntentBuilderPlugin: BuildToolPlugin {
   func createBuildCommands(context: PluginContext, target: Target) async throws -> [Command] {
     let outputDirectory = context.pluginWorkDirectory.appending("GeneratedSources")
-    let target = target as! SourceModuleTarget
+    guard let target = target as? SourceModuleTarget else {
+      Diagnostics.error("Attempted to use `IntentBuilderPlugin` on an unsupported module target")
+      return []
+    }
     return target.sourceFiles(withSuffix: "intentdefinition")
       .map { file in
         .prebuildCommand(

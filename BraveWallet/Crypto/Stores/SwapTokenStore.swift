@@ -366,7 +366,6 @@ public class SwapTokenStore: ObservableObject {
     _ spenderAddress: String,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     guard
       let fromToken = selectedFromToken,
       let accountInfo = accountInfo

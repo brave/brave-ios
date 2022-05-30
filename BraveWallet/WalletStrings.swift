@@ -1366,6 +1366,13 @@ extension Strings {
       value: "Submitted",
       comment: "A status that explains that the transaction has been submitted to the blockchain"
     )
+    public static let transactionStatusDropped = NSLocalizedString(
+      "wallet.transactionStatusDropped",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Dropped",
+      comment: "A status that explains that the transaction has been dropped due to some error"
+    )
     public static let transactionStatusError = NSLocalizedString(
       "wallet.transactionStatusError",
       tableName: "BraveWallet",
