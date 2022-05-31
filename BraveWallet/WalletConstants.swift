@@ -16,5 +16,5 @@ struct WalletConstants {
   static let MAX_UINT256 = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
   
   /// The origin used for transactions/requests from Brave Wallet.
-  static let braveWalletOrigin = "chrome://wallet"
+  static let braveWalletOrigin: URLOrigin = .init(url: URL(string: "chrome://wallet")!)
 }
