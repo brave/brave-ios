@@ -38,7 +38,12 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
         faviconRenderer: faviconRenderer
       )
       walletHostingController.delegate = self.delegate
-      self.present(walletHostingController, animated: true)
+      switch context {
+      case .default, .settings:
+        self.delegate?.onFullScreenWallet(walletHostingController)
+      default:
+        self.present(walletHostingController, animated: true)
+      }
     }
     rootView.presentBuySendSwap = { [weak self] in
       guard let self = self, let store = walletStore.cryptoStore else { return }

@@ -112,6 +112,12 @@ extension BrowserViewController: BraveWalletDelegate {
       )
     }
   }
+  
+  func onFullScreenWallet(_ viewController: UIViewController) {
+    self.dismiss(animated: true) { [weak self] in
+      self?.present(viewController, animated: true)
+    }
+  }
 }
 
 extension Tab: BraveWalletProviderDelegate {
