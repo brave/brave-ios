@@ -170,7 +170,8 @@ struct TransactionConfirmationView: View {
           .foregroundColor(Color(.braveBlurpleTint))
       }
     }
-    .padding()
+    .padding(.horizontal)
+    .padding(.bottom)
   }
 
   @ViewBuilder private var editGasFeeButton: some View {
