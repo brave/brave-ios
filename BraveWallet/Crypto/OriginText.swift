@@ -13,7 +13,7 @@ struct OriginText: View {
   let urlOrigin: URLOrigin
   
   var body: some View {
-    if urlOrigin == WalletConstants.braveOrigin.origin {
+    if urlOrigin.url?.absoluteString.hasPrefix(WalletConstants.braveWalletOrigin) == true {
       Text(Strings.Wallet.braveWallet)
     } else {
       let origin = urlOrigin.url?.absoluteString ?? ""

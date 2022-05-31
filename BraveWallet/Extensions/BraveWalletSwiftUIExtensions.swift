@@ -164,8 +164,6 @@ extension BraveWallet {
 extension BraveWallet.OriginInfo {
   /// If the current OriginInfo matches the Brave Wallet origin
   var isBraveWalletOrigin: Bool {
-    origin == WalletConstants.braveOrigin.origin
-    && originSpec == WalletConstants.braveOrigin.originSpec
-    && eTldPlusOne == WalletConstants.braveOrigin.eTldPlusOne
+    origin.url?.absoluteString.hasPrefix(WalletConstants.braveWalletOrigin) ?? false
   }
 }
