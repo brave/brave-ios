@@ -98,6 +98,9 @@ struct TransactionConfirmationView: View {
   
   private var globeFavicon: some View {
     Image(systemName: "globe")
+      .resizable()
+      .aspectRatio(contentMode: .fit)
+      .padding(8)
       .background(Color(.braveDisabled))
   }
   
@@ -106,7 +109,12 @@ struct TransactionConfirmationView: View {
       if let originInfo = confirmationStore.state.originInfo {
         Group {
           if originInfo.isBraveWalletOrigin {
-            Color.red // TODO: BraveLogo
+            Image("wallet-brave-icon")
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .padding(4)
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+              .background(Color(.braveDisabled))
           } else {
             if let url = originInfo.origin.url {
               FaviconReader(url: url) { image in
