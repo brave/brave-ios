@@ -15,8 +15,8 @@ public protocol BraveWalletDelegate: AnyObject {
   ///
   /// This will be called after the wallet UI is dismissed
   func openWalletURL(_ url: URL)
-  /// Will dismiss wallet panel and open full screen wallet or full screen wallet settings
-  func onFullScreenWallet(_ viewController: UIViewController)
+  /// Present Wallet with or without dismiss the Wallet Panel depends on the value of the `presentWalletWithContext`
+  func walletPanel(_ presentWalletWithContext: PresentingContext)
 }
 
 /// The context of which wallet is being presented. Controls what content is shown when the wallet is unlocked

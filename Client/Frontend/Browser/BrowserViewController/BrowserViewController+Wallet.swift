@@ -113,9 +113,26 @@ extension BrowserViewController: BraveWalletDelegate {
     }
   }
   
-  func onFullScreenWallet(_ viewController: UIViewController) {
-    self.dismiss(animated: true) { [weak self] in
-      self?.present(viewController, animated: true)
+  func walletPanel(_ presentWalletWithContext: PresentingContext) {
+    if let walletStore = WalletStore.from(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
+      let walletHostingController = WalletHostingViewController(
+        walletStore: walletStore,
+        presentingContext: presentWalletWithContext,
+        faviconRenderer: FavIconImageRenderer()
+      )
+      walletHostingController.delegate = self
+  
+      switch presentWalletWithContext {
+      case .default, .settings:
+        // Dismiss Wallet Panel first, then present Wallet
+        self.dismiss(animated: true) { [weak self] in
+          self?.present(walletHostingController, animated: true)
+        }
+      default:
+        if let presentedViewController = presentedViewController {
+          presentedViewController.present(walletHostingController, animated: true)
+        }
+      }
     }
   }
 }
