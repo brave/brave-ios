@@ -79,7 +79,6 @@ class Tab: NSObject {
       walletKeyringService?.add(self)
     }
   }
-  var lastEmittedAccount: String?
   // PageMetadata is derived from the page content itself, and as such lags behind the
   // rest of the tab.
   var pageMetadata: PageMetadata?

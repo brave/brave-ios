@@ -280,22 +280,13 @@ extension Tab: BraveWalletEventsListener {
   }
   
   func accountsChangedEvent(_ accounts: [String]) {
-    if let lastEmittedAccount = lastEmittedAccount {
-      if lastEmittedAccount != "" {
-        /// Temporary fix for #5402.
-        /// If we emit from one account directly to another we're not seeing dapp sites
-        /// update our selected account. If we emit an  undefined/empty string before
-        /// emitting the new account, we're seeing correct account change behaviour
-        self.lastEmittedAccount = ""
-        emitEthereumEvent(.ethereumAccountsChanged(accounts: [""]))
-        self.lastEmittedAccount = accounts.first
-        emitEthereumEvent(.ethereumAccountsChanged(accounts: accounts))
-      }
-    } else {
-      lastEmittedAccount = accounts.first
-      emitEthereumEvent(.ethereumAccountsChanged(accounts: accounts))
-      updateEthereumProperties()
-    }
+    /// Temporary fix for #5402.
+    /// If we emit from one account directly to another we're not seeing dapp sites
+    /// update our selected account. If we emit an undefined/empty string before
+    /// emitting the new account, we're seeing correct account change behaviour
+    emitEthereumEvent(.ethereumAccountsChanged(accounts: []))
+    emitEthereumEvent(.ethereumAccountsChanged(accounts: accounts))
+    updateEthereumProperties()
   }
   
   func updateEthereumProperties() {
@@ -336,9 +327,6 @@ extension Tab: BraveWalletEventsListener {
       let coin = await walletService.selectedCoin()
       let accounts = await keyringService.keyringInfo(coin.keyringId).accountInfos.map(\.address)
       let selectedAccount = valueOrUndefined(await allowedAccounts(coin, accounts: accounts).1.first)
-      if self.lastEmittedAccount == nil {
-        self.lastEmittedAccount = selectedAccount
-      }
       webView.evaluateSafeJavaScript(
         functionName: "window.ethereum.selectedAddress = \(selectedAccount)",
         contentWorld: .page,
