@@ -262,6 +262,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       Preferences.DAU.appRetentionLaunchDate.value = Date()
     }
     
+    // Starting Date for Brave Search Promotion to mark 15 days period
+    if Preferences.DAU.braveSearchPromotionLaunchDate.value == nil {
+      Preferences.DAU.braveSearchPromotionLaunchDate.value = Date()
+    }
+    
     if isFirstLaunch {
       Preferences.PrivacyReports.ntpOnboardingCompleted.value = false
     }

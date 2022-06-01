@@ -42,6 +42,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
     static let iconBorderColor = UIColor(white: 0, alpha: 0.1)
     static let iconBorderWidth: CGFloat = 0.5
     static let maxSearchSuggestions = 5
+    static let maxPeriodBraveSearchPromotion = 5
   }
 
   // MARK: SearchListSection
@@ -147,9 +148,25 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
   }
   
   private var braveSearchPromotionAvailable: Bool {
-    return !Preferences.General.isFirstLaunch.value &&
-    searchEngines?.defaultEngine().shortName != OpenSearchEngine.EngineNames.brave &&
-    !tabType.isPrivate
+    guard !Preferences.General.isFirstLaunch.value,
+            searchEngines?.defaultEngine().shortName != OpenSearchEngine.EngineNames.brave,
+            let braveSearchPromotionLaunchDate = Preferences.DAU.braveSearchPromotionLaunchDate.value,
+            !tabType.isPrivate else {
+      return false
+    }
+    
+    let rightNow = Date()
+
+    let nextShowDate = braveSearchPromotionLaunchDate.addingTimeInterval(
+      //AppConstants.buildChannel.isPublic ?
+      SearchViewControllerUX.maxPeriodBraveSearchPromotion.days) //:
+      //SearchViewControllerUX.maxPeriodBraveSearchPromotion.minutes)
+    
+    if rightNow > nextShowDate {
+      return false
+    }
+      
+    return true
   }
 
   // MARK: Lifecycle
@@ -592,6 +609,15 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
 
       if isBraveSearchPrompt(for: indexPath) {
         cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
+        if let promotionSearchCell = cell as? BraveSearchPromotionCell {
+          promotionSearchCell.enableSearchEngineTapped = { [weak self] in
+
+          }
+          
+          promotionSearchCell.ca = { [weak self] in
+            self?.dismissVPNHeaderTapped()
+          }
+        }
 
         // TODO: Cell Button Actions
       } else {

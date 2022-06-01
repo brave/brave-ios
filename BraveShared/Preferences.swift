@@ -37,6 +37,8 @@ extension Preferences {
     public static let installationDate = Option<Date?>(key: "dau.installation-date", default: nil)
     /// The app launch date after retention
     public static let appRetentionLaunchDate = Option<Date?>(key: "dau.app-retention-launch-date", default: nil)
+    /// The app launch date after brave search promotion
+    public static let braveSearchPromotionLaunchDate = Option<Date?>(key: "dau.search-promo-launch-date", default: nil)
   }
   public final class URP {
     static let nextCheckDate = Option<TimeInterval?>(key: "urp.next-check-date", default: nil)
