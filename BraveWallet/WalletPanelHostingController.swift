@@ -31,7 +31,8 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
       origin: origin
     ))
     rootView.presentWalletWithContext = { [weak self] context in
-      self?.delegate?.walletPanel(context)
+      guard let self = self else { return }
+      self.delegate?.walletPanel(self, presentWalletWithContext: context)
     }
     rootView.presentBuySendSwap = { [weak self] in
       guard let self = self, let store = walletStore.cryptoStore else { return }

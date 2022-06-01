@@ -113,7 +113,7 @@ extension BrowserViewController: BraveWalletDelegate {
     }
   }
   
-  func walletPanel(_ presentWalletWithContext: PresentingContext) {
+  public func walletPanel(_ panel: WalletPanelHostingController, presentWalletWithContext: PresentingContext) {
     if let walletStore = WalletStore.from(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
       let walletHostingController = WalletHostingViewController(
         walletStore: walletStore,
@@ -129,9 +129,7 @@ extension BrowserViewController: BraveWalletDelegate {
           self?.present(walletHostingController, animated: true)
         }
       default:
-        if let presentedViewController = presentedViewController {
-          presentedViewController.present(walletHostingController, animated: true)
-        }
+        panel.present(walletHostingController, animated: true)
       }
     }
   }

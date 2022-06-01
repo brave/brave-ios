@@ -16,7 +16,7 @@ public protocol BraveWalletDelegate: AnyObject {
   /// This will be called after the wallet UI is dismissed
   func openWalletURL(_ url: URL)
   /// Present Wallet with or without dismiss the Wallet Panel depends on the value of the `presentWalletWithContext`
-  func walletPanel(_ presentWalletWithContext: PresentingContext)
+  func walletPanel(_ panel: WalletPanelHostingController, presentWalletWithContext: PresentingContext)
 }
 
 /// The context of which wallet is being presented. Controls what content is shown when the wallet is unlocked
