@@ -322,7 +322,7 @@ let package = Package(
         .copy("blocking-summary-test.json"),
       ]
     ),
-    .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist"]),
+    .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist", "README.md"]),
     .plugin(name: "IntentBuilderPlugin", capability: .buildTool())
   ],
   cxxLanguageStandard: .cxx17
