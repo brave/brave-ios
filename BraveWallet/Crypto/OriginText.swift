@@ -5,7 +5,7 @@
 
 import BraveCore
 import SwiftUI
-import struct Shared.Strings
+import Strings
 
 /// View used to display a URLOrigin, bolding the eTLD+1.
 struct OriginText: View {
