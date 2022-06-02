@@ -6,6 +6,7 @@
 import UIKit
 import Shared
 import BraveUI
+import BraveShared
 
 class BraveSearchPromotionCell: UITableViewCell {
   
@@ -16,7 +17,7 @@ class BraveSearchPromotionCell: UITableViewCell {
 
   static let identifier = "BraveSearchPromotionCell"
 
-  var enableSearchEngineTapped: (() -> Void)?
+  var trySearchEngineTapped: (() -> Void)?
   var dismissTapped: (() -> Void)?
 
   private let promotionContentView = UIView().then {
@@ -70,7 +71,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
 
-  private let enableButton = RoundInterfaceButton(type: .roundedRect).then {
+  private let tryButton = RoundInterfaceButton(type: .roundedRect).then {
     $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     $0.titleLabel?.minimumScaleFactor = 0.75
     $0.setTitleColor(.white, for: .normal)
@@ -85,11 +86,15 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
   
-  private let cancelButton = UIButton().then {
+  private let dismissButton = UIButton().then {
     $0.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
     $0.titleLabel?.minimumScaleFactor = 0.75
     $0.setTitleColor(.braveOrange, for: .normal)
-    $0.setTitle("Maybe later", for: .normal)
+    $0.setTitle(
+      Preferences.BraveSearch.braveSearchPromotionCompletionState.value != BraveSearchPromotionState.maybeLaterUpcomingSession.rawValue ?
+        "Maybe later" :
+        "Dismiss",
+      for: .normal)
     $0.backgroundColor = .clear
     $0.snp.makeConstraints { make in
       make.height.equalTo(44)
@@ -112,7 +117,7 @@ class BraveSearchPromotionCell: UITableViewCell {
       $0.edges.equalToSuperview().inset(8)
     }
     
-    [enableButton, cancelButton].forEach(buttonsStackView.addArrangedSubview(_:))
+    [tryButton, dismissButton].forEach(buttonsStackView.addArrangedSubview(_:))
     
     [titleLabel, bodyLabel, buttonsStackView].forEach(mainStackView.addArrangedSubview(_:))
 
@@ -134,18 +139,18 @@ class BraveSearchPromotionCell: UITableViewCell {
       $0.trailing.equalToSuperview()
     }
 
-    enableButton.addTarget(self, action: #selector(enableAction), for: .touchUpInside)
-    cancelButton.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+    tryButton.addTarget(self, action: #selector(tryAction), for: .touchUpInside)
+    dismissButton.addTarget(self, action: #selector(dismissAction), for: .touchUpInside)
   }
 
   @available(*, unavailable)
   required init(coder: NSCoder) { fatalError() }
 
-  @objc func enableAction() {
-    enableSearchEngineTapped?()
+  @objc func tryAction() {
+    trySearchEngineTapped?()
   }
 
-  @objc func closeAction() {
+  @objc func dismissAction() {
     dismissTapped?()
   }
 }

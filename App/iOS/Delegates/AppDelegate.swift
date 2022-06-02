@@ -263,8 +263,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     // Starting Date for Brave Search Promotion to mark 15 days period
-    if Preferences.DAU.braveSearchPromotionLaunchDate.value == nil {
-      Preferences.DAU.braveSearchPromotionLaunchDate.value = Date()
+    if Preferences.BraveSearch.braveSearchPromotionLaunchDate.value == nil {
+      Preferences.BraveSearch.braveSearchPromotionLaunchDate.value = Date()
+    }
+    
+    // After user pressed 'maybe later' in promotion, the banner will not be shown user in same session
+    if Preferences.BraveSearch.braveSearchPromotionCompletionState.value ==
+        BraveSearchPromotionState.maybeLaterSameSession.rawValue {
+      Preferences.BraveSearch.braveSearchPromotionCompletionState.value =
+        BraveSearchPromotionState.maybeLaterUpcomingSession.rawValue
     }
     
     if isFirstLaunch {

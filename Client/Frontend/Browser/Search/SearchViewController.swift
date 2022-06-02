@@ -149,9 +149,10 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
   
   private var braveSearchPromotionAvailable: Bool {
     guard !Preferences.General.isFirstLaunch.value,
-            searchEngines?.defaultEngine().shortName != OpenSearchEngine.EngineNames.brave,
-            let braveSearchPromotionLaunchDate = Preferences.DAU.braveSearchPromotionLaunchDate.value,
-            !tabType.isPrivate else {
+          searchEngines?.defaultEngine().shortName != OpenSearchEngine.EngineNames.brave,
+          let braveSearchPromotionLaunchDate = Preferences.BraveSearch.braveSearchPromotionLaunchDate.value,
+          Preferences.BraveSearch.braveSearchPromotionCompletionState.value != BraveSearchPromotionState.dismissed.rawValue,
+          Preferences.BraveSearch.braveSearchPromotionCompletionState.value != BraveSearchPromotionState.maybeLaterSameSession.rawValue else {
       return false
     }
     
@@ -415,6 +416,21 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       return indexPath.row == 2 && braveSearchPromotionAvailable
     }
   }
+  
+  private func changeBraveSearchPromotionState() {
+    // The promotion state will changed "maybeLaterUpcomingSession" next launch
+    if Preferences.BraveSearch.braveSearchPromotionCompletionState.value !=
+        BraveSearchPromotionState.maybeLaterSameSession.rawValue {
+        Preferences.BraveSearch.braveSearchPromotionCompletionState.value += 1
+    }
+  }
+  
+  private func submitSeachTemplateQuery() {
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl: nil)
+    }
+    searchDelegate?.searchViewController(self, didSubmit: searchQuery)
+  }
 
   // MARK: Actions
 
@@ -450,10 +466,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
 
     switch section {
     case .quickBar:
-      if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-        RecentSearch.addItem(type: .text, text: searchQuery, websiteUrl: nil)
-      }
-      searchDelegate?.searchViewController(self, didSubmit: searchQuery)
+      submitSeachTemplateQuery()
     case .searchSuggestionsOptIn: return
     case .searchSuggestions:
       if !isBraveSearchPrompt(for: indexPath) {
@@ -610,16 +623,14 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       if isBraveSearchPrompt(for: indexPath) {
         cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
         if let promotionSearchCell = cell as? BraveSearchPromotionCell {
-          promotionSearchCell.enableSearchEngineTapped = { [weak self] in
-
+          promotionSearchCell.trySearchEngineTapped = { [weak self] in
+            self?.submitSeachTemplateQuery()
           }
           
-          promotionSearchCell.ca = { [weak self] in
-            self?.dismissVPNHeaderTapped()
+          promotionSearchCell.dismissTapped = { [weak self] in
+            self?.changeBraveSearchPromotionState()
           }
         }
-
-        // TODO: Cell Button Actions
       } else {
         cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
 
