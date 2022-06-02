@@ -2362,6 +2362,8 @@ extension BrowserViewController: TabDelegate {
       Task { @MainActor in
         let isPendingRequestAvailable = await isPendingRequestAvailable()
         topToolbar.locationView.walletButton.buttonState = isPendingRequestAvailable ? .activeWithPendingRequest : .active
+        topToolbar.updateReaderModeState(.unavailable)
+        topToolbar.locationView.playlistButton.buttonState = .none
       }
     } else {
       topToolbar.locationView.walletButton.buttonState = .inactive

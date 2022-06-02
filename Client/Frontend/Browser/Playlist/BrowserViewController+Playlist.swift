@@ -84,7 +84,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
       tab.playlistItemState = state
       tab.playlistItem = item
 
-      let shouldShowPlaylistURLBarButton = tab.url?.isPlaylistSupportedSiteURL == true && Preferences.Playlist.enablePlaylistURLBarButton.value
+      let shouldShowPlaylistURLBarButton = tab.url?.isPlaylistSupportedSiteURL == true && Preferences.Playlist.enablePlaylistURLBarButton.value && !tab.isWalletIconVisible
 
       let playlistButton = topToolbar.locationView.playlistButton
       switch state {
@@ -94,7 +94,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
         toolbar?.menuButton.removeBadge(.playlist, animated: true)
       case .newItem:
         if shouldShowPlaylistURLBarButton {
-          topToolbar.locationView.readerModeState = .unavailable
+          topToolbar.updateReaderModeState(.unavailable)
         }
         playlistButton.buttonState = shouldShowPlaylistURLBarButton ? .addToPlaylist : .none
         if Preferences.Playlist.enablePlaylistMenuBadge.value {
@@ -106,7 +106,7 @@ extension BrowserViewController: PlaylistHelperDelegate {
         }
       case .existingItem:
         if shouldShowPlaylistURLBarButton {
-          topToolbar.locationView.readerModeState = .unavailable
+          topToolbar.updateReaderModeState(.unavailable)
         }
         playlistButton.buttonState = shouldShowPlaylistURLBarButton ? .addedToPlaylist : .none
         topToolbar.menuButton.removeBadge(.playlist, animated: true)

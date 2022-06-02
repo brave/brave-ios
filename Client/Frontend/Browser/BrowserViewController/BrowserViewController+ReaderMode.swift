@@ -30,7 +30,7 @@ extension BrowserViewController: ReaderModeDelegate {
     if tabManager.selectedTab === tab {
       let shouldShowPlaylistURLBarButton = tab.url?.isPlaylistSupportedSiteURL == true
 
-      if !shouldShowPlaylistURLBarButton || tab.playlistItemState == .none {
+      if (!shouldShowPlaylistURLBarButton || tab.playlistItemState == .none) && !tab.isWalletIconVisible {
         topToolbar.updateReaderModeState(state)
       }
     }
