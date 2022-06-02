@@ -414,6 +414,43 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
   func updateReaderModeState(_ state: ReaderModeState) {
     locationView.readerModeState = state
+    updateURLBarButtonsVisibility()
+  }
+  
+  func updatePlaylistButtonState(_ state: PlaylistURLBarButton.State) {
+    locationView.playlistButton.buttonState = state
+    updateURLBarButtonsVisibility()
+  }
+  
+  func updateWalletButtonState(_ state: WalletURLBarButton.ButtonState) {
+    locationView.walletButton.buttonState = state
+    updateURLBarButtonsVisibility()
+  }
+  
+  private func updateURLBarButtonsVisibility() {
+    if locationView.walletButton.buttonState != .inactive {
+      currentURLBarButton = .wallet
+    } else if locationView.playlistButton.buttonState != .none {
+      currentURLBarButton = .playlist
+    } else if locationView.readerModeState != .unavailable {
+      currentURLBarButton = .readerMode
+    } else {
+      currentURLBarButton = nil
+    }
+  }
+  
+  enum URLBarButton {
+    case wallet
+    case playlist
+    case readerMode
+  }
+  
+  private(set) var currentURLBarButton: URLBarButton? {
+    didSet {
+      locationView.walletButton.isHidden = currentURLBarButton != .wallet
+      locationView.playlistButton.isHidden = currentURLBarButton != .playlist
+      locationView.readerModeButton.isHidden = currentURLBarButton != .readerMode
+    }
   }
 
   func setAutocompleteSuggestion(_ suggestion: String?) {
