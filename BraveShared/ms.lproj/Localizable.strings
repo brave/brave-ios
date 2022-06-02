@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "pada %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Tahap Zum Halaman-Web Lalai";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Apabila Tahap-Zum laman web berubah, laman web akan muncul pada senarai di sini. Pada masa ini, tiada laman web yang zum dekat atau zum keluar.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Tiada Laman Web Ditambah";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Zum Halaman";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Semua Laman Web Lain";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Tetapkan Semula Semua";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Tetapkan Semula Tahap Zum Laman Web";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Tetapan Halaman Khusus";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Tetapan Zum Halaman";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Zum Halaman";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Adakah anda mahu menambah video ini ke senarai main anda?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** mempunyai purata **%2$lld** penjejak & iklan yang disekat pada setiap lawatan";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Laman web paling berisiko yang anda lawati";
+"privacyHub.riskiestWebsiteTitle" = "Tapak dengan penjejak terbanyak";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Hab Privasi memaparkan jumlah laman yang disekat oleh Shields. Tetapan tidak akan mempengaruhi bilangan Shields pada halaman tab baharu. Data Shields tidak dikira dalam tetingkap peribadi.";

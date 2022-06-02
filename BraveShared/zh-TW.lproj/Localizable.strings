@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "(%@)";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "預設網頁縮放比例";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "一旦網站的縮放比例有所變動，網站就會以清單的形式顯示在這裡。目前沒有任何網站的頁面經過放大或縮小。";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "未新增任何網站";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "頁面縮放";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "其他所有網站";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "全部重設";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "重設網站縮放比例";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "特定頁面設定";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "頁面縮放設定";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "頁面縮放";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "你想新增此影片至播放清單嗎？";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** 每次造訪平均有 **%2$lld** 個追蹤器和廣告遭封鎖";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "您所造訪風險最高的網站";
+"privacyHub.riskiestWebsiteTitle" = "追蹤器最多的網站";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "隱私中心會顯示防護封鎖的數量。設定不會影響新分頁上的防護計數器。防護資料不會計入隱私視窗。";

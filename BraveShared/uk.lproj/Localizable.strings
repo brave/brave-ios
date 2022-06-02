@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "у %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Рівень масштабування сторінки за замовчуванням";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Якщо буде змінено рівень масштабування сторінки, то вона відображатиметься в цьому списку. Наразі немає вебсайтів, для яких би було змінено рівень масштабування.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Немає доданих вебсайтів";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Масштабування сторінки";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Усі інші вебсайти";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Скинути все";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Скинути рівні масштабування вебсайтів";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Налаштування певної сторінки";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Налаштування масштабування сторінки";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Масштабування сторінки";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Хочете додати це відео до списку відтворення?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "Середня кількість трекерів і реклами, заблокованих під час відвідування сайту **%1$@**: **%2$lld**";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Відвідані вами вебсайти з найбільшим ризиком";
+"privacyHub.riskiestWebsiteTitle" = "Сайт із найбільшою кількістю трекерів";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "У центрі конфіденційності показано, скільки й чого заблоковано за допомогою Shields. Налаштування не вплинуть на лічильник Shields на сторінці нової вкладки. Дані Shields не враховуються у приватних вікнах.";

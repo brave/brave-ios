@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "on %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "デフォルトのウェブページズームレベル";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "ウェブサイトのズームレベルを変更すると、ウェブサイトがこのリストに表示されます。現在、拡大または縮小されたウェブサイトはありません。";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "ウェブサイトが追加されていません";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "ページのズーム";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "その他すべてのウェブサイト";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "すべてリセット";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "ウェブサイトのズームレベルをリセット";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "特定ページの設定";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "ページのズーム設定";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "ページのズーム";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "この動画をPlaylistに追加しますか？";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** では、1回の訪問当たり平均 **%2$lld** 個のトラッカーおよび広告がブロックされました";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "最もリスクの高い訪問先ウェブサイト";
+"privacyHub.riskiestWebsiteTitle" = "最もトラッカーの多いサイト";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "プライバシーハブには、Shieldsによりブロックされた数が表示されます。設定は、新しいタブページのShieldsカウントに影響しません。プライベートウィンドウではShieldsのデータはカウントされません。";
