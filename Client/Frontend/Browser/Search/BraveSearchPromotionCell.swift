@@ -52,7 +52,7 @@ class BraveSearchPromotionCell: UITableViewCell {
   }
 
   private let titleLabel = UILabel().then {
-    $0.text = "Support independent search with better privacy"
+    $0.text = Strings.BraveSearchPromotion.braveSearchPromotionBannerTitle
     $0.textColor = .bravePrimary
     $0.textAlignment = .left
     $0.font = .preferredFont(forTextStyle: .headline)
@@ -62,7 +62,7 @@ class BraveSearchPromotionCell: UITableViewCell {
   }
 
   private let bodyLabel = UILabel().then {
-    $0.text = "Brave Search doesn't track you, your queries, or your clicks."
+    $0.text = Strings.BraveSearchPromotion.braveSearchPromotionBannerDescription
     $0.textColor = .braveLabel
     $0.textAlignment = .left
     $0.font = .preferredFont(forTextStyle: .body)
@@ -75,7 +75,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     $0.titleLabel?.minimumScaleFactor = 0.75
     $0.setTitleColor(.white, for: .normal)
-    $0.setTitle("Try Brave Search", for: .normal)
+    $0.setTitle(Strings.BraveSearchPromotion.braveSearchPromotionBannerTryButtonTitle, for: .normal)
     $0.backgroundColor = .braveOrange
     $0.snp.makeConstraints { make in
       make.height.equalTo(44)
@@ -92,8 +92,8 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.setTitleColor(.braveOrange, for: .normal)
     $0.setTitle(
       Preferences.BraveSearch.braveSearchPromotionCompletionState.value != BraveSearchPromotionState.maybeLaterUpcomingSession.rawValue ?
-        "Maybe later" :
-        "Dismiss",
+        Strings.BraveSearchPromotion.braveSearchPromotionBannerMaybeLaterButtonTitle :
+        Strings.BraveSearchPromotion.braveSearchPromotionBannerDismissButtonTitle,
       for: .normal)
     $0.backgroundColor = .clear
     $0.snp.makeConstraints { make in
