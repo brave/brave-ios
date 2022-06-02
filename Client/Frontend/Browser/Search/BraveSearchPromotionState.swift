@@ -5,7 +5,7 @@
 
 import Foundation
 
-enum BraveSearchPromotionState: Int {
+public enum BraveSearchPromotionState: Int {
   /// Unknown state, this is default state when user didnt engage with promotion
   case undetermined = 0
   /// The user has pressed maybe later and didnt end the session

@@ -625,31 +625,31 @@ extension Strings {
     public static let braveSearchPromotionBannerTitle = NSLocalizedString(
       "braveSearchPromotion.bannerTitle",
       tableName: "BraveShared",
-      bundle: .braveShared,
+      bundle: .strings,
       value: "Support independent search with better privacy",
       comment: "Brave Search Banner Promotion title in Search Suggestions")
     public static let braveSearchPromotionBannerDescription = NSLocalizedString(
       "braveSearchPromotion.bannerDescription",
       tableName: "BraveShared",
-      bundle: .braveShared,
+      bundle: .strings,
       value: "Brave Search doesn't track you, your queries, or your clicks.",
       comment: "Brave Search Banner Promotion description content in Search Suggestions")
     public static let braveSearchPromotionBannerTryButtonTitle = NSLocalizedString(
       "braveSearchPromotion.bannerTryButtonTitle",
       tableName: "BraveShared",
-      bundle: .braveShared,
+      bundle: .strings,
       value: "Try Brave Search",
       comment: "Brave Search Banner Promotion title for try button in Search Suggestions")
     public static let braveSearchPromotionBannerMaybeLaterButtonTitle = NSLocalizedString(
       "braveSearchPromotion.bannerMaybeLaterButtonTitle",
       tableName: "BraveShared",
-      bundle: .braveShared,
+      bundle: .strings,
       value: "Maybe later",
       comment: "Brave Search Banner Promotion title for maybe later button to activate promotion later in Search Suggestions")
     public static let braveSearchPromotionBannerDismissButtonTitle = NSLocalizedString(
       "braveSearchPromotion.braveSearchPromotionBannerDismissButtonTitle",
       tableName: "BraveShared",
-      bundle: .braveShared,
+      bundle: .strings,
       value: "Dismiss",
       comment: "Brave Search Banner Promotion title for dismiss button to remove promotion in Search Suggestions")
   }

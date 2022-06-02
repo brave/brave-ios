@@ -42,7 +42,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
   }
   
-  private let promotionalImageView = UIImageView(image: #imageLiteral(resourceName: "brave-search-promotion")).then {
+  private let promotionalImageView = UIImageView(image: UIImage(named: "brave-search-promotion", in: .current, compatibleWith: nil)).then {
     $0.contentMode = .scaleAspectFill
     $0.snp.makeConstraints { make in
       make.width.greaterThanOrEqualTo(88)
@@ -101,10 +101,6 @@ class BraveSearchPromotionCell: UITableViewCell {
     }
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
-  }
-
-  private let backgroundImage = UIImageView(image: #imageLiteral(resourceName: "enable_vpn_settings_banner")).then {
-    $0.contentMode = .scaleToFill
   }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

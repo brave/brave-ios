@@ -178,16 +178,10 @@ extension Preferences {
     static let braveSearchDefaultBrowserPromptCount =
       Option<Int>(key: "search.brave-search-default-website-prompt", default: 0)
     /// Determines Yahoo Search Engine is migration is done
-<<<<<<< HEAD:Client/Frontend/ClientPreferences.swift
     public static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
-
-  }
-  final public class Privacy {
-=======
-    static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
   }
   
-  public final class BraveSearch {
+  final public class BraveSearch {
     /// The app launch date after brave search promotion
     public static let braveSearchPromotionLaunchDate = Option<Date?>(key: "brave-search.promo-launch-date", default: nil)
     /// Whether or not  user interacted with brave search promotion
@@ -198,8 +192,7 @@ extension Preferences {
       default: BraveSearchPromotionState.undetermined.rawValue)
   }
   
-  final class Privacy {
->>>>>>> ac8a8c0c7 (Submit and Dismiss logic is adde to promotions):Client/Application/ClientPreferences.swift
+  final public class Privacy {
     static let lockWithPasscode = Option<Bool>(key: "privacy.lock-with-passcode", default: false)
     /// Forces all private tabs
     public static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)

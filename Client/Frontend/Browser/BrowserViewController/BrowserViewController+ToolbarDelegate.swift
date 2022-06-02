@@ -193,7 +193,7 @@ extension BrowserViewController: TopToolbarDelegate {
       hideSearchController()
     } else {
       showSearchController()
-      searchController?.searchQuery = text
+      searchController?.setSearchQuery(query: text)
       searchLoader?.query = text.lowercased()
     }
   }
@@ -348,12 +348,16 @@ extension BrowserViewController: TopToolbarDelegate {
   private func showSearchController() {
     if searchController != nil { return }
 
+    // Setting up data source for SearchSuggestions
     let tabType = TabType.of(tabManager.selectedTab)
-    searchController = SearchViewController(forTabType: tabType)
-
+    let searchDataSource = SearchSuggestionDataSource(
+      forTabType: tabType,
+      searchEngines: profile.searchEngines)
+    
+    // Setting up controller for SearchSuggestions
+    searchController = SearchViewController(with: searchDataSource)
     guard let searchController = searchController else { return }
-
-    searchController.searchEngines = profile.searchEngines
+    searchController.setupSearchEngineList()
     searchController.searchDelegate = self
     searchController.profile = self.profile
 
