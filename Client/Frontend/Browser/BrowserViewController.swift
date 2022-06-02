@@ -883,6 +883,14 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
       }
     }
   }
+  
+  private func executeAfterSetup(_ block: @escaping () -> Void) {
+    if setupTasksCompleted {
+      block()
+    } else {
+      postSetupTasks.append(block)
+    }
+  }
 
   fileprivate func setupTabs() {
     assert(contentBlockListCompiled, "Tabs should not be set up until after blocker lists are compiled")
@@ -3290,15 +3298,15 @@ extension BrowserViewController: PreferencesObserver {
 
 extension BrowserViewController {
   func openReferralLink(url: URL) {
-    postSetupTasks.append({
-      self.openURLInNewTab(url, isPrivileged: false)
-    })
+    executeAfterSetup { [self] in
+      openURLInNewTab(url, isPrivileged: false)
+    }
   }
 
   func handleNavigationPath(path: NavigationPath) {
-    postSetupTasks.append({
+    executeAfterSetup {
       NavigationPath.handle(nav: path, with: self)
-    })
+    }
   }
 }
 
