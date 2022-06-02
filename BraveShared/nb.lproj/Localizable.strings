@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "%@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Standard zoom-nivå for nettsider";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Når zoom-nivået på et nettsted er endret, vises nettstedet i listen her. Akkurat nå er det ingen nettsider som er zoomet inn eller ut.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Ingen nettsider lagt til";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Sidezoon";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Alle andre nettsider";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Tilbakestill alle";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Tilbakestill nettsidezoom-nivåer";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Spesifikke sideinnstillinger";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Sidezoom-innstillinger";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Sidezoom";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Vil du legge til denne videoen i spillelisten din?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** fikk i snitt blokkert **%2$lld** sporere og annonser per besøk";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Den mest risikable nettsiden du besøkte";
+"privacyHub.riskiestWebsiteTitle" = "Siden med flest sporere";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "I Privacy Hub ser du et tall for hvor mange ting Brave-skjoldet har blokkert. Innstillingen påvirker ikke Skjold-telleren på nye faner, og Skjold-data telles ikke i private vinduer.";

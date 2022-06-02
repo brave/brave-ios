@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "- %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "기본 웹페이지 확대 수준";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "확대 수준을 변경한 웹사이트가 여기 목록에 표시됩니다. 현재 확대/축소 비율을 지정한 웹사이트가 없습니다.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "추가된 웹사이트 없음";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "페이지 확대";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "다른 모든 웹사이트";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "모두 재설정";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "웹사이트 확대 수준 재설정";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "페이지별 설정";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "페이지 확대 설정";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "페이지 확대";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "이 동영상을 재생목록에 추가하시겠습니까?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** 방문 시마다 평균 **%2$lld**개의 트래커 및 광고 탐지됨";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "방문한 웹사이트 중 가장 위험한 곳";
+"privacyHub.riskiestWebsiteTitle" = "트래커가 가장 많은 사이트";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "프라이버시 허브에는 Shields의 차단 횟수가 표시됩니다. 설정은 새 탭 페이지의 Shields 카운터에 영향을 주지 않습니다. 비공개 창에서는 Shields 데이터가 집계되지 않습니다.";

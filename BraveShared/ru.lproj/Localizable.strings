@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "в %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Масштаб по умолчанию для веб-страниц";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Если масштаб для сайта изменится, сайт появится в этом списке. Сейчас все сайты просматриваются в масштабе по умолчанию.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Нет добавленных сайтов";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Масштаб страницы";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Все остальные сайты";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Сбросить все";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Сбросить масштаб для сайтов";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Настройки для отдельной страницы";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Настройки масштаба для страницы";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Масштаб для страницы";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Добавить это видео в плейлист?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "За одно посещение сайта **%1$@** в среднем блокируется трекеров и рекламных объявлений: **%2$lld**";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Наиболее опасные посещенные сайты";
+"privacyHub.riskiestWebsiteTitle" = "Сайт с наибольшим количеством трекеров";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "В центре конфиденциальности отображаются количественные данные по блокировке, выполненной Щитом. Настройка не влияет на счетчик Щита на новой вкладке. Данные Щита не учитываются при работе в окнах инкогнито.";

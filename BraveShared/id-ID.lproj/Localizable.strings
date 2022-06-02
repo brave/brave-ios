@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "pada %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Level Perbesar Halaman Web Bawaan";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Ketika Level-Perbesar sebuah situs web telah berubah, situs web akan menunjukkan daftarnya di sini. Saat ini tidak ada situs web yang memperbesar atau memperkecil.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Tidak Ada Situs Web yang Ditambahkan";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Memperbesar Halaman";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Situs Web Lainnya";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Atur Ulang Semua";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Atur Ulang Level Pembesaran Situs Web ";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Pengaturan Halaman Khusus";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Pengaturan Pembesaran Halaman";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Pembesaran Halaman";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Apakah Anda ingin menambahkan video ini ke daftar putar Anda?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** memiliki rata-rata **%2$lld** pelacak & iklan yang diblokir per kunjungan";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Situs web paling berisiko yang Anda kunjungi";
+"privacyHub.riskiestWebsiteTitle" = "Situs dengan pelacak paling banyak";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Hub Privasi menunjukkan jumlah hal yang diblokir Perisai. Pengaturan tidak akan memengaruhi penghitungan Perisai pada halaman tab yang baru. Data Perisai tidak dihitung pada jendela privat.";

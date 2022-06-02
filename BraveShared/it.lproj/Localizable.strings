@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "su %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Livello di zoom predefinito per le pagine web";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Quando si modifica il livello di zoom di un sito, il sito sarà indicato qui. Al momento non ci sono siti con zoom.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Nessun sito web aggiunto";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Zoom della pagina";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Tutti gli altri siti web";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Reimposta tutto";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Reimposta i livelli di zoom del sito";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Impostazioni delle pagine";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Impostazioni dello zoom della pagina";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Zoom della pagina";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Vuoi aggiungere questo video alla playlist?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** in media ha **%2$lld** elementi bloccati, fra tracker e annunci, a ogni visita ";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Il sito più rischioso che hai visitato";
+"privacyHub.riskiestWebsiteTitle" = "Sito con più tracker";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Il Centro privacy mostra il numero di elementi bloccati dalle Protezioni. La sua configurazione non avrà conseguenze per il contatore delle Protezioni nella nuova scheda. I dati delle Protezioni non sono conteggiati nelle finestre private.";

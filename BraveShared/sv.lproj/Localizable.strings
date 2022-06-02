@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "på %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Zoomnivå för webbsida som standard";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "När en webbplats zoomnivå har ändrats kommer webbplatsen att visas i listan här. För närvarande finns det inga webbplatser som zoomas in eller ut.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Inga webbplatser tillagda";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Zoom för sida";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Alla andra webbplatser";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Återställ alla";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Återställ zoomnivåer för webbplats";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Specifika sidinställningar";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Zoominställningar för sida";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Zoom för sida";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Vill du lägga till den här videon i din spellista?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** hade i genomsnitt **%2$lld** spårare och annonser blockerade per besök";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Den mest riskfyllda webbplatsen du har besökt";
+"privacyHub.riskiestWebsiteTitle" = "Webbplats med flest spårare";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Sekretesshubben visar en beräkning av vad Shields har blockerat. Inställningen påverkar inte Shields-räknaren på en ny fliksida. Shields-data räknas inte i privata fönster.";

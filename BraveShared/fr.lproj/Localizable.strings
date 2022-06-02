@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "sur %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Niveau de zoom de la page Web par défaut";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Lorsque le niveau de zoom d'un site Web change, le site apparaît dans la liste ici. Actuellement, il n'y a pas de site Web bénéficiant d'un zoom avant ou arrière.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Aucun site Web ajouté";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Zoom de la page";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Tous les autres sites Web";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Tout réinitialiser";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Réinitialiser les niveaux de zoom du site Web";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Paramètres spécifiques de la page";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Paramètres de zoom de la page";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Zoom de la page";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Souhaitez-vous ajouter cette vidéo à votre liste de lecture ?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "Une moyenne de **%2$lld** traqueurs et publicités ont été bloqués sur **%1$@** par visite";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Sites Web les plus dangereux que vous avez visités";
+"privacyHub.riskiestWebsiteTitle" = "Site avec le plus de traqueurs";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Le centre de confidentialité affiche le nombre d'éléments bloqués par les Boucliers. Ce paramètre n'affectera pas le compteur des Boucliers sur la page de nouvel onglet. Les données en mode navigation privée ne sont pas prises en compte.";

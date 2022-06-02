@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "auf %@";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Standard-Zoomebene für Websites";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Wenn die Zoomebene verändert wurde, wird die Website in dieser Liste angezeigt. Derzeit wurde auf keine Websites Zoom angewendet.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Keine Websites hinzugefügt";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Seitenzoom";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Alle anderen Websites";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Alle zurücksetzen";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Zoomebenen für Websites zurücksetzen";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Spezielle Seiteneinstellungen";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Zoomeinstellungen für Seiten";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Seitenzoom";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Möchten Sie dieses Video zu Ihrer Playlist hinzufügen?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "Auf **%1$@** wurden durchschnittlich **%2$lld** Tracker und Anzeigen pro Besuch blockiert.";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Von Ihnen besuchte Website mit dem höchsten Risiko";
+"privacyHub.riskiestWebsiteTitle" = "Website mit den meisten Trackern";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Der Datenschutzhub zeigt an, welche Elemente der Brave-Schutz blockiert hat. Die Einstellung hat keine Auswirkung auf die Schutz-Anzahl in neuen Tabs. In privaten Fenstern werden keine Schutz-Daten erfasst.";

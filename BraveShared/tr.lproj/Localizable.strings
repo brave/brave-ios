@@ -337,6 +337,36 @@
 /* This is a suffix statement. example: SomeChannel on Twitter */
 "OnProviderText" = "% üzerinde @";
 
+/* Title for the section for the global/default zoom level */
+"pagezoom.settings.defaultZoomLevelSectionTitle" = "Varsayılan Web Sayfası Yakınlaştırma Seviyesi";
+
+/* Description for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesDescription" = "Bir web sitesinin Yakınlaştırma Seviyesi değiştiği zaman web sitesi buradaki listede görünür. Şu anda yakınlaştırılan veya uzaklaştırılan bir web sitesi yok.";
+
+/* Title for the empty Web-Page zoom view */
+"pagezoom.settings.emptyWebsitesTitle" = "Eklenen Web Sitesi Yok";
+
+/* Title of the Web-Page Zoom settings menu */
+"pagezoom.settings.menu-title" = "Sayfa Yakınlaştırma";
+
+/* Title for the section for the Web-Page zoom level of other websites */
+"pagezoom.settings.otherWebsitesZoomLevelSectionTitle" = "Diğer Tüm Web Siteleri";
+
+/* Title of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all" = "Tümünü Sıfırla";
+
+/* Description of the Web-Page Zoom reset all option */
+"pagezoom.settings.reset-all-description" = "Web Sitesi Yakınlaştırma Seviyelerini Sıfırla";
+
+/* Title for list of websites shown in settings screen */
+"pagezoom.settings.specificWebsitesZoomLevelsSectionTitle" = "Özel Sayfa Ayarları";
+
+/* Title of the Web-Page Zoom screen */
+"pagezoom.settings.title" = "Sayfa Yakınlaştırma Ayarları";
+
+/* Title for the web-page zoom level view */
+"pagezoom.zoomView.text" = "Sayfa Yakınlaştırma";
+
 /* Alert Description for adding videos to playlist */
 "playList.addToPlayListAlertDescription" = "Bu videoyu oynatma listenize eklemek ister misiniz?";
 
@@ -722,7 +752,7 @@
 "privacyHub.riskiestWebsiteBody" = "**%1$@** sitesinin ziyaret başına ortalama olarak **%2$lld** izleyici ve reklamı engellendi";
 
 /* Title of a website that contained the most trackers per visit. */
-"privacyHub.riskiestWebsiteTitle" = "Ziyaret ettiğiniz en riskli web sitesi";
+"privacyHub.riskiestWebsiteTitle" = "En çok izleyiciye sahip site";
 
 /* This text explains a setting that lets Brave monitor blocked network requests */
 "privacyHub.settingsEnableShieldsFooter" = "Gizlilik Merkezi, Kalkanlar tarafından engellenenlerin sayısını gösterir. Ayar, yeni sekme sayfasındaki Kalkanlar sayacını etkilemez. Kalkanlar verileri özel pencerelerde sayılmaz.";
