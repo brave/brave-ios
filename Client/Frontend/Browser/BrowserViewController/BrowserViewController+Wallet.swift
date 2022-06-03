@@ -74,9 +74,10 @@ extension CryptoStore {
 extension BrowserViewController {
   func presentWalletPanel(tab: Tab) {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    guard let walletStore = WalletStore.from(privateMode: privateMode) else {
+    guard let walletStore = self.walletStore ?? WalletStore.from(privateMode: privateMode) else {
       return
     }
+    self.walletStore = walletStore
     self.onPendingRequestUpdatedCancellable = walletStore.onPendingRequestUpdated
       .sink { [weak self] _ in
         self?.updateURLBarWalletButton()
@@ -120,6 +121,7 @@ extension BrowserViewController: BraveWalletDelegate {
       faviconRenderer: FavIconImageRenderer()
     )
     walletHostingController.delegate = self
+    self.walletStore = walletStore
     
     switch presentWalletWithContext {
     case .default, .settings:
