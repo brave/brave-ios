@@ -7,6 +7,32 @@ import Foundation
 import BraveCore
 
 extension AdblockEngine {
+  public enum ResourceType: String {
+    case xmlhttprequest
+  }
+  
+  /// Check the rust engine if the request should be blocked given the `sourceURL` and `resourceType`.
+  ///
+  /// - Warning: You must provide a absolute URL (i.e. containing a host) fo r `requestURL` and `sourceURL`
+  public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType) -> Bool {
+    // Compare the etld+1 of requestURL and sourceURL.
+    // Note: `baseDomain` returns etld+1
+    let isThirdParty = requestURL.baseDomain != sourceURL.baseDomain
+    
+    guard let requestHost = requestURL.host, let sourceHost = sourceURL.host else {
+      assertionFailure("You must provide absolute paths for `requestURL` and `sourceURL`")
+      return false
+    }
+    
+    return matches(
+      url: requestURL.absoluteString,
+      host: requestHost,
+      tabHost: sourceHost,
+      isThirdParty: isThirdParty,
+      resourceType: resourceType.rawValue
+    ).didMatchRule
+  }
+  
   public func shouldBlock(requestUrl: String, requestHost: String, sourceHost: String) -> Bool {
     return matches(
       url: requestUrl,
