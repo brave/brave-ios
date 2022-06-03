@@ -427,6 +427,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     updateURLBarButtonsVisibility()
   }
   
+  /// Updates the `currentURLBarButton` based on priority: 1) Wallet 2) Playlist 3) ReaderMode.
   private func updateURLBarButtonsVisibility() {
     if locationView.walletButton.buttonState != .inactive {
       currentURLBarButton = .wallet
@@ -445,6 +446,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     case readerMode
   }
   
+  /// The currently visible URL bar button beside the refresh button.
   private(set) var currentURLBarButton: URLBarButton? {
     didSet {
       locationView.walletButton.isHidden = currentURLBarButton != .wallet
