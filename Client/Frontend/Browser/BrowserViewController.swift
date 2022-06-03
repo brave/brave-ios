@@ -1908,13 +1908,15 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   }
   
   func displayPageZoom(visible: Bool) {
-    if !visible || pageZoomBar != nil {
-      alertStackView.arrangedSubviews.forEach({
-        $0.removeFromSuperview()
-      })
-      
+    if !visible || pageZoomBar != nil {     
+      pageZoomBar?.view.removeFromSuperview()
       updateViewConstraints()
       pageZoomBar = nil
+      
+      if let zoomBarView = pageZoomBar?.view {
+        alertStackView.removeArrangedSubview(zoomBarView)
+      }
+      
       return
     }
     
