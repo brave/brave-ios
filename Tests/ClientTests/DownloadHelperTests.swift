@@ -72,6 +72,15 @@ class DownloadHelperTests: XCTestCase {
     XCTAssertNil(downloadAlert)
   }
 
+  func test_downloadAlert_deliversCorrectTitle() {
+    let request = anyRequest(urlString: "http://some-domain.com/some-image.jpg")
+    let sut = DownloadHelper(request: request, response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
+
+    let downloadAlert = sut?.downloadAlert(from: UIView(), okAction: { _ in })
+
+    XCTAssertEqual(downloadAlert!.title!, "some-image.jpg - some-domain.com")
+  }
+
   func test_okActionButton_sendsCorrectMessage() {
     let request = anyRequest()
     let sut = DownloadHelper(request: request, response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
