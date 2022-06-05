@@ -94,6 +94,15 @@ class DownloadHelperTests: XCTestCase {
     XCTAssertEqual(receivedMessages, [request.url!.absoluteString])
   }
 
+  func test_downloadAlert_deliversCorrectCancelButton() {
+    let sut = DownloadHelper(request: anyRequest(), response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
+
+    let downloadAlert = sut?.downloadAlert(from: UIView(), okAction: { _ in })
+
+    XCTAssertEqual(downloadAlert!.actions.count, 2)
+    XCTAssertEqual(downloadAlert!.actions.last!.style, .cancel)
+  }
+
   // MARK: - Helpers
 
   private func anyRequest(urlString: String = "http://any-url.com") -> URLRequest {
