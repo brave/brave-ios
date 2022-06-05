@@ -63,6 +63,15 @@ class DownloadHelperTests: XCTestCase {
     XCTAssertNotNil(sut)
   }
 
+  func test_downloadAlert_whenRequestURLIsWrong_deliversEmptyResult() {
+    let request = anyRequest(urlString: "wrong-url.com")
+    let sut = DownloadHelper(request: request, response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
+
+    let downloadAlert = sut?.downloadAlert(from: UIView(), okAction: { _ in })
+
+    XCTAssertNil(downloadAlert)
+  }
+
   func test_okActionButton_sendsCorrectMessage() {
     let request = anyRequest()
     let sut = DownloadHelper(request: request, response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
@@ -78,8 +87,8 @@ class DownloadHelperTests: XCTestCase {
 
   // MARK: - Helpers
 
-  private func anyRequest() -> URLRequest {
-    return URLRequest(url: URL(string: "http://any-url.com")!, cachePolicy: anyCachePolicy(), timeoutInterval: 60.0)
+  private func anyRequest(urlString: String = "http://any-url.com") -> URLRequest {
+    return URLRequest(url: URL(string: urlString)!, cachePolicy: anyCachePolicy(), timeoutInterval: 60.0)
   }
 
   private func anyResponse(mimeType: String?) -> URLResponse {
