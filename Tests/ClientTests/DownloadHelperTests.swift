@@ -63,6 +63,19 @@ class DownloadHelperTests: XCTestCase {
     XCTAssertNotNil(sut)
   }
 
+  func test_okActionButton_sendsCorrectMessage() {
+    let request = anyRequest()
+    let sut = DownloadHelper(request: request, response: anyResponse(mimeType: nil), cookieStore: cookieStore(), canShowInWebView: true, forceDownload: false)
+    let okActionIndex = 0
+
+    var receivedMessages = [String]()
+    let okAction: (HTTPDownload) -> Void = { download in receivedMessages.append(download.request.url!.absoluteString) }
+    let downloadAlert = sut?.downloadAlert(from: UIView(), okAction: okAction)
+    downloadAlert?.tapButton(atIndex: okActionIndex)
+
+    XCTAssertEqual(receivedMessages, [request.url!.absoluteString])
+  }
+
   // MARK: - Helpers
 
   private func anyRequest() -> URLRequest {
@@ -97,4 +110,14 @@ class DownloadHelperTests: XCTestCase {
             MIMEType.xHTML]
   }
 } 
+
+private extension UIAlertController {
+  typealias AlertHandler = @convention(block) (UIAlertAction) -> Void
+
+  func tapButton(atIndex index: Int) {
+    guard let block = actions[index].value(forKey: "handler") else { return }
+    let handler = unsafeBitCast(block as AnyObject, to: AlertHandler.self)
+    handler(actions[index])
+  }
+}
 

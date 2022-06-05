@@ -67,7 +67,7 @@ class DownloadHelper: NSObject {
     self.preflightResponse = response    
   }
 
-  func downloadAlert(from view: UIView, okAction: @escaping (HTTPDownload) -> Void) -> UIViewController? {
+  func downloadAlert(from view: UIView, okAction: @escaping (HTTPDownload) -> Void) -> UIAlertController? {
     guard let host = request.url?.host, let filename = request.url?.lastPathComponent else {
       return nil
     }
