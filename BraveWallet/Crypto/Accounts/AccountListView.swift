@@ -13,8 +13,7 @@ struct AccountListView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var isPresentingAddAccount: Bool = false
   
-  // Dismiss closure for DApps entries
-  var onDismiss: (() -> Void)?
+  var onDismiss: () -> Void
   
   var body: some View {
     NavigationView {
@@ -25,11 +24,7 @@ struct AccountListView: View {
           ForEach(keyringStore.keyring.accountInfos) { account in
             Button(action: {
               keyringStore.selectedAccount = account
-              if onDismiss == nil {
-                presentationMode.dismiss()
-              } else {
-                onDismiss?()
-              }
+              onDismiss()
             }) {
               AccountView(address: account.address, name: account.name)
             }
@@ -49,10 +44,7 @@ struct AccountListView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
-          Button(action: {
-            presentationMode.dismiss()
-            onDismiss?()
-          }) {
+          Button(action: { onDismiss() }) {
             Text(Strings.cancelButtonTitle)
               .foregroundColor(Color(.braveOrange))
           }
@@ -83,7 +75,7 @@ struct AccountListView_Previews: PreviewProvider {
       store.addPrimaryAccount("Account 2", completion: nil)
       store.addPrimaryAccount("Account 3", completion: nil)
       return store
-    }())
+    }(), onDismiss: {})
   }
 }
 #endif

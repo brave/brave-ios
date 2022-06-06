@@ -111,9 +111,7 @@ public struct CryptoView: View {
             case .accountSelection:
               AccountListView(
                 keyringStore: keyringStore,
-                onDismiss: {
-                  dismissAction?()
-                }
+                onDismiss: { dismissAction?() }
               )
             case .transactionHistory:
               NavigationView {
@@ -254,19 +252,22 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
             BuyTokenView(
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              buyTokenStore: cryptoStore.openBuyTokenStore(action.initialToken)
+              buyTokenStore: cryptoStore.openBuyTokenStore(action.initialToken),
+              onDismiss: { cryptoStore.buySendSwapDestination = nil }
             )
           case .send:
             SendTokenView(
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              sendTokenStore: cryptoStore.openSendTokenStore(action.initialToken)
+              sendTokenStore: cryptoStore.openSendTokenStore(action.initialToken),
+              onDismiss: { cryptoStore.buySendSwapDestination = nil }
             )
           case .swap:
             SwapCryptoView(
               keyringStore: keyringStore,
               ethNetworkStore: cryptoStore.networkStore,
-              swapTokensStore: cryptoStore.openSwapTokenStore(action.initialToken)
+              swapTokensStore: cryptoStore.openSwapTokenStore(action.initialToken),
+              onDismiss: { cryptoStore.buySendSwapDestination = nil }
             )
           }
         }

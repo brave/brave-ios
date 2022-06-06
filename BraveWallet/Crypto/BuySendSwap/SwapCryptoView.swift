@@ -170,11 +170,10 @@ struct SwapCryptoView: View {
   @State var hideSlippage = true
   @State private var isSwapDisclaimerVisible: Bool = false
 
-  @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.openWalletURLAction) private var openWalletURL
   
   var completion: ((_ success: Bool) -> Void)?
-  var onDismiss: (() -> Void)?
+  var onDismiss: () -> Void
 
   @ViewBuilder var unsupportedSwapChainSection: some View {
     Section {
@@ -483,11 +482,7 @@ struct SwapCryptoView: View {
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
-            if onDismiss == nil {
-              presentationMode.dismiss()
-            } else {
-              onDismiss?()
-            }
+            onDismiss()
           }) {
             Text(Strings.cancelButtonTitle)
               .foregroundColor(Color(.braveOrange))
@@ -508,7 +503,8 @@ struct SwapCryptoView_Previews: PreviewProvider {
     SwapCryptoView(
       keyringStore: .previewStore,
       ethNetworkStore: .previewStore,
-      swapTokensStore: .previewStore
+      swapTokensStore: .previewStore,
+      onDismiss: {}
     )
     //      .previewSizeCategories([.large, .accessibilityLarge])
   }
