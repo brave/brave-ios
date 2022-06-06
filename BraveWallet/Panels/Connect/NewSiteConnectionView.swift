@@ -159,7 +159,7 @@ public struct NewSiteConnectionView: View {
   private var accountsAddressesToConfirm: String {
     keyringStore.keyring.accountInfos
       .filter { selectedAccounts.contains($0.id) }
-      .map(\.address.truncatedAddress)
+      .map(\.address)
       .joined(separator: ", ")
   }
   

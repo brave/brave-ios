@@ -48,7 +48,7 @@ struct AccountPicker: View {
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
-        Text(keyringStore.selectedAccount.address.truncatedAddress)
+        Text(keyringStore.selectedAccount.address)
           .foregroundColor(Color(.braveLabel))
           .multilineTextAlignment(.leading)
       }
@@ -104,7 +104,7 @@ struct AccountPicker: View {
       }
     }
     .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
-    .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
+    .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address)")
   }
 
   private var networkPickerView: some View {

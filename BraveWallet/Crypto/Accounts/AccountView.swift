@@ -23,7 +23,7 @@ struct AccountView: View {
         Text(name)
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
-        Text(address.truncatedAddress)
+        Text(address)
           .foregroundColor(Color(.braveLabel))
       }
       .font(.caption)
@@ -31,7 +31,7 @@ struct AccountView: View {
     }
     .padding(.vertical, 6)
     .accessibilityElement()
-    .accessibilityLabel("\(name), \(address.truncatedAddress)")
+    .accessibilityLabel("\(name), \(address)")
   }
 }
 

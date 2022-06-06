@@ -119,14 +119,14 @@ struct SuggestedNetworkView: View {
     VStack {
       HStack(spacing: 8) {
         Spacer()
-        Text(keyringStore.selectedAccount.address.truncatedAddress)
+        Text(keyringStore.selectedAccount.address)
           .fontWeight(.semibold)
         Blockie(address: keyringStore.selectedAccount.address)
           .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
           .aspectRatio(1, contentMode: .fit)
       }
       .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
-      .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
+      .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address)")
       VStack(spacing: 8) {
         faviconAndOrigin
         Text(headerTitle)
