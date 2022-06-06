@@ -24,6 +24,7 @@ let package = Package(
     .library(name: "BrowserIntentsModels", targets: ["BrowserIntentsModels"]),
     .library(name: "BraveWidgetsModels", targets: ["BraveWidgetsModels"]),
     .library(name: "Strings", targets: ["Strings"]),
+    .library(name: "BraveVPN", targets: ["BraveVPN"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
     .plugin(name: "CurrentBundleGenPlugin", targets: ["CurrentBundleGenPlugin"]),
   ],
@@ -72,6 +73,7 @@ let package = Package(
         "XCGLogger",
         "BrowserIntentsModels",
         "BraveWidgetsModels",
+        "BraveVPN",
         .product(name: "Lottie", package: "lottie-ios"),
         .product(name: "Collections", package: "swift-collections"),
       ],
@@ -285,6 +287,19 @@ let package = Package(
     ),
     .target(name: "BraveSharedTestUtils"),
     .target(name: "DataTestsUtils", dependencies: ["Data", "BraveShared"]),
+    .target(
+      name: "BraveVPN",
+      dependencies: [
+        "BraveShared",
+        "Strings",
+        "PanModal",
+        "SnapKit",
+        "Then",
+        "XCGLogger",
+        "Data",
+        "GuardianVPN"
+      ]
+    ),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
       name: "BraveSharedTests",
