@@ -74,7 +74,7 @@ struct AccountTransactionListView: View {
         networkStore: networkStore,
         keyringStore: keyringStore,
         visibleTokens: activityStore.assets.map(\.token),
-        allTokens: [],
+        allTokens: activityStore.allTokens,
         assetRatios: assetRatios,
         currencyCode: activityStore.currencyCode
       )

@@ -23,6 +23,7 @@ public struct WalletPanelContainerView: View {
   var origin: URLOrigin
   var presentWalletWithContext: ((PresentingContext) -> Void)?
   var presentBuySendSwap: (() -> Void)?
+  /// An invisible `UIView` background lives in SwiftUI for UIKit API to reference later
   var buySendSwapBackground: InvisibleUIView = .init()
   
   // When the screen first apperas the keyring is set as the default value
