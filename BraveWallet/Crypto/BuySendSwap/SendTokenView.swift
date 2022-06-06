@@ -192,8 +192,11 @@ struct SendTokenView: View {
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
-            onDismiss?()
-            presentationMode.dismiss()
+            if onDismiss == nil {
+              presentationMode.dismiss()
+            } else {
+              onDismiss?()
+            }
           }) {
             Text(Strings.cancelButtonTitle)
               .foregroundColor(Color(.braveOrange))
@@ -204,6 +207,7 @@ struct SendTokenView: View {
     .onAppear {
       sendTokenStore.fetchAssets()
     }
+    .navigationViewStyle(.stack)
   }
 }
 

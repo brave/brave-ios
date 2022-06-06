@@ -109,13 +109,24 @@ public struct CryptoView: View {
             case .panelUnlockOrSetup:
               EmptyView()
             case .accountSelection:
-              AccountListView(keyringStore: keyringStore)
-            case .transactionHistory:
-              AccountTransactionListView(
-                keyringStore: walletStore.keyringStore,
-                activityStore: store.accountActivityStore(for: walletStore.keyringStore.selectedAccount),
-                networkStore: store.networkStore
+              AccountListView(
+                keyringStore: keyringStore,
+                onDismiss: {
+                  dismissAction?()
+                }
               )
+            case .transactionHistory:
+              NavigationView {
+                AccountTransactionListView(
+                  keyringStore: walletStore.keyringStore,
+                  activityStore: store.accountActivityStore(for: walletStore.keyringStore.selectedAccount),
+                  networkStore: store.networkStore
+                )
+                .toolbar {
+                  dismissButtonToolbarContents
+                }
+              }
+              .navigationViewStyle(.stack)
             case .buySendSwap(let destination):
               switch destination.kind {
               case .buy:
@@ -125,6 +136,7 @@ public struct CryptoView: View {
                   buyTokenStore: store.openBuyTokenStore(destination.initialToken),
                   onDismiss: {
                     store.closeBSSStores()
+                    dismissAction?()
                   }
                 )
               case .send:
@@ -139,6 +151,7 @@ public struct CryptoView: View {
                   },
                   onDismiss: {
                     store.closeBSSStores()
+                    dismissAction?()
                   }
                 )
               case .swap:
@@ -153,6 +166,7 @@ public struct CryptoView: View {
                   },
                   onDismiss: {
                     store.closeBSSStores()
+                    dismissAction?()
                   }
                 )
               }
@@ -167,6 +181,7 @@ public struct CryptoView: View {
                   dismissButtonToolbarContents
                 }
               }
+              .navigationViewStyle(.stack)
             case .editSiteConnection(let origin, let handler):
               EditSiteConnectionView(
                 keyringStore: keyringStore,

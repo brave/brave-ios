@@ -13,6 +13,9 @@ struct AccountListView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var isPresentingAddAccount: Bool = false
   
+  // Dismiss closure for DApps entries
+  var onDismiss: (() -> Void)?
+  
   var body: some View {
     NavigationView {
       List {
@@ -23,6 +26,7 @@ struct AccountListView: View {
             Button(action: {
               keyringStore.selectedAccount = account
               presentationMode.dismiss()
+              onDismiss?()
             }) {
               AccountView(address: account.address, name: account.name)
             }
@@ -37,11 +41,15 @@ struct AccountListView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
+      .listStyle(InsetGroupedListStyle())
       .navigationTitle(Strings.Wallet.selectAccountTitle)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
-          Button(action: { presentationMode.dismiss() }) {
+          Button(action: {
+            presentationMode.dismiss()
+            onDismiss?()
+          }) {
             Text(Strings.cancelButtonTitle)
               .foregroundColor(Color(.braveOrange))
           }

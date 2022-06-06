@@ -118,8 +118,11 @@ struct BuyTokenView: View {
       .toolbar {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: {
-            onDismiss?()
-            presentationMode.dismiss()
+            if onDismiss == nil {
+              presentationMode.dismiss()
+            } else {
+              onDismiss?()
+            }
           }) {
             Text(Strings.cancelButtonTitle)
               .foregroundColor(Color(.braveOrange))
@@ -130,6 +133,7 @@ struct BuyTokenView: View {
         buyTokenStore.fetchBuyTokens()
       }
     }
+    .navigationViewStyle(.stack)
   }
 }
 
