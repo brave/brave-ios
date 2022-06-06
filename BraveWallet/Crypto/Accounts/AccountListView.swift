@@ -25,8 +25,11 @@ struct AccountListView: View {
           ForEach(keyringStore.keyring.accountInfos) { account in
             Button(action: {
               keyringStore.selectedAccount = account
-              presentationMode.dismiss()
-              onDismiss?()
+              if onDismiss == nil {
+                presentationMode.dismiss()
+              } else {
+                onDismiss?()
+              }
             }) {
               AccountView(address: account.address, name: account.name)
             }
