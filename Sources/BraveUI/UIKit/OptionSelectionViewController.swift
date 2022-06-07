@@ -6,6 +6,7 @@ import Foundation
 import Static
 import UIKit
 import Shared
+import BraveShared
 
 public class OptionSelectionViewController<OptionType: RepresentableOptionType>: TableViewController {
   public typealias SelectedOptionChanged = (OptionSelectionViewController<OptionType>, OptionType) -> Void
