@@ -136,3 +136,20 @@ extension InstallVPNViewController {
     required init(coder: NSCoder) { fatalError() }
   }
 }
+
+extension UIView {
+    static func spacer(_ direction: NSLayoutConstraint.Axis, amount: Int) -> UIView {
+      let spacer = UIView()
+      spacer.snp.makeConstraints { make in
+        switch direction {
+        case .vertical:
+          make.height.equalTo(amount)
+        case .horizontal:
+          make.width.equalTo(amount)
+        @unknown default:
+          assertionFailure()
+        }
+      }
+      return spacer
+    }
+}

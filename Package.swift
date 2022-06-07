@@ -58,7 +58,6 @@ let package = Package(
         "BraveUI",
         "Data",
         "Storage",
-        "GuardianVPN",
         "GCDWebServers",
         "HTTPSE",
         "Fuzi",
@@ -79,7 +78,6 @@ let package = Package(
       ],
       path: "Client",
       exclude: [
-        "Frontend/BraveVPN/GRDAPI",
         "WebFilters/ShieldStats/Httpse",
         "Frontend/UserContent/UserScripts/AllFrames",
         "Frontend/UserContent/UserScripts/MainFrame",
@@ -183,7 +181,7 @@ let package = Package(
       ],
       plugins: ["CurrentBundleGenPlugin"]
     ),
-    .target(name: "GuardianVPN", path: "Client/Frontend/BraveVPN/GRDAPI", publicHeadersPath: "."),
+    .target(name: "GuardianVPN", publicHeadersPath: "."),
     .target(
       name: "HTTPSE",
       path: "Client/WebFilters/ShieldStats/Httpse",
@@ -238,7 +236,9 @@ let package = Package(
         "SnapKit",
         .product(name: "Introspect", package: "SwiftUI-Introspect"),
         "Then",
-        "XCGLogger"
+        "XCGLogger",
+        "Static",
+        .product(name: "Lottie", package: "lottie-ios")
       ],
       plugins: ["CurrentBundleGenPlugin"]
     ),
@@ -297,8 +297,11 @@ let package = Package(
         "Then",
         "XCGLogger",
         "Data",
-        "GuardianVPN"
-      ]
+        "GuardianVPN",
+        "BraveUI",
+        .product(name: "Lottie", package: "lottie-ios")
+      ],
+      plugins: ["CurrentBundleGenPlugin"]
     ),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
