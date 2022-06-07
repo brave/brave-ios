@@ -45,10 +45,11 @@
     const targetHref = canonicalLinkElm.getAttribute('href')
     try {
       const destUrl = new URL(targetHref)
+      const locationUrl = W.location
       W.clearInterval(intervalId)
-      
-      if (W.location.href == destUrl.href || !(destUrl.protocol === 'http:' || destUrl.protocol === 'https:')) {
+      if (locationUrl.href == destUrl.href || destUrl.href == D.referrer || !(destUrl.protocol === 'http:' || destUrl.protocol === 'https:')) {
         // Only handle http/https and only if the canoncial url is different than the current url
+        // Also add a check the referrer to prevent an infinite load loop in some cases
         return
       }
       W.location.replace(destUrl.href)
