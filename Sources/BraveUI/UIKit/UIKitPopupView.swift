@@ -172,7 +172,7 @@ open class UIKitPopupView: UIView, UIGestureRecognizerDelegate {
     return UIApplication.shared.delegate?.window as? UIWindow
   }
 
-    public override func layoutSubviews() {
+  public override func layoutSubviews() {
     let contentSize: CGSize = contentView.frame.size
     let keyboardHeight = keyboardState?.intersectionHeightForView(applicationWindow ?? self) ?? 0
 
@@ -569,10 +569,10 @@ open class UIKitPopupView: UIView, UIGestureRecognizerDelegate {
 
   // MARK: Background
 
-    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        let point: CGPoint = touch.location(in: dialogView)
-        return dialogView.point(inside: point, with: nil) == false
-    }
+  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    let point: CGPoint = touch.location(in: dialogView)
+    return dialogView.point(inside: point, with: nil) == false
+  }
 
   @objc func backgroundTapped(recognizer: UIGestureRecognizer?) {
     if overlayDismisses == false {
@@ -597,7 +597,7 @@ open class UIKitPopupView: UIView, UIGestureRecognizerDelegate {
 }
 
 extension UIKitPopupView: KeyboardHelperDelegate {
-    public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
+  public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
     keyboardState = state
     if !automaticallyMovesWithKeyboard {
       return
@@ -606,7 +606,7 @@ extension UIKitPopupView: KeyboardHelperDelegate {
     _dialogFrameWithKeyboardHeight(height: keyboardHeight)
   }
 
-    public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
+  public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
     keyboardState = nil
     if !automaticallyMovesWithKeyboard {
       return

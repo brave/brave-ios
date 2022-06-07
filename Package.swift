@@ -292,7 +292,6 @@ let package = Package(
       dependencies: [
         "BraveShared",
         "Strings",
-        "PanModal",
         "SnapKit",
         "Then",
         "XCGLogger",
