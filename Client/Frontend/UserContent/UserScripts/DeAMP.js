@@ -36,7 +36,7 @@
     }
 
     const canonicalLinkElm = D.querySelector('head > link[rel="canonical"][href^="http"]')
-    if (!canonicalLinkElm === null) {
+    if (canonicalLinkElm === null || canonicalLinkElm === undefined) {
       // didn't find a link elm.
       checkIfShouldStopChecking()
       return
