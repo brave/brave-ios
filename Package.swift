@@ -200,8 +200,7 @@ let package = Package(
         "SDWebImage",
         "SwiftKeychainWrapper",
         "SwiftyJSON",
-        "XCGLogger",
-        "Static"
+        "XCGLogger"
       ],
       resources: [.copy("effective_tld_names.dat")]
     ),
