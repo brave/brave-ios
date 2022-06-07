@@ -48,12 +48,21 @@ struct EncryptionView: View {
     keyringStore.keyring.accountInfos.first(where: { $0.address.caseInsensitiveCompare(request.address) == .orderedSame }) ?? keyringStore.selectedAccount
   }
   
+  private var navigationTitle: String {
+    switch request {
+    case .getEncryptionPublicKey:
+      return Strings.Wallet.getEncryptionPublicKeyRequestTitle
+    case .decrypt:
+      return Strings.Wallet.decryptRequestTitle
+    }
+  }
+  
   private var subtitle: String {
     switch request {
     case .getEncryptionPublicKey:
-      return "A DApp is requesting your public encryption key"
+      return Strings.Wallet.getEncryptionPublicKeyRequestSubtitle
     case .decrypt:
-      return "This DApp would like to read this message to complete your request"
+      return Strings.Wallet.decryptRequestSubtitle
     }
   }
   
@@ -88,7 +97,7 @@ struct EncryptionView: View {
       Group {
         if case .getEncryptionPublicKey = request {
           ScrollView {
-            Text(urlOrigin: request.originInfo.origin) + Text(" is requesting your wallets public encryption key. If you consent to providing this key, the site will be able to compose encrypted messages to you.")
+            Text(urlOrigin: request.originInfo.origin) + Text(" \(Strings.Wallet.getEncryptionPublicKeyRequestMessage)")
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
           .padding(20)
@@ -105,7 +114,7 @@ struct EncryptionView: View {
             Group {
               if !isShowingDecryptMessage {
                 Button(action: { isShowingDecryptMessage.toggle() }) {
-                  Text("Reveal")
+                  Text(Strings.Wallet.decryptRequestReveal)
                 }
                 .buttonStyle(BraveFilledButtonStyle(size: .normal))
               }
@@ -114,7 +123,7 @@ struct EncryptionView: View {
           .alertOnScreenshot {
             Alert(
               title: Text(Strings.Wallet.screenshotDetectedTitle),
-              message: Text("Warning: A screenshot of your message may get backed up to a cloud file service, and be readable by any application with photos access. Brave recommends that you not save this screenshot, and delete it as soon as possible."),
+              message: Text(Strings.Wallet.decryptMessageScreenshotDetectedMessage),
               dismissButton: .cancel(Text(Strings.OKString))
             )
           }
@@ -160,7 +169,7 @@ struct EncryptionView: View {
       alignment: .bottom
     )
     .frame(maxWidth: .infinity)
-    .navigationTitle(Strings.Wallet.signatureRequestTitle)
+    .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
     .foregroundColor(Color(.braveLabel))
     .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
@@ -189,9 +198,9 @@ struct EncryptionView: View {
   private var approveButtonTitle: String {
     switch request {
     case .getEncryptionPublicKey:
-      return "Provide"
+      return Strings.Wallet.getEncryptionPublicKeyRequestApprove
     case .decrypt:
-      return "Allow"
+      return Strings.Wallet.decryptRequestApprove
     }
   }
   
@@ -212,7 +221,7 @@ struct EncryptionView: View {
     .buttonStyle(BraveFilledButtonStyle(size: .large))
   }
   
-  func handleAction(approved: Bool) {
+  private func handleAction(approved: Bool) {
     switch request {
     case .getEncryptionPublicKey(let request):
       cryptoStore.handleWebpageRequestResponse(.getEncryptionPublicKey(approved: approved, originInfo: request.originInfo))
