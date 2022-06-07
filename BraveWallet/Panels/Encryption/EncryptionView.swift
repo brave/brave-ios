@@ -99,7 +99,6 @@ struct EncryptionView: View {
           ScrollView {
             Text(urlOrigin: request.originInfo.origin) + Text(" \(Strings.Wallet.getEncryptionPublicKeyRequestMessage)")
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
           .padding(20)
         } else if case let .decrypt(decryptRequest) = request {
           ScrollView {
