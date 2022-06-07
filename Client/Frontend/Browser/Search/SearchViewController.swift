@@ -287,12 +287,23 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
   }
   
   private func isBraveSearchPrompt(for indexPath: IndexPath) -> Bool {
-    let index = traitCollection.horizontalSizeClass == .regular && UIDevice.current.orientation.isPortrait ? 4 : 2
-    switch dataSource.suggestions.count {
-    case 0...index:
-      return indexPath.row == dataSource.suggestions.count && dataSource.braveSearchPromotionAvailable
+    guard let section = dataSource.availableSections[safe: indexPath.section] else {
+      return false
+    }
+
+    switch section {
+    case .searchSuggestionsOptIn:
+      return indexPath.row == 1 && dataSource.braveSearchPromotionAvailable
+    case .searchSuggestions:
+      let index = traitCollection.horizontalSizeClass == .regular && UIDevice.current.orientation.isPortrait ? 4 : 2
+      switch dataSource.suggestions.count {
+      case 0...index:
+        return indexPath.row == dataSource.suggestions.count && dataSource.braveSearchPromotionAvailable
+      default:
+        return indexPath.row == index && dataSource.braveSearchPromotionAvailable
+      }
     default:
-      return indexPath.row == index && dataSource.braveSearchPromotionAvailable
+      return false
     }
   }
   
@@ -389,7 +400,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       case .quickBar:
         return super.tableView(tableView, heightForRowAt: indexPath)
       case .searchSuggestionsOptIn:
-        return 100.0
+        return isBraveSearchPrompt(for: indexPath) ? UITableView.automaticDimension : 100.0
       case .searchSuggestions:
         return isBraveSearchPrompt(for: indexPath) ? UITableView.automaticDimension : 44.0
       case .openTabsAndHistoryAndBookmarks:
@@ -466,6 +477,22 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func createSearchSuggestionPromotionCell() -> UITableViewCell {
+      let cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
+      if let promotionSearchCell = cell as? BraveSearchPromotionCell {
+        promotionSearchCell.trySearchEngineTapped = { [weak self] in
+          self?.submitSeachTemplateQuery(isBraveSearchPromotion: true)
+        }
+        
+        promotionSearchCell.dismissTapped = { [weak self] in
+          self?.changeBraveSearchPromotionState()
+          tableView.reloadData()
+        }
+      }
+      
+      return cell
+    }
+    
     guard let section = dataSource.availableSections[safe: indexPath.section] else {
       return UITableViewCell()
     }
@@ -481,39 +508,38 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
 
       return cell
     case .searchSuggestionsOptIn:
-      let cell = tableView.dequeueReusableCell(withIdentifier: SearchSuggestionPromptCell.identifier, for: indexPath)
-      if let promptCell = cell as? SearchSuggestionPromptCell {
-        promptCell.selectionStyle = .none
-        promptCell.onOptionSelected = { [weak self] option in
-          guard let self = self else { return }
+      var cell: UITableViewCell?
 
-          self.dataSource.searchEngines?.shouldShowSearchSuggestions = option
-          self.dataSource.searchEngines?.shouldShowSearchSuggestionsOptIn = false
+      if isBraveSearchPrompt(for: indexPath) {
+        cell = createSearchSuggestionPromotionCell()
+      } else {
+        cell = tableView.dequeueReusableCell(withIdentifier: SearchSuggestionPromptCell.identifier, for: indexPath)
+        if let promptCell = cell as? SearchSuggestionPromptCell {
+          promptCell.selectionStyle = .none
+          promptCell.onOptionSelected = { [weak self] option in
+            guard let self = self else { return }
 
-          if option {
-            self.dataSource.querySuggestClient()
+            self.dataSource.searchEngines?.shouldShowSearchSuggestions = option
+            self.dataSource.searchEngines?.shouldShowSearchSuggestionsOptIn = false
+
+            if option {
+              self.dataSource.querySuggestClient()
+            }
+            self.layoutSuggestionsOptInPrompt()
+            self.reloadSearchEngines()
           }
-          self.layoutSuggestionsOptInPrompt()
-          self.reloadSearchEngines()
         }
       }
-        
-      return cell
+          
+      guard let tableViewCell = cell else { return UITableViewCell() }
+      tableViewCell.separatorInset = .zero
+
+      return tableViewCell
     case .searchSuggestions:
       var cell: UITableViewCell?
 
       if isBraveSearchPrompt(for: indexPath) {
-        cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
-        if let promotionSearchCell = cell as? BraveSearchPromotionCell {
-          promotionSearchCell.trySearchEngineTapped = { [weak self] in
-            self?.submitSeachTemplateQuery(isBraveSearchPromotion: true)
-          }
-          
-          promotionSearchCell.dismissTapped = { [weak self] in
-            self?.changeBraveSearchPromotionState()
-            tableView.reloadData()
-          }
-        }
+        cell = createSearchSuggestionPromotionCell()
       } else {
         cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
 
@@ -597,7 +623,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
     case .quickBar:
       return 1
     case .searchSuggestionsOptIn:
-      return 1
+      return dataSource.braveSearchPromotionAvailable ? 2 : 1
     case .searchSuggestions:
       guard let shouldShowSuggestions = dataSource.searchEngines?.shouldShowSearchSuggestions else { return 0 }
       
