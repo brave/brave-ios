@@ -11,7 +11,7 @@ import Data
 // MARK: - SearchViewControllerDelegate
 
 protocol SearchViewControllerDelegate: AnyObject {
-  func searchViewController(_ searchViewController: SearchViewController, didSubmit query: String)
+  func searchViewController(_ searchViewController: SearchViewController, didSubmit query: String, braveSearchPromotion: Bool)
   func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL)
   func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: String?, url: URL))
   func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String)
@@ -304,11 +304,14 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
     }
   }
   
-  private func submitSeachTemplateQuery() {
+  private func submitSeachTemplateQuery(isBraveSearchPromotion: Bool) {
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       RecentSearch.addItem(type: .text, text: dataSource.searchQuery, websiteUrl: nil)
     }
-    searchDelegate?.searchViewController(self, didSubmit: dataSource.searchQuery)
+    searchDelegate?.searchViewController(
+      self,
+      didSubmit: dataSource.searchQuery,
+      braveSearchPromotion: isBraveSearchPromotion)
   }
 
   // MARK: Actions
@@ -345,7 +348,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
 
     switch section {
     case .quickBar:
-      submitSeachTemplateQuery()
+      submitSeachTemplateQuery(isBraveSearchPromotion: false)
     case .searchSuggestionsOptIn: return
     case .searchSuggestions:
       if !isBraveSearchPrompt(for: indexPath) {
@@ -503,11 +506,12 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
         cell = tableView.dequeueReusableCell(withIdentifier: BraveSearchPromotionCell.identifier, for: indexPath)
         if let promotionSearchCell = cell as? BraveSearchPromotionCell {
           promotionSearchCell.trySearchEngineTapped = { [weak self] in
-            self?.submitSeachTemplateQuery()
+            self?.submitSeachTemplateQuery(isBraveSearchPromotion: true)
           }
           
           promotionSearchCell.dismissTapped = { [weak self] in
             self?.changeBraveSearchPromotionState()
+            tableView.reloadData()
           }
         }
       } else {

@@ -205,7 +205,7 @@ extension BrowserViewController: TopToolbarDelegate {
     processAddressBar(text: text, visitType: .typed)
   }
 
-  func processAddressBar(text: String, visitType: VisitType) {
+  func processAddressBar(text: String, visitType: VisitType, isBraveSearchPromotion: Bool = false) {
     if let fixupURL = URIFixup.getURL(text) {
       // The user entered a URL, so use it.
       finishEditingAndSubmit(fixupURL, visitType: visitType)
@@ -214,17 +214,27 @@ extension BrowserViewController: TopToolbarDelegate {
     }
 
     // We couldn't build a URL, so pass it on to the search engine.
-    submitSearchText(text)
+    submitSearchText(text, isBraveSearchPromotion: isBraveSearchPromotion)
 
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       RecentSearch.addItem(type: .text, text: text, websiteUrl: nil)
     }
   }
 
-  func submitSearchText(_ text: String) {
-    let engine = profile.searchEngines.defaultEngine()
-
-    if let searchURL = engine.searchURLForQuery(text) {
+  func submitSearchText(_ text: String, isBraveSearchPromotion: Bool = false) {
+    var engine = profile.searchEngines.defaultEngine()
+    
+    if isBraveSearchPromotion {
+      let braveSearchEngine = profile.searchEngines.orderedEngines.first {
+        $0.shortName == OpenSearchEngine.EngineNames.brave
+      }
+      
+      if let searchEngine = braveSearchEngine {
+        engine = searchEngine
+      }
+    }
+    
+    if let searchURL = engine.searchURLForQuery(text, isBraveSearchPromotion: isBraveSearchPromotion) {
       // We couldn't find a matching search keyword, so do a search query.
       finishEditingAndSubmit(searchURL, visitType: .typed)
     } else {

@@ -110,7 +110,7 @@ class BraveSearchPromotionCell: UITableViewCell {
 
     contentView.addSubview(promotionContentView)
     promotionContentView.snp.makeConstraints {
-      $0.edges.equalToSuperview().inset(8)
+      $0.edges.equalToSuperview()
     }
     
     [tryButton, dismissButton].forEach(buttonsStackView.addArrangedSubview(_:))
