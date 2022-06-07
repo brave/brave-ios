@@ -61,60 +61,21 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               onDismiss: onDismiss
             )
           case let .getEncryptionPublicKey(request):
-            // TODO: Replace with real UI
-            VStack {
-              Text("Get Encryption Public Key Request")
-              Text("Origin: \(request.originInfo.origin.url?.absoluteString ?? "nil origin url")")
-              Text("Address: \(request.address)")
-              
-              HStack {
-                Button(action: {
-                  cryptoStore.handleWebpageRequestResponse(.getEncryptionPublicKey(approved: false, originInfo: request.originInfo))
-                  onDismiss()
-                }) {
-                  Text("Reject")
-                }
-                .buttonStyle(BraveOutlineButtonStyle(size: .large))
-                
-                Button(action: {
-                  cryptoStore.handleWebpageRequestResponse(.getEncryptionPublicKey(approved: true, originInfo: request.originInfo))
-                  onDismiss()
-                }) {
-                  Text("Accept")
-                }
-                .buttonStyle(BraveFilledButtonStyle(size: .large))
-              }
-              .padding()
-            }
-            .padding()
+            EncryptionView(
+              request: .getEncryptionPublicKey(request),
+              cryptoStore: cryptoStore,
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onDismiss: onDismiss
+            )
           case let .decrypt(request):
-            // TODO: Replace with real UI
-            VStack {
-              Text("Decrypt Request")
-              Text("Origin: \(request.originInfo.origin.url?.absoluteString ?? "nil origin url")")
-              Text("Address: \(request.address)")
-              Text("Unsafe Message: \(request.unsafeMessage ?? "nil message")")
-              
-              HStack {
-                Button(action: {
-                  cryptoStore.handleWebpageRequestResponse(.decrypt(approved: false, originInfo: request.originInfo))
-                  onDismiss()
-                }) {
-                  Text("Reject")
-                }
-                .buttonStyle(BraveOutlineButtonStyle(size: .large))
-                
-                Button(action: {
-                  cryptoStore.handleWebpageRequestResponse(.decrypt(approved: true, originInfo: request.originInfo))
-                  onDismiss()
-                }) {
-                  Text("Accept")
-                }
-                .buttonStyle(BraveFilledButtonStyle(size: .large))
-              }
-              .padding()
-            }
-            .padding()
+            EncryptionView(
+              request: .decrypt(request),
+              cryptoStore: cryptoStore,
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onDismiss: onDismiss
+            )
           }
         }
       }
