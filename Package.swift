@@ -201,6 +201,7 @@ let package = Package(
         "SwiftKeychainWrapper",
         "SwiftyJSON",
         "XCGLogger",
+        "Static"
       ],
       resources: [.copy("effective_tld_names.dat")]
     ),
