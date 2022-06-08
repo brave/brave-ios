@@ -7,6 +7,7 @@ import Foundation
 import LocalAuthentication
 import BraveCore
 import Data
+import BraveShared
 
 public class SettingsStore: ObservableObject {
   /// The number of minutes to wait until the Brave Wallet is automatically locked
@@ -46,10 +47,12 @@ public class SettingsStore: ObservableObject {
     self.walletService = walletService
     self.txService = txService
 
+    keyringService.add(self)
     keyringService.autoLockMinutes { [self] minutes in
       self.autoLockInterval = .init(value: minutes)
     }
     
+    walletService.add(self)
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = CurrencyCode(code: currencyCode)
     }
@@ -59,6 +62,9 @@ public class SettingsStore: ObservableObject {
     walletService.reset()
     KeyringStore.resetKeychainStoredPassword()
     Domain.clearAllEthereumPermissions()
+    Preferences.Wallet.defaultWallet.reset()
+    Preferences.Wallet.allowEthereumProviderAccountRequests.reset()
+    Preferences.Wallet.displayWeb3Notifications.reset()
   }
 
   func resetTransaction() {
@@ -88,6 +94,56 @@ public class SettingsStore: ObservableObject {
   
   func closeManageSiteConnectionStore() {
     manageSiteConnectionsStore = nil
+  }
+}
+
+extension SettingsStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: String) {
+  }
+  
+  public func keyringRestored(_ keyringId: String) {
+  }
+  
+  public func keyringReset() {
+  }
+  
+  public func locked() {
+  }
+  
+  public func unlocked() {
+  }
+  
+  public func backedUp() {
+  }
+  
+  public func accountsChanged() {
+  }
+  
+  public func autoLockMinutesChanged() {
+    keyringService.autoLockMinutes { [weak self] minutes in
+      self?.autoLockInterval = .init(value: minutes)
+    }
+  }
+  
+  public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
+  }
+}
+
+extension SettingsStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
+  }
+  
+  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+  
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+    currencyCode = CurrencyCode(code: currency)
+  }
+  
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+  
+  public func onNetworkListChanged() {
   }
 }
 
