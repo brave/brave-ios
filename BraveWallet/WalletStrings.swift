@@ -2448,7 +2448,7 @@ extension Strings {
       "wallet.getEncryptionPublicKeyRequestMessage",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "is requesting your wallets public encryption key. If you consent to providing this key, the site will be able to compose encrypted messages to you.",
+      value: "is requesting your wallet's public encryption key. If you consent to providing this key, the site will be able to compose encrypted messages to you.",
       comment: "The text shown beside the URL origin of a get public encryption key request from a dapp site. Ex 'https://brave.com is requesting your wallets public encryption key. If you consent to providing this key, the site will be able to compose encrypted messages to you.'"
     )
     public static let getEncryptionPublicKeyRequestApprove = NSLocalizedString(
