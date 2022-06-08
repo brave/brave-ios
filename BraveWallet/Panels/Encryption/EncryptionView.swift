@@ -74,6 +74,7 @@ struct EncryptionView: View {
           Spacer()
         }
         .font(.callout)
+        .padding(.bottom, 6)
       }
       VStack(spacing: 12) {
         VStack(spacing: 8) {
