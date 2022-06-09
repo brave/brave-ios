@@ -31,7 +31,7 @@ struct AccountView: View {
     }
     .padding(.vertical, 6)
     .accessibilityElement()
-    .accessibilityLabel("\(name), \(address)")
+    .accessibilityLabel("\(name), \(address.truncatedAddress)")
   }
 }
 

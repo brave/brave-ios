@@ -135,7 +135,7 @@ struct SuggestedNetworkView: View {
         }
       }
       .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
-      .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address)")
+      .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
       VStack(spacing: 8) {
         faviconAndOrigin
         Text(headerTitle)

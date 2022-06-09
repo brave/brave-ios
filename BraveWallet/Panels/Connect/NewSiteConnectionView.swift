@@ -93,7 +93,9 @@ public struct NewSiteConnectionView: View {
               }
             } label: {
               HStack {
-                AccountView(address: account.address, name: account.name)
+                AddressView(address: account.address) {
+                  AccountView(address: account.address, name: account.name)
+                }
                 Spacer()
                 Group {
                   if selectedAccounts.contains(account.id) {
@@ -159,7 +161,7 @@ public struct NewSiteConnectionView: View {
   private var accountsAddressesToConfirm: String {
     keyringStore.keyring.accountInfos
       .filter { selectedAccounts.contains($0.id) }
-      .map(\.address)
+      .map(\.address.truncatedAddress)
       .joined(separator: ", ")
   }
   

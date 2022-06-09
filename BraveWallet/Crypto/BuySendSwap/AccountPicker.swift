@@ -105,7 +105,7 @@ struct AccountPicker: View {
       }
     }
     .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
-    .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address)")
+    .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
   }
 
   private var networkPickerView: some View {
