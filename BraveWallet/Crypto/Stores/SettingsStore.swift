@@ -19,7 +19,7 @@ public class SettingsStore: ObservableObject {
 
   /// If we should attempt to unlock via biometrics (Face ID / Touch ID)
   var isBiometricsUnlockEnabled: Bool {
-    KeyringStore.isKeychainPasswordStored && isBiometricsAvailable
+    keychain.isPasswordStoredInKeychain(key: KeyringStore.passwordKeychainKey) && isBiometricsAvailable
   }
 
   /// If the device has biometrics available
@@ -37,15 +37,18 @@ public class SettingsStore: ObservableObject {
   private let keyringService: BraveWalletKeyringService
   private let walletService: BraveWalletBraveWalletService
   private let txService: BraveWalletTxService
+  private let keychain: KeychainType
 
   public init(
     keyringService: BraveWalletKeyringService,
     walletService: BraveWalletBraveWalletService,
-    txService: BraveWalletTxService
+    txService: BraveWalletTxService,
+    keychain: KeychainType = Keychain()
   ) {
     self.keyringService = keyringService
     self.walletService = walletService
     self.txService = txService
+    self.keychain = keychain
 
     keyringService.add(self)
     keyringService.autoLockMinutes { [self] minutes in
@@ -60,7 +63,7 @@ public class SettingsStore: ObservableObject {
 
   func reset() {
     walletService.reset()
-    KeyringStore.resetKeychainStoredPassword()
+    keychain.resetPasswordInKeychain(key: KeyringStore.passwordKeychainKey)
     Domain.clearAllEthereumPermissions()
     Preferences.Wallet.defaultWallet.reset()
     Preferences.Wallet.allowEthereumProviderAccountRequests.reset()

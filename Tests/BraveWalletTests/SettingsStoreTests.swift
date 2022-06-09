@@ -54,7 +54,8 @@ class SettingsStoreTests: XCTestCase {
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
-      txService: txService
+      txService: txService,
+      keychain: TestableKeychain()
     )
 
     XCTAssertEqual(sut.autoLockInterval, .minute)
@@ -67,6 +68,13 @@ class SettingsStoreTests: XCTestCase {
     var keyringServiceAutolockMinutes: Int32 = 1
     keyringService._autoLockMinutes = { $0(keyringServiceAutolockMinutes) }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.cad.code) }
+    
+    let keychain = TestableKeychain()
+    var resetPasswordInKeychainCalled = false
+    keychain._resetPasswordInKeychain = { _ in
+      resetPasswordInKeychainCalled = true
+      return true
+    }
 
     var walletServiceResetCalled = false
     walletService._reset = {
@@ -95,7 +103,8 @@ class SettingsStoreTests: XCTestCase {
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
-      txService: txService
+      txService: txService,
+      keychain: keychain
     )
     
     XCTAssertEqual(sut.autoLockInterval, .minute)
@@ -129,11 +138,11 @@ class SettingsStoreTests: XCTestCase {
       Preferences.Wallet.displayWeb3Notifications.value,
       Preferences.Wallet.displayWeb3Notifications.defaultValue,
       "Display web3 notifications was not reset to default")
+    XCTAssert(
+      resetPasswordInKeychainCalled,
+      "Reset password in keychain was not called")
     /// Testing against `Domain.clearAllEthereumPermissions` has proven flakey
     /// on CI, verified in `ManageSiteConnectionsStoreTests`, `DomainTests`.
-    /// Testing against `KeyringStore.resetKeychainStoredPassword`
-    /// accesses keychain, requiring host app or testable keychain wrapper
-    // TODO: Add testable keychain wrapper
   }
 
   /// Test `resetTransaction()` will call `reset()` on TxService
@@ -147,7 +156,8 @@ class SettingsStoreTests: XCTestCase {
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
-      txService: txService
+      txService: txService,
+      keychain: TestableKeychain()
     )
     
     sut.resetTransaction()
