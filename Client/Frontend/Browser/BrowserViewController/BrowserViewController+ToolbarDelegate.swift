@@ -206,7 +206,7 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func processAddressBar(text: String, visitType: VisitType, isBraveSearchPromotion: Bool = false) {
-    if let fixupURL = URIFixup.getURL(text) {
+    if let fixupURL = URIFixup.getURL(text), !isBraveSearchPromotion {
       // The user entered a URL, so use it.
       finishEditingAndSubmit(fixupURL, visitType: visitType)
 
