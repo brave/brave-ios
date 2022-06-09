@@ -24,7 +24,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.clipsToBounds = true
     $0.layer.cornerRadius = 16
     $0.layer.cornerCurve = .continuous
-    $0.layer.borderWidth = 2.0
+    $0.layer.borderWidth = 1.0
     $0.layer.borderColor = UX.contentBorderColor.cgColor
     $0.backgroundColor = UX.contentBackgroundColor
   }
@@ -32,13 +32,12 @@ class BraveSearchPromotionCell: UITableViewCell {
   private let mainStackView = UIStackView().then {
     $0.axis = .vertical
     $0.alignment = .leading
-    $0.spacing = 8
   }
   
   private let buttonsStackView = UIStackView().then {
     $0.axis = .horizontal
-    $0.alignment = .leading
-    $0.spacing = 15.0
+    $0.alignment = .lastBaseline
+    $0.spacing = 16.0
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
   }
   
@@ -58,7 +57,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.font = .preferredFont(forTextStyle: .headline)
     $0.numberOfLines = 0
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
   }
 
   private let bodyLabel = UILabel().then {
@@ -68,7 +67,7 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.font = .preferredFont(forTextStyle: .body)
     $0.numberOfLines = 0
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
   }
 
   private let tryButton = RoundInterfaceButton(type: .roundedRect).then {
@@ -78,10 +77,9 @@ class BraveSearchPromotionCell: UITableViewCell {
     $0.setTitle(Strings.BraveSearchPromotion.braveSearchPromotionBannerTryButtonTitle, for: .normal)
     $0.backgroundColor = .braveOrange
     $0.snp.makeConstraints { make in
-      make.height.equalTo(44)
       make.width.greaterThanOrEqualTo(120)
     }
-    $0.contentEdgeInsets = UIEdgeInsets(top: -4, left: 8, bottom: -4, right: 8)
+    $0.contentEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
@@ -96,9 +94,6 @@ class BraveSearchPromotionCell: UITableViewCell {
         Strings.BraveSearchPromotion.braveSearchPromotionBannerDismissButtonTitle,
       for: .normal)
     $0.backgroundColor = .clear
-    $0.snp.makeConstraints { make in
-      make.height.equalTo(44)
-    }
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
@@ -107,16 +102,30 @@ class BraveSearchPromotionCell: UITableViewCell {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     
     backgroundColor = .secondaryBraveBackground
+    selectionStyle = .none
 
     contentView.addSubview(promotionContentView)
     promotionContentView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+      $0.leading.equalTo(safeArea.leading).inset(8)
+      $0.trailing.equalTo(safeArea.trailing).inset(8)
+      $0.top.equalTo(safeArea.top)
+      $0.bottom.equalTo(safeArea.bottom)
     }
     
     [tryButton, dismissButton].forEach(buttonsStackView.addArrangedSubview(_:))
     
-    [titleLabel, bodyLabel, buttonsStackView].forEach(mainStackView.addArrangedSubview(_:))
-
+    mainStackView.addStackViewItems(
+      .view(titleLabel),
+      .customSpace(8.0),
+      .view(bodyLabel),
+      .customSpace(16.0),
+      .view(buttonsStackView)
+    )
+    
+    buttonsStackView.snp.makeConstraints {
+      $0.height.equalTo(tryButton.snp.height)
+    }
+    
     promotionContentView.addSubview(mainStackView)
     promotionContentView.addSubview(promotionalImageView)
 
