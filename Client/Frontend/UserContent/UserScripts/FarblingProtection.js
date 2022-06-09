@@ -8,10 +8,25 @@
 window.braveFarble = (args) => {
   // 1. Farble audio
   // Adds slight randization when reading data for audio files
-  // Randomization is determined by the fudge factor
-  const farbleAudio = (fudgeFactor) => {
-    const braveNacl = window.nacl
-    delete window.nacl
+  // Randomization is determined by the fudge factor and the
+  // indexes farbled are determined by farbleSeed
+  const farbleAudio = (fudgeFactor, farbleSeed) => {
+    const mapValues = (value, inMin, inMax, outMin, outMax) => {
+      return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+    }
+    
+    const farbleChannelData = (destination) => {
+      const seedIndex = farbleSeed % destination.length
+      let farbleIndex = Math.round(mapValues(destination[seedIndex], -1, 1, 0, destination.length))
+      let numIndexesFarbled = 0
+      const numIndexesToFarble = 100
+      
+      while (numIndexesFarbled < numIndexesToFarble) {
+        destination[farbleIndex] = destination[farbleIndex] * fudgeFactor
+        farbleIndex = (farbleIndex + 100) % destination.length
+        numIndexesFarbled += 1
+      }
+    }
 
     const farbleArrayData = (destination) => {
       // Let's fudge the data by our fudge factor.
@@ -20,46 +35,14 @@ window.braveFarble = (args) => {
       }
     }
 
-    // Convert an unsinged byte (Uint8) to a hex character
-    // Unsigned bytes must be between 0 and 255
-    const byteToHex = (unsignedByte) => {
-      // convert the possibly signed byte (-128 to 127) to an unsigned byte (0 to 255).
-      // if you know, that you only deal with unsigned bytes (Uint8Array), you can omit this line
-      // const unsignedByte = byte & 0xff
-
-      // If the number can be represented with only 4 bits (0-15),
-      // the hexadecimal representation of this number is only one char (0-9, a-f).
-      if (unsignedByte < 16) {
-        return '0' + unsignedByte.toString(16)
-      } else {
-        return unsignedByte.toString(16)
-      }
-    }
-
-    // Convert an array of unsigned bytes (Uint8Array) to a hex string.
-    // Each value in the array must be between 0 and 255,
-    // resulting in hex values between 0 to f (i.e. 0 to 15)
-    const toHexString = (unsignedBytes) => {
-      return Array.from(unsignedBytes)
-        .map(byte => byteToHex(byte))
-        .join('')
-    }
-
-    // Hash an array
-    const hashArray = (a) => {
-      const byteArray = new Uint8Array(a.buffer)
-      const hexArray = braveNacl.hash(byteArray)
-      return toHexString(hexArray)
-    }
-
     // 1. Farble `getChannelData`
     // This will also result in a farbled `copyFromChannel`
     const getChannelData = window.AudioBuffer.prototype.getChannelData
     window.AudioBuffer.prototype.getChannelData = function () {
       const channelData = Reflect.apply(getChannelData, this, arguments)
-      // TODO: @JS Add more optimized audio farbling.
-      // Will be done as a future PR of #5482 here:
-      // https://github.com/brave/brave-ios/pull/5485
+      // Farble the array and store the hash of this
+      // so that we don't farble the same data again.
+      farbleChannelData(channelData)
       return channelData
     }
 
@@ -245,7 +228,8 @@ window.braveFarble = (args) => {
   // This small decrease should not affect affect legitimite users of this api.
   // But will affect fingerprinters by introducing a small random change.
   const fudgeFactor = args['fudgeFactor']
-  farbleAudio(fudgeFactor)
+  const farbleSeed = args['farbleSeed']
+  farbleAudio(fudgeFactor, farbleSeed)
 
   // Fake data that is to be used to construct fake plugins
   const fakePluginData = args['fakePluginData']

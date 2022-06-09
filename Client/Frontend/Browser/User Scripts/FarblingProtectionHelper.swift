@@ -45,6 +45,8 @@ class FarblingProtectionHelper {
     ///
     /// Must be a value between 0 and 1
     let randomHardwareIndexScale: Float
+    /// A random value used to farble data
+    let farbleSeed: UInt32
   }
 
   /// Variables representing the prefix of a randomly generated strings used as the plugin name
@@ -82,7 +84,8 @@ class FarblingProtectionHelper {
       fakeVoiceName: fakeVoiceNames.seededRandom() ?? "",
       fakePluginData: FarblingProtectionHelper.makeFakePluginData(),
       randomVoiceIndexScale: Float(drand48()),
-      randomHardwareIndexScale: Float(drand48())
+      randomHardwareIndexScale: Float(drand48()),
+      farbleSeed: UInt32.seededRandom(in: UInt32.min...UInt32.max)
     )
 
     let encoder = JSONEncoder()
