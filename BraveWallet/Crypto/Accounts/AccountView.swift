@@ -23,7 +23,7 @@ struct AccountView: View {
         Text(name)
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
-        Text(address)
+        Text(address.truncatedAddress)
           .foregroundColor(Color(.braveLabel))
       }
       .font(.caption)

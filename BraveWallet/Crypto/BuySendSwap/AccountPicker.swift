@@ -48,7 +48,7 @@ struct AccountPicker: View {
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
-        Text(keyringStore.selectedAccount.address)
+        Text(keyringStore.selectedAccount.address.truncatedAddress)
           .foregroundColor(Color(.braveLabel))
           .multilineTextAlignment(.leading)
       }
@@ -71,6 +71,7 @@ struct AccountPicker: View {
     Group {
       if #available(iOS 15.0, *) {
         Menu {
+          Text(keyringStore.selectedAccount.address)
           Button(action: copyAddress) {
             Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "brave.clipboard")
           }

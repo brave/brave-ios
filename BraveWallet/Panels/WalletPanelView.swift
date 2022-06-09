@@ -343,9 +343,11 @@ struct WalletPanelView: View {
             VStack(spacing: 4) {
               Text(keyringStore.selectedAccount.name)
                 .font(.headline)
-              Text(keyringStore.selectedAccount.address)
-                .font(.callout)
-                .multilineTextAlignment(.center)
+              AddressView(address: keyringStore.selectedAccount.address) {
+                Text(keyringStore.selectedAccount.address.truncatedAddress)
+                  .font(.callout)
+                  .multilineTextAlignment(.center)
+              }
             }
           }
           VStack(spacing: 4) {
@@ -406,6 +408,31 @@ struct WalletPanelView: View {
       }
       accountActivityStore.update()
     }
+  }
+}
+
+struct AddressView<Content: View>: View {
+  var address: String
+  var content: () -> Content
+  
+  init(
+    address: String,
+    @ViewBuilder content: @escaping () -> Content
+  ) {
+    self.address = address
+    self.content = content
+  }
+  
+  var body: some View {
+    content()
+      .contextMenu {
+        Text(address)
+        Button(action: {
+          UIPasteboard.general.string = address
+        }) {
+          Label(Strings.Wallet.copyAddressButtonTitle, image: "brave.clipboard")
+        }
+      }
   }
 }
 
