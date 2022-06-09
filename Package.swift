@@ -12,7 +12,7 @@ let package = Package(
   platforms: [.iOS(.v14), .macOS(.v11)],
   products: [
     .library(name: "Brave", targets: ["Brave"]),
-    .library(name: "GuardianVPN", targets: ["GuardianVPN"]),
+    .library(name: "GuardianConnect", targets: ["GuardianConnect"]),
     .library(name: "HTTPSE", targets: ["HTTPSE"]),
     .library(name: "Shared", targets: ["Shared"]),
     .library(name: "BraveCore", targets: ["BraveCore", "MaterialComponents"]),
@@ -185,7 +185,6 @@ let package = Package(
       ],
       plugins: ["CurrentBundleGenPlugin"]
     ),
-    .target(name: "GuardianVPN", publicHeadersPath: "."),
     .target(
       name: "HTTPSE",
       path: "Client/WebFilters/ShieldStats/Httpse",
@@ -306,13 +305,14 @@ let package = Package(
         "Then",
         "XCGLogger",
         "Data",
-        "GuardianVPN",
+        "GuardianConnect",
         "BraveUI",
         .product(name: "Lottie", package: "lottie-ios")
       ],
       resources: [.copy("vpncheckmark.json")],
       plugins: ["CurrentBundleGenPlugin"]
     ),
+    .binaryTarget(name: "GuardianConnect", path: "ThirdParty/GuardianConnect/GuardianConnect.xcframework"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
       name: "BraveSharedTests",
