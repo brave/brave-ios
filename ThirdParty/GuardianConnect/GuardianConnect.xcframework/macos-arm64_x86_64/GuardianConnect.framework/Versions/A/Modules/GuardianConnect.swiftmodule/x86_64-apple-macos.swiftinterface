@@ -1,0 +1,15 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.6 (swiftlang-5.6.0.323.62 clang-1316.0.20.8)
+// swift-module-flags: -target x86_64-apple-macos10.15 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name GuardianConnect
+import CryptoKit
+import Foundation
+@_exported import GuardianConnect
+import Swift
+import _Concurrency
+@_inheritsConvenienceInitializers @objc public class GRDCurve25519 : ObjectiveC.NSObject {
+  @objc public var privateKey: Swift.String
+  @objc public var publicKey: Swift.String
+  @objc public func generateKeyPair()
+  @objc override dynamic public init()
+  @objc deinit
+}

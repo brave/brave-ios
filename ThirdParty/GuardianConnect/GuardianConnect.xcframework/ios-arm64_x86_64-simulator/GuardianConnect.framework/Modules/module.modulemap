@@ -1,0 +1,11 @@
+framework module GuardianConnect {
+  umbrella header "GuardianConnect.h"
+
+  export *
+  module * { export * }
+}
+
+module GuardianConnect.Swift {
+    header "GuardianConnect-Swift.h"
+    requires objc
+}

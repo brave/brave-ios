@@ -19,6 +19,7 @@ import BraveCore
 import Combine
 import Brave
 import BraveVPN
+import GuardianConnect
 
 private let log = Logger.browserLogger
 
@@ -138,6 +139,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // Set the Safari UA for browsing.
     setUserAgent()
+    // Moving Brave VPN v1 users to v2 type of credentials.
+    BraveVPN.migrateV1Credentials()
 
     // Start the keyboard helper to monitor and cache keyboard state.
     KeyboardHelper.defaultHelper.startObserving()
