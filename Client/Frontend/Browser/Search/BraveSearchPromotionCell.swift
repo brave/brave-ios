@@ -160,7 +160,7 @@ class BraveSearchPromotionCell: UITableViewCell {
   }
 }
 
-extension UIColor {
+private extension UIColor {
   static var borderColor: UIColor {
     return UIColor { $0.userInterfaceStyle == .dark ?
       UIColor(rgb: 0x1f257a) :

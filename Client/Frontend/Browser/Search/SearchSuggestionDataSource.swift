@@ -8,6 +8,8 @@ import BraveUI
 import Shared
 import BraveShared
 
+private let log = Logger.browserLogger
+
 // MARK: - SearchSuggestionDataSourceDelegate
 
 protocol SearchSuggestionDataSourceDelegate: AnyObject {
@@ -134,9 +136,9 @@ class SearchSuggestionDataSource {
             // Engine does not support search suggestions. Do nothing.
             break
           case SearchSuggestClientErrorInvalidResponse where isSuggestClientError:
-            print("Error: Invalid search suggestion data")
+            log.error("Error: Invalid search suggestion data")
           default:
-            print("Error: \(error.description)")
+            log.error("Error: \(error.description)")
           }
         } else if let suggestionList = suggestions {
           self.suggestions = suggestionList
