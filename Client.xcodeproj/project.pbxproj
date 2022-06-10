@@ -615,6 +615,7 @@
 		44029EB627BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */; };
 		440848AC27C7CC2200998C13 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440848AB27C7CC2200998C13 /* VisualEffectView.swift */; };
 		440982A526658EAA00BB37FE /* BraveSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440982A426658EAA00BB37FE /* BraveSearchManager.swift */; };
+		440C17D92853B4B6009C8D13 /* DeAmpHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440C17D82853B4B6009C8D13 /* DeAmpHelper.swift */; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
 		441BA43627E9EFCA00D73919 /* PrivacyReportSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441BA43527E9EFCA00D73919 /* PrivacyReportSettingsView.swift */; };
 		4422D42321BFCE9200BF1855 /* HttpsEverywhereStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */; };
@@ -2227,6 +2228,7 @@
 		44029EB527BC108200E6CE18 /* PrivacyReportAllTimeListsView.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = PrivacyReportAllTimeListsView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		440848AB27C7CC2200998C13 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		440982A426658EAA00BB37FE /* BraveSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraveSearchManager.swift; sourceTree = "<group>"; };
+		440C17D82853B4B6009C8D13 /* DeAmpHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeAmpHelper.swift; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
 		441BA43527E9EFCA00D73919 /* PrivacyReportSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReportSettingsView.swift; sourceTree = "<group>"; };
 		4422D42221BFCE9200BF1855 /* HttpsEverywhereStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpsEverywhereStats.swift; sourceTree = "<group>"; };
@@ -4524,6 +4526,7 @@
 		2F1273C127D67279007EE7B7 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				440C17D82853B4B6009C8D13 /* DeAmpHelper.swift */,
 				CA039237271E2B11000EB13C /* BrowserNavigationHelper.swift */,
 				0BA1E02D1B046F1E007675AF /* ErrorPageHelper.swift */,
 				D3B6923E1B9F9A58004B87A4 /* FindInPageHelper.swift */,
@@ -8114,6 +8117,7 @@
 				4422D4D721BFFB7600BF1855 /* table.cc in Sources */,
 				0A4BEF62221B26610005551A /* LocalAdblockResourceProtocol.swift in Sources */,
 				27C626CB25BA198700418F40 /* WalletTransferExpiredViewController.swift in Sources */,
+				440C17D92853B4B6009C8D13 /* DeAmpHelper.swift in Sources */,
 				44CE9914280831E400135A2E /* PrivacyReportsWebsite.swift in Sources */,
 				5D5E2361238C386B00AD6FBD /* NTPTableViewController.swift in Sources */,
 				CA19C781275FE26A004235B9 /* OnboardingCommon.swift in Sources */,
