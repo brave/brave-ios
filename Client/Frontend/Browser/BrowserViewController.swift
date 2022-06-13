@@ -2617,7 +2617,9 @@ extension BrowserViewController: TabManagerDelegate {
     // Update Tab Count on Tab-Tray Button
     let count = tabManager.tabsForCurrentMode.count
     toolbar?.updateTabCount(count)
-    topToolbar.updateTabCount(count)
+    if topToolbar != nil {
+      topToolbar.updateTabCount(count)
+    }
 
     // Update Actions for Tab-Tray Button
     var newTabMenuChildren: [UIAction] = []
