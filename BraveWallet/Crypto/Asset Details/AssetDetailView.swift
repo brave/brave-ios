@@ -83,7 +83,7 @@ struct AssetDetailView: View {
         } else {
           ForEach(assetDetailStore.transactions, id: \.id) { tx in
             Button(action: { self.transactionDetails = tx }) {
-              TransactionView(
+              TransactionView( // TODO: Replace with `TransactionSummaryView`
                 info: tx,
                 keyringStore: keyringStore,
                 networkStore: networkStore,
