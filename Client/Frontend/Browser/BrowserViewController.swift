@@ -1256,7 +1256,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
   func updateTabsBarVisibility() {
     defer {
-      topToolbar.line.isHidden = !tabsBar.view.isHidden
+      if topToolbar != nil {
+        topToolbar.line.isHidden = !tabsBar.view.isHidden
+      }
     }
 
     if tabManager.selectedTab == nil {
