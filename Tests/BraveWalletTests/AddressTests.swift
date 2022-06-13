@@ -42,7 +42,7 @@ class AddressTests: XCTestCase {
   
   func testZwspAddress() {
     let address = "0x1bBE4E6EF7294c99358377abAd15A6d9E98127A2"
-    let zwspAddress = "0x1bBE4E6E\u{200b}F7294c9935\u{200b}8377abAd15\u{200b}A6d9E98127\u{200b}A2\u{200b}"
+    let zwspAddress = "0\u{200b}x\u{200b}1\u{200b}b\u{200b}B\u{200b}E\u{200b}4\u{200b}E\u{200b}6\u{200b}E\u{200b}F\u{200b}7\u{200b}2\u{200b}9\u{200b}4\u{200b}c\u{200b}9\u{200b}9\u{200b}3\u{200b}5\u{200b}8\u{200b}3\u{200b}7\u{200b}7\u{200b}a\u{200b}b\u{200b}A\u{200b}d\u{200b}1\u{200b}5\u{200b}A\u{200b}6\u{200b}d\u{200b}9\u{200b}E\u{200b}9\u{200b}8\u{200b}1\u{200b}2\u{200b}7\u{200b}A\u{200b}2\u{200b}"
     let result = address.zwspAddress
     XCTAssertNotEqual(address, result)
     XCTAssertEqual(zwspAddress, result)

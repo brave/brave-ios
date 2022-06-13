@@ -43,16 +43,10 @@ extension String {
     return hex.count == 40 && hex.allSatisfy(\.isHexDigit)
   }
   
-  /// Insert zero-width space every 10 characters inside account address string
+  /// Insert zero-width space every character inside account address string
   var zwspAddress: String {
-    let characters = Array(self)
-    var result = ""
-    for index in stride(from: 0, through: characters.count, by: 10) {
-      result += String(characters[index..<min(index+10, characters.count)])
-      if index % 10 == 0 || index != 0 {
-        result += "\u{200b}"
-      }
-    }
-    return result
+    return map {
+      String($0) + "\u{200b}"
+    }.joined()
   }
 }
