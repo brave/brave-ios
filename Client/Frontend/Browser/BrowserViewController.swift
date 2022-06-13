@@ -1256,9 +1256,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
   func updateTabsBarVisibility() {
     defer {
-      if topToolbar != nil {
-        topToolbar.line.isHidden = !tabsBar.view.isHidden
-      }
+      topToolbar?.line.isHidden = !tabsBar.view.isHidden
     }
 
     if tabManager.selectedTab == nil {
@@ -2617,9 +2615,7 @@ extension BrowserViewController: TabManagerDelegate {
     // Update Tab Count on Tab-Tray Button
     let count = tabManager.tabsForCurrentMode.count
     toolbar?.updateTabCount(count)
-    if topToolbar != nil {
-      topToolbar.updateTabCount(count)
-    }
+    topToolbar?.updateTabCount(count)
 
     // Update Actions for Tab-Tray Button
     var newTabMenuChildren: [UIAction] = []
