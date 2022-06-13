@@ -39,4 +39,12 @@ class AddressTests: XCTestCase {
     let isAddressFalseNoHexDigits = "0x"
     XCTAssertFalse(isAddressFalseNoHexDigits.isETHAddress)
   }
+  
+  func testZwspAddress() {
+    let address = "0x1bBE4E6EF7294c99358377abAd15A6d9E98127A2"
+    let zwspAddress = "0x1bBE4E6E\u{200b}F7294c9935\u{200b}8377abAd15\u{200b}A6d9E98127\u{200b}A2\u{200b}"
+    let result = address.zwspAddress
+    XCTAssertNotEqual(address, result)
+    XCTAssertEqual(zwspAddress, result)
+  }
 }

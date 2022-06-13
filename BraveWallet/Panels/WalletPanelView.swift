@@ -411,31 +411,6 @@ struct WalletPanelView: View {
   }
 }
 
-struct AddressView<Content: View>: View {
-  var address: String
-  var content: () -> Content
-  
-  init(
-    address: String,
-    @ViewBuilder content: @escaping () -> Content
-  ) {
-    self.address = address
-    self.content = content
-  }
-  
-  var body: some View {
-    content()
-      .contextMenu {
-        Text(address)
-        Button(action: {
-          UIPasteboard.general.string = address
-        }) {
-          Label(Strings.Wallet.copyAddressButtonTitle, image: "brave.clipboard")
-        }
-      }
-  }
-}
-
 struct InvisibleUIView: UIViewRepresentable {
   let uiView = UIView()
   func makeUIView(context: Context) -> UIView {
