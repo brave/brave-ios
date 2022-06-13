@@ -79,10 +79,10 @@ struct AccountActivityView: View {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.transactionsTitle))
       ) {
-        if activityStore.transactionSummarys.isEmpty {
+        if activityStore.transactionSummaries.isEmpty {
           emptyTextView(Strings.Wallet.noTransactions)
         } else {
-          ForEach(activityStore.transactionSummarys) { txSummary in
+          ForEach(activityStore.transactionSummaries) { txSummary in
             Button(action: { self.transactionDetails = txSummary.txInfo }) {
               TransactionSummaryView(summary: txSummary)
             }

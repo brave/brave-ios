@@ -77,11 +77,11 @@ struct AssetDetailView: View {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.transactionsTitle))
       ) {
-        if assetDetailStore.transactionSummarys.isEmpty {
+        if assetDetailStore.transactionSummaries.isEmpty {
           Text(Strings.Wallet.noTransactions)
             .font(.footnote)
         } else {
-          ForEach(assetDetailStore.transactionSummarys) { txSummary in
+          ForEach(assetDetailStore.transactionSummaries) { txSummary in
             Button(action: { self.transactionDetails = txSummary.txInfo }) {
               TransactionSummaryView(summary: txSummary, displayAccountCreator: true)
             }

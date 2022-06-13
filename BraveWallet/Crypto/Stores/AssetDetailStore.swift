@@ -36,7 +36,7 @@ class AssetDetailStore: ObservableObject {
   }
   @Published private(set) var isLoadingAccountBalances: Bool = false
   @Published private(set) var accounts: [AccountAssetViewModel] = []
-  @Published private(set) var transactionSummarys: [TransactionSummary] = []
+  @Published private(set) var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var isBuySupported: Bool = true
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -127,7 +127,7 @@ class AssetDetailStore: ObservableObject {
       
       self.accounts = await fetchAccountBalances(updatedAccounts, keyring: keyring)
       let assetRatios = [token.symbol.lowercased(): assetPriceValue]
-      self.transactionSummarys = await fetchTransactionSummarys(keyring: keyring, assetRatios: assetRatios)
+      self.transactionSummaries = await fetchTransactionSummarys(keyring: keyring, assetRatios: assetRatios)
     }
   }
   

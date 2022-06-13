@@ -9,7 +9,7 @@ import BraveCore
 class AccountActivityStore: ObservableObject {
   private(set) var account: BraveWallet.AccountInfo
   @Published private(set) var assets: [AssetViewModel] = []
-  @Published var transactionSummarys: [TransactionSummary] = []
+  @Published var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var allTokens: [BraveWallet.BlockchainToken] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -64,7 +64,7 @@ class AccountActivityStore: ObservableObject {
       let assetRatios = self.assets.reduce(into: [String: Double](), {
         $0[$1.token.symbol.lowercased()] = Double($1.price)
       })
-      self.transactionSummarys = await fetchTransactionSummarys(
+      self.transactionSummaries = await fetchTransactionSummarys(
         network: network,
         accountInfos: keyring.accountInfos,
         userVisibleTokens: userVisibleTokens,
@@ -140,7 +140,7 @@ class AccountActivityStore: ObservableObject {
   
   #if DEBUG
   func previewTransactions() {
-    transactionSummarys = [.previewConfirmedSwap, .previewConfirmedSend, .previewConfirmedERC20Approve]
+    transactionSummaries = [.previewConfirmedSwap, .previewConfirmedSend, .previewConfirmedERC20Approve]
   }
   #endif
 }
