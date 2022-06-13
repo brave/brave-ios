@@ -137,4 +137,32 @@ extension BraveWallet.TransactionInfo {
   }
 }
 
+extension TransactionSummary {
+  static var previewConfirmedSend = Self(
+    txInfo: .previewConfirmedSend,
+    namedFromAddress: "Account 1",
+    namedToAddress: "Account 2",
+    title: "Sent 0.0100 ETH ($0.00)",
+    gasFee: .init(fee: "0.003402", fiat: "$0.00"),
+    networkSymbol: "ETH"
+  )
+  
+  static var previewConfirmedSwap = Self(
+    txInfo: .previewConfirmedSwap,
+    namedFromAddress: "Account 1",
+    namedToAddress: "0x Exchange Proxy",
+    title: "Swapped 0.0100 ETH ($0.00)",
+    gasFee: .init(fee: "0.083346", fiat: "$0.00"),
+    networkSymbol: "ETH"
+  )
+  
+  static var previewConfirmedERC20Approve = Self(
+    txInfo: .previewConfirmedERC20Approve,
+    namedFromAddress: "Account 1",
+    namedToAddress: "0x Exchange Proxy",
+    title: "Approved 1.0000 DAI",
+    gasFee: .init(fee: "0.083346", fiat: "$0.00"),
+    networkSymbol: "ETH"
+  )
+}
 #endif
