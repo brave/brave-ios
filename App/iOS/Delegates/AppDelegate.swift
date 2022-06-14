@@ -46,6 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
       }
     }
+    // FIXME: Use proper value, prod. Or prod for prod builds, development for others.
+    switches[BraveCoreSwitch.skusEnvironment] = "development"
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
   }()
   

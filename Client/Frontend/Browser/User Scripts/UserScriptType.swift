@@ -31,6 +31,8 @@ enum UserScriptType: Hashable {
         return .braveSearchHelper
       case .braveTalkHelper:
         return .braveTalkHelper
+      case .braveSkus:
+        return .braveSus
       }
     case .nacl:
       return .nacl

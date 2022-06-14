@@ -108,6 +108,17 @@ class ScriptFactory {
         source = source
           .replacingOccurrences(of: "$<brave-talk-helper>", with: messageToken, options: .literal)
           .replacingOccurrences(of: "$<security_token>", with: securityToken)
+      case .braveSkus:
+        var alteredSource = source
+        
+        let securityToken = UserScriptManager.securityTokenString
+        alteredSource = alteredSource
+          .replacingOccurrences(of: "$<brave-skus-helper>",
+                                with: "BSKU\(UserScriptManager.messageHandlerTokenString)",
+                                options: .literal)
+          .replacingOccurrences(of: "$<security_token>", with: securityToken)
+        
+        return WKUserScript(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
       }
     }
     

@@ -13,7 +13,8 @@ private let log = Logger.browserLogger
 
 public class BraveVPNSettingsViewController: TableViewController {
 
-  public var faqButtonTapped: (() -> Void)?
+    public var faqButtonTapped: (() -> Void)?
+    public var manageBraveAccountSubscriptionTapped: (() -> Void)?
 
   public init() {
     super.init(style: .grouped)
@@ -99,7 +100,11 @@ public class BraveVPNSettingsViewController: TableViewController {
             rows: [Row(text: Strings.VPN.settingsSubscriptionStatus,
                        detailText: subscriptionStatus),
                    Row(text: Strings.VPN.settingsSubscriptionExpiration, detailText: expiration),
-                   Row(text: Strings.VPN.settingsManageSubscription,
+                   Row(text: Strings.VPN.settingsManageBraveAccountSubscription,
+                       selection: { [unowned self] in
+                         self.manageBraveAccountSubscriptionTapped?()
+                       }, cellClass: ButtonCell.self),
+                   Row(text: Strings.VPN.settingsManageAppleSubscription,
                        selection: { [unowned self] in
       guard let url = self.manageSubcriptionURL else { return }
       if UIApplication.shared.canOpenURL(url) {

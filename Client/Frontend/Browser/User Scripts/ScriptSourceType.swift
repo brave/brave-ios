@@ -20,6 +20,7 @@ enum ScriptSourceType {
   case archive
   case braveSearchHelper
   case braveTalkHelper
+  case braveSus
 
   var fileName: String {
     switch self {
@@ -29,6 +30,7 @@ enum ScriptSourceType {
     case .archive: return "ArchiveIsCompat"
     case .braveSearchHelper: return "BraveSearchHelper"
     case .braveTalkHelper: return "BraveTalkHelper"
+    case .braveSus: return "BraveSkusHelper"
     }
   }
 

@@ -82,6 +82,12 @@ public class BraveVPN {
       receiptHasExpired?(nil)
       return
     }
+    
+    if Preferences.VPN.skusCredential.value != nil {
+      // Receipt verification applies to Apple's IAP only,
+      // if we detect Brave's SKU token we should not look at Apple's receipt.
+      return
+    }
 
     housekeepingApi.verifyReceipt(receipt, bundleId: "com.brave.ios.browser") { validSubscriptions, success, error in
       if !success {
@@ -184,10 +190,25 @@ public class BraveVPN {
       return Strings.VPN.vpnSettingsMonthlySubName
     case VPNProductInfo.ProductIdentifiers.yearlySub:
       return Strings.VPN.vpnSettingsYearlySubName
+    case VPNProductInfo.ProductIdentifiers.monthlySubSKU:
+      return Strings.VPN.vpnSettingsMonthlySubName
     default:
       assertionFailure("Can't get product id")
       return ""
     }
+  }
+  
+  static var neverPurchasedVPN: Bool {
+    switch BraveVPN.vpnState {
+    case .notPurchased:
+      return true
+    default:
+      return false
+    }
+  }
+  
+  private static var isBraveSkusVPN: Bool {
+    Preferences.VPN.skusCredential.value != nil
   }
   
   // MARK: - Actions

@@ -34,6 +34,7 @@ protocol TabDelegate {
   func showWalletNotification(_ tab: Tab, origin: URLOrigin)
   func updateURLBarWalletButton()
   func isTabVisible(_ tab: Tab) -> Bool
+  func showInstallVPNScreen(for credential: String)
 }
 
 @objc

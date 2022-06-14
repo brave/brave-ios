@@ -486,6 +486,11 @@ class SettingsViewController: TableViewController {
               self?.settingsDelegate?.settingsOpenURLInNewTab(BraveUX.braveVPNFaqURL)
               self?.dismiss(animated: true)
             }
+            vc.manageBraveAccountSubscriptionTapped = { [weak self] in
+              // TODO: Update url
+              self?.settingsDelegate?.settingsOpenURLInNewTab(URL(string: "https://account.brave.com")!)
+              self?.dismiss(animated: true)
+            }
             return vc
           }
         }()
