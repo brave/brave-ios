@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-"use strict";
+'use strict'
 
 window.braveFarble = (args) => {
   // 1. Farble audio
@@ -66,7 +66,7 @@ window.braveFarble = (args) => {
   // 2. Farble plugin data
   // Injects fake plugins with fake mime-types
   // Random plugins are determined by the plugin data
-  const farblePlugins = (pluginData) => {
+  const farblePlugins = (fakePluginsData) => {
     // Function that create a fake mime-type based on the given fake data
     const makeFakeMimeType = (fakeData) => {
       return Object.create(window.MimeType.prototype, {
@@ -118,14 +118,14 @@ window.braveFarble = (args) => {
         window.navigator.plugins[newPlugin.name] = newPlugin
       }
 
-      for (const [index, pluginData] of fakePluginData.entries()) {
+      for (const [index, pluginData] of fakePluginsData.entries()) {
         const newPlugin = makeFakePlugin(pluginData)
         addPluginAtIndex(newPlugin, index)
       }
 
       // Adjust the length of the original plugin array
       Reflect.defineProperty(window.navigator.plugins, 'length', {
-        value: originalPluginsLength + fakePluginData.length
+        value: originalPluginsLength + fakePluginsData.length
       })
 
       // Patch `PluginArray.item(index)` function to return the correct item 
@@ -227,26 +227,26 @@ window.braveFarble = (args) => {
   // always be within the expected range of -1 and 1.
   // This small decrease should not affect affect legitimite users of this api.
   // But will affect fingerprinters by introducing a small random change.
-  const fudgeFactor = args['fudgeFactor']
-  const farbleSeed = args['farbleSeed']
+  const fudgeFactor = args.fudgeFactor
+  const farbleSeed = args.farbleSeed
   farbleAudio(fudgeFactor, farbleSeed)
 
   // Fake data that is to be used to construct fake plugins
-  const fakePluginData = args['fakePluginData']
-  farblePlugins(fakePluginData)
+  const fakePluginsData = args.fakePluginsData
+  farblePlugins(fakePluginsData)
 
   // A value representing a fake voice name that will be used to add a fake voice
-  const fakeVoiceName = args['fakeVoiceName']
+  const fakeVoiceName = args.fakeVoiceName
   // This value is used to get a random index between 0 and voices.length
   // It's important to have a value between 0 - 1 in order to be within the 
   // array bounds
-  const randomVoiceIndexScale = args['randomVoiceIndexScale']
+  const randomVoiceIndexScale = args.randomVoiceIndexScale
   farbleVoices(fakeVoiceName, randomVoiceIndexScale)
 
   // This value lets us pick a value between 2 and window.navigator.hardwareConcurrency
   // It is a value between 0 and 1. For example 0.5 will give us 3 and 
   // thus return 2 + 3 = 5 for hardware concurrency
-  const randomHardwareIndexScale = args['randomHardwareIndexScale']
+  const randomHardwareIndexScale = args.randomHardwareIndexScale
   farbleHardwareConcurrency(randomHardwareIndexScale)
 }
 

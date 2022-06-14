@@ -36,7 +36,7 @@ class FarblingProtectionHelper {
     /// A value representing a fake voice name that will be used to add a fake voice
     let fakeVoiceName: String
     /// Fake data that is to be used to construct fake plugins
-    let fakePluginData: [FakePluginData]
+    let fakePluginsData: [FakePluginData]
     /// This value is used to get a random index between 0 and an unknown count
     ///
     /// It's important to have a value between 0 - 1 in order to be within the array bounds
@@ -82,7 +82,7 @@ class FarblingProtectionHelper {
     let farblingData = FarblingData(
       fudgeFactor: Float.seededRandom(in: 0.99...1),
       fakeVoiceName: fakeVoiceNames.seededRandom() ?? "",
-      fakePluginData: FarblingProtectionHelper.makeFakePluginData(),
+      fakePluginsData: FarblingProtectionHelper.makeFakePluginsData(),
       randomVoiceIndexScale: Float(drand48()),
       randomHardwareIndexScale: Float(drand48()),
       farbleSeed: UInt32.seededRandom(in: UInt32.min...UInt32.max)
@@ -94,7 +94,7 @@ class FarblingProtectionHelper {
   }
 
   /// Generate fake plugin data to be injected into the farbling protection script
-  private static func makeFakePluginData() -> [FarblingData.FakePluginData] {
+  private static func makeFakePluginsData() -> [FarblingData.FakePluginData] {
     let pluginCount = UInt8.seededRandom(in: 1...3)
 
     // Generate 1 to 3 fake plugins
