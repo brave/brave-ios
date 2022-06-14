@@ -142,7 +142,7 @@ public class ActivityShortcutManager: NSObject {
         guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
 
         bvc.openInsideSettingsNavigation(with: enableVPNController)
-      case .installed(let connected):
+      case .purchased(let connected):
         if !connected {
           BraveVPN.reconnect()
         }
