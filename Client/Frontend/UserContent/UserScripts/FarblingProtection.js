@@ -19,11 +19,11 @@ window.braveFarble = (args) => {
       const seedIndex = farbleSeed % destination.length
       let farbleIndex = Math.round(mapValues(destination[seedIndex], -1, 1, 0, destination.length))
       let numIndexesFarbled = 0
-      const numIndexesToFarble = 100
+      const numIndexesToFarble = 500
       
       while (numIndexesFarbled < numIndexesToFarble) {
         destination[farbleIndex] = destination[farbleIndex] * fudgeFactor
-        farbleIndex = (farbleIndex + 100) % destination.length
+        farbleIndex = (farbleIndex + Math.round(destination.length / numIndexesToFarble)) % destination.length
         numIndexesFarbled += 1
       }
     }
