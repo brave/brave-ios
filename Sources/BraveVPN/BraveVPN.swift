@@ -78,7 +78,7 @@ public class BraveVPN {
         // Api call for receipt verification failed,
         // we do not know if the receipt has expired or not.
         receiptHasExpired?(nil)
-        logAndStoreError("Api call for receipt verification failed")
+        logAndStoreError("Api call for receipt verification failed, :\(error ?? "no error")")
         return
       }
 
@@ -251,9 +251,9 @@ public class BraveVPN {
   }
 
   /// Clears current vpn configuration and removes it from preferences.
-  /// This method does not clear keychain items and jwt token.
   private static func clearConfiguration() {
     GRDVPNHelper.clearVpnConfiguration()
+    clearCredentials()
 
     NEVPNManager.shared().removeFromPreferences { error in
       if let error = error {

@@ -820,8 +820,10 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       log.info("Bookmarks from old database were successfully restored")
     }
 
-    vpnProductInfo.load()
-    BraveVPN.initialize()
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      self.vpnProductInfo.load()
+      BraveVPN.initialize()
+    }
 
     showWalletTransferExpiryPanelIfNeeded()
 
