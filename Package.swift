@@ -157,6 +157,7 @@ let package = Package(
         .copy("Frontend/UserContent/UserScripts/ArchiveIsCompat.js"),
         .copy("Frontend/UserContent/UserScripts/BraveSearchHelper.js"),
         .copy("Frontend/UserContent/UserScripts/BraveTalkHelper.js"),
+        .copy("Frontend/UserContent/UserScripts/BraveSkusHelper.js"),
         .copy("Frontend/UserContent/UserScripts/CookieControl.js"),
         .copy("Frontend/UserContent/UserScripts/FarblingProtection.js"),
         .copy("Frontend/UserContent/UserScripts/FullscreenHelper.js"),
