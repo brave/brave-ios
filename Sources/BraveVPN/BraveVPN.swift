@@ -36,39 +36,31 @@ public class BraveVPN {
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
   public static func initialize() {
-    // The vpn can live outside of the app.
-    // When the app loads we should load it from preferences to track its state.
-    NEVPNManager.shared().loadFromPreferences { error in
+    helper.verifyMainCredentials { valid, error in
+      logAndStoreError("Initialize credentials valid: \(valid)")
       if let error = error {
-        logAndStoreError("Failed to load vpn conection: \(error)")
+        logAndStoreError("Initialize credentials error: \(error)")
       }
-      
-      helper.verifyMainCredentials { valid, error in
-        logAndStoreError("Initialize credentials valid: \(valid)")
-        if let error = error {
-          logAndStoreError("Initialize credentials error: \(error)")
-        }
-      }
-      
-      helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
-      helper.tunnelLocalizedDescription = connectionName
-      
-      if case .notPurchased = vpnState {
-        // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
+    }
+
+    helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
+    helper.tunnelLocalizedDescription = connectionName
+
+    if case .notPurchased = vpnState {
+      // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
+      BraveVPN.clearConfiguration()
+      return
+    }
+    
+    // We validate the current receipt at the start to know if the subscription has expirerd.
+    BraveVPN.validateReceipt() { expired in
+      if expired == true {
         BraveVPN.clearConfiguration()
+        logAndStoreError("Receipt expired")
         return
       }
 
-      // We validate the current receipt at the start to know if the subscription has expirerd.
-      BraveVPN.validateReceipt() { expired in
-        if expired == true {
-          BraveVPN.clearConfiguration()
-          logAndStoreError("Receipt expired")
-          return
-        }
-
-        populateRegionDataIfNecessary()
-      }
+      populateRegionDataIfNecessary()
     }
   }
   
@@ -228,12 +220,7 @@ public class BraveVPN {
         }
         
         reconnectPending = false
-        if status == .success {
-          populateRegionDataIfNecessary()
-          completion?(true)
-        } else {
-          completion?(false)
-        }
+        completion?(status == .success)
       }
     } else {
       // New user or no credentials and have to remake them.
@@ -243,14 +230,7 @@ public class BraveVPN {
         }
         
         reconnectPending = false
-        if !success {
-          completion?(false)
-          return
-        }
-        
-        log.debug("Creating credentials and vpn connection successful")
-        populateRegionDataIfNecessary()
-        completion?(true)
+        completion?(success)
       }
     }
   }
