@@ -475,6 +475,7 @@ class UserScriptManager {
       if !AppConstants.buildChannel.isPublic {
         if let script = walletProviderScript,
            tab?.isPrivate == false,
+           (tab?.secureContentState == .localHost || tab?.secureContentState == .secure),
            Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultWallet.value) == .brave {
           $0.addUserScript(script)
           if let providerJS = walletProviderJS {
