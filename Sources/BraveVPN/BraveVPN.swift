@@ -116,7 +116,7 @@ public class BraveVPN {
   public enum State {
     case notPurchased
     /// Purchased and installed
-    case installed(enabled: Bool)
+    case purchased(enabled: Bool)
 
     case expired
 
@@ -125,7 +125,7 @@ public class BraveVPN {
       switch self {
       case .notPurchased, .expired: return BuyVPNViewController(iapObserver: iapObserver)
       // Show nothing, the `Enable` button will now be used to connect and disconnect the vpn.
-      case .installed: return nil
+      case .purchased: return nil
       }
     }
   }
@@ -141,7 +141,7 @@ public class BraveVPN {
       return .expired
     }
 
-    return .installed(enabled: isConnected)
+    return .purchased(enabled: isConnected)
   }
 
   /// Returns true if the user is connected to Brave's vpn at the moment.
@@ -326,7 +326,7 @@ public class BraveVPN {
   // MARK: - VPN Alerts and notifications
   private static func shouldProcessVPNAlerts() -> Bool {
     switch vpnState {
-    case .installed(let enabled):
+    case .purchased(let enabled):
       return enabled
     default:
       return false
@@ -368,7 +368,7 @@ public class BraveVPN {
     switch vpnState {
     case .expired, .notPurchased:
       break
-    case .installed(let enabled):
+    case .purchased(let enabled):
       if !enabled || Preferences.VPN.vpnWorksInBackgroundNotificationShowed.value {
         break
       }
