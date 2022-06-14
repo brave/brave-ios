@@ -138,7 +138,7 @@ public class ActivityShortcutManager: NSObject {
       bvc.popToBVC()
 
       switch BraveVPN.vpnState {
-      case .notPurchased, .purchased, .expired:
+      case .notPurchased, .expired:
         guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
 
         bvc.openInsideSettingsNavigation(with: enableVPNController)

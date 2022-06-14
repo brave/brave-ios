@@ -67,7 +67,6 @@ public class BraveVPN {
           return
         }
 
-        GRDSubscriptionManager.setIsPayingUser(true)
         populateRegionDataIfNecessary()
       }
     }
@@ -103,6 +102,7 @@ public class BraveVPN {
       Preferences.VPN.expirationDate.value = newestReceipt.expiresDate
       Preferences.VPN.freeTrialUsed.value = !newestReceipt.isTrialPeriod
 
+      GRDSubscriptionManager.setIsPayingUser(true)
       receiptHasExpired?(false)
     }
   }
@@ -115,8 +115,6 @@ public class BraveVPN {
   /// A state in which the vpn can be.
   public enum State {
     case notPurchased
-    /// Purchased but not installed
-    case purchased
     /// Purchased and installed
     case installed(enabled: Bool)
 
@@ -126,7 +124,6 @@ public class BraveVPN {
     public var enableVPNDestinationVC: UIViewController? {
       switch self {
       case .notPurchased, .expired: return BuyVPNViewController(iapObserver: iapObserver)
-      case .purchased: return InstallVPNViewController()
       // Show nothing, the `Enable` button will now be used to connect and disconnect the vpn.
       case .installed: return nil
       }
@@ -138,21 +135,11 @@ public class BraveVPN {
     // User hasn't bought or restored the vpn yet.
     // If vpn plan expired, this preference is not set to nil but the date is set to year 1970
     // to force the UI to show expired state.
-    if Preferences.VPN.expirationDate.value == nil { return .notPurchased }
+    if hasExpired == nil { return .notPurchased }
     
     if hasExpired == true {
       return .expired
     }
-    
-    // The app has not expired yet and nothing is in keychain.
-    // This means user has reinstalled the app while their vpn plan is still active.
-    if helper.mainCredential?.mainCredential != true {
-      return .notPurchased
-    }
-    
-    // No VPN config set means the user could buy the vpn but hasn't gone through the second screen
-    // to install the vpn and connect to a server.
-    if NEVPNManager.shared().connection.status == .invalid { return .purchased }
 
     return .installed(enabled: isConnected)
   }
@@ -379,7 +366,7 @@ public class BraveVPN {
   
   public static func sendVPNWorksInBackgroundNotification() {
     switch vpnState {
-    case .expired, .notPurchased, .purchased:
+    case .expired, .notPurchased:
       break
     case .installed(let enabled):
       if !enabled || Preferences.VPN.vpnWorksInBackgroundNotificationShowed.value {
