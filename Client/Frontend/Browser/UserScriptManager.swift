@@ -409,14 +409,6 @@ class UserScriptManager {
       alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
     })
     
-    alteredSource = """
-    (function() {
-      if (window.isSecureContext) {
-        \(alteredSource)
-      }
-    })();
-    """
-    
     return WKUserScript(source: alteredSource,
                         injectionTime: .atDocumentStart,
                         forMainFrameOnly: true,
