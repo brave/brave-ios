@@ -409,6 +409,14 @@ class UserScriptManager {
       alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
     })
     
+    alteredSource = """
+    (function() {
+      if (window.isSecureContext) {
+        \(alteredSource)
+      }
+    })();
+    """
+    
     return WKUserScript(source: alteredSource,
                         injectionTime: .atDocumentStart,
                         forMainFrameOnly: true,
@@ -475,10 +483,16 @@ class UserScriptManager {
       if !AppConstants.buildChannel.isPublic {
         if let script = walletProviderScript,
            tab?.isPrivate == false,
-           (tab?.secureContentState == .localHost || tab?.secureContentState == .secure),
            Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultWallet.value) == .brave {
           $0.addUserScript(script)
-          if let providerJS = walletProviderJS {
+          if var providerJS = walletProviderJS {
+            providerJS = """
+            (function() {
+              if (window.isSecureContext) {
+                \(providerJS)
+              }
+            })();
+            """
             $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
           }
         }
