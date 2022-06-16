@@ -31,33 +31,13 @@ public struct WalletPanelContainerView: View {
   @State private var fetchingInitialKeyring: Bool = true
   
   private enum VisibleScreen: Equatable {
+    case loading
     case panel
     case onboarding
     case unlock
   }
-  
-  private var visibleScreen: VisibleScreen {
-    let keyring = keyringStore.keyring
-    if !keyring.isKeyringCreated || keyringStore.isOnboardingVisible {
-      return .onboarding
-    }
-    if keyring.isLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible {
-      return .unlock
-    }
-    return .panel
-  }
-  
-  private var visibleScreenAnimation: Animation? {
-    if fetchingInitialKeyring {
-      return nil
-    }
-    switch visibleScreen {
-    case .panel:
-      return nil
-    default:
-      return .default
-    }
-  }
+
+  @State private var visibleScreen: VisibleScreen = .loading
   
   private var lockedView: some View {
     VStack(spacing: 36) {
@@ -110,6 +90,12 @@ public struct WalletPanelContainerView: View {
   public var body: some View {
     ZStack {
       switch visibleScreen {
+      case .loading:
+        lockedView
+          .hidden() // used for sizing to prevent #5378
+          .accessibilityHidden(true)
+        Color.white
+          .overlay(ProgressView())
       case .panel:
         if let cryptoStore = walletStore.cryptoStore {
           WalletPanelView(
@@ -138,13 +124,25 @@ public struct WalletPanelContainerView: View {
           .zIndex(2)  // Needed or the dismiss animation messes up
       }
     }
-    .animation(visibleScreenAnimation, value: visibleScreen)
     .frame(idealWidth: 320, maxWidth: .infinity)
     .onAppear {
       fetchingInitialKeyring = keyringStore.keyring.id.isEmpty
     }
     .onChange(of: keyringStore.keyring) { newValue in
       fetchingInitialKeyring = false
+      
+      if !newValue.isKeyringCreated {
+        visibleScreen = .onboarding
+      } else if newValue.isLocked {
+        // only animate when transitioning from .panel to .unlock
+        let shouldAnimate: Bool = visibleScreen == .panel
+        withAnimation(shouldAnimate ? .default : nil) {
+          visibleScreen = .unlock
+        }
+      } else {
+        visibleScreen = .panel
+      }
+      
       if visibleScreen != .panel, !keyringStore.lockedManually {
         presentWalletWithContext?(.panelUnlockOrSetup)
       }
