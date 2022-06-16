@@ -99,13 +99,13 @@ struct EditSiteConnectionView: View {
           Image(uiImage: image)
             .resizable()
             .scaledToFit()
-            .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
             .background(Color(.braveDisabled))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         } else {
           ProgressView()
         }
       }
+      .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
     }
     VStack(alignment: sizeCategory.isAccessibilityCategory ? .center : .leading, spacing: 2) {
       Text(urlOrigin: urlOrigin)
