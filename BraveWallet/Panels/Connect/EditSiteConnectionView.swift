@@ -110,7 +110,6 @@ struct EditSiteConnectionView: View {
     VStack(alignment: sizeCategory.isAccessibilityCategory ? .center : .leading, spacing: 2) {
       Text(urlOrigin: urlOrigin)
         .font(.subheadline)
-        .multilineTextAlignment(.center)
         .foregroundColor(Color(.bravePrimary))
       Text(connectedAddresses)
         .font(.footnote)
