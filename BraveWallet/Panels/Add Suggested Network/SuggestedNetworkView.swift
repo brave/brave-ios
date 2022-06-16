@@ -123,6 +123,7 @@ struct SuggestedNetworkView: View {
           UIPasteboard.general.string = keyringStore.selectedAccount.address
         }) {
           Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "brave.clipboard")
+            .font(.body)
         }
       } label: {
         HStack(spacing: 8) {
