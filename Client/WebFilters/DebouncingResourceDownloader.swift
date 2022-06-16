@@ -25,6 +25,11 @@ public class DebouncingResourceDownloader {
     enum Action: String {
       case base64
       case redirect
+      case regexPath = "regex-path"
+    }
+    
+    enum RuleError: Error {
+      case unsupportedAction(String)
     }
 
     /// A set of patterns that are include in this rule
@@ -38,9 +43,16 @@ public class DebouncingResourceDownloader {
 
     /// Actions in a strictly typed format and split up into an array
     /// - Note: Unrecognized actions will be filtered out
-    var actions: Set<Action> {
+    func makeActions() throws -> Set<Action> {
       let actionStrings = action.split(separator: ",")
-      return Set(actionStrings.compactMap({ Action(rawValue: String($0)) }))
+      
+      return Set(try actionStrings.map({
+        if let action = Action(rawValue: String($0)) {
+          return action
+        } else {
+          throw RuleError.unsupportedAction(String($0))
+        }
+      }))
     }
 
     /// Determines if this url is not excluded in the exclude list
@@ -154,6 +166,28 @@ public class DebouncingResourceDownloader {
     /// 3. If any of the query params (the keys) in the map from #4 above are in URL we might navigate to, apply the corresponding rule
     /// 4. Apply all the rules from bucket C
     func redirectURLOnce(from url: URL) -> URL? {
+      do {
+        guard let pair = try matchingQueryItemAndActions(for: url) else {
+          return nil
+        }
+        
+        return redirectURL(queryItem: pair.queryItem, actions: pair.actions)
+      } catch MatcherRule.RuleError.unsupportedAction(let rawRule) {
+        // We may add new rules in the future. If thats the case, this will throw but we don't want
+        // an error presented or anything to happen because ios is not ready to handle this new rule
+        // But since it's impossible to discriminate a programmer mistake from a new rule added
+        // we at least log this error.
+        log.error("Unsupported rule used for debouncing: `\(rawRule)`")
+        return nil
+      } catch {
+        assertionFailure(error.localizedDescription)
+        return nil
+      }
+    }
+    
+    /// Attempts to find a valid  query param  and a set of actions for the given URL
+    /// - Throws: May throw `DebouncingResourceDownloader.MatcherRule.RuleError`
+    private func matchingQueryItemAndActions(for url: URL) throws -> (queryItem: URLQueryItem, actions: Set<MatcherRule.Action>)? {
       // Extract the redirect URL
       guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
       guard let queryItems = components.queryItems else { return nil }
@@ -168,15 +202,15 @@ public class DebouncingResourceDownloader {
           return nil
         }
 
-        return redirectURL(queryItem: queryItem, actions: entry.rule.actions)
-      } else if let pair = matchingQueryItemsAndActions(for: url, queryItems: queryItems) {
-        return redirectURL(queryItem: pair.queryItem, actions: pair.actions)
+        return (queryItem, try entry.rule.makeActions())
+      } else if let pair = try matchingQueryItemsAndActions(for: url, queryItems: queryItems) {
+        return (pair.queryItem, pair.actions)
       } else if let rule = otherRules.first(where: { $0.handles(url: url) }) {
         guard let queryItem = queryItems.first(where: { $0.name == rule.param }) else {
           return nil
         }
 
-        return redirectURL(queryItem: queryItem, actions: rule.actions)
+        return (queryItem, try rule.makeActions())
       } else {
         return nil
       }
@@ -186,10 +220,11 @@ public class DebouncingResourceDownloader {
     ///
     /// - Parameter queryItems: The query items to extract the value and actions from
     /// - Returns: A raw query item and actions to perform on that query item
+    /// - Throws: May throw `DebouncingResourceDownloader.MatcherRule.RuleError`
     private func matchingQueryItemsAndActions(
       for url: URL,
       queryItems: [URLQueryItem]
-    ) -> (queryItem: URLQueryItem, actions: Set<MatcherRule.Action>)? {
+    ) throws -> (queryItem: URLQueryItem, actions: Set<MatcherRule.Action>)? {
       for queryItem in queryItems {
         guard
           let rule = queryToRule[queryItem.name],
@@ -197,8 +232,8 @@ public class DebouncingResourceDownloader {
         else {
           continue
         }
-
-        return (queryItem, rule.actions)
+        
+        return (queryItem, try rule.makeActions())
       }
 
       return nil
