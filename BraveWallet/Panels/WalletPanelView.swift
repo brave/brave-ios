@@ -47,6 +47,18 @@ public struct WalletPanelContainerView: View {
     return .panel
   }
   
+  private var visibleScreenAnimation: Animation? {
+    if fetchingInitialKeyring {
+      return nil
+    }
+    switch visibleScreen {
+    case .panel:
+      return nil
+    default:
+      return .default
+    }
+  }
+  
   private var lockedView: some View {
     VStack(spacing: 36) {
       Image("graphic-lock", bundle: .current)
@@ -126,7 +138,7 @@ public struct WalletPanelContainerView: View {
           .zIndex(2)  // Needed or the dismiss animation messes up
       }
     }
-    .animation(fetchingInitialKeyring ? nil : .default, value: visibleScreen)
+    .animation(visibleScreenAnimation, value: visibleScreen)
     .frame(idealWidth: 320, maxWidth: .infinity)
     .onAppear {
       fetchingInitialKeyring = keyringStore.keyring.id.isEmpty
