@@ -26,10 +26,6 @@ public struct WalletPanelContainerView: View {
   /// An invisible `UIView` background lives in SwiftUI for UIKit API to reference later
   var buySendSwapBackground: InvisibleUIView = .init()
   
-  // When the screen first apperas the keyring is set as the default value
-  // which causes an unnessary animation
-  @State private var fetchingInitialKeyring: Bool = true
-  
   private enum VisibleScreen: Equatable {
     case loading
     case panel
@@ -125,12 +121,7 @@ public struct WalletPanelContainerView: View {
       }
     }
     .frame(idealWidth: 320, maxWidth: .infinity)
-    .onAppear {
-      fetchingInitialKeyring = keyringStore.keyring.id.isEmpty
-    }
     .onChange(of: keyringStore.keyring) { newValue in
-      fetchingInitialKeyring = false
-      
       if !newValue.isKeyringCreated {
         visibleScreen = .onboarding
       } else if newValue.isLocked {
