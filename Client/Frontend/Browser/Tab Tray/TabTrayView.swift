@@ -10,7 +10,7 @@ import BraveUI
 
 extension TabTrayController {
 
-  class View: UIView {
+  class TabTrayView: UIView {
     private struct UX {
       static let regularCellHeight = 192.0
       static let largeCellHeight = 256.0
