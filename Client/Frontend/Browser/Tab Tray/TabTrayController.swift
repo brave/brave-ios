@@ -8,6 +8,7 @@ import Shared
 import BraveCore
 import BraveShared
 import Combine
+import SnapKit
 
 protocol TabTrayDelegate: AnyObject {
   /// Notifies the delegate that order of tabs on tab tray has changed.
@@ -17,68 +18,8 @@ protocol TabTrayDelegate: AnyObject {
 
 class TabTrayController: LoadingViewController {
 
-  let containerView = UIView().then {
-    $0.backgroundColor = .braveBackground
-  }
+  // MARK: Internal
   
-  let tabContentView = UIView().then {
-    $0.backgroundColor = .braveBackground
-  }
-  
-  var tabTypeSelectorItems = [String]()
-  lazy var tabTypeSelector: UISegmentedControl = {
-    let segmentedControl = UISegmentedControl(items: tabTypeSelectorItems).then {
-      $0.selectedSegmentIndex = 0
-      $0.backgroundColor = .braveBackground
-    }
-    return segmentedControl
-  }()
-  
-  var tabTrayView = TabTrayView()
-  var tabSyncView = TabSyncView()
-  
-  override func loadView() {
-    createTypeSelectorItems()
-    layoutTabTray()
-  }
-  
-  private func layoutTabTray() {
-    setTypeSelectorHidden(privateMode)
-    view = containerView
-  }
-  
-  private func createTypeSelectorItems() {
-    tabTypeSelectorItems = ["Normal Tabs", "Synced Tabs"]
-  }
-  
-  private func setTypeSelectorHidden(_ isHidden: Bool) {
-    tabTypeSelector.removeFromSuperview()
-    tabTrayView.removeFromSuperview()
-    
-    if isHidden {
-      containerView.addSubview(tabTrayView)
-      tabTrayView.snp.makeConstraints {
-        $0.top.equalToSuperview()
-        $0.edges.equalTo(containerView.safeAreaLayoutGuide)
-      }
-    } else {
-      containerView.addSubview(tabTypeSelector)
-      containerView.addSubview(tabTrayView)
-
-      tabTypeSelector.snp.makeConstraints {
-        $0.top.equalTo(containerView.safeAreaLayoutGuide.snp.top).offset(8)
-        $0.left.right.equalTo(containerView).inset(8)
-        $0.bottom.equalTo(tabTrayView.safeAreaLayoutGuide.snp.top).offset(-8)
-      }
-    
-      tabTrayView.snp.makeConstraints {
-        $0.trailing.equalTo(containerView.safeAreaLayoutGuide.snp.trailing)
-        $0.leading.equalTo(containerView.safeAreaLayoutGuide.snp.leading)
-        $0.bottom.equalTo(containerView.safeAreaLayoutGuide.snp.bottom)
-      }
-    }
-  }
-
   enum TabTraySection {
     case main
   }
@@ -87,8 +28,9 @@ class TabTrayController: LoadingViewController {
   typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
 
   let tabManager: TabManager
-  weak var delegate: TabTrayDelegate?
   private let openTabsAPI: BraveOpenTabsAPI
+
+  weak var delegate: TabTrayDelegate?
 
   private(set) lazy var dataSource =
     DataSource(
@@ -109,13 +51,43 @@ class TabTrayController: LoadingViewController {
 
   private var searchTabTrayTimer: Timer?
   private var isTabTrayBeingSearched = false
-  private let tabTraySearchController = UISearchController(searchResultsController: nil)
   private var tabTraySearchQuery = ""
+  private var privateModeCancellable: AnyCancellable?
+  private var initialScrollCompleted = false
+  
+  // MARK: User Interface Elements
+  
+  private let containerView = UIView().then {
+    $0.backgroundColor = .secondaryBraveBackground
+  }
+  
+  private let tabContentView = UIView().then {
+    $0.backgroundColor = .braveBackground
+  }
+  
+  private var tabTypeSelectorItems = [UIImage]()
+  private lazy var tabTypeSelector: UISegmentedControl = {
+    let segmentedControl = UISegmentedControl(items: tabTypeSelectorItems).then {
+      $0.selectedSegmentIndex = 0
+      $0.backgroundColor = .secondaryBraveBackground
+      $0.addTarget(self, action: #selector(typeSelectionDidChange(_:)), for: .valueChanged)
+    }
+    return segmentedControl
+  }()
+  private var tabTypeSelectorHeight: ConstraintItem?
+  
+  var tabTrayView = TabTrayView().then {
+    $0.isHidden = false
+  }
+  
+  var tabSyncView = TabSyncView().then {
+    $0.isHidden = true
+  }
+  
   private var searchBarView: TabTraySearchBar?
+  private let tabTraySearchController = UISearchController(searchResultsController: nil)
 
   private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
-
-  private var privateModeCancellable: AnyCancellable?
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -125,6 +97,8 @@ class TabTrayController: LoadingViewController {
     return view.overrideUserInterfaceStyle == .light ? .darkContent : .lightContent
   }
 
+  // MARK: Lifecycle
+  
   init(tabManager: TabManager, openTabsAPI: BraveOpenTabsAPI) {
     self.tabManager = tabManager
     self.openTabsAPI = openTabsAPI
@@ -209,6 +183,54 @@ class TabTrayController: LoadingViewController {
     }
   }
   
+  override func loadView() {
+    createTypeSelectorItems()
+    layoutTabTray()
+  }
+  
+  private func layoutTabTray() {
+    containerView.addSubview(tabTypeSelector)
+    containerView.addSubview(tabContentView)
+    
+    tabTypeSelector.snp.makeConstraints {
+      $0.top.equalTo(containerView.safeAreaLayoutGuide.snp.top).offset(8)
+      $0.centerX.equalTo(containerView)
+      $0.width.equalTo(containerView.snp.width).dividedBy(2)
+    }
+  
+    tabContentView.snp.makeConstraints {
+      $0.top.equalTo(tabTypeSelector.safeAreaLayoutGuide.snp.bottom).offset(8)
+      $0.trailing.equalTo(containerView.safeAreaLayoutGuide.snp.trailing)
+      $0.leading.equalTo(containerView.safeAreaLayoutGuide.snp.leading)
+      $0.bottom.equalTo(containerView.safeAreaLayoutGuide.snp.bottom)
+    }
+    
+    tabContentView.addSubview(tabTrayView)
+    tabContentView.addSubview(tabSyncView)
+    
+    tabTrayView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
+    
+    tabSyncView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
+    
+    tabTypeSelectorHeight = tabTypeSelector.snp.height
+
+    view = containerView
+  }
+  
+  private func createTypeSelectorItems() {
+    tabTypeSelectorItems = [UIImage(systemName: "square.on.square")!.template,
+                            UIImage(systemName: "laptopcomputer.and.iphone")!.template]
+  }
+  
+  @objc func typeSelectionDidChange(_ sender: UISegmentedControl) {
+    tabTrayView.isHidden = sender.selectedSegmentIndex == 1
+    tabSyncView.isHidden = sender.selectedSegmentIndex == 0
+  }
+  
   private func updateColors(_ isPrivateBrowsing: Bool) {
     if isPrivateBrowsing {
       overrideUserInterfaceStyle = .dark
@@ -219,8 +241,6 @@ class TabTrayController: LoadingViewController {
     
     setNeedsStatusBarAppearanceUpdate()
   }
-
-  private var initialScrollCompleted = false
 
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
@@ -328,22 +348,20 @@ class TabTrayController: LoadingViewController {
     // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
     tabManager.resetSelectedIndex()
     if privateMode {
-      navigationController?.setNavigationBarHidden(true, animated: false)
-      setTypeSelectorHidden(true)
-      
       tabTrayView.showPrivateModeInfo()
       // New private tab is created immediately to reflect changes on NTP.
       // If user drags the modal down or dismisses it, a new private tab will be ready.
       tabManager.addTabAndSelect(isPrivate: true)
     } else {
-      navigationController?.setNavigationBarHidden(false, animated: false)
-      setTypeSelectorHidden(false)
-      
       tabTrayView.hidePrivateModeInfo()
       // When you go back from private mode, a first tab is selected.
       // So when you dismiss the modal, correct tab and url is showed.
       tabManager.selectTab(tabManager.tabsForCurrentMode.first)
     }
+    
+    navigationController?.setNavigationBarHidden(privateMode, animated: false)
+    tabTypeSelector.isHidden = privateMode
+
   }
 
   private func remove(tab: Tab) {
