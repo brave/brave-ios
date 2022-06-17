@@ -17,12 +17,66 @@ protocol TabTrayDelegate: AnyObject {
 
 class TabTrayController: LoadingViewController {
 
-  var tabTrayView: View {
-    return view as! View  // swiftlint:disable:this force_cast
+  let containerView = UIView().then {
+    $0.backgroundColor = .braveBackground
   }
-
+  
+  let tabContentView = UIView().then {
+    $0.backgroundColor = .braveBackground
+  }
+  
+  var tabTypeSelectorItems = [String]()
+  lazy var tabTypeSelector: UISegmentedControl = {
+    let segmentedControl = UISegmentedControl(items: tabTypeSelectorItems).then {
+      $0.selectedSegmentIndex = 0
+      $0.backgroundColor = .braveBackground
+    }
+    return segmentedControl
+  }()
+  
+  var tabTrayView = TabTrayView()
+  var tabSyncView = TabSyncView()
+  
   override func loadView() {
-    view = View()
+    createTypeSelectorItems()
+    layoutTabTray()
+  }
+  
+  private func layoutTabTray() {
+    setTypeSelectorHidden(privateMode)
+    view = containerView
+  }
+  
+  private func createTypeSelectorItems() {
+    tabTypeSelectorItems = ["Normal Tabs", "Synced Tabs"]
+  }
+  
+  private func setTypeSelectorHidden(_ isHidden: Bool) {
+    tabTypeSelector.removeFromSuperview()
+    tabTrayView.removeFromSuperview()
+    
+    if isHidden {
+      containerView.addSubview(tabTrayView)
+      tabTrayView.snp.makeConstraints {
+        $0.top.equalToSuperview()
+        $0.edges.equalTo(containerView.safeAreaLayoutGuide)
+      }
+    } else {
+      containerView.addSubview(tabTypeSelector)
+      containerView.addSubview(tabTrayView)
+
+      tabTypeSelector.snp.makeConstraints {
+        $0.top.equalTo(containerView.safeAreaLayoutGuide.snp.top).offset(8)
+        $0.left.right.equalTo(containerView).inset(8)
+        $0.bottom.equalTo(tabTrayView.safeAreaLayoutGuide.snp.top).offset(-8)
+      }
+    
+      tabTrayView.snp.makeConstraints {
+        $0.trailing.equalTo(containerView.safeAreaLayoutGuide.snp.trailing)
+        $0.leading.equalTo(containerView.safeAreaLayoutGuide.snp.leading)
+        $0.bottom.equalTo(containerView.safeAreaLayoutGuide.snp.bottom)
+      }
+    }
   }
 
   enum TabTraySection {
@@ -270,22 +324,26 @@ class TabTrayController: LoadingViewController {
 
     tabManager.willSwitchTabMode(leavingPBM: privateMode)
     privateMode.toggle()
+    
     // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
     tabManager.resetSelectedIndex()
     if privateMode {
+      navigationController?.setNavigationBarHidden(true, animated: false)
+      setTypeSelectorHidden(true)
+      
       tabTrayView.showPrivateModeInfo()
       // New private tab is created immediately to reflect changes on NTP.
       // If user drags the modal down or dismisses it, a new private tab will be ready.
       tabManager.addTabAndSelect(isPrivate: true)
     } else {
+      navigationController?.setNavigationBarHidden(false, animated: false)
+      setTypeSelectorHidden(false)
+      
       tabTrayView.hidePrivateModeInfo()
       // When you go back from private mode, a first tab is selected.
       // So when you dismiss the modal, correct tab and url is showed.
       tabManager.selectTab(tabManager.tabsForCurrentMode.first)
     }
-
-    // Disable Search when Private mode info is on
-    navigationController?.setNavigationBarHidden(privateMode, animated: false)
   }
 
   private func remove(tab: Tab) {
