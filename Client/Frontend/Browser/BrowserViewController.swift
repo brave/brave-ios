@@ -2365,7 +2365,7 @@ extension BrowserViewController: TabDelegate {
   }
   
   func isTabVisible(_ tab: Tab) -> Bool {
-    tabManager.selectedTab == tab
+    tabManager.selectedTab === tab
   }
 
   func updateURLBarWalletButton() {
