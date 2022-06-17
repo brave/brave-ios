@@ -1549,25 +1549,24 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         }
         break
       }
-
-      let policies = [
-        SecPolicyCreateBasicX509(),
-        SecPolicyCreateSSL(true, tab.webView?.url?.host as CFString?),
-      ]
-
-      SecTrustSetPolicies(serverTrust, policies as CFTypeRef)
-      let queue = DispatchQueue.global()
-      queue.async {
-        SecTrustEvaluateAsyncWithError(serverTrust, queue) { _, secTrustResult, _ in
-          DispatchQueue.main.async {
-            if secTrustResult {
-              tab.secureContentState = .secure
-            } else {
-              tab.secureContentState = .insecure
-            }
-            self.updateURLBar()
+      
+      BraveCertificateUtils.evaluateTrust(serverTrust, for: tab.webView?.url?.host) { [weak tab] error in
+        guard let tab = tab else {
+          return
+        }
+        
+        if let error = error {
+          tab.secureContentState = .insecure
+          log.debug(error)
+        } else {
+          if let webView = tab.webView {
+            tab.secureContentState = webView.hasOnlySecureContent ? .secure : .insecure
+          } else {
+            tab.secureContentState = .secure
           }
         }
+        
+        self.updateURLBar()
       }
     default:
       assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")

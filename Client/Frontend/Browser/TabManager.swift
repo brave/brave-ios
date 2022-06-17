@@ -1144,6 +1144,34 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
           pref = preference
         })
     }
+    
+    // Mixed-Content validation
+    if res != .cancel,
+       !webView.hasOnlySecureContent,
+       let url = navigationAction.request.url,
+       url.scheme == "http" || url.scheme == "ws",
+       !url.isLocal {
+      
+      // Block only form requests
+      if let contentType =  navigationAction.request.allHTTPHeaderFields?["Content-Type"]?.lowercased(),
+         contentType.contains("form") {  // application/x-www-form-urlencoded || multipart/form-data
+        
+        let alert = UIAlertController(title: Strings.errorPagesMixedContentTitle,
+                                      message: Strings.errorPagesMixedContentDescription,
+                                      preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.errorPagesSendAnyway, style: .default, handler: { _ in
+          decisionHandler(.allow, pref)
+        }))
+        
+        alert.addAction(UIAlertAction(title: Strings.CancelString, style: .destructive, handler: { _ in
+          decisionHandler(.cancel, pref)
+        }))
+        
+        webView.currentScene?.browserViewController?.present(alert, animated: true, completion: nil)
+        return
+      }
+    }
 
     decisionHandler(res, pref)
   }

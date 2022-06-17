@@ -331,6 +331,12 @@ extension BrowserViewController: WKNavigationDelegate {
         self.tabManager.selectedTab?.alertShownCount = 0
         self.tabManager.selectedTab?.blockAllAlerts = false
       }
+      
+      // Mixed-Content validation
+      if let target = navigationAction.targetFrame?.request.url,
+         url.scheme == "http", target.scheme == "https" {
+        return
+      }
 
       decisionHandler(.allow, preferences)
       return

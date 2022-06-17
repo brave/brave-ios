@@ -794,6 +794,12 @@ extension Strings {
   public static let errorPagesNoInternetTryItem1 = NSLocalizedString("ErrorPagesNoInternetTryItem1", tableName: "BraveShared", bundle: .strings, value: "Checking the network cables, modem, and router", comment: "List of things to try when internet is not working")
 
   public static let errorPagesNoInternetTryItem2 = NSLocalizedString("ErrorPagesNoInternetTryItem2", tableName: "BraveShared", bundle: .strings, value: "Reconnecting to Wi-Fi", comment: "List of things to try when internet is not working")
+  
+  public static let errorPagesMixedContentTitle = NSLocalizedString("ErrorPagesMixedContentTitle", tableName: "BraveShared", bundle: .strings, value: "The information you're about to submit is not secure", comment: "Title of the page when mixed-content is about to be executed")
+  
+  public static let errorPagesMixedContentDescription = NSLocalizedString("ErrorPagesMixedContentDescription", tableName: "BraveShared", bundle: .strings, value: "This form is being submitted using a connection that's not secure, your information will be visible to others.", comment: "Description of the page when mixed-content is about to be executed")
+  
+  public static let errorPagesSendAnyway = NSLocalizedString("ErrorPagesSendAnyway", tableName: "BraveShared", bundle: .strings, value: "Send Anyway", comment: "Title of the button on the error page, to send information anyway, when a page is not secure")
 }
 
 // MARK: - Sync

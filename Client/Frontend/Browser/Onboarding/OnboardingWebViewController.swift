@@ -148,23 +148,17 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   private func updateWebPageSecurity() {
     if let trust = webView.serverTrust {
       toolbar.secureIcon.isHidden = false
-
-      let policies = [
-        SecPolicyCreateBasicX509(),
-        SecPolicyCreateSSL(true, webView.url?.host as CFString?),
-      ]
-
-      SecTrustSetPolicies(trust, policies as CFTypeRef)
-
-      var error: CFError?
-      let result = SecTrustEvaluateWithError(trust, &error)
-
-      if result && webView.hasOnlySecureContent {
-        toolbar.secureIcon.tintColor = UX.secureWebPageColor
-        toolbar.urlLabel.textColor = UX.secureWebPageColor
-      } else {
-        toolbar.secureIcon.tintColor = UX.insecureWebPageColor
-        toolbar.urlLabel.textColor = UX.insecureWebPageColor
+      
+      BraveCertificateUtils.evaluateTrust(trust, for: webView.url?.host) { [weak self] error in
+        guard let self = self else { return }
+        
+        if error != nil {
+          self.toolbar.secureIcon.tintColor = UX.insecureWebPageColor
+          self.toolbar.urlLabel.textColor = UX.insecureWebPageColor
+        } else {
+          self.toolbar.secureIcon.tintColor = UX.secureWebPageColor
+          self.toolbar.urlLabel.textColor = UX.secureWebPageColor
+        }
       }
     } else {
       toolbar.secureIcon.isHidden = true

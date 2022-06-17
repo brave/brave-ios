@@ -189,7 +189,6 @@ public extension BraveCertificateUtils {
   
   static func evaluateTrust(_ trust: SecTrust, for host: String?, completion: @escaping (_ error: NSError?) -> Void) {
     let policies = [
-      SecPolicyCreateBasicX509(),
       SecPolicyCreateSSL(true, host as CFString?),
     ]
 
@@ -198,7 +197,7 @@ public extension BraveCertificateUtils {
     queue.async {
       let result = SecTrustEvaluateAsyncWithError(trust, queue) { _, isTrusted, error in
         DispatchQueue.main.async {
-          if let error = error {
+          if !isTrusted, let error = error {
             completion(error as Error as NSError)
           } else {
             completion(nil)
