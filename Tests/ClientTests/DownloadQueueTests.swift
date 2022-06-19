@@ -56,6 +56,23 @@ class DownloadQueueTests: XCTestCase {
     XCTAssertEqual(download3.receivedMessages, [.pause])
   }
 
+  func test_resumeAll_sendsResumeMessageForIncompleteDownloads() {
+    let (sut, _) = makeSUT()
+    let download1 = DownloadSpy()
+    let download2 = DownloadSpy()
+    let download3 = DownloadSpy()
+    sut.downloads = [download1, download2, download3]
+
+    sut.resumeAll()
+
+    XCTAssertFalse(download1.isComplete)
+    XCTAssertFalse(download2.isComplete)
+    XCTAssertFalse(download3.isComplete)
+    XCTAssertEqual(download1.receivedMessages, [.resume])
+    XCTAssertEqual(download2.receivedMessages, [.resume])
+    XCTAssertEqual(download3.receivedMessages, [.resume])
+  }
+
   func test_downloadDidCompleteWithError_whenErrorIsEmpty_doNothing() {
     let (sut, delegate) = makeSUT()
     let download = Download()
