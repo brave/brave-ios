@@ -39,6 +39,23 @@ class DownloadQueueTests: XCTestCase {
     XCTAssertEqual(download3.receivedMessages, [.cancel])
   }
 
+  func test_pauseAll_sendsPauseMessageForIncompleteDownloads() {
+    let (sut, _) = makeSUT()
+    let download1 = DownloadSpy()
+    let download2 = DownloadSpy()
+    let download3 = DownloadSpy()
+    sut.downloads = [download1, download2, download3]
+
+    sut.pauseAll()
+
+    XCTAssertFalse(download1.isComplete)
+    XCTAssertFalse(download2.isComplete)
+    XCTAssertFalse(download3.isComplete)
+    XCTAssertEqual(download1.receivedMessages, [.pause])
+    XCTAssertEqual(download2.receivedMessages, [.pause])
+    XCTAssertEqual(download3.receivedMessages, [.pause])
+  }
+
   func test_downloadDidCompleteWithError_whenErrorIsEmpty_doNothing() {
     let (sut, delegate) = makeSUT()
     let download = Download()
@@ -158,6 +175,7 @@ private class DownloadSpy: Download {
     enum Message {
       case resume
       case cancel
+      case pause
     }
 
     var receivedMessages: [Message] = []
@@ -168,6 +186,10 @@ private class DownloadSpy: Download {
     
     override func cancel() {
       receivedMessages.append(.cancel)
+    }
+
+    override func pause() {
+      receivedMessages.append(.pause)
     }
 }
 
