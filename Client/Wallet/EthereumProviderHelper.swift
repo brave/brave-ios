@@ -74,9 +74,11 @@ class EthereumProviderHelper: TabContentScript {
           JSONSerialization.isValidJSONObject(message.body),
           let messageData = try? JSONSerialization.data(withJSONObject: message.body, options: []),
           let body = try? JSONDecoder().decode(MessageBody.self, from: messageData),
-          body.securityToken == UserScriptManager.securityTokenString
+          body.securityToken == UserScriptManager.securityTokenString,
+          message.webView?.hasOnlySecureContent == true  // prevent communication in mixed-content scenarios
     else {
       log.error("Failed to handle ethereum provider communication")
+      replyHandler(nil, "Failed Security Test")
       return
     }
     
