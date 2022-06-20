@@ -8,6 +8,7 @@ import Shared
 import BraveCore
 import BraveShared
 import Combine
+import Data
 import SnapKit
 
 protocol TabTrayDelegate: AnyObject {
@@ -18,14 +19,14 @@ protocol TabTrayDelegate: AnyObject {
 
 class TabTrayController: LoadingViewController {
 
+  typealias DataSource = UICollectionViewDiffableDataSource<TabTraySection, Tab>
+  typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
+  
   // MARK: Internal
   
   enum TabTraySection {
     case main
   }
-
-  typealias DataSource = UICollectionViewDiffableDataSource<TabTraySection, Tab>
-  typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
 
   let tabManager: TabManager
   private let openTabsAPI: BraveOpenTabsAPI
@@ -38,6 +39,9 @@ class TabTrayController: LoadingViewController {
       cellProvider: { [weak self] collectionView, indexPath, tab -> UICollectionViewCell? in
         self?.cellProvider(collectionView: collectionView, indexPath: indexPath, tab: tab)
       })
+  
+  private(set) var sessionList = [OpenDistantSession]()
+  var hiddenSections = Set<Int>()
 
   private(set) var privateMode: Bool = false {
     didSet {
@@ -80,11 +84,11 @@ class TabTrayController: LoadingViewController {
   }()
   private var tabTypeSelectorHeight: ConstraintItem?
   
-  var tabTrayView = TabTrayView().then {
+  var tabTrayView = TabTrayContainerView().then {
     $0.isHidden = false
   }
   
-  var tabSyncView = TabSyncView().then {
+  var tabSyncView = TabSyncContainerView().then {
     $0.isHidden = true
   }
   
@@ -216,8 +220,11 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
-    openTabsAPI.getSyncedSessions() { sessionList in
-      print(" List \(sessionList)")
+    openTabsAPI.getSyncedSessions() { [weak self] sessions in
+      guard let self = self else { return }
+      
+      self.sessionList = sessions
+      self.tabSyncView.tableView.reloadData()
     }
   }
   
@@ -519,11 +526,80 @@ extension TabTrayController: UIScrollViewAccessibilityDelegate {
 }
 
 extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
+  
+  func numberOfSections(in tableView: UITableView) -> Int {
+    sessionList.count
+  }
+  
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    0
+    sessionList[safe: section]?.tabs.count ?? 0
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    UITableViewCell()
+    let cell = tableView.dequeueReusableCell(withIdentifier: "SiteTableCellIdentifier", for: indexPath)
+    if self.tableView(tableView, hasFullWidthSeparatorForRowAtIndexPath: indexPath) {
+      cell.separatorInset = .zero
+    }
+    
+    configureCell(cell, atIndexPath: indexPath)
+
+    return cell
+  }
+  
+  func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
+    guard let cell = cell as? TwoLineTableViewCell else { return }
+
+    guard let distantTab = sessionList[safe: indexPath.section]?.tabs[safe: indexPath.row] else {
+      return
+    }
+
+    cell.do {
+      $0.backgroundColor = UIColor.clear
+      $0.setLines(distantTab.title, detailText: distantTab.url.absoluteString)
+
+      $0.imageView?.contentMode = .scaleAspectFit
+      $0.imageView?.image = FaviconFetcher.defaultFaviconImage
+      $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+      $0.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
+      $0.imageView?.layer.cornerRadius = 6
+      $0.imageView?.layer.cornerCurve = .continuous
+      $0.imageView?.layer.masksToBounds = true
+
+      let domain = Domain.getOrCreate(
+        forUrl: distantTab.url,
+        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+
+      if let url = domain.url?.asURL {
+        cell.imageView?.loadFavicon(
+          for: url,
+          domain: domain,
+          fallbackMonogramCharacter: distantTab.title?.first,
+          shouldClearMonogramFavIcon: false,
+          cachedOnly: true)
+      } else {
+        cell.imageView?.clearMonogramFavicon()
+        cell.imageView?.image = FaviconFetcher.defaultFaviconImage
+      }
+    }
+  }
+  
+  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    SiteTableViewControllerUX.headerHeight
+  }
+
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    SiteTableViewControllerUX.rowHeight
+  }
+  
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    guard let sectionDetails = sessionList[safe: section] else {
+      return ""
+    }
+      
+    return "\(sectionDetails.name ?? "") \(sectionDetails.modifiedTime?.description ?? "")"
+  }
+
+  public func tableView(_ tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: IndexPath) -> Bool {
+    false
   }
 }
