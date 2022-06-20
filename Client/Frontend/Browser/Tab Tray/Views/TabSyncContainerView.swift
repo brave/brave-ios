@@ -7,25 +7,19 @@ import UIKit
 import Shared
 import BraveShared
 import BraveUI
-import AudioToolbox
 
 extension TabTrayController {
 
-  class TabSyncView: UIView {
+  class TabSyncContainerView: UIView {
     
     // MARK: UX
 
     struct UX {
       static let sectionTopPadding: CGFloat = 5
-    }
-
-    // MARK: Constants
-
-    struct Constants {
       static let siteTableCellIdentifier = "SiteTableCellIdentifier"
       static let siteTableHeaderIdentifier = "SiteTableHeaderIdentifier"
     }
-    
+
     var tableView = UITableView()
 
     override init(frame: CGRect) {
@@ -41,10 +35,10 @@ extension TabTrayController {
       tableView.do {
         $0.register(
           SiteTableViewCell.self,
-          forCellReuseIdentifier: Constants.siteTableCellIdentifier)
+          forCellReuseIdentifier: UX.siteTableCellIdentifier)
         $0.register(
           SiteTableViewHeader.self,
-          forHeaderFooterViewReuseIdentifier: Constants.siteTableHeaderIdentifier)
+          forHeaderFooterViewReuseIdentifier: UX.siteTableHeaderIdentifier)
         $0.layoutMargins = .zero
         $0.backgroundColor = .secondaryBraveBackground
         $0.separatorColor = .braveSeparator

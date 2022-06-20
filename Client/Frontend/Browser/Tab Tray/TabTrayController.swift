@@ -8,6 +8,7 @@ import Shared
 import BraveCore
 import BraveShared
 import Combine
+import Data
 import SnapKit
 
 protocol TabTrayDelegate: AnyObject {
@@ -18,14 +19,14 @@ protocol TabTrayDelegate: AnyObject {
 
 class TabTrayController: LoadingViewController {
 
+  typealias DataSource = UICollectionViewDiffableDataSource<TabTraySection, Tab>
+  typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
+  
   // MARK: Internal
   
   enum TabTraySection {
     case main
   }
-
-  typealias DataSource = UICollectionViewDiffableDataSource<TabTraySection, Tab>
-  typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
 
   let tabManager: TabManager
   private let openTabsAPI: BraveOpenTabsAPI
@@ -38,6 +39,9 @@ class TabTrayController: LoadingViewController {
       cellProvider: { [weak self] collectionView, indexPath, tab -> UICollectionViewCell? in
         self?.cellProvider(collectionView: collectionView, indexPath: indexPath, tab: tab)
       })
+  
+  private(set) var sessionList = [OpenDistantSession]()
+  var hiddenSections = Set<Int>()
 
   private(set) var privateMode: Bool = false {
     didSet {
@@ -80,11 +84,11 @@ class TabTrayController: LoadingViewController {
   }()
   private var tabTypeSelectorHeight: ConstraintItem?
   
-  var tabTrayView = TabTrayView().then {
+  var tabTrayView = TabTrayContainerView().then {
     $0.isHidden = false
   }
   
-  var tabSyncView = TabSyncView().then {
+  var tabSyncView = TabSyncContainerView().then {
     $0.isHidden = true
   }
   
@@ -216,8 +220,11 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
-    openTabsAPI.getSyncedSessions() { sessionList in
-      print(" List \(sessionList)")
+    openTabsAPI.getSyncedSessions() { [weak self] sessions in
+      guard let self = self else { return }
+      
+      self.sessionList = sessions
+      self.tabSyncView.tableView.reloadData()
     }
   }
   
