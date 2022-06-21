@@ -525,7 +525,7 @@ extension TabTrayController: UIScrollViewAccessibilityDelegate {
   }
 }
 
-extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
+extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSyncHeaderViewDelegate {
   
   func numberOfSections(in tableView: UITableView) -> Int {
     sessionList.count
@@ -583,23 +583,34 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
     }
   }
   
-  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     SiteTableViewControllerUX.headerHeight
   }
 
-  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     SiteTableViewControllerUX.rowHeight
   }
   
-  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     guard let sectionDetails = sessionList[safe: section] else {
-      return ""
+      return nil
     }
-      
-    return "\(sectionDetails.name ?? "") \(sectionDetails.modifiedTime?.description ?? "")"
+    
+    let headerView = tableView.dequeueReusableHeaderFooter() as TabSyncHeaderView
+  
+    headerView.titleLabel.text = "\(sectionDetails.name ?? "") \(sectionDetails.modifiedTime?.description ?? "")"
+    headerView.arrowLabel.text = ">"
+    headerView.section = section
+    headerView.delegate = self
+         
+    return headerView
+  }
+  
+  func tableView(_ tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: IndexPath) -> Bool {
+    false
   }
 
-  public func tableView(_ tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: IndexPath) -> Bool {
-    false
+  func toggleSection(_ header: TabSyncHeaderView, section: Int) {
+  
   }
 }

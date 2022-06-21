@@ -17,7 +17,6 @@ extension TabTrayController {
     struct UX {
       static let sectionTopPadding: CGFloat = 5
       static let siteTableCellIdentifier = "SiteTableCellIdentifier"
-      static let siteTableHeaderIdentifier = "SiteTableHeaderIdentifier"
     }
 
     var tableView = UITableView()
@@ -36,9 +35,7 @@ extension TabTrayController {
         $0.register(
           SiteTableViewCell.self,
           forCellReuseIdentifier: UX.siteTableCellIdentifier)
-        $0.register(
-          SiteTableViewHeader.self,
-          forHeaderFooterViewReuseIdentifier: UX.siteTableHeaderIdentifier)
+        $0.registerHeaderFooter(TabSyncHeaderView.self)
         $0.layoutMargins = .zero
         $0.backgroundColor = .secondaryBraveBackground
         $0.separatorColor = .braveSeparator
