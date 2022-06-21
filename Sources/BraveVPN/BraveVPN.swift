@@ -74,11 +74,17 @@ public class BraveVPN {
     }
   }
   
+  public static var receipt: String? {
+    guard let receiptUrl = Bundle.main.appStoreReceiptURL,
+          let receipt = try? Data(contentsOf: receiptUrl).base64EncodedString else { return nil }
+    
+    return receipt
+  }
+  
   /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
-    guard let receiptUrl = Bundle.main.appStoreReceiptURL,
-          let receipt = try? Data(contentsOf: receiptUrl).base64EncodedString else {
+    guard let receipt = receipt else {
       receiptHasExpired?(nil)
       return
     }

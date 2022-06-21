@@ -58,3 +58,14 @@ writable: false,
     }
 }
 });
+
+Object.defineProperty(window.chrome, 'braveVpn', {
+enumerable: false,
+configurable: true,
+writable: false,
+    value: {
+    receipt() {
+        return window.__firefox__.$<brave-skus-helper>.sendMessage(5, { });
+    }
+}
+});
