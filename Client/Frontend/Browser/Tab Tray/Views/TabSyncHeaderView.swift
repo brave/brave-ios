@@ -4,23 +4,28 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import UIKit
+import BraveUI
 
 protocol TabSyncHeaderViewDelegate {
     func toggleSection(_ header: TabSyncHeaderView, section: Int)
 }
 
-class TabSyncHeaderView: UITableViewHeaderFooterView {
+class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
   var section: Int = 0
     
   let titleLabel = UILabel().then {
     $0.textColor = .braveLabel
+    $0.font = .preferredFont(forTextStyle: .footnote, weight: .semibold)
+    $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
   }
   
   let arrowLabel = UILabel().then {
     $0.textColor = .braveLabel
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.font = .preferredFont(forTextStyle: .headline)
+    $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
   }
     
   override init(reuseIdentifier: String?) {
@@ -30,13 +35,15 @@ class TabSyncHeaderView: UITableViewHeaderFooterView {
     contentView.addSubview(arrowLabel)
     contentView.addSubview(titleLabel)
 
-    arrowLabel.snp.makeConstraints {
-      $0.top.leading.bottom.equalTo(layoutMarginsGuide)
-      $0.trailing.equalTo(arrowLabel.snp.leading)
+    titleLabel.snp.makeConstraints {
+      $0.leading.equalToSuperview().inset(TwoLineCellUX.borderViewMargin)
+      $0.top.bottom.equalToSuperview()
     }
     
     arrowLabel.snp.makeConstraints {
-      $0.top.bottom.leading.equalTo(layoutMarginsGuide)
+      $0.trailing.equalToSuperview().inset(TwoLineCellUX.borderViewMargin)
+      $0.top.bottom.trailing.equalToSuperview()
+      $0.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).inset(-TwoLineCellUX.borderViewMargin)
     }
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapHeader(_:))))
