@@ -14,6 +14,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
   var section: Int = 0
+  var collapsed: Bool = false
     
   let titleLabel = UILabel().then {
     $0.textColor = .braveLabel
@@ -24,8 +25,8 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
   let arrowLabel = UILabel().then {
     $0.textColor = .braveLabel
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    $0.font = .preferredFont(forTextStyle: .headline)
     $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+    $0.text = ">"
   }
     
   override init(reuseIdentifier: String?) {
@@ -57,11 +58,18 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     guard let cell = gestureRecognizer.view as? TabSyncHeaderView else {
       return
     }
+    
+    setCollapsed { [weak self] in
+      guard let self = self else { return }
+      
+      self.delegate?.toggleSection(self, section: cell.section)
+    }
         
-    delegate?.toggleSection(self, section: cell.section)
   }
     
-  func setCollapsed(_ collapsed: Bool) {
+  func setCollapsed(completion: (() -> Void)? = nil) {
+    CATransaction.begin()
+    
     let animation = CABasicAnimation(keyPath: "transform.rotation").then {
       $0.toValue = collapsed ? 0.0 : .pi / 2
       $0.duration = 0.2
@@ -69,6 +77,14 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
       $0.fillMode = CAMediaTimingFillMode.forwards
     }
 
+    CATransaction.setCompletionBlock { [weak self] in
+      guard let self = self else { return }
+      self.collapsed = !self.collapsed
+      completion?()
+    }
+    
     arrowLabel.layer.add(animation, forKey: nil)
+    
+    CATransaction.commit()
   }
 }
