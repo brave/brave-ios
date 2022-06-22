@@ -32,6 +32,7 @@ class TabTrayController: LoadingViewController {
   private let openTabsAPI: BraveOpenTabsAPI
 
   weak var delegate: TabTrayDelegate?
+  weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
 
   private(set) lazy var dataSource =
     DataSource(
@@ -125,7 +126,7 @@ class TabTrayController: LoadingViewController {
   }
   
   private var searchBarView: TabTraySearchBar?
-  private let tabTraySearchController = UISearchController(searchResultsController: nil)
+  let tabTraySearchController = UISearchController(searchResultsController: nil)
 
   private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
 
@@ -437,18 +438,6 @@ class TabTrayController: LoadingViewController {
         $0.edges.equalTo(tabTrayView.collectionView)
       }
     }
-  }
-}
-
-// MARK: UICollectionViewDelegate
-
-extension TabTrayController: UICollectionViewDelegate {
-  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    guard let tab = dataSource.itemIdentifier(for: indexPath) else { return }
-    tabManager.selectTab(tab)
-
-    tabTraySearchController.isActive = false
-    dismiss(animated: true)
   }
 }
 

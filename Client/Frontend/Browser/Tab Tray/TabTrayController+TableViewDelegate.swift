@@ -119,4 +119,20 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
       tabSyncView.tableView.deleteRows(at: indexPathsForSection(), with: .fade)
     }
   }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let distantTab = sessionList[safe: indexPath.section]?.tabs[safe: indexPath.row] else {
+      return
+    }
+    
+    tabTraySearchController.isActive = false
+
+    if let url = URL(string: distantTab.url.absoluteString) {
+      dismiss(animated: true) {
+        self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
+      }
+    }
+
+    tableView.deselectRow(at: indexPath, animated: true)
+  }
 }

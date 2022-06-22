@@ -13,8 +13,8 @@ protocol TabSyncHeaderViewDelegate {
 class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
-  var section: Int = 0
-  var collapsed: Bool = false
+  var section = 0
+  var collapsed = false
     
   let titleLabel = UILabel().then {
     $0.textColor = .braveLabel
@@ -64,7 +64,6 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
       
       self.delegate?.toggleSection(self, section: cell.section)
     }
-        
   }
     
   func setCollapsed(completion: (() -> Void)? = nil) {
