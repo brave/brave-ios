@@ -5,6 +5,18 @@
 
 import UIKit
 
+// MARK: UICollectionViewDelegate
+
+extension TabTrayController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard let tab = dataSource.itemIdentifier(for: indexPath) else { return }
+    tabManager.selectTab(tab)
+
+    tabTraySearchController.isActive = false
+    dismiss(animated: true)
+  }
+}
+
 // MARK: UICollectionViewDragDelegate
 
 extension TabTrayController: UICollectionViewDragDelegate {
