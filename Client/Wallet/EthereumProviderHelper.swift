@@ -82,7 +82,7 @@ class EthereumProviderHelper: TabContentScript {
     
     if message.webView?.url?.isLocal == false,
         message.webView?.hasOnlySecureContent == false { // prevent communication in mixed-content scenarios
-      replyHandler(nil, "Failed Security Test")
+      log.error("Failed ethereum provider communication security test")
       return
     }
     
