@@ -135,13 +135,16 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   func handleProvidingReceipt() {
+    print("bxx 5")
     guard let receipt = BraveVPN.receipt else { return }
     let json: [String: Any] = [
       "type": "ios",
       "raw_receipt": receipt
     ]
     
-    self.callback(methodId: 5, result: json)
+    if let base64json = try? JSONSerialization.data(withJSONObject: json).base64EncodedString {
+      self.callback(methodId: 5, result: base64json)
+    }
   }
   
   private func callback(methodId: Int, result: Any) {
