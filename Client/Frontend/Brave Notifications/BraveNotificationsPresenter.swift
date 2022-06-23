@@ -168,7 +168,7 @@ class BraveNotificationsPresenter: UIViewController {
   private func enqueueNotification(_ notification: BraveNotification) {
     // We will skip duplication checking for notifications that have empty id. These notifications are usually custom ads
     if !notification.id.isEmpty,
-       notificationsQueue.contains(where: { $0.id == notification.id }) {
+       notificationsQueue.contains(where: { $0.id == notification.id }) || visibleNotification?.id == notification.id {
       return
     }
     
