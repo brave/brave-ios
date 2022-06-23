@@ -965,7 +965,7 @@
 "wallet.transactionStatusConfirmed" = "已确认";
 
 /* A status that explains that the transaction has been dropped due to some error */
-"wallet.transactionStatusDropped" = "放弃";
+"wallet.transactionStatusDropped" = "取消";
 
 /* A status that explains that the transaction failed due to some error */
 "wallet.transactionStatusError" = "错误";
