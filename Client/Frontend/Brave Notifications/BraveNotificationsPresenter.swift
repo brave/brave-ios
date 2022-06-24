@@ -60,6 +60,9 @@ class BraveNotificationsPresenter: UIViewController {
         enqueueNotification(notification)
         return
       } else {
+        if let timer = dismissTimers[visibleNotification.id] {
+          timer.invalidate()
+        }
         // will hide the current visible notification and display the incoming notification
         // if the notification has higher priority
         self.hide(visibleNotification)
@@ -75,6 +78,7 @@ class BraveNotificationsPresenter: UIViewController {
     }
     
     let notificationView = notification.view
+    view.subviews.forEach { $0.removeFromSuperview() }
     view.addSubview(notificationView)
     notificationView.snp.makeConstraints {
       $0.leading.greaterThanOrEqualTo(view).inset(8)
