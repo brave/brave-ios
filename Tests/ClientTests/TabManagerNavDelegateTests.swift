@@ -88,6 +88,19 @@ class TabManagerNavDelegateTests: XCTestCase {
         XCTAssertEqual(delegate1.receivedMessages, [.webViewDidReceiveServerRedirectForProvisionalNavigation])
         XCTAssertEqual(delegate2.receivedMessages, [.webViewDidReceiveServerRedirectForProvisionalNavigation])
     }
+
+    func test_webViewDidStartProvisionalNavigation_sendsCorrectMessage() {
+        let sut = TabManagerNavDelegate()
+        let delegate1 = WKNavigationDelegateSpy()
+        let delegate2 = WKNavigationDelegateSpy()
+
+        sut.insert(delegate1)
+        sut.insert(delegate2)
+        sut.webView(anyWebView(), didStartProvisionalNavigation: navigation)
+
+        XCTAssertEqual(delegate1.receivedMessages, [.webViewDidStartProvisionalNavigation])
+        XCTAssertEqual(delegate2.receivedMessages, [.webViewDidStartProvisionalNavigation])
+    }
 }
 
 // MARK: - Helpers
