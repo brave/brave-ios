@@ -62,6 +62,19 @@ class TabManagerNavDelegateTests: XCTestCase {
         XCTAssertEqual(delegate1.receivedMessages, [.webViewDidFinish])
         XCTAssertEqual(delegate2.receivedMessages, [.webViewDidFinish])
     }
+
+    func test_webViewWebContentProcessDidTerminate_sendsCorrectMessage() {
+        let sut = TabManagerNavDelegate()
+        let delegate1 = WKNavigationDelegateSpy()
+        let delegate2 = WKNavigationDelegateSpy()
+
+        sut.insert(delegate1)
+        sut.insert(delegate2)
+        sut.webViewWebContentProcessDidTerminate(anyWebView())
+
+        XCTAssertEqual(delegate1.receivedMessages, [.webViewWebContentProcessDidTerminate])
+        XCTAssertEqual(delegate2.receivedMessages, [.webViewWebContentProcessDidTerminate])
+    }
 }
 
 // MARK: - Helpers
