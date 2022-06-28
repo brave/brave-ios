@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import BraveCore
 import UIKit
 
 class WalletNotification: BraveNotification {
@@ -23,6 +24,7 @@ class WalletNotification: BraveNotification {
   var priority: BraveNotificationPriority
   var view: UIView
   var id: String { WalletNotification.Constant.id }
+  var origin: URLOrigin
   var dismissAction: (() -> Void)?
   
   private let handler: (Action) -> Void
@@ -33,10 +35,12 @@ class WalletNotification: BraveNotification {
   
   init(
     priority: BraveNotificationPriority,
+    origin: URLOrigin,
     handler: @escaping (Action) -> Void
   ) {
     self.priority = priority
-    self.view = WalletConnectionView()
+    self.origin = origin
+    self.view = WalletConnectionView(origin: origin)
     self.handler = handler
     self.setup()
   }

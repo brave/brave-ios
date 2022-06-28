@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import Shared
 import BraveUI
+import BraveCore
 
 class WalletConnectionView: UIControl {
   private let stackView: UIStackView = {
@@ -30,17 +31,32 @@ class WalletConnectionView: UIControl {
   private let titleLabel: UILabel = {
     let result = UILabel()
     result.textColor = .white
-    result.font = .preferredFont(forTextStyle: .subheadline, weight: .semibold)
+    result.font = WalletConnectionView.regularFont
     result.adjustsFontForContentSizeCategory = true
     result.numberOfLines = 0
     result.text = Strings.Wallet.dappsConnectionNotificationTitle
     result.setContentCompressionResistancePriority(.required, for: .horizontal)
+    result.setContentCompressionResistancePriority(.required, for: .vertical)
+    if #available(iOS 15, *) {
+      result.maximumContentSizeCategory = .accessibilityMedium
+    }
     return result
   }()
+  
+  var origin: URLOrigin
+  
+  init(origin: URLOrigin) {
+    self.origin = origin
+    super.init(frame: .zero)
+    setup()
+  }
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+      fatalError()
+  }
+  
+  private func setup() {
     addSubview(stackView)
     stackView.snp.makeConstraints {
       $0.edges.equalToSuperview().inset(24)
@@ -54,9 +70,38 @@ class WalletConnectionView: UIControl {
 
     layer.backgroundColor = UIColor.braveBlurpleTint.cgColor
     layer.cornerRadius = 10
+    
+    titleLabel.attributedText = titleText(for: origin)
   }
-  @available(*, unavailable)
-  required init(coder: NSCoder) {
-      fatalError()
+  
+  private static let regularFont: UIFont = .preferredFont(forTextStyle: .subheadline, weight: .regular)
+  private static let emphasisedFont: UIFont = .preferredFont(forTextStyle: .subheadline, weight: .bold)
+  
+  private func titleText(for origin: URLOrigin) -> NSAttributedString {
+    guard let originString = origin.url?.host else {
+      return NSAttributedString(
+        string: Strings.Wallet.dappsConnectionNotificationTitle,
+        attributes: [.font: Self.regularFont]
+      )
+    }
+
+    if let originEtldPlusOne = origin.url?.baseDomain {
+      // eTLD+1 available, bold it
+      let displayString = String.localizedStringWithFormat(Strings.Wallet.dappsConnectionNotificationOriginTitle, originString)
+      let rangeForEldPlusOne = (displayString as NSString).range(of: originEtldPlusOne)
+      let string = NSMutableAttributedString(
+        string: displayString,
+        attributes: [.font: Self.regularFont]
+      )
+      string.setAttributes([.font: Self.emphasisedFont], range: rangeForEldPlusOne)
+      return string
+    } else {
+      // eTLD+1 unavailable
+      let displayString = String.localizedStringWithFormat(Strings.Wallet.dappsConnectionNotificationOriginTitle, originString)
+      return NSAttributedString(
+        string: displayString,
+        attributes: [.font: Self.regularFont]
+      )
+    }
   }
 }
