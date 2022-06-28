@@ -1034,8 +1034,6 @@ extension TabManager: WKNavigationDelegate {
   // Do not excute JS at this point that requires running prior to DOM parsing.
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     guard let tab = self[webView] else { return }
-    let isNoImageMode = Preferences.Shields.blockImages.value
-    tab.noImageMode = isNoImageMode
 
     if !tab.contentBlocker.isEnabled {
       webView.evaluateSafeJavaScript(functionName: "window.__firefox__.TrackingProtectionStats.setEnabled", args: [false, UserScriptManager.securityTokenString], contentWorld: .page)
@@ -1093,7 +1091,8 @@ extension TabManager: PreferencesObserver {
     switch key {
     case Preferences.Shields.blockImages.key:
       // Update Block images
-      allTabs.forEach { $0.noImageMode = Preferences.Shields.blockImages.value }
+      // TODO: @JS Enable this?
+      break
     case Preferences.General.blockPopups.key:
       let allowPopups = !Preferences.General.blockPopups.value
       // Each tab may have its own configuration, so we should tell each of them in turn.

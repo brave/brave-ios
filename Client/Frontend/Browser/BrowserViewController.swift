@@ -449,24 +449,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     Preferences.PrivacyReports.captureShieldsData.observe(from: self)
     Preferences.PrivacyReports.captureVPNAlerts.observe(from: self)
     Preferences.Wallet.defaultEthWallet.observe(from: self)
-    
-    // Lists need to be compiled before attempting tab restoration
-    
-    var contentBlockListTask: AnyCancellable?
-    contentBlockListTask = ContentBlockerHelper.compileBundledLists()
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] res in
-        if case .failure(let error) = res {
-          log.error("Content Blocker failed to compile bundled lists: \(error)")
-        }
-          
-        contentBlockListTask = nil
-        
-        self?.contentBlockListCompiled = true
-        self?.setupTabs()
-    } receiveValue: { _ in
-      log.debug("Content Blocker successfully compiled bundled lists")
-    }
 
     if rewards.ledger != nil {
       // Ledger was started immediately due to user having ads enabled
@@ -537,6 +519,47 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     try? widgetBookmarksFRC?.performFetch()
 
     updateWidgetFavoritesData()
+    
+    Task.detached(priority: .high) {
+      await ContentBlockerManager.shared.loadBundledResources()
+      await ContentBlockerManager.shared.loadCachedCompileResults()
+      
+      // Load cached data
+      // This is done first because compileResources and compilePendingResource need their results
+      await withTaskGroup(of: Void.self) { group in
+        group .addTask {
+          await FilterListResourceDownloader.shared.loadCachedData()
+        }
+        group .addTask {
+          await AdblockResourceDownloader.shared.loadCachedData()
+        }
+      }
+      
+      // Compile some ad-block data
+      await withTaskGroup(of: Void.self) { group in
+        group.addTask {
+          await AdBlockEngineManager.shared.compileResources()
+        }
+        group.addTask {
+          await ContentBlockerManager.shared.compilePendingResources()
+          
+          // TODO: We should ideally call this after this whole group
+          // but it gives us a split second blackness. So for now we keep it like this
+          await Task { @MainActor in
+            self.contentBlockListCompiled = true
+            self.setupTabs()
+          }.value
+        }
+      }
+      
+      // Start fetching external data
+      Task { @MainActor in
+        FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
+        AdblockResourceDownloader.shared.startFetching()
+        ContentBlockerManager.shared.startTimer()
+        AdBlockEngineManager.shared.startTimer()
+      }
+    }
   }
 
   private func setupAdsNotificationHandler() {
@@ -927,7 +950,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     }
   }
 
-  fileprivate func setupTabs() {
+  private func setupTabs() {
     assert(contentBlockListCompiled, "Tabs should not be set up until after blocker lists are compiled")
     let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
     let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
@@ -2319,8 +2342,6 @@ extension BrowserViewController: TabDelegate {
     // tab.addHelper(spotlightHelper, name: SpotlightHelper.name())
 
     tab.addContentScript(LocalRequestHelper(), name: LocalRequestHelper.name(), contentWorld: .page)
-
-    tab.contentBlocker.setupTabTrackingProtection()
     tab.addContentScript(tab.contentBlocker, name: ContentBlockerHelper.name(), contentWorld: .page)
 
     tab.addContentScript(FocusHelper(tab: tab), name: FocusHelper.name(), contentWorld: .defaultClient)
@@ -2356,6 +2377,7 @@ extension BrowserViewController: TabDelegate {
     tab.addContentScript(ReadyStateScriptHelper(tab: tab), name: ReadyStateScriptHelper.name(), contentWorld: .page)
     tab.addContentScript(DeAmpHelper(tab: tab), name: DeAmpHelper.name(), contentWorld: .defaultClient)
     tab.addContentScript(tab.requestBlockingContentHelper, name: RequestBlockingContentHelper.name(), contentWorld: .page)
+    tab.addContentScript(SiteStateListenerContentHelper(tab: tab), name: SiteStateListenerContentHelper.name(), contentWorld: UserScriptType.siteStateListener.contentWorld)
   }
 
   func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
