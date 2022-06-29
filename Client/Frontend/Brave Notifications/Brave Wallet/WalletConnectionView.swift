@@ -8,6 +8,7 @@ import UIKit
 import Shared
 import BraveUI
 import BraveCore
+import Combine
 
 class WalletConnectionView: UIControl {
   private let stackView: UIStackView = {
@@ -31,17 +32,20 @@ class WalletConnectionView: UIControl {
   private let titleLabel: UILabel = {
     let result = UILabel()
     result.textColor = .white
-    result.font = WalletConnectionView.regularFont
-    result.adjustsFontForContentSizeCategory = true
+    result.font = .preferredFont(forTextStyle: .subheadline, weight: .regular)
+    result.adjustsFontForContentSizeCategory = false
     result.numberOfLines = 0
     result.text = Strings.Wallet.dappsConnectionNotificationTitle
     result.setContentCompressionResistancePriority(.required, for: .horizontal)
     result.setContentCompressionResistancePriority(.required, for: .vertical)
     if #available(iOS 15, *) {
+      result.adjustsFontSizeToFitWidth = true
       result.maximumContentSizeCategory = .accessibilityMedium
     }
     return result
   }()
+  
+  private var cancellable: AnyCancellable?
   
   var origin: URLOrigin
   
@@ -72,18 +76,36 @@ class WalletConnectionView: UIControl {
     layer.cornerRadius = 10
     
     titleLabel.attributedText = titleText(for: origin)
+    
+    if #available(iOS 14, *) {
+      // font size adjustment with a maximum content size category of .medium
+      cancellable = NotificationCenter.default
+        .publisher(for: UIContentSizeCategory.didChangeNotification, object: nil)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          self.titleLabel.attributedText = self.titleText(for: self.origin)
+        }
+    }
   }
   
-  private static let regularFont: UIFont = .preferredFont(forTextStyle: .subheadline, weight: .regular)
-  private static let emphasisedFont: UIFont = .preferredFont(forTextStyle: .subheadline, weight: .bold)
+  private func font(forTextStyle textStyle: UIFont.TextStyle, weight: UIFont.Weight) -> UIFont {
+    var sizeCategory = UIApplication.shared.preferredContentSizeCategory
+    if sizeCategory.isAccessibilityCategory { // set a maximum size category
+      sizeCategory = .accessibilityMedium
+    }
+    let traitCollection = UITraitCollection(preferredContentSizeCategory: sizeCategory)
+    return UIFont.preferredFont(forTextStyle: textStyle, weight: weight, traitCollection: traitCollection)
+  }
   
   private func titleText(for origin: URLOrigin) -> NSAttributedString {
+    let regularFont = self.font(forTextStyle: .subheadline, weight: .regular)
     guard let originString = origin.url?.host else {
       return NSAttributedString(
         string: Strings.Wallet.dappsConnectionNotificationTitle,
-        attributes: [.font: Self.regularFont]
+        attributes: [.font: regularFont]
       )
     }
+    let emphasisedFont = self.font(forTextStyle: .subheadline, weight: .bold)
 
     if let originEtldPlusOne = origin.url?.baseDomain {
       // eTLD+1 available, bold it
@@ -91,16 +113,16 @@ class WalletConnectionView: UIControl {
       let rangeForEldPlusOne = (displayString as NSString).range(of: originEtldPlusOne)
       let string = NSMutableAttributedString(
         string: displayString,
-        attributes: [.font: Self.regularFont]
+        attributes: [.font: regularFont]
       )
-      string.setAttributes([.font: Self.emphasisedFont], range: rangeForEldPlusOne)
+      string.setAttributes([.font: emphasisedFont], range: rangeForEldPlusOne)
       return string
     } else {
       // eTLD+1 unavailable
       let displayString = String.localizedStringWithFormat(Strings.Wallet.dappsConnectionNotificationOriginTitle, originString)
       return NSAttributedString(
         string: displayString,
-        attributes: [.font: Self.regularFont]
+        attributes: [.font: regularFont]
       )
     }
   }
