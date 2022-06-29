@@ -17,6 +17,7 @@ class WalletConnectionView: UIControl {
     result.spacing = 20
     result.alignment = .center
     result.isUserInteractionEnabled = false
+    result.setContentCompressionResistancePriority(.required, for: .vertical)
     return result
   }()
 
@@ -26,6 +27,7 @@ class WalletConnectionView: UIControl {
     result.contentMode = .scaleAspectFit
     result.setContentHuggingPriority(.required, for: .horizontal)
     result.setContentCompressionResistancePriority(.required, for: .horizontal)
+    result.setContentCompressionResistancePriority(.required, for: .vertical)
     return result
   }()
 
@@ -39,7 +41,7 @@ class WalletConnectionView: UIControl {
     result.setContentCompressionResistancePriority(.required, for: .horizontal)
     result.setContentCompressionResistancePriority(.required, for: .vertical)
     if #available(iOS 15, *) {
-      result.adjustsFontSizeToFitWidth = true
+      result.adjustsFontForContentSizeCategory = true
       result.maximumContentSizeCategory = .accessibilityMedium
     }
     return result

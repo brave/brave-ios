@@ -3375,6 +3375,11 @@ extension BrowserViewController: PreferencesObserver {
       tabManager.reloadSelectedTab()
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
       WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests()
+      let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+      if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
+        cryptoStore.rejectAllPendingWebpageRequests()
+      }
+      updateURLBarWalletButton()
     default:
       log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break
