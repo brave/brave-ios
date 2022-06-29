@@ -8,7 +8,7 @@ import BraveCore
 import UIKit
 
 class WalletNotification: BraveNotification {
-  private struct Constant {
+  struct Constant {
     static let id = "wallet-notification"
   }
   

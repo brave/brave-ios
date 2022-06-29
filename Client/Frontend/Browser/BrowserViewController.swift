@@ -2545,6 +2545,9 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     updateInContentHomePanel(selected?.url as URL?)
+
+    notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
+    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests()
     updateURLBarWalletButton()
   }
 
@@ -3370,6 +3373,8 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.Wallet.defaultWallet.key:
       tabManager.reset()
       tabManager.reloadSelectedTab()
+      notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
+      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests()
     default:
       log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break
