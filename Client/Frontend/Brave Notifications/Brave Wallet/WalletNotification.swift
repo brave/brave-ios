@@ -47,7 +47,8 @@ class WalletNotification: BraveNotification {
   
   private func setup() {
     guard let walletPanel = view as? WalletConnectionView else { return }
-    walletPanel.addTarget(self, action: #selector(tappedWalletConnectionView(_:)), for: .touchUpInside)
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedWalletConnectionView(_:)))
+    walletPanel.addGestureRecognizer(tapGesture)
   }
   
   @objc private func tappedWalletConnectionView(_ sender: WalletConnectionView) {

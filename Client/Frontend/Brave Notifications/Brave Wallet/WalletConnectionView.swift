@@ -11,6 +11,8 @@ import BraveCore
 import Combine
 
 class WalletConnectionView: UIControl {
+  private let scrollView = UIScrollView()
+
   private let stackView: UIStackView = {
     let result = UIStackView()
     result.axis = .horizontal
@@ -63,15 +65,30 @@ class WalletConnectionView: UIControl {
   }
   
   private func setup() {
-    addSubview(stackView)
+    addSubview(scrollView)
+    scrollView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
+    
+    scrollView.addSubview(stackView)
     stackView.snp.makeConstraints {
       $0.edges.equalToSuperview().inset(24)
     }
     stackView.addArrangedSubview(iconImageView)
     stackView.addArrangedSubview(titleLabel)
     
+    scrollView.contentLayoutGuide.snp.makeConstraints {
+      $0.width.equalTo(self)
+      $0.top.bottom.equalTo(stackView).inset(24)
+    }
+    
     iconImageView.snp.makeConstraints {
       $0.width.height.equalTo(20)
+    }
+    
+    snp.makeConstraints {
+      $0.height.equalTo(stackView).inset(-24).priority(.low)
+      $0.height.lessThanOrEqualTo(UIScreen.main.bounds.height / 2)
     }
 
     layer.backgroundColor = UIColor.braveBlurpleTint.cgColor
