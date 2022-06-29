@@ -42,10 +42,6 @@ class WalletConnectionView: UIControl {
     result.text = Strings.Wallet.dappsConnectionNotificationTitle
     result.setContentCompressionResistancePriority(.required, for: .horizontal)
     result.setContentCompressionResistancePriority(.required, for: .vertical)
-    if #available(iOS 15, *) {
-      result.adjustsFontForContentSizeCategory = true
-      result.maximumContentSizeCategory = .accessibilityMedium
-    }
     return result
   }()
   
@@ -65,6 +61,7 @@ class WalletConnectionView: UIControl {
   }
   
   private func setup() {
+    let contentInset = 24.0
     addSubview(scrollView)
     scrollView.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -72,14 +69,14 @@ class WalletConnectionView: UIControl {
     
     scrollView.addSubview(stackView)
     stackView.snp.makeConstraints {
-      $0.edges.equalToSuperview().inset(24)
+      $0.edges.equalToSuperview().inset(contentInset)
     }
     stackView.addArrangedSubview(iconImageView)
     stackView.addArrangedSubview(titleLabel)
     
     scrollView.contentLayoutGuide.snp.makeConstraints {
-      $0.width.equalTo(self)
-      $0.top.bottom.equalTo(stackView).inset(24)
+      $0.width.equalToSuperview()
+      $0.top.bottom.equalTo(stackView).inset(contentInset)
     }
     
     iconImageView.snp.makeConstraints {
@@ -87,23 +84,30 @@ class WalletConnectionView: UIControl {
     }
     
     snp.makeConstraints {
-      $0.height.equalTo(stackView).inset(-24).priority(.low)
-      $0.height.lessThanOrEqualTo(UIScreen.main.bounds.height / 2)
+      $0.height.equalTo(stackView).inset(-contentInset).priority(.low)
     }
 
     layer.backgroundColor = UIColor.braveBlurpleTint.cgColor
     layer.cornerRadius = 10
     
     titleLabel.attributedText = titleText(for: origin)
+    updateAccessibilityTraits()
     
-    if #available(iOS 14, *) {
-      // font size adjustment with a maximum content size category of .medium
-      cancellable = NotificationCenter.default
-        .publisher(for: UIContentSizeCategory.didChangeNotification, object: nil)
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          self.titleLabel.attributedText = self.titleText(for: self.origin)
-        }
+    // font size adjustment with a maximum content size category of .medium
+    cancellable = NotificationCenter.default
+      .publisher(for: UIContentSizeCategory.didChangeNotification, object: nil)
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        self.titleLabel.attributedText = self.titleText(for: self.origin)
+        self.updateAccessibilityTraits()
+      }
+  }
+  
+  override func didMoveToSuperview() {
+    super.didMoveToSuperview()
+    guard superview != nil else { return }
+    snp.makeConstraints {
+      $0.height.lessThanOrEqualToSuperview().dividedBy(2)
     }
   }
   
@@ -144,5 +148,12 @@ class WalletConnectionView: UIControl {
         attributes: [.font: regularFont]
       )
     }
+  }
+  
+  private func updateAccessibilityTraits() {
+    isAccessibilityElement = true
+    accessibilityLabel = titleLabel.text
+    accessibilityTraits = [.staticText, .button]
+    titleLabel.isAccessibilityElement = false
   }
 }

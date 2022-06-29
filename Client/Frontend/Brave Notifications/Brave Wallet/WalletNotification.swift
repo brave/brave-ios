@@ -24,7 +24,6 @@ class WalletNotification: BraveNotification {
   var priority: BraveNotificationPriority
   var view: UIView
   var id: String { WalletNotification.Constant.id }
-  var origin: URLOrigin
   var dismissAction: (() -> Void)?
   
   private let handler: (Action) -> Void
@@ -39,7 +38,6 @@ class WalletNotification: BraveNotification {
     handler: @escaping (Action) -> Void
   ) {
     self.priority = priority
-    self.origin = origin
     self.view = WalletConnectionView(origin: origin)
     self.handler = handler
     self.setup()
