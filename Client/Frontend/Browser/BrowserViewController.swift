@@ -68,6 +68,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var findInPageBar: FindInPageBar?
   var pageZoomBar: UIHostingController<PageZoomView>?
   private var pageZoomListener: NSObjectProtocol?
+  private let collapsedURLBarView = CollapsedURLBarView()
 
   // Single data source used for all favorites vcs
   public let backgroundDataSource = NTPDataSource()
@@ -107,7 +108,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   fileprivate let crashedLastSession: Bool
 
   // These views wrap the top and bottom toolbars to provide background effects on them
-  var header: UIStackView!
+  var header = HeaderContainerView()
   var footer: UIView!
   fileprivate var topTouchArea: UIButton!
 
@@ -749,17 +750,15 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     let toolBarInteraction = UIContextMenuInteraction(delegate: self)
     topToolbar.locationView.addInteraction(toolBarInteraction)
 
-    header = UIStackView().then {
-      $0.axis = .vertical
-      $0.clipsToBounds = true
-      $0.translatesAutoresizingMaskIntoConstraints = false
-    }
-    header.addArrangedSubview(topToolbar)
+    header.expandedBarStackView.addArrangedSubview(topToolbar)
 
     tabsBar = TabsBarViewController(tabManager: tabManager)
     tabsBar.delegate = self
-    header.addArrangedSubview(tabsBar.view)
+    header.expandedBarStackView.addArrangedSubview(tabsBar.view)
 
+    header.collapsedBarContainerView.addSubview(collapsedURLBarView)
+    header.collapsedBarContainerView.addTarget(self, action: #selector(tappedTopArea), for: .touchUpInside)
+    
     view.addSubview(header)
 
     addChild(tabsBar)
@@ -938,6 +937,10 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     topToolbar.snp.makeConstraints { make in
       make.height.equalTo(UIConstants.topToolbarHeight)
     }
+    
+    collapsedURLBarView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
 
     tabsBar.view.snp.makeConstraints { make in
       make.height.equalTo(UX.TabsBar.height)
@@ -960,7 +963,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       make.top.left.right.equalTo(self.view)
       make.bottom.equalTo(view.safeArea.top)
     }
-    toolbarVisibilityViewModel.transitionDistance = header.bounds.height
+    toolbarVisibilityViewModel.transitionDistance = header.expandedBarStackView.bounds.height - header.collapsedBarContainerView.bounds.height
     // Since the height of the WKWebView changes while collapsing we need to use a stable value to determine
     // if the toolbars can collapse
     toolbarVisibilityViewModel.minimumCollapsableContentHeight = webViewContainer.bounds.height + header.bounds.height + footer.bounds.height + view.safeAreaInsets.top + view.safeAreaInsets.bottom
@@ -1349,6 +1352,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
     } else {
       topToolbar.currentURL = url
+      collapsedURLBarView.currentURL = url
       topToolbar.leaveOverlayMode()
 
       guard let tab = tabManager.selectedTab else {
@@ -1482,6 +1486,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
       if tabManager.selectedTab === tab {
         topToolbar.secureContentState = tab.secureContentState
+        collapsedURLBarView.secureContentState = tab.secureContentState
       }
     case .serverTrust:
       guard let tab = tabManager[webView] else {
@@ -1499,6 +1504,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
             tab.secureContentState = .localHost
             if tabManager.selectedTab === tab {
               topToolbar.secureContentState = .localHost
+              collapsedURLBarView.secureContentState = .localHost
             }
             break
           }
@@ -1511,6 +1517,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
               tab.secureContentState = .insecure
               if tabManager.selectedTab === tab {
                 topToolbar.secureContentState = .insecure
+                collapsedURLBarView.secureContentState = .insecure
               }
               break
             }
@@ -1520,6 +1527,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
             tab.secureContentState = .unknown
             if tabManager.selectedTab === tab {
               topToolbar.secureContentState = .unknown
+              collapsedURLBarView.secureContentState = .unknown
             }
             break
           }
@@ -1533,6 +1541,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
         if tabManager.selectedTab === tab {
           topToolbar.secureContentState = tab.secureContentState
+          collapsedURLBarView.secureContentState = tab.secureContentState
         }
         break
       }
@@ -1607,8 +1616,10 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     }
 
     topToolbar.currentURL = tab.url?.displayURL
+    collapsedURLBarView.currentURL = tab.url?.displayURL
     if tabManager.selectedTab === tab {
       topToolbar.secureContentState = tab.secureContentState
+      collapsedURLBarView.secureContentState = tab.secureContentState
     }
 
     let isPage = tab.url?.displayURL?.isWebPage() ?? false
@@ -2091,6 +2102,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           view.layoutIfNeeded()
           topToolbar.locationContainer.alpha = 1
           topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+          header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
           tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
         }
         animator.startAnimation()
@@ -2112,6 +2124,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
       topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+      header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
       return
     }
     switch state {
@@ -2126,7 +2139,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       toolbarBottomConstraint?.update(offset: footerHeight)
     }
-    
+    header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
     let animator = toolbarVisibilityViewModel.toolbarChangePropertyAnimator
     animator.addAnimations {
       self.view.layoutIfNeeded()
@@ -2982,6 +2995,7 @@ extension BrowserViewController: WKUIDelegate {
     if error.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue) {
       if let tab = tabManager[webView], tab === tabManager.selectedTab {
         topToolbar.currentURL = tab.url?.displayURL
+        collapsedURLBarView.currentURL = tab.url?.displayURL
         updateWebViewPageZoom(tab: tab)
       }
       return
