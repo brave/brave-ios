@@ -2734,7 +2734,7 @@ extension BrowserViewController: TabManagerDelegate {
           alert.addAction(cancelAction)
 
           if let popoverPresentation = alert.popoverPresentationController,
-              let tabsButton: UIView = toolbar?.tabsButton ?? topToolbar?.tabsButton {
+              let tabsButton = toolbar?.tabsButton ?? topToolbar?.tabsButton {
             popoverPresentation.sourceView = tabsButton
             popoverPresentation.sourceRect =
               .init(x: tabsButton.frame.width / 2, y: tabsButton.frame.height, width: 1, height: 1)
