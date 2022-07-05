@@ -1254,11 +1254,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
   func updateTabsBarVisibility() {
     defer {
-      topToolbar?.line.isHidden = !tabsBar.view.isHidden
+      topToolbar?.line.isHidden = tabsBar?.view.isHidden == false
     }
 
     if tabManager.selectedTab == nil {
-      tabsBar.view.isHidden = true
+      tabsBar?.view.isHidden = true
       return
     }
 
@@ -1279,7 +1279,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
     }
 
-    let isShowing = !tabsBar.view.isHidden
+    let isShowing = tabsBar?.view.isHidden == false
     let shouldShow = shouldShowTabBar()
 
     if isShowing != shouldShow && presentedViewController == nil {
