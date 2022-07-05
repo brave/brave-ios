@@ -12,7 +12,6 @@ let package = Package(
   platforms: [.iOS(.v14), .macOS(.v11)],
   products: [
     .library(name: "Brave", targets: ["Brave"]),
-    .library(name: "GuardianConnect", targets: ["GuardianConnect"]),
     .library(name: "HTTPSE", targets: ["HTTPSE"]),
     .library(name: "Shared", targets: ["Shared"]),
     .library(name: "BraveCore", targets: ["BraveCore", "MaterialComponents"]),
@@ -46,6 +45,7 @@ let package = Package(
     .package(url: "https://github.com/devxoul/Then", from: "2.7.0"),
     .package(url: "https://github.com/mkrd/Swift-BigInt", from: "2.0.0"),
     .package(url: "https://github.com/apple/swift-markdown", revision: "4f0c76fcd29fea648915f41e2aa896d47608087a"),
+    .package(url: "https://github.com/GuardianFirewall/GuardianConnect", exact: "1.6.2"),
     .package(name: "Static", path: "ThirdParty/Static"),
   ],
   targets: [
@@ -312,7 +312,6 @@ let package = Package(
       resources: [.copy("vpncheckmark.json")],
       plugins: ["CurrentBundleGenPlugin"]
     ),
-    .binaryTarget(name: "GuardianConnect", path: "ThirdParty/GuardianConnect/GuardianConnect.xcframework"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
       name: "BraveSharedTests",

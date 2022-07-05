@@ -855,6 +855,7 @@
 				2775685F25ACF6FE00C129AF /* XCRemoteSwiftPackageReference "XCGLogger" */,
 				2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				27756B0D25AD08FA00C129AF /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				44EAE655287440D900DECF18 /* XCRemoteSwiftPackageReference "GuardianConnect" */,
 			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
@@ -2870,6 +2871,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.10.2;
+			};
+		};
+		44EAE655287440D900DECF18 /* XCRemoteSwiftPackageReference "GuardianConnect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GuardianFirewall/GuardianConnect";
+			requirement = {
+				kind = exactVersion;
+				version = 1.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
