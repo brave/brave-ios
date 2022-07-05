@@ -7,6 +7,7 @@ import SwiftUI
 import BraveUI
 import DesignSystem
 import Strings
+import BraveCore
 
 struct AddAccountView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -19,6 +20,9 @@ struct AddAccountView: View {
   @State private var failedToImport: Bool = false
   @ScaledMetric(relativeTo: .body) private var privateKeyFieldHeight: CGFloat = 140.0
   @Environment(\.presentationMode) @Binding var presentationMode
+  
+  var coin: BraveWallet.CoinType
+  var dismissAction: (() -> Void)?
 
   private func addAccount() {
     if privateKey.isEmpty {
@@ -27,6 +31,7 @@ struct AddAccountView: View {
       keyringStore.addPrimaryAccount(accountName) { success in
         if success {
           presentationMode.dismiss()
+          dismissAction?()
         }
       }
     } else {
@@ -99,7 +104,10 @@ struct AddAccountView: View {
     )
     .toolbar {
       ToolbarItemGroup(placement: .cancellationAction) {
-        Button(action: { presentationMode.dismiss() }) {
+        Button(action: {
+          presentationMode.dismiss()
+          dismissAction?()
+        }) {
           Text(Strings.cancelButtonTitle)
             .foregroundColor(Color(.braveOrange))
         }
@@ -196,7 +204,7 @@ struct AddAccountView: View {
 struct AddAccountView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      AddAccountView(keyringStore: .previewStore)
+      AddAccountView(keyringStore: .previewStore, coin: .eth)
     }
   }
 }

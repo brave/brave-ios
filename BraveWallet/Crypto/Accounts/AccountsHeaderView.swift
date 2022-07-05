@@ -13,7 +13,8 @@ struct AccountsHeaderView: View {
   var networkStore: NetworkStore
 
   @State private var isPresentingBackup: Bool = false
-  @State private var isPresentingAddAccount: Bool = false
+  
+  @Binding var isPresentingCoinTypes: Bool
 
   var body: some View {
     HStack {
@@ -38,19 +39,12 @@ struct AccountsHeaderView: View {
       )
       Spacer()
       HStack(spacing: 16) {
-        Button(action: { isPresentingAddAccount = true }) {
+        Button(action: {
+          isPresentingCoinTypes = true
+        }) {
           Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
             .labelStyle(.iconOnly)
         }
-        .background(
-          Color.clear
-            .sheet(isPresented: $isPresentingAddAccount) {
-              NavigationView {
-                AddAccountView(keyringStore: keyringStore)
-              }
-              .navigationViewStyle(StackNavigationViewStyle())
-            }
-        )
         NavigationLink(
           destination: WalletSettingsView(
             settingsStore: settingsStore,
@@ -73,7 +67,8 @@ struct AccountsHeaderView_Previews: PreviewProvider {
     AccountsHeaderView(
       keyringStore: .previewStore,
       settingsStore: .previewStore,
-      networkStore: .previewStore
+      networkStore: .previewStore,
+      isPresentingCoinTypes: .constant(false)
     )
     .previewLayout(.sizeThatFits)
     .previewColorSchemes()

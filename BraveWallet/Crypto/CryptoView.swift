@@ -22,6 +22,8 @@ public struct CryptoView: View {
   var openWalletURLAction: ((URL) -> Void)?
   
   var faviconRenderer: WalletFaviconRenderer
+  
+  var openCoinTypeSelection: (() -> Void)?
 
   public init(
     walletStore: WalletStore,
@@ -111,7 +113,16 @@ public struct CryptoView: View {
             case .accountSelection:
               AccountListView(
                 keyringStore: keyringStore,
-                onDismiss: { dismissAction?() }
+                isPresentingCoinTypes: Binding(
+                  get: { store.isPresentingCoinTypes },
+                  set: { value in
+                    if value {
+                      openCoinTypeSelection?()
+                    }
+                  }),
+                onDismiss: {
+                  dismissAction?()
+                }
               )
             case .transactionHistory:
               NavigationView {
@@ -289,6 +300,18 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           }
         }
     )
+    .background(
+      Color.clear
+        .sheet(item: $cryptoStore.accountCreationCoinType) { coin in
+          NavigationView {
+            AddAccountView(
+              keyringStore: keyringStore,
+              coin: coin
+            )
+          }
+          .navigationViewStyle(StackNavigationViewStyle())
+        }
+    )
     .environment(
       \.buySendSwapDestination,
       Binding(
@@ -302,6 +325,13 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           } else {
             cryptoStore?.buySendSwapDestination = destination
           }
+        }))
+    .environment(
+      \.isPresentingCoinTypes,
+       Binding(
+        get: { [weak cryptoStore] in cryptoStore?.isPresentingCoinTypes ?? false },
+        set: { [weak cryptoStore] value in
+          cryptoStore?.isPresentingCoinTypes = value
         }))
   }
 }

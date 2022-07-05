@@ -11,7 +11,8 @@ struct AccountListView: View {
   @ObservedObject var keyringStore: KeyringStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @State private var isPresentingAddAccount: Bool = false
+  
+  @Binding var isPresentingCoinTypes: Bool
   
   var onDismiss: () -> Void
   
@@ -45,17 +46,13 @@ struct AccountListView: View {
           }
         }
         ToolbarItemGroup(placement: .primaryAction) {
-          Button(action: { isPresentingAddAccount = true }) {
+          Button(action: {
+            isPresentingCoinTypes = true
+          }) {
             Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
               .foregroundColor(Color(.braveOrange))
           }
         }
-      }
-      .sheet(isPresented: $isPresentingAddAccount) {
-        NavigationView {
-          AddAccountView(keyringStore: keyringStore)
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
@@ -70,7 +67,7 @@ struct AccountListView_Previews: PreviewProvider {
       store.addPrimaryAccount("Account 2", completion: nil)
       store.addPrimaryAccount("Account 3", completion: nil)
       return store
-    }(), onDismiss: {})
+    }(), isPresentingCoinTypes: .constant(false), onDismiss: {})
   }
 }
 #endif

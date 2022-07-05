@@ -16,13 +16,14 @@ struct AssetDetailView: View {
   @ObservedObject var networkStore: NetworkStore
 
   @State private var tableInset: CGFloat = -16.0
-  @State private var isShowingAddAccount: Bool = false
   @State private var transactionDetails: BraveWallet.TransactionInfo?
 
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
 
   @Environment(\.openWalletURLAction) private var openWalletURL
+  
+  @Binding var isPresentingCoinTypes: Bool
 
   var body: some View {
     List {
@@ -40,7 +41,7 @@ struct AssetDetailView: View {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.accountsPageTitle)),
         footer: Button(action: {
-          isShowingAddAccount = true
+          isPresentingCoinTypes = true
         }) {
           Text(Strings.Wallet.addAccountTitle)
         }
@@ -126,15 +127,6 @@ struct AssetDetailView: View {
     }
     .background(
       Color.clear
-    .sheet(isPresented: $isShowingAddAccount) {
-      NavigationView {
-        AddAccountView(keyringStore: keyringStore)
-      }
-      .navigationViewStyle(StackNavigationViewStyle())
-    }
-    )
-    .background(
-      Color.clear
         .sheet(item: $transactionDetails) { tx in
           TransactionDetailsView(
             info: tx,
@@ -157,7 +149,8 @@ struct CurrencyDetailView_Previews: PreviewProvider {
       AssetDetailView(
         assetDetailStore: .previewStore,
         keyringStore: .previewStore,
-        networkStore: .previewStore
+        networkStore: .previewStore,
+        isPresentingCoinTypes: .constant(false)
       )
       .navigationBarTitleDisplayMode(.inline)
     }
