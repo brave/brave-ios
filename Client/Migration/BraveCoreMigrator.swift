@@ -129,19 +129,22 @@ public class BraveCoreMigrator {
     }
 
     let group = DispatchGroup()
+    var migrationError: MigrationError?
     
     group.enter()
     
     // Step 1:  Check If bookmarks are migrated / migrate
     migrateBookmarkModels { [unowned self] success in
       guard success else {
+        defer {
+          group.leave()
+        }
+        
         self.migrationObserver = .failed
-        completion?(.failedBookmarksMigration)
+        migrationError = .failedBookmarksMigration
         
         return
       }
-      
-      group.leave()
     }
     
     group.enter()
@@ -149,31 +152,35 @@ public class BraveCoreMigrator {
     // Step 2: Check If history is migrated / migrate
     migrateHistoryModels { [unowned self] success in
       guard success else {
-        self.migrationObserver = .failed
-        completion?(.failedHistoryMigration)
+        defer {
+          group.leave()
+        }
         
+        self.migrationObserver = .failed
+        migrationError = .failedHistoryMigration
+
         return
       }
-      
-      group.leave()
     }
     
     group.enter()
     
     // Step 3: Check If passwords are migrate / migrate
     migratePasswordForms { [unowned self] success in
+      defer {
+        group.leave()
+      }
+      
       guard success else {
         self.migrationObserver = .failed
-        completion?(.failedPasswordMigration)
+        migrationError = .failedPasswordMigration
 
         return
       }
-      
-      group.leave()
     }
   
     group.notify(queue: .main) {
-      completion?(nil)
+      completion?(migrationError)
       return
     }
   }

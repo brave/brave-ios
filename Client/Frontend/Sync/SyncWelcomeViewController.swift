@@ -240,7 +240,6 @@ class SyncWelcomeViewController: SyncViewController {
       self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices)
       self.syncAPI.requestSync()
       self.syncAPI.setSetupComplete()
-
     }
 
     self.navigationController?.pushViewController(addDevice, animated: true)
