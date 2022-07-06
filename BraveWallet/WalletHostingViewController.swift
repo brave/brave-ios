@@ -76,7 +76,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     }
     rootView.openCoinTypeSelection = { [unowned self] in
       let controller = FixedHeightHostingPanModalController(
-        rootView: AccountCoinTypeView(action: { [weak self] type in
+        rootView: AccountCoinTypesView(action: { [weak self] type in
           self?.dismiss(animated: true, completion: {
             self?.presentAddAccount(coin: type)
           })
@@ -143,7 +143,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   private func presentCoinTypes() {
     walletStore.cryptoStore?.isPresentingCoinTypes = false
     let controller = FixedHeightHostingPanModalController(
-      rootView: AccountCoinTypeView(action: { [weak self] coin in
+      rootView: AccountCoinTypesView(action: { [weak self] coin in
         self?.dismiss(
           animated: true,
           completion: {
