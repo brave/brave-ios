@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import BraveShared
 import BraveCore
 import Strings
 
@@ -12,6 +13,7 @@ struct CustomNetworkListView: View {
   @State private var isPresentingNetworkDetails: CustomNetworkModel?
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.sizeCategory) private var sizeCategory
+  @ObservedObject private var showTestNetworks = Preferences.Wallet.showTestNetworks
 
   private struct CustomNetworkDetails: Identifiable {
     var isEditMode: Bool
@@ -86,6 +88,12 @@ struct CustomNetworkListView: View {
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      
+      Section {
+        Toggle("Show test networks", isOn: $showTestNetworks.value)
+          .foregroundColor(Color(.braveLabel))
+          .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
+      }
     }
     .listStyle(.insetGrouped)
     .overlay(

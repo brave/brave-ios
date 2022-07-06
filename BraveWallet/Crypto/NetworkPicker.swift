@@ -5,6 +5,7 @@
 
 import SwiftUI
 import BraveCore
+import BraveShared
 import Strings
 
 extension BraveWallet.NetworkInfo {
@@ -43,14 +44,18 @@ struct NetworkPicker: View {
   }
   
   private var availableChains: [BraveWallet.NetworkInfo] {
-    networkStore.ethereumChains.filter({
+    networkStore.ethereumChains.filter {
+      if !Preferences.Wallet.showTestNetworks.value,
+          WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) {
+        return false
+      }
       if let destination = buySendSwapDestination {
         if destination.kind != .send {
           return !$0.isCustom
         }
       }
       return true
-    })
+    }
   }
   
   var body: some View {
