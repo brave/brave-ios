@@ -44,7 +44,7 @@ struct NetworkPicker: View {
   }
   
   private var availableChains: [BraveWallet.NetworkInfo] {
-    networkStore.ethereumChains.filter { chain in
+    networkStore.allChains.filter { chain in
       if !Preferences.Wallet.showTestNetworks.value {
         var testNetworkChainIdsToRemove = WalletConstants.supportedTestNetworkChainIds
         // Don't remove selected network (possible if selected then disabled showing test networks)
