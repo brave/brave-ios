@@ -14,11 +14,13 @@ public class WalletStore {
   public var cryptoStore: CryptoStore?
   
   public let onPendingRequestUpdated = PassthroughSubject<Void, Never>()
+  public let openCoinTypes = PassthroughSubject<Void, Never>()
 
   // MARK: -
 
   private var cancellable: AnyCancellable?
   private var onPendingRequestCancellable: AnyCancellable?
+  private var openCoinTypesCancellable: AnyCancellable?
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -75,6 +77,14 @@ public class WalletStore {
             .removeDuplicates()
             .sink { [weak self] _ in
               self?.onPendingRequestUpdated.send()
+            }
+          self.openCoinTypesCancellable = self.cryptoStore?.$isPresentingCoinTypes
+            .dropFirst()
+            .removeDuplicates()
+            .sink { [weak self] value in
+              if value {
+                self?.openCoinTypes.send()
+              }
             }
         }
       }

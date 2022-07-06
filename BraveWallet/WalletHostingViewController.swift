@@ -105,12 +105,9 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         }
       }
       .store(in: &cancellables)
-    walletStore.cryptoStore?.$isPresentingCoinTypes
-      .dropFirst()
-      .sink { [weak self] value in
-        if value {
-          self?.presentCoinTypes()
-        }
+    walletStore.openCoinTypes
+      .sink { [weak self] _ in
+        self?.presentCoinTypes()
       }
       .store(in: &cancellables)
   }
@@ -144,6 +141,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   
   // MARK: - Private
   private func presentCoinTypes() {
+    walletStore.cryptoStore?.isPresentingCoinTypes = false
     let controller = FixedHeightHostingPanModalController(
       rootView: AccountCoinTypeView(action: { [weak self] coin in
         self?.dismiss(
