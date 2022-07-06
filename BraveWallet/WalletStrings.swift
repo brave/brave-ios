@@ -2546,7 +2546,7 @@ extension Strings {
       "wallet.coinTypeUnknown",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Unkown",
+      value: "Unknown",
       comment: "A placeholder for unknown coin type."
     )
   }
