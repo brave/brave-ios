@@ -14,6 +14,8 @@ public struct CryptoView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
   var presentingContext: PresentingContext
+  /// An invisible `UIView` background lives in SwiftUI for UIKit API to reference later
+  var coinTypesMenuAnchor: InvisibleUIView
 
   // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
   // but for now we'll have to manage this ourselves
@@ -29,12 +31,14 @@ public struct CryptoView: View {
     walletStore: WalletStore,
     keyringStore: KeyringStore,
     presentingContext: PresentingContext,
-    faviconRenderer: WalletFaviconRenderer
+    faviconRenderer: WalletFaviconRenderer,
+    coinTypesMenuAnchor: InvisibleUIView
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore
     self.presentingContext = presentingContext
     self.faviconRenderer = faviconRenderer
+    self.coinTypesMenuAnchor = coinTypesMenuAnchor
   }
 
   private enum VisibleScreen: Equatable {
@@ -236,6 +240,10 @@ public struct CryptoView: View {
     .environment(
       \.faviconRenderer,
        faviconRenderer
+    )
+    .environment(
+      \.coinTypesMenuAnchor,
+       coinTypesMenuAnchor
     )
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {

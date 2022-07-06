@@ -15,6 +15,8 @@ struct AccountsHeaderView: View {
   @State private var isPresentingBackup: Bool = false
   
   @Binding var isPresentingCoinTypes: Bool
+  
+  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
 
   var body: some View {
     HStack {
@@ -45,6 +47,7 @@ struct AccountsHeaderView: View {
           Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
             .labelStyle(.iconOnly)
         }
+        .background(coinTypesMenuAnchor)
         NavigationLink(
           destination: WalletSettingsView(
             settingsStore: settingsStore,

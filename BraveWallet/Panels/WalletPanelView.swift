@@ -412,16 +412,6 @@ struct WalletPanelView: View {
   }
 }
 
-struct InvisibleUIView: UIViewRepresentable {
-  let uiView = UIView()
-  func makeUIView(context: Context) -> UIView {
-    uiView.backgroundColor = .clear
-    return uiView
-  }
-  func updateUIView(_ uiView: UIView, context: Context) {
-  }
-}
-
 #if DEBUG
 struct WalletPanelView_Previews: PreviewProvider {
   static var previews: some View {

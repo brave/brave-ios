@@ -11,6 +11,7 @@ struct AccountListView: View {
   @ObservedObject var keyringStore: KeyringStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
   
   @Binding var isPresentingCoinTypes: Bool
   
@@ -52,6 +53,7 @@ struct AccountListView: View {
             Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
               .foregroundColor(Color(.braveOrange))
           }
+          .background(coinTypesMenuAnchor)
         }
       }
     }

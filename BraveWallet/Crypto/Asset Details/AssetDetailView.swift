@@ -22,6 +22,7 @@ struct AssetDetailView: View {
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
 
   @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
   
   @Binding var isPresentingCoinTypes: Bool
 
@@ -45,6 +46,7 @@ struct AssetDetailView: View {
         }) {
           Text(Strings.Wallet.addAccountTitle)
         }
+          .background(coinTypesMenuAnchor)
         .listRowInsets(.zero)
         .buttonStyle(BraveOutlineButtonStyle(size: .small))
         .padding(.vertical, 8)

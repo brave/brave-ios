@@ -47,6 +47,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public weak var delegate: BraveWalletDelegate?
   private var cancellables: Set<AnyCancellable> = []
   private let walletStore: WalletStore
+  private let coinTypesMenuAnchor = InvisibleUIView()
   
   public init(
     walletStore: WalletStore,
@@ -63,7 +64,8 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         walletStore: walletStore,
         keyringStore: walletStore.keyringStore,
         presentingContext: presentingContext,
-        faviconRenderer: faviconRenderer
+        faviconRenderer: faviconRenderer,
+        coinTypesMenuAnchor: coinTypesMenuAnchor
       )
     )
     rootView.dismissAction = { [unowned self] in
@@ -82,7 +84,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
           })
         })
       )
-      self.presentPanModal(controller)
+      self.presentPanModal(controller, sourceView: self.coinTypesMenuAnchor.uiView, sourceRect: self.coinTypesMenuAnchor.uiView.bounds)
     }
     walletStore.keyringStore.$keyring
       .dropFirst() // Drop initial value
@@ -157,7 +159,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
       topController = newTopController
     }
     
-    (topController ?? self).presentPanModal(controller)
+    (topController ?? self).presentPanModal(controller, sourceView: coinTypesMenuAnchor.uiView, sourceRect: coinTypesMenuAnchor.uiView.bounds)
   }
   
   private func presentAddAccount(coin: BraveWallet.CoinType) {
