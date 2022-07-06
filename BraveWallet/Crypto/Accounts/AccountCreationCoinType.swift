@@ -15,26 +15,26 @@ extension BraveWallet.CoinType: Identifiable {
   var localizedTitle: String {
     switch self {
     case .eth:
-      return "Ethereum"
+      return Strings.Wallet.coinTypeEthereum
     case .sol:
-      return "Solana"
+      return Strings.Wallet.coinTypeSolana
     case .fil:
-      return "Filecoin"
+      return Strings.Wallet.coinTypeFilecoin
     @unknown default:
-      return "Unkown"
+      return Strings.Wallet.coinTypeUnknown
     }
   }
   
   var localizedDescription: String {
     switch self {
     case .eth:
-      return "Supports EVM compatible assets on the Ethereum blockchain (ERC-20, ERC-721, ERC-1551, ERC-1155)"
+      return Strings.Wallet.coinTypeEthereumDescription
     case .sol:
-      return "Supports SPL compatible assets on the Solana blockchain"
+      return Strings.Wallet.coinTypeSolanaDescription
     case .fil:
-      return "Store FIL asset"
+      return Strings.Wallet.coinTypeFilecoinDescription
     @unknown default:
-      return "Unknown"
+      return Strings.Wallet.coinTypeUnknown
     }
   }
 }
