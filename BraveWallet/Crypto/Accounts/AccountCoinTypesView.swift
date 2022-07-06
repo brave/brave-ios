@@ -7,12 +7,11 @@ import SwiftUI
 import BraveCore
 import Strings
 
-struct AccountCoinTypeView: View {
+struct AccountCoinTypesView: View {
   var action: (BraveWallet.CoinType) -> Void
-  var coinTypes: [BraveWallet.CoinType]
+  var coinTypes: [BraveWallet.CoinType] = WalletConstants.supportedCoinTypes
   
   init(action: @escaping (BraveWallet.CoinType) -> Void) {
-    self.coinTypes = [.eth, .sol, .fil]
     self.action = action
   }
   
@@ -45,9 +44,9 @@ struct AccountCoinTypeView: View {
 }
 
 #if DEBUG
-struct AccountCoinTypeView_Previews: PreviewProvider {
+struct AccountCoinTypesView_Previews: PreviewProvider {
   static var previews: some View {
-    AccountCoinTypeView(action: { _ in })
+    AccountCoinTypesView(action: { _ in })
       .previewLayout(.sizeThatFits)
       .previewSizeCategories([.large, .accessibilityLarge])
   }
