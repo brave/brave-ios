@@ -11,9 +11,10 @@ struct AccountListView: View {
   @ObservedObject var keyringStore: KeyringStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
   
-  @Binding var isPresentingCoinTypes: Bool
+  @State private var isPresentingCoinTypes: Bool = false
+  @State private var isPresentingAddAccount: Bool = false
+  @State private var coinType: BraveWallet.CoinType?
   
   var onDismiss: () -> Void
   
@@ -53,11 +54,22 @@ struct AccountListView: View {
             Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
               .foregroundColor(Color(.braveOrange))
           }
-          .background(coinTypesMenuAnchor)
         }
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
+    .panModal(isPresented: $isPresentingCoinTypes) {
+      AccountCoinTypesView { coin in
+        isPresentingCoinTypes = false
+        coinType = coin
+      }
+    }
+    .sheet(item: $coinType) { coin in
+      NavigationView {
+        AddAccountView(keyringStore: keyringStore, coin: coin)
+      }
+      .navigationViewStyle(StackNavigationViewStyle())
+    }
   }
 }
 
@@ -69,7 +81,7 @@ struct AccountListView_Previews: PreviewProvider {
       store.addPrimaryAccount("Account 2", completion: nil)
       store.addPrimaryAccount("Account 3", completion: nil)
       return store
-    }(), isPresentingCoinTypes: .constant(false), onDismiss: {})
+    }(), onDismiss: {})
   }
 }
 #endif

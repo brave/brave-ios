@@ -45,9 +45,8 @@ public enum PresentingContext {
 /// The initial wallet controller to present when the user wants to view their wallet
 public class WalletHostingViewController: UIHostingController<CryptoView> {
   public weak var delegate: BraveWalletDelegate?
-  private var cancellables: Set<AnyCancellable> = []
+  private var cancellable: AnyCancellable?
   private let walletStore: WalletStore
-  private let coinTypesMenuAnchor = InvisibleUIView()
   
   public init(
     walletStore: WalletStore,
@@ -64,8 +63,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         walletStore: walletStore,
         keyringStore: walletStore.keyringStore,
         presentingContext: presentingContext,
-        faviconRenderer: faviconRenderer,
-        coinTypesMenuAnchor: coinTypesMenuAnchor
+        faviconRenderer: faviconRenderer
       )
     )
     rootView.dismissAction = { [unowned self] in
@@ -76,17 +74,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         self.delegate?.openWalletURL(url)
       }
     }
-    rootView.openCoinTypeSelection = { [unowned self] in
-      let controller = FixedHeightHostingPanModalController(
-        rootView: AccountCoinTypesView(action: { [weak self] type in
-          self?.dismiss(animated: true, completion: {
-            self?.presentAddAccount(coin: type)
-          })
-        })
-      )
-      self.presentPanModal(controller, sourceView: self.coinTypesMenuAnchor.uiView, sourceRect: self.coinTypesMenuAnchor.uiView.bounds)
-    }
-    walletStore.keyringStore.$keyring
+    cancellable = walletStore.keyringStore.$keyring
       .dropFirst() // Drop initial value
       .map(\.isLocked)
       .removeDuplicates()
@@ -106,12 +94,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
           self.dismiss(animated: true)
         }
       }
-      .store(in: &cancellables)
-    walletStore.openCoinTypes
-      .sink { [weak self] _ in
-        self?.presentCoinTypes()
-      }
-      .store(in: &cancellables)
   }
   
   @available(*, unavailable)
@@ -139,40 +121,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   
   public override var shouldAutorotate: Bool {
     true
-  }
-  
-  // MARK: - Private
-  private func presentCoinTypes() {
-    walletStore.cryptoStore?.isPresentingCoinTypes = false
-    let controller = FixedHeightHostingPanModalController(
-      rootView: AccountCoinTypesView(action: { [weak self] coin in
-        self?.dismiss(
-          animated: true,
-          completion: {
-            self?.walletStore.cryptoStore?.accountCreationCoinType = coin
-          })
-      })
-    )
-    
-    var topController = presentedViewController
-    while let newTopController = topController?.presentedViewController {
-      topController = newTopController
-    }
-    
-    (topController ?? self).presentPanModal(controller, sourceView: coinTypesMenuAnchor.uiView, sourceRect: coinTypesMenuAnchor.uiView.bounds)
-  }
-  
-  private func presentAddAccount(coin: BraveWallet.CoinType) {
-    let hostingVC = UIHostingController(
-      rootView: AddAccountView(
-        keyringStore: walletStore.keyringStore,
-        coin: coin,
-        dismissAction: { [weak self] in
-          self?.dismiss(animated: true)
-        }
-      )
-    )
-    present(UINavigationController(rootViewController: hostingVC), animated: true)
   }
 }
 

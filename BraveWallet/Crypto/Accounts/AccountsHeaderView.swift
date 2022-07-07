@@ -6,6 +6,7 @@
 import SwiftUI
 import Strings
 import DesignSystem
+import BraveCore
 
 struct AccountsHeaderView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -13,10 +14,8 @@ struct AccountsHeaderView: View {
   var networkStore: NetworkStore
 
   @State private var isPresentingBackup: Bool = false
-  
-  @Binding var isPresentingCoinTypes: Bool
-  
-  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
+  @State private var isPresentingCoinTypes: Bool = false
+  @State private var coinType: BraveWallet.CoinType?
 
   var body: some View {
     HStack {
@@ -47,7 +46,6 @@ struct AccountsHeaderView: View {
           Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
             .labelStyle(.iconOnly)
         }
-        .background(coinTypesMenuAnchor)
         NavigationLink(
           destination: WalletSettingsView(
             settingsStore: settingsStore,
@@ -60,6 +58,18 @@ struct AccountsHeaderView: View {
       }
       .foregroundColor(Color(.braveLabel))
     }
+    .panModal(isPresented: $isPresentingCoinTypes) {
+      AccountCoinTypesView { coin in
+        isPresentingCoinTypes = false
+        coinType = coin
+      }
+    }
+    .sheet(item: $coinType) { coin in
+      NavigationView {
+        AddAccountView(keyringStore: keyringStore, coin: coin)
+      }
+      .navigationViewStyle(StackNavigationViewStyle())
+    }
     .padding(.top)
   }
 }
@@ -70,8 +80,7 @@ struct AccountsHeaderView_Previews: PreviewProvider {
     AccountsHeaderView(
       keyringStore: .previewStore,
       settingsStore: .previewStore,
-      networkStore: .previewStore,
-      isPresentingCoinTypes: .constant(false)
+      networkStore: .previewStore
     )
     .previewLayout(.sizeThatFits)
     .previewColorSchemes()

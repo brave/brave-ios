@@ -15,8 +15,6 @@ struct AccountPicker: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @ScaledMetric private var avatarSize = 24.0
 
-  @Environment(\.isPresentingCoinTypes) private var isPresentingCoinTypes: Binding<Bool>
-
   var body: some View {
     Group {
       if sizeCategory.isAccessibilityCategory {
@@ -36,7 +34,6 @@ struct AccountPicker: View {
     .sheet(isPresented: $isPresentingPicker) {
       AccountListView(
         keyringStore: keyringStore,
-        isPresentingCoinTypes: isPresentingCoinTypes,
         onDismiss: { isPresentingPicker = false }
       )
     }

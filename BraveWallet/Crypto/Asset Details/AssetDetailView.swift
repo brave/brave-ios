@@ -17,14 +17,13 @@ struct AssetDetailView: View {
 
   @State private var tableInset: CGFloat = -16.0
   @State private var transactionDetails: BraveWallet.TransactionInfo?
+  @State private var isPresentingCoinTypes: Bool = false
+  @State private var coinType: BraveWallet.CoinType?
 
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
 
   @Environment(\.openWalletURLAction) private var openWalletURL
-  @Environment(\.coinTypesMenuAnchor) private var coinTypesMenuAnchor
-  
-  @Binding var isPresentingCoinTypes: Bool
 
   var body: some View {
     List {
@@ -46,7 +45,6 @@ struct AssetDetailView: View {
         }) {
           Text(Strings.Wallet.addAccountTitle)
         }
-          .background(coinTypesMenuAnchor)
         .listRowInsets(.zero)
         .buttonStyle(BraveOutlineButtonStyle(size: .small))
         .padding(.vertical, 8)
@@ -141,6 +139,18 @@ struct AssetDetailView: View {
           )
         }
     )
+    .panModal(isPresented: $isPresentingCoinTypes) {
+      AccountCoinTypesView { coin in
+        isPresentingCoinTypes = false
+        coinType = coin
+      }
+    }
+    .sheet(item: $coinType) { coin in
+      NavigationView {
+        AddAccountView(keyringStore: keyringStore, coin: coin)
+      }
+      .navigationViewStyle(StackNavigationViewStyle())
+    }
   }
 }
 
@@ -151,8 +161,7 @@ struct CurrencyDetailView_Previews: PreviewProvider {
       AssetDetailView(
         assetDetailStore: .previewStore,
         keyringStore: .previewStore,
-        networkStore: .previewStore,
-        isPresentingCoinTypes: .constant(false)
+        networkStore: .previewStore
       )
       .navigationBarTitleDisplayMode(.inline)
     }

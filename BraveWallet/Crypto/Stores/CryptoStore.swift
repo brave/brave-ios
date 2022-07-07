@@ -58,8 +58,6 @@ public class CryptoStore: ObservableObject {
     }
   }
   @Published private(set) var pendingRequest: PendingRequest?
-  @Published var accountCreationCoinType: BraveWallet.CoinType?
-  @Published var isPresentingCoinTypes: Bool = false
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService

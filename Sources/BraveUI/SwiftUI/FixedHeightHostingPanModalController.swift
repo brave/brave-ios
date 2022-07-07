@@ -15,6 +15,9 @@ import PanModal
 /// - note: The SwiftUI within this class should not scroll as `panScrollable` is hard-coded to `nil`
 public class FixedHeightHostingPanModalController<Content: View>: UIViewController, PanModalPresentable {
   private let hostingController: UIHostingController<Content>
+  
+  public var didDismiss: (() -> Void)?
+  
   public init(rootView: Content) {
     hostingController = .init(rootView: rootView)
     super.init(nibName: nil, bundle: nil)
@@ -42,6 +45,10 @@ public class FixedHeightHostingPanModalController<Content: View>: UIViewControll
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     panModalSetNeedsLayoutUpdate()
+  }
+  public override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    didDismiss?()
   }
   @objc private func sizeCategoryChanged() {
     panModalSetNeedsLayoutUpdate()

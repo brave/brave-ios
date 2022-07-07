@@ -14,8 +14,6 @@ public struct CryptoView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
   var presentingContext: PresentingContext
-  /// An invisible `UIView` background lives in SwiftUI for UIKit API to reference later
-  var coinTypesMenuAnchor: InvisibleUIView
 
   // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
   // but for now we'll have to manage this ourselves
@@ -24,21 +22,17 @@ public struct CryptoView: View {
   var openWalletURLAction: ((URL) -> Void)?
   
   var faviconRenderer: WalletFaviconRenderer
-  
-  var openCoinTypeSelection: (() -> Void)?
 
   public init(
     walletStore: WalletStore,
     keyringStore: KeyringStore,
     presentingContext: PresentingContext,
-    faviconRenderer: WalletFaviconRenderer,
-    coinTypesMenuAnchor: InvisibleUIView
+    faviconRenderer: WalletFaviconRenderer
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore
     self.presentingContext = presentingContext
     self.faviconRenderer = faviconRenderer
-    self.coinTypesMenuAnchor = coinTypesMenuAnchor
   }
 
   private enum VisibleScreen: Equatable {
@@ -117,13 +111,6 @@ public struct CryptoView: View {
             case .accountSelection:
               AccountListView(
                 keyringStore: keyringStore,
-                isPresentingCoinTypes: Binding(
-                  get: { store.isPresentingCoinTypes },
-                  set: { value in
-                    if value {
-                      openCoinTypeSelection?()
-                    }
-                  }),
                 onDismiss: {
                   dismissAction?()
                 }
@@ -241,10 +228,6 @@ public struct CryptoView: View {
       \.faviconRenderer,
        faviconRenderer
     )
-    .environment(
-      \.coinTypesMenuAnchor,
-       coinTypesMenuAnchor
-    )
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
         dismissAction?()
@@ -308,18 +291,6 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           }
         }
     )
-    .background(
-      Color.clear
-        .sheet(item: $cryptoStore.accountCreationCoinType) { coin in
-          NavigationView {
-            AddAccountView(
-              keyringStore: keyringStore,
-              coin: coin
-            )
-          }
-          .navigationViewStyle(StackNavigationViewStyle())
-        }
-    )
     .environment(
       \.buySendSwapDestination,
       Binding(
@@ -333,13 +304,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           } else {
             cryptoStore?.buySendSwapDestination = destination
           }
-        }))
-    .environment(
-      \.isPresentingCoinTypes,
-       Binding(
-        get: { [weak cryptoStore] in cryptoStore?.isPresentingCoinTypes ?? false },
-        set: { [weak cryptoStore] value in
-          cryptoStore?.isPresentingCoinTypes = value
-        }))
+        })
+    )
   }
 }

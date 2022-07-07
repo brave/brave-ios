@@ -14,8 +14,6 @@ struct AccountsView: View {
   var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
   @State private var selectedAccount: BraveWallet.AccountInfo?
-  
-  @Environment(\.isPresentingCoinTypes) private var isPresentingCoinTypes: Binding<Bool>
 
   private var primaryAccounts: [BraveWallet.AccountInfo] {
     keyringStore.keyring.accountInfos.filter(\.isPrimary)
@@ -31,8 +29,7 @@ struct AccountsView: View {
         header: AccountsHeaderView(
           keyringStore: keyringStore,
           settingsStore: cryptoStore.settingsStore,
-          networkStore: cryptoStore.networkStore,
-          isPresentingCoinTypes: isPresentingCoinTypes
+          networkStore: cryptoStore.networkStore
         )
         .resetListHeaderStyle()
       ) {

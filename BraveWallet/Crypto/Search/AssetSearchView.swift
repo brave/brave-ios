@@ -13,7 +13,6 @@ struct AssetSearchView: View {
   var cryptoStore: CryptoStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @Environment(\.isPresentingCoinTypes) private var isPresentingCoinTypes: Binding<Bool>
   
   @State private var allTokens: [BraveWallet.BlockchainToken] = []
   
@@ -24,8 +23,7 @@ struct AssetSearchView: View {
           destination: AssetDetailView(
             assetDetailStore: cryptoStore.assetDetailStore(for: token),
             keyringStore: keyringStore,
-            networkStore: cryptoStore.networkStore,
-            isPresentingCoinTypes: isPresentingCoinTypes
+            networkStore: cryptoStore.networkStore
           )
             .onDisappear {
               cryptoStore.closeAssetDetailStore(for: token)

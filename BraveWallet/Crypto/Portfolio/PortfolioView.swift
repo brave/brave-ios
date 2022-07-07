@@ -20,8 +20,6 @@ struct PortfolioView: View {
   @State private var dismissedBackupBannerThisSession: Bool = false
   @State private var isPresentingBackup: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
-  
-  @Environment(\.isPresentingCoinTypes) private var isPresentingCoinTypes: Binding<Bool>
 
   private var isShowingBackupBanner: Bool {
     !keyringStore.keyring.isBackedUp && !dismissedBackupBannerThisSession
@@ -113,8 +111,7 @@ struct PortfolioView: View {
             AssetDetailView(
               assetDetailStore: cryptoStore.assetDetailStore(for: token),
               keyringStore: keyringStore,
-              networkStore: cryptoStore.networkStore,
-              isPresentingCoinTypes: isPresentingCoinTypes
+              networkStore: cryptoStore.networkStore
             )
             .onDisappear {
               cryptoStore.closeAssetDetailStore(for: token)

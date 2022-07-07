@@ -9,15 +9,13 @@ import Strings
 
 struct AccountCoinTypesView: View {
   var action: (BraveWallet.CoinType) -> Void
-  var coinTypes: [BraveWallet.CoinType] = WalletConstants.supportedCoinTypes
-  
-  init(action: @escaping (BraveWallet.CoinType) -> Void) {
-    self.action = action
+  var coinTypes: [BraveWallet.CoinType] {
+    WalletConstants.supportedCoinTypes
   }
   
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      ForEach(coinTypes, id: \.self) { type in
+      ForEach(coinTypes) { type in
         Button(action: { self.action(type) }) {
           VStack(alignment: .leading, spacing: 3) {
             Text(type.localizedTitle)
