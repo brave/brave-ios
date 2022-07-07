@@ -51,6 +51,7 @@ enum TabSecureContentState {
 class Tab: NSObject {
   var id: String?
 
+  private let syncTab = BraveTab()
   let rewardsId: UInt32
 
   var onScreenshotUpdated: (() -> Void)?
@@ -137,6 +138,10 @@ class Tab: NSObject {
     didSet {
       if let _url = url, let internalUrl = InternalURL(_url), internalUrl.isAuthorized {
         url = URL(string: internalUrl.stripAuthorization)
+      }
+      
+      if let url = url, !isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
+        syncTab.setURL(url)
       }
     }
   }
@@ -457,21 +462,26 @@ class Tab: NSObject {
 
   var displayTitle: String {
     if let title = webView?.title, !title.isEmpty {
-      return title.contains("localhost") ? "" : title
+      let displayTitle = title.contains("localhost") ? "" : title
+      syncTab.setTitle(displayTitle)
+      return displayTitle
     }
 
     // When picking a display title. Tabs with sessionData are pending a restore so show their old title.
     // To prevent flickering of the display title. If a tab is restoring make sure to use its lastTitle.
     if let url = self.url, InternalURL(url)?.isAboutHomeURL ?? false, sessionData == nil, !restoring {
+      syncTab.setTitle(Strings.newTabTitle)
       return Strings.newTabTitle
     }
 
     // lets double check the sessionData in case this is a non-restored new tab
     if let firstURL = sessionData?.urls.first, sessionData?.urls.count == 1, InternalURL(firstURL)?.isAboutHomeURL ?? false {
+      syncTab.setTitle(Strings.newTabTitle)
       return Strings.newTabTitle
     }
 
     if let url = self.url, !InternalURL.isValid(url: url), let shownUrl = url.displayURL?.absoluteString {
+      syncTab.setTitle(shownUrl)
       return shownUrl
     }
 
@@ -479,13 +489,19 @@ class Tab: NSObject {
       // FF uses url?.displayURL?.absoluteString ??  ""
       // but we can grab the title from `TabMO`
       if let title = url?.absoluteString {
+        syncTab.setTitle(title)
         return title
       } else if let tab = TabMO.get(fromId: id) {
-        return tab.title ?? tab.url ?? ""
+        let title = tab.title ?? tab.url ?? ""
+        syncTab.setTitle(title)
+        return title
       }
+      
+      syncTab.setTitle("")
       return ""
     }
 
+    syncTab.setTitle(lastTitle)
     return lastTitle
   }
 
