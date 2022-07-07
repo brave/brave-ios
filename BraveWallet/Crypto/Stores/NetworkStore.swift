@@ -5,8 +5,6 @@
 
 import Foundation
 import BraveCore
-import BraveShared
-import Combine
 import SwiftUI
 import Strings
 
@@ -32,7 +30,6 @@ public class NetworkStore: ObservableObject {
 
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
-  private var cancellable: AnyCancellable?
 
   public init(
     rpcService: BraveWalletJsonRpcService,
@@ -47,10 +44,6 @@ public class NetworkStore: ObservableObject {
       }
     }
     rpcService.add(self)
-    cancellable = Preferences.Wallet.showTestNetworks.$value
-      .sink { [weak self] showTestNetworks in
-        self?.updateChainList()
-      }
   }
 
   private func updateChainList() {
