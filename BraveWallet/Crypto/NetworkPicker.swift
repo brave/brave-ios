@@ -44,14 +44,18 @@ struct NetworkPicker: View {
   }
   
   private var availableChains: [BraveWallet.NetworkInfo] {
-    networkStore.ethereumChains.filter {
-      if !Preferences.Wallet.showTestNetworks.value,
-          WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) {
-        return false
+    networkStore.ethereumChains.filter { chain in
+      if !Preferences.Wallet.showTestNetworks.value {
+        var testNetworkChainIdsToRemove = WalletConstants.supportedTestNetworkChainIds
+        // Don't remove selected network (possible if selected then disabled showing test networks)
+        testNetworkChainIdsToRemove.removeAll(where: { $0 == selectedNetwork.chainId })
+        if testNetworkChainIdsToRemove.contains(chain.chainId) {
+          return false
+        }
       }
       if let destination = buySendSwapDestination {
         if destination.kind != .send {
-          return !$0.isCustom
+          return !chain.isCustom
         }
       }
       return true
