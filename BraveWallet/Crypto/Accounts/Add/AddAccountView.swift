@@ -93,7 +93,7 @@ struct AddAccountView: View {
 
   var body: some View {
     Group {
-      if coin == nil {
+      if coin == nil && WalletConstants.supportedCoinTypes.count > 1 {
         List {
           Section(
             header: WalletListHeaderView(
