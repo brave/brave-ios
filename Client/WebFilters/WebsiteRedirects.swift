@@ -59,6 +59,9 @@ struct WebsiteRedirects {
     guard let redirect = foundMatch,
           var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
     
+    // For privacy reasons we do not redirect websites if username or password are present.
+    if components.user != nil || components.password != nil { return nil }
+    
     components.host = redirect.hostToRedirectTo
     return components.url
   }

@@ -82,4 +82,16 @@ class WebsiteRedirectsTests: XCTestCase {
       for: try url("https://www.npr.org/2022/07/07/1107814440/researchers-can-now-explain-how-climate-change-is-affecting-your-weather")),
                    try url("https://text.npr.org/2022/07/07/1107814440/researchers-can-now-explain-how-climate-change-is-affecting-your-weather"))
   }
+  
+  func testSkipRedirectIfUserPasswordPresent() {
+    // Normal case no user/password
+    XCTAssertEqual(WebsiteRedirects.websiteRedirect(
+      for: try url("https://reddit.com/r/brave")), try url("https://old.reddit.com/r/brave"))
+    
+    // User:Password
+    XCTAssertNil(WebsiteRedirects.websiteRedirect(for: try url("https://username:password@reddit.com/r/brave")))
+    
+    // User only
+    XCTAssertNil(WebsiteRedirects.websiteRedirect(for: try url("https://username@reddit.com/r/brave")))
+  }
 }
