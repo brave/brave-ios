@@ -7,11 +7,11 @@ import Foundation
 import UIKit
 import BraveCore
 import BraveShared
+import SnapKit
 
 /// A view that displays the tab's secure content state and the URL while scrolling into the page
 class CollapsedURLBarView: UIView {
   private let stackView = UIStackView().then {
-    $0.axis = .horizontal
     $0.spacing = 4
     $0.isUserInteractionEnabled = false
   }
@@ -32,6 +32,9 @@ class CollapsedURLBarView: UIView {
     $0.textColor = .bravePrimary
     $0.adjustsFontForContentSizeCategory = true
     $0.lineBreakMode = .byTruncatingHead
+    $0.numberOfLines = 1
+    $0.textAlignment = .right
+    $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
   }
   
   private func updateLockImageView() {
@@ -42,8 +45,10 @@ class CollapsedURLBarView: UIView {
       lockImageView.isHidden = true
     case .insecure:
       lockImageView.setImage(UIImage(named: "insecure-site-icon", in: .current, compatibleWith: nil)!, for: .normal)
+      lockImageView.accessibilityLabel = Strings.tabToolbarWarningImageAccessibilityLabel
     case .secure, .unknown:
       lockImageView.setImage(UIImage(named: "lock_verified", in: .current, compatibleWith: nil)!.template, for: .normal)
+      lockImageView.accessibilityLabel = Strings.tabToolbarLockImageAccessibilityLabel
     }
   }
   
@@ -61,6 +66,8 @@ class CollapsedURLBarView: UIView {
     }
   }
   
+  private var bottomConstraint: Constraint?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -75,7 +82,7 @@ class CollapsedURLBarView: UIView {
     
     stackView.snp.makeConstraints {
       $0.top.equalToSuperview()
-      $0.bottom.equalToSuperview().inset(4)
+      bottomConstraint = $0.bottom.equalToSuperview().constraint
       $0.leading.greaterThanOrEqualToSuperview().inset(12)
       $0.trailing.lessThanOrEqualToSuperview().inset(12)
       $0.centerX.equalToSuperview()
@@ -85,6 +92,12 @@ class CollapsedURLBarView: UIView {
       $0.top.equalTo(self.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
+  }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    let topSafeAreaInset = window.map(\.safeAreaInsets.top) ?? 0.0
+    bottomConstraint?.update(inset: topSafeAreaInset > 0 ? 4 : 0)
   }
   
   @available(*, unavailable)

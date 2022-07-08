@@ -108,7 +108,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   fileprivate let crashedLastSession: Bool
 
   // These views wrap the top and bottom toolbars to provide background effects on them
-  var header = HeaderContainerView()
+  let header = HeaderContainerView()
   var footer: UIView!
   fileprivate var topTouchArea: UIButton!
 
@@ -601,6 +601,16 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     }
 
     updateTabsBarVisibility()
+  }
+  
+  private func updateToolbarSecureContentState(_ secureContentState: TabSecureContentState) {
+    topToolbar.secureContentState = secureContentState
+    collapsedURLBarView.secureContentState = secureContentState
+  }
+  
+  private func updateToolbarCurrentURL(_ currentURL: URL?) {
+    topToolbar.currentURL = currentURL
+    collapsedURLBarView.currentURL = currentURL
   }
 
   override public func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -1351,8 +1361,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         }
       }
     } else {
-      topToolbar.currentURL = url
-      collapsedURLBarView.currentURL = url
+      updateToolbarCurrentURL(url)
       topToolbar.leaveOverlayMode()
 
       guard let tab = tabManager.selectedTab else {
@@ -1485,8 +1494,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
 
       if tabManager.selectedTab === tab {
-        topToolbar.secureContentState = tab.secureContentState
-        collapsedURLBarView.secureContentState = tab.secureContentState
+        updateToolbarSecureContentState(tab.secureContentState)
       }
     case .serverTrust:
       guard let tab = tabManager[webView] else {
@@ -1503,8 +1511,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
             tab.secureContentState = .localHost
             if tabManager.selectedTab === tab {
-              topToolbar.secureContentState = .localHost
-              collapsedURLBarView.secureContentState = .localHost
+              updateToolbarSecureContentState(.localHost)
             }
             break
           }
@@ -1516,8 +1523,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
             if ErrorPageHelper.certificateError(for: url) != 0 {
               tab.secureContentState = .insecure
               if tabManager.selectedTab === tab {
-                topToolbar.secureContentState = .insecure
-                collapsedURLBarView.secureContentState = .insecure
+                updateToolbarSecureContentState(.insecure)
               }
               break
             }
@@ -1526,8 +1532,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           if url.isReaderModeURL || InternalURL.isValid(url: url) {
             tab.secureContentState = .unknown
             if tabManager.selectedTab === tab {
-              topToolbar.secureContentState = .unknown
-              collapsedURLBarView.secureContentState = .unknown
+              updateToolbarSecureContentState(.unknown)
             }
             break
           }
@@ -1540,8 +1545,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         }
 
         if tabManager.selectedTab === tab {
-          topToolbar.secureContentState = tab.secureContentState
-          collapsedURLBarView.secureContentState = tab.secureContentState
+          updateToolbarSecureContentState(tab.secureContentState)
         }
         break
       }
@@ -1615,11 +1619,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
     }
 
-    topToolbar.currentURL = tab.url?.displayURL
-    collapsedURLBarView.currentURL = tab.url?.displayURL
+    updateToolbarCurrentURL(tab.url?.displayURL)
     if tabManager.selectedTab === tab {
-      topToolbar.secureContentState = tab.secureContentState
-      collapsedURLBarView.secureContentState = tab.secureContentState
+      updateToolbarSecureContentState(tab.secureContentState)
     }
 
     let isPage = tab.url?.displayURL?.isWebPage() ?? false
@@ -2132,13 +2134,13 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       toolbarTopConstraint?.update(offset: 0)
       toolbarBottomConstraint?.update(offset: 0)
       topToolbar.locationContainer.alpha = 1
-      tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     case .collapsed:
       toolbarTopConstraint?.update(offset: -headerHeight)
       topToolbar.locationContainer.alpha = 0
-      tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       toolbarBottomConstraint?.update(offset: footerHeight)
     }
+    tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+    topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
     let animator = toolbarVisibilityViewModel.toolbarChangePropertyAnimator
     animator.addAnimations {
@@ -2994,8 +2996,7 @@ extension BrowserViewController: WKUIDelegate {
 
     if error.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue) {
       if let tab = tabManager[webView], tab === tabManager.selectedTab {
-        topToolbar.currentURL = tab.url?.displayURL
-        collapsedURLBarView.currentURL = tab.url?.displayURL
+        updateToolbarCurrentURL(tab.url?.displayURL)
         updateWebViewPageZoom(tab: tab)
       }
       return

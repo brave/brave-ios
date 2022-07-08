@@ -24,7 +24,7 @@ class HeaderContainerView: UIView {
     addSubview(collapsedBarContainerView)
     
     collapsedBarContainerView.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview()
+      $0.leading.trailing.equalTo(safeAreaLayoutGuide)
       $0.bottom.equalToSuperview()
     }
     expandedBarStackView.snp.makeConstraints {
