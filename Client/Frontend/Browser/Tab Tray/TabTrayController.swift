@@ -30,6 +30,7 @@ class TabTrayController: LoadingViewController {
 
   let tabManager: TabManager
   private let openTabsAPI: BraveOpenTabsAPI
+  private var openTabsSessionServiceListener: OpenTabsSessionStateListener?
 
   weak var delegate: TabTrayDelegate?
   weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
@@ -149,6 +150,20 @@ class TabTrayController: LoadingViewController {
       transitioningDelegate = self
       modalPresentationStyle = .fullScreen
     }
+    
+    // Adding the Open Tabs session observer in constructor to watch synced sessions updating
+    openTabsSessionServiceListener = openTabsAPI.add(
+      OpenTabsStateObserver { [weak self] stateChange in
+        guard let self = self else { return }
+        
+        switch stateChange {
+        case .openTabsSyncStateChanged:
+          print("Change")
+        default:
+          break
+        }
+      }
+    )
   }
 
   @available(*, unavailable)
