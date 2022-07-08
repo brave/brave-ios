@@ -116,7 +116,11 @@ public class AdblockResourceDownloader {
         return nil
       }
 
-      let url = URL(string: resourcePath, relativeTo: baseResourceURL)!
+      guard let url = URL(string: resourcePath, relativeTo: baseResourceURL) else {
+        assertionFailure("This uses all hardcoded components so it should not fail unless we made a mistake somewhere")
+        return nil
+      }
+      
       var headers = [String: String]()
       if let servicesKeyValue = Bundle.main.getPlistString(for: self.servicesKeyName) {
         headers[self.servicesKeyHeaderValue] = servicesKeyValue
