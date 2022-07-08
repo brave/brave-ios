@@ -124,7 +124,7 @@ struct AddAccountView: View {
                         .multilineTextAlignment(.leading)
                     }
                   }
-                  .padding([.top, .bottom], 10)
+                  .padding(.vertical, 10)
                 }
               }
             }
