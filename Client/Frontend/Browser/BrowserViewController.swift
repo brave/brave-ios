@@ -949,9 +949,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       make.left.right.equalTo(self.view)
     }
 
-    topToolbar.snp.makeConstraints { make in
-      make.height.equalTo(UIConstants.topToolbarHeight)
-    }
+//    topToolbar.snp.makeConstraints { make in
+//      make.height.equalTo(UIConstants.topToolbarHeight)
+//    }
     
     collapsedURLBarView.snp.makeConstraints {
       $0.edges.equalToSuperview()

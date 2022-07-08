@@ -8,6 +8,7 @@ import BraveShared
 import Data
 import Combine
 import UIKit
+import DesignSystem
 
 private struct TopToolbarViewUX {
   static let locationPadding: CGFloat = 8
@@ -152,7 +153,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }()
 
   lazy var bookmarkButton = ToolbarButton(top: true).then {
-    $0.setImage(UIImage(named: "menu_bookmarks", in: .current, compatibleWith: nil)!.template, for: .normal)
+    $0.setImage(UIImage(braveSystemNamed: "brave.book"), for: .normal)
     $0.accessibilityLabel = Strings.bookmarksMenuItem
     $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
   }
@@ -181,8 +182,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
   /// Update the shields icon based on whether or not shields are enabled for this site
   func refreshShieldsStatus() {
     // Default on
-    var shieldIcon = "shields-menu-icon"
-    let shieldsOffIcon = "shields-off-menu-icon"
+    var shieldIcon = "brave.logo"
+    let shieldsOffIcon = "brave.logo.greyscale"
     if let currentURL = currentURL {
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
       let domain = Domain.getOrCreate(forUrl: currentURL, persistent: !isPrivateBrowsing)
@@ -196,7 +197,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
       shieldIcon = shieldsOffIcon
     }
 
-    locationView.shieldsButton.setImage(UIImage(named: shieldIcon, in: .current, compatibleWith: nil)!, for: .normal)
+    locationView.shieldsButton.setImage(UIImage(sharedNamed: shieldIcon), for: .normal)
   }
 
   private var privateModeCancellable: AnyCancellable?
@@ -229,18 +230,21 @@ class TopToolbarView: UIView, ToolbarProtocol {
     // Url bar will expand while keeping space for other items on the address bar.
     locationContainer.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-    navigationStackView.addArrangedSubview(backButton)
-    navigationStackView.addArrangedSubview(forwardButton)
+    leadingItemsStackView.addArrangedSubview(backButton)
+    leadingItemsStackView.addArrangedSubview(forwardButton)
+    leadingItemsStackView.addArrangedSubview(bookmarkButton)
 
-    [backButton, forwardButton, bookmarkButton, tabsButton, menuButton].forEach {
-      $0.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
+    [backButton, forwardButton].forEach {
+      $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
     }
+    bookmarkButton.contentEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 2)
+    
+    trailingItemsStackView.addArrangedSubview(tabsButton)
+    trailingItemsStackView.addArrangedSubview(menuButton)
 
-    [navigationStackView, bookmarkButton, locationContainer, tabsButton, menuButton, cancelButton].forEach {
+    [leadingItemsStackView, locationContainer, trailingItemsStackView, cancelButton].forEach {
       mainStackView.addArrangedSubview($0)
     }
-
-    mainStackView.setCustomSpacing(16, after: locationContainer)
 
     setupConstraints()
 
@@ -264,6 +268,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
       .store(in: &cancellables)
     
     updateURLBarButtonsVisibility()
+    helper?.updateForTraitCollection(traitCollection, additionalButtons: [bookmarkButton])
+    updateForTraitCollection()
   }
 
   @available(*, unavailable)
@@ -279,14 +285,41 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.insetsLayoutMarginsFromSafeArea = false
   }
 
-  private let navigationStackView = UIStackView().then {
+  private let leadingItemsStackView = UIStackView().then {
     $0.distribution = .fillEqually
     $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.spacing = 8
+  }
+  
+  private let trailingItemsStackView = UIStackView().then {
+    $0.distribution = .fillEqually
+    $0.alignment = .center
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    $0.spacing = 8
   }
 
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    helper?.updateForTraitCollection(traitCollection, additionalButtons: [bookmarkButton])
+    updateForTraitCollection()
+  }
+  
+  private func updateForTraitCollection() {
+    let toolbarSizeCategory = traitCollection.toolbarButtonContentSizeCategory
+    let pointSize = UIFont.preferredFont(forTextStyle: .body, compatibleWith: .init(preferredContentSizeCategory: toolbarSizeCategory)).lineHeight
+    locationView.shieldsButton.snp.remakeConstraints {
+      $0.height.equalTo(pointSize)
+    }
+    locationView.rewardsButton.snp.remakeConstraints {
+      $0.height.equalTo(pointSize)
+    }
+    let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
+    locationTextField?.font = .preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection)
+  }
+  
   private func setupConstraints() {
     locationContainer.snp.remakeConstraints {
-      $0.height.equalTo(TopToolbarViewUX.locationHeight)
+      $0.top.bottom.equalToSuperview().inset(8)
     }
 
     mainStackView.layoutMargins = UIDevice.isIpad ? UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5) : .zero
@@ -315,6 +348,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
     locationView.snp.makeConstraints { make in
       make.edges.equalTo(self.locationContainer)
+      make.height.greaterThanOrEqualTo(TopToolbarViewUX.locationHeight)
     }
   }
 
@@ -351,7 +385,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     locationTextField.returnKeyType = .go
     locationTextField.clearButtonMode = .whileEditing
     locationTextField.textAlignment = .left
-    locationTextField.font = UIConstants.defaultChromeFont
+    locationTextField.font = .preferredFont(forTextStyle: .body)
     locationTextField.accessibilityIdentifier = "address"
     locationTextField.accessibilityLabel = Strings.URLBarViewLocationTextViewAccessibilityLabel
     locationTextField.attributedPlaceholder = self.locationView.placeholder
@@ -491,6 +525,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
   func enterOverlayMode(_ locationText: String?, pasted: Bool, search: Bool) {
     createLocationTextField()
+    updateForTraitCollection()
 
     // Show the overlay mode UI, which includes hiding the locationView and replacing it
     // with the editable locationTextField.
@@ -537,13 +572,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
       cancelButton.isHidden = !inOverlayMode
     }
     progressBar.isHidden = inOverlayMode
-    navigationStackView.isHidden = !toolbarIsShowing || inOverlayMode
-    menuButton.isHidden = !toolbarIsShowing || inOverlayMode
-    tabsButton.isHidden = !toolbarIsShowing || inOverlayMode
+    backButton.isHidden = !toolbarIsShowing || inOverlayMode
+    forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
+    trailingItemsStackView.isHidden = !toolbarIsShowing || inOverlayMode
     locationView.contentView.isHidden = inOverlayMode
 
     let showBookmarkPref = Preferences.General.showBookmarkToolbarShortcut.value
     bookmarkButton.isHidden = showBookmarkPref ? inOverlayMode : true
+    leadingItemsStackView.isHidden = leadingItemsStackView.arrangedSubviews.allSatisfy(\.isHidden)
   }
 
   private func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -554,7 +590,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
 
     if inOverlayMode {
-      [progressBar, navigationStackView, bookmarkButton, menuButton, tabsButton, locationView.contentView].forEach {
+      [progressBar, leadingItemsStackView, bookmarkButton, menuButton, tabsButton, locationView.contentView].forEach {
         $0?.isHidden = true
       }
 
