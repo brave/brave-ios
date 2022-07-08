@@ -14,8 +14,7 @@ struct AccountsHeaderView: View {
   var networkStore: NetworkStore
 
   @State private var isPresentingBackup: Bool = false
-  @State private var isPresentingCoinTypes: Bool = false
-  @State private var coinType: BraveWallet.CoinType?
+  @State private var isPresentingAddAccount: Bool = false
 
   var body: some View {
     HStack {
@@ -41,7 +40,7 @@ struct AccountsHeaderView: View {
       Spacer()
       HStack(spacing: 16) {
         Button(action: {
-          isPresentingCoinTypes = true
+          isPresentingAddAccount = true
         }) {
           Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
             .labelStyle(.iconOnly)
@@ -58,15 +57,9 @@ struct AccountsHeaderView: View {
       }
       .foregroundColor(Color(.braveLabel))
     }
-    .panModal(isPresented: $isPresentingCoinTypes) {
-      AccountCoinTypesView { coin in
-        isPresentingCoinTypes = false
-        coinType = coin
-      }
-    }
-    .sheet(item: $coinType) { coin in
+    .sheet(isPresented: $isPresentingAddAccount) {
       NavigationView {
-        AddAccountView(keyringStore: keyringStore, coin: coin)
+        AddAccountView(keyringStore: keyringStore)
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }

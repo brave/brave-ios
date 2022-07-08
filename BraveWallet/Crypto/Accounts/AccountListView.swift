@@ -12,9 +12,7 @@ struct AccountListView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  @State private var isPresentingCoinTypes: Bool = false
   @State private var isPresentingAddAccount: Bool = false
-  @State private var coinType: BraveWallet.CoinType?
   
   var onDismiss: () -> Void
   
@@ -49,7 +47,7 @@ struct AccountListView: View {
         }
         ToolbarItemGroup(placement: .primaryAction) {
           Button(action: {
-            isPresentingCoinTypes = true
+            isPresentingAddAccount = true
           }) {
             Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
               .foregroundColor(Color(.braveOrange))
@@ -58,15 +56,9 @@ struct AccountListView: View {
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
-    .panModal(isPresented: $isPresentingCoinTypes) {
-      AccountCoinTypesView { coin in
-        isPresentingCoinTypes = false
-        coinType = coin
-      }
-    }
-    .sheet(item: $coinType) { coin in
+    .sheet(isPresented: $isPresentingAddAccount) {
       NavigationView {
-        AddAccountView(keyringStore: keyringStore, coin: coin)
+        AddAccountView(keyringStore: keyringStore)
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }

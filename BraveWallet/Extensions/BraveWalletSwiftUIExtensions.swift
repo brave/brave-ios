@@ -230,4 +230,17 @@ extension BraveWallet.CoinType: Identifiable {
       return Strings.Wallet.coinTypeUnknown
     }
   }
+  
+  var iconName: String {
+    switch self {
+    case .eth:
+      return "eth-asset-icon"
+    case .sol:
+      return "sol-asset-icon"
+    case .fil:
+      return "filecoin-asset-icon"
+    @unknown default:
+      return ""
+    }
+  }
 }

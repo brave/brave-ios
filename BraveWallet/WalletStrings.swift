@@ -2549,5 +2549,12 @@ extension Strings {
       value: "Unknown",
       comment: "A placeholder for unknown coin type."
     )
+    public static let coinTypeSelectionHeader = NSLocalizedString(
+      "wallet.coinTypeSelectionHeader",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Select one of the following account types",
+      comment: "A header displayed above coin types selection."
+    )
   }
 }

@@ -17,8 +17,7 @@ struct AssetDetailView: View {
 
   @State private var tableInset: CGFloat = -16.0
   @State private var transactionDetails: BraveWallet.TransactionInfo?
-  @State private var isPresentingCoinTypes: Bool = false
-  @State private var coinType: BraveWallet.CoinType?
+  @State private var isPresentingAddAccount: Bool = false
 
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -41,7 +40,7 @@ struct AssetDetailView: View {
       Section(
         header: WalletListHeaderView(title: Text(Strings.Wallet.accountsPageTitle)),
         footer: Button(action: {
-          isPresentingCoinTypes = true
+          isPresentingAddAccount = true
         }) {
           Text(Strings.Wallet.addAccountTitle)
         }
@@ -139,15 +138,9 @@ struct AssetDetailView: View {
           )
         }
     )
-    .panModal(isPresented: $isPresentingCoinTypes) {
-      AccountCoinTypesView { coin in
-        isPresentingCoinTypes = false
-        coinType = coin
-      }
-    }
-    .sheet(item: $coinType) { coin in
+    .sheet(isPresented: $isPresentingAddAccount) {
       NavigationView {
-        AddAccountView(keyringStore: keyringStore, coin: coin)
+        AddAccountView(keyringStore: keyringStore)
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }
