@@ -37,4 +37,10 @@ extension UIColor {
     let colorInt = UInt32(Scanner(string: string).scanInt32(representation: .hexadecimal) ?? 0)
     self.init(rgb: (Int)(colorInt))
   }
+  
+  public var rgb: Int {
+    var (r, g, b): (CGFloat, CGFloat, CGFloat) = (0.0, 0.0, 0.0)
+    getRed(&r, green: &g, blue: &b, alpha: nil)
+    return (Int(r * 255.0) << 16) | (Int(g * 255.0) << 8) | Int(b * 255.0)
+  }
 }

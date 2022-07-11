@@ -6,10 +6,10 @@
 import Foundation
 import UIKit
 import BraveCore
+import SDWebImage
 
 /// Handles obtaining favicons for URLs from local files, database or internet
 public class FaviconFetcher {
-  private static let cache = NSCache<NSURL, Favicon>()
   private static var operations = Set<FaviconOperation>()
   public static let defaultFaviconImage = UIImage(named: "defaultFavicon", in: .current, compatibleWith: nil)!
 
@@ -25,8 +25,43 @@ public class FaviconFetcher {
     case smallIcon
   }
   
+  public static func clearCache() {
+    SDImageCache.shared.memoryCache.removeAllObjects()
+    SDImageCache.shared.diskCache.removeAllData()
+  }
+  
   @discardableResult
   public static func loadIcon(url: URL, kind: FaviconFetcher.Kind = .smallIcon, persistent: Bool, completion: ((Favicon?) -> Void)?) -> Cancellable {
+    // Some websites still only have a favicon for the FULL url including the fragmented parts
+    // But they won't have a favicon for their domain
+    // In this case, we want to store the favicon for the entire domain regardless of query parameters or fragmented parts
+    // Example: `https://app.uniswap.org/` has no favicon, but `https://app.uniswap.org/#/swap?chain=mainnet` does.
+    let cacheURL = URLOrigin(url: url).url ?? url
+    
+    func storeInCache(_ favicon: Favicon, for url: URL) {
+      // Do not cache persistent icons
+      // Do not cache monogram icons
+      if persistent, !favicon.isMonogramImage {
+        guard let data = try? JSONEncoder().encode(favicon) else {
+          return
+        }
+        
+        SDImageCache.shared.memoryCache.setObject(data, forKey: cacheURL.absoluteString, cost: UInt(data.count))
+        SDImageCache.shared.diskCache.setData(data, forKey: cacheURL.absoluteString)
+      }
+    }
+    
+    func getFromCache(for url: URL) -> Favicon? {
+      let data = SDImageCache.shared.memoryCache.object(forKey: cacheURL.absoluteString) as? Data ??
+                 SDImageCache.shared.diskCache.data(forKey: cacheURL.absoluteString)
+      
+      if let data = data,
+          let favicon = try? JSONDecoder().decode(Favicon.self, from: data) {
+        return favicon
+      }
+      
+      return nil
+    }
     
     var workItem: DispatchWorkItem?
     workItem = DispatchWorkItem {
@@ -35,7 +70,7 @@ public class FaviconFetcher {
         return
       }
       
-      if let favicon = cache.object(forKey: url as NSURL) {
+      if let favicon = getFromCache(for: url) {
         workItem = nil
         completion?(favicon)
         return
@@ -57,7 +92,7 @@ public class FaviconFetcher {
         if let favicon = favicon {
           workItem = nil
           operations.remove(operation)
-          cache.setObject(favicon, forKey: url as NSURL)
+          storeInCache(favicon, for: url)
           operation.completion?(favicon)
           return
         }
@@ -76,7 +111,7 @@ public class FaviconFetcher {
           
           // A favicon was fetched
           if let favicon = favicon {
-            cache.setObject(favicon, forKey: url as NSURL)
+            storeInCache(favicon, for: url)
           }
           
           operation.completion?(favicon)
