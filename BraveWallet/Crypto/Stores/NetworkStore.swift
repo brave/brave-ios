@@ -90,6 +90,7 @@ public class NetworkStore: ObservableObject {
     guard self.selectedChainId != network.chainId else { return }
     self.previousNetworkChainId = selectedChainId
     self.selectedChainId = network.chainId
+    self.rpcService.setNetwork(network.chainId, coin: network.coin) { _ in }
   }
   
   func returnToPreviousChainIfAccountNotCreated() {
