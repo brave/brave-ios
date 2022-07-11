@@ -43,11 +43,9 @@ extension Data {
   public var hexEncodedString: String {
     var result = String()
     result.reserveCapacity(count * 2)
-    withUnsafeBytes {
-      for i in 0..<count {
-        result.append(HexDigits[Int(($0[i] & 0xf0) >> 4)])
-        result.append(HexDigits[Int($0[i] & 0x0f)])
-      }
+    for byte in self {
+      result.append(HexDigits[Int((byte & 0xf0) >> 4)])
+      result.append(HexDigits[Int(byte & 0x0f)])
     }
 
     return String(result)

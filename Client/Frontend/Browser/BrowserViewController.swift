@@ -200,7 +200,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var isOnboardingOrFullScreenCalloutPresented = false
 
   private(set) var widgetBookmarksFRC: NSFetchedResultsController<Favorite>?
-  var widgetFaviconFetchers: [FaviconFetcher] = []
+  var widgetFaviconFetchers: [FaviconFetcher.Cancellable] = []
   let deviceCheckClient: DeviceCheckClient?
 
   /// The currently open WalletStore
@@ -2313,6 +2313,7 @@ extension BrowserViewController: TabDelegate {
     tab.addContentScript(ReadyStateScriptHelper(tab: tab), name: ReadyStateScriptHelper.name(), contentWorld: .page)
     tab.addContentScript(DeAmpHelper(tab: tab), name: DeAmpHelper.name(), contentWorld: .defaultClient)
     tab.addContentScript(RequestBlockingContentHelper(), name: RequestBlockingContentHelper.name(), contentWorld: .page)
+    tab.addContentScript(FaviconHelper(tab: tab), name: FaviconHelper.name(), contentWorld: .page)
   }
 
   func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {

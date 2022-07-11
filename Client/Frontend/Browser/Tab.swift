@@ -108,6 +108,7 @@ class Tab: NSObject {
 
   var userActivity: NSUserActivity?
 
+  let driver = FaviconLoader.Driver(privateBrowsingMode: false)
   var webView: BraveWebView?
   var tabDelegate: TabDelegate?
   weak var urlDidChangeDelegate: URLChangeDelegate?  // TODO: generalize this.
@@ -502,7 +503,7 @@ class Tab: NSObject {
 
   var displayFavicon: Favicon? {
     if let url = url, InternalURL(url)?.isAboutHomeURL == true { return nil }
-    return favicons.max { $0.width! < $1.width! }
+    return favicons.first
   }
 
   var canGoBack: Bool {

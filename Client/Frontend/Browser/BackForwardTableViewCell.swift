@@ -5,6 +5,7 @@
 import UIKit
 import Storage
 import Shared
+import BraveShared
 
 class BackForwardTableViewCell: UITableViewCell {
 
@@ -68,7 +69,6 @@ class BackForwardTableViewCell: UITableViewCell {
         if InternalURL.isValid(url: s.tileURL) {
           faviconView.backgroundColor = .white
           faviconView.image = FaviconFetcher.defaultFaviconImage
-          faviconView.clearMonogramFavicon()
         } else {
           faviconView.loadFavicon(for: s.tileURL)
         }

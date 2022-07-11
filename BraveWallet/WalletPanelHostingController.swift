@@ -19,8 +19,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
 
   public init(
     walletStore: WalletStore,
-    origin: URLOrigin,
-    faviconRenderer: WalletFaviconRenderer
+    origin: URLOrigin
   ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
@@ -43,7 +42,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
             self.dismiss(
               animated: true,
               completion: {
-                let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: .buySendSwap(destination), faviconRenderer: faviconRenderer)
+                let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: .buySendSwap(destination))
                 walletHostingController.delegate = self.delegate
                 self.present(walletHostingController, animated: true)
               })

@@ -6,7 +6,7 @@ import Foundation
 import Shared
 import Storage
 import SDWebImage
-import class Data.FaviconMO
+import BraveShared
 import UIKit
 
 class FaviconHandler {
@@ -25,82 +25,23 @@ class FaviconHandler {
 
   @MainActor func loadFaviconURL(
     _ faviconURL: String,
-    type: IconType,
     forTab tab: Tab
-  ) async throws -> (Favicon, Data?) {
-    guard let iconURL = URL(string: faviconURL), let currentURL = tab.url else {
+  ) async throws -> Favicon {
+    guard let currentURL = tab.url else {
       throw FaviconError.noImageLoaded
     }
     
-    var imageOperation: SDWebImageOperation?
-
-    let webImageCache = WebImageCacheManager.shared
-    
-    return await withCheckedContinuation { continuation in
-      let onProgress: ImageCacheProgress = { receivedSize, expectedSize, _ in
-        if receivedSize >= FaviconHandler.maximumFaviconSize || expectedSize > FaviconHandler.maximumFaviconSize {
-          imageOperation?.cancel()
-        }
-      }
-      
-      let onSuccess: (Favicon, Data?) -> Void = { [weak tab] (favicon, data) -> Void in
-        defer { continuation.resume(returning: (favicon, data)) }
-        
+    return try await withCheckedThrowingContinuation { continuation in
+      FaviconFetcher.loadIcon(url: currentURL, kind: .smallIcon, persistent: !tab.isPrivate) { [weak tab] favicon in
         guard let tab = tab else { return }
         
-        tab.favicons.append(favicon)
-        FaviconMO.add(favicon, forSiteUrl: currentURL, persistent: !tab.isPrivate)
-      }
-      
-      let onCompletedSiteFavicon: ImageCacheCompletion = { image, data, _, _, url in
-        let favicon = Favicon(url: url.absoluteString, date: Date(), type: type)
-        
-        guard let image = image,
-              let imageData = data
-        else {
-          favicon.width = 0
-          favicon.height = 0
-          
-          onSuccess(favicon, data)
-          return
+        if let favicon = favicon {
+          tab.favicons.append(favicon)
+          continuation.resume(with: .success(favicon))
+        } else {
+          continuation.resume(throwing: FaviconError.noImageLoaded)
         }
-        
-        if let header = "%PDF".data(using: .utf8),
-           imageData.count >= header.count,
-           let range = imageData.range(of: header),
-           range.lowerBound.distance(to: imageData.startIndex) < 8 {
-          // strict PDF parsing. Otherwise index <= (1024 - header.count)
-          // ^8 is the best range because some PDF's can contain a UTF-8 BOM (Byte-Order Mark)
-          
-          favicon.width = 0
-          favicon.height = 0
-          onSuccess(favicon, data)
-          return
-        }
-        
-        favicon.width = Int(image.size.width)
-        favicon.height = Int(image.size.height)
-        
-        onSuccess(favicon, data)
       }
-      
-      let onCompletedPageFavicon: ImageCacheCompletion = { image, data, _, _, url in
-        guard let image = image else {
-          // If we failed to download a page-level icon, try getting the domain-level icon
-          // instead before ultimately failing.
-          let siteIconURL = currentURL.domainURL.appendingPathComponent("favicon.ico")
-          imageOperation = webImageCache.load(from: siteIconURL, options: [.lowPriority], progress: onProgress, completion: onCompletedSiteFavicon)
-          return
-        }
-        
-        let favicon = Favicon(url: url.absoluteString, date: Date(), type: type)
-        favicon.width = Int(image.size.width)
-        favicon.height = Int(image.size.height)
-        
-        onSuccess(favicon, data)
-      }
-      
-      imageOperation = webImageCache.load(from: iconURL, options: [.lowPriority], progress: onProgress, completion: onCompletedPageFavicon)
     }
   }
 }
@@ -110,18 +51,18 @@ extension FaviconHandler: TabEventHandler {
     tab.favicons.removeAll(keepingCapacity: false)
     Task { @MainActor in
       if let iconURL = metadata.largeIconURL {
-        let (favicon, data) = try await loadFaviconURL(iconURL, type: .appleIcon, forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
+        let favicon = try await loadFaviconURL(iconURL, forTab: tab)
+        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
       } else if let iconURL = metadata.faviconURL {
-        let (favicon, data) = try await loadFaviconURL(iconURL, type: .appleIcon, forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
+        let favicon = try await loadFaviconURL(iconURL, forTab: tab)
+        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
       }
       // No favicon fetched from metadata, trying base domain's standard favicon location.
       else if let baseURL = tab.url?.domainURL {
-        let (favicon, data) = try await loadFaviconURL(
+        let favicon = try await loadFaviconURL(
           baseURL.appendingPathComponent("favicon.ico").absoluteString,
-          type: .icon, forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
+          forTab: tab)
+        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
       }
     }
   }

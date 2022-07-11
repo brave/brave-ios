@@ -11,6 +11,10 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``TokenRegistryStore.previewStore``
 class MockBlockchainRegistry: BraveWalletBlockchainRegistry {
+  func searchNetworks(_ chainIdFilter: String?, chainNameFilter: String?, completion: @escaping ([BraveWallet.NetworkInfo]) -> Void) {
+    completion([.init()])
+  }
+  
   static let testTokens: [BraveWallet.BlockchainToken] = [
     .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: "BAT", decimals: 18, visible: true, tokenId: "", coingeckoId: "", chainId: "", coin: .eth),
     .init(contractAddress: "0xB8c77482e45F1F44dE1745F52C74426C631bDD52", name: "BNB", logo: "", isErc20: true, isErc721: false, symbol: "BNB", decimals: 18, visible: true, tokenId: "", coingeckoId: "", chainId: "", coin: .eth),

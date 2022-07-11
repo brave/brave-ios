@@ -14,7 +14,7 @@ class PlaylistFolderImageLoader: ObservableObject {
   @Published var image: UIImage?
 
   private let renderer = PlaylistThumbnailRenderer()
-  private let fetcher = FavIconImageRenderer()
+  private var faviconTask: FaviconFetcher.Cancellable?
 
   func load(thumbnail: PlaylistItem) {
     guard let mediaSrc = thumbnail.mediaSrc,
@@ -39,9 +39,10 @@ class PlaylistFolderImageLoader: ObservableObject {
   }
 
   func load(domainUrl: URL) {
-    fetcher.loadIcon(siteURL: domainUrl, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing) { [weak self] image in
-      self?.image = image
-    }
+    faviconTask?.cancel()
+    faviconTask = FaviconFetcher.loadIcon(url: domainUrl, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing, completion: { [weak self] favicon in
+      self?.image = favicon?.image
+    })
   }
 
   private func loadImage(url: URL, isFavIcon: Bool) {

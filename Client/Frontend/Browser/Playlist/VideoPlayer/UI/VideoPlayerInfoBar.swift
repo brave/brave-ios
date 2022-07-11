@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import AVKit
 import Data
+import BraveShared
 
 class VideoPlayerInfoBar: UIView {
   private let controlStackView = UIStackView().then {
@@ -109,18 +110,15 @@ class VideoPlayerInfoBar: UIView {
 
   func updateFavIcon(domain: String) {
     favIconImageView.cancelFaviconLoad()
-    favIconImageView.clearMonogramFavicon()
     favIconImageView.contentMode = .scaleAspectFit
     favIconImageView.image = FaviconFetcher.defaultFaviconImage
 
     if let url = URL(string: domain) {
-      let domain = Domain.getOrCreate(forUrl: url, persistent: false)
-      favIconImageView.loadFavicon(for: url, domain: domain)
+      favIconImageView.loadFavicon(for: url)
     }
   }
 
   func clearFavIcon() {
-    favIconImageView.clearMonogramFavicon()
     favIconImageView.image = nil
   }
 }

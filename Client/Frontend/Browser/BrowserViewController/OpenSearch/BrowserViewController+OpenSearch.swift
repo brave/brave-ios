@@ -8,6 +8,7 @@ import Storage
 import UIKit
 import WebKit
 import XCGLogger
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -153,45 +154,16 @@ extension BrowserViewController {
       url = constructedReferenceURL
     }
 
-    downloadOpenSearchXML(url, reference: reference, title: title, iconURL: tabManager.selectedTab?.displayFavicon?.url)
+    downloadOpenSearchXML(url, reference: reference, title: title, icon: tabManager.selectedTab?.displayFavicon)
   }
 
-  func downloadOpenSearchXML(_ url: URL, reference: String, title: String, iconURL: String?) {
+  func downloadOpenSearchXML(_ url: URL, reference: String, title: String, icon: Favicon?) {
     customSearchEngineButton.action = .loading
 
-    var searchEngineIcon = UIImage(named: "defaultFavicon", in: .current, compatibleWith: nil)!
-
-    if let faviconURLString = tabManager.selectedTab?.displayFavicon?.url,
-      let iconURL = URL(string: faviconURLString) {
-
-      // Try to fetch Engine Icon using cache manager
-      WebImageCacheManager.shared.load(
-        from: iconURL,
-        completion: { [weak self] (image, _, error, _, _) in
-          if error != nil {
-            URLSession.shared.dataTask(
-              with: iconURL,
-              completionHandler: { [weak self] data, response, error in
-                guard let data = data else { return }
-
-                if let downloadedImage = UIImage(data: data) {
-                  searchEngineIcon = downloadedImage
-                  WebImageCacheManager.shared.cacheImage(image: downloadedImage, data: data, url: iconURL)
-                }
-
-                self?.createSearchEngine(url, reference: reference, icon: searchEngineIcon)
-              }
-            ).resume()
-          } else {
-            // In case fetch fails use default icon and do not block addition of this engine
-            if let favIcon = image {
-              searchEngineIcon = favIcon
-            }
-
-            self?.createSearchEngine(url, reference: reference, icon: searchEngineIcon)
-          }
-
-        })
+    var searchEngineIcon = FaviconFetcher.defaultFaviconImage
+    if let favicon = tabManager.selectedTab?.displayFavicon?.image {
+      searchEngineIcon = favicon
+      createSearchEngine(url, reference: reference, icon: favicon)
     } else {
       createSearchEngine(url, reference: reference, icon: searchEngineIcon)
     }

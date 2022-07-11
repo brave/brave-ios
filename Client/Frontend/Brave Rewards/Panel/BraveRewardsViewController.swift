@@ -34,7 +34,6 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       rewardsView.publisherView.hostLabel.attributedText = publisher?.attributedDisplayName(fontSize: BraveRewardsPublisherView.UX.hostLabelFontSize)
       rewardsView.publisherView.bodyLabel.text = isVerified ? Strings.Rewards.supportingPublisher : Strings.Rewards.unverifiedPublisher
       if !isVerified {
-        rewardsView.publisherView.faviconImageView.clearMonogramFavicon()
         rewardsView.publisherView.faviconImageView.image = UIImage(named: "rewards-panel-unverified-pub", in: .current, compatibleWith: nil)!.withRenderingMode(.alwaysOriginal)
         rewardsView.publisherView.faviconImageView.contentMode = .center
       } else {

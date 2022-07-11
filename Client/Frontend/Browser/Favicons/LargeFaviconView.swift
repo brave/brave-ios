@@ -11,28 +11,24 @@ import UIKit
 /// Displays a large favicon given some favorite
 class LargeFaviconView: UIView {
   func loadFavicon(siteURL: URL, domain: Domain? = nil, monogramFallbackCharacter: Character? = nil) {
-    // Use the base domain's first character, but if that isn't valid
-    // use the favorites title as the monogram instead
-    monogramFallbackLabel.text = FaviconFetcher.monogramLetter(
-      for: siteURL,
-      fallbackCharacter: monogramFallbackCharacter
-    )
     // Setup the favicon fetcher to pull a large icon for the given
     // domain
-    fetcher = FaviconFetcher(siteURL: siteURL, kind: .largeIcon, domain: domain)
-    fetcher?.load { [weak self] url, attributes in
-      guard let self = self, url == siteURL else { return }
-      self.monogramFallbackLabel.isHidden = attributes.image != nil
-      self.imageView.image = attributes.image
-      self.imageView.contentMode = attributes.contentMode
-      self.backgroundColor = attributes.backgroundColor
-      self.layoutMargins = .init(equalInset: attributes.includePadding ? 4 : 0)
-      self.backgroundView.isHidden = !attributes.includePadding
-    }
+    faviconTask?.cancel()
+    faviconTask = FaviconFetcher.loadIcon(url: siteURL,
+                                          kind: .largeIcon,
+                                          persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing,
+                                          completion: { [weak self] favicon in
+      guard let self = self else { return }
+      self.imageView.image = favicon?.image
+      self.backgroundColor = favicon?.backgroundColor
+      self.imageView.contentMode = .scaleAspectFit
+      self.backgroundView.isHidden = !(favicon?.backgroundColor == .clear) || favicon?.isMonogramImage == true
+    })
   }
 
   func cancelLoading() {
-    fetcher = nil
+    faviconTask?.cancel()
+    faviconTask = nil
     imageView.image = nil
     imageView.contentMode = .scaleAspectFit
     backgroundColor = .clear
@@ -40,23 +36,10 @@ class LargeFaviconView: UIView {
     backgroundView.isHidden = false
   }
 
-  private var fetcher: FaviconFetcher?
+  private var faviconTask: FaviconFetcher.Cancellable?
 
   private let imageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
-  }
-
-  private let monogramFallbackLabel = UILabel().then {
-    $0.textColor = .white
-    $0.isHidden = true
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-
-    if bounds.height > 0 {
-      monogramFallbackLabel.font = .systemFont(ofSize: bounds.height / 2)
-    }
   }
 
   private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .regular)).then {
@@ -76,7 +59,6 @@ class LargeFaviconView: UIView {
     layoutMargins = .zero
 
     addSubview(backgroundView)
-    addSubview(monogramFallbackLabel)
     addSubview(imageView)
 
     backgroundView.snp.makeConstraints {
@@ -87,9 +69,6 @@ class LargeFaviconView: UIView {
       $0.center.equalTo(self)
       $0.leading.top.greaterThanOrEqualTo(layoutMarginsGuide)
       $0.trailing.bottom.lessThanOrEqualTo(layoutMarginsGuide)
-    }
-    monogramFallbackLabel.snp.makeConstraints {
-      $0.center.equalTo(self)
     }
   }
 

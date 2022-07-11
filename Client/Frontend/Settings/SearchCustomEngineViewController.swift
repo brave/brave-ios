@@ -12,6 +12,7 @@ import SnapKit
 import Fuzi
 import Storage
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -70,7 +71,7 @@ class SearchCustomEngineViewController: UIViewController {
     }
   }
 
-  private var fetcher: FaviconFetcher?
+  private var faviconTask: FaviconFetcher.Cancellable?
 
   fileprivate var faviconImage: UIImage?
 
@@ -389,12 +390,11 @@ extension SearchCustomEngineViewController {
       return
     }
 
-    fetcher = FaviconFetcher(siteURL: url, kind: .favicon)
-
-    fetcher?.load { [weak self] _, attributes in
+    faviconTask?.cancel()
+    faviconTask = FaviconFetcher.loadIcon(url: url,
+                            persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing) { [weak self] favicon in
       guard let self = self else { return }
-
-      self.faviconImage = attributes.image ?? UIImage(named: "defaultFavicon", in: .current, compatibleWith: nil)!
+      self.faviconImage = favicon?.image ?? FaviconFetcher.defaultFaviconImage
       self.openSearchEngine = searchEngineDetails
     }
   }
@@ -460,7 +460,7 @@ extension SearchCustomEngineViewController {
       return
     }
 
-    var engineImage = UIImage(named: "defaultFavicon", in: .current, compatibleWith: nil)!
+    var engineImage = FaviconFetcher.defaultFaviconImage
 
     guard let hostUrl = host else {
       let engine = OpenSearchEngine(shortName: name, image: engineImage, searchTemplate: template, isCustomEngine: true)
@@ -469,17 +469,18 @@ extension SearchCustomEngineViewController {
       return
     }
 
-    fetcher = FaviconFetcher(siteURL: hostUrl, kind: .favicon)
-
-    fetcher?.load { siteUrl, attributes in
-      if let image = attributes.image {
+    faviconTask?.cancel()
+    faviconTask = FaviconFetcher.loadIcon(url: hostUrl,
+                                          persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing,
+                                          completion: { favicon in
+      if let image = favicon?.image {
         engineImage = image
       }
 
       let engine = OpenSearchEngine(shortName: name, image: engineImage, searchTemplate: template, isCustomEngine: true)
 
       completion(engine, nil)
-    }
+    })
   }
 
   private func getSearchTemplate(with query: String) -> String? {
