@@ -94,47 +94,51 @@ struct AddAccountView: View {
       )
     }
   }
+  
+  @ViewBuilder private var coinSelectionView: some View {
+    List {
+      Section(
+        header: WalletListHeaderView(
+          title: Text(Strings.Wallet.coinTypeSelectionHeader)
+        )
+      ) {
+        ForEach(WalletConstants.supportedCoinTypes) { coin in
+          NavigationLink(
+            tag: coin,
+            selection: $selectedCoin) {
+              addAccountView
+            } label: {
+              HStack(spacing: 10) {
+                Image(coin.iconName, bundle: .current)
+                  .resizable()
+                  .aspectRatio(contentMode: .fit)
+                  .clipShape(Circle())
+                  .frame(width: min(iconSize, maxIconSize), height: min(iconSize, maxIconSize))
+                VStack(alignment: .leading, spacing: 3) {
+                  Text(coin.localizedTitle)
+                    .foregroundColor(Color(.bravePrimary))
+                    .font(.headline)
+                    .multilineTextAlignment(.leading)
+                  Text(coin.localizedDescription)
+                    .foregroundColor(Color(.braveLabel))
+                    .font(.footnote)
+                    .multilineTextAlignment(.leading)
+                }
+              }
+              .padding(.vertical, 10)
+            }
+        }
+      }
+    }
+    .listStyle(InsetGroupedListStyle())
+    .navigationBarTitleDisplayMode(.inline)
+    .navigationTitle(Strings.Wallet.addAccountTitle)
+  }
 
   var body: some View {
     Group {
       if showCoinSelection {
-        List {
-          Section(
-            header: WalletListHeaderView(
-              title: Text(Strings.Wallet.coinTypeSelectionHeader)
-            )
-          ) {
-            ForEach(WalletConstants.supportedCoinTypes) { coin in
-              NavigationLink(
-                tag: coin,
-                selection: $selectedCoin) {
-                  addAccountView
-                } label: {
-                  HStack(spacing: 10) {
-                    Image(coin.iconName, bundle: .current)
-                      .resizable()
-                      .aspectRatio(contentMode: .fit)
-                      .clipShape(Circle())
-                      .frame(width: min(iconSize, maxIconSize), height: min(iconSize, maxIconSize))
-                    VStack(alignment: .leading, spacing: 3) {
-                      Text(coin.localizedTitle)
-                        .foregroundColor(Color(.bravePrimary))
-                        .font(.headline)
-                        .multilineTextAlignment(.leading)
-                      Text(coin.localizedDescription)
-                        .foregroundColor(Color(.braveLabel))
-                        .font(.footnote)
-                        .multilineTextAlignment(.leading)
-                    }
-                  }
-                  .padding(.vertical, 10)
-                }
-            }
-          }
-        }
-        .listStyle(InsetGroupedListStyle())
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle(Strings.Wallet.addAccountTitle)
+        coinSelectionView
       } else {
         addAccountView
       }
