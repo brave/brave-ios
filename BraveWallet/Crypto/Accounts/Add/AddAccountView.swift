@@ -24,6 +24,8 @@ struct AddAccountView: View {
   
   @ScaledMetric private var iconSize = 40.0
   private let maxIconSize: CGFloat = 80.0
+  
+  var preSelectedCoin: BraveWallet.CoinType?
 
   private func addAccount() {
     if privateKey.isEmpty {
@@ -63,6 +65,10 @@ struct AddAccountView: View {
     }
   }
   
+  private var showCoinSelection: Bool {
+    preSelectedCoin == nil && WalletConstants.supportedCoinTypes.count > 1
+  }
+  
   @ViewBuilder private var addAccountView: some View {
     List {
       accountNameSection
@@ -91,7 +97,7 @@ struct AddAccountView: View {
 
   var body: some View {
     Group {
-      if selectedCoin == nil && WalletConstants.supportedCoinTypes.count > 1 {
+      if showCoinSelection {
         List {
           Section(
             header: WalletListHeaderView(
