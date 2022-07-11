@@ -48,7 +48,7 @@ struct WebsiteRedirects {
   
   /// Decides whether a website the user is on should bre redirected to another website.
   /// Returns nil if no redirection should happen.
-  static func websiteRedirect(for url: URL) -> URL? {
+  static func redirect(for url: URL) -> URL? {
     guard let host = url.host else { return nil }
     
     let foundMatch = Site.allCases

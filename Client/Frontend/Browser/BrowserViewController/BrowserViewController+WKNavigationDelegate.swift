@@ -208,7 +208,7 @@ extension BrowserViewController: WKNavigationDelegate {
     // Website redirection logic
     if url.isWebPage(includeDataURIs: false),
        navigationAction.targetFrame?.isMainFrame == true,
-       let redirectURL = WebsiteRedirects.websiteRedirect(for: url) {
+       let redirectURL = WebsiteRedirects.redirect(for: url) {
       
       decisionHandler(.cancel, preferences)
       tab?.loadRequest(URLRequest(url: redirectURL))
