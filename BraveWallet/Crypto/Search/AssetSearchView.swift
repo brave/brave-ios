@@ -48,7 +48,7 @@ struct AssetSearchView: View {
     .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
       cryptoStore.blockchainRegistry.allTokens(
-        cryptoStore.networkStore.selectedChain.chainId,
+        cryptoStore.networkStore.selectedChainId,
         coin: cryptoStore.networkStore.selectedChain.coin
       ) { tokens in
         self.allTokens = ([cryptoStore.networkStore.selectedChain.nativeToken] + tokens).sorted(by: { $0.symbol < $1.symbol })

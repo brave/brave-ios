@@ -53,6 +53,7 @@ struct AssetDetailHeaderView: View {
           VStack(alignment: .leading) {
             HStack {
               NetworkPicker(
+                keyringStore: keyringStore,
                 networkStore: networkStore,
                 selectedNetwork: networkStore.selectedChainBinding
               )
@@ -81,6 +82,7 @@ struct AssetDetailHeaderView: View {
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
             NetworkPicker(
+              keyringStore: keyringStore,
               networkStore: networkStore,
               selectedNetwork: networkStore.selectedChainBinding
             )

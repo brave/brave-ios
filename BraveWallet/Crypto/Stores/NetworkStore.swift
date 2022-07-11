@@ -27,14 +27,21 @@ public class NetworkStore: ObservableObject {
       }
     )
   }
+  /// Current selected chain does not have any accounts created.
+  /// We should show an alert to create an account, or return to previously selected chain.
+  @Published private(set) var currentNetworkNeedsAccount: Bool = false
+  private var previousNetworkChainId: String?
 
+  private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
 
   public init(
+    keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
     walletService: BraveWalletBraveWalletService
   ) {
+    self.keyringService = keyringService
     self.rpcService = rpcService
     self.walletService = walletService
     self.updateChainList()
@@ -74,13 +81,27 @@ public class NetworkStore: ObservableObject {
   }
   
   private func setSelectedChain(_ network: BraveWallet.NetworkInfo) {
-    if network.coin != .eth {
-      // TODO: check if we need to prompt to create new account
-      print("Selected network that does not use Ethereum Coin Type!")
-      return
+    Task { @MainActor in
+      let keyringId = network.coin.keyringId
+      let keyringInfo = await keyringService.keyringInfo(keyringId)
+        // Need to prompt user to create new account via alert
+        self.currentNetworkNeedsAccount = keyringInfo.accountInfos.isEmpty
     }
     guard self.selectedChainId != network.chainId else { return }
+    self.previousNetworkChainId = selectedChainId
     self.selectedChainId = network.chainId
+  }
+  
+  func returnToPreviousChainIfAccountNotCreated() {
+    Task { @MainActor in
+      let keyring = await keyringService.keyringInfo(selectedChain.coin.keyringId)
+      guard keyring.accountInfos.isEmpty, // no accounts available
+            let previousNetworkChainId = previousNetworkChainId,
+            let previousChain = allChains.first(where: { $0.chainId == previousNetworkChainId }) else {
+        return // account was created for this coin, don't need to return to previous network
+      }
+      setSelectedChain(previousChain)
+    }
   }
 
   // MARK: - Custom Networks

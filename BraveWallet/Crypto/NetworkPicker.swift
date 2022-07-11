@@ -27,18 +27,22 @@ struct NetworkPicker: View {
   }
   
   let style: Style
+  var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   @Binding var selectedNetwork: BraveWallet.NetworkInfo
   @State private var isPresentingAddNetwork: Bool = false
+  @State private var isPresentingAddAccount: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.buySendSwapDestination) @Binding private var buySendSwapDestination
   
   init(
     style: Style = .`default`,
+    keyringStore: KeyringStore,
     networkStore: NetworkStore,
     selectedNetwork: Binding<BraveWallet.NetworkInfo>
   ) {
     self.style = style
+    self.keyringStore = keyringStore
     self.networkStore = networkStore
     self._selectedNetwork = selectedNetwork
   }
@@ -100,13 +104,52 @@ struct NetworkPicker: View {
         CustomNetworkDetailsView(networkStore: networkStore, model: .init())
       }
     }
+    .alert(
+      isPresented: Binding(
+        get: { networkStore.currentNetworkNeedsAccount },
+        set: { isPresenting in
+          // alert dismissed, return to previous chain if account not created
+          networkStore.returnToPreviousChainIfAccountNotCreated()
+        }
+      )
+    ) {
+      Alert(
+        title: Text("You don't have a \(selectedNetwork.shortChainName) account"),
+        message: Text("Create one now?"),
+        primaryButton: .default(Text(Strings.yes), action: {
+          // show create account for `networkStore.selectedChain.coin`
+          self.isPresentingAddAccount = true
+        }),
+        secondaryButton: .cancel(Text(Strings.no))
+      )
+    }
+    .sheet(
+      isPresented: Binding(
+        get: { isPresentingAddAccount },
+        set: { isPresenting in
+          if !isPresenting {
+            // add account dismissed, return to previous chain if account not created
+            networkStore.returnToPreviousChainIfAccountNotCreated()
+          }
+          self.isPresentingAddAccount = false
+        }
+      )
+    ) {
+      NavigationView {
+        AddAccountView(keyringStore: keyringStore) // TODO: pass `networkStore.selectedNetwork.coin` to account creation
+      }
+    }
   }
 }
 
 #if DEBUG
 struct NetworkPicker_Previews: PreviewProvider {
   static var previews: some View {
-    NetworkPicker(networkStore: .previewStore, selectedNetwork: .constant(.mockMainnet))
+    NetworkPicker(
+      keyringStore: .previewStoreWithWalletCreated,
+      networkStore: .previewStore,
+      selectedNetwork: .constant(.mockMainnet)
+    )
       .padding()
       .previewLayout(.sizeThatFits)
       .previewColorSchemes()
