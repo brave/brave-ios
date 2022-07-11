@@ -18,14 +18,12 @@ struct AddAccountView: View {
   @State private var isLoadingFile: Bool = false
   @State private var originPassword: String = ""
   @State private var failedToImport: Bool = false
-  @State private var isPresentingAddAccount: Bool = false
+  @State private var selectedCoin: BraveWallet.CoinType?
   @ScaledMetric(relativeTo: .body) private var privateKeyFieldHeight: CGFloat = 140.0
   @Environment(\.presentationMode) @Binding var presentationMode
   
   @ScaledMetric private var iconSize = 40.0
   private let maxIconSize: CGFloat = 80.0
-  
-  var coin: BraveWallet.CoinType?
 
   private func addAccount() {
     if privateKey.isEmpty {
@@ -93,7 +91,7 @@ struct AddAccountView: View {
 
   var body: some View {
     Group {
-      if coin == nil && WalletConstants.supportedCoinTypes.count > 1 {
+      if selectedCoin == nil && WalletConstants.supportedCoinTypes.count > 1 {
         List {
           Section(
             header: WalletListHeaderView(
@@ -101,12 +99,11 @@ struct AddAccountView: View {
             )
           ) {
             ForEach(WalletConstants.supportedCoinTypes) { coin in
-              NavigationLink(isActive: $isPresentingAddAccount) {
-                addAccountView
-              } label: {
-                Button(action: {
-                  isPresentingAddAccount = true
-                }) {
+              NavigationLink(
+                tag: coin,
+                selection: $selectedCoin) {
+                  addAccountView
+                } label: {
                   HStack(spacing: 10) {
                     Image(coin.iconName, bundle: .current)
                       .resizable()
@@ -126,7 +123,6 @@ struct AddAccountView: View {
                   }
                   .padding(.vertical, 10)
                 }
-              }
             }
           }
         }
