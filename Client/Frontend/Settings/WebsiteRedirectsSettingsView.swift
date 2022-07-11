@@ -13,22 +13,25 @@ struct WebsiteRedirectsSettingsView: View {
   
   var body: some View {
     List {
-      Section(footer: Text(Strings.redditRedirectFooter)) {
-        // Cell titles for websites do not have to be translated.
+      Section {
         Toggle(isOn: $reddit.value) {
           Text("reddit.com \(Image(systemName: "arrow.right")) old.reddit.com")
         }
         .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      } footer: {
+        Text(Strings.redditRedirectFooter)
       }
-      .listRowBackground(Color(.secondaryBraveGroupedBackground))
       
-      Section(footer: Text(Strings.nprRedirectFooter)) {
+      Section {
         Toggle(isOn: $npr.value) {
           Text("npr.org \(Image(systemName: "arrow.right")) text.npr.org")
         }
         .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      } footer: {
+        Text(Strings.nprRedirectFooter)
       }
-      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listStyle(.insetGrouped)
     .navigationTitle(Strings.urlRedirectsSettings)

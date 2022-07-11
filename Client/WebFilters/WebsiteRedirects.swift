@@ -8,42 +8,39 @@ import Shared
 import BraveShared
 
 struct WebsiteRedirects {
-  private enum Site: CaseIterable {
-    case reddit
-    case npr
-    
+  private struct Rule {
     /// This is the host we want to redirect users to. All other parts of the url remain unchanged
-    var hostToRedirectTo: String {
-      switch self {
-      case .reddit: return "old.reddit.com"
-      case .npr: return "text.npr.org"
-      }
-    }
-    
+    let hostToRedirectTo: String
     /// What hosts should be redirected. Due to compat reasons not every host may be easily replaced.
-    var eligibleHosts: Set<String> {
-      switch self {
-      case .reddit: return ["reddit.com", "www.reddit.com", "np.reddit.com", "amp.reddit.com", "i.reddit.com"]
-      case .npr: return ["www.npr.org", "npr.org"]
-      }
-    }
-    
+    let eligibleHosts: Set<String>
     /// What hosts should not be redirected. It's either due to web compat reasons or to let user explicitely type a url to not override it.
     /// Reddit is good example, regular reddit.com and new.reddit.com point to the same new user interface.
     /// So we redirect all regular reddit.com link, but the user may explicitely go to new.reddit.com without having to disable the reddit redirect toggle.
-    var excludedHosts: Set<String> {
-      switch self {
-      case .reddit: return ["new.reddit.com"]
-      case .npr: return ["account.npr.org"]
-      }
+    let excludedHosts: Set<String>
+  }
+  
+  private static let reddit = Rule(
+    hostToRedirectTo: "old.reddit.com",
+    eligibleHosts: ["reddit.com", "www.reddit.com", "np.reddit.com", "amp.reddit.com", "i.reddit.com"],
+    excludedHosts: ["new.reddit.com"])
+  
+  private static let npr = Rule(
+    hostToRedirectTo: "text.npr.org",
+    eligibleHosts: ["www.npr.org", "npr.org"],
+    excludedHosts: ["account.npr.org"])
+  
+  private static var enabledRules: [Rule] {
+    var rules = [Rule]()
+    
+    if Preferences.WebsiteRedirects.reddit.value {
+      rules.append(reddit)
     }
     
-    var isEnabled: Bool {
-      switch self {
-      case .reddit: return Preferences.WebsiteRedirects.reddit.value
-      case .npr: return Preferences.WebsiteRedirects.npr.value
-      }
+    if Preferences.WebsiteRedirects.npr.value {
+      rules.append(npr)
     }
+    
+    return rules
   }
   
   /// Decides whether a website the user is on should bre redirected to another website.
@@ -51,8 +48,7 @@ struct WebsiteRedirects {
   static func redirect(for url: URL) -> URL? {
     guard let host = url.host else { return nil }
     
-    let foundMatch = Site.allCases
-      .filter { $0.isEnabled }
+    let foundMatch = enabledRules
       .filter { !$0.excludedHosts.contains(host) && host != $0.hostToRedirectTo }
       .first(where: { $0.eligibleHosts.contains(host) })
     
