@@ -157,8 +157,8 @@ class TabTrayController: LoadingViewController {
         guard let self = self else { return }
         
         switch stateChange {
-        case .openTabsSyncStateChanged:
-          print("Change")
+        case .openTabsSyncCycleCompleted:
+          self.reloadOpenTabsSession()
         default:
           break
         }
@@ -236,12 +236,7 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
-    openTabsAPI.getSyncedSessions() { [weak self] sessions in
-      guard let self = self else { return }
-      
-      self.sessionList = sessions
-      self.tabSyncView.tableView.reloadData()
-    }
+    reloadOpenTabsSession()
   }
   
   override func loadView() {
@@ -372,6 +367,15 @@ class TabTrayController: LoadingViewController {
     }
 
     return cell
+  }
+  
+  private func reloadOpenTabsSession() {
+    openTabsAPI.getSyncedSessions() { [weak self] sessions in
+      guard let self = self else { return }
+      
+      self.sessionList = sessions
+      self.tabSyncView.tableView.reloadData()
+    }
   }
 
   // MARK: - Actions
