@@ -114,8 +114,8 @@ struct NetworkPicker: View {
       )
     ) {
       Alert(
-        title: Text("You don't have a \(selectedNetwork.shortChainName) account"),
-        message: Text("Create one now?"),
+        title: Text(String.localizedStringWithFormat(Strings.Wallet.createAccountAlertTitle, selectedNetwork.shortChainName)),
+        message: Text(Strings.Wallet.createAccountAlertMessage),
         primaryButton: .default(Text(Strings.yes), action: {
           // show create account for `networkStore.selectedChain.coin`
           self.isPresentingAddAccount = true
