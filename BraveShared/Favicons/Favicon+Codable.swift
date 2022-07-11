@@ -36,13 +36,7 @@ public struct FaviconAttributesContainer: Codable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(image?.sd_imageData(), forKey: .image)
-    var rgb: Int?
-    if let color = backgroundColor {
-      var (r, g, b): (CGFloat, CGFloat, CGFloat) = (0.0, 0.0, 0.0)
-      color.getRed(&r, green: &g, blue: &b, alpha: nil)
-      rgb = (Int(r * 255.0) << 16) | (Int(g * 255.0) << 8) | Int(b * 255.0)
-    }
-    try container.encode(rgb, forKey: .backgroundColor)
+    try container.encode(backgroundColor?.rgb, forKey: .backgroundColor)
     try container.encode(contentMode.rawValue, forKey: .contentMode)
     try container.encode(includePadding, forKey: .includePadding)
   }

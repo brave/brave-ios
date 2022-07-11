@@ -84,6 +84,7 @@ class CacheClearable: Clearable {
     WebImageCacheManager.shared.clearMemoryCache()
     WebImageCacheWithNoPrivacyProtectionManager.shared.clearDiskCache()
     WebImageCacheWithNoPrivacyProtectionManager.shared.clearMemoryCache()
+    FaviconFetcher.clearCache()
     
     await BraveWebView.sharedNonPersistentStore().removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0))
   }

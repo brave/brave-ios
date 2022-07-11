@@ -46,38 +46,31 @@ class FaviconRenderer {
           return
         }
         
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-          guard let self = self, !self.isCancelled else {
-            taskCompletion(nil)
-            return
-          }
-          
-          if let image = attributes.faviconImage {
-            // Render the Favicon on a UIImage
-            UIImage.renderImage(image, backgroundColor: attributes.backgroundColor) { [weak self] favicon in
-              guard let self = self, !self.isCancelled else {
-                taskCompletion(nil)
-                return
-              }
-              
-              taskCompletion(favicon)
+        if let image = attributes.faviconImage {
+          // Render the Favicon on a UIImage
+          UIImage.renderImage(image, backgroundColor: attributes.backgroundColor) { [weak self] favicon in
+            guard let self = self, !self.isCancelled else {
+              taskCompletion(nil)
+              return
             }
-          } else {
-            // Render the Monogram on a UIImage
-            let textColor = !attributes.isDefaultBackgroundColor ? attributes.textColor : nil
-            let backColor = !attributes.isDefaultBackgroundColor ? attributes.backgroundColor : nil
             
-            UIImage.renderMonogram(url,
-                                   textColor: textColor,
-                                   backgroundColor: backColor,
-                                   monogramString: attributes.monogramString) { [weak self] favicon in
-              guard let self = self, !self.isCancelled else {
-                taskCompletion(nil)
-                return
-              }
-              
-              taskCompletion(favicon)
+            taskCompletion(favicon)
+          }
+        } else {
+          // Render the Monogram on a UIImage
+          let textColor = !attributes.isDefaultBackgroundColor ? attributes.textColor : nil
+          let backColor = !attributes.isDefaultBackgroundColor ? attributes.backgroundColor : nil
+          
+          UIImage.renderMonogram(url,
+                                 textColor: textColor,
+                                 backgroundColor: backColor,
+                                 monogramString: attributes.monogramString) { [weak self] favicon in
+            guard let self = self, !self.isCancelled else {
+              taskCompletion(nil)
+              return
             }
+            
+            taskCompletion(favicon)
           }
         }
       }
