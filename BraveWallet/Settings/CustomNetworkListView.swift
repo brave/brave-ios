@@ -64,6 +64,7 @@ struct CustomNetworkListView: View {
         }
         .padding(.vertical, 6)
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
       .osAvailabilityModifiers { content in
         if #available(iOS 15.0, *) {
           content
@@ -95,13 +96,13 @@ struct CustomNetworkListView: View {
         Section {
           customNetworksList
         }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       
       Section {
         Toggle(Strings.Wallet.showTestNetworksTitle, isOn: $showTestNetworks.value)
           .foregroundColor(Color(.braveLabel))
           .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
     }
     .listStyle(.insetGrouped)
