@@ -107,15 +107,15 @@ extension UIImage {
         height: image.size.height + padding)
 
       let finalImage = drawOnImageContext(size: size) { context, rect in
-        context.saveGState()
-        context.setFillColor(backgroundColor?.cgColor ?? UIColor.clear.cgColor)
-        context.fill(rect)
+        context.cgContext.saveGState()
+        context.cgContext.setFillColor(backgroundColor?.cgColor ?? UIColor.clear.cgColor)
+        context.cgContext.fill(rect)
 
-        context.translateBy(x: 0.0, y: rect.size.height)
-        context.scaleBy(x: 1.0, y: -1.0)
+        context.cgContext.translateBy(x: 0.0, y: rect.size.height)
+        context.cgContext.scaleBy(x: 1.0, y: -1.0)
 
-        context.draw(cgImage, in: rect.insetBy(dx: padding, dy: padding))
-        context.restoreGState()
+        context.cgContext.draw(cgImage, in: rect.insetBy(dx: padding, dy: padding))
+        context.cgContext.restoreGState()
       }
       completion?(Favicon(image: finalImage ?? image, isMonogramImage: false, backgroundColor: backgroundColor ?? .clear))
     } else {
@@ -169,8 +169,8 @@ extension UIImage {
       }
 
       if let backgroundColor = label.backgroundColor?.cgColor {
-        context.setFillColor(backgroundColor)
-        context.fill(rect)
+        context.cgContext.setFillColor(backgroundColor)
+        context.cgContext.fill(rect)
       }
 
       let newFont = font.withSize(fontSize)
@@ -194,16 +194,13 @@ extension UIImage {
 
 // MARK: - Drawing
 extension UIImage {
-  private static func drawOnImageContext(size: CGSize, _ draw: (CGContext, CGRect) -> Void) -> UIImage? {
-    let size = CGSize(width: size.width, height: size.height)
-    UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-    draw(UIGraphicsGetCurrentContext()!, CGRect(size: size))
-    let img = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    return img
+  private static func drawOnImageContext(size: CGSize, _ draw: (UIGraphicsImageRendererContext, CGRect) -> Void) -> UIImage? {
+    return UIGraphicsImageRenderer(size: size).image { context in
+      draw(context, CGRect(size: size))
+    }
   }
 
-  private static func drawOnImageContext(_ draw: (CGContext, CGRect) -> Void) -> UIImage? {
+  private static func drawOnImageContext(_ draw: (UIGraphicsImageRendererContext, CGRect) -> Void) -> UIImage? {
     drawOnImageContext(size: CGSize(width: 20.0, height: 20.0), draw)
   }
 }

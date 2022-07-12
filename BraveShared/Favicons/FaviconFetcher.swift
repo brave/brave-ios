@@ -7,10 +7,12 @@ import Foundation
 import UIKit
 import BraveCore
 import SDWebImage
+import Shared
+
+private let log = Logger.browserLogger
 
 /// Handles obtaining favicons for URLs from local files, database or internet
 public class FaviconFetcher {
-  private static var operations = Set<FaviconOperation>()
   public static let defaultFaviconImage = UIImage(named: "defaultFavicon", in: .current, compatibleWith: nil)!
 
   /// The size requirement for the favicon
@@ -32,133 +34,119 @@ public class FaviconFetcher {
   
   @discardableResult
   public static func loadIcon(url: URL, kind: FaviconFetcher.Kind = .smallIcon, persistent: Bool, completion: ((Favicon?) -> Void)?) -> Cancellable {
-    // Some websites still only have a favicon for the FULL url including the fragmented parts
-    // But they won't have a favicon for their domain
-    // In this case, we want to store the favicon for the entire domain regardless of query parameters or fragmented parts
-    // Example: `https://app.uniswap.org/` has no favicon, but `https://app.uniswap.org/#/swap?chain=mainnet` does.
-    let cacheURL = URLOrigin(url: url).url ?? url
-    
-    func storeInCache(_ favicon: Favicon, for url: URL) {
-      // Do not cache persistent icons
-      // Do not cache monogram icons
-      if persistent, !favicon.isMonogramImage {
-        guard let data = try? JSONEncoder().encode(favicon) else {
-          return
-        }
-        
-        SDImageCache.shared.memoryCache.setObject(data, forKey: cacheURL.absoluteString, cost: UInt(data.count))
-        SDImageCache.shared.diskCache.setData(data, forKey: cacheURL.absoluteString)
-      }
-    }
-    
-    func getFromCache(for url: URL) -> Favicon? {
-      let data = SDImageCache.shared.memoryCache.object(forKey: cacheURL.absoluteString) as? Data ??
-                 SDImageCache.shared.diskCache.data(forKey: cacheURL.absoluteString)
-      
-      if let data = data,
-          let favicon = try? JSONDecoder().decode(Favicon.self, from: data) {
-        return favicon
-      }
-      
-      return nil
-    }
-    
-    var workItem: DispatchWorkItem?
-    workItem = DispatchWorkItem {
-      guard let task = workItem, !task.isCancelled else {
-        workItem = nil
+    let cancellable = Cancellable { (task, bundledRenderer, faviconRenderer) in
+      guard let task = task, !task.isCancelled else {
+        completion?(nil)
         return
       }
       
       if let favicon = getFromCache(for: url) {
-        workItem = nil
         completion?(favicon)
         return
       }
-      
-      let operation = FaviconOperation(completion: completion)
-      operations.insert(operation)
 
       // Fetch bundled icons or custom icons first
-      operation.bundledRenderer.load(url: url) { [weak operation, weak task] favicon in
-        guard let operation = operation else { return }
+      bundledRenderer?.load(url: url) { [weak task] favicon in
         guard let task = task, !task.isCancelled else {
-          workItem = nil
-          operations.remove(operation)
+          completion?(nil)
           return
         }
         
         // A bundled or custom icon was found
         if let favicon = favicon {
-          workItem = nil
-          operations.remove(operation)
-          storeInCache(favicon, for: url)
-          operation.completion?(favicon)
+          storeInCache(favicon, for: url, persistent: persistent)
+          completion?(favicon)
           return
         }
         
         // If there are no bundled or custom icons, fetch the icons from Brave-Core
-        operation.faviconRenderer.loadIcon(for: url, persistent: persistent) { [weak operation, weak task] favicon in
-          guard let operation = operation else { return }
+        faviconRenderer?.loadIcon(for: url, persistent: persistent) { [weak task] favicon in
           guard let task = task, !task.isCancelled else {
-            workItem = nil
-            operations.remove(operation)
+            completion?(nil)
             return
           }
           
-          workItem = nil
-          operations.remove(operation)
-          
           // A favicon was fetched
           if let favicon = favicon {
-            storeInCache(favicon, for: url)
+            storeInCache(favicon, for: url, persistent: persistent)
           }
           
-          operation.completion?(favicon)
+          completion?(favicon)
         }
       }
     }
     
-    if let task = workItem {
-      DispatchQueue.main.async(execute: task)
-    }
-    
-    return Cancellable(task: workItem)
+    cancellable.execute(on: .main)
+    return cancellable
   }
   
   public class Cancellable {
-    private var task: DispatchWorkItem?
+    private var workItem: DispatchWorkItem?
+    private var task: (Cancellable, BundledFaviconImageRenderer, FaviconRenderer) -> Void
+    private var bundledRenderer: BundledFaviconImageRenderer?
+    private var faviconRenderer: FaviconRenderer?
     
-    init(task: DispatchWorkItem?) {
-      self.task = task
-    }
-    
-    var isCancelled: Bool {
-      task?.isCancelled ?? true
+    public var isCancelled: Bool {
+      workItem?.isCancelled ?? true
     }
     
     public func cancel() {
-      task?.cancel()
-      task = nil
+      workItem?.cancel()
+      workItem = nil
+    }
+    
+    fileprivate init(task: @escaping (Cancellable?, BundledFaviconImageRenderer?, FaviconRenderer?) -> Void) {
+      self.task = task
+      self.bundledRenderer = BundledFaviconImageRenderer()
+      self.faviconRenderer = FaviconRenderer()
+      
+      self.workItem = DispatchWorkItem { [weak self] in
+        task(self, self?.bundledRenderer, self?.faviconRenderer)
+      }
+    }
+    
+    fileprivate func execute(on queue: DispatchQueue) {
+      if let workItem = workItem {
+        queue.async(execute: workItem)
+      }
     }
   }
   
-  private class FaviconOperation: Hashable, Equatable {
-    let id = UUID().uuidString
-    let bundledRenderer = BundledFaviconImageRenderer()
-    let faviconRenderer = FaviconRenderer()
-    let completion: ((Favicon?) -> Void)?
-    
-    init(completion: ((Favicon?) -> Void)?) {
-      self.completion = completion
+  private static func cacheURL(for url: URL) -> URL {
+    // Some websites still only have a favicon for the FULL url including the fragmented parts
+    // But they won't have a favicon for their domain
+    // In this case, we want to store the favicon for the entire domain regardless of query parameters or fragmented parts
+    // Example: `https://app.uniswap.org/` has no favicon, but `https://app.uniswap.org/#/swap?chain=mainnet` does.
+    return URLOrigin(url: url).url ?? url
+  }
+  
+  private static func storeInCache(_ favicon: Favicon, for url: URL, persistent: Bool) {
+    // Do not cache non-persistent icons
+    // Do not cache monogram icons
+    if persistent && !favicon.isMonogramImage {
+      do {
+        let data = try JSONEncoder().encode(favicon)
+        let cachedURL = cacheURL(for: url)
+        SDImageCache.shared.memoryCache.setObject(data, forKey: cachedURL.absoluteString, cost: UInt(data.count))
+        SDImageCache.shared.diskCache.setData(data, forKey: cachedURL.absoluteString)
+      } catch {
+        log.error(error)
+      }
+    }
+  }
+  
+  private static func getFromCache(for url: URL) -> Favicon? {
+    let cachedURL = cacheURL(for: url)
+    guard let data = SDImageCache.shared.memoryCache.object(forKey: cachedURL.absoluteString) as? Data ??
+            SDImageCache.shared.diskCache.data(forKey: cachedURL.absoluteString) else {
+      return nil
     }
     
-    static func == (lhs: FaviconFetcher.FaviconOperation, rhs: FaviconFetcher.FaviconOperation) -> Bool {
-      return lhs.id == rhs.id
+    do {
+      return try JSONDecoder().decode(Favicon.self, from: data)
+    } catch {
+      log.error(error)
     }
-    
-    func hash(into hasher: inout Hasher) {
-      hasher.combine(id)
-    }
+    return nil
   }
 }

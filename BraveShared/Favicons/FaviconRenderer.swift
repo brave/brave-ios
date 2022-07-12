@@ -32,11 +32,7 @@ class FaviconRenderer {
       }
 
       // Load the Favicon from Brave-Core
-      FaviconLoader.getForPrivateMode(persistent).favicon(forPageURL: url,
-                                                          sizeInPoints: .desiredMedium,
-                                                          minSizeInPoints: .init(rawValue: 0),
-                                                          fallbackToGoogleServer: false) { [weak self] attributes in
-        
+      FaviconLoader.getForPrivateMode(persistent).favicon(forPageURLOrHost: url, sizeInPoints: .desiredMedium) { [weak self] attributes in
         guard let self = self, !self.isCancelled else {
           taskCompletion(nil)
           return

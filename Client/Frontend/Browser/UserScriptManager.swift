@@ -458,7 +458,7 @@ class UserScriptManager {
       source: alteredSource,
       injectionTime: .atDocumentEnd,
       forMainFrameOnly: true,
-      in: .page)
+      in: .defaultClient)
   }()
 
   private let walletProviderScript: WKUserScript? = {

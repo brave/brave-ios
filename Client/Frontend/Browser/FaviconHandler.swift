@@ -31,18 +31,19 @@ class FaviconHandler {
       throw FaviconError.noImageLoaded
     }
     
-    return try await withCheckedThrowingContinuation { continuation in
-      FaviconFetcher.loadIcon(url: currentURL, kind: .smallIcon, persistent: !tab.isPrivate) { [weak tab] favicon in
-        guard let tab = tab else { return }
-        
-        if let favicon = favicon {
-          tab.favicons.append(favicon)
-          continuation.resume(with: .success(favicon))
-        } else {
+    let favicon: Favicon = try await withCheckedThrowingContinuation { continuation in
+      FaviconFetcher.loadIcon(url: currentURL, kind: .smallIcon, persistent: !tab.isPrivate) { favicon in
+        guard let favicon = favicon else {
           continuation.resume(throwing: FaviconError.noImageLoaded)
+          return
         }
+        
+        continuation.resume(with: .success(favicon))
       }
     }
+    
+    tab.favicons.append(favicon)
+    return favicon
   }
 }
 
@@ -52,17 +53,17 @@ extension FaviconHandler: TabEventHandler {
     Task { @MainActor in
       if let iconURL = metadata.largeIconURL {
         let favicon = try await loadFaviconURL(iconURL, forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
+        TabEvent.post(.didLoadFavicon(favicon), for: tab)
       } else if let iconURL = metadata.faviconURL {
         let favicon = try await loadFaviconURL(iconURL, forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
+        TabEvent.post(.didLoadFavicon(favicon), for: tab)
       }
       // No favicon fetched from metadata, trying base domain's standard favicon location.
       else if let baseURL = tab.url?.domainURL {
         let favicon = try await loadFaviconURL(
           baseURL.appendingPathComponent("favicon.ico").absoluteString,
           forTab: tab)
-        TabEvent.post(.didLoadFavicon(favicon, with: nil), for: tab)
+        TabEvent.post(.didLoadFavicon(favicon), for: tab)
       }
     }
   }

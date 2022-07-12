@@ -31,7 +31,7 @@ class FaviconHelper: TabContentScript {
     
     if !InternalURL.isValid(url: url),
        !(InternalURL(url)?.isSessionRestore ?? false) {
-      tab?.driver.webView(webView, onFaviconURLsUpdated: message)
+      tab?.faviconDriver?.webView(webView, onFaviconURLsUpdated: message)
     }
   }
 }

@@ -63,6 +63,7 @@ class TabCell: UICollectionViewCell {
     accessibilityHint = Strings.tabTrayCellCloseAccessibilityHint
 
     favicon.image = nil
+    favicon.cancelFaviconLoad()
 
     // Tab may not be restored and so may not include a tab URL yet...
     if let displayFavicon = tab.displayFavicon {

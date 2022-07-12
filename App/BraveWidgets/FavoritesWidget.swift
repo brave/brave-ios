@@ -146,8 +146,8 @@ private struct FavoritesGridView: View {
             label: {
               Group {
                 if let attributes = favorite.favicon, let image = attributes.image {
-                  FaviconImage(image: image, contentMode: attributes.contentMode)
-                    .background(Color(attributes.backgroundColor ?? .clear))
+                  FaviconImage(image: image, contentMode: .center)
+                    .background(Color(attributes.backgroundColor))
                 } else {
                   Text(verbatim: favorite.url.baseDomain?.first?.uppercased() ?? "")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

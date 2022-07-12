@@ -108,7 +108,6 @@ class Tab: NSObject {
 
   var userActivity: NSUserActivity?
 
-  let driver = FaviconLoader.Driver(privateBrowsingMode: false)
   var webView: BraveWebView?
   var tabDelegate: TabDelegate?
   weak var urlDidChangeDelegate: URLChangeDelegate?  // TODO: generalize this.
@@ -119,6 +118,7 @@ class Tab: NSObject {
   fileprivate var lastRequest: URLRequest?
   var restoring: Bool = false
   var pendingScreenshot = false
+  private(set) var faviconDriver: FaviconLoader.Driver?
   
   /// The url set after a successful navigation. This will also set the `url` property.
   ///
@@ -317,6 +317,8 @@ class Tab: NSObject {
       if configuration!.urlSchemeHandler(forURLScheme: InternalURL.scheme) == nil {
         configuration!.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
       }
+      
+      faviconDriver = FaviconLoader.Driver(privateBrowsingMode: isPrivate)
       let webView = TabWebView(frame: .zero, configuration: configuration!, isPrivate: isPrivate)
       webView.delegate = self
       configuration = nil
