@@ -252,14 +252,8 @@ extension LoginListViewController {
         if let signOnRealmURL = URL(string: loginInfo.signOnRealm) {
           let domain = Domain.getOrCreate(forUrl: signOnRealmURL, persistent: true)
 
-          cell.imageView?.loadFavicon(
-            for: signOnRealmURL,
-            domain: domain,
-            fallbackMonogramCharacter: signOnRealmURL.baseDomain?.first,
-            shouldClearMonogramFavIcon: false,
-            cachedOnly: true)
+          cell.imageView?.loadFavicon(for: signOnRealmURL)
         } else {
-          cell.imageView?.clearMonogramFavicon()
           cell.imageView?.image = FaviconFetcher.defaultFaviconImage
         }
       }

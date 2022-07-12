@@ -380,7 +380,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
 
     cell.domainOrFolderName = domainOrFolderName
 
-    func configCell(image: UIImage? = nil, icon: FaviconMO? = nil) {
+    func configCell(image: UIImage? = nil) {
       if !tableView.isEditing {
         cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
       }
@@ -402,7 +402,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         cell.imageView?.image = image
         cell.imageView?.contentMode = .center
         cell.imageView?.layer.borderWidth = 0.0
-        cell.imageView?.clearMonogramFavicon()
       } else {
         cell.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
         cell.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
@@ -410,15 +409,11 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Sets the favIcon of a cell's imageView from Brave-Core
         // If the icon does not exist, fallback to our FavIconFetcher
         let setFavIcon = { (cell: UITableViewCell, item: Bookmarkv2) in
-          cell.imageView?.clearMonogramFavicon()
-
           if let icon = item.bookmarkNode.icon {
             cell.imageView?.image = icon
-          } else if let domain = item.domain, let url = domain.url?.asURL {
-            // favicon object associated through domain relationship - set from cache only
-            cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first, cachedOnly: true)
+          } else if let urlString = item.url, let url = URL(string: urlString) {
+            cell.imageView?.loadFavicon(for: url)
           } else {
-            cell.imageView?.clearMonogramFavicon()
             cell.imageView?.image = FaviconFetcher.defaultFaviconImage
           }
         }
@@ -426,7 +421,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         // Brave-Core favIcons are async and notify an observer when changed..
         bookmarkManager.addFavIconObserver(item) { [weak item] in
           guard let item = item else { return }
-
           setFavIcon(cell, item)
         }
 
@@ -436,12 +430,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         if (item.bookmarkNode.icon == nil && (item.bookmarkNode.isFavIconLoading || item.bookmarkNode.isFavIconLoaded))
           || item.bookmarkNode.icon != nil {
           setFavIcon(cell, item)
-        } else if let domain = item.domain, let url = domain.url?.asURL {
-          // favicon object associated through domain relationship - set from cache or download
-          cell.imageView?.loadFavicon(for: url, domain: domain, fallbackMonogramCharacter: item.title?.first)
-        } else {
-          cell.imageView?.clearMonogramFavicon()
-          cell.imageView?.image = FaviconFetcher.defaultFaviconImage
         }
       }
     }
@@ -451,7 +439,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     cell.textLabel?.lineBreakMode = .byTruncatingTail
 
     if !item.isFolder {
-      configCell(icon: item.domain?.favicon)
+      configCell()
       cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)
       cell.accessoryType = .none
     } else {

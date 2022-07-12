@@ -10,6 +10,7 @@ import Combine
 import SDWebImage
 import Shared
 import Data
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -17,7 +18,7 @@ public class PlaylistThumbnailRenderer {
   private let timeout: TimeInterval = 3
   private var hlsGenerator: HLSThumbnailGenerator?
   private var assetGenerator: AVAssetImageGenerator?
-  private var favIconGenerator: FavIconImageRenderer?
+  private var favIconGenerator: FaviconFetcher.Cancellable?
   private var thumbnailGenerator = Set<AnyCancellable>()
 
   func loadThumbnail(assetUrl: URL?, favIconUrl: URL?, completion: @escaping (UIImage?) -> Void) {
@@ -130,12 +131,10 @@ public class PlaylistThumbnailRenderer {
   }
 
   private func loadFavIconThumbnail(url: URL, completion: @escaping (UIImage?) -> Void) {
-    favIconGenerator = FavIconImageRenderer()
-    favIconGenerator?.loadIcon(siteURL: url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing) { icon in
-      DispatchQueue.main.async {
-        completion(icon)
-      }
-    }
+    favIconGenerator?.cancel()
+    favIconGenerator = FaviconFetcher.loadIcon(url: url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing, completion: { favicon in
+      completion(favicon?.image)
+    })
   }
 }
 

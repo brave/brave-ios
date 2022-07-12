@@ -4,6 +4,7 @@
 
 import Foundation
 import Storage
+import BraveShared
 
 /**
  * A handler can be a plain old swift object. It does not need to extend any

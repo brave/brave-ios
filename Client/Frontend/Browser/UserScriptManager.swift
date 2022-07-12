@@ -435,6 +435,31 @@ class UserScriptManager {
       forMainFrameOnly: true,
       in: .page)
   }()
+  
+  private let FaviconHelperScript: WKUserScript? = {
+    guard let path = Bundle.current.path(forResource: "FaviconHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+      log.error("Failed to load FaviconHelper.js")
+      return nil
+    }
+
+    var alteredSource = source
+    let token = UserScriptManager.securityTokenString
+
+    let replacements = [
+      "$<security_token>": token,
+      "$<handler>": "FaviconHelper_\(messageHandlerTokenString)",
+    ]
+
+    replacements.forEach({
+      alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+    })
+
+    return WKUserScript.create(
+      source: alteredSource,
+      injectionTime: .atDocumentEnd,
+      forMainFrameOnly: true,
+      in: .page)
+  }()
 
   private let walletProviderScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "WalletEthereumProvider", ofType: "js"),
@@ -509,6 +534,10 @@ class UserScriptManager {
       }
       
       if let script = ReadyStateScript {
+        $0.addUserScript(script)
+      }
+      
+      if let script = FaviconHelperScript {
         $0.addUserScript(script)
       }
 

@@ -17,7 +17,7 @@ extension FileManager {
 
   /// URL where files downloaded by user are stored.
   /// If the download folder doesn't exists it creates a new one
-  func downloadsPath() throws -> URL {
+  public func downloadsPath() throws -> URL {
     FileManager.default.getOrCreateFolder(name: "Downloads", excludeFromBackups: true, location: .documentDirectory)
 
     return try FileManager.default.url(
@@ -53,7 +53,7 @@ extension FileManager {
     return false
   }
 
-  func writeToDiskInFolder(
+  public func writeToDiskInFolder(
     _ data: Data, fileName: String, folderName: String,
     location: SearchPathDirectory = .applicationSupportDirectory
   ) -> Bool {
@@ -74,7 +74,7 @@ extension FileManager {
   /// Creates a folder at given location and returns its URL.
   /// If folder already exists, returns its URL as well.
   @discardableResult
-  func getOrCreateFolder(
+  public func getOrCreateFolder(
     name: String, excludeFromBackups: Bool = true,
     location: SearchPathDirectory = .applicationSupportDirectory
   ) -> URL? {
@@ -100,7 +100,7 @@ extension FileManager {
     }
   }
 
-  func removeFolder(withName name: String, location: SearchPathDirectory) {
+  public func removeFolder(withName name: String, location: SearchPathDirectory) {
     guard let locationUrl = location.url else { return }
     let fileUrl = locationUrl.appendingPathComponent(name)
 
@@ -116,7 +116,7 @@ extension FileManager {
     }
   }
 
-  func moveFile(
+  public func moveFile(
     sourceName: String, sourceLocation: SearchPathDirectory,
     destinationName: String, destinationLocation: SearchPathDirectory
   ) {
@@ -149,7 +149,7 @@ extension FileManager {
 extension FileManager.SearchPathDirectory {
 
   /// Returns first url in user domain mask of given search path directory
-  var url: URL? {
+  public var url: URL? {
     return FileManager.default.urls(for: self, in: .userDomainMask).first
   }
 }
@@ -157,7 +157,7 @@ extension FileManager.SearchPathDirectory {
 extension FileManager {
 
   /// Navigates to download Folder inside the application's folder
-  func openBraveDownloadsFolder(_ completion: @escaping (Bool) -> Void) {
+  public func openBraveDownloadsFolder(_ completion: @escaping (Bool) -> Void) {
     do {
       guard
         var downloadsPathComponents = URLComponents(

@@ -27,12 +27,11 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
       for (index, fav) in Array(favs).prefix(16).enumerated() {
         if let url = fav.url?.asURL {
           group.enter()
-          let fetcher = FaviconFetcher(siteURL: url, kind: .largeIcon, persistentCheckOverride: true)
-          widgetFaviconFetchers.append(fetcher)
-          fetcher.load { _, attributes in
-            favData[index] = .init(url: url, favicon: attributes)
+          let faviconTask = FaviconFetcher.loadIcon(url: url, kind: .largeIcon, persistent: true) { favicon in
+            favData[index] = .init(url: url, favicon: favicon)
             group.leave()
           }
+          widgetFaviconFetchers.append(faviconTask)
         }
       }
 

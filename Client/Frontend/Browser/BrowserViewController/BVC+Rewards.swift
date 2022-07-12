@@ -304,13 +304,9 @@ extension Tab {
     }
 
     group.notify(queue: .main) {
-      let faviconURL = URL(string: self.displayFavicon?.url ?? "")
-      if faviconURL == nil {
-        log.warning("No favicon found in \(self) to report to rewards panel")
-      }
       rewards.reportLoadedPage(
         url: url, redirectionURLs: urls.isEmpty ? [url] : urls,
-        faviconURL: faviconURL, tabId: Int(self.rewardsId),
+        faviconURL: nil, tabId: Int(self.rewardsId),
         html: htmlBlob ?? "", adsInnerText: classifierText)
     }
   }

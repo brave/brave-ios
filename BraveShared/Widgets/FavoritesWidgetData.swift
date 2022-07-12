@@ -12,11 +12,19 @@ private let log = Logger.browserLogger
 
 public struct WidgetFavorite: Codable {
   public var url: URL
-  public var favicon: FaviconAttributes?
+  public var favicon: FaviconAttributesContainer?
 
-  public init(url: URL, favicon: FaviconAttributes) {
+  public init(url: URL, favicon: FaviconAttributesContainer) {
     self.url = url
     self.favicon = favicon
+  }
+  
+  public init(url: URL, favicon: Favicon?) {
+    self.url = url
+    self.favicon = FaviconAttributesContainer(image: favicon?.image ?? FaviconFetcher.defaultFaviconImage,
+                                              backgroundColor: favicon?.backgroundColor,
+                                              contentMode: .center,
+                                              includePadding: false)
   }
 }
 

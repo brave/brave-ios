@@ -10,6 +10,7 @@ import AVFoundation
 import Data
 import Shared
 import BraveUI
+import BraveShared
 
 private let log = Logger.browserLogger
 
