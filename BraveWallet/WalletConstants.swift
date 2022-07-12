@@ -31,5 +31,5 @@ struct WalletConstants {
   ]
   
   /// The currently supported coin types.
-  static let supportedCoinTypes: [BraveWallet.CoinType] = [.eth, .sol, .fil]
+  static let supportedCoinTypes: [BraveWallet.CoinType] = [.eth]
 }
