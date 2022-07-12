@@ -84,8 +84,8 @@ public class NetworkStore: ObservableObject {
     Task { @MainActor in
       let keyringId = network.coin.keyringId
       let keyringInfo = await keyringService.keyringInfo(keyringId)
-        // Need to prompt user to create new account via alert
-        self.currentNetworkNeedsAccount = keyringInfo.accountInfos.isEmpty
+      // Need to prompt user to create new account via alert
+      self.currentNetworkNeedsAccount = keyringInfo.accountInfos.isEmpty
     }
     guard self.selectedChainId != network.chainId else { return }
     self.previousNetworkChainId = selectedChainId
