@@ -47,7 +47,7 @@ public class NetworkStore: ObservableObject {
     self.updateChainList()
     rpcService.add(self)
     
-    Task { // fetch current selected network
+    Task { @MainActor in // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
       let chainIdForCoin = await rpcService.chainId(selectedCoin)
       let allNetworksForCoin = await rpcService.allNetworks(selectedCoin)
@@ -60,7 +60,7 @@ public class NetworkStore: ObservableObject {
   }
 
   private func updateChainList() {
-    Task { // fetch all networks for all coin types
+    Task { @MainActor in // fetch all networks for all coin types
       self.allChains = await withTaskGroup(of: [BraveWallet.NetworkInfo].self) { [weak rpcService] group -> [BraveWallet.NetworkInfo] in
         guard let rpcService = rpcService else { return [] }
         for coinType in WalletConstants.supportedCoinTypes {
