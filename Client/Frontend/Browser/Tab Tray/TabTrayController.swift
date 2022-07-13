@@ -238,10 +238,22 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
+    let controller = SendTabToSelfController()
+    
     reloadOpenTabsSession()
     
-    let deviceList = sendTabAPI.getListOfSyncedDevices()
-    print(deviceList)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+      let deviceList = self.sendTabAPI.getListOfSyncedDevices()
+      print("Device lists = \(deviceList)")
+
+      self.present(controller, animated: true, completion: nil)
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 15.0) {
+      controller.dismiss(animated: true)
+    }
+    
     
   }
   
@@ -376,12 +388,8 @@ class TabTrayController: LoadingViewController {
   }
   
   private func reloadOpenTabsSession() {
-    openTabsAPI.getSyncedSessions() { [weak self] sessions in
-      guard let self = self else { return }
-      
-      self.sessionList = sessions
-      self.tabSyncView.tableView.reloadData()
-    }
+    sessionList = openTabsAPI.getSyncedSessions()
+    tabSyncView.tableView.reloadData()
   }
 
   // MARK: - Actions
