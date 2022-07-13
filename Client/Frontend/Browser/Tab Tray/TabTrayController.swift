@@ -30,6 +30,7 @@ class TabTrayController: LoadingViewController {
 
   let tabManager: TabManager
   private let openTabsAPI: BraveOpenTabsAPI
+  private let sendTabAPI: BraveSendTabAPI
   private var openTabsSessionServiceListener: OpenTabsSessionStateListener?
 
   weak var delegate: TabTrayDelegate?
@@ -141,9 +142,10 @@ class TabTrayController: LoadingViewController {
 
   // MARK: Lifecycle
   
-  init(tabManager: TabManager, openTabsAPI: BraveOpenTabsAPI) {
+  init(tabManager: TabManager, openTabsAPI: BraveOpenTabsAPI, sendTabAPI: BraveSendTabAPI) {
     self.tabManager = tabManager
     self.openTabsAPI = openTabsAPI
+    self.sendTabAPI = sendTabAPI
     super.init(nibName: nil, bundle: nil)
 
     if !UIAccessibility.isReduceMotionEnabled {
@@ -237,6 +239,10 @@ class TabTrayController: LoadingViewController {
       })
   
     reloadOpenTabsSession()
+    
+    let deviceList = sendTabAPI.getListOfSyncedDevices()
+    print(deviceList)
+    
   }
   
   override func loadView() {
