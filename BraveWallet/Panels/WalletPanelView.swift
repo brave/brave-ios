@@ -215,8 +215,7 @@ struct WalletPanelView: View {
     NetworkPicker(
       style: .init(textColor: .white, borderColor: .white),
       keyringStore: keyringStore,
-      networkStore: networkStore,
-      selectedNetwork: networkStore.selectedChainBinding
+      networkStore: networkStore
     )
   }
   

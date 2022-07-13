@@ -13,24 +13,18 @@ import Strings
 /// This wraps a JsonRpcService that you would obtain through BraveCore and makes it observable
 public class NetworkStore: ObservableObject {
   
+  enum SetSelectedChainError: Error {
+    case selectedChainHasNoAccounts
+    case chainAlreadySelected
+    case unknown
+  }
+  
   @Published private(set) var allChains: [BraveWallet.NetworkInfo] = []
 
   @Published private(set) var selectedChainId: String = BraveWallet.MainnetChainId
   var selectedChain: BraveWallet.NetworkInfo {
     allChains.first(where: { $0.chainId == self.selectedChainId }) ?? .init()
   }
-  var selectedChainBinding: Binding<BraveWallet.NetworkInfo> {
-    .init(
-      get: { self.allChains.first(where: { $0.chainId == self.selectedChainId }) ?? .init() },
-      set: { newNetwork in
-        self.setSelectedChain(newNetwork)
-      }
-    )
-  }
-  /// Current selected chain does not have any accounts created.
-  /// We should show an alert to create an account, or return to previously selected chain.
-  @Published private(set) var currentNetworkNeedsAccount: Bool = false
-  private var previousNetworkChainId: String?
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -51,11 +45,8 @@ public class NetworkStore: ObservableObject {
       let selectedCoin = await walletService.selectedCoin()
       let chainIdForCoin = await rpcService.chainId(selectedCoin)
       let allNetworksForCoin = await rpcService.allNetworks(selectedCoin)
-      guard let chain = allNetworksForCoin.first(where: { $0.chainId == chainIdForCoin }) else {
-        // set selected chain to `.init()`?
-        return
-      }
-      self.setSelectedChain(chain)
+      guard let chain = allNetworksForCoin.first(where: { $0.chainId == chainIdForCoin }) else { return }
+      await setSelectedChain(chain)
     }
   }
 
@@ -80,28 +71,17 @@ public class NetworkStore: ObservableObject {
     }
   }
   
-  private func setSelectedChain(_ network: BraveWallet.NetworkInfo) {
-    Task { @MainActor in
-      let keyringId = network.coin.keyringId
-      let keyringInfo = await keyringService.keyringInfo(keyringId)
+  @MainActor @discardableResult func setSelectedChain(_ network: BraveWallet.NetworkInfo) async -> SetSelectedChainError? {
+    let keyringId = network.coin.keyringId
+    let keyringInfo = await keyringService.keyringInfo(keyringId)
+    if keyringInfo.accountInfos.isEmpty {
       // Need to prompt user to create new account via alert
-      self.currentNetworkNeedsAccount = keyringInfo.accountInfos.isEmpty
-    }
-    guard self.selectedChainId != network.chainId else { return }
-    self.previousNetworkChainId = selectedChainId
-    self.selectedChainId = network.chainId
-    self.rpcService.setNetwork(network.chainId, coin: network.coin) { _ in }
-  }
-  
-  func returnToPreviousChainIfAccountNotCreated() {
-    Task { @MainActor in
-      let keyring = await keyringService.keyringInfo(selectedChain.coin.keyringId)
-      guard keyring.accountInfos.isEmpty, // no accounts available
-            let previousNetworkChainId = previousNetworkChainId,
-            let previousChain = allChains.first(where: { $0.chainId == previousNetworkChainId }) else {
-        return // account was created for this coin, don't need to return to previous network
-      }
-      setSelectedChain(previousChain)
+      return .selectedChainHasNoAccounts
+    } else {
+      guard self.selectedChainId != network.chainId else { return .chainAlreadySelected }
+      self.selectedChainId = network.chainId
+      let success = await rpcService.setNetwork(network.chainId, coin: network.coin)
+      return success ? nil : .unknown
     }
   }
 
@@ -196,10 +176,9 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
     updateChainList()
   }
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
-    guard let chain = allChains.first(where: { $0.chainId == chainId && $0.coin == coin }) else {
-      // set selected chain to `.init()`?
-      return
+    Task { @MainActor in
+      guard let chain = allChains.first(where: { $0.chainId == chainId && $0.coin == coin }) else {  return }
+      await setSelectedChain(chain)
     }
-    setSelectedChain(chain)
   }
 }

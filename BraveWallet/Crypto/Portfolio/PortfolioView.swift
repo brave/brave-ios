@@ -153,8 +153,7 @@ struct BalanceHeaderView: View {
           VStack(alignment: .leading) {
             NetworkPicker(
               keyringStore: keyringStore,
-              networkStore: networkStore,
-              selectedNetwork: networkStore.selectedChainBinding
+              networkStore: networkStore
             )
             Text(verbatim: balance)
               .font(.largeTitle.bold())
@@ -165,8 +164,7 @@ struct BalanceHeaderView: View {
               .font(.largeTitle.bold())
             NetworkPicker(
               keyringStore: keyringStore,
-              networkStore: networkStore,
-              selectedNetwork: networkStore.selectedChainBinding
+              networkStore: networkStore
             )
             Spacer()
           }
