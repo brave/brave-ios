@@ -43,9 +43,7 @@ public class NetworkStore: ObservableObject {
     
     Task { @MainActor in // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
-      let chainIdForCoin = await rpcService.chainId(selectedCoin)
-      let allNetworksForCoin = await rpcService.allNetworks(selectedCoin)
-      guard let chain = allNetworksForCoin.first(where: { $0.chainId == chainIdForCoin }) else { return }
+      let chain = await rpcService.network(selectedCoin)
       await setSelectedChain(chain)
     }
   }

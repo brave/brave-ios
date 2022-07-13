@@ -145,7 +145,7 @@ struct NetworkPicker: View {
       .onDisappear {
         Task { @MainActor in
           guard let nextNetwork = nextNetwork else { return }
-          // iff it errors it's due to no accounts and we don't want to switch to nextNetwork
+          // if it errors it's due to no accounts and we don't want to switch to nextNetwork
           await networkStore.setSelectedChain(nextNetwork)
           self.nextNetwork = nil
         }
