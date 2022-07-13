@@ -23,7 +23,7 @@ class BundledFaviconImageRenderer {
     task?.cancel()
   }
   
-  func load(url: URL, completion: ((Favicon?) -> Void)?) {
+  func loadIcon(url: URL, completion: ((Favicon?) -> Void)?) {
     let taskCompletion = { [weak self] (image: Favicon?) in
       self?.task = nil
       

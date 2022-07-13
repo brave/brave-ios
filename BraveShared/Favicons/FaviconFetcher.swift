@@ -46,7 +46,7 @@ public class FaviconFetcher {
       }
 
       // Fetch bundled icons or custom icons first
-      bundledRenderer?.load(url: url) { [weak task] favicon in
+      bundledRenderer?.loadIcon(url: url) { [weak task] favicon in
         guard let task = task, !task.isCancelled else {
           completion?(nil)
           return
