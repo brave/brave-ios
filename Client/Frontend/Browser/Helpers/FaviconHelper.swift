@@ -16,11 +16,11 @@ class FaviconHelper: TabContentScript {
   }
 
   static func name() -> String {
-    return "FaviconUrlsHandler"
+    return "FaviconHelper"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "FaviconUrlsHandler"
+    return "FaviconHelper_\(UserScriptManager.messageHandlerTokenString)"
   }
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
@@ -30,8 +30,9 @@ class FaviconHelper: TabContentScript {
             let url = webView.url else { return }
     
     if !InternalURL.isValid(url: url),
-       !(InternalURL(url)?.isSessionRestore ?? false) {
-      tab?.faviconDriver?.webView(webView, onFaviconURLsUpdated: message)
+       !(InternalURL(url)?.isSessionRestore ?? false),
+       let faviconDriver = tab?.faviconDriver {
+      faviconDriver.webView(webView, onFaviconURLsUpdated: message)
     }
   }
 }

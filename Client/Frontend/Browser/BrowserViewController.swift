@@ -2312,7 +2312,7 @@ extension BrowserViewController: TabDelegate {
     tab.addContentScript(ReadyStateScriptHelper(tab: tab), name: ReadyStateScriptHelper.name(), contentWorld: .page)
     tab.addContentScript(DeAmpHelper(tab: tab), name: DeAmpHelper.name(), contentWorld: .defaultClient)
     tab.addContentScript(tab.requestBlockingContentHelper, name: RequestBlockingContentHelper.name(), contentWorld: .page)
-    tab.addContentScript(FaviconHelper(tab: tab), name: FaviconHelper.name(), contentWorld: .page)
+    tab.addContentScript(FaviconHelper(tab: tab), name: FaviconHelper.name(), contentWorld: .defaultClient)
   }
 
   func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {

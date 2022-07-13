@@ -100,8 +100,8 @@ extension UIImage {
 extension UIImage {
   /// Renders an image to a canvas with a background colour and passing
   static func renderImage(_ image: UIImage, backgroundColor: UIColor?, completion: ((Favicon?) -> Void)?) {
-    if let cgImage = image.cgImage, image.hasTransparentEdges {
-      let padding = 4.0
+    if let cgImage = image.cgImage {
+      let padding = image.hasTransparentEdges ? 4.0 : 0.0
       let size = CGSize(
         width: image.size.width + padding,
         height: image.size.height + padding)

@@ -63,7 +63,7 @@
   }
 
   sendFaviconUrls = function() {
-    window.webkit.messageHandlers.FaviconUrlsHandler.postMessage(getFavicons());
+    window.webkit.messageHandlers.$<handler>.postMessage(getFavicons());
   };
 
   window.addEventListener('hashchange', function(evt) {
