@@ -150,8 +150,7 @@ extension BuyVPNViewController: IAPObserverDelegate {
     DispatchQueue.main.async {
       self.navigationController?.setViewControllers(
         [InstallVPNViewController()],
-        animated:
-          true)
+        animated: true)
     }
     
     if validateReceipt {

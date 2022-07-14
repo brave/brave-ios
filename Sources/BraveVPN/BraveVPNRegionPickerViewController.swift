@@ -155,8 +155,10 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
     guard let region = regionList[safe: indexPath.row] else { return }
 
     // Tapped on the same cell, do nothing
-    if (region.displayName == BraveVPN.selectedRegion?.displayName)
-        || (indexPath.section == Section.automatic.rawValue && BraveVPN.isAutomaticRegion) {
+    let sameRegionSelected = region.displayName == BraveVPN.selectedRegion?.displayName
+    let sameAutomaticRegionSelected = indexPath.section == Section.automatic.rawValue && BraveVPN.isAutomaticRegion
+    
+    if sameRegionSelected || sameAutomaticRegionSelected {
       return
     }
 
@@ -165,11 +167,11 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
     isLoading = true
 
     // Implementation detail: nil region means we use an automatic way to connect to the host.
-    let regionToSwitchTo = indexPath.section == Section.automatic.rawValue ? nil : region
+    let newRegion = indexPath.section == Section.automatic.rawValue ? nil : region
 
     self.dispatchGroup = DispatchGroup()
 
-    BraveVPN.changeVPNRegion(regionToSwitchTo) { [weak self] success in
+    BraveVPN.changeVPNRegion(to: newRegion) { [weak self] success in
       guard let self = self else { return }
 
       func _showError() {
@@ -217,17 +219,17 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
   }
 
   private func showSuccessAlert() {
-      let animation = AnimationView(name: "vpncheckmark", bundle: .current).then {
+    let animation = AnimationView(name: "vpncheckmark", bundle: .current).then {
       $0.bounds = CGRect(x: 0, y: 0, width: 300, height: 200)
       $0.contentMode = .scaleAspectFill
       $0.play()
     }
-
+    
     let popup = AlertPopupView(imageView: animation,
                                title: Strings.VPN.regionSwitchSuccessPopupText, message: "",
                                titleWeight: .semibold, titleSize: 18,
                                dismissHandler: { true })
-
+    
     popup.showWithType(showType: .flyUp, autoDismissTime: 1.5)
   }
 }
