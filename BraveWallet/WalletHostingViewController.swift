@@ -46,7 +46,6 @@ public enum PresentingContext {
 public class WalletHostingViewController: UIHostingController<CryptoView> {
   public weak var delegate: BraveWalletDelegate?
   private var cancellable: AnyCancellable?
-  private let walletStore: WalletStore
   
   public init(
     walletStore: WalletStore,
@@ -54,7 +53,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     faviconRenderer: WalletFaviconRenderer,
     onUnlock: (() -> Void)? = nil
   ) {
-    self.walletStore = walletStore
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
     )

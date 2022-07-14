@@ -45,6 +45,15 @@ struct AccountsHeaderView: View {
           Label(Strings.Wallet.addAccountTitle, systemImage: "plus")
             .labelStyle(.iconOnly)
         }
+        .background(
+          Color.clear
+            .sheet(isPresented: $isPresentingAddAccount) {
+              NavigationView {
+                AddAccountView(keyringStore: keyringStore)
+              }
+              .navigationViewStyle(StackNavigationViewStyle())
+            }
+        )
         NavigationLink(
           destination: WalletSettingsView(
             settingsStore: settingsStore,
@@ -56,12 +65,6 @@ struct AccountsHeaderView: View {
         }
       }
       .foregroundColor(Color(.braveLabel))
-    }
-    .sheet(isPresented: $isPresentingAddAccount) {
-      NavigationView {
-        AddAccountView(keyringStore: keyringStore)
-      }
-      .navigationViewStyle(StackNavigationViewStyle())
     }
     .padding(.top)
   }
