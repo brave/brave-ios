@@ -25,6 +25,7 @@ public class BraveVPN {
   /// This list is not static and should be refetched every now and then.
   static var regions: [GRDRegion] = []
   
+  // Non translatable
   private static let connectionName = "Brave Firewall + VPN"
 
   // MARK: - Initialization
@@ -59,8 +60,6 @@ public class BraveVPN {
         logAndStoreError("Receipt expired")
         return
       }
-
-      populateRegionDataIfNecessary()
     }
   }
   
@@ -78,7 +77,7 @@ public class BraveVPN {
         // Api call for receipt verification failed,
         // we do not know if the receipt has expired or not.
         receiptHasExpired?(nil)
-        logAndStoreError("Api call for receipt verification failed, :\(error ?? "no error")")
+        logAndStoreError("Api call for receipt verification failed: \(error ?? "unknown error")")
         return
       }
 
@@ -93,7 +92,8 @@ public class BraveVPN {
 
       Preferences.VPN.expirationDate.value = newestReceipt.expiresDate
       Preferences.VPN.freeTrialUsed.value = !newestReceipt.isTrialPeriod
-
+      populateRegionDataIfNecessary()
+      
       GRDSubscriptionManager.setIsPayingUser(true)
       receiptHasExpired?(false)
     }
@@ -107,7 +107,6 @@ public class BraveVPN {
   /// A state in which the vpn can be.
   public enum State {
     case notPurchased
-    /// Purchased and installed
     case purchased(enabled: Bool)
 
     case expired
@@ -284,7 +283,7 @@ public class BraveVPN {
     helper.selectedRegion == nil
   }
   
-  public static func changeVPNRegion(_ region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
+  public static func changeVPNRegion(to region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
     helper.select(region)
     helper.configureFirstTimeUser(with: region) { success, error in
       if success {

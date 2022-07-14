@@ -13,9 +13,9 @@ private let log = Logger.browserLogger
 
 public class BraveVPNSettingsViewController: TableViewController {
 
-    public var faqButtonTapped: (() -> Void)?
+  public var faqButtonTapped: (() -> Void)?
 
-    public init() {
+  public init() {
     super.init(style: .grouped)
   }
 
@@ -67,7 +67,7 @@ public class BraveVPNSettingsViewController: TableViewController {
     }
   }
 
-   public override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     title = Strings.VPN.vpnName

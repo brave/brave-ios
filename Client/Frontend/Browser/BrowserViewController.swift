@@ -820,6 +820,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       log.info("Bookmarks from old database were successfully restored")
     }
 
+    // Adding a small delay before fetching gives more reliability to it,
+    // epsecially when you are connected to a VPN.
     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
       self.vpnProductInfo.load()
       BraveVPN.initialize()

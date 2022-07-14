@@ -25,7 +25,7 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   public weak var delegate: IAPObserverDelegate?
 
   public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-    // These helper variables helps to call the IAPObserverDelegate delegate purchased method only once.
+    // This helper variable helps to call the IAPObserverDelegate delegate purchased method only once.
     // Reason is when restoring or sometimes when purchasing or restoring a product there's multiple transactions
     // that are returned in `transactions` array.
     // Apple advices to call `finishTransaction` for all of them,
