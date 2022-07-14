@@ -174,6 +174,7 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
     updateChainList()
   }
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
+    walletService.setSelectedCoin(coin)
     Task { @MainActor in
       guard let chain = allChains.first(where: { $0.chainId == chainId && $0.coin == coin }) else {  return }
       await setSelectedChain(chain)
