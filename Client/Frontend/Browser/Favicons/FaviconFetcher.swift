@@ -292,18 +292,18 @@ public class FaviconFetcher {
           if !cache.isCached(url) {
             completion(self.url, self.monogramFavicon)
             return
-          } else {
-            cache.getCachedImage(for: url) { image in
-              if let image = image {
-                Self.isIconBackgroundTransparentAroundEdges(image) { isTransparent in
-                  completion(self.url, FaviconAttributes(image: image, includePadding: isTransparent))
-                }
-              } else {
-                completion(self.url, self.monogramFavicon)
-              }
-            }
-            return
           }
+          
+          cache.getCachedImage(for: url) { image in
+            if let image = image {
+              Self.isIconBackgroundTransparentAroundEdges(image) { isTransparent in
+                completion(self.url, FaviconAttributes(image: image, includePadding: isTransparent))
+              }
+            } else {
+              completion(self.url, self.monogramFavicon)
+            }
+          }
+          return
         }
 
         downloadIcon(url: url, addingToDatabase: false) { [weak self] image in
