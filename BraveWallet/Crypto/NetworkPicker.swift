@@ -140,7 +140,7 @@ struct NetworkPicker: View {
       isPresented: $isPresentingAddAccount
     ) {
       NavigationView {
-        AddAccountView(keyringStore: keyringStore) // TODO: pass `nextNetwork.coin` to account creation
+        AddAccountView(keyringStore: keyringStore, preSelectedCoin: nextNetwork?.coin)
       }
       .onDisappear {
         Task { @MainActor in
