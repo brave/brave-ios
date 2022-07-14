@@ -238,22 +238,18 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
-    let controller = SendTabToSelfController()
     
     reloadOpenTabsSession()
     
     
     DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-      let deviceList = self.sendTabAPI.getListOfSyncedDevices()
+      var deviceList = self.sendTabAPI.getListOfSyncedDevices()
       print("Device lists = \(deviceList)")
+      
+      let controller = SendTabToSelfController(deviceList: deviceList)
 
       self.present(controller, animated: true, completion: nil)
     }
-
-    DispatchQueue.main.asyncAfter(deadline: .now() + 15.0) {
-      controller.dismiss(animated: true)
-    }
-    
     
   }
   
