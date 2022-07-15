@@ -40,6 +40,7 @@ public class NetworkStore: ObservableObject {
     self.walletService = walletService
     self.updateChainList()
     rpcService.add(self)
+    keyringService.add(self)
     
     Task { @MainActor in // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
@@ -91,10 +92,6 @@ public class NetworkStore: ObservableObject {
     _ network: BraveWallet.NetworkInfo,
     completion: @escaping (_ accepted: Bool, _ errMsg: String) -> Void
   ) {
-    guard network.coin == .eth else {
-      completion(false, "Not supported")
-      return
-    }
     func add(network: BraveWallet.NetworkInfo, completion: @escaping (_ accepted: Bool, _ errMsg: String) -> Void) {
       rpcService.addEthereumChain(network) { [self] chainId, status, message in
         if status == .success {
@@ -179,5 +176,39 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
       guard let chain = allChains.first(where: { $0.chainId == chainId && $0.coin == coin }) else {  return }
       await setSelectedChain(chain)
     }
+  }
+}
+
+extension NetworkStore: BraveWalletKeyringServiceObserver {
+  public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
+    Task { @MainActor in
+      // coin type of selected account might have changed
+      let chain = await rpcService.network(coin)
+      await setSelectedChain(chain)
+    }
+  }
+  
+  public func keyringCreated(_ keyringId: String) {
+  }
+  
+  public func keyringRestored(_ keyringId: String) {
+  }
+  
+  public func keyringReset() {
+  }
+  
+  public func locked() {
+  }
+  
+  public func unlocked() {
+  }
+  
+  public func backedUp() {
+  }
+  
+  public func accountsChanged() {
+  }
+  
+  public func autoLockMinutesChanged() {
   }
 }
