@@ -12,17 +12,9 @@ import DesignSystem
 
 private struct TopToolbarViewUX {
   static let locationPadding: CGFloat = 8
-  static let smallPadding: CGFloat = 2
-  static let normalPadding: CGFloat = 10
   static let locationHeight: CGFloat = 34
-  static let buttonHeight: CGFloat = 44
-  static let locationContentOffset: CGFloat = 8
   static let textFieldCornerRadius: CGFloat = 8
   static let progressBarHeight: CGFloat = 3
-
-  static let tabsButtonRotationOffset: CGFloat = 1.5
-  static let tabsButtonHeight: CGFloat = 18.0
-  static let toolbarButtonInsets = UIEdgeInsets(equalInset: normalPadding)
 }
 
 protocol TopToolbarDelegate: AnyObject {
