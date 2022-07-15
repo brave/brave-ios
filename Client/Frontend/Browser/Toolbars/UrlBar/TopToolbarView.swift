@@ -294,7 +294,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   private let trailingItemsStackView = UIStackView().then {
     $0.distribution = .fillEqually
     $0.alignment = .center
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
     $0.spacing = 8
   }
 
@@ -590,7 +589,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
 
     if inOverlayMode {
-      [progressBar, leadingItemsStackView, bookmarkButton, menuButton, tabsButton, locationView.contentView].forEach {
+      [progressBar, leadingItemsStackView, bookmarkButton, trailingItemsStackView, locationView.contentView].forEach {
         $0?.isHidden = true
       }
 
