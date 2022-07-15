@@ -143,12 +143,9 @@ struct NetworkPicker: View {
         AddAccountView(keyringStore: keyringStore, preSelectedCoin: nextNetwork?.coin)
       }
       .onDisappear {
-        Task { @MainActor in
-          guard let nextNetwork = nextNetwork else { return }
-          // if it errors it's due to no accounts and we don't want to switch to nextNetwork
-          await networkStore.setSelectedChain(nextNetwork)
-          self.nextNetwork = nil
-        }
+        // User either created an account, or cancelled. If account created,
+        // `NetworkStore`s `keyringCreated` observation will switch to the new account
+        self.nextNetwork = nil
       }
     }
   }
