@@ -2570,5 +2570,19 @@ extension Strings {
       value: "Create one now?",
       comment: "The message of the alert shown when a user switches to a network they do not have an account for yet."
     )
+    public static let networkSelectionTitle = NSLocalizedString(
+      "wallet.networkSelectionTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Select Network",
+      comment: "The title of the to select a network from the available networks"
+    )
+    public static let networkSelectionSecondaryNetworks = NSLocalizedString(
+      "wallet.networkSelectionSecondaryNetworks",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Secondary Networks",
+      comment: "The title of the section for secondary networks in the network selection view."
+    )
   }
 }
