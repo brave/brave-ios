@@ -280,7 +280,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   private let mainStackView = UIStackView().then {
     $0.alignment = .center
     $0.spacing = 8
-    $0.translatesAutoresizingMaskIntoConstraints = false
     $0.isLayoutMarginsRelativeArrangement = true
     $0.insetsLayoutMarginsFromSafeArea = false
   }
@@ -321,12 +320,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
       $0.top.bottom.equalToSuperview().inset(8)
     }
 
-    mainStackView.layoutMargins = UIDevice.isIpad ? UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5) : .zero
-
     mainStackView.snp.remakeConstraints { make in
       make.top.bottom.equalTo(self)
-      make.leading.equalTo(self.safeArea.leading).inset(topToolbarPadding)
-      make.trailing.equalTo(self.safeArea.trailing).inset(topToolbarPadding)
+      make.leading.trailing.equalTo(self.safeAreaLayoutGuide)
     }
 
     line.snp.makeConstraints { make in
@@ -350,21 +346,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
       make.height.greaterThanOrEqualTo(TopToolbarViewUX.locationHeight)
     }
   }
-
-  private var topToolbarPadding: CGFloat {
-    // The only case where we want small padding is on iPads and iPhones in landscape.
-    // Instead of padding we give extra tap area for buttons on the toolbar.
-    if !inOverlayMode && toolbarIsShowing { return TopToolbarViewUX.smallPadding }
-    return TopToolbarViewUX.normalPadding
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    // Increase the inset of the main stack view if there's no additional space from safe areas
+    let horizontalInset: CGFloat = safeAreaInsets.left > 0 ? 0 : 8
+    mainStackView.layoutMargins = .init(top: 0, left: horizontalInset, bottom: 0, right: horizontalInset)
   }
-
-  private func updateMargins() {
-    mainStackView.snp.updateConstraints {
-      $0.leading.equalTo(self.safeArea.leading).inset(topToolbarPadding)
-      $0.trailing.equalTo(self.safeArea.trailing).inset(topToolbarPadding)
-    }
-  }
-
+  
   /// Created whenever the location bar on top is selected
   ///     it is "converted" from static to actual TextField
   private func createLocationTextField() {
@@ -416,7 +405,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   // that can show in either mode.
   func setShowToolbar(_ shouldShow: Bool) {
     toolbarIsShowing = shouldShow
-    updateMargins()
     setNeedsUpdateConstraints()
     // when we transition from portrait to landscape, calling this here causes
     // the constraints to be calculated too early and there are constraint errors
@@ -600,7 +588,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
       }
     }
 
-    updateMargins()
     layoutIfNeeded()
   }
 
