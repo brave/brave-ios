@@ -84,7 +84,7 @@ public struct NewSiteConnectionView: View {
         }
         .listRowBackground(Color(.braveGroupedBackground))
         Section {
-          ForEach(keyringStore.keyring.accountInfos) { account in
+          ForEach(keyringStore.allAccounts) { account in
             Button {
               if selectedAccounts.contains(account.id) {
                 selectedAccounts.remove(account.id)
@@ -159,7 +159,7 @@ public struct NewSiteConnectionView: View {
   }
   
   private var accountsAddressesToConfirm: String {
-    keyringStore.keyring.accountInfos
+    keyringStore.allAccounts
       .filter { selectedAccounts.contains($0.id) }
       .map(\.address.truncatedAddress)
       .joined(separator: ", ")
@@ -193,7 +193,7 @@ public struct NewSiteConnectionView: View {
       .listRowBackground(Color(.braveGroupedBackground))
       Section {
         Button {
-          let accounts = keyringStore.keyring.accountInfos
+          let accounts = keyringStore.allAccounts
             .filter { selectedAccounts.contains($0.id) }
             .map(\.address)
           onConnect(accounts)
@@ -218,8 +218,8 @@ struct NewSiteConnectionView_Previews: PreviewProvider {
       origin: .init(url: URL(string: "https://app.uniswap.org")!),
       keyringStore: {
         let store = KeyringStore.previewStoreWithWalletCreated
-        store.addPrimaryAccount("Account 2", completion: nil)
-        store.addPrimaryAccount("Account 3", completion: nil)
+        store.addPrimaryAccount("Account 2", coin: .eth, completion: nil)
+        store.addPrimaryAccount("Account 3", coin: .eth, completion: nil)
         return store
       }(),
       onConnect: { _ in },

@@ -256,4 +256,36 @@ extension BraveWallet.CoinType: Identifiable {
       return ""
     }
   }
+  
+  var defaultAccountName: String {
+    switch self {
+    case .eth:
+      return Strings.Wallet.defaultEthAccountName
+    case .sol:
+      return Strings.Wallet.defaultSolAccountName
+    case .fil:
+      return Strings.Wallet.defaultFilAccountName
+    @unknown default:
+      return ""
+    }
+  }
+  
+  var defaultSecondaryAccountName: String {
+    switch self {
+    case .eth:
+      return Strings.Wallet.defaultSecondaryEthAccountName
+    case .sol:
+      return Strings.Wallet.defaultSecondarySolAccountName
+    case .fil:
+      return Strings.Wallet.defaultSecondaryFilAccountName
+    @unknown default:
+      return ""
+    }
+  }
+}
+
+extension BraveWallet.KeyringInfo {
+  var coin: BraveWallet.CoinType? {
+    accountInfos.first?.coin
+  }
 }
