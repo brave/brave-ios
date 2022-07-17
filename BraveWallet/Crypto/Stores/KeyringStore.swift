@@ -112,6 +112,7 @@ public class KeyringStore: ObservableObject {
     self.keychain = keychain
     
     keyringService.add(self)
+    rpcService.add(self)
     updateKeyringInfo()
     
     self.keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyringInfo in
@@ -370,7 +371,7 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
     Task { @MainActor in
       walletService.setSelectedCoin(coinType)
       let network = await rpcService.network(coinType)
-      await rpcService.setNetwork(network.chainId, coin: coinType)
+      await rpcService.setNetwork(network.chainId, coin: coinType) // update network here in case NetworkStore is closed. p.s. Multiple network selection with the same network will not cause `chainChangedEvent` getting called multiple times.
       updateKeyringInfo()
     }
   }
@@ -414,5 +415,23 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
 
   public func accountsChanged() {
     updateKeyringInfo()
+  }
+}
+
+extension KeyringStore: BraveWalletJsonRpcServiceObserver {
+  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
+    Task { @MainActor in // This observer will take care of selected account update caused by network switching
+      let accountAddress = await keyringService.selectedAccount(coin)
+      let keyring = await keyringService.keyringInfo(coin.keyringId)
+      if let account = keyring.accountInfos.first(where: { $0.address == accountAddress }) {
+        selectedAccount = account
+      }
+    }
+  }
+  
+  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
+  }
+  
+  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
