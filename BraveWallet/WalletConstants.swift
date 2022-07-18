@@ -38,9 +38,14 @@ struct WalletConstants {
   ]
   
   /// The currently supported coin types.
-#if DEBUG
-  static let supportedCoinTypes: [BraveWallet.CoinType] = [.eth, .sol]
-#else
-  static let supportedCoinTypes: [BraveWallet.CoinType] = [.eth]
-#endif
+  static var supportedCoinTypes: [BraveWallet.CoinType] {
+    if WalletDebugFlags.isSolanaEnabled {
+      return [.eth, .sol]
+    }
+    return [.eth]
+  }
+}
+
+struct WalletDebugFlags {
+  static var isSolanaEnabled: Bool = false
 }
