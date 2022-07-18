@@ -37,6 +37,17 @@ public class BraveVPN {
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
   public static func initialize() {
+    func clearConfiguration() {
+      GRDVPNHelper.clearVpnConfiguration()
+      clearCredentials()
+
+      NEVPNManager.shared().removeFromPreferences { error in
+        if let error = error {
+          logAndStoreError("Remove vpn error: \(error)")
+        }
+      }
+    }
+    
     helper.verifyMainCredentials { valid, error in
       logAndStoreError("Initialize credentials valid: \(valid)")
       if let error = error {
@@ -49,14 +60,14 @@ public class BraveVPN {
 
     if case .notPurchased = vpnState {
       // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
-      BraveVPN.clearConfiguration()
+      clearConfiguration()
       return
     }
     
     // We validate the current receipt at the start to know if the subscription has expirerd.
     BraveVPN.validateReceipt() { expired in
       if expired == true {
-        BraveVPN.clearConfiguration()
+        clearConfiguration()
         logAndStoreError("Receipt expired")
         return
       }
@@ -246,18 +257,6 @@ public class BraveVPN {
 
     connectToVPN() { status in
       completion?(status)
-    }
-  }
-
-  /// Clears current vpn configuration and removes it from preferences.
-  private static func clearConfiguration() {
-    GRDVPNHelper.clearVpnConfiguration()
-    clearCredentials()
-
-    NEVPNManager.shared().removeFromPreferences { error in
-      if let error = error {
-        logAndStoreError("Remove vpn error: \(error)")
-      }
     }
   }
 
