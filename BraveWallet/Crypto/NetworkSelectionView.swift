@@ -161,10 +161,14 @@ private struct NetworkRowView: View {
     self.selectedNetwork = selectedNetwork
     self.detailTappedHandler = detailTappedHandler
   }
+  
+  private var isSelected: Bool {
+    presentation.network == selectedNetwork || presentation.subNetworks.contains(selectedNetwork)
+  }
 
   @ViewBuilder private var checkmark: some View {
     Group {
-      if presentation.network == selectedNetwork || presentation.subNetworks.contains(selectedNetwork) {
+      if isSelected {
         Image(systemName: "checkmark")
       } else {
         Image(systemName: "checkmark").hidden()
@@ -179,24 +183,34 @@ private struct NetworkRowView: View {
 
   var body: some View {
     HStack {
-      checkmark
-      NetworkIcon(network: presentation.network)
-      VStack(alignment: .leading, spacing: 0) {
-        Text(showShortChainName ? presentation.network.shortChainName : presentation.network.chainName)
-        if presentation.subNetworks.contains(selectedNetwork) {
-          Text(selectedNetwork.chainName)
-            .foregroundColor(Color(.secondaryBraveLabel))
-            .font(.footnote)
-        }
-      }
-      Spacer()
-      if !presentation.subNetworks.isEmpty {
-        Image(systemName: "chevron.right.circle")
-          .foregroundColor(Color(.braveBlurpleTint))
-          .contentShape(Rectangle())
-          .onTapGesture {
-            detailTappedHandler?()
+      HStack {
+        checkmark
+        NetworkIcon(network: presentation.network)
+        VStack(alignment: .leading, spacing: 0) {
+          Text(showShortChainName ? presentation.network.shortChainName : presentation.network.chainName)
+          if presentation.subNetworks.contains(selectedNetwork) {
+            Text(selectedNetwork.chainName)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .font(.footnote)
           }
+        }
+        Spacer()
+      }
+      .accessibilityElement(children: .combine)
+      .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+      if !presentation.subNetworks.isEmpty {
+        Button(action: { detailTappedHandler?() }) {
+          Image(systemName: "chevron.right.circle")
+            .foregroundColor(Color(.braveBlurpleTint))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(
+          Text(String.localizedStringWithFormat(
+            Strings.Wallet.networkSelectionTestnetAccessibilityLabel,
+            presentation.network.shortChainName)
+          )
+        )
       }
     }
     .foregroundColor(Color(.braveLabel))
@@ -298,6 +312,8 @@ private struct NetworkSelectionDetailRow: View {
       }
     }
     .foregroundColor(Color(.braveLabel))
+    .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    .accessibilityElement(children: .combine)
   }
 }
 
