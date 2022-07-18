@@ -27,7 +27,7 @@ struct AddAccountView: View {
   
   var preSelectedCoin: BraveWallet.CoinType?
 
-  private func addAccount(coin: BraveWallet.CoinType) {
+  private func addAccount(for coin: BraveWallet.CoinType) {
     if privateKey.isEmpty {
       // Add normal account
       let accountName = name.isEmpty ? defaultAccountName(for: coin, isPrimary: true) : name
@@ -82,7 +82,7 @@ struct AddAccountView: View {
     .navigationBarItems(
       // Have to use this instead of toolbar placement to have a custom button style
       trailing: Button(action: {
-        addAccount(coin: preSelectedCoin ?? (selectedCoin ?? .eth))
+        addAccount(for: preSelectedCoin ?? (selectedCoin ?? .eth))
       }) {
         Text(Strings.Wallet.add)
       }

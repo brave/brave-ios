@@ -91,7 +91,7 @@ public class KeyringStore: ObservableObject {
   @Published var allKeyrings: [BraveWallet.KeyringInfo] = []
   /// All `AccountInfo` for all available keyrings
   var allAccounts: [BraveWallet.AccountInfo] {
-    allKeyrings.flatMap { $0.accountInfos }
+    allKeyrings.flatMap(\.accountInfos)
   }
 
   private let keyringService: BraveWalletKeyringService
@@ -149,8 +149,7 @@ public class KeyringStore: ObservableObject {
           guard let keyringService = keyringService else { return [] }
           for coin in WalletConstants.supportedCoinTypes {
             group.addTask {
-              let keyringInfo = await keyringService.keyringInfo(coin.keyringId)
-              return keyringInfo
+              await keyringService.keyringInfo(coin.keyringId)
             }
           }
           var allKeyrings: [BraveWallet.KeyringInfo] = []

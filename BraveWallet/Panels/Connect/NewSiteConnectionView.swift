@@ -84,7 +84,7 @@ public struct NewSiteConnectionView: View {
         }
         .listRowBackground(Color(.braveGroupedBackground))
         Section {
-          ForEach(keyringStore.allAccounts) { account in
+          ForEach(keyringStore.defaultKeyring.accountInfos) { account in
             Button {
               if selectedAccounts.contains(account.id) {
                 selectedAccounts.remove(account.id)
@@ -159,7 +159,7 @@ public struct NewSiteConnectionView: View {
   }
   
   private var accountsAddressesToConfirm: String {
-    keyringStore.allAccounts
+    keyringStore.defaultKeyring.accountInfos
       .filter { selectedAccounts.contains($0.id) }
       .map(\.address.truncatedAddress)
       .joined(separator: ", ")
@@ -193,7 +193,7 @@ public struct NewSiteConnectionView: View {
       .listRowBackground(Color(.braveGroupedBackground))
       Section {
         Button {
-          let accounts = keyringStore.allAccounts
+          let accounts = keyringStore.defaultKeyring.accountInfos
             .filter { selectedAccounts.contains($0.id) }
             .map(\.address)
           onConnect(accounts)

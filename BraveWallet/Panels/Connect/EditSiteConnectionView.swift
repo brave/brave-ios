@@ -79,7 +79,7 @@ struct EditSiteConnectionView: View {
         }
         permittedAccounts.removeAll(where: { $0 == account.address })
         
-        if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.allAccounts.first(where: { $0.id == firstAllowedAdd }) {
+        if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.defaultKeyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
           keyringStore.selectedAccount = firstAllowedAccount
         }
       case .switch:
@@ -122,7 +122,7 @@ struct EditSiteConnectionView: View {
     NavigationView {
       Form {
         Section {
-          ForEach(keyringStore.allAccounts) { account in
+          ForEach(keyringStore.defaultKeyring.accountInfos) { account in
             let action = editAction(for: account)
             if sizeCategory.isAccessibilityCategory {
               VStack {

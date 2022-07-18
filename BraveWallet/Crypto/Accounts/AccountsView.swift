@@ -16,15 +16,11 @@ struct AccountsView: View {
   @State private var selectedAccount: BraveWallet.AccountInfo?
 
   private var primaryAccounts: [BraveWallet.AccountInfo] {
-    keyringStore.allAccounts
-      .filter(\.isPrimary)
-      .sorted { $0.name < $1.name }
+    keyringStore.allAccounts.filter(\.isPrimary)
   }
 
   private var secondaryAccounts: [BraveWallet.AccountInfo] {
-    keyringStore.allAccounts
-      .filter(\.isImported)
-      .sorted { $0.name < $1.name }
+    keyringStore.allAccounts.filter(\.isImported)
   }
 
   var body: some View {

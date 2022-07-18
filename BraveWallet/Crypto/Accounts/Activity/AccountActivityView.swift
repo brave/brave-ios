@@ -129,7 +129,7 @@ struct AccountActivityView: View {
         }
     )
     .onReceive(keyringStore.$allKeyrings) { allKeyrings in
-      let allAccounts = allKeyrings.flatMap { $0.accountInfos }
+      let allAccounts = allKeyrings.flatMap(\.accountInfos)
       if !allAccounts.contains(where: { $0.address == accountInfo.address }) {
         // Account was deleted
         detailsPresentation = nil
