@@ -14,14 +14,7 @@ struct NetworkIcon: View {
   
   var body: some View {
     Group {
-      if network.chainId != BraveWallet.PolygonMainnetChainId,
-          let (iconName, grayscale) = networkImageInfo {
-        Image(iconName, bundle: .current)
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .grayscale(grayscale ? 1 : 0)
-          .clipShape(Circle()) // don't clip polygon
-      } else if let (iconName, grayscale) = networkImageInfo {
+      if let (iconName, grayscale) = networkImageInfo {
         Image(iconName, bundle: .current)
           .resizable()
           .aspectRatio(contentMode: .fit)
