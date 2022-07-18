@@ -101,7 +101,7 @@ class BraveSkusScriptHandler: TabContentScript {
     sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
       // FIXME: Confirm we can pass string only not json/dict
       if !credential.isEmpty {
-        Preferences.VPN.skusCredential.value = credential
+        BraveVPN.setSkusCredential(credential)
       }
       
       self?.callback(methodId: 3, result: credential)

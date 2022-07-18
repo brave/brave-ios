@@ -81,6 +81,12 @@ public class BraveVPN {
     return receipt
   }
   
+  public static func setSkusCredential(_ credential: String) {
+    Preferences.VPN.skusCredential.value = credential
+    GRDSubscriptionManager.setIsPayingUser(true)
+    populateRegionDataIfNecessary()
+  }
+  
   /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
