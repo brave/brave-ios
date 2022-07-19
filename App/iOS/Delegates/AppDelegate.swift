@@ -19,7 +19,6 @@ import BraveCore
 import Combine
 import Brave
 import BraveVPN
-import GuardianConnect
 
 private let log = Logger.browserLogger
 

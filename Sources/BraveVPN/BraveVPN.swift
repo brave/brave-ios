@@ -78,12 +78,13 @@ public class BraveVPN {
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
     guard let receiptUrl = Bundle.main.appStoreReceiptURL,
-          let receipt = try? Data(contentsOf: receiptUrl).base64EncodedString else {
+          let receipt = try? Data(contentsOf: receiptUrl).base64EncodedString,
+          let bundleId = Bundle.main.bundleIdentifier else {
       receiptHasExpired?(nil)
       return
     }
 
-    housekeepingApi.verifyReceipt(receipt, bundleId: "com.brave.ios.browser") { validSubscriptions, success, error in
+    housekeepingApi.verifyReceipt(receipt, bundleId: bundleId) { validSubscriptions, success, error in
       if !success {
         // Api call for receipt verification failed,
         // we do not know if the receipt has expired or not.
