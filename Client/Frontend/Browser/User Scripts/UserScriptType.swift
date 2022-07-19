@@ -32,7 +32,7 @@ enum UserScriptType: Hashable {
       case .braveTalkHelper:
         return .braveTalkHelper
       case .braveSkus:
-        return .braveSus
+        return .braveSkus
       }
     case .nacl:
       return .nacl

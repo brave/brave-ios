@@ -2492,10 +2492,6 @@ extension BrowserViewController: TabDelegate {
     }
     return false
   }
-  
-  func showInstallVPNScreen(for credential: String) {
-    present(InstallVPNViewController(), animated: true)
-  }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {

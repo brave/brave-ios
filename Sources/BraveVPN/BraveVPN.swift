@@ -210,19 +210,6 @@ public class BraveVPN {
     }
   }
   
-  static var neverPurchasedVPN: Bool {
-    switch BraveVPN.vpnState {
-    case .notPurchased:
-      return true
-    default:
-      return false
-    }
-  }
-  
-  private static var isBraveSkusVPN: Bool {
-    Preferences.VPN.skusCredential.value != nil
-  }
-  
   // MARK: - Actions
 
   /// Reconnects to the vpn.
