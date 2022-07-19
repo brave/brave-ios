@@ -154,7 +154,15 @@ public struct NewSiteConnectionView: View {
     }
     .navigationViewStyle(.stack)
     .onAppear {
-      selectedAccounts.insert(keyringStore.selectedAccount.id)
+      if keyringStore.selectedAccount.coin == .eth {
+        selectedAccounts.insert(keyringStore.selectedAccount.id)
+      } else { // fetch selected account for `.eth` coin type
+        Task { @MainActor in
+          if let selectedEthAccount = await keyringStore.selectedAccount(for: .eth) {
+            selectedAccounts.insert(selectedEthAccount.id)
+          }
+        }
+      }
     }
   }
   
