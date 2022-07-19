@@ -141,4 +141,22 @@ extension BrowserViewController {
       isOnboardingOrFullScreenCalloutPresented = true
     }
   }
+  
+  func presentTabReceivedCallout(url: URL) {
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      let toast = ButtonToast(
+        labelText: "Tab Received",
+        image: UIImage(systemName: "laptopcomputer.and.iphone"),
+        buttonText: Strings.goButtonTittle,
+        completion: { [weak self] buttonPressed in
+          guard let self = self else { return }
+          
+          if buttonPressed {
+            self.tabManager.addTabAndSelect(URLRequest(url: url), isPrivate: false)
+          }
+      })
+          
+      show(toast: toast)
+    }
+  }
 }
