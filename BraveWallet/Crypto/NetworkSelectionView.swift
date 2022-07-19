@@ -28,26 +28,24 @@ struct NetworkSelectionView: View {
     List {
       Section {
         ForEach(store.primaryNetworks) { presentation in
-          NetworkRowView(
-            presentation: presentation,
-            selectedNetwork: networkStore.selectedChain,
-            detailTappedHandler: {
-              store.detailNetwork = presentation
-            }
-          )
-          .onTapGesture {
-            selectNetwork(presentation.network)
+          Button(action: { selectNetwork(presentation.network) }) {
+            NetworkRowView(
+              presentation: presentation,
+              selectedNetwork: networkStore.selectedChain,
+              detailTappedHandler: {
+                store.detailNetwork = presentation
+              }
+            )
           }
         }
       }
       Section(content: {
         ForEach(store.secondaryNetworks) { presentation in
-          NetworkRowView(
-            presentation: presentation,
-            selectedNetwork: networkStore.selectedChain
-          )
-          .onTapGesture {
-            selectNetwork(presentation.network)
+          Button(action: { selectNetwork(presentation.network) }) {
+            NetworkRowView(
+              presentation: presentation,
+              selectedNetwork: networkStore.selectedChain
+            )
           }
         }
       }, header: {
@@ -113,6 +111,7 @@ struct NetworkSelectionView: View {
           NavigationView {
             AddAccountView(keyringStore: keyringStore, preSelectedCoin: store.nextNetwork?.coin)
           }
+          .navigationViewStyle(.stack)
           .onDisappear {
             Task { @MainActor in
               await store.handleDismissAddAccount()
@@ -130,19 +129,6 @@ struct NetworkSelectionView: View {
     }
   }
 }
-
-/*
-#if DEBUG
-struct NetworkSelectionView_Previews: PreviewProvider {
-  static var previews: some View {
-    NavigationView {
-      NetworkSelectionView(
-        networkStore: .previewStore
-      )
-    }
-  }
-#endif
-*/
 
 private struct NetworkRowView: View {
 
@@ -167,14 +153,9 @@ private struct NetworkRowView: View {
   }
 
   @ViewBuilder private var checkmark: some View {
-    Group {
-      if isSelected {
-        Image(systemName: "checkmark")
-      } else {
-        Image(systemName: "checkmark").hidden()
-      }
-    }
-    .foregroundColor(Color(.braveLabel))
+    Image(systemName: "checkmark")
+      .opacity(isSelected ? 1 : 0)
+      .foregroundColor(Color(.braveLabel))
   }
   
   private var showShortChainName: Bool {
@@ -217,6 +198,7 @@ private struct NetworkRowView: View {
     .padding(.vertical, 4)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
 }
 
@@ -265,13 +247,12 @@ private struct NetworkSelectionDetailView: View {
   var body: some View {
     List {
       ForEach(networks) { network in
-        NetworkSelectionDetailRow(
-          isSelected: selectedNetwork == network,
-          network: network
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-          selectedNetworkHandler(network)
+        Button(action: { selectedNetworkHandler(network) }) {
+          NetworkSelectionDetailRow(
+            isSelected: selectedNetwork == network,
+            network: network
+          )
+          .contentShape(Rectangle())
         }
       }
     }
@@ -312,6 +293,7 @@ private struct NetworkSelectionDetailRow: View {
       }
     }
     .foregroundColor(Color(.braveLabel))
+    .listRowBackground(Color(.secondaryBraveGroupedBackground))
     .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     .accessibilityElement(children: .combine)
   }

@@ -107,6 +107,7 @@ struct NetworkPicker: View {
                 networkSelectionStore: networkSelectionStore
               )
             }
+            .navigationViewStyle(.stack)
           }
         }
     )

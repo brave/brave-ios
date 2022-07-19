@@ -28,8 +28,8 @@ class NetworkSelectionStore: ObservableObject {
   
   var networkStore: NetworkStore
   
-  @Published var primaryNetworks: [NetworkPresentation] = []
-  @Published var secondaryNetworks: [NetworkPresentation] = []
+  @Published private(set) var primaryNetworks: [NetworkPresentation] = []
+  @Published private(set) var secondaryNetworks: [NetworkPresentation] = []
   
   /// Network selected to show detail view (test networks)
   @Published var detailNetwork: NetworkPresentation?
