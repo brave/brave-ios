@@ -29,10 +29,9 @@ class TabTrayController: LoadingViewController {
   }
 
   let tabManager: TabManager
-  private let openTabsAPI: BraveOpenTabsAPI
-  private let sendTabAPI: BraveSendTabAPI
+  private let openTabsAPI: BraveOpenTabsAPI  
   private var openTabsSessionServiceListener: OpenTabsSessionStateListener?
-
+  
   weak var delegate: TabTrayDelegate?
   weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
 
@@ -142,10 +141,9 @@ class TabTrayController: LoadingViewController {
 
   // MARK: Lifecycle
   
-  init(tabManager: TabManager, openTabsAPI: BraveOpenTabsAPI, sendTabAPI: BraveSendTabAPI) {
+  init(tabManager: TabManager, openTabsAPI: BraveOpenTabsAPI) {
     self.tabManager = tabManager
     self.openTabsAPI = openTabsAPI
-    self.sendTabAPI = sendTabAPI
     super.init(nibName: nil, bundle: nil)
 
     if !UIAccessibility.isReduceMotionEnabled {
@@ -173,6 +171,11 @@ class TabTrayController: LoadingViewController {
 
   deinit {
     tabManager.removeDelegate(self)
+    
+    // Remove the open tabs service observer
+    if let observer = openTabsSessionServiceListener {
+      openTabsAPI.removeObserver(observer)
+    }
   }
 
   override func viewDidLoad() {
@@ -238,19 +241,7 @@ class TabTrayController: LoadingViewController {
         self?.updateColors(isPrivateBrowsing)
       })
   
-    
     reloadOpenTabsSession()
-    
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-      var deviceList = self.sendTabAPI.getListOfSyncedDevices()
-      print("Device lists = \(deviceList)")
-      
-      let controller = SendTabToSelfController(deviceList: deviceList)
-
-      self.present(controller, animated: true, completion: nil)
-    }
-    
   }
   
   override func loadView() {

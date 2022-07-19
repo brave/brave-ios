@@ -10,13 +10,12 @@ import BraveShared
 import DesignSystem
 import UIKit
 
-struct DesignUX {
-  static let informationRowHeight: CGFloat = 58
-  static let standardItemHeight: CGFloat = 44
-  static let contentInset: CGFloat = 20
-}
-
-public class SendTabToSelfController: UIViewController {
+class SendTabToSelfController: UIViewController {
+  
+  struct UX {
+    static let contentInset: CGFloat = 20
+  }
+  
   private let contentNavigationController: UINavigationController
   private let sendTabContentController: SendTabToSelfContentController
   
@@ -24,8 +23,8 @@ public class SendTabToSelfController: UIViewController {
     $0.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
   }
 
-  public init(deviceList: [SendTabTargetDevice]) {
-    sendTabContentController = SendTabToSelfContentController(deviceList: deviceList)
+  init(sendTabAPI: BraveSendTabAPI, dataSource: SendableTabInfoDataSource) {
+    sendTabContentController = SendTabToSelfContentController(sendTabAPI: sendTabAPI, dataSource: dataSource)
     contentNavigationController = UINavigationController(rootViewController: sendTabContentController)
     
     super.init(nibName: nil, bundle: nil)
@@ -36,7 +35,7 @@ public class SendTabToSelfController: UIViewController {
     contentNavigationController.didMove(toParent: self)
   }
 
-  public override func viewDidLoad() {
+  override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .clear
@@ -52,11 +51,11 @@ public class SendTabToSelfController: UIViewController {
       withHorizontalFittingPriority: .required,
       verticalFittingPriority: .fittingSizeLevel
     ).with {
-      $0.height += (DesignUX.informationRowHeight + DesignUX.informationRowHeight)
+      $0.height += 72
     }
     
     contentNavigationController.view.snp.makeConstraints {
-      $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(DesignUX.contentInset)
+      $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(UX.contentInset)
       $0.centerX.centerY.equalToSuperview()
       $0.height.equalTo(preferredSize.height)
     }
@@ -70,6 +69,11 @@ public class SendTabToSelfController: UIViewController {
 
 class SendTabToSelfContentController: UITableViewController {
   
+  struct UX {
+    static let informationRowHeight: CGFloat = 58
+    static let standardItemHeight: CGFloat = 44
+  }
+  
   // MARK: Section
 
   enum Section: Int, CaseIterable {
@@ -79,13 +83,16 @@ class SendTabToSelfContentController: UITableViewController {
 
   // MARK: Internal
   
-  private var deviceList = [SendTabTargetDevice]()
-  private var selectedIndex = 0
-  
+  private var dataSource: SendableTabInfoDataSource?
+  private var sendTabAPI: BraveSendTabAPI?
+
   // MARK: Lifecycle
-  convenience init(deviceList: [SendTabTargetDevice]) {
+  
+  convenience init(sendTabAPI: BraveSendTabAPI, dataSource: SendableTabInfoDataSource) {
     self.init(style: .plain)
-    self.deviceList = deviceList
+    
+    self.dataSource = dataSource
+    self.sendTabAPI = sendTabAPI
   }
 
   override init(style: UITableView.Style) {
@@ -110,17 +117,25 @@ class SendTabToSelfContentController: UITableViewController {
       $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
     }
   }
-
-  // MARK: UITableViewDelegate, UITableViewDataSource
   
+  @objc func cancel() {
+    dismiss(animated: true)
+  }
+}
+
+// MARK: UITableViewDataSource - UITableViewDelegate
+
+extension SendTabToSelfContentController {
   override func numberOfSections(in tableView: UITableView) -> Int {
     return Section.allCases.count
-  }  
+  }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    guard let dataSource = dataSource else { return 0 }
+    
     switch section {
     case Section.information.rawValue:
-      return deviceList.count
+      return dataSource.numberOfDevices()
     default:
       return 1
     }
@@ -129,9 +144,9 @@ class SendTabToSelfContentController: UITableViewController {
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     switch indexPath.section {
     case Section.information.rawValue:
-      return DesignUX.informationRowHeight
+      return UX.informationRowHeight
     case Section.send.rawValue:
-      return DesignUX.standardItemHeight
+      return UX.standardItemHeight
     default:
       return UITableView.automaticDimension
     }
@@ -140,18 +155,19 @@ class SendTabToSelfContentController: UITableViewController {
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     switch indexPath.section {
     case Section.information.rawValue:
-      let device = deviceList[indexPath.row]
-      
       let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
-      cell.do {
-        $0.separatorInset = .zero
-        $0.accessoryType = indexPath.row == selectedIndex ? .checkmark : .none
-        $0.setLines(device.fullName, detailText: device.lastUpdatedTime.description)
-        $0.imageView?.contentMode = .scaleAspectFit
-        $0.imageView?.image = UIImage(systemName: "laptopcomputer")
+
+      if let device = dataSource?.deviceInformation(for: indexPath) {
+        cell.do {
+          $0.separatorInset = .zero
+          $0.accessoryType = indexPath.row == dataSource?.selectedIndex ? .checkmark : .none
+          $0.setLines(device.fullName, detailText: device.lastUpdatedTime.description)
+          $0.imageView?.contentMode = .scaleAspectFit
+          $0.imageView?.image = UIImage(systemName: "laptopcomputer")
+        }
+      
+        return cell
       }
-           
-      return cell
     case Section.send.rawValue:
       let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
       cell.do {
@@ -168,19 +184,23 @@ class SendTabToSelfContentController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let dataSource = dataSource else { return }
+    
     switch indexPath.section {
     case Section.information.rawValue:
-      selectedIndex = indexPath.row
+      dataSource.selectedIndex = indexPath.row
       tableView.reloadSections(IndexSet(integer: indexPath.section), with: .fade)
     case Section.send.rawValue:
-      print("Send")
+      if let device = dataSource.deviceInformation(for: indexPath) {
+        sendTabAPI?.sendActiveTab(
+          toDevice: device.cacheId,
+          tabTitle: dataSource.displayTitle,
+          activeURL: dataSource.sendableURL)
+      }
+      dismiss(animated: true)
     default:
       assertionFailure("No cell available for index path: \(indexPath)")
     }
-  }
-
-  @objc func cancel() {
-    dismiss(animated: true)
   }
 }
 
@@ -231,5 +251,34 @@ extension SendTabToSelfController: UIViewControllerTransitioningDelegate {
     forDismissed dismissed: UIViewController
   ) -> UIViewControllerAnimatedTransitioning? {
     return BasicAnimationController(delegate: self, direction: .dismissing)
+  }
+}
+
+// MARK: - SendableTabInfoDataSource
+
+class SendableTabInfoDataSource {
+
+  /// The information  related with tab to be sent to alist of devices
+  private let deviceList: [SendTabTargetDevice]
+  let displayTitle: String
+  let sendableURL: URL
+  var selectedIndex = 0
+  
+  // MARK: Lifecycle
+
+  init(with deviceList: [SendTabTargetDevice], displayTitle: String, sendableURL: URL) {
+    self.deviceList = deviceList
+    self.displayTitle = displayTitle
+    self.sendableURL = sendableURL
+  }
+
+  // MARK: Internal
+
+  func deviceInformation(for indexPath: IndexPath) -> SendTabTargetDevice? {
+    return deviceList[safe: indexPath.row]
+  }
+  
+  func numberOfDevices() -> Int {
+    return deviceList.count
   }
 }
