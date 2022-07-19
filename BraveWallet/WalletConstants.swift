@@ -59,5 +59,5 @@ struct WalletConstants {
 }
 
 struct WalletDebugFlags {
-  static var isSolanaEnabled: Bool = false
+  static var isSolanaEnabled: Bool = true
 }
