@@ -43,20 +43,44 @@ extension BraveWalletJsonRpcService {
           }
         )
       case .sol:
-        solanaBalance(account.address, chainId: network.chainId) { lamports, status, errorMessage in
-          guard status == .success else {
-            completion(nil)
-            return
+        if token.symbol == network.nativeToken.symbol {
+          solanaBalance(account.address, chainId: network.chainId) { lamports, status, errorMessage in
+            guard status == .success else {
+              completion(nil)
+              return
+            }
+            let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+            if let valueString = formatter.decimalString(
+              for: "\(lamports)",
+              radix: .decimal,
+              decimals: Int(token.decimals)
+            ) {
+              completion(Double(valueString))
+            } else {
+              completion(nil)
+            }
           }
-          let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
-          if let valueString = formatter.decimalString(
-            for: "\(lamports)",
-            radix: .decimal,
-            decimals: Int(token.decimals)
-          ) {
-            completion(Double(valueString))
-          } else {
-            completion(nil)
+        } else {
+          // TODO: verify working
+          splTokenAccountBalance(
+            account.address,
+            tokenMintAddress: token.contractAddress,
+            chainId: network.chainId
+          ) { amount, lamports, uiAmountString, status, errorMessage in
+            guard status == .success else {
+              completion(nil)
+              return
+            }
+            let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+            if let valueString = formatter.decimalString(
+              for: "\(lamports)",
+              radix: .decimal,
+              decimals: Int(token.decimals)
+            ) {
+              completion(Double(valueString))
+            } else {
+              completion(nil)
+            }
           }
         }
       case .fil:
@@ -119,20 +143,44 @@ extension BraveWalletJsonRpcService {
           }
         )
       case .sol:
-        solanaBalance(accountAddress, chainId: network.chainId) { lamports, status, errorMessage in
-          guard status == .success else {
-            completion(nil)
-            return
+        if token.symbol == network.nativeToken.symbol {
+          solanaBalance(accountAddress, chainId: network.chainId) { lamports, status, errorMessage in
+            guard status == .success else {
+              completion(nil)
+              return
+            }
+            let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+            if let valueString = formatter.decimalString(
+              for: "\(lamports)",
+              radix: .decimal,
+              decimals: Int(token.decimals)
+            ) {
+              completion(BDouble(valueString))
+            } else {
+              completion(nil)
+            }
           }
-          let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
-          if let valueString = formatter.decimalString(
-            for: "\(lamports)",
-            radix: .decimal,
-            decimals: Int(token.decimals)
-          ) {
-            completion(BDouble(valueString))
-          } else {
-            completion(nil)
+        } else {
+          // TODO: verify working
+          splTokenAccountBalance(
+            accountAddress,
+            tokenMintAddress: token.contractAddress,
+            chainId: network.chainId
+          ) { amount, lamports, uiAmountString, status, errorMessage in
+            guard status == .success else {
+              completion(nil)
+              return
+            }
+            let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+            if let valueString = formatter.decimalString(
+              for: "\(lamports)",
+              radix: .decimal,
+              decimals: Int(token.decimals)
+            ) {
+              completion(BDouble(valueString))
+            } else {
+              completion(nil)
+            }
           }
         }
       case .fil:
