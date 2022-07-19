@@ -12,6 +12,11 @@ class KeyringStoreTests: XCTestCase {
   
   private var cancellables: Set<AnyCancellable> = .init()
   
+  override func setUp() {
+    super.setUp()
+    WalletDebugFlags.isSolanaEnabled = true
+  }
+  
   private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestJsonRpcService, BraveWallet.TestBraveWalletService) {
     let currentNetwork: BraveWallet.NetworkInfo = .mockMainnet
     let currentChainId = currentNetwork.chainId
@@ -61,14 +66,14 @@ class KeyringStoreTests: XCTestCase {
       rpcService: rpcService
     )
     
-    let expectedKeyrings = [BraveWallet.KeyringInfo.mockDefaultKeyringInfo, BraveWallet.KeyringInfo.mockSolanaKeyringInfo, BraveWallet.KeyringInfo.mockFilecoinKeyringInfo]
+    let expectedKeyrings = [BraveWallet.KeyringInfo.mockDefaultKeyringInfo, BraveWallet.KeyringInfo.mockSolanaKeyringInfo]
     
     let allTokensExpectation = expectation(description: "allKeyrings")
     store.$allKeyrings
       .dropFirst()
       .sink { allKeyrings in
         defer { allTokensExpectation.fulfill() }
-        XCTAssertEqual(allKeyrings.count, 3)
+        XCTAssertEqual(allKeyrings.count, 2)
         for keyring in allKeyrings {
           XCTAssertTrue(expectedKeyrings.contains(where: { $0.id == keyring.id }))
         }
