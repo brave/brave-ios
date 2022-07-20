@@ -83,12 +83,12 @@ class AccountActivityStore: ObservableObject {
       AssetViewModel(token: $0, decimalBalance: 0, price: "", history: [])
     }
     // fetch price for each asset
-    let (_, prices) = await assetRatioService.price(
+    let priceResult = await assetRatioService.priceWithIndividualRetry(
       userVisibleTokens.map { $0.symbol.lowercased() },
       toAssets: [currencyFormatter.currencyCode],
       timeframe: .oneDay
     )
-    for price in prices {
+    for price in priceResult.assetPrices {
       if let index = updatedAssets.firstIndex(where: {
         $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
       }) {
