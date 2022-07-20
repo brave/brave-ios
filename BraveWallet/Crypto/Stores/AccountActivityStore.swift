@@ -56,7 +56,7 @@ class AccountActivityStore: ObservableObject {
 
   func update() {
     Task { @MainActor in
-      let coin = await walletService.selectedCoin()
+      let coin = account.coin
       let network = await rpcService.network(coin)
       let keyring = await keyringService.keyringInfo(coin.keyringId)
       let allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)

@@ -217,6 +217,9 @@ extension BraveWalletJsonRpcService {
         chainId: network.chainId,
         completion: completion
       )
+    } else {
+      let errorMessage = "Unable to fetch ethereum balance for \(token.symbol) token in account address '\(accountAddress)'"
+      completion("", .internalError, errorMessage)
     }
   }
 }
