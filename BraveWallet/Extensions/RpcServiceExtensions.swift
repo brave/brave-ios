@@ -61,7 +61,6 @@ extension BraveWalletJsonRpcService {
             }
           }
         } else {
-          // TODO: verify working
           splTokenAccountBalance(
             account.address,
             tokenMintAddress: token.contractAddress,
@@ -73,7 +72,7 @@ extension BraveWalletJsonRpcService {
             }
             let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
             if let valueString = formatter.decimalString(
-              for: "\(lamports)",
+              for: "\(amount)",
               radix: .decimal,
               decimals: Int(token.decimals)
             ) {
@@ -161,7 +160,6 @@ extension BraveWalletJsonRpcService {
             }
           }
         } else {
-          // TODO: verify working
           splTokenAccountBalance(
             accountAddress,
             tokenMintAddress: token.contractAddress,
@@ -173,7 +171,7 @@ extension BraveWalletJsonRpcService {
             }
             let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
             if let valueString = formatter.decimalString(
-              for: "\(lamports)",
+              for: "\(amount)",
               radix: .decimal,
               decimals: Int(token.decimals)
             ) {
