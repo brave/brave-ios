@@ -65,7 +65,7 @@ extension BraveWalletJsonRpcService {
             account.address,
             tokenMintAddress: token.contractAddress,
             chainId: network.chainId
-          ) { amount, lamports, uiAmountString, status, errorMessage in
+          ) { amount, _, _, status, errorMessage in
             guard status == .success else {
               completion(nil)
               return
@@ -164,7 +164,7 @@ extension BraveWalletJsonRpcService {
             accountAddress,
             tokenMintAddress: token.contractAddress,
             chainId: network.chainId
-          ) { amount, lamports, uiAmountString, status, errorMessage in
+          ) { amount, _, _, status, errorMessage in
             guard status == .success else {
               completion(nil)
               return
