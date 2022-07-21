@@ -30,7 +30,7 @@ class TransactionParserTests: XCTestCase {
     .init(address: "0x1234567890123456789012345678901234567890", name: "Account 1"),
     .init(address: "0x0987654321098765432109876543210987654321", name: "Account 2")
   ]
-  private let tokens: [BraveWallet.BlockchainToken] = [.previewToken, .previewDaiToken]
+  private let tokens: [BraveWallet.BlockchainToken] = [.previewToken, .previewDaiToken, .mockUSDCToken]
   let assetRatios: [String: Double] = ["eth": 1,
                                        "dai": 2]
   
@@ -245,6 +245,88 @@ class TransactionParserTests: XCTestCase {
           toToken: .previewDaiToken,
           minBuyValue: "0x5c6f2d76e910358b",
           minBuyAmount: "6.660592362643797387",
+          gasFee: .init(
+            fee: "0.000466",
+            fiat: "$0.00"
+          )
+        )
+      )
+    )
+    
+    guard let parsedTransaction = TransactionParser.parseTransaction(
+      transaction: transaction,
+      network: network,
+      accountInfos: accountInfos,
+      visibleTokens: tokens,
+      allTokens: tokens,
+      assetRatios: assetRatios,
+      currencyFormatter: currencyFormatter
+    ) else {
+      XCTFail("Failed to parse ethSwap transaction")
+      return
+    }
+    XCTAssertEqual(expectedParsedTransaction, parsedTransaction)
+  }
+  
+  func testEthSwapTransactionUSDCToDAI() {
+    let network: BraveWallet.NetworkInfo = .mockMainnet
+    
+    let transactionData: BraveWallet.TxData1559 = .init(
+      baseData: .init(
+        nonce: "1",
+        gasPrice: "0x0",
+        gasLimit: "0x4be75",
+        to: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF", // 0x exchange address
+        value: "0x0",
+        data: []
+      ),
+      chainId: network.chainId,
+      maxPriorityFeePerGas: "0x59682f00",
+      maxFeePerGas: "0x59682f09",
+      gasEstimation: .init(
+        slowMaxPriorityFeePerGas: "0x4ed3152b",
+        slowMaxFeePerGas: "0x4ed31534",
+        avgMaxPriorityFeePerGas: "0x59672ead",
+        avgMaxFeePerGas: "0x59672eb6",
+        fastMaxPriorityFeePerGas: "0x59682f00",
+        fastMaxFeePerGas: "0x59682f09",
+        baseFeePerGas: "0x9"
+      )
+    )
+    let transaction = BraveWallet.TransactionInfo(
+      id: "3",
+      fromAddress: "0x1234567890123456789012345678901234567890",
+      txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
+      txDataUnion: .init(ethTxData1559: transactionData),
+      txStatus: .confirmed,
+      txType: .ethSwap,
+      txParams: [],
+      txArgs: [
+        "0x07865c6e87b9f70255377e024ace6630c1eaa37fad6d458402f60fd3bd25163575031acdce07538d", // usdc -> dai
+        "0x16e360", // 1.5 USDC
+        "0x1bd02ca9a7c244e" // ~0.1253 DAI
+      ],
+      createdTime: Date(),
+      submittedTime: Date(),
+      confirmedTime: Date(),
+      originInfo: nil
+    )
+    
+    let expectedParsedTransaction = ParsedTransaction(
+      transaction: transaction,
+      namedFromAddress: "Account 1",
+      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedToAddress: "0x Exchange Proxy",
+      toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
+      networkSymbol: "ETH",
+      details: .ethSwap(
+        .init(
+          fromToken: .mockUSDCToken,
+          fromValue: "0x16e360",
+          fromAmount: "1.5",
+          toToken: .previewDaiToken,
+          minBuyValue: "0x1bd02ca9a7c244e",
+          minBuyAmount: "0.125259433834718286",
           gasFee: .init(
             fee: "0.000466",
             fiat: "$0.00"

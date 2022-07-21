@@ -136,29 +136,33 @@ class TransactionParser {
             let minBuyAmountValue = transaction.txArgs[safe: 2] else {
         return nil
       }
-      let formattedSellAmount = formatter.decimalString(for: sellAmountValue.removingHexPrefix, radix: .hex, decimals: Int(network.decimals))?.trimmingTrailingZeros ?? ""
-      let formattedMinBuyAmount = formatter.decimalString(for: minBuyAmountValue.removingHexPrefix, radix: .hex, decimals: Int(network.decimals))?.trimmingTrailingZeros ?? ""
       
       let fillPathNoHexPrefix = fillPath.removingHexPrefix
       let fillPathLength = fillPathNoHexPrefix.count / 2
       let splitIndex = fillPathNoHexPrefix.index(fillPathNoHexPrefix.startIndex, offsetBy: fillPathLength)
-      let fromTokenAddress = String(fillPathNoHexPrefix[..<splitIndex])
-      let fromToken = token(for: fromTokenAddress.addingHexPrefix, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
-      let toTokenAddress = String(fillPathNoHexPrefix[splitIndex...])
-      let toToken = token(for: toTokenAddress.addingHexPrefix, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
-      /* Example:
-       ETH -> DAI
-       Sell Amount: 0.12345
+      let fromTokenAddress = String(fillPathNoHexPrefix[..<splitIndex]).addingHexPrefix
+      let toTokenAddress = String(fillPathNoHexPrefix[splitIndex...]).addingHexPrefix
       
-       fillPath="0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeead6d458402f60fd3bd25163575031acdce07538d"
-       sellAmountValue="0x1b6951ef585a000"
-       minBuyAmountValue="0x5c6f2d76e910358b"
-       formattedSellAmount="0.12345"
-       formattedMinBuyAmount="6.660592362643797387"
-       fromToken.symbol = "ETH"
-       fromTokenAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-       toToken.symbol = "DAI"
+      let fromToken = token(for: fromTokenAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
+      let fromTokenDecimals = Int(fromToken?.decimals ?? network.decimals)
+      let toToken = token(for: toTokenAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
+      let toTokenDecimals = Int(toToken?.decimals ?? network.decimals)
+      
+      let formattedSellAmount = formatter.decimalString(for: sellAmountValue.removingHexPrefix, radix: .hex, decimals: fromTokenDecimals)?.trimmingTrailingZeros ?? ""
+      let formattedMinBuyAmount = formatter.decimalString(for: minBuyAmountValue.removingHexPrefix, radix: .hex, decimals: toTokenDecimals)?.trimmingTrailingZeros ?? ""
+      /* Example:
+       USDC -> DAI
+       Sell Amount: 1.5
+      
+       fillPath="0x07865c6e87b9f70255377e024ace6630c1eaa37fad6d458402f60fd3bd25163575031acdce07538d"
+       fromTokenAddress = "0x07865c6e87b9f70255377e024ace6630c1eaa37f"
+       fromToken.symbol = "USDC"
+       sellAmountValue="0x16e360"
+       formattedSellAmount="1.5"
        toTokenAddress = "0xad6d458402f60fd3bd25163575031acdce07538d"
+       toToken.symbol = "DAI"
+       minBuyAmountValue="0x1bd02ca9a7c244e"
+       formattedMinBuyAmount="0.125259433834718286"
        */
       return .init(
         transaction: transaction,
