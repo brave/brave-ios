@@ -90,7 +90,8 @@ public class BraveVPN {
   /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
-    guard let receipt = receipt else {
+    guard let receipt = receipt,
+    let bundleId = Bundle.main.bundleIdentifier else {
       receiptHasExpired?(nil)
       return
     }
@@ -101,7 +102,7 @@ public class BraveVPN {
       return
     }
 
-    housekeepingApi.verifyReceipt(receipt, bundleId: "com.brave.ios.browser") { validSubscriptions, success, error in
+    housekeepingApi.verifyReceipt(receipt, bundleId: bundleId) { validSubscriptions, success, error in
       if !success {
         // Api call for receipt verification failed,
         // we do not know if the receipt has expired or not.
