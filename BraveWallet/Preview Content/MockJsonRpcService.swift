@@ -220,4 +220,23 @@ extension BraveWallet.NetworkInfo {
   )
 }
 
+// TODO: Move to separate file
+class MockSolanaTxManagerProxy: BraveWalletSolanaTxManagerProxy {
+  func makeSystemProgramTransferTxData(_ from: String, to: String, lamports: UInt64, completion: @escaping (BraveWallet.SolanaTxData?, BraveWallet.SolanaProviderError, String) -> Void) {
+    completion(nil, .internalError, "Error message")
+  }
+  
+  func processSolanaHardwareSignature(_ txMetaId: String, signatureBytes: [NSNumber], completion: @escaping (Bool, BraveWallet.ProviderErrorUnion, String) -> Void) {
+    completion(false, .init(solanaProviderError: .internalError), "Error message")
+  }
+  
+  func makeTokenProgramTransferTxData(_ splTokenMintAddress: String, fromWalletAddress: String, toWalletAddress: String, amount: UInt64, completion: @escaping (BraveWallet.SolanaTxData?, BraveWallet.SolanaProviderError, String) -> Void) {
+    completion(nil, .internalError, "Error message")
+  }
+  
+  func estimatedTxFee(_ txMetaId: String, completion: @escaping (UInt64, BraveWallet.SolanaProviderError, String) -> Void) {
+    completion(0, .internalError, "Error message")
+  }
+}
+
 #endif

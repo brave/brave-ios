@@ -27,8 +27,10 @@ class TransactionParserTests: XCTestCase {
   
   private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   private let accountInfos: [BraveWallet.AccountInfo] = [
-    .init(address: "0x1234567890123456789012345678901234567890", name: "Account 1"),
-    .init(address: "0x0987654321098765432109876543210987654321", name: "Account 2")
+    .init(address: "0x1234567890123456789012345678901234567890", name: "Ethereum Account 1"),
+    .init(address: "0x0987654321098765432109876543210987654321", name: "Ethereum Account 2"),
+    .init(address: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd", name: "Solana Account 1", coin: .sol),
+    .init(address: "0xeeeeeeeeeeffffffffff11111111112222222222", name: "Solana Account 2", coin: .sol)
   ]
   private let tokens: [BraveWallet.BlockchainToken] = [.previewToken, .previewDaiToken, .mockUSDCToken]
   let assetRatios: [String: Double] = ["eth": 1,
@@ -76,14 +78,14 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
-      namedToAddress: "Account 2",
+      namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
       details: .ethSend(
         .init(
-          fromTokenSymbol: "ETH",
+          fromToken: network.nativeToken,
           fromValue: "0x1b667a56d488000",
           fromAmount: "0.1234",
           fromFiat: "$0.12",
@@ -102,12 +104,26 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse ethSend transaction")
       return
     }
-    XCTAssertEqual(expectedParsedTransaction, parsedTransaction)
+    XCTAssertEqual(expectedParsedTransaction.fromAddress, parsedTransaction.fromAddress)
+    XCTAssertEqual(expectedParsedTransaction.namedFromAddress, parsedTransaction.namedFromAddress)
+    XCTAssertEqual(expectedParsedTransaction.toAddress, parsedTransaction.toAddress)
+    XCTAssertEqual(expectedParsedTransaction.networkSymbol, parsedTransaction.networkSymbol)
+    guard case let .ethSend(expectedDetails) = expectedParsedTransaction.details,
+          case let .ethSend(parsedDetails) = parsedTransaction.details else {
+      XCTFail("Incorrectly parsed ethSend transaction")
+      return
+    }
+    // `fromToken` to fail equatability check because `network.nativeToken` will because is a computed property
+    XCTAssertEqual(expectedDetails.fromValue, parsedDetails.fromValue)
+    XCTAssertEqual(expectedDetails.fromAmount, parsedDetails.fromAmount)
+    XCTAssertEqual(expectedDetails.fromFiat, parsedDetails.fromFiat)
+    XCTAssertEqual(expectedDetails.gasFee, parsedDetails.gasFee)
   }
   
   func testEthErc20TransferTransaction() {
@@ -152,14 +168,14 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
-      namedToAddress: "Account 2",
+      namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
       details: .erc20Transfer(
         .init(
-          fromTokenSymbol: "DAI",
+          fromToken: .previewDaiToken,
           fromValue: "0x5ff20a91f724000",
           fromAmount: "0.4321",
           fromFiat: "$0.86",
@@ -178,6 +194,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse erc20Transfer transaction")
@@ -232,7 +249,7 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
@@ -260,6 +277,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse ethSwap transaction")
@@ -314,7 +332,7 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
@@ -342,6 +360,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse ethSwap transaction")
@@ -392,7 +411,7 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
@@ -418,6 +437,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse erc20Approve transaction")
@@ -468,7 +488,7 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
@@ -494,6 +514,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse erc20Approve transaction")
@@ -548,9 +569,9 @@ class TransactionParserTests: XCTestCase {
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Account 1",
+      namedFromAddress: "Ethereum Account 1",
       fromAddress: "0x1234567890123456789012345678901234567890",
-      namedToAddress: "Account 2",
+      namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
       details: .erc721Transfer(
@@ -571,11 +592,20 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse erc721TransferFrom transaction")
       return
     }
     XCTAssertEqual(expectedParsedTransaction, parsedTransaction)
+  }
+  
+  func testSolanaSystemTransfer() {
+    // TODO: unit test `.solanaSystemTransfer` tx type
+  }
+  
+  func testSolanaSplTokenTransfer() {
+    // TODO: unit test `.solanaSplTokenTransfer`, `.solanaSplTokenTransferWithAssociatedTokenAccountCreation` tx type
   }
 }
