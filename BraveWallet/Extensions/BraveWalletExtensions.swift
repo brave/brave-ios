@@ -172,3 +172,15 @@ extension BraveWallet.KeyringInfo {
     accountInfos.first?.coin
   }
 }
+
+extension BraveWallet.TransactionInfo {
+  var coin: BraveWallet.CoinType {
+    if txDataUnion.solanaTxData != nil {
+      return .sol
+    } else if txDataUnion.filTxData != nil {
+      return .fil
+    } else {
+      return .eth
+    }
+  }
+}

@@ -11,7 +11,15 @@ import BraveShared
 
 extension WalletStore {
   static var previewStore: WalletStore {
-    .init(
+    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
+    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    
+    return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
       walletService: MockBraveWalletService(),
@@ -19,14 +27,23 @@ extension WalletStore {
       swapService: MockSwapService(),
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
-      ethTxManagerProxy: MockEthTxManagerProxy()
+      ethTxManagerProxy: MockEthTxManagerProxy(),
+      solTxManagerProxy: solTxManagerProxy
     )
   }
 }
 
 extension CryptoStore {
   static var previewStore: CryptoStore {
-    .init(
+    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
+    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    
+    return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
       walletService: MockBraveWalletService(),
@@ -34,7 +51,8 @@ extension CryptoStore {
       swapService: MockSwapService(),
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
-      ethTxManagerProxy: MockEthTxManagerProxy()
+      ethTxManagerProxy: MockEthTxManagerProxy(),
+      solTxManagerProxy: solTxManagerProxy
     )
   }
 }
@@ -81,13 +99,22 @@ extension BuyTokenStore {
 
 extension SendTokenStore {
   static var previewStore: SendTokenStore {
-    .init(
+    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
+    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    
+    return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
       walletService: MockBraveWalletService(),
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
+      solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken
     )
   }
