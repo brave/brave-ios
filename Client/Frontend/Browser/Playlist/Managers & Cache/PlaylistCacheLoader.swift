@@ -379,7 +379,7 @@ class PlaylistWebLoader: UIView {
   private var handler: (PlaylistInfo?) -> Void
 
   init(certStore: CertStore?, handler: @escaping (PlaylistInfo?) -> Void) {
-    self.certStore = certStore
+    self.certStore = certStore ?? UIApplication.shared.keyWindow?.windowScene?.browserViewController?.profile.certStore
     self.handler = handler
     super.init(frame: .zero)
 
@@ -394,7 +394,7 @@ class PlaylistWebLoader: UIView {
     }
 
     // TODO: REFACTOR to support multiple windows better
-    if let browserController = webView.currentScene?.browserViewController {
+    if let browserController = webView.currentScene?.browserViewController ?? UIApplication.shared.keyWindow?.windowScene?.browserViewController {
       let KVOs: [KVOConstants] = [
         .estimatedProgress, .loading, .canGoBack,
         .canGoForward, .URL, .title,

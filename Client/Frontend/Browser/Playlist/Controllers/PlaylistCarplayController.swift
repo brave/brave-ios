@@ -29,7 +29,7 @@ class PlaylistCarplayController: NSObject {
   private var assetLoadingStateObservers = Set<AnyCancellable>()
   private var playlistObservers = Set<AnyCancellable>()
   private let savedFolder = PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID)
-  private let frc = PlaylistFolder.frc(savedFolderContentsOnly: false)
+  private let frc = PlaylistFolder.frc(savedFolder: false, sharedFolders: false)
 
   // For now, I have absolutely ZERO idea why the API says:
   // CPAllowedTemplates = CPAlertTemplate, invalid object CPActionSheetTemplate

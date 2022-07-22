@@ -15,14 +15,16 @@ private let log = Logger.browserLogger
 
 private enum Section: Int, CaseIterable {
   case savedItems
-  case folders
+  case nonSharedFolders
+  case sharedFolders
 }
 
 class PlaylistFolderController: UIViewController {
   private let cellIdentifier = "PlaylistCell"
   private let tableView = UITableView(frame: .zero, style: .insetGrouped)
   private let savedFolder = PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID)
-  private let othersFRC = PlaylistFolder.frc(savedFolderContentsOnly: false)
+  private let nonSharedFoldersFrc = PlaylistFolder.frc(savedFolder: false, sharedFolders: false)
+  private let sharedFoldersFrc = PlaylistFolder.frc(savedFolder: false, sharedFolders: true)
 
   var onFolderSelected: ((_ playlistFolder: PlaylistFolder) -> Void)?
 
@@ -42,7 +44,13 @@ class PlaylistFolderController: UIViewController {
     overrideUserInterfaceStyle = .dark
 
     do {
-      try othersFRC.performFetch()
+      try nonSharedFoldersFrc.performFetch()
+    } catch {
+      log.error("Error: \(error)")
+    }
+    
+    do {
+      try sharedFoldersFrc.performFetch()
     } catch {
       log.error("Error: \(error)")
     }
@@ -74,7 +82,8 @@ class PlaylistFolderController: UIViewController {
     super.viewWillAppear(animated)
 
     // Reload the table when visible
-    othersFRC.delegate = self
+    nonSharedFoldersFrc.delegate = self
+    sharedFoldersFrc.delegate = self
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
@@ -82,7 +91,8 @@ class PlaylistFolderController: UIViewController {
     super.viewWillDisappear(animated)
 
     // Avoid reloading the table while in the background
-    othersFRC.delegate = nil
+    nonSharedFoldersFrc.delegate = nil
+    sharedFoldersFrc.delegate = nil
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -96,6 +106,45 @@ class PlaylistFolderController: UIViewController {
   private func onDonePressed(_ button: UIBarButtonItem) {
     self.dismiss(animated: true)
   }
+  
+  private func section(from rawValue: Int) -> Section? {
+    var rawValue = rawValue
+    
+    if rawValue == Section.savedItems.rawValue {
+      return .savedItems
+    }
+    
+    if nonSharedFoldersFrc.fetchedObjects?.count == 0 {
+      rawValue += 1
+    }
+    
+    if rawValue == Section.nonSharedFolders.rawValue {
+      return .nonSharedFolders
+    }
+    
+    if sharedFoldersFrc.fetchedObjects?.count == 0 {
+      rawValue += 1
+    }
+    
+    if rawValue == Section.sharedFolders.rawValue {
+      return .sharedFolders
+    }
+    
+    return Section(rawValue: rawValue)
+  }
+  
+  private func frc(for section: Section) -> NSFetchedResultsController<PlaylistFolder>? {
+    switch section {
+    case .savedItems:
+      return nil
+      
+    case .nonSharedFolders:
+      return nonSharedFoldersFrc
+      
+    case .sharedFolders:
+      return sharedFoldersFrc
+    }
+  }
 }
 
 extension PlaylistFolderController: UITableViewDataSource {
@@ -104,13 +153,25 @@ extension PlaylistFolderController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard let section = Section(rawValue: section) else {
+    guard let section = self.section(from: section) else {
       return 0
     }
 
     switch section {
     case .savedItems: return 1
-    case .folders: return othersFRC.fetchedObjects?.count ?? 0
+    case .nonSharedFolders, .sharedFolders: return frc(for: section)?.fetchedObjects?.count ?? 0
+    }
+  }
+  
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    guard let section = self.section(from: section) else {
+      return nil
+    }
+    
+    switch section {
+    case .savedItems: return nil
+    case .nonSharedFolders: return Strings.PlayList.playListSectionTitle
+    case .sharedFolders: return Strings.PlayList.playListSharedFolderSectionTitle
     }
   }
 
@@ -123,15 +184,13 @@ extension PlaylistFolderController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-
-    guard let section = Section(rawValue: indexPath.section) else {
+    guard let section = self.section(from: indexPath.section) else {
       return
     }
 
-    let folderIcon = UIImage(systemName: "folder")?.template
-
     switch section {
     case .savedItems:
+      let folderIcon = UIImage(systemName: "folder")?.template
       let itemCount = savedFolder?.playlistItems?.count ?? 0
 
       cell.imageView?.image = folderIcon
@@ -140,11 +199,15 @@ extension PlaylistFolderController: UITableViewDataSource {
       cell.detailTextLabel?.textColor = .secondaryBraveLabel
       cell.accessoryType = .disclosureIndicator
       cell.selectionStyle = .none
-    case .folders:
-      guard let folder = othersFRC.fetchedObjects?[safe: indexPath.row] else {
+      
+    case .nonSharedFolders, .sharedFolders:
+      guard let folder = frc(for: section)?.fetchedObjects?[safe: indexPath.row] else {
         return
       }
 
+      let folderIcon = section == .nonSharedFolders ? UIImage(systemName: "folder")?.template :
+                      UIImage(named: "playlist_synced_folder", in: .current, compatibleWith: nil)?.template
+      
       let itemCount = folder.playlistItems?.count ?? 0
 
       cell.imageView?.image = folderIcon
@@ -162,17 +225,22 @@ extension PlaylistFolderController: UITableViewDelegate {
   private func deleteFolder(folder: PlaylistFolder) {
     PlaylistManager.shared.delete(folder: folder)
 
-    do {
-      try self.othersFRC.performFetch()
-    } catch {
-      log.error("Error: \(error)")
-    }
+    Section.allCases.forEach({
+      do {
+        try frc(for: $0)?.performFetch()
+      } catch {
+        log.error("Error: \(error)")
+      }
+    })
 
     tableView.reloadData()
   }
 
   private func onEditFolder(folderUUID: String) {
-    guard let folder = self.othersFRC.fetchedObjects?.first(where: { $0.uuid == folderUUID }) else {
+    guard let folder = Section.allCases
+        .compactMap({ frc(for: $0)?.fetchedObjects })
+        .flatMap({ $0 })
+        .first(where: { $0.uuid == folderUUID }) else {
       return
     }
 
@@ -237,11 +305,13 @@ extension PlaylistFolderController: UITableViewDelegate {
         PlaylistItem.moveItems(items: selectedItems, to: uuid)
 
         DispatchQueue.main.async {
-          do {
-            try self.othersFRC.performFetch()
-          } catch {
-            log.error("Error Reloading Table: \(error)")
-          }
+          Section.allCases.forEach({
+            do {
+              try self.frc(for: $0)?.performFetch()
+            } catch {
+              log.error("Error Reloading Table: \(error)")
+            }
+          })
 
           self.tableView.reloadData()
         }
@@ -257,7 +327,7 @@ extension PlaylistFolderController: UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let section = Section(rawValue: indexPath.section) else {
+    guard let section = section(from: indexPath.section) else {
       return
     }
 
@@ -266,8 +336,8 @@ extension PlaylistFolderController: UITableViewDelegate {
       if let savedFolder = savedFolder {
         onFolderSelected?(savedFolder)
       }
-    case .folders:
-      if let folder = othersFRC.fetchedObjects?[safe: indexPath.row] {
+    case .nonSharedFolders, .sharedFolders:
+      if let folder = frc(for: section)?.fetchedObjects?[safe: indexPath.row] {
         onFolderSelected?(folder)
       }
     }
@@ -275,7 +345,7 @@ extension PlaylistFolderController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 
-    guard let section = Section(rawValue: indexPath.section) else {
+    guard let section = section(from: indexPath.section) else {
       return nil
     }
 
@@ -292,8 +362,8 @@ extension PlaylistFolderController: UITableViewDelegate {
         case .savedItems:
           break
 
-        case .folders:
-          guard let folder = self.othersFRC.fetchedObjects?[safe: indexPath.row],
+        case .nonSharedFolders, .sharedFolders:
+          guard let folder = self.frc(for: section)?.fetchedObjects?[safe: indexPath.row],
             let folderUUID = folder.uuid
           else {
             completionHandler(false)
@@ -314,8 +384,8 @@ extension PlaylistFolderController: UITableViewDelegate {
         case .savedItems:
           break
 
-        case .folders:
-          guard let folder = self.othersFRC.fetchedObjects?[safe: indexPath.row] else {
+        case .nonSharedFolders, .sharedFolders:
+          guard let folder = self.frc(for: section)?.fetchedObjects?[safe: indexPath.row] else {
             completionHandler(false)
             return
           }
@@ -336,15 +406,11 @@ extension PlaylistFolderController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
 
-    guard let section = Section(rawValue: indexPath.section),
-      section == .folders
-    else {
+    guard let section = section(from: indexPath.section), section != .savedItems else {
       return nil
     }
 
-    guard let folder = othersFRC.fetchedObjects?[safe: indexPath.row],
-      let folderUUID = folder.uuid
-    else {
+    guard let folder = frc(for: section)?.fetchedObjects?[safe: indexPath.row], let folderUUID = folder.uuid else {
       return nil
     }
 
@@ -364,7 +430,7 @@ extension PlaylistFolderController: UITableViewDelegate {
           title: Strings.delete, image: UIImage(systemName: "trash"), attributes: .destructive,
           handler: { _ in
             guard let self = self else { return }
-            self.othersFRC.fetchedObjects?.first(where: { $0.uuid == folderUUID })?.do {
+            self.frc(for: section)?.fetchedObjects?.first(where: { $0.uuid == folderUUID })?.do {
               self.deleteFolder(folder: $0)
             }
           }),
@@ -373,7 +439,7 @@ extension PlaylistFolderController: UITableViewDelegate {
 
     let identifier = NSDictionary(dictionary: [
       "folderUUID": folderUUID,
-      "row": indexPath.row,
+      "indexPath": indexPath
     ])
     return UIContextMenuConfiguration(identifier: identifier, previewProvider: nil, actionProvider: actionProvider)
   }
@@ -384,15 +450,16 @@ extension PlaylistFolderController: UITableViewDelegate {
     }
 
     guard let folderUUID = identifier["folderUUID"] as? String,
-      let row = identifier["row"] as? Int,
-      row < othersFRC.fetchedObjects?.count ?? -1
+          let indexPath = identifier["indexPath"] as? IndexPath,
+          let section = section(from: indexPath.section),
+          indexPath.row < frc(for: section)?.fetchedObjects?.count ?? -1
     else {
       return nil
     }
 
-    guard let folder = othersFRC.fetchedObjects?[safe: row],
+    guard let folder = frc(for: section)?.fetchedObjects?[safe: indexPath.row],
       folderUUID == folder.uuid,
-      let cell = tableView.cellForRow(at: IndexPath(row: row, section: Section.folders.rawValue))
+      let cell = tableView.cellForRow(at: indexPath)
     else {
       return nil
     }
@@ -420,8 +487,16 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
     var indexPath = indexPath
     var newIndexPath = newIndexPath
 
-    indexPath?.section = Section.folders.rawValue
-    newIndexPath?.section = Section.folders.rawValue
+    if controller == nonSharedFoldersFrc {
+      indexPath?.section = Section.nonSharedFolders.rawValue
+      newIndexPath?.section = Section.nonSharedFolders.rawValue
+    } else if controller == sharedFoldersFrc {
+      indexPath?.section = Section.nonSharedFolders.rawValue
+      newIndexPath?.section = Section.nonSharedFolders.rawValue
+    } else {
+      log.error("SHOULD NEVER GET HERE!")
+      return
+    }
 
     switch type {
     case .insert:
@@ -459,10 +534,10 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
 
 extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDelegate {
   func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-    guard let section = Section(rawValue: indexPath.section) else {
+    guard let section = section(from: indexPath.section) else {
       return false
     }
-    return section == .folders
+    return section != .savedItems
   }
 
   func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
@@ -487,21 +562,24 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     reorderItems(from: sourceIndexPath, to: destinationIndexPath) { [weak self] in
       guard let self = self else { return }
 
-      do {
-        try self.othersFRC.performFetch()
-      } catch {
-        log.error("Error Reloading Data: \(error)")
+      Section.allCases.forEach {
+        do {
+          try self.frc(for: $0)?.performFetch()
+        } catch {
+          log.error("Error Reloading Data: \(error)")
+        }
       }
     }
   }
 
   func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
 
-    if indexPath.section != Section.folders.rawValue {
+    guard indexPath.section != Section.savedItems.rawValue,
+          let section = section(from: indexPath.section) else {
       return []
     }
 
-    let item = othersFRC.fetchedObjects?[safe: indexPath.row]
+    let item = frc(for: section)?.fetchedObjects?[safe: indexPath.row]
     let dragItem = UIDragItem(itemProvider: NSItemProvider())
     dragItem.localObject = item
     return [dragItem]
@@ -512,7 +590,7 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     var dropProposal = UITableViewDropProposal(operation: .cancel)
     guard session.items.count == 1 else { return dropProposal }
 
-    if destinationIndexPath?.section != Section.folders.rawValue {
+    if destinationIndexPath?.section == Section.savedItems.rawValue {
       return dropProposal
     }
 
@@ -536,8 +614,8 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
       destinationIndexPath = IndexPath(row: row, section: section)
     }
 
-    guard let section = Section(rawValue: destinationIndexPath.section),
-      section == .folders
+    guard let section = section(from: destinationIndexPath.section),
+      section != .savedItems
     else {
       return
     }
@@ -578,23 +656,25 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
   }
 
   func reorderItems(from sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath, completion: (() -> Void)?) {
-    guard var objects = othersFRC.fetchedObjects else {
+    guard let section = section(from: sourceIndexPath.section),
+          let frc = frc(for: section),
+          var objects = frc.fetchedObjects else {
       ensureMainThread {
         completion?()
       }
       return
     }
 
-    othersFRC.managedObjectContext.perform { [weak self] in
+    frc.managedObjectContext.perform { [weak frc] in
       defer {
         ensureMainThread {
           completion?()
         }
       }
 
-      guard let self = self else { return }
+      guard let frc = frc else { return }
 
-      let src = self.othersFRC.object(at: sourceIndexPath)
+      let src = frc.object(at: sourceIndexPath)
       objects.remove(at: sourceIndexPath.row)
       objects.insert(src, at: destinationIndexPath.row)
 
@@ -603,9 +683,9 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
       }
 
       do {
-        try self.othersFRC.managedObjectContext.save()
+        try frc.managedObjectContext.save()
       } catch {
-        log.error(error)
+        log.error("Error Saving ManagedObjectContext: \(error)")
       }
     }
   }

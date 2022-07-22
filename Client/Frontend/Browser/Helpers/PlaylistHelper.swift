@@ -76,6 +76,7 @@ class PlaylistHelper: NSObject, TabContentScript {
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
+    
     PlaylistHelper.processPlaylistInfo(
       helper: self,
       item: PlaylistInfo.from(message: message))

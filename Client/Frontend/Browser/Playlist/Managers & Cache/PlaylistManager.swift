@@ -565,15 +565,18 @@ extension PlaylistManager {
       return
     }
 
-    guard let index = index(of: item.pageSrc) else {
-      completion(item.duration)  // Return the database duration
-      return
-    }
-
     // Attempt to retrieve the duration from the Asset file
-    guard let asset = assetAtIndex(index) else {
-      completion(item.duration)  // Return the database duration
-      return
+    let asset: AVURLAsset
+    if item.src.isEmpty || item.pageSrc.isEmpty {
+      if let index = index(of: item.pageSrc), let urlAsset = assetAtIndex(index) {
+        asset = urlAsset
+      } else {
+        // Return the database duration
+        completion(item.duration)
+        return
+      }
+    } else {
+      asset = self.asset(for: item.pageSrc, mediaSrc: item.src)
     }
 
     // Accessing tracks blocks the main-thread if not already loaded
@@ -698,7 +701,11 @@ extension PlaylistManager {
               dateAdded: item.dateAdded,
               tagId: item.tagId)
 
-            PlaylistItem.updateItem(newItem) {
+            if PlaylistItem.itemExists(newItem) {
+              PlaylistItem.updateItem(newItem) {
+                completion(duration.seconds)
+              }
+            } else {
               completion(duration.seconds)
             }
           } else {

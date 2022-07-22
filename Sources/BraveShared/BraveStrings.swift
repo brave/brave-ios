@@ -1364,6 +1364,11 @@ extension Strings {
       NSLocalizedString("playList.playListSectionTitle", tableName: "BraveShared", bundle: .strings,
         value: "Playlist",
         comment: "Title For the Section that videos are listed")
+    
+    public static let playListSharedFolderSectionTitle =
+      NSLocalizedString("playList.playListSharedFolderSectionTitle", tableName: "BraveShared", bundle: .strings,
+        value: "Shared with you",
+        comment: "Title For the Section that videos are listed")
 
     public static let removeActionButtonTitle =
       NSLocalizedString("playList.removeActionButtonTitle", tableName: "BraveShared", bundle: .strings,

@@ -12,7 +12,7 @@ import UIKit
 
 private let log = Logger.browserLogger
 
-extension BrowserViewController: PlaylistHelperDelegate {
+extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHelperDelegate {
 
   private func createPlaylistPopover(tab: Tab?, state: PlaylistPopoverState) -> PopoverController {
     return PopoverController(
@@ -46,10 +46,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
               DispatchQueue.main.async {
                 if let webView = tab?.webView {
                   PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                    self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
+                    self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime, folderSharingId: nil)
                   }
                 } else {
-                  self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0)
+                  self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0, folderSharingId: nil)
                 }
               }
             }
@@ -189,10 +189,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
             DispatchQueue.main.async {
               if let webView = tab?.webView {
                 PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                  self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
+                  self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime, folderSharingId: nil)
                 }
               } else {
-                self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0)
+                self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0, folderSharingId: nil)
               }
             }
           }
@@ -306,9 +306,14 @@ extension BrowserViewController: PlaylistHelperDelegate {
     }
   }
 
-  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double) {
-    let playlistController = PlaylistCarplayManager.shared.getPlaylistController(tab: tab, initialItem: item, initialItemPlaybackOffset: playbackOffset)
+  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingId: String?) {
+    let playlistController = PlaylistCarplayManager.shared.getPlaylistController(tab: tab,
+                                                                                 initialItem: item,
+                                                                                 initialItemPlaybackOffset: playbackOffset)
     playlistController.modalPresentationStyle = .fullScreen
+    if let folderSharingId = folderSharingId {
+      playlistController.setFolderSharingId(folderSharingId)
+    }
 
     /// Donate Open Playlist Activity for suggestions
     let openPlaylist = ActivityShortcutManager.shared.createShortcutActivity(type: .openPlayList)
@@ -386,5 +391,10 @@ extension BrowserViewController: PlaylistHelperDelegate {
         completion?(true)
       }
     }
+  }
+  
+  // MARK: - PlaylistFolderSharingHelperDelegate
+  func openPlaylistSharingFolder(with playlistId: String) {
+    openPlaylist(tab: nil, item: nil, playbackOffset: 0.0, folderSharingId: playlistId)
   }
 }

@@ -2345,6 +2345,10 @@ extension BrowserViewController: TabDelegate {
     let playlistHelper = PlaylistHelper(tab: tab)
     playlistHelper.delegate = self
     tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), contentWorld: .page)
+    
+    let playlistFolderSharingHelper = PlaylistFolderSharingHelper(tab: tab)
+    playlistFolderSharingHelper.delegate = self
+    tab.addContentScript(playlistFolderSharingHelper, name: PlaylistFolderSharingHelper.name(), contentWorld: .page)
 
     tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name(), contentWorld: .page)
     tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name(), contentWorld: .defaultClient)

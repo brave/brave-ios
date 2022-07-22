@@ -9,7 +9,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-public struct PlaylistInfo: Codable {
+public struct PlaylistInfo: Codable, Identifiable {
   public let name: String
   public let src: String
   public let pageSrc: String
@@ -19,6 +19,22 @@ public struct PlaylistInfo: Codable {
   public let detected: Bool
   public let dateAdded: Date
   public let tagId: String
+  
+  public var id: String {
+    !tagId.isEmpty ? tagId : pageSrc + src
+  }
+  
+  public init(pageSrc: String) {
+    self.name = ""
+    self.src = ""
+    self.pageSrc = pageSrc
+    self.pageTitle = ""
+    self.mimeType = ""
+    self.duration = 0.0
+    self.dateAdded = Date()
+    self.detected = false
+    self.tagId = ""
+  }
 
   public init(item: PlaylistItem) {
     self.name = item.name ?? ""

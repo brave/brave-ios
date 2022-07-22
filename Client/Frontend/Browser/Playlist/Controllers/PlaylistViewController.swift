@@ -61,6 +61,7 @@ class PlaylistViewController: UIViewController {
   private var assetLoadingStateObservers = Set<AnyCancellable>()
 
   private var openInNewTab: ((_ url: URL?, _ isPrivate: Bool, _ isPrivileged: Bool) -> Void)?
+  private var folderSharingId: String?
 
   init(
     openInNewTab: ((URL?, Bool, Bool) -> Void)?,
@@ -75,6 +76,7 @@ class PlaylistViewController: UIViewController {
     self.mediaStreamer = PlaylistMediaStreamer(
       playerView: playerView,
       certStore: profile?.certStore)
+    self.folderSharingId = nil
     super.init(nibName: nil, bundle: nil)
 
     listController.initialItem = initialItem
@@ -151,19 +153,24 @@ class PlaylistViewController: UIViewController {
       $0.maximumPrimaryColumnWidth = 400
       $0.minimumPrimaryColumnWidth = 400
     }
-
-    if let initialItem = listController.initialItem,
-      let item = PlaylistItem.getItem(pageSrc: initialItem.pageSrc) {
-      PlaylistManager.shared.currentFolder = item.playlistFolder
-    } else if let url = Preferences.Playlist.lastPlayedItemUrl.value,
-      let item = PlaylistItem.getItem(pageSrc: url) {
-      PlaylistManager.shared.currentFolder = item.playlistFolder
+    
+    if let folderSharingId = folderSharingId {
+      let sharingController = PlaylistFolderSharingController(item: PlaylistSharedFolderModel(playlistId: folderSharingId), folderExists: false)
+      folderController.navigationController?.pushViewController(sharingController, animated: false)
     } else {
-      PlaylistManager.shared.currentFolder = nil
-    }
+      if let initialItem = listController.initialItem,
+        let item = PlaylistItem.getItem(pageSrc: initialItem.pageSrc) {
+        PlaylistManager.shared.currentFolder = item.playlistFolder
+      } else if let url = Preferences.Playlist.lastPlayedItemUrl.value,
+        let item = PlaylistItem.getItem(pageSrc: url) {
+        PlaylistManager.shared.currentFolder = item.playlistFolder
+      } else {
+        PlaylistManager.shared.currentFolder = nil
+      }
 
-    if PlaylistManager.shared.currentFolder != nil {
-      folderController.navigationController?.pushViewController(listController, animated: false)
+      if PlaylistManager.shared.currentFolder != nil {
+        folderController.navigationController?.pushViewController(listController, animated: false)
+      }
     }
 
     addChild(splitController)
@@ -182,6 +189,16 @@ class PlaylistViewController: UIViewController {
 
     detailController.setVideoPlayer(playerView)
     updateLayoutForOrientationMode()
+  }
+  
+  func setFolderSharingId(_ folderSharingId: String) {
+    self.folderSharingId = folderSharingId
+    
+    if let navigationController = folderController.navigationController {
+      navigationController.popToRootViewController(animated: false)
+      let sharingController = PlaylistFolderSharingController(item: PlaylistSharedFolderModel(playlistId: folderSharingId), folderExists: false)
+      navigationController.pushViewController(sharingController, animated: false)
+    }
   }
 
   override func viewDidAppear(_ animated: Bool) {

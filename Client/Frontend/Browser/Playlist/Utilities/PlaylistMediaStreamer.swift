@@ -99,7 +99,7 @@ class PlaylistMediaStreamer {
           // If we don't do this, youtube shows ads 100% of the time.
           // It's some weird race-condition in WKWebView where the content blockers may not load until
           // The WebView is visible!
-          self.playerView?.window?.insertSubview($0, at: 0)
+          self.playerView?.window?.insertSubview($0, at: 0) ?? UIApplication.shared.keyWindow?.insertSubview($0, at: 0)
         }
 
         if let url = URL(string: item.pageSrc) {

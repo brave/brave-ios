@@ -247,10 +247,10 @@ extension BrowserViewController {
 
                   if let webView = tab?.webView {
                     PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak browserViewController] currentTime in
-                      browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
+                      browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime, folderSharingId: nil)
                     }
                   } else {
-                    browserViewController.openPlaylist(tab: nil, item: item, playbackOffset: 0.0)
+                    browserViewController.openPlaylist(tab: nil, item: item, playbackOffset: 0.0, folderSharingId: nil)
                   }
                 }
               }

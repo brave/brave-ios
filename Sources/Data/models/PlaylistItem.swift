@@ -99,6 +99,33 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
       }
     }
   }
+  
+  public static func addItems(_ items: [PlaylistInfo], folderUUID: String, completion: (() -> Void)? = nil) {
+    DataController.perform(context: .new(inMemory: false), save: false) { context in
+      let folder = PlaylistFolder.getFolder(uuid: folderUUID, context: context)
+      
+      items.forEach({ item in
+        let playlistItem = PlaylistItem(context: context)
+        playlistItem.name = item.name
+        playlistItem.pageTitle = item.pageTitle
+        playlistItem.pageSrc = item.pageSrc
+        playlistItem.dateAdded = Date()
+        playlistItem.cachedData = Data()
+        playlistItem.duration = item.duration
+        playlistItem.mimeType = item.mimeType
+        playlistItem.mediaSrc = item.src
+        playlistItem.order = Int32.min
+        playlistItem.playlistFolder = folder
+      })
+
+      PlaylistItem.reorderItems(context: context)
+      PlaylistItem.saveContext(context)
+
+      DispatchQueue.main.async {
+        completion?()
+      }
+    }
+  }
 
   public static func getItems(parentFolder: PlaylistFolder?) -> [PlaylistItem] {
     let predicate: NSPredicate
