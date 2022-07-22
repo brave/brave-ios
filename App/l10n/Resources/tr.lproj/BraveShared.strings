@@ -1883,7 +1883,7 @@
 "RecentSearchSuggestionsTitle" = "Arama Önerileri";
 
 /* Setting title for option to automatically redirect a url to another url */
-"redditRedirectFooter" = "Reddit bağlantılarını otomatik olarak (old.reddit.com adresindeki) daha eski arayüze bağlar. Yeni Reddi arayüzünü kullanmak için, bunun yerinenew.reddit.com adresini kullanın.";
+"redditRedirectFooter" = "Reddit bağlantılarını otomatik olarak (old.reddit.com adresindeki) daha eski arayüze bağlar. Yeni Reddit arayüzünü kullanmak için, bunun yerine new.reddit.com adresini kullanın.";
 
 /* Action button for removing sync device. */
 "RemoveDevice" = "Kaldır";
