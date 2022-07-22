@@ -16,6 +16,7 @@ public class SendTokenStore: ObservableObject {
   @Published var selectedSendToken: BraveWallet.BlockchainToken? {
     didSet {
       fetchAssetBalance()
+      validateSendAddress()
     }
   }
   /// The current selected token balance. Default with nil value.
