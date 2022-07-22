@@ -6,9 +6,7 @@
 import BraveCore
 import Strings
 
-class TransactionParser {
-  
-  private init() {}
+enum TransactionParser {
   
   static func gasFee(
     from transaction: BraveWallet.TransactionInfo,
