@@ -389,7 +389,8 @@ extension BraveWallet.TransactionInfo {
       visibleTokens: visibleTokens,
       allTokens: allTokens,
       assetRatios: assetRatios,
-      currencyFormatter: currencyFormatter
+      currencyFormatter: currencyFormatter,
+      decimalFormatStyle: decimalFormatStyle
     )
   }
 }
