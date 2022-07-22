@@ -319,7 +319,7 @@ public class SendTokenStore: ObservableObject {
       return
     }
     
-    rpcService.network(.eth) { [weak self] network in
+    rpcService.network(.sol) { [weak self] network in
       guard let self = self else { return }
       if network.isNativeAsset(token) {
         self.solTxManagerProxy.makeSystemProgramTransferTxData(
