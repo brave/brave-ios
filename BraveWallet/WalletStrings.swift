@@ -2500,5 +2500,96 @@ extension Strings {
       value: "Warning: A screenshot of your message may get backed up to a cloud file service, and be readable by any application with photos access. Brave recommends that you not save this screenshot, and delete it as soon as possible.",
       comment: "The message displayed when the user takes a screenshot of their dapp decrypt request."
     )
+    public static let coinTypeEthereum = NSLocalizedString(
+      "wallet.coinTypeEthereum",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Ethereum",
+      comment: "One of the coin types for users to create an account in Ethereum mainnet or any EVM networks."
+    )
+    public static let coinTypeSolana = NSLocalizedString(
+      "wallet.coinTypeSolana",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Solana",
+      comment: "One of the coin types for users to create an account with in Solana network"
+    )
+    public static let coinTypeFilecoin = NSLocalizedString(
+      "wallet.coinTypeFilecoin",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Filecoin",
+      comment: "One of the coin types for users to create an account to store FIL assets"
+    )
+    public static let coinTypeEthereumDescription = NSLocalizedString(
+      "wallet.coinTypeEthereumDescription",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Supports EVM compatible assets on the Ethereum blockchain (ERC-20, ERC-721, ERC-1551, ERC-1155)",
+      comment: "A description for Ethereum coin type."
+    )
+    public static let coinTypeSolanaDescription = NSLocalizedString(
+      "wallet.coinTypeSolanaDescription",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Supports SPL compatible assets on the Solana blockchain",
+      comment: "A description for Solana coin type."
+    )
+    public static let coinTypeFilecoinDescription = NSLocalizedString(
+      "wallet.coinTypeFilecoinDescription",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Store FIL asset",
+      comment: "A description for Filecoin coin type."
+    )
+    public static let coinTypeUnknown = NSLocalizedString(
+      "wallet.coinTypeUnknown",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Unknown",
+      comment: "A placeholder for unknown coin type."
+    )
+    public static let coinTypeSelectionHeader = NSLocalizedString(
+      "wallet.coinTypeSelectionHeader",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Select one of the following account types",
+      comment: "A header displayed above coin types selection."
+    )
+    public static let createAccountAlertTitle = NSLocalizedString(
+      "wallet.createAccountAlertTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "You don't have a %@ account",
+      comment: "The title of the alert shown when a user switches to a network they do not have an account for yet. '%@' will be replaced with a network name such as 'Solana' or 'Filecoin'."
+    )
+    public static let createAccountAlertMessage = NSLocalizedString(
+      "wallet.createAccountAlertMessage",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Create one now?",
+      comment: "The message of the alert shown when a user switches to a network they do not have an account for yet."
+    )
+    public static let networkSelectionTitle = NSLocalizedString(
+      "wallet.networkSelectionTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Select Network",
+      comment: "The title of the to select a network from the available networks"
+    )
+    public static let networkSelectionSecondaryNetworks = NSLocalizedString(
+      "wallet.networkSelectionSecondaryNetworks",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Secondary Networks",
+      comment: "The title of the section for secondary networks in the network selection view."
+    )
+    public static let networkSelectionTestnetAccessibilityLabel = NSLocalizedString(
+      "wallet.networkSelectionTestnetAccessibilityLabel",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "View %@ test networks",
+      comment: "A VoiceOver label that will be read out when a user focuses on the show test networks button in the network selection view. \"%@\" will be replaced with the network name such as \"Solana\" or \"Ethereum\""
+    )
   }
 }
