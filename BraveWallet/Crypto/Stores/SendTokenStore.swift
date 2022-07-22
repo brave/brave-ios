@@ -266,8 +266,9 @@ public class SendTokenStore: ObservableObject {
     else { return }
 
     isMakingTx = true
-    self.rpcService.network(.eth) { network in
-      if token.contractAddress.isEmpty {
+    rpcService.network(.eth) { [weak self] network in
+      guard let self = self else { return }
+      if network.isNativeAsset(token) {
         let baseData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: self.sendAddress, value: "0x\(weiHexString)", data: .init())
         if network.isEip1559 {
           self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: fromAddress) { success, errorMessage  in
@@ -317,35 +318,38 @@ public class SendTokenStore: ObservableObject {
       return
     }
     
-    if token.contractAddress.isEmpty {
-      solTxManagerProxy.makeSystemProgramTransferTxData(
-        fromAddress,
-        to: sendAddress,
-        lamports: lamports
-      ) { solTxData, error, errMsg in
-        guard let solanaTxData = solTxData else {
-          completion(false, errMsg)
-          return
+    rpcService.network(.eth) { [weak self] network in
+      guard let self = self else { return }
+      if network.isNativeAsset(token) {
+        self.solTxManagerProxy.makeSystemProgramTransferTxData(
+          fromAddress,
+          to: self.sendAddress,
+          lamports: lamports
+        ) { solTxData, error, errMsg in
+          guard let solanaTxData = solTxData else {
+            completion(false, errMsg)
+            return
+          }
+          let txDataUnion = BraveWallet.TxDataUnion(solanaTxData: solanaTxData)
+          self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errMsg in
+            completion(success, errMsg)
+          }
         }
-        let txDataUnion = BraveWallet.TxDataUnion(solanaTxData: solanaTxData)
-        self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errMsg in
-          completion(success, errMsg)
-        }
-      }
-    } else {
-      solTxManagerProxy.makeTokenProgramTransferTxData(
-        token.contractAddress,
-        fromWalletAddress: fromAddress,
-        toWalletAddress: sendAddress,
-        amount: lamports
-      ) { solTxData, error, errMsg in
-        guard let solanaTxData = solTxData else {
-          completion(false, errMsg)
-          return
-        }
-        let txDataUnion = BraveWallet.TxDataUnion(solanaTxData: solanaTxData)
-        self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errorMessage in
-          completion(success, errorMessage)
+      } else {
+        self.solTxManagerProxy.makeTokenProgramTransferTxData(
+          token.contractAddress,
+          fromWalletAddress: fromAddress,
+          toWalletAddress: self.sendAddress,
+          amount: lamports
+        ) { solTxData, error, errMsg in
+          guard let solanaTxData = solTxData else {
+            completion(false, errMsg)
+            return
+          }
+          let txDataUnion = BraveWallet.TxDataUnion(solanaTxData: solanaTxData)
+          self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil) { success, txMetaId, errorMessage in
+            completion(success, errorMessage)
+          }
         }
       }
     }

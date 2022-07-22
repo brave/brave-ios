@@ -11,14 +11,6 @@ import BraveShared
 
 extension WalletStore {
   static var previewStore: WalletStore {
-    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    
     return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
@@ -28,21 +20,13 @@ extension WalletStore {
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
-      solTxManagerProxy: solTxManagerProxy
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
     )
   }
 }
 
 extension CryptoStore {
   static var previewStore: CryptoStore {
-    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    
     return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
@@ -52,7 +36,7 @@ extension CryptoStore {
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
-      solTxManagerProxy: solTxManagerProxy
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
     )
   }
 }
@@ -99,14 +83,6 @@ extension BuyTokenStore {
 
 extension SendTokenStore {
   static var previewStore: SendTokenStore {
-    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
-      completion(.init(), .success, "")
-    }
-    
     return .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
@@ -114,7 +90,7 @@ extension SendTokenStore {
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
-      solTxManagerProxy: solTxManagerProxy,
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
       prefilledToken: .previewToken
     )
   }
@@ -201,6 +177,21 @@ extension SettingsStore {
       txService: MockTxService(),
       keychain: TestableKeychain()
     )
+  }
+}
+
+extension BraveWallet.TestSolanaTxManagerProxy {
+  static var previewProxy: BraveWallet.TestSolanaTxManagerProxy {
+    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
+    solTxManagerProxy._makeSystemProgramTransferTxData = { _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    solTxManagerProxy._estimatedTxFee = { $1(UInt64(0), .success, "") }
+    
+    return solTxManagerProxy
   }
 }
 

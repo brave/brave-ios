@@ -184,3 +184,13 @@ extension BraveWallet.TransactionInfo {
     }
   }
 }
+
+extension BraveWallet.NetworkInfo {
+  func isNativeAsset(_ token: BraveWallet.BlockchainToken) -> Bool {
+    return nativeToken.contractAddress.caseInsensitiveCompare(token.contractAddress) == .orderedSame
+    && nativeToken.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
+    && symbol.caseInsensitiveCompare(token.symbol) == .orderedSame
+    && nativeToken.decimals == token.decimals
+    && coin == token.coin
+  }
+}

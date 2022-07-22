@@ -46,16 +46,16 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._network = { $1(.mockRopsten) }
     rpcService._addObserver = { _ in }
     
-    let wallatService = BraveWallet.TestBraveWalletService()
-    wallatService._selectedCoin = { $0(.eth) }
-    wallatService._userAssets = { $2([.previewToken]) }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
+    walletService._userAssets = { $2([.previewToken]) }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let store = SendTokenStore(
       keyringService: MockKeyringService(),
       rpcService: rpcService,
-      walletService: wallatService,
+      walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
@@ -81,16 +81,16 @@ class SendTokenStoreTests: XCTestCase {
   }
 
   func testMakeSendETHEIP1559Transaction() {
-    let wallatService = BraveWallet.TestBraveWalletService()
-    wallatService._selectedCoin = { $0(.eth) }
-    wallatService._userAssets = { $2([.previewToken]) }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
+    walletService._userAssets = { $2([.previewToken]) }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let store = SendTokenStore(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
-      walletService: wallatService,
+      walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
@@ -113,16 +113,16 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._network = { $1(.mockRopsten) }
     rpcService._addObserver = { _ in }
     
-    let wallatService = BraveWallet.TestBraveWalletService()
-    wallatService._selectedCoin = { $0(.eth) }
-    wallatService._userAssets = { $2([.previewToken]) }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
+    walletService._userAssets = { $2([.previewToken]) }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let store = SendTokenStore(
       keyringService: MockKeyringService(),
       rpcService: rpcService,
-      walletService: wallatService,
+      walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
@@ -142,16 +142,16 @@ class SendTokenStoreTests: XCTestCase {
   }
 
   func testMakeSendERC20EIP1559Transaction() {
-    let wallatService = BraveWallet.TestBraveWalletService()
-    wallatService._selectedCoin = { $0(.eth) }
-    wallatService._userAssets = { $2([.previewToken]) }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
+    walletService._userAssets = { $2([.previewToken]) }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let store = SendTokenStore(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
-      walletService: wallatService,
+      walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
@@ -177,8 +177,8 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._network = { $1(.mockRopsten) }
     rpcService._addObserver = { _ in }
     
-    let wallatService = BraveWallet.TestBraveWalletService()
-    wallatService._selectedCoin = { $0(.eth) }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
@@ -329,7 +329,7 @@ class SendTokenStoreTests: XCTestCase {
     keyringService._addObserver = { _ in }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._makeTokenProgramTransferTxData = {_, _, _, _, completion in
+    solTxManagerProxy._makeTokenProgramTransferTxData = { _, _, _, _, completion in
       completion(.init(), .success, "")
     }
     
