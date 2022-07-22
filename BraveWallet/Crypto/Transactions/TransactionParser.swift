@@ -370,3 +370,26 @@ struct Eth721TransferDetails: Equatable {
   /// The token id
   let tokenId: String
 }
+
+extension BraveWallet.TransactionInfo {
+  /// Use `TransactionParser` to build a `ParsedTransaction` model for this transaction.
+  func parsedTransaction(
+    network: BraveWallet.NetworkInfo,
+    accountInfos: [BraveWallet.AccountInfo],
+    visibleTokens: [BraveWallet.BlockchainToken],
+    allTokens: [BraveWallet.BlockchainToken],
+    assetRatios: [String: Double],
+    currencyFormatter: NumberFormatter,
+    decimalFormatStyle: WeiFormatter.DecimalFormatStyle? = nil
+  ) -> ParsedTransaction? {
+    TransactionParser.parseTransaction(
+      transaction: self,
+      network: network,
+      accountInfos: accountInfos,
+      visibleTokens: visibleTokens,
+      allTokens: allTokens,
+      assetRatios: assetRatios,
+      currencyFormatter: currencyFormatter
+    )
+  }
+}
