@@ -32,9 +32,13 @@ class TransactionParserTests: XCTestCase {
     .init(address: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd", name: "Solana Account 1", coin: .sol),
     .init(address: "0xeeeeeeeeeeffffffffff11111111112222222222", name: "Solana Account 2", coin: .sol)
   ]
-  private let tokens: [BraveWallet.BlockchainToken] = [.previewToken, .previewDaiToken, .mockUSDCToken]
+  private let tokens: [BraveWallet.BlockchainToken] = [
+    .previewToken, .previewDaiToken, .mockUSDCToken, .mockSolToken, .mockSpdToken
+  ]
   let assetRatios: [String: Double] = ["eth": 1,
-                                       "dai": 2]
+                                       "dai": 2,
+                                       "sol": 20,
+                                       "spd": 15]
   
   func testEthSendTransaction() {
     let network: BraveWallet.NetworkInfo = .mockMainnet
@@ -602,10 +606,157 @@ class TransactionParserTests: XCTestCase {
   }
   
   func testSolanaSystemTransfer() {
-    // TODO: unit test `.solanaSystemTransfer` tx type
+    let network: BraveWallet.NetworkInfo = .mockSolana
+    
+    let transactionData: BraveWallet.SolanaTxData = .init(
+      recentBlockhash: "",
+      lastValidBlockHeight: 0,
+      feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      splTokenMintAddress: "",
+      lamports: 100000000000000000,
+      amount: 0,
+      txType: .solanaSystemTransfer,
+      instructions: [
+        .init(
+          programId: "",
+          accountMetas: [.init(pubkey: "", isSigner: false, isWritable: false)],
+          data: [])
+      ],
+      send: .init(maxRetries: .init(maxRetries: 1), preflightCommitment: nil, skipPreflight: nil),
+      signTransactionParam: nil
+    )
+    let transaction = BraveWallet.TransactionInfo(
+      id: "7",
+      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
+      txDataUnion: .init(solanaTxData: transactionData),
+      txStatus: .confirmed,
+      txType: .solanaSystemTransfer,
+      txParams: [],
+      txArgs: [
+      ],
+      createdTime: Date(),
+      submittedTime: Date(),
+      confirmedTime: Date(),
+      originInfo: nil
+    )
+    let expectedParsedTransaction = ParsedTransaction(
+      transaction: transaction,
+      namedFromAddress: "Solana Account 1",
+      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      namedToAddress: "Solana Account 2",
+      toAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      networkSymbol: "SOL",
+      details: .solSystemTransfer(
+        .init(
+          fromToken: .mockSolToken,
+          fromValue: "100000000000000000",
+          fromAmount: "0.1",
+          fromFiat: "$2.00",
+          gasFee: .init(fee: "0.000000123", fiat: "$0.00")
+        )
+      )
+    )
+    
+    guard let parsedTransaction = TransactionParser.parseTransaction(
+      transaction: transaction,
+      network: network,
+      accountInfos: accountInfos,
+      visibleTokens: tokens,
+      allTokens: tokens,
+      assetRatios: assetRatios,
+      solEstimatedTxFee: 123000000000,
+      currencyFormatter: currencyFormatter
+    ) else {
+      XCTFail("Failed to parse ethSend transaction")
+      return
+    }
+    
+    XCTAssertEqual(expectedParsedTransaction.fromAddress, parsedTransaction.fromAddress)
+    XCTAssertEqual(expectedParsedTransaction.namedFromAddress, parsedTransaction.namedFromAddress)
+    XCTAssertEqual(expectedParsedTransaction.toAddress, parsedTransaction.toAddress)
+    XCTAssertEqual(expectedParsedTransaction.networkSymbol, parsedTransaction.networkSymbol)
+    guard case let .solSystemTransfer(expectedDetails) = expectedParsedTransaction.details,
+          case let .solSystemTransfer(parsedDetails) = parsedTransaction.details else {
+      XCTFail("Incorrectly parsed solanaSystemTransfer transaction")
+      return
+    }
+    // `fromToken` to fail equatability check because `network.nativeToken` will because is a computed property
+    XCTAssertEqual(expectedDetails.fromValue, parsedDetails.fromValue)
+    XCTAssertEqual(expectedDetails.fromAmount, parsedDetails.fromAmount)
+    XCTAssertEqual(expectedDetails.fromFiat, parsedDetails.fromFiat)
+    XCTAssertEqual(expectedDetails.gasFee, parsedDetails.gasFee)
   }
   
   func testSolanaSplTokenTransfer() {
-    // TODO: unit test `.solanaSplTokenTransfer`, `.solanaSplTokenTransferWithAssociatedTokenAccountCreation` tx type
+    let network: BraveWallet.NetworkInfo = .mockSolana
+    
+    let transactionData: BraveWallet.SolanaTxData = .init(
+      recentBlockhash: "",
+      lastValidBlockHeight: 0,
+      feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      splTokenMintAddress: BraveWallet.BlockchainToken.mockSpdToken.contractAddress,
+      lamports: 0,
+      amount: 43210000,
+      txType: .solanaSplTokenTransfer,
+      instructions: [
+        .init(
+          programId: "",
+          accountMetas: [.init(pubkey: "", isSigner: false, isWritable: false)],
+          data: [])
+      ],
+      send: .init(maxRetries: .init(maxRetries: 1), preflightCommitment: nil, skipPreflight: nil),
+      signTransactionParam: nil
+    )
+    let transaction = BraveWallet.TransactionInfo(
+      id: "7",
+      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
+      txDataUnion: .init(solanaTxData: transactionData),
+      txStatus: .confirmed,
+      txType: .solanaSplTokenTransfer,
+      txParams: [],
+      txArgs: [
+      ],
+      createdTime: Date(),
+      submittedTime: Date(),
+      confirmedTime: Date(),
+      originInfo: nil
+    )
+    let expectedParsedTransaction = ParsedTransaction(
+      transaction: transaction,
+      namedFromAddress: "Solana Account 1",
+      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      namedToAddress: "Solana Account 2",
+      toAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      networkSymbol: "SOL",
+      details: .solSplTokenTransfer(
+        .init(
+          fromToken: .mockSpdToken,
+          fromValue: "43210000",
+          fromAmount: "43.21",
+          fromFiat: "$648.15",
+          gasFee: .init(fee: "0.000000123", fiat: "$0.00")
+        )
+      )
+    )
+    
+    guard let parsedTransaction = TransactionParser.parseTransaction(
+      transaction: transaction,
+      network: network,
+      accountInfos: accountInfos,
+      visibleTokens: tokens,
+      allTokens: tokens,
+      assetRatios: assetRatios,
+      solEstimatedTxFee: 123000000000,
+      currencyFormatter: currencyFormatter
+    ) else {
+      XCTFail("Failed to parse ethSend transaction")
+      return
+    }
+    
+    XCTAssertEqual(expectedParsedTransaction, parsedTransaction)
   }
 }
