@@ -9,48 +9,69 @@ import UIKit
 
 class EmptyStateOverlayView: UIView {
 
-  private let logoImageView = UIImageView().then {
+  private let iconImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
     $0.tintColor = .braveLabel
   }
 
   private let informationLabel = UILabel().then {
     $0.textAlignment = .center
-    $0.font = .preferredFont(for: .title3, weight: .light)
+    $0.font = .preferredFont(for: .title3, weight: .medium)
+    $0.textColor = .braveLabel
+    $0.numberOfLines = 0
+    $0.adjustsFontSizeToFitWidth = true
+  }
+  
+  private let descriptionLabel = UILabel().then {
+    $0.textAlignment = .center
+    $0.font = .preferredFont(forTextStyle: .subheadline)
     $0.textColor = .braveLabel
     $0.numberOfLines = 0
     $0.adjustsFontSizeToFitWidth = true
   }
 
-  required init(description: String? = nil, icon: UIImage? = nil) {
+  required init(title: String? = nil, description: String? = nil, icon: UIImage? = nil) {
     super.init(frame: .zero)
 
     backgroundColor = .secondaryBraveBackground
 
     if let icon = icon {
-      logoImageView.image = icon.template
+      iconImageView.image = icon.template
     }
 
-    addSubview(logoImageView)
+    addSubview(iconImageView)
 
-    logoImageView.snp.makeConstraints { make in
+    iconImageView.snp.makeConstraints { make in
       make.centerX.equalToSuperview()
-      make.size.equalTo(60)
+      make.size.greaterThanOrEqualTo(60)
       // Sets proper top constraint for iPhone 6 in portrait and for iPad.
       make.centerY.equalToSuperview().offset(-180).priority(100)
       // Sets proper top constraint for iPhone 4, 5 in portrait.
       make.top.greaterThanOrEqualToSuperview().offset(50)
     }
 
-    if let description = description {
-      informationLabel.text = description
+    if let title = title {
+      informationLabel.text = title
     }
 
     addSubview(informationLabel)
 
     informationLabel.snp.makeConstraints { make in
       make.centerX.equalToSuperview()
-      make.top.equalTo(logoImageView.snp.bottom).offset(15)
-      make.left.right.equalToSuperview().inset(15)
+      make.top.equalTo(iconImageView.snp.bottom).offset(15)
+      make.width.equalToSuperview().multipliedBy(0.75)
+    }
+    
+    if let description = description {
+      descriptionLabel.text = description
+    }
+    
+    addSubview(descriptionLabel)
+    
+    descriptionLabel.snp.makeConstraints { make in
+      make.centerX.equalToSuperview()
+      make.top.equalTo(informationLabel.snp.bottom).offset(15)
+      make.width.equalToSuperview().multipliedBy(0.75)
     }
   }
 
@@ -61,5 +82,9 @@ class EmptyStateOverlayView: UIView {
 
   func updateInfoLabel(with text: String) {
     informationLabel.text = text
+  }
+  
+  func updateDescriptionLabel(with text: String) {
+    descriptionLabel.text = text
   }
 }

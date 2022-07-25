@@ -82,16 +82,18 @@ class TabManager: NSObject {
   var selectedIndex: Int { return _selectedIndex }
   var tempTabs: [Tab]?
   private weak var rewards: BraveRewards?
+  private weak var tabGeneratorAPI: BraveTabGeneratorAPI?
   var makeWalletProvider: ((Tab) -> (BraveWalletEthereumProvider, js: String)?)?
   private var domainFrc = Domain.frc()
 
-  init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?) {
+  init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?, tabGeneratorAPI: BraveTabGeneratorAPI) {
     assert(Thread.isMainThread)
 
     self.prefs = prefs
     self.navDelegate = TabManagerNavDelegate()
     self.imageStore = imageStore
     self.rewards = rewards
+    self.tabGeneratorAPI = tabGeneratorAPI
     self.tabEventHandlers = TabEventHandlers.create(with: prefs)
     super.init()
 
@@ -353,7 +355,7 @@ class TabManager: NSObject {
   }
 
   func addPopupForParentTab(_ parentTab: Tab, configuration: WKWebViewConfiguration) -> Tab {
-    let popup = Tab(configuration: configuration, type: parentTab.type)
+    let popup = Tab(configuration: configuration, type: parentTab.type, tabGeneratorAPI: tabGeneratorAPI)
     configureTab(popup, request: nil, afterTab: parentTab, flushToDisk: true, zombie: false, isPopup: true)
 
     // Wait momentarily before selecting the new tab, otherwise the parent tab
@@ -400,7 +402,7 @@ class TabManager: NSObject {
     let configuration: WKWebViewConfiguration = configuration ?? self.configuration
 
     let type: TabType = isPrivate ? .private : .regular
-    let tab = Tab(configuration: configuration, type: type)
+    let tab = Tab(configuration: configuration, type: type, tabGeneratorAPI: tabGeneratorAPI)
 
     configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie, id: id)
     return tab

@@ -19,6 +19,11 @@ extension TabTrayController {
     }
 
     var tableView = UITableView()
+    
+    lazy var noSyncTabsOverlayView = EmptyStateOverlayView(
+      title: "Tabs From other devices will appear here",
+      description: "To see your tabs from devices, join a sync chain and enable Open Tabs",
+      icon: UIImage(systemName: "laptopcomputer.and.iphone"))
 
     override init(frame: CGRect) {
       super.init(frame: frame)
@@ -50,5 +55,20 @@ extension TabTrayController {
     
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
+    
+    func updateNoSyncPanelState(isHidden: Bool) {
+      if isHidden {
+        noSyncTabsOverlayView.removeFromSuperview()
+      } else {
+        if noSyncTabsOverlayView.superview == nil {
+          addSubview(noSyncTabsOverlayView)
+          bringSubviewToFront(noSyncTabsOverlayView)
+          
+          noSyncTabsOverlayView.snp.makeConstraints {
+            $0.edges.equalTo(tableView)
+          }
+        }
+      }
+    }
   }
 }

@@ -129,7 +129,7 @@ class TabTrayController: LoadingViewController {
   private var searchBarView: TabTraySearchBar?
   let tabTraySearchController = UISearchController(searchResultsController: nil)
 
-  private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(description: Strings.noSearchResultsfound)
+  private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(title: Strings.noSearchResultsfound)
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -376,7 +376,10 @@ class TabTrayController: LoadingViewController {
   
   private func reloadOpenTabsSession() {
     sessionList = openTabsAPI.getSyncedSessions()
-    tabSyncView.tableView.reloadData()
+    tabSyncView.do {
+      $0.tableView.reloadData()
+      $0.updateNoSyncPanelState(isHidden: sessionList.count > 0)
+    }
   }
 
   // MARK: - Actions
