@@ -167,19 +167,24 @@ enum TransactionParser {
       
       let formattedSellAmount = formatter.decimalString(for: sellAmountValue.removingHexPrefix, radix: .hex, decimals: fromTokenDecimals)?.trimmingTrailingZeros ?? ""
       let formattedMinBuyAmount = formatter.decimalString(for: minBuyAmountValue.removingHexPrefix, radix: .hex, decimals: toTokenDecimals)?.trimmingTrailingZeros ?? ""
+      
+      let fromFiat = currencyFormatter.string(from: NSNumber(value: assetRatios[fromToken?.symbol.lowercased() ?? "", default: 0] * (Double(formattedSellAmount) ?? 0))) ?? "$0.00"
+      let minBuyAmountFiat = currencyFormatter.string(from: NSNumber(value: assetRatios[toToken?.symbol.lowercased() ?? "", default: 0] * (Double(formattedMinBuyAmount) ?? 0))) ?? "$0.00"
       /* Example:
        USDC -> DAI
        Sell Amount: 1.5
       
-       fillPath="0x07865c6e87b9f70255377e024ace6630c1eaa37fad6d458402f60fd3bd25163575031acdce07538d"
+       fillPath = "0x07865c6e87b9f70255377e024ace6630c1eaa37fad6d458402f60fd3bd25163575031acdce07538d"
        fromTokenAddress = "0x07865c6e87b9f70255377e024ace6630c1eaa37f"
        fromToken.symbol = "USDC"
-       sellAmountValue="0x16e360"
-       formattedSellAmount="1.5"
+       sellAmountValue = "0x16e360"
+       formattedSellAmount = "1.5"
+       fromFiat = "$187.37"
        toTokenAddress = "0xad6d458402f60fd3bd25163575031acdce07538d"
        toToken.symbol = "DAI"
-       minBuyAmountValue="0x1bd02ca9a7c244e"
-       formattedMinBuyAmount="0.125259433834718286"
+       minBuyAmountValue = "0x1bd02ca9a7c244e"
+       formattedMinBuyAmount = "0.125259433834718286"
+       minBuyAmountFiat = "$6.67"
        */
       return .init(
         transaction: transaction,
@@ -193,9 +198,11 @@ enum TransactionParser {
             fromToken: fromToken,
             fromValue: sellAmountValue,
             fromAmount: formattedSellAmount,
+            fromFiat: fromFiat,
             toToken: toToken,
             minBuyValue: minBuyAmountValue,
             minBuyAmount: formattedMinBuyAmount,
+            minBuyAmountFiat: minBuyAmountFiat,
             gasFee: gasFee(
               from: transaction,
               network: network,
@@ -443,6 +450,8 @@ struct EthSwapDetails: Equatable {
   let fromValue: String
   /// From amount formatted
   let fromAmount: String
+  /// The amount formatted as currency
+  let fromFiat: String?
   
   /// Token being swapped to
   let toToken: BraveWallet.BlockchainToken?
@@ -450,6 +459,8 @@ struct EthSwapDetails: Equatable {
   let minBuyValue: String
   /// Min. buy amount formatted
   let minBuyAmount: String
+  /// The amount formatted as currency
+  let minBuyAmountFiat: String?
   
   /// Gas fee for the transaction
   let gasFee: GasFee?

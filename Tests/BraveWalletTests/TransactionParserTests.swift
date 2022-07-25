@@ -37,6 +37,7 @@ class TransactionParserTests: XCTestCase {
   ]
   let assetRatios: [String: Double] = ["eth": 1,
                                        "dai": 2,
+                                       "usdc": 3,
                                        "sol": 20,
                                        "spd": 15]
   
@@ -263,9 +264,11 @@ class TransactionParserTests: XCTestCase {
           fromToken: .previewToken,
           fromValue: "0x1b6951ef585a000",
           fromAmount: "0.12345",
+          fromFiat: "$0.12",
           toToken: .previewDaiToken,
           minBuyValue: "0x5c6f2d76e910358b",
           minBuyAmount: "6.660592362643797387",
+          minBuyAmountFiat: "$13.32",
           gasFee: .init(
             fee: "0.000466",
             fiat: "$0.00"
@@ -346,9 +349,11 @@ class TransactionParserTests: XCTestCase {
           fromToken: .mockUSDCToken,
           fromValue: "0x16e360",
           fromAmount: "1.5",
+          fromFiat: "$4.50",
           toToken: .previewDaiToken,
           minBuyValue: "0x1bd02ca9a7c244e",
           minBuyAmount: "0.125259433834718286",
+          minBuyAmountFiat: "$0.25",
           gasFee: .init(
             fee: "0.000466",
             fiat: "$0.00"
