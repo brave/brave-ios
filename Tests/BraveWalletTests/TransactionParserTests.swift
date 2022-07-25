@@ -614,7 +614,7 @@ class TransactionParserTests: XCTestCase {
       feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
       toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
       splTokenMintAddress: "",
-      lamports: 100000000000000000,
+      lamports: 100000000,
       amount: 0,
       txType: .solanaSystemTransfer,
       instructions: [
@@ -651,10 +651,10 @@ class TransactionParserTests: XCTestCase {
       details: .solSystemTransfer(
         .init(
           fromToken: .mockSolToken,
-          fromValue: "100000000000000000",
+          fromValue: "100000000",
           fromAmount: "0.1",
           fromFiat: "$2.00",
-          gasFee: .init(fee: "0.000000123", fiat: "$0.00")
+          gasFee: .init(fee: "0.00123", fiat: "$0.02")
         )
       )
     )
@@ -666,7 +666,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
-      solEstimatedTxFee: 123000000000,
+      solEstimatedTxFee: 1230000,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse solanaSystemTransfer transaction")
@@ -738,7 +738,7 @@ class TransactionParserTests: XCTestCase {
           fromValue: "43210000",
           fromAmount: "43.21",
           fromFiat: "$648.15",
-          gasFee: .init(fee: "0.000000123", fiat: "$0.00")
+          gasFee: .init(fee: "0.0123", fiat: "$0.25")
         )
       )
     )
@@ -750,7 +750,7 @@ class TransactionParserTests: XCTestCase {
       visibleTokens: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
-      solEstimatedTxFee: 123000000000,
+      solEstimatedTxFee: 12300000,
       currencyFormatter: currencyFormatter
     ) else {
       XCTFail("Failed to parse solanaSplTokenTransfer transaction")
