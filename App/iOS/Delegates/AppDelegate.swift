@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
       }
     }
-    
+
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
   }()
   
