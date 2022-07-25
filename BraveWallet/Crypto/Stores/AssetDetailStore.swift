@@ -180,7 +180,7 @@ class AssetDetailStore: ObservableObject {
       })
     }
     var solEstimatedTxFees: [String: UInt64] = [:]
-    if network.coin == .sol {
+    if token.coin == .sol {
       solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: allTransactions.map(\.id))
     }
     return allTransactions

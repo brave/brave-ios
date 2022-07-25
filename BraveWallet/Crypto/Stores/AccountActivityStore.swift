@@ -129,7 +129,7 @@ class AccountActivityStore: ObservableObject {
   ) async -> [TransactionSummary] {
     let transactions = await txService.allTransactionInfo(account.coin, from: account.address)
     var solEstimatedTxFees: [String: UInt64] = [:]
-    if network.coin == .sol {
+    if account.coin == .sol {
       solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: transactions.map(\.id))
     }
     return transactions
