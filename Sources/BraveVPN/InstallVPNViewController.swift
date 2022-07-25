@@ -9,13 +9,13 @@ import BraveShared
 import Lottie
 import BraveUI
 
-public class InstallVPNViewController: UIViewController {
+class InstallVPNViewController: UIViewController {
 
   private var installVPNView: View {
     return view as! View  // swiftlint:disable:this force_cast
   }
 
-  public override func loadView() {
+  override func loadView() {
     view = View()
   }
 
@@ -23,7 +23,7 @@ public class InstallVPNViewController: UIViewController {
     dismiss(animated: true)
   }
 
-  public override func viewDidLoad() {
+  override func viewDidLoad() {
     super.viewDidLoad()
     title = Strings.VPN.installTitle
     installVPNView.installVPNButton.addTarget(self, action: #selector(installVPNAction), for: .touchUpInside)
@@ -33,7 +33,7 @@ public class InstallVPNViewController: UIViewController {
     navigationItem.standardAppearance = BraveVPNCommonUI.navigationBarAppearance
   }
 
-  public override func viewWillAppear(_ animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
     // navigationItem.standardAppearance does not support tinting the back button for some
@@ -41,7 +41,7 @@ public class InstallVPNViewController: UIViewController {
     navigationController?.navigationBar.tintColor = .white
   }
 
-  public override func viewWillDisappear(_ animated: Bool) {
+  override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
 
     // Reset styling set above

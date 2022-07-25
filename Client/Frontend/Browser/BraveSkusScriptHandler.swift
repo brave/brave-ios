@@ -31,7 +31,6 @@ class BraveSkusScriptHandler: TabContentScript {
     case fetchOrderCredentials = 2
     case prepareCredentialsPresentation = 3
     case credentialsSummary = 4
-    case receipt = 5
   }
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
@@ -68,8 +67,6 @@ class BraveSkusScriptHandler: TabContentScript {
       if let domain = data["domain"] as? String {
         handleCredentialsSummary(for: domain)
       }
-    case Method.receipt.rawValue:
-      handleProvidingReceipt()
     default:
       assertionFailure("Failure, the website called unhandled method with id: \(methodId)")
     }
@@ -131,19 +128,6 @@ class BraveSkusScriptHandler: TabContentScript {
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
       
-    }
-  }
-  
-  func handleProvidingReceipt() {
-    print("bxx 5")
-    guard let receipt = BraveVPN.receipt else { return }
-    let json: [String: Any] = [
-      "type": "ios",
-      "raw_receipt": receipt
-    ]
-    
-    if let base64json = try? JSONSerialization.data(withJSONObject: json).base64EncodedString {
-      self.callback(methodId: 5, result: base64json)
     }
   }
   
