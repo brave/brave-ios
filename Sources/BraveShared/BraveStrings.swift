@@ -260,6 +260,12 @@ extension Strings {
         tableName: "BraveShared", bundle: .strings,
         value: "Watch the video",
         comment: "Button title for Playlist Onboarding View")
+    public static let tabReceivedCalloutTitle =
+      NSLocalizedString(
+        "callout.tabReceivedCalloutTitle",
+        tableName: "BraveShared", bundle: .strings,
+        value: "Tab Received",
+        comment: "Title for 'Tab Received' Callout, This is shown in the message when a Tab information is received from another sync device. ")
   }
 }
 

@@ -268,7 +268,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     self.tabManager = TabManager(
       prefs: profile.prefs,
       imageStore: diskImageStore,
-      rewards: rewards)
+      rewards: rewards,
+      tabGeneratorAPI: braveCore.tabGeneratorAPI)
 
     // Setup ReaderMode Cache
     self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
@@ -315,6 +316,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       SendTabToSelfStateObserver { [weak self] stateChange in
         switch stateChange {
         case .sendTabToSelfEntriesAddedRemotely(let newEntries):
+          // Fetching the last URL that has been sent from synced sessions
           if let requestedURL = newEntries.last?.url {
             self?.presentTabReceivedCallout(url: requestedURL)
           }
