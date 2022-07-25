@@ -669,7 +669,7 @@ class TransactionParserTests: XCTestCase {
       solEstimatedTxFee: 123000000000,
       currencyFormatter: currencyFormatter
     ) else {
-      XCTFail("Failed to parse ethSend transaction")
+      XCTFail("Failed to parse solanaSystemTransfer transaction")
       return
     }
     
@@ -753,7 +753,7 @@ class TransactionParserTests: XCTestCase {
       solEstimatedTxFee: 123000000000,
       currencyFormatter: currencyFormatter
     ) else {
-      XCTFail("Failed to parse ethSend transaction")
+      XCTFail("Failed to parse solanaSplTokenTransfer transaction")
       return
     }
     
