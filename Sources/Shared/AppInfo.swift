@@ -75,9 +75,4 @@ open class AppInfo {
     }
     return baseBundleIdentifier
   }
-
-  // Return whether the currently executing code is running in an Application
-  public static var isApplication: Bool {
-    return Bundle.main.infoDictionaryString(forKey: "CFBundlePackageType") == "APPL"
-  }
 }
