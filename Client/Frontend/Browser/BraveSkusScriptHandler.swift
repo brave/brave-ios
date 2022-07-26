@@ -77,7 +77,7 @@ class BraveSkusScriptHandler: TabContentScript {
       do {
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        print("bxx 1")
+        log.debug("skus refreshOrder")
         self?.callback(methodId: 1, result: json)
       } catch {
         log.error("refrshOrder: Failed to decode json: \(error)")
@@ -87,16 +87,13 @@ class BraveSkusScriptHandler: TabContentScript {
   
   private func handleFetchOrderCredentials(for orderId: String) {
     sku?.fetchOrderCredentials(orderId) { [weak self] completion in
-      // FIXME: Confirm we can pass string only not json/dict
-      print("bxx 2")
+      log.debug("skus fetchOrderCredentials")
       self?.callback(methodId: 2, result: completion)
     }
   }
   
   private func handlePrepareCredentialsSummary(for domain: String, path: String) {
-    print("bxx 3")
     sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
-      // FIXME: Confirm we can pass string only not json/dict
       if !credential.isEmpty {
         BraveVPN.setSkusCredential(credential)
       }
@@ -108,7 +105,7 @@ class BraveSkusScriptHandler: TabContentScript {
   private func handleCredentialsSummary(for domain: String) {
     sku?.credentialSummary(domain) { [weak self] completion in
       do {
-        print("bxx 4")
+        log.debug("skus credentialSummary")
         
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
@@ -119,15 +116,15 @@ class BraveSkusScriptHandler: TabContentScript {
           formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
           if let date = formatter.date(from: expiresDate) {
             Preferences.VPN.expirationDate.value = date
+          } else {
+            assertionFailure("Failed to parse date: \(expiresDate)")
           }
         }
         
-        // FIXME: Experiment
         self?.handlePrepareCredentialsSummary(for: domain, path: "*")
       } catch {
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
-      
     }
   }
   
@@ -135,9 +132,6 @@ class BraveSkusScriptHandler: TabContentScript {
     let functionName =
     "window.__firefox__.BSKU\(UserScriptManager.messageHandlerTokenString).resolve"
     
-    //let dd = try? JSONSerialization.jsonObject(with: result.data(using: .utf8)!, options: .fragmentsAllowed)
-    
-    // FIXME: Not sure what do we want to pass back to the promise.
     let args: [Any] = ["\(methodId)", result]
     
     self.tab?.webView?.evaluateSafeJavaScript(
