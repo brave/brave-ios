@@ -24,6 +24,10 @@ class TransactionDetailsStore: ObservableObject {
     }
   }
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+    .then {
+      $0.minimumFractionDigits = 2
+      $0.maximumFractionDigits = 10
+    }
   
   private let keyringService: BraveWalletKeyringService
   private let walletService: BraveWalletBraveWalletService
@@ -86,6 +90,7 @@ class TransactionDetailsStore: ObservableObject {
         return
       }
       self.parsedTransaction = parsedTransaction
+      self.currencyFormatter.maximumFractionDigits = 2 // use max. 2 digits for market price calculation
       
       switch parsedTransaction.details {
       case let .ethSend(details),
