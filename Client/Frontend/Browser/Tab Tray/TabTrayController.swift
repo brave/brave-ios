@@ -27,6 +27,11 @@ class TabTrayController: LoadingViewController {
   enum TabTraySection {
     case main
   }
+  
+  enum TabTrayMode {
+    case local
+    case sync
+  }
 
   let tabManager: TabManager
   private let openTabsAPI: BraveOpenTabsAPI  
@@ -58,6 +63,7 @@ class TabTrayController: LoadingViewController {
   var searchTabTrayTimer: Timer?
   var isTabTrayBeingSearched = false
   var tabTraySearchQuery = ""
+  var tabTrayMode: TabTrayMode = .local
   private var privateModeCancellable: AnyCancellable?
   private var initialScrollCompleted = false
   
@@ -288,8 +294,13 @@ class TabTrayController: LoadingViewController {
   }
   
   @objc func typeSelectionDidChange(_ sender: UISegmentedControl) {
-    tabTrayView.isHidden = sender.selectedSegmentIndex == 1
-    tabSyncView.isHidden = sender.selectedSegmentIndex == 0
+    tabTraySearchController.isActive = false
+    tabTrayMode = sender.selectedSegmentIndex == 0 ? .local : .sync
+
+    tabTrayView.isHidden = tabTrayMode == .sync
+    tabSyncView.isHidden = tabTrayMode == .local
+    
+    searchBarView?.searchBar.placeholder = tabTrayMode == .local ? Strings.tabTraySearchBarTitle : "Search Open Tabs"
   }
   
   private func updateColors(_ isPrivateBrowsing: Bool) {
@@ -374,12 +385,31 @@ class TabTrayController: LoadingViewController {
     return cell
   }
   
-  private func reloadOpenTabsSession() {
-    sessionList = openTabsAPI.getSyncedSessions()
+  func reloadOpenTabsSession(for query: String? = nil) {
+    sessionList = fetchSyncedSessions(for: query)
+    
     tabSyncView.do {
       $0.tableView.reloadData()
       $0.updateNoSyncPanelState(isHidden: sessionList.count > 0)
     }
+  }
+  
+  private func fetchSyncedSessions(for query: String? = nil) -> [OpenDistantSession] {
+    let allSessions = openTabsAPI.getSyncedSessions()
+    var queriedSessions = [OpenDistantSession]()
+    
+    if let query = query, !query.isEmpty {
+      for session in allSessions {
+        let queriedSyncedTabList = session.tabs.filter {
+          ($0.title?.lowercased().contains(query) ?? false) || ($0.url.baseDomain?.contains(query) ?? false)
+        }
+
+        session.tabs = queriedSyncedTabList
+        queriedSessions.append(session)
+      }
+    }
+    
+    return queriedSessions
   }
 
   // MARK: - Actions

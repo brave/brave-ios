@@ -25,7 +25,13 @@ extension TabTrayController: UISearchResultsUpdating {
     }
 
     tabTraySearchQuery = query
-    applySnapshot(for: tabTraySearchQuery)
+    
+    switch tabTrayMode {
+    case .local:
+      applySnapshot(for: tabTraySearchQuery)
+    case .sync:
+      reloadOpenTabsSession(for: query)
+    }
   }
 
   private func invalidateSearchTimer() {
@@ -43,12 +49,24 @@ extension TabTrayController: UISearchControllerDelegate {
   func willPresentSearchController(_ searchController: UISearchController) {
     isTabTrayBeingSearched = true
     tabTraySearchQuery = ""
-    tabTrayView.collectionView.reloadData()
+    
+    switch tabTrayMode {
+    case .local:
+      tabTrayView.collectionView.reloadData()
+    case .sync:
+      tabSyncView.tableView.reloadData()
+    }
   }
 
   func willDismissSearchController(_ searchController: UISearchController) {
     invalidateSearchTimer()
     isTabTrayBeingSearched = false
-    tabTrayView.collectionView.reloadData()
+    
+    switch tabTrayMode {
+    case .local:
+      tabTrayView.collectionView.reloadData()
+    case .sync:
+      tabSyncView.tableView.reloadData()
+    }
   }
 }
