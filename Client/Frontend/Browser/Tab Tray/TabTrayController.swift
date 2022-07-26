@@ -57,6 +57,7 @@ class TabTrayController: LoadingViewController {
       applySnapshot()
 
       privateModeButton.isSelected = privateMode
+      tabTypeSelector.isHidden = privateMode
     }
   }
 
@@ -90,7 +91,6 @@ class TabTrayController: LoadingViewController {
     }
     return segmentedControl
   }()
-  private var tabTypeSelectorHeight: ConstraintItem?
   
   var tabTrayView = TabTrayContainerView().then {
     $0.isHidden = false
@@ -256,20 +256,22 @@ class TabTrayController: LoadingViewController {
   }
   
   private func layoutTabTray() {
-    containerView.addSubview(tabTypeSelector)
-    containerView.addSubview(tabContentView)
+    let contentStackView = UIStackView().then {
+      $0.axis = .vertical
+      $0.alignment = .center
+    }
+        
+    contentStackView.addArrangedSubview(tabTypeSelector)
+    contentStackView.addArrangedSubview(tabContentView)
+    
+    containerView.addSubview(contentStackView)
+    
+    contentStackView.snp.makeConstraints {
+      $0.edges.equalTo(containerView.safeAreaLayoutGuide)
+    }
     
     tabTypeSelector.snp.makeConstraints {
-      $0.top.equalTo(containerView.safeAreaLayoutGuide.snp.top).offset(8)
-      $0.centerX.equalTo(containerView)
-      $0.width.equalTo(containerView.snp.width).dividedBy(2)
-    }
-  
-    tabContentView.snp.makeConstraints {
-      $0.top.equalTo(tabTypeSelector.safeAreaLayoutGuide.snp.bottom).offset(8)
-      $0.trailing.equalTo(containerView.safeAreaLayoutGuide.snp.trailing)
-      $0.leading.equalTo(containerView.safeAreaLayoutGuide.snp.leading)
-      $0.bottom.equalTo(containerView.safeAreaLayoutGuide.snp.bottom)
+      $0.width.equalTo(contentStackView.snp.width).dividedBy(2)
     }
     
     tabContentView.addSubview(tabTrayView)
@@ -283,8 +285,6 @@ class TabTrayController: LoadingViewController {
       $0.edges.equalToSuperview()
     }
     
-    tabTypeSelectorHeight = tabTypeSelector.snp.height
-
     view = containerView
   }
   
