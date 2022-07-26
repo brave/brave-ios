@@ -507,7 +507,6 @@ extension BraveWallet.TransactionInfo {
     assetRatios: [String: Double],
     solEstimatedTxFee: UInt64? = nil,
     currencyFormatter: NumberFormatter,
-    solEstimatedTxFee: UInt64? = nil,
     decimalFormatStyle: WeiFormatter.DecimalFormatStyle? = nil
   ) -> ParsedTransaction? {
     TransactionParser.parseTransaction(
