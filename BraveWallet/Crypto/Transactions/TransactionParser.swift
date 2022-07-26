@@ -27,7 +27,7 @@ enum TransactionParser {
       let limit = transaction.ethTxGasLimit
       let formatter = WeiFormatter(decimalFormatStyle: .gasFee(limit: limit.removingHexPrefix, radix: .hex))
       let hexFee = isEIP1559Transaction ? (transaction.txDataUnion.ethTxData1559?.maxFeePerGas ?? "") : transaction.ethTxGasPrice
-      if let value = formatter.decimalString(for: hexFee.removingHexPrefix, radix: .hex, decimals: Int(network.decimals)) {
+      if let value = formatter.decimalString(for: hexFee.removingHexPrefix, radix: .hex, decimals: Int(network.decimals))?.trimmingTrailingZeros {
         if let doubleValue = Double(value),
             let assetRatio = assetRatios[network.symbol.lowercased()],
             let fiat = currencyFormatter.string(from: NSNumber(value: doubleValue * assetRatio)) {

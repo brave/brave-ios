@@ -26,7 +26,7 @@ class TransactionDetailsStore: ObservableObject {
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
     .then {
       $0.minimumFractionDigits = 2
-      $0.maximumFractionDigits = 10
+      $0.maximumFractionDigits = 6
     }
   
   private let keyringService: BraveWalletKeyringService
