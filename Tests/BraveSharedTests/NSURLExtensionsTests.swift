@@ -536,21 +536,6 @@ class NSURLExtensionsTests: XCTestCase {
     ]
     urls.forEach { XCTAssertEqual(URL(string: $0.0)!.hostSLD, $0.1) }
   }
-  
-  func testhostPort() {
-    let urls = [
-      ("https://www.example.com", "www.example.com"),
-      ("https://user:pass@www.example.com", "www.example.com"),
-      ("http://localhost:6000/blah", "localhost:6000"),
-    ]
-
-    let badurls = [
-      "blah",
-      "http://",
-    ]
-    urls.forEach { XCTAssertEqual(URL(string: $0.0)!.hostPort, $0.1) }
-    badurls.forEach { XCTAssertNil(URL(string: $0)!.hostPort) }
-  }
 
   func testgetQuery() {
     let url = URL(string: "http://example.com/path?a=1&b=2&c=3")!
