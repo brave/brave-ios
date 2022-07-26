@@ -414,6 +414,23 @@ struct ParsedTransaction: Equatable {
   
   /// Details of the transaction
   let details: Details
+  
+  /// Gas fee for the transaction if available
+  var gasFee: GasFee? {
+    switch details {
+    case let .ethSend(details),
+      let .erc20Transfer(details),
+      let .solSystemTransfer(details),
+      let .solSplTokenTransfer(details):
+      return details.gasFee
+    case let .ethSwap(details):
+      return details.gasFee
+    case let .ethErc20Approve(details):
+      return details.gasFee
+    case .erc721Transfer:
+      return nil
+    }
+  }
 }
 
 struct EthErc20ApproveDetails: Equatable {
@@ -488,8 +505,8 @@ extension BraveWallet.TransactionInfo {
     visibleTokens: [BraveWallet.BlockchainToken],
     allTokens: [BraveWallet.BlockchainToken],
     assetRatios: [String: Double],
-    currencyFormatter: NumberFormatter,
     solEstimatedTxFee: UInt64? = nil,
+    currencyFormatter: NumberFormatter,
     decimalFormatStyle: WeiFormatter.DecimalFormatStyle? = nil
   ) -> ParsedTransaction? {
     TransactionParser.parseTransaction(

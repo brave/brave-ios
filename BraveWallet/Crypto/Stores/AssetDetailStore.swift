@@ -169,6 +169,8 @@ class AssetDetailStore: ObservableObject {
   ) async -> [TransactionSummary] {
     let coin = token.coin
     let network = await rpcService.network(coin)
+    let userVisibleAssets = await walletService.userAssets(network.chainId, coin: coin)
+    let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin)
     let allTransactions = await withTaskGroup(of: [BraveWallet.TransactionInfo].self) { group -> [BraveWallet.TransactionInfo] in
       for account in keyring.accountInfos {
         group.addTask {
@@ -212,8 +214,8 @@ class AssetDetailStore: ObservableObject {
           from: transaction,
           network: network,
           accountInfos: keyring.accountInfos,
-          visibleTokens: [token],
-          allTokens: [],
+          visibleTokens: userVisibleAssets,
+          allTokens: allTokens,
           assetRatios: assetRatios,
           solEstimatedTxFee: solEstimatedTxFees[transaction.id],
           currencyFormatter: self.currencyFormatter
