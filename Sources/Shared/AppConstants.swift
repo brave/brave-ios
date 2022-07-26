@@ -51,7 +51,7 @@ public enum KVOConstants: String {
 }
 
 public struct AppConstants {
-  public static let isRunningTest = NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.arguments.contains(LaunchArguments.test)
+  public static let isRunningTest = NSClassFromString("XCTestCase") != nil
 
   /// Build Channel.
   public static var buildChannel: AppBuildChannel = .release
