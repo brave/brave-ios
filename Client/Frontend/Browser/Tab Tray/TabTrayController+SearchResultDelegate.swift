@@ -66,7 +66,7 @@ extension TabTrayController: UISearchControllerDelegate {
     case .local:
       tabTrayView.collectionView.reloadData()
     case .sync:
-      tabSyncView.tableView.reloadData()
+      reloadOpenTabsSession()
     }
   }
 }

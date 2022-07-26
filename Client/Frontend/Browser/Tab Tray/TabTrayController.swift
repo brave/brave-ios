@@ -347,7 +347,10 @@ class TabTrayController: LoadingViewController {
     snapshot.appendSections([.main])
     snapshot.appendItems(tabManager.tabsForCurrentMode(for: query))
     dataSource.apply(snapshot, animatingDifferences: true) { [weak self] in
-      self?.updateEmptyPanelState()
+      guard let self = self else { return }
+      
+      let isSearchResultEmpty = self.dataSource.snapshot().numberOfItems == 0 && self.isTabTrayBeingSearched
+      self.updateEmptyPanelState(isHidden: !isSearchResultEmpty)
     }
   }
 
@@ -392,6 +395,8 @@ class TabTrayController: LoadingViewController {
       $0.tableView.reloadData()
       $0.updateNoSyncPanelState(isHidden: sessionList.count > 0)
     }
+    
+    updateEmptyPanelState(isHidden: !(isTabTrayBeingSearched && sessionList.isEmpty && !(query?.isEmpty ?? true)))
   }
   
   private func fetchSyncedSessions(for query: String? = nil) -> [OpenDistantSession] {
@@ -412,6 +417,24 @@ class TabTrayController: LoadingViewController {
     return queriedSessions
   }
 
+  private func updateEmptyPanelState(isHidden: Bool) {
+    if isHidden {
+      emptyStateOverlayView.removeFromSuperview()
+    } else {
+      showEmptyPanelState()
+    }
+  }
+
+  private func showEmptyPanelState() {
+    if emptyStateOverlayView.superview == nil {
+      view.addSubview(emptyStateOverlayView)
+      view.bringSubviewToFront(emptyStateOverlayView)
+      emptyStateOverlayView.snp.makeConstraints {
+        $0.edges.equalTo(tabTrayView.collectionView)
+      }
+    }
+  }
+  
   // MARK: - Actions
 
   @objc func doneAction() {
@@ -473,24 +496,6 @@ class TabTrayController: LoadingViewController {
   func removeAllTabs() {
     tabManager.removeTabsWithUndoToast(tabManager.tabsForCurrentMode)
     applySnapshot()
-  }
-
-  private func updateEmptyPanelState() {
-    if dataSource.snapshot().numberOfItems == 0, isTabTrayBeingSearched {
-      showEmptyPanelState()
-    } else {
-      emptyStateOverlayView.removeFromSuperview()
-    }
-  }
-
-  private func showEmptyPanelState() {
-    if emptyStateOverlayView.superview == nil {
-      view.addSubview(emptyStateOverlayView)
-      view.bringSubviewToFront(emptyStateOverlayView)
-      emptyStateOverlayView.snp.makeConstraints {
-        $0.edges.equalTo(tabTrayView.collectionView)
-      }
-    }
   }
 }
 
