@@ -19,6 +19,7 @@ struct TransactionConfirmationView: View {
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.openWalletURLAction) private var openWalletURL
 
   /// Blockie size for ERC 20 Approve transactions
   @ScaledMetric private var blockieSize = 24
@@ -33,14 +34,6 @@ struct TransactionConfirmationView: View {
 
   @State private var viewMode: ViewMode = .transaction
 
-  private var fromAccountName: String {
-    NamedAddresses.name(for: confirmationStore.activeTransaction.fromAddress, accounts: keyringStore.allAccounts)
-  }
-
-  private var toAccountName: String {
-    return NamedAddresses.name(for: confirmationStore.activeTransaction.ethTxToAddress, accounts: keyringStore.allAccounts)
-  }
-
   private var transactionType: String {
     if confirmationStore.activeTransaction.txType == .erc20Approve {
       return Strings.Wallet.transactionTypeApprove
@@ -49,27 +42,27 @@ struct TransactionConfirmationView: View {
   }
 
   private var transactionDetails: String {
-    if confirmationStore.activeTransaction.txArgs.isEmpty {
-      let data = confirmationStore.activeTransaction.ethTxData
-        .map { byte in
-          String(format: "%02X", byte.uint8Value)
-        }
-        .joined()
-      if data.isEmpty {
-        return Strings.Wallet.inputDataPlaceholder
-      }
-      return "0x\(data)"
+    if confirmationStore.activeTransaction.coin == .sol {
+      return String.localizedStringWithFormat(Strings.Wallet.inputDataPlaceholderSolana, confirmationStore.activeTransaction.txType.rawValue)
     } else {
-      return zip(confirmationStore.activeTransaction.txParams, confirmationStore.activeTransaction.txArgs)
-        .map { (param, arg) in
-          "\(param): \(arg)"
+      if confirmationStore.activeTransaction.txArgs.isEmpty {
+        let data = confirmationStore.activeTransaction.ethTxData
+          .map { byte in
+            String(format: "%02X", byte.uint8Value)
+          }
+          .joined()
+        if data.isEmpty {
+          return Strings.Wallet.inputDataPlaceholder
         }
-        .joined(separator: "\n\n")
+        return "0x\(data)"
+      } else {
+        return zip(confirmationStore.activeTransaction.txParams, confirmationStore.activeTransaction.txArgs)
+          .map { (param, arg) in
+            "\(param): \(arg)"
+          }
+          .joined(separator: "\n\n")
+      }
     }
-  }
-  
-  private var isConfirmDisabled: Bool {
-    confirmationStore.activeTransaction.coin != networkStore.selectedChain.coin
   }
 
   /// View showing the currently selected account with a blockie
@@ -173,7 +166,7 @@ struct TransactionConfirmationView: View {
       }
       NavigationLink(
         destination: EditPermissionsView(
-          proposedAllowance: confirmationStore.activeTransaction.txArgs[safe: 1] ?? "",
+          proposedAllowance: confirmationStore.state.proposedAllowance,
           confirmationStore: confirmationStore,
           keyringStore: keyringStore,
           networkStore: networkStore
@@ -218,6 +211,27 @@ struct TransactionConfirmationView: View {
     }
     .font(.footnote)
   }
+  
+  @ViewBuilder private var editNonceRow: some View {
+    NavigationLink(
+      destination: EditNonceView(
+        confirmationStore: confirmationStore,
+        transaction: confirmationStore.activeTransaction
+      )
+    ) {
+      HStack {
+        Image(braveSystemName: "brave.gear")
+          .foregroundColor(Color(.braveBlurpleTint))
+        Text(Strings.Wallet.advancedSettingsTransaction)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .foregroundColor(Color(.braveBlurpleTint))
+        Spacer()
+        Image(systemName: "chevron.right")
+      }
+      .padding()
+      .font(.footnote.weight(.semibold))
+    }
+  }
 
   var body: some View {
       ScrollView(.vertical) {
@@ -239,14 +253,35 @@ struct TransactionConfirmationView: View {
             erc20ApproveHeader
           } else {
             TransactionHeader(
-              fromAccountAddress: confirmationStore.activeTransaction.fromAddress,
-              fromAccountName: fromAccountName,
-              toAccountAddress: confirmationStore.activeTransaction.ethTxToAddress,
-              toAccountName: toAccountName,
+              fromAccountAddress: confirmationStore.activeParsedTransaction?.fromAddress ?? "",
+              fromAccountName: confirmationStore.activeParsedTransaction?.namedFromAddress ?? "",
+              toAccountAddress: confirmationStore.activeParsedTransaction?.toAddress ?? "",
+              toAccountName: confirmationStore.activeParsedTransaction?.namedToAddress ?? "",
               originInfo: confirmationStore.state.originInfo,
               transactionType: transactionType,
               value: "\(confirmationStore.state.value) \(confirmationStore.state.symbol)",
               fiat: confirmationStore.state.fiat
+            )
+          }
+          
+          if confirmationStore.activeTransaction.txType == .solanaSplTokenTransferWithAssociatedTokenAccountCreation {
+            VStack(alignment: .leading, spacing: 8) {
+              Text(Strings.Wallet.confirmationViewSolSplTokenAccountCreationWarning)
+                .foregroundColor(Color(.braveErrorLabel))
+                .font(.subheadline.weight(.medium))
+              Button {
+                openWalletURL?(WalletConstants.splTokenAccountCreationLink)
+              } label: {
+                Text(Strings.Wallet.learnMoreButton)
+                  .foregroundColor(Color(.braveBlurpleTint))
+                  .font(.subheadline)
+              }
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
+            .background(
+              Color(.braveErrorBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             )
           }
 
@@ -263,9 +298,11 @@ struct TransactionConfirmationView: View {
                 VStack(spacing: 0) {
                   HStack {
                     VStack(alignment: .leading) {
-                      Text(Strings.Wallet.gasFee)
+                      Text(confirmationStore.activeTransaction.coin == .sol ? Strings.Wallet.transactionFee : Strings.Wallet.gasFee)
                         .foregroundColor(Color(.bravePrimary))
-                      editGasFeeButton
+                      if confirmationStore.activeTransaction.coin == .eth {
+                        editGasFeeButton
+                      }
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
@@ -310,7 +347,7 @@ struct TransactionConfirmationView: View {
                         .accessibility(sortPriority: 1)
                       Spacer()
                       VStack(alignment: .trailing) {
-                        Text(Strings.Wallet.amountAndGas)
+                        Text(confirmationStore.activeTransaction.coin == .sol ? Strings.Wallet.amountAndFee : Strings.Wallet.amountAndGas)
                           .font(.footnote)
                           .foregroundColor(Color(.secondaryBraveLabel))
                         Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol) + \(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
@@ -332,25 +369,10 @@ struct TransactionConfirmationView: View {
                     .padding()
                     .accessibilityElement(children: .contain)
                   }
-                  Divider()
-                    .padding(.leading)
-                  NavigationLink(
-                    destination: EditNonceView(
-                      confirmationStore: confirmationStore,
-                      transaction: confirmationStore.activeTransaction
-                    )
-                  ) {
-                    HStack {
-                      Image(braveSystemName: "brave.gear")
-                        .foregroundColor(Color(.braveBlurpleTint))
-                      Text(Strings.Wallet.advancedSettingsTransaction)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(Color(.braveBlurpleTint))
-                      Spacer()
-                      Image(systemName: "chevron.right")
-                    }
-                    .padding()
-                    .font(.footnote.weight(.semibold))
+                  if confirmationStore.activeTransaction.coin == .eth {
+                    Divider()
+                      .padding(.leading)
+                    editNonceRow
                   }
                 }
               case .details:
@@ -421,7 +443,9 @@ struct TransactionConfirmationView: View {
         }
       }
     .onAppear {
-      confirmationStore.prepare()
+      Task { @MainActor in
+        await confirmationStore.prepare()
+      }
     }
   }
 
@@ -458,7 +482,7 @@ struct TransactionConfirmationView: View {
       Label(Strings.Wallet.confirm, systemImage: "checkmark.circle.fill")
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
-    .disabled(!confirmationStore.state.isBalanceSufficient || isConfirmDisabled)
+    .disabled(!confirmationStore.state.isBalanceSufficient)
   }
 }
 

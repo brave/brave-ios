@@ -228,7 +228,8 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService
+      keyringService: keyringService,
+      solTxManagerProxy: solTxManagerProxy
     )
     confirmationStore = store
     return store
