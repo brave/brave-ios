@@ -38,15 +38,12 @@ public class TransactionConfirmationStore: ObservableObject {
       }
     }
   }
-  @Published var allTokens: [BraveWallet.BlockchainToken] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
       fetchDetails(for: activeTransaction)
     }
   }
-
-  private var assetRatios: [String: Double] = [:]
 
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
@@ -387,24 +384,6 @@ public class TransactionConfirmationStore: ObservableObject {
         completion(success)
       }
     }
-  }
-  
-  func fetchTokens(completion: (([BraveWallet.BlockchainToken]) -> Void)? = nil) {
-    walletService.selectedCoin { [weak self] coin in
-      guard let self = self else { return }
-      self.rpcService.network(coin) { network in
-        self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
-          self.allTokens = tokens
-          completion?(tokens)
-        }
-      }
-    }
-  }
-
-  func token(for contractAddress: String, in network: BraveWallet.NetworkInfo) -> BraveWallet.BlockchainToken? {
-    allTokens.first(where: {
-      $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame
-    })
   }
 }
 

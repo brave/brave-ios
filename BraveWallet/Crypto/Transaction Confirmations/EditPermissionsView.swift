@@ -30,9 +30,13 @@ struct EditPermissionsView: View {
       return WalletConstants.MAX_UINT256
     }
     
+    guard let parsedTransaction = confirmationStore.activeParsedTransaction else {
+      return "0x0"
+    }
+    
     var decimals: Int = 18
-    if let contractAddress = activeTransaction.txDataUnion.ethTxData1559?.baseData.to, let token = confirmationStore.token(for: contractAddress, in: networkStore.selectedChain) {
-      decimals = Int(token.decimals)
+    if case .ethErc20Approve(let details) = parsedTransaction.details {
+      decimals = Int(details.token.decimals)
     }
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: decimals))
     let customAllowanceInWei = weiFormatter.weiString(from: customAllowance, radix: .hex, decimals: decimals) ?? "0"
