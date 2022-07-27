@@ -46,6 +46,10 @@ public class TransactionConfirmationStore: ObservableObject {
   }
 
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+    .then {
+      $0.minimumFractionDigits = 2
+      $0.maximumFractionDigits = 6
+    }
   
   var activeTransaction: BraveWallet.TransactionInfo {
     transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
@@ -244,13 +248,12 @@ public class TransactionConfirmationStore: ObservableObject {
     assetRatios: [String: Double],
     currencyFormatter: NumberFormatter
   ) -> String {
-    if let ratio = assetRatios[tokenSymbol.lowercased()], let gasRatio = assetRatios[gasSymbol.lowercased()] {
-      let amount = (Double(value) ?? 0.0) * ratio
-      let gasAmount = (Double(gasValue) ?? 0.0) * gasRatio
-      let totalFiat = currencyFormatter.string(from: NSNumber(value: amount + gasAmount)) ?? "$0.00"
-      return totalFiat
-    }
-    return "$0.00"
+    let ratio = assetRatios[tokenSymbol.lowercased(), default: 0]
+    let gasRatio = assetRatios[gasSymbol.lowercased(), default: 0]
+    let amount = (Double(value) ?? 0.0) * ratio
+    let gasAmount = (Double(gasValue) ?? 0.0) * gasRatio
+    let totalFiat = currencyFormatter.string(from: NSNumber(value: amount + gasAmount)) ?? "$0.00"
+    return totalFiat
   }
 
   @MainActor private func fetchTransactions() async -> [BraveWallet.TransactionInfo] {
