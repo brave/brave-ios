@@ -7,8 +7,10 @@ import Foundation
 
 extension NumberFormatter {
   /// Currency number formatter in USD
-  static let usdCurrencyFormatter = NumberFormatter().then {
-    $0.numberStyle = .currency
-    $0.currencyCode = CurrencyCode.usd.code
+  static func usdCurrencyFormatter() -> NumberFormatter {
+    return NumberFormatter().then {
+      $0.numberStyle = .currency
+      $0.currencyCode = CurrencyCode.usd.code
+    }
   }
 }

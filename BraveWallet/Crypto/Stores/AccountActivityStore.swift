@@ -18,7 +18,7 @@ class AccountActivityStore: ObservableObject {
     }
   }
 
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
 
   private let keyringService: BraveWalletKeyringService
   private let walletService: BraveWalletBraveWalletService

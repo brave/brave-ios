@@ -25,7 +25,7 @@ private extension BraveWallet.AccountInfo {
 
 class TransactionParserTests: XCTestCase {
   
-  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
   private let accountInfos: [BraveWallet.AccountInfo] = [
     .init(address: "0x1234567890123456789012345678901234567890", name: "Ethereum Account 1"),
     .init(address: "0x0987654321098765432109876543210987654321", name: "Ethereum Account 2"),
@@ -431,6 +431,7 @@ class TransactionParserTests: XCTestCase {
           approvalValue: "0x2386f26fc10000",
           approvalAmount: "0.01",
           isUnlimited: false,
+          spenderAddress: "",
           gasFee: .init(
             fee: "0.000061",
             fiat: "$0.000061"
@@ -508,6 +509,7 @@ class TransactionParserTests: XCTestCase {
           approvalValue: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
           approvalAmount: "Unlimited",
           isUnlimited: true,
+          spenderAddress: "",
           gasFee: .init(
             fee: "0.000061",
             fiat: "$0.000061"

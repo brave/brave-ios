@@ -227,6 +227,7 @@ enum TransactionParser {
       )
     case .erc20Approve:
       guard let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to,
+            let spenderAddress = transaction.txArgs[safe: 0],
             let value = transaction.txArgs[safe: 1],
             let token = token(for: contractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens) else {
         return nil
@@ -262,6 +263,7 @@ enum TransactionParser {
             approvalValue: value,
             approvalAmount: approvalAmount,
             isUnlimited: isUnlimited,
+            spenderAddress: spenderAddress,
             gasFee: gasFee(
               from: transaction,
               network: network,
@@ -455,6 +457,8 @@ struct EthErc20ApproveDetails: Equatable {
   let approvalAmount: String
   /// If the value being approved is unlimited
   let isUnlimited: Bool
+  /// The spender address to get the current allowance
+  let spenderAddress: String
   /// Gas fee for the transaction
   let gasFee: GasFee?
 }

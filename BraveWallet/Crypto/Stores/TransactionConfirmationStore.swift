@@ -20,8 +20,10 @@ public class TransactionConfirmationStore: ObservableObject {
     var totalFiat: String = ""
     var isBalanceSufficient: Bool = true
     var isUnlimitedApprovalRequested: Bool = false
+    var isSolTokenTransferWithAssociatedTokenAccountCreation: Bool = false
     var currentAllowance: String = ""
     var proposedAllowance: String = ""
+    var transactionDetails: String = ""
     var originInfo: BraveWallet.OriginInfo?
   }
   @Published var state: State = .init()
@@ -45,7 +47,7 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
 
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
     .then {
       $0.minimumFractionDigits = 2
       $0.maximumFractionDigits = 6
@@ -153,6 +155,29 @@ public class TransactionConfirmationStore: ObservableObject {
       state = .init() // Reset state
       state.originInfo = transaction.originInfo
       
+      if transaction.coin == .sol {
+        state.transactionDetails = String.localizedStringWithFormat(Strings.Wallet.inputDataPlaceholderSolana, transaction.txType.rawValue)
+      } else {
+        if transaction.txArgs.isEmpty {
+          let data = transaction.ethTxData
+            .map { byte in
+              String(format: "%02X", byte.uint8Value)
+            }
+            .joined()
+          if data.isEmpty {
+            state.transactionDetails = Strings.Wallet.inputDataPlaceholder
+          } else {
+            state.transactionDetails = "0x\(data)"
+          }
+        } else {
+          state.transactionDetails = zip(transaction.txParams, transaction.txArgs)
+            .map { (param, arg) in
+              "\(param): \(arg)"
+            }
+            .joined(separator: "\n\n")
+        }
+      }
+      
       switch parsedTransaction.details {
       case let .ethSend(details),
         let .erc20Transfer(details),
@@ -161,6 +186,8 @@ public class TransactionConfirmationStore: ObservableObject {
         state.symbol = details.fromToken.symbol
         state.value = details.fromAmount
         state.fiat = details.fromFiat ?? ""
+        
+        state.isSolTokenTransferWithAssociatedTokenAccountCreation = parsedTransaction.transaction.txType == .solanaSplTokenTransferWithAssociatedTokenAccountCreation
         
         if let gasFee = details.gasFee {
           state.gasValue = gasFee.fee
@@ -207,12 +234,8 @@ public class TransactionConfirmationStore: ObservableObject {
         if let token = allTokens.first(where: {
           $0.contractAddress(in: selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
         }) {
-          rpcService.erc20TokenAllowance(
-            token.contractAddress(in: selectedChain),
-            ownerAddress: transaction.fromAddress,
-            spenderAddress: transaction.txArgs[safe: 0] ?? "") { allowance, status, _ in
-              self.state.currentAllowance = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
-            }
+          let (allowance, _, _) = await rpcService.erc20TokenAllowance(token.contractAddress(in: selectedChain), ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
+          state.currentAllowance = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
         }
       case let .ethSwap(details):
         state.symbol = details.fromToken?.symbol ?? ""
@@ -257,44 +280,9 @@ public class TransactionConfirmationStore: ObservableObject {
   }
 
   @MainActor private func fetchTransactions() async -> [BraveWallet.TransactionInfo] {
-    var allKeyrings: [BraveWallet.KeyringInfo] = []
-    allKeyrings = await withTaskGroup(
-      of: BraveWallet.KeyringInfo.self,
-      returning: [BraveWallet.KeyringInfo].self,
-      body: { group in
-        for coin in WalletConstants.supportedCoinTypes {
-          group.addTask {
-            await self.keyringService.keyringInfo(coin.keyringId)
-          }
-        }
-        var allKeyrings: [BraveWallet.KeyringInfo] = []
-        for await keyring in group {
-          allKeyrings.append(keyring)
-        }
-        return allKeyrings
-      }
-    )
+    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
     
-    var pendingTransactions: [BraveWallet.TransactionInfo] = []
-    pendingTransactions = await withTaskGroup(
-      of: [BraveWallet.TransactionInfo].self,
-      body: { group in
-        for keyring in allKeyrings {
-          for info in keyring.accountInfos {
-            group.addTask {
-              await self.txService.allTransactionInfo(info.coin, from: info.address)
-            }
-          }
-        }
-        var allPendingTx: [BraveWallet.TransactionInfo] = []
-        for await transactions in group {
-          allPendingTx.append(contentsOf: transactions.filter { $0.txStatus == .unapproved })
-        }
-        return allPendingTx
-      }
-    )
-    
-    return pendingTransactions
+    return await txService.pendingTransactions(for: allKeyrings)
   }
 
   func confirm(transaction: BraveWallet.TransactionInfo, completion: @escaping (_ error: String?) -> Void) {

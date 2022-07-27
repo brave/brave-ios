@@ -41,30 +41,6 @@ struct TransactionConfirmationView: View {
     return confirmationStore.activeTransaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
   }
 
-  private var transactionDetails: String {
-    if confirmationStore.activeTransaction.coin == .sol {
-      return String.localizedStringWithFormat(Strings.Wallet.inputDataPlaceholderSolana, confirmationStore.activeTransaction.txType.rawValue)
-    } else {
-      if confirmationStore.activeTransaction.txArgs.isEmpty {
-        let data = confirmationStore.activeTransaction.ethTxData
-          .map { byte in
-            String(format: "%02X", byte.uint8Value)
-          }
-          .joined()
-        if data.isEmpty {
-          return Strings.Wallet.inputDataPlaceholder
-        }
-        return "0x\(data)"
-      } else {
-        return zip(confirmationStore.activeTransaction.txParams, confirmationStore.activeTransaction.txArgs)
-          .map { (param, arg) in
-            "\(param): \(arg)"
-          }
-          .joined(separator: "\n\n")
-      }
-    }
-  }
-
   /// View showing the currently selected account with a blockie
   @ViewBuilder private var accountView: some View {
     HStack {
@@ -265,7 +241,7 @@ struct TransactionConfirmationView: View {
             )
           }
           
-          if confirmationStore.activeTransaction.txType == .solanaSplTokenTransferWithAssociatedTokenAccountCreation {
+          if confirmationStore.state.isSolTokenTransferWithAssociatedTokenAccountCreation {
             VStack(alignment: .leading, spacing: 8) {
               Text(Strings.Wallet.confirmationViewSolSplTokenAccountCreationWarning)
                 .foregroundColor(Color(.braveErrorLabel))
@@ -378,7 +354,7 @@ struct TransactionConfirmationView: View {
                 }
               case .details:
                 VStack(alignment: .leading) {
-                  StaticTextView(text: transactionDetails)
+                  StaticTextView(text: confirmationStore.state.transactionDetails)
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
                     .background(Color(.tertiaryBraveGroupedBackground))
