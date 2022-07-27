@@ -34,16 +34,16 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published var activeTransactionId: BraveWallet.TransactionInfo.ID = "" {
     didSet {
       if let tx = transactions.first(where: { $0.id == activeTransactionId }) {
-        fetchDetails(for: tx)
+        updateState(with: tx)
       } else if let firstTx = transactions.first {
-        fetchDetails(for: firstTx)
+        updateState(with: firstTx)
       }
     }
   }
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
-      fetchDetails(for: activeTransaction)
+      updateState(with: activeTransaction)
     }
   }
 
@@ -113,154 +113,164 @@ public class TransactionConfirmationStore: ObservableObject {
       reject(transaction: transaction, completion: { _ in })
     }
   }
-
-  func fetchDetails(for transaction: BraveWallet.TransactionInfo) {
+  
+  func updateState(with transaction: BraveWallet.TransactionInfo) {
     Task { @MainActor in
-      let keyring = await keyringService.keyringInfo(transaction.coin.keyringId)
-      let network = await rpcService.network(transaction.coin)
-      let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: transaction.coin)
-      let userVisibleTokens = await walletService.userAssets(network.chainId, coin: transaction.coin)
-      let priceResult = await assetRatioService.priceWithIndividualRetry(
-        userVisibleTokens.map { $0.symbol.lowercased() },
-        toAssets: [currencyFormatter.currencyCode],
-        timeframe: .oneDay
-      )
-      let assetRatios = priceResult.assetPrices.reduce(into: [String: Double]()) {
-        $0[$1.fromAsset] = Double($1.price)
+      if let state = await fetchDetails(for: transaction) {
+        self.state = state
       }
-      
-      var gasTokenBalance: Double?
-      if let account = keyring.accountInfos.first(where: { $0.address == transaction.fromAddress }) {
-        gasTokenBalance = await rpcService.balance(for: network.nativeToken, in: account)
-      }
-      
-      var solEstimatedTxFee: UInt64?
-      if transaction.coin == .sol {
-        (solEstimatedTxFee, _, _) = await solTxManagerProxy.estimatedTxFee(transaction.id)
-      }
-      
-      guard let parsedTransaction = transaction.parsedTransaction(
-        network: network,
-        accountInfos: keyring.accountInfos,
-        visibleTokens: userVisibleTokens,
-        allTokens: allTokens,
-        assetRatios: assetRatios,
-        solEstimatedTxFee: solEstimatedTxFee,
-        currencyFormatter: currencyFormatter
-      ) else {
-        return
-      }
-      activeParsedTransaction = parsedTransaction
-      
-      state = .init() // Reset state
-      state.originInfo = transaction.originInfo
-      
-      if transaction.coin == .sol {
-        state.transactionDetails = String.localizedStringWithFormat(Strings.Wallet.inputDataPlaceholderSolana, transaction.txType.rawValue)
-      } else {
-        if transaction.txArgs.isEmpty {
-          let data = transaction.ethTxData
-            .map { byte in
-              String(format: "%02X", byte.uint8Value)
-            }
-            .joined()
-          if data.isEmpty {
-            state.transactionDetails = Strings.Wallet.inputDataPlaceholder
-          } else {
-            state.transactionDetails = "0x\(data)"
+    }
+  }
+
+  @MainActor func fetchDetails(
+    for transaction: BraveWallet.TransactionInfo
+  ) async -> State? {
+    let keyring = await keyringService.keyringInfo(transaction.coin.keyringId)
+    let network = await rpcService.network(transaction.coin)
+    let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: transaction.coin)
+    let userVisibleTokens = await walletService.userAssets(network.chainId, coin: transaction.coin)
+    let priceResult = await assetRatioService.priceWithIndividualRetry(
+      userVisibleTokens.map { $0.symbol.lowercased() },
+      toAssets: [currencyFormatter.currencyCode],
+      timeframe: .oneDay
+    )
+    let assetRatios = priceResult.assetPrices.reduce(into: [String: Double]()) {
+      $0[$1.fromAsset] = Double($1.price)
+    }
+    
+    var gasTokenBalance: Double?
+    if let account = keyring.accountInfos.first(where: { $0.address == transaction.fromAddress }) {
+      gasTokenBalance = await rpcService.balance(for: network.nativeToken, in: account)
+    }
+    
+    var solEstimatedTxFee: UInt64?
+    if transaction.coin == .sol {
+      (solEstimatedTxFee, _, _) = await solTxManagerProxy.estimatedTxFee(transaction.id)
+    }
+    
+    guard let parsedTransaction = transaction.parsedTransaction(
+      network: network,
+      accountInfos: keyring.accountInfos,
+      visibleTokens: userVisibleTokens,
+      allTokens: allTokens,
+      assetRatios: assetRatios,
+      solEstimatedTxFee: solEstimatedTxFee,
+      currencyFormatter: currencyFormatter
+    ) else {
+      return nil
+    }
+    activeParsedTransaction = parsedTransaction
+    
+    var state: State = .init()
+    state.originInfo = transaction.originInfo
+    
+    if transaction.coin == .sol {
+      state.transactionDetails = String.localizedStringWithFormat(Strings.Wallet.inputDataPlaceholderSolana, transaction.txType.rawValue)
+    } else {
+      if transaction.txArgs.isEmpty {
+        let data = transaction.ethTxData
+          .map { byte in
+            String(format: "%02X", byte.uint8Value)
           }
+          .joined()
+        if data.isEmpty {
+          state.transactionDetails = Strings.Wallet.inputDataPlaceholder
         } else {
-          state.transactionDetails = zip(transaction.txParams, transaction.txArgs)
-            .map { (param, arg) in
-              "\(param): \(arg)"
-            }
-            .joined(separator: "\n\n")
+          state.transactionDetails = "0x\(data)"
+        }
+      } else {
+        state.transactionDetails = zip(transaction.txParams, transaction.txArgs)
+          .map { (param, arg) in
+            "\(param): \(arg)"
+          }
+          .joined(separator: "\n\n")
+      }
+    }
+    
+    switch parsedTransaction.details {
+    case let .ethSend(details),
+      let .erc20Transfer(details),
+      let .solSystemTransfer(details),
+      let .solSplTokenTransfer(details):
+      state.symbol = details.fromToken.symbol
+      state.value = details.fromAmount
+      state.fiat = details.fromFiat ?? ""
+      
+      state.isSolTokenTransferWithAssociatedTokenAccountCreation = parsedTransaction.transaction.txType == .solanaSplTokenTransferWithAssociatedTokenAccountCreation
+      
+      if let gasFee = details.gasFee {
+        state.gasValue = gasFee.fee
+        state.gasFiat = gasFee.fiat
+        state.gasSymbol = parsedTransaction.networkSymbol
+        state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
+        
+        if let gasBalance = gasTokenBalance,
+           let gasValue = BDouble(gasFee.fee),
+           BDouble(gasBalance) > gasValue {
+          state.isBalanceSufficient = true
+        } else {
+          state.isBalanceSufficient = false
         }
       }
       
-      switch parsedTransaction.details {
-      case let .ethSend(details),
-        let .erc20Transfer(details),
-        let .solSystemTransfer(details),
-        let .solSplTokenTransfer(details):
-        state.symbol = details.fromToken.symbol
-        state.value = details.fromAmount
-        state.fiat = details.fromFiat ?? ""
+      state.totalFiat = totalFiat(value: state.value, tokenSymbol: state.symbol, gasValue: state.gasValue, gasSymbol: state.gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
+      
+    case let .ethErc20Approve(details):
+      state.value = details.approvalAmount
+      state.symbol = details.token.symbol
+      state.proposedAllowance = details.approvalValue
+      state.isUnlimitedApprovalRequested = details.isUnlimited
+      if let gasFee = details.gasFee {
+        state.gasValue = gasFee.fee
+        state.gasFiat = gasFee.fiat
+        state.gasSymbol = parsedTransaction.networkSymbol
+        state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
         
-        state.isSolTokenTransferWithAssociatedTokenAccountCreation = parsedTransaction.transaction.txType == .solanaSplTokenTransferWithAssociatedTokenAccountCreation
+        if let gasBalance = gasTokenBalance,
+           let gasValue = BDouble(gasFee.fee),
+           BDouble(gasBalance) > gasValue {
+          state.isBalanceSufficient = true
+        } else {
+          state.isBalanceSufficient = false
+        }
+      }
+      
+      state.totalFiat = state.gasFiat
+      
+      // Update `State.currentAllowance`
+      let formatter = WeiFormatter(decimalFormatStyle: .balance)
+      let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to ?? ""
+      if let token = allTokens.first(where: {
+        $0.contractAddress(in: selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
+      }) {
+        let (allowance, _, _) = await rpcService.erc20TokenAllowance(token.contractAddress(in: selectedChain), ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
+        state.currentAllowance = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+      }
+    case let .ethSwap(details):
+      state.symbol = details.fromToken?.symbol ?? ""
+      state.value = details.fromAmount
+      if let gasFee = details.gasFee {
+        state.gasValue = gasFee.fee
+        state.gasFiat = gasFee.fiat
+        state.gasSymbol = parsedTransaction.networkSymbol
+        state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
         
-        if let gasFee = details.gasFee {
-          state.gasValue = gasFee.fee
-          state.gasFiat = gasFee.fiat
-          state.gasSymbol = parsedTransaction.networkSymbol
-          state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
-          
-          if let gasBalance = gasTokenBalance,
-             let gasValue = BDouble(gasFee.fee),
-             BDouble(gasBalance) > gasValue {
-            state.isBalanceSufficient = true
-          } else {
-            state.isBalanceSufficient = false
-          }
+        if let gasBalance = gasTokenBalance,
+           let gasValue = BDouble(gasFee.fee),
+           BDouble(gasBalance) > gasValue {
+          state.isBalanceSufficient = true
+        } else {
+          state.isBalanceSufficient = false
         }
         
         state.totalFiat = totalFiat(value: state.value, tokenSymbol: state.symbol, gasValue: state.gasValue, gasSymbol: state.gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
-        
-      case let .ethErc20Approve(details):
-        state.value = details.approvalAmount
-        state.symbol = details.token.symbol
-        state.proposedAllowance = details.approvalValue
-        state.isUnlimitedApprovalRequested = details.isUnlimited
-        if let gasFee = details.gasFee {
-          state.gasValue = gasFee.fee
-          state.gasFiat = gasFee.fiat
-          state.gasSymbol = parsedTransaction.networkSymbol
-          state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
-          
-          if let gasBalance = gasTokenBalance,
-             let gasValue = BDouble(gasFee.fee),
-             BDouble(gasBalance) > gasValue {
-            state.isBalanceSufficient = true
-          } else {
-            state.isBalanceSufficient = false
-          }
-        }
-        
-        state.totalFiat = state.gasFiat
-        
-        // Update `State.currentAllowance`
-        let formatter = WeiFormatter(decimalFormatStyle: .balance)
-        let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to ?? ""
-        if let token = allTokens.first(where: {
-          $0.contractAddress(in: selectedChain).caseInsensitiveCompare(contractAddress) == .orderedSame
-        }) {
-          let (allowance, _, _) = await rpcService.erc20TokenAllowance(token.contractAddress(in: selectedChain), ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
-          state.currentAllowance = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
-        }
-      case let .ethSwap(details):
-        state.symbol = details.fromToken?.symbol ?? ""
-        state.value = details.fromAmount
-        if let gasFee = details.gasFee {
-          state.gasValue = gasFee.fee
-          state.gasFiat = gasFee.fiat
-          state.gasSymbol = parsedTransaction.networkSymbol
-          state.gasAssetRatio = assetRatios[parsedTransaction.networkSymbol.lowercased(), default: 0]
-          
-          if let gasBalance = gasTokenBalance,
-             let gasValue = BDouble(gasFee.fee),
-             BDouble(gasBalance) > gasValue {
-            state.isBalanceSufficient = true
-          } else {
-            state.isBalanceSufficient = false
-          }
-          
-          state.totalFiat = totalFiat(value: state.value, tokenSymbol: state.symbol, gasValue: state.gasValue, gasSymbol: state.gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
-        }
-      case let .erc721Transfer(details):
-        state.symbol = details.fromToken?.symbol ?? ""
-        state.value = details.fromAmount
       }
+    case let .erc721Transfer(details):
+      state.symbol = details.fromToken?.symbol ?? ""
+      state.value = details.fromAmount
     }
+    
+    return state
   }
   
   private func totalFiat(
@@ -397,7 +407,7 @@ extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
   @MainActor private func refreshTransactions(_ txInfo: BraveWallet.TransactionInfo) async {
     transactions = await fetchTransactions()
     if activeTransactionId == txInfo.id {
-      fetchDetails(for: txInfo)
+      updateState(with: txInfo)
     }
   }
 }

@@ -22,12 +22,13 @@ class TransactionConfirmationStoreTests: XCTestCase {
     setDataForUnapprovedTransactionSuccess: Bool = true
   ) -> TransactionConfirmationStore {
     let mockEthAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23")
+    let mockSolAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "sol", toAsset: "usd", price: "39.57", assetTimeframeChange: "-57.23")
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     let mockBalanceWei = formatter.weiString(from: 0.0896, radix: .hex, decimals: 18) ?? ""
     // setup test services
     let assetRatioService = BraveWallet.TestAssetRatioService()
     assetRatioService._price = { _, _, _, completion in
-      completion(true, [mockEthAssetPrice])
+      completion(true, [mockEthAssetPrice, mockSolAssetPrice])
     }
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._chainId = { $1(network.chainId) }
@@ -91,6 +92,92 @@ class TransactionConfirmationStoreTests: XCTestCase {
   }
   
   /// Test `prepare()`  update `state` data for symbol, value, isUnlimitedApprovalRequested.
+  func testPrepareSolSystemTransfer() async {
+    let mockAllTokens: [BraveWallet.BlockchainToken] = [.mockSolToken, .mockSpdToken]
+    let mockTransaction: BraveWallet.TransactionInfo = .previewConfirmedSolSystemTransfer
+    let mockTransactions: [BraveWallet.TransactionInfo] = [mockTransaction].map { tx in
+      tx.txStatus = .unapproved
+      return tx
+    }
+    let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
+    let store = setupStore(
+      network: .mockSolana,
+      accountInfos: [.mockSolAccount],
+      allTokens: mockAllTokens,
+      transactions: mockTransactions,
+      gasEstimation: mockGasEstimation
+    )
+    let prepareExpectation = expectation(description: "prepare")
+    prepareExpectation.expectedFulfillmentCount = 2
+    await store.prepare()
+    store.$activeTransactionId
+      .sink { id in
+        defer { prepareExpectation.fulfill() }
+        XCTAssertEqual(id, mockTransaction.id)
+      }
+      .store(in: &cancellables)
+    store.$gasEstimation1559
+      .sink { gas in
+        defer { prepareExpectation.fulfill() }
+        XCTAssertEqual(store.gasEstimation1559, mockGasEstimation)
+      }
+      .store(in: &cancellables)
+
+    let state = await store.fetchDetails(for: store.activeTransaction)
+    XCTAssertNotNil(state)
+    XCTAssertEqual(state!.gasValue, "0")
+    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
+    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
+    XCTAssertEqual(state!.value, "0.1")
+    XCTAssertFalse(state!.isUnlimitedApprovalRequested)
+
+    wait(for: [prepareExpectation], timeout: 1)
+  }
+  
+  /// Test `prepare()`  update `state` data for symbol, value, isUnlimitedApprovalRequested.
+  func testPrepareSolTokenTransfer() async {
+    let mockAllTokens: [BraveWallet.BlockchainToken] = [.mockSolToken, .mockSpdToken]
+    let mockTransaction: BraveWallet.TransactionInfo = .previewConfirmedSolTokenTransfer
+    let mockTransactions: [BraveWallet.TransactionInfo] = [mockTransaction].map { tx in
+      tx.txStatus = .unapproved
+      return tx
+    }
+    let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
+    let store = setupStore(
+      network: .mockSolana,
+      accountInfos: [.mockSolAccount],
+      allTokens: mockAllTokens,
+      transactions: mockTransactions,
+      gasEstimation: mockGasEstimation
+    )
+    let prepareExpectation = expectation(description: "prepare")
+    prepareExpectation.expectedFulfillmentCount = 2
+    await store.prepare()
+    store.$activeTransactionId
+      .sink { id in
+        defer { prepareExpectation.fulfill() }
+        XCTAssertEqual(id, mockTransaction.id)
+      }
+      .store(in: &cancellables)
+    store.$gasEstimation1559
+      .sink { gas in
+        defer { prepareExpectation.fulfill() }
+        XCTAssertEqual(store.gasEstimation1559, mockGasEstimation)
+      }
+      .store(in: &cancellables)
+    
+    let state = await store.fetchDetails(for: store.activeTransaction)
+    XCTAssertNotNil(state)
+    XCTAssertEqual(state!.gasValue, "0")
+    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
+    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.mockSpdToken.symbol)
+    XCTAssertEqual(state!.value, "100") // .mockSpdToken has 6 decimals
+    XCTAssertFalse(state!.isUnlimitedApprovalRequested)
+    
+    wait(for: [prepareExpectation], timeout: 1)
+  }
+  
+  /// Test `prepare()`  update `state` data for symbol, value, isUnlimitedApprovalRequested.
   func testPrepareERC20Approve() async {
     let mockAllTokens: [BraveWallet.BlockchainToken] = [.previewToken, .daiToken]
     let mockTransaction: BraveWallet.TransactionInfo = .previewConfirmedERC20Approve
@@ -121,24 +208,13 @@ class TransactionConfirmationStoreTests: XCTestCase {
       }
       .store(in: &cancellables)
     
-//    let stateExpectation = expectation(description: "state")
-//    store.$state
-//      .dropFirst()
-//      .collect(13) // collect until currentAllowance is set
-//      .first()
-//      .sink { state in
-//        defer{ stateExpectation.fulfill() }
-//        guard let lastState = state.last else {
-//          XCTFail("state not updated")
-//          return
-//        }
-//        XCTAssertEqual(lastState.gasSymbol, BraveWallet.BlockchainToken.previewToken.symbol)
-//        XCTAssertEqual(lastState.symbol, BraveWallet.BlockchainToken.daiToken.symbol)
-//        XCTAssertEqual(lastState.value, "Unlimited")
-//        XCTAssertTrue(lastState.isUnlimitedApprovalRequested)
-//        XCTAssertEqual(lastState.currentAllowance, "0.1000")
-//      }
-//      .store(in: &cancellables)
+    let state = await store.fetchDetails(for: store.activeTransaction)
+    XCTAssertNotNil(state)
+    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.previewToken.symbol)
+    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.daiToken.symbol)
+    XCTAssertEqual(state!.value, "Unlimited")
+    XCTAssertTrue(state!.isUnlimitedApprovalRequested)
+    XCTAssertEqual(state!.currentAllowance, "0.1000")
     
     wait(for: [prepareExpectation], timeout: 1)
   }
