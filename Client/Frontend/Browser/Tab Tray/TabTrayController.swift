@@ -475,6 +475,9 @@ class TabTrayController: LoadingViewController {
     // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
     tabManager.resetSelectedIndex()
     if privateMode {
+      tabTypeSelector.selectedSegmentIndex = 0
+      tabTypeSelector.sendActions(for: UIControl.Event.valueChanged)
+      
       tabTrayView.showPrivateModeInfo()
       // New private tab is created immediately to reflect changes on NTP.
       // If user drags the modal down or dismisses it, a new private tab will be ready.
