@@ -409,6 +409,7 @@ struct ParsedTransaction: Equatable {
     case erc721Transfer(Eth721TransferDetails)
     case solSystemTransfer(SendDetails)
     case solSplTokenTransfer(SendDetails)
+    case other
   }
   
   /// The transaction
@@ -442,9 +443,37 @@ struct ParsedTransaction: Equatable {
       return details.gasFee
     case let .ethErc20Approve(details):
       return details.gasFee
-    case .erc721Transfer:
+    case .erc721Transfer, .other:
       return nil
     }
+  }
+  
+  init() {
+    self.transaction = .init()
+    self.namedFromAddress = ""
+    self.fromAddress = ""
+    self.namedToAddress = ""
+    self.toAddress = ""
+    self.networkSymbol = ""
+    self.details = .other
+  }
+  
+  init(
+    transaction: BraveWallet.TransactionInfo,
+    namedFromAddress: String,
+    fromAddress: String,
+    namedToAddress: String,
+    toAddress: String,
+    networkSymbol: String,
+    details: Details
+  ) {
+    self.transaction = transaction
+    self.namedFromAddress = namedFromAddress
+    self.fromAddress = fromAddress
+    self.namedToAddress = namedToAddress
+    self.toAddress = toAddress
+    self.networkSymbol = networkSymbol
+    self.details = details
   }
 }
 
@@ -537,5 +566,11 @@ extension BraveWallet.TransactionInfo {
       currencyFormatter: currencyFormatter,
       decimalFormatStyle: decimalFormatStyle
     )
+  }
+}
+
+extension ParsedTransaction {
+  var coin: BraveWallet.CoinType {
+    transaction.coin
   }
 }

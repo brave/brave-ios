@@ -108,7 +108,6 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    prepareExpectation.expectedFulfillmentCount = 2
     await store.prepare()
     store.$activeTransactionId
       .sink { id in
@@ -116,20 +115,38 @@ class TransactionConfirmationStoreTests: XCTestCase {
         XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
-    store.$gasEstimation1559
-      .sink { gas in
-        defer { prepareExpectation.fulfill() }
-        XCTAssertEqual(store.gasEstimation1559, mockGasEstimation)
+    
+    store.$gasValue
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, "0")
       }
       .store(in: &cancellables)
-
-    let state = await store.fetchDetails(for: store.activeTransaction)
-    XCTAssertNotNil(state)
-    XCTAssertEqual(state!.gasValue, "0")
-    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
-    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
-    XCTAssertEqual(state!.value, "0.1")
-    XCTAssertFalse(state!.isUnlimitedApprovalRequested)
+    
+    store.$gasSymbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.mockSolToken.symbol)
+      }
+      .store(in: &cancellables)
+    store.$symbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.mockSolToken.symbol)
+      }
+      .store(in: &cancellables)
+    store.$value
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, "0.1")
+      }
+      .store(in: &cancellables)
+    store.$isUnlimitedApprovalRequested
+      .dropFirst()
+      .sink { value in
+        XCTAssertFalse(value) // .mockSpdToken has 6 decimals
+      }
+      .store(in: &cancellables)
 
     wait(for: [prepareExpectation], timeout: 1)
   }
@@ -151,7 +168,6 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    prepareExpectation.expectedFulfillmentCount = 2
     await store.prepare()
     store.$activeTransactionId
       .sink { id in
@@ -159,20 +175,38 @@ class TransactionConfirmationStoreTests: XCTestCase {
         XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
-    store.$gasEstimation1559
-      .sink { gas in
-        defer { prepareExpectation.fulfill() }
-        XCTAssertEqual(store.gasEstimation1559, mockGasEstimation)
+    
+    store.$gasValue
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, "0")
       }
       .store(in: &cancellables)
     
-    let state = await store.fetchDetails(for: store.activeTransaction)
-    XCTAssertNotNil(state)
-    XCTAssertEqual(state!.gasValue, "0")
-    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.mockSolToken.symbol)
-    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.mockSpdToken.symbol)
-    XCTAssertEqual(state!.value, "100") // .mockSpdToken has 6 decimals
-    XCTAssertFalse(state!.isUnlimitedApprovalRequested)
+    store.$gasSymbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.mockSolToken.symbol)
+      }
+      .store(in: &cancellables)
+    store.$symbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.mockSpdToken.symbol)
+      }
+      .store(in: &cancellables)
+    store.$value
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, "100") // .mockSpdToken has 6 decimals
+      }
+      .store(in: &cancellables)
+    store.$isUnlimitedApprovalRequested
+      .dropFirst()
+      .sink { value in
+        XCTAssertFalse(value) // .mockSpdToken has 6 decimals
+      }
+      .store(in: &cancellables)
     
     wait(for: [prepareExpectation], timeout: 1)
   }
@@ -193,7 +227,6 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    prepareExpectation.expectedFulfillmentCount = 2
     await store.prepare()
     store.$activeTransactionId
       .sink { id in
@@ -201,20 +234,38 @@ class TransactionConfirmationStoreTests: XCTestCase {
         XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
-    store.$gasEstimation1559
-      .sink { gas in
-        defer { prepareExpectation.fulfill() }
-        XCTAssertEqual(store.gasEstimation1559, mockGasEstimation)
+    store.$gasSymbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.previewToken.symbol)
       }
       .store(in: &cancellables)
-    
-    let state = await store.fetchDetails(for: store.activeTransaction)
-    XCTAssertNotNil(state)
-    XCTAssertEqual(state!.gasSymbol, BraveWallet.BlockchainToken.previewToken.symbol)
-    XCTAssertEqual(state!.symbol, BraveWallet.BlockchainToken.daiToken.symbol)
-    XCTAssertEqual(state!.value, "Unlimited")
-    XCTAssertTrue(state!.isUnlimitedApprovalRequested)
-    XCTAssertEqual(state!.currentAllowance, "0.1000")
+    store.$symbol
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, BraveWallet.BlockchainToken.daiToken.symbol)
+      }
+      .store(in: &cancellables)
+    store.$value
+      .dropFirst()
+      .sink { value in
+        XCTAssertEqual(value, "Unlimited")
+      }
+      .store(in: &cancellables)
+    store.$isUnlimitedApprovalRequested
+      .dropFirst()
+      .sink { value in
+        XCTAssertTrue(value)
+      }
+      .store(in: &cancellables)
+    store.$currentAllowance
+      .dropFirst()
+      .collect(3)
+      .sink { values in
+        XCTAssertNotNil(values.last)
+        XCTAssertEqual(values.last!, "0.1000")
+      }
+      .store(in: &cancellables)
     
     wait(for: [prepareExpectation], timeout: 1)
   }
@@ -238,10 +289,10 @@ class TransactionConfirmationStoreTests: XCTestCase {
     
     let prepareExpectation = expectation(description: "prepare")
     await store.prepare()
-    store.$gasEstimation1559
-      .sink { gas in
+    store.$activeTransactionId
+      .sink { id in
         defer { prepareExpectation.fulfill() }
-        XCTAssertNotNil(gas)
+        XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
     await waitForExpectations(timeout: 1) { error in
@@ -284,10 +335,10 @@ class TransactionConfirmationStoreTests: XCTestCase {
     
     let prepareExpectation = expectation(description: "prepare")
     await store.prepare()
-    store.$gasEstimation1559
-      .sink { gas in
+    store.$activeTransactionId
+      .sink { id in
         defer { prepareExpectation.fulfill() }
-        XCTAssertNotNil(gas)
+        XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
     await waitForExpectations(timeout: 1) { error in
@@ -330,10 +381,10 @@ class TransactionConfirmationStoreTests: XCTestCase {
     
     let prepareExpectation = expectation(description: "prepare")
     await store.prepare()
-    store.$gasEstimation1559
-      .sink { gas in
+    store.$activeTransactionId
+      .sink { id in
         defer { prepareExpectation.fulfill() }
-        XCTAssertNotNil(gas)
+        XCTAssertEqual(id, mockTransaction.id)
       }
       .store(in: &cancellables)
     await waitForExpectations(timeout: 1) { error in

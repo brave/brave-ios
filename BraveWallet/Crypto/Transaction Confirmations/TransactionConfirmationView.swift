@@ -35,16 +35,16 @@ struct TransactionConfirmationView: View {
   @State private var viewMode: ViewMode = .transaction
 
   private var transactionType: String {
-    if confirmationStore.activeTransaction.txType == .erc20Approve {
+    if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
       return Strings.Wallet.transactionTypeApprove
     }
-    return confirmationStore.activeTransaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
+    return confirmationStore.activeParsedTransaction.transaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
   }
 
   /// View showing the currently selected account with a blockie
   @ViewBuilder private var accountView: some View {
     HStack {
-      let address = confirmationStore.activeParsedTransaction?.fromAddress ?? keyringStore.selectedAccount.address
+      let address = confirmationStore.activeParsedTransaction.fromAddress
       AddressView(address: address) {
         Text(address.truncatedAddress)
           .fontWeight(.semibold)
@@ -57,7 +57,7 @@ struct TransactionConfirmationView: View {
   /// The view for changing between available pending transactions. ex. '1 of 4 Next'
   @ViewBuilder private var transactionsButton: some View {
     if confirmationStore.transactions.count > 1 {
-      let index = confirmationStore.transactions.firstIndex(of: confirmationStore.activeTransaction) ?? 0
+      let index = confirmationStore.transactions.firstIndex(of: confirmationStore.activeParsedTransaction.transaction) ?? 0
       HStack {
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, index + 1, confirmationStore.transactions.count))
           .fontWeight(.semibold)
@@ -82,7 +82,7 @@ struct TransactionConfirmationView: View {
   
   @ViewBuilder private var faviconAndOrigin: some View {
     VStack(spacing: 8) {
-      if let originInfo = confirmationStore.state.originInfo {
+      if let originInfo = confirmationStore.originInfo {
         Group {
           if originInfo.isBraveWalletOrigin {
             Image("wallet-brave-icon", bundle: .current)
@@ -123,15 +123,15 @@ struct TransactionConfirmationView: View {
       VStack(spacing: 8) {
         faviconAndOrigin
         VStack(spacing: 10) {
-          Text(String.localizedStringWithFormat(Strings.Wallet.confirmationViewAllowSpendTitle, confirmationStore.state.symbol))
+          Text(String.localizedStringWithFormat(Strings.Wallet.confirmationViewAllowSpendTitle, confirmationStore.symbol))
             .fontWeight(.semibold)
             .foregroundColor(Color(.bravePrimary))
-          Text(String.localizedStringWithFormat(Strings.Wallet.confirmationViewAllowSpendSubtitle, confirmationStore.state.symbol))
+          Text(String.localizedStringWithFormat(Strings.Wallet.confirmationViewAllowSpendSubtitle, confirmationStore.symbol))
             .font(.footnote)
         }
         .multilineTextAlignment(.center)
       }
-      if confirmationStore.state.isUnlimitedApprovalRequested {
+      if confirmationStore.isUnlimitedApprovalRequested {
         Label(Strings.Wallet.confirmationViewUnlimitedWarning, systemImage: "exclamationmark.triangle")
           .padding(12)
           .foregroundColor(Color(.braveErrorLabel))
@@ -143,7 +143,7 @@ struct TransactionConfirmationView: View {
       }
       NavigationLink(
         destination: EditPermissionsView(
-          proposedAllowance: confirmationStore.state.proposedAllowance,
+          proposedAllowance: confirmationStore.proposedAllowance,
           confirmationStore: confirmationStore,
           keyringStore: keyringStore,
           networkStore: networkStore
@@ -163,22 +163,20 @@ struct TransactionConfirmationView: View {
       .fontWeight(.semibold)
       .foregroundColor(Color(.braveBlurpleTint))
     Group {
-      if confirmationStore.activeTransaction.isEIP1559Transaction {
-        if let gasEstimation = confirmationStore.activeTransaction.txDataUnion.ethTxData1559?.gasEstimation {
-          NavigationLink(
-            destination: EditPriorityFeeView(
-              transaction: confirmationStore.activeTransaction,
-              gasEstimation: gasEstimation,
-              confirmationStore: confirmationStore
-            )
-          ) {
-            titleView
-          }
+      if let gasEstimation = confirmationStore.eip1559GasEstimation {
+        NavigationLink(
+          destination: EditPriorityFeeView(
+            transaction: confirmationStore.activeParsedTransaction.transaction,
+            gasEstimation: gasEstimation,
+            confirmationStore: confirmationStore
+          )
+        ) {
+          titleView
         }
       } else {
         NavigationLink(
           destination: EditGasFeeView(
-            transaction: confirmationStore.activeTransaction,
+            transaction: confirmationStore.activeParsedTransaction.transaction,
             confirmationStore: confirmationStore
           )
         ) {
@@ -193,7 +191,7 @@ struct TransactionConfirmationView: View {
     NavigationLink(
       destination: EditNonceView(
         confirmationStore: confirmationStore,
-        transaction: confirmationStore.activeTransaction
+        transaction: confirmationStore.activeParsedTransaction.transaction
       )
     ) {
       HStack {
@@ -215,33 +213,33 @@ struct TransactionConfirmationView: View {
         VStack {
           // Header
           HStack(alignment: .top) {
-            Text(networkStore.selectedChain.shortChainName)
+            Text(confirmationStore.networkShortChainName)
             Spacer()
             VStack(alignment: .trailing) {
               transactionsButton
-              if confirmationStore.activeTransaction.txType == .erc20Approve {
+              if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
                 accountView // for other txTypes, account is shown in `TransactionHeader`
               }
             }
           }
           .font(.callout)
           // Summary
-          if confirmationStore.activeTransaction.txType == .erc20Approve {
+          if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
             erc20ApproveHeader
           } else {
             TransactionHeader(
-              fromAccountAddress: confirmationStore.activeParsedTransaction?.fromAddress ?? "",
-              fromAccountName: confirmationStore.activeParsedTransaction?.namedFromAddress ?? "",
-              toAccountAddress: confirmationStore.activeParsedTransaction?.toAddress ?? "",
-              toAccountName: confirmationStore.activeParsedTransaction?.namedToAddress ?? "",
-              originInfo: confirmationStore.state.originInfo,
+              fromAccountAddress: confirmationStore.activeParsedTransaction.fromAddress,
+              fromAccountName: confirmationStore.activeParsedTransaction.namedFromAddress,
+              toAccountAddress: confirmationStore.activeParsedTransaction.toAddress,
+              toAccountName: confirmationStore.activeParsedTransaction.namedToAddress,
+              originInfo: confirmationStore.originInfo,
               transactionType: transactionType,
-              value: "\(confirmationStore.state.value) \(confirmationStore.state.symbol)",
-              fiat: confirmationStore.state.fiat
+              value: "\(confirmationStore.value) \(confirmationStore.symbol)",
+              fiat: confirmationStore.fiat
             )
           }
           
-          if confirmationStore.state.isSolTokenTransferWithAssociatedTokenAccountCreation {
+          if confirmationStore.isSolTokenTransferWithAssociatedTokenAccountCreation {
             VStack(alignment: .leading, spacing: 8) {
               Text(Strings.Wallet.confirmationViewSolSplTokenAccountCreationWarning)
                 .foregroundColor(Color(.braveErrorLabel))
@@ -275,17 +273,17 @@ struct TransactionConfirmationView: View {
                 VStack(spacing: 0) {
                   HStack {
                     VStack(alignment: .leading) {
-                      Text(confirmationStore.activeTransaction.coin == .sol ? Strings.Wallet.transactionFee : Strings.Wallet.gasFee)
+                      Text(confirmationStore.activeParsedTransaction.coin == .sol ? Strings.Wallet.transactionFee : Strings.Wallet.gasFee)
                         .foregroundColor(Color(.bravePrimary))
-                      if confirmationStore.activeTransaction.coin == .eth {
+                      if confirmationStore.activeParsedTransaction.coin == .eth {
                         editGasFeeButton
                       }
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
-                      Text("\(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
+                      Text("\(confirmationStore.gasValue) \(confirmationStore.gasSymbol)")
                         .foregroundColor(Color(.bravePrimary))
-                      Text(confirmationStore.state.gasFiat)
+                      Text(confirmationStore.gasFiat)
                         .font(.footnote)
                     }
                   }
@@ -294,12 +292,12 @@ struct TransactionConfirmationView: View {
                   .accessibilityElement(children: .contain)
                   Divider()
                     .padding(.leading)
-                  if confirmationStore.activeTransaction.txType == .erc20Approve {
+                  if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
                     Group {
                       HStack {
                         Text(Strings.Wallet.confirmationViewCurrentAllowance)
                         Spacer()
-                        Text("\(confirmationStore.state.currentAllowance) \(confirmationStore.state.symbol)")
+                        Text("\(confirmationStore.currentAllowance) \(confirmationStore.symbol)")
                           .multilineTextAlignment(.trailing)
                       }
                       .padding()
@@ -308,7 +306,7 @@ struct TransactionConfirmationView: View {
                       HStack {
                         Text(Strings.Wallet.editPermissionsProposedAllowanceHeader)
                         Spacer()
-                        Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol)")
+                        Text("\(confirmationStore.value) \(confirmationStore.symbol)")
                           .multilineTextAlignment(.trailing)
                       }
                       .padding()
@@ -324,19 +322,19 @@ struct TransactionConfirmationView: View {
                         .accessibility(sortPriority: 1)
                       Spacer()
                       VStack(alignment: .trailing) {
-                        Text(confirmationStore.activeTransaction.coin == .sol ? Strings.Wallet.amountAndFee : Strings.Wallet.amountAndGas)
+                        Text(confirmationStore.activeParsedTransaction.coin == .sol ? Strings.Wallet.amountAndFee : Strings.Wallet.amountAndGas)
                           .font(.footnote)
                           .foregroundColor(Color(.secondaryBraveLabel))
-                        Text("\(confirmationStore.state.value) \(confirmationStore.state.symbol) + \(confirmationStore.state.gasValue) \(confirmationStore.state.gasSymbol)")
+                        Text("\(confirmationStore.value) \(confirmationStore.symbol) + \(confirmationStore.gasValue) \(confirmationStore.gasSymbol)")
                           .foregroundColor(Color(.bravePrimary))
                         HStack(spacing: 4) {
-                          if !confirmationStore.state.isBalanceSufficient {
+                          if !confirmationStore.isBalanceSufficient {
                             Text(Strings.Wallet.insufficientBalance)
                               .foregroundColor(Color(.braveErrorLabel))
                           }
-                          Text(confirmationStore.state.totalFiat)
+                          Text(confirmationStore.totalFiat)
                             .foregroundColor(
-                              confirmationStore.state.isBalanceSufficient ? Color(.braveLabel) : Color(.braveErrorLabel)
+                              confirmationStore.isBalanceSufficient ? Color(.braveLabel) : Color(.braveErrorLabel)
                             )
                         }
                         .accessibilityElement(children: .contain)
@@ -346,7 +344,7 @@ struct TransactionConfirmationView: View {
                     .padding()
                     .accessibilityElement(children: .contain)
                   }
-                  if confirmationStore.activeTransaction.coin == .eth {
+                  if confirmationStore.activeParsedTransaction.coin == .eth {
                     Divider()
                       .padding(.leading)
                     editNonceRow
@@ -354,7 +352,7 @@ struct TransactionConfirmationView: View {
                 }
               case .details:
                 VStack(alignment: .leading) {
-                  StaticTextView(text: confirmationStore.state.transactionDetails)
+                  StaticTextView(text: confirmationStore.transactionDetails)
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
                     .background(Color(.tertiaryBraveGroupedBackground))
@@ -440,7 +438,7 @@ struct TransactionConfirmationView: View {
 
   @ViewBuilder private var rejectConfirmButtons: some View {
     Button(action: {
-      confirmationStore.reject(transaction: confirmationStore.activeTransaction) { success in
+      confirmationStore.reject(transaction: confirmationStore.activeParsedTransaction.transaction) { success in
         if confirmationStore.transactions.count <= 1 {
           onDismiss()
         }
@@ -450,7 +448,7 @@ struct TransactionConfirmationView: View {
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
     Button(action: {
-      confirmationStore.confirm(transaction: confirmationStore.activeTransaction) { error in
+      confirmationStore.confirm(transaction: confirmationStore.activeParsedTransaction.transaction) { error in
         if confirmationStore.transactions.count <= 1 {
           onDismiss()
         }
@@ -459,7 +457,7 @@ struct TransactionConfirmationView: View {
       Label(Strings.Wallet.confirm, systemImage: "checkmark.circle.fill")
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
-    .disabled(!confirmationStore.state.isBalanceSufficient)
+    .disabled(!confirmationStore.isBalanceSufficient)
   }
 }
 
