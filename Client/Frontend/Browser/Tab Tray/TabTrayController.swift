@@ -164,7 +164,9 @@ class TabTrayController: LoadingViewController {
         
         switch stateChange {
         case .openTabsSyncCycleCompleted:
-          self.reloadOpenTabsSession()
+          if !self.isTabTrayBeingSearched {
+            self.reloadOpenTabsSession()
+          }
         default:
           break
         }
@@ -409,12 +411,16 @@ class TabTrayController: LoadingViewController {
           ($0.title?.lowercased().contains(query) ?? false) || ($0.url.baseDomain?.contains(query) ?? false)
         }
 
-        session.tabs = queriedSyncedTabList
-        queriedSessions.append(session)
+        if !queriedSyncedTabList.isEmpty {
+          session.tabs = queriedSyncedTabList
+          queriedSessions.append(session)
+        }
       }
+      
+      return queriedSessions
     }
     
-    return queriedSessions
+    return allSessions
   }
 
   private func updateEmptyPanelState(isHidden: Bool) {
