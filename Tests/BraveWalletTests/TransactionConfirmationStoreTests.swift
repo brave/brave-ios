@@ -8,7 +8,7 @@ import XCTest
 import BraveCore
 @testable import BraveWallet
 
-class TransactionConfirmationStoreTests: XCTestCase {
+@MainActor class TransactionConfirmationStoreTests: XCTestCase {
   
   private var cancellables: Set<AnyCancellable> = .init()
   
