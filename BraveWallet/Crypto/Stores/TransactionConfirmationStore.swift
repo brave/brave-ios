@@ -213,7 +213,7 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   private func clearTrasactionInfoBeforeUpdate() {
-    // clear fileds that could have dynamic async changes
+    // clear fields that could have dynamic async changes
     fiat = ""
     gasFiat = ""
     gasAssetRatio = 0.0

@@ -16,9 +16,9 @@ extension BraveWalletKeyringService {
     allKeyrings = await withTaskGroup(
       of: BraveWallet.KeyringInfo.self,
       returning: [BraveWallet.KeyringInfo].self,
-      body: { group in
+      body: { @MainActor group in
         for coin in coins {
-          group.addTask {
+          group.addTask { @MainActor in
             await self.keyringInfo(coin.keyringId)
           }
         }

@@ -15,10 +15,10 @@ extension BraveWalletTxService {
     var pendingTransactions: [BraveWallet.TransactionInfo] = []
     pendingTransactions = await withTaskGroup(
       of: [BraveWallet.TransactionInfo].self,
-      body: { group in
+      body: { @MainActor group in
         for keyring in keyrings {
           for info in keyring.accountInfos {
-            group.addTask {
+            group.addTask { @MainActor in
               await self.allTransactionInfo(info.coin, from: info.address)
             }
           }
