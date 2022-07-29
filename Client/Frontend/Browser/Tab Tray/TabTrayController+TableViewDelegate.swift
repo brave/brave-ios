@@ -41,7 +41,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
     }
 
     cell.do {
-      $0.backgroundColor = UIColor.clear
+      $0.backgroundColor = .clear
       $0.setLines(distantTab.title, detailText: distantTab.url.absoluteString)
 
       $0.imageView?.contentMode = .scaleAspectFit
@@ -71,7 +71,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
   }
   
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    SiteTableViewControllerUX.headerHeight
+    UITableView.automaticDimension
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -86,7 +86,9 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
     let headerView = tableView.dequeueReusableHeaderFooter() as TabSyncHeaderView
     
     headerView.do {
-      $0.titleLabel.text = "\(sectionDetails.name ?? "") \(sectionDetails.modifiedTime?.description ?? "")"
+      $0.imageIconView.image = UIImage(systemName: "laptopcomputer.and.iphone")?.template
+      $0.titleLabel.text = sectionDetails.name
+      $0.descriptionLabel.text = sectionDetails.modifiedTime?.description
       $0.section = section
       $0.delegate = self
     }
@@ -129,7 +131,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
 
     if let url = URL(string: distantTab.url.absoluteString) {
       dismiss(animated: true) {
-        self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
+        self.toolbarUrlActionsDelegate?.openInNewTab(url, isPrivate: false)
       }
     }
 
