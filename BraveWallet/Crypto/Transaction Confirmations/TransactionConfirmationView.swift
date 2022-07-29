@@ -419,7 +419,7 @@ struct TransactionConfirmationView: View {
       }
     .onAppear {
       Task { @MainActor in
-        await confirmationStore.prepare()
+        await confirmationStore.prepare(with: confirmationStore.activeTransactionId)
       }
     }
   }

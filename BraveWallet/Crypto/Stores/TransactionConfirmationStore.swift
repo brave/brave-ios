@@ -152,17 +152,20 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  @MainActor func prepare() async {
+  @MainActor func prepare(with activeTransactionId: String) async {
     transactions = await fetchTransactions()
-    if let firstTx = transactions.first {
-      activeTransactionId = firstTx.id
-      
-      let coinsForTransactions: Set<BraveWallet.CoinType> = .init(transactions.map(\.coin))
-      for coin in coinsForTransactions {
-        let network = await rpcService.network(coin)
-        let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
-        await fetchAssetRatios(for: userVisibleTokens)
+    if !activeTransactionId.isEmpty {
+      self.activeTransactionId = activeTransactionId
+    } else {
+      if let firstTx = transactions.first {
+        self.activeTransactionId = firstTx.id
       }
+    }
+    let coinsForTransactions: Set<BraveWallet.CoinType> = .init(transactions.map(\.coin))
+    for coin in coinsForTransactions {
+      let network = await rpcService.network(coin)
+      let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
+      await fetchAssetRatios(for: userVisibleTokens)
     }
   }
   
@@ -218,8 +221,10 @@ public class TransactionConfirmationStore: ObservableObject {
     gasFiat = ""
     gasAssetRatio = 0.0
     totalFiat = ""
-    isBalanceSufficient = true
     currentAllowance = ""
+    isBalanceSufficient = true
+    isSolTokenTransferWithAssociatedTokenAccountCreation = false
+    isUnlimitedApprovalRequested = false
   }
   
   private var assetRatios: [String: Double] = [:]
@@ -489,20 +494,25 @@ extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
   }
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     Task { @MainActor in
-      await refreshTransactions(txInfo)
+      // once we come here. it means user either rejects or confirms a transaction
+      // we will need to refresh the transaction list as well as
+      // update the `activeTransactionId` to update the UI
+      let indexOfChangedTx = transactions.firstIndex(where: { $0.id == txInfo.id }) ?? 0
+      let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
+      
+      transactions = await fetchTransactions()
+      if let newActiveTx = transactions[safe: newIndex] {
+        activeTransactionId = newActiveTx.id
+      }
     }
   }
   public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
     Task { @MainActor in
       // refresh the unapproved transaction list, as well as tx details UI
-      await refreshTransactions(txInfo)
-    }
-  }
-
-  @MainActor private func refreshTransactions(_ txInfo: BraveWallet.TransactionInfo) async {
-    transactions = await fetchTransactions()
-    if activeTransactionId == txInfo.id {
-      updateTransaction(with: txInfo)
+      transactions = await fetchTransactions()
+      if activeTransactionId == txInfo.id {
+        updateTransaction(with: txInfo)
+      }
     }
   }
 }
