@@ -108,7 +108,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
@@ -168,7 +168,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
@@ -227,7 +227,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
       gasEstimation: mockGasEstimation
     )
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
@@ -290,7 +290,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
     )
     
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
@@ -336,7 +336,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
     )
     
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
@@ -382,7 +382,7 @@ class TransactionConfirmationStoreTests: XCTestCase {
     )
     
     let prepareExpectation = expectation(description: "prepare")
-    await store.prepare(with: "")
+    await store.prepare()
     store.$activeTransactionId
       .sink { id in
         defer { prepareExpectation.fulfill() }
