@@ -15,36 +15,64 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
   var delegate: TabSyncHeaderViewDelegate?
   var section = 0
   var collapsed = false
+  
+  let imageIconView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+    $0.tintColor = .braveLabel
+  }
     
-  let titleLabel = UILabel().then {
-    $0.textColor = .braveLabel
-    $0.font = .preferredFont(forTextStyle: .footnote, weight: .semibold)
+  let labelStackView = UIStackView().then {
+    $0.axis = .vertical
+    $0.alignment = .leading
     $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
   }
   
-  let arrowLabel = UILabel().then {
+  let titleLabel = UILabel().then {
     $0.textColor = .braveLabel
-    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.font = .preferredFont(forTextStyle: .footnote, weight: .semibold)
+  }
+  
+  let descriptionLabel = UILabel().then {
+    $0.textColor = .secondaryBraveLabel
+    $0.font = .preferredFont(forTextStyle: .footnote)
+  }
+  
+  let arrowIconView = UIImageView().then {
+    $0.image = UIImage(systemName: "arrowtriangle.down")
+    $0.contentMode = .scaleAspectFit
+    $0.tintColor = .braveLabel
     $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-    $0.text = ">"
   }
     
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     contentView.backgroundColor = .clear
-        
-    contentView.addSubview(arrowLabel)
-    contentView.addSubview(titleLabel)
+    
+    contentView.addSubview(imageIconView)
+    contentView.addSubview(labelStackView)
+    contentView.addSubview(arrowIconView)
 
-    titleLabel.snp.makeConstraints {
+    labelStackView.addArrangedSubview(titleLabel)
+    labelStackView.setCustomSpacing(3.0, after: titleLabel)
+    labelStackView.addArrangedSubview(descriptionLabel)
+
+    imageIconView.snp.makeConstraints {
       $0.leading.equalToSuperview().inset(TwoLineCellUX.borderViewMargin)
-      $0.top.bottom.equalToSuperview()
+      $0.centerY.equalToSuperview()
+      $0.size.equalTo(TwoLineCellUX.imageSize)
     }
     
-    arrowLabel.snp.makeConstraints {
+    labelStackView.snp.makeConstraints {
+      $0.leading.equalTo(imageIconView.snp.trailing).offset(TwoLineCellUX.borderViewMargin)
+      $0.top.equalToSuperview().offset(5.0)
+      $0.bottom.equalToSuperview().offset(-5.0)
+    }
+    
+    arrowIconView.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(TwoLineCellUX.borderViewMargin)
-      $0.top.bottom.trailing.equalToSuperview()
       $0.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).inset(-TwoLineCellUX.borderViewMargin)
+      $0.centerY.equalToSuperview()
+      $0.size.equalTo(2 * TwoLineCellUX.imageSize / 3)
     }
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapHeader(_:))))
@@ -70,7 +98,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     CATransaction.begin()
     
     let animation = CABasicAnimation(keyPath: "transform.rotation").then {
-      $0.toValue = collapsed ? 0.0 : .pi / 2
+      $0.toValue = collapsed ? 0.0 : -1 * (.pi / 2)
       $0.duration = 0.2
       $0.isRemovedOnCompletion = false
       $0.fillMode = CAMediaTimingFillMode.forwards
@@ -82,7 +110,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
       completion?()
     }
     
-    arrowLabel.layer.add(animation, forKey: nil)
+    arrowIconView.layer.add(animation, forKey: nil)
     
     CATransaction.commit()
   }
