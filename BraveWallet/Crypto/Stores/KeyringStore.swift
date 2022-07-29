@@ -145,10 +145,10 @@ public class KeyringStore: ObservableObject {
       self.allKeyrings = await withTaskGroup(
         of: BraveWallet.KeyringInfo.self,
         returning: [BraveWallet.KeyringInfo].self,
-        body: { [weak keyringService] group in
+        body: { @MainActor [weak keyringService] group in
           guard let keyringService = keyringService else { return [] }
           for coin in WalletConstants.supportedCoinTypes {
-            group.addTask {
+            group.addTask { @MainActor in
               await keyringService.keyringInfo(coin.keyringId)
             }
           }
@@ -313,14 +313,8 @@ public class KeyringStore: ObservableObject {
   }
 
   func privateKey(for account: BraveWallet.AccountInfo, completion: @escaping (String?) -> Void) {
-    if account.isPrimary {
-      keyringService.privateKey(forKeyringAccount: account.address, coin: account.coin) { success, key in
-        completion(success ? key : nil)
-      }
-    } else {
-      keyringService.privateKey(forImportedAccount: account.address, coin: account.coin) { success, key in
-        completion(success ? key : nil)
-      }
+    keyringService.privateKey(forKeyringAccount: account.address, coin: account.coin) { success, key in
+      completion(success ? key : nil)
     }
   }
 

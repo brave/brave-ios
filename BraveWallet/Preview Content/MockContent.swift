@@ -39,14 +39,44 @@ extension BraveWallet.BlockchainToken {
     coin: .eth
   )
   
+  static let mockUSDCToken: BraveWallet.BlockchainToken = .init(
+    contractAddress: "0x07865c6e87b9f70255377e024ace6630c1eaa37f",
+    name: "USDC",
+    logo: "",
+    isErc20: false,
+    isErc721: false,
+    symbol: "USDC",
+    decimals: 6,
+    visible: false,
+    tokenId: "",
+    coingeckoId: "",
+    chainId: "",
+    coin: .eth
+  )
+  
   static let mockSolToken: BraveWallet.BlockchainToken = .init(
-    contractAddress: "0x1111111111222222222233333333334444444444",
+    contractAddress: "",
     name: "Solana",
     logo: "",
     isErc20: false,
     isErc721: false,
     symbol: "SOL",
     decimals: 9,
+    visible: false,
+    tokenId: "",
+    coingeckoId: "",
+    chainId: "",
+    coin: .sol
+  )
+  
+  static let mockSpdToken: BraveWallet.BlockchainToken = .init(
+    contractAddress: "0x1111111111222222222233333333334444444444",
+    name: "Solpad",
+    logo: "",
+    isErc20: false,
+    isErc721: false,
+    symbol: "SPD",
+    decimals: 6,
     visible: false,
     tokenId: "",
     coingeckoId: "",
@@ -182,6 +212,7 @@ extension TransactionSummary {
       visibleTokens: [.previewToken, .previewDaiToken],
       allTokens: [],
       assetRatios: [BraveWallet.BlockchainToken.previewToken.symbol.lowercased(): 1],
+      solEstimatedTxFee: nil,
       currencyFormatter: .usdCurrencyFormatter
     )
   }

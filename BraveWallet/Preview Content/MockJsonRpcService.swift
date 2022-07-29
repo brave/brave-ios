@@ -141,7 +141,15 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   }
   
   func hiddenNetworks(_ coin: BraveWallet.CoinType, completion: @escaping ([String]) -> Void) {
-    completion([""])
+    completion([])
+  }
+  
+  func customNetworks(_ coin: BraveWallet.CoinType, completion: @escaping ([String]) -> Void) {
+    completion([])
+  }
+  
+  func knownNetworks(_ coin: BraveWallet.CoinType, completion: @escaping ([String]) -> Void) {
+    completion([])
   }
 }
 
@@ -202,7 +210,7 @@ extension BraveWallet.NetworkInfo {
     rpcUrls: [],
     symbol: "SOL",
     symbolName: "Solana",
-    decimals: 18,
+    decimals: 9,
     coin: .sol,
     data: nil
   )

@@ -1331,12 +1331,12 @@ extension Strings {
       value: "Approved",
       comment: "The title shown for ERC20 approvals when the user doesn't have the visible asset added"
     )
-    public static let transactionSwapTitle = NSLocalizedString(
-      "wallet.transactionSwapTitle",
+    public static let transactionSwappedTitle = NSLocalizedString(
+      "wallet.transactionSwappedTitle",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Swapped %@ %@ (%@)",
-      comment: "A title shown for a swap transaction. The first '%@' becomes the  amount, the second '%@' becomes the symbol for the cryptocurrency and the last '%@' becomes the fiat amount. For example: \"Swapped 0.0054 ETH ($22.44)\""
+      value: "Swapped %@ %@ to %@ %@",
+      comment: "A title shown for a swap transaction. The first '%@' becomes the from amount, the second '%@' becomes the symbol for the from currency, the third '%@' becomes the to amount, and the last '%@' becomes the to symbol. For example: \"Swapped 0.0054 ETH to 1.5 DAI\""
     )
     public static let transactionSendTitle = NSLocalizedString(
       "wallet.transactionSendTitle",
@@ -1645,6 +1645,13 @@ extension Strings {
       bundle: .strings,
       value: "Address did not pass verification (invalid checksum). Please try again, replacing lowercase letters with uppercase.",
       comment: "A warning that appears below the send crypto address text field, when the input `To` address has invalid checksum."
+    )
+    public static let sendWarningSolAddressNotValid = NSLocalizedString(
+      "wallet.sendWarningSolAddressNotValid",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Not a valid SOL address",
+      comment: "A warning that appears below the send crypto address text field, when the input `To` address is not a valid SOL address."
     )
     public static let customNetworkChainIdTitle = NSLocalizedString(
       "wallet.customNetworkChainIdTitle",
@@ -2550,7 +2557,7 @@ extension Strings {
       comment: "One of the coin types for users to create an account to store FIL assets"
     )
     public static let coinTypeEthereumDescription = NSLocalizedString(
-      "wallet.coinTypeEthereum",
+      "wallet.coinTypeEthereumDescription",
       tableName: "BraveWallet",
       bundle: .strings,
       value: "Supports EVM compatible assets on the Ethereum blockchain (ERC-20, ERC-721, ERC-1551, ERC-1155)",

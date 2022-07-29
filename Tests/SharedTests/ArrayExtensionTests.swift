@@ -49,17 +49,6 @@ class ArrayExtensionTests: XCTestCase {
     XCTAssertEqual(i.union(j) { return $0 }, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   }
 
-  func testSameElements() {
-    let k = [1, 2, 3, 4, 5]
-    let l = [1, 2, 3, 4, 5]
-    let m = [2, 4, 6, 8, 10]
-    let n: [Int]?
-    n = k
-    XCTAssertTrue(k.sameElements(l))
-    XCTAssertFalse(l.sameElements(m))
-    XCTAssertTrue((n?.sameElements(k))!)
-  }
-
   func testSplitEvery() {
     // Edge cases
     let emptyArray = [Int]()
@@ -71,5 +60,30 @@ class ArrayExtensionTests: XCTestCase {
 
     XCTAssertEqual([1, 2, 3].splitEvery(1), [[1], [2], [3]])
     XCTAssertEqual([1, 2, 3, 4, 5].splitEvery(2), [[1, 2], [3, 4], [5]])
+  }
+  
+  func testContiguiousUntil() {
+    let testArray = [2, 4, 6, 8, 10]
+    let emptyArray = [Int]()
+    
+    XCTAssertEqual(
+      testArray.contiguousUntil(condition: { $0 % 2 == 0 }),
+      testArray[0...]
+    )
+    
+    XCTAssertEqual(
+      testArray.contiguousUntil(condition: { $0 % 2 != 0 }),
+      emptyArray[0...]
+    )
+    
+    XCTAssertEqual(
+      testArray.contiguousUntil(condition: { $0 <= 6 }),
+      testArray[0...2]
+    )
+    
+    XCTAssertEqual(
+      emptyArray.contiguousUntil(condition: { $0 > 0 }),
+      emptyArray[0...]
+    )
   }
 }
