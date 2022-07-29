@@ -25,7 +25,7 @@ private extension BraveWallet.AccountInfo {
 
 class TransactionParserTests: XCTestCase {
   
-  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   private let accountInfos: [BraveWallet.AccountInfo] = [
     .init(address: "0x1234567890123456789012345678901234567890", name: "Ethereum Account 1"),
     .init(address: "0x0987654321098765432109876543210987654321", name: "Ethereum Account 2"),

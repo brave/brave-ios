@@ -60,7 +60,7 @@ public class PortfolioStore: ObservableObject {
     assetRatioService: self.assetRatioService
   )
   
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService

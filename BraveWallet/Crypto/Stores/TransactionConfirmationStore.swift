@@ -62,7 +62,7 @@ public class TransactionConfirmationStore: ObservableObject {
   /// This is a list of all unpproved transactions iterated through all the accounts for the current keyring
   private(set) var transactions: [BraveWallet.TransactionInfo] = []
 
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
     .then {
       $0.minimumFractionDigits = 2
       $0.maximumFractionDigits = 6

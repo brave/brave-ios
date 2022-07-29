@@ -10,7 +10,7 @@ extension BraveWalletKeyringService {
   
   // Fetches all keyrings for all given coin types
   func keyrings(
-    for coins: [BraveWallet.CoinType]
+    for coins: Set<BraveWallet.CoinType>
   ) async -> [BraveWallet.KeyringInfo] {
     var allKeyrings: [BraveWallet.KeyringInfo] = []
     allKeyrings = await withTaskGroup(

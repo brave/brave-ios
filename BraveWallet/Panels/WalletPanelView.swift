@@ -155,7 +155,7 @@ struct WalletPanelView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @ScaledMetric private var blockieSize = 54
   
-  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
   init(
     keyringStore: KeyringStore,

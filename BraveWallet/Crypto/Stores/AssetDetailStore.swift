@@ -45,7 +45,7 @@ class AssetDetailStore: ObservableObject {
     }
   }
 
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
   private(set) var assetPriceValue: Double = 0.0
 

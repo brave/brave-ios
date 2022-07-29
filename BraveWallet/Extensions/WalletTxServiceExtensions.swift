@@ -12,8 +12,7 @@ extension BraveWalletTxService {
   func pendingTransactions(
     for keyrings: [BraveWallet.KeyringInfo]
   ) async -> [BraveWallet.TransactionInfo] {
-    var pendingTransactions: [BraveWallet.TransactionInfo] = []
-    pendingTransactions = await withTaskGroup(
+    return await withTaskGroup(
       of: [BraveWallet.TransactionInfo].self,
       body: { @MainActor group in
         for keyring in keyrings {
@@ -30,6 +29,5 @@ extension BraveWalletTxService {
         return allPendingTx
       }
     )
-    return pendingTransactions
   }
 }

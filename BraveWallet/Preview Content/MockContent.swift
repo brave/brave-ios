@@ -275,7 +275,7 @@ extension TransactionSummary {
       allTokens: [],
       assetRatios: [BraveWallet.BlockchainToken.previewToken.symbol.lowercased(): 1],
       solEstimatedTxFee: nil,
-      currencyFormatter: .usdCurrencyFormatter()
+      currencyFormatter: .usdCurrencyFormatter
     )
   }
 }

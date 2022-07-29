@@ -23,7 +23,7 @@ class TransactionDetailsStore: ObservableObject {
       update()
     }
   }
-  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter()
+  let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
     .then {
       $0.minimumFractionDigits = 2
       $0.maximumFractionDigits = 6
