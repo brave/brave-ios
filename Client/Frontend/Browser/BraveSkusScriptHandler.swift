@@ -52,12 +52,12 @@ class BraveSkusScriptHandler: TabContentScript {
     
     switch methodId {
     case Method.refreshOrder.rawValue:
-      if let domain = data["domain"] as? String, let orderId = data["orderId"] as? String {
-        handleRefreshOrder(for: domain, orderId: orderId)
+      if let orderId = data["orderId"] as? String {
+        handleRefreshOrder(for: orderId)
       }
     case Method.fetchOrderCredentials.rawValue:
-      if let domain = data["domain"] as? String, let orderId = data["orderId"] as? String {
-        handleFetchOrderCredentials(for: domain, orderId: orderId)
+      if let orderId = data["orderId"] as? String {
+        handleFetchOrderCredentials(for: orderId)
       }
     case Method.prepareCredentialsPresentation.rawValue:
       if let domain = data["domain"] as? String, let path = data["path"] as? String {
@@ -72,21 +72,21 @@ class BraveSkusScriptHandler: TabContentScript {
     }
   }
   
-  private func handleRefreshOrder(for domain: String, orderId: String) {
-    sku?.refreshOrder(domain, orderId: orderId) { [weak self] completion in
+  private func handleRefreshOrder(for orderId: String) {
+    sku?.refreshOrder(orderId) { [weak self] completion in
       do {
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
         log.debug("skus refreshOrder")
         self?.callback(methodId: 1, result: json)
       } catch {
-        log.error("refreshOrder: Failed to decode json: \(error)")
+        log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
   }
   
-  private func handleFetchOrderCredentials(for domain: String, orderId: String) {
-    sku?.fetchOrderCredentials(domain, orderId: orderId) { [weak self] completion in
+  private func handleFetchOrderCredentials(for orderId: String) {
+    sku?.fetchOrderCredentials(orderId) { [weak self] completion in
       log.debug("skus fetchOrderCredentials")
       self?.callback(methodId: 2, result: completion)
     }

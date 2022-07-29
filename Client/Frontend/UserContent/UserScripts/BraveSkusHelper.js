@@ -45,10 +45,10 @@ configurable: true,
 writable: false,
     value: {
     refresh_order(orderId) {
-        return window.__firefox__.$<brave-skus-helper>.sendMessage(1, { domain, orderId });
+        return window.__firefox__.$<brave-skus-helper>.sendMessage(1, { orderId });
     },
     fetch_order_credentials(orderId) {
-        return window.__firefox__.$<brave-skus-helper>.sendMessage(2, { domain, orderId });
+        return window.__firefox__.$<brave-skus-helper>.sendMessage(2, { orderId });
     },
     prepare_credentials_presentation(domain, path) {
         return window.__firefox__.$<brave-skus-helper>.sendMessage(3, { domain, path });
