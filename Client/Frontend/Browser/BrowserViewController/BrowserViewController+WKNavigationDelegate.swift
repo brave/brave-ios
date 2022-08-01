@@ -524,7 +524,8 @@ extension BrowserViewController: WKNavigationDelegate {
       // Deciding whether to inject app's IAP receipt for Brave SKUs or not
       if let url = tab.url,
           let braveSkusHelper = BraveSkusWebHelper(for: url),
-          let receiptData = braveSkusHelper.receiptData {
+          let receiptData = braveSkusHelper.receiptData,
+          !tab.isPrivate {
         tab.injectSessionStorageItem(key: receiptData.key, value: receiptData.value)
       }
 
