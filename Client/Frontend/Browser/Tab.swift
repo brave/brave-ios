@@ -956,9 +956,9 @@ extension Tab {
 
 // MARK: - Brave SKU
 extension Tab {
-  func injectReceipt(data: String) {
+  func injectSessionStorageItem(key: String, value: String) {
     self.webView?.evaluateSafeJavaScript(functionName: "sessionStorage.setItem",
-                                         args: ["braveVpn.receipt", data],
+                                         args: [key, value],
                                          contentWorld: .page)
   }
 }

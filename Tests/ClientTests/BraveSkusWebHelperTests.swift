@@ -6,7 +6,7 @@
 import XCTest
 @testable import Brave
 
-final class BraveSkusTests: XCTestCase {
+final class BraveSkusWebHelperTests: XCTestCase {
   
   func testShouldInjectReceipt() throws {
     
@@ -33,20 +33,22 @@ final class BraveSkusTests: XCTestCase {
     ]
     
     try goodURLs.forEach {
-      XCTAssertNotNil(BraveSkusHelperMock(for: try XCTUnwrap($0)), "failed at: \($0?.absoluteString ?? "nil")")
+      XCTAssertNotNil(BraveSkusWebHelperMock(for: try XCTUnwrap($0)), "failed at: \($0?.absoluteString ?? "nil")")
     }
     
     try badURLs.forEach {
-      XCTAssertNil(BraveSkusHelperMock(for: try XCTUnwrap($0)), "failed at: \($0?.absoluteString ?? "nil")")
+      XCTAssertNil(BraveSkusWebHelperMock(for: try XCTUnwrap($0)), "failed at: \($0?.absoluteString ?? "nil")")
     }
   }
   
   func testReceiptJson() throws {
     let url = try XCTUnwrap(URL(string: "https://account.brave.com/?intent=connect-receipt&product=vpn"))
     
-    let helper = try XCTUnwrap(BraveSkusHelperMock(for: url))
+    let helper = try XCTUnwrap(BraveSkusWebHelperMock(for: url))
     let receiptData = try XCTUnwrap(helper.receiptData)
-    let decodedData = try XCTUnwrap(Data(base64Encoded: receiptData))
+    XCTAssertEqual(receiptData.key, "braveVpn.receipt")
+    let value = receiptData.value
+    let decodedData = try XCTUnwrap(Data(base64Encoded: value))
     
     let json = try XCTUnwrap(JSONSerialization.jsonObject(with: decodedData) as? [String: String])
     let type = try XCTUnwrap(json["type"])
@@ -55,7 +57,7 @@ final class BraveSkusTests: XCTestCase {
     let subscriptionId = try XCTUnwrap(json["subscription_id"])
     
     XCTAssertEqual(type, "ios")
-    XCTAssertEqual(rawReceipt, BraveSkusHelperMock.mockReceiptValue)
+    XCTAssertEqual(rawReceipt, BraveSkusWebHelperMock.mockReceiptValue)
     XCTAssertEqual(package, "com.brave.browser")
     XCTAssertEqual(subscriptionId, "brave-firewall-vpn-premium")
   }

@@ -9,10 +9,11 @@ import BraveShared
 
 private let log = Logger.browserLogger
 
-class BraveSkusHelper {
+class BraveSkusWebHelper {
   private let allowedHosts = ["account.brave.com", "account.bravesoftware.com", "account.brave.software"]
   private let requiredQueryItems: [URLQueryItem] =
   [.init(name: "intent", value: "connect-receipt"), .init(name: "product", value: "vpn")]
+  private let storageKey = "braveVpn.receipt"
   
   private let url: URL
   
@@ -47,7 +48,7 @@ class BraveSkusHelper {
   }
   
   /// Returns app's receipt and few other properties as a base64 encoded JSON.
-  var receiptData: String? {
+  var receiptData: (key: String, value: String)? {
     guard let receipt = receipt else { return nil }
     
     struct ReceiptDataJson: Codable {
@@ -69,7 +70,7 @@ class BraveSkusHelper {
                                subscriptionId: "brave-firewall-vpn-premium")
     
     do {
-        return try JSONEncoder().encode(json).base64EncodedString
+      return (key: storageKey, value: try JSONEncoder().encode(json).base64EncodedString)
     } catch {
       assertionFailure("serialization error: \(error)")
       return nil
@@ -78,7 +79,7 @@ class BraveSkusHelper {
 }
 
 // MARK: - Test Files
-class BraveSkusHelperMock: BraveSkusHelper {
+class BraveSkusWebHelperMock: BraveSkusWebHelper {
   static let mockReceiptValue = "test-receipt"
   
   override var receipt: String? {
