@@ -953,3 +953,12 @@ extension Tab {
     }
   }
 }
+
+// MARK: - Brave SKU
+extension Tab {
+  func injectReceipt(data: String) {
+    self.webView?.evaluateSafeJavaScript(functionName: "sessionStorage.setItem",
+                                         args: ["braveVpn.receipt", data],
+                                         contentWorld: .page)
+  }
+}
