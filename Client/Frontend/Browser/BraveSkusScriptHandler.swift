@@ -73,7 +73,7 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   private func handleRefreshOrder(for orderId: String) {
-    sku?.refreshOrder(orderId) { [weak self] completion in
+    sku?.refreshOrder("account.brave.software", orderId: orderId) { [weak self] completion in
       do {
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
@@ -86,16 +86,19 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   private func handleFetchOrderCredentials(for orderId: String) {
-    sku?.fetchOrderCredentials(orderId) { [weak self] completion in
+    sku?.fetchOrderCredentials("account.brave.software", orderId: orderId) { [weak self] completion in
       log.debug("skus fetchOrderCredentials")
       self?.callback(methodId: 2, result: completion)
     }
   }
   
   private func handlePrepareCredentialsSummary(for domain: String, path: String) {
+    log.debug("skus prepareCredentialsPresentation")
     sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
       if !credential.isEmpty {
         BraveVPN.setSkusCredential(credential)
+      } else {
+        assertionFailure()
       }
       
       self?.callback(methodId: 3, result: credential)
@@ -114,7 +117,13 @@ class BraveSkusScriptHandler: TabContentScript {
         if let expiresDate = (json as? [String: Any])?["expires_at"] as? String {
           let formatter = DateFormatter()
           formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+          
+          let formatter2 = DateFormatter()
+          formatter2.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+          
           if let date = formatter.date(from: expiresDate) {
+            Preferences.VPN.expirationDate.value = date
+          } else if let date = formatter2.date(from: expiresDate) {
             Preferences.VPN.expirationDate.value = date
           } else {
             assertionFailure("Failed to parse date: \(expiresDate)")
