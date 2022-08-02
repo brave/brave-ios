@@ -83,12 +83,25 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
       return nil
     }
     
-    let headerView = tableView.dequeueReusableHeaderFooter() as TabSyncHeaderView
+    var deviceTypeImage: UIImage?
     
+    switch sectionDetails.deviceType {
+    case .phone, .tablet:
+      deviceTypeImage = UIImage(systemName: "ipad.and.iphone")
+    case .win, .linux, .mac:
+      deviceTypeImage = UIImage(systemName: "laptopcomputer")
+    default:
+      deviceTypeImage = UIImage(systemName: "laptopcomputer.and.iphone")
+    }
+        
+    let headerView = tableView.dequeueReusableHeaderFooter() as TabSyncHeaderView
+
     headerView.do {
-      $0.imageIconView.image = UIImage(systemName: "laptopcomputer.and.iphone")?.template
+      $0.imageIconView.image = deviceTypeImage?.template
       $0.titleLabel.text = sectionDetails.name
-      $0.descriptionLabel.text = sectionDetails.modifiedTime?.description
+      if let modifiedTime = sectionDetails.modifiedTime {
+        $0.descriptionLabel.text = modifiedTime.formattedSyncSessionPeriodDate
+      }
       $0.section = section
       $0.delegate = self
     }
@@ -137,4 +150,85 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
 
     tableView.deselectRow(at: indexPath, animated: true)
   }
+  
+}
+
+extension Date {
+  enum TimePeriodOffset {
+    case today, yesterday, lastWeek, lastMonth
+
+    var period: Int {
+      switch self {
+        case .today: return 0
+        case .yesterday: return -1
+        case .lastWeek: return -7
+        case .lastMonth: return -31
+      }
+    }
+  }
+  
+  var formattedSyncSessionPeriodDate: String {
+    let hourFormatter = DateFormatter().then {
+      $0.locale = .current
+      $0.dateFormat = "HH:mm a"
+    }
+    
+    let hourDayFormatter = DateFormatter().then {
+      $0.locale = .current
+      $0.dateFormat = "EEEE HH:mm a"
+    }
+    
+    let fullDateFormatter = DateFormatter().then {
+      $0.locale = .current
+      $0.dateFormat = "HH:mm a MM-dd-yyyy"
+    }
+        
+    if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.today.period)) ==
+        ComparisonResult.orderedDescending {
+      return "Last synced: Today \(hourFormatter.string(from: self))"
+    } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.yesterday.period)) ==
+                ComparisonResult.orderedDescending {
+      return "Last synced: Yesterday \(hourFormatter.string(from: self))"
+    } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastWeek.period)) ==
+                ComparisonResult.orderedDescending {
+      return "Last synced: Last Week \(hourDayFormatter.string(from: self))"
+    }
+    
+    return "Last Synced: \(fullDateFormatter.string(from: self))"
+  }
+  
+  var formattedActivePeriodDate: String {
+    if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.today.period)) ==
+        ComparisonResult.orderedDescending {
+      return "Active Today"
+    } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.yesterday.period)) ==
+                ComparisonResult.orderedDescending {
+      return "Active Yesterday"
+    } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastWeek.period)) ==
+                ComparisonResult.orderedDescending {
+      return "Active This Week"
+    
+    } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastMonth.period)) ==
+                ComparisonResult.orderedDescending {
+      return "Active This Month"
+    }
+      
+    let dateComponents = Calendar(identifier: .gregorian).dateComponents([.day], from: self, to: Date())
+      
+    return "Active \(dateComponents.day ?? 0) Days Ago"
+  }
+  
+  private func getCurrentDateWith(dayOffset: Int) -> Date {
+    let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+    let nowComponents = calendar.dateComponents(
+      [Calendar.Component.year, Calendar.Component.month, Calendar.Component.day], from: Date())
+
+    guard let today = calendar.date(from: nowComponents) else {
+      return Date()
+    }
+
+    return (calendar as NSCalendar).date(
+      byAdding: NSCalendar.Unit.day, value: dayOffset, to: today, options: []) ?? Date()
+  }
+
 }
