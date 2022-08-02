@@ -18,12 +18,7 @@ import BraveShared
     .sol: [.mockSolana, .mockSolanaTestnet]
   ]
   
-  override func setUp() {
-    super.setUp()
-    WalletDebugFlags.isSolanaEnabled = true
-  }
-  
-  private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestJsonRpcService, BraveWallet.TestBraveWalletService, BraveWallet.TestSwapService) {
+  private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestJsonRpcService, BraveWallet.TestBraveWalletService) {
     let currentNetwork: BraveWallet.NetworkInfo = .mockMainnet
     let currentChainId = currentNetwork.chainId
     let currentSelectedCoin: BraveWallet.CoinType = .eth
