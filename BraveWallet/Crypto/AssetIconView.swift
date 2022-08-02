@@ -41,8 +41,8 @@ struct AssetIconView: View {
     
     if network.isNativeAsset(token) {
       // check bundled images
-      if UIImage(named: network.nativeTokenLogo, in: .current, with: nil) != nil {
-        return Image(network.nativeTokenLogo, bundle: .current)
+      if let uiImage = UIImage(named: network.nativeTokenLogo, in: .current, with: nil) {
+        return Image(uiImage: uiImage)
       }
     }
     
