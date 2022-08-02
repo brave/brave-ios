@@ -10,10 +10,17 @@ import BraveShared
 private let log = Logger.browserLogger
 
 class BraveSkusWebHelper {
+  /// On which hosts the receipt should be allowed to be exposed.
   private let allowedHosts = ["account.brave.com", "account.bravesoftware.com", "account.brave.software"]
+  /// Which parameters have to be present before we expose the iOS receipt.
   private let requiredQueryItems: [URLQueryItem] =
   [.init(name: "intent", value: "connect-receipt"), .init(name: "product", value: "vpn")]
+  /// What key should be used to pass the receipt in session storage.
   private let storageKey = "braveVpn.receipt"
+  /// Value to pass to the json file's 'package' property. This is not related to the app's bundle ID.
+  private let receiptJsonPackage = "com.brave.browser"
+  /// Value to pass to the json file's 'subscription_id' property. This is not related to the IAPs product ID.
+  private let receiptJsonSubscriptionId = "brave-firewall-vpn-premium"
   
   private let url: URL
   
@@ -29,6 +36,7 @@ class BraveSkusWebHelper {
 
     if !allowedHosts.contains(host) || scheme != "https" { return nil }
 
+    // Both query parameters must be present before the receipt is allowed to be shown.
     if requiredQueryItems.allSatisfy(queryItems.contains) {
       self.url = url
     } else {
@@ -66,8 +74,8 @@ class BraveSkusWebHelper {
     
     let json = ReceiptDataJson(type: "ios",
                                rawReceipt: receipt,
-                               package: "com.brave.browser",
-                               subscriptionId: "brave-firewall-vpn-premium")
+                               package: receiptJsonPackage,
+                               subscriptionId: receiptJsonSubscriptionId)
     
     do {
       return (key: storageKey, value: try JSONEncoder().encode(json).base64EncodedString)
@@ -78,7 +86,7 @@ class BraveSkusWebHelper {
   }
 }
 
-// MARK: - Test Files
+// MARK: - Testing
 class BraveSkusWebHelperMock: BraveSkusWebHelper {
   static let mockReceiptValue = "test-receipt"
   
