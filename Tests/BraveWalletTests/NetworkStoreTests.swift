@@ -46,6 +46,7 @@ class NetworkStoreTests: XCTestCase {
     rpcService._setNetwork = { _, _, completion in
       completion(true)
     }
+    rpcService._customNetworks = { $1([]) }
     
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._addObserver = { _ in }
