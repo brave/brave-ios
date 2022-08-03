@@ -29,7 +29,7 @@ extension BraveWallet.NetworkInfo: Identifiable {
     .init(
       contractAddress: "",
       name: symbolName,
-      logo: nativeTokenLogo,
+      logo: nativeTokenLogo ?? "",
       isErc20: false,
       isErc721: false,
       symbol: symbol,
@@ -42,7 +42,7 @@ extension BraveWallet.NetworkInfo: Identifiable {
     )
   }
   
-  public var nativeTokenLogo: String {
+  public var nativeTokenLogo: String? {
     if symbol.caseInsensitiveCompare("ETH") == .orderedSame {
       return "eth-asset-icon"
     } else if symbol.caseInsensitiveCompare("SOL") == .orderedSame {
@@ -59,10 +59,8 @@ extension BraveWallet.NetworkInfo: Identifiable {
       return "avax"
     } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
       return "fantom"
-    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
-      return "optimism" // should never happen since OptimismMainnet's symbol is ETH
     } else {
-      return iconUrls.first ?? ""
+      return iconUrls.first
     }
   }
   
