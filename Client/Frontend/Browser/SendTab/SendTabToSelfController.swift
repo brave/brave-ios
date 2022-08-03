@@ -7,25 +7,28 @@ import Foundation
 import BraveUI
 import BraveCore
 import BraveShared
-import DesignSystem
-import UIKit
 
 class SendTabToSelfController: UIViewController {
   
   struct UX {
     static let contentInset: CGFloat = 20
+    static let preferredSizePadding: CGFloat = 72
   }
   
-  private let contentNavigationController: UINavigationController
-  private let sendTabContentController: SendTabToSelfContentController
+  let contentNavigationController: UINavigationController
+  let sendTabContentController: SendTabToSelfContentController
   
-  private let backgroundView = UIView().then {
+  let backgroundView = UIView().then {
     $0.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
   }
 
   init(sendTabAPI: BraveSendTabAPI, dataSource: SendableTabInfoDataSource) {
     sendTabContentController = SendTabToSelfContentController(sendTabAPI: sendTabAPI, dataSource: dataSource)
-    contentNavigationController = UINavigationController(rootViewController: sendTabContentController)
+    contentNavigationController = UINavigationController(rootViewController: sendTabContentController).then {
+      $0.view.layer.cornerRadius = 10.0
+      $0.view.layer.cornerCurve = .continuous
+      $0.view.clipsToBounds = true
+    }
     
     super.init(nibName: nil, bundle: nil)
         
@@ -51,7 +54,7 @@ class SendTabToSelfController: UIViewController {
       withHorizontalFittingPriority: .required,
       verticalFittingPriority: .fittingSizeLevel
     ).with {
-      $0.height += 72
+      $0.height += UX.preferredSizePadding
     }
     
     contentNavigationController.view.snp.makeConstraints {
@@ -70,15 +73,7 @@ class SendTabToSelfController: UIViewController {
 class SendTabToSelfContentController: UITableViewController {
   
   struct UX {
-    static let informationRowHeight: CGFloat = 58
     static let standardItemHeight: CGFloat = 44
-  }
-  
-  // MARK: Section
-
-  enum Section: Int, CaseIterable {
-    case information
-    case send
   }
 
   // MARK: Internal
@@ -107,14 +102,23 @@ class SendTabToSelfContentController: UITableViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    navigationItem.title = "Send WebPage"
+    navigationItem.title = "Send Webpage"
     navigationItem.leftBarButtonItem =
       UIBarButtonItem(title: Strings.cancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
 
     tableView.do {
+      $0.tableHeaderView = UIView()
       $0.register(CenteredButtonCell.self)
       $0.register(TwoLineTableViewCell.self)
-      $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
+      $0.registerHeaderFooter(SendTabToSelfContentHeaderFooterView.self)
+      tableView.tableFooterView = SendTabToSelfContentHeaderFooterView(
+        frame: CGRect(width: tableView.bounds.width, height: UX.standardItemHeight)).then {
+        $0.titleLabel.text = "Send To Your Device"
+        $0.titleLabel.isUserInteractionEnabled = true
+        $0.titleLabel.addGestureRecognizer(UITapGestureRecognizer(
+          target: self,
+          action: #selector(tappedSendLabel(_:))))
+      }
     }
   }
   
@@ -127,158 +131,93 @@ class SendTabToSelfContentController: UITableViewController {
 
 extension SendTabToSelfContentController {
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return Section.allCases.count
+    return 1
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     guard let dataSource = dataSource else { return 0 }
-    
-    switch section {
-    case Section.information.rawValue:
-      return dataSource.numberOfDevices()
-    default:
-      return 1
-    }
+
+    return dataSource.numberOfDevices()
   }
   
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    switch indexPath.section {
-    case Section.information.rawValue:
-      return UX.informationRowHeight
-    case Section.send.rawValue:
-      return UX.standardItemHeight
-    default:
-      return UITableView.automaticDimension
-    }
+    UITableView.automaticDimension
   }
   
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    switch indexPath.section {
-    case Section.information.rawValue:
-      let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
+    let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
 
-      if let device = dataSource?.deviceInformation(for: indexPath) {
-        cell.do {
-          $0.separatorInset = .zero
-          $0.accessoryType = indexPath.row == dataSource?.selectedIndex ? .checkmark : .none
-          $0.setLines(device.fullName, detailText: device.lastUpdatedTime.description)
-          $0.imageView?.contentMode = .scaleAspectFit
-          $0.imageView?.image = UIImage(systemName: "laptopcomputer")
-        }
+    if let device = dataSource?.deviceInformation(for: indexPath) {
+      var deviceTypeImage: UIImage?
       
-        return cell
+      switch device.deviceType {
+      case .mobile:
+        deviceTypeImage = UIImage(systemName: "ipad.and.iphone")
+      case .PC:
+        deviceTypeImage = UIImage(systemName: "laptopcomputer")
+      default:
+        deviceTypeImage = UIImage(systemName: "laptopcomputer.and.iphone")
       }
-    case Section.send.rawValue:
-      let cell = tableView.dequeueReusableCell(for: indexPath) as CenteredButtonCell
+      
       cell.do {
-        $0.textLabel?.text = "Send To Your Device"
-        $0.separatorInset = .zero
-        $0.tintColor = .braveOrange
+        $0.backgroundColor = .clear
+        $0.accessoryType = indexPath.row == dataSource?.selectedIndex ? .checkmark : .none
+        $0.setLines(device.fullName, detailText: device.lastUpdatedTime.formattedActivePeriodDate)
+        $0.imageView?.contentMode = .scaleAspectFit
+        $0.imageView?.tintColor = .braveLabel
+        $0.imageView?.image = deviceTypeImage?.template
       }
-      return cell
-    default:
-      assertionFailure("No cell available for index path: \(indexPath)")
     }
-
-    return UITableViewCell()
+    
+    return cell
   }
-
+  
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let dataSource = dataSource else { return }
     
-    switch indexPath.section {
-    case Section.information.rawValue:
-      dataSource.selectedIndex = indexPath.row
-      tableView.reloadSections(IndexSet(integer: indexPath.section), with: .fade)
-    case Section.send.rawValue:
-      if let device = dataSource.deviceInformation(for: indexPath) {
-        sendTabAPI?.sendActiveTab(
-          toDevice: device.cacheId,
-          tabTitle: dataSource.displayTitle,
-          activeURL: dataSource.sendableURL)
-      }
-      dismiss(animated: true)
-    default:
-      assertionFailure("No cell available for index path: \(indexPath)")
-    }
-  }
-}
-
-// MARK: - BasicAnimationControllerDelegate
-
-extension SendTabToSelfController: BasicAnimationControllerDelegate {
-  public func animatePresentation(context: UIViewControllerContextTransitioning) {
-    context.containerView.addSubview(view)
-
-    backgroundView.alpha = 0.0
-    contentNavigationController.view.transform =
-      CGAffineTransform(translationX: 0, y: context.containerView.bounds.height)
-
-    UIViewPropertyAnimator(duration: 0.35, dampingRatio: 1.0) { [self] in
-      backgroundView.alpha = 1.0
-      contentNavigationController.view.transform = .identity
-    }.startAnimation()
-
-    context.completeTransition(true)
-  }
-
-  public func animateDismissal(context: UIViewControllerContextTransitioning) {
-    let animator = UIViewPropertyAnimator(duration: 0.25, dampingRatio: 1.0) { [self] in
-      backgroundView.alpha = 0.0
-      contentNavigationController.view.transform =
-        CGAffineTransform(translationX: 0, y: context.containerView.bounds.height)
-    }
-    animator.addCompletion { _ in
-      self.view.removeFromSuperview()
-      context.completeTransition(true)
-    }
-    animator.startAnimation()
-  }
-}
-
-// MARK: - UIViewControllerTransitioningDelegate
-
-extension SendTabToSelfController: UIViewControllerTransitioningDelegate {
-  public func animationController(
-    forPresented presented: UIViewController,
-    presenting: UIViewController,
-    source: UIViewController
-  ) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .presenting)
-  }
-
-  public func animationController(
-    forDismissed dismissed: UIViewController
-  ) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .dismissing)
-  }
-}
-
-// MARK: - SendableTabInfoDataSource
-
-class SendableTabInfoDataSource {
-
-  /// The information  related with tab to be sent to alist of devices
-  private let deviceList: [SendTabTargetDevice]
-  let displayTitle: String
-  let sendableURL: URL
-  var selectedIndex = 0
-  
-  // MARK: Lifecycle
-
-  init(with deviceList: [SendTabTargetDevice], displayTitle: String, sendableURL: URL) {
-    self.deviceList = deviceList
-    self.displayTitle = displayTitle
-    self.sendableURL = sendableURL
-  }
-
-  // MARK: Internal
-
-  func deviceInformation(for indexPath: IndexPath) -> SendTabTargetDevice? {
-    return deviceList[safe: indexPath.row]
+    dataSource.selectedIndex = indexPath.row
+    tableView.reloadSections(IndexSet(integer: indexPath.section), with: .fade)
   }
   
-  func numberOfDevices() -> Int {
-    return deviceList.count
+  @objc private func tappedSendLabel(_ gesture: UITapGestureRecognizer) {
+    guard let dataSource = dataSource, gesture.state == .ended else { return }
+
+    if let deviceCacheId = dataSource.deviceCacheID() {
+      sendTabAPI?.sendActiveTab(
+        toDevice: deviceCacheId,
+        tabTitle: dataSource.displayTitle,
+        activeURL: dataSource.sendableURL)
+    }
+    
+    dismiss(animated: true)
+  }
+}
+
+class SendTabToSelfContentHeaderFooterView: UITableViewHeaderFooterView, TableViewReusable {
+  private struct UX {
+    static let horizontalPadding: CGFloat = 15
+    static let verticalPadding: CGFloat = 6
+  }
+  
+  var titleLabel = UILabel().then {
+    $0.font = .preferredFont(forTextStyle: .body)
+    $0.numberOfLines = 0
+    $0.textColor = .braveOrange
+    $0.textAlignment = .center
+  }
+
+  override init(reuseIdentifier: String?) {
+    super.init(reuseIdentifier: reuseIdentifier)
+    addSubview(titleLabel)
+
+    titleLabel.snp.remakeConstraints {
+      $0.left.right.greaterThanOrEqualTo(self).inset(UX.horizontalPadding)
+      $0.top.bottom.greaterThanOrEqualTo(self).inset(UX.verticalPadding)
+      $0.centerX.centerY.equalToSuperview()
+    }
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 }
