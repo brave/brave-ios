@@ -155,6 +155,27 @@ struct AddAccountView: View {
         }
       }
     }
+    .sheet(isPresented: $isPresentingImport) {
+      DocumentOpenerView(allowedContentTypes: [.text, .json]) { urls in
+        guard let fileURL = urls.first else { return }
+        self.isLoadingFile = true
+        DispatchQueue.global(qos: .userInitiated).async {
+          do {
+            let data = try String(contentsOf: fileURL)
+            DispatchQueue.main.async {
+              self.privateKey = data
+              self.isLoadingFile = false
+            }
+          } catch {
+            DispatchQueue.main.async {
+              // Error: Couldn't load file
+              self.isLoadingFile = false
+            }
+          }
+        }
+      }
+    }
+    .animation(.default, value: isJSONImported)
   }
 
   private var accountNameSection: some View {
