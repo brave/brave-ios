@@ -51,9 +51,7 @@ struct WalletConstants {
   
   /// Supported networks for buying via Wyre
   static let supportedBuyWithWyreNetworkChainIds: [String] = [
-    BraveWallet.MainnetChainId,
-    BraveWallet.PolygonMainnetChainId,
-    BraveWallet.AvalancheMainnetChainId
+    BraveWallet.MainnetChainId
   ]
 }
 
