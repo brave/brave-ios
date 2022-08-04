@@ -238,19 +238,21 @@ struct AddAccountView: View {
           textView.smartQuotesType = .no
         }
         .accessibilityValue(privateKey.isEmpty ? Strings.Wallet.importAccountPlaceholder : privateKey)
-      Button(action: { isPresentingImport = true }) {
-        HStack {
-          Text(Strings.Wallet.importButtonTitle)
-            .foregroundColor(.accentColor)
-            .font(.callout)
-          if isLoadingFile {
-            ProgressView()
-              .progressViewStyle(CircularProgressViewStyle())
+      if selectedCoin == nil || selectedCoin == .eth { // nil is possible if Solana is disabled
+        Button(action: { isPresentingImport = true }) {
+          HStack {
+            Text(Strings.Wallet.importButtonTitle)
+              .foregroundColor(.accentColor)
+              .font(.callout)
+            if isLoadingFile {
+              ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+            }
           }
+          .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
+        .disabled(isLoadingFile)
       }
-      .disabled(isLoadingFile)
     }
     .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
