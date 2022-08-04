@@ -8,7 +8,7 @@ import BraveCore
 import Strings
 
 struct BuySendSwapView: View {
-  @ObservedObject var networkStore: NetworkStore
+  var networkStore: NetworkStore
   var action: (BuySendSwapDestination) -> Void
   var destinations: [BuySendSwapDestination] = []
 
