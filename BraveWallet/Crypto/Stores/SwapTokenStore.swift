@@ -745,13 +745,16 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
   }
 
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-    keyringService.keyringInfo(coinType.keyringId) { [self] keyringInfo in
+    Task { @MainActor in
+      let network = await rpcService.network(coinType)
+      guard await swapService.isSwapSupported(network.chainId) else { return }
+      
+      let keyringInfo = await keyringService.keyringInfo(coinType.keyringId)
       if !keyringInfo.accountInfos.isEmpty {
-        keyringService.selectedAccount(coinType) { [self] accountAddress in
-          let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
-          prepare(with: selectedAccountInfo) { [self] in
-            fetchPriceQuote(base: .perSellAsset)
-          }
+        let accountAddress = await keyringService.selectedAccount(coinType)
+        let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
+        prepare(with: selectedAccountInfo) { [self] in
+          fetchPriceQuote(base: .perSellAsset)
         }
       }
     }
@@ -760,14 +763,15 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
 
 extension SwapTokenStore: BraveWalletJsonRpcServiceObserver {
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
-    guard
-      let accountInfo = accountInfo,
-      chainId == BraveWallet.MainnetChainId || chainId == BraveWallet.RopstenChainId
-    else { return }
-    selectedFromToken = nil
-    selectedToToken = nil
-    prepare(with: accountInfo) { [self] in
-      fetchPriceQuote(base: .perSellAsset)
+    Task { @MainActor in
+      guard await swapService.isSwapSupported(chainId), let accountInfo = accountInfo else {
+        return
+      }
+      selectedFromToken = nil
+      selectedToToken = nil
+      prepare(with: accountInfo) { [self] in
+        fetchPriceQuote(base: .perSellAsset)
+      }
     }
   }
 
