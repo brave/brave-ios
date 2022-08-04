@@ -31,6 +31,10 @@ class MockAssetRatioService: BraveWalletAssetRatioService {
   func priceHistory(_ asset: String, vsAsset: String, timeframe: BraveWallet.AssetPriceTimeframe, completion: @escaping (Bool, [BraveWallet.AssetTimePrice]) -> Void) {
     completion(false, [])
   }
+  
+  func buyUrlV1(_ provider: BraveWallet.OnRampProvider, chainId: String, address: String, symbol: String, amount: String, currencyCode: String, completion: @escaping (String, String?) -> Void) {
+    completion("", nil)
+  }
 }
 
 #endif

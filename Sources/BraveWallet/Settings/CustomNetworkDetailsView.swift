@@ -506,7 +506,7 @@ struct CustomNetworkDetailsView: View {
       symbolName: model.networkSymbol.input,
       decimals: Int32(model.networkDecimals.input) ?? 18,
       coin: .eth,
-      data: .init(ethData: .init(isEip1559: false))
+      isEip1559: false
     )
     networkStore.addCustomNetwork(network) { accepted, errMsg in
       guard accepted else {

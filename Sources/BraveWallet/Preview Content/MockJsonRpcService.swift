@@ -164,7 +164,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "Ethereum",
     decimals: 18,
     coin: .eth,
-    data: .init(ethData: .init(isEip1559: true))
+    isEip1559: true
   )
   static let mockRinkeby: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.RinkebyChainId,
@@ -176,7 +176,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "Ethereum",
     decimals: 18,
     coin: .eth,
-    data: .init(ethData: .init(isEip1559: true))
+    isEip1559: true
   )
   static let mockRopsten: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.RopstenChainId,
@@ -188,7 +188,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "Ethereum",
     decimals: 18,
     coin: .eth,
-    data: .init(ethData: .init(isEip1559: true))
+    isEip1559: true
   )
   static let mockPolygon: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.PolygonMainnetChainId,
@@ -200,7 +200,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "MATIC",
     decimals: 18,
     coin: .eth,
-    data: .init(ethData: .init(isEip1559: true))
+    isEip1559: true
   )
   static let mockSolana: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.SolanaMainnet,
@@ -212,7 +212,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "Solana",
     decimals: 9,
     coin: .sol,
-    data: nil
+    isEip1559: false
   )
   static let mockSolanaTestnet: BraveWallet.NetworkInfo = .init(
     chainId: BraveWallet.SolanaTestnet,
@@ -224,7 +224,7 @@ extension BraveWallet.NetworkInfo {
     symbolName: "Solana",
     decimals: 18,
     coin: .sol,
-    data: nil
+    isEip1559: false
   )
 }
 
