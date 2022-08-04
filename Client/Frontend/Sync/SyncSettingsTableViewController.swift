@@ -10,7 +10,7 @@ import BraveUI
 
 private let log = Logger.browserLogger
 
-class SyncSettingsTableViewController: UITableViewController {
+class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
   // MARK: Lifecycle
 
@@ -18,18 +18,29 @@ class SyncSettingsTableViewController: UITableViewController {
     self.showDoneButton = showDoneButton
     self.syncAPI = syncAPI
     self.syncProfileService = syncProfileService
-    super.init(style: .grouped)
+
+    super.init(nibName: nil, bundle: nil)
   }
 
-  @available(*, unavailable)
-  required init?(coder aDecoder: NSCoder) {
-    fatalError()
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
     title = Strings.sync
+    
+    tableView.do {
+      $0.dataSource = self
+      $0.delegate = self
+    }
+    
+    view.addSubview(tableView)
 
+    tableView.snp.makeConstraints { make in
+      make.edges.equalTo(self.view)
+    }
+    
     syncDeviceObserver = syncAPI.addDeviceStateObserver { [weak self] in
       self?.updateDeviceList()
     }
@@ -46,7 +57,6 @@ class SyncSettingsTableViewController: UITableViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    tableView.tableHeaderView?.sizeToFit()
 
     if showDoneButton {
       navigationController?.interactivePopGestureRecognizer?.isEnabled = false
@@ -57,6 +67,15 @@ class SyncSettingsTableViewController: UITableViewController {
     } else {
       navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: .plain, target: self, action: #selector(onSyncInternalsTapped))
     }
+  }
+  
+  override func viewWillLayoutSubviews() {
+      super.viewWillLayoutSubviews()
+
+    guard let headerView = tableView.tableHeaderView else { return }
+
+    let newSize = headerView.systemLayoutSizeFitting(CGSize(width: self.view.bounds.width, height: 0))
+    headerView.frame.size.height = newSize.height
   }
 
   // MARK: Private
@@ -118,6 +137,13 @@ class SyncSettingsTableViewController: UITableViewController {
   /// After synchronization is completed, user needs to tap on `Done` to go back.
   /// Standard navigation is disabled then.
   private var showDoneButton = false
+  
+  private var tableView = UITableView(frame: .zero, style: .grouped)
+
+  private lazy var noSyncedDevicesOverlayView = EmptyStateOverlayView(
+    title: "No Devices in this sync chain",
+    description: "To see your devices and enabled sync types, join a sync chain",
+    icon: UIImage(systemName: "exclamationmark.arrow.triangle.2.circlepath"))
 
   // MARK: Actions
 
@@ -192,13 +218,28 @@ class SyncSettingsTableViewController: UITableViewController {
 
     syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
   }
+  
+  private func updateNoSyncedDevicesState(isHidden: Bool) {
+    if isHidden {
+      noSyncedDevicesOverlayView.removeFromSuperview()
+    } else {
+      if noSyncedDevicesOverlayView.superview == nil {
+        view.addSubview(noSyncedDevicesOverlayView)
+        view.bringSubviewToFront(noSyncedDevicesOverlayView)
+        
+        noSyncedDevicesOverlayView.snp.makeConstraints {
+          $0.edges.equalTo(tableView)
+        }
+      }
+    }
+  }
 }
 
 // MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension SyncSettingsTableViewController {
 
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     defer { tableView.deselectRow(at: indexPath, animated: true) }
     
     guard let section = Sections(rawValue: indexPath.section) else {
@@ -258,11 +299,11 @@ extension SyncSettingsTableViewController {
     present(actionSheet, animated: true)
   }
 
-  override func numberOfSections(in tableView: UITableView) -> Int {
+  func numberOfSections(in tableView: UITableView) -> Int {
     return 3
   }
 
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     switch section {
     case Sections.deviceList.rawValue:
       return devices.count
@@ -275,14 +316,14 @@ extension SyncSettingsTableViewController {
     }
   }
 
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
     configureCell(cell, atIndexPath: indexPath)
 
     return cell
   }
 
-  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
     switch section {
     case Sections.deviceList.rawValue:
       return Strings.devices
@@ -293,7 +334,7 @@ extension SyncSettingsTableViewController {
     }
   }
 
-  override func tableView(_ tableView: UITableView, viewForFooterInSection sectionIndex: Int) -> UIView? {
+  func tableView(_ tableView: UITableView, viewForFooterInSection sectionIndex: Int) -> UIView? {
     switch sectionIndex {
     case Sections.syncTypes.rawValue:
       return makeInformationTextView(with: Strings.Sync.syncConfigurationInformationText)
@@ -302,7 +343,7 @@ extension SyncSettingsTableViewController {
     }
   }
 
-  override func tableView(_ tableView: UITableView, heightForFooterInSection sectionIndex: Int) -> CGFloat {
+  func tableView(_ tableView: UITableView, heightForFooterInSection sectionIndex: Int) -> CGFloat {
     switch sectionIndex {
     case Sections.syncTypes.rawValue:
       return UITableView.automaticDimension
@@ -408,7 +449,7 @@ extension SyncSettingsTableViewController {
         self.devices = devices
 
         if devices.count <= 0 {
-          self.navigationController?.popToRootViewController(animated: true)
+          self.updateNoSyncedDevicesState(isHidden: false)
         } else {
           self.tableView.reloadData()
         }
@@ -431,25 +472,5 @@ extension SyncSettingsTableViewController {
       self.navigationController?.pushViewController(view, animated: true)
     }
     navigationController?.pushViewController(view, animated: true)
-  }
-
-  private func removeDeviceAction() {
-    let alert = UIAlertController(
-      title: Strings.syncRemoveThisDeviceQuestion,
-      message: Strings.syncRemoveThisDeviceQuestionDesc,
-      preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
-    alert.addAction(
-      UIAlertAction(title: Strings.removeDevice, style: .destructive) { action in
-        if !DeviceInfo.hasConnectivity() {
-          self.present(SyncAlerts.noConnection, animated: true)
-          return
-        }
-
-        self.syncAPI.leaveSyncGroup()
-        self.navigationController?.popToRootViewController(animated: true)
-      })
-
-    navigationController?.present(alert, animated: true, completion: nil)
   }
 }
