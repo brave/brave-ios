@@ -1773,7 +1773,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   func makeShareActivities(for url: URL, tab: Tab?, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) -> [UIActivity] {
     var activities = [UIActivity]()
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL,
+        braveCore.syncAPI.isSendTabToSelfVisible {
       let sendTabToSelfActivity = SendTabToSelfActivity() { [weak self] in
         guard let self = self else { return }
         

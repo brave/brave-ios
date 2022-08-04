@@ -83,20 +83,6 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
   private let syncAPI: BraveSyncAPI
   private let syncProfileService: BraveSyncProfileServiceIOS
 
-  private struct BraveSyncDevice: Codable {
-    let chromeVersion: String
-    let hasSharingInfo: Bool
-    let id: String
-    let guid: String
-    let isCurrentDevice: Bool
-    let supportsSelfDelete: Bool
-    let lastUpdatedTimestamp: TimeInterval
-    let name: String?
-    let os: String
-    let sendTabToSelfReceivingEnabled: Bool
-    let type: String
-  }
-
   private var syncDeviceObserver: AnyObject?
   private var devices = [BraveSyncDevice]()
 
