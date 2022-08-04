@@ -2661,5 +2661,12 @@ extension Strings {
       value: "View %@ test networks",
       comment: "A VoiceOver label that will be read out when a user focuses on the show test networks button in the network selection view. \"%@\" will be replaced with the network name such as \"Solana\" or \"Ethereum\""
     )
+    public static let networkNotSupportedForBuyToken = NSLocalizedString(
+      "wallet.networkNotSupportedForBuyToken",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Buy not supported for selected network",
+      comment: "A placeholder in Buy Screen, when user switched to a network that Brave currently doesn't support buy token with Wyre."
+    )
   }
 }

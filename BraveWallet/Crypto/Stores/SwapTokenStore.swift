@@ -649,6 +649,12 @@ public class SwapTokenStore: ObservableObject {
           } else {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == daiSymbol.uppercased() })
           }
+        } else {
+          if let fromToken = selectedFromToken {
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != fromToken.symbol.uppercased() })
+          } else {
+            selectedToToken = allTokens.first
+          }
         }
         completion?()
       }
