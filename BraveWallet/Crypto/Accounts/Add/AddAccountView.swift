@@ -211,6 +211,11 @@ struct AddAccountView: View {
     }
     .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
+  
+  private var isJsonImportSupported: Bool {
+    // nil is possible if Solana is disabled
+    selectedCoin == nil || selectedCoin == .eth
+  }
 
   private var privateKeySection: some View {
     Section(
@@ -225,7 +230,7 @@ struct AddAccountView: View {
         .font(.system(.body, design: .monospaced))
         .frame(height: privateKeyFieldHeight)
         .background(
-          Text(Strings.Wallet.importAccountPlaceholder)
+          Text(isJsonImportSupported ? Strings.Wallet.importAccountPlaceholder : Strings.Wallet.importNonEthAccountPlaceholder)
             .padding(.vertical, 8)
             .padding(.horizontal, 4)  // To match the TextEditor's editing insets
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -238,7 +243,7 @@ struct AddAccountView: View {
           textView.smartQuotesType = .no
         }
         .accessibilityValue(privateKey.isEmpty ? Strings.Wallet.importAccountPlaceholder : privateKey)
-      if selectedCoin == nil || selectedCoin == .eth { // nil is possible if Solana is disabled
+      if isJsonImportSupported {
         Button(action: { isPresentingImport = true }) {
           HStack {
             Text(Strings.Wallet.importButtonTitle)
