@@ -194,3 +194,9 @@ extension BraveWallet.NetworkInfo {
     && coin == token.coin
   }
 }
+
+extension BraveWallet.BlockchainToken {
+  var assetRatioId: String {
+    coingeckoId.isEmpty ? symbol : coingeckoId
+  }
+}
