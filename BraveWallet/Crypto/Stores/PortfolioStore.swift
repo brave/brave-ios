@@ -196,7 +196,7 @@ public class PortfolioStore: ObservableObject {
     return balances
   }
   
-  /// Fetches the prices for a given list of symbols, giving a dictionary with the price for each symbol
+  /// Fetches the prices for a given list of `assetRatioId`, giving a dictionary with the price for each symbol
   @MainActor func fetchPrices(
     for priceIds: [String]
   ) async -> [String: String] {
@@ -209,7 +209,7 @@ public class PortfolioStore: ObservableObject {
     return prices
   }
   
-  /// Fetches the price history for the given symbols, giving a dictionary with the price history for each symbol
+  /// Fetches the price history for the given `assetRatioId`, giving a dictionary with the price history for each symbol
   @MainActor func fetchPriceHistory(
     for priceIds: [String]
   ) async -> [String: [BraveWallet.AssetTimePrice]] {
