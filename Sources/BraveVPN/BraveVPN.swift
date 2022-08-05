@@ -85,6 +85,16 @@ public class BraveVPN {
     Preferences.VPN.skusCredential.value = credential
     GRDSubscriptionManager.setIsPayingUser(true)
     populateRegionDataIfNecessary()
+    if let unescapedCredential = credential.unescape() {
+      let cookies = HTTPCookie.cookies(withResponseHeaderFields: ["Set-Cookie": unescapedCredential], for: URL(string: "https://brave.com")!)
+      if let cookie = cookies.first {
+        let dict: NSMutableDictionary =
+        ["brave-vpn-premium-monthly-pass": cookie.value,
+         "brave-payments-env": "development",
+         "validation-method": "brave-premium"]
+        helper.customSubscriberCredentialAuthKeys = dict
+      }
+    }
   }
   
   /// Connects to Guardian's server to validate locally stored receipt.
