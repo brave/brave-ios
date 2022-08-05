@@ -5,6 +5,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 import AVKit
 import AVFoundation
 import Data
@@ -140,7 +141,7 @@ extension PlaylistListViewController: UITableViewDataSource {
         }
       }
       
-      header.menu = {
+      header.menu = { [weak header] in
         guard isPersistent,
               let folder = folder,
               let persistentFolderId = folder.uuid,
@@ -156,9 +157,7 @@ extension PlaylistListViewController: UITableViewDataSource {
               let newItems = Set(model.mediaItems).subtracting(oldItems)
               oldItems = []
               
-              deletedItems.forEach({
-                PlaylistManager.shared.delete(itemId: $0.tagId)
-              })
+              deletedItems.forEach({ PlaylistManager.shared.delete(itemId: $0.tagId) })
               
               await withCheckedContinuation { continuation in
                 PlaylistItem.updateItems(Array(newItems), folderUUID: persistentFolderId) {
@@ -177,8 +176,50 @@ extension PlaylistListViewController: UITableViewDataSource {
           
         }
         
-        let renameAction = UIAction(title: "Rename", image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { _ in
-          
+        let renameAction = UIAction(title: "Rename", image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { [weak self] _ in
+          let folderID = folder.objectID
+          var editView = PlaylistEditFolderView(currentFolder: folderID, currentFolderTitle: folder.title ?? "")
+
+          editView.onCancelButtonPressed = { [weak self] in
+            self?.presentedViewController?.dismiss(animated: true, completion: nil)
+          }
+
+          editView.onEditFolder = { [weak self] folderTitle in
+            guard let self = self else { return }
+            PlaylistFolder.updateFolder(folderID: folderID) { result in
+              switch result {
+              case .failure(let error):
+                log.error("Error Saving Folder Title: \(error)")
+
+                DispatchQueue.main.async {
+                  let alert = UIAlertController(title: Strings.genericErrorTitle, message: Strings.PlaylistFolders.playlistFolderErrorSavingMessage, preferredStyle: .alert)
+
+                  alert.addAction(
+                    UIAlertAction(
+                      title: Strings.OBErrorOkay, style: .default,
+                      handler: { _ in
+                        self.presentedViewController?.dismiss(animated: true, completion: nil)
+                      }))
+                  self.present(alert, animated: true, completion: nil)
+                }
+
+              case .success(let folder):
+                folder.title = folderTitle
+                
+                DispatchQueue.main.async {
+                  header?.titleLabel.text = folderTitle
+                  self.title = folderTitle
+                  self.presentedViewController?.dismiss(animated: true, completion: nil)
+                }
+              }
+            }
+          }
+
+          let hostingController = UIHostingController(rootView: editView.environment(\.managedObjectContext, folder.managedObjectContext ?? DataController.swiftUIContext)).then {
+            $0.modalPresentationStyle = .formSheet
+          }
+
+          self?.present(hostingController, animated: true, completion: nil)
         }
         
         let deleteOfflineAction = UIAction(title: "Remove Offline Data", image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { [weak self] _ in
