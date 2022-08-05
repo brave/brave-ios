@@ -279,27 +279,26 @@ public class PlaylistManager: NSObject {
         assetFetcher.cancelLoading()
       }
 
-      if let cacheItem = PlaylistItem.getItem(uuid: item.tagId),
-        cacheItem.cachedData != nil {
-        if !deleteCache(itemId: item.tagId) {
-          // If we cannot delete an item's cache for any given reason,
-          // Do NOT delete the folder containing the item.
-          // Delete all other items.
-          success = false
-        } else {
-          itemsToDelete.append(item)
-        }
+      if !deleteCache(itemId: item.tagId) {
+        // If we cannot delete an item's cache for any given reason,
+        // Do NOT delete the folder containing the item.
+        // Delete all other items.
+        success = false
+      } else {
+        itemsToDelete.append(item)
       }
     })
 
     if success, currentFolder?.objectID == folder.objectID {
       currentFolder = nil
     }
-
+    
+    // Delete items from the folder
+    PlaylistItem.removeItems(itemsToDelete)
+    
+    // Attempt to delete the folder if we can
     if success, folder.uuid != PlaylistFolder.savedFolderUUID {
       PlaylistFolder.removeFolder(folder)
-    } else {
-      PlaylistItem.removeItems(itemsToDelete)
     }
 
     if currentFolder?.isDeleted == true {

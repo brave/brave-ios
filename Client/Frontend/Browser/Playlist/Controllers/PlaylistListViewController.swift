@@ -26,9 +26,13 @@ class PlaylistListViewController: UIViewController {
   // MARK: Constants
 
   struct Constants {
+    static let playListMenuHeaderRedactedIdentifier = "playListMenuHeaderRedactedIdentifier"
+    static let playListMenuHeaderIdentifier = "playlistMenuHeaderIdentifier"
+    static let playlistCellRedactedIdentifier = "playlistCellRedactedIdentifier"
     static let playListCellIdentifier = "playlistCellIdentifier"
     static let tableRowHeight: CGFloat = 80
     static let tableHeaderHeight: CGFloat = 11
+    static let tableRedactedCellCount = 5
   }
 
   // MARK: Properties
@@ -130,6 +134,9 @@ class PlaylistListViewController: UIViewController {
 
     // Layout
     tableView.do {
+      $0.register(PlaylistRedactedHeader.self, forHeaderFooterViewReuseIdentifier: Constants.playListMenuHeaderRedactedIdentifier)
+      $0.register(PlaylistMenuHeader.self, forHeaderFooterViewReuseIdentifier: Constants.playListMenuHeaderIdentifier)
+      $0.register(PlaylistCellRedacted.self, forCellReuseIdentifier: Constants.playlistCellRedactedIdentifier)
       $0.register(PlaylistCell.self, forCellReuseIdentifier: Constants.playListCellIdentifier)
       $0.dataSource = self
       $0.delegate = self
@@ -139,10 +146,7 @@ class PlaylistListViewController: UIViewController {
       $0.allowsMultipleSelectionDuringEditing = true
     }
 
-    toolbarItems = [
-      UIBarButtonItem(title: Strings.PlaylistFolders.playlistFolderEditButtonTitle, style: .plain, target: self, action: #selector(onEditItems)),
-      UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-    ]
+    updateToolbar(editing: false)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -331,6 +335,8 @@ class PlaylistListViewController: UIViewController {
   // MARK: Actions
 
   func updateToolbar(editing: Bool) {
+    (tableView.headerView(forSection: 0) as? PlaylistMenuHeader)?.setMenuEnabled(enabled: !editing)
+    
     if editing {
       if PlaylistFolder.getOtherFoldersCount() == 0 {
         toolbarItems = [
@@ -350,10 +356,7 @@ class PlaylistListViewController: UIViewController {
         ]
       }
     } else {
-      toolbarItems = [
-        UIBarButtonItem(title: Strings.PlaylistFolders.playlistFolderEditButtonTitle, style: .plain, target: self, action: #selector(onEditItems)),
-        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-      ]
+      toolbarItems = nil
     }
   }
 
@@ -405,7 +408,7 @@ class PlaylistListViewController: UIViewController {
   }
 
   @objc
-  private func onEditItems() {
+  func onEditItems() {
     if tableView.isEditing {
       // If already editing, such as when swiping on a cell,
       // dismiss the trailing swipe and show the selections instead.
@@ -419,7 +422,7 @@ class PlaylistListViewController: UIViewController {
   }
 
   @objc
-  private func onCancelEditingItems() {
+  func onCancelEditingItems() {
     tableView.setEditing(false, animated: true)
     updateToolbar(editing: false)
   }
@@ -553,7 +556,7 @@ class PlaylistListViewController: UIViewController {
 
 extension PlaylistListViewController {
   func updateTableBackgroundView() {
-    if PlaylistManager.shared.numberOfAssets > 0 {
+    if PlaylistManager.shared.numberOfAssets > 0 || PlaylistManager.shared.currentFolder == nil {
       tableView.backgroundView = nil
       tableView.separatorStyle = .singleLine
       

@@ -52,7 +52,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    PlaylistManager.shared.numberOfAssets
+    PlaylistManager.shared.currentFolder == nil ? Constants.tableRedactedCellCount : PlaylistManager.shared.numberOfAssets
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -68,6 +68,14 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    if PlaylistManager.shared.currentFolder == nil {
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playlistCellRedactedIdentifier, for: indexPath) as? PlaylistCellRedacted else {
+        return UITableViewCell()
+      }
+
+      return cell
+    }
+    
     guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
       return UITableViewCell()
     }
@@ -77,7 +85,7 @@ extension PlaylistListViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     guard let cell = cell as? PlaylistCell,
-      let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+          let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
     else {
       return
     }
@@ -120,17 +128,20 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let folder = PlaylistManager.shared.currentFolder
-    let isPersistent = folder?.managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
+    guard let folder = PlaylistManager.shared.currentFolder else {
+      return tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.playListMenuHeaderRedactedIdentifier)
+    }
     
-//    if let uuid = folder?.uuid {
-//      isPersistent = PlaylistFolder.getFolder(uuid: uuid) != nil
-//    }
+    guard folder.playlistItems?.isEmpty == false else {
+      return nil
+    }
     
-    return PlaylistMenuHeader().then { header in
-      header.titleLabel.text = folder?.title
-      header.subtitleLabel.text = folder?.creatorName
-      header.subtitleLabel.isHidden = folder?.creatorName == nil
+    let isPersistent = folder.managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
+    let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.playListMenuHeaderIdentifier) as? PlaylistMenuHeader
+    return header?.then { header in
+      header.titleLabel.text = folder.title
+      header.subtitleLabel.text = folder.creatorName
+      header.subtitleLabel.isHidden = folder.creatorName == nil
       header.setState(isPersistent ? .menu : .add)
       
       header.onAddPlaylist = {
@@ -141,14 +152,15 @@ extension PlaylistListViewController: UITableViewDataSource {
         }
       }
       
-      header.menu = { [weak header] in
+      header.menu = { [weak header, weak folder] in
         guard isPersistent,
               let folder = folder,
-              let persistentFolderId = folder.uuid,
-              let sharedFolderId = folder.sharedFolderId
+              let folderId = folder.uuid
         else { return nil }
         
         let syncAction = UIAction(title: "Sync Now", image: UIImage(named: "playlist_sync", in: .current, compatibleWith: nil)) { _ in
+          guard let sharedFolderId = folder.sharedFolderId else { return }
+          
           Task { @MainActor in
             do {
               let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: sharedFolderId)
@@ -160,20 +172,20 @@ extension PlaylistListViewController: UITableViewDataSource {
               deletedItems.forEach({ PlaylistManager.shared.delete(itemId: $0.tagId) })
               
               await withCheckedContinuation { continuation in
-                PlaylistItem.updateItems(Array(newItems), folderUUID: persistentFolderId) {
+                PlaylistItem.updateItems(Array(newItems), folderUUID: folderId) {
                   continuation.resume()
                 }
               }
               
-              PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+              PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: folderId)
             } catch {
               log.error("CANNOT SYNC SHARED PLAYLIST: \(error)")
             }
           }
         }
         
-        let editAction = UIAction(title: "Edit", image: UIImage(braveSystemNamed: "brave.edit")) { _ in
-          
+        let editAction = UIAction(title: "Edit", image: UIImage(braveSystemNamed: "brave.edit")) { [weak self] _ in
+          self?.onEditItems()
         }
         
         let renameAction = UIAction(title: "Rename", image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { [weak self] _ in
@@ -245,7 +257,15 @@ extension PlaylistListViewController: UITableViewDataSource {
           self?.navigationController?.popToRootViewController(animated: true)
         }
         
-        return UIMenu(children: [syncAction, editAction, renameAction, deleteOfflineAction, deleteAction])
+        if folder.sharedFolderId != nil {
+          return UIMenu(children: [syncAction, editAction, renameAction, deleteOfflineAction, deleteAction])
+        }
+        
+        if folder.uuid == PlaylistFolder.savedFolderUUID {
+          return UIMenu(children: [editAction, deleteOfflineAction, deleteAction])
+        }
+        
+        return UIMenu(children: [editAction, renameAction, deleteOfflineAction, deleteAction])
       }()
     }
   }

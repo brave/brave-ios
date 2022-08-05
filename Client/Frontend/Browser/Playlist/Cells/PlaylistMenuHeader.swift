@@ -7,7 +7,7 @@ import Foundation
 import UIKit
 import BraveUI
 
-class PlaylistMenuHeader: UIView {
+class PlaylistMenuHeader: UITableViewHeaderFooterView {
   enum State {
     case add
     case menu
@@ -53,8 +53,18 @@ class PlaylistMenuHeader: UIView {
     }
   }
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  public func setMenuEnabled(enabled: Bool) {
+    if menu == nil {
+      menuButton.isUserInteractionEnabled = true
+    } else {
+      menuButton.isUserInteractionEnabled = enabled
+    }
+    
+    menuButton.imageView?.tintColor = menuButton.isUserInteractionEnabled ? .bravePrimary : .braveDisabled
+  }
+  
+  override init(reuseIdentifier: String?) {
+    super.init(reuseIdentifier: reuseIdentifier)
     
     let hStack = UIStackView(arrangedSubviews: [
       UIStackView(arrangedSubviews: [
@@ -71,7 +81,7 @@ class PlaylistMenuHeader: UIView {
       $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
     }
     
-    addSubview(hStack)
+    contentView.addSubview(hStack)
     hStack.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
