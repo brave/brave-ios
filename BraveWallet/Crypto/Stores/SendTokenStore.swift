@@ -315,7 +315,7 @@ public class SendTokenStore: ObservableObject {
   ) {
     guard let token = selectedSendToken,
           let fromAddress = currentAccountAddress,
-          let amount = WeiFormatter.decimalToSplAmount(amount, tokenDecimals: Int(token.decimals))
+          let amount = WeiFormatter.decimalToAmount(amount, tokenDecimals: Int(token.decimals))
     else {
       completion(false, "An Internal Error")
       return

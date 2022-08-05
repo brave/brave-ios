@@ -150,7 +150,7 @@ struct WeiFormatter {
       .rounded().asString(radix: outputRadix.rawValue)
   }
   
-  static func decimalToSplAmount(_ decimalString: String, tokenDecimals: Int) -> UInt64? {
+  static func decimalToAmount(_ decimalString: String, tokenDecimals: Int) -> UInt64? {
     guard isStringValid(decimalString, radix: .decimal),
           let value = BDouble(decimalString, radix: Radix.decimal.rawValue)
     else {

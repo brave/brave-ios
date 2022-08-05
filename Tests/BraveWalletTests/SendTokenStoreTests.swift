@@ -370,7 +370,7 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._addObserver = { _ in }
     
     let walletService = BraveWallet.TestBraveWalletService()
-    walletService._userAssets = { $2([.previewToken]) }
+    walletService._userAssets = { $2([.mockSolToken, .mockSpdToken]) }
     walletService._selectedCoin = { $0(BraveWallet.CoinType.sol) }
     
     let keyringService = BraveWallet.TestKeyringService()
@@ -409,7 +409,7 @@ class SendTokenStoreTests: XCTestCase {
     }
   }
   
-  func testSendSolTokenAmount() {
+  func testSendSplTokenAmount() {
     let mockBalance = 47
     let sendSplAmountDecimalString = "0.01"
     
@@ -419,10 +419,19 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._solanaBalance = { _, _ , completion in
       completion(UInt64(mockBalance), .success, "")
     }
+    rpcService._splTokenAccountBalance = { _, tokenAddress, _, completion in
+      // balance of 0.1 SPD for token
+      guard tokenAddress.caseInsensitiveCompare(BraveWallet.BlockchainToken.mockSpdToken.contractAddress) == .orderedSame else {
+        completion("", UInt8(0), "", .internalError, "")
+        XCTFail("Unexpected spl token balance fetched")
+        return
+      }
+      completion("100000", UInt8(6), "0.1", .success, "")
+    }
     rpcService._addObserver = { _ in }
     
     let walletService = BraveWallet.TestBraveWalletService()
-    walletService._userAssets = { $2([.previewToken]) }
+    walletService._userAssets = { $2([.mockSolToken, .mockSpdToken]) }
     walletService._selectedCoin = { $0(BraveWallet.CoinType.sol) }
     
     let keyringService = BraveWallet.TestKeyringService()
@@ -448,7 +457,7 @@ class SendTokenStoreTests: XCTestCase {
       prefilledToken: .mockSpdToken
     )
     
-    let ex = expectation(description: "send-sol-transaction")
+    let ex = expectation(description: "send-spl-transaction")
     store.sendToken(
       amount: sendSplAmountDecimalString
     ) { success, errMsg in

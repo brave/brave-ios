@@ -74,18 +74,18 @@ class WeiFormatterTests: XCTestCase {
     }
   }
   
-  func testDecimalToSplAmount() {
+  func testDecimalToAmount() {
     let decimalInputString = "1"
     let solValueString = "1000000000"
     let spdValueString = "1000000"
     
-    let solFormatted = WeiFormatter.decimalToSplAmount(decimalInputString, tokenDecimals: Int(BraveWallet.BlockchainToken.mockSolToken.decimals))
+    let solFormatted = WeiFormatter.decimalToAmount(decimalInputString, tokenDecimals: Int(BraveWallet.BlockchainToken.mockSolToken.decimals))
     
     XCTAssertNotNil(UInt64(solValueString))
     XCTAssertNotNil(solFormatted)
     XCTAssertEqual(UInt64(solValueString)!, solFormatted!)
     
-    let spdformatted = WeiFormatter.decimalToSplAmount(decimalInputString, tokenDecimals: Int(BraveWallet.BlockchainToken.mockSpdToken.decimals))
+    let spdformatted = WeiFormatter.decimalToAmount(decimalInputString, tokenDecimals: Int(BraveWallet.BlockchainToken.mockSpdToken.decimals))
     
     XCTAssertNotNil(UInt64(spdValueString))
     XCTAssertNotNil(spdformatted)
