@@ -93,7 +93,8 @@ public class CryptoStore: ObservableObject {
     self.networkStore = .init(
       keyringService: keyringService,
       rpcService: rpcService,
-      walletService: walletService
+      walletService: walletService,
+      swapService: swapService
     )
     self.portfolioStore = .init(
       keyringService: keyringService,
@@ -105,6 +106,7 @@ public class CryptoStore: ObservableObject {
     
     self.keyringService.add(self)
     self.txService.add(self)
+    self.rpcService.add(self)
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -228,7 +230,8 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
-      keyringService: keyringService
+      keyringService: keyringService,
+      solTxManagerProxy: solTxManagerProxy
     )
     confirmationStore = store
     return store
@@ -264,46 +267,9 @@ public class CryptoStore: ObservableObject {
 
   @MainActor
   func fetchPendingTransactions() async -> [BraveWallet.TransactionInfo] {
-    var allKeyrings: [BraveWallet.KeyringInfo] = []
-    allKeyrings = await withTaskGroup(
-      of: BraveWallet.KeyringInfo.self,
-      returning: [BraveWallet.KeyringInfo].self,
-      body: { @MainActor [weak keyringService] group in
-        guard let keyringService = keyringService else { return [] }
-        for coin in WalletConstants.supportedCoinTypes {
-          group.addTask { @MainActor in
-            await keyringService.keyringInfo(coin.keyringId)
-          }
-        }
-        var allKeyrings: [BraveWallet.KeyringInfo] = []
-        for await keyring in group {
-          allKeyrings.append(keyring)
-        }
-        return allKeyrings
-      }
-    )
+    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
 
-    var pendingTransactions: [BraveWallet.TransactionInfo] = []
-    pendingTransactions = await withTaskGroup(
-      of: [BraveWallet.TransactionInfo].self,
-      body: { @MainActor [weak txService] group in
-        guard let txService = txService else { return [] }
-        for keyring in allKeyrings {
-          for info in keyring.accountInfos {
-            group.addTask { @MainActor in
-              await txService.allTransactionInfo(info.coin, from: info.address)
-            }
-          }
-        }
-        var allPendingTx: [BraveWallet.TransactionInfo] = []
-        for await transactions in group {
-          allPendingTx.append(contentsOf: transactions.filter { $0.txStatus == .unapproved })
-        }
-        return allPendingTx
-      }
-    )
-
-    return pendingTransactions
+    return await txService.pendingTransactions(for: allKeyrings)
   }
 
   @MainActor
@@ -419,5 +385,17 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+  }
+}
+
+extension CryptoStore: BraveWalletJsonRpcServiceObserver {
+  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
+    prepare()
+  }
+  
+  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
+  }
+  
+  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }

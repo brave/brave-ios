@@ -29,7 +29,7 @@ extension BraveWallet.NetworkInfo: Identifiable {
     .init(
       contractAddress: "",
       name: symbolName,
-      logo: iconUrls.first ?? "",
+      logo: nativeTokenLogo ?? "",
       isErc20: false,
       isErc721: false,
       symbol: symbol,
@@ -41,38 +41,27 @@ extension BraveWallet.NetworkInfo: Identifiable {
       coin: coin
     )
   }
-
-  public var isCustom: Bool {
-    /// Will be able to get known/custom networks after
-    /// https://github.com/brave/brave-ios/issues/5489
-    // brave-core/components/brave_wallet/browser/brave_wallet_utils.cc
-    let knownEthNetworks = [
-      BraveWallet.MainnetChainId,
-      BraveWallet.RinkebyChainId,
-      BraveWallet.RopstenChainId,
-      BraveWallet.GoerliChainId,
-      BraveWallet.KovanChainId,
-      BraveWallet.LocalhostChainId,
-      BraveWallet.PolygonMainnetChainId,
-      BraveWallet.BinanceSmartChainMainnetChainId,
-      BraveWallet.CeloMainnetChainId,
-      BraveWallet.AvalancheMainnetChainId,
-      BraveWallet.FantomMainnetChainId,
-      BraveWallet.OptimismMainnetChainId
-    ]
-    let knownSolNetworks = [
-      BraveWallet.SolanaMainnet,
-      BraveWallet.SolanaTestnet,
-      BraveWallet.SolanaDevnet,
-      BraveWallet.LocalhostChainId
-    ]
-    let knownFilNetworks = [
-      BraveWallet.FilecoinMainnet,
-      BraveWallet.FilecoinTestnet,
-      BraveWallet.LocalhostChainId
-    ]
-    let knownNetworks = knownEthNetworks + knownSolNetworks + knownFilNetworks
-    return !knownNetworks.contains(id)
+  
+  public var nativeTokenLogo: String? {
+    if symbol.caseInsensitiveCompare("ETH") == .orderedSame {
+      return "eth-asset-icon"
+    } else if symbol.caseInsensitiveCompare("SOL") == .orderedSame {
+      return "sol-asset-icon"
+    } else if symbol.caseInsensitiveCompare("FIL") == .orderedSame {
+      return "filecoin-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
+      return "matic"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
+      return "bnb-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
+      return "celo"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
+      return "avax"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
+      return "fantom"
+    } else {
+      return iconUrls.first
+    }
   }
   
   // Only Eth Mainnet or EVM has eip 1559

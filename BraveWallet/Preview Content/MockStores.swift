@@ -46,7 +46,8 @@ extension NetworkStore {
     .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
-      walletService: MockBraveWalletService()
+      walletService: MockBraveWalletService(),
+      swapService: MockSwapService()
     )
   }
   
@@ -166,7 +167,8 @@ extension TransactionConfirmationStore {
         let service = MockKeyringService()
         service.createWallet("password") { _  in }
         return service
-      }()
+      }(),
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
     )
   }
 }

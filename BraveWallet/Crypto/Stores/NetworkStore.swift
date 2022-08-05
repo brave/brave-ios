@@ -20,24 +20,30 @@ public class NetworkStore: ObservableObject {
   }
   
   @Published private(set) var allChains: [BraveWallet.NetworkInfo] = []
+  @Published private(set) var customChains: [BraveWallet.NetworkInfo] = []
 
   @Published private(set) var selectedChainId: String = BraveWallet.MainnetChainId
   var selectedChain: BraveWallet.NetworkInfo {
     allChains.first(where: { $0.chainId == self.selectedChainId }) ?? .init()
   }
+  
+  @Published private(set) var isSwapSupported: Bool = true
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
+  private let swapService: BraveWalletSwapService
 
   public init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
-    walletService: BraveWalletBraveWalletService
+    walletService: BraveWalletBraveWalletService,
+    swapService: BraveWalletSwapService
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
     self.walletService = walletService
+    self.swapService = swapService
     self.updateChainList()
     rpcService.add(self)
     keyringService.add(self)
@@ -45,7 +51,11 @@ public class NetworkStore: ObservableObject {
     Task { @MainActor in // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
       let chain = await rpcService.network(selectedCoin)
-      await setSelectedChain(chain)
+      // since we are fetch network from JsonRpcService,
+      // we don't need to call `setNetwork` on JsonRpcService
+      self.selectedChainId = chain.chainId
+      // update `isSwapSupported` for Buy/Send/Swap panel
+      self.isSwapSupported = await swapService.isSwapSupported(chain.chainId)
     }
   }
 
@@ -67,7 +77,14 @@ public class NetworkStore: ObservableObject {
           lhs.coin == .sol && rhs.coin != .sol
         }
       }
+      
+      let customChainIds = await rpcService.customNetworks(.eth) // only support Ethereum custom chains
+      self.customChains = allChains.filter { customChainIds.contains($0.id) }
     }
+  }
+  
+  func isCustomChain(_ network: BraveWallet.NetworkInfo) -> Bool {
+    customChains.contains(where: { $0.coin == network.coin && $0.chainId == network.chainId })
   }
   
   @MainActor @discardableResult func setSelectedChain(_ network: BraveWallet.NetworkInfo) async -> SetSelectedChainError? {
@@ -182,10 +199,13 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
     updateChainList()
   }
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
-    walletService.setSelectedCoin(coin)
     Task { @MainActor in
-      guard let chain = allChains.first(where: { $0.chainId == chainId && $0.coin == coin }) else {  return }
-      await setSelectedChain(chain)
+      walletService.setSelectedCoin(coin)
+      // since JsonRpcService notify us of change,
+      // we don't need to call `setNetwork` on JsonRpcService
+      selectedChainId = chainId
+      
+      isSwapSupported = await swapService.isSwapSupported(chainId)
     }
   }
 }

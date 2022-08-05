@@ -64,7 +64,11 @@ struct SendTokenView: View {
           ) {
             HStack {
               if let token = sendTokenStore.selectedSendToken {
-                AssetIconView(token: token, length: 26)
+                AssetIconView(
+                  token: token,
+                  network: networkStore.selectedChain,
+                  length: 26
+                )
               }
               Text(sendTokenStore.selectedSendToken?.symbol ?? "")
                 .font(.title3.weight(.semibold))
@@ -125,7 +129,7 @@ struct SendTokenView: View {
           }
         ) {
           HStack(spacing: 14.0) {
-            TextField(Strings.Wallet.sendCryptoAddressPlaceholder, text: $sendTokenStore.sendAddress)
+            TextField(Strings.Wallet.sendToCryptoAddressPlaceholder, text: $sendTokenStore.sendAddress)
             Button(action: {
               if let string = UIPasteboard.general.string {
                 sendTokenStore.sendAddress = string

@@ -67,7 +67,7 @@ struct AssetDetailHeaderView: View {
               }
             }
             HStack {
-              AssetIconView(token: assetDetailStore.token)
+              AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
               Text(assetDetailStore.token.name)
                 .fixedSize(horizontal: false, vertical: true)
                 .font(.title3.weight(.semibold))
@@ -76,7 +76,7 @@ struct AssetDetailHeaderView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
         } else {
           HStack {
-            AssetIconView(token: assetDetailStore.token)
+            AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
             Text(assetDetailStore.token.name)
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
@@ -148,8 +148,7 @@ struct AssetDetailHeaderView: View {
         .padding(.bottom)
       HStack {
         if assetDetailStore.isBuySupported
-            && !networkStore.selectedChain.isCustom
-            && networkStore.selectedChain.coin == .eth {
+            && WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(networkStore.selectedChainId) {
           Button(
             action: {
               buySendSwapDestination = BuySendSwapDestination(
@@ -171,7 +170,7 @@ struct AssetDetailHeaderView: View {
         ) {
           Text(Strings.Wallet.send)
         }
-        if !networkStore.selectedChain.isCustom && networkStore.selectedChain.coin == .eth {
+        if networkStore.isSwapSupported {
           Button(
             action: {
               buySendSwapDestination = BuySendSwapDestination(
