@@ -236,6 +236,50 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
       addItem(item, cachedData: nil, completion: completion)
     }
   }
+  
+  public static func updateItems(_ items: [PlaylistInfo], folderUUID: String? = nil, completion: (() -> Void)? = nil) {
+    DataController.perform(context: .new(inMemory: false), save: false) { context in
+      let uuids = items.compactMap({ $0.tagId })
+      let existingItems = PlaylistItem.all(where: NSPredicate(format: "uuid IN %@", uuids), context: context) ?? []
+      let existingUUIDs = existingItems.compactMap({ $0.uuid })
+      let newItems = items.filter({ !existingUUIDs.contains($0.tagId) })
+      
+      existingItems.forEach { existingItem in
+        items.forEach { item in
+          if existingItem.uuid == item.tagId {
+            existingItem.name = item.name
+            existingItem.pageTitle = item.pageTitle
+            existingItem.pageSrc = item.pageSrc
+            existingItem.duration = item.duration
+            existingItem.mimeType = item.mimeType
+            existingItem.mediaSrc = item.src
+          }
+        }
+      }
+      
+      newItems.forEach {
+        let playlistItem = PlaylistItem(context: context)
+        playlistItem.name = $0.name
+        playlistItem.pageTitle = $0.pageTitle
+        playlistItem.pageSrc = $0.pageSrc
+        playlistItem.dateAdded = Date()
+        playlistItem.cachedData = Data()
+        playlistItem.duration = $0.duration
+        playlistItem.mimeType = $0.mimeType
+        playlistItem.mediaSrc = $0.src
+        playlistItem.order = Int32.min
+        playlistItem.uuid = $0.tagId
+        playlistItem.playlistFolder = PlaylistFolder.getFolder(uuid: folderUUID ?? PlaylistFolder.savedFolderUUID, context: context)
+      }
+      
+      PlaylistItem.reorderItems(context: context)
+      PlaylistItem.saveContext(context)
+
+      DispatchQueue.main.async {
+        completion?()
+      }
+    }
+  }
 
   public static func updateCache(uuid: String, cachedData: Data?) {
     DataController.perform(context: .new(inMemory: false), save: true) { context in

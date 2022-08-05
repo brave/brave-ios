@@ -143,23 +143,33 @@ extension PlaylistListViewController: UITableViewDataSource {
       header.menu = {
         guard isPersistent,
               let folder = folder,
+              let persistentFolderId = folder.uuid,
               let sharedFolderId = folder.sharedFolderId
         else { return nil }
         
         let syncAction = UIAction(title: "Sync Now", image: UIImage(named: "playlist_sync", in: .current, compatibleWith: nil)) { _ in
           Task { @MainActor in
-            var model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: sharedFolderId)
-            
-            var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
-            let deletedItems = oldItems.subtracting(model.mediaItems)
-            let newItems = Set(model.mediaItems).subtracting(oldItems)
-            oldItems = []
-            
-            
-            
-//            let folder = await model.createInMemoryStorage()
-//            let persistentFolderId = await PlaylistSharedFolderModel.saveToDiskStorage(memoryFolder: folder)
-//            PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+            do {
+              let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: sharedFolderId)
+              var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
+              let deletedItems = oldItems.subtracting(model.mediaItems)
+              let newItems = Set(model.mediaItems).subtracting(oldItems)
+              oldItems = []
+              
+              deletedItems.forEach({
+                PlaylistManager.shared.delete(itemId: $0.tagId)
+              })
+              
+              await withCheckedContinuation { continuation in
+                PlaylistItem.updateItems(Array(newItems), folderUUID: persistentFolderId) {
+                  continuation.resume()
+                }
+              }
+              
+              PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+            } catch {
+              log.error("CANNOT SYNC SHARED PLAYLIST: \(error)")
+            }
           }
         }
         
@@ -171,12 +181,27 @@ extension PlaylistListViewController: UITableViewDataSource {
           
         }
         
-        let deleteOfflineAction = UIAction(title: "Remove Offline Data", image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { _ in
+        let deleteOfflineAction = UIAction(title: "Remove Offline Data", image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { [weak self] _ in
+          folder.playlistItems?.forEach {
+            if let itemId = $0.uuid {
+              PlaylistManager.shared.deleteCache(itemId: itemId)
+            }
+          }
           
+          self?.tableView.reloadData()
         }
         
-        let deleteAction = UIAction(title: "Delete Playlist", image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { _ in
-          
+//        let saveOfflineAction = UIAction(title: "Save Offline Data", image: UIImage(systemName: "icloud.and.arrow.down")) { [weak self] _ in
+//          folder.playlistItems?.forEach {
+//            PlaylistManager.shared.download(item: PlaylistInfo(item: $0))
+//          }
+//
+//          self?.tableView.reloadData()
+//        }
+        
+        let deleteAction = UIAction(title: "Delete Playlist", image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { [weak self] _ in
+          PlaylistManager.shared.delete(folder: folder)
+          self?.navigationController?.popToRootViewController(animated: true)
         }
         
         return UIMenu(children: [syncAction, editAction, renameAction, deleteOfflineAction, deleteAction])
