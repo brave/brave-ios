@@ -158,8 +158,8 @@ private struct PlaylistCellRedactedView: View {
     HStack(alignment: .center) {
       Image("")
         .resizable()
+        .frame(width: 64.0 * 1.47, height: 64.0, alignment: .center)
         .aspectRatio(contentMode: .fit)
-        .frame(width: 64.0 * 1.4, height: 64.0, alignment: .center)
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 5.0, style: .continuous))
         .shimmer(true)
@@ -168,6 +168,13 @@ private struct PlaylistCellRedactedView: View {
         Text("Placeholder Title\nPlaceholder Title Second Line")
           .font(.callout)
           .fontWeight(.medium)
+          .foregroundColor(Color(.bravePrimary))
+          .multilineTextAlignment(.leading)
+          .redacted(reason: .placeholder)
+          .shimmer(true)
+        
+        Text("Placeholder SubTitle")
+          .font(.callout)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
           .redacted(reason: .placeholder)

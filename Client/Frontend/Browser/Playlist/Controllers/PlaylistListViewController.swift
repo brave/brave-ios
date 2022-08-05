@@ -830,37 +830,38 @@ extension PlaylistListViewController {
   }
 
   func controllerDidChange(_ anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
     if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
 
-    switch type {
-    case .insert:
-      guard let newIndexPath = newIndexPath else { break }
-      tableView.insertRows(at: [newIndexPath], with: .fade)
-    case .delete:
-      guard let indexPath = indexPath else { break }
-      tableView.deleteRows(at: [indexPath], with: .fade)
-    case .update:
-      guard let indexPath = indexPath else { break }
-      tableView.reloadRows(at: [indexPath], with: .fade)
-    case .move:
-      guard let indexPath = indexPath,
-        let newIndexPath = newIndexPath
-      else { break }
-      tableView.deleteRows(at: [indexPath], with: .fade)
-      tableView.insertRows(at: [newIndexPath], with: .fade)
-    default:
-      break
-    }
+//    switch type {
+//    case .insert:
+//      guard let newIndexPath = newIndexPath else { break }
+//      tableView.insertRows(at: [newIndexPath], with: .fade)
+//    case .delete:
+//      guard let indexPath = indexPath else { break }
+//      tableView.deleteRows(at: [indexPath], with: .fade)
+//    case .update:
+//      guard let indexPath = indexPath else { break }
+//      tableView.reloadRows(at: [indexPath], with: .fade)
+//    case .move:
+//      guard let indexPath = indexPath,
+//        let newIndexPath = newIndexPath
+//      else { break }
+//      tableView.deleteRows(at: [indexPath], with: .fade)
+//      tableView.insertRows(at: [newIndexPath], with: .fade)
+//    default:
+//      break
+//    }
+    
+    tableView.reloadData()
   }
 
   func controllerDidChangeContent() {
     if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
-    tableView.endUpdates()
+    tableView.reloadData()
   }
 
   func controllerWillChangeContent() {
     if tableView.hasActiveDrag || tableView.hasActiveDrop { return }
-    tableView.beginUpdates()
+    tableView.reloadData()
   }
 }
