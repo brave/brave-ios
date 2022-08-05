@@ -52,7 +52,7 @@ struct WalletConstants {
   /// Supported networks for buying via Wyre
   // Not include Polygon Mainnet and Avalanche Mainnet due to core-side issue
   // https://github.com/brave/brave-browser/issues/24444
-  // Will bring back via https://github.com/brave/brave-ios/pull/5777
+  // Will bring back via https://github.com/brave/brave-ios/issues/5781
   static let supportedBuyWithWyreNetworkChainIds: [String] = [
     BraveWallet.MainnetChainId
   ]
