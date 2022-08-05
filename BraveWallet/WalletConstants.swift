@@ -50,6 +50,9 @@ struct WalletConstants {
   static let splTokenAccountCreationLink = URL(string: "https://support.brave.com/hc/en-us/articles/5546517853325")!
   
   /// Supported networks for buying via Wyre
+  // Not include Polygon Mainnet and Avalanche Mainnet due to core-side issue
+  // https://github.com/brave/brave-browser/issues/24444
+  // Will bring back via https://github.com/brave/brave-ios/pull/5777
   static let supportedBuyWithWyreNetworkChainIds: [String] = [
     BraveWallet.MainnetChainId
   ]
