@@ -33,7 +33,7 @@ private extension PlaylistListViewController {
   func cacheItem(_ item: PlaylistInfo, indexPath: IndexPath, cacheState: PlaylistDownloadManager.DownloadState) {
     switch cacheState {
     case .inProgress:
-      PlaylistManager.shared.cancelDownload(item: item)
+      PlaylistManager.shared.cancelDownload(itemId: item.tagId)
       tableView.reloadRows(at: [indexPath], with: .automatic)
     case .invalid:
       if PlaylistManager.shared.isDiskSpaceEncumbered() {
@@ -64,7 +64,7 @@ private extension PlaylistListViewController {
         UIAlertAction(
           title: Strings.PlayList.removeActionButtonTitle, style: .destructive,
           handler: { [unowned self] _ in
-            _ = PlaylistManager.shared.deleteCache(item: item)
+            _ = PlaylistManager.shared.deleteCache(itemId: item.tagId)
             self.tableView.reloadRows(at: [indexPath], with: .automatic)
           }))
 
@@ -73,7 +73,7 @@ private extension PlaylistListViewController {
     }
   }
 
-  func deleteItem(_ item: PlaylistInfo, indexPath: IndexPath) {
+  func deleteItem(itemId: String, indexPath: IndexPath) {
     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
     let alert = UIAlertController(
       title: Strings.PlayList.removePlaylistVideoAlertTitle, message: Strings.PlayList.removePlaylistVideoAlertMessage, preferredStyle: style)
@@ -84,7 +84,7 @@ private extension PlaylistListViewController {
         handler: { [weak self] _ in
           guard let self = self else { return }
 
-          self.delegate?.deleteItem(item: item, at: indexPath.row)
+          self.delegate?.deleteItem(itemId: itemId, at: indexPath.row)
 
           if self.delegate?.currentPlaylistItem == nil {
             self.updateTableBackgroundView()
@@ -127,7 +127,7 @@ extension PlaylistListViewController: UITableViewDelegate {
       return nil
     }
 
-    let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
+    let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
 
     let cacheAction = UIContextualAction(
       style: .normal, title: nil,
@@ -139,7 +139,7 @@ extension PlaylistListViewController: UITableViewDelegate {
     let deleteAction = UIContextualAction(
       style: .normal, title: nil,
       handler: { [weak self] (action, view, completionHandler) in
-        self?.deleteItem(currentItem, indexPath: indexPath)
+        self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
         completionHandler(true)
       })
 
@@ -214,7 +214,7 @@ extension PlaylistListViewController: UITableViewDelegate {
     }
 
     let actionProvider: UIContextMenuActionProvider = { _ in
-      let cacheState = PlaylistManager.shared.state(for: currentItem.pageSrc)
+      let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
       let cacheTitle = cacheState == .invalid ? Strings.PlayList.playlistSaveForOfflineButtonTitle : Strings.PlayList.playlistDeleteForOfflineButtonTitle
       let cacheIcon = cacheState == .invalid ? UIImage(systemName: "icloud.and.arrow.down") : UIImage(systemName: "icloud.slash")
 
@@ -282,13 +282,13 @@ extension PlaylistListViewController: UITableViewDelegate {
         UIAction(
           title: Strings.delete, image: UIImage(systemName: "trash"), attributes: .destructive,
           handler: { [weak self] _ in
-            self?.deleteItem(currentItem, indexPath: indexPath)
+            self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
           }),
       ])
     }
 
     let identifier = NSDictionary(dictionary: [
-      "itemID": currentItem.pageSrc,
+      "itemID": currentItem.tagId,
       "row": indexPath.row,
     ])
     return UIContextMenuConfiguration(identifier: identifier, previewProvider: nil, actionProvider: actionProvider)
@@ -307,7 +307,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
     guard row >= 0 || row < PlaylistManager.shared.numberOfAssets,
       let currentItem = PlaylistManager.shared.itemAtIndex(row),
-      currentItem.pageSrc == itemID
+      currentItem.tagId == itemID
     else {
       return nil
     }

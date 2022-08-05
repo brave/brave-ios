@@ -65,7 +65,7 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
           self.dismiss(animated: true)
 
           DispatchQueue.main.async {
-            if PlaylistManager.shared.delete(item: item) {
+            if PlaylistManager.shared.delete(itemId: item.tagId) {
               self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)
             }
           }

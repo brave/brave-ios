@@ -16,6 +16,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var order: Int32
   @NSManaged public var dateAdded: Date?
   @NSManaged public var sharedFolderId: String?
+  @NSManaged public var creatorName: String?
+  @NSManaged public var creatorLink: String?
   @NSManaged public var playlistItems: Set<PlaylistItem>?
   public static let savedFolderUUID = "7B6CC019-8946-4182-ACE8-42FE7B704C43"
 
@@ -54,7 +56,7 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       sectionNameKeyPath: nil, cacheName: nil)
   }
 
-  public static func addFolder(title: String, uuid: String? = nil, sharedFolderId: String? = nil, completion: ((_ uuid: String) -> Void)? = nil) {
+  public static func addFolder(title: String, uuid: String? = nil, completion: ((_ uuid: String) -> Void)? = nil) {
     DataController.perform(context: .new(inMemory: false), save: false) { context in
       var folderId: String
       if let uuid = uuid, !uuid.isEmpty {
@@ -68,11 +70,55 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       playlistFolder.dateAdded = Date()
       playlistFolder.order = Int32.min
       playlistFolder.uuid = folderId
-      playlistFolder.sharedFolderId = sharedFolderId
+      playlistFolder.sharedFolderId = nil
 
       PlaylistFolder.reorderItems(context: context)
       PlaylistFolder.saveContext(context)
-
+      
+      DispatchQueue.main.async {
+        completion?(folderId)
+      }
+    }
+  }
+  
+  public static func addInMemoryFolder(title: String, creatorName: String, creatorLink: String, sharedFolderId: String, completion: ((_ folder: PlaylistFolder, _ uuid: String) -> Void)? = nil) {
+    DataController.perform(context: .existing(DataController.viewContextInMemory), save: false) { context in
+      context.perform {
+        let folderId = UUID().uuidString
+        let playlistFolder = PlaylistFolder(context: context)
+        playlistFolder.title = title
+        playlistFolder.creatorName = creatorName
+        playlistFolder.creatorLink = creatorLink
+        playlistFolder.dateAdded = Date()
+        playlistFolder.order = Int32.min
+        playlistFolder.uuid = folderId
+        playlistFolder.sharedFolderId = sharedFolderId
+        
+        PlaylistFolder.reorderItems(context: context)
+        PlaylistFolder.saveContext(context)
+        
+        DispatchQueue.main.async {
+          completion?(playlistFolder, folderId)
+        }
+      }
+    }
+  }
+  
+  public static func saveInMemoryFolderToDisk(folder: PlaylistFolder, completion: ((_ uuid: String) -> Void)? = nil) {
+    DataController.perform(context: .existing(DataController.viewContext), save: false) { context in
+      let folderId = folder.uuid ?? UUID().uuidString
+      let playlistFolder = PlaylistFolder(context: context)
+      playlistFolder.uuid = folder.uuid
+      playlistFolder.title = folder.title
+      playlistFolder.order = Int32.min
+      playlistFolder.dateAdded = folder.dateAdded
+      playlistFolder.sharedFolderId = folder.sharedFolderId
+      playlistFolder.creatorName = folder.creatorName
+      playlistFolder.creatorLink = folder.creatorLink
+      
+      PlaylistFolder.reorderItems(context: context)
+      PlaylistFolder.saveContext(context)
+      
       DispatchQueue.main.async {
         completion?(folderId)
       }

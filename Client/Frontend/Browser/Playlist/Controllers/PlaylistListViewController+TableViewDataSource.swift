@@ -59,6 +59,10 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    UITableView.automaticDimension
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
     Constants.tableHeaderHeight
   }
 
@@ -93,7 +97,7 @@ extension PlaylistListViewController: UITableViewDataSource {
       }
     }
 
-    let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
+    let cacheState = PlaylistManager.shared.state(for: item.tagId)
     self.updateCellDownloadStatus(
       indexPath: indexPath,
       cell: cell,
@@ -115,6 +119,68 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    return UIView()
+    let folder = PlaylistManager.shared.currentFolder
+    let isPersistent = folder?.managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
+    
+//    if let uuid = folder?.uuid {
+//      isPersistent = PlaylistFolder.getFolder(uuid: uuid) != nil
+//    }
+    
+    return PlaylistMenuHeader().then { header in
+      header.titleLabel.text = folder?.title
+      header.subtitleLabel.text = folder?.creatorName
+      header.subtitleLabel.isHidden = folder?.creatorName == nil
+      header.setState(isPersistent ? .menu : .add)
+      
+      header.onAddPlaylist = {
+        Task { @MainActor [weak folder] in
+          guard let folder = folder else { return }
+          let persistentFolderId = await PlaylistSharedFolderModel.saveToDiskStorage(memoryFolder: folder)
+          PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+        }
+      }
+      
+      header.menu = {
+        guard isPersistent,
+              let folder = folder,
+              let sharedFolderId = folder.sharedFolderId
+        else { return nil }
+        
+        let syncAction = UIAction(title: "Sync Now", image: UIImage(named: "playlist_sync", in: .current, compatibleWith: nil)) { _ in
+          Task { @MainActor in
+            var model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: sharedFolderId)
+            
+            var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
+            let deletedItems = oldItems.subtracting(model.mediaItems)
+            let newItems = Set(model.mediaItems).subtracting(oldItems)
+            oldItems = []
+            
+            
+            
+//            let folder = await model.createInMemoryStorage()
+//            let persistentFolderId = await PlaylistSharedFolderModel.saveToDiskStorage(memoryFolder: folder)
+//            PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+          }
+        }
+        
+        let editAction = UIAction(title: "Edit", image: UIImage(braveSystemNamed: "brave.edit")) { _ in
+          
+        }
+        
+        let renameAction = UIAction(title: "Rename", image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { _ in
+          
+        }
+        
+        let deleteOfflineAction = UIAction(title: "Remove Offline Data", image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { _ in
+          
+        }
+        
+        let deleteAction = UIAction(title: "Delete Playlist", image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { _ in
+          
+        }
+        
+        return UIMenu(children: [syncAction, editAction, renameAction, deleteOfflineAction, deleteAction])
+      }()
+    }
   }
 }

@@ -35,7 +35,7 @@ class PlaylistMediaStreamer {
     // We need to check if the item is cached locally.
     // If the item is cached (downloaded)
     // then we can play it directly without having to stream it.
-    let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
+    let cacheState = PlaylistManager.shared.state(for: item.tagId)
     if cacheState != .invalid {
       return Future { resolver in
         resolver(.success(Void()))

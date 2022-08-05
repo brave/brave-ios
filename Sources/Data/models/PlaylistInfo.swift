@@ -9,7 +9,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-public struct PlaylistInfo: Codable, Identifiable {
+public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
   public let name: String
   public let src: String
   public let pageSrc: String
@@ -21,7 +21,7 @@ public struct PlaylistInfo: Codable, Identifiable {
   public let tagId: String
   
   public var id: String {
-    !tagId.isEmpty ? tagId : pageSrc + src
+    tagId
   }
   
   public init(pageSrc: String) {
@@ -33,7 +33,7 @@ public struct PlaylistInfo: Codable, Identifiable {
     self.duration = 0.0
     self.dateAdded = Date()
     self.detected = false
-    self.tagId = ""
+    self.tagId = UUID().uuidString
   }
 
   public init(item: PlaylistItem) {
@@ -45,7 +45,7 @@ public struct PlaylistInfo: Codable, Identifiable {
     self.duration = item.duration
     self.dateAdded = item.dateAdded ?? Date()
     self.detected = false
-    self.tagId = ""
+    self.tagId = item.uuid ?? UUID().uuidString
   }
 
   public init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: TimeInterval, detected: Bool, dateAdded: Date, tagId: String) {
@@ -57,7 +57,7 @@ public struct PlaylistInfo: Codable, Identifiable {
     self.duration = duration
     self.detected = detected
     self.dateAdded = dateAdded
-    self.tagId = tagId
+    self.tagId = tagId.isEmpty ? UUID().uuidString : tagId
   }
 
   public init(from decoder: Decoder) throws {
@@ -69,7 +69,7 @@ public struct PlaylistInfo: Codable, Identifiable {
     self.mimeType = try container.decodeIfPresent(String.self, forKey: .mimeType) ?? ""
     self.duration = try container.decodeIfPresent(TimeInterval.self, forKey: .duration) ?? 0.0
     self.detected = try container.decodeIfPresent(Bool.self, forKey: .detected) ?? false
-    self.tagId = try container.decodeIfPresent(String.self, forKey: .tagId) ?? ""
+    self.tagId = try container.decodeIfPresent(String.self, forKey: .tagId) ?? UUID().uuidString
     self.dateAdded = Date()
     self.src = PlaylistInfo.fixSchemelessURLs(src: src, pageSrc: pageSrc)
   }
@@ -87,6 +87,15 @@ public struct PlaylistInfo: Codable, Identifiable {
     }
 
     return nil
+  }
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(pageSrc)
+    hasher.combine(tagId)
+  }
+  
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.pageSrc == rhs.pageSrc && lhs.tagId == rhs.tagId
   }
 
   public static func fixSchemelessURLs(src: String, pageSrc: String) -> String {

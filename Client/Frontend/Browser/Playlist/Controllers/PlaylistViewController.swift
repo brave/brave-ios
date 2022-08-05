@@ -29,7 +29,7 @@ protocol PlaylistViewControllerDelegate: AnyObject {
   func playItem(item: PlaylistInfo, completion: ((PlaylistMediaStreamer.PlaybackError) -> Void)?)
   func pausePlaying()
   func stopPlaying()
-  func deleteItem(item: PlaylistInfo, at index: Int)
+  func deleteItem(itemId: String, at index: Int)
   func updateLastPlayedItem(item: PlaylistInfo)
   func displayLoadingResourceError()
   func displayExpiredResourceError(item: PlaylistInfo)
@@ -155,22 +155,19 @@ class PlaylistViewController: UIViewController {
     }
     
     if let folderSharingId = folderSharingId {
-      let sharingController = PlaylistFolderSharingController(item: PlaylistSharedFolderModel(playlistId: folderSharingId), folderExists: false)
-      folderController.navigationController?.pushViewController(sharingController, animated: false)
+      setFolderSharingId(folderSharingId)
+    } else if let initialItem = listController.initialItem,
+      let item = PlaylistItem.getItem(uuid: initialItem.tagId) {
+      PlaylistManager.shared.currentFolder = item.playlistFolder
+    } else if let url = Preferences.Playlist.lastPlayedItemUrl.value,
+              let item = PlaylistItem.getItems(pageSrc: url).first {
+      PlaylistManager.shared.currentFolder = item.playlistFolder
     } else {
-      if let initialItem = listController.initialItem,
-        let item = PlaylistItem.getItem(pageSrc: initialItem.pageSrc) {
-        PlaylistManager.shared.currentFolder = item.playlistFolder
-      } else if let url = Preferences.Playlist.lastPlayedItemUrl.value,
-        let item = PlaylistItem.getItem(pageSrc: url) {
-        PlaylistManager.shared.currentFolder = item.playlistFolder
-      } else {
-        PlaylistManager.shared.currentFolder = nil
-      }
+      PlaylistManager.shared.currentFolder = nil
+    }
 
-      if PlaylistManager.shared.currentFolder != nil {
-        folderController.navigationController?.pushViewController(listController, animated: false)
-      }
+    if PlaylistManager.shared.currentFolder != nil {
+      folderController.navigationController?.pushViewController(listController, animated: false)
     }
 
     addChild(splitController)
@@ -196,8 +193,15 @@ class PlaylistViewController: UIViewController {
     
     if let navigationController = folderController.navigationController {
       navigationController.popToRootViewController(animated: false)
-      let sharingController = PlaylistFolderSharingController(item: PlaylistSharedFolderModel(playlistId: folderSharingId), folderExists: false)
-      navigationController.pushViewController(sharingController, animated: false)
+      
+      PlaylistManager.shared.currentFolder = nil
+      folderController.navigationController?.pushViewController(listController, animated: false)
+
+      Task { @MainActor in
+        let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: folderSharingId)
+        let folder = await model.createInMemoryStorage()
+        PlaylistManager.shared.currentFolder = folder
+      }
     }
   }
 
@@ -542,8 +546,8 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     assetStateObservers.removeAll()
   }
 
-  func deleteItem(item: PlaylistInfo, at index: Int) {
-    PlaylistManager.shared.delete(item: item)
+  func deleteItem(itemId: String, at index: Int) {
+    PlaylistManager.shared.delete(itemId: itemId)
 
     if PlaylistCarplayManager.shared.currentlyPlayingItemIndex == index || PlaylistManager.shared.numberOfAssets == 0 {
       stopPlaying()
@@ -903,9 +907,9 @@ extension PlaylistViewController: VideoViewDelegate {
     }
 
     // If the item is cached, load it from the cache and play it.
-    let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
+    let cacheState = PlaylistManager.shared.state(for: item.tagId)
     if cacheState != .invalid {
-      if let index = PlaylistManager.shared.index(of: item.pageSrc),
+      if let index = PlaylistManager.shared.index(of: item.tagId),
         let asset = PlaylistManager.shared.assetAtIndex(index) {
         load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)
           .handleEvents(receiveCancel: {
@@ -978,7 +982,7 @@ extension PlaylistViewController: VideoViewDelegate {
           }
 
           // Item can be streamed, so let's retrieve its URL from our DB
-          guard let index = PlaylistManager.shared.index(of: item.pageSrc),
+          guard let index = PlaylistManager.shared.index(of: item.tagId),
             let item = PlaylistManager.shared.itemAtIndex(index)
           else {
             PlaylistMediaStreamer.clearNowPlayingInfo()

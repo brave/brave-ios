@@ -320,18 +320,21 @@ private class ViewModel: ObservableObject {
   
   func addLocalFolder() {
     // Create a local shared folder
-    PlaylistFolder.addFolder(title: self.item.folderName,
-                             sharedFolderId: self.item.playlistId) { uuid in
+    PlaylistFolder.addInMemoryFolder(title: item.folderName,
+                                     creatorName: item.creatorName,
+                                     creatorLink: item.creatorLink,
+                                     sharedFolderId: item.playlistId) { _, folderId in
       
       // Add the items to the folder
-      PlaylistItem.addItems(self.item.mediaItems, folderUUID: uuid) {
-        // Items were added
-        self.item.mediaItems.forEach {
-          // Download items
-          PlaylistManager.shared.download(item: $0)
+      PlaylistItem.addInMemoryItems(self.item.mediaItems, folderUUID: folderId) {
+        DispatchQueue.main.async {
+          // Items were added
+          self.item.mediaItems.forEach {
+            // Download items
+            PlaylistManager.shared.download(item: $0)
+          }
+          self.folderExists = true
         }
-        
-        self.folderExists = true
       }
     }
   }
@@ -437,7 +440,7 @@ struct PlaylistFolderSharingView: View {
             
             Button(action: {
               model.item.mediaItems.forEach({
-                PlaylistManager.shared.deleteCache(item: $0)
+                PlaylistManager.shared.deleteCache(itemId: $0.tagId)
               })
             }) {
               HStack {

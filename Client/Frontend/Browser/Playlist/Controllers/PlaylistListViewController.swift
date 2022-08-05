@@ -197,7 +197,7 @@ class PlaylistListViewController: UIViewController {
     playerView.setControlsEnabled(false)
 
     if let initialItem = initialItem,
-      let item = PlaylistItem.getItem(pageSrc: initialItem.pageSrc) {
+      let item = PlaylistItem.getItem(uuid: initialItem.tagId) {
       PlaylistManager.shared.currentFolder = item.playlistFolder
     }
 
@@ -246,8 +246,8 @@ class PlaylistListViewController: UIViewController {
     }
 
     // If the current item is already playing, do nothing.
-    if let currentItemSrc = PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc,
-      PlaylistManager.shared.index(of: currentItemSrc) != nil {
+    if let currentItemId = PlaylistCarplayManager.shared.currentPlaylistItem?.tagId,
+      PlaylistManager.shared.index(of: currentItemId) != nil {
       return
     }
 
@@ -364,7 +364,7 @@ class PlaylistListViewController: UIViewController {
       PlaylistManager.shared.fetchedObjects[safe: $0.row]
     })
 
-    if selectedItems.contains(where: { $0.pageSrc == PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc }) {
+    if selectedItems.contains(where: { $0.uuid == PlaylistCarplayManager.shared.currentPlaylistItem?.tagId }) {
       delegate?.stopPlaying()
     } else {
       delegate?.pausePlaying()
@@ -380,7 +380,7 @@ class PlaylistListViewController: UIViewController {
       self.presentedViewController?.dismiss(animated: true, completion: nil)
 
       // We moved an item that was playing
-      if items.firstIndex(where: { PlaylistInfo(item: $0).pageSrc == PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc }) != nil {
+      if items.firstIndex(where: { PlaylistInfo(item: $0).tagId == PlaylistCarplayManager.shared.currentPlaylistItem?.tagId }) != nil {
         self.delegate?.stopPlaying()
       }
 
@@ -440,7 +440,7 @@ class PlaylistListViewController: UIViewController {
 
     for row in rows {
       if let item = row.item {
-        delegate?.deleteItem(item: item, at: row.index)
+        delegate?.deleteItem(itemId: item.tagId, at: row.index)
       }
     }
   }
@@ -740,7 +740,7 @@ extension PlaylistListViewController {
       }
 
     case .downloaded:
-      if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.pageSrc) {
+      if let itemSize = PlaylistManager.shared.sizeOfDownloadedItem(for: item.tagId) {
         getAssetDurationFormatted(item: item) { [weak cell] in
           cell?.detailLabel.text = "\($0) - \(itemSize)"
         }

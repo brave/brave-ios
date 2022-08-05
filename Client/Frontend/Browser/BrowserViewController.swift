@@ -1626,7 +1626,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     DispatchQueue.main.async {
       if let item = tab.playlistItem {
-        if PlaylistItem.itemExists(item) {
+        if PlaylistItem.itemExists(uuid: item.tagId) || PlaylistItem.itemExists(pageSrc: item.pageSrc) {
           self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
         } else {
           self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)

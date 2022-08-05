@@ -38,7 +38,7 @@ public class PlaylistCarplayManager: NSObject {
       // After all, we can't play media simultaneously.
       if let selectedTab = browserController?.tabManager.selectedTab,
         let playlistItem = selectedTab.playlistItem,
-        PlaylistManager.shared.index(of: playlistItem.pageSrc) == nil {
+        PlaylistManager.shared.index(of: playlistItem.tagId) == nil {
 
         browserController?.updatePlaylistURLBar(
           tab: selectedTab,
