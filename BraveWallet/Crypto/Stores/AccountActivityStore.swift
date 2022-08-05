@@ -66,7 +66,7 @@ class AccountActivityStore: ObservableObject {
       let userVisibleTokens: [BraveWallet.BlockchainToken] = await walletService.userAssets(network.chainId, coin: network.coin)
       self.assets = await fetchAssets(network: network, userVisibleTokens: userVisibleTokens)
       let assetRatios = self.assets.reduce(into: [String: Double](), {
-        $0[$1.token.symbol.lowercased()] = Double($1.price)
+        $0[$1.token.assetRatioId.lowercased()] = Double($1.price)
       })
       self.transactionSummaries = await fetchTransactionSummarys(
         network: network,

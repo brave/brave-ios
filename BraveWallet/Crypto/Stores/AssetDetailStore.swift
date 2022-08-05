@@ -131,7 +131,7 @@ class AssetDetailStore: ObservableObject {
       self.priceHistory = priceHistory
       
       self.accounts = await fetchAccountBalances(updatedAccounts, keyring: keyring)
-      let assetRatios = [token.symbol.lowercased(): assetPriceValue]
+      let assetRatios = [token.assetRatioId.lowercased(): assetPriceValue]
       self.transactionSummaries = await fetchTransactionSummarys(keyring: keyring, assetRatios: assetRatios)
     }
   }
