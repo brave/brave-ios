@@ -58,7 +58,7 @@ final class BraveSkusWebHelperTests: XCTestCase {
     
     XCTAssertEqual(type, "ios")
     XCTAssertEqual(rawReceipt, BraveSkusWebHelperMock.mockReceiptValue)
-    XCTAssertEqual(package, "com.brave.browser")
+    XCTAssertEqual(package, try XCTUnwrap(Bundle.main.bundleIdentifier))
     XCTAssertEqual(subscriptionId, "brave-firewall-vpn-premium")
   }
 }

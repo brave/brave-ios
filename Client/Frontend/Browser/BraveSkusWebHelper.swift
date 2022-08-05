@@ -17,8 +17,6 @@ class BraveSkusWebHelper {
   [.init(name: "intent", value: "connect-receipt"), .init(name: "product", value: "vpn")]
   /// What key should be used to pass the receipt in session storage.
   private let storageKey = "braveVpn.receipt"
-  /// Value to pass to the json file's 'package' property. This is not related to the app's bundle ID.
-  private let receiptJsonPackage = "com.brave.browser"
   /// Value to pass to the json file's 'subscription_id' property. This is not related to the IAPs product ID.
   private let receiptJsonSubscriptionId = "brave-firewall-vpn-premium"
   
@@ -57,7 +55,7 @@ class BraveSkusWebHelper {
   
   /// Returns app's receipt and few other properties as a base64 encoded JSON.
   var receiptData: (key: String, value: String)? {
-    guard let receipt = receipt else { return nil }
+    guard let receipt = receipt, let bundleId = Bundle.main.bundleIdentifier else { return nil }
     
     struct ReceiptDataJson: Codable {
       let type: String
@@ -74,7 +72,7 @@ class BraveSkusWebHelper {
     
     let json = ReceiptDataJson(type: "ios",
                                rawReceipt: receipt,
-                               package: receiptJsonPackage,
+                               package: bundleId,
                                subscriptionId: receiptJsonSubscriptionId)
     
     do {
