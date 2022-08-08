@@ -60,7 +60,7 @@ enum DomainUserScript: CaseIterable {
                  "dev.talk.brave.software", "beta.talk.brave.software",
                  "talk.brave.software"])
     case .bravePlaylistFolderSharingHelper:
-      return Set(["playlist.bravesoftware.com", "playlist.brave.com", "127.0.0.1"])
+      return Set(["playlist.bravesoftware.com", "playlist.brave.com", "127.0.0.1", "brandon-t.github.io"])
     }
   }
 }

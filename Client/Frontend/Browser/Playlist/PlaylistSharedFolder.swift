@@ -64,7 +64,7 @@ public struct PlaylistSharedFolderModel: Codable {
   }
   
   public static func fetchPlaylist(playlistId: String) async throws -> PlaylistSharedFolderModel {
-    guard let playlistURL = URL(string: "http://127.0.0.1:5005/playlist/\(playlistId)") else {
+    guard let playlistURL = URL(string: "https://brandon-t.github.io/playlist/static/\(playlistId == "SyncNow" ? "content" : "playlist").json?\(playlistId)") else {
       throw "Invalid Playlist URL"
     }
     

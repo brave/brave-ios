@@ -163,7 +163,12 @@ extension PlaylistListViewController: UITableViewDataSource {
           
           Task { @MainActor in
             do {
+              #if DEBUG
+              self.syncNowDebug.toggle()
+              let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: self.syncNowDebug ? "SyncNow" : sharedFolderId)
+              #else
               let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: sharedFolderId)
+              #endif
               var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
               let deletedItems = oldItems.subtracting(model.mediaItems)
               let newItems = Set(model.mediaItems).subtracting(oldItems)
