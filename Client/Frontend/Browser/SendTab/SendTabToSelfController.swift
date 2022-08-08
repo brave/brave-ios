@@ -12,7 +12,7 @@ class SendTabToSelfController: UIViewController {
   
   struct UX {
     static let contentInset: CGFloat = 20
-    static let preferredSizePadding: CGFloat = 72
+    static let preferredSizePadding: CGFloat = 60
   }
   
   let contentNavigationController: UINavigationController

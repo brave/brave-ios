@@ -32,14 +32,14 @@ extension BraveSyncAPI {
 
   var isSendTabToSelfVisible: Bool {
     guard let json = getDeviceListJSON(), let data = json.data(using: .utf8) else {
-      return true
+      return false
     }
     
     do {
       let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
-      return devices.count < 1
+      return devices.count > 1
     } catch {
-      return true
+      return false
     }
   }
   

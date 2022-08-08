@@ -14,11 +14,12 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
 
   // MARK: Lifecycle
 
-  init(showDoneButton: Bool = false, syncAPI: BraveSyncAPI, syncProfileService: BraveSyncProfileServiceIOS) {
+  init(showDoneButton: Bool = false, syncAPI: BraveSyncAPI, syncProfileService: BraveSyncProfileServiceIOS, tabManager: TabManager) {
     self.showDoneButton = showDoneButton
     self.syncAPI = syncAPI
     self.syncProfileService = syncProfileService
-
+    self.tabManager = tabManager
+    
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -61,12 +62,17 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
     if showDoneButton {
       navigationController?.interactivePopGestureRecognizer?.isEnabled = false
       navigationItem.setHidesBackButton(true, animated: false)
-      navigationItem.rightBarButtonItem = UIBarButtonItem(
-        barButtonSystemItem: .done, target: self,
+      navigationItem.leftBarButtonItem = UIBarButtonItem(
+        barButtonSystemItem: .done,
+        target: self,
         action: #selector(doneTapped))
-    } else {
-      navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: .plain, target: self, action: #selector(onSyncInternalsTapped))
     }
+    
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      image: UIImage(systemName: "gearshape"),
+      style: .plain,
+      target: self,
+      action: #selector(onSyncInternalsTapped))
   }
   
   override func viewWillLayoutSubviews() {
@@ -82,6 +88,7 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
 
   private let syncAPI: BraveSyncAPI
   private let syncProfileService: BraveSyncProfileServiceIOS
+  private let tabManager: TabManager
 
   private var syncDeviceObserver: AnyObject?
   private var devices = [BraveSyncDevice]()
@@ -198,6 +205,11 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
       Preferences.Chromium.syncPasswordsEnabled.value = toggle.isOn
     case SyncDataTypes.openTabs.rawValue:
       Preferences.Chromium.syncOpenTabsEnabled.value = toggle.isOn
+      
+      //Sync Regular Tabs when Opent Tabs are enabled
+      if Preferences.Chromium.syncOpenTabsEnabled.value {
+        tabManager.addRegularTabsToSyncChain()
+      }
     default:
       return
     }

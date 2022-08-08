@@ -91,6 +91,8 @@ class TabManager: NSObject {
   private weak var tabGeneratorAPI: BraveTabGeneratorAPI?
   var makeWalletEthProvider: ((Tab) -> (BraveWalletEthereumProvider, js: String)?)?
   private var domainFrc = Domain.frc()
+  private let syncedTabsQueue = DispatchQueue(label: "synced-tabs-queue")
+  private var syncTabsTask: DispatchWorkItem?
 
   init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?, tabGeneratorAPI: BraveTabGeneratorAPI) {
     assert(Thread.isMainThread)
@@ -116,6 +118,10 @@ class TabManager: NSObject {
     } catch {
       log.error("Failed to perform fetch of Domains for observing dapps permission changes: \(error)")
     }
+  }
+  
+  deinit {
+    syncTabsTask?.cancel()
   }
 
   func addNavigationDelegate(_ delegate: WKNavigationDelegate) {
@@ -202,6 +208,33 @@ class TabManager: NSObject {
       return allTabs.filter { $0.displayTitle.lowercased().contains(query) || ($0.url?.baseDomain?.contains(query) ?? false) }
     } else {
       return allTabs
+    }
+  }
+  
+  /// <#Description#>
+  func addRegularTabsToSyncChain() {
+    let regularTabs = tabs(withType: .regular)
+
+    syncTabsTask?.cancel()
+
+    syncTabsTask = DispatchWorkItem {
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self, let task = self.syncTabsTask, !task.isCancelled else {
+          return
+        }
+        
+        for tab in regularTabs {
+          if let url = tab.fetchedURL, !tab.type.isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
+            tab.syncTab?.setURL(url)
+            tab.syncTab?.setTitle(tab.displayTitle)
+          }
+        }
+
+      }
+    }
+        
+    if let task = self.syncTabsTask {
+      syncedTabsQueue.async(execute: task)
     }
   }
 

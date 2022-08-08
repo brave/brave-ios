@@ -51,7 +51,7 @@ enum TabSecureContentState {
 class Tab: NSObject {
   var id: String?
 
-  private let syncTab: BraveSyncTab?
+  let syncTab: BraveSyncTab?
   let rewardsId: UInt32
 
   var onScreenshotUpdated: (() -> Void)?

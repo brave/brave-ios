@@ -270,6 +270,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       imageStore: diskImageStore,
       rewards: rewards,
       tabGeneratorAPI: braveCore.tabGeneratorAPI)
+    
+    // Add Regular tabs to Sync Chain 
+    if Preferences.Chromium.syncOpenTabsEnabled.value {
+      tabManager.addRegularTabsToSyncChain()
+    }
 
     // Setup ReaderMode Cache
     self.readerModeCache = ReaderMode.cache(for: tabManager.selectedTab)
