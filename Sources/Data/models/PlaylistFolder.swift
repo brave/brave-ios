@@ -106,6 +106,7 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
   
   public static func saveInMemoryFolderToDisk(folder: PlaylistFolder, completion: ((_ uuid: String) -> Void)? = nil) {
     DataController.perform(context: .existing(DataController.viewContext), save: false) { context in
+      
       let folderId = folder.uuid ?? UUID().uuidString
       let playlistFolder = PlaylistFolder(context: context)
       playlistFolder.uuid = folder.uuid
@@ -143,8 +144,16 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       includesPropertyValues: false)
   }
 
-  public static func removeFolder(_ folder: PlaylistFolder) {
-    folder.delete()
+  public static func removeFolder(_ folder: PlaylistFolder, completion: (() -> Void)? = nil) {
+    let objectID = folder.objectID
+    DataController.perform(context: .new(inMemory: false)) { context in
+      let objectOnContext = context.object(with: objectID)
+      context.delete(objectOnContext)
+      
+      DispatchQueue.main.async {
+        completion?()
+      }
+    }
   }
 
   public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (Result<PlaylistFolder, Error>) -> Void) {

@@ -144,12 +144,24 @@ extension PlaylistListViewController: UITableViewDataSource {
       header.subtitleLabel.isHidden = folder.creatorName == nil
       header.setState(isPersistent ? .menu : .add)
       
-      header.onAddPlaylist = {
-        Task { @MainActor [weak folder] in
-          guard let folder = folder else { return }
-          let persistentFolderId = await PlaylistSharedFolderModel.saveToDiskStorage(memoryFolder: folder)
-          PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
-        }
+      header.onAddPlaylist = { [weak self] in
+        guard let self = self else { return }
+        let controller = PopupViewController(rootView: PlaylistFolderSharingManagementView(onAddToPlaylistPressed: { [weak self] in
+          self?.dismiss(animated: true)
+          
+          Task { @MainActor [weak folder] in
+            guard let folder = folder else { return }
+
+            let persistentFolderId = await PlaylistSharedFolderModel.saveToDiskStorage(memoryFolder: folder)
+            PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+          }
+        }, onSettingsPressed: {
+          // TODO: Take user to the settings screen
+        }, onCancelPressed: { [weak self] in
+          self?.dismiss(animated: true)
+        }))
+        
+        self.present(controller, animated: true, completion: nil)
       }
       
       header.menu = { [weak header, weak folder] in
@@ -249,9 +261,10 @@ extension PlaylistListViewController: UITableViewDataSource {
           self?.tableView.reloadData()
         }
         
-        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { [weak self] _ in
-          PlaylistManager.shared.delete(folder: folder)
-          self?.navigationController?.popToRootViewController(animated: true)
+        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { _ in
+          PlaylistManager.shared.delete(folder: folder) { [weak self] _ in
+            self?.navigationController?.popToRootViewController(animated: true)
+          }
         }
         
         if folder.sharedFolderId != nil {

@@ -265,8 +265,7 @@ public class PlaylistManager: NSObject {
     downloadManager.cancelDownload(itemId: itemId)
   }
 
-  @discardableResult
-  func delete(folder: PlaylistFolder) -> Bool {
+  func delete(folder: PlaylistFolder, _ completion: ((_ success: Bool) -> Void)? = nil) {
     var success = true
     var itemsToDelete = [PlaylistInfo]()
 
@@ -298,16 +297,30 @@ public class PlaylistManager: NSObject {
     
     // Attempt to delete the folder if we can
     if success, folder.uuid != PlaylistFolder.savedFolderUUID {
-      PlaylistFolder.removeFolder(folder)
-    }
+      PlaylistFolder.removeFolder(folder) { [weak self] in
+        guard let self = self else {
+          completion?(success)
+          return
+        }
+        
+        if self.currentFolder?.isDeleted == true {
+          self.currentFolder = nil
+        }
 
-    if currentFolder?.isDeleted == true {
-      currentFolder = nil
-    }
+        self.onFolderDeleted.send()
+        self.reloadData()
+        
+        completion?(success)
+      }
+    } else {
+      if currentFolder?.isDeleted == true {
+        currentFolder = nil
+      }
 
-    onFolderDeleted.send()
-    reloadData()
-    return success
+      onFolderDeleted.send()
+      reloadData()
+      completion?(success)
+    }
   }
 
   @discardableResult

@@ -43,18 +43,6 @@ class PlaylistFolderController: UIViewController {
 
     overrideUserInterfaceStyle = .dark
 
-    do {
-      try nonSharedFoldersFrc.performFetch()
-    } catch {
-      log.error("Error: \(error)")
-    }
-    
-    do {
-      try sharedFoldersFrc.performFetch()
-    } catch {
-      log.error("Error: \(error)")
-    }
-
     toolbarItems = [
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
       UIBarButtonItem(title: Strings.PlaylistFolders.playlistNewFolderButtonTitle, style: .plain, target: self, action: #selector(onNewFolder(_:))),
@@ -75,7 +63,7 @@ class PlaylistFolderController: UIViewController {
       $0.dragInteractionEnabled = true
     }
 
-    tableView.reloadData()
+    reloadData()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -84,6 +72,8 @@ class PlaylistFolderController: UIViewController {
     // Reload the table when visible
     nonSharedFoldersFrc.delegate = self
     sharedFoldersFrc.delegate = self
+    reloadData()
+    
     navigationController?.setToolbarHidden(false, animated: true)
   }
 
@@ -148,6 +138,18 @@ class PlaylistFolderController: UIViewController {
 }
 
 extension PlaylistFolderController: UITableViewDataSource {
+  func reloadData() {
+    Section.allCases.forEach({
+      do {
+        try frc(for: $0)?.performFetch()
+      } catch {
+        log.error("Error: \(error)")
+      }
+    })
+
+    tableView.reloadData()
+  }
+  
   func numberOfSections(in tableView: UITableView) -> Int {
     return Section.allCases.count
   }
@@ -223,17 +225,9 @@ extension PlaylistFolderController: UITableViewDataSource {
 extension PlaylistFolderController: UITableViewDelegate {
 
   private func deleteFolder(folder: PlaylistFolder) {
-    PlaylistManager.shared.delete(folder: folder)
-
-    Section.allCases.forEach({
-      do {
-        try frc(for: $0)?.performFetch()
-      } catch {
-        log.error("Error: \(error)")
-      }
-    })
-
-    tableView.reloadData()
+    PlaylistManager.shared.delete(folder: folder) { [weak self] _ in
+      self?.reloadData()
+    }
   }
 
   private func onEditFolder(folderUUID: String) {
@@ -303,18 +297,7 @@ extension PlaylistFolderController: UITableViewDelegate {
 
       PlaylistFolder.addFolder(title: folderTitle) { uuid in
         PlaylistItem.moveItems(items: selectedItems, to: uuid)
-
-        DispatchQueue.main.async {
-          Section.allCases.forEach({
-            do {
-              try self.frc(for: $0)?.performFetch()
-            } catch {
-              log.error("Error Reloading Table: \(error)")
-            }
-          })
-
-          self.tableView.reloadData()
-        }
+        self.reloadData()
       }
     }
 
@@ -483,50 +466,17 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
     if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
-
-    var indexPath = indexPath
-    var newIndexPath = newIndexPath
-
-    if controller == nonSharedFoldersFrc {
-      indexPath?.section = Section.nonSharedFolders.rawValue
-      newIndexPath?.section = Section.nonSharedFolders.rawValue
-    } else if controller == sharedFoldersFrc {
-      indexPath?.section = Section.sharedFolders.rawValue
-      newIndexPath?.section = Section.sharedFolders.rawValue
-    } else {
-      log.error("SHOULD NEVER GET HERE!")
-      return
-    }
-
-    switch type {
-    case .insert:
-      guard let newIndexPath = newIndexPath else { break }
-      tableView.insertRows(at: [newIndexPath], with: .fade)
-    case .delete:
-      guard let indexPath = indexPath else { break }
-      tableView.deleteRows(at: [indexPath], with: .fade)
-    case .update:
-      guard let indexPath = indexPath else { break }
-      tableView.reloadRows(at: [indexPath], with: .fade)
-    case .move:
-      guard let indexPath = indexPath,
-        let newIndexPath = newIndexPath
-      else { break }
-      tableView.deleteRows(at: [indexPath], with: .fade)
-      tableView.insertRows(at: [newIndexPath], with: .fade)
-    default:
-      break
-    }
+    reloadData()
   }
 
   func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
-    tableView.endUpdates()
+    reloadData()
   }
 
   func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
-    tableView.beginUpdates()
+    reloadData()
   }
 }
 
