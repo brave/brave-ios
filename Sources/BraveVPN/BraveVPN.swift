@@ -81,10 +81,13 @@ public class BraveVPN {
     return receipt
   }
   
-  public static func setSkusCredential(_ credential: String) {
+  public static func setSkusCredential(_ credential: String, domain: String) {
     Preferences.VPN.skusCredential.value = credential
     GRDSubscriptionManager.setIsPayingUser(true)
     populateRegionDataIfNecessary()
+    
+    
+    
     if let unescapedCredential = credential.unescape() {
       let cookies = HTTPCookie.cookies(withResponseHeaderFields: ["Set-Cookie": unescapedCredential], for: URL(string: "https://brave.com")!)
       if let cookie = cookies.first {

@@ -83,6 +83,37 @@ class BraveSkusWebHelper {
     }
   }
   
+  var environment: String? {
+    guard let host = url.host else { return nil }
+    return Self.environment(domain: host)
+  }
+  
+  static func environment(domain: String) -> String? {
+    switch domain {
+    case "account.brave.software": return "development"
+    case "account.bravesoftware.com": return "staging"
+    case "account.brave.com": return "production"
+    default:
+      assertionFailure()
+      return nil
+    }
+  }
+  
+  /// Takes credential passed from the Brave SKUs and extract a proper credential to pass to the GuardianConnect framework.
+  static func fetchVPNCredential(_ credential: String, domain: String) -> (credential: String, environment: String)? {
+    guard let unescapedCredential = credential.unescape(),
+          let env = environment(domain: domain),
+            let sampleUrl = URL(string: "https://brave.com") else { return nil }
+    
+    guard let guardianConnectCredential =
+      HTTPCookie.cookies(withResponseHeaderFields:
+                          ["Set-Cookie": unescapedCredential], for: sampleUrl).first?.value else {
+      return nil
+    }
+    
+    return (guardianConnectCredential, env)
+  }
+  
   static func milisecondsOptionalDate(from stringDate: String) -> Date? {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [

@@ -96,7 +96,7 @@ class BraveSkusScriptHandler: TabContentScript {
     log.debug("skus prepareCredentialsPresentation")
     sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
       if !credential.isEmpty {
-        BraveVPN.setSkusCredential(credential)
+        BraveVPN.setSkusCredential(credential, domain: domain)
       } else {
         assertionFailure()
       }
