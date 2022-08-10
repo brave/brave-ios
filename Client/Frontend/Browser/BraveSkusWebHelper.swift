@@ -82,6 +82,20 @@ class BraveSkusWebHelper {
       return nil
     }
   }
+  
+  static func milisecondsOptionalDate(from stringDate: String) -> Date? {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [
+      .withYear,
+      .withMonth,
+      .withDay,
+      .withTime,
+      .withDashSeparatorInDate,
+      .withColonSeparatorInTime
+    ]
+    
+    return formatter.date(from: stringDate)
+  }
 }
 
 // MARK: - Testing

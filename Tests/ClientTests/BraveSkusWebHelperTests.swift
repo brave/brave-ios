@@ -61,4 +61,10 @@ final class BraveSkusWebHelperTests: XCTestCase {
     XCTAssertEqual(package, try XCTUnwrap(Bundle.main.bundleIdentifier))
     XCTAssertEqual(subscriptionId, "brave-firewall-vpn-premium")
   }
+  
+  func testMilisecondsOptionalDateFormatter() throws {
+    XCTAssertNotNil(BraveSkusWebHelper.milisecondsOptionalDate(from: "2022-08-01T00:21:21"))
+    XCTAssertNotNil(BraveSkusWebHelper.milisecondsOptionalDate(from: "2022-08-01T00:21:21.123456"))
+    XCTAssertNotNil(BraveSkusWebHelper.milisecondsOptionalDate(from: "2022-08-01T00:21:21.9"))
+  }
 }
