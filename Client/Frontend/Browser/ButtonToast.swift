@@ -15,7 +15,7 @@ struct ButtonToastUX {
   static let toastButtonBorderWidth: CGFloat = 1
   static let toastLabelFont = UIFont.systemFont(ofSize: 15, weight: .semibold)
   static let toastDescriptionFont = UIFont.systemFont(ofSize: 13)
-  static let toastDismissAfter = DispatchTimeInterval.milliseconds(6000)  // 6 seconds.
+  static let toastDismissAfter = DispatchTimeInterval.milliseconds(10000)  // 10 seconds.
 }
 
 class ButtonToast: Toast {

@@ -102,7 +102,7 @@ class SendTabToSelfContentController: UITableViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    navigationItem.title = "Send Webpage"
+    navigationItem.title = Strings.OpenTabs.sendWebpageScreenTitle
     navigationItem.leftBarButtonItem =
       UIBarButtonItem(title: Strings.cancelButtonTitle, style: .plain, target: self, action: #selector(cancel))
 
@@ -113,11 +113,11 @@ class SendTabToSelfContentController: UITableViewController {
       $0.registerHeaderFooter(SendTabToSelfContentHeaderFooterView.self)
       tableView.tableFooterView = SendTabToSelfContentHeaderFooterView(
         frame: CGRect(width: tableView.bounds.width, height: UX.standardItemHeight)).then {
-        $0.titleLabel.text = "Send To Your Device"
-        $0.titleLabel.isUserInteractionEnabled = true
-        $0.titleLabel.addGestureRecognizer(UITapGestureRecognizer(
-          target: self,
-          action: #selector(tappedSendLabel(_:))))
+          $0.titleLabel.text = Strings.OpenTabs.sendDeviceButtonTitle
+          $0.titleLabel.isUserInteractionEnabled = true
+          $0.titleLabel.addGestureRecognizer(UITapGestureRecognizer(
+            target: self,
+            action: #selector(tappedSendLabel(_:))))
       }
     }
   }

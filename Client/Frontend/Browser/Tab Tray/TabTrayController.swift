@@ -302,7 +302,7 @@ class TabTrayController: LoadingViewController {
     tabTrayView.isHidden = tabTrayMode == .sync
     tabSyncView.isHidden = tabTrayMode == .local
     
-    searchBarView?.searchBar.placeholder = tabTrayMode == .local ? Strings.tabTraySearchBarTitle : "Search Open Tabs"
+    searchBarView?.searchBar.placeholder = tabTrayMode == .local ? Strings.tabTraySearchBarTitle : Strings.OpenTabs.tabTrayOpenTabSearchBarTitle
   }
   
   private func updateColors(_ isPrivateBrowsing: Bool) {
@@ -391,6 +391,8 @@ class TabTrayController: LoadingViewController {
   }
   
   func reloadOpenTabsSession(for query: String? = nil) {
+    // Fetch all synced session from devices with open tabs information
+    // Query is nil when search bar is inactive
     sessionList = fetchSyncedSessions(for: query)
     
     tabSyncView.do {

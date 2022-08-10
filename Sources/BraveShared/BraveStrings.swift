@@ -2964,6 +2964,123 @@ extension Strings {
 }
 
 extension Strings {
+  public struct OpenTabs {
+    public static let sendWebpageScreenTitle =
+      NSLocalizedString(
+        "openTabs.sendWebpageScreenTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Send Webpage",
+        comment: "The title displayed on the send wendwebpage screen")
+    public static let sendDeviceButtonTitle =
+      NSLocalizedString(
+        "opentabs.sendDeviceButtonTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Send To Your Device",
+        comment: "Title action button for sending webpage to selected other device")
+    public static let openTabsItemLastSyncedTodayTitle =
+      NSLocalizedString(
+        "opentabs.openTabsItemLastSyncedTodayTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Last synced: Today %@",
+        comment: "The desription indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string represantation of the exact time. E.g.: Last Synced: Today 12:00 PM")
+    public static let openTabsItemLastSyncedYesterdayTitle =
+      NSLocalizedString(
+        "opentabs.openTabsItemLastSyncedYesterdayTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Last synced: Yesterday %@",
+        comment: "The desription indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string represantation of the exact time. E.g.: Last Synced: Yesterday 12:00 PM")
+    public static let openTabsItemLastSyncedLastWeekTitle =
+      NSLocalizedString(
+        "opentabs.openTabsItemLastSyncedLastWeekTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Last synced: Last Week %@",
+        comment: "The desription indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string represantation of the exact day of the week and exact time. E.g.: Last Synced: Last Week Monday 12:00 PM")
+    public static let openTabsItemLastSyncedFullTitle =
+      NSLocalizedString(
+        "opentabs.openTabsItemLastSyncedFullTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Last synced: %@",
+        comment: "The desription indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string represantation of the exact time-date. E.g.: Last Synced: 14:00 PM 08-08-2022")
+    public static let activePeriodDeviceTodayTitle =
+      NSLocalizedString(
+        "opentabs.activePeriodDeviceTodayTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Active Today",
+        comment: "The desription indicating the device is active last time today")
+    public static let activePeriodDeviceYesterdayTitle =
+      NSLocalizedString(
+        "opentabs.activePeriodDeviceYesterdayTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Active Yesterday",
+        comment: "The desription indicating the device is active last time yesterday")
+    public static let activePeriodDeviceThisWeekTitle =
+      NSLocalizedString(
+        "opentabs.activePeriodDeviceThisWeekTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Active Last Week",
+        comment: "The desription indicating the device is active last time this week")
+    public static let activePeriodDeviceThisMonthTitle =
+      NSLocalizedString(
+        "opentabs.activePeriodDeviceThisMonthTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Active Last Month",
+        comment: "The desription indicating the device is active last time this month")
+    public static let activePeriodDeviceDaysAgoTitle =
+      NSLocalizedString(
+        "opentabs.activePeriodDeviceDaysAgoTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Active %ld Days Ago",
+        comment: "The desription indicating the device is active # of days ago. The parameter substituted for \"%ld\" is the number of days. E.g.: Active 123 Days Ago")
+    public static let tabTrayOpenTabSearchBarTitle =
+      NSLocalizedString(
+        "opentabs.tabTrayOpenSearchBarTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Search Open Tabs",
+        comment: "The placeholder written in seach bar while trab tray is showing open tabs.")
+    public static let noSyncSessionPlaceHolderViewTitle =
+      NSLocalizedString(
+        "opentabs.noSyncSessionPlaceHolderViewTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Tabs From other devices will appear here",
+        comment: "The title of the view showing no synced sessions")
+    public static let noSyncSessionPlaceHolderViewDescription =
+      NSLocalizedString(
+        "opentabs.noSyncSessionPlaceHolderViewDescription",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Too see your tabs from other devices, join a sync chain and enable Open Tabs",
+        comment: "The description of the view showing no synced sessions")
+    public static let noDevicesSyncChainPlaceholderViewTitle =
+      NSLocalizedString(
+        "opentabs.noDevicesSyncChainPlaceholderViewTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "No Devices in this sync chain",
+        comment: "The title of the view showing no devices inside sync chain")
+    public static let noDevicesSyncChainPlaceholderViewDescription =
+      NSLocalizedString(
+        "opentabs.noDevicesSyncChainPlaceholderViewDescription",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "To see your devices and enabled sync types, join a sync chain",
+        comment: "The description of the view showing no devices inside sync chain")
+  }
+}
+
+extension Strings {
   public struct BraveNews {
     public static let braveNews = NSLocalizedString("today.braveToday", tableName: "BraveShared", bundle: .strings,
       value: "Brave News",

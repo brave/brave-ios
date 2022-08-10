@@ -81,7 +81,9 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-    
+  
+  /// Tap action where arrow indicating header status rotates with animation
+  /// - Parameter gestureRecognizer: Tap GestureRecognizer
   @objc func tapHeader(_ gestureRecognizer: UITapGestureRecognizer) {
     guard let cell = gestureRecognizer.view as? TabSyncHeaderView else {
       return
@@ -94,7 +96,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     }
   }
     
-  func setCollapsed(completion: (() -> Void)? = nil) {
+  private func setCollapsed(completion: (() -> Void)? = nil) {
     CATransaction.begin()
     
     let animation = CABasicAnimation(keyPath: "transform.rotation").then {

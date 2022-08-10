@@ -271,7 +271,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       rewards: rewards,
       tabGeneratorAPI: braveCore.tabGeneratorAPI)
     
-    // Add Regular tabs to Sync Chain 
+    // Add Regular tabs to Sync Chain
     if Preferences.Chromium.syncOpenTabsEnabled.value {
       tabManager.addRegularTabsToSyncChain()
     }
@@ -317,6 +317,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     feedDataSource.rewards = rewards
     
+    // Observer watching tab information is sent by another device
     openTabsModelStateListener = braveCore.sendTabAPI.add(
       SendTabToSelfStateObserver { [weak self] stateChange in
         switch stateChange {
@@ -1778,6 +1779,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   func makeShareActivities(for url: URL, tab: Tab?, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) -> [UIActivity] {
     var activities = [UIActivity]()
 
+    // Adding SendTabToSelfActivity conditionally to show device selection screen
     if !PrivateBrowsingManager.shared.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL,
         braveCore.syncAPI.isSendTabToSelfVisible {
       let sendTabToSelfActivity = SendTabToSelfActivity() { [weak self] in

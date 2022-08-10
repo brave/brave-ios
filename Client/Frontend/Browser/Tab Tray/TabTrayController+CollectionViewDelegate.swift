@@ -21,7 +21,6 @@ extension TabTrayController: UICollectionViewDelegate {
 
 extension TabTrayController: UICollectionViewDragDelegate {
   func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-
     guard let tab = dataSource.itemIdentifier(for: indexPath) else { return [] }
 
     UIImpactFeedbackGenerator(style: .medium).bzzt()
@@ -45,7 +44,7 @@ extension TabTrayController: UICollectionViewDropDelegate {
       let destinationIndexPath = coordinator.destinationIndexPath
     else { return }
 
-    coordinator.drop(dragItem, toItemAt: destinationIndexPath)
+    _ = coordinator.drop(dragItem, toItemAt: destinationIndexPath)
     tabManager.moveTab(tab, toIndex: destinationIndexPath.item)
     delegate?.tabOrderChanged()
     applySnapshot()

@@ -11,11 +11,15 @@ extension TabTrayController: UISearchResultsUpdating {
 
   func updateSearchResults(for searchController: UISearchController) {
     guard let query = searchController.searchBar.text else { return }
-
+    
     invalidateSearchTimer()
-
-    searchTabTrayTimer =
-      Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+    
+    searchTabTrayTimer = Timer.scheduledTimer(
+      timeInterval: 0.1,
+      target: self,
+      selector: #selector(fetchSearchResults(timer:)),
+      userInfo: query,
+      repeats: false)
   }
 
   @objc private func fetchSearchResults(timer: Timer) {

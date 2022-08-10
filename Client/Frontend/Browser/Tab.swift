@@ -50,8 +50,6 @@ enum TabSecureContentState {
 
 class Tab: NSObject {
   var id: String?
-
-  let syncTab: BraveSyncTab?
   let rewardsId: UInt32
 
   var onScreenshotUpdated: (() -> Void)?
@@ -59,8 +57,10 @@ class Tab: NSObject {
 
   var alertShownCount: Int = 0
   var blockAllAlerts: Bool = false
+  
   private(set) var type: TabType = .regular
-
+  private let syncTab: BraveSyncTab?
+  
   var redirectURLs = [URL]()
 
   var isPrivate: Bool {
@@ -140,6 +140,7 @@ class Tab: NSObject {
         url = URL(string: internalUrl.stripAuthorization)
       }
       
+      // Setting URL in SyncTab is adding pending item to navigation manager on brave-core side
       if let url = url, !isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
         syncTab?.setURL(url)
       }
@@ -764,6 +765,11 @@ class Tab: NSObject {
 
   func stopMediaPlayback() {
     tabDelegate?.stopMediaPlayback(self)
+  }
+  
+  func addTabInfoToSyncedSessions(url: URL, displayTitle: String) {
+    syncTab?.setURL(url)
+    syncTab?.setTitle(displayTitle)
   }
 }
 

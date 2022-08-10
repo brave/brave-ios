@@ -85,8 +85,8 @@ extension TabTrayController {
 
       scrollView.snp.makeConstraints {
         $0.edges.equalTo(self.snp.edges)
-        
       }
+      
       scrollView.contentLayoutGuide.snp.makeConstraints {
         $0.width.equalTo(self)
         $0.top.equalTo(self.stackView).offset(2 * UX.minBottomMargin)

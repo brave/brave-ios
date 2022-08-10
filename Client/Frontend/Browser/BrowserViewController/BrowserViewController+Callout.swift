@@ -143,6 +143,7 @@ extension BrowserViewController {
   }
   
   func presentTabReceivedCallout(url: URL) {
+    // 'Tab Received' indicator will only be shown in normal browsing
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       let toast = ButtonToast(
         labelText: Strings.Callout.tabReceivedCalloutTitle,

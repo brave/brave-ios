@@ -52,6 +52,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
       $0.imageView?.layer.cornerCurve = .continuous
       $0.imageView?.layer.masksToBounds = true
 
+      // TODO: Remove Domain creation and load FavIcon method swap the method with brave-core fetch #5312
       let domain = Domain.getOrCreate(
         forUrl: distantTab.url,
         persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
@@ -185,37 +186,36 @@ extension Date {
         
     if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.today.period)) ==
         ComparisonResult.orderedDescending {
-      return "Last synced: Today \(hourFormatter.string(from: self))"
+      return String(format: Strings.OpenTabs.openTabsItemLastSyncedTodayTitle, hourFormatter.string(from: self))
     } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.yesterday.period)) ==
                 ComparisonResult.orderedDescending {
-      return "Last synced: Yesterday \(hourFormatter.string(from: self))"
+      return String(format: Strings.OpenTabs.openTabsItemLastSyncedYesterdayTitle, hourFormatter.string(from: self))
     } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastWeek.period)) ==
                 ComparisonResult.orderedDescending {
-      return "Last synced: Last Week \(hourDayFormatter.string(from: self))"
+      return String(format: Strings.OpenTabs.openTabsItemLastSyncedLastWeekTitle, hourDayFormatter.string(from: self))
     }
     
-    return "Last Synced: \(fullDateFormatter.string(from: self))"
+    return String(format: Strings.OpenTabs.openTabsItemLastSyncedFullTitle, fullDateFormatter.string(from: self))
   }
   
   var formattedActivePeriodDate: String {
     if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.today.period)) ==
         ComparisonResult.orderedDescending {
-      return "Active Today"
+      return Strings.OpenTabs.activePeriodDeviceTodayTitle
     } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.yesterday.period)) ==
                 ComparisonResult.orderedDescending {
-      return "Active Yesterday"
+      return Strings.OpenTabs.activePeriodDeviceYesterdayTitle
     } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastWeek.period)) ==
                 ComparisonResult.orderedDescending {
-      return "Active This Week"
-    
+      return Strings.OpenTabs.activePeriodDeviceThisWeekTitle
     } else if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.lastMonth.period)) ==
                 ComparisonResult.orderedDescending {
-      return "Active This Month"
+      return Strings.OpenTabs.activePeriodDeviceThisMonthTitle
     }
       
     let dateComponents = Calendar(identifier: .gregorian).dateComponents([.day], from: self, to: Date())
       
-    return "Active \(dateComponents.day ?? 0) Days Ago"
+    return String(format: Strings.OpenTabs.activePeriodDeviceDaysAgoTitle, (dateComponents.day ?? 0))
   }
   
   private func getCurrentDateWith(dayOffset: Int) -> Date {

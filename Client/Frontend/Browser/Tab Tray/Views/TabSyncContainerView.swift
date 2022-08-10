@@ -21,8 +21,8 @@ extension TabTrayController {
     var tableView = UITableView()
     
     lazy var noSyncTabsOverlayView = EmptyStateOverlayView(
-      title: "Tabs From other devices will appear here",
-      description: "To see your tabs from devices, join a sync chain and enable Open Tabs",
+      title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
+      description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
       icon: UIImage(systemName: "laptopcomputer.and.iphone"))
 
     override init(frame: CGRect) {
@@ -56,6 +56,9 @@ extension TabTrayController {
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
     
+    /// Update visibility of view shown when no synced session exists
+    /// This view contaisn information about  how to join sync and enable open tabs
+    /// - Parameter isHidden: Boolean to set isHidden
     func updateNoSyncPanelState(isHidden: Bool) {
       if isHidden {
         noSyncTabsOverlayView.removeFromSuperview()

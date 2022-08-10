@@ -94,7 +94,7 @@ class TabManager: NSObject {
   private let syncedTabsQueue = DispatchQueue(label: "synced-tabs-queue")
   private var syncTabsTask: DispatchWorkItem?
 
-  init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?, tabGeneratorAPI: BraveTabGeneratorAPI) {
+  init(prefs: Prefs, imageStore: DiskImageStore?, rewards: BraveRewards?, tabGeneratorAPI: BraveTabGeneratorAPI?) {
     assert(Thread.isMainThread)
 
     self.prefs = prefs
@@ -211,7 +211,8 @@ class TabManager: NSObject {
     }
   }
   
-  /// <#Description#>
+  /// Function for adding local tabs as synced sessions
+  /// This is used when open tabs toggle is enabled in sync settings and browser constructor
   func addRegularTabsToSyncChain() {
     let regularTabs = tabs(withType: .regular)
 
@@ -225,8 +226,7 @@ class TabManager: NSObject {
         
         for tab in regularTabs {
           if let url = tab.fetchedURL, !tab.type.isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
-            tab.syncTab?.setURL(url)
-            tab.syncTab?.setTitle(tab.displayTitle)
+            tab.addTabInfoToSyncedSessions(url: url, displayTitle: tab.displayTitle)
           }
         }
 

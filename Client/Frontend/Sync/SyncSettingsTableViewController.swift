@@ -134,8 +134,8 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
   private var tableView = UITableView(frame: .zero, style: .grouped)
 
   private lazy var noSyncedDevicesOverlayView = EmptyStateOverlayView(
-    title: "No Devices in this sync chain",
-    description: "To see your devices and enabled sync types, join a sync chain",
+    title: Strings.OpenTabs.noDevicesSyncChainPlaceholderViewTitle,
+    description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
     icon: UIImage(systemName: "exclamationmark.arrow.triangle.2.circlepath"))
 
   // MARK: Actions
@@ -206,7 +206,7 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
     case SyncDataTypes.openTabs.rawValue:
       Preferences.Chromium.syncOpenTabsEnabled.value = toggle.isOn
       
-      //Sync Regular Tabs when Opent Tabs are enabled
+      // Sync Regular Tabs when open tabs are enabled
       if Preferences.Chromium.syncOpenTabsEnabled.value {
         tabManager.addRegularTabsToSyncChain()
       }
@@ -217,6 +217,9 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
     syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
   }
   
+  /// Update visibility of view shown when no devices returned for sync session
+  /// This view is used for error state and will enable users to fetch details from sync internals
+  /// - Parameter isHidden: Boolean to set isHidden
   private func updateNoSyncedDevicesState(isHidden: Bool) {
     if isHidden {
       noSyncedDevicesOverlayView.removeFromSuperview()
