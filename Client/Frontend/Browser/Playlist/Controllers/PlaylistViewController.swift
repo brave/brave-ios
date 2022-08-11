@@ -194,6 +194,7 @@ class PlaylistViewController: UIViewController {
     if let navigationController = folderController.navigationController {
       navigationController.popToRootViewController(animated: false)
       
+      listController.loadingState = .loading
       PlaylistManager.shared.currentFolder = nil
       folderController.navigationController?.pushViewController(listController, animated: false)
 
@@ -201,6 +202,24 @@ class PlaylistViewController: UIViewController {
         let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: folderSharingId)
         let folder = await model.createInMemoryStorage()
         PlaylistManager.shared.currentFolder = folder
+        self.listController.loadingState = .partial
+        
+        Task { @MainActor in
+          let items = await PlaylistSharedFolderModel.fetchMediaItemInfo(item: model)
+          folder.playlistItems?.forEach({ playlistItem in
+            if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
+              playlistItem.name = item.name
+              playlistItem.pageTitle = item.pageTitle
+              playlistItem.pageSrc = item.pageSrc
+              playlistItem.duration = item.duration
+              playlistItem.mimeType = item.mimeType
+              playlistItem.mediaSrc = item.src
+              playlistItem.uuid = item.tagId
+            }
+          })
+          
+          self.listController.loadingState = .fullyLoaded
+        }
       }
     }
   }

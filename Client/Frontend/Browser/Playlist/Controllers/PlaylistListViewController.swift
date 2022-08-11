@@ -23,6 +23,13 @@ private let log = Logger.browserLogger
 // MARK: - PlaylistListViewController
 
 class PlaylistListViewController: UIViewController {
+  // MARK: Loading State
+  enum LoadingState {
+    case partial
+    case loading
+    case fullyLoaded
+  }
+  
   // MARK: Constants
 
   struct Constants {
@@ -47,6 +54,11 @@ class PlaylistListViewController: UIViewController {
   private var folderObserver: AnyCancellable?
   private(set) var autoPlayEnabled = Preferences.Playlist.firstLoadAutoPlay.value
   var playerController: AVPlayerViewController?
+  var loadingState: LoadingState = .fullyLoaded {
+    didSet {
+      tableView.reloadData()
+    }
+  }
 
   let activityIndicator = UIActivityIndicatorView(style: .medium).then {
     $0.color = .white
@@ -558,7 +570,7 @@ class PlaylistListViewController: UIViewController {
 
 extension PlaylistListViewController {
   func updateTableBackgroundView() {
-    if PlaylistManager.shared.numberOfAssets > 0 || PlaylistManager.shared.currentFolder == nil {
+    if PlaylistManager.shared.numberOfAssets > 0 || loadingState != .fullyLoaded {
       tableView.backgroundView = nil
       tableView.separatorStyle = .singleLine
       

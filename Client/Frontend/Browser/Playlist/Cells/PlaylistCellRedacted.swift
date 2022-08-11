@@ -11,126 +11,27 @@ import DesignSystem
 import BraveShared
 import Data
 
-@available(iOS, deprecated: 15.0, renamed: "SwiftUI.AsyncImage")
-public struct AsyncImage<Content: View>: View {
-  @StateObject private var loader = ImageLoader()
-  
-  private let url: URL?
-  private let scale: CGFloat
-  private let transaction: Transaction
-  private let render: (AsyncImagePhase) -> Content
-  
-  public init(url: URL?, scale: CGFloat = 1) where Content == Image {
-    self.url = url
-    self.scale = scale
-    self.transaction = Transaction()
-    self.render = { $0.image ?? Image("") }
-  }
-
-  init<ContentView: View, PlaceHolder: View>(url: URL, scale: CGFloat = 1, @ViewBuilder content: @escaping (Image) -> ContentView, @ViewBuilder placeholder: @escaping () -> PlaceHolder) where Content == _ConditionalContent<ContentView, PlaceHolder> {
-      
-    self.url = url
-    self.scale = scale
-    self.transaction = Transaction()
-    
-    self.render = { phase -> _ConditionalContent<ContentView, PlaceHolder> in
-      if let image = phase.image {
-        return ViewBuilder.buildEither(first: content(image))
-      } else {
-        return ViewBuilder.buildEither(second: placeholder())
-      }
-    }
-  }
-  
-  public init(url: URL?, scale: CGFloat = 1, transaction: Transaction = Transaction(), @ViewBuilder content: @escaping (AsyncImagePhase) -> Content) {
-    self.url = url
-    self.scale = scale
-    self.transaction = transaction
-    self.render = content
-  }
-
-  public var body: some View {
-    render(loader.phase)
-      .onAppear {
-        loader.load(url, scale: scale, transaction: transaction)
-      }
-      .onChange(of: url) { url in
-        loader.load(url, scale: scale, transaction: transaction)
-      }
-  }
-  
-  private class ImageLoader: ObservableObject {
-    @Published var phase: AsyncImagePhase
-    
-    init() {
-      self.phase = .empty
-    }
-      
-    func load(_ url: URL?, scale: CGFloat, transaction: Transaction) {
-      guard let url = url, !url.absoluteString.isEmpty else {
-        withTransaction(transaction) {
-          self.phase = .empty
-        }
-        return
-      }
-      
-      let session = URLSession(configuration: .ephemeral)
-      Task { @MainActor in
-        do {
-          let (data, _) = try await session.dataRequest(with: url)
-          withTransaction(transaction) {
-            if let image = UIImage(data: data, scale: scale) {
-              self.phase = .success(Image(uiImage: image))
-            } else {
-              self.phase = .empty
-            }
-          }
-        } catch {
-          self.phase = .failure(error)
-        }
-      }
-    }
-  }
-  
-  public enum AsyncImagePhase {
-    case empty
-    case success(Image)
-    case failure(Error)
-
-    public var image: Image? {
-      switch self {
-      case .empty, .failure: return nil
-      case .success(let image): return image
-      }
-    }
-    
-    public var error: Error? {
-      switch self {
-      case .empty, .success: return nil
-      case .failure(let error): return error
-      }
-    }
-  }
-}
-
 private struct PlaylistRedactedHeaderView: View {
+  @Observable var title: String?
+  @Observable var creatorName: String?
+  
   var body: some View {
     HStack(alignment: .center) {
       VStack(alignment: .leading) {
-        Text("PlaylistTitlePlaceholder" /* Placeholder */)
+        Text(title ?? "PlaylistTitlePlaceholder" /* Placeholder */)
           .font(.title3)
           .fontWeight(.medium)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
-          .redacted(reason: .placeholder)
-          .shimmer(true)
+          .redacted(reason: title == nil ? .placeholder : [])
+          .shimmer(title == nil)
         
-        Text("CreatorName" /* Placeholder */)
+        Text(creatorName ?? "CreatorName" /* Placeholder */)
           .font(.footnote)
           .foregroundColor(Color(.braveLabel))
           .multilineTextAlignment(.leading)
-          .redacted(reason: .placeholder)
-          .shimmer(true)
+          .redacted(reason: creatorName == nil ? .placeholder : [])
+          .shimmer(creatorName == nil)
       }
       
       Spacer()
@@ -149,38 +50,52 @@ private struct PlaylistRedactedHeaderView: View {
 }
 
 private struct PlaylistCellRedactedView: View {
+  @Observable var thumbnail: UIImage?
+  @Observable var title: String?
+  @Observable var subtitle: String?
+  
   var body: some View {
     HStack(alignment: .center) {
-      Image("")
+      Image(uiImage: UIImage())
         .resizable()
+        .background(Color.black)
         .frame(width: 64.0 * 1.47, height: 64.0, alignment: .center)
         .aspectRatio(contentMode: .fit)
-        .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 5.0, style: .continuous))
-        .shimmer(true)
+        .overlay(
+          VStack {
+            Image(uiImage: thumbnail ?? UIImage())
+              .resizable()
+              .aspectRatio(1.0, contentMode: .fit)
+              .clipShape(RoundedRectangle(cornerRadius: 3.0, style: .continuous))
+          }.padding(), alignment: .center
+        )
+        .shimmer(thumbnail == nil)
       
       VStack(alignment: .leading) {
-        Text("Placeholder Title\nPlaceholder Title Second Line")
+        Text(title ?? "Placeholder Title - Placeholder Title Longer")
           .font(.callout)
           .fontWeight(.medium)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
-          .redacted(reason: .placeholder)
-          .shimmer(true)
+          .redacted(reason: title == nil ? .placeholder : [])
+          .shimmer(title == nil)
         
-        Text("Placeholder SubTitle")
+        Text(subtitle ?? "Placeholder SubTitle")
           .font(.callout)
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
-          .redacted(reason: .placeholder)
-          .shimmer(true)
+          .redacted(reason: subtitle == nil ? .placeholder : [])
+          .shimmer(subtitle == nil)
         
-        Text("00:00")
-          .font(.footnote)
-          .foregroundColor(Color(.secondaryBraveLabel))
-          .multilineTextAlignment(.leading)
-          .redacted(reason: .placeholder)
-          .shimmer(true)
+        if subtitle == nil {
+          Text("00:00")
+            .font(.footnote)
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .multilineTextAlignment(.leading)
+            .redacted(reason: .placeholder)
+            .shimmer(true)
+        }
       }
       
       Spacer()
@@ -193,10 +108,11 @@ private struct PlaylistCellRedactedView: View {
 }
 
 class PlaylistRedactedHeader: UITableViewHeaderFooterView {
+  private let hostingController = UIHostingController(rootView: PlaylistRedactedHeaderView())
+  
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     
-    let hostingController = UIHostingController(rootView: PlaylistRedactedHeaderView())
     contentView.addSubview(hostingController.view)
     hostingController.view.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -205,14 +121,24 @@ class PlaylistRedactedHeader: UITableViewHeaderFooterView {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setTitle(title: String?) {
+    hostingController.rootView.title = title
+  }
+  
+  func setCreatorName(creatorName: String?) {
+    hostingController.rootView.creatorName = creatorName
   }
 }
 
 class PlaylistCellRedacted: UITableViewCell {
+  private var faviconRenderer: FavIconImageRenderer?
+  private let hostingController = UIHostingController(rootView: PlaylistCellRedactedView())
+  
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     
-    let hostingController = UIHostingController(rootView: PlaylistCellRedactedView())
     contentView.addSubview(hostingController.view)
     hostingController.view.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -221,5 +147,20 @@ class PlaylistCellRedacted: UITableViewCell {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  func loadThumbnail(for url: URL) {
+    faviconRenderer = FavIconImageRenderer()
+    faviconRenderer?.loadIcon(siteURL: url, persistent: false) { [weak self] image in
+      self?.hostingController.rootView.thumbnail = image
+    }
+  }
+  
+  func setTitle(title: String?) {
+    hostingController.rootView.title = title
+  }
+  
+  func setSubtitle(subtitle: String?) {
+    hostingController.rootView.subtitle = subtitle
   }
 }

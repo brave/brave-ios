@@ -52,7 +52,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    PlaylistManager.shared.currentFolder == nil ? Constants.tableRedactedCellCount : PlaylistManager.shared.numberOfAssets
+    loadingState != .fullyLoaded ? Constants.tableRedactedCellCount : PlaylistManager.shared.numberOfAssets
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -68,7 +68,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    if PlaylistManager.shared.currentFolder == nil {
+    if loadingState != .fullyLoaded {
       guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playlistCellRedactedIdentifier, for: indexPath) as? PlaylistCellRedacted else {
         return UITableViewCell()
       }
@@ -84,9 +84,29 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    if loadingState != .fullyLoaded {
+      guard let cell = cell as? PlaylistCellRedacted,
+            let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
+        return
+      }
+      
+      let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
+      
+      cell.do {
+        $0.showsReorderControl = false
+        $0.setTitle(title: item.name)
+        $0.setSubtitle(subtitle: domain)
+        
+        if let url = URL(string: item.pageSrc) {
+          $0.loadThumbnail(for: url)
+        }
+      }
+      
+      return
+    }
+    
     guard let cell = cell as? PlaylistCell,
-          let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
-    else {
+          let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
       return
     }
 
@@ -128,11 +148,16 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    guard let folder = PlaylistManager.shared.currentFolder else {
-      return tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.playListMenuHeaderRedactedIdentifier)
+    let folder = PlaylistManager.shared.currentFolder
+    
+    if loadingState != .fullyLoaded {
+      let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.playListMenuHeaderRedactedIdentifier) as? PlaylistRedactedHeader
+      header?.setTitle(title: folder?.title)
+      header?.setCreatorName(creatorName: folder?.creatorName)
+      return header
     }
     
-    guard folder.playlistItems?.isEmpty == false else {
+    guard let folder = folder, folder.playlistItems?.isEmpty == false else {
       return nil
     }
     

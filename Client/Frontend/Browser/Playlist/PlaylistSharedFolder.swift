@@ -58,9 +58,7 @@ public struct PlaylistSharedFolderModel: Codable {
     }
     
     let (data, _) = try await NetworkManager().dataRequest(with: playlistURL)
-    var item = try JSONDecoder().decode(Self.self, from: data)
-    item.mediaItems = await fetchMediaItemInfo(item: item)
-    return item
+    return try JSONDecoder().decode(Self.self, from: data)
   }
   
   @MainActor
@@ -88,7 +86,7 @@ public struct PlaylistSharedFolderModel: Codable {
     })
   }
   
-  private static func fetchMediaItemInfo(item: PlaylistSharedFolderModel) async -> [PlaylistInfo] {
+  public static func fetchMediaItemInfo(item: PlaylistSharedFolderModel) async -> [PlaylistInfo] {
     @Sendable @MainActor
     func fetchTask(item: PlaylistInfo) async -> PlaylistInfo {
       await withCheckedContinuation { continuation in
