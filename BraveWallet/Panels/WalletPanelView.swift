@@ -407,7 +407,7 @@ struct WalletPanelView: View {
       if let url = origin.url, let accounts = Domain.ethereumPermissions(forUrl: url) {
         permittedAccounts = accounts
       }
-      accountActivityStore.update()
+      accountActivityStore.setup()
     }
   }
 }
