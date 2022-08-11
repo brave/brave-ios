@@ -58,11 +58,7 @@ class AccountActivityStore: ObservableObject {
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-      // Delay call to `update()` or JsonRpcService might disconnect
-      // and fail to respond. See #5815.
-      self.update()
-    }
+    update()
   }
 
   func update() {

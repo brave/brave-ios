@@ -110,7 +110,7 @@ public struct WalletPanelContainerView: View {
             keyringStore: keyringStore,
             cryptoStore: cryptoStore,
             networkStore: cryptoStore.networkStore,
-            accountActivityStore: cryptoStore.accountActivityStore(for: keyringStore.selectedAccount),
+            walletPanelStore: cryptoStore.walletPanelStore(),
             origin: origin,
             presentWalletWithContext: { context in
               self.presentWalletWithContext?(context)
@@ -145,7 +145,7 @@ struct WalletPanelView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var networkStore: NetworkStore
-  @ObservedObject var accountActivityStore: AccountActivityStore
+  @ObservedObject var walletPanelStore: WalletPanelStore
   var origin: URLOrigin
   var presentWalletWithContext: (PresentingContext) -> Void
   var presentBuySendSwap: () -> Void
@@ -161,7 +161,7 @@ struct WalletPanelView: View {
     keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
     networkStore: NetworkStore,
-    accountActivityStore: AccountActivityStore,
+    walletPanelStore: WalletPanelStore,
     origin: URLOrigin,
     presentWalletWithContext: @escaping (PresentingContext) -> Void,
     presentBuySendSwap: @escaping () -> Void,
@@ -170,13 +170,13 @@ struct WalletPanelView: View {
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
     self.networkStore = networkStore
-    self.accountActivityStore = accountActivityStore
+    self.walletPanelStore = walletPanelStore
     self.origin = origin
     self.presentWalletWithContext = presentWalletWithContext
     self.presentBuySendSwap = presentBuySendSwap
     self.buySendSwapBackground = buySendSwapBackground
     
-    currencyFormatter.currencyCode = accountActivityStore.currencyCode
+    currencyFormatter.currencyCode = walletPanelStore.currencyCode
   }
   
   @State private var permittedAccounts: [String] = []
@@ -352,7 +352,7 @@ struct WalletPanelView: View {
             }
           }
           VStack(spacing: 4) {
-            let nativeAsset = accountActivityStore.assets.first(where: { $0.token.symbol == networkStore.selectedChain.symbol })
+            let nativeAsset = walletPanelStore.assets.first(where: { $0.token.symbol == networkStore.selectedChain.symbol })
             Text(String(format: "%.04f %@", nativeAsset?.decimalBalance ?? 0.0, networkStore.selectedChain.symbol))
               .font(.title2.weight(.bold))
             Text(currencyFormatter.string(from: NSNumber(value: (Double(nativeAsset?.price ?? "") ?? 0) * (nativeAsset?.decimalBalance ?? 0.0))) ?? "")
@@ -407,7 +407,7 @@ struct WalletPanelView: View {
       if let url = origin.url, let accounts = Domain.ethereumPermissions(forUrl: url) {
         permittedAccounts = accounts
       }
-      accountActivityStore.setup()
+      walletPanelStore.setup()
     }
   }
 }
@@ -430,7 +430,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         keyringStore: .previewStoreWithWalletCreated,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
-        accountActivityStore: .previewStore,
+        walletPanelStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},
@@ -440,7 +440,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         keyringStore: .previewStore,
         cryptoStore: .previewStore,
         networkStore: .previewStore,
-        accountActivityStore: .previewStore,
+        walletPanelStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},
@@ -454,7 +454,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         }(),
         cryptoStore: .previewStore,
         networkStore: .previewStore,
-        accountActivityStore: .previewStore,
+        walletPanelStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},

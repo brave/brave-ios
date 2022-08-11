@@ -211,6 +211,21 @@ public class CryptoStore: ObservableObject {
     }
   }
   
+  private var _walletPanelStore: WalletPanelStore?
+  func walletPanelStore() -> WalletPanelStore {
+    if let walletPanelStore = _walletPanelStore {
+      return walletPanelStore
+    }
+    let store = WalletPanelStore(
+      keyringService: keyringService,
+      walletService: walletService,
+      rpcService: rpcService,
+      assetRatioService: assetRatioService
+    )
+    self._walletPanelStore = store
+    return store
+  }
+  
   func closeBSSStores() {
     buyTokenStore = nil
     sendTokenStore = nil
