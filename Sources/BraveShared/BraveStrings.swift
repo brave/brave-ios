@@ -2450,23 +2450,10 @@ extension Strings {
         value: "Expires",
         comment: "Table cell title for cell that shows when the VPN subscription expires.")
 
-    public static let settingsManageBraveAccountSubscription =
-    NSLocalizedString("vpn.settingsManageBraveAccountSubscription",
-                      bundle: .strings,
-                      value: "Manage Brave Account Subscription",
-                      comment: "Button to manage your VPN subscription from Brave website")
-    
-    public static let settingsManageAppleSubscription =
-    NSLocalizedString("vpn.settingsManageSubscription",
-                      bundle: .strings,
-                      value: "Manage Apple Subscription",
-                      comment: "Button to manage your VPN subscription")
-    
-    public static let settingsBuyVPNButton =
-    NSLocalizedString("vpn.settingsBuyVPNButton",
-                      bundle: .strings,
-                      value: "Buy Brave VPN",
-                      comment: "Button to buy Brave VPN from the settings screen")
+    public static let settingsManageSubscription =
+          NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .strings,
+            value: "Manage Subscription",
+            comment: "Button to manage your VPN subscription")
 
     public static let settingsServerHost =
       NSLocalizedString("vpn.settingsServerHost", tableName: "BraveShared", bundle: .strings,

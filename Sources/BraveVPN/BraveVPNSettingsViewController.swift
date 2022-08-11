@@ -100,11 +100,7 @@ public class BraveVPNSettingsViewController: TableViewController {
             rows: [Row(text: Strings.VPN.settingsSubscriptionStatus,
                        detailText: subscriptionStatus),
                    Row(text: Strings.VPN.settingsSubscriptionExpiration, detailText: expiration),
-                   Row(text: Strings.VPN.settingsManageBraveAccountSubscription,
-                       selection: { [unowned self] in
-                         self.manageBraveAccountSubscriptionTapped?()
-                       }, cellClass: ButtonCell.self),
-                   Row(text: Strings.VPN.settingsManageAppleSubscription,
+                   Row(text: Strings.VPN.settingsManageSubscription,
                        selection: { [unowned self] in
       guard let url = self.manageSubcriptionURL else { return }
       if UIApplication.shared.canOpenURL(url) {

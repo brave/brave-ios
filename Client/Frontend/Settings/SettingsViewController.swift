@@ -487,9 +487,11 @@ class SettingsViewController: TableViewController {
               self?.dismiss(animated: true)
             }
             vc.manageBraveAccountSubscriptionTapped = { [weak self] in
-              // TODO: Update url
-              self?.settingsDelegate?.settingsOpenURLInNewTab(URL(string: "https://account.brave.com")!)
-              self?.dismiss(animated: true)
+              if let domain = Preferences.VPN.skusCredentialDomain.value,
+                 let url = URL(string: "https://\(domain)") {
+                self?.settingsDelegate?.settingsOpenURLInNewTab(url)
+                self?.dismiss(animated: true)
+              }
             }
             return vc
           }
