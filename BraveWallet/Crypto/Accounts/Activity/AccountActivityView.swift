@@ -138,7 +138,7 @@ struct AccountActivityView: View {
       }
     }
     .onAppear {
-      activityStore.setup()
+      activityStore.update()
     }
   }
 }

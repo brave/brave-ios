@@ -183,17 +183,6 @@ extension SettingsStore {
   }
 }
 
-extension WalletPanelStore {
-  static var previewStore: WalletPanelStore {
-    .init(
-      keyringService: MockKeyringService(),
-      walletService: MockBraveWalletService(),
-      rpcService: MockJsonRpcService(),
-      assetRatioService: MockAssetRatioService()
-    )
-  }
-}
-
 extension BraveWallet.TestSolanaTxManagerProxy {
   static var previewProxy: BraveWallet.TestSolanaTxManagerProxy {
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()

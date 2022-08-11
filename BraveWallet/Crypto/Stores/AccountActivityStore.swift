@@ -14,7 +14,6 @@ class AccountActivityStore: ObservableObject {
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
-      guard oldValue != currencyCode else { return }
       update()
     }
   }
@@ -47,18 +46,15 @@ class AccountActivityStore: ObservableObject {
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.solTxManagerProxy = solTxManagerProxy
-  }
-  
-  func setup() {
-    keyringService.add(self)
-    rpcService.add(self)
-    txService.add(self)
-    walletService.add(self)
+    
+    self.keyringService.add(self)
+    self.rpcService.add(self)
+    self.txService.add(self)
+    self.walletService.add(self)
     
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
-    update()
   }
 
   func update() {
