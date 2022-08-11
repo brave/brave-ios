@@ -213,7 +213,7 @@ public class PortfolioStore: ObservableObject {
   @MainActor func fetchPriceHistory(
     for priceIds: [String]
   ) async -> [String: [BraveWallet.AssetTimePrice]] {
-    let uniquePriceIds = Array(Set(priceIds))
+    let uniquePriceIds = Set(priceIds)
     let priceHistories = await withTaskGroup(of: [String: [BraveWallet.AssetTimePrice]].self) { @MainActor group -> [String: [BraveWallet.AssetTimePrice]] in
       for priceId in uniquePriceIds {
         let priceId = priceId.lowercased()

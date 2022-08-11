@@ -32,7 +32,7 @@ extension BraveWalletAssetRatioService {
     timeframe: BraveWallet.AssetPriceTimeframe
   ) async -> PricesResult {
     // make sure there is no duplicate priceId
-    let uniquePriceIds = Array(Set(fromAssets))
+    let uniquePriceIds = Set(fromAssets)
     return await withTaskGroup(of: PricesResult.self) { @MainActor group -> PricesResult in
       uniquePriceIds.forEach { asset in
         group.addTask { @MainActor in
@@ -75,7 +75,7 @@ extension BraveWalletAssetRatioService {
     completion: @escaping (PricesResult) -> Void
   ) {
     // make sure there is no duplicate priceId
-    let uniquePriceIds = Array(Set(fromAssets))
+    let uniquePriceIds = Set(fromAssets)
     var pricesResults: [PricesResult] = []
     let dispatchGroup = DispatchGroup()
     uniquePriceIds.forEach { asset in
