@@ -36,8 +36,9 @@ Object.defineProperty(window.__firefox__, '$<brave-skus-helper>', {
     }
 });
 
-// FIXME: Any way to secure it better?
-window.chrome = {};
+if (!window.chrome) {
+  window.chrome = {};
+}
 
 Object.defineProperty(window.chrome, 'braveSkus', {
 enumerable: false,
