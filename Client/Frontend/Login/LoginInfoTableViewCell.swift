@@ -48,12 +48,10 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
 
   var isEditingFieldData: Bool = false {
     didSet {
-      if isEditingFieldData != oldValue {
-        descriptionTextField.isUserInteractionEnabled = isEditingFieldData
+      descriptionTextField.isUserInteractionEnabled = isEditingFieldData
 
-        highlightedLabel.textColor = isEditingFieldData ? .bravePrimary : .secondaryBraveLabel
-        descriptionTextField.textColor = isEditingFieldData ? .bravePrimary : .braveLabel
-      }
+      highlightedLabel.textColor = isEditingFieldData ? .bravePrimary : .secondaryBraveLabel
+      descriptionTextField.textColor = isEditingFieldData ? .bravePrimary : .braveLabel
     }
   }
 

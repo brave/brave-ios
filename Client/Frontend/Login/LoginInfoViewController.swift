@@ -314,10 +314,11 @@ extension LoginInfoViewController {
   }
 
   @objc private func done() {
+    isEditingFieldData = false
+    
     updateLoginInfo { [weak self] success in
       guard let self = self else { return }
 
-      self.isEditingFieldData = false
       if success {
         self.tableView.reloadData()
       }
