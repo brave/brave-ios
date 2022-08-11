@@ -57,16 +57,19 @@ class LoginAuthViewController: UITableViewController {
   // MARK: Internal
 
   @discardableResult
-  func askForAuthentication() -> Bool {
+  func askForAuthentication(completion: (() -> Void)? = nil) -> Bool {
     guard let windowProtection = windowProtection else {
+      completion?()
       return false
     }
 
     if !windowProtection.isPassCodeAvailable {
       showSetPasscodeError()
+      completion?()
       return false
     } else {
       windowProtection.presentAuthenticationForViewController(determineLockWithPasscode: false)
+      completion?()
       return true
     }
   }

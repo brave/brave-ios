@@ -292,12 +292,16 @@ extension LoginInfoViewController {
 extension LoginInfoViewController {
 
   @objc private func edit() {
-    isEditingFieldData = true
-
+    askForAuthentication() { [weak self] in
+      guard let self = self else { return }
+      
+      self.isEditingFieldData = true
+      
+      self.navigationItem.rightBarButtonItem =
+        UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.done))
+    }
+    
     cellForItem(InfoItem.usernameItem)?.descriptionTextField.becomeFirstResponder()
-
-    navigationItem.rightBarButtonItem =
-      UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done))
   }
 
   private func showActionMenu(for indexPath: IndexPath) {
