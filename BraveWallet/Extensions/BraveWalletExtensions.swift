@@ -165,6 +165,20 @@ extension BraveWallet.CoinType {
       return ""
     }
   }
+  
+  /// Sort order used when sorting by coin types
+  var sortOrder: Int {
+    switch self {
+    case .eth:
+      return 1
+    case .sol:
+      return 2
+    case .fil:
+      return 3
+    @unknown default:
+      return 10
+    }
+  }
 }
 
 extension BraveWallet.KeyringInfo {
@@ -196,8 +210,16 @@ extension BraveWallet.NetworkInfo {
 }
 
 extension BraveWallet.BlockchainToken {
-  /// The id to fetch price and price history. Use `coingeckoId` when it's not empty, otherwise use `symbol`
+  /// The id to fetch price and price history.
   var assetRatioId: String {
-    coingeckoId.isEmpty ? symbol : coingeckoId
+    if !coingeckoId.isEmpty {
+      return coingeckoId
+    }
+    
+    if chainId != BraveWallet.MainnetChainId || contractAddress.isEmpty {
+      return symbol
+    }
+    
+    return contractAddress
   }
 }

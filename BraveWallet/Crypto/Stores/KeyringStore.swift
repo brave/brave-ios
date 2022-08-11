@@ -146,23 +146,7 @@ public class KeyringStore: ObservableObject {
     }
     Task { @MainActor in // fetch all KeyringInfo for all coin types
       let selectedCoin = await walletService.selectedCoin()
-      self.allKeyrings = await withTaskGroup(
-        of: BraveWallet.KeyringInfo.self,
-        returning: [BraveWallet.KeyringInfo].self,
-        body: { @MainActor [weak keyringService] group in
-          guard let keyringService = keyringService else { return [] }
-          for coin in WalletConstants.supportedCoinTypes {
-            group.addTask { @MainActor in
-              await keyringService.keyringInfo(coin.keyringId)
-            }
-          }
-          var allKeyrings: [BraveWallet.KeyringInfo] = []
-          for await keyring in group {
-            allKeyrings.append(keyring)
-          }
-          return allKeyrings
-        }
-      )
+      self.allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       if let defaultKeyring = self.allKeyrings.first(where: { $0.id == BraveWallet.DefaultKeyringId }) {
         self.defaultKeyring = defaultKeyring
       }
@@ -253,6 +237,8 @@ public class KeyringStore: ObservableObject {
         self.updateKeyringInfo()
         self.resetKeychainStoredPassword()
       }
+      self.walletService.setSelectedCoin(.eth)
+      self.rpcService.setNetwork(BraveWallet.MainnetChainId, coin: .eth, completion: { _ in })
       Domain.clearAllEthereumPermissions()
       completion?(isMnemonicValid)
     }
@@ -383,21 +369,26 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
   }
 
   public func keyringCreated(_ keyringId: String) {
-    var coin: BraveWallet.CoinType = .eth
-    switch keyringId {
-    case BraveWallet.DefaultKeyringId:
-      coin = .eth
-    case BraveWallet.SolanaKeyringId:
-      coin = .sol
-    case BraveWallet.FilecoinKeyringId:
-      coin = .fil
-    default:
-      break
+    Task { @MainActor in
+      var coin: BraveWallet.CoinType = .eth
+      switch keyringId {
+      case BraveWallet.DefaultKeyringId:
+        coin = .eth
+      case BraveWallet.SolanaKeyringId:
+        coin = .sol
+      case BraveWallet.FilecoinKeyringId:
+        coin = .fil
+      default:
+        break
+      }
+      
+      if selectedAccount.coin.keyringId != keyringId {
+        walletService.setSelectedCoin(coin)
+        let network = await rpcService.network(coin)
+        await rpcService.setNetwork(network.chainId, coin: network.coin)
+      }
+      updateKeyringInfo()
     }
-    if selectedAccount.coin.keyringId != keyringId {
-      walletService.setSelectedCoin(coin)
-    }
-    updateKeyringInfo()
   }
 
   public func keyringRestored(_ keyringId: String) {
