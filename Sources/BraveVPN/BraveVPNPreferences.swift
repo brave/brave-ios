@@ -27,5 +27,6 @@ extension Preferences {
       static let vpnRegionOverride = Option<String?>(key: "vpn.region-override", default: nil)
       static let vpnHostDisplayName = Option<String?>(key: "vpn.host-location", default: nil)
       public static let skusCredential = Option<String?>(key: "skus.credential", default: nil)
+      public static let skusCredentialDomain = Option<String?>(key: "skus.credential-domain", default: nil)
     }
 }

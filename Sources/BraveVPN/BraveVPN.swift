@@ -36,7 +36,7 @@ public class BraveVPN {
 
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
-  public static func initialize() {
+  public static func initialize(customCredential: (credential: String, environment: String)?) {
     func clearConfiguration() {
       GRDVPNHelper.clearVpnConfiguration()
       clearCredentials()
@@ -46,6 +46,10 @@ public class BraveVPN {
           logAndStoreError("Remove vpn error: \(error)")
         }
       }
+    }
+    
+    if let customCredential = customCredential {
+      setCustomVPNCredential(customCredential.credential, environment: customCredential.environment)
     }
     
     helper.verifyMainCredentials { valid, error in
@@ -81,23 +85,15 @@ public class BraveVPN {
     return receipt
   }
   
-  public static func setSkusCredential(_ credential: String, domain: String) {
-    Preferences.VPN.skusCredential.value = credential
+  public static func setCustomVPNCredential(_ credential: String, environment: String) {
     GRDSubscriptionManager.setIsPayingUser(true)
     populateRegionDataIfNecessary()
     
-    
-    
-    if let unescapedCredential = credential.unescape() {
-      let cookies = HTTPCookie.cookies(withResponseHeaderFields: ["Set-Cookie": unescapedCredential], for: URL(string: "https://brave.com")!)
-      if let cookie = cookies.first {
-        let dict: NSMutableDictionary =
-        ["brave-vpn-premium-monthly-pass": cookie.value,
-         "brave-payments-env": "development",
-         "validation-method": "brave-premium"]
-        helper.customSubscriberCredentialAuthKeys = dict
-      }
-    }
+    let dict: NSMutableDictionary =
+    ["brave-vpn-premium-monthly-pass": credential,
+     "brave-payments-env": environment,
+     "validation-method": "brave-premium"]
+    helper.customSubscriberCredentialAuthKeys = dict
   }
   
   /// Connects to Guardian's server to validate locally stored receipt.

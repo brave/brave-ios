@@ -94,7 +94,6 @@ class BraveSkusWebHelper {
     case "account.bravesoftware.com": return "staging"
     case "account.brave.com": return "production"
     default:
-      assertionFailure()
       return nil
     }
   }
