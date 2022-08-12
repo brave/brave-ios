@@ -155,6 +155,10 @@ public class KeyringStore: ObservableObject {
         if self.selectedAccount.address != selectedAccountAddress {
           if let selectedAccount = selectedAccountKeyring.accountInfos.first(where: { $0.address == selectedAccountAddress }) {
             self.selectedAccount = selectedAccount
+          } else if let firstAccount = selectedAccountKeyring.accountInfos.first {
+            // try and correct invalid state (no selected account for this coin type)
+            self.selectedAccount = firstAccount
+            await self.keyringService.setSelectedAccount(firstAccount.address, coin: firstAccount.coin)
           } // else selected account address does not exist in keyring (should not occur...)
         } // else `self.selectedAccount` is already the currently selected account
       } // else keyring for selected coin is unavailable (should not occur...)
