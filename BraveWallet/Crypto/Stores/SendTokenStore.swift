@@ -126,9 +126,6 @@ public class SendTokenStore: ObservableObject {
       } else {
         self.selectedSendToken = userAssets.first
       }
-      // store tokens in `allTokens` for address validation
-      // if the task was cancelled, don't update the UI
-      guard !Task.isCancelled else { return }
       let tokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
       allTokens = tokens + [network.nativeToken]
     }
@@ -145,17 +142,15 @@ public class SendTokenStore: ObservableObject {
   }
 
   private func fetchAssetBalance() {
-    guard let token = selectedSendToken else {
-      selectedSendTokenBalance = nil
-      return
-    }
-    
     fetchAssetBalanceTask?.cancel()
     fetchAssetBalanceTask = Task { @MainActor in
+      guard let token = selectedSendToken else {
+        selectedSendTokenBalance = nil
+        return
+      }
+      
       let coin = await walletService.selectedCoin()
       let network = await rpcService.network(coin)
-      // if the task was cancelled, don't update the UI
-      guard !Task.isCancelled else { return }
       userAssets = await walletService.userAssets(network.chainId, coin: network.coin)
       guard userAssets.first(where: { $0.id == token.id }) != nil,
             let accountAddress = currentAccountAddress
@@ -163,11 +158,14 @@ public class SendTokenStore: ObservableObject {
         self.selectedSendTokenBalance = nil
         return
       }
-      guard !Task.isCancelled else { return } // limit network request(s) if cancelled
-      selectedSendTokenBalance = await rpcService.balance(for: token,
-                                                          in: accountAddress,
-                                                          with: coin,
-                                                          decimalFormatStyle: .decimals(precision: Int(token.decimals)))
+      // limit network request(s) if cancelled
+      guard !Task.isCancelled else { return }
+      selectedSendTokenBalance = await rpcService.balance(
+        for: token,
+        in: accountAddress,
+        with: coin,
+        decimalFormatStyle: .decimals(precision: Int(token.decimals))
+      )
     }
   }
 
@@ -381,10 +379,11 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
   }
 
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-    fetchAssetBalance()
-    keyringService.selectedAccount(coinType) { [weak self] address in
-      self?.currentAccountAddress = address
-      self?.validateSendAddress()
+    Task { @MainActor in
+      fetchAssetBalance()
+      let address = await keyringService.selectedAccount(coinType)
+      currentAccountAddress = address
+      validateSendAddress()
     }
   }
 }
