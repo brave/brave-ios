@@ -56,32 +56,35 @@ class LoginAuthViewController: UITableViewController {
 
   // MARK: Internal
 
-  @discardableResult
-  func askForAuthentication(completion: (() -> Void)? = nil) -> Bool {
+  func askForAuthentication(completion: ((Bool) -> Void)? = nil) {
     guard let windowProtection = windowProtection else {
-      completion?()
-      return false
+      completion?(false)
+      return
     }
 
     if !windowProtection.isPassCodeAvailable {
-      showSetPasscodeError()
-      completion?()
-      return false
+      showSetPasscodeError() {
+        completion?(false)
+      }
     } else {
-      windowProtection.presentAuthenticationForViewController(determineLockWithPasscode: false)
-      completion?()
-      return true
+      windowProtection.presentAuthenticationForViewController(determineLockWithPasscode: false) { status in
+        completion?(status)
+      }
     }
   }
 
-  func showSetPasscodeError() {
+  func showSetPasscodeError(completion: @escaping (() -> Void)) {
     let alert = UIAlertController(
       title: Strings.Login.loginInfoSetPasscodeAlertTitle,
       message: Strings.Login.loginInfoSetPasscodeAlertDescription,
       preferredStyle: .alert)
 
-    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-
+    alert.addAction(
+      UIAlertAction(title: Strings.OKString, style: .default, handler: { _ in
+          completion()
+      })
+    )
+    
     present(alert, animated: true, completion: nil)
   }
 
