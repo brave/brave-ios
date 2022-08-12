@@ -381,10 +381,10 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
         break
       }
       
-      if selectedAccount.coin.keyringId != keyringId {
+      let newKeyring = await keyringService.keyringInfo(keyringId)
+      if let newAccount = newKeyring.accountInfos.first {
         walletService.setSelectedCoin(coin)
-        let network = await rpcService.network(coin)
-        await rpcService.setNetwork(network.chainId, coin: network.coin)
+        await keyringService.setSelectedAccount(newAccount.address, coin: newAccount.coin)
       }
       updateKeyringInfo()
     }
