@@ -16,7 +16,9 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedFromToken: BraveWallet.BlockchainToken? {
     didSet {
       if let token = selectedFromToken {
-        Task { @MainActor in
+        fetchBalanceTask[.sellToken]??.cancel()
+        fetchBalanceTask[.sellToken] = Task { @MainActor in
+          guard !Task.isCancelled else { return }
           selectedFromTokenBalance = await fetchTokenBalance(for: token)
         }
       }
@@ -26,7 +28,9 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedToToken: BraveWallet.BlockchainToken? {
     didSet {
       if let token = selectedToToken {
-        Task { @MainActor in
+        fetchBalanceTask[.buyToken]??.cancel()
+        fetchBalanceTask[.buyToken] = Task { @MainActor in
+          guard !Task.isCancelled else { return }
           selectedToTokenBalance = await fetchTokenBalance(for: token)
         }
       }
@@ -124,6 +128,13 @@ public class SwapTokenStore: ObservableObject {
   
   /// Cancellable for the last running `prepare()` Task.
   private var prepareTask: Task<(), Never>?
+  /// Cancelable for the last running
+  private var fetchBalanceTask: [FetchBalanceTaskKind: Task<(), Never>?] = [.buyToken: nil, .sellToken: nil]
+  
+  enum FetchBalanceTaskKind {
+    case buyToken
+    case sellToken
+  }
 
   enum SwapParamsBase {
     // calculating based on sell asset amount
@@ -171,11 +182,12 @@ public class SwapTokenStore: ObservableObject {
   @MainActor private func fetchTokenBalance(for token: BraveWallet.BlockchainToken) async -> BDouble? {
     guard let account = accountInfo else { return nil }
     
-    return await rpcService.balance(for: token,
-                                    in: account.address,
-                                    with: account.coin,
-                                    decimalFormatStyle: .decimals(precision: Int(token.decimals)))
-    
+    return await rpcService.balance(
+      for: token,
+      in: account.address,
+      with: account.coin,
+      decimalFormatStyle: .decimals(precision: Int(token.decimals))
+    )
   }
 
   private func swapParameters(
@@ -643,31 +655,23 @@ public class SwapTokenStore: ObservableObject {
         self.allTokens.insert(nativeAsset, at: 0)
       }
       
+      guard !Task.isCancelled else {
+        completion?()
+        return
+      } // limit network request(s) if cancelled
       if let fromToken = selectedFromToken {  // refresh balance
-        guard !Task.isCancelled else {
-          completion?()
-          return
-        } // limit network request(s) if cancelled
         selectedFromTokenBalance = await fetchTokenBalance(for: fromToken) ?? 0
       } else {
-        guard !Task.isCancelled else {
-          completion?()
-          return
-        } // limit network request(s) if cancelled
         selectedFromToken = allTokens.first(where: { $0.symbol == network.symbol })
       }
       
+      guard !Task.isCancelled else {
+        completion?()
+        return
+      } // limit network request(s) if cancelled
       if let toToken = selectedToToken {
-        guard !Task.isCancelled else {
-          completion?()
-          return
-        } // limit network request(s) if cancelled
         selectedToTokenBalance = await fetchTokenBalance(for: toToken) ?? 0
       } else {
-        guard !Task.isCancelled else {
-          completion?()
-          return
-        } // limit network request(s) if cancelled
         if network.chainId == BraveWallet.MainnetChainId {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == batSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != batSymbol.uppercased() })
