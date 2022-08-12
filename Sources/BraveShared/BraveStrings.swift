@@ -3049,6 +3049,13 @@ extension Strings {
         bundle: .strings,
         value: "Search Open Tabs",
         comment: "The placeholder written in seach bar while trab tray is showing open tabs.")
+    public static let sendWebsiteShareActionTitle =
+      NSLocalizedString(
+        "opentabs.sendWebsiteShareActionTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Send To Your Devices",
+        comment: "Share action title for sending e url to another device")
     public static let noSyncSessionPlaceHolderViewTitle =
       NSLocalizedString(
         "opentabs.noSyncSessionPlaceHolderViewTitle",

@@ -15,7 +15,7 @@ extension TabTrayController {
     // MARK: UX
 
     struct UX {
-      static let sectionTopPadding: CGFloat = 5
+      static let sectionTopPadding = 5.0
     }
 
     var tableView = UITableView()
@@ -57,7 +57,7 @@ extension TabTrayController {
     required init(coder: NSCoder) { fatalError() }
     
     /// Update visibility of view shown when no synced session exists
-    /// This view contaisn information about  how to join sync and enable open tabs
+    /// This view contains information about  how to join sync chain and enable open tabs
     /// - Parameter isHidden: Boolean to set isHidden
     func updateNoSyncPanelState(isHidden: Bool) {
       if isHidden {

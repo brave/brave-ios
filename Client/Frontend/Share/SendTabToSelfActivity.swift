@@ -15,7 +15,7 @@ class SendTabToSelfActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return "Send To Your Devices"
+    return Strings.OpenTabs.sendWebsiteShareActionTitle
   }
 
   override var activityImage: UIImage? {

@@ -320,17 +320,13 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     // Observer watching tab information is sent by another device
     openTabsModelStateListener = braveCore.sendTabAPI.add(
       SendTabToSelfStateObserver { [weak self] stateChange in
-        switch stateChange {
-        case .sendTabToSelfEntriesAddedRemotely(let newEntries):
+        if case .sendTabToSelfEntriesAddedRemotely(let newEntries) = stateChange {
           // Fetching the last URL that has been sent from synced sessions
           if let requestedURL = newEntries.last?.url {
             self?.presentTabReceivedCallout(url: requestedURL)
           }
-        default:
-          break
         }
-      }
-    )
+      })
   }
 
   deinit {

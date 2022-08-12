@@ -11,8 +11,8 @@ import BraveShared
 class SendTabToSelfController: UIViewController {
   
   struct UX {
-    static let contentInset: CGFloat = 20
-    static let preferredSizePadding: CGFloat = 60
+    static let contentInset = 20.0
+    static let preferredSizePadding = 60.0
   }
   
   let contentNavigationController: UINavigationController
@@ -73,7 +73,7 @@ class SendTabToSelfController: UIViewController {
 class SendTabToSelfContentController: UITableViewController {
   
   struct UX {
-    static let standardItemHeight: CGFloat = 44
+    static let standardItemHeight = 44.0
   }
 
   // MARK: Internal
@@ -195,8 +195,8 @@ extension SendTabToSelfContentController {
 
 class SendTabToSelfContentHeaderFooterView: UITableViewHeaderFooterView, TableViewReusable {
   private struct UX {
-    static let horizontalPadding: CGFloat = 15
-    static let verticalPadding: CGFloat = 6
+    static let horizontalPadding = 15.0
+    static let verticalPadding = 6.0
   }
   
   var titleLabel = UILabel().then {

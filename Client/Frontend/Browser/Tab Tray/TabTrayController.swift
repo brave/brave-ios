@@ -162,16 +162,12 @@ class TabTrayController: LoadingViewController {
       OpenTabsStateObserver { [weak self] stateChange in
         guard let self = self else { return }
         
-        switch stateChange {
-        case .openTabsSyncCycleCompleted:
+        if case .openTabsSyncCycleCompleted = stateChange {
           if !self.isTabTrayBeingSearched {
             self.reloadOpenTabsSession()
           }
-        default:
-          break
         }
-      }
-    )
+      })
   }
 
   @available(*, unavailable)
