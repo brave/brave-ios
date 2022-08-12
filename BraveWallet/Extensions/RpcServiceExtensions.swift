@@ -189,6 +189,27 @@ extension BraveWalletJsonRpcService {
     }
   }
   
+  /// Obtain the decimal balance of an `BlockchainToken` for a given account, with coinType and decimalFormatStyle
+  ///
+  /// If the call fails for some reason or the resulting wei cannot be converted,
+  /// `completion` will be called with `nil`
+  @MainActor func balance(
+    for token: BraveWallet.BlockchainToken,
+    in accountAddress: String,
+    with coin: BraveWallet.CoinType,
+    decimalFormatStyle: WeiFormatter.DecimalFormatStyle
+  ) async -> BDouble? {
+    await withCheckedContinuation { continuation in
+      balance(for: token,
+              in: accountAddress,
+              with: coin,
+              decimalFormatStyle: decimalFormatStyle
+      ) { value in
+        continuation.resume(returning: value)
+      }
+    }
+  }
+  
   private func ethBalance(
     for token: BraveWallet.BlockchainToken,
     in accountAddress: String,

@@ -16,8 +16,8 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedFromToken: BraveWallet.BlockchainToken? {
     didSet {
       if let token = selectedFromToken {
-        fetchTokenBalance(for: token) { [weak self] balance in
-          self?.selectedFromTokenBalance = balance
+        Task { @MainActor in
+          selectedFromTokenBalance = await fetchTokenBalance(for: token)
         }
       }
     }
@@ -26,8 +26,8 @@ public class SwapTokenStore: ObservableObject {
   @Published var selectedToToken: BraveWallet.BlockchainToken? {
     didSet {
       if let token = selectedToToken {
-        fetchTokenBalance(for: token) { [weak self] balance in
-          self?.selectedToTokenBalance = balance
+        Task { @MainActor in
+          selectedToTokenBalance = await fetchTokenBalance(for: token)
         }
       }
     }
@@ -121,6 +121,9 @@ public class SwapTokenStore: ObservableObject {
   private var timer: Timer?
   private let batSymbol = "BAT"
   private let daiSymbol = "DAI"
+  
+  /// Cancellable for the last running `prepare()` Task.
+  private var prepareTask: Task<(), Never>?
 
   enum SwapParamsBase {
     // calculating based on sell asset amount
@@ -165,25 +168,14 @@ public class SwapTokenStore: ObservableObject {
     self.rpcService.add(self)
   }
 
-  private func fetchTokenBalance(
-    for token: BraveWallet.BlockchainToken,
-    completion: @escaping (_ balance: BDouble?) -> Void
-  ) {
-    guard let account = accountInfo else {
-      completion(nil)
-      return
-    }
+  @MainActor private func fetchTokenBalance(for token: BraveWallet.BlockchainToken) async -> BDouble? {
+    guard let account = accountInfo else { return nil }
     
-    walletService.selectedCoin { [weak self] coinType in
-      self?.rpcService.balance(
-        for: token,
-        in: account.address,
-        with: coinType,
-        decimalFormatStyle: .decimals(precision: Int(token.decimals))
-      ) { balance in
-        completion(balance)
-      }
-    }
+    return await rpcService.balance(for: token,
+                                    in: account.address,
+                                    with: account.coin,
+                                    decimalFormatStyle: .decimals(precision: Int(token.decimals)))
+    
   }
 
   private func swapParameters(
@@ -618,22 +610,64 @@ public class SwapTokenStore: ObservableObject {
   }
 
   func prepare(with accountInfo: BraveWallet.AccountInfo, completion: (() -> Void)? = nil) {
-    self.accountInfo = accountInfo
-
-    func updateSelectedTokens(in network: BraveWallet.NetworkInfo) {
-      if let fromToken = selectedFromToken {  // refresh balance
-        fetchTokenBalance(for: fromToken) { [weak self] balance in
-          self?.selectedFromTokenBalance = balance ?? 0
+    prepareTask?.cancel()
+    prepareTask = Task { @MainActor in
+      self.accountInfo = accountInfo
+      
+      let coin = await walletService.selectedCoin()
+      let network = await rpcService.network(coin)
+      let tokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
+      // Native token on the current selected network
+      let nativeAsset = network.nativeToken
+      // Custom tokens added by users
+      let userAssets = await walletService.userAssets(network.chainId, coin: network.coin)
+      let customTokens = userAssets.filter { asset in
+        !tokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(asset.contractAddress) == .orderedSame })
+      }
+      let sortedCustomTokens = customTokens.sorted {
+        if $0.contractAddress(in: network).caseInsensitiveCompare(nativeAsset.contractAddress) == .orderedSame {
+          return true
+        } else {
+          return $0.symbol < $1.symbol
         }
+      }
+      // if the task was cancelled, don't update the UI
+      guard !Task.isCancelled else {
+        completion?()
+        return
+      }
+      allTokens = sortedCustomTokens + tokens.sorted(by: { $0.symbol < $1.symbol })
+      // Seems like user assets always include the selected network's native asset
+      // But let's make sure all token list includes the native asset
+      if !self.allTokens.contains(where: { $0.symbol.lowercased() == nativeAsset.symbol.lowercased() }) {
+        self.allTokens.insert(nativeAsset, at: 0)
+      }
+      
+      if let fromToken = selectedFromToken {  // refresh balance
+        guard !Task.isCancelled else {
+          completion?()
+          return
+        } // limit network request(s) if cancelled
+        selectedFromTokenBalance = await fetchTokenBalance(for: fromToken) ?? 0
       } else {
+        guard !Task.isCancelled else {
+          completion?()
+          return
+        } // limit network request(s) if cancelled
         selectedFromToken = allTokens.first(where: { $0.symbol == network.symbol })
       }
-
+      
       if let toToken = selectedToToken {
-        fetchTokenBalance(for: toToken) { [weak self] balance in
-          self?.selectedToTokenBalance = balance ?? 0
-        }
+        guard !Task.isCancelled else {
+          completion?()
+          return
+        } // limit network request(s) if cancelled
+        selectedToTokenBalance = await fetchTokenBalance(for: toToken) ?? 0
       } else {
+        guard !Task.isCancelled else {
+          completion?()
+          return
+        } // limit network request(s) if cancelled
         if network.chainId == BraveWallet.MainnetChainId {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == batSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != batSymbol.uppercased() })
@@ -653,39 +687,9 @@ public class SwapTokenStore: ObservableObject {
             selectedToToken = allTokens.first
           }
         }
-        completion?()
       }
-    }
-
-    // All tokens from token registry
-    walletService.selectedCoin { [weak self] coinType in
-      guard let self = self else { return }
-      self.rpcService.network(coinType) { network in
-        self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
-          // Native token on the current selected network
-          let nativeAsset = network.nativeToken
-          // Custom tokens added by users
-          self.walletService.userAssets(network.chainId, coin: network.coin) { userAssets in
-            let customTokens = userAssets.filter { asset in
-              !tokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(asset.contractAddress) == .orderedSame })
-            }
-            let sortedCustomTokens = customTokens.sorted {
-              if $0.contractAddress(in: network).caseInsensitiveCompare(nativeAsset.contractAddress) == .orderedSame {
-                return true
-              } else {
-                return $0.symbol < $1.symbol
-              }
-            }
-            self.allTokens = sortedCustomTokens + tokens.sorted(by: { $0.symbol < $1.symbol })
-            // Seems like user assets always include the selected network's native asset
-            // But let's make sure all token list includes the native asset
-            if !self.allTokens.contains(where: { $0.symbol.lowercased() == nativeAsset.symbol.lowercased() }) {
-              self.allTokens.insert(nativeAsset, at: 0)
-            }
-            updateSelectedTokens(in: network)
-          }
-        }
-      }
+      
+      completion?()
     }
   }
   
@@ -702,15 +706,14 @@ public class SwapTokenStore: ObservableObject {
 
   #if DEBUG
   func setUpTest() {
-    accountInfo = .init()
+    accountInfo = BraveWallet.AccountInfo.mockEthAccount
     selectedFromToken = .previewToken
-    selectedToToken = .previewToken
+    selectedToToken = .mockUSDCToken
     sellAmount = "0.01"
-    selectedFromTokenBalance = 0.02
   }
   
   func setUpTestForRounding() {
-    accountInfo = .init()
+    accountInfo = BraveWallet.AccountInfo.mockEthAccount
     selectedFromToken = .previewToken
   }
   #endif

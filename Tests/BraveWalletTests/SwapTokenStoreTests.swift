@@ -127,11 +127,32 @@ class SwapStoreTests: XCTestCase {
   }
 
   func testFetchPriceQuote() {
+    let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+    let mockSellTokenBalance = "10"
+    let mockSellTokenBalanceWei = formatter.weiString(from: mockSellTokenBalance, radix: .hex, decimals: 18) ?? ""
+    let mockBuyTokenBalance = "1"
+    let mockBuyTokenBalanceWei = formatter.weiString(from: mockBuyTokenBalance, radix: .hex, decimals: 18) ?? ""
+    
+    let swapService = BraveWallet.TestSwapService()
+    swapService._priceQuote = { _, completion in
+      completion(true, .init(price: "1", guaranteedPrice: "1", to: "", data: "", value: "", gas: "1", estimatedGas: "1", gasPrice: "1", protocolFee: "1", minimumProtocolFee: "1", buyTokenAddress: "mock-buy-token-address", sellTokenAddress: "mock-sell-to-token-address", buyAmount: "1", sellAmount: "1", allowanceTarget: "1", sellTokenToEthRate: "1", buyTokenToEthRate: "1"), "")
+    }
+    
+    let rpcService = BraveWallet.TestJsonRpcService()
+    rpcService._balance = { address, _, _, completion in
+      completion(mockSellTokenBalanceWei, .success, "")
+    }
+    rpcService._erc20TokenBalance = { _, _, _, completion in
+      completion(mockBuyTokenBalanceWei, .success, "")
+    }
+    rpcService._network = { $1(BraveWallet.NetworkInfo.mockRopsten)}
+    rpcService._addObserver = { _ in }
+    
     let store = SwapTokenStore(
       keyringService: MockKeyringService(),
       blockchainRegistry: MockBlockchainRegistry(),
-      rpcService: MockJsonRpcService(),
-      swapService: MockSwapService(),
+      rpcService: rpcService,
+      swapService: swapService,
       txService: MockTxService(),
       walletService: MockBraveWalletService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
@@ -286,21 +307,26 @@ class SwapStoreTests: XCTestCase {
     
     let fetchFromTokenBalanceEx = expectation(description: "fetchFromTokenBalance")
     store.$selectedFromTokenBalance
+      .dropFirst()
       .sink { balance in
+        defer { fetchFromTokenBalanceEx.fulfill() }
         XCTAssertEqual(balance, BDouble(mockBalance)!)
-        store.suggestedAmountTapped(.all)
-        fetchFromTokenBalanceEx.fulfill()
       }
       .store(in: &cancellables)
     
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+      store.suggestedAmountTapped(.all)
+    }
+    
     let sendFullBalanceEx = expectation(description: "sendFullBalance")
     store.$sellAmount
+      .dropFirst()
       .sink { amount in
         XCTAssertEqual("\(amount)", "\(mockBalance)")
         sendFullBalanceEx.fulfill()
       }
       .store(in: &cancellables)
-    
+
     waitForExpectations(timeout: 3) { error in
       XCTAssertNil(error)
     }

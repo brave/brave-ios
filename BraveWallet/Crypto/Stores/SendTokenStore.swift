@@ -75,6 +75,10 @@ public class SendTokenStore: ObservableObject {
   private var allTokens: [BraveWallet.BlockchainToken] = []
   private var currentAccountAddress: String?
   private var timer: Timer?
+  /// Cancellable for the last running `fetchAssets()` Task.
+  private var fetchAssetsTask: Task<(), Never>?
+  /// Cancellable for the last running `fetchAssetBalance()` Task.
+  private var fetchAssetBalanceTask: Task<(), Never>?
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -106,28 +110,27 @@ public class SendTokenStore: ObservableObject {
   }
 
   func fetchAssets() {
-    walletService.selectedCoin { [weak self] coin in
-      guard let self = self else { return }
-      self.rpcService.network(coin) { network in
-        self.walletService.userAssets(network.chainId, coin: network.coin) { tokens in
-          self.userAssets = tokens
-          
-          if let selectedToken = self.selectedSendToken {
-            if tokens.isEmpty {
-              self.selectedSendToken = nil
-            } else if let token = tokens.first(where: { $0.id == selectedToken.id }) {
-              self.selectedSendToken = token
-            }
-          } else {
-            self.selectedSendToken = tokens.first
-          }
+    fetchAssetsTask?.cancel()
+    fetchAssetsTask = Task { @MainActor in
+      let coin = await walletService.selectedCoin()
+      let network = await rpcService.network(coin)
+      let userAssets = await walletService.userAssets(network.chainId, coin: network.coin)
+      // if the task was cancelled, don't update the UI
+      guard !Task.isCancelled else { return }
+      if let selectedToken = selectedSendToken {
+        if userAssets.isEmpty {
+          selectedSendToken = nil
+        } else if let token = userAssets.first(where: { $0.id == selectedToken.id }) {
+          selectedSendToken = token
         }
-        
-        // store tokens in `allTokens` for address validation
-        self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
-          self.allTokens = tokens + [network.nativeToken]
-        }
+      } else {
+        self.selectedSendToken = userAssets.first
       }
+      // store tokens in `allTokens` for address validation
+      // if the task was cancelled, don't update the UI
+      guard !Task.isCancelled else { return }
+      let tokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
+      allTokens = tokens + [network.nativeToken]
     }
   }
   
@@ -146,39 +149,25 @@ public class SendTokenStore: ObservableObject {
       selectedSendTokenBalance = nil
       return
     }
-
-    walletService.selectedCoin { [weak self] coin in
-      guard let self = self else { return }
-      self.rpcService.network(coin) { network in
-        self.walletService.userAssets(network.chainId, coin: network.coin) { tokens in
-          guard let index = tokens.firstIndex(where: { $0.id == token.id }) else {
-            self.selectedSendTokenBalance = nil
-            return
-          }
-          self.fetchBalance(for: tokens[index])
-        }
+    
+    fetchAssetBalanceTask?.cancel()
+    fetchAssetBalanceTask = Task { @MainActor in
+      let coin = await walletService.selectedCoin()
+      let network = await rpcService.network(coin)
+      // if the task was cancelled, don't update the UI
+      guard !Task.isCancelled else { return }
+      userAssets = await walletService.userAssets(network.chainId, coin: network.coin)
+      guard userAssets.first(where: { $0.id == token.id }) != nil,
+            let accountAddress = currentAccountAddress
+      else {
+        self.selectedSendTokenBalance = nil
+        return
       }
-    }
-  }
-
-  private func fetchBalance(for token: BraveWallet.BlockchainToken) {
-    walletService.selectedCoin { [weak self] coin in
-      guard let self = self else { return }
-      self.keyringService.selectedAccount(coin) { accountAddress in
-        guard let accountAddress = accountAddress else {
-          self.selectedSendTokenBalance = nil
-          return
-        }
-        
-        self.rpcService.balance(
-          for: token,
-          in: accountAddress,
-          with: coin,
-          decimalFormatStyle: .decimals(precision: Int(token.decimals))
-        ) { balance in
-          self.selectedSendTokenBalance = balance
-        }
-      }
+      guard !Task.isCancelled else { return } // limit network request(s) if cancelled
+      selectedSendTokenBalance = await rpcService.balance(for: token,
+                                                          in: accountAddress,
+                                                          with: coin,
+                                                          decimalFormatStyle: .decimals(precision: Int(token.decimals)))
     }
   }
 

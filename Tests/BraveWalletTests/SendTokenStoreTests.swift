@@ -112,6 +112,9 @@ class SendTokenStoreTests: XCTestCase {
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._network = { $1(.mockRopsten) }
     rpcService._addObserver = { _ in }
+    rpcService._balance = {_, _, _, completion in
+      completion("47.156499657504857477", .success, "")
+    }
     
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._selectedCoin = { $0(.eth) }
@@ -173,9 +176,16 @@ class SendTokenStoreTests: XCTestCase {
   }
 
   func testMakeSendERC20Transaction() {
+    let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+    let mockBalance = "47.156499657504857477"
+    let mockBalanceWei = formatter.weiString(from: mockBalance, radix: .hex, decimals: 18) ?? ""
+    
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._network = { $1(.mockRopsten) }
     rpcService._addObserver = { _ in }
+    rpcService._balance = { _, _, _, completion in
+      completion(mockBalanceWei, .success, "")
+    }
     
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._selectedCoin = { $0(.eth) }
@@ -241,20 +251,25 @@ class SendTokenStoreTests: XCTestCase {
     
     let fetchSelectedTokenBalanceEx = expectation(description: "fetchSelectedTokenBalance")
     store.$selectedSendTokenBalance
+      .dropFirst()
       .sink { balance in
+        defer { fetchSelectedTokenBalanceEx.fulfill() }
         XCTAssertEqual(balance, BDouble(mockBalance)!)
-        store.suggestedAmountTapped(.all)
-        fetchSelectedTokenBalanceEx.fulfill()
       }
       .store(in: &cancellables)
     
     let sendFullBalanceEx = expectation(description: "sendFullBalance")
     store.$sendAmount
+      .dropFirst()
       .sink { amount in
+        defer { sendFullBalanceEx.fulfill() }
         XCTAssertEqual("\(amount)", "\(mockBalance)")
-        sendFullBalanceEx.fulfill()
       }
       .store(in: &cancellables)
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+      store.suggestedAmountTapped(.all)
+    }
     
     waitForExpectations(timeout: 3) { error in
       XCTAssertNil(error)
