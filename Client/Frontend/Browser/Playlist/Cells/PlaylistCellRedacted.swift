@@ -12,55 +12,51 @@ import BraveShared
 import Data
 
 private struct PlaylistRedactedHeaderView: View {
-  @Observable var title: String?
-  @Observable var creatorName: String?
+  var title: String?
+  var creatorName: String?
   
   var body: some View {
-    HStack(alignment: .center) {
+    HStack {
       VStack(alignment: .leading) {
-        Text(title ?? "PlaylistTitlePlaceholder" /* Placeholder */)
-          .font(.title3)
-          .fontWeight(.medium)
+        Text(title ?? "PlaylistTitlePlaceholder")
+          .font(.title3.weight(.medium))
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
           .redacted(reason: title == nil ? .placeholder : [])
           .shimmer(title == nil)
         
-        Text(creatorName ?? "CreatorName" /* Placeholder */)
+        Text(creatorName ?? "CreatorName")
           .font(.footnote)
           .foregroundColor(Color(.braveLabel))
           .multilineTextAlignment(.leading)
           .redacted(reason: creatorName == nil ? .placeholder : [])
           .shimmer(creatorName == nil)
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
       
-      Spacer()
-      
-      Button("+ Add" /* Placeholder */, action: {})
+      Button("+ Add", action: {})
+        .font(.subheadline.weight(.bold))
         .buttonStyle(BraveFilledButtonStyle(size: .normal))
         .disabled(true)
         .redacted(reason: .placeholder)
         .shimmer(true)
     }
-    .padding()
-    .frame(height: 80.0, alignment: .center)
+    .padding(15)
     .background(Color(.braveBackground))
-    .environment(\.colorScheme, .dark)
+    .preferredColorScheme(.dark)
   }
 }
 
 private struct PlaylistCellRedactedView: View {
-  @Observable var thumbnail: UIImage?
-  @Observable var title: String?
-  @Observable var subtitle: String?
+  var thumbnail: UIImage?
+  var title: String?
+  var details: String?
   
   var body: some View {
-    HStack(alignment: .center) {
-      Image(uiImage: UIImage())
-        .resizable()
-        .background(Color.black)
-        .frame(width: 64.0 * 1.47, height: 64.0, alignment: .center)
-        .aspectRatio(contentMode: .fit)
+    HStack {
+      RoundedRectangle(cornerRadius: 5.0, style: .continuous)
+        .fill(Color.black)
+        .frame(width: 80.0 * 1.46875, height: 64.0, alignment: .center)
         .clipShape(RoundedRectangle(cornerRadius: 5.0, style: .continuous))
         .overlay(
           VStack {
@@ -74,36 +70,25 @@ private struct PlaylistCellRedactedView: View {
       
       VStack(alignment: .leading) {
         Text(title ?? "Placeholder Title - Placeholder Title Longer")
-          .font(.callout)
-          .fontWeight(.medium)
+          .font(.callout.weight(.medium))
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
           .redacted(reason: title == nil ? .placeholder : [])
           .shimmer(title == nil)
         
-        Text(subtitle ?? "Placeholder SubTitle")
-          .font(.callout)
-          .foregroundColor(Color(.bravePrimary))
+        Text(details ?? "00:00")
+          .font(.footnote)
+          .foregroundColor(Color(.secondaryBraveLabel))
           .multilineTextAlignment(.leading)
-          .redacted(reason: subtitle == nil ? .placeholder : [])
-          .shimmer(subtitle == nil)
-        
-        if subtitle == nil {
-          Text("00:00")
-            .font(.footnote)
-            .foregroundColor(Color(.secondaryBraveLabel))
-            .multilineTextAlignment(.leading)
-            .redacted(reason: .placeholder)
-            .shimmer(true)
-        }
+          .redacted(reason: details == nil ? .placeholder : [])
+          .shimmer(details == nil)
       }
       
       Spacer()
     }
-    .padding()
-    .frame(height: 80.0, alignment: .center)
+    .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
     .background(Color(.braveBackground))
-    .environment(\.colorScheme, .dark)
+    .preferredColorScheme(.dark)
   }
 }
 
@@ -160,7 +145,7 @@ class PlaylistCellRedacted: UITableViewCell {
     hostingController.rootView.title = title
   }
   
-  func setSubtitle(subtitle: String?) {
-    hostingController.rootView.subtitle = subtitle
+  func setDetails(details: String?) {
+    hostingController.rootView.details = details
   }
 }

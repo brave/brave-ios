@@ -200,13 +200,29 @@ class PlaylistViewController: UIViewController {
 
       Task { @MainActor in
         do {
-          let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: folderSharingId)
-          let folder = await model.createInMemoryStorage()
+          self.listController.showOverlay(image: UIImage())
+          let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(playlistId: folderSharingId)
+          let folder = await PlaylistSharedFolderNetwork.createInMemoryStorage(for: model)
           PlaylistManager.shared.currentFolder = folder
           self.listController.loadingState = .partial
           
           Task { @MainActor in
-            let items = await PlaylistSharedFolderModel.fetchMediaItemInfo(item: model)
+            let authManager = BasicAuthCredentialsManager(for: [model.folderImage.absoluteString])
+            let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
+            defer { session.finishTasksAndInvalidate() }
+            
+            let (data, response) = try await NetworkManager(session: session).dataRequest(with: model.folderImage)
+            if let response = response as? HTTPURLResponse, response.statusCode != 200 {
+              return
+            }
+            
+            if let image = UIImage(data: data, scale: UIScreen.main.scale) {
+              self.listController.showOverlay(image: image)
+            }
+          }
+          
+          Task { @MainActor in
+            let items = await PlaylistSharedFolderNetwork.fetchMediaItemInfo(item: model)
             folder.playlistItems?.forEach({ playlistItem in
               if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
                 playlistItem.name = item.name

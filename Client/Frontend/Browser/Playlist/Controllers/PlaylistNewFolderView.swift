@@ -220,7 +220,7 @@ struct PlaylistNewFolderView: View {
         }
       }
     }
-    .environment(\.colorScheme, .dark)
+    .preferredColorScheme(.dark)
   }
 }
 

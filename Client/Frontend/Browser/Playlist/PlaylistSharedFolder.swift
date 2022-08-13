@@ -52,6 +52,38 @@ public struct PlaylistSharedFolderModel: Codable {
     try container.encode(items, forKey: .mediaItems)
   }
   
+  private struct MediaItem: Codable {
+
+    public init(mediaItemId: String, title: String, url: URL) {
+      self.mediaItemId = mediaItemId
+      self.title = title
+      self.url = url
+    }
+    
+    public let mediaItemId: String
+    public let title: String
+    public let url: URL
+    
+    private enum CodingKeys: String, CodingKey {
+      case mediaItemId = "mediaitemid"
+      case title
+      case url
+    }
+  }
+  
+  private enum CodingKeys: String, CodingKey {
+    case version
+    case folderId = "folderid"
+    case folderName = "foldername"
+    case folderImage = "folderimage"
+    case creatorName = "creatorname"
+    case creatorLink = "creatorlink"
+    case updateAt = "updateat"
+    case mediaItems = "mediaitems"
+  }
+}
+
+public struct PlaylistSharedFolderNetwork {
   public static func fetchPlaylist(playlistId: String) async throws -> PlaylistSharedFolderModel {
     guard let playlistURL = URL(string: "\(playlistId)")?.appendingPathComponent("playlist").appendingPathExtension("json") else {
       throw "Invalid Playlist URL"
@@ -65,16 +97,19 @@ public struct PlaylistSharedFolderModel: Codable {
     if let response = response as? HTTPURLResponse, response.statusCode != 200 {
       throw "Invalid Response Status Code: \(response.statusCode)"
     }
-    return try JSONDecoder().decode(Self.self, from: data)
+    return try JSONDecoder().decode(PlaylistSharedFolderModel.self, from: data)
   }
   
   @MainActor
-  public func createInMemoryStorage() async -> PlaylistFolder {
+  public static func createInMemoryStorage(for model: PlaylistSharedFolderModel) async -> PlaylistFolder {
     await withCheckedContinuation { continuation in
       // Create a local shared folder
-      PlaylistFolder.addInMemoryFolder(title: folderName, creatorName: creatorName, creatorLink: creatorLink, sharedFolderId: folderId) { folder, folderId in
+      PlaylistFolder.addInMemoryFolder(title: model.folderName,
+                                       creatorName: model.creatorName,
+                                       creatorLink: model.creatorLink,
+                                       sharedFolderId: model.folderId) { folder, folderId in
         // Add the items to the folder
-        PlaylistItem.addInMemoryItems(mediaItems, folderUUID: folderId) {
+        PlaylistItem.addInMemoryItems(model.mediaItems, folderUUID: folderId) {
           // Items were added
           continuation.resume(returning: folder)
         }
@@ -150,40 +185,5 @@ public struct PlaylistSharedFolderModel: Codable {
       }
       return result
     }
-  }
-  
-  private struct MediaItem: Codable {
-    public init() {
-      mediaItemId = UUID().uuidString
-      title = ""
-      url = NSURL() as URL
-    }
-    
-    public init(mediaItemId: String, title: String, url: URL) {
-      self.mediaItemId = mediaItemId
-      self.title = title
-      self.url = url
-    }
-    
-    public let mediaItemId: String
-    public let title: String
-    public let url: URL
-    
-    private enum CodingKeys: String, CodingKey {
-      case mediaItemId = "mediaitemid"
-      case title
-      case url
-    }
-  }
-  
-  private enum CodingKeys: String, CodingKey {
-    case version
-    case folderId = "folderid"
-    case folderName = "foldername"
-    case folderImage = "folderimage"
-    case creatorName = "creatorname"
-    case creatorLink = "creatorlink"
-    case updateAt = "updateat"
-    case mediaItems = "mediaitems"
   }
 }

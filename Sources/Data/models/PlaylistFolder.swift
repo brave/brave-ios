@@ -38,17 +38,10 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
     if savedFolder {
       fetchRequest.predicate = NSPredicate(format: "uuid == %@", savedFolderUUID)
     } else {
-      if sharedFolders {
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-          NSPredicate(format: "uuid != %@", savedFolderUUID),
-          NSPredicate(format: "sharedFolderId != nil")
-        ])
-      } else {
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-          NSPredicate(format: "uuid != %@", savedFolderUUID),
-          NSPredicate(format: "sharedFolderId == nil")
-        ])
-      }
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        NSPredicate(format: "uuid != %@", savedFolderUUID),
+        NSPredicate(format: sharedFolders ? "sharedFolderId != nil" : "sharedFolderId == nil")
+      ])
     }
 
     return NSFetchedResultsController(

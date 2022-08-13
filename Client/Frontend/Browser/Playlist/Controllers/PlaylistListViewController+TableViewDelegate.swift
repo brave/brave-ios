@@ -123,7 +123,8 @@ extension PlaylistListViewController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 
-    guard let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
+    guard PlaylistManager.shared.currentFolder?.sharedFolderId == nil,
+          let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
       return nil
     }
 
@@ -209,7 +210,8 @@ extension PlaylistListViewController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
 
-    guard let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
+    guard PlaylistManager.shared.currentFolder?.sharedFolderId == nil,
+          let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
       return nil
     }
 
@@ -332,6 +334,8 @@ extension PlaylistListViewController: UITableViewDelegate {
       updateToolbar(editing: true)
       return
     }
+    
+    showOverlay(image: nil)
 
     prepareToPlayItem(at: indexPath) { [weak self] item in
       guard let item = item else {

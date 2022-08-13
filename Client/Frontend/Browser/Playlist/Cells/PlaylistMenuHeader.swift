@@ -15,19 +15,15 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
   }
   
   let titleLabel = UILabel().then {
-    $0.font = UIFont.preferredFont(forTextStyle: .title3)
+    $0.font = .preferredFont(forTextStyle: .title3, weight: .medium)
     $0.textColor = .bravePrimary
     $0.numberOfLines = 2
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
-    $0.setContentHuggingPriority(.required, for: .vertical)
   }
   
   let subtitleLabel = UILabel().then {
-    $0.font = UIFont.preferredFont(forTextStyle: .footnote)
+    $0.font = .preferredFont(forTextStyle: .footnote)
     $0.textColor = .bravePrimary
     $0.numberOfLines = 2
-    $0.setContentCompressionResistancePriority(.required, for: .vertical)
-    $0.setContentHuggingPriority(.required, for: .vertical)
   }
   
   private let menuButton = RoundInterfaceButton(type: .custom).then {
@@ -40,6 +36,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     $0.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.setContentHuggingPriority(.required, for: .horizontal)
   }
   
   private var state: State = .add
@@ -73,7 +70,6 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
       ]).then {
         $0.axis = .vertical
       },
-      UIView(),
       menuButton
     ]).then {
       $0.spacing = 20.0
@@ -102,11 +98,13 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
       menuButton.setImage(nil, for: .normal)
       menuButton.backgroundColor = .braveBlurple
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.addButtonAccessibilityTitle
+      menuButton.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
     case .menu:
       menuButton.setTitle(nil, for: .normal)
       menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
       menuButton.backgroundColor = .clear
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.menuButtonAccessibilityTitle
+      menuButton.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 0.0)
     }
   }
   

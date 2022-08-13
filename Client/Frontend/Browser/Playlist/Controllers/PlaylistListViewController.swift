@@ -48,6 +48,7 @@ class PlaylistListViewController: UIViewController {
 
   weak var delegate: PlaylistViewControllerDelegate?
   private let playerView: VideoView
+  private let overlayView = UIImageView()
   private var observers = Set<AnyCancellable>()
   private var folderObserver: AnyCancellable?
   private(set) var autoPlayEnabled = Preferences.Playlist.firstLoadAutoPlay.value
@@ -165,6 +166,7 @@ class PlaylistListViewController: UIViewController {
     super.viewWillAppear(animated)
 
     title = PlaylistManager.shared.currentFolder?.title
+    navigationController?.setToolbarHidden(true, animated: true)
 
     // Update
     DispatchQueue.main.async {
@@ -255,7 +257,6 @@ class PlaylistListViewController: UIViewController {
     guard let lastPlayedItemUrl = lastPlayedItemUrl,
       let index = PlaylistManager.shared.index(of: lastPlayedItemUrl)
     else {
-
       tableView.delegate?.tableView?(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
       autoPlayEnabled = true
       return
@@ -370,6 +371,8 @@ class PlaylistListViewController: UIViewController {
     } else {
       toolbarItems = nil
     }
+    
+    navigationController?.setToolbarHidden(!editing, animated: true)
   }
 
   func moveItems(indexPaths: [IndexPath]) {
@@ -463,6 +466,13 @@ class PlaylistListViewController: UIViewController {
   override var preferredStatusBarStyle: UIStatusBarStyle {
     .lightContent
   }
+  
+  public func showOverlay(image: UIImage?) {
+    overlayView.image = image
+    overlayView.isHidden = image == nil
+    overlayView.backgroundColor = .black
+    overlayView.contentMode = .scaleAspectFit
+  }
 
   public func updateLayoutForMode(_ mode: UIUserInterfaceIdiom) {
     navigationItem.rightBarButtonItem = nil
@@ -475,6 +485,7 @@ class PlaylistListViewController: UIViewController {
       // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
       view.addSubview(tableView)
       view.addSubview(playerView)
+      view.addSubview(overlayView)
       playerView.addSubview(activityIndicator)
 
       if !playerView.isFullscreen {
@@ -493,13 +504,6 @@ class PlaylistListViewController: UIViewController {
           playerView.setExitButtonHidden(true)
           let videoPlayerHeight = (1.0 / 3.0) * (UIScreen.main.bounds.width > UIScreen.main.bounds.height ? UIScreen.main.bounds.width : UIScreen.main.bounds.height)
 
-          tableView.do {
-            $0.contentInset = UIEdgeInsets(top: videoPlayerHeight, left: 0.0, bottom: view.safeAreaInsets.bottom, right: 0.0)
-            $0.scrollIndicatorInsets = $0.contentInset
-            $0.contentOffset = CGPoint(x: 0.0, y: -videoPlayerHeight)
-            $0.isHidden = false
-          }
-
           playerView.snp.remakeConstraints {
             $0.top.equalTo(view.safeArea.top)
             $0.leading.trailing.equalToSuperview()
@@ -511,7 +515,15 @@ class PlaylistListViewController: UIViewController {
           }
 
           tableView.snp.remakeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(playerView.snp.bottom)
+            $0.bottom.equalTo(view.safeArea.bottom)
+          }
+          
+          overlayView.snp.remakeConstraints {
+            $0.top.equalTo(view.safeArea.top)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(videoPlayerHeight)
           }
         }
       } else {
@@ -537,18 +549,14 @@ class PlaylistListViewController: UIViewController {
       view.addSubview(tableView)
       playerView.addSubview(activityIndicator)
 
-      tableView.do {
-        $0.contentInset = .zero
-        $0.scrollIndicatorInsets = $0.contentInset
-        $0.contentOffset = .zero
-      }
-
       activityIndicator.snp.remakeConstraints {
         $0.center.equalToSuperview()
       }
 
       tableView.snp.remakeConstraints {
-        $0.edges.equalToSuperview()
+        $0.leading.trailing.equalToSuperview()
+        $0.top.equalTo(playerView.snp.bottom)
+        $0.bottom.equalTo(view.safeArea.bottom)
       }
     }
   }
@@ -571,14 +579,6 @@ extension PlaylistListViewController {
     if PlaylistManager.shared.numberOfAssets > 0 || loadingState != .fullyLoaded {
       tableView.backgroundView = nil
       tableView.separatorStyle = .singleLine
-      
-      if !playerView.isFullscreen {
-        if UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
-          navigationController?.setToolbarHidden(true, animated: true)
-        } else {
-          navigationController?.setToolbarHidden(false, animated: true)
-        }
-      }
     } else {
       let messageLabel = UILabel(frame: view.bounds).then {
         $0.text = Strings.PlayList.noItemLabelTitle
@@ -618,7 +618,7 @@ extension PlaylistListViewController {
 
     let selectedCell = tableView.cellForRow(at: indexPath) as? PlaylistCell
     playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
-    PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: selectedCell?.thumbnailView.image)
+    PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: selectedCell?.iconView.image)
     completion?(item)
   }
 
@@ -628,6 +628,7 @@ extension PlaylistListViewController {
       selectedCell?.detailLabel.text = Strings.PlayList.expiredLabelTitle
     }
 
+    playerView.setControlsEnabled(!isExpired)
     activityIndicator.stopAnimating()
   }
 }

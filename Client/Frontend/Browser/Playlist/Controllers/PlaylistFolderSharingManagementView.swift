@@ -21,15 +21,14 @@ struct PlaylistFolderSharingManagementView: View {
   var body: some View {
     VStack {
       Text(Strings.PlaylistFolderSharing.offlineManagementViewTitle)
-        .font(.title2)
-        .fontWeight(.medium)
+        .font(.title2.weight(.medium))
+        .multilineTextAlignment(.center)
         .foregroundColor(Color(.bravePrimary))
         .padding(.horizontal, UX.hPadding)
         .padding(.bottom, UX.vPadding)
       
       Text(String(format: "%@\n\n%@", Strings.PlaylistFolderSharing.offlineManagementViewDescription, Strings.PlaylistFolderSharing.offlineManagementViewSubDescription))
         .font(.body)
-        .fontWeight(.medium)
         .foregroundColor(Color(.braveLabel))
         .padding(.horizontal, UX.hPadding)
         .padding(.bottom, UX.vPadding)
@@ -39,43 +38,41 @@ struct PlaylistFolderSharingManagementView: View {
           onAddToPlaylistPressed?()
         }) {
           Text(Strings.PlaylistFolderSharing.offlineManagementViewAddButtonTitle)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             .font(.callout.weight(.medium))
             .padding()
         }
-        .frame(height: 44.0)
+        .frame(minHeight: 44.0)
         .background(Color(.braveBlurple))
-        .accentColor(Color(.white))
         .clipShape(Capsule())
         
         Button(action: {
           onSettingsPressed?()
         }) {
           Text(Strings.PlaylistFolderSharing.offlineManagementViewSettingsButtonTitle)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             .font(.callout.weight(.medium))
             .padding()
         }
-        .frame(height: 44.0)
+        .frame(minHeight: 44.0)
         .background(Color(.braveBlurple))
-        .accentColor(Color(.white))
         .clipShape(Capsule())
         
         Button(action: {
           onCancelPressed?()
         }) {
           Text(Strings.cancelButtonTitle)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             .font(.callout.weight(.medium))
             .padding()
         }
-        .frame(height: 44.0)
+        .frame(minHeight: 44.0)
         .foregroundColor(Color(.braveLighterBlurple))
-        .accentColor(Color(.white))
         .clipShape(Capsule())
       }
       .padding(.horizontal, UX.hPadding)
     }
+    .accentColor(Color(.white))
     .padding(EdgeInsets(top: UX.vPadding, leading: UX.hPadding, bottom: UX.vPadding, trailing: UX.hPadding))
     .background(Color(.braveBackground))
     .accessibilityEmbedInScrollView()
