@@ -74,6 +74,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     ]).then {
       $0.spacing = 20.0
       $0.isLayoutMarginsRelativeArrangement = true
+      $0.insetsLayoutMarginsFromSafeArea = false
       $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
     }
     

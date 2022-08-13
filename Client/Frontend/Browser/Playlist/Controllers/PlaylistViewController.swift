@@ -194,6 +194,7 @@ class PlaylistViewController: UIViewController {
     if let navigationController = folderController.navigationController {
       navigationController.popToRootViewController(animated: false)
       
+      splitController.preferredDisplayMode = .oneOverSecondary
       listController.loadingState = .loading
       PlaylistManager.shared.currentFolder = nil
       folderController.navigationController?.pushViewController(listController, animated: false)

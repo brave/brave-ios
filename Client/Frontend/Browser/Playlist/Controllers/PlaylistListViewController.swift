@@ -165,7 +165,7 @@ class PlaylistListViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    title = PlaylistManager.shared.currentFolder?.title
+    title = PlaylistManager.shared.numberOfAssets == 0 ? PlaylistManager.shared.currentFolder?.title : nil
     navigationController?.setToolbarHidden(true, animated: true)
 
     // Update
@@ -181,7 +181,7 @@ class PlaylistListViewController: UIViewController {
       .receive(on: DispatchQueue.main)
       .sink { [weak self] in
         guard let self = self else { return }
-        self.title = PlaylistManager.shared.currentFolder?.title
+        self.title = PlaylistManager.shared.numberOfAssets == 0 ? PlaylistManager.shared.currentFolder?.title : nil
         self.tableView.reloadData()
       }
   }
@@ -554,9 +554,7 @@ class PlaylistListViewController: UIViewController {
       }
 
       tableView.snp.remakeConstraints {
-        $0.leading.trailing.equalToSuperview()
-        $0.top.equalTo(playerView.snp.bottom)
-        $0.bottom.equalTo(view.safeArea.bottom)
+        $0.edges.equalToSuperview()
       }
     }
   }
