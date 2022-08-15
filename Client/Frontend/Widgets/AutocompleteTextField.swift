@@ -280,13 +280,15 @@ public class AutocompleteTextField: UITextField, UITextFieldDelegate {
     hideCursor = autocompleteTextLabel != nil
     removeCompletion()
 
-    let isAtEnd = selectedTextRange?.start == endOfDocument
     let isKeyboardReplacingText = lastReplacement != nil
-    if isKeyboardReplacingText, isAtEnd, markedTextRange == nil {
-      notifyTextChanged?()
-    } else {
+    let noMarkedText = markedTextRange == nil // Should not add typed text before marked text is confirmed by user
+
+    guard isKeyboardReplacingText, noMarkedText  else {
       hideCursor = false
+      return
     }
+    
+    notifyTextChanged?()
   }
 
   // Reset the cursor to the end of the text field.
