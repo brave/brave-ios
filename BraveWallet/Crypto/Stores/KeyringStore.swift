@@ -146,19 +146,21 @@ public class KeyringStore: ObservableObject {
     }
     Task { @MainActor in // fetch all KeyringInfo for all coin types
       let selectedCoin = await walletService.selectedCoin()
+      let selectedAccountAddress = await keyringService.selectedAccount(selectedCoin)
       self.allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
-      if let defaultKeyring = self.allKeyrings.first(where: { $0.id == BraveWallet.DefaultKeyringId }) {
+      if let defaultKeyring = allKeyrings.first(where: { $0.id == BraveWallet.DefaultKeyringId }) {
         self.defaultKeyring = defaultKeyring
       }
-      
-      if let selectedAccountKeyring = self.allKeyrings.first(where: { $0.coin == selectedCoin }) {
-        if !selectedAccountKeyring.accountInfos.isEmpty {
-          let selectedAccountAddress = await keyringService.selectedAccount(selectedCoin)
-          if self.selectedAccount.address != selectedAccountAddress {
-            self.selectedAccount = selectedAccountKeyring.accountInfos.first(where: { $0.address == selectedAccountAddress }) ?? selectedAccountKeyring.accountInfos.first!
-          }
-        }
-      }
+      if let selectedAccountKeyring = allKeyrings.first(where: { $0.coin == selectedCoin }) {
+        if self.selectedAccount.address != selectedAccountAddress {
+          if let selectedAccount = selectedAccountKeyring.accountInfos.first(where: { $0.address == selectedAccountAddress }) {
+            self.selectedAccount = selectedAccount
+          } else if let firstAccount = selectedAccountKeyring.accountInfos.first {
+            // try and correct invalid state (no selected account for this coin type)
+            self.selectedAccount = firstAccount
+          } // else selected account address does not exist in keyring (should not occur...)
+        } // else `self.selectedAccount` is already the currently selected account
+      } // else keyring for selected coin is unavailable (should not occur...)
     }
   }
 
@@ -382,10 +384,10 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
         break
       }
       
-      if selectedAccount.coin.keyringId != keyringId {
+      let newKeyring = await keyringService.keyringInfo(keyringId)
+      if let newAccount = newKeyring.accountInfos.first {
         walletService.setSelectedCoin(coin)
-        let network = await rpcService.network(coin)
-        await rpcService.setNetwork(network.chainId, coin: network.coin)
+        await keyringService.setSelectedAccount(newAccount.address, coin: newAccount.coin)
       }
       updateKeyringInfo()
     }
