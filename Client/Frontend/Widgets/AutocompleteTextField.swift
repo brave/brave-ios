@@ -81,7 +81,7 @@ public class AutocompleteTextField: UITextField, UITextFieldDelegate {
       0.1,
       action: {
         if self.isEditing {
-          self.autocompleteDelegate?.autocompleteTextField(self, didEnterText: self.normalizeString(self.text ?? ""))
+          self.autocompleteDelegate?.autocompleteTextField(self, didEnterText: self.text?.preferredSearchSuggestionText ?? "")
         }
       })
 
@@ -93,7 +93,7 @@ public class AutocompleteTextField: UITextField, UITextFieldDelegate {
           if text?.isEmpty == true && self.autocompleteTextLabel?.text?.isEmpty == false {
             text = self.autocompleteTextLabel?.text
           }
-          self.autocompleteDelegate?.autocompleteTextField(self, didDeleteAutoSelectedText: self.normalizeString(text ?? ""))
+          self.autocompleteDelegate?.autocompleteTextField(self, didDeleteAutoSelectedText: text?.preferredSearchSuggestionText ?? "")
         }
       })
   }
