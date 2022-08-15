@@ -476,23 +476,10 @@ class TabManager: NSObject {
     if let request = request {
       tab.loadRequest(request)
     } else if !isPopup {
-      let newTabChoice = NewTabAccessors.getNewTabPage()
-      switch newTabChoice {
-      case .homePage:
-        // We definitely have a homepage if we've got here
-        // (so we can safely dereference it).
-        let url = HomePageAccessors.getHomePage(prefs)!
-        tab.loadRequest(URLRequest(url: url))
-      case .blankPage:
-        // Do nothing: we're already seeing a blank page.
-        break
-      default:
-        // The common case, where the NewTabPage enum defines
-        // one of the about:home pages.
-        if let url = newTabChoice.url {
-          tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
-          tab.url = url
-        }
+      
+      if let url = NewTabPageViewController.ntpInteralURL {
+        tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
+        tab.url = url
       }
     }
 
