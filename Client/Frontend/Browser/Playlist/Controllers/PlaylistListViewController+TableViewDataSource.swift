@@ -56,6 +56,10 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    UITableView.automaticDimension
+  }
+  
+  func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
     Constants.tableRowHeight
   }
 
@@ -64,7 +68,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-    500
+    Constants.tableHeaderHeight
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

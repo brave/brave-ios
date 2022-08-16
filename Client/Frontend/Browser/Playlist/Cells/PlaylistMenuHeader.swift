@@ -41,6 +41,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.setContentHuggingPriority(.required, for: .horizontal)
   }
   
   private var state: State = .add
@@ -67,24 +68,43 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     
-    let hStack = UIStackView(arrangedSubviews: [
-      UIStackView(arrangedSubviews: [
+    if traitCollection.preferredContentSizeCategory > .extraLarge {
+      let vStack = UIStackView(arrangedSubviews: [
         titleLabel,
-        subtitleLabel
+        subtitleLabel,
+        menuButton
       ]).then {
         $0.axis = .vertical
-      },
-      menuButton
-    ]).then {
-      $0.spacing = 20.0
-      $0.isLayoutMarginsRelativeArrangement = true
-      $0.insetsLayoutMarginsFromSafeArea = false
-      $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
-    }
-    
-    contentView.addSubview(hStack)
-    hStack.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+        $0.setCustomSpacing(20.0, after: subtitleLabel)
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.insetsLayoutMarginsFromSafeArea = false
+        $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
+      }
+      
+      contentView.addSubview(vStack)
+      vStack.snp.makeConstraints {
+        $0.edges.equalToSuperview()
+      }
+    } else {
+      let hStack = UIStackView(arrangedSubviews: [
+        UIStackView(arrangedSubviews: [
+          titleLabel,
+          subtitleLabel
+        ]).then {
+          $0.axis = .vertical
+        },
+        menuButton
+      ]).then {
+        $0.spacing = 20.0
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.insetsLayoutMarginsFromSafeArea = false
+        $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
+      }
+      
+      contentView.addSubview(hStack)
+      hStack.snp.makeConstraints {
+        $0.edges.equalToSuperview()
+      }
     }
     
     menuButton.addTarget(self, action: #selector(onMenuButtonPressed(_:)), for: .touchUpInside)

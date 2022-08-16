@@ -52,18 +52,22 @@ class PlaylistCell: UITableViewCell {
 
   let titleLabel = UILabel().then {
     $0.textColor = .bravePrimary
-    $0.numberOfLines = 2
+    $0.numberOfLines = 0
     $0.font = .preferredFont(forTextStyle: .callout, weight: .medium)
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    $0.setContentHuggingPriority(.required, for: .vertical)
   }
 
   let detailLabel = UILabel().then {
     $0.textColor = .secondaryBraveLabel
+    $0.numberOfLines = 0
     $0.font = .preferredFont(forTextStyle: .footnote)
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
+    $0.setContentHuggingPriority(.required, for: .vertical)
   }
 
   private let infoStackView = UIStackView().then {
     $0.axis = .vertical
-    $0.alignment = .fill
     $0.spacing = 5.0
   }
 
@@ -91,37 +95,68 @@ class PlaylistCell: UITableViewCell {
     infoStackView.addArrangedSubview(titleLabel)
     infoStackView.addArrangedSubview(detailLabel)
     
-    thumbnailHolder.snp.makeConstraints {
-      // Keeps a 94.0px width on iPhone-X as per design
-      $0.width.equalTo(contentView.snp.height).multipliedBy(1.46875 /* 94.0 / (tableViewCellHeight - (8.0 * 2)) */)
-      $0.leading.equalToSuperview().offset(12.0)
-      $0.centerY.equalToSuperview()
-      $0.top.greaterThanOrEqualToSuperview().offset(8.0)
-      $0.bottom.lessThanOrEqualToSuperview().offset(8.0)
-    }
+    if traitCollection.preferredContentSizeCategory > .extraLarge {
+      thumbnailHolder.snp.makeConstraints {
+        $0.leading.trailing.equalToSuperview().inset(12.0)
+        $0.height.equalTo(thumbnailHolder.snp.width).multipliedBy(9.0 / 16.0)
+        $0.top.equalToSuperview().inset(8.0)
+      }
 
-    iconView.snp.makeConstraints {
-      $0.center.equalToSuperview()
-      $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
-      $0.width.height.equalToSuperview()
-    }
+      iconView.snp.makeConstraints {
+        $0.center.equalToSuperview()
+        $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
+        $0.width.height.equalToSuperview()
+      }
 
-    loadingView.snp.makeConstraints {
-      $0.center.equalToSuperview()
-    }
+      loadingView.snp.makeConstraints {
+        $0.center.equalToSuperview()
+      }
 
-    infoStackView.snp.makeConstraints {
-      $0.leading.equalTo(thumbnailHolder.snp.trailing).offset(8.0)
-      $0.trailing.equalToSuperview().offset(-15.0)
-      $0.centerY.equalToSuperview()
-      $0.top.greaterThanOrEqualToSuperview().offset(8.0)
-      $0.bottom.lessThanOrEqualToSuperview().offset(8.0)
-    }
+      infoStackView.snp.makeConstraints {
+        $0.leading.trailing.equalToSuperview().inset(12.0)
+        $0.top.equalTo(thumbnailHolder.snp.bottom).offset(8.0)
+        $0.bottom.equalToSuperview().inset(8.0)
+      }
 
-    separator.snp.makeConstraints {
-      $0.leading.equalTo(titleLabel.snp.leading)
-      $0.trailing.bottom.equalToSuperview()
-      $0.height.equalTo(1.0 / UIScreen.main.scale)
+      separator.snp.makeConstraints {
+        $0.leading.equalTo(titleLabel.snp.leading)
+        $0.trailing.bottom.equalToSuperview()
+        $0.height.equalTo(1.0 / UIScreen.main.scale)
+      }
+    } else {
+      thumbnailHolder.snp.makeConstraints {
+        // Keeps a 94.0px width on iPhone-X as per design
+        $0.width.equalTo(contentView.snp.width).multipliedBy(0.30)
+        $0.height.equalTo(thumbnailHolder.snp.width).multipliedBy(9.0 / 16.0)
+        $0.leading.equalToSuperview().inset(12.0)
+        $0.centerY.equalToSuperview()
+        $0.top.greaterThanOrEqualToSuperview().inset(8.0)
+        $0.bottom.lessThanOrEqualToSuperview().inset(8.0)
+      }
+
+      iconView.snp.makeConstraints {
+        $0.center.equalToSuperview()
+        $0.leading.trailing.top.bottom.equalToSuperview().priority(.high)
+        $0.width.height.equalToSuperview()
+      }
+
+      loadingView.snp.makeConstraints {
+        $0.center.equalToSuperview()
+      }
+
+      infoStackView.snp.makeConstraints {
+        $0.leading.equalTo(thumbnailHolder.snp.trailing).offset(8.0)
+        $0.trailing.equalToSuperview().inset(12.0)
+        $0.centerY.equalToSuperview()
+        $0.top.greaterThanOrEqualToSuperview().inset(8.0)
+        $0.bottom.lessThanOrEqualToSuperview().inset(8.0)
+      }
+
+      separator.snp.makeConstraints {
+        $0.leading.equalTo(titleLabel.snp.leading)
+        $0.trailing.bottom.equalToSuperview()
+        $0.height.equalTo(1.0 / UIScreen.main.scale)
+      }
     }
   }
 
