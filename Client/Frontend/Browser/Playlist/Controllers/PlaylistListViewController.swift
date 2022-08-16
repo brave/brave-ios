@@ -45,8 +45,6 @@ class PlaylistListViewController: UIViewController {
   // MARK: Properties
   public var initialItem: PlaylistInfo?
   public var initialItemPlaybackOffset = 0.0
-  
-  var syncNowDebug = false
 
   weak var delegate: PlaylistViewControllerDelegate?
   private let playerView: VideoView

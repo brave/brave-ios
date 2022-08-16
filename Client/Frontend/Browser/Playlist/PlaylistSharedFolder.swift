@@ -10,7 +10,7 @@ import CoreData
 
 public struct PlaylistSharedFolderModel: Codable {
   public let version: String
-  public let playlistId: String
+  public let folderId: String
   public let folderName: String
   public let folderImage: URL
   public let creatorName: String
@@ -21,7 +21,7 @@ public struct PlaylistSharedFolderModel: Codable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     version = try container.decode(String.self, forKey: .version)
-    playlistId = try container.decode(String.self, forKey: .playlistId)
+    folderId = try container.decode(String.self, forKey: .folderId)
     folderName = try container.decode(String.self, forKey: .folderName)
     folderImage = try container.decode(URL.self, forKey: .folderImage)
     creatorName = try container.decode(String.self, forKey: .creatorName)
@@ -35,7 +35,7 @@ public struct PlaylistSharedFolderModel: Codable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(version, forKey: .version)
-    try container.encode(playlistId, forKey: .playlistId)
+    try container.encode(folderId, forKey: .folderId)
     try container.encode(folderName, forKey: .folderName)
     try container.encode(folderImage, forKey: .folderImage)
     try container.encode(creatorName, forKey: .creatorName)
@@ -53,11 +53,18 @@ public struct PlaylistSharedFolderModel: Codable {
   }
   
   public static func fetchPlaylist(playlistId: String) async throws -> PlaylistSharedFolderModel {
-    guard let playlistURL = URL(string: "https://brandon-t.github.io/playlist/static/\(playlistId == "SyncNow" ? "content" : "playlist").json?\(playlistId)") else {
+    guard let playlistURL = URL(string: "\(playlistId)")?.appendingPathComponent("playlist").appendingPathExtension("json") else {
       throw "Invalid Playlist URL"
     }
     
-    let (data, _) = try await NetworkManager().dataRequest(with: playlistURL)
+    let authenticator = BasicAuthCredentialsManager(for: Array(DomainUserScript.bravePlaylistFolderSharingHelper.associatedDomains))
+    let session = URLSession(configuration: .ephemeral, delegate: authenticator, delegateQueue: .main)
+    defer { session.finishTasksAndInvalidate() }
+    
+    let (data, response) = try await NetworkManager(session: session).dataRequest(with: playlistURL)
+    if let response = response as? HTTPURLResponse, response.statusCode != 200 {
+      throw "Invalid Response Status Code: \(response.statusCode)"
+    }
     return try JSONDecoder().decode(Self.self, from: data)
   }
   
@@ -65,7 +72,7 @@ public struct PlaylistSharedFolderModel: Codable {
   public func createInMemoryStorage() async -> PlaylistFolder {
     await withCheckedContinuation { continuation in
       // Create a local shared folder
-      PlaylistFolder.addInMemoryFolder(title: folderName, creatorName: creatorName, creatorLink: creatorLink, sharedFolderId: playlistId) { folder, folderId in
+      PlaylistFolder.addInMemoryFolder(title: folderName, creatorName: creatorName, creatorLink: creatorLink, sharedFolderId: folderId) { folder, folderId in
         // Add the items to the folder
         PlaylistItem.addInMemoryItems(mediaItems, folderUUID: folderId) {
           // Items were added
@@ -171,7 +178,7 @@ public struct PlaylistSharedFolderModel: Codable {
   
   private enum CodingKeys: String, CodingKey {
     case version
-    case playlistId
+    case folderId = "folderid"
     case folderName = "foldername"
     case folderImage = "folderimage"
     case creatorName = "creatorname"

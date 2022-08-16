@@ -199,26 +199,30 @@ class PlaylistViewController: UIViewController {
       folderController.navigationController?.pushViewController(listController, animated: false)
 
       Task { @MainActor in
-        let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: folderSharingId)
-        let folder = await model.createInMemoryStorage()
-        PlaylistManager.shared.currentFolder = folder
-        self.listController.loadingState = .partial
-        
-        Task { @MainActor in
-          let items = await PlaylistSharedFolderModel.fetchMediaItemInfo(item: model)
-          folder.playlistItems?.forEach({ playlistItem in
-            if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
-              playlistItem.name = item.name
-              playlistItem.pageTitle = item.pageTitle
-              playlistItem.pageSrc = item.pageSrc
-              playlistItem.duration = item.duration
-              playlistItem.mimeType = item.mimeType
-              playlistItem.mediaSrc = item.src
-              playlistItem.uuid = item.tagId
-            }
-          })
+        do {
+          let model = try await PlaylistSharedFolderModel.fetchPlaylist(playlistId: folderSharingId)
+          let folder = await model.createInMemoryStorage()
+          PlaylistManager.shared.currentFolder = folder
+          self.listController.loadingState = .partial
           
-          self.listController.loadingState = .fullyLoaded
+          Task { @MainActor in
+            let items = await PlaylistSharedFolderModel.fetchMediaItemInfo(item: model)
+            folder.playlistItems?.forEach({ playlistItem in
+              if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
+                playlistItem.name = item.name
+                playlistItem.pageTitle = item.pageTitle
+                playlistItem.pageSrc = item.pageSrc
+                playlistItem.duration = item.duration
+                playlistItem.mimeType = item.mimeType
+                playlistItem.mediaSrc = item.src
+                playlistItem.uuid = item.tagId
+              }
+            })
+            
+            self.listController.loadingState = .fullyLoaded
+          }
+        } catch {
+          log.error("No Playlist JSON")
         }
       }
     }
