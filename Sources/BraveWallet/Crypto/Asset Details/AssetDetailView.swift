@@ -188,6 +188,11 @@ struct AssetDetailView: View {
         }
       )
     )
+    .onChange(of: keyringStore.defaultKeyring) { newValue in
+      if newValue.isLocked, isShowingAuroraBridgeAlert {
+        isShowingAuroraBridgeAlert = false
+      }
+    }
   }
 }
 
