@@ -18,6 +18,7 @@ struct AssetDetailView: View {
   @State private var tableInset: CGFloat = -16.0
   @State private var isShowingAddAccount: Bool = false
   @State private var transactionDetails: TransactionDetailsStore?
+  @State private var isShowingAuroraBridgeAlert: Bool = false
 
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -31,7 +32,8 @@ struct AssetDetailView: View {
           assetDetailStore: assetDetailStore,
           keyringStore: keyringStore,
           networkStore: networkStore,
-          buySendSwapDestination: buySendSwapDestination
+          buySendSwapDestination: buySendSwapDestination,
+          isShowingBridgeAlert: $isShowingAuroraBridgeAlert
         )
         .resetListHeaderStyle()
         .padding(.horizontal, tableInset)  // inset grouped layout margins workaround
@@ -154,6 +156,37 @@ struct AssetDetailView: View {
             )
           }
         }
+    )
+    .background(
+      WalletPromptView(
+        isPresented: $isShowingAuroraBridgeAlert,
+        buttonTitle: Strings.Wallet.auroraBridgeButtonTitle,
+        action: { proceed in
+          if proceed {
+            openWalletURL?(WalletConstants.auroraBridgeLink)
+          }
+        },
+        content: {
+          VStack {
+            Text(Strings.Wallet.auroraBridgeAlertTitle)
+              .font(.headline.weight(.bold))
+              .multilineTextAlignment(.center)
+              .padding(.vertical)
+            VStack(alignment: .leading) {
+              Text(Strings.Wallet.auroraBridgeAlertDescription)
+                .font(.subheadline)
+              Button(action: {
+                isShowingAuroraBridgeAlert = false
+                openWalletURL?(WalletConstants.auroraBridgeRiskLink)
+              }) {
+                Text(Strings.Wallet.learnMoreButton)
+                  .font(.subheadline)
+                  .foregroundColor(Color(.braveBlurpleTint))
+              }
+            }
+          }
+        }
+      )
     )
   }
 }

@@ -20,6 +20,7 @@ struct AssetDetailHeaderView: View {
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   @Binding var buySendSwapDestination: BuySendSwapDestination?
+  @Binding var isShowingBridgeAlert: Bool
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -44,6 +45,62 @@ struct AssetDetailHeaderView: View {
   private var emptyData: [BraveWallet.AssetTimePrice] {
     // About 300 points added so it doesn't animate funny
     (0..<300).map { _ in .init(date: Date(), price: "0.0") }
+  }
+  
+  private var isBuySupported: Bool {
+    assetDetailStore.isBuySupported
+    && WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(networkStore.selectedChainId)
+  }
+  
+  @ViewBuilder var buySendSwapButtonsContainer: some View {
+    HStack {
+      if isBuySupported {
+        Button(
+          action: {
+            buySendSwapDestination = BuySendSwapDestination(
+              kind: .buy,
+              initialToken: assetDetailStore.token
+            )
+          }
+        ) {
+          Text(Strings.Wallet.buy)
+        }
+      }
+      Button(
+        action: {
+          buySendSwapDestination = BuySendSwapDestination(
+            kind: .send,
+            initialToken: assetDetailStore.token
+          )
+        }
+      ) {
+        Text(Strings.Wallet.send)
+      }
+      if networkStore.isSwapSupported {
+        Button(
+          action: {
+            buySendSwapDestination = BuySendSwapDestination(
+              kind: .swap,
+              initialToken: assetDetailStore.token
+            )
+          }
+        ) {
+          Text(Strings.Wallet.swap)
+        }
+      }
+    }
+    .buttonStyle(BraveFilledButtonStyle(size: .normal))
+  }
+  
+  @ViewBuilder var auroraBridgeButton: some View {
+    Button(
+      action: {
+        isShowingBridgeAlert = true
+      }
+    ) {
+      Text(Strings.Wallet.auroraBridgeButtonTitle)
+    }
+    .buttonStyle(BraveFilledButtonStyle(size: .normal))
   }
 
   var body: some View {
@@ -146,44 +203,21 @@ struct AssetDetailHeaderView: View {
       .padding(16)
       Divider()
         .padding(.bottom)
-      HStack {
-        if assetDetailStore.isBuySupported
-            && WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(networkStore.selectedChainId) {
-          Button(
-            action: {
-              buySendSwapDestination = BuySendSwapDestination(
-                kind: .buy,
-                initialToken: assetDetailStore.token
-              )
-            }
-          ) {
-            Text(Strings.Wallet.buy)
+      if isBuySupported && networkStore.isSwapSupported {
+        VStack {
+          buySendSwapButtonsContainer
+          if assetDetailStore.token.isAuroraSupportedToken {
+            auroraBridgeButton
           }
         }
-        Button(
-          action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .send,
-              initialToken: assetDetailStore.token
-            )
-          }
-        ) {
-          Text(Strings.Wallet.send)
-        }
-        if networkStore.isSwapSupported {
-          Button(
-            action: {
-              buySendSwapDestination = BuySendSwapDestination(
-                kind: .swap,
-                initialToken: assetDetailStore.token
-              )
-            }
-          ) {
-            Text(Strings.Wallet.swap)
+      } else {
+        HStack {
+          buySendSwapButtonsContainer
+          if assetDetailStore.token.isAuroraSupportedToken {
+            auroraBridgeButton
           }
         }
       }
-      .buttonStyle(BraveFilledButtonStyle(size: .normal))
     }
   }
 }
@@ -195,7 +229,8 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
       assetDetailStore: .previewStore,
       keyringStore: .previewStore,
       networkStore: .previewStore,
-      buySendSwapDestination: .constant(nil)
+      buySendSwapDestination: .constant(nil),
+      isShowingBridgeAlert: .constant(false)
     )
     .padding(.vertical)
     .previewLayout(.sizeThatFits)

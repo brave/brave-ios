@@ -227,4 +227,9 @@ extension BraveWallet.BlockchainToken {
   var assetBalanceId: String {
     "\(contractAddress)+\(symbol)"
   }
+  
+  var isAuroraSupportedToken: Bool {
+    (contractAddress.isEmpty || WalletConstants.supportedAuroraBridgeTokensContractAddresses.map({ $0.lowercased() })
+      .contains(contractAddress.lowercased())) && chainId == BraveWallet.MainnetChainId
+  }
 }

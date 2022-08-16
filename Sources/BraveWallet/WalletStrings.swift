@@ -2654,5 +2654,26 @@ extension Strings {
       value: "Buy not supported for selected network",
       comment: "A placeholder in Buy Screen, when user switched to a network that Brave currently doesn't support buy token with Wyre."
     )
+    public static let auroraBridgeAlertTitle = NSLocalizedString(
+      "wallet.auroraBridgeAlertTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Open rainbowbridge.app?",
+      comment: "The title of the alert that will show up when users click on `Bridge to Aurora` button inside asset details screen for tokens that support briding to `Aurora`."
+    )
+    public static let auroraBridgeAlertDescription = NSLocalizedString(
+      "wallet.auroraBridgeAlertDescription",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Bridging assets across networks allows you to use your crypto on other networks and other DApp ecosystems. Bridging assets to other networks has some risks.",
+      comment: "The description of the alert that will show up when users click on `Bridge to Aurora` button inside asset details screen for tokens that support briding to `Aurora`. This will displayed right below `auroraBridgeAlertTitle`."
+    )
+    public static let auroraBridgeButtonTitle = NSLocalizedString(
+      "wallet.auroraBridgeButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Bridge to Aurora",
+      comment: "The title for the button for users to click inside any asset details screen, whose asset is supported to redirect users to Aurora site."
+    )
   }
 }
