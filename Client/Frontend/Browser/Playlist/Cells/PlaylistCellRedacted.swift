@@ -1,9 +1,7 @@
-//
-//  SwiftUIView.swift
-//  
-//
-//  Created by Brandon on 2022-07-21.
-//
+// Copyright 2022 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
 import CoreData
@@ -15,7 +13,7 @@ import Data
 
 @available(iOS, deprecated: 15.0, renamed: "SwiftUI.AsyncImage")
 public struct AsyncImage<Content: View>: View {
-  @StateObject private var loader: ImageLoader
+  @StateObject private var loader = ImageLoader()
   
   private let url: URL?
   private let scale: CGFloat
@@ -26,7 +24,6 @@ public struct AsyncImage<Content: View>: View {
     self.url = url
     self.scale = scale
     self.transaction = Transaction()
-    _loader = StateObject(wrappedValue: ImageLoader())
     self.render = { $0.image ?? Image("") }
   }
 
@@ -35,7 +32,6 @@ public struct AsyncImage<Content: View>: View {
     self.url = url
     self.scale = scale
     self.transaction = Transaction()
-    _loader = StateObject(wrappedValue: ImageLoader())
     
     self.render = { phase -> _ConditionalContent<ContentView, PlaceHolder> in
       if let image = phase.image {
@@ -50,7 +46,6 @@ public struct AsyncImage<Content: View>: View {
     self.url = url
     self.scale = scale
     self.transaction = transaction
-    _loader = StateObject(wrappedValue: ImageLoader())
     self.render = content
   }
 

@@ -491,8 +491,8 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
       indexPath?.section = Section.nonSharedFolders.rawValue
       newIndexPath?.section = Section.nonSharedFolders.rawValue
     } else if controller == sharedFoldersFrc {
-      indexPath?.section = Section.nonSharedFolders.rawValue
-      newIndexPath?.section = Section.nonSharedFolders.rawValue
+      indexPath?.section = Section.sharedFolders.rawValue
+      newIndexPath?.section = Section.sharedFolders.rawValue
     } else {
       log.error("SHOULD NEVER GET HERE!")
       return

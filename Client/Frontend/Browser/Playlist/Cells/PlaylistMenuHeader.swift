@@ -39,7 +39,6 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     $0.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    $0.accessibilityLabel = ""
   }
   
   private var state: State = .add
@@ -98,13 +97,15 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     
     switch state {
     case .add:
-      menuButton.setTitle("+ Add", for: .normal)
+      menuButton.setTitle(Strings.PlaylistFolderSharing.addButtonTitle, for: .normal)
       menuButton.setImage(nil, for: .normal)
       menuButton.backgroundColor = .braveBlurple
+      menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.addButtonAccessibilityTitle
     case .menu:
       menuButton.setTitle(nil, for: .normal)
       menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
       menuButton.backgroundColor = .clear
+      menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.menuButtonAccessibilityTitle
     }
   }
   

@@ -33,7 +33,7 @@ class PlaylistFolderSharingHelper: NSObject, TabContentScript {
   }
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer {  }
+    defer { replyHandler(nil, nil) }
     
     if let sharingInfo = PlaylistFolderSharingInfo.from(message: message) {
       // This shared playlist folder already exists
@@ -46,8 +46,6 @@ class PlaylistFolderSharingHelper: NSObject, TabContentScript {
       }
       return
     }
-    
-    replyHandler(nil, nil)
   }
 }
 

@@ -104,7 +104,7 @@ class BrowserNavigationHelper {
   }
 
   func openPlaylist() {
-    bvc?.openPlaylist(tab: nil, item: nil, playbackOffset: 0.0, folderSharingId: nil)
+    bvc?.openPlaylist(tab: nil, item: nil, playbackOffset: 0.0)
   }
 
   @objc private func dismissView() {

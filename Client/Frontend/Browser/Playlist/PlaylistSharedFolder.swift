@@ -18,17 +18,6 @@ public struct PlaylistSharedFolderModel: Codable {
   public let updateAt: String
   public var mediaItems: [PlaylistInfo]
   
-  public init(playlistId: String) {
-    version = "1"
-    self.playlistId = playlistId
-    folderName = ""
-    folderImage = NSURL() as URL
-    creatorName = ""
-    creatorLink = ""
-    updateAt = ""
-    mediaItems = []
-  }
-  
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     version = try container.decode(String.self, forKey: .version)

@@ -46,10 +46,10 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
               DispatchQueue.main.async {
                 if let webView = tab?.webView {
                   PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                    self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime, folderSharingId: nil)
+                    self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
                   }
                 } else {
-                  self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0, folderSharingId: nil)
+                  self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0)
                 }
               }
             }
@@ -189,10 +189,10 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
             DispatchQueue.main.async {
               if let webView = tab?.webView {
                 PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak self] currentTime in
-                  self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime, folderSharingId: nil)
+                  self?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
                 }
               } else {
-                self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0, folderSharingId: nil)
+                self.openPlaylist(tab: tab, item: item, playbackOffset: 0.0)
               }
             }
           }
@@ -306,7 +306,7 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
     }
   }
 
-  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingId: String?) {
+  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingId: String? = nil) {
     let playlistController = PlaylistCarplayManager.shared.getPlaylistController(tab: tab,
                                                                                  initialItem: item,
                                                                                  initialItemPlaybackOffset: playbackOffset)

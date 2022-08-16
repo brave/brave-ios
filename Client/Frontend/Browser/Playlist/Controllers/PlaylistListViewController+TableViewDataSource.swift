@@ -158,7 +158,7 @@ extension PlaylistListViewController: UITableViewDataSource {
               let folderId = folder.uuid
         else { return nil }
         
-        let syncAction = UIAction(title: "Sync Now", image: UIImage(named: "playlist_sync", in: .current, compatibleWith: nil)) { _ in
+        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(named: "playlist_sync", in: .current, compatibleWith: nil)) { _ in
           guard let sharedFolderId = folder.sharedFolderId else { return }
           
           Task { @MainActor in
@@ -189,11 +189,11 @@ extension PlaylistListViewController: UITableViewDataSource {
           }
         }
         
-        let editAction = UIAction(title: "Edit", image: UIImage(braveSystemNamed: "brave.edit")) { [weak self] _ in
+        let editAction = UIAction(title: Strings.PlaylistFolderSharing.editMenuTitle, image: UIImage(braveSystemNamed: "brave.edit")) { [weak self] _ in
           self?.onEditItems()
         }
         
-        let renameAction = UIAction(title: "Rename", image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { [weak self] _ in
+        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: nil)) { [weak self] _ in
           let folderID = folder.objectID
           var editView = PlaylistEditFolderView(currentFolder: folderID, currentFolderTitle: folder.title ?? "")
 
@@ -239,7 +239,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self?.present(hostingController, animated: true, completion: nil)
         }
         
-        let deleteOfflineAction = UIAction(title: "Remove Offline Data", image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { [weak self] _ in
+        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)) { [weak self] _ in
           folder.playlistItems?.forEach {
             if let itemId = $0.uuid {
               PlaylistManager.shared.deleteCache(itemId: itemId)
@@ -249,15 +249,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self?.tableView.reloadData()
         }
         
-//        let saveOfflineAction = UIAction(title: "Save Offline Data", image: UIImage(systemName: "icloud.and.arrow.down")) { [weak self] _ in
-//          folder.playlistItems?.forEach {
-//            PlaylistManager.shared.download(item: PlaylistInfo(item: $0))
-//          }
-//
-//          self?.tableView.reloadData()
-//        }
-        
-        let deleteAction = UIAction(title: "Delete Playlist", image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { [weak self] _ in
+        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil), attributes: .destructive) { [weak self] _ in
           PlaylistManager.shared.delete(folder: folder)
           self?.navigationController?.popToRootViewController(animated: true)
         }

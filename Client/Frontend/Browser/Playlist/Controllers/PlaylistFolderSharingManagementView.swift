@@ -1,27 +1,26 @@
-//
-//  SwiftUIView.swift
-//  
-//
-//  Created by Brandon on 2022-07-22.
-//
+// Copyright 2022 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import BraveShared
 
 struct PlaylistFolderSharingManagementView: View {
   var body: some View {
     VStack {
-      Text("Managing your Playlist data")
-      Text("Auto-save for offline use is on, meaning new additions to playlists, including shared playlists are saveed to your device for viewing offline and could use your cellular data.")
-      Text("Auto-save for offlien use can be managed in Playlist settings.")
+      Text(Strings.PlaylistFolderSharing.offlineManagementViewTitle)
+      Text(Strings.PlaylistFolderSharing.offlineManagementViewDescription)
+      Text(Strings.PlaylistFolderSharing.offlineManagementViewSubDescription)
       
-      Button("Add playlist now") {
+      Button(Strings.PlaylistFolderSharing.offlineManagementViewAddButtonTitle) {
         
       }
       
-      Button("Settings") {
+      Button(Strings.PlaylistFolderSharing.offlineManagementViewSettingsButtonTitle) {
       }
       
-      Button("Cancel") {
+      Button(Strings.cancelButtonTitle) {
         
       }
     }
