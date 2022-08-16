@@ -42,6 +42,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
 
     cell.do {
       $0.backgroundColor = .clear
+      $0.detailTextLabel?.font = .preferredFont(forTextStyle: .subheadline)
       $0.setLines(distantTab.title, detailText: distantTab.url.absoluteString)
 
       $0.imageView?.contentMode = .scaleAspectFit
@@ -76,7 +77,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    SiteTableViewControllerUX.rowHeight
+    UITableView.automaticDimension
   }
   
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

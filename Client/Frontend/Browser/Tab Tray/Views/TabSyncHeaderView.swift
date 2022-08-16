@@ -64,6 +64,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
     labelStackView.snp.makeConstraints {
       $0.leading.equalTo(imageIconView.snp.trailing).offset(TwoLineCellUX.borderViewMargin)
+      $0.trailing.equalToSuperview().offset(5.0)
       $0.top.equalToSuperview().offset(5.0)
       $0.bottom.equalToSuperview().offset(-5.0)
     }

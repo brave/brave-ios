@@ -12,11 +12,11 @@ class SendTabToSelfController: UIViewController {
   
   struct UX {
     static let contentInset = 20.0
-    static let preferredSizePadding = 60.0
+    static let preferredSizePadding = 132.0
   }
   
   let contentNavigationController: UINavigationController
-  let sendTabContentController: SendTabToSelfContentController
+  private let sendTabContentController: SendTabToSelfContentController
   
   let backgroundView = UIView().then {
     $0.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
@@ -37,6 +37,11 @@ class SendTabToSelfController: UIViewController {
     addChild(contentNavigationController)
     contentNavigationController.didMove(toParent: self)
   }
+  
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+    fatalError()
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -45,6 +50,16 @@ class SendTabToSelfController: UIViewController {
     view.addSubview(backgroundView)
     view.addSubview(contentNavigationController.view)
 
+    updateLayoutConstraints()
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    updateLayoutConstraints()
+  }
+  
+  private func updateLayoutConstraints() {
     backgroundView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
@@ -58,16 +73,17 @@ class SendTabToSelfController: UIViewController {
     }
     
     contentNavigationController.view.snp.makeConstraints {
-      $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(UX.contentInset)
+      if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+        $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(UX.contentInset)
+      } else {
+        $0.width.equalToSuperview().multipliedBy(0.75)
+      }
+      
       $0.centerX.centerY.equalToSuperview()
       $0.height.equalTo(preferredSize.height)
     }
   }
 
-  @available(*, unavailable)
-  required init(coder: NSCoder) {
-    fatalError()
-  }
 }
 
 class SendTabToSelfContentController: UITableViewController {
@@ -111,14 +127,27 @@ class SendTabToSelfContentController: UITableViewController {
       $0.register(CenteredButtonCell.self)
       $0.register(TwoLineTableViewCell.self)
       $0.registerHeaderFooter(SendTabToSelfContentHeaderFooterView.self)
-      tableView.tableFooterView = SendTabToSelfContentHeaderFooterView(
-        frame: CGRect(width: tableView.bounds.width, height: UX.standardItemHeight)).then {
-          $0.titleLabel.text = Strings.OpenTabs.sendDeviceButtonTitle
-          $0.titleLabel.isUserInteractionEnabled = true
-          $0.titleLabel.addGestureRecognizer(UITapGestureRecognizer(
-            target: self,
-            action: #selector(tappedSendLabel(_:))))
+      $0.tableFooterView = SendTabToSelfContentHeaderFooterView().then {
+        $0.titleLabel.text = Strings.OpenTabs.sendDeviceButtonTitle
+        $0.titleLabel.isUserInteractionEnabled = true
+        $0.titleLabel.addGestureRecognizer(UITapGestureRecognizer(
+          target: self,
+          action: #selector(tappedSendLabel(_:))))
       }
+    }
+  }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    
+    guard let footerView = tableView.tableFooterView else { return }
+    
+    let size = footerView.systemLayoutSizeFitting(
+      CGSize(width: tableView.bounds.size.width, height: UIView.layoutFittingCompressedSize.height))
+    
+    if footerView.frame.size.height != size.height {
+      footerView.frame.size.height = size.height
+      tableView.tableFooterView = footerView
     }
   }
   
@@ -163,6 +192,7 @@ extension SendTabToSelfContentController {
         $0.backgroundColor = .clear
         $0.accessoryType = indexPath.row == dataSource?.selectedIndex ? .checkmark : .none
         $0.setLines(device.fullName, detailText: device.lastUpdatedTime.formattedActivePeriodDate)
+        $0.detailTextLabel?.font = .preferredFont(forTextStyle: .subheadline)
         $0.imageView?.contentMode = .scaleAspectFit
         $0.imageView?.tintColor = .braveLabel
         $0.imageView?.image = deviceTypeImage?.template
@@ -196,11 +226,10 @@ extension SendTabToSelfContentController {
 class SendTabToSelfContentHeaderFooterView: UITableViewHeaderFooterView, TableViewReusable {
   private struct UX {
     static let horizontalPadding = 15.0
-    static let verticalPadding = 6.0
+    static let verticalPadding = 12.0
   }
   
   var titleLabel = UILabel().then {
-    $0.font = .preferredFont(forTextStyle: .body)
     $0.numberOfLines = 0
     $0.textColor = .braveOrange
     $0.textAlignment = .center
@@ -210,6 +239,22 @@ class SendTabToSelfContentHeaderFooterView: UITableViewHeaderFooterView, TableVi
     super.init(reuseIdentifier: reuseIdentifier)
     addSubview(titleLabel)
 
+    updateFont()
+    updateLayoutConstraints()
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    updateFont()
+    updateLayoutConstraints()
+  }
+  
+  private func updateFont() {
+    titleLabel.font = .preferredFont(forTextStyle: .body)
+  }
+  
+  private func updateLayoutConstraints() {
     titleLabel.snp.remakeConstraints {
       $0.left.right.greaterThanOrEqualTo(self).inset(UX.horizontalPadding)
       $0.top.bottom.greaterThanOrEqualTo(self).inset(UX.verticalPadding)
