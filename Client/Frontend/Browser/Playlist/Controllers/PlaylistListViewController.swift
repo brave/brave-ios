@@ -876,3 +876,13 @@ extension PlaylistListViewController {
     tableView.reloadData()
   }
 }
+
+extension PlaylistListViewController {
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    if traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory {
+      tableView.reloadData()
+    }
+  }
+}

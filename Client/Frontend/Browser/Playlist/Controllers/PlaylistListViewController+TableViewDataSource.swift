@@ -64,7 +64,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-    Constants.tableHeaderHeight
+    500
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

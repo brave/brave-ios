@@ -17,26 +17,30 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
   let titleLabel = UILabel().then {
     $0.font = .preferredFont(forTextStyle: .title3, weight: .medium)
     $0.textColor = .bravePrimary
-    $0.numberOfLines = 2
+    $0.numberOfLines = 0
+    $0.lineBreakMode = .byWordWrapping
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
   
   let subtitleLabel = UILabel().then {
     $0.font = .preferredFont(forTextStyle: .footnote)
     $0.textColor = .bravePrimary
-    $0.numberOfLines = 2
+    $0.numberOfLines = 0
+    $0.lineBreakMode = .byWordWrapping
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
   
   private let menuButton = RoundInterfaceButton(type: .custom).then {
     $0.setTitleColor(.bravePrimary, for: .normal)
     $0.titleLabel?.numberOfLines = 0
-    $0.titleLabel?.minimumScaleFactor = 0.7
-    $0.titleLabel?.adjustsFontSizeToFitWidth = true
+    $0.titleLabel?.lineBreakMode = .byWordWrapping
     $0.titleLabel?.font = .preferredFont(for: .subheadline, weight: .bold)
     $0.imageView?.tintColor = .bravePrimary
-    $0.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
+    $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    $0.setContentHuggingPriority(.required, for: .horizontal)
   }
   
   private var state: State = .add
