@@ -208,7 +208,7 @@ extension PlaylistFolderController: UITableViewDataSource {
       }
 
       let folderIcon = section == .nonSharedFolders ? UIImage(systemName: "folder")?.template :
-                      UIImage(named: "playlist_synced_folder", in: .current, compatibleWith: nil)?.template
+                      UIImage(braveSystemNamed: "brave.folder.badge.sync")?.template
       
       let itemCount = folder.playlistItems?.count ?? 0
 

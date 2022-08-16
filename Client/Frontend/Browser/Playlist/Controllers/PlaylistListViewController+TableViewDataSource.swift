@@ -198,7 +198,7 @@ extension PlaylistListViewController: UITableViewDataSource {
               let folderId = folder.uuid
         else { return nil }
         
-        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(named: "playlist_sync", in: .current, compatibleWith: traitCollection)) { _ in
+        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")) { _ in
           guard let sharedFolderId = folder.sharedFolderId else { return }
           
           Task { @MainActor in
@@ -228,7 +228,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.onEditItems()
         }
         
-        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(named: "playlist_rename_folder", in: .current, compatibleWith: traitCollection)) { [unowned self] _ in
+        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(braveSystemNamed: "brave.letter.folder")) { [unowned self] _ in
           let folderID = folder.objectID
           var editView = PlaylistEditFolderView(currentFolder: folderID, currentFolderTitle: folder.title ?? "")
 
