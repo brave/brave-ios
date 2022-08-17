@@ -147,33 +147,10 @@ extension BrowserViewController {
         }
       }
       MenuItemButton(icon: UIImage(named: "menu-settings", in: .current, compatibleWith: nil)!.template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-        var settingsStore: SettingsStore?
-        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        let walletService = BraveWallet.ServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        let swapService = BraveWallet.SwapServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        
-        if let keyringService = keyringService,
-          let walletService = walletService,
-          let txService = BraveWallet.TxServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
-          settingsStore = SettingsStore(
-            keyringService: keyringService,
-            walletService: walletService,
-            txService: txService
-          )
-        }
-        var networkStore: NetworkStore?
-        if let keyringService = keyringService,
-           let rpcService = rpcService,
-           let walletService = walletService,
-           let swapService = swapService {
-          networkStore = NetworkStore(
-            keyringService: keyringService,
-            rpcService: rpcService,
-            walletService: walletService,
-            swapService: swapService
-          )
-        }
+        let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode)
+        let walletService = BraveWallet.ServiceFactory.get(privateMode: privateMode)
+        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode)
         
         var keyringStore: KeyringStore?
         if let keyringService = keyringService,
@@ -185,6 +162,8 @@ extension BrowserViewController {
             rpcService: rpcService
           )
         }
+        
+        let cryptoStore = CryptoStore.from(privateMode: privateMode)
 
         let vc = SettingsViewController(
           profile: self.profile,
@@ -194,9 +173,9 @@ extension BrowserViewController {
           legacyWallet: self.legacyWallet,
           windowProtection: self.windowProtection,
           braveCore: self.braveCore,
-          walletSettingsStore: settingsStore,
-          walletNetworkStore: networkStore,
-          keyringStore: keyringStore)
+          keyringStore: keyringStore,
+          cryptoStore: cryptoStore
+        )
         vc.settingsDelegate = self
         menuController.pushInnerMenu(vc)
       }
