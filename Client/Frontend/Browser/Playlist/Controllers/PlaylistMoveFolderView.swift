@@ -237,7 +237,7 @@ struct PlaylistMoveFolderView: View {
         }
       }
     }
-    .preferredColorScheme(.dark)
+    .environment(\.colorScheme, .dark)
   }
 }
 

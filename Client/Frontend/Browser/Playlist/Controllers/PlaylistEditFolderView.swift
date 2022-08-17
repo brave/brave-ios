@@ -52,7 +52,7 @@ struct PlaylistEditFolderView: View {
         }
       }
     }
-    .preferredColorScheme(.dark)
+    .environment(\.colorScheme, .dark)
   }
 }
 
