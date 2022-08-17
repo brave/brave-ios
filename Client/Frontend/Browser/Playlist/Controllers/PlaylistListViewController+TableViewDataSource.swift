@@ -198,7 +198,7 @@ extension PlaylistListViewController: UITableViewDataSource {
               let folderId = folder.uuid
         else { return nil }
         
-        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")) { _ in
+        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")?.template) { _ in
           guard let sharedFolderId = folder.sharedFolderId else { return }
           
           Task { @MainActor in
@@ -224,11 +224,11 @@ extension PlaylistListViewController: UITableViewDataSource {
           }
         }
         
-        let editAction = UIAction(title: Strings.PlaylistFolderSharing.editMenuTitle, image: UIImage(braveSystemNamed: "brave.edit")) { [unowned self] _ in
+        let editAction = UIAction(title: Strings.PlaylistFolderSharing.editMenuTitle, image: UIImage(braveSystemNamed: "brave.edit")?.template) { [unowned self] _ in
           self.onEditItems()
         }
         
-        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(braveSystemNamed: "brave.letter.folder")) { [unowned self] _ in
+        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(braveSystemNamed: "brave.letter.folder")?.template) { [unowned self] _ in
           let folderID = folder.objectID
           var editView = PlaylistEditFolderView(currentFolder: folderID, currentFolderTitle: folder.title ?? "")
 
@@ -275,7 +275,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.present(hostingController, animated: true, completion: nil)
         }
         
-        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: traitCollection)) { [unowned self] _ in
+        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: traitCollection)?.template) { [unowned self] _ in
           folder.playlistItems?.forEach {
             if let itemId = $0.uuid {
               PlaylistManager.shared.deleteCache(itemId: itemId)

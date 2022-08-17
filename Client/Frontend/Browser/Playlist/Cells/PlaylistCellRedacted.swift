@@ -83,8 +83,7 @@ private struct PlaylistCellRedactedView: View {
           .redacted(reason: details == nil ? .placeholder : [])
           .shimmer(details == nil)
       }
-      
-      Spacer()
+      .frame(maxHeight: .infinity, alignment: .top)
     }
     .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
     .background(Color(.braveBackground))
