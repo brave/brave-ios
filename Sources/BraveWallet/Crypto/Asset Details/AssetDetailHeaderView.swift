@@ -52,6 +52,25 @@ struct AssetDetailHeaderView: View {
     && WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(networkStore.selectedChainId)
   }
   
+  @ViewBuilder private var actionButtonsContainer: some View {
+    if isBuySupported && networkStore.isSwapSupported {
+      VStack {
+        actionButtons
+      }
+    } else {
+      HStack {
+        actionButtons
+      }
+    }
+  }
+  
+  @ViewBuilder private var actionButtons: some View {
+    buySendSwapButtonsContainer
+    if assetDetailStore.token.isAuroraSupportedToken {
+      auroraBridgeButton
+    }
+  }
+  
   @ViewBuilder var buySendSwapButtonsContainer: some View {
     HStack {
       if isBuySupported {
@@ -108,20 +127,13 @@ struct AssetDetailHeaderView: View {
       VStack(alignment: .leading) {
         if sizeCategory.isAccessibilityCategory {
           VStack(alignment: .leading) {
-            HStack {
-              NetworkPicker(
-                keyringStore: keyringStore,
-                networkStore: networkStore
-              )
-              if horizontalSizeClass == .regular {
-                Spacer()
-                DateRangeView(selectedRange: $assetDetailStore.timeframe)
-                  .padding(6)
-                  .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                      .strokeBorder(Color(.secondaryButtonTint))
-                  )
-              }
+            if horizontalSizeClass == .regular {
+              DateRangeView(selectedRange: $assetDetailStore.timeframe)
+                .padding(6)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(Color(.secondaryButtonTint))
+                )
             }
             HStack {
               AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
@@ -137,10 +149,6 @@ struct AssetDetailHeaderView: View {
             Text(assetDetailStore.token.name)
               .fixedSize(horizontal: false, vertical: true)
               .font(.title3.weight(.semibold))
-            NetworkPicker(
-              keyringStore: keyringStore,
-              networkStore: networkStore
-            )
             if horizontalSizeClass == .regular {
               Spacer()
               DateRangeView(selectedRange: $assetDetailStore.timeframe)
@@ -203,21 +211,7 @@ struct AssetDetailHeaderView: View {
       .padding(16)
       Divider()
         .padding(.bottom)
-      if isBuySupported && networkStore.isSwapSupported {
-        VStack {
-          buySendSwapButtonsContainer
-          if assetDetailStore.token.isAuroraSupportedToken {
-            auroraBridgeButton
-          }
-        }
-      } else {
-        HStack {
-          buySendSwapButtonsContainer
-          if assetDetailStore.token.isAuroraSupportedToken {
-            auroraBridgeButton
-          }
-        }
-      }
+      actionButtonsContainer
     }
   }
 }

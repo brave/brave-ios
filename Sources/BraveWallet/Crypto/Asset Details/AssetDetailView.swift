@@ -161,10 +161,11 @@ struct AssetDetailView: View {
       WalletPromptView(
         isPresented: $isShowingAuroraBridgeAlert,
         buttonTitle: Strings.Wallet.auroraBridgeButtonTitle,
-        action: { proceed in
+        action: { proceed, _ in
           if proceed {
             openWalletURL?(WalletConstants.auroraBridgeLink)
           }
+          return true
         },
         content: {
           VStack {

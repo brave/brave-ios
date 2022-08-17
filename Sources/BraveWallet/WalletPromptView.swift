@@ -49,7 +49,7 @@ struct WalletPromptContentView<Content: View>: View {
 struct WalletPromptView<Content>: UIViewControllerRepresentable where Content: View {
   @Binding var isPresented: Bool
   var buttonTitle: String
-  var action: (_ proceed: Bool) -> Void
+  var action: (Bool, UINavigationController?) -> Bool
   var content: () -> Content
   
   func makeUIViewController(context: Context) -> UIViewController {
@@ -65,9 +65,10 @@ struct WalletPromptView<Content>: UIViewControllerRepresentable where Content: V
         rootView: WalletPromptContentView(
           buttonTitle: buttonTitle,
           action: { proceed in
-            action(proceed)
-            uiViewController.dismiss(animated: true) {
-              isPresented = false
+            if action(proceed, uiViewController.navigationController) {
+              uiViewController.dismiss(animated: true) {
+                isPresented = false
+              }
             }
           },
           content: content
@@ -75,9 +76,7 @@ struct WalletPromptView<Content>: UIViewControllerRepresentable where Content: V
       )
       uiViewController.present(controller, animated: true)
     } else {
-      if uiViewController.presentedViewController != nil {
-        uiViewController.presentedViewController?.dismiss(animated: true)
-      }
+      uiViewController.presentedViewController?.dismiss(animated: true)
     }
   }
 }
