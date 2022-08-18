@@ -42,6 +42,17 @@ extension Row {
       uuid: option.key
     )
   }
+  
+  public static func boolRow(title: String, detailText: String? = nil, option: Preferences.Option<Bool?>, onValueChange: SwitchAccessoryView.ValueChange? = nil, image: UIImage? = nil) -> Row {
+    return Row(
+      text: title,
+      detailText: detailText,
+      image: image,
+      accessory: .view(SwitchAccessoryView(initialValue: option.value ?? false, valueChange: onValueChange ?? { option.value = $0 })),
+      cellClass: MultilineSubtitleCell.self,
+      uuid: option.key
+    )
+  }
 
   /// Creates a switch toggle `Row` which holds local value and no preference update
   public static func boolRow(title: String, detailText: String? = nil, toggleValue: Bool, valueChange: @escaping ValueChange, cellReuseId: String) -> Row {

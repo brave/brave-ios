@@ -960,7 +960,7 @@ extension Strings {
 
 extension Strings {
   public static let blockPopups = NSLocalizedString("BlockPopups", tableName: "BraveShared", bundle: .strings, value: "Block Popups", comment: "Setting to enable popup blocking")
-  public static let followUniversalLinks = NSLocalizedString("FollowUniversalLinks", tableName: "BraveShared", bundle: .strings, value: "Allow universal links to open in external apps", comment: "Setting to follow universal links")
+  public static let openUniversalLinksInBrave = NSLocalizedString("FollowUniversalLinks", tableName: "BraveShared", bundle: .strings, value: "Open web links in Brave (even when link app is installed)", comment: "Setting to open universal links in Brave")
   public static let mediaAutoBackgrounding = NSLocalizedString("MediaAutoBackgrounding", tableName: "BraveShared", bundle: .strings, value: "Enable Background Audio", comment: "Setting to allow media to play in the background")
   public static let showTabsBar = NSLocalizedString("ShowTabsBar", tableName: "BraveShared", bundle: .strings, value: "Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
   public static let privateBrowsingOnly = NSLocalizedString("PrivateBrowsingOnly", tableName: "BraveShared", bundle: .strings, value: "Private Browsing Only", comment: "Setting to keep app in private mode")

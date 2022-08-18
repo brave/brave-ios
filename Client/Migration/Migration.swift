@@ -46,6 +46,13 @@ public class Migration {
       Preferences.General.tabBarVisibility.value = TabBarVisibility.landscapeOnly.rawValue
     }
 
+    // Settings default value for openUniversalLinksInBrave by migrating the followUniversalLinks value
+    if Preferences.General.openUniversalLinksInBrave.value == nil {
+      Preferences.General.openUniversalLinksInBrave.value = !Preferences.General.followUniversalLinks.value
+    } else {
+      Preferences.General.openUniversalLinksInBrave.value = false
+    }
+    
     // Adding Observer to enable sync types
 
     NotificationCenter.default.addObserver(
