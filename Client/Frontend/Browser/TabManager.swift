@@ -49,6 +49,9 @@ class TabManager: NSObject {
   fileprivate var delegates = [WeakTabManagerDelegate]()
   fileprivate let tabEventHandlers: [TabEventHandler]
   weak var stateDelegate: TabManagerStateDelegate?
+  
+  /// Internal url to access the new tab page.
+  private let ntpInteralURL = URL(string: "\(InternalURL.baseUrl)/\(AboutHomeHandler.path)#panel=0")!
 
   func addDelegate(_ delegate: TabManagerDelegate) {
     assert(Thread.isMainThread)
@@ -477,10 +480,8 @@ class TabManager: NSObject {
       tab.loadRequest(request)
     } else if !isPopup {
       
-      if let url = NewTabPageViewController.ntpInteralURL {
-        tab.loadRequest(PrivilegedRequest(url: url) as URLRequest)
-        tab.url = url
-      }
+      tab.loadRequest(PrivilegedRequest(url: ntpInteralURL) as URLRequest)
+      tab.url = ntpInteralURL
     }
 
     // Ignore on restore.

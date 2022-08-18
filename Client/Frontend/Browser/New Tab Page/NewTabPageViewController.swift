@@ -109,9 +109,6 @@ class NewTabPageViewController: UIViewController {
   private var preventReloadOnBraveNewsEnabledChange = false
 
   private let notifications: NewTabPageNotifications
-  
-  /// Internal url to access the new tab page.
-  static let ntpInteralURL = URL(string: "\(InternalURL.baseUrl)/\(AboutHomeHandler.path)#panel=0")
 
   init(
     tab: Tab,
