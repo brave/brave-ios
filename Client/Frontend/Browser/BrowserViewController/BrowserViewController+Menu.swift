@@ -147,10 +147,10 @@ extension BrowserViewController {
         }
       }
       MenuItemButton(icon: UIImage(named: "menu-settings", in: .current, compatibleWith: nil)!.template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-        let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode)
-        let walletService = BraveWallet.ServiceFactory.get(privateMode: privateMode)
-        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode)
+        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: isPrivateMode)
+        let walletService = BraveWallet.ServiceFactory.get(privateMode: isPrivateMode)
+        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode)
         
         var keyringStore: KeyringStore?
         if let keyringService = keyringService,
@@ -163,7 +163,7 @@ extension BrowserViewController {
           )
         }
         
-        let cryptoStore = CryptoStore.from(privateMode: privateMode)
+        let cryptoStore = CryptoStore.from(privateMode: isPrivateMode)
 
         let vc = SettingsViewController(
           profile: self.profile,
