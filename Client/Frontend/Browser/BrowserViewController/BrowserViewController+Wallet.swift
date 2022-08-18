@@ -177,7 +177,7 @@ extension Tab: BraveWalletProviderDelegate {
       // Check if eth permissions already exist for this origin and if they don't, ensure the user allows
       // ethereum provider access
       let ethPermissions = origin.url.map { Domain.ethereumPermissions(forUrl: $0) ?? [] } ?? []
-      if ethPermissions.isEmpty, !Preferences.Wallet.allowEthereumProviderAccountRequests.value {
+      if ethPermissions.isEmpty, !Preferences.Wallet.allowDappProviderAccountRequests.value {
         completion(.internal, nil)
         return
       }
@@ -284,6 +284,9 @@ extension Tab: BraveWalletProviderDelegate {
 
 extension Tab: BraveWalletEventsListener {
   func emitEthereumEvent(_ event: Web3ProviderEvent) {
+    guard Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
+      return
+    }
     var arguments: [Any] = [event.name]
     if let eventArgs = event.arguments {
       arguments.append(eventArgs)
@@ -319,7 +322,8 @@ extension Tab: BraveWalletEventsListener {
   
   func updateEthereumProperties() {
     guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
-          let walletService = BraveWallet.ServiceFactory.get(privateMode: false) else {
+          let walletService = BraveWallet.ServiceFactory.get(privateMode: false),
+          Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
       return
     }
     Task { @MainActor in
@@ -335,7 +339,7 @@ extension Tab: BraveWalletEventsListener {
           return "undefined"
         }
       }
-      guard let webView = webView, let provider = walletProvider else {
+      guard let webView = webView, let provider = walletEthProvider else {
         return
       }
       let chainId = await provider.chainId()
