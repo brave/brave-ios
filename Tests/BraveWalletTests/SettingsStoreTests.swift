@@ -89,10 +89,10 @@ class SettingsStoreTests: XCTestCase {
       Preferences.Wallet.defaultEthWallet.value,
       Preferences.Wallet.WalletType.none.rawValue,
       "Failed to update default wallet")
-    Preferences.Wallet.allowEthereumProviderAccountRequests.value = !Preferences.Wallet.allowEthereumProviderAccountRequests.defaultValue
+    Preferences.Wallet.allowDappProviderAccountRequests.value = !Preferences.Wallet.allowDappProviderAccountRequests.defaultValue
     XCTAssertEqual(
-      Preferences.Wallet.allowEthereumProviderAccountRequests.value,
-      !Preferences.Wallet.allowEthereumProviderAccountRequests.defaultValue,
+      Preferences.Wallet.allowDappProviderAccountRequests.value,
+      !Preferences.Wallet.allowDappProviderAccountRequests.defaultValue,
       "Failed to update allow ethereum requests")
     Preferences.Wallet.displayWeb3Notifications.value = !Preferences.Wallet.displayWeb3Notifications.defaultValue
     XCTAssertEqual(
@@ -131,8 +131,8 @@ class SettingsStoreTests: XCTestCase {
       Preferences.Wallet.defaultEthWallet.defaultValue,
       "Default Wallet was not reset to default")
     XCTAssertEqual(
-      Preferences.Wallet.allowEthereumProviderAccountRequests.value,
-      Preferences.Wallet.allowEthereumProviderAccountRequests.defaultValue,
+      Preferences.Wallet.allowDappProviderAccountRequests.value,
+      Preferences.Wallet.allowDappProviderAccountRequests.defaultValue,
       "Allow ethereum requests was not reset to default")
     XCTAssertEqual(
       Preferences.Wallet.displayWeb3Notifications.value,
