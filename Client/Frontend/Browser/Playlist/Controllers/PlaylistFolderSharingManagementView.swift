@@ -27,7 +27,7 @@ struct PlaylistFolderSharingManagementView: View {
         .padding(.horizontal, UX.hPadding)
         .padding(.bottom, UX.vPadding)
       
-      Text(String(format: "%@\n\n%@", Strings.PlaylistFolderSharing.offlineManagementViewDescription, Strings.PlaylistFolderSharing.offlineManagementViewSubDescription))
+      Text(Strings.PlaylistFolderSharing.offlineManagementViewDescription)
         .font(.body)
         .foregroundColor(Color(.braveLabel))
         .padding(.horizontal, UX.hPadding)

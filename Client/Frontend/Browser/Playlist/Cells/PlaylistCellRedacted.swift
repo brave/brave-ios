@@ -34,14 +34,21 @@ private struct PlaylistRedactedHeaderView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
       
-      Button("+ Add", action: {})
-        .font(.subheadline.weight(.bold))
-        .buttonStyle(BraveFilledButtonStyle(size: .normal))
-        .disabled(true)
-        .redacted(reason: .placeholder)
-        .shimmer(true)
+      Button(action: {}) {
+        Label {
+          Text(Strings.PlaylistFolderSharing.addButtonTitle)
+        } icon: {
+          Image(systemName: "plus")
+        }
+
+      }
+      .font(.subheadline.weight(.bold))
+      .buttonStyle(BraveFilledButtonStyle(size: .normal))
+      .disabled(true)
+      .redacted(reason: .placeholder)
+      .shimmer(true)
     }
-    .padding(15)
+    .padding(16)
     .background(Color(.braveBackground))
     .preferredColorScheme(.dark)
   }
@@ -57,14 +64,13 @@ private struct PlaylistCellRedactedView: View {
       RoundedRectangle(cornerRadius: 5.0, style: .continuous)
         .fill(Color.black)
         .frame(width: 80.0 * 1.46875, height: 64.0, alignment: .center)
-        .clipShape(RoundedRectangle(cornerRadius: 5.0, style: .continuous))
         .overlay(
-          VStack {
             Image(uiImage: thumbnail ?? UIImage())
               .resizable()
               .aspectRatio(1.0, contentMode: .fit)
               .clipShape(RoundedRectangle(cornerRadius: 3.0, style: .continuous))
-          }.padding(), alignment: .center
+              .padding(),
+            alignment: .center
         )
         .shimmer(thumbnail == nil)
       
@@ -83,7 +89,7 @@ private struct PlaylistCellRedactedView: View {
           .redacted(reason: details == nil ? .placeholder : [])
           .shimmer(details == nil)
       }
-      .frame(maxHeight: .infinity, alignment: .top)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
     .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
     .background(Color(.braveBackground))

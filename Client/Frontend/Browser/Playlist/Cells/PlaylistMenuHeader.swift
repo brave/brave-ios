@@ -78,7 +78,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
         $0.setCustomSpacing(20.0, after: subtitleLabel)
         $0.isLayoutMarginsRelativeArrangement = true
         $0.insetsLayoutMarginsFromSafeArea = false
-        $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
+        $0.layoutMargins = UIEdgeInsets(equalInset: 16.0)
       }
       
       contentView.addSubview(vStack)
@@ -98,7 +98,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
         $0.spacing = 20.0
         $0.isLayoutMarginsRelativeArrangement = true
         $0.insetsLayoutMarginsFromSafeArea = false
-        $0.layoutMargins = UIEdgeInsets(equalInset: 15.0)
+        $0.layoutMargins = UIEdgeInsets(equalInset: 16.0)
       }
       
       contentView.addSubview(hStack)
@@ -123,13 +123,13 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
       menuButton.setImage(nil, for: .normal)
       menuButton.backgroundColor = .braveBlurple
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.addButtonAccessibilityTitle
-      menuButton.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 20.0)
+      menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 20.0)
     case .menu:
       menuButton.setTitle(nil, for: .normal)
       menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
       menuButton.backgroundColor = .clear
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.menuButtonAccessibilityTitle
-      menuButton.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 20.0, bottom: 5.0, right: 0.0)
+      menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 0.0)
     }
   }
   

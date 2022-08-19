@@ -1906,13 +1906,7 @@ extension Strings {
     
     public static let offlineManagementViewDescription =
     NSLocalizedString("playlistFolderSharing.offlineManagementViewDescription", tableName: "BraveShared", bundle: .strings,
-                      value: "Auto-save for offline use is on, meaning new additions to playlists, including shared playlists are saved to your device for viewing offline and could use your cellular data.",
-                      comment: "Description of the playlist offline data management view")
-    
-    public static let offlineManagementViewSubDescription =
-    NSLocalizedString("playlistFolderSharing.offlineManagementViewSubDescription",
-                      tableName: "BraveShared", bundle: .strings,
-                      value: "Auto-save for offline use can be managed in Playlist settings.",
+                      value: "Auto-save for offline use is on, meaning new additions to playlists, including shared playlists are saved to your device for viewing offline and could use your cellular data.\n\nAuto-save for offline use can be managed in Playlist settings.",
                       comment: "Description of the playlist offline data management view")
     
     public static let offlineManagementViewAddButtonTitle =
