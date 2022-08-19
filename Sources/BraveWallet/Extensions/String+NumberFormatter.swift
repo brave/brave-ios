@@ -6,18 +6,19 @@
 import Foundation
 
 extension String {
-  static let numberFormatterWithCurrentLocale = NumberFormatter().then {
+  private static let numberFormatterWithCurrentLocale = NumberFormatter().then {
     $0.numberStyle = .decimal
     $0.locale = Locale.current
   }
   
-  static let numberFormatterUsLocale = NumberFormatter().then {
+  private static let numberFormatterUsLocale = NumberFormatter().then {
     $0.numberStyle = .decimal
     $0.locale = .init(identifier: "en_US")
   }
   
+  /// This will convert decimal string to use `en_US` locale decimal separator
   var normalizedDecimals: String {
-    guard String.numberFormatterUsLocale.locale != String.numberFormatterWithCurrentLocale.locale else { return self }
+    guard String.numberFormatterUsLocale.decimalSeparator != String.numberFormatterWithCurrentLocale.decimalSeparator else { return self }
     guard let number = String.numberFormatterWithCurrentLocale.number(from: self) else { return self }
     return  String.numberFormatterUsLocale.string(from: number) ?? self
   }
