@@ -83,6 +83,7 @@ class Tab: NSObject {
 
   var walletEthProvider: BraveWalletEthereumProvider?
   var walletEthProviderScript: WKUserScript?
+  var walletSolProvider: BraveWalletSolanaProvider?
   var tabDappStore: TabDappStore = .init()
   var isWalletIconVisible: Bool = false {
     didSet {
@@ -525,7 +526,7 @@ class Tab: NSObject {
   
   /// This property is for fetching the actual URL for the Tab
   /// In private browsing the URL is in memory but this is not the case for normal mode
-  /// For Normal  Mode Tab information is fetched using Tab ID from 
+  /// For Normal  Mode Tab information is fetched using Tab ID from
   var fetchedURL: URL? {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
       if let url = url, url.isWebPage() {

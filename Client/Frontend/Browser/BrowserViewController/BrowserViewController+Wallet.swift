@@ -265,7 +265,14 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func isPermissionDenied(_ type: BraveWallet.CoinType) -> Bool {
-    return type != .eth
+    switch type {
+    case .eth, .sol:
+      return false
+    case .fil:
+      return true
+    @unknown default:
+      return true
+    }
   }
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
@@ -371,6 +378,50 @@ extension Tab: BraveWalletEventsListener {
         asFunction: false,
         completion: nil
       )
+    }
+  }
+}
+
+extension Tab: BraveWalletSolanaEventsListener {
+  func accountChangedEvent(_ account: String?) {
+    emitSolanaEvent(.solanaAccountChanged(account: account ?? ""))
+    updateSolanaProperties()
+  }
+
+  func emitSolanaEvent(_ event: Web3ProviderEvent) {
+    guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
+          let webView = webView else {
+      return
+    }
+    Task { @MainActor in
+      var arguments: [Any] = [event.name]
+      if let eventArgs = event.arguments {
+        arguments.append(eventArgs)
+      }
+      await webView.evaluateSafeJavaScript(
+        functionName: "window.solana.emit", // TODO: `window.braveSolana` ?
+        args: arguments,
+        contentWorld: .page
+      )
+    }
+  }
+
+  func updateSolanaProperties() {
+    guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
+      return
+    }
+    Task { @MainActor in
+      guard let webView = webView,
+            let provider = walletSolProvider else {
+        return
+      }
+      let isConnected = await provider.isConnected()
+      await webView.evaluateSafeJavaScript(
+        functionName: "window.solana.isConnected = \(isConnected)",
+        contentWorld: .page,
+        asFunction: false
+      )
+      // TODO: publicKey
     }
   }
 }
