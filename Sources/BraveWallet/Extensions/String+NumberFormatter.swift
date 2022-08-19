@@ -6,12 +6,19 @@
 import Foundation
 
 extension String {
-  static let numberFormatter = NumberFormatter().then {
+  static let numberFormatterWithCurrentLocale = NumberFormatter().then {
     $0.numberStyle = .decimal
     $0.locale = Locale.current
   }
   
+  static let numberFormatterUsLocale = NumberFormatter().then {
+    $0.numberStyle = .decimal
+    $0.locale = .init(identifier: "en_US")
+  }
+  
   var normalizedDecimals: String {
-    return self.replacingOccurrences(of: String.numberFormatter.decimalSeparator, with: ".")
+    guard String.numberFormatterUsLocale.locale != String.numberFormatterWithCurrentLocale.locale else { return self }
+    guard let number = String.numberFormatterWithCurrentLocale.number(from: self) else { return self }
+    return  String.numberFormatterUsLocale.string(from: number) ?? self
   }
 }
