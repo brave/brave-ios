@@ -414,6 +414,14 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
       return (provider, js: js)
     }
+    tabManager.makeWalletSolProvider = { [weak self] tab in
+      guard let self = self,
+            let provider = self.braveCore.braveWalletAPI.solanaProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
+        return nil
+      }
+      let scripts = self.braveCore.braveWalletAPI.providerScripts(for: .sol)
+      return (provider, jsScripts: scripts)
+    }
     downloadQueue.delegate = self
 
     // Observe some user preferences
@@ -1990,7 +1998,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   }
   
   func displayPageZoom(visible: Bool) {
-    if !visible || pageZoomBar != nil {     
+    if !visible || pageZoomBar != nil {
       pageZoomBar?.view.removeFromSuperview()
 
       if let zoomBarView = pageZoomBar?.view {
@@ -2311,6 +2319,7 @@ extension BrowserViewController: TabDelegate {
       let logins = LoginsHelper(tab: tab, profile: profile, passwordAPI: braveCore.passwordAPI)
       tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
       tab.addContentScript(EthereumProviderHelper(tab: tab), name: EthereumProviderHelper.name(), contentWorld: .page)
+      tab.addContentScript(SolanaProviderHelper(tab: tab), name: SolanaProviderHelper.name(), contentWorld: .page)
     }
 
     let errorHelper = ErrorPageHelper(certStore: profile.certStore)

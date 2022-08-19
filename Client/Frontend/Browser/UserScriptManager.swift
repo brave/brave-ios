@@ -158,7 +158,8 @@ class UserScriptManager {
     isMediaBackgroundPlaybackEnabled: Bool,
     isNightModeEnabled: Bool,
     isDeAMPEnabled: Bool,
-    walletEthProviderJS: String?
+    walletEthProviderJS: String?,
+    walletSolProviderScripts: [BraveWalletProviderScriptKey: String]
   ) {
     self.tab = tab
     self.isCookieBlockingEnabled = isCookieBlockingEnabled
@@ -170,6 +171,7 @@ class UserScriptManager {
     self.isDeAMPEnabled = isDeAMPEnabled
     self.userScriptTypes = []
     self.walletEthProviderJS = walletEthProviderJS
+    self.walletSolProviderScripts = walletSolProviderScripts
     self.isRequestBlockingEnabled = true
     
     reloadUserScripts()
@@ -492,6 +494,31 @@ class UserScriptManager {
   }()
 
   private var walletEthProviderJS: String?
+  
+  private let walletSolProviderScript: WKUserScript? = {
+    guard let path = Bundle.current.path(forResource: "WalletSolanaProvider", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
+      return nil
+    }
+    
+    var alteredSource = source
+    
+    let replacements = [
+      "$<security_token>": UserScriptManager.securityTokenString,
+      "$<handler>": "walletSolanaProvider_\(messageHandlerTokenString)",
+    ]
+    
+    replacements.forEach({
+      alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
+    })
+    
+    return WKUserScript(source: alteredSource,
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: true,
+                        in: .page)
+  }()
+  
+  private var walletSolProviderScripts: [BraveWalletProviderScriptKey: String]
     
   public func reloadUserScripts() {
     tab?.webView?.configuration.userContentController.do {
@@ -565,6 +592,22 @@ class UserScriptManager {
                 \(providerJS)
               }
             })(Object);
+            """
+          $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
+        }
+      }
+      
+      if let script = walletSolProviderScript,
+         tab?.isPrivate == false,
+         Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave {
+        $0.addUserScript(script)
+        if var providerJS = walletSolProviderScripts[.solana] {
+          providerJS = """
+            (function() {
+              if (window.isSecureContext) {
+                \(providerJS)
+              }
+            })();
             """
           $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
         }

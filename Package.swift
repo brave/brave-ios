@@ -172,6 +172,7 @@ let package = Package(
         .copy("Frontend/UserContent/UserScripts/ReadyState.js"),
         .copy("Frontend/UserContent/UserScripts/ResourceDownloader.js"),
         .copy("Frontend/UserContent/UserScripts/WalletEthereumProvider.js"),
+        .copy("Frontend/UserContent/UserScripts/WalletSolanaProvider.js"),
         .copy("Frontend/UserContent/UserScripts/WindowRenderHelper.js"),
         .copy("Frontend/UserContent/UserScripts/YoutubeAdblock.js"),
         .copy("Frontend/UserContent/UserScripts/DeAMP.js"),
