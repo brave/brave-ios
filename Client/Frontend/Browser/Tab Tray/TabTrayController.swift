@@ -261,6 +261,7 @@ class TabTrayController: LoadingViewController {
   @objc func togglePrivateModeAction() {
     tabTraySearchController.isActive = false
 
+    // Record the slected index before private mode navigation
     if !privateMode {
       tabManager.normalTabSelectedIndex = tabManager.selectedIndex
     }
@@ -277,6 +278,8 @@ class TabTrayController: LoadingViewController {
     } else {
       tabTrayView.hidePrivateModeInfo()
       
+      // When you go back from private mode, a previous current tab is selected
+      // Reloding the collection view in order to mark the selecte the tab
       tabManager.selectTab(tabManager.tabsForCurrentMode[safe: tabManager.normalTabSelectedIndex])
       tabTrayView.collectionView.reloadData()
     }
