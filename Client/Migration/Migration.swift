@@ -40,17 +40,15 @@ public class Migration {
     if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
       movePlaylistV1Items()
     }
+    
+    // New users will have universal links open in the browser by default
+    if Preferences.General.isFirstLaunch.value {
+      Preferences.General.followUniversalLinks.value = false
+    }
 
     // Default Value for preference of tab bar visibility for new users changed to landscape only
     if Preferences.General.isFirstLaunch.value {
       Preferences.General.tabBarVisibility.value = TabBarVisibility.landscapeOnly.rawValue
-    }
-
-    // Settings default value for openUniversalLinksInBrave by migrating the followUniversalLinks value
-    if Preferences.General.openUniversalLinksInBrave.value == nil {
-      Preferences.General.openUniversalLinksInBrave.value = !Preferences.General.followUniversalLinks.value
-    } else {
-      Preferences.General.openUniversalLinksInBrave.value = false
     }
 
     // Adding Observer to enable sync types
