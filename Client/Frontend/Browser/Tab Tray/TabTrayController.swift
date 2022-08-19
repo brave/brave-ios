@@ -261,6 +261,10 @@ class TabTrayController: LoadingViewController {
   @objc func togglePrivateModeAction() {
     tabTraySearchController.isActive = false
 
+    if !privateMode {
+      tabManager.normalTabSelectedIndex = tabManager.selectedIndex
+    }
+    
     tabManager.willSwitchTabMode(leavingPBM: privateMode)
     privateMode.toggle()
     // When we switch from Private => Regular make sure we reset _selectedIndex, fix for bug #888
@@ -272,9 +276,9 @@ class TabTrayController: LoadingViewController {
       tabManager.addTabAndSelect(isPrivate: true)
     } else {
       tabTrayView.hidePrivateModeInfo()
-      // When you go back from private mode, a first tab is selected.
-      // So when you dismiss the modal, correct tab and url is showed.
-      tabManager.selectTab(tabManager.tabsForCurrentMode.first)
+      
+      tabManager.selectTab(tabManager.tabsForCurrentMode[safe: tabManager.normalTabSelectedIndex])
+      tabTrayView.collectionView.reloadData()
     }
 
     // Disable Search when Private mode info is on
