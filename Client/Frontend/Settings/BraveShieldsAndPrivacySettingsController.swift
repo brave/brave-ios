@@ -215,7 +215,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
           }
         ),
         .boolRow(title: Strings.blockPopups, option: Preferences.General.blockPopups),
-        .boolRow(title: Strings.openUniversalLinksInBrave, option: Preferences.General.openUniversalLinksInBrave),
+        .inversedBoolRow(title: Strings.openUniversalLinksInBrave, option: Preferences.General.followUniversalLinks)
       ]
     )
     if #available(iOS 14.0, *) {

@@ -110,11 +110,8 @@ extension Preferences {
     static let defaultBrowserCalloutDismissed =
       Option<Bool>(key: "general.default-browser-callout-dismissed", default: false)
 
-    /// Whether or not the app (in regular browsing mode) will follow universal links (deprecated/replaced with openUniversalLinksInBrave)
-    static let followUniversalLinks = Option<Bool>(key: "general.follow-universal-links", default: true)
-    
-    /// Whether or not the app (in regular browsing mode) will open universal links in Brave
-    static let openUniversalLinksInBrave = Option<Bool?>(key: "general.open-universal-links", default: nil)
+    /// Whether or not the app (in regular browsing mode) will follow universal links
+    static let followUniversalLinks = Option<Bool>(key: "general.follow-universal-links", default: false)
 
     /// Whether or not the pull-to-refresh control is added to web views
     static let enablePullToRefresh = Option<Bool>(key: "general.enable-pull-to-refresh", default: true)

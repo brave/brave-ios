@@ -52,7 +52,7 @@ public class Migration {
     } else {
       Preferences.General.openUniversalLinksInBrave.value = false
     }
-    
+
     // Adding Observer to enable sync types
 
     NotificationCenter.default.addObserver(
