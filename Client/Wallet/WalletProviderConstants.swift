@@ -29,4 +29,10 @@ extension Web3ProviderEvent {
   static func ethereumAccountsChanged(accounts: [String]) -> Self {
     .init("accountsChanged", arguments: accounts.first ?? "")
   }
+  
+  // MARK: - Solana
+  
+  static func solanaAccountChanged(account: String) -> Self {
+    .init("accountChanged", arguments: account)
+  }
 }
