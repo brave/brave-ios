@@ -196,10 +196,10 @@ extension PlaylistListViewController: UITableViewDelegate {
         completionHandler(true)
       })
 
-    cacheAction.image = cacheState == .invalid ? UIImage(named: "playlist_download", in: .current, compatibleWith: nil)! : UIImage(named: "playlist_delete_download", in: .current, compatibleWith: nil)!
+    cacheAction.image = cacheState == .invalid ? UIImage(braveSystemNamed: "brave.cloud.and.arrow.down")! : UIImage(braveSystemNamed: "brave.cloud.slash")!
     cacheAction.backgroundColor = UIColor.braveDarkerBlurple
 
-    deleteAction.image = UIImage(named: "playlist_delete_item", in: .current, compatibleWith: nil)!
+    deleteAction.image = UIImage(braveSystemNamed: "brave.trash")!
     deleteAction.backgroundColor = UIColor.braveErrorLabel
 
     shareAction.image = UIImage(systemName: "square.and.arrow.up")
@@ -218,7 +218,7 @@ extension PlaylistListViewController: UITableViewDelegate {
     let actionProvider: UIContextMenuActionProvider = { _ in
       let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
       let cacheTitle = cacheState == .invalid ? Strings.PlayList.playlistSaveForOfflineButtonTitle : Strings.PlayList.playlistDeleteForOfflineButtonTitle
-      let cacheIcon = cacheState == .invalid ? UIImage(systemName: "icloud.and.arrow.down") : UIImage(systemName: "icloud.slash")
+      let cacheIcon = cacheState == .invalid ? UIImage(braveSystemNamed: "brave.cloud.and.arrow.down") : UIImage(braveSystemNamed: "brave.cloud.slash")
 
       return UIMenu(children: [
         UIMenu(
@@ -282,7 +282,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           }()),
 
         UIAction(
-          title: Strings.delete, image: UIImage(systemName: "trash"), attributes: .destructive,
+          title: Strings.delete, image: UIImage(braveSystemNamed: "brave.trash"), attributes: .destructive,
           handler: { [weak self] _ in
             self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
           }),

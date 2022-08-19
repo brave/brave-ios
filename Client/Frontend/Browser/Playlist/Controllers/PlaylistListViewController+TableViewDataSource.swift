@@ -275,7 +275,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.present(hostingController, animated: true, completion: nil)
         }
         
-        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(named: "playlist_delete_download", in: .current, compatibleWith: traitCollection)?.template) { [unowned self] _ in
+        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "brave.cloud.slash")?.template) { [unowned self] _ in
           folder.playlistItems?.forEach {
             if let itemId = $0.uuid {
               PlaylistManager.shared.deleteCache(itemId: itemId)
@@ -285,7 +285,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.tableView.reloadData()
         }
         
-        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(named: "playlist_delete_item", in: .current, compatibleWith: traitCollection)?.template, attributes: .destructive) { _ in
+        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(braveSystemNamed: "brave.trash")?.template, attributes: .destructive) { _ in
           PlaylistManager.shared.delete(folder: folder) { [weak self] _ in
             self?.navigationController?.popToRootViewController(animated: true)
           }
