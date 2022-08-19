@@ -38,6 +38,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     $0.titleLabel?.lineBreakMode = .byWordWrapping
     $0.titleLabel?.font = .preferredFont(for: .subheadline, weight: .bold)
     $0.imageView?.tintColor = .bravePrimary
+    $0.imageView?.image = UIImage(systemName: "plus")
     $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -120,16 +121,18 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     switch state {
     case .add:
       menuButton.setTitle(Strings.PlaylistFolderSharing.addButtonTitle, for: .normal)
-      menuButton.setImage(nil, for: .normal)
+      menuButton.setImage(UIImage(systemName: "plus"), for: .normal)
       menuButton.backgroundColor = .braveBlurple
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.addButtonAccessibilityTitle
       menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 20.0)
+      menuButton.sizeToFit()
     case .menu:
       menuButton.setTitle(nil, for: .normal)
       menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
       menuButton.backgroundColor = .clear
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.menuButtonAccessibilityTitle
       menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 0.0)
+      menuButton.sizeToFit()
     }
   }
   
