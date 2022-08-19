@@ -2304,6 +2304,13 @@ extension Strings {
       value: "Default Ethereum Wallet",
       comment: "The title for the entry displaying the current preferred default Ethereum wallet is."
     )
+    public static let web3PreferencesDefaultSolWallet = NSLocalizedString(
+      "wallet.web3PreferencesDefaultSolWallet",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Default Solana Wallet",
+      comment: "The title for the entry displaying the current preferred default Solana wallet is."
+    )
     public static let web3PreferencesAllowSiteToRequestAccounts = NSLocalizedString(
       "wallet.web3PreferencesAllowSiteToRequestAccounts",
       tableName: "BraveWallet",

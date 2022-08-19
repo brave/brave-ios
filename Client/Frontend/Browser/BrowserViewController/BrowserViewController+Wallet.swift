@@ -162,12 +162,12 @@ extension Tab: BraveWalletProviderDelegate {
     return origin
   }
 
-  public func requestPermissions(_ type: BraveWallet.CoinType, accounts: [String], completion: @escaping RequestPermissionsCallback) {
+  public func requestPermissions(_ coinType: BraveWallet.CoinType, accounts: [String], completion: @escaping RequestPermissionsCallback) {
     Task { @MainActor in
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       let origin = getOrigin()
       
-      if permissionRequestManager.hasPendingRequest(for: origin, coinType: type) {
+      if permissionRequestManager.hasPendingRequest(for: origin, coinType: coinType) {
         completion(.requestInProgress, nil)
         return
       }
@@ -186,7 +186,7 @@ extension Tab: BraveWalletProviderDelegate {
         completion(.internal, nil)
         return
       }
-      let (success, accounts) = await allowedAccounts(type, accounts: accounts)
+      let (success, accounts) = await allowedAccounts(coinType, accounts: accounts)
       if !success {
         completion(.internal, [])
         return
@@ -197,7 +197,7 @@ extension Tab: BraveWalletProviderDelegate {
       }
       
       // add permission request to the queue
-      _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, providerHandler: completion, completion: { response in
+      _ = permissionRequestManager.beginRequest(for: origin, coinType: coinType, providerHandler: completion, completion: { response in
         switch response {
         case .granted(let accounts):
           completion(.none, accounts)
