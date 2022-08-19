@@ -13,6 +13,8 @@ import BraveVPN
 private let log = Logger.browserLogger
 
 class BraveSkusScriptHandler: TabContentScript {
+  typealias ReplyHandler = (Any?, String?) -> Void
+  
   private weak var tab: Tab?
   
   private let sku: SkusSkusService?
@@ -24,7 +26,7 @@ class BraveSkusScriptHandler: TabContentScript {
   
   static func name() -> String { "BraveSkusHelper" }
   
-  func scriptMessageHandlerName() -> String? { BraveSkusScriptHandler.name() }
+  func scriptMessageHandlerName() -> String? { "braveSkusHelper" }
   
   private enum Method: Int {
     case refreshOrder = 1
@@ -53,46 +55,46 @@ class BraveSkusScriptHandler: TabContentScript {
     switch methodId {
     case Method.refreshOrder.rawValue:
       if let orderId = data["orderId"] as? String {
-        handleRefreshOrder(for: orderId, domain: requestHost)
+        handleRefreshOrder(for: orderId, domain: requestHost, replyHandler: replyHandler)
       }
     case Method.fetchOrderCredentials.rawValue:
       if let orderId = data["orderId"] as? String {
-        handleFetchOrderCredentials(for: orderId, domain: requestHost)
+        handleFetchOrderCredentials(for: orderId, domain: requestHost, replyHandler: replyHandler)
       }
     case Method.prepareCredentialsPresentation.rawValue:
       if let domain = data["domain"] as? String, let path = data["path"] as? String {
-        handlePrepareCredentialsSummary(for: domain, path: path)
+        handlePrepareCredentialsSummary(for: domain, path: path, replyHandler: replyHandler)
       }
     case Method.credentialsSummary.rawValue:
       if let domain = data["domain"] as? String {
-        handleCredentialsSummary(for: domain)
+        handleCredentialsSummary(for: domain, replyHandler: replyHandler)
       }
     default:
       assertionFailure("Failure, the website called unhandled method with id: \(methodId)")
     }
   }
   
-  private func handleRefreshOrder(for orderId: String, domain: String) {
+  private func handleRefreshOrder(for orderId: String, domain: String, replyHandler: @escaping ReplyHandler) {
     sku?.refreshOrder(domain, orderId: orderId) { [weak self] completion in
       do {
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
         log.debug("skus refreshOrder")
-        self?.callback(methodId: 1, result: json)
+        self?.callback(methodId: 1, result: json, replyHandler: replyHandler)
       } catch {
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
   }
   
-  private func handleFetchOrderCredentials(for orderId: String, domain: String) {
+  private func handleFetchOrderCredentials(for orderId: String, domain: String, replyHandler: @escaping ReplyHandler) {
     sku?.fetchOrderCredentials(domain, orderId: orderId) { [weak self] completion in
       log.debug("skus fetchOrderCredentials")
-      self?.callback(methodId: 2, result: completion)
+      self?.callback(methodId: 2, result: completion, replyHandler: replyHandler)
     }
   }
   
-  private func handlePrepareCredentialsSummary(for domain: String, path: String) {
+  private func handlePrepareCredentialsSummary(for domain: String, path: String, replyHandler: @escaping ReplyHandler) {
     log.debug("skus prepareCredentialsPresentation")
     sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
       if !credential.isEmpty {
@@ -106,18 +108,18 @@ class BraveSkusScriptHandler: TabContentScript {
         assertionFailure()
       }
       
-      self?.callback(methodId: 3, result: credential)
+      self?.callback(methodId: 3, result: credential, replyHandler: replyHandler)
     }
   }
   
-  private func handleCredentialsSummary(for domain: String) {
+  private func handleCredentialsSummary(for domain: String, replyHandler: @escaping ReplyHandler) {
     sku?.credentialSummary(domain) { [weak self] completion in
       do {
         log.debug("skus credentialSummary")
         
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        self?.callback(methodId: 4, result: json)
+        self?.callback(methodId: 4, result: json, replyHandler: replyHandler)
         
         if let expiresDate = (json as? [String: Any])?["expires_at"] as? String,
            let date = BraveSkusWebHelper.milisecondsOptionalDate(from: expiresDate) {
@@ -126,22 +128,16 @@ class BraveSkusScriptHandler: TabContentScript {
           assertionFailure("Failed to parse date")
         }
         
-        self?.handlePrepareCredentialsSummary(for: domain, path: "*")
+        self?.handlePrepareCredentialsSummary(for: domain, path: "*", replyHandler: replyHandler)
       } catch {
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
   }
   
-  private func callback(methodId: Int, result: Any) {
-    let functionName =
-    "window.__firefox__.BSKU\(UserScriptManager.messageHandlerTokenString).resolve"
-    
+  private func callback(methodId: Int, result: Any, replyHandler: ReplyHandler) {
     let args: [Any] = ["\(methodId)", result]
     
-    self.tab?.webView?.evaluateSafeJavaScript(
-      functionName: functionName,
-      args: args,
-      contentWorld: .page)
+    replyHandler(args, nil)
   }
 }
