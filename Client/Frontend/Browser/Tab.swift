@@ -71,6 +71,9 @@ class Tab: NSObject {
 
   var walletEthProvider: BraveWalletEthereumProvider?
   var walletEthProviderJS: String?
+  var walletSolProvider: BraveWalletSolanaProvider?
+  var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
+  
   var isWalletIconVisible: Bool = false {
     didSet {
       tabDelegate?.updateURLBarWalletButton()
@@ -333,7 +336,8 @@ class Tab: NSObject {
         isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
         isNightModeEnabled: Preferences.General.nightModeEnabled.value,
         isDeAMPEnabled: Preferences.Shields.autoRedirectAMPPages.value,
-        walletEthProviderJS: walletEthProviderJS
+        walletEthProviderJS: walletEthProviderJS,
+        walletSolProviderScripts: walletSolProviderScripts
       )
       tabDelegate?.tab(self, didCreateWebView: webView)
 
@@ -520,7 +524,7 @@ class Tab: NSObject {
   
   /// This property is for fetching the actual URL for the Tab
   /// In private browsing the URL is in memory but this is not the case for normal mode
-  /// For Normal  Mode Tab information is fetched using Tab ID from 
+  /// For Normal  Mode Tab information is fetched using Tab ID from
   var fetchedURL: URL? {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
       if let url = url, url.isWebPage() {

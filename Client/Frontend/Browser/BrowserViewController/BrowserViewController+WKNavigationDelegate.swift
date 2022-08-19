@@ -584,6 +584,7 @@ extension BrowserViewController: WKNavigationDelegate {
         )
       }
       tab.updateEthereumProperties()
+      tab.updateSolanaProperties()
       tab.reportPageLoad(to: rewards, redirectionURLs: tab.redirectURLs)
       tab.redirectURLs = []
       if webView.url?.isLocal == false {
