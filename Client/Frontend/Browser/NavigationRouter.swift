@@ -101,7 +101,7 @@ public enum NavigationPath: Equatable {
 
   private static func handleWidgetShortcut(_ path: WidgetShortcut, with bvc: BrowserViewController) {
     switch path {
-    case .unknown:
+    case .unknown, .search:
       // Search
       bvc.focusURLBar()
     case .newTab:
@@ -120,6 +120,8 @@ public enum NavigationPath: Equatable {
       }
     case .playlist:
       bvc.navigationHelper.openPlaylist()
+    case .wallet:
+      bvc.navigationHelper.openWallet()
     @unknown default:
       assertionFailure()
       break
