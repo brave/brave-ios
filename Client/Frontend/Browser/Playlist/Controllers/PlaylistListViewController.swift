@@ -48,7 +48,6 @@ class PlaylistListViewController: UIViewController {
 
   weak var delegate: PlaylistViewControllerDelegate?
   private let playerView: VideoView
-  private let overlayView = UIImageView()
   private var observers = Set<AnyCancellable>()
   private var folderObserver: AnyCancellable?
   private(set) var autoPlayEnabled = Preferences.Playlist.firstLoadAutoPlay.value
@@ -472,13 +471,6 @@ class PlaylistListViewController: UIViewController {
   override var preferredStatusBarStyle: UIStatusBarStyle {
     .lightContent
   }
-  
-  public func showOverlay(image: UIImage?) {
-    overlayView.image = image
-    overlayView.isHidden = image == nil
-    overlayView.backgroundColor = .black
-    overlayView.contentMode = .scaleAspectFit
-  }
 
   public func updateLayoutForMode(_ mode: UIUserInterfaceIdiom) {
     navigationItem.rightBarButtonItem = nil
@@ -491,7 +483,6 @@ class PlaylistListViewController: UIViewController {
       // If the player view is in fullscreen, we should NOT change the tableView layout on rotation.
       view.addSubview(tableView)
       view.addSubview(playerView)
-      view.addSubview(overlayView)
       playerView.addSubview(activityIndicator)
 
       if !playerView.isFullscreen {
@@ -524,12 +515,6 @@ class PlaylistListViewController: UIViewController {
             $0.leading.trailing.equalToSuperview()
             $0.top.equalTo(playerView.snp.bottom)
             $0.bottom.equalTo(view.safeArea.bottom)
-          }
-          
-          overlayView.snp.remakeConstraints {
-            $0.top.equalTo(view.safeArea.top)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(videoPlayerHeight)
           }
         }
       } else {

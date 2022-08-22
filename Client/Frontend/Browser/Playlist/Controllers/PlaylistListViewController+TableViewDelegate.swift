@@ -346,7 +346,7 @@ extension PlaylistListViewController: UITableViewDelegate {
       return
     }
     
-    showOverlay(image: nil)
+    delegate?.showStaticImage(image: nil)
 
     prepareToPlayItem(at: indexPath) { [weak self] item in
       guard let item = item else {

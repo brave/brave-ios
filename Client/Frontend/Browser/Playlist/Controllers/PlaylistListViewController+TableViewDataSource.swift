@@ -72,26 +72,14 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    // Display Redacted Cells
     if loadingState != .fullyLoaded {
       guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playlistCellRedactedIdentifier, for: indexPath) as? PlaylistCellRedacted else {
         return UITableViewCell()
       }
-
-      return cell
-    }
-    
-    guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
-      return UITableViewCell()
-    }
-
-    return cell
-  }
-
-  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    if loadingState != .fullyLoaded {
-      guard let cell = cell as? PlaylistCellRedacted,
-            let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
-        return
+      
+      guard let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
+        return cell
       }
       
       let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
@@ -105,13 +93,17 @@ extension PlaylistListViewController: UITableViewDataSource {
           $0.loadThumbnail(for: url)
         }
       }
-      
-      return
+
+      return cell
     }
     
-    guard let cell = cell as? PlaylistCell,
-          let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
-      return
+    // Display Item Cells
+    guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
+      return UITableViewCell()
+    }
+    
+    guard let item = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
+      return cell
     }
 
     cell.prepareForDisplay()
@@ -149,6 +141,8 @@ extension PlaylistListViewController: UITableViewDataSource {
         cell.loadingView.stopAnimating()
       }
     }
+
+    return cell
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -19,63 +19,64 @@ struct PlaylistFolderSharingManagementView: View {
   var onCancelPressed: (() -> Void)?
   
   var body: some View {
-    VStack {
-      Text(Strings.PlaylistFolderSharing.offlineManagementViewTitle)
-        .font(.title2.weight(.medium))
-        .multilineTextAlignment(.center)
-        .foregroundColor(Color(.bravePrimary))
-        .padding(.horizontal, UX.hPadding)
-        .padding(.bottom, UX.vPadding)
-      
-      Text(Strings.PlaylistFolderSharing.offlineManagementViewDescription)
-        .font(.body)
-        .foregroundColor(Color(.braveLabel))
-        .padding(.horizontal, UX.hPadding)
-        .padding(.bottom, UX.vPadding)
-      
-      VStack(spacing: UX.vPadding) {
-        Button(action: {
-          onAddToPlaylistPressed?()
-        }) {
-          Text(Strings.PlaylistFolderSharing.offlineManagementViewAddButtonTitle)
-            .frame(maxWidth: .infinity)
-            .font(.callout.weight(.medium))
-            .padding()
-        }
-        .frame(minHeight: 44.0)
-        .background(Color(.braveBlurple))
-        .clipShape(Capsule())
+    ScrollView(.vertical) {
+      VStack {
+        Text(Strings.PlaylistFolderSharing.offlineManagementViewTitle)
+          .font(.title2.weight(.medium))
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.bravePrimary))
+          .padding(.horizontal, UX.hPadding)
+          .padding(.bottom, UX.vPadding)
         
-        Button(action: {
-          onSettingsPressed?()
-        }) {
-          Text(Strings.PlaylistFolderSharing.offlineManagementViewSettingsButtonTitle)
-            .frame(maxWidth: .infinity)
-            .font(.callout.weight(.medium))
-            .padding()
-        }
-        .frame(minHeight: 44.0)
-        .background(Color(.braveBlurple))
-        .clipShape(Capsule())
+        Text(Strings.PlaylistFolderSharing.offlineManagementViewDescription)
+          .font(.body)
+          .foregroundColor(Color(.braveLabel))
+          .padding(.horizontal, UX.hPadding)
+          .padding(.bottom, UX.vPadding)
         
-        Button(action: {
-          onCancelPressed?()
-        }) {
-          Text(Strings.cancelButtonTitle)
-            .frame(maxWidth: .infinity)
-            .font(.callout.weight(.medium))
-            .padding()
+        VStack(spacing: UX.vPadding) {
+          Button(action: {
+            onAddToPlaylistPressed?()
+          }) {
+            Text(Strings.PlaylistFolderSharing.offlineManagementViewAddButtonTitle)
+              .frame(maxWidth: .infinity)
+              .font(.callout.weight(.medium))
+              .padding()
+          }
+          .frame(minHeight: 44.0)
+          .background(Color(.braveBlurple))
+          .clipShape(Capsule())
+          
+          Button(action: {
+            onSettingsPressed?()
+          }) {
+            Text(Strings.PlaylistFolderSharing.offlineManagementViewSettingsButtonTitle)
+              .frame(maxWidth: .infinity)
+              .font(.callout.weight(.medium))
+              .padding()
+          }
+          .frame(minHeight: 44.0)
+          .background(Color(.braveBlurple))
+          .clipShape(Capsule())
+          
+          Button(action: {
+            onCancelPressed?()
+          }) {
+            Text(Strings.cancelButtonTitle)
+              .frame(maxWidth: .infinity)
+              .font(.callout.weight(.medium))
+              .padding()
+          }
+          .frame(minHeight: 44.0)
+          .foregroundColor(Color(.braveLighterBlurple))
+          .clipShape(Capsule())
         }
-        .frame(minHeight: 44.0)
-        .foregroundColor(Color(.braveLighterBlurple))
-        .clipShape(Capsule())
+        .padding(.horizontal, UX.hPadding)
       }
-      .padding(.horizontal, UX.hPadding)
+      .accentColor(Color(.white))
+      .padding(EdgeInsets(top: UX.vPadding, leading: UX.hPadding, bottom: UX.vPadding, trailing: UX.hPadding))
+      .background(Color(.braveBackground))
     }
-    .accentColor(Color(.white))
-    .padding(EdgeInsets(top: UX.vPadding, leading: UX.hPadding, bottom: UX.vPadding, trailing: UX.hPadding))
-    .background(Color(.braveBackground))
-    .accessibilityEmbedInScrollView()
     .environment(\.colorScheme, .dark)
   }
 }

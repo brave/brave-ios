@@ -26,6 +26,7 @@ protocol PlaylistViewControllerDelegate: AnyObject {
   func onSidePanelStateChanged()
   func onFullscreen()
   func onExitFullscreen()
+  func showStaticImage(image: UIImage?)
   func playItem(item: PlaylistInfo, completion: ((PlaylistMediaStreamer.PlaybackError) -> Void)?)
   func pausePlaying()
   func stopPlaying()
@@ -201,7 +202,7 @@ class PlaylistViewController: UIViewController {
 
       Task { @MainActor in
         do {
-          self.listController.showOverlay(image: UIImage())
+          self.playerView.setStaticImage(image: UIImage())
           let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(playlistId: folderSharingId)
           let folder = await PlaylistSharedFolderNetwork.createInMemoryStorage(for: model)
           PlaylistManager.shared.currentFolder = folder
@@ -219,7 +220,7 @@ class PlaylistViewController: UIViewController {
               }
               
               if let image = UIImage(data: data, scale: UIScreen.main.scale) {
-                self.listController.showOverlay(image: image)
+                self.playerView.setStaticImage(image: image)
               }
             }
           }
@@ -306,7 +307,7 @@ class PlaylistViewController: UIViewController {
       splitController.preferredDisplayMode = .secondaryOnly
     } else {
       if UIDevice.current.orientation.isLandscape {
-        splitController.preferredDisplayMode = .secondaryOnly
+        splitController.preferredDisplayMode = PlaylistManager.shared.currentFolder?.isPersistent == true ? .oneOverSecondary : .secondaryOnly
       } else {
         splitController.preferredDisplayMode = .oneOverSecondary
       }
@@ -569,6 +570,10 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
         dismiss(animated: true, completion: nil)
       }
     }
+  }
+  
+  func showStaticImage(image: UIImage?) {
+    playerView.setStaticImage(image: image)
   }
 
   func pausePlaying() {
