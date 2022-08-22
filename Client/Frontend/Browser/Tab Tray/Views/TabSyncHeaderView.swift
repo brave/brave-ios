@@ -14,7 +14,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
   var section = 0
-  var isCollapsed = false
+  private var isCollapsed = false
   
   let imageIconView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
