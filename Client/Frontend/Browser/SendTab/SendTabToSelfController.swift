@@ -229,7 +229,7 @@ class SendTabToSelfContentHeaderFooterView: UITableViewHeaderFooterView, TableVi
     static let verticalPadding = 12.0
   }
   
-  var titleLabel = UILabel().then {
+  private(set) var titleLabel = UILabel().then {
     $0.numberOfLines = 0
     $0.textColor = .braveOrange
     $0.textAlignment = .center

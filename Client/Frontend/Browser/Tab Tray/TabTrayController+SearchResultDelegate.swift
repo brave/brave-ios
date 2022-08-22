@@ -23,26 +23,17 @@ extension TabTrayController: UISearchResultsUpdating {
   }
 
   @objc private func fetchSearchResults(timer: Timer) {
-    guard let query = timer.userInfo as? String else {
-      tabTraySearchQuery = ""
-      return
-    }
-
-    tabTraySearchQuery = query
-    
     switch tabTrayMode {
     case .local:
       applySnapshot(for: tabTraySearchQuery)
     case .sync:
-      reloadOpenTabsSession(for: query)
+      reloadOpenTabsSession(for: tabTraySearchQuery)
     }
   }
 
   private func invalidateSearchTimer() {
-    if searchTabTrayTimer != nil {
-      searchTabTrayTimer?.invalidate()
-      searchTabTrayTimer = nil
-    }
+    searchTabTrayTimer?.invalidate()
+    searchTabTrayTimer = nil
   }
 }
 
@@ -52,7 +43,7 @@ extension TabTrayController: UISearchControllerDelegate {
 
   func willPresentSearchController(_ searchController: UISearchController) {
     isTabTrayBeingSearched = true
-    tabTraySearchQuery = ""
+    tabTraySearchQuery = nil
     
     switch tabTrayMode {
     case .local:

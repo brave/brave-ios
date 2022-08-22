@@ -22,10 +22,10 @@ class SyncHelperTests: XCTestCase {
     let someRandomDateTime = userCalendar.date(from: dateComponents)!
     
     
-    XCTAssertTrue(someRandomDateTime.formattedSyncSessionPeriodDate == "Last synced: 08:34 AM 07-11-1980")
-    XCTAssertTrue(today.formattedActivePeriodDate == "Active Today")
-    XCTAssertTrue(yesterday.formattedActivePeriodDate == "Active Yesterday")
-    XCTAssertTrue(randomDateInLastWeek.formattedActivePeriodDate == "Active Last Week")
-    XCTAssertTrue(randomDateInLastMonth.formattedActivePeriodDate == "Active Last Month")
+    XCTAssertEqual(someRandomDateTime.formattedSyncSessionPeriodDate, "Last synced: 08:34 AM 07-11-1980")
+    XCTAssertEqual(today.formattedActivePeriodDate, "Active Today")
+    XCTAssertEqual(yesterday.formattedActivePeriodDate, "Active Yesterday")
+    XCTAssertEqual(randomDateInLastWeek.formattedActivePeriodDate, "Active Last Week")
+    XCTAssertEqual(randomDateInLastMonth.formattedActivePeriodDate, "Active Last Month")
   }
 }

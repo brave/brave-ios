@@ -63,7 +63,7 @@ class TabTrayController: LoadingViewController {
 
   var searchTabTrayTimer: Timer?
   var isTabTrayBeingSearched = false
-  var tabTraySearchQuery = ""
+  var tabTraySearchQuery: String? = nil
   var tabTrayMode: TabTrayMode = .local
   private var privateModeCancellable: AnyCancellable?
   private var initialScrollCompleted = false

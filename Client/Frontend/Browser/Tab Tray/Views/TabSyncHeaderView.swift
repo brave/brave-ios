@@ -7,14 +7,14 @@ import UIKit
 import BraveUI
 
 protocol TabSyncHeaderViewDelegate {
-    func toggleSection(_ header: TabSyncHeaderView, section: Int)
+  func toggleSection(_ header: TabSyncHeaderView, section: Int)
 }
 
 class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
   var section = 0
-  var collapsed = false
+  var isCollapsed = false
   
   let imageIconView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
@@ -101,7 +101,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     CATransaction.begin()
     
     let animation = CABasicAnimation(keyPath: "transform.rotation").then {
-      $0.toValue = collapsed ? 0.0 : -1 * (.pi / 2)
+      $0.toValue = isCollapsed ? 0.0 : -1 * (.pi / 2)
       $0.duration = 0.2
       $0.isRemovedOnCompletion = false
       $0.fillMode = CAMediaTimingFillMode.forwards
@@ -109,7 +109,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
 
     CATransaction.setCompletionBlock { [weak self] in
       guard let self = self else { return }
-      self.collapsed = !self.collapsed
+      self.isCollapsed = !self.isCollapsed
       completion?()
     }
     

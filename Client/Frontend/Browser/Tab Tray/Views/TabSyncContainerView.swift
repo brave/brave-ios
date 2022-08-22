@@ -18,9 +18,9 @@ extension TabTrayController {
       static let sectionTopPadding = 5.0
     }
 
-    var tableView = UITableView()
+    private(set) var tableView = UITableView()
     
-    lazy var noSyncTabsOverlayView = EmptyStateOverlayView(
+    private(set) lazy var noSyncTabsOverlayView = EmptyStateOverlayView(
       title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
       description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
       icon: UIImage(systemName: "laptopcomputer.and.iphone"))
@@ -42,11 +42,9 @@ extension TabTrayController {
         $0.backgroundColor = .secondaryBraveBackground
         $0.separatorColor = .braveSeparator
         $0.cellLayoutMarginsFollowReadableWidth = false
-        #if swift(>=5.5)
         if #available(iOS 15.0, *) {
           $0.sectionHeaderTopPadding = UX.sectionTopPadding
         }
-        #endif
       }
 
       // Set an empty footer to prevent empty cells from appearing in the list.

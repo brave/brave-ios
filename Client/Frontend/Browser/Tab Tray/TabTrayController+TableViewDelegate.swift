@@ -15,7 +15,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if self.hiddenSections.contains(section) {
-        return 0
+      return 0
     }
     
     return sessionList[safe: section]?.tabs.count ?? 0
