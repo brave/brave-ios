@@ -109,7 +109,7 @@ class BraveSkusScriptHandler: TabContentScript {
         //assertionFailure()
       }
       
-      self?.callback(methodId: 3, result: credential, replyHandler: replyHandler)
+      //self?.callback(methodId: 3, result: credential, replyHandler: replyHandler)
     }
   }
   
