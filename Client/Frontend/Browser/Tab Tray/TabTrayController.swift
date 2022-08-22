@@ -63,7 +63,7 @@ class TabTrayController: LoadingViewController {
 
   var searchTabTrayTimer: Timer?
   var isTabTrayBeingSearched = false
-  var tabTraySearchQuery: String? = nil
+  var tabTraySearchQuery: String?
   var tabTrayMode: TabTrayMode = .local
   private var privateModeCancellable: AnyCancellable?
   private var initialScrollCompleted = false
@@ -71,6 +71,7 @@ class TabTrayController: LoadingViewController {
   // MARK: User Interface Elements
   
   private struct UX {
+    static let horizontalInset = 5.0
     static let buttonEdgeInset = 10.0
   }
   
@@ -257,9 +258,12 @@ class TabTrayController: LoadingViewController {
     let contentStackView = UIStackView().then {
       $0.axis = .vertical
       $0.alignment = .center
+      $0.layoutMargins = UIEdgeInsets(top: UX.horizontalInset, left: 0, bottom: 0, right: 0)
+      $0.isLayoutMarginsRelativeArrangement = true
     }
         
     contentStackView.addArrangedSubview(tabTypeSelector)
+    contentStackView.setCustomSpacing(UX.horizontalInset, after: tabTypeSelector)
     contentStackView.addArrangedSubview(tabContentView)
     
     containerView.addSubview(contentStackView)
