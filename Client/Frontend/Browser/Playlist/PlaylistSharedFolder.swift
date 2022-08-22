@@ -12,7 +12,7 @@ public struct PlaylistSharedFolderModel: Codable {
   public let version: String
   public let folderId: String
   public let folderName: String
-  public let folderImage: URL
+  public let folderImage: String
   public let creatorName: String
   public let creatorLink: String
   public let updateAt: String
@@ -23,7 +23,7 @@ public struct PlaylistSharedFolderModel: Codable {
     version = try container.decode(String.self, forKey: .version)
     folderId = try container.decode(String.self, forKey: .folderId)
     folderName = try container.decode(String.self, forKey: .folderName)
-    folderImage = try container.decode(URL.self, forKey: .folderImage)
+    folderImage = try container.decode(String.self, forKey: .folderImage)
     creatorName = try container.decode(String.self, forKey: .creatorName)
     creatorLink = try container.decode(String.self, forKey: .creatorLink)
     updateAt = try container.decode(String.self, forKey: .updateAt)

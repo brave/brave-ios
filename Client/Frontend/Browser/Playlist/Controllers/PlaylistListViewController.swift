@@ -246,6 +246,12 @@ class PlaylistListViewController: UIViewController {
       autoPlayEnabled = true
       return
     }
+    
+    // Shared folders are loading
+    if PlaylistManager.shared.currentFolder == nil {
+      autoPlayEnabled = true
+      return
+    }
 
     // Setup initial playback item and time-offset
     let lastPlayedItemUrl = initialItem?.pageSrc ?? Preferences.Playlist.lastPlayedItemUrl.value

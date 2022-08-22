@@ -207,18 +207,20 @@ class PlaylistViewController: UIViewController {
           PlaylistManager.shared.currentFolder = folder
           self.listController.loadingState = .partial
           
-          Task { @MainActor in
-            let authManager = BasicAuthCredentialsManager(for: [model.folderImage.absoluteString])
-            let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
-            defer { session.finishTasksAndInvalidate() }
-            
-            let (data, response) = try await NetworkManager(session: session).dataRequest(with: model.folderImage)
-            if let response = response as? HTTPURLResponse, response.statusCode != 200 {
-              return
-            }
-            
-            if let image = UIImage(data: data, scale: UIScreen.main.scale) {
-              self.listController.showOverlay(image: image)
+          if let folderImage = URL(string: model.folderImage) {
+            Task { @MainActor in
+              let authManager = BasicAuthCredentialsManager(for: [folderImage.absoluteString])
+              let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
+              defer { session.finishTasksAndInvalidate() }
+              
+              let (data, response) = try await NetworkManager(session: session).dataRequest(with: folderImage)
+              if let response = response as? HTTPURLResponse, response.statusCode != 200 {
+                return
+              }
+              
+              if let image = UIImage(data: data, scale: UIScreen.main.scale) {
+                self.listController.showOverlay(image: image)
+              }
             }
           }
           
@@ -1100,5 +1102,11 @@ extension PlaylistViewController: VideoViewDelegate {
     // tracks may not always be available and the particle effect will show even on videos..
     // It's best to assume this type of media is a video stream.
     return true
+  }
+}
+
+extension PlaylistFolder {
+  var isPersistent: Bool {
+    managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
   }
 }

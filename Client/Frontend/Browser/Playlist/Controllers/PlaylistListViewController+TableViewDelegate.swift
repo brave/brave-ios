@@ -123,11 +123,12 @@ extension PlaylistListViewController: UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 
-    guard PlaylistManager.shared.currentFolder?.sharedFolderId == nil,
+    guard PlaylistManager.shared.currentFolder?.isPersistent == true,
           let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
       return nil
     }
-
+    
+    let isSharedFolder = PlaylistManager.shared.currentFolder?.sharedFolderId != nil
     let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
 
     let cacheAction = UIContextualAction(
@@ -205,22 +206,26 @@ extension PlaylistListViewController: UITableViewDelegate {
     shareAction.image = UIImage(systemName: "square.and.arrow.up")
     shareAction.backgroundColor = UIColor.braveInfoLabel
 
+    if isSharedFolder {
+      return UISwipeActionsConfiguration(actions: [shareAction, cacheAction])
+    }
     return UISwipeActionsConfiguration(actions: [deleteAction, shareAction, cacheAction])
   }
 
   func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-
-    guard PlaylistManager.shared.currentFolder?.sharedFolderId == nil,
+    guard PlaylistManager.shared.currentFolder?.isPersistent == true,
           let currentItem = PlaylistManager.shared.itemAtIndex(indexPath.row) else {
       return nil
     }
+    
+    let isSharedFolder = PlaylistManager.shared.currentFolder?.sharedFolderId != nil
 
     let actionProvider: UIContextMenuActionProvider = { _ in
       let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
       let cacheTitle = cacheState == .invalid ? Strings.PlayList.playlistSaveForOfflineButtonTitle : Strings.PlayList.playlistDeleteForOfflineButtonTitle
       let cacheIcon = cacheState == .invalid ? UIImage(braveSystemNamed: "brave.cloud.and.arrow.down") : UIImage(braveSystemNamed: "brave.cloud.slash")
-
-      return UIMenu(children: [
+      
+      var menuItems: [UIMenuElement] = [
         UIMenu(
           options: .displayInline,
           children: [
@@ -256,37 +261,43 @@ extension PlaylistListViewController: UITableViewDelegate {
                 }))
 
             return actions
-          }()),
+          }())
+      ]
+      
+      if !isSharedFolder {
+        menuItems += [
+          UIMenu(
+            options: .displayInline,
+            children: {
+              var actions = [UIMenuElement]()
+              if PlaylistFolder.getOtherFoldersCount() > 0 {
+                actions.append(
+                  UIAction(
+                    title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(systemName: "folder"),
+                    handler: { [weak self] _ in
+                      self?.moveItems(indexPaths: [indexPath])
+                    }))
+              }
 
-        UIMenu(
-          options: .displayInline,
-          children: {
-            var actions = [UIMenuElement]()
-            if PlaylistFolder.getOtherFoldersCount() > 0 {
               actions.append(
                 UIAction(
-                  title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(systemName: "folder"),
+                  title: Strings.PlayList.sharePlaylistShareActionMenuTitle, image: UIImage(systemName: "square.and.arrow.up"),
                   handler: { [weak self] _ in
-                    self?.moveItems(indexPaths: [indexPath])
+                    self?.shareItem(currentItem, anchorView: tableView.cellForRow(at: indexPath))
                   }))
-            }
 
-            actions.append(
-              UIAction(
-                title: Strings.PlayList.sharePlaylistShareActionMenuTitle, image: UIImage(systemName: "square.and.arrow.up"),
-                handler: { [weak self] _ in
-                  self?.shareItem(currentItem, anchorView: tableView.cellForRow(at: indexPath))
-                }))
+              return actions
+            }()),
 
-            return actions
-          }()),
+          UIAction(
+            title: Strings.delete, image: UIImage(braveSystemNamed: "brave.trash"), attributes: .destructive,
+            handler: { [weak self] _ in
+              self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
+            })
+        ]
+      }
 
-        UIAction(
-          title: Strings.delete, image: UIImage(braveSystemNamed: "brave.trash"), attributes: .destructive,
-          handler: { [weak self] _ in
-            self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
-          }),
-      ])
+      return UIMenu(children: menuItems)
     }
 
     let identifier = NSDictionary(dictionary: [

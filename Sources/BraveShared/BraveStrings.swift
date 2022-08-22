@@ -1889,6 +1889,11 @@ extension Strings {
                       value: "Rename",
                       comment: "Menu Title for renaming a folder")
     
+    public static let saveOfflineDataMenuTitle =
+    NSLocalizedString("playlistFolderSharing.saveOfflineDataMenuTitle", tableName: "BraveShared", bundle: .strings,
+                      value: "Save Offline Data",
+                      comment: "Menu Title for saving offline data/cache")
+    
     public static let deleteOfflineDataMenuTitle =
     NSLocalizedString("playlistFolderSharing.deleteOfflineDataMenuTitle", tableName: "BraveShared", bundle: .strings,
                       value: "Remove Offline Data",

@@ -44,7 +44,7 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    PlaylistManager.shared.currentFolder?.sharedFolderId == nil
+    PlaylistManager.shared.currentFolder?.isPersistent == true
   }
 
   func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -165,7 +165,7 @@ extension PlaylistListViewController: UITableViewDataSource {
       return nil
     }
     
-    let isPersistent = folder.managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
+    let isPersistent = folder.isPersistent
     let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: Constants.playListMenuHeaderIdentifier) as? PlaylistMenuHeader
     return header?.then { header in
       header.titleLabel.text = folder.title
@@ -275,6 +275,21 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.present(hostingController, animated: true, completion: nil)
         }
         
+        var canSaveOffline = true
+        for item in folder.playlistItems ?? [] {
+          if let cachedData = item.cachedData, !cachedData.isEmpty {
+            canSaveOffline = false
+          }
+        }
+        
+        let saveOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.saveOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "brave.cloud.and.arrow.down")?.template) { [unowned self] _ in
+          folder.playlistItems?.forEach {
+            PlaylistManager.shared.download(item: PlaylistInfo(item: $0))
+          }
+          
+          self.tableView.reloadData()
+        }
+        
         let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "brave.cloud.slash")?.template) { [unowned self] _ in
           folder.playlistItems?.forEach {
             if let itemId = $0.uuid {
@@ -292,14 +307,14 @@ extension PlaylistListViewController: UITableViewDataSource {
         }
         
         if folder.sharedFolderId != nil {
-          return UIMenu(children: [syncAction, editAction, renameAction, deleteOfflineAction, deleteAction])
+          return UIMenu(children: [syncAction, renameAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction, deleteAction])
         }
         
         if folder.uuid == PlaylistFolder.savedFolderUUID {
-          return UIMenu(children: [editAction, deleteOfflineAction, deleteAction])
+          return UIMenu(children: [editAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction, deleteAction])
         }
         
-        return UIMenu(children: [editAction, renameAction, deleteOfflineAction, deleteAction])
+        return UIMenu(children: [editAction, renameAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction, deleteAction])
       }()
     }
   }
