@@ -178,7 +178,7 @@ public class BraveRewards: NSObject {
       ledger?.selectedTabId = UInt32(tabId)
       tabRetrieved(tabId, url: url, faviconURL: faviconURL, html: nil)
     }
-    ads.reportTabUpdated(tabId, url: url, isSelected: isSelected, isPrivate: isPrivate)
+    ads.reportTabUpdated(tabId, url: url, redirectedFrom: [], isSelected: isSelected, isPrivate: isPrivate)
   }
 
   /// Report that a page has loaded in the current browser tab, and the HTML is available for analysis

@@ -37,7 +37,7 @@ extension WalletStore {
       walletService: walletService,
       assetRatioService: assetRatioService,
       swapService: swapService,
-      blockchainRegistry: BraveCoreMain.blockchainRegistry,
+      blockchainRegistry: BraveWalletAPI.blockchainRegistry,
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy
@@ -67,7 +67,7 @@ extension CryptoStore {
       walletService: walletService,
       assetRatioService: assetRatioService,
       swapService: swapService,
-      blockchainRegistry: BraveCoreMain.blockchainRegistry,
+      blockchainRegistry: BraveWalletAPI.blockchainRegistry,
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy

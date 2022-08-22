@@ -412,10 +412,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     tabManager.addNavigationDelegate(self)
     tabManager.makeWalletEthProvider = { [weak self] tab in
       guard let self = self,
-            let provider = self.braveCore.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
+            let provider = self.braveCore.braveWalletAPI.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate),
+            let js = self.braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] else {
         return nil
       }
-      return (provider, js: self.braveCore.providerScript(for: .eth))
+      return (provider, js: js)
     }
     downloadQueue.delegate = self
 
