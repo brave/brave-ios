@@ -82,6 +82,7 @@ class BraveSkusScriptHandler: TabContentScript {
         log.debug("skus refreshOrder")
         self?.callback(methodId: 1, result: json, replyHandler: replyHandler)
       } catch {
+        self?.callback(methodId: 1, result: "", replyHandler: replyHandler)
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
@@ -105,7 +106,7 @@ class BraveSkusScriptHandler: TabContentScript {
           BraveVPN.setCustomVPNCredential(vpnCredential.credential, environment: vpnCredential.environment)
         }
       } else {
-        assertionFailure()
+        //assertionFailure()
       }
       
       self?.callback(methodId: 3, result: credential, replyHandler: replyHandler)
@@ -125,7 +126,7 @@ class BraveSkusScriptHandler: TabContentScript {
            let date = BraveSkusWebHelper.milisecondsOptionalDate(from: expiresDate) {
           Preferences.VPN.expirationDate.value = date
         } else {
-          assertionFailure("Failed to parse date")
+          //assertionFailure("Failed to parse date")
         }
         
         self?.handlePrepareCredentialsSummary(for: domain, path: "*", replyHandler: replyHandler)
@@ -136,8 +137,8 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   private func callback(methodId: Int, result: Any, replyHandler: ReplyHandler) {
-    let args: [Any] = ["\(methodId)", result]
+    //let args: [Any] = ["\(methodId)", result]
     
-    replyHandler(args, nil)
+    replyHandler(result, nil)
   }
 }
