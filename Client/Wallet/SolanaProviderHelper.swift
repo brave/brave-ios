@@ -193,10 +193,11 @@ class SolanaProviderHelper: TabContentScript {
   }
   
   @MainActor private func createPublicKey(_ publicKey: String) async -> String? {
-    // TODO: Inject	`BraveWalletProviderScriptKey.solanaInternal` in `UserScriptManager` here so `_brave_solana.createPublicKey` is available
-    guard let webView = tab?.webView else {
+    guard let webView = tab?.webView,
+          let userScriptManager = tab?.userScriptManager else {
       return nil
     }
+    await userScriptManager.injectSolanaInternalScript()
     let (value, _) = await webView.evaluateSafeJavaScript(
       functionName: "_brave_solana.createPublickey",
       args: [publicKey],
@@ -206,10 +207,11 @@ class SolanaProviderHelper: TabContentScript {
   }
   
   @MainActor private func createTransaction(_ serializedTx: [NSNumber]) async -> String? {
-    // TODO: Inject  `BraveWalletProviderScriptKey.solanaInternal` in `UserScriptManager` here so `_brave_solana.createTransaction` is available
-    guard let webView = tab?.webView else {
+    guard let webView = tab?.webView,
+          let userScriptManager = tab?.userScriptManager else {
       return nil
     }
+    await userScriptManager.injectSolanaInternalScript()
     let (value, _) = await webView.evaluateSafeJavaScript(
       functionName: "_brave_solana.createTransaction",
       args: [serializedTx],
