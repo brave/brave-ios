@@ -22,19 +22,15 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(for: indexPath) as TwoLineTableViewCell
+    let cell = tableView.dequeueReusableCell(for: indexPath) as TabSyncTableViewCell
 
-    if self.tableView(tableView, hasFullWidthSeparatorForRowAtIndexPath: indexPath) {
-      cell.separatorInset = .zero
-    }
-    
     configureCell(cell, atIndexPath: indexPath)
 
     return cell
   }
   
-  func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
-    guard let cell = cell as? TwoLineTableViewCell else { return }
+  private func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
+    guard let cell = cell as? TabSyncTableViewCell else { return }
 
     guard let distantTab = sessionList[safe: indexPath.section]?.tabs[safe: indexPath.row] else {
       return
@@ -44,31 +40,22 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
       $0.backgroundColor = .clear
       $0.detailTextLabel?.font = .preferredFont(forTextStyle: .subheadline)
       $0.setLines(distantTab.title, detailText: distantTab.url.absoluteString)
-
-      $0.imageView?.contentMode = .scaleAspectFit
-      $0.imageView?.image = FaviconFetcher.defaultFaviconImage
-      $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
-      $0.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
-      $0.imageView?.layer.cornerRadius = 6
-      $0.imageView?.layer.cornerCurve = .continuous
-      $0.imageView?.layer.masksToBounds = true
-
+    }
+    
+    cell.imageIconView.do {
+      $0.contentMode = .scaleAspectFit
+      $0.image = FaviconFetcher.defaultFaviconImage
+      $0.layer.borderColor = BraveUX.faviconBorderColor.cgColor
+      $0.layer.borderWidth = BraveUX.faviconBorderWidth
+      $0.layer.cornerRadius = 6
+      $0.layer.cornerCurve = .continuous
+      $0.layer.masksToBounds = true
+      
       // TODO: Remove Domain creation and load FavIcon method swap the method with brave-core fetch #5312
-      let domain = Domain.getOrCreate(
-        forUrl: distantTab.url,
-        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
-
-      if let url = domain.url?.asURL {
-        cell.imageView?.loadFavicon(
-          for: url,
-          domain: domain,
-          fallbackMonogramCharacter: distantTab.title?.first,
-          shouldClearMonogramFavIcon: false,
-          cachedOnly: true)
-      } else {
-        cell.imageView?.clearMonogramFavicon()
-        cell.imageView?.image = FaviconFetcher.defaultFaviconImage
-      }
+      $0.loadFavicon(
+        for: distantTab.url,
+        fallbackMonogramCharacter: distantTab.title?.first,
+        cachedOnly: true)
     }
   }
   
@@ -111,10 +98,6 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
     return headerView
   }
   
-  func tableView(_ tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: IndexPath) -> Bool {
-    false
-  }
-
   func toggleSection(_ header: TabSyncHeaderView, section: Int) {
     func indexPathsForSection() -> [IndexPath] {
       var indexPaths = [IndexPath]()

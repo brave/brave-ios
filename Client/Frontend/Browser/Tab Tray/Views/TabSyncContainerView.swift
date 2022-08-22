@@ -36,10 +36,12 @@ extension TabTrayController {
       }
 
       tableView.do {
-        $0.register(TwoLineTableViewCell.self)
+        $0.register(TabSyncTableViewCell.self)
         $0.registerHeaderFooter(TabSyncHeaderView.self)
         $0.layoutMargins = .zero
         $0.backgroundColor = .secondaryBraveBackground
+        $0.estimatedRowHeight = SiteTableViewControllerUX.rowHeight
+        $0.estimatedSectionHeaderHeight = SiteTableViewControllerUX.rowHeight
         $0.separatorColor = .braveSeparator
         $0.cellLayoutMarginsFollowReadableWidth = false
         if #available(iOS 15.0, *) {

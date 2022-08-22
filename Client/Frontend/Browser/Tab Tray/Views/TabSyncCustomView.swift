@@ -118,3 +118,65 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     CATransaction.commit()
   }
 }
+
+class TabSyncTableViewCell: UITableViewCell, TableViewReusable {
+    
+  var delegate: TabSyncHeaderViewDelegate?
+  
+  let imageIconView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+    $0.tintColor = .braveLabel
+  }
+    
+  let labelStackView = UIStackView().then {
+    $0.axis = .vertical
+    $0.alignment = .leading
+    $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+  }
+  
+  let titleLabel = UILabel().then {
+    $0.textColor = .braveLabel
+    $0.font = .preferredFont(forTextStyle: .footnote)
+  }
+  
+  let descriptionLabel = UILabel().then {
+    $0.textColor = .secondaryBraveLabel
+    $0.font = .preferredFont(forTextStyle: .subheadline)
+  }
+  
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+    contentView.backgroundColor = .clear
+    
+    contentView.addSubview(imageIconView)
+    contentView.addSubview(labelStackView)
+
+    labelStackView.addArrangedSubview(titleLabel)
+    labelStackView.setCustomSpacing(3.0, after: titleLabel)
+    labelStackView.addArrangedSubview(descriptionLabel)
+
+    imageIconView.snp.makeConstraints {
+      $0.leading.equalToSuperview().inset(TwoLineCellUX.borderViewMargin)
+      $0.centerY.equalToSuperview()
+      $0.size.equalTo(TwoLineCellUX.imageSize)
+    }
+    
+    labelStackView.snp.makeConstraints {
+      $0.leading.equalTo(imageIconView.snp.trailing).offset(TwoLineCellUX.borderViewMargin)
+      $0.trailing.equalToSuperview().offset(5.0)
+      $0.top.equalToSuperview().offset(5.0)
+      $0.bottom.equalToSuperview().offset(-5.0)
+    }
+  }
+    
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setLines(_ text: String?, detailText: String?) {
+    titleLabel.text = text
+    descriptionLabel.text = detailText
+  }
+}
