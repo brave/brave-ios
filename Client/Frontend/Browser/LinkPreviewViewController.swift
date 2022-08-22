@@ -24,7 +24,7 @@ class LinkPreviewViewController: UIViewController {
       $0.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
     }
 
-    let wk = WKWebView(frame: view.frame, configuration: configuration)
+    let wk = BraveWebView(frame: view.frame, configuration: configuration)
 
     let domain = Domain.getOrCreate(forUrl: url, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
 
