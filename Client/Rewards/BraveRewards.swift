@@ -168,17 +168,18 @@ public class BraveRewards: NSObject {
 
   /// Report that a tab with a given id was updated
   func reportTabUpdated(
-    _ tabId: Int,
+    tab: Tab,
     url: URL,
     faviconURL: URL?,
     isSelected: Bool,
     isPrivate: Bool
   ) {
+    let tabId = Int(tab.rewardsId)
     if isSelected {
       ledger?.selectedTabId = UInt32(tabId)
       tabRetrieved(tabId, url: url, faviconURL: faviconURL, html: nil)
     }
-    ads.reportTabUpdated(tabId, url: url, redirectedFrom: [], isSelected: isSelected, isPrivate: isPrivate)
+    ads.reportTabUpdated(tabId, url: url, redirectedFrom: tab.redirectURLs, isSelected: isSelected, isPrivate: isPrivate)
   }
 
   /// Report that a page has loaded in the current browser tab, and the HTML is available for analysis
