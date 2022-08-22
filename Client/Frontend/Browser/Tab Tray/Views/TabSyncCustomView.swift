@@ -14,7 +14,14 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
   var delegate: TabSyncHeaderViewDelegate?
   var section = 0
-  private var isCollapsed = false
+  var isCollapsed = false {
+    didSet {
+      if oldValue == isCollapsed { return }
+      
+      let rotationAngle = isCollapsed ? -1 * (.pi / 2) : 0.0
+      arrowIconView.transform = CGAffineTransform(rotationAngle: rotationAngle)
+    }
+  }
   
   let imageIconView = UIImageView().then {
     $0.contentMode = .scaleAspectFit

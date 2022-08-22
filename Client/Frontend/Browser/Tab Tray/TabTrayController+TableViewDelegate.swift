@@ -91,6 +91,7 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate, TabSync
       if let modifiedTime = sectionDetails.modifiedTime {
         $0.descriptionLabel.text = modifiedTime.formattedSyncSessionPeriodDate
       }
+      $0.isCollapsed = hiddenSections.contains(section)
       $0.section = section
       $0.delegate = self
     }
