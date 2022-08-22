@@ -201,4 +201,17 @@ class UserScriptManager {
       }
     }
   }
+  
+  @MainActor func injectSolanaInternalScript() async {
+    guard let webView = tab?.webView,
+          let solanaInternalScript = walletSolProviderScripts[.solanaInternal] else {
+      return
+    }
+    await webView.evaluateSafeJavaScript(
+      functionName: solanaInternalScript,
+      args: [],
+      contentWorld: .page,
+      asFunction: false
+    )
+  }
 }
