@@ -12,7 +12,10 @@ struct PlaylistFolderSharingManagementView: View {
   private struct UX {
     static let hPadding = 20.0
     static let vPadding = 20.0
+    static let vMidSpacing = 6.0
   }
+  
+  @State private var contentSize: CGSize = .zero
   
   var onAddToPlaylistPressed: (() -> Void)?
   var onSettingsPressed: (() -> Void)?
@@ -34,49 +37,57 @@ struct PlaylistFolderSharingManagementView: View {
           .padding(.horizontal, UX.hPadding)
           .padding(.bottom, UX.vPadding)
         
-        VStack(spacing: UX.vPadding) {
+        VStack(spacing: UX.vMidSpacing) {
           Button(action: {
             onAddToPlaylistPressed?()
           }) {
             Text(Strings.PlaylistFolderSharing.offlineManagementViewAddButtonTitle)
+              .foregroundColor(Color(.bravePrimary))
               .frame(maxWidth: .infinity)
-              .font(.callout.weight(.medium))
-              .padding()
           }
           .frame(minHeight: 44.0)
-          .background(Color(.braveBlurple))
-          .clipShape(Capsule())
+          .buttonStyle(BraveFilledButtonStyle(size: .normal))
           
           Button(action: {
             onSettingsPressed?()
           }) {
             Text(Strings.PlaylistFolderSharing.offlineManagementViewSettingsButtonTitle)
+              .foregroundColor(Color(.bravePrimary))
               .frame(maxWidth: .infinity)
-              .font(.callout.weight(.medium))
-              .padding()
           }
           .frame(minHeight: 44.0)
-          .background(Color(.braveBlurple))
-          .clipShape(Capsule())
+          .buttonStyle(BraveOutlineButtonStyle(size: .normal))
           
           Button(action: {
             onCancelPressed?()
           }) {
             Text(Strings.cancelButtonTitle)
               .frame(maxWidth: .infinity)
-              .font(.callout.weight(.medium))
-              .padding()
+              .font(BraveButtonSize.normal.font)
+              .foregroundColor(Color(.bravePrimary))
+              .padding(BraveButtonSize.normal.padding)
+              .clipShape(Capsule())
+              .contentShape(Capsule())
           }
           .frame(minHeight: 44.0)
-          .foregroundColor(Color(.braveLighterBlurple))
-          .clipShape(Capsule())
         }
         .padding(.horizontal, UX.hPadding)
       }
       .accentColor(Color(.white))
       .padding(EdgeInsets(top: UX.vPadding, leading: UX.hPadding, bottom: UX.vPadding, trailing: UX.hPadding))
-      .background(Color(.braveBackground))
+      .background(
+        GeometryReader { geometry in
+          Color(.braveBackground)
+            .onAppear {
+              contentSize = geometry.size
+            }
+            .onChange(of: geometry.size) { size in
+              contentSize = size
+            }
+        }
+      )
     }
+    .frame(maxHeight: contentSize.height)
     .environment(\.colorScheme, .dark)
   }
 }
