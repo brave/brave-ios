@@ -65,6 +65,7 @@ public class SettingsStore: ObservableObject {
     walletService.reset()
     keychain.resetPasswordInKeychain(key: KeyringStore.passwordKeychainKey)
     Domain.clearAllWalletPermissions(for: .eth)
+    // TODO: will need to clear permission for `.sol` coin type once we support solana Dapps
     Preferences.Wallet.defaultEthWallet.reset()
     Preferences.Wallet.allowDappProviderAccountRequests.reset()
     Preferences.Wallet.displayWeb3Notifications.reset()

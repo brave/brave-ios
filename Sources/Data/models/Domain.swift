@@ -244,7 +244,7 @@ public final class Domain: NSManagedObject, CRUD {
           }
         }
       } catch {
-        log.error("Clear ethereum permissions error: \(error)")
+        log.error("Clear coin(\(coin)) accounts permissions error: \(error)")
       }
 
       DispatchQueue.main.async {
