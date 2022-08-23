@@ -12,6 +12,10 @@ protocol TabSyncHeaderViewDelegate {
 
 class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
+  struct UX {
+    static let labelOffset = 5.0
+  }
+  
   var delegate: TabSyncHeaderViewDelegate?
   var section = 0
   var isCollapsed = false {
@@ -71,9 +75,9 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     
     labelStackView.snp.makeConstraints {
       $0.leading.equalTo(imageIconView.snp.trailing).offset(TwoLineCellUX.borderViewMargin)
-      $0.trailing.equalToSuperview().offset(5.0)
-      $0.top.equalToSuperview().offset(5.0)
-      $0.bottom.equalToSuperview().offset(-5.0)
+      $0.trailing.equalToSuperview().offset(-UX.labelOffset)
+      $0.top.equalToSuperview().offset(UX.labelOffset)
+      $0.bottom.equalToSuperview().offset(-UX.labelOffset)
     }
     
     arrowIconView.snp.makeConstraints {
@@ -128,6 +132,10 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
 
 class TabSyncTableViewCell: UITableViewCell, TableViewReusable {
     
+  struct UX {
+    static let labelOffset = 5.0
+  }
+  
   var delegate: TabSyncHeaderViewDelegate?
   
   let imageIconView = UIImageView().then {
@@ -171,9 +179,9 @@ class TabSyncTableViewCell: UITableViewCell, TableViewReusable {
     
     labelStackView.snp.makeConstraints {
       $0.leading.equalTo(imageIconView.snp.trailing).offset(TwoLineCellUX.borderViewMargin)
-      $0.trailing.equalToSuperview().offset(5.0)
-      $0.top.equalToSuperview().offset(5.0)
-      $0.bottom.equalToSuperview().offset(-5.0)
+      $0.trailing.equalToSuperview().offset(-UX.labelOffset)
+      $0.top.equalToSuperview().offset(UX.labelOffset)
+      $0.bottom.equalToSuperview().offset(-UX.labelOffset)
     }
   }
     
