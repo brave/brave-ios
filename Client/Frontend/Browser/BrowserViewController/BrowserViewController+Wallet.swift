@@ -276,6 +276,20 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
+    // TODO: can be called when Solana dapp tries to connect but user does not have Solana account
+  }
+  
+  func isSolanaAccountConnected(_ account: String, completion: @escaping (Bool) -> Void) {
+    // TODO: Track currently connected accounts, return true if account previously added
+    completion(false)
+  }
+  
+  func addSolanaConnectedAccount(_ account: String) {
+    
+  }
+  
+  func removeSolanaConnectedAccount(_ account: String) {
+    
   }
   
   func isSolanaAccountConnected(_ account: String) -> Bool {
@@ -421,7 +435,25 @@ extension Tab: BraveWalletSolanaEventsListener {
         contentWorld: .page,
         asFunction: false
       )
-      // TODO: publicKey
+      // publicKey
+      if let keyringService = walletKeyringService,
+         let userScriptManager = userScriptManager,
+         let publicKey = await keyringService.selectedAccount(.sol) {
+        await userScriptManager.injectSolanaInternalScript()
+        let (createdPublicKey, _) = await webView.evaluateSafeJavaScript(
+          functionName: "_brave_solana.createPublickey",
+          args: [publicKey],
+          contentWorld: .page
+        )
+        guard let createdPublicKey = createdPublicKey else {
+          return // `createPublicKey` function failed
+        }
+        await webView.evaluateSafeJavaScript(
+          functionName: "window.solana.publicKey = \(createdPublicKey)",
+          contentWorld: .page,
+          asFunction: false
+        )
+      }
     }
   }
 }
