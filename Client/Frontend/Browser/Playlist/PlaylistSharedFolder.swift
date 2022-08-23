@@ -16,6 +16,8 @@ public struct PlaylistSharedFolderModel: Codable {
   public let creatorName: String
   public let creatorLink: String
   public let updateAt: String
+  public var folderUrl: String?
+  public var eTag: String?
   public var mediaItems: [PlaylistInfo]
   
   public init(from decoder: Decoder) throws {
@@ -84,8 +86,8 @@ public struct PlaylistSharedFolderModel: Codable {
 }
 
 public struct PlaylistSharedFolderNetwork {
-  public static func fetchPlaylist(playlistId: String) async throws -> PlaylistSharedFolderModel {
-    guard let playlistURL = URL(string: "\(playlistId)")?.appendingPathComponent("playlist").appendingPathExtension("json") else {
+  public static func fetchPlaylist(folderUrl: String) async throws -> PlaylistSharedFolderModel {
+    guard let playlistURL = URL(string: folderUrl)?.appendingPathComponent("playlist").appendingPathExtension("json") else {
       throw "Invalid Playlist URL"
     }
     
@@ -93,11 +95,23 @@ public struct PlaylistSharedFolderNetwork {
     let session = URLSession(configuration: .ephemeral, delegate: authenticator, delegateQueue: .main)
     defer { session.finishTasksAndInvalidate() }
     
-    let (data, response) = try await NetworkManager(session: session).dataRequest(with: playlistURL)
-    if let response = response as? HTTPURLResponse, response.statusCode != 200 {
-      throw "Invalid Response Status Code: \(response.statusCode)"
+    var request = URLRequest(url: playlistURL)
+    request.httpMethod = "GET"
+    
+    if let eTag = PlaylistFolder.getSharedFolder(sharedFolderUrl: folderUrl)?.sharedFolderETag {
+      request.setValue(eTag, forHTTPHeaderField: "If-None-Match")
     }
-    return try JSONDecoder().decode(PlaylistSharedFolderModel.self, from: data)
+    
+    let (data, response) = try await NetworkManager(session: session).dataRequest(with: request)
+    guard let response = response as? HTTPURLResponse,
+              response.statusCode == 304 || response.statusCode >= 200 || response.statusCode <= 299 else {
+      throw "Invalid Response Status Code"
+    }
+    
+    var model = try JSONDecoder().decode(PlaylistSharedFolderModel.self, from: data)
+    model.folderUrl = folderUrl
+    model.eTag = response.allHeaderFields["ETag"] as? String
+    return model
   }
   
   @MainActor
@@ -107,7 +121,9 @@ public struct PlaylistSharedFolderNetwork {
       PlaylistFolder.addInMemoryFolder(title: model.folderName,
                                        creatorName: model.creatorName,
                                        creatorLink: model.creatorLink,
-                                       sharedFolderId: model.folderId) { folder, folderId in
+                                       sharedFolderId: model.folderId,
+                                       sharedFolderUrl: model.folderUrl,
+                                       sharedFolderETag: model.eTag) { folder, folderId in
         // Add the items to the folder
         PlaylistItem.addInMemoryItems(model.mediaItems, folderUUID: folderId) {
           // Items were added
@@ -128,14 +144,12 @@ public struct PlaylistSharedFolderNetwork {
     })
   }
   
-  public static func fetchMediaItemInfo(item: PlaylistSharedFolderModel) async -> [PlaylistInfo] {
+  public static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async -> [PlaylistInfo] {
     @Sendable @MainActor
     func fetchTask(item: PlaylistInfo) async -> PlaylistInfo {
       await withCheckedContinuation { continuation in
         var webLoader: PlaylistWebLoader?
-        webLoader = PlaylistWebLoader(
-          certStore: nil,
-          handler: { newItem in
+        webLoader = PlaylistWebLoader(handler: { newItem in
             if let newItem = newItem {
               PlaylistManager.shared.getAssetDuration(item: newItem) { duration in
                 let item = PlaylistInfo(name: item.name,
@@ -161,7 +175,7 @@ public struct PlaylistSharedFolderNetwork {
             }
           }
         ).then {
-          UIApplication.shared.keyWindow?.insertSubview($0, at: 0)
+          viewForInvisibleWebView.insertSubview($0, at: 0)
         }
 
         if let url = URL(string: item.pageSrc) {

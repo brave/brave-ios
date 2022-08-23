@@ -35,6 +35,7 @@ protocol PlaylistViewControllerDelegate: AnyObject {
   func displayLoadingResourceError()
   func displayExpiredResourceError(item: PlaylistInfo)
   func openURLInNewTab(_ url: URL?, isPrivate: Bool, isPrivileged: Bool)
+  func openPlaylistSettings()
 
   var isPlaying: Bool { get }
   var currentPlaylistItem: AVPlayerItem? { get }
@@ -62,10 +63,12 @@ class PlaylistViewController: UIViewController {
   private var assetLoadingStateObservers = Set<AnyCancellable>()
 
   private var openInNewTab: ((_ url: URL?, _ isPrivate: Bool, _ isPrivileged: Bool) -> Void)?
-  private var folderSharingId: String?
+  private var openPlaylistSettingsMenu: (() -> Void)?
+  private var folderSharingUrl: String?
 
   init(
     openInNewTab: ((URL?, Bool, Bool) -> Void)?,
+    openPlaylistSettingsMenu: (() -> Void)?,
     profile: Profile?,
     mediaPlayer: MediaPlayer,
     initialItem: PlaylistInfo?,
@@ -73,11 +76,10 @@ class PlaylistViewController: UIViewController {
   ) {
 
     self.openInNewTab = openInNewTab
+    self.openPlaylistSettingsMenu = openPlaylistSettingsMenu
     self.player = mediaPlayer
-    self.mediaStreamer = PlaylistMediaStreamer(
-      playerView: playerView,
-      certStore: profile?.certStore)
-    self.folderSharingId = nil
+    self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView)
+    self.folderSharingUrl = nil
     super.init(nibName: nil, bundle: nil)
 
     listController.initialItem = initialItem
@@ -155,8 +157,16 @@ class PlaylistViewController: UIViewController {
       $0.minimumPrimaryColumnWidth = 400
     }
     
-    if let folderSharingId = folderSharingId {
-      setFolderSharingId(folderSharingId)
+    if let folderSharingUrl = folderSharingUrl {
+      if let navigationController = folderController.navigationController {
+        navigationController.popToRootViewController(animated: false)
+        splitController.preferredDisplayMode = .oneOverSecondary
+        listController.loadingState = .loading
+        PlaylistManager.shared.currentFolder = nil
+        navigationController.pushViewController(listController, animated: false)
+      }
+      
+      setFolderSharingUrl(folderSharingUrl)
     } else if let initialItem = listController.initialItem,
       let item = PlaylistItem.getItem(uuid: initialItem.tagId) {
       PlaylistManager.shared.currentFolder = item.playlistFolder
@@ -189,21 +199,23 @@ class PlaylistViewController: UIViewController {
     updateLayoutForOrientationMode()
   }
   
-  func setFolderSharingId(_ folderSharingId: String) {
-    self.folderSharingId = folderSharingId
-    
-    if let navigationController = folderController.navigationController {
-      navigationController.popToRootViewController(animated: false)
-      
-      splitController.preferredDisplayMode = .oneOverSecondary
-      listController.loadingState = .loading
-      PlaylistManager.shared.currentFolder = nil
-      folderController.navigationController?.pushViewController(listController, animated: false)
+  func setFolderSharingUrl(_ folderSharingUrl: String) {
+    self.folderSharingUrl = folderSharingUrl
+    if presentingViewController != nil || navigationController != nil || parent != nil {
+      self.folderSharingUrl = nil
 
       Task { @MainActor in
+        // Shared Folder already exists
+        if let existingFolder = PlaylistFolder.getSharedFolder(sharedFolderUrl: folderSharingUrl) {
+          PlaylistManager.shared.currentFolder = existingFolder
+          self.listController.loadingState = .fullyLoaded
+          return
+        }
+        
+        // Shared Folder doesn't exist
         do {
           self.playerView.setStaticImage(image: UIImage())
-          let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(playlistId: folderSharingId)
+          let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(folderUrl: folderSharingUrl)
           let folder = await PlaylistSharedFolderNetwork.createInMemoryStorage(for: model)
           PlaylistManager.shared.currentFolder = folder
           self.listController.loadingState = .partial
@@ -226,7 +238,7 @@ class PlaylistViewController: UIViewController {
           }
           
           Task { @MainActor in
-            let items = await PlaylistSharedFolderNetwork.fetchMediaItemInfo(item: model)
+            let items = await PlaylistSharedFolderNetwork.fetchMediaItemInfo(item: model, viewForInvisibleWebView: self.view)
             folder.playlistItems?.forEach({ playlistItem in
               if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
                 playlistItem.name = item.name
@@ -632,6 +644,15 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
 
   func openURLInNewTab(_ url: URL?, isPrivate: Bool, isPrivileged: Bool) {
     openInNewTab?(url, isPrivate, isPrivileged)
+  }
+  
+  func openPlaylistSettings() {
+    let openMenu = openPlaylistSettingsMenu
+    self.dismiss(animated: false) {
+      DispatchQueue.main.async {
+        openMenu?()
+      }
+    }
   }
 
   var currentPlaylistItem: AVPlayerItem? {

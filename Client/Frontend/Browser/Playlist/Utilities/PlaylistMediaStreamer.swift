@@ -26,9 +26,8 @@ class PlaylistMediaStreamer {
     case other(Error)
   }
 
-  init(playerView: UIView, certStore: CertStore?) {
+  init(playerView: UIView) {
     self.playerView = playerView
-    self.certStore = certStore
   }
 
   func loadMediaStreamingAsset(_ item: PlaylistInfo) -> AnyPublisher<Void, PlaybackError> {
@@ -75,9 +74,7 @@ class PlaylistMediaStreamer {
           return
         }
 
-        self.webLoader = PlaylistWebLoader(
-          certStore: self.certStore,
-          handler: { [weak self] newItem in
+        self.webLoader = PlaylistWebLoader(handler: { [weak self] newItem in
             guard let self = self else { return }
             defer {
               // Destroy the web loader when the callback is complete.
@@ -99,7 +96,7 @@ class PlaylistMediaStreamer {
           // If we don't do this, youtube shows ads 100% of the time.
           // It's some weird race-condition in WKWebView where the content blockers may not load until
           // The WebView is visible!
-          self.playerView?.window?.insertSubview($0, at: 0) ?? UIApplication.shared.keyWindow?.insertSubview($0, at: 0)
+          self.playerView?.insertSubview($0, at: 0)
         }
 
         if let url = URL(string: item.pageSrc) {

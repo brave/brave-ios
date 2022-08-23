@@ -16,6 +16,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var order: Int32
   @NSManaged public var dateAdded: Date?
   @NSManaged public var sharedFolderId: String?
+  @NSManaged public var sharedFolderUrl: String?
+  @NSManaged public var sharedFolderETag: String?
   @NSManaged public var creatorName: String?
   @NSManaged public var creatorLink: String?
   @NSManaged public var playlistItems: Set<PlaylistItem>?
@@ -64,6 +66,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       playlistFolder.order = Int32.min
       playlistFolder.uuid = folderId
       playlistFolder.sharedFolderId = nil
+      playlistFolder.sharedFolderUrl = nil
+      playlistFolder.sharedFolderETag = nil
 
       PlaylistFolder.reorderItems(context: context)
       PlaylistFolder.saveContext(context)
@@ -74,7 +78,7 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
     }
   }
   
-  public static func addInMemoryFolder(title: String, creatorName: String, creatorLink: String, sharedFolderId: String, completion: ((_ folder: PlaylistFolder, _ uuid: String) -> Void)? = nil) {
+  public static func addInMemoryFolder(title: String, creatorName: String, creatorLink: String, sharedFolderId: String, sharedFolderUrl: String?, sharedFolderETag: String?, completion: ((_ folder: PlaylistFolder, _ uuid: String) -> Void)? = nil) {
     DataController.perform(context: .existing(DataController.viewContextInMemory), save: false) { context in
       context.perform {
         let folderId = UUID().uuidString
@@ -86,6 +90,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
         playlistFolder.order = Int32.min
         playlistFolder.uuid = folderId
         playlistFolder.sharedFolderId = sharedFolderId
+        playlistFolder.sharedFolderUrl = sharedFolderUrl
+        playlistFolder.sharedFolderETag = sharedFolderETag
         
         PlaylistFolder.reorderItems(context: context)
         PlaylistFolder.saveContext(context)
@@ -107,6 +113,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       playlistFolder.order = Int32.min
       playlistFolder.dateAdded = folder.dateAdded
       playlistFolder.sharedFolderId = folder.sharedFolderId
+      playlistFolder.sharedFolderUrl = folder.sharedFolderUrl
+      playlistFolder.sharedFolderETag = folder.sharedFolderETag
       playlistFolder.creatorName = folder.creatorName
       playlistFolder.creatorLink = folder.creatorLink
       
@@ -127,8 +135,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
     PlaylistFolder.first(where: NSPredicate(format: "uuid == %@", uuid), context: context ?? DataController.viewContext)
   }
   
-  public static func getSharedFolder(folderId: String, context: NSManagedObjectContext? = nil) -> PlaylistFolder? {
-    PlaylistFolder.first(where: NSPredicate(format: "sharedFolderId == %@", folderId), context: context ?? DataController.viewContext)
+  public static func getSharedFolder(sharedFolderUrl: String, context: NSManagedObjectContext? = nil) -> PlaylistFolder? {
+    PlaylistFolder.first(where: NSPredicate(format: "sharedFolderUrl == %@", sharedFolderUrl), context: context ?? DataController.viewContext)
   }
 
   public static func removeFolder(_ uuid: String) {

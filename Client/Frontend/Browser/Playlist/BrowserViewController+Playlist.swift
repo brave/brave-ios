@@ -306,13 +306,13 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
     }
   }
 
-  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingId: String? = nil) {
+  func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingPageUrl: String? = nil) {
     let playlistController = PlaylistCarplayManager.shared.getPlaylistController(tab: tab,
                                                                                  initialItem: item,
                                                                                  initialItemPlaybackOffset: playbackOffset)
     playlistController.modalPresentationStyle = .fullScreen
-    if let folderSharingId = folderSharingId {
-      playlistController.setFolderSharingId(folderSharingId)
+    if let folderSharingPageUrl = folderSharingPageUrl {
+      playlistController.setFolderSharingUrl(folderSharingPageUrl)
     }
 
     /// Donate Open Playlist Activity for suggestions
@@ -320,7 +320,11 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
     self.userActivity = openPlaylist
     openPlaylist.becomeCurrent()
 
-    present(playlistController, animated: true)
+    present(playlistController, animated: true) {
+      if let folderSharingPageUrl = folderSharingPageUrl {
+        playlistController.setFolderSharingUrl(folderSharingPageUrl)
+      }
+    }
   }
 
   func addToPlayListActivity(info: PlaylistInfo?, itemDetected: Bool) {
@@ -394,7 +398,15 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
   }
   
   // MARK: - PlaylistFolderSharingHelperDelegate
-  func openPlaylistSharingFolder(with playlistId: String) {
-    openPlaylist(tab: nil, item: nil, playbackOffset: 0.0, folderSharingId: playlistId)
+  func openPlaylistSharingFolder(with pageUrl: String) {
+    openPlaylist(tab: nil, item: nil, playbackOffset: 0.0, folderSharingPageUrl: pageUrl)
+  }
+}
+
+extension BrowserViewController {
+  func openPlaylistSettingsMenu() {
+    let playlistSettings = PlaylistSettingsViewController()
+    let navigationController = UINavigationController(rootViewController: playlistSettings)
+    self.present(navigationController, animated: true)
   }
 }

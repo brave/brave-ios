@@ -1,11 +1,15 @@
 window.__firefox__.includeOnce("PlaylistFolderSharing", function() {
-  function sendMessage(playlistId) {
+  function sendMessage(pageUrl) {
       if (window.webkit.messageHandlers.$<handler>) {
           window.webkit.messageHandlers.$<handler>.postMessage({
             "securitytoken": "$<security_token>",
-            "playlistId": playlistId
+            "pageUrl": pageUrl
           });
       }
+  }
+  
+  sendMessage.toString = function() {
+    return "function() {\n\t[native code]\n}";
   }
   
   if (!window.brave) {
@@ -14,8 +18,8 @@ window.__firefox__.includeOnce("PlaylistFolderSharing", function() {
   
   if (!window.brave.playlist) {
     window.brave.playlist = {};
-    window.brave.playlist.open = function(playlistId) {
-      sendMessage(playlistId);
+    window.brave.playlist.open = function(pageUrl) {
+      sendMessage(pageUrl);
     };
   }
 });

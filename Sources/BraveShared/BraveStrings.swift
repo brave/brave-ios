@@ -1926,10 +1926,20 @@ extension Strings {
                       value: "Settings",
                       comment: "Button that takes the user to the settings menu")
     
-    public static let playListSharedFolderSectionTitle =
-    NSLocalizedString("playList.playListSharedFolderSectionTitle", tableName: "BraveShared", bundle: .strings,
+    public static let playlistSharedFolderSectionTitle =
+    NSLocalizedString("playList.playlistSharedFolderSectionTitle", tableName: "BraveShared", bundle: .strings,
                       value: "Shared with you",
-                      comment: "Title For the Section that videos are listed")
+                      comment: "Title for the Section that videos are listed")
+    
+    public static let playlistSharedFolderAlreadyExistsTitle =
+    NSLocalizedString("playList.playlistSharedFolderAlreadyExistsTitle", tableName: "BraveShared", bundle: .strings,
+                      value: "Sorry",
+                      comment: "Title for the error message that shows when a playlist folder already exists")
+    
+    public static let playlistSharedFolderAlreadyExistsBody =
+    NSLocalizedString("playList.playlistSharedFolderAlreadyExistsBody", tableName: "BraveShared", bundle: .strings,
+                      value: "This folder already exists in your Brave Playlist",
+                      comment: "Body for the error message that shows when a playlist folder already exists")
   }
     
 }

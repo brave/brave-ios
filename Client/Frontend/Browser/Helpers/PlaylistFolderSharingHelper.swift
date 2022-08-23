@@ -12,7 +12,7 @@ import Data
 private let log = Logger.browserLogger
 
 protocol PlaylistFolderSharingHelperDelegate: AnyObject {
-  func openPlaylistSharingFolder(with id: String)
+  func openPlaylistSharingFolder(with pageUrl: String)
 }
 
 class PlaylistFolderSharingHelper: NSObject, TabContentScript {
@@ -37,20 +37,18 @@ class PlaylistFolderSharingHelper: NSObject, TabContentScript {
     
     if let sharingInfo = PlaylistFolderSharingInfo.from(message: message) {
       // This shared playlist folder already exists
-      if let sharedFolder = PlaylistFolder.getSharedFolder(folderId: sharingInfo.playlistId) {
-        message.webView?.evaluateSafeJavaScript(functionName: "window.brave.playlist.errorHandler",
-                                                args: ["Item Already Exists \(sharedFolder.title ?? sharingInfo.playlistId)"],
-                                                contentWorld: .page)
-      } else {
-        delegate?.openPlaylistSharingFolder(with: sharingInfo.playlistId)
+      var sharedFolderPageUrl = sharingInfo.pageUrl
+      if sharedFolderPageUrl.last != "/" {
+        sharedFolderPageUrl += "/"
       }
-      return
+      
+      delegate?.openPlaylistSharingFolder(with: sharedFolderPageUrl)
     }
   }
 }
 
 private struct PlaylistFolderSharingInfo: Codable {
-  public let playlistId: String
+  public let pageUrl: String
 
   public static func from(message: WKScriptMessage) -> PlaylistFolderSharingInfo? {
     if !JSONSerialization.isValidJSONObject(message.body) {

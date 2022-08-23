@@ -175,8 +175,11 @@ extension PlaylistListViewController: UITableViewDataSource {
             let persistentFolderId = await PlaylistSharedFolderNetwork.saveToDiskStorage(memoryFolder: folder)
             PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
           }
-        }, onSettingsPressed: {
-          // TODO: Take user to the settings screen
+        }, onSettingsPressed: { [unowned self] in
+          let delegate = self.delegate
+          self.dismiss(animated: false) {
+            delegate?.openPlaylistSettings()
+          }
         }, onCancelPressed: { [unowned self] in
           self.dismiss(animated: true)
         })).then {
@@ -193,11 +196,11 @@ extension PlaylistListViewController: UITableViewDataSource {
         else { return nil }
         
         let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")?.template) { _ in
-          guard let sharedFolderId = folder.sharedFolderId else { return }
+          guard let sharedFolderUrl = folder.sharedFolderUrl else { return }
           
           Task { @MainActor in
             do {
-              let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(playlistId: sharedFolderId)
+              let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(folderUrl: sharedFolderUrl)
               var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
               let deletedItems = oldItems.subtracting(model.mediaItems)
               let newItems = Set(model.mediaItems).subtracting(oldItems)
