@@ -54,7 +54,7 @@ class CookiesAndCacheClearable: Clearable {
     UserDefaults.standard.synchronize()
     await BraveWebView.sharedNonPersistentStore().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0))
     UserDefaults.standard.synchronize()
-    await Domain.clearAllEthereumPermissions()
+    await Domain.clearAllWalletPermissions(for: .eth)
   }
 }
 

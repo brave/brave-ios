@@ -241,7 +241,7 @@ public class KeyringStore: ObservableObject {
       }
       self.walletService.setSelectedCoin(.eth)
       self.rpcService.setNetwork(BraveWallet.MainnetChainId, coin: .eth, completion: { _ in })
-      Domain.clearAllEthereumPermissions()
+      Domain.clearAllWalletPermissions(for: .eth)
       completion?(isMnemonicValid)
     }
   }
