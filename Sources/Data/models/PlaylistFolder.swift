@@ -78,7 +78,7 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
     }
   }
   
-  public static func addInMemoryFolder(title: String, creatorName: String, creatorLink: String, sharedFolderId: String, sharedFolderUrl: String?, sharedFolderETag: String?, completion: ((_ folder: PlaylistFolder, _ uuid: String) -> Void)? = nil) {
+  public static func addInMemoryFolder(title: String, creatorName: String, creatorLink: String?, sharedFolderId: String, sharedFolderUrl: String?, sharedFolderETag: String?, completion: ((_ folder: PlaylistFolder, _ uuid: String) -> Void)? = nil) {
     DataController.perform(context: .existing(DataController.viewContextInMemory), save: false) { context in
       context.perform {
         let folderId = UUID().uuidString

@@ -220,13 +220,13 @@ class PlaylistViewController: UIViewController {
           PlaylistManager.shared.currentFolder = folder
           self.listController.loadingState = .partial
           
-          if let folderImage = URL(string: model.folderImage) {
+          if let folderImageUrl = model.folderImage {
             Task { @MainActor in
-              let authManager = BasicAuthCredentialsManager(for: [folderImage.absoluteString])
+              let authManager = BasicAuthCredentialsManager(for: [folderImageUrl.absoluteString])
               let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
               defer { session.finishTasksAndInvalidate() }
               
-              let (data, response) = try await NetworkManager(session: session).dataRequest(with: folderImage)
+              let (data, response) = try await NetworkManager(session: session).dataRequest(with: folderImageUrl)
               if let response = response as? HTTPURLResponse, response.statusCode != 200 {
                 return
               }

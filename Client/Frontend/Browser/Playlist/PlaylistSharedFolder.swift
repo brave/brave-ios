@@ -8,63 +8,43 @@ import UIKit
 import Data
 import CoreData
 
-public struct PlaylistSharedFolderModel: Codable {
-  public let version: String
-  public let folderId: String
-  public let folderName: String
-  public let folderImage: String
-  public let creatorName: String
-  public let creatorLink: String
-  public let updateAt: String
-  public var folderUrl: String?
-  public var eTag: String?
-  public var mediaItems: [PlaylistInfo]
+struct PlaylistSharedFolderModel: Decodable {
+  let version: String
+  let folderId: String
+  let folderName: String
+  @URLString private(set) var folderImage: URL?
+  let creatorName: String
+  @URLString private(set) var creatorLink: URL?
+  let updateAt: String
+  var folderUrl: String?
+  var eTag: String?
+  var mediaItems: [PlaylistInfo]
   
-  public init(from decoder: Decoder) throws {
+  init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     version = try container.decode(String.self, forKey: .version)
     folderId = try container.decode(String.self, forKey: .folderId)
     folderName = try container.decode(String.self, forKey: .folderName)
-    folderImage = try container.decode(String.self, forKey: .folderImage)
+    _folderImage = try container.decode(URLString.self, forKey: .folderImage)
     creatorName = try container.decode(String.self, forKey: .creatorName)
-    creatorLink = try container.decode(String.self, forKey: .creatorLink)
+    _creatorLink = try container.decode(URLString.self, forKey: .creatorLink)
     updateAt = try container.decode(String.self, forKey: .updateAt)
     mediaItems = try container.decode([MediaItem].self, forKey: .mediaItems).map { item in
       PlaylistInfo(name: item.title, src: item.url.absoluteString, pageSrc: item.url.absoluteString, pageTitle: item.title, mimeType: "video", duration: 0.0, detected: true, dateAdded: Date(), tagId: item.mediaItemId)
     }
   }
   
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(version, forKey: .version)
-    try container.encode(folderId, forKey: .folderId)
-    try container.encode(folderName, forKey: .folderName)
-    try container.encode(folderImage, forKey: .folderImage)
-    try container.encode(creatorName, forKey: .creatorName)
-    try container.encode(creatorLink, forKey: .creatorLink)
-    try container.encode(updateAt, forKey: .updateAt)
-    
-    let items = mediaItems.compactMap({ item -> MediaItem? in
-      guard let url = URL(string: item.pageSrc) else { return nil }
-      return MediaItem(mediaItemId: item.tagId.isEmpty ? UUID().uuidString : item.tagId,
-                title: item.pageTitle,
-                url: url)
-    })
-    
-    try container.encode(items, forKey: .mediaItems)
-  }
-  
   private struct MediaItem: Codable {
 
-    public init(mediaItemId: String, title: String, url: URL) {
+    init(mediaItemId: String, title: String, url: URL) {
       self.mediaItemId = mediaItemId
       self.title = title
       self.url = url
     }
     
-    public let mediaItemId: String
-    public let title: String
-    public let url: URL
+    let mediaItemId: String
+    let title: String
+    let url: URL
     
     private enum CodingKeys: String, CodingKey {
       case mediaItemId = "mediaitemid"
@@ -85,7 +65,7 @@ public struct PlaylistSharedFolderModel: Codable {
   }
 }
 
-public struct PlaylistSharedFolderNetwork {
+struct PlaylistSharedFolderNetwork {
   enum Status: String, Error {
     case invalidURL
     case invalidResponse
@@ -93,7 +73,7 @@ public struct PlaylistSharedFolderNetwork {
   }
   
   @MainActor
-  public static func fetchPlaylist(folderUrl: String) async throws -> PlaylistSharedFolderModel {
+  static func fetchPlaylist(folderUrl: String) async throws -> PlaylistSharedFolderModel {
     guard let playlistURL = URL(string: folderUrl)?.appendingPathComponent("playlist").appendingPathExtension("json") else {
       throw Status.invalidURL
     }
@@ -126,12 +106,12 @@ public struct PlaylistSharedFolderNetwork {
   }
   
   @MainActor
-  public static func createInMemoryStorage(for model: PlaylistSharedFolderModel) async -> PlaylistFolder {
+  static func createInMemoryStorage(for model: PlaylistSharedFolderModel) async -> PlaylistFolder {
     await withCheckedContinuation { continuation in
       // Create a local shared folder
       PlaylistFolder.addInMemoryFolder(title: model.folderName,
                                        creatorName: model.creatorName,
-                                       creatorLink: model.creatorLink,
+                                       creatorLink: model.creatorLink?.absoluteString,
                                        sharedFolderId: model.folderId,
                                        sharedFolderUrl: model.folderUrl,
                                        sharedFolderETag: model.eTag) { folder, folderId in
@@ -145,7 +125,7 @@ public struct PlaylistSharedFolderNetwork {
   }
   
   @MainActor
-  public static func saveToDiskStorage(memoryFolder: PlaylistFolder) async -> String {
+  static func saveToDiskStorage(memoryFolder: PlaylistFolder) async -> String {
     await withCheckedContinuation({ continuation in
       PlaylistFolder.saveInMemoryFolderToDisk(folder: memoryFolder) { folderId in
         PlaylistItem.saveInMemoryItemsToDisk(items: Array(memoryFolder.playlistItems ?? []), folderUUID: folderId) {
@@ -155,7 +135,7 @@ public struct PlaylistSharedFolderNetwork {
     })
   }
   
-  public static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async -> [PlaylistInfo] {
+  static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async -> [PlaylistInfo] {
     @Sendable @MainActor
     func fetchTask(item: PlaylistInfo) async -> PlaylistInfo {
       await withCheckedContinuation { continuation in
