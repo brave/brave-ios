@@ -196,7 +196,10 @@ extension PlaylistListViewController: UITableViewDataSource {
         else { return nil }
         
         let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")?.template) { _ in
-          guard let sharedFolderUrl = folder.sharedFolderUrl else { return }
+          guard let sharedFolderUrl = folder.sharedFolderUrl else {
+            log.error("Invalid Playlist Shared Folder URL")
+            return
+          }
           
           Task { @MainActor in
             do {
@@ -208,15 +211,21 @@ extension PlaylistListViewController: UITableViewDataSource {
               
               deletedItems.forEach({ PlaylistManager.shared.delete(itemId: $0.tagId) })
               
-              await withCheckedContinuation { continuation in
-                PlaylistItem.updateItems(Array(newItems), folderUUID: folderId) {
-                  continuation.resume()
+              if !newItems.isEmpty {
+                await withCheckedContinuation { continuation in
+                  PlaylistItem.updateItems(Array(newItems), folderUUID: folderId) {
+                    continuation.resume()
+                  }
                 }
               }
               
               PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: folderId)
             } catch {
-              log.error("CANNOT SYNC SHARED PLAYLIST: \(error)")
+              if let error = error as? PlaylistSharedFolderNetwork.Status {
+                log.error(error)
+              } else {
+                log.error("CANNOT SYNC SHARED PLAYLIST: \(error)")
+              }
             }
           }
         }

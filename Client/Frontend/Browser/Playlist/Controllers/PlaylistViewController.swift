@@ -254,7 +254,11 @@ class PlaylistViewController: UIViewController {
             self.listController.loadingState = .fullyLoaded
           }
         } catch {
-          log.error("No Playlist JSON")
+          if let error = error as? PlaylistSharedFolderNetwork.Status {
+            log.error(error)
+          } else {
+            log.error("Failed Fetching Playlist Shared Folder: \(error)")
+          }
         }
       }
     }

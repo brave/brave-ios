@@ -90,11 +90,14 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
   }
   
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(pageSrc)
+    hasher.combine(pageSrc.asURL?.normalizedHostAndPath ?? pageSrc)
     hasher.combine(tagId)
   }
   
   public static func == (lhs: Self, rhs: Self) -> Bool {
+    if let lhsPageSrc = lhs.pageSrc.asURL?.normalizedHostAndPath, let rhsPageSrc = rhs.pageSrc.asURL?.normalizedHostAndPath {
+      return lhsPageSrc == rhsPageSrc && lhs.tagId == rhs.tagId
+    }
     return lhs.pageSrc == rhs.pageSrc && lhs.tagId == rhs.tagId
   }
 

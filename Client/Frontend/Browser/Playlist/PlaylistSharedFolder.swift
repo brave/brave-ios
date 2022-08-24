@@ -86,9 +86,16 @@ public struct PlaylistSharedFolderModel: Codable {
 }
 
 public struct PlaylistSharedFolderNetwork {
+  enum Status: String, Error {
+    case invalidURL
+    case invalidResponse
+    case cacheNotModified
+  }
+  
+  @MainActor
   public static func fetchPlaylist(folderUrl: String) async throws -> PlaylistSharedFolderModel {
     guard let playlistURL = URL(string: folderUrl)?.appendingPathComponent("playlist").appendingPathExtension("json") else {
-      throw "Invalid Playlist URL"
+      throw Status.invalidURL
     }
     
     let authenticator = BasicAuthCredentialsManager(for: Array(DomainUserScript.bravePlaylistFolderSharingHelper.associatedDomains))
@@ -105,7 +112,11 @@ public struct PlaylistSharedFolderNetwork {
     let (data, response) = try await NetworkManager(session: session).dataRequest(with: request)
     guard let response = response as? HTTPURLResponse,
               response.statusCode == 304 || response.statusCode >= 200 || response.statusCode <= 299 else {
-      throw "Invalid Response Status Code"
+      throw Status.invalidResponse
+    }
+    
+    if response.statusCode == 304 {
+      throw Status.cacheNotModified
     }
     
     var model = try JSONDecoder().decode(PlaylistSharedFolderModel.self, from: data)
