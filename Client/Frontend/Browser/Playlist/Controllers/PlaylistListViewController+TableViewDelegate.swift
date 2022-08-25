@@ -273,7 +273,7 @@ extension PlaylistListViewController: UITableViewDelegate {
               if PlaylistFolder.getOtherFoldersCount() > 0 {
                 actions.append(
                   UIAction(
-                    title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(systemName: "folder"),
+                    title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(braveSystemNamed: "brave.folder"),
                     handler: { [weak self] _ in
                       self?.moveItems(indexPaths: [indexPath])
                     }))

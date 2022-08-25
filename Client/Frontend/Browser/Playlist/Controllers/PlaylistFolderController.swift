@@ -192,7 +192,7 @@ extension PlaylistFolderController: UITableViewDataSource {
 
     switch section {
     case .savedItems:
-      let folderIcon = UIImage(systemName: "folder")?.template
+      let folderIcon = UIImage(braveSystemNamed: "brave.folder.badge.star")?.template
       let itemCount = savedFolder?.playlistItems?.count ?? 0
 
       cell.imageView?.image = folderIcon
@@ -207,7 +207,7 @@ extension PlaylistFolderController: UITableViewDataSource {
         return
       }
 
-      let folderIcon = section == .nonSharedFolders ? UIImage(systemName: "folder")?.template :
+      let folderIcon = section == .nonSharedFolders ? UIImage(braveSystemNamed: "brave.folder")?.template :
                       UIImage(braveSystemNamed: "brave.folder.badge.sync")?.template
       
       let itemCount = folder.playlistItems?.count ?? 0

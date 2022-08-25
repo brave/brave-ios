@@ -83,11 +83,11 @@ extension PlaylistListViewController: UITableViewDataSource {
       }
       
       let domain = URL(string: item.pageSrc)?.baseDomain ?? "0s"
+      let rootView = PlaylistCellRedactedView(thumbnail: nil, title: item.name, details: domain, contentSize: view.bounds.size)
       
       cell.do {
         $0.showsReorderControl = false
-        $0.setTitle(title: item.name)
-        $0.setDetails(details: domain)
+        $0.setRootView(rootView, parent: self)
         
         if let url = URL(string: item.pageSrc) {
           $0.loadThumbnail(for: url)
@@ -203,22 +203,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           
           Task { @MainActor in
             do {
-              let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(folderUrl: sharedFolderUrl)
-              var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
-              let deletedItems = oldItems.subtracting(model.mediaItems)
-              let newItems = Set(model.mediaItems).subtracting(oldItems)
-              oldItems = []
-              
-              deletedItems.forEach({ PlaylistManager.shared.delete(itemId: $0.tagId) })
-              
-              if !newItems.isEmpty {
-                await withCheckedContinuation { continuation in
-                  PlaylistItem.updateItems(Array(newItems), folderUUID: folderId) {
-                    continuation.resume()
-                  }
-                }
-              }
-              
+              try await PlaylistManager.syncSharedFolder(sharedFolderUrl: sharedFolderUrl)
               PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: folderId)
             } catch {
               if let error = error as? PlaylistSharedFolderNetwork.Status {

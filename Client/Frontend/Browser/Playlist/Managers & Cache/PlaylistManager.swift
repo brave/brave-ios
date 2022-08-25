@@ -709,7 +709,8 @@ extension PlaylistManager {
               duration: duration.seconds,
               detected: item.detected,
               dateAdded: item.dateAdded,
-              tagId: item.tagId)
+              tagId: item.tagId,
+              order: item.order)
 
             if PlaylistItem.itemExists(uuid: item.tagId) || PlaylistItem.itemExists(pageSrc: item.pageSrc) {
               PlaylistItem.updateItem(newItem) {
@@ -726,6 +727,44 @@ extension PlaylistManager {
     }
 
     assetInformation.append(PlaylistAssetFetcher(itemId: item.tagId, asset: asset))
+  }
+}
+
+extension PlaylistManager {
+  @MainActor
+  static func syncSharedFolder(sharedFolderUrl: String) async throws {
+    guard let folder = PlaylistFolder.getSharedFolder(sharedFolderUrl: sharedFolderUrl),
+          let folderId = folder.sharedFolderId else {
+      return
+    }
+    
+    let model = try await PlaylistSharedFolderNetwork.fetchPlaylist(folderUrl: sharedFolderUrl)
+    var oldItems = Set(folder.playlistItems?.map({ PlaylistInfo(item: $0) }) ?? [])
+    let deletedItems = oldItems.subtracting(model.mediaItems)
+    let newItems = Set(model.mediaItems).subtracting(oldItems)
+    oldItems = []
+    
+    deletedItems.forEach({ PlaylistManager.shared.delete(itemId: $0.tagId) })
+    
+    if !newItems.isEmpty {
+      await withCheckedContinuation { continuation in
+        PlaylistItem.updateItems(Array(newItems), folderUUID: folderId) {
+          continuation.resume()
+        }
+      }
+    }
+  }
+  
+  @MainActor
+  static func syncSharedFolders() async throws {
+    let folderURLs = PlaylistFolder.getSharedFolders().compactMap({ $0.sharedFolderUrl })
+    await withTaskGroup(of: Void.self) { group in
+      folderURLs.forEach { url in
+        group.addTask {
+          try? await syncSharedFolder(sharedFolderUrl: url)
+        }
+      }
+    }
   }
 }
 

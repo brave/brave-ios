@@ -54,16 +54,17 @@ private struct PlaylistRedactedHeaderView: View {
   }
 }
 
-private struct PlaylistCellRedactedView: View {
+struct PlaylistCellRedactedView: View {
   var thumbnail: UIImage?
   var title: String?
   var details: String?
+  var contentSize: CGSize = .zero
   
   var body: some View {
     HStack {
       RoundedRectangle(cornerRadius: 5.0, style: .continuous)
         .fill(Color.black)
-        .frame(width: 80.0 * 1.46875, height: 64.0, alignment: .center)
+        .frame(width: contentSize.width * 0.30, height: contentSize.width * 0.3 * (9.0 / 16.0), alignment: .center)
         .overlay(
             Image(uiImage: thumbnail ?? UIImage())
               .resizable()
@@ -79,6 +80,7 @@ private struct PlaylistCellRedactedView: View {
           .font(.callout.weight(.medium))
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.leading)
+          .fixedSize(horizontal: false, vertical: true)
           .redacted(reason: title == nil ? .placeholder : [])
           .shimmer(title == nil)
         
@@ -86,6 +88,7 @@ private struct PlaylistCellRedactedView: View {
           .font(.footnote)
           .foregroundColor(Color(.secondaryBraveLabel))
           .multilineTextAlignment(.leading)
+          .fixedSize(horizontal: false, vertical: true)
           .redacted(reason: details == nil ? .placeholder : [])
           .shimmer(details == nil)
       }
@@ -122,35 +125,35 @@ class PlaylistRedactedHeader: UITableViewHeaderFooterView {
   }
 }
 
-class PlaylistCellRedacted: UITableViewCell {
+class PlaylistCellRedacted: HostingTableViewCell<PlaylistCellRedactedView> {
   private var faviconRenderer: FavIconImageRenderer?
-  private let hostingController = UIHostingController(rootView: PlaylistCellRedactedView())
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
-    contentView.addSubview(hostingController.view)
-    hostingController.view.snp.makeConstraints {
-      $0.edges.equalToSuperview()
-    }
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    
+    hostingController.rootView?.contentSize = bounds.size
+  }
+  
   func loadThumbnail(for url: URL) {
     faviconRenderer = FavIconImageRenderer()
     faviconRenderer?.loadIcon(siteURL: url, persistent: false) { [weak self] image in
-      self?.hostingController.rootView.thumbnail = image
+      self?.hostingController.rootView?.thumbnail = image
     }
   }
   
   func setTitle(title: String?) {
-    hostingController.rootView.title = title
+    hostingController.rootView?.title = title
   }
   
   func setDetails(details: String?) {
-    hostingController.rootView.details = details
+    hostingController.rootView?.details = details
   }
 }

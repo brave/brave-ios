@@ -19,6 +19,7 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
   public let detected: Bool
   public let dateAdded: Date
   public let tagId: String
+  public let order: Int32
   
   public var id: String {
     tagId
@@ -34,6 +35,7 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
     self.dateAdded = Date()
     self.detected = false
     self.tagId = UUID().uuidString
+    self.order = Int32.min
   }
 
   public init(item: PlaylistItem) {
@@ -46,9 +48,10 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
     self.dateAdded = item.dateAdded ?? Date()
     self.detected = false
     self.tagId = item.uuid ?? UUID().uuidString
+    self.order = item.order
   }
 
-  public init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: TimeInterval, detected: Bool, dateAdded: Date, tagId: String) {
+  public init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: TimeInterval, detected: Bool, dateAdded: Date, tagId: String, order: Int32) {
     self.name = name
     self.src = src
     self.pageSrc = pageSrc
@@ -58,6 +61,7 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
     self.detected = detected
     self.dateAdded = dateAdded
     self.tagId = tagId.isEmpty ? UUID().uuidString : tagId
+    self.order = order
   }
 
   public init(from decoder: Decoder) throws {
@@ -72,6 +76,7 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
     self.tagId = try container.decodeIfPresent(String.self, forKey: .tagId) ?? UUID().uuidString
     self.dateAdded = Date()
     self.src = PlaylistInfo.fixSchemelessURLs(src: src, pageSrc: pageSrc)
+    self.order = try container.decodeIfPresent(Int32.self, forKey: .order) ?? Int32.min
   }
 
   public static func from(message: WKScriptMessage) -> PlaylistInfo? {
@@ -120,5 +125,6 @@ public struct PlaylistInfo: Codable, Identifiable, Hashable, Equatable {
     case detected
     case tagId
     case dateAdded
+    case order
   }
 }

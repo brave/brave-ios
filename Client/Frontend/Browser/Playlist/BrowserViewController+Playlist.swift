@@ -409,4 +409,8 @@ extension BrowserViewController {
     let navigationController = UINavigationController(rootViewController: playlistSettings)
     self.present(navigationController, animated: true)
   }
+  
+  func syncPlaylistFolders() {
+    
+  }
 }

@@ -138,6 +138,10 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
   public static func getSharedFolder(sharedFolderUrl: String, context: NSManagedObjectContext? = nil) -> PlaylistFolder? {
     PlaylistFolder.first(where: NSPredicate(format: "sharedFolderUrl == %@", sharedFolderUrl), context: context ?? DataController.viewContext)
   }
+  
+  public static func getSharedFolders(context: NSManagedObjectContext? = nil) -> [PlaylistFolder] {
+    PlaylistFolder.all(where: NSPredicate(format: "sharedFolderUrl != nil"), context: context ?? DataController.viewContext) ?? []
+  }
 
   public static func removeFolder(_ uuid: String) {
     PlaylistFolder.deleteAll(

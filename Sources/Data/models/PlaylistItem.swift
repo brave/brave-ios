@@ -89,7 +89,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
       playlistItem.duration = item.duration
       playlistItem.mimeType = item.mimeType
       playlistItem.mediaSrc = item.src
-      playlistItem.order = Int32.min
+      playlistItem.order = item.order
       playlistItem.uuid = item.tagId
       playlistItem.playlistFolder = PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID, context: context)
 
@@ -117,7 +117,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
           playlistItem.duration = item.duration
           playlistItem.mimeType = item.mimeType
           playlistItem.mediaSrc = item.src
-          playlistItem.order = Int32.min
+          playlistItem.order = item.order
           playlistItem.uuid = item.tagId
           playlistItem.playlistFolder = folder
         })
@@ -224,6 +224,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
           existingItem.duration = item.duration
           existingItem.mimeType = item.mimeType
           existingItem.mediaSrc = item.src
+          existingItem.uuid = item.tagId
         }
 
         PlaylistItem.saveContext(context)
@@ -267,7 +268,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
         playlistItem.duration = $0.duration
         playlistItem.mimeType = $0.mimeType
         playlistItem.mediaSrc = $0.src
-        playlistItem.order = Int32.min
+        playlistItem.order = $0.order
         playlistItem.uuid = $0.tagId
         playlistItem.playlistFolder = PlaylistFolder.getFolder(uuid: folderUUID ?? PlaylistFolder.savedFolderUUID, context: context)
       }

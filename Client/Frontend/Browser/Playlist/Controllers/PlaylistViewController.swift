@@ -248,6 +248,7 @@ class PlaylistViewController: UIViewController {
                 playlistItem.mimeType = item.mimeType
                 playlistItem.mediaSrc = item.src
                 playlistItem.uuid = item.tagId
+                playlistItem.order = item.order
               }
             })
             

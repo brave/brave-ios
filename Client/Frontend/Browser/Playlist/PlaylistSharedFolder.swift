@@ -16,9 +16,9 @@ struct PlaylistSharedFolderModel: Decodable {
   let creatorName: String
   @URLString private(set) var creatorLink: URL?
   let updateAt: String
-  var folderUrl: String?
-  var eTag: String?
-  var mediaItems: [PlaylistInfo]
+  fileprivate(set) var folderUrl: String?
+  fileprivate(set) var eTag: String?
+  fileprivate(set) var mediaItems: [PlaylistInfo]
   
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -30,26 +30,22 @@ struct PlaylistSharedFolderModel: Decodable {
     _creatorLink = try container.decode(URLString.self, forKey: .creatorLink)
     updateAt = try container.decode(String.self, forKey: .updateAt)
     mediaItems = try container.decode([MediaItem].self, forKey: .mediaItems).map { item in
-      PlaylistInfo(name: item.title, src: item.url.absoluteString, pageSrc: item.url.absoluteString, pageTitle: item.title, mimeType: "video", duration: 0.0, detected: true, dateAdded: Date(), tagId: item.mediaItemId)
-    }
+      PlaylistInfo(name: item.title, src: item.url.absoluteString, pageSrc: item.url.absoluteString, pageTitle: item.title, mimeType: "video", duration: 0.0, detected: true, dateAdded: Date(), tagId: item.mediaItemId, order: Int32(item.order) ?? -1)
+    }.sorted(by: { $0.order < $1.order })
   }
   
   private struct MediaItem: Codable {
 
-    init(mediaItemId: String, title: String, url: URL) {
-      self.mediaItemId = mediaItemId
-      self.title = title
-      self.url = url
-    }
-    
     let mediaItemId: String
     let title: String
     let url: URL
+    let order: String
     
     private enum CodingKeys: String, CodingKey {
       case mediaItemId = "mediaitemid"
       case title
       case url
+      case order
     }
   }
   
@@ -82,23 +78,29 @@ struct PlaylistSharedFolderNetwork {
     let session = URLSession(configuration: .ephemeral, delegate: authenticator, delegateQueue: .main)
     defer { session.finishTasksAndInvalidate() }
     
-    var request = URLRequest(url: playlistURL)
-    request.httpMethod = "GET"
+    func executeRequest(method: String, headers: [String: String]) async throws -> (Data, HTTPURLResponse) {
+      var request = URLRequest(url: playlistURL)
+      request.httpMethod = method
+      headers.forEach({ request.setValue($0.value, forHTTPHeaderField: $0.key) })
+      
+      let (data, response) = try await NetworkManager(session: session).dataRequest(with: request)
+      guard let response = response as? HTTPURLResponse,
+                response.statusCode == 304 || response.statusCode >= 200 || response.statusCode <= 299 else {
+        throw Status.invalidResponse
+      }
+      
+      if response.statusCode == 304 {
+        throw Status.cacheNotModified
+      }
+      
+      return (data, response)
+    }
     
     if let eTag = PlaylistFolder.getSharedFolder(sharedFolderUrl: folderUrl)?.sharedFolderETag {
-      request.setValue(eTag, forHTTPHeaderField: "If-None-Match")
+      _ = try await executeRequest(method: "HEAD", headers: ["If-None-Match": eTag])
     }
     
-    let (data, response) = try await NetworkManager(session: session).dataRequest(with: request)
-    guard let response = response as? HTTPURLResponse,
-              response.statusCode == 304 || response.statusCode >= 200 || response.statusCode <= 299 else {
-      throw Status.invalidResponse
-    }
-    
-    if response.statusCode == 304 {
-      throw Status.cacheNotModified
-    }
-    
+    let (data, response) = try await executeRequest(method: "GET", headers: [:])
     var model = try JSONDecoder().decode(PlaylistSharedFolderModel.self, from: data)
     model.folderUrl = folderUrl
     model.eTag = response.allHeaderFields["ETag"] as? String
@@ -151,7 +153,8 @@ struct PlaylistSharedFolderNetwork {
                                    duration: duration ?? newItem.duration,
                                    detected: newItem.detected,
                                    dateAdded: newItem.dateAdded,
-                                   tagId: item.tagId)
+                                   tagId: item.tagId,
+                                   order: item.order)
                 
                 // Destroy the web loader when the callback is complete.
                 webLoader?.removeFromSuperview()

@@ -435,7 +435,7 @@ class PlaylistWebLoader: UIView {
       }
     }
     
-    webView.frame = self.bounds ?? .zero
+    webView.frame = superview?.bounds ?? self.bounds
     webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
   }
 
