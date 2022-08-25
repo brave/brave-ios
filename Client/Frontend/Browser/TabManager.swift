@@ -219,8 +219,7 @@ class TabManager: NSObject {
     syncTabsTask?.cancel()
 
     syncTabsTask = DispatchWorkItem {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self, let task = self.syncTabsTask, !task.isCancelled else {
+        guard let task = self.syncTabsTask, !task.isCancelled else {
           return
         }
         
@@ -229,12 +228,10 @@ class TabManager: NSObject {
             tab.addTabInfoToSyncedSessions(url: url, displayTitle: tab.displayTitle)
           }
         }
-
-      }
     }
         
     if let task = self.syncTabsTask {
-      syncedTabsQueue.async(execute: task)
+      DispatchQueue.main.async(execute: task)
     }
   }
 
