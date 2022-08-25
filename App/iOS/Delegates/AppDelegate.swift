@@ -454,16 +454,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     FaviconFetcher.htmlParsingUserAgent = UserAgent.desktop
   }
 
-  fileprivate func presentEmailComposerWithLogs() {
-    if let buildNumber = Bundle.main.object(forInfoDictionaryKey: String(kCFBundleVersionKey)) as? NSString {
-      let mailComposeViewController = MFMailComposeViewController()
-      mailComposeViewController.mailComposeDelegate = self
-      mailComposeViewController.setSubject("Debug Info for iOS client version v\(appVersion) (\(buildNumber))")
-
-      self.window?.rootViewController?.present(mailComposeViewController, animated: true, completion: nil)
-    }
-  }
-
   func sceneInfo(for sceneSession: UISceneSession) -> SceneInfoModel? {
     return sceneInfo
   }
