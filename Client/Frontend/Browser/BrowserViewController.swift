@@ -433,6 +433,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     Preferences.Rewards.rewardsToggledOnce.observe(from: self)
     Preferences.Playlist.enablePlaylistMenuBadge.observe(from: self)
     Preferences.Playlist.enablePlaylistURLBarButton.observe(from: self)
+    Preferences.Playlist.syncSharedFoldersAutomatically.observe(from: self)
     
     pageZoomListener = NotificationCenter.default.addObserver(forName: PageZoomView.notificationName, object: nil, queue: .main) { [weak self] _ in
       self?.tabManager.allTabs.forEach({
@@ -3527,6 +3528,8 @@ extension BrowserViewController: PreferencesObserver {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
+    case Preferences.Playlist.syncSharedFoldersAutomatically.key:
+      syncPlaylistFolders()
     default:
       log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break

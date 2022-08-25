@@ -413,16 +413,18 @@ extension BrowserViewController {
   }
   
   func syncPlaylistFolders() {
-    BrowserViewController.playlistSyncFoldersTimer?.invalidate()
-    
-    let lastSyncDate = Preferences.Playlist.lastPlaylistFoldersSyncTime.value ?? Date()
-    
-    BrowserViewController.playlistSyncFoldersTimer = Timer(fire: lastSyncDate, interval: 4.hours, repeats: true, block: { _ in
-      Preferences.Playlist.lastPlaylistFoldersSyncTime.value = Date()
+    if Preferences.Playlist.syncSharedFoldersAutomatically.value {
+      BrowserViewController.playlistSyncFoldersTimer?.invalidate()
       
-      Task { @MainActor in
-        try await PlaylistManager.syncSharedFolders()
-      }
-    })
+      let lastSyncDate = Preferences.Playlist.lastPlaylistFoldersSyncTime.value ?? Date()
+      
+      BrowserViewController.playlistSyncFoldersTimer = Timer(fire: lastSyncDate, interval: 4.hours, repeats: true, block: { _ in
+        Preferences.Playlist.lastPlaylistFoldersSyncTime.value = Date()
+        
+        Task { @MainActor in
+          try await PlaylistManager.syncSharedFolders()
+        }
+      })
+    }
   }
 }

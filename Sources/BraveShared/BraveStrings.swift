@@ -1940,6 +1940,16 @@ extension Strings {
     NSLocalizedString("playList.playlistSharedFolderAlreadyExistsBody", tableName: "BraveShared", bundle: .strings,
                       value: "This folder already exists in your Brave Playlist",
                       comment: "Body for the error message that shows when a playlist folder already exists")
+    
+    public static let sharedFolderSyncAutomaticallyTitle =
+    NSLocalizedString("playList.sharedFolderSyncAutomaticallyTitle", tableName: "BraveShared", bundle: .strings,
+                      value: "Sync playlist folders automatically",
+                      comment: "Title of the settings option to sync folders with the server automatically, every 4 hours.")
+    
+    public static let sharedFolderSyncAutomaticallyDescription =
+    NSLocalizedString("playList.sharedFolderSyncAutomaticallyDescription", tableName: "BraveShared", bundle: .strings,
+                      value: "Syncs all your playlist folders automatically",
+                      comment: "Description of the settings option to sync folders with the server automatically, every 4 hours.")
   }
     
 }

@@ -172,6 +172,16 @@ class PlaylistSettingsViewController: TableViewController {
           ])
       )
     }
+    
+    dataSource.sections.append(
+      Section(
+        rows: [
+          .boolRow(
+            title: Strings.PlaylistFolderSharing.sharedFolderSyncAutomaticallyTitle,
+            option: Preferences.Playlist.syncSharedFoldersAutomatically)
+        ],
+        footer: .title(Strings.PlaylistFolderSharing.sharedFolderSyncAutomaticallyDescription)
+      ))
 
     dataSource.sections.append(
       Section(

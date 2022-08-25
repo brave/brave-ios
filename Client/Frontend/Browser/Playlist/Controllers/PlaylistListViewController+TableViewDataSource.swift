@@ -11,6 +11,7 @@ import AVFoundation
 import Data
 import Shared
 import BraveUI
+import BraveShared
 
 private let log = Logger.browserLogger
 
@@ -170,7 +171,7 @@ extension PlaylistListViewController: UITableViewDataSource {
       header.onAddPlaylist = { [unowned self] in
         guard let sharedFolderUrl = folder.sharedFolderUrl else { return }
         
-        if Preferences.Playlist.autoDownloadVideo.value {
+        if PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value) != nil {
           let controller = PopupViewController(rootView: PlaylistFolderSharingManagementView(onAddToPlaylistPressed: { [unowned self] in
             self.dismiss(animated: true)
             
