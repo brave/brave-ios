@@ -9,9 +9,7 @@ import BraveShared
 import Storage
 import Data
 import BraveCore
-
-private let log = Logger.browserLogger
-
+import Logger
 class LoginListViewController: LoginAuthViewController {
 
   // MARK: UX

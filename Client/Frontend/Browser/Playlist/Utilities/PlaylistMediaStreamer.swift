@@ -11,8 +11,7 @@ import WebKit
 import MediaPlayer
 import Shared
 import Storage
-
-private let log = Logger.browserLogger
+import Logger
 
 class PlaylistMediaStreamer {
   private weak var playerView: UIView?
@@ -208,7 +207,7 @@ class PlaylistMediaStreamer {
     session.dataTask(with: request) { data, response, error in
       DispatchQueue.main.async {
         if let error = error {
-          log.error("Error fetching MimeType: \(error)")
+          Log.main.error("Error fetching MimeType: \(error.localizedDescription)")
           return completion(nil)
         }
 

@@ -9,8 +9,7 @@ import AVKit
 import Data
 import BraveShared
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 enum PlaylistItemAddedState {
   case none
@@ -143,7 +142,7 @@ class PlaylistHelper: NSObject, TabContentScript {
       let isPlayable = status == .loaded
 
       if let error = error {
-        log.error("Couldn't load asset's playability: \(error)")
+        Log.main.error("Couldn't load asset's playability: \(error.localizedDescription)")
       }
       return isPlayable
     }
@@ -159,7 +158,7 @@ class PlaylistHelper: NSObject, TabContentScript {
 
     switch Reach().connectionStatus() {
     case .offline, .unknown:
-      log.error("Couldn't load asset's playability -- Offline")
+      Log.main.error("Couldn't load asset's playability -- Offline")
       DispatchQueue.main.async {
         // We have no other way of knowing the playable status
         // It is best to assume the item can be played
@@ -184,7 +183,7 @@ class PlaylistHelper: NSObject, TabContentScript {
     PlaylistItem.updateItem(item) { [weak self] in
       guard let self = self else { return }
 
-      log.debug("Playlist Item Updated")
+      Log.main.debug("Playlist Item Updated")
 
       if !self.playlistItems.contains(item.src) {
         self.playlistItems.insert(item.src)
@@ -214,7 +213,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
       webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, asFunction: true) { _, error in
 
         if let error = error {
-          log.error("Error executing onLongPressActivated: \(error)")
+          Log.main.error("Error executing onLongPressActivated: \(error.localizedDescription)")
         }
       }
     }
@@ -235,7 +234,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
 extension PlaylistHelper {
   static func getCurrentTime(webView: WKWebView, nodeTag: String, completion: @escaping (Double) -> Void) {
     guard UUID(uuidString: nodeTag) != nil else {
-      log.error("Unsanitized NodeTag.")
+      Log.main.error("Unsanitized NodeTag.")
       return
     }
 
@@ -244,7 +243,7 @@ extension PlaylistHelper {
     webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, asFunction: true) { value, error in
 
       if let error = error {
-        log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
+        Log.main.error("Error Retrieving Playlist Page Media Current Time: \(error.localizedDescription)")
       }
 
       DispatchQueue.main.async {
@@ -267,7 +266,7 @@ extension PlaylistHelper {
       functionName: javascript, contentWorld: .page,
       completion: { value, error in
         if let error = error {
-          log.error("Error Retrieving Stopping Media Playback: \(error)")
+          Log.main.error("Error Retrieving Stopping Media Playback: \(error.localizedDescription)")
         }
       })
   }

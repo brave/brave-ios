@@ -5,8 +5,7 @@
 
 import UIKit
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 // MARK: - SearchQuickEnginesViewController
 

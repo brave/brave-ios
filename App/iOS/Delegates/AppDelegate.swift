@@ -5,7 +5,7 @@
 import Shared
 import Storage
 import AVFoundation
-import XCGLogger
+import Logger
 import MessageUI
 import SDWebImage
 import SwiftKeychainWrapper
@@ -25,8 +25,6 @@ import BraveNews
 #if DEBUG
 import os
 #endif
-
-private let log = Logger.browserLogger
 
 extension AppDelegate {
   // A model that is passed used in every scene
@@ -117,24 +115,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #endif
       }
 
-      let level: XCGLogger.Level = {
+      let level: OSLogType = {
         switch severity {
-        case .fatal: return .severe
+        case .fatal: return .fault
         case .error: return .error
-        case .warning: return .warning
+        // No `.warning` level exists for OSLogType. os_Log.main.warning is an alias for `.error`
+        case .warning: return .error
         case .info: return .info
         default: return .debug
         }
       }()
-
-      Logger.braveCoreLogger.logln(
-        level,
-        fileName: file,
-        lineNumber: Int(line),
-        // Only print the actual message content, and drop the final character which is
-        // a new line as it will be handled by logln
-        closure: { message }
-      )
+      
+      Log.braveCore.log(level: level, "\(message, privacy: .public)")
       return true
     }
 
@@ -163,7 +155,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   @discardableResult
   fileprivate func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
-    log.info("startApplication begin")
+    Log.main.info("startApplication begin")
 
     // Set the Safari UA for browsing.
     setUserAgent()
@@ -180,11 +172,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     SDImageCodersManager.shared.addCoder(PrivateCDNImageCoder())
 
-    let logDate = Date()
-    // Create a new sync log file on cold app launch. Note that this doesn't roll old logs.
-    Logger.syncLogger.newLogWithDate(logDate)
-    Logger.browserLogger.newLogWithDate(logDate)
-
     // Setup Profile
     let profile = BrowserProfile(localName: "profile")
 
@@ -196,7 +183,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           namespace: "TabManagerScreenshots",
           quality: UIConstants.screenshotQuality)
       } catch {
-        log.error("Failed to create an image store for files: \(profile.files) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
+        Log.main.error("Failed to create an image store for files: \(profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
         assertionFailure()
       }
       return nil
@@ -239,7 +226,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Schedule Brave Core Priority Tasks
     braveCore.scheduleLowPriorityStartupTasks()
 
-    log.info("startApplication end")
+    Log.main.info("startApplication end")
     return true
   }
 
@@ -257,12 +244,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     if Preferences.Rewards.isUsingBAP.value == nil {
       Preferences.Rewards.isUsingBAP.value = Locale.current.regionCode == "JP"
-    }
-
-    // Now roll logs.
-    DispatchQueue.global(qos: DispatchQoS.background.qosClass).async {
-      Logger.syncLogger.deleteOldLogsDownToSizeLimit()
-      Logger.browserLogger.deleteOldLogsDownToSizeLimit()
     }
 
     // If a shortcut was launched, display its information and take the appropriate action
@@ -346,7 +327,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
       SceneDelegate.shouldHandleUrpLookup = true
     } else {
-      log.error("Failed to initialize user referral program")
+      Log.main.error("Failed to initialize user referral program")
       UrpLog.log("Failed to initialize user referral program")
     }
 
@@ -366,7 +347,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Clean up BraveCore
     braveCore.syncAPI.removeAllObservers()
 
-    log.debug("Cleanly Terminated the Application")
+    Log.main.debug("Cleanly Terminated the Application")
   }
 
   func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {

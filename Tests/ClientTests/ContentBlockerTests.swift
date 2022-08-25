@@ -107,7 +107,7 @@ class ContentBlockerTests: XCTestCase {
         switch res {
         case .failure(let error):
           if expectSuccess {
-            XCTFail("Error Compiling Content Blocker Rules: \(error)")
+            XCTFail("Error Compiling Content Blocker Rules: \(error.localizedDescription)")
           }
         default:
           exp.fulfill()

@@ -5,8 +5,7 @@
 import Foundation
 import Shared
 import WebKit
-
-private let log = Logger.browserLogger
+import Logger
 
 protocol SessionRestoreHelperDelegate: AnyObject {
   func sessionRestoreHelper(_ helper: SessionRestoreHelper, didRestoreSessionForTab tab: Tab)
@@ -30,7 +29,7 @@ class SessionRestoreHelper: TabContentScript {
     if let tab = tab, let params = message.body as? [String: AnyObject] {
 
       if UserScriptManager.isMessageHandlerTokenMissing(in: params) {
-        log.debug("Missing required security token.")
+        Log.main.debug("Missing required security token.")
         return
       }
 

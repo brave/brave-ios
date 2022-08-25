@@ -8,8 +8,7 @@ import WebKit
 import Shared
 import BraveShared
 import Combine
-
-private let log = Logger.browserLogger
+import Logger
 
 class AdblockDebugMenuTableViewController: TableViewController {
 
@@ -45,7 +44,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] res in
               if case .failure(let error) = res {
-                let alert = UIAlertController(title: nil, message: "Failed to Recompile Blockers: \(error)", preferredStyle: .alert)
+                let alert = UIAlertController(title: nil, message: "Failed to Recompile Blockers: \(error.localizedDescription)", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self?.present(alert, animated: true)
               }

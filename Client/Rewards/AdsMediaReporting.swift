@@ -6,8 +6,7 @@ import Foundation
 import Shared
 import WebKit
 import BraveCore
-
-private let log = Logger.braveCoreLogger
+import Logger
 
 class AdsMediaReporting: TabContentScript {
   let rewards: BraveRewards
@@ -33,7 +32,7 @@ class AdsMediaReporting: TabContentScript {
     }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: body) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 

@@ -5,9 +5,9 @@
 import Foundation
 import GCDWebServers
 import Shared
+import Logger
 
 public class WebServer {
-  private let log = Logger.browserLogger
 
   public static let webServerSharedInstance = WebServer()
 

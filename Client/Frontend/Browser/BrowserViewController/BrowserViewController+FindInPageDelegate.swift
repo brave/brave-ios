@@ -6,8 +6,7 @@
 import Foundation
 import WebKit
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 /// List of Find Options used by WebKit to `Find-In-Page`
 /// Typically we use `caseInsensitive`, `wrapAround`, `backwards`, `showHighlight`
@@ -108,12 +107,12 @@ class WKWebViewFindStringFindDelegate: NSObject {
     super.init()
 
     if !WKWebViewFindStringFindDelegate.canFindInPagePrivate {
-      log.error("CANNOT INSTANTIATE WKWebViewFindStringFindDelegate!")
+      Log.main.error("CANNOT INSTANTIATE WKWebViewFindStringFindDelegate!")
       return nil
     }
 
     if WKWebViewFindStringFindDelegate.findDelegate(for: webView) != nil {
-      log.error("CANNOT SET FIND DELEGATE TWICE!")
+      Log.main.error("CANNOT SET FIND DELEGATE TWICE!")
       return nil
     }
 
@@ -161,7 +160,7 @@ class WKWebViewFindStringFindDelegate: NSObject {
 
   @objc
   private func _webView(_ webView: WKWebView, didCountMatches matches: UInt, forString string: NSString) {
-    log.debug("FIND-IN-PAGE COUNT-MATCHES: \(matches)")
+    Log.main.debug("FIND-IN-PAGE COUNT-MATCHES: \(matches)")
   }
 
   @objc

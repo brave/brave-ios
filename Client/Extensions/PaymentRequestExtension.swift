@@ -7,8 +7,7 @@ import BraveShared
 import Data
 import Shared
 import WebKit
-
-private let log = Logger.browserLogger
+import Logger
 
 class PaymentRequestExtension: NSObject {
   typealias PaymentRequestHandler = (
@@ -50,8 +49,8 @@ extension PaymentRequestExtension: TabContentScript {
   private func sendPaymentRequestError(errorName: String, errorMessage: String) {
     ensureMainThread {
       self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage], contentWorld: .page) { _, error in
-        if error != nil {
-          log.error(error)
+        if let error = error {
+          Log.main.error("\(error.localizedDescription)")
         }
       }
     }
@@ -96,8 +95,8 @@ extension PaymentRequestExtension: TabContentScript {
         case .completed(let orderId):
           ensureMainThread {
             self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""], contentWorld: .page) { _, error in
-              if error != nil {
-                log.error(error)
+              if let error = error {
+                Log.main.error("\(error.localizedDescription)")
               }
             }
           }

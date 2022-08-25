@@ -7,15 +7,14 @@ import WebKit
 import Shared
 import BraveShared
 import Data
-
-private let log = Logger.browserLogger
+import Logger
 
 public class SafeBrowsing {
   public init() {}
   
   public static func isSafeBrowsingEnabledForURL(_ url: URL) -> Bool {
     guard url.baseDomain != nil else {
-      log.error("url: \(url) host is nil")
+      Log.main.error("url: \(url) host is nil")
       return false
     }
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing

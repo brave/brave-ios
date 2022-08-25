@@ -27,13 +27,13 @@ let package = Package(
     .library(name: "BraveVPN", targets: ["BraveVPN"]),
     .library(name: "BraveNews", targets: ["BraveNews"]),
     .library(name: "RuntimeWarnings", targets: ["RuntimeWarnings"]),
+    .library(name: "Logger", targets: ["Logger"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
     .plugin(name: "CurrentBundleGenPlugin", targets: ["CurrentBundleGenPlugin"]),
   ],
   dependencies: [
     .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.11"),
     .package(url: "https://github.com/SnapKit/SnapKit", from: "5.0.1"),
-    .package(url: "https://github.com/DaveWoodCom/XCGLogger", from: "7.0.1"),
     .package(url: "https://github.com/cezheng/Fuzi", from: "3.1.3"),
     .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", from: "5.0.0"),
     .package(url: "https://github.com/airbnb/lottie-ios", from: "3.1.9"),
@@ -72,12 +72,12 @@ let package = Package(
         "Then",
         "SwiftKeychainWrapper",
         "SwiftyJSON",
-        "XCGLogger",
         "BrowserIntentsModels",
         "BraveWidgetsModels",
         "BraveVPN",
         "BraveNews",
         "CodableHelpers",
+        "Logger",
         .product(name: "Lottie", package: "lottie-ios"),
         .product(name: "Collections", package: "swift-collections"),
       ],
@@ -204,12 +204,12 @@ let package = Package(
         "SDWebImage",
         "SwiftKeychainWrapper",
         "SwiftyJSON",
-        "XCGLogger"
+        "Logger"
       ]
     ),
     .target(
       name: "BraveShared",
-      dependencies: ["SDWebImage", "Shared", "Strings", "SnapKit", "XCGLogger"],
+      dependencies: ["SDWebImage", "Shared", "Strings", "SnapKit", "Logger"],
       resources: [
         .copy("Certificates/AmazonRootCA1.cer"),
         .copy("Certificates/AmazonRootCA2.cer"),
@@ -239,7 +239,7 @@ let package = Package(
         "SnapKit",
         .product(name: "Introspect", package: "SwiftUI-Introspect"),
         "Then",
-        "XCGLogger",
+        "Logger",
         "Static",
         .product(name: "Lottie", package: "lottie-ios")
       ],
@@ -255,7 +255,7 @@ let package = Package(
     .binaryTarget(name: "GCDWebServers", path: "ThirdParty/GCDWebServers/GCDWebServers.xcframework"),
     .target(
       name: "Storage",
-      dependencies: ["Shared", "sqlcipher", "SDWebImage", "XCGLogger"],
+      dependencies: ["Shared", "sqlcipher", "SDWebImage", "Logger"],
       cSettings: [.define("SQLITE_HAS_CODEC")]
     ),
     .target(
@@ -276,7 +276,7 @@ let package = Package(
         "SDWebImage",
         "SnapKit",
         "Then",
-        "XCGLogger",
+        "Logger",
         .product(name: "BigNumber", package: "Swift-BigInt"),
         .product(name: "Algorithms", package: "swift-algorithms"),
         .product(name: "Collections", package: "swift-collections"),
@@ -302,7 +302,7 @@ let package = Package(
         "Strings",
         "SnapKit",
         "Then",
-        "XCGLogger",
+        "Logger",
         "Data",
         "GuardianConnect",
         "BraveUI",
@@ -376,6 +376,7 @@ let package = Package(
     ),
     .target(name: "Strings", path: "App/l10n", exclude: ["tools", "Resources/Info.plist", "README.md"]),
     .target(name: "RuntimeWarnings"),
+    .target(name: "Logger"),
     .plugin(name: "IntentBuilderPlugin", capability: .buildTool()),
     .plugin(name: "CurrentBundleGenPlugin", capability: .buildTool()),
   ],

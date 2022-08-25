@@ -7,8 +7,7 @@ import Foundation
 import Shared
 import BraveShared
 import WebKit
-
-private let log = Logger.browserLogger
+import Logger
 
 enum DomainUserScript: CaseIterable {
   case youtubeAdBlock

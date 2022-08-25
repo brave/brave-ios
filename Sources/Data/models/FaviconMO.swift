@@ -6,8 +6,7 @@ import Foundation
 import Storage
 import Shared
 import BraveShared
-
-private let log = Logger.browserLogger
+import Logger
 
 public final class FaviconMO: NSManagedObject, CRUD {
 
@@ -24,12 +23,12 @@ public final class FaviconMO: NSManagedObject, CRUD {
 
   public class func add(_ favicon: Favicon, forSiteUrl siteUrl: URL, persistent: Bool) {
     guard let width = favicon.width, let height = favicon.height else {
-      log.warning("Failed to unwrap favicon's width or height")
+      Log.main.warning("Failed to unwrap favicon's width or height")
       return
     }
 
     if width > maxSize || height > maxSize {
-      log.warning("Favicon to save is too large.")
+      Log.main.warning("Favicon to save is too large.")
       return
     }
 

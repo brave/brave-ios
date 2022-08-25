@@ -6,8 +6,7 @@ import Foundation
 import Shared
 import Storage
 import UIKit
-
-private let log = Logger.browserLogger
+import Logger
 
 class Authenticator {
   fileprivate static let maxAuthenticationAttempts = 3
@@ -72,9 +71,9 @@ class Authenticator {
       
       do {
         try await loginsProvider.removeLoginsWithGUIDs(malformedGUIDs)
-        log.debug("Removed malformed logins.")
+        Log.main.debug("Removed malformed logins.")
       } catch {
-        log.error("Failed to remove malformed logins.")
+        Log.main.error("Failed to remove malformed logins.")
       }
     }
     

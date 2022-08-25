@@ -7,8 +7,7 @@ import SwiftUI
 import Shared
 import BraveShared
 import BraveUI
-
-private let log = Logger.browserLogger
+import Logger
 
 struct BraveSearchDebugMenuDetail: View {
   let logEntry: BraveSearchLogEntry.FallbackLogEntry
@@ -54,7 +53,7 @@ struct BraveSearchDebugMenuDetail: View {
       try data.write(to: tempUrl)
       return tempUrl
     } catch {
-      log.error("data write-to error")
+      Log.main.error("data write-to error")
       return nil
     }
   }

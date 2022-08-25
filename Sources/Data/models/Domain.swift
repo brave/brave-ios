@@ -6,8 +6,7 @@ import Foundation
 import BraveShared
 import Shared
 import BraveCore
-
-private let log = Logger.browserLogger
+import Logger
 
 public final class Domain: NSManagedObject, CRUD {
 
@@ -244,7 +243,7 @@ public final class Domain: NSManagedObject, CRUD {
           }
         }
       } catch {
-        log.error("Clear coin(\(coin)) accounts permissions error: \(error)")
+        Log.main.error("Clear coin(\(coin.rawValue)) accounts permissions error: \(error.localizedDescription)")
       }
 
       DispatchQueue.main.async {
@@ -298,7 +297,7 @@ extension Domain {
         do {
           try writeContext.save()
         } catch {
-          log.error("Domain save error: \(error)")
+          Log.main.error("Domain save error: \(error.localizedDescription)")
         }
       }
     }

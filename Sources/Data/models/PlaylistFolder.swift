@@ -6,8 +6,7 @@
 import Foundation
 import CoreData
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 @objc(PlaylistFolder)
 final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
@@ -127,14 +126,14 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
 
   private static func saveContext(_ context: NSManagedObjectContext) {
     if context.concurrencyType == .mainQueueConcurrencyType {
-      log.warning("Writing to view context, this should be avoided.")
+      Log.main.warning("Writing to view context, this should be avoided.")
     }
 
     if context.hasChanges {
       do {
         try context.save()
       } catch {
-        assertionFailure("Error saving DB: \(error)")
+        assertionFailure("Error saving DB: \(error.localizedDescription)")
       }
     }
   }

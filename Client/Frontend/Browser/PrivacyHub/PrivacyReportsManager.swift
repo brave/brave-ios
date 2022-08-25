@@ -9,8 +9,7 @@ import BraveShared
 import Data
 import UIKit
 import BraveVPN
-
-private let log = Logger.browserLogger
+import Logger
 
 public struct PrivacyReportsManager {
 
@@ -140,7 +139,7 @@ public struct PrivacyReportsManager {
       
       notificationCenter.add(request) { error in
         if let error = error {
-          log.error("Scheduling privacy reports notification error: \(error)")
+          Log.main.error("Scheduling privacy reports notification error: \(error.localizedDescription)")
         }
       }
     }

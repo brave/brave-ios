@@ -8,8 +8,7 @@ import Shared
 import BraveShared
 import Combine
 import BraveCore
-
-private let log = Logger.browserLogger
+import Logger
 
 struct CosmeticFilterModel: Codable {
   let hideSelectors: [String]
@@ -73,10 +72,10 @@ public class CosmeticFiltersResourceDownloader {
           .receive(on: DispatchQueue.main)
           .sink { res in
             if case .failure(let error) = res {
-              log.error("Error Loading Cosmetic-Filters: \(error)")
+              Log.main.error("Error Loading Cosmetic-Filters: \(error.localizedDescription)")
             }
           } receiveValue: { _ in
-            log.debug("Successfully Loaded Cosmetic-Filters")
+            Log.main.debug("Successfully Loaded Cosmetic-Filters")
           }
       }
       
@@ -88,12 +87,12 @@ public class CosmeticFiltersResourceDownloader {
       let tempEngine = AdblockEngine()
       
       let cosmeticSamplesTask = downloadCosmeticSamples(with: tempEngine).catch { error -> AnyPublisher<Void, Never> in
-        log.error("Failed to Download Cosmetic-Filters (CosmeticSamples): \(error)")
+        Log.main.error("Failed to Download Cosmetic-Filters (CosmeticSamples): \(error.localizedDescription)")
         return Just(()).eraseToAnyPublisher()
       }
       
       let resourceSamplesTask = downloadResourceSamples(with: tempEngine).catch { error -> AnyPublisher<Void, Never> in
-        log.error("Failed to Download Cosmetic-Filters (ResourceSamples): \(error)")
+        Log.main.error("Failed to Download Cosmetic-Filters (ResourceSamples): \(error.localizedDescription)")
         return Just(()).eraseToAnyPublisher()
       }
       
@@ -117,11 +116,11 @@ public class CosmeticFiltersResourceDownloader {
         .flatMap { $0 }
         .sink { res in
           if case .failure(let error) = res {
-            log.error("Failed to Setup Cosmetic-Filters: \(error)")
+            Log.main.error("Failed to Setup Cosmetic-Filters: \(error.localizedDescription)")
           }
         } receiveValue: { [weak self] engine in
           self?.engine = engine
-          log.debug("Successfully Setup Cosmetic-Filters")
+          Log.main.debug("Successfully Setup Cosmetic-Filters")
         }
     }
   }
@@ -164,7 +163,7 @@ public class CosmeticFiltersResourceDownloader {
     downloadResources(for: engine, type: .cosmeticSample)
       .receive(on: DispatchQueue.main)
       .map {
-        log.debug("Downloaded Cosmetic Filters CSS Samples")
+        Log.main.debug("Downloaded Cosmetic Filters CSS Samples")
         Preferences.Debug.lastCosmeticFiltersCSSUpdate.value = Date()
       }
       .eraseToAnyPublisher()
@@ -174,7 +173,7 @@ public class CosmeticFiltersResourceDownloader {
     return downloadResources(for: engine, type: .resourceSample)
       .receive(on: DispatchQueue.main)
       .map {
-        log.debug("Downloaded Cosmetic Filters Scriptlets Samples")
+        Log.main.debug("Downloaded Cosmetic Filters Scriptlets Samples")
         Preferences.Debug.lastCosmeticFiltersScripletsUpdate.value = Date()
       }
       .eraseToAnyPublisher()
@@ -244,7 +243,7 @@ public class CosmeticFiltersResourceDownloader {
 
   private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
     guard let folderUrl = FileManager.default.getOrCreateFolder(name: folder) else {
-      log.error("Failed to get folder: \(folder)")
+      Log.main.error("Failed to get folder: \(folder)")
       return nil
     }
 
@@ -363,10 +362,10 @@ public class CosmeticFiltersResourceDownloader {
         return value.count > 0
       }
       
-      log.error("JSON Must have a top-level type of Array of Dictionary.")
+      Log.main.error("JSON Must have a top-level type of Array of Dictionary.")
       return false
     } catch {
-      log.error("JSON Deserialization Failed: \(error)")
+      Log.main.error("JSON Deserialization Failed: \(error.localizedDescription)")
       return false
     }
   }

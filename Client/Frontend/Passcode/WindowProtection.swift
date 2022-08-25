@@ -11,8 +11,7 @@ import Combine
 import BraveShared
 import BraveUI
 import SwiftKeychainWrapper
-
-private let log = Logger.browserLogger
+import Logger
 
 public class WindowProtection {
 
@@ -166,7 +165,7 @@ public class WindowProtection {
           completion?(false)
           
           if let error = error {
-            log.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
+            Log.main.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
           }
         }
       }

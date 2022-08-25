@@ -14,8 +14,7 @@ import Brave
 import BrowserIntentsModels
 import BraveWidgetsModels
 import BraveVPN
-
-private let log = Logger.browserLogger
+import Logger
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -137,7 +136,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     if let response = connectionOptions.notificationResponse {
       if response.notification.request.identifier == BrowserViewController.defaultBrowserNotificationId {
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-          log.error("Failed to unwrap iOS settings URL")
+          Log.main.error("Failed to unwrap iOS settings URL")
           return
         }
         UIApplication.shared.open(settingsUrl)
@@ -225,13 +224,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let scene = scene as? UIWindowScene else {
-      log.debug("Invalid Scene - Scene is not a UIWindowScene")
+      Log.main.debug("Invalid Scene - Scene is not a UIWindowScene")
       return
     }
 
     URLContexts.forEach({
       guard let routerpath = NavigationPath(url: $0.url) else {
-        log.debug("Invalid Navigation Path: \($0.url)")
+        Log.main.debug("Invalid Navigation Path: \($0.url)")
         return
       }
 

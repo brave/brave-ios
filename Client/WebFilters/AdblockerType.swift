@@ -4,8 +4,7 @@
 
 import Foundation
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 enum FileType: String {
   case dat, json

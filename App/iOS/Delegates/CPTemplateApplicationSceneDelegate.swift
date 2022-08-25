@@ -8,8 +8,7 @@ import UIKit
 import CarPlay
 import Shared
 import Brave
-
-private let log = Logger.browserLogger
+import Logger
 
 class CarplayTemplateApplicationSceneDelegate: NSObject {
   private static let configurationName = "CPTemplateSceneConfiguration"
@@ -19,25 +18,25 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     if scene is CPTemplateApplicationScene,
       session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
-      log.debug("Template application scene will connect.")
+      Log.main.debug("Template application scene will connect.")
     }
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
     if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
-      log.debug("Template application scene did disconnect.")
+      Log.main.debug("Template application scene did disconnect.")
     }
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {
     if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
-      log.debug("Template application scene did become active.")
+      Log.main.debug("Template application scene did become active.")
     }
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
     if scene.session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
-      log.debug("Template application scene will resign active.")
+      Log.main.debug("Template application scene will resign active.")
     }
   }
 }
@@ -47,7 +46,7 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
 extension CarplayTemplateApplicationSceneDelegate: CPTemplateApplicationSceneDelegate {
 
   func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
-    log.debug("Template application scene did connect.")
+    Log.main.debug("Template application scene did connect.")
 
     DispatchQueue.main.async {
       PlaylistCarplayManager.shared.connect(interfaceController: interfaceController)
@@ -58,7 +57,7 @@ extension CarplayTemplateApplicationSceneDelegate: CPTemplateApplicationSceneDel
     _ templateApplicationScene: CPTemplateApplicationScene,
     didDisconnectInterfaceController interfaceController: CPInterfaceController
   ) {
-    log.debug("Template application scene did disconnect.")
+    Log.main.debug("Template application scene did disconnect.")
 
     DispatchQueue.main.async {
       PlaylistCarplayManager.shared.disconnect(interfaceController: interfaceController)

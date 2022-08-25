@@ -5,9 +5,7 @@
 import Foundation
 import CoreData
 import Shared
-import XCGLogger
-
-private let log = Logger.browserLogger
+import Logger
 
 // TODO: Creatable, Updateable. Those are not needed at the moment.
 typealias CRUD = Readable & Deletable
@@ -80,7 +78,7 @@ extension Deletable {
           NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: contextsToUpdate)
         }
       } catch {
-        log.error("Delete all error: \(error)")
+        Log.main.error("Delete all error: \(error.localizedDescription, privacy: .public)")
       }
     }
   }
@@ -98,7 +96,7 @@ extension Readable {
     do {
       return try context.count(for: request)
     } catch {
-      log.error("Count error: \(error)")
+      Log.main.error("Count error: \(error.localizedDescription, privacy: .public)")
     }
 
     return nil
@@ -128,7 +126,7 @@ extension Readable {
     do {
       return try context.fetch(request)
     } catch {
-      log.error("Fetch error: \(error)")
+      Log.main.error("Fetch error: \(error.localizedDescription, privacy: .public)")
     }
 
     return nil

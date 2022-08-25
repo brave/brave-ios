@@ -9,8 +9,7 @@ import Shared
 import BraveShared
 import UIKit
 import BraveUI
-
-private let log = Logger.browserLogger
+import Logger
 
 class RetentionPreferencesDebugMenuViewController: TableViewController {
 

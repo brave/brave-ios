@@ -6,8 +6,7 @@
 import Foundation
 import StoreKit
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 public class VPNProductInfo: NSObject {
   // Prices are fetched once per launch and kept in memory.
@@ -68,6 +67,6 @@ extension VPNProductInfo: SKProductsRequestDelegate {
   }
 
   public func request(_ request: SKRequest, didFailWithError error: Error) {
-    log.error("SKProductsRequestDelegate error: \(error)")
+    Log.main.error("SKProductsRequestDelegate error: \(error.localizedDescription)")
   }
 }

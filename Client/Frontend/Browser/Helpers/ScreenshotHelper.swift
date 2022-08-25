@@ -6,8 +6,7 @@ import Foundation
 import WebKit
 import Shared
 import UIKit
-
-private let log = Logger.browserLogger
+import Logger
 
 /**
  * Handles screenshots for a given tab, including pages with non-webview content.
@@ -23,7 +22,7 @@ class ScreenshotHelper {
 
   func takeScreenshot(_ tab: Tab) {
     guard let webView = tab.webView, let url = tab.url else {
-      log.error("Tab webView or url is nil")
+      Log.main.error("Tab webView or url is nil")
       tab.setScreenshot(nil)
       return
     }
@@ -44,10 +43,10 @@ class ScreenshotHelper {
         if let image = image {
           tab.setScreenshot(image)
         } else if let error = error {
-          log.error(error)
+          Log.main.error("\(error.localizedDescription)")
           tab.setScreenshot(nil)
         } else {
-          log.error("Cannot snapshot Tab Screenshot - No error description")
+          Log.main.error("Cannot snapshot Tab Screenshot - No error description")
           tab.setScreenshot(nil)
         }
       }

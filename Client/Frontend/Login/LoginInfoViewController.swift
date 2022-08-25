@@ -10,8 +10,7 @@ import SwiftKeychainWrapper
 import BraveCore
 import UIKit
 import BraveUI
-
-private let log = Logger.browserLogger
+import Logger
 
 class LoginInfoViewController: LoginAuthViewController {
 

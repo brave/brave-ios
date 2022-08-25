@@ -6,8 +6,7 @@
 import Foundation
 import Shared
 import WebKit
-
-private let log = Logger.browserLogger
+import Logger
 
 #if compiler(>=5.3)
 
@@ -41,7 +40,7 @@ class CreatePDFActivity: UIActivity {
         self.callback(data)
         self.activityDidFinish(true)
       case .failure(let error):
-        log.error("Failed to create PDF with error: \(error)")
+        Log.main.error("Failed to create PDF with error: \(error.localizedDescription)")
         self.activityDidFinish(false)
       }
     }

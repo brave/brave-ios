@@ -11,8 +11,7 @@ import Shared
 import Data
 import BraveWallet
 import BraveCore
-
-private let log = Logger.browserLogger
+import Logger
 
 extension BrowserViewController {
   func featuresMenuSection(_ menuController: MenuViewController) -> some View {
@@ -236,7 +235,7 @@ extension BrowserViewController {
               if !isPlaylistItemAdded {
                 // Add to playlist
                 browserViewController.addToPlaylist(item: item) { didAddItem in
-                  log.debug("Playlist Item Added")
+                  Log.main.debug("Playlist Item Added")
                   if didAddItem {
                     playlistItemAdded = true
                   }

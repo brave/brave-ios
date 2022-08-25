@@ -7,8 +7,7 @@ import Shared
 import Data
 import BraveShared
 import Combine
-
-private let log = Logger.browserLogger
+import Logger
 
 class BlocklistName: CustomStringConvertible, ContentBlocker {
 

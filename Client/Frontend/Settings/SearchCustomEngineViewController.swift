@@ -12,8 +12,7 @@ import SnapKit
 import Fuzi
 import Storage
 import Data
-
-private let log = Logger.browserLogger
+import Logger
 
 class SearchCustomEngineViewController: UIViewController {
 
@@ -164,7 +163,7 @@ class SearchCustomEngineViewController: UIViewController {
       alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
     }
 
-    log.error(error)
+    Log.main.error("\(error.localizedDescription)")
     present(alert, animated: true, completion: nil)
   }
 
@@ -298,7 +297,7 @@ extension SearchCustomEngineViewController {
           }
         }
       case .failure(let error):
-        log.error(error)
+        Log.main.error("\(error.localizedDescription)")
         
         let alert = ThirdPartySearchAlerts.failedToAddThirdPartySearch()
         self.present(alert, animated: true) {

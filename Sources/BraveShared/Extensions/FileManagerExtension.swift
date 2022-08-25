@@ -5,8 +5,7 @@
 import Foundation
 import Shared
 import UIKit
-
-private let log = Logger.browserLogger
+import Logger
 
 extension FileManager {
   public enum Folder: String {
@@ -33,7 +32,7 @@ extension FileManager {
       do {
         try self.setAttributes([.posixPermissions: (lockObj.lock ? 0 : 0o755)], ofItemAtPath: baseDir + lockObj.folder.rawValue)
       } catch {
-        log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(error)")
+        Log.main.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(error.localizedDescription)")
         return false
       }
     }
@@ -48,7 +47,7 @@ extension FileManager {
         return lockValue == 0o755
       }
     } catch {
-      log.error("Failed to check lock status on item at path \(folder.rawValue) with error: \n\(error)")
+      Log.main.error("Failed to check lock status on item at path \(folder.rawValue) with error: \n\(error.localizedDescription)")
     }
     return false
   }
@@ -64,7 +63,7 @@ extension FileManager {
       let fileUrl = folderUrl.appendingPathComponent(fileName)
       try data.write(to: fileUrl, options: [.atomic])
     } catch {
-      log.error("Failed to write data, error: \(error)")
+      Log.main.error("Failed to write data, error: \(error.localizedDescription)")
       return false
     }
 
@@ -95,7 +94,7 @@ extension FileManager {
 
       return folderDir
     } catch {
-      log.error("Failed to create folder, error: \(error)")
+      Log.main.error("Failed to create folder, error: \(error.localizedDescription)")
       return nil
     }
   }
@@ -105,14 +104,14 @@ extension FileManager {
     let fileUrl = locationUrl.appendingPathComponent(name)
 
     if !fileExists(atPath: fileUrl.path) {
-      log.debug("File \(fileUrl) doesn't exist")
+      Log.main.debug("File \(fileUrl) doesn't exist")
       return
     }
 
     do {
       try removeItem(at: fileUrl)
     } catch {
-      log.error(error)
+      Log.main.error("\(error.localizedDescription)")
     }
   }
 
@@ -130,14 +129,14 @@ extension FileManager {
     let destinationFileUrl = destinationLocation.appendingPathComponent(destinationName)
 
     if !fileExists(atPath: sourceFileUrl.path) {
-      log.debug("File \(sourceFileUrl) doesn't exist")
+      Log.main.debug("File \(sourceFileUrl) doesn't exist")
       return
     }
 
     do {
       try moveItem(at: sourceFileUrl, to: destinationFileUrl)
     } catch {
-      log.error(error)
+      Log.main.error("\(error.localizedDescription)")
     }
   }
 
@@ -180,7 +179,7 @@ extension FileManager {
       }
     } catch {
       completion(false)
-      log.error("Unable to get downloads path: \(error.localizedDescription)")
+      Log.main.error("Unable to get downloads path: \(error.localizedDescription)")
     }
   }
 }

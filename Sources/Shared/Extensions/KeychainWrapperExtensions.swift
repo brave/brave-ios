@@ -3,10 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
-import XCGLogger
+import Logger
 import SwiftKeychainWrapper
-
-private let log = Logger.keychainLogger
 
 public extension KeychainWrapper {
   static var sharedAppContainerKeychain: KeychainWrapper {
@@ -21,19 +19,19 @@ public extension KeychainWrapper {
   func ensureStringItemAccessibility(_ accessibility: SwiftKeychainWrapper.KeychainItemAccessibility, forKey key: String) {
     if self.hasValue(forKey: key) {
       if self.accessibilityOfKey(key) != .afterFirstUnlock {
-        log.debug("updating item \(key) with \(accessibility)")
+        Log.legacy.debug("updating item \(key) with \(accessibility.hashValue)")
 
         guard let value = self.string(forKey: key) else {
-          log.error("failed to get item \(key)")
+          Log.legacy.error("failed to get item \(key)")
           return
         }
 
         if !self.removeObject(forKey: key) {
-          log.warning("failed to remove item \(key)")
+          Log.legacy.warning("failed to remove item \(key)")
         }
 
         if !self.set(value, forKey: key, withAccessibility: accessibility) {
-          log.warning("failed to update item \(key)")
+          Log.legacy.warning("failed to update item \(key)")
         }
       }
     }
@@ -42,19 +40,19 @@ public extension KeychainWrapper {
   func ensureObjectItemAccessibility(_ accessibility: SwiftKeychainWrapper.KeychainItemAccessibility, forKey key: String) {
     if self.hasValue(forKey: key) {
       if self.accessibilityOfKey(key) != .afterFirstUnlock {
-        log.debug("updating item \(key) with \(accessibility)")
+        Log.legacy.debug("updating item \(key) with \(accessibility.hashValue)")
 
         guard let value = self.object(forKey: key) else {
-          log.error("failed to get item \(key)")
+          Log.legacy.error("failed to get item \(key)")
           return
         }
 
         if !self.removeObject(forKey: key) {
-          log.warning("failed to remove item \(key)")
+          Log.legacy.warning("failed to remove item \(key)")
         }
 
         if !self.set(value, forKey: key, withAccessibility: accessibility) {
-          log.warning("failed to update item \(key)")
+          Log.legacy.warning("failed to update item \(key)")
         }
       }
     }

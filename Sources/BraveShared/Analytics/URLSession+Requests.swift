@@ -4,8 +4,7 @@
 
 import Foundation
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 extension URLSession {
   @discardableResult
@@ -41,7 +40,7 @@ extension URLSession {
       task.resume()
       return task
     } catch {
-      log.error(error)
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }

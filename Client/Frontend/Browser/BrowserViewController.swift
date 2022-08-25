@@ -9,7 +9,7 @@ import WebKit
 import Shared
 import Storage
 import SnapKit
-import XCGLogger
+import Logger
 import MobileCoreServices
 import SwiftyJSON
 import Data
@@ -26,9 +26,7 @@ import SwiftUI
 import class Combine.AnyCancellable
 import BraveWallet
 import BraveVPN
-import BraveNews
-
-private let log = Logger.browserLogger
+import Logger
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -378,7 +376,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       BraveLedger.environment = config.ledgerEnvironment
       return BraveLedger(stateStoragePath: legacyLedger.path)
     } catch {
-      log.error("Failed to migrate legacy wallet into a new folder: \(error)")
+      Log.adsRewards.error("Failed to migrate legacy wallet into a new folder: \(error.localizedDescription)")
       return nil
     }
   }
@@ -479,7 +477,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       .receive(on: DispatchQueue.main)
       .sink { [weak self] res in
         if case .failure(let error) = res {
-          log.error("Content Blocker failed to compile bundled lists: \(error)")
+          Log.main.error("Content Blocker failed to compile bundled lists: \(error.localizedDescription, privacy: .public)")
         }
           
         contentBlockListTask = nil
@@ -487,7 +485,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         self?.contentBlockListCompiled = true
         self?.setupTabs()
     } receiveValue: { _ in
-      log.debug("Content Blocker successfully compiled bundled lists")
+      Log.main.debug("Content Blocker successfully compiled bundled lists")
     }
 
     if rewards.ledger != nil {
@@ -843,7 +841,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     }
 
     LegacyBookmarksHelper.restore_1_12_Bookmarks() {
-      log.info("Bookmarks from old database were successfully restored")
+      Log.main.info("Bookmarks from old database were successfully restored")
     }
 
     // Adding a small delay before fetching gives more reliability to it,
@@ -899,12 +897,12 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
       if let error = error {
-        log.error("Failed to request notifications permissions: \(error)")
+        Log.main.error("Failed to request notifications permissions: \(error.localizedDescription, privacy: .public)")
         return
       }
 
       if !granted {
-        log.info("Not authorized to schedule a notification")
+        Log.main.info("Not authorized to schedule a notification")
         return
       }
 
@@ -929,7 +927,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
         center.add(request) { error in
           if let error = error {
-            log.error("Failed to add notification: \(error)")
+            Log.main.error("Failed to add notification: \(error.localizedDescription, privacy: .public)")
             return
           }
 
@@ -1392,7 +1390,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           asFunction: false
         ) { _, error in
           if let error = error {
-            log.error(error)
+            Log.main.error("\(error.localizedDescription, privacy: .public)")
           }
         }
       }
@@ -1429,13 +1427,13 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
 
     guard let webView = object as? WKWebView else {
-      log.error("An object of type: \(String(describing: object)) is being observed instead of a WKWebView")
+      Log.main.error("An object of type: \(String(describing: object), privacy: .public) is being observed instead of a WKWebView")
       return  // False alarm.. the source MUST be a web view.
     }
 
     // WebView is a zombie and somehow still has an observer attached to it
     guard let tab = tabManager[webView] else {
-      log.error("WebView: \(webView) has been removed from TabManager but still has attached observers")
+      Log.main.error("WebView: \(webView, privacy: .public) has been removed from TabManager but still has attached observers")
       return
     }
 
@@ -1866,7 +1864,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
             }
             self.present(pdfActivityController, animated: true)
           } catch {
-            log.error("Failed to write PDF to disk: \(error)")
+            Log.main.error("Failed to write PDF to disk: \(error.localizedDescription, privacy: .public)")
           }
         }
         activities.append(createPDFActivity)
@@ -3541,7 +3539,7 @@ extension BrowserViewController: PreferencesObserver {
       }
       updateURLBarWalletButton()
     default:
-      log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
+      Log.main.debug("Received a preference change for an unknown key: \(key, privacy: .public) on \(type(of: self), privacy: .public)")
       break
     }
   }
@@ -3565,7 +3563,7 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     if response.notification.request.identifier == Self.defaultBrowserNotificationId {
       guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-        log.error("Failed to unwrap iOS settings URL")
+        Log.main.error("Failed to unwrap iOS settings URL")
         return
       }
       UIApplication.shared.open(settingsUrl)

@@ -6,14 +6,12 @@
 import Foundation
 import BraveWallet
 import struct Shared.InternalURL
-import struct Shared.Logger
 import BraveCore
 import SwiftUI
 import BraveUI
 import Data
 import BraveShared
-
-private let log = Logger.browserLogger
+import Logger
 
 extension WalletStore {
   /// Creates a WalletStore based on whether or not the user is in Private Mode
@@ -28,7 +26,7 @@ extension WalletStore {
       let ethTxManagerProxy = BraveWallet.EthTxManagerProxyFactory.get(privateMode: privateMode),
       let solTxManagerProxy = BraveWallet.SolanaTxManagerProxyFactory.get(privateMode: privateMode)
     else {
-      log.error("Failed to load wallet. One or more services were unavailable")
+      Log.main.error("Failed to load wallet. One or more services were unavailable")
       return nil
     }
     return WalletStore(
@@ -58,7 +56,7 @@ extension CryptoStore {
       let ethTxManagerProxy = BraveWallet.EthTxManagerProxyFactory.get(privateMode: privateMode),
       let solTxManagerProxy = BraveWallet.SolanaTxManagerProxyFactory.get(privateMode: privateMode)
     else {
-      log.error("Failed to load wallet. One or more services were unavailable")
+      Log.main.error("Failed to load wallet. One or more services were unavailable")
       return nil
     }
     return CryptoStore(
@@ -81,7 +79,7 @@ extension BrowserViewController {
   func newWalletStore() -> WalletStore? {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
     guard let walletStore = WalletStore.from(privateMode: privateMode) else {
-      log.error("Failed to load wallet. One or more services were unavailable")
+      Log.main.error("Failed to load wallet. One or more services were unavailable")
       return nil
     }
     self.walletStore = walletStore
@@ -148,7 +146,7 @@ extension BrowserViewController: BraveWalletDelegate {
 extension Tab: BraveWalletProviderDelegate {
   func showPanel() {
     guard let origin = url?.origin else {
-      log.error("Failing to show Wallet panel due to unavailable tab url origin")
+      Log.main.error("Failing to show Wallet panel due to unavailable tab url origin")
       return
     }
     tabDelegate?.showWalletNotification(self, origin: origin)

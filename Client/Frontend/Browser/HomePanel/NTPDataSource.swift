@@ -6,6 +6,7 @@ import UIKit
 import Shared
 import BraveShared
 import BraveCore
+import Logger
 
 public class NTPDataSource {
 
@@ -215,7 +216,7 @@ public class NTPDataSource {
       let backgroundData = try Data(contentsOf: URL(fileURLWithPath: filePath))
       return backgroundData
     } catch {
-      Logger.browserLogger.error("Failed to get bundle path for \(file)")
+      Log.main.error("Failed to get bundle path for \(file)")
     }
 
     return nil
@@ -276,7 +277,7 @@ extension NTPDataSource: PreferencesObserver {
         do {
           try downloader.removeCampaign(type: .sponsor)
         } catch {
-          Logger.browserLogger.error(error)
+          Log.main.error("\(error.localizedDescription)")
         }
       }
     case customThemePref.key:

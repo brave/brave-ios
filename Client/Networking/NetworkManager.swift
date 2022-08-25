@@ -6,8 +6,7 @@ import Foundation
 import Shared
 import Combine
 import Dispatch
-
-private let log = Logger.browserLogger
+import Logger
 
 class NetworkManager {
   private let session: NetworkSession

@@ -6,8 +6,7 @@
 import Foundation
 import CoreData
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 public enum RecentSearchType: Int32 {
   case qrCode = 0
@@ -110,7 +109,7 @@ final public class RecentSearch: NSManagedObject, CRUD {
     do {
       return try DataController.viewContext.count(for: request)
     } catch {
-      log.error("Count error: \(error)")
+      Log.main.error("Count error: \(error.localizedDescription)")
     }
     return 0
   }
@@ -126,14 +125,14 @@ final public class RecentSearch: NSManagedObject, CRUD {
 
   private static func saveContext(_ context: NSManagedObjectContext) {
     if context.concurrencyType == .mainQueueConcurrencyType {
-      log.warning("Writing to view context, this should be avoided.")
+      Log.main.warning("Writing to view context, this should be avoided.")
     }
 
     if context.hasChanges {
       do {
         try context.save()
       } catch {
-        assertionFailure("Error saving DB: \(error)")
+        assertionFailure("Error saving DB: \(error.localizedDescription)")
       }
     }
   }

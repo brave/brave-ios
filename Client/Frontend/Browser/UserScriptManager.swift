@@ -7,8 +7,7 @@ import Shared
 import Data
 import BraveCore
 import BraveShared
-
-private let log = Logger.browserLogger
+import Logger
 
 class UserScriptManager {
 
@@ -166,7 +165,7 @@ class UserScriptManager {
 
   private let cookieControlUserScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "CookieControl", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
-      log.error("Failed to load cookie control user script")
+      Log.main.error("Failed to load cookie control user script")
       return nil
     }
 
@@ -180,7 +179,7 @@ class UserScriptManager {
   /// A script that adds blocking for invalid fetch and ajax calls
   private let requestBlockingUserScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "RequestBlocking", ofType: "js"), var source: String = try? String(contentsOfFile: path) else {
-      log.error("Failed to load cookie control user script")
+      Log.main.error("Failed to load cookie control user script")
       return nil
     }
     
@@ -200,7 +199,7 @@ class UserScriptManager {
       )
     } catch {
       assertionFailure(error.localizedDescription)
-      log.error(error.localizedDescription)
+      Log.main.error("\(error.localizedDescription)")
       return nil
     }
   }()
@@ -212,7 +211,7 @@ class UserScriptManager {
   /// The third part is handled by debouncing amp links and handled by debouncing logic in `DebouncingResourceDownloader`
   private let deAMPUserScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "DeAMP", ofType: "js"), var source: String = try? String(contentsOfFile: path) else {
-      log.error("Failed to load cookie control user script")
+      Log.main.error("Failed to load cookie control user script")
       return nil
     }
     
@@ -239,7 +238,7 @@ class UserScriptManager {
   // requests to payment APIs
   private let PaymentRequestUserScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load PaymentRequest.js")
+      Log.main.error("Failed to load PaymentRequest.js")
       return nil
     }
 
@@ -260,7 +259,7 @@ class UserScriptManager {
 
   private let resourceDownloadManagerUserScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load ResourceDownloader.js")
+      Log.main.error("Failed to load ResourceDownloader.js")
       return nil
     }
     var alteredSource: String = source
@@ -277,7 +276,7 @@ class UserScriptManager {
 
   private let WindowRenderHelperScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "WindowRenderHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load WindowRenderHelper.js")
+      Log.main.error("Failed to load WindowRenderHelper.js")
       return nil
     }
 
@@ -298,7 +297,7 @@ class UserScriptManager {
 
   private let FullscreenHelperScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "FullscreenHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load FullscreenHelper.js")
+      Log.main.error("Failed to load FullscreenHelper.js")
       return nil
     }
 
@@ -313,7 +312,7 @@ class UserScriptManager {
     guard let path = Bundle.current.path(forResource: "PlaylistSwizzler", ofType: "js"),
       let source = try? String(contentsOfFile: path)
     else {
-      log.error("Failed to load PlaylistSwizzler.js")
+      Log.main.error("Failed to load PlaylistSwizzler.js")
       return nil
     }
 
@@ -326,7 +325,7 @@ class UserScriptManager {
 
   private let PlaylistHelperScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load Playlist.js")
+      Log.main.error("Failed to load Playlist.js")
       return nil
     }
 
@@ -372,7 +371,7 @@ class UserScriptManager {
 
   private let MediaBackgroundingScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "MediaBackgrounding", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load MediaBackgrounding.js")
+      Log.main.error("Failed to load MediaBackgrounding.js")
       return nil
     }
 
@@ -405,7 +404,7 @@ class UserScriptManager {
   
   private let ReadyStateScript: WKUserScript? = {
     guard let path = Bundle.current.path(forResource: "ReadyState", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load ReadyState.js")
+      Log.main.error("Failed to load ReadyState.js")
       return nil
     }
 
@@ -510,7 +509,7 @@ class UserScriptManager {
           $0.addUserScript(script)
         } catch {
           assertionFailure("Should never happen. The scripts are packed in the project and loading/modifying should always be possible.")
-          log.error(error)
+          Log.main.error("\(error.localizedDescription)")
         }
       }
 

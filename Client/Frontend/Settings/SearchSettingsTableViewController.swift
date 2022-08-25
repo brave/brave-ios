@@ -4,8 +4,7 @@
 
 import UIKit
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 // MARK: - SearchEnginePickerDelegate
 
@@ -319,7 +318,7 @@ class SearchSettingsTableViewController: UITableViewController {
           tableView.deleteRows(at: [indexPath], with: .right)
           tableView.reloadData()
         } catch {
-          log.error("Search Engine Error while deleting")
+          Log.main.error("Search Engine Error while deleting")
         }
       }
 

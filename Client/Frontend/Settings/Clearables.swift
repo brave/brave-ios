@@ -8,9 +8,7 @@ import Data
 import BraveShared
 import WebKit
 import BraveCore
-import BraveNews
-
-private let log = Logger.browserLogger
+import Logger
 
 // A base protocol for something that can be cleared.
 protocol Clearable {
@@ -156,7 +154,7 @@ class DownloadsClearable: Clearable {
       }
     } catch {
       // Not logging the `error` because downloaded file names can be sensitive to some users.
-      log.error("Could not remove downloaded file")
+      Log.main.error("Could not remove downloaded file")
     }
   }
 }
@@ -194,7 +192,7 @@ class PlayListCacheClearable: Clearable {
       do {
         try FileManager.default.removeItem(at: playlistDirectory)
       } catch {
-        log.error("Error Deleting Playlist directory: \(error)")
+        Log.main.error("Error Deleting Playlist directory: \(error.localizedDescription)")
       }
     }
   }
@@ -216,7 +214,7 @@ class PlayListDataClearable: Clearable {
       do {
         try FileManager.default.removeItem(at: playlistDirectory)
       } catch {
-        log.error("Error Deleting Playlist directory: \(error)")
+        Log.main.error("Error Deleting Playlist directory: \(error.localizedDescription)")
       }
     }
   }

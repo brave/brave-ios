@@ -11,8 +11,7 @@ import AVKit
 import AVFoundation
 
 import MediaPlayer
-
-private let log = Logger.browserLogger
+import Logger
 
 protocol VideoViewDelegate: AnyObject {
   func onPreviousTrack(_ videoView: VideoView, isUserInitiated: Bool)

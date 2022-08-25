@@ -8,8 +8,7 @@ import BraveUI
 import Shared
 import Data
 import UIKit
-
-private let log = Logger.browserLogger
+import Logger
 
 // MARK: - ProductNotification
 

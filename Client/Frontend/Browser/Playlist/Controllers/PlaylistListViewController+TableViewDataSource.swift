@@ -10,8 +10,7 @@ import AVFoundation
 import Data
 import Shared
 import BraveUI
-
-private let log = Logger.browserLogger
+import Logger
 
 // MARK: UITableViewDataSource
 

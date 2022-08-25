@@ -10,8 +10,7 @@ import BraveUI
 import Shared
 import Data
 import MediaPlayer
-
-private let log = Logger.browserLogger
+import Logger
 
 private extension PlaylistListViewController {
   func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {
@@ -351,7 +350,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
         switch error {
         case .other(let err):
-          log.error(err)
+          Log.main.error("\(err.localizedDescription)")
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
           self.delegate?.displayLoadingResourceError()
         case .expired:
@@ -364,7 +363,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           self.delegate?.updateLastPlayedItem(item: item)
         case .cancelled:
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          log.debug("User cancelled Playlist Playback")
+          Log.main.debug("User cancelled Playlist Playback")
         }
       }
     }

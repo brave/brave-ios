@@ -6,9 +6,7 @@
 import Foundation
 import WebKit
 import BraveCore
-import struct Shared.Logger
-
-private let log = Logger.browserLogger
+import Logger
 
 class EthereumProviderHelper: TabContentScript {
   private static let supportedSingleArgMethods = [
@@ -76,13 +74,13 @@ class EthereumProviderHelper: TabContentScript {
           let body = try? JSONDecoder().decode(MessageBody.self, from: messageData),
           body.securityToken == UserScriptManager.securityTokenString
     else {
-      log.error("Failed to handle ethereum provider communication")
+      Log.main.error("Failed to handle ethereum provider communication")
       return
     }
     
     if message.webView?.url?.isLocal == false,
         message.webView?.hasOnlySecureContent == false { // prevent communication in mixed-content scenarios
-      log.error("Failed ethereum provider communication security test")
+      Log.main.error("Failed ethereum provider communication security test")
       return
     }
     

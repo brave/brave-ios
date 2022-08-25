@@ -9,10 +9,8 @@ import Shared
 import BraveCore
 import BraveShared
 import SwiftyJSON
-import XCGLogger
+import Logger
 import Data
-
-private let log = Logger.browserLogger
 
 protocol TabContentScript {
   static func name() -> String
@@ -263,7 +261,7 @@ class Tab: NSObject {
         asFunction: true
       ) { _, error in
         if let error = error {
-          log.error("Error executing script: \(error)")
+          Log.main.error("Error executing script: \(error.localizedDescription, privacy: .public)")
         }
       }
 
@@ -414,7 +412,7 @@ class Tab: NSObject {
     } else if let request = lastRequest {
       webView.load(request)
     } else {
-      log.warning("creating webview with no lastRequest and no session data: \(String(describing: self.url))")
+      Log.main.warning("creating webview with no lastRequest and no session data: \(String(describing: self.url), privacy: .public)")
     }
 
   }
@@ -604,12 +602,12 @@ class Tab: NSObject {
 
     if let _ = webView?.reloadFromOrigin() {
       nightMode = Preferences.General.nightModeEnabled.value
-      log.debug("reloaded zombified tab from origin")
+      Log.main.debug("reloaded zombified tab from origin")
       return
     }
 
     if let webView = self.webView {
-      log.debug("restoring webView from scratch")
+      Log.main.debug("restoring webView from scratch")
       restore(webView, restorationData: sessionData?.savedTabData)
     }
   }
@@ -949,16 +947,16 @@ extension Tab {
         result, error in
 
         if let error = error {
-          log.error("onFetchedBackupResults existence check error: \(error)")
+          Log.main.error("onFetchedBackupResults existence check error: \(error.localizedDescription, privacy: .public)")
         }
 
         guard let methodUndefined = result as? Bool else {
-          log.error("onFetchedBackupResults existence check, failed to unwrap bool result value")
+          Log.main.error("onFetchedBackupResults existence check, failed to unwrap bool result value")
           return
         }
 
         if methodUndefined {
-          log.info("Search Backup results are ready but the page has not been loaded yet")
+          Log.main.info("Search Backup results are ready but the page has not been loaded yet")
           return
         }
 

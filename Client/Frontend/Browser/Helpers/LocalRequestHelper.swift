@@ -5,8 +5,7 @@
 import Foundation
 import Shared
 import WebKit
-
-private let log = Logger.browserLogger
+import Logger
 
 class LocalRequestHelper: TabContentScript {
   func scriptMessageHandlerName() -> String? {
@@ -21,7 +20,7 @@ class LocalRequestHelper: TabContentScript {
     else { return }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: params) {
-      log.debug("Missing required security token.")
+      Log.main.debug("Missing required security token.")
       return
     }
 

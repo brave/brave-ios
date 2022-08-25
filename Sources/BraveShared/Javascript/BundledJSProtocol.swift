@@ -4,8 +4,7 @@
 
 import Foundation
 import Shared
-
-private let log = Logger.browserLogger
+import Logger
 
 /// A javascript file stored in app's Bundle.
 /// The file does not need to be statically copied into the app.
@@ -30,7 +29,7 @@ public extension BundledJSProtocol {
 
       return try String(contentsOfFile: filePath, encoding: String.Encoding.utf8)
     } catch {
-      log.error("Could not find or parse script named: \(name)")
+      Log.main.error("Could not find or parse script named: \(name, privacy: .public)")
       return nil
     }
   }

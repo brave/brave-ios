@@ -6,8 +6,7 @@ import Foundation
 import Shared
 import BraveShared
 import Combine
-
-private let log = Logger.browserLogger
+import Logger
 
 private struct AdBlockNetworkResource {
   let resource: CachedNetworkResource
@@ -37,7 +36,7 @@ public class AdblockResourceDownloader {
 
   init(networkManager: NetworkManager = NetworkManager(), locale: String? = Locale.current.languageCode) {
     if locale == nil {
-      log.warning("No locale provided, using default one(\"en\")")
+      Log.main.warning("No locale provided, using default one(\"en\")")
     }
     self.locale = locale ?? "en"
     self.networkManager = networkManager
@@ -57,12 +56,12 @@ public class AdblockResourceDownloader {
       lastFetchDate = now
       
       let regionalSetup = regionalAdblockResourcesSetup().catch { error -> AnyPublisher<Void, Never> in
-        log.error("Failed to Download Regional Adblock-Resources: \(error)")
+        Log.main.error("Failed to Download Regional Adblock-Resources: \(error.localizedDescription)")
         return Just(()).eraseToAnyPublisher()
       }
       
       let generalSetup = generalAdblockResourcesSetup().catch { error -> AnyPublisher<Void, Never> in
-        log.error("Failed to Download General Adblock-Resources: \(error)")
+        Log.main.error("Failed to Download General Adblock-Resources: \(error.localizedDescription)")
         return Just(()).eraseToAnyPublisher()
       }
       
@@ -70,21 +69,21 @@ public class AdblockResourceDownloader {
         .collect()
         .receive(on: DispatchQueue.main)
         .sink { _ in
-          log.debug("Finished Setting Up Adblock-Resources")
+          Log.main.debug("Finished Setting Up Adblock-Resources")
         }
     }
   }
 
   func regionalAdblockResourcesSetup() -> AnyPublisher<Void, Error> {
     if !Preferences.Shields.useRegionAdBlock.value {
-      log.debug("Regional adblocking disabled, aborting attempt to download regional resources")
+      Log.main.debug("Regional adblocking disabled, aborting attempt to download regional resources")
       return Empty(outputType: Void.self, failureType: Error.self).eraseToAnyPublisher()
     }
 
     return downloadResources(type: .regional(locale: locale))
       .receive(on: DispatchQueue.main)
       .map {
-        log.debug("Regional blocklists download and setup completed.")
+        Log.main.debug("Regional blocklists download and setup completed.")
         Preferences.Debug.lastRegionalAdblockUpdate.value = Date()
       }.eraseToAnyPublisher()
   }
@@ -93,7 +92,7 @@ public class AdblockResourceDownloader {
     return downloadResources(type: .general)
       .receive(on: DispatchQueue.main)
       .map {
-        log.debug("General blocklists download and setup completed.")
+        Log.main.debug("General blocklists download and setup completed.")
         Preferences.Debug.lastGeneralAdblockUpdate.value = Date()
       }.eraseToAnyPublisher()
   }
@@ -162,7 +161,7 @@ public class AdblockResourceDownloader {
 
   private func fileFromDocumentsAsString(_ name: String, inFolder folder: String) -> String? {
     guard let folderUrl = FileManager.default.getOrCreateFolder(name: folder) else {
-      log.error("Failed to get folder: \(folder)")
+      Log.main.error("Failed to get folder: \(folder)")
       return nil
     }
 
@@ -258,11 +257,11 @@ extension AdblockResourceDownloader: PreferencesObserver {
         .receive(on: DispatchQueue.main)
         .sink { res in
           if case .failure(let error) = res {
-            log.error(error)
+            Log.main.error("\(error.localizedDescription)")
           }
           cancellable = nil
         } receiveValue: { _ in
-          log.debug("Successfully Setup Adblock Regional Preferences")
+          Log.main.debug("Successfully Setup Adblock Regional Preferences")
         }
     }
   }
