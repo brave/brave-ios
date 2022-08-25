@@ -404,6 +404,8 @@ extension BrowserViewController: PlaylistHelperDelegate, PlaylistFolderSharingHe
 }
 
 extension BrowserViewController {
+  private static var playlistSyncFoldersTimer: Timer?
+  
   func openPlaylistSettingsMenu() {
     let playlistSettings = PlaylistSettingsViewController()
     let navigationController = UINavigationController(rootViewController: playlistSettings)
@@ -411,6 +413,16 @@ extension BrowserViewController {
   }
   
   func syncPlaylistFolders() {
+    BrowserViewController.playlistSyncFoldersTimer?.invalidate()
     
+    let lastSyncDate = Preferences.Playlist.lastPlaylistFoldersSyncTime.value ?? Date()
+    
+    BrowserViewController.playlistSyncFoldersTimer = Timer(fire: lastSyncDate, interval: 4.hours, repeats: true, block: { _ in
+      Preferences.Playlist.lastPlaylistFoldersSyncTime.value = Date()
+      
+      Task { @MainActor in
+        try await PlaylistManager.syncSharedFolders()
+      }
+    })
   }
 }

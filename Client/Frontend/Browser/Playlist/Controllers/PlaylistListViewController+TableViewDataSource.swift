@@ -168,25 +168,38 @@ extension PlaylistListViewController: UITableViewDataSource {
       header.setState(isPersistent ? .menu : .add)
       
       header.onAddPlaylist = { [unowned self] in
-        let controller = PopupViewController(rootView: PlaylistFolderSharingManagementView(onAddToPlaylistPressed: { [unowned self] in
-          self.dismiss(animated: true)
+        guard let sharedFolderUrl = folder.sharedFolderUrl else { return }
+        
+        if Preferences.Playlist.autoDownloadVideo.value {
+          let controller = PopupViewController(rootView: PlaylistFolderSharingManagementView(onAddToPlaylistPressed: { [unowned self] in
+            self.dismiss(animated: true)
+            
+            Task { @MainActor in
+              let persistentFolderId = await PlaylistSharedFolderNetwork.saveToDiskStorage(memoryFolder: folder)
+              PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
+              
+              PlaylistFolder.getSharedFolder(sharedFolderUrl: sharedFolderUrl)?.playlistItems?.forEach({
+                PlaylistManager.shared.autoDownload(item: PlaylistInfo(item: $0))
+              })
+            }
+          }, onSettingsPressed: { [unowned self] in
+            let delegate = self.delegate
+            self.dismiss(animated: false) {
+              delegate?.openPlaylistSettings()
+            }
+          }, onCancelPressed: { [unowned self] in
+            self.dismiss(animated: true)
+          })).then {
+            $0.overrideUserInterfaceStyle = .dark
+          }
           
+          self.present(controller, animated: true, completion: nil)
+        } else {
           Task { @MainActor in
             let persistentFolderId = await PlaylistSharedFolderNetwork.saveToDiskStorage(memoryFolder: folder)
             PlaylistManager.shared.currentFolder = PlaylistFolder.getFolder(uuid: persistentFolderId)
           }
-        }, onSettingsPressed: { [unowned self] in
-          let delegate = self.delegate
-          self.dismiss(animated: false) {
-            delegate?.openPlaylistSettings()
-          }
-        }, onCancelPressed: { [unowned self] in
-          self.dismiss(animated: true)
-        })).then {
-          $0.overrideUserInterfaceStyle = .dark
         }
-        
-        self.present(controller, animated: true, completion: nil)
       }
       
       header.menu = { [weak header, weak folder] in

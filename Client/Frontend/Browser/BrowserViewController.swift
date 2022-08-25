@@ -871,6 +871,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         }
       }
       .store(in: &cancellables)
+    
+    syncPlaylistFolders()
   }
 
   public static let defaultBrowserNotificationId = "defaultBrowserNotification"
