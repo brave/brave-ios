@@ -78,7 +78,7 @@
 		<string>OpenWebsiteIntent</string>
 		<string>ShortcutsConfigurationIntent</string>
 		<string>StatsConfigurationIntent</string>
-		<string>org.mozilla.ios.firefox.browsing</string>
+		<string>com.brave.ios.browsing</string>
 	</array>
 	<key>SERVICES_KEY</key>
 	<string>$(BRAVE_SERVICES_KEY)</string>
