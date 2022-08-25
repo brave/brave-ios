@@ -7,8 +7,6 @@ import Shared
 import Combine
 import Dispatch
 
-private let log = Logger.browserLogger
-
 enum NetworkManagerError: Error {
   /// The eTag in the response headers matched one on file
   case fileNotModified
@@ -173,7 +171,7 @@ extension NetworkManager {
     case 400...499:
       let error = """
         Failed to download, status code: \(response.statusCode),\
-        URL:\(String(describing: response.url))
+        URL:\(response.url?.absoluteString ?? "nil")
         """
       log.error(error)
       throw URLError(.badServerResponse)

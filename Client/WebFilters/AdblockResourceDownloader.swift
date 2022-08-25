@@ -6,8 +6,7 @@ import Foundation
 import BraveCore
 import Shared
 import BraveShared
-
-private let log = Logger.browserLogger
+import os.log
 
 /// A class responsible for downloading some generic ad-block resources
 public actor AdblockResourceDownloader: Sendable {

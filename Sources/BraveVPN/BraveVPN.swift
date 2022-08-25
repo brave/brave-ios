@@ -9,8 +9,7 @@ import BraveShared
 import NetworkExtension
 import Data
 import GuardianConnect
-
-private let log = Logger.browserLogger
+import os.log
 
 /// A static class to handle all things related to the Brave VPN service.
 public class BraveVPN {
@@ -43,7 +42,7 @@ public class BraveVPN {
 
       NEVPNManager.shared().removeFromPreferences { error in
         if let error = error {
-          logAndStoreError("Remove vpn error: \(error)")
+          logAndStoreError("Remove vpn error: \(error.localizedDescription)")
         }
       }
     }
@@ -55,7 +54,7 @@ public class BraveVPN {
     helper.verifyMainCredentials { valid, error in
       logAndStoreError("Initialize credentials valid: \(valid)")
       if let error = error {
-        logAndStoreError("Initialize credentials error: \(error)")
+        logAndStoreError("Initialize credentials error: \(error.localizedDescription)")
       }
     }
 
@@ -256,7 +255,7 @@ public class BraveVPN {
       // just configure & connect, no need for 'first user' setup
       helper.configureAndConnectVPN { error, status in
         if let error = error {
-          logAndStoreError("configureAndConnectVPN: \(error)")
+          logAndStoreError("configureAndConnectVPN: \(error.localizedDescription)")
         }
         
         reconnectPending = false
@@ -266,7 +265,7 @@ public class BraveVPN {
       // New user or no credentials and have to remake them.
       helper.configureFirstTimeUserPostCredential(nil) { success, error in
         if let error = error {
-          logAndStoreError("configureFirstTimeUserPostCredential \(error)")
+          logAndStoreError("configureFirstTimeUserPostCredential \(error.localizedDescription)")
         }
         
         reconnectPending = false
@@ -315,10 +314,10 @@ public class BraveVPN {
     helper.select(region)
     helper.configureFirstTimeUser(with: region) { success, error in
       if success {
-        log.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
+        Logger.module.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
         completion(true)
       } else {
-        log.debug("connection failed: \(String(describing: error))")
+        Logger.module.debug("connection failed: \(error ?? "nil")")
         completion(false)
       }
     }
@@ -346,16 +345,16 @@ public class BraveVPN {
     Task {
       let (data, success, error) = await GRDGatewayAPI().events()
       if !success {
-        log.error("VPN getEvents call failed")
+        Logger.module.error("VPN getEvents call failed")
         if let error = error {
-          log.warning(error)
+          Logger.module.warning("\(error.localizedDescription)")
         }
         
         return
       }
       
       guard let alertsData = data["alerts"] else {
-        log.error("Failed to unwrap json for vpn alerts")
+        Logger.module.error("Failed to unwrap json for vpn alerts")
         return
       }
       
@@ -366,7 +365,7 @@ public class BraveVPN {
         
         BraveVPNAlert.batchInsertIfNotExists(alerts: decoded)
       } catch {
-        log.error("Failed parsing vpn alerts data")
+        Logger.module.error("Failed parsing vpn alerts data")
       }
     }
   }
@@ -385,12 +384,12 @@ public class BraveVPN {
 
       center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
         if let error = error {
-          log.error("Failed to request notifications permissions: \(error)")
+          Logger.module.error("Failed to request notifications permissions: \(error.localizedDescription)")
           return
         }
 
         if !granted {
-          log.info("Not authorized to schedule a notification")
+          Logger.module.info("Not authorized to schedule a notification")
           return
         }
 
@@ -411,7 +410,7 @@ public class BraveVPN {
 
           center.add(request) { error in
             if let error = error {
-              log.error("Failed to add notification: \(error)")
+              Logger.module.error("Failed to add notification: \(error.localizedDescription)")
               return
             }
 
@@ -432,7 +431,7 @@ public class BraveVPN {
   /// This can be further used for a customer support form.
   private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
     if printToConsole {
-      log.error(message)
+      Logger.module.error("\(message)")
     }
 
     // Extra safety here in case the log is spammed by many messages.
