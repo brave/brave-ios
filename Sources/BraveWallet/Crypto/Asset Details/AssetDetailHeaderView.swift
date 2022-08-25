@@ -8,6 +8,7 @@ import SwiftUI
 import BraveCore
 import DesignSystem
 import Strings
+import BraveShared
 
 extension BraveWallet.AssetTimePrice: DataPoint {
   var value: CGFloat {
@@ -24,6 +25,7 @@ struct AssetDetailHeaderView: View {
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.openWalletURLAction) private var openWalletURL
   @State private var selectedCandle: BraveWallet.AssetTimePrice?
 
   private var deltaText: some View {
@@ -114,7 +116,13 @@ struct AssetDetailHeaderView: View {
   @ViewBuilder var auroraBridgeButton: some View {
     Button(
       action: {
-        isShowingBridgeAlert = true
+        if Preferences.Wallet.showAuroraPopup.value {
+          isShowingBridgeAlert = true
+        } else {
+          if let link = WalletConstants.auroraBridgeLink {
+            openWalletURL?(link)
+          }
+        }
       }
     ) {
       Text(Strings.Wallet.auroraBridgeButtonTitle)

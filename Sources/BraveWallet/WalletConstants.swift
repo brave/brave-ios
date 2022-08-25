@@ -86,11 +86,13 @@ struct WalletConstants {
     "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e"  // YFI
   ]
   
+  /// The link for users to learn the overview of aurora bridge
+  static let auroraBridgeOverviewLink: URL? = URL(string: "https://doc.aurora.dev/bridge/bridge-overview/")
   /// The link for users to learn about the risk of using aurora bridge
-  static let auroraBridgeRiskLink: URL = URL(string: "https://ethereum.org/en/bridges/#bridge-risk")!
+  static let auroraBridgeRiskLink: URL? = URL(string: "https://rainbowbridge.app/approvals")
   
   /// The link for users to open Aurora site
-  static let auroraBridgeLink: URL = URL(string: "https://rainbowbridge.app")!
+  static let auroraBridgeLink: URL? = URL(string: "https://rainbowbridge.app")
 }
 
 struct WalletDebugFlags {

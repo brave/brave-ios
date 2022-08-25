@@ -9,6 +9,7 @@ import SwiftUI
 import BraveCore
 import DesignSystem
 import Strings
+import BraveShared
 
 struct AssetDetailView: View {
   @ObservedObject var assetDetailStore: AssetDetailStore
@@ -162,30 +163,57 @@ struct AssetDetailView: View {
         isPresented: $isShowingAuroraBridgeAlert,
         buttonTitle: Strings.Wallet.auroraBridgeButtonTitle,
         action: { proceed, _ in
-          if proceed {
-            openWalletURL?(WalletConstants.auroraBridgeLink)
+          isShowingAuroraBridgeAlert = false
+          if proceed, let link = WalletConstants.auroraBridgeLink {
+            openWalletURL?(link)
           }
           return true
         },
         content: {
-          VStack {
+          VStack(spacing: 10) {
             Text(Strings.Wallet.auroraBridgeAlertTitle)
               .font(.headline.weight(.bold))
               .multilineTextAlignment(.center)
               .padding(.vertical)
-            VStack(alignment: .leading) {
-              Text(Strings.Wallet.auroraBridgeAlertDescription)
-                .font(.subheadline)
-              Button(action: {
-                isShowingAuroraBridgeAlert = false
-                openWalletURL?(WalletConstants.auroraBridgeRiskLink)
-              }) {
-                Text(Strings.Wallet.learnMoreButton)
-                  .font(.subheadline)
-                  .foregroundColor(Color(.braveBlurpleTint))
+            Text(Strings.Wallet.auroraBridgeAlertDescription)
+              .multilineTextAlignment(.center)
+              .font(.subheadline)
+          }
+        },
+        footer: {
+          VStack(spacing: 8) {
+            Button(action: {
+              isShowingAuroraBridgeAlert = false
+              Preferences.Wallet.showAuroraPopup.value = false
+            }) {
+              Text(Strings.Wallet.auroraPopupDontShowAgain)
+                .foregroundColor(Color(.braveLabel))
+                .font(.callout.weight(.semibold))
+            }
+            Button {
+              isShowingAuroraBridgeAlert = false
+              if let link = WalletConstants.auroraBridgeOverviewLink {
+                openWalletURL?(link)
               }
+            } label: {
+              Text(Strings.Wallet.auroraBridgeLearnMore)
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color(.braveBlurpleTint))
+                .font(.subheadline)
+            }
+            Button {
+              isShowingAuroraBridgeAlert = false
+              if let link = WalletConstants.auroraBridgeRiskLink {
+                openWalletURL?(link)
+              }
+            } label: {
+              Text(Strings.Wallet.auroraBridgeRisk)
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color(.braveBlurpleTint))
+                .font(.subheadline)
             }
           }
+          .padding(.top, 16)
         }
       )
     )
