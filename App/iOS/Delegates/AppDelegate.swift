@@ -219,7 +219,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       class_addMethod(clazz, MenuHelper.selectorFindInPage, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
     }
 
-    #if !NO_BRAVE_NEWS
     if Preferences.BraveNews.isEnabled.value && !Preferences.BraveNews.userOptedIn.value {
       // Opt-out any user that has not explicitly opted-in
       Preferences.BraveNews.isEnabled.value = false
@@ -233,7 +232,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       // Base opt-in visibility on whether or not the user's language is supported in BT
       Preferences.BraveNews.isShowingOptIn.value = FeedDataSource.supportedLanguages.contains(String(languageCode))
     }
-    #endif
 
     SystemUtils.onFirstRun()
 
