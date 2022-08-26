@@ -305,9 +305,11 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.tableView.reloadData()
         }
         
-        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(braveSystemNamed: "brave.trash")?.template, attributes: .destructive) { _ in
-          PlaylistManager.shared.delete(folder: folder) { [weak self] _ in
-            self?.navigationController?.popToRootViewController(animated: true)
+        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(braveSystemNamed: "brave.trash")?.template, attributes: .destructive) { [unowned self] _ in
+          
+          self.navigationController?.popToRootViewController(animated: true)
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            PlaylistManager.shared.delete(folder: folder)
           }
         }
         
