@@ -41,6 +41,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     $0.imageView?.image = UIImage(systemName: "plus")
     $0.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
     $0.contentMode = .scaleAspectFit
+    $0.setPreferredSymbolConfiguration(.init(font: .preferredFont(forTextStyle: .body), scale: .large), forImageIn: .normal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.setContentHuggingPriority(.required, for: .horizontal)
   }

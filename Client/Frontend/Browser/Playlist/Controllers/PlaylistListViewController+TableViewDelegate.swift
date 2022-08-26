@@ -177,12 +177,14 @@ extension PlaylistListViewController: UITableViewDelegate {
               self?.openInNewTab(currentItem, isPrivate: true)
             }))
 
-        alert.addAction(
-          UIAlertAction(
-            title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, style: .default,
-            handler: { [weak self] _ in
-              self?.moveItems(indexPaths: [indexPath])
-            }))
+        if !isSharedFolder {
+          alert.addAction(
+            UIAlertAction(
+              title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, style: .default,
+              handler: { [weak self] _ in
+                self?.moveItems(indexPaths: [indexPath])
+              }))
+        }
 
         alert.addAction(
           UIAlertAction(
