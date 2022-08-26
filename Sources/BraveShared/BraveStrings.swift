@@ -1362,8 +1362,13 @@ extension Strings {
   public struct PlayList {
     public static let playListSectionTitle =
       NSLocalizedString("playList.playListSectionTitle", tableName: "BraveShared", bundle: .strings,
-        value: "Playlist",
+        value: "Playlists",
         comment: "Title For the Section that videos are listed")
+    
+    public static let playListTitle =
+      NSLocalizedString("playList.playListSettingTitle", tableName: "BraveShared", bundle: .strings,
+        value: "Playlist",
+        comment: "Title Playlist (used for back button, and playlist settings)")
     
     public static let playListSharedFolderSectionTitle =
       NSLocalizedString("playList.playListSharedFolderSectionTitle", tableName: "BraveShared", bundle: .strings,

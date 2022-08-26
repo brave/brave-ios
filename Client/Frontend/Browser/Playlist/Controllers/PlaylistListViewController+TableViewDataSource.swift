@@ -316,7 +316,7 @@ extension PlaylistListViewController: UITableViewDataSource {
         }
         
         if folder.uuid == PlaylistFolder.savedFolderUUID {
-          return UIMenu(children: [editAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction, deleteAction])
+          return UIMenu(children: [editAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction])
         }
         
         return UIMenu(children: [editAction, renameAction, canSaveOffline ? saveOfflineAction : deleteOfflineAction, deleteAction])

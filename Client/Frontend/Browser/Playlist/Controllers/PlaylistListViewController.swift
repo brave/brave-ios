@@ -131,7 +131,7 @@ class PlaylistListViewController: UIViewController {
       }.store(in: &observers)
 
     // Theme
-    title = Strings.PlayList.playListSectionTitle
+    title = Strings.PlayList.playListTitle
     view.backgroundColor = .braveBackground
     navigationController?.do {
       let appearance = UINavigationBarAppearance()

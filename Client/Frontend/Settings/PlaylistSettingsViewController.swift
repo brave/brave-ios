@@ -62,7 +62,7 @@ class PlaylistSettingsViewController: TableViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    title = Strings.PlayList.playListSectionTitle
+    title = Strings.PlayList.playListTitle
 
     dataSource.sections = [
       Section(
