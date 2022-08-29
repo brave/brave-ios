@@ -25,6 +25,7 @@ let package = Package(
     .library(name: "BraveWidgetsModels", targets: ["BraveWidgetsModels"]),
     .library(name: "Strings", targets: ["Strings"]),
     .library(name: "BraveVPN", targets: ["BraveVPN"]),
+    .library(name: "BraveNews", targets: ["BraveNews"]),
     .library(name: "RuntimeWarnings", targets: ["RuntimeWarnings"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
     .plugin(name: "CurrentBundleGenPlugin", targets: ["CurrentBundleGenPlugin"]),
@@ -76,6 +77,8 @@ let package = Package(
         "BrowserIntentsModels",
         "BraveWidgetsModels",
         "BraveVPN",
+        "BraveNews",
+        "CodableHelpers",
         .product(name: "Lottie", package: "lottie-ios"),
         .product(name: "Collections", package: "swift-collections"),
       ],
@@ -152,7 +155,6 @@ let package = Package(
         .copy("Frontend/Browser/Onboarding/onboarding-shields.json"),
         .copy("Frontend/Browser/Onboarding/Welcome/disconnect-entitylist.json"),
         .copy("Frontend/Browser/BrowserViewController/ProductNotifications/blocking-summary.json"),
-        .copy("Frontend/Brave Today/Lottie Assets/brave-today-welcome-graphic.json"),
         .copy("Frontend/Sync/WebFilter/Bookmarks/Bookmarks.html"),
         .copy("Frontend/UserContent/UserScripts/ArchiveIsCompat.js"),
         .copy("Frontend/UserContent/UserScripts/BraveSearchHelper.js"),
@@ -310,6 +312,28 @@ let package = Package(
       resources: [.copy("vpncheckmark.json")],
       plugins: ["CurrentBundleGenPlugin"]
     ),
+    .target(
+      name: "BraveNews",
+      dependencies: [
+        "BraveShared",
+        "Strings",
+        "SnapKit",
+        "Then",
+        "XCGLogger",
+        "Data",
+        "BraveUI",
+        "DesignSystem",
+        "CodableHelpers",
+        "BraveCore",
+        "Static",
+        .product(name: "Lottie", package: "lottie-ios")
+      ],
+      resources: [
+        .copy("Lottie Assets/brave-today-welcome-graphic.json"),
+      ],
+      plugins: ["CurrentBundleGenPlugin"]
+    ),
+    .target(name: "CodableHelpers"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
       name: "BraveSharedTests",
