@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 import Data
 import CoreData
+import CodableHelpers
 
 struct PlaylistSharedFolderModel: Decodable {
   let version: String
