@@ -69,7 +69,6 @@ let package = Package(
         "Static",
         "ZIPFoundation",
         "SDWebImage",
-        "FeedKit",
         "Then",
         "SwiftKeychainWrapper",
         "SwiftyJSON",
@@ -326,6 +325,8 @@ let package = Package(
         "CodableHelpers",
         "BraveCore",
         "Static",
+        "FeedKit",
+        "Fuzi",
         .product(name: "Lottie", package: "lottie-ios")
       ],
       resources: [
@@ -333,6 +334,10 @@ let package = Package(
       ],
       plugins: ["CurrentBundleGenPlugin"]
     ),
+    .testTarget(name: "BraveNewsTests", dependencies: ["BraveNews"], resources: [
+      .copy("opml-test-files/subscriptionList.opml"),
+      .copy("opml-test-files/states.opml"),
+    ]),
     .target(name: "CodableHelpers"),
     .testTarget(name: "SharedTests", dependencies: ["Shared"]),
     .testTarget(
@@ -366,8 +371,6 @@ let package = Package(
         .copy("Resources/debouncing.json"),
         .copy("Resources/google-search-plugin.xml"),
         .copy("Resources/duckduckgo-search-plugin.xml"),
-        .copy("opml-test-files/subscriptionList.opml"),
-        .copy("opml-test-files/states.opml"),
         .copy("blocking-summary-test.json"),
       ]
     ),
