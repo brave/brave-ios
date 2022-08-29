@@ -96,6 +96,7 @@ class SchemePermissionTests: XCTestCase {
     let urlRequestHttps = urlRequestForScheme(.https)
     let urlRequestJavascript = urlRequestForScheme(.javascript)
     let urlRequestAbout = urlRequestForScheme(.about)
+    let urlRequestWhatsApp = urlRequestForScheme(.whatsapp)
 
     // Test Http URL Scheme
     XCTAssertTrue(subject.shouldRequestBeOpenedAsPopup(urlRequestHttp.request), urlRequestHttp.comment)
@@ -108,6 +109,9 @@ class SchemePermissionTests: XCTestCase {
 
     // Test About URL Scheme
     XCTAssertTrue(subject.shouldRequestBeOpenedAsPopup(urlRequestAbout.request), urlRequestAbout.comment)
+
+    // Test Whatapp URL Scheme
+    XCTAssertTrue(subject.shouldRequestBeOpenedAsPopup(urlRequestWhatsApp.request), urlRequestWhatsApp.comment)
   }
 
   private func urlRequestForScheme(_ type: SchemeTestType) -> (request: URLRequest, comment: String) {
