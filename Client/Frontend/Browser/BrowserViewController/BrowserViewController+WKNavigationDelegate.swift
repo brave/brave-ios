@@ -39,6 +39,10 @@ extension URL {
 }
 
 extension BrowserViewController {
+  private func tab(for webView: WKWebView) -> Tab? {
+    tabManager[webView] ?? (webView as? TabWebView)?.tab
+  }
+  
   fileprivate func handleExternalURL(_ url: URL, openedURLCompletionHandler: ((Bool) -> Void)? = nil) {
     self.view.endEditing(true)
     let popup = AlertPopupView(
@@ -198,7 +202,7 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-    let tab = tabManager[webView] ?? (webView as? TabWebView)?.tab
+    let tab = tab(for: webView)
 
     let domainForRequestURL = Domain.getOrCreate(
       forUrl: url,
@@ -393,7 +397,7 @@ extension BrowserViewController: WKNavigationDelegate {
   public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
     let response = navigationResponse.response
     let responseURL = response.url
-    let tab = tabManager[webView] ?? (webView as? TabWebView)?.tab
+    let tab = tab(for: webView)
 
     if let tab = tab,
       let responseURL = responseURL,
@@ -480,7 +484,7 @@ extension BrowserViewController: WKNavigationDelegate {
     guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
           challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
           challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM,
-          let tab = tabManager[webView] ?? (webView as? TabWebView)?.tab
+          let tab = tab(for: webView)
     else {
       completionHandler(.performDefaultHandling, nil)
       return
@@ -507,7 +511,7 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-    guard let tab = tabManager[webView] ?? (webView as? TabWebView)?.tab else { return }
+    guard let tab = tab(for: webView) else { return }
     // Set the committed url which will also set tab.url
     tab.committedURL = webView.url
     
@@ -606,7 +610,7 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-    guard let tab = tabManager[webView] ?? (webView as? TabWebView)?.tab, let url = webView.url, rewards.isEnabled else { return }
+    guard let tab = tab(for: webView), let url = webView.url, rewards.isEnabled else { return }
     tab.redirectURLs.append(url)
   }
 }
