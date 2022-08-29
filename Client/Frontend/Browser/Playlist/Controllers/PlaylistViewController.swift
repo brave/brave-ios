@@ -1138,6 +1138,12 @@ extension PlaylistViewController: VideoViewDelegate {
 
 extension PlaylistFolder {
   var isPersistent: Bool {
-    managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: { $0.type == "InMemory" }) == nil
+    managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: {
+      if #available(iOS 15.0, *) {
+        return $0.type == NSPersistentStore.StoreType.inMemory.rawValue
+      } else {
+        return $0.type == "InMemory"
+      }
+    }) == nil
   }
 }

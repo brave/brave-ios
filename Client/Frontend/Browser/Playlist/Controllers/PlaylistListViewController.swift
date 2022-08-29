@@ -486,7 +486,7 @@ class PlaylistListViewController: UIViewController {
       playerView.addSubview(activityIndicator)
 
       if !playerView.isFullscreen {
-        if UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
+        if view.window?.windowScene?.interfaceOrientation.isLandscape ?? UIDevice.current.orientation.isLandscape && UIDevice.isPhone {
           playerView.setExitButtonHidden(false)
           playerView.setFullscreenButtonHidden(true)
           playerView.snp.remakeConstraints {

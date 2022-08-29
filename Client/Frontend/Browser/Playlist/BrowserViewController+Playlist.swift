@@ -421,7 +421,7 @@ extension BrowserViewController {
       BrowserViewController.playlistSyncFoldersTimer = Timer(fire: lastSyncDate, interval: 4.hours, repeats: true, block: { _ in
         Preferences.Playlist.lastPlaylistFoldersSyncTime.value = Date()
         
-        Task { @MainActor in
+        Task {
           try await PlaylistManager.syncSharedFolders()
         }
       })
