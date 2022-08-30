@@ -264,6 +264,21 @@ struct WalletPanelView: View {
     .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
   }
   
+  /// A boolean value indicates to hide or unhide `Connect` button
+  private var isConnectHidden: Bool {
+    let account = keyringStore.selectedAccount
+    if account.coin == .sol {
+      for domain in Domain.allDomainsWithWalletPermissions(for: .sol) {
+        if let accounts = domain.wallet_solanaPermittedAcccounts, !accounts.isEmpty {
+          return false
+        }
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+  
   var body: some View {
     ScrollView(.vertical, showsIndicators: false) {
       VStack(spacing: 0) {
@@ -322,12 +337,16 @@ struct WalletPanelView: View {
         VStack {
           if sizeCategory.isAccessibilityCategory {
             VStack {
-              connectButton
+              if !isConnectHidden {
+                connectButton
+              }
               networkPickerButton
             }
           } else {
             HStack {
-              connectButton
+              if !isConnectHidden {
+                connectButton
+              }
               Spacer()
               networkPickerButton
             }
