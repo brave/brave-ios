@@ -3060,14 +3060,14 @@ extension Strings {
         "opentabs.noSyncSessionPlaceHolderViewTitle",
         tableName: "BraveShared",
         bundle: .strings,
-        value: "Tabs From other devices will appear here",
+        value: "Tabs open in Brave on your other devices will appear here",
         comment: "The title of the view showing no synced sessions")
-    public static let noSyncSessionPlaceHolderViewDescription =
+    public static let noSyncChainPlaceHolderViewDescription =
       NSLocalizedString(
-        "opentabs.noSyncSessionPlaceHolderViewDescription",
+        "opentabs.noSyncChainPlaceHolderViewDescription",
         tableName: "BraveShared",
         bundle: .strings,
-        value: "To see your tabs from other devices, join a sync chain and enable Open Tabs",
+        value: "To sync tabs open in Brave on your other devices, start a sync chain, then turn on \"Open Tabs\" in sync settings.",
         comment: "The description of the view showing no synced sessions")
     public static let noDevicesSyncChainPlaceholderViewTitle =
       NSLocalizedString(

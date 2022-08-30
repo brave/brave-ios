@@ -296,13 +296,23 @@ class TabTrayController: LoadingViewController {
   }
   
   @objc func typeSelectionDidChange(_ sender: UISegmentedControl) {
-    tabTraySearchController.isActive = false
     tabTrayMode = sender.selectedSegmentIndex == 0 ? .local : .sync
 
     tabTrayView.isHidden = tabTrayMode == .sync
     tabSyncView.isHidden = tabTrayMode == .local
     
     searchBarView?.searchBar.placeholder = tabTrayMode == .local ? Strings.tabTraySearchBarTitle : Strings.OpenTabs.tabTrayOpenTabSearchBarTitle
+    
+    refreshDataSource()
+  }
+  
+  func refreshDataSource() {
+    switch tabTrayMode {
+    case .local:
+      applySnapshot(for: tabTraySearchQuery)
+    case .sync:
+      reloadOpenTabsSession(for: tabTraySearchQuery)
+    }
   }
   
   private func updateColors(_ isPrivateBrowsing: Bool) {
