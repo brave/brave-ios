@@ -54,7 +54,9 @@ class EmptyStateOverlayView: UIView {
     $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
   }
   
-  required init(title: String? = nil, description: String? = nil, icon: UIImage? = nil, buttonText: String? = nil, actionDescription: String? = nil) {
+  private var actionHandler: (() -> Void)?
+
+  required init(title: String? = nil, description: String? = nil, icon: UIImage? = nil, buttonText: String? = nil, action: (() -> Void)? = nil, actionDescription: String? = nil) {
     super.init(frame: .zero)
 
     backgroundColor = .secondaryBraveBackground
@@ -92,6 +94,7 @@ class EmptyStateOverlayView: UIView {
     
     if let buttonText = buttonText {
       actionButton.setTitle(buttonText, for: .normal)
+      actionButton.addTarget(self, action: #selector(tappedActionButton), for: .touchUpInside)
       containerView.addArrangedSubview(actionButton)
       containerView.setCustomSpacing(25, after: actionButton)
     }
@@ -127,7 +130,6 @@ class EmptyStateOverlayView: UIView {
     actionButton.titleLabel?.font = .systemFont(ofSize: buttonFont.pointSize)
     actionDescriptionLabel.font = descriptionFont
   }
-    
 
   func updateInfoLabel(with text: String) {
     informationLabel.text = text
@@ -135,5 +137,9 @@ class EmptyStateOverlayView: UIView {
   
   func updateDescriptionLabel(with text: String) {
     descriptionLabel.text = text
+  }
+  
+  @objc private func tappedActionButton() {
+    actionHandler?()
   }
 }

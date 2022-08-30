@@ -20,11 +20,27 @@ extension TabTrayController {
 
     private(set) var tableView = UITableView()
     
-    private(set) lazy var noSyncTabsOverlayView = EmptyStateOverlayView(
-      title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
-      description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
-      icon: UIImage(systemName: "laptopcomputer.and.iphone"))
-
+    private lazy var noSyncTabsOverlayView: EmptyStateOverlayView = {
+      let noSyncChainEmptyStateView = EmptyStateOverlayView(
+        title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
+        description: Strings.OpenTabs.noSyncChainPlaceHolderViewDescription,
+        icon: UIImage(named: "sync-settings", in: .current, compatibleWith: nil),
+        buttonText: "Set up sync →")
+      
+      let disabledOpenTabsEmptyStateView = EmptyStateOverlayView(
+        title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
+        description: "Sync open tabs from your other devices.",
+        icon: UIImage(named: "sync-settings", in: .current, compatibleWith: nil),
+        buttonText: "Enable tab syncing",
+        actionDescription: "Manage what Brave syncs in Settings.")
+      
+      if Preferences.Chromium.syncEnabled.value, !Preferences.Chromium.syncOpenTabsEnabled.value {
+        return disabledOpenTabsEmptyStateView
+      }
+      
+      return noSyncChainEmptyStateView
+    }()
+    
     override init(frame: CGRect) {
       super.init(frame: frame)
 
