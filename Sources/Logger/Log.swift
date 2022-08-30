@@ -10,6 +10,8 @@ import OSLog
 public struct Log {}
 
 public extension Log {
+  /// To make it easier to grab correct logs, there's few categories you can choose from.
+  /// New categories can be added, based on needs for your module.
   enum Category: String {
     case main = "main"
     case braveCore = "brave-core"
@@ -17,6 +19,7 @@ public extension Log {
     case legacy = "legacy"
   }
   
+  /// Subsystem name. All Brave logs should use this subsystem.
   private static let subsystem = "com.brave.ios"
   
   /// Main logger of the app. Should be used for most things you want to log.
@@ -31,6 +34,9 @@ public extension Log {
   /// Used in legacy places, in code we inherited from Firefox, should not be used elsewhere.
   static let legacy = Logger(subsystem: subsystem, category: Category.legacy.rawValue)
   
+  /// Allows you to export a log for a given category as a string array.
+  /// Returns empty array in case of error.
+  /// This method is available only for iOS 15+ due to api limitations.
   @available(iOS 15.0, *)
   static func export(category: Category) -> [String] {
     do {
@@ -46,12 +52,13 @@ public extension Log {
       
       return entries
     } catch {
+      assertionFailure("Failed to export logs for: \(category.rawValue)")
       return []
     }
   }
   
-  /// The old log system was based on XCGLogger with a rolling file saving to disk.
-  /// This method removes old entries of the legacy log implementation.
+  /// The old log system was based on XCGLogger with a rolling file saved to disk.
+  /// This method removes old entries of that old log implementation.
   static func removeLegacyLogs() {
     let fileManager = FileManager.default
     
