@@ -126,6 +126,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
       }()
       
+      // Every brave-core log has public visibiity, otherwise nothing will be recorded.
       Log.braveCore.log(level: level, "\(message, privacy: .public)")
       return true
     }
