@@ -409,7 +409,7 @@ extension Strings {
   public static let tabTrayAddTabAccessibilityLabel = NSLocalizedString("TabTrayAddTabAccessibilityLabel", tableName: "BraveShared", bundle: .strings, value: "Add Tab", comment: "Accessibility label for the Add Tab button in the Tab Tray.")
   public static let `private` = NSLocalizedString("Private", tableName: "BraveShared", bundle: .strings, value: "Private", comment: "Private button title")
   public static let privateBrowsing = NSLocalizedString("PrivateBrowsing", tableName: "BraveShared", bundle: .strings, value: "Private Browsing", comment: "")
-  public static let tabTraySearchBarTitle = NSLocalizedString("TabTraySearchBarTitle", tableName: "BraveShared", bundle: .strings, value: "Search Tabs", comment: "Title displayed for placeholder inside Search Bar in Tab Tray")
+  public static let tabTraySearchBarTitle = NSLocalizedString("TabTraySearchBarTitle", tableName: "BraveShared", bundle: .strings, value: "Search Open Tabs", comment: "Title displayed for placeholder inside Search Bar in Tab Tray")
 }
 
 // MARK:-  TabTrayButtonExtensions.swift
@@ -3046,7 +3046,7 @@ extension Strings {
         "opentabs.tabTrayOpenSearchBarTitle",
         tableName: "BraveShared",
         bundle: .strings,
-        value: "Search Open Tabs",
+        value: "Search Tab on other Devices",
         comment: "The placeholder written in seach bar while tab-tray is showing open tabs.")
     public static let sendWebsiteShareActionTitle =
       NSLocalizedString(
