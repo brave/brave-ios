@@ -128,6 +128,7 @@ class VideoView: UIView, VideoTrackerBarDelegate {
     addSubview(overlayView)
     addSubview(infoView)
     addSubview(controlsView)
+    addSubview(staticImageView)
 
     particleView.snp.makeConstraints {
       $0.edges.equalToSuperview()
