@@ -119,7 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         switch severity {
         case .fatal: return .fault
         case .error: return .error
-        // No `.warning` level exists for OSLogType. os_Log.main.warning is an alias for `.error`
+        // No `.warning` level exists for OSLogType. os_Log.warning is an alias for `.error`
         case .warning: return .error
         case .info: return .info
         default: return .debug
