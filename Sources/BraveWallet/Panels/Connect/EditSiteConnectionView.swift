@@ -13,7 +13,6 @@ import Data
 struct EditSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
   var origin: URLOrigin
-  var coin: BraveWallet.CoinType
   var onDismiss: (_ permittedAccounts: [String]) -> Void
   
   @Environment(\.sizeCategory) private var sizeCategory
@@ -24,16 +23,16 @@ struct EditSiteConnectionView: View {
   @State private var permittedAccounts: [String] = []
   
   enum EditAction {
-    case connect(_ coin: BraveWallet.CoinType)
-    case disconnect(_ coin: BraveWallet.CoinType)
+    case connect
+    case disconnect
     case `switch`
     
     var title: String {
       switch self {
-      case .connect(let coin):
-        return coin == .eth ? Strings.Wallet.editSiteConnectionAccountActionConnect : Strings.Wallet.editSiteConnectionAccountActionTrust
-      case .disconnect(let coin):
-        return coin == .eth ? Strings.Wallet.editSiteConnectionAccountActionDisconnect : Strings.Wallet.editSiteConnectionAccountActionRevoke
+      case .connect:
+        return Strings.Wallet.editSiteConnectionAccountActionConnect
+      case .disconnect:
+        return Strings.Wallet.editSiteConnectionAccountActionDisconnect
       case .switch:
         return Strings.Wallet.editSiteConnectionAccountActionSwitch
       }
@@ -44,17 +43,14 @@ struct EditSiteConnectionView: View {
     if permittedAccounts.contains(account.address) {
       if keyringStore.selectedAccount.id == account.id {
         // Disconnect - Connected and selected account
-        return .disconnect(coin)
+        return .disconnect
       } else {
-        if coin == .sol {
-          return .disconnect(coin)
-        }
-        // Switch - Connected but not selected account (only for ethereum)
+        // Switch - Connected but not selected account
         return .`switch`
       }
     } else {
       // Connect - Not connected
-      return .connect(coin)
+      return .connect
     }
   }
   
@@ -73,29 +69,21 @@ struct EditSiteConnectionView: View {
       switch action {
       case .connect:
         if let url = origin.url {
-          Domain.setWalletPermissions(forUrl: url, coin: coin, accounts: [account.address], grant: true)
+          Domain.setWalletPermissions(forUrl: url, coin: .eth, accounts: [account.address], grant: true)
         }
         permittedAccounts.append(account.address)
-        
-        if coin == .eth { // only for eth dapp connection can be triggered on the wallet side
-          keyringStore.selectedAccount = account
-        }
+        keyringStore.selectedAccount = account
       case .disconnect:
         if let url = origin.url {
-          Domain.setWalletPermissions(forUrl: url, coin: coin, accounts: [account.address], grant: false)
+          Domain.setWalletPermissions(forUrl: url, coin: .eth, accounts: [account.address], grant: false)
         }
         permittedAccounts.removeAll(where: { $0 == account.address })
         
-        if coin == .eth { // only for eth dapp connection can be triggered on the wallet side
-          if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = accountInfos.first(where: { $0.id == firstAllowedAdd }) {
-            keyringStore.selectedAccount = firstAllowedAccount
-          }
+        if let firstAllowedAdd = permittedAccounts.first, let firstAllowedAccount = keyringStore.defaultKeyring.accountInfos.first(where: { $0.id == firstAllowedAdd }) {
+          keyringStore.selectedAccount = firstAllowedAccount
         }
       case .switch:
-        // So far switch should only be an action for eth accounts
-        if coin == .eth { // only for eth dapp connection can be triggered on the wallet side
-          keyringStore.selectedAccount = account
-        }
+        keyringStore.selectedAccount = account
       }
     } label: {
       Text(action.title)
@@ -130,15 +118,11 @@ struct EditSiteConnectionView: View {
     }
   }
   
-  private var accountInfos: [BraveWallet.AccountInfo] {
-    keyringStore.allKeyrings.first(where: { $0.coin == coin })?.accountInfos ?? []
-  }
-  
   var body: some View {
     NavigationView {
       Form {
         Section {
-          ForEach(accountInfos) { account in
+          ForEach(keyringStore.defaultKeyring.accountInfos) { account in
             let action = editAction(for: account)
             if sizeCategory.isAccessibilityCategory {
               VStack {
@@ -189,7 +173,7 @@ struct EditSiteConnectionView: View {
         }
       }
       .onAppear {
-        if let url = origin.url, let accounts = Domain.walletPermissions(forUrl: url, coin: coin) {
+        if let url = origin.url, let accounts = Domain.walletPermissions(forUrl: url, coin: .eth) {
           permittedAccounts = accounts
         }
       }
@@ -209,7 +193,6 @@ struct EditSiteConnectionView_Previews: PreviewProvider {
         return store
       }(),
       origin: .init(url: URL(string: "https://app.uniswap.org")!),
-      coin: .eth,
       onDismiss: { _ in }
     )
   }
