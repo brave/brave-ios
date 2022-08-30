@@ -9,6 +9,7 @@ import BraveShared
 import WebKit
 import BraveCore
 import Logger
+import BraveNews
 
 // A base protocol for something that can be cleared.
 protocol Clearable {

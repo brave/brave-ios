@@ -318,7 +318,7 @@ let package = Package(
         "Strings",
         "SnapKit",
         "Then",
-        "XCGLogger",
+        "Logger",
         "Data",
         "BraveUI",
         "DesignSystem",

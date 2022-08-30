@@ -13,6 +13,7 @@ import UIKit
 import BrowserIntentsModels
 import BraveVPN
 import Logger
+import BraveNews
 
 /// Shortcut Activity Types and detailed information to create and perform actions
 public enum ActivityType: String {

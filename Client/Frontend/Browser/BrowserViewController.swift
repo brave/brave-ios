@@ -27,6 +27,7 @@ import class Combine.AnyCancellable
 import BraveWallet
 import BraveVPN
 import Logger
+import BraveNews
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,

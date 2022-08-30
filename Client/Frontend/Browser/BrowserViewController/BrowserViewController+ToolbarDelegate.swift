@@ -11,6 +11,7 @@ import Storage
 import Data
 import SwiftUI
 import Logger
+import BraveNews
 
 // MARK: - TopToolbarDelegate
 

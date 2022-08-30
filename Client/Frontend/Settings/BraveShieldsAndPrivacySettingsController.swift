@@ -12,6 +12,7 @@ import class SwiftUI.UIHostingController
 import UIKit
 import BraveUI
 import Logger
+import BraveNews
 
 class BraveShieldsAndPrivacySettingsController: TableViewController {
   let profile: Profile
