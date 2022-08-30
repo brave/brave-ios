@@ -4,14 +4,14 @@ module Fastlane
     class ImportBuildToolsAction < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
-        Helper.Log.main.info "Parameter URL: #{params[:url]}"
-        Helper.Log.main.info "Parameter Clone Folder: #{params[:clone_folder]}"
-        Helper.Log.main.info "Parameter Branch: #{params[:branch]}"
+        Helper.log.info "Parameter URL: #{params[:url]}"
+        Helper.log.info "Parameter Clone Folder: #{params[:clone_folder]}"
+        Helper.log.info "Parameter Branch: #{params[:branch]}"
         directory = params[:clone_folder]
 
         git_command = ""
         if File.directory?(directory)
-          Helper.Log.main.info("Fetching latest version of build tools from #{directory}")
+          Helper.log.info("Fetching latest version of build tools from #{directory}")
           branch_option = ""
           branch_option = "git checkout #{params[:branch]}\n" if params[:branch] != 'HEAD'
           git_command = "cd #{directory}\n \
@@ -20,7 +20,7 @@ module Fastlane
           #{branch_option} \
           git pull"
         else
-          Helper.Log.main.info("Cloning build tools repository")
+          Helper.log.info("Cloning build tools repository")
           #import from git into subdir
           branch_option = ""
           branch_option = "--branch #{params[:branch]}" if params[:branch] != 'HEAD'
@@ -28,7 +28,7 @@ module Fastlane
           git_command = "git clone '#{params[:url]}' '#{directory}' #{branch_option}"
         end
 
-        Helper.Log.main.info("Excuting #{git_command}")
+        Helper.log.info("Excuting #{git_command}")
         Actions.sh(git_command)
       end
 
