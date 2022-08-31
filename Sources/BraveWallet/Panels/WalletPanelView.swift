@@ -192,19 +192,32 @@ struct WalletPanelView: View {
     return permittedAccounts.contains(keyringStore.selectedAccount.address)
   }
   
-  private var connectButton: some View {
+  @ViewBuilder private var connectButton: some View {
     Button {
       presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
         permittedAccounts = accounts
       }))
     } label: {
       HStack {
-        if isConnected {
-          Image(systemName: "checkmark")
+        if keyringStore.selectedAccount.coin == .sol {
+          Circle()
+            .strokeBorder(.white, lineWidth: 1)
+            .background(
+              Circle()
+                .foregroundColor(isConnected ? .green : .red)
+            )
+            .frame(width: 12, height: 12)
+          Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelDisconnected)
+            .fontWeight(.bold)
+            .lineLimit(1)
+        } else {
+          if isConnected {
+            Image(systemName: "checkmark")
+          }
+          Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
+            .fontWeight(.bold)
+            .lineLimit(1)
         }
-        Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
-          .fontWeight(.bold)
-          .lineLimit(1)
       }
       .foregroundColor(.white)
       .font(.caption.weight(.semibold))
