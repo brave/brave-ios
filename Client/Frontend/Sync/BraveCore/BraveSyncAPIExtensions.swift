@@ -70,7 +70,6 @@ extension BraveSyncAPI {
   }
   
   func resetSyncChain() {
-    Preferences.Chromium.syncBookmarksEnabled.value = false
     Preferences.Chromium.syncHistoryEnabled.value = false
     Preferences.Chromium.syncPasswordsEnabled.value = false
     Preferences.Chromium.syncOpenTabsEnabled.value = false

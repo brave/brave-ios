@@ -56,7 +56,13 @@ class EmptyStateOverlayView: UIView {
   
   private var actionHandler: (() -> Void)?
 
-  required init(title: String? = nil, description: String? = nil, icon: UIImage? = nil, buttonText: String? = nil, action: (() -> Void)? = nil, actionDescription: String? = nil) {
+  required init(
+    title: String? = nil,
+    description: String? = nil,
+    icon: UIImage? = nil,
+    buttonText: String? = nil,
+    action: (() -> Void)? = nil,
+    actionDescription: String? = nil) {
     super.init(frame: .zero)
 
     backgroundColor = .secondaryBraveBackground
@@ -102,6 +108,10 @@ class EmptyStateOverlayView: UIView {
     if let actionDescription = actionDescription {
       actionDescriptionLabel.text = actionDescription
       containerView.addArrangedSubview(actionDescriptionLabel)
+    }
+    
+    if let action = action {
+      actionHandler = action
     }
     
     updateFont()

@@ -142,7 +142,7 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
 
   @objc
   private func doneTapped() {
-    navigationController?.popToRootViewController(animated: true)
+    navigationController?.dismiss(animated: true)
   }
 
   @objc
