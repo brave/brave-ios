@@ -2514,6 +2514,13 @@ extension Strings {
       value: "Connect",
       comment: "The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected any his/her wallet account to the dapp."
     )
+    public static let walletPanelDisconnected = NSLocalizedString(
+      "wallet.walletPanelDisconnected",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Disconnected",
+      comment: "The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected his/her current selected Solana account to the Solana Dapp."
+    )
     public static let getEncryptionPublicKeyRequestTitle = NSLocalizedString(
       "wallet.getEncryptionPublicKeyRequestTitle",
       tableName: "BraveWallet",
