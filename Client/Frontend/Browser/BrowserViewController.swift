@@ -592,6 +592,13 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     traitCollection.userInterfaceIdiom == .phone
   }
 
+  public override func viewSafeAreaInsetsDidChange() {
+    super.viewSafeAreaInsetsDidChange()
+    
+    topTouchArea.isEnabled = view.safeAreaInsets.top > 0
+    statusBarOverlay.isHidden = view.safeAreaInsets.top.isZero
+  }
+  
   fileprivate func updateToolbarStateForTraitCollection(_ newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator? = nil) {
     let showToolbar = shouldShowFooterForTraitCollection(newCollection)
 
@@ -600,7 +607,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     toolbar?.tabToolbarDelegate = nil
     toolbar = nil
     bottomTouchArea.isEnabled = showToolbar
-    topTouchArea.isEnabled = view.safeAreaInsets.top > 0
 
     if showToolbar {
       toolbar = BottomToolbarView()
@@ -806,11 +812,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     view.addSubview(alertStackView)
     footer = UIView()
     footer.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(bottomTouchArea)
+    view.addSubview(topTouchArea)
     view.addSubview(footer)
     view.addSubview(header)
     view.addSubview(statusBarOverlay)
-    view.addSubview(topTouchArea)
-    view.addSubview(bottomTouchArea)
     alertStackView.axis = .vertical
     alertStackView.alignment = .center
 
