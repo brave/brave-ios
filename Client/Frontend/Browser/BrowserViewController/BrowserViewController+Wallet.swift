@@ -311,16 +311,6 @@ extension Tab: BraveWalletProviderDelegate {
   func clearSolanaConnectedAccounts() {
     walletSolConnectedAddresses = .init()
   }
-  
-  func isSolanaAccountConnected(_ account: String) -> Bool {
-    return false
-  }
-  
-  func addSolanaConnectedAccount(_ account: String) {
-  }
-  
-  func removeSolanaConnectedAccount(_ account: String) {
-  }
 }
 
 extension Tab: BraveWalletEventsListener {
