@@ -337,7 +337,7 @@ extension BraveRewards {
         flags["development"] = "true"
       }
       if let debug = isDebug {
-        flags["debug"] = debug ? "true" : "false"
+        flags["debug"] = String(debug)
       }
       if let reconcileInterval = overridenNumberOfSecondsBetweenReconcile {
         flags["reconcile-interval"] = "\(reconcileInterval)"
