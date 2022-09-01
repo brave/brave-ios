@@ -391,8 +391,9 @@ extension BrowserViewController: TopToolbarDelegate {
       make.left.right.equalTo(self.view)
       return
     }
-
     searchController.didMove(toParent: self)
+    searchController.view.setNeedsLayout()
+    searchController.view.layoutIfNeeded()
   }
 
   private func displayFavoritesController() {
