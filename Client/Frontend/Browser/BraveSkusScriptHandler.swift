@@ -75,29 +75,31 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   private func handleRefreshOrder(for orderId: String, domain: String, replyHandler: @escaping ReplyHandler) {
-    sku?.refreshOrder(domain, orderId: orderId) { [weak self] completion in
+    sku?.refreshOrder(domain, orderId: orderId) { completion in
       do {
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
         log.debug("skus refreshOrder")
-        self?.callback(methodId: 1, result: json, replyHandler: replyHandler)
+        replyHandler(json, nil)
       } catch {
-        self?.callback(methodId: 1, result: "", replyHandler: replyHandler)
+        replyHandler("", nil)
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
   }
   
   private func handleFetchOrderCredentials(for orderId: String, domain: String, replyHandler: @escaping ReplyHandler) {
-    sku?.fetchOrderCredentials(domain, orderId: orderId) { [weak self] completion in
+    sku?.fetchOrderCredentials(domain, orderId: orderId) { completion in
       log.debug("skus fetchOrderCredentials")
-      self?.callback(methodId: 2, result: completion, replyHandler: replyHandler)
+      replyHandler(completion, nil)
     }
   }
   
-  private func handlePrepareCredentialsSummary(for domain: String, path: String, replyHandler: @escaping ReplyHandler) {
+  /// If no reply handler is passed, this function will not send the callback back to the website.
+  /// Reason is this method may be called from within another web handler, and the callback can be called only once or it crashes.
+  private func handlePrepareCredentialsSummary(for domain: String, path: String, replyHandler: ReplyHandler?) {
     log.debug("skus prepareCredentialsPresentation")
-    sku?.prepareCredentialsPresentation(domain, path: path) { [weak self] credential in
+    sku?.prepareCredentialsPresentation(domain, path: path) { credential in
       if !credential.isEmpty {
         if let vpnCredential = BraveSkusWebHelper.fetchVPNCredential(credential, domain: domain) {
           Preferences.VPN.skusCredential.value = credential
@@ -106,10 +108,10 @@ class BraveSkusScriptHandler: TabContentScript {
           BraveVPN.setCustomVPNCredential(vpnCredential.credential, environment: vpnCredential.environment)
         }
       } else {
-        //assertionFailure()
+        log.debug("skus empty credential from prepareCredentialsPresentation call")
       }
       
-      //self?.callback(methodId: 3, result: credential, replyHandler: replyHandler)
+      replyHandler?(credential, nil)
     }
   }
   
@@ -120,25 +122,20 @@ class BraveSkusScriptHandler: TabContentScript {
         
         guard let data = completion.data(using: .utf8) else { return }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        self?.callback(methodId: 4, result: json, replyHandler: replyHandler)
+        
+        replyHandler(json, nil)
         
         if let expiresDate = (json as? [String: Any])?["expires_at"] as? String,
            let date = BraveSkusWebHelper.milisecondsOptionalDate(from: expiresDate) {
           Preferences.VPN.expirationDate.value = date
         } else {
-          //assertionFailure("Failed to parse date")
+          assertionFailure("Failed to parse date")
         }
         
-        self?.handlePrepareCredentialsSummary(for: domain, path: "*", replyHandler: replyHandler)
+        self?.handlePrepareCredentialsSummary(for: domain, path: "*", replyHandler: nil)
       } catch {
         log.error("refrshOrder: Failed to decode json: \(error)")
       }
     }
-  }
-  
-  private func callback(methodId: Int, result: Any, replyHandler: ReplyHandler) {
-    //let args: [Any] = ["\(methodId)", result]
-    
-    replyHandler(result, nil)
   }
 }

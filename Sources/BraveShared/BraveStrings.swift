@@ -2458,8 +2458,8 @@ extension Strings {
 
     public static let settingsManageSubscription =
           NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .strings,
-            value: "Manage Subscription",
-            comment: "Button to manage your VPN subscription")
+          value: "Manage Subscription",
+          comment: "Button to manage your VPN subscription")
 
     public static let settingsServerHost =
       NSLocalizedString("vpn.settingsServerHost", tableName: "BraveShared", bundle: .strings,

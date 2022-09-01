@@ -88,11 +88,15 @@ class BraveSkusWebHelper {
     return Self.environment(domain: host)
   }
   
+  private enum SkusEnvironment: String {
+    case development, staging, production
+  }
+  
   static func environment(domain: String) -> String? {
     switch domain {
-    case "account.brave.software", "vpn.brave.software": return "development"
-    case "account.bravesoftware.com", "vpn.bravesoftware.com": return "staging"
-    case "account.brave.com", "vpn.brave.com": return "production"
+    case "account.brave.software", "vpn.brave.software": return SkusEnvironment.development.rawValue
+    case "account.bravesoftware.com", "vpn.bravesoftware.com": return SkusEnvironment.staging.rawValue
+    case "account.brave.com", "vpn.brave.com": return SkusEnvironment.production.rawValue
     default:
       return nil
     }
