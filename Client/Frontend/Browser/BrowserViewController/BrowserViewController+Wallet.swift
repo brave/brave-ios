@@ -295,17 +295,20 @@ extension Tab: BraveWalletProviderDelegate {
     // TODO: can be called when Solana dapp tries to connect but user does not have Solana account
   }
   
-  func isSolanaAccountConnected(_ account: String, completion: @escaping (Bool) -> Void) {
-    // TODO: Track currently connected accounts, return true if account previously added
-    completion(false)
+  func isSolanaAccountConnected(_ account: String) -> Bool {
+    walletSolConnectedAddresses.contains(account)
   }
   
   func addSolanaConnectedAccount(_ account: String) {
-    
+    walletSolConnectedAddresses.insert(account)
   }
   
   func removeSolanaConnectedAccount(_ account: String) {
-    
+    walletSolConnectedAddresses.remove(account)
+  }
+  
+  func clearSolanaConnectedAccounts() {
+    walletSolConnectedAddresses = .init()
   }
   
   func isSolanaAccountConnected(_ account: String) -> Bool {

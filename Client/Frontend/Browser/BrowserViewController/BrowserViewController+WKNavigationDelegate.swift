@@ -80,6 +80,8 @@ extension BrowserViewController: WKNavigationDelegate {
        selectedTab.url?.origin != webView.url?.origin {
       // new site has a different origin, hide wallet icon.
       tabManager.selectedTab?.isWalletIconVisible = false
+      // new site, reset connected addresses
+      tabManager.selectedTab?.clearSolanaConnectedAccounts()
       // close wallet panel if it's open
       if let popoverController = self.presentedViewController as? PopoverController,
          popoverController.contentController is WalletPanelHostingController {

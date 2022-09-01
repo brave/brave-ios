@@ -84,6 +84,7 @@ class Tab: NSObject {
   var walletEthProvider: BraveWalletEthereumProvider?
   var walletEthProviderScript: WKUserScript?
   var walletSolProvider: BraveWalletSolanaProvider?
+  var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
   var tabDappStore: TabDappStore = .init()
   var isWalletIconVisible: Bool = false {
     didSet {
