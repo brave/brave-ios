@@ -73,6 +73,7 @@ class Tab: NSObject {
   var walletEthProviderJS: String?
   var walletSolProvider: BraveWalletSolanaProvider?
   var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
+  var walletSolConnectedAddresses: Set<String> = .init()
   
   var isWalletIconVisible: Bool = false {
     didSet {
