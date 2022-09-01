@@ -170,6 +170,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
       self.shareButton, self.tabsButton, self.bookmarkButton,
       self.forwardButton, self.backButton, self.menuButton,
     ].compactMap { $0 }
+  
+  var isURLBarEnabled = true {
+    didSet {
+      if oldValue == isURLBarEnabled { return }
+      
+      locationTextField?.isUserInteractionEnabled = isURLBarEnabled
+    }
+  }
 
   /// Update the shields icon based on whether or not shields are enabled for this site
   func refreshShieldsStatus() {
@@ -221,6 +229,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
     // Url bar will expand while keeping space for other items on the address bar.
     locationContainer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+    locationContainer.setContentHuggingPriority(.required, for: .vertical)
 
     leadingItemsStackView.addArrangedSubview(backButton)
     leadingItemsStackView.addArrangedSubview(forwardButton)
@@ -270,7 +279,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }
 
   private let mainStackView = UIStackView().then {
-    $0.alignment = .center
     $0.spacing = 8
     $0.isLayoutMarginsRelativeArrangement = true
     $0.insetsLayoutMarginsFromSafeArea = false
@@ -284,7 +292,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   private let trailingItemsStackView = UIStackView().then {
     $0.distribution = .fillEqually
-    $0.alignment = .center
     $0.spacing = 8
   }
 

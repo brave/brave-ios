@@ -33,8 +33,9 @@ extension BrowserViewController: TopToolbarDelegate {
 
     isTabTrayActive = true
 
-    let tabTrayController = TabTrayController(tabManager: tabManager).then {
+    let tabTrayController = TabTrayController(tabManager: tabManager, braveCore: braveCore).then {
       $0.delegate = self
+      $0.toolbarUrlActionsDelegate = self
     }
     let container = UINavigationController(rootViewController: tabTrayController)
 
@@ -245,14 +246,10 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidEnterOverlayMode(_ topToolbar: TopToolbarView) {
-    if .blankPage == NewTabAccessors.getNewTabPage() {
-      UIAccessibility.post(notification: .screenChanged, argument: nil)
-    } else {
-      if let toast = clipboardBarDisplayHandler?.clipboardToast {
-        toast.removeFromSuperview()
-      }
-      displayFavoritesController()
+    if let toast = clipboardBarDisplayHandler?.clipboardToast {
+      toast.removeFromSuperview()
     }
+    displayFavoritesController()
   }
 
   func topToolbarDidLeaveOverlayMode(_ topToolbar: TopToolbarView) {

@@ -43,7 +43,7 @@ function checkReadability() {
         return;
       }
 
-      var Readability = require("readability/Readability.js");
+      var {Readability} = require("@mozilla/readability");
 
       var uri = {
         spec: document.location.href,
@@ -56,9 +56,24 @@ function checkReadability() {
       // document.cloneNode() can cause the webview to break (bug 1128774).
       // Serialize and then parse the document instead.
       var docStr = new XMLSerializer().serializeToString(document);
+
+      // Do not attempt to parse DOM if this document contains a <frameset/>
+      // element. This causes the WKWebView content process to crash (Bug 1489543).
+      if (docStr.indexOf("<frameset ") > -1) {
+        debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
+        return;
+      }
+
       var doc = new DOMParser().parseFromString(docStr, "text/html");
       var readability = new Readability(uri, doc, { debug: DEBUG });
       readabilityResult = readability.parse();
+
+      if (!readabilityResult) {
+        debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
+        return;
+      }
 
       debug({Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"});
       webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"}});

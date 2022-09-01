@@ -11,6 +11,7 @@ import BraveCore
 import class SwiftUI.UIHostingController
 import UIKit
 import BraveUI
+import BraveNews
 
 private let log = Logger.browserLogger
 
@@ -145,9 +146,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         (RecentSearchClearable(), true),
       ]
 
-    #if !NO_BRAVE_NEWS
     alwaysVisible.append((BraveNewsClearable(feedDataSource: self.feedDataSource), true))
-    #endif
 
     alwaysVisible.append(contentsOf: others)
 

@@ -162,12 +162,12 @@ extension Tab: BraveWalletProviderDelegate {
     return origin
   }
 
-  public func requestPermissions(_ type: BraveWallet.CoinType, accounts: [String], completion: @escaping RequestPermissionsCallback) {
+  public func requestPermissions(_ coinType: BraveWallet.CoinType, accounts: [String], completion: @escaping RequestPermissionsCallback) {
     Task { @MainActor in
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       let origin = getOrigin()
       
-      if permissionRequestManager.hasPendingRequest(for: origin, coinType: type) {
+      if permissionRequestManager.hasPendingRequest(for: origin, coinType: coinType) {
         completion(.requestInProgress, nil)
         return
       }
@@ -175,9 +175,9 @@ extension Tab: BraveWalletProviderDelegate {
       let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
       
       // Check if eth permissions already exist for this origin and if they don't, ensure the user allows
-      // ethereum provider access
-      let ethPermissions = origin.url.map { Domain.ethereumPermissions(forUrl: $0) ?? [] } ?? []
-      if ethPermissions.isEmpty, !Preferences.Wallet.allowEthereumProviderAccountRequests.value {
+      // ethereum/solana provider access
+      let walletPermissions = origin.url.map { Domain.walletPermissions(forUrl: $0, coin: coinType) ?? [] } ?? []
+      if walletPermissions.isEmpty, !Preferences.Wallet.allowDappProviderAccountRequests.value {
         completion(.internal, nil)
         return
       }
@@ -186,7 +186,7 @@ extension Tab: BraveWalletProviderDelegate {
         completion(.internal, nil)
         return
       }
-      let (success, accounts) = await allowedAccounts(type, accounts: accounts)
+      let (success, accounts) = await allowedAccounts(coinType, accounts: accounts)
       if !success {
         completion(.internal, [])
         return
@@ -197,7 +197,7 @@ extension Tab: BraveWalletProviderDelegate {
       }
       
       // add permission request to the queue
-      _ = permissionRequestManager.beginRequest(for: origin, coinType: .eth, providerHandler: completion, completion: { response in
+      _ = permissionRequestManager.beginRequest(for: origin, coinType: coinType, providerHandler: completion, completion: { response in
         switch response {
         case .granted(let accounts):
           completion(.none, accounts)
@@ -242,16 +242,7 @@ extension Tab: BraveWalletProviderDelegate {
       return (false, [])
     }
     let selectedAccount = await keyringService.selectedAccount(type)
-    let permissions: [String]? = {
-      switch type {
-      case .eth:
-        return Domain.ethereumPermissions(forUrl: originURL)
-      case .sol, .fil:
-        return nil
-      @unknown default:
-        return nil
-      }
-    }()
+    let permissions = Domain.walletPermissions(forUrl: originURL, coin: type)
     return (
       true,
       filterAccounts(permissions ?? [], selectedAccount: selectedAccount)
@@ -284,6 +275,9 @@ extension Tab: BraveWalletProviderDelegate {
 
 extension Tab: BraveWalletEventsListener {
   func emitEthereumEvent(_ event: Web3ProviderEvent) {
+    guard Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
+      return
+    }
     var arguments: [Any] = [event.name]
     if let eventArgs = event.arguments {
       arguments.append(eventArgs)
@@ -319,7 +313,8 @@ extension Tab: BraveWalletEventsListener {
   
   func updateEthereumProperties() {
     guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
-          let walletService = BraveWallet.ServiceFactory.get(privateMode: false) else {
+          let walletService = BraveWallet.ServiceFactory.get(privateMode: false),
+          Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
       return
     }
     Task { @MainActor in
@@ -335,7 +330,7 @@ extension Tab: BraveWalletEventsListener {
           return "undefined"
         }
       }
-      guard let webView = webView, let provider = walletProvider else {
+      guard let webView = webView, let provider = walletEthProvider else {
         return
       }
       let chainId = await provider.chainId()

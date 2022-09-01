@@ -8,6 +8,7 @@ import Data
 import BraveShared
 import WebKit
 import BraveCore
+import BraveNews
 
 private let log = Logger.browserLogger
 
@@ -54,7 +55,8 @@ class CookiesAndCacheClearable: Clearable {
     UserDefaults.standard.synchronize()
     await BraveWebView.sharedNonPersistentStore().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0))
     UserDefaults.standard.synchronize()
-    await Domain.clearAllEthereumPermissions()
+    await Domain.clearAllWalletPermissions(for: .eth)
+    // TODO: will need to clear permission for `.sol` coin type once we support solana Dapps
   }
 }
 
