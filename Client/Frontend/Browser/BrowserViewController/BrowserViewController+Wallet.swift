@@ -271,6 +271,16 @@ extension Tab: BraveWalletProviderDelegate {
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
   }
+  
+  func isSolanaAccountConnected(_ account: String) -> Bool {
+    return false
+  }
+  
+  func addSolanaConnectedAccount(_ account: String) {
+  }
+  
+  func removeSolanaConnectedAccount(_ account: String) {
+  }
 }
 
 extension Tab: BraveWalletEventsListener {
