@@ -6,6 +6,7 @@
 import Foundation
 import WebKit
 import BraveCore
+import BraveShared
 import struct Shared.Logger
 import BraveShared
 

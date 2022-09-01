@@ -6,6 +6,7 @@
 import Foundation
 import WebKit
 import BraveCore
+import BraveShared
 import struct Shared.Logger
 
 private let log = Logger.browserLogger
@@ -73,6 +74,11 @@ class SolanaProviderHelper: TabContentScript {
       if message.webView?.url?.isLocal == false,
          message.webView?.hasOnlySecureContent == false { // prevent communication in mixed-content scenarios
         log.error("Failed solana provider communication security test")
+        return
+      }
+      
+      if !Preferences.Wallet.allowSolProviderAccess.value {
+        log.error("Solana provider access is disabled")
         return
       }
       
