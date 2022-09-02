@@ -209,7 +209,13 @@ class SolanaProviderHelper: TabContentScript {
       args: [publicKey],
       contentWorld: .page
     )
-    return value as? String
+    guard let dict = value as? [String: Any],
+          let createdPublicKey = dict["publicKey"],
+          let data = try? JSONSerialization.data(withJSONObject: createdPublicKey, options: [.fragmentsAllowed]) else {
+      return nil // `createPublicKey` function failed, or failed to convert to JS data
+    }
+    let JSEncodedPublicKey = String(data: data, encoding: .utf8) ?? "{}"
+    return JSEncodedPublicKey
   }
   
   @MainActor private func createTransaction(_ serializedTx: [NSNumber]) async -> String? {
