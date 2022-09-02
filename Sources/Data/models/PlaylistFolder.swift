@@ -143,22 +143,11 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
     PlaylistFolder.all(where: NSPredicate(format: "sharedFolderUrl != nil"), context: context ?? DataController.viewContext) ?? []
   }
 
-  public static func removeFolder(_ uuid: String) {
+  public static func removeFolder(_ uuid: String, completion: (() -> Void)? = nil) {
     PlaylistFolder.deleteAll(
       predicate: NSPredicate(format: "uuid == %@", uuid),
-      includesPropertyValues: false)
-  }
-
-  public static func removeFolder(_ folder: PlaylistFolder, completion: (() -> Void)? = nil) {
-    let objectID = folder.objectID
-    DataController.perform(context: .new(inMemory: false)) { context in
-      let objectOnContext = context.object(with: objectID)
-      context.delete(objectOnContext)
-      
-      DispatchQueue.main.async {
-        completion?()
-      }
-    }
+      includesPropertyValues: false,
+      completion: completion)
   }
 
   public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (Result<PlaylistFolder, Error>) -> Void) {

@@ -298,9 +298,9 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
     PlaylistItem.deleteAll(predicate: NSPredicate(format: "uuid == %@", uuid), context: .new(inMemory: false), includesPropertyValues: false)
   }
 
-  public static func removeItems(_ items: [PlaylistInfo]) {
+  public static func removeItems(_ items: [PlaylistInfo], completion: (() -> Void)? = nil) {
     let uuids = items.map({ $0.tagId })
-    PlaylistItem.deleteAll(predicate: NSPredicate(format: "uuid IN %@", uuids), context: .new(inMemory: false), includesPropertyValues: false)
+    PlaylistItem.deleteAll(predicate: NSPredicate(format: "uuid IN %@", uuids), context: .new(inMemory: false), includesPropertyValues: false, completion: completion)
   }
 
   public static func moveItems(items: [NSManagedObjectID], to folderUUID: String?) {

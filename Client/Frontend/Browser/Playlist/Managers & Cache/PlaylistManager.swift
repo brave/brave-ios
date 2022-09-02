@@ -293,33 +293,33 @@ public class PlaylistManager: NSObject {
     }
     
     // Delete items from the folder
-    PlaylistItem.removeItems(itemsToDelete)
-    
-    // Attempt to delete the folder if we can
-    if success, folder.uuid != PlaylistFolder.savedFolderUUID {
-      PlaylistFolder.removeFolder(folder) { [weak self] in
-        guard let self = self else {
+    PlaylistItem.removeItems(itemsToDelete) {
+      // Attempt to delete the folder if we can
+      if success, folder.uuid != PlaylistFolder.savedFolderUUID {
+        PlaylistFolder.removeFolder(folder.uuid ?? "") { [weak self] in
+          guard let self = self else {
+            completion?(success)
+            return
+          }
+          
+          if self.currentFolder?.isDeleted == true {
+            self.currentFolder = nil
+          }
+
+          self.onFolderDeleted.send()
+          self.reloadData()
+          
           completion?(success)
-          return
         }
-        
+      } else {
         if self.currentFolder?.isDeleted == true {
           self.currentFolder = nil
         }
 
         self.onFolderDeleted.send()
         self.reloadData()
-        
         completion?(success)
       }
-    } else {
-      if currentFolder?.isDeleted == true {
-        currentFolder = nil
-      }
-
-      onFolderDeleted.send()
-      reloadData()
-      completion?(success)
     }
   }
 
