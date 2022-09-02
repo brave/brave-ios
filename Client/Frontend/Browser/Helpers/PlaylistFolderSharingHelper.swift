@@ -35,6 +35,11 @@ class PlaylistFolderSharingHelper: NSObject, TabContentScript {
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
     
+    guard let body = message.body as? [String: Any],
+          body["securitytoken"] as? String == UserScriptManager.securityTokenString else {
+      return
+    }
+    
     if let sharingInfo = PlaylistFolderSharingInfo.from(message: message) {
       // This shared playlist folder already exists
       var sharedFolderPageUrl = sharingInfo.pageUrl
