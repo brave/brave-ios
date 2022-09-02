@@ -444,7 +444,7 @@ extension Tab: BraveWalletSolanaEventsListener {
         let (value, _) = await webView.evaluateSafeJavaScript(
           functionName: "_brave_solana.createPublickey",
           args: [publicKey],
-          contentWorld: .page
+          contentWorld: .walletSandbox
         )
         guard let dict = value as? [String: Any],
               let createdPublicKey = dict["publicKey"],
