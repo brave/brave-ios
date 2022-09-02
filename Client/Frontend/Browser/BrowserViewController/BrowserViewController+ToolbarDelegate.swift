@@ -642,24 +642,52 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
       var actionMenuChildren: [UIAction] = []
 
-      let pasteGoAction = UIAction(
-        title: Strings.pasteAndGoTitle,
-        image: UIImage(systemName: "doc.on.clipboard.fill"),
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
-            self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-          }
-        })
+      var pasteGoAction: UIAction?
+      var pasteAction: UIAction?
+      
+      if #available(iOS 15.0, *) {
+        pasteGoAction = UIAction(
+          title: Strings.pasteAndGoTitle,
+          image: UIImage(systemName: "doc.on.clipboard.fill"),
+          identifier: .pasteAndGo,
+          handler: UIAction.deferredActionHandler { _ in
+            if let pasteboardContents = UIPasteboard.general.string {
+              self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
+            }
+          })
+      } else {
+        pasteGoAction = UIAction(
+          title: Strings.pasteAndGoTitle,
+          image: UIImage(systemName: "doc.on.clipboard.fill"),
+          handler: UIAction.deferredActionHandler { _ in
+            if let pasteboardContents = UIPasteboard.general.string {
+              self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
+            }
+          })
+      }
 
-      let pasteAction = UIAction(
-        title: Strings.pasteTitle,
-        image: UIImage(systemName: "doc.on.clipboard"),
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
-            // Enter overlay mode and make the search controller appear.
-            self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-          }
-        })
+      if #available(iOS 15.0, *) {
+        pasteAction = UIAction(
+          title: Strings.pasteTitle,
+          image: UIImage(systemName: "doc.on.clipboard"),
+          identifier: .paste,
+          handler: UIAction.deferredActionHandler { _ in
+            if let pasteboardContents = UIPasteboard.general.string {
+              // Enter overlay mode and make the search controller appear.
+              self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+            }
+          })
+      } else {
+        pasteAction = UIAction(
+          title: Strings.pasteTitle,
+          image: UIImage(systemName: "doc.on.clipboard"),
+          handler: UIAction.deferredActionHandler { _ in
+            if let pasteboardContents = UIPasteboard.general.string {
+              // Enter overlay mode and make the search controller appear.
+              self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+            }
+          })
+      }
 
       let copyAction = UIAction(
         title: Strings.copyAddressTitle,
@@ -671,7 +699,15 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         })
 
       if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-        actionMenuChildren = [pasteGoAction, pasteAction, copyAction]
+        if let pasteGoAction = pasteGoAction {
+          actionMenuChildren.append(pasteGoAction)
+        }
+        
+        if let pasteAction = pasteAction {
+          actionMenuChildren.append(pasteAction)
+        }
+        
+        actionMenuChildren.append(copyAction)
       } else {
         actionMenuChildren = [copyAction]
       }
