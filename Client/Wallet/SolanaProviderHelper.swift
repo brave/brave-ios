@@ -93,8 +93,12 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        let createdPublicKey = await self.createPublicKey(publicKey)
+        guard let createdPublicKey = await self.createPublicKey(publicKey) else {
+          replyHandler(nil, "Internal error")
+          return
+        }
         replyHandler(createdPublicKey, nil)
+        tab.updateSolanaProperties()
         tab.emitSolanaEvent(.connect)
       case .disconnect:
         provider.disconnect()
@@ -210,8 +214,7 @@ class SolanaProviderHelper: TabContentScript {
       contentWorld: .walletSandbox
     )
     guard let dict = value as? [String: Any],
-          let createdPublicKey = dict["publicKey"],
-          let data = try? JSONSerialization.data(withJSONObject: createdPublicKey, options: [.fragmentsAllowed]) else {
+          let data = try? JSONSerialization.data(withJSONObject: dict, options: [.fragmentsAllowed]) else {
       return nil // `createPublicKey` function failed, or failed to convert to JS data
     }
     let JSEncodedPublicKey = String(data: data, encoding: .utf8) ?? "{}"
