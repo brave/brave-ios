@@ -32,7 +32,6 @@ public class ContentBlockerManager {
     case blockAds = "block-ads"
     case blockCookies = "block-cookies"
     case upgradeHTTP = "upgrade-http"
-    case blockImages = "block-images"
     case blockTrackers = "block-trackers"
     
     var fileName: String {

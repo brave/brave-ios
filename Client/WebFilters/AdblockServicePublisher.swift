@@ -24,11 +24,7 @@ class AdblockServicePublisher {
       let filterList = try self.filterList(forUUID: uuid)
       
       adBlockService.registerFilterListComponent(filterList, componentReady: { [weak self] filterList, folderPath in
-        guard let folderPath = folderPath else {
-          // TODO: @JS Show error?
-          return
-        }
-        
+        guard let folderPath = folderPath else { return }
         let folderURL = URL(fileURLWithPath: folderPath)
         self?.filterListResults[filterList.uuid] = (Date(), .success(folderURL))
       })

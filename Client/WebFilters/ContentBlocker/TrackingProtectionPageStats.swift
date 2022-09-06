@@ -55,7 +55,7 @@ class TPStatsBlocklistChecker {
       return
     }
 
-    if resourceType == .image && loadedRuleTypes.contains(.general(.blockImages)) {
+    if resourceType == .image && Preferences.Shields.blockImages.value {
       callback(.image)
     }
 

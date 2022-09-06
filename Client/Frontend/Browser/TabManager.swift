@@ -1089,10 +1089,6 @@ extension TabManagerDelegate {
 extension TabManager: PreferencesObserver {
   func preferencesDidChange(for key: String) {
     switch key {
-    case Preferences.Shields.blockImages.key:
-      // Update Block images
-      // TODO: @JS Enable this?
-      break
     case Preferences.General.blockPopups.key:
       let allowPopups = !Preferences.General.blockPopups.value
       // Each tab may have its own configuration, so we should tell each of them in turn.

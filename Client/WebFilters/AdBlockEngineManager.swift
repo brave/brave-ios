@@ -320,7 +320,6 @@ public class AdBlockEngineManager {
     var compileResults: [ResourceWithVersion: Result<Void, Error>] = [:]
     
     for resourceWithVersion in resources {
-      /// TODO: @JS Not sure if we can do this in parallel. I'm a bit weary of compiling things into the same engine in parallel. Is that going to cause issues?
       do {
         try await self.compile(resource: resourceWithVersion, into: engine)
         compileResults[resourceWithVersion] = .success(Void())

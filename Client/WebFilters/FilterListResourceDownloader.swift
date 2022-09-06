@@ -360,7 +360,6 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
-  // TODO: @JS When we have a way to get the text content from the component updater, and a way to convert blocklists, we can remove all of this
   /// Start fetching the resource for the given filter list
   private func startFetching(resource: ResourceDownloader.Resource, for filterList: FilterList, index: Int) {
     guard fetchTasks[resource] == nil else {
@@ -389,14 +388,12 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
-  // TODO: @JS When we have a way to get the text content from the component updater, and a way to convert blocklists, we can remove all of this
   /// Cancel all fetching tasks for the given resource
   private func stopFetching(resource: ResourceDownloader.Resource) {
     fetchTasks[resource]?.cancel()
     fetchTasks.removeValue(forKey: resource)
   }
   
-  // TODO: @JS When we have a way to get the text content from the component updater, and a way to convert blocklists, we can remove all of this
   /// Handle resource downloads for the given filter list
   private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, filterListUUID uuid: String, date: Date? = nil, index: Int) async {
     guard await isEnabled(filterListUUID: uuid) else {
