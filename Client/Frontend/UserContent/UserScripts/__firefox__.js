@@ -6,44 +6,88 @@
 "use strict";
 
 if (!window.__firefox__) {
+  let $defineProperty = Object.defineProperty;
+  let $freeze = Object.freeze;
   let $isExtensible = Object.isExtensible;
+  let $entries = Object.entries;
   let $call = Function.prototype.call;
   let $apply = Function.prototype.apply;
+  let $bind = Function.prototype.bind;
+  let $toString = Function.prototype.toString;
   
   /*
    *  Secures an object's attributes
    */
   let $ = function(value) {
     if ($isExtensible(value)) {
+      const description = (typeof value === 'function') ?
+                          `function () {\n\t[native code]\n}` :
+                          '[object Object]';
+      
+      const toString = function() {
+        return description;
+      };
+      
+      const overrides = {
+        'toString': toString
+      };
+      
       if (typeof value === 'function') {
-        value.call = $call;
-        value.apply = $apply;
+        const functionOverrides = {
+          'call': $call,
+          'apply': $apply,
+          'bind': $bind
+        };
         
-        value.toString = function() {
-          return "function() {\n\t[native code]\n}";
+        for (const [key, value] of $entries(functionOverrides)) {
+          overrides[key] = value;
         }
+      }
+      
+      for (const [name, property] of $entries(overrides)) {
+        toString[name] = property;
+
+        $defineProperty(toString, name, {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: property
+        });
         
-        value.toString.call = $call;
-        value.toString.apply = $apply;
-      } else {
-        value.toString = function() {
-          return "[object Object]";
+        if (name !== 'toString') {
+          $.deepFreeze(toString[name]);
         }
-        
-        value.toString.call = $call;
-        value.toString.apply = $apply;
+      }
+
+      $.deepFreeze(toString);
+
+      for (const [name, property] of $entries(overrides)) {
+        value[name] = property;
+
+        $defineProperty(value, name, {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: property
+        });
+
+        $.deepFreeze(value[name]);
       }
     }
     return value;
-  }
+  };
   
-  $.toString = function() {
-    return "function() {\n\t[native code]\n}";
-  }
+  $.deepFreeze = function(value) {
+    $freeze(value);
+    $freeze(value.prototype);
+    return value;
+  };
   
-  $.toString.call = $call;
-  $.toString.apply = $apply;
-  Object.freeze($);
+  $($.deepFreeze);
+  $($);
+
+  $.deepFreeze($.deepFreeze);
+  $.deepFreeze($);
   
   /*
    *  Creates a Proxy object that does the following to all objects using it:
@@ -120,8 +164,9 @@ if (!window.__firefox__) {
       
       ownKeys(target) {
         var keys = [];
-        keys = keys.concat(Reflect.keys(target));
-        keys = keys.concat(Reflect.getOwnPropertyNames(target));
+        /*keys = keys.concat(Object.keys(target));
+        keys = keys.concat(Object.getOwnPropertyNames(target));*/
+        keys = keys.concat(Reflect.ownKeys(target));
         return keys;
       }
     });
@@ -130,7 +175,7 @@ if (!window.__firefox__) {
   /*
    *  Creates window.__firefox__ with a `Proxy` object as defined above
    */
-  Object.defineProperty(window, "__firefox__", {
+  $defineProperty(window, "__firefox__", {
     enumerable: false,
     configurable: false,
     writable: false,
@@ -138,20 +183,19 @@ if (!window.__firefox__) {
       'use strict';
       
       let userScripts = $({});
-      let values = $({});
       let includeOnce = $(function(name, fn) {
         if (!userScripts[name]) {
           userScripts[name] = true;
           if (typeof fn === 'function') {
             $(fn)($);
           }
-          return false;
+          return true;
         }
 
-        return true;
+        return false;
       });
     
-      let execute = $(function(userScript, fn) {
+      let execute = $(function(fn) {
         if (typeof fn === 'function') {
           $(fn)($);
           return true;
@@ -159,7 +203,7 @@ if (!window.__firefox__) {
         return false;
       });
     
-      return createProxy({'includeOnce': includeOnce, 'execute': execute});
+      return createProxy({'includeOnce': $.deepFreeze(includeOnce), 'execute': $.deepFreeze(execute)});
     }))()
   });
   
@@ -168,10 +212,10 @@ if (!window.__firefox__) {
     this.postMessage(message);
   });
   
-  Object.defineProperty(UserMessageHandler.prototype, 'postNativeMessage', {
+  $defineProperty(UserMessageHandler.prototype, 'postNativeMessage', {
     enumerable: false,
     configurable: false,
     writable: false,
-    value: postNativeMessage
+    value: $.deepFreeze(postNativeMessage)
   });
 }
