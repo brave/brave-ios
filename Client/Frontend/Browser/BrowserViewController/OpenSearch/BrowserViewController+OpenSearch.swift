@@ -252,6 +252,9 @@ extension BrowserViewController: KeyboardHelperDelegate {
 
     UIViewPropertyAnimator(duration: state.animationDuration, curve: state.animationCurve) {
       self.alertStackView.layoutIfNeeded()
+      if self.isUsingBottomBar {
+        self.header.superview?.layoutIfNeeded()
+      }
     }
     .startAnimation()
 
@@ -273,6 +276,9 @@ extension BrowserViewController: KeyboardHelperDelegate {
 
     UIViewPropertyAnimator(duration: state.animationDuration, curve: state.animationCurve) {
       self.alertStackView.layoutIfNeeded()
+      if self.isUsingBottomBar {
+        self.header.superview?.layoutIfNeeded()
+      }
     }
     .startAnimation()
   }

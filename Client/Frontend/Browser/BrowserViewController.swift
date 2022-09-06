@@ -113,6 +113,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var footer: UIView!
   fileprivate var topTouchArea: UIButton!
   fileprivate let bottomTouchArea = UIButton()
+  // A view to place behind the bottom bar down to the toolbar during keyboard animations to avoid
+  // the odd look for the URL bar floating
+  private let bottomBarKeyboardBackground = UIView().then {
+    $0.isUserInteractionEnabled = false
+  }
 
   // These constraints allow to show/hide tabs bar
   var webViewContainerTopOffset: Constraint?
@@ -655,6 +660,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       alongsideTransition: { context in
         if self.isViewLoaded {
           self.statusBarOverlay.backgroundColor = self.topToolbar.backgroundColor
+          self.bottomBarKeyboardBackground.backgroundColor = self.topToolbar.backgroundColor
           self.setNeedsStatusBarAppearanceUpdate()
         }
       },
@@ -736,6 +742,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       header.isUsingBottomBar = isUsingBottomBar
       collapsedURLBarView.isUsingBottomBar = isUsingBottomBar
       searchController?.isUsingBottomBar = isUsingBottomBar
+      bottomBarKeyboardBackground.isHidden = !isUsingBottomBar
       updateTabsBarVisibility()
       updateViewConstraints()
     }
@@ -814,6 +821,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     footer.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(bottomTouchArea)
     view.addSubview(topTouchArea)
+    view.addSubview(bottomBarKeyboardBackground)
     view.addSubview(footer)
     view.addSubview(header)
     view.addSubview(statusBarOverlay)
@@ -890,6 +898,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           self?.statusBarOverlay.backgroundColor =
           Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
         }
+        self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
       })
     
     Preferences.General.nightModeEnabled.objectWillChange
@@ -901,6 +910,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           self?.statusBarOverlay.backgroundColor =
           Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
         }
+        self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
       }
       .store(in: &cancellables)
     
@@ -1217,6 +1227,16 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       make.height.equalTo(height)
     }
 
+    bottomBarKeyboardBackground.snp.remakeConstraints {
+      if self.isUsingBottomBar {
+        $0.top.equalTo(header)
+        $0.bottom.equalTo(footer)
+      } else {
+        $0.top.bottom.equalTo(footer)
+      }
+      $0.leading.trailing.equalToSuperview()
+    }
+    
     // Remake constraints even if we're already showing the home controller.
     // The home controller may change sizes if we tap the URL bar while on about:home.
     pageOverlayLayoutGuide.snp.remakeConstraints { make in

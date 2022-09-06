@@ -483,6 +483,8 @@ extension BrowserViewController: TopToolbarDelegate {
         $0.leading.trailing.equalTo(pageOverlayLayoutGuide)
         $0.top.bottom.equalTo(view)
       }
+      favoritesController.view.setNeedsLayout()
+      favoritesController.view.layoutIfNeeded()
     }
     guard let favoritesController = favoritesController else { return }
     favoritesController.view.alpha = 0.0
