@@ -603,11 +603,11 @@ class UserScriptManager {
         $0.addUserScript(script)
         if var providerJS = walletSolProviderScripts[.solana] {
           providerJS = """
-            (function() {
+            (function($Object) {
               if (window.isSecureContext) {
                 \(providerJS)
               }
-            })();
+            })(Object);
             """
           $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
         }
@@ -620,28 +620,11 @@ class UserScriptManager {
           let solanaInternalScript = walletSolProviderScripts[.solanaInternal] else {
       return
     }
-    // create `window._brave_solana` in `walletSandbox` content world
-    let script = """
-(function() {
-  if (!window._brave_solana) {
-    Object.defineProperty(window, '_brave_solana', {
-      value: {},
-      writable: false
-    });
-  }
-})();
-"""
-    await webView.evaluateSafeJavaScript(
-      functionName: script,
-      args: [],
-      contentWorld: .walletSandbox,
-      asFunction: false
-    )
     // inject the internal solana script
     await webView.evaluateSafeJavaScript(
-      functionName: solanaInternalScript,
+      functionName: "(function($Object){ \(solanaInternalScript) })(Object);",
       args: [],
-      contentWorld: .walletSandbox,
+      contentWorld: .page,
       asFunction: false
     )
   }

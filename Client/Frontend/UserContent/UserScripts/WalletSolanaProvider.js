@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-(function() {
+(function($Object) {
   if (window.isSecureContext) {
     function post(method, payload) {
       return new Promise((resolve, reject) => {
@@ -21,6 +21,31 @@
         })
       })
     }
+    function postConnect(method, payload) {
+      return new Promise((resolve, reject) => {
+        webkit.messageHandlers.$<handler>.postMessage({
+          "securitytoken": "$<security_token>",
+          "method": method,
+          "args": JSON.stringify(payload)
+        })
+        .then(
+            (publicKey) => {
+             /* Convert `publicKey` to `solanaWeb3.PublicKey`
+               & wrap as {publicKey: solanaWeb3.PublicKey} for success response */
+              const result = new Object();
+              result.publicKey = window._brave_solana.createPublickey(publicKey);
+              resolve(result)
+            },
+            (errorJSON) => {
+              try {
+                reject(JSON.parse(errorJSON))
+              } catch(e) {
+                reject(errorJSON)
+              }
+            }
+          )
+      })
+    }
     const provider = {
       value: {
         /* Properties */
@@ -30,11 +55,7 @@
         publicKey: null,
         /* Methods */
         connect: function(payload) {
-          if (payload == undefined) {
-            return post('connect', {})
-          } else {
-            return post('connect', payload)
-          }
+          return postConnect('connect', payload)
         },
         disconnect: function(payload) {
           return post('disconnect', payload)
@@ -58,11 +79,11 @@
         },
       }
     }
-    Object.defineProperty(window, 'solana', provider);
-    Object.defineProperty(window, 'braveSolana', provider);
-    Object.defineProperty(window, '_brave_solana', {
+    $Object.defineProperty(window, 'solana', provider);
+    $Object.defineProperty(window, 'braveSolana', provider);
+    $Object.defineProperty(window, '_brave_solana', {
       value: {},
       writable: false
     });
   }
-})();
+})(Object);
