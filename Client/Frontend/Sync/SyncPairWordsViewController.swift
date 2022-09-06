@@ -5,17 +5,39 @@ import Shared
 import BraveShared
 import BraveCore
 import Data
+import UniformTypeIdentifiers
 
 private let log = Logger.browserLogger
 
 class SyncPairWordsViewController: SyncViewController {
 
+  // MARK: Internal
+  
   weak var delegate: SyncPairControllerDelegate?
-  var scrollView: UIScrollView!
-  var containerView: UIView!
-  var codewordsView: SyncCodewordsView!
-
-  lazy var wordCountLabel: UILabel = {
+  
+  private var scrollView = UIScrollView().then {
+    $0.translatesAutoresizingMaskIntoConstraints = false
+  }
+  
+  private var containerView = UIView().then {
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.backgroundColor = .braveBackground
+    $0.layer.shadowColor = UIColor.braveSeparator.cgColor
+    $0.layer.shadowRadius = 0
+    $0.layer.shadowOpacity = 1.0
+    $0.layer.shadowOffset = CGSize(width: 0, height: 0.5)
+  }
+  
+  private var codewordsView = SyncCodewordsView(data: [])
+  
+  private var loadingView = UIView().then {
+    $0.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
+    $0.isHidden = true
+  }
+  
+  private let loadingSpinner = UIActivityIndicatorView(style: .large)
+  
+  private lazy var wordCountLabel: UILabel = {
     let label = UILabel()
     label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
     label.textColor = .braveLabel
@@ -23,26 +45,25 @@ class SyncPairWordsViewController: SyncViewController {
     return label
   }()
 
-  lazy var copyPasteButton: UIButton = {
-    let button = UIButton()
-    button.setImage(UIImage(named: "copy_paste", in: .current, compatibleWith: nil)?.template, for: .normal)
-    button.addTarget(self, action: #selector(SEL_paste), for: .touchUpInside)
-    button.tintColor = .braveLabel
-    return button
-  }()
-
-  lazy var useCameraButton = UIButton().then {
+  private lazy var useCameraButton = UIButton().then {
     $0.setTitle(Strings.syncSwitchBackToCameraButton, for: .normal)
     $0.addTarget(self, action: #selector(useCameraButtonTapped), for: .touchDown)
     $0.setTitleColor(.braveLabel, for: .normal)
     $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
   }
-
-  var loadingView: UIView!
-  let loadingSpinner = UIActivityIndicatorView(style: .large)
-
+  
+//  private lazy var copyPasteButton: UIButton = {
+//    let button = UIButton()
+//    button.setImage(UIImage(named: "copy_paste", in: .current, compatibleWith: nil)?.template, for: .normal)
+//    button.addTarget(self, action: #selector(pasteKeywords), for: .touchUpInside)
+//    button.tintColor = .braveLabel
+//    return button
+//  }()
+  
   private let syncAPI: BraveSyncAPI
 
+  // MARK: Lifecycle
+  
   init(syncAPI: BraveSyncAPI) {
     self.syncAPI = syncAPI
     super.init(nibName: nil, bundle: nil)
@@ -62,90 +83,97 @@ class SyncPairWordsViewController: SyncViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    edgesForExtendedLayout = UIRectEdge()
     title = Strings.syncAddDeviceWordsTitle
+    navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.confirm, style: .done, target: self, action: #selector(done))
 
-    scrollView = UIScrollView()
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(scrollView)
-
-    containerView = UIView()
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.backgroundColor = .braveBackground
-    containerView.layer.shadowColor = UIColor.braveSeparator.cgColor
-    containerView.layer.shadowRadius = 0
-    containerView.layer.shadowOpacity = 1.0
-    containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
     scrollView.addSubview(containerView)
 
-    codewordsView = SyncCodewordsView(data: [])
-    codewordsView.wordCountChangeCallback = { (count) in
-      self.wordCountLabel.text = String(format: Strings.wordCount, count)
+    codewordsView.wordCountChangeCallback = { [weak self] count in
+      self?.wordCountLabel.text = String(format: Strings.wordCount, count)
     }
     containerView.addSubview(codewordsView)
     containerView.addSubview(wordCountLabel)
-    containerView.addSubview(copyPasteButton)
+//    containerView.addSubview(copyPasteButton)
 
-    loadingSpinner.startAnimating()
-
-    loadingView = UIView()
-    loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
-    loadingView.isHidden = true
     loadingView.addSubview(loadingSpinner)
 
     view.addSubview(loadingView)
     view.addSubview(useCameraButton)
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.confirm, style: .done, target: self, action: #selector(SEL_done))
-
-    edgesForExtendedLayout = UIRectEdge()
-
-    scrollView.snp.makeConstraints { (make) in
-      make.edges.equalTo(self.view)
+    scrollView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
     }
 
-    containerView.snp.makeConstraints { (make) in
+    containerView.snp.makeConstraints {
       // Making these edges based off of the scrollview removes selectability on codewords.
       //  This currently works for all layouts and enables interaction, so using `view` instead.
-      make.top.equalTo(self.view)
-      make.left.equalTo(self.view)
-      make.right.equalTo(self.view)
-      make.height.equalTo(295)
-      make.width.equalTo(self.view)
+      $0.top.left.right.width.equalTo(view)
+      $0.height.equalTo(295)
     }
 
-    codewordsView.snp.makeConstraints { (make) in
-      make.edges.equalTo(self.containerView).inset(UIEdgeInsets(top: 0, left: 0, bottom: 45, right: 0))
+    codewordsView.snp.makeConstraints {
+      $0.edges.equalTo(containerView).inset(UIEdgeInsets(top: 0, left: 0, bottom: 45, right: 0))
     }
 
-    wordCountLabel.snp.makeConstraints { (make) in
-      make.top.equalTo(codewordsView.snp.bottom)
-      make.left.equalTo(codewordsView).inset(24)
+    wordCountLabel.snp.makeConstraints {
+      $0.top.equalTo(codewordsView.snp.bottom)
+      $0.left.equalTo(codewordsView).inset(24)
     }
 
-    copyPasteButton.snp.makeConstraints { (make) in
-      make.size.equalTo(45)
-      make.right.equalTo(containerView).inset(15)
-      make.bottom.equalTo(containerView).inset(15)
+//    copyPasteButton.snp.makeConstraints {
+//      $0.size.equalTo(45)
+//      $0.right.equalTo(containerView).inset(15)
+//      $0.bottom.equalTo(containerView).inset(15)
+//    }
+//
+//    copyPasteButton.isHidden = true
+    
+    if #available(iOS 16.0, *) {
+//      let configuration = UIPasteControl.Configuration().then {
+//        $0.displayMode = .iconOnly
+//        $0.baseBackgroundColor = .clear
+//        $0.baseForegroundColor = .white
+//      }
+      
+      let pasteControl = UIPasteControl()
+      pasteControl.target = self
+      
+      containerView.addSubview(pasteControl)
+      pasteControl.translatesAutoresizingMaskIntoConstraints = false
+
+      NSLayoutConstraint.activate([
+        pasteControl.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+        pasteControl.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+      ])
+      
+//      pasteControl.snp.makeConstraints {
+////        $0.size.equalTo(45)
+//        $0.right.equalTo(containerView).inset(15)
+//        $0.bottom.equalTo(containerView).inset(15)
+//      }
+      
+      pasteConfiguration = UIPasteConfiguration(acceptableTypeIdentifiers: [
+          UTType.text.identifier,
+          UTType.image.identifier,
+      ])
     }
 
-    loadingView.snp.makeConstraints { (make) in
-      make.edges.equalTo(loadingView.superview!)
+    loadingView.snp.makeConstraints {
+      $0.edges.equalTo(loadingView.superview!)
     }
 
-    loadingSpinner.snp.makeConstraints { (make) in
-      make.center.equalTo(loadingView)
+    loadingSpinner.snp.makeConstraints {
+      $0.center.equalTo(loadingView)
     }
 
-    useCameraButton.snp.makeConstraints { make in
-      make.top.equalTo(containerView.snp.bottom).offset(16)
-      make.left.equalTo(self.view)
-      make.right.equalTo(self.view)
-      make.centerX.equalTo(self.view)
+    useCameraButton.snp.makeConstraints {
+      $0.top.equalTo(containerView.snp.bottom).offset(16)
+      $0.left.right.centerX.equalTo(view)
     }
-  }
-
-  @objc func useCameraButtonTapped() {
-    self.navigationController?.popViewController(animated: true)
+    
+    loadingSpinner.startAnimating()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -154,16 +182,22 @@ class SyncPairWordsViewController: SyncViewController {
     codewordsView.becomeFirstResponder()
   }
 
-  @objc func SEL_paste() {
-    if let contents = UIPasteboard.general.string, !contents.isEmpty {
-      // remove linebreaks and whitespace, split into codewords.
-      codewordsView.setCodewords(data: contents.separatedBy(" "))
-
-      UIPasteboard.general.clearPasteboard()
-    }
+  // MARK: Actions
+  
+  @objc func useCameraButtonTapped() {
+    navigationController?.popViewController(animated: true)
   }
+  
+//  @objc func pasteKeywords() {
+//    if let contents = UIPasteboard.general.string, !contents.isEmpty {
+//      // remove linebreaks and whitespace, split into codewords.
+//      codewordsView.setCodewords(data: contents.separatedBy(" "))
+//
+//      UIPasteboard.general.clearPasteboard()
+//    }
+//  }
 
-  @objc func SEL_done() {
+  @objc func done() {
     doIfConnected {
       self.checkCodes()
     }
@@ -213,6 +247,8 @@ class SyncPairWordsViewController: SyncViewController {
   }
 }
 
+// MARK: Navigation Prevention
+
 extension SyncPairWordsViewController: NavigationPrevention {
   func enableNavigationPrevention() {
     loadingView.isHidden = false
@@ -226,4 +262,29 @@ extension SyncPairWordsViewController: NavigationPrevention {
     navigationItem.hidesBackButton = false
 
   }
+}
+
+extension SyncPairWordsViewController {
+  override func paste(itemProviders: [NSItemProvider]) {
+    for provider in itemProviders {
+      if provider.hasItemConformingToTypeIdentifier(UTType.text.identifier) {
+        _ = provider.loadObject(ofClass: String.self) { [weak self] providerContents, error in
+          if let contents = providerContents, !contents.isEmpty {
+            // remove linebreaks and whitespace, split into codewords.
+            Task { @MainActor in
+              self?.codewordsView.setCodewords(data: contents.separatedBy(" "))
+              
+              //UIPasteboard.general.clearPasteboard()
+              print(contents as Any, error as Any)
+            }
+          }
+        }
+      } else if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+        _ = provider.loadObject(ofClass: UIImage.self) { img, error in
+            print(img as Any, error as Any)
+        }
+      }
+    }
+  }
+  
 }
