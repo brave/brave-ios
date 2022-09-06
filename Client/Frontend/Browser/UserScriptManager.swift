@@ -560,11 +560,11 @@ class UserScriptManager {
         $0.addUserScript(script)
         if var providerJS = walletEthProviderJS {
           providerJS = """
-            (function() {
+            (function($Object) {
               if (window.isSecureContext) {
                 \(providerJS)
               }
-            })();
+            })(Object);
             """
           $0.addUserScript(.init(source: providerJS, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page))
         }
