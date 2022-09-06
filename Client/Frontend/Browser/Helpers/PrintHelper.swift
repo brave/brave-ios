@@ -23,7 +23,7 @@ class PrintHelper: TabContentScript {
 
   static let scriptName = "PrintHelper"
   static let scriptId = UUID().uuidString
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let messageHandlerName = "printHandler"
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
       return nil

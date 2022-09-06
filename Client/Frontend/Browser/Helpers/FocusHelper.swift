@@ -17,7 +17,7 @@ class FocusHelper: TabContentScript {
 
   static let scriptName = "FocusHelper"
   static let scriptId = UUID().uuidString
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let messageHandlerName = "focusHelper"
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
