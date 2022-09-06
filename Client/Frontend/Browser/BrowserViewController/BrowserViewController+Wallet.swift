@@ -441,19 +441,8 @@ extension Tab: BraveWalletSolanaEventsListener {
       // publicKey
       if let keyringService = walletKeyringService,
          let publicKey = await keyringService.selectedAccount(.sol) {
-        let (value, _) = await webView.evaluateSafeJavaScript(
-          functionName: "_brave_solana.createPublickey",
-          args: [publicKey],
-          contentWorld: .walletSandbox
-        )
-        guard let dict = value as? [String: Any],
-              let createdPublicKey = dict["publicKey"],
-              let data = try? JSONSerialization.data(withJSONObject: createdPublicKey, options: [.fragmentsAllowed]) else {
-          return // `createPublicKey` function failed, or failed to convert to JS data
-        }
-        let JSEncodedPublicKey = String(data: data, encoding: .utf8) ?? "{}"
         await webView.evaluateSafeJavaScript(
-          functionName: "window.solana.publicKey = \(JSEncodedPublicKey)",
+          functionName: "window.solana.publicKey = window._brave_solana.createPublickey('\(publicKey)');",
           contentWorld: .page,
           asFunction: false
         )

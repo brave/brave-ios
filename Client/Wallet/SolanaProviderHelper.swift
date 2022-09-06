@@ -46,7 +46,7 @@ class SolanaProviderHelper: TabContentScript {
     }
     var securityToken: String
     var method: Method
-    var args: String
+    var args: String?
     
     private enum CodingKeys: String, CodingKey {
       case securityToken = "securitytoken"
@@ -87,27 +87,32 @@ class SolanaProviderHelper: TabContentScript {
       
       switch body.method {
       case .connect:
-        let param = MojoBase.Value(jsonString: body.args)?.dictionaryValue
+        var param: [String: MojoBase.Value]?
+        if let args = body.args {
+          param = MojoBase.Value(jsonString: args)?.dictionaryValue
+        }
         let (status, errorMessage, publicKey) = await provider.connect(param)
         guard status == .success else {
           replyHandler(nil, errorMessage)
           return
         }
-        guard let createdPublicKey = await self.createPublicKey(publicKey) else {
-          replyHandler(nil, "Internal error")
-          return
-        }
-        replyHandler(createdPublicKey, nil)
+        // need to inject `_brave_solana.createPublickey` function before replying w/ success.
+        await tab.userScriptManager?.injectSolanaInternalScript()
+        replyHandler(publicKey, nil)
         tab.updateSolanaProperties()
-        tab.emitSolanaEvent(.connect)
+        if let webView = tab.webView {
+          let script = "window.solana.emit('connect', _brave_solana.createPublickey('\(publicKey)'))"
+          await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
+        }
       case .disconnect:
         provider.disconnect()
         tab.emitSolanaEvent(.disconnect)
         replyHandler("", nil)
       case .signAndSendTransaction:
-        guard let transaction = MojoBase.Value(jsonString: body.args)?.dictionaryValue,
+        guard let args = body.args,
+              let transaction = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let param = signTransactionParam(from: transaction),
-              let sendOptions = MojoBase.Value(jsonString: body.args)?.dictionaryValue else {
+              let sendOptions = MojoBase.Value(jsonString: args)?.dictionaryValue else {
           replyHandler(nil, "Invalid args")
           return
         }
@@ -119,11 +124,12 @@ class SolanaProviderHelper: TabContentScript {
         // TODO: Use/reply `result`
         replyHandler("", nil)
       case .signMessage:
-        guard let blobMsg = MojoBase.Value(jsonString: body.args)?.binaryValue else {
+        guard let args = body.args,
+              let blobMsg = MojoBase.Value(jsonString: args)?.binaryValue else {
           replyHandler(nil, "Invalid args")
           return
         }
-        let displayEncoding: String? = MojoBase.Value(jsonString: body.args)?.stringValue
+        let displayEncoding: String? = MojoBase.Value(jsonString: args)?.stringValue
         let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
         guard status == .success,
               let publicKey = result["publicKey"]?.stringValue,
@@ -131,11 +137,11 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        let createdPublicKey = await self.createPublicKey(publicKey)
-        // TODO: Use/reply `signature`, `createdPublicKey`
+        // TODO: Use/reply `signature`, `window._brave_solana.createPublicKey` with `publicKey`
         replyHandler("", nil)
       case .request:
-        guard let requestPayload = MojoBase.Value(jsonString: body.args)?.dictionaryValue,
+        guard let args = body.args,
+              let requestPayload = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let method = requestPayload["method"]?.stringValue else {
           replyHandler(nil, "Invalid args")
           return
@@ -147,8 +153,7 @@ class SolanaProviderHelper: TabContentScript {
         }
         if method == "connect",
            let publicKey = result["publicKey"]?.stringValue {
-          let createdPublicKey = await self.createPublicKey(publicKey)
-          replyHandler(createdPublicKey, nil)
+          replyHandler(publicKey, nil)
         } else {
           // TODO: Handle non-connect request
           replyHandler("", nil)
@@ -160,8 +165,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        let createdTransaction = await self.createTransaction(serializedTx)
-        // TODO: Use/reply `createdTransaction`
+        // TODO: Use/reply `window._brave_solana.createTransaction`
         replyHandler("", nil)
       case .signAllTransactions:
         let params: [BraveWallet.SolanaSignTransactionParam] = []
@@ -170,15 +174,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        let createdTransactions: [String] = await withTaskGroup(of: [String?].self) { @MainActor group -> [String?] in
-          for serializedTx in serializedTxs {
-            group.addTask { @MainActor in
-              return [await self.createTransaction(serializedTx)]
-            }
-          }
-          return await group.reduce([String](), { $0 + $1 })
-        }.compactMap { $0 }
-        // TODO: Use/reply `createdTransactions`
+        // TODO: Use/reply `window._brave_solana.createTransaction` for each `serializedTxs` element
         replyHandler("", nil)
       }
     }
@@ -200,38 +196,5 @@ class SolanaProviderHelper: TabContentScript {
     }
     let signatures = signatures(from: transaction)
     return .init(encodedSerializedMsg: serializedMessage, signatures: signatures)
-  }
-  
-  @MainActor private func createPublicKey(_ publicKey: String) async -> String? {
-    guard let webView = tab?.webView,
-          let userScriptManager = tab?.userScriptManager else {
-      return nil
-    }
-    await userScriptManager.injectSolanaInternalScript()
-    let (value, _) = await webView.evaluateSafeJavaScript(
-      functionName: "_brave_solana.createPublickey",
-      args: [publicKey],
-      contentWorld: .walletSandbox
-    )
-    guard let dict = value as? [String: Any],
-          let data = try? JSONSerialization.data(withJSONObject: dict, options: [.fragmentsAllowed]) else {
-      return nil // `createPublicKey` function failed, or failed to convert to JS data
-    }
-    let JSEncodedPublicKey = String(data: data, encoding: .utf8) ?? "{}"
-    return JSEncodedPublicKey
-  }
-  
-  @MainActor private func createTransaction(_ serializedTx: [NSNumber]) async -> String? {
-    guard let webView = tab?.webView,
-          let userScriptManager = tab?.userScriptManager else {
-      return nil
-    }
-    await userScriptManager.injectSolanaInternalScript()
-    let (value, _) = await webView.evaluateSafeJavaScript(
-      functionName: "_brave_solana.createTransaction",
-      args: [serializedTx],
-      contentWorld: .walletSandbox
-    )
-    return value as? String
   }
 }
