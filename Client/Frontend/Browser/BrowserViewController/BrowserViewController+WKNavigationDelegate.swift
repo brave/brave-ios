@@ -157,8 +157,6 @@ extension BrowserViewController: WKNavigationDelegate {
       return
     }
 
-    webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = SafeBrowsing.isSafeBrowsingEnabledForURL(url)
-
     // Universal links do not work if the request originates from the app, manual handling is required.
     if let mainDocURL = navigationAction.request.mainDocumentURL,
       let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
@@ -216,6 +214,8 @@ extension BrowserViewController: WKNavigationDelegate {
     
     if let mainDocumentURL = navigationAction.request.mainDocumentURL {
       let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
+      // Enable safe browsing (frodulent website warnings)
+      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
       
       // Debouncing logic
       // Handle debouncing for main frame only and only if the site (etld+1) changes
