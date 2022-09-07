@@ -204,6 +204,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
       backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
     }
   }
+  
+  private(set) var displayTabTraySwipeGestureRecognizer: UISwipeGestureRecognizer?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -267,6 +269,13 @@ class TopToolbarView: UIView, ToolbarProtocol {
     updateURLBarButtonsVisibility()
     helper?.updateForTraitCollection(traitCollection, additionalButtons: [bookmarkButton])
     updateForTraitCollection()
+    
+    let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedLocationView))
+    swipeGestureRecognizer.direction = .up
+    swipeGestureRecognizer.isEnabled = false
+    locationView.addGestureRecognizer(swipeGestureRecognizer)
+    
+    self.displayTabTraySwipeGestureRecognizer = swipeGestureRecognizer
   }
 
   @available(*, unavailable)
@@ -617,6 +626,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
   @objc func topToolbarDidPressQrCodeButton() {
     leaveOverlayMode(didCancel: true)
     delegate?.topToolbarDidPressQrCodeButton(self)
+  }
+  
+  @objc private func swipedLocationView() {
+    delegate?.topToolbarDidPressTabs(self)
   }
 }
 

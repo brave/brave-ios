@@ -743,6 +743,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       collapsedURLBarView.isUsingBottomBar = isUsingBottomBar
       searchController?.isUsingBottomBar = isUsingBottomBar
       bottomBarKeyboardBackground.isHidden = !isUsingBottomBar
+      topToolbar.displayTabTraySwipeGestureRecognizer?.isEnabled = isUsingBottomBar
       updateTabsBarVisibility()
       updateViewConstraints()
     }
