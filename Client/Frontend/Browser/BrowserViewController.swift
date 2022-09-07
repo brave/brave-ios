@@ -2281,6 +2281,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
           header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
           tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+          toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
         }
         animator.startAnimation()
       }
@@ -2304,6 +2305,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
+      toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       return
     }
     switch state {
@@ -2319,6 +2321,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
+    toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     let animator = toolbarVisibilityViewModel.toolbarChangePropertyAnimator
     animator.addAnimations {
       self.view.layoutIfNeeded()
