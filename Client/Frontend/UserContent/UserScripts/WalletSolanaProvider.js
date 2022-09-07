@@ -67,6 +67,9 @@
           return post('signMessage', payload)
         },
         request: function(args) /* -> Promise<unknown> */  {
+          if (args["method"] == 'connect') {
+            return postConnect('request', args)
+          }
           return post('request', args)
         },
           /* Deprecated */
