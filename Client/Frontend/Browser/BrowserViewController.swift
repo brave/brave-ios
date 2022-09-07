@@ -1047,7 +1047,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     if isUsingBottomBar {
       additionalInsets = .init(top: 0, left: 0, bottom: topToolbar.bounds.height, right: 0)
     } else {
-      additionalInsets = .init(top: topToolbar.bounds.height, left: 0, bottom: 0, right: 0)
+      additionalInsets = .init(top: header.bounds.height, left: 0, bottom: 0, right: 0)
     }
     searchController?.additionalSafeAreaInsets = additionalInsets
     favoritesController?.additionalSafeAreaInsets = additionalInsets
