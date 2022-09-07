@@ -63,7 +63,7 @@
         signAndSendTransaction: function(payload) {
           return post('signAndSendTransaction', payload)
         },
-        signMessage: function(payload) {
+        signMessage: function(...payload) {
           return post('signMessage', payload)
         },
         request: function(args) /* -> Promise<unknown> */  {
