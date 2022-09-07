@@ -208,6 +208,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
   /// The currently open WalletStore
   weak var walletStore: WalletStore?
+  
+  var lastEnteredURLVisitType: VisitType = .unknown
 
   public init(
     profile: Profile,
@@ -1409,7 +1411,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
       tab.loadRequest(URLRequest(url: url))
 
-      recordNavigationInTab(url, visitType: visitType)
+      // Recording the last Visit Type for the url submitted
+      lastEnteredURLVisitType = visitType
       updateWebViewPageZoom(tab: tab)
     }
   }
@@ -2070,8 +2073,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         if !tab.isPrivate, !url.isReaderModeURL {
           // The visitType is checked If it is "typed" or not to determine the History object we are adding
           // should be synced or not. This limitation exists on browser side so we are aligning with this
-          if let visitType = typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
-            visitType == .typed {
+          if let visitType = typedNavigation.first(where: {
+            $0.key.typedDisplayString == url.typedDisplayString
+          })?.value, visitType == .typed {
             braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
           } else {
             braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
