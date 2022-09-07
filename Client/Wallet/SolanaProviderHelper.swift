@@ -152,22 +152,32 @@ class SolanaProviderHelper: TabContentScript {
         replyHandler(encodedString, nil)
       case .request:
         guard let args = body.args,
-              let requestPayload = MojoBase.Value(jsonString: args)?.dictionaryValue,
-              let method = requestPayload["method"]?.stringValue else {
+              let argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
+              let method = argDict["method"]?.stringValue else {
           replyHandler(nil, "Invalid args")
           return
         }
-        let (status, errorMessage, result) = await provider.request(requestPayload)
+        let (status, errorMessage, result) = await provider.request(argDict)
         guard status == .success else {
           replyHandler(nil, errorMessage)
           return
         }
         if method == "connect",
            let publicKey = result["publicKey"]?.stringValue {
+          // need to inject `_brave_solana.createPublickey` function before replying w/ success.
+          await tab.userScriptManager?.injectSolanaInternalScript()
           replyHandler(publicKey, nil)
+          tab.updateSolanaProperties()
+          if let webView = tab.webView {
+            let script = "window.solana.emit('connect', _brave_solana.createPublickey('\(publicKey)'))"
+            await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
+          }
         } else {
-          // TODO: Handle non-connect request
-          replyHandler("", nil)
+          if method == "disconnect" {
+            tab.emitSolanaEvent(.disconnect)
+          }
+          // TODO: Handle non-connect/disconnect request
+          replyHandler("{:}", nil)
         }
       case .signTransaction:
         let param = BraveWallet.SolanaSignTransactionParam(encodedSerializedMsg: "", signatures: [])
