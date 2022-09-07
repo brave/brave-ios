@@ -259,11 +259,8 @@ extension BrowserViewController: WKNavigationDelegate {
       // Set some additional user scripts
       if navigationAction.targetFrame?.isMainFrame == true {
         // Add de-amp script
-        // Only do this if shields are on
         // The user script manager will take care to not reload scripts if this value doesn't change
-        if !domainForMainFrame.isShieldExpected(.AllOff, considerAllShieldsOption: false) {
-          tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value
-        }
+        tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value
         
         // Add request blocking script
         // This script will block certian `xhr` and `window.fetch()` requests
