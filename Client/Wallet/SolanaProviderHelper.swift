@@ -125,20 +125,31 @@ class SolanaProviderHelper: TabContentScript {
         replyHandler("", nil)
       case .signMessage:
         guard let args = body.args,
-              let blobMsg = MojoBase.Value(jsonString: args)?.binaryValue else {
+              let argsList = MojoBase.Value(jsonString: args)?.listValue,
+              let messageDict = argsList.first?.dictionaryValue else {
           replyHandler(nil, "Invalid args")
           return
         }
-        let displayEncoding: String? = MojoBase.Value(jsonString: args)?.stringValue
+        let blobMsg: [NSNumber] =  messageDict.keys
+          .sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending })
+          .compactMap { messageDict[$0]?.intValue }
+          .map { NSNumber(value: $0) }
+        let displayEncoding = argsList[safe: 1]?.stringValue
         let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
         guard status == .success,
               let publicKey = result["publicKey"]?.stringValue,
-              let signature = result["signature"] else {
+              let signature = result["signature"]?.stringValue else {
           replyHandler(nil, errorMessage)
           return
         }
-        // TODO: Use/reply `signature`, `window._brave_solana.createPublicKey` with `publicKey`
-        replyHandler("", nil)
+        // TODO: signature string needs decoded from base58
+        let resultDict = ["publicKey": publicKey, "signature": signature]
+        guard let encodedResult = try? JSONSerialization.data(withJSONObject: resultDict, options: .fragmentsAllowed),
+              let encodedString = String(data: encodedResult, encoding: .utf8) else {
+          replyHandler(nil, "Internal error")
+          return
+        }
+        replyHandler(encodedString, nil)
       case .request:
         guard let args = body.args,
               let requestPayload = MojoBase.Value(jsonString: args)?.dictionaryValue,
