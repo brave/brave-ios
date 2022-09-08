@@ -107,7 +107,7 @@ class SolanaProviderHelper: TabContentScript {
       case .disconnect:
         provider.disconnect()
         tab.emitSolanaEvent(.disconnect)
-        replyHandler("", nil)
+        replyHandler("{:}", nil)
       case .signAndSendTransaction:
         guard let args = body.args,
               let transaction = MojoBase.Value(jsonString: args)?.dictionaryValue,
@@ -121,7 +121,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        // TODO: Use/reply `result`
+        // TODO: Reply with `{publicKey: <base58 encoded string>, signature: <base58 encoded string>}`
         replyHandler("", nil)
       case .signMessage:
         guard let args = body.args,
@@ -149,6 +149,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, "Internal error")
           return
         }
+        // TODO: Reply with `{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}`
         replyHandler(encodedString, nil)
       case .request:
         guard let args = body.args,
@@ -176,7 +177,17 @@ class SolanaProviderHelper: TabContentScript {
           if method == "disconnect" {
             tab.emitSolanaEvent(.disconnect)
           }
-          // TODO: Handle non-connect/disconnect request
+          // TODO: Handle non-connect/disconnect request. Reply with:
+          // - connect => { publicKey: solanaWeb3.PublicKey}
+          // - disconnect => {}
+          // - signTransaction => { publicKey: <base58 encoded string>,
+          //                        signature: <base58 encoded string>}
+          // - signAndSendTransaction => { publicKey: <base58 encoded string>,
+          //                               signature: <base58 encoded string>}
+          // - signAllTransactions => { publicKey: <base58 encoded string>,
+          //                            signature: <base58 encoded string>[]}
+          // - signMessage => { publicKey: <base58 encoded string>,
+          //                    signature: <base58 encoded string>}
           replyHandler("{:}", nil)
         }
       case .signTransaction:
@@ -186,7 +197,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        // TODO: Use/reply `window._brave_solana.createTransaction`
+        // TODO: Reply with `solanaWeb3.Transaction`
         replyHandler("", nil)
       case .signAllTransactions:
         let params: [BraveWallet.SolanaSignTransactionParam] = []
@@ -195,7 +206,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, errorMessage)
           return
         }
-        // TODO: Use/reply `window._brave_solana.createTransaction` for each `serializedTxs` element
+        // TODO: Reply with array of `solanaWeb3.Transaction`
         replyHandler("", nil)
       }
     }
