@@ -545,10 +545,10 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           
           // TODO: We should ideally call this after this whole group
           // but it gives us a split second blackness. So for now we keep it like this
-          await Task { @MainActor in
+          await MainActor.run {
             self.contentBlockListCompiled = true
             self.setupTabs()
-          }.value
+          }
         }
       }
       

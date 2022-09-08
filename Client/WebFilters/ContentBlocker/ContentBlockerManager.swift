@@ -133,11 +133,11 @@ public class ContentBlockerManager {
     guard let identifiers = await ruleStore.availableIdentifiers() else { return }
     let loadedCachedResults = await load(identifiers: identifiers)
     
-    await Task { @MainActor in
+    await MainActor.run {
       for cachedResults in loadedCachedResults {
         self.cachedCompileResults[cachedResults.0] = (.bundled, cachedResults.1)
       }
-    }.value
+    }
   }
   
   private func cleanupRuleLists() async {
@@ -249,15 +249,15 @@ public class ContentBlockerManager {
             do {
               let ruleList = try await self.compile(resource: resource, forIdentifier: identifier)
               
-              await Task { @MainActor in
+              await MainActor.run {
                 self.cachedCompileResults[identifier] = (resource.sourceType, .success(ruleList))
-              }.value
+              }
             } catch {
               log.error(error)
               
-              await Task { @MainActor in
+              await MainActor.run {
                 self.cachedCompileResults[identifier] = (resource.sourceType, .failure(error))
-              }.value
+              }
             }
             
             await self.data.movePendingResource(forIdentifier: identifier)

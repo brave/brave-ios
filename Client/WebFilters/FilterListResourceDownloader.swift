@@ -163,14 +163,14 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   private func loadCachedFilterLists() async {
-    let settingsInfo: [(index: Int, uuid: String, folderURL: URL?, resources: [ResourceDownloader.Resource])] = await Task { @MainActor in
+    let settingsInfo: [(index: Int, uuid: String, folderURL: URL?, resources: [ResourceDownloader.Resource])] = await MainActor.run {
       let filterListSettings = settingsManager.allFilterListSettings
       
       return filterListSettings.enumerated().compactMap { (index, setting) in
         guard setting.isEnabled else { return nil }
         return (index, setting.uuid, setting.folderURL, setting.resources)
       }
-    }.value
+    }
     
     return await withTaskGroup(of: Void.self) { group in
       for settingInfo in settingsInfo {

@@ -33,7 +33,7 @@ class ContentBlockerManagerTests: XCTestCase {
       
       await manager.compilePendingResources()
       
-      await Task { @MainActor in
+      await MainActor.run {
         // Then
         // Check for the correct source and cached rule list
         for generalType in ContentBlockerManager.GeneralBlocklistTypes.allCases {
@@ -59,7 +59,7 @@ class ContentBlockerManagerTests: XCTestCase {
             }
           }
         }
-      }.value
+      }
       
       // Check we go back to the bundled rule type if we remove the downloaded one
       await manager.removeResource(for: downloadedRuleType)
