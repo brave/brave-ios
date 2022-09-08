@@ -162,12 +162,12 @@ extension Strings {
       value: "Remove this account?",
       comment: "The title of a confirmation dialog when attempting to remove an account"
     )
-    public static let accountRemoveAlertConfirmationMessage = NSLocalizedString(
-      "wallet.accountRemoveAlertConfirmationMessage",
+    public static let warningAlertConfirmation = NSLocalizedString(
+      "wallet.warningAlertConfirmation",
       tableName: "BraveWallet",
       bundle: .strings,
       value: "Are you sure?",
-      comment: "The message of a confirmation dialog when attempting to remove an account"
+      comment: "The message of a confirmation dialog when attempting to remove an account. Or the title of a confirmation dialog when attempting to remove all wallet connection for one or more websites"
     )
     public static let accountPrivateKeyDisplayWarning = NSLocalizedString(
       "wallet.accountPrivateKeyDisplayWarning",
@@ -2311,12 +2311,19 @@ extension Strings {
       value: "Default Solana Wallet",
       comment: "The title for the entry displaying the current preferred default Solana wallet is."
     )
-    public static let web3PreferencesAllowSiteToRequestAccounts = NSLocalizedString(
-      "wallet.web3PreferencesAllowSiteToRequestAccounts",
+    public static let web3PreferencesAllowEthProviderAccess = NSLocalizedString(
+      "wallet.web3PreferencesAllowEthProviderAccess",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Allow Sites to Request Accounts",
-      comment: "The title for the entry displaying the preferred option to allow web3 sites to rquest account's permission."
+      value: "Allow Sites to Access Ethereum Provider API",
+      comment: "The title for the entry displaying the preferred option to allow web3 sites to access the Ethereum provider API."
+    )
+    public static let web3PreferencesAllowSolProviderAccess = NSLocalizedString(
+      "wallet.web3PreferencesAllowSolProviderAccess",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Allow Sites to Access Solana Provider API",
+      comment: "The title for the entry displaying the preferred option to allow web3 sites to access the Solana provider API."
     )
     public static let web3PreferencesDisplayWeb3Notifications = NSLocalizedString(
       "wallet.web3PreferencesDisplayWeb3Notifications",
@@ -2336,7 +2343,7 @@ extension Strings {
       "wallet.manageSiteConnectionsFilterPlaceholder",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Filter",
+      value: "Filter Conneted Sites",
       comment: "The filter in the search bar for the screen to manage web3 sites account connections."
     )
     public static let manageSiteConnectionsRemoveAll = NSLocalizedString(
@@ -2709,6 +2716,48 @@ extension Strings {
       bundle: .strings,
       value: "Don't show again",
       comment: "A text button for user to click so this pop up will not show again."
+    )
+    public static let dappsSettingsNavTitle = NSLocalizedString(
+      "wallet.dappsSettingsNavTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "%@ Settings",
+      comment: "The navigation title of the settings screen for each Dapp. '%@' will be relpaced by the name of the coin type. For example, the title could 'Ethereum Settings', 'Solana Settings' etc."
+    )
+    public static let dappsSettingsRemoveAllWarning = NSLocalizedString(
+      "wallet.dappsSettingsRemoveAllWarning",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "This will remove all Wallet connection permissions for %d %@",
+      comment: "The warning message in a confirmation dialog when attempting to remove all wallet connection to a dapp."
+    )
+    public static let dappsSettingsWebsiteSingular = NSLocalizedString(
+      "wallet.dappsSettingsWebsiteSingular",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "website",
+      comment: "The singular word that will be used in `manageSiteConnectionsAccount`."
+    )
+    public static let dappsSettingsWebsitePlural = NSLocalizedString(
+      "wallet.dappsSettingsWebsitePlural",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "websites",
+      comment: "The plural word that will be used in `manageSiteConnectionsAccount`."
+    )
+    public static let dappsSettingsGeneralSectionTitle = NSLocalizedString(
+      "wallet.dappsSettingsGeneralSectionTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "General",
+      comment: "The title of the section that will display settings for default wallet and dapp provider api access permission"
+    )
+    public static let dappsSettingsConnectedSitesSectionTitle = NSLocalizedString(
+      "wallet.dappsSettingsConnectedSitesSectionTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Connected Sites",
+      comment: "The title of the section that will list all the permitted dapp connections"
     )
   }
 }

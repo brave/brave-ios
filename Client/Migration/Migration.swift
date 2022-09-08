@@ -315,6 +315,9 @@ fileprivate extension Preferences {
 
     // BraveShared
     migrateBraveShared(keyPrefix: keyPrefix)
+    
+    // BraveWallet
+    migrate(key: "wallet.allow-eth-provider-account-requests", to: Preferences.Wallet.allowEthProviderAccess)
 
     // On 1.6 lastLaunchInfo is used to check if it's first app launch or not.
     // This needs to be translated to our new preference.
