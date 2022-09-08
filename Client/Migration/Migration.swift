@@ -26,6 +26,8 @@ public class Migration {
 
   public func launchMigrations(keyPrefix: String, profile: Profile) {
     Preferences.migratePreferences(keyPrefix: keyPrefix)
+    
+    Preferences.migrateWalletPreferences()
 
     if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
       documentsDirectoryCleanup()
@@ -245,6 +247,9 @@ fileprivate extension Preferences {
     static let coreDataCompleted = Option<Bool>(
       key: "migration.cd-completed",
       default: Preferences.Migration.completed.value)
+    /// A new preference key will be introduced in 1.44.x, indicates if Wallet Preferences migration has completed
+    static let walletCompleted =
+    Option<Bool>(key: "migration.wallet-completed", default: false)
   }
 
   /// Migrate the users preferences from prior versions of the app (<2.0)
@@ -315,14 +320,21 @@ fileprivate extension Preferences {
 
     // BraveShared
     migrateBraveShared(keyPrefix: keyPrefix)
-    
-    // BraveWallet
-    migrate(key: "wallet.allow-eth-provider-account-requests", to: Preferences.Wallet.allowEthProviderAccess)
 
     // On 1.6 lastLaunchInfo is used to check if it's first app launch or not.
     // This needs to be translated to our new preference.
     Preferences.General.isFirstLaunch.value = Preferences.DAU.lastLaunchInfo.value == nil
 
     Preferences.Migration.completed.value = true
+  }
+  
+  /// Migrate Wallet Preferences from version <1.43
+  class func migrateWalletPreferences() {
+    guard Preferences.Migration.walletCompleted.value != true else { return }
+    
+    // Migrate `allowDappProviderAccountRequests` to `allowEthProviderAccess`
+    migrate(keyPrefix: "", key: "wallet.allow-eth-provider-account-requests", to: Preferences.Wallet.allowEthProviderAccess)
+    
+    Preferences.Migration.walletCompleted.value = true
   }
 }
