@@ -272,9 +272,8 @@ class PlaylistListViewController: UIViewController {
        let lastPlayedItem = Preferences.Playlist.lastPlayedItemUrl.value,
        pageSrc == lastPlayedItem {
       
-      // User is current on the same page as the last played item
-      lastPlayedItemTime = initialItemOffset > Preferences.Playlist.lastPlayedItemTime.value ?
-                           initialItemOffset : Preferences.Playlist.lastPlayedItemTime.value
+      // User is current on the same page as the last played item]
+      lastPlayedItemTime = max(initialItemOffset, Preferences.Playlist.lastPlayedItemTime.value)
     } else {
       // Otherwise we choose the last played item offset from the page and fallback to the preference if none exists
       lastPlayedItemTime = initialItem != nil ? initialItemOffset : Preferences.Playlist.lastPlayedItemTime.value
