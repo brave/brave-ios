@@ -236,7 +236,7 @@ public class FilterListResourceDownloader: ObservableObject {
     
     let folderURL = URL(fileURLWithPath: folderPath)
     
-    Task.detached {
+    Task {
       await self.loadShields(fromFolderURL: folderURL)
     }
   }
@@ -287,8 +287,6 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Ensures settings are saved for the given filter list and that our publisher is aware of the changes
   private func handleUpdate(to filterList: FilterList) {
-    assertIsMainThread("Not main thread")
-    
     settingsManager.upsertSetting(
       uuid: filterList.uuid,
       isEnabled: filterList.isEnabled,
@@ -320,16 +318,14 @@ public class FilterListResourceDownloader: ObservableObject {
       startFetching(resource: resource, for: filterList, index: index)
     }
 
-    adBlockServiceTasks[filterList.uuid] = Task.detached(priority: .background) {
+    adBlockServiceTasks[filterList.uuid] = Task { @MainActor in
       for await folderURL in await adBlockService.register(filterListUUID: filterList.uuid) {
         guard let folderURL = folderURL else { continue }
-        guard await self.isEnabled(filterListUUID: filterList.uuid) else { return }
+        guard self.isEnabled(filterListUUID: filterList.uuid) else { return }
         await self.handle(downloadedFolderURL: folderURL, forFilterListUUID: filterList.uuid, index: index)
         
         // Save the downloaded folder for later (caching) purposes
-        Task { @MainActor in
-          self.settingsManager.set(folderURL: folderURL, forUUID: filterList.uuid)
-        }
+        self.settingsManager.set(folderURL: folderURL, forUUID: filterList.uuid)
       }
     }
   }
@@ -344,14 +340,9 @@ public class FilterListResourceDownloader: ObservableObject {
     }
     
     Task {
-      await withTaskGroup(of: Void.self) { group in
-        group.addTask {
-          await ContentBlockerManager.shared.removeResource(for: .filterList(uuid: filterList.uuid))
-        }
-        group.addTask {
-          await AdBlockEngineManager.shared.removeResources(for: .filterList(uuid: filterList.uuid))
-        }
-      }
+      async let removeContentBlockerResource: Void = ContentBlockerManager.shared.removeResource(for: .filterList(uuid: filterList.uuid))
+      async let removeAdBlockEngineResource: Void = AdBlockEngineManager.shared.removeResources(for: .filterList(uuid: filterList.uuid))
+      _ = await (removeContentBlockerResource, removeAdBlockEngineResource)
     }
   }
   
@@ -362,7 +353,7 @@ public class FilterListResourceDownloader: ObservableObject {
       return
     }
     
-    fetchTasks[resource] = Task.detached(priority: .background) {
+    fetchTasks[resource] = Task { @MainActor in
       if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
         await self.handle(downloadedFileURL: fileURL, for: resource, filterListUUID: filterList.uuid, index: index)
       }

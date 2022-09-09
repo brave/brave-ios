@@ -57,7 +57,7 @@ public class AdblockResourceDownloader {
   
   /// Start fetching the given resource at regular intervals
   private func startFetching(resource: ResourceDownloader.Resource, every fetchInterval: TimeInterval) {
-    Task.detached(priority: .background) {
+    Task { @MainActor in
       if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
         let date = try ResourceDownloader.creationDate(for: resource)
         await self.handle(downloadedFileURL: fileURL, for: resource, date: date)

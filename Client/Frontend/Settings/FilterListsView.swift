@@ -18,9 +18,9 @@ struct FilterListsView: View {
         ForEach($downloader.filterLists) { $filterList in
           Toggle(isOn: $filterList.isEnabled) {
             VStack(alignment: .leading) {
-              Text($filterList.wrappedValue.title)
+              Text(filterList.title)
                 .foregroundColor(Color(.bravePrimary))
-              Text($filterList.wrappedValue.description)
+              Text(filterList.description)
                 .font(.caption)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }

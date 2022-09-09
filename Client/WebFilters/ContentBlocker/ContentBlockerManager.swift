@@ -202,7 +202,7 @@ public class ContentBlockerManager {
   /// Start the timer that will continually compile new resources
   public func startTimer() {
     self.timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { _ in
-      Task.detached {
+      Task {
         guard await !self.data.isSynced else { return }
         await self.compilePendingResources()
         await self.cleanupRuleLists()
