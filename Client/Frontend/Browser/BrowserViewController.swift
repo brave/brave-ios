@@ -520,45 +520,28 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     updateWidgetFavoritesData()
     
-    Task.detached(priority: .high) {
+    Task { @MainActor in
       await ContentBlockerManager.shared.loadBundledResources()
       await ContentBlockerManager.shared.loadCachedCompileResults()
       
       // Load cached data
       // This is done first because compileResources and compilePendingResource need their results
-      await withTaskGroup(of: Void.self) { group in
-        group .addTask {
-          await FilterListResourceDownloader.shared.loadCachedData()
-        }
-        group .addTask {
-          await AdblockResourceDownloader.shared.loadCachedData()
-        }
-      }
+      async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
+      async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
+      _ = await (filterListCache, adblockResourceCache)
       
       // Compile some ad-block data
-      await withTaskGroup(of: Void.self) { group in
-        group.addTask {
-          await AdBlockEngineManager.shared.compileResources()
-        }
-        group.addTask {
-          await ContentBlockerManager.shared.compilePendingResources()
-          
-          // TODO: We should ideally call this after this whole group
-          // but it gives us a split second blackness. So for now we keep it like this
-          await MainActor.run {
-            self.contentBlockListCompiled = true
-            self.setupTabs()
-          }
-        }
-      }
+      async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
+      async let pendingResourcesCompile: Void = await ContentBlockerManager.shared.compilePendingResources()
+      _ = await (compiledResourcesCompile, pendingResourcesCompile)
       
-      // Start fetching external data
-      Task { @MainActor in
-        FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
-        AdblockResourceDownloader.shared.startFetching()
-        ContentBlockerManager.shared.startTimer()
-        AdBlockEngineManager.shared.startTimer()
-      }
+      self.contentBlockListCompiled = true
+      self.setupTabs()
+      
+      FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
+      AdblockResourceDownloader.shared.startFetching()
+      ContentBlockerManager.shared.startTimer()
+      AdBlockEngineManager.shared.startTimer()
     }
   }
 

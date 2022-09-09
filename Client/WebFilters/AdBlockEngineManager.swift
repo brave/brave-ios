@@ -82,6 +82,12 @@ public class AdBlockEngineManager {
     }
   }
   
+  enum CompileError: Error {
+    case invalidResourceJSON
+    case fileNotFound
+    case couldNotDeserializeDATFile
+  }
+  
   private actor SyncData {
     /// The current set resources which will be compiled and loaded
     var enabledResources: Set<ResourceWithVersion>
@@ -286,9 +292,9 @@ public class AdBlockEngineManager {
       await self.data.set(compileResults: allCompileResults)
       let engines = allEngines
       
-      await Task { @MainActor in
+      await MainActor.run {
         self.stats.set(engines: engines)
-      }.value
+      }
       
       #if DEBUG
       Task {
@@ -371,18 +377,18 @@ public class AdBlockEngineManager {
       switch resource.resource.type {
       case .dat:
         guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: "Dat file not found")
+          continuation.resume(throwing: CompileError.fileNotFound)
           return
         }
         
         if engine.deserialize(data: data) {
           continuation.resume()
         } else {
-          continuation.resume(throwing: "Could not deserialize data")
+          continuation.resume(throwing: CompileError.couldNotDeserializeDATFile)
         }
       case .jsonResources:
         guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: "Dat file not found")
+          continuation.resume(throwing: CompileError.fileNotFound)
           return
         }
         
@@ -418,6 +424,6 @@ public class AdBlockEngineManager {
       return String(data: data, encoding: .utf8)
     }
     
-    throw "JSON Must have a top-level type of Array of Dictionary."
+    throw CompileError.invalidResourceJSON
   }
 }

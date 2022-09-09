@@ -46,9 +46,9 @@ class AdblockDebugMenuTableViewController: TableViewController {
       Row(
         text: "Recompile Content Blockers",
         selection: {
-          Task(priority: .background) {
+          Task { @MainActor in
             await ContentBlockerManager.shared.compilePendingResources()
-            await self.showCompiledBlockListAlert()
+            self.showCompiledBlockListAlert()
           }
         }, cellClass: ButtonCell.self)
     ]
@@ -56,7 +56,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
     return section
   }
   
-  @MainActor private func showCompiledBlockListAlert() async {
+  @MainActor private func showCompiledBlockListAlert() {
     let alert = UIAlertController(title: nil, message: "Recompiled Blockers", preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "OK", style: .default))
     present(alert, animated: true)

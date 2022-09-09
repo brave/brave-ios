@@ -8,10 +8,10 @@ import Combine
 /// An implemntation of `NetworkSession` which is able to return dynamic mock results as defined by a completion callback
 class BaseMockNetworkSession: NetworkSession {
   /// A completion block that returns dynamic responses based on the given URL
-  var completion: (URL) async throws -> NetworkSessionDataResponse
+  var completion: @Sendable (URL) async throws -> NetworkSessionDataResponse
   
   /// Initialize this session with a completion block
-  init(completion: @escaping (URL) async throws -> NetworkSessionDataResponse) {
+  init(completion: @Sendable @escaping (URL) async throws -> NetworkSessionDataResponse) {
     self.completion = completion
   }
   

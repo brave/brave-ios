@@ -15,12 +15,12 @@ struct FilterListsView: View {
   var body: some View {
     List {
       Section {
-        ForEach(downloader.filterLists) { filterList in
-          Toggle(isOn: $downloader.filterLists[getIndex(for: filterList)!].isEnabled) {
+        ForEach($downloader.filterLists) { $filterList in
+          Toggle(isOn: $filterList.isEnabled) {
             VStack(alignment: .leading) {
-              Text(filterList.title)
+              Text($filterList.wrappedValue.title)
                 .foregroundColor(Color(.bravePrimary))
-              Text(filterList.description)
+              Text($filterList.wrappedValue.description)
                 .font(.caption)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }

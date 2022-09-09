@@ -152,14 +152,9 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   public func loadCachedData() async {
-    await withTaskGroup(of: Void.self) { group in
-      group.addTask {
-        await self.loadCachedFilterLists()
-      }
-      group.addTask {
-        await self.loadCachedDefaultFilterList()
-      }
-    }
+    async let cachedFilterLists: Void = self.loadCachedFilterLists()
+    async let cachedDefaultFilterList: Void = self.loadCachedDefaultFilterList()
+    _ = await (cachedFilterLists, cachedDefaultFilterList)
   }
   
   private func loadCachedFilterLists() async {
