@@ -87,40 +87,54 @@ struct DappsSettings: View {
           .foregroundColor(Color(.braveLabel))
           .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
       }
-      Section(header: Text(Strings.Wallet.dappsSettingsConnectedSitesSectionTitle)) {
-        ForEach(siteConnectionStore.siteConnections.filter(by: coin, text: filterText)) { siteConnection in
-          NavigationLink(
-            destination: SiteConnectionDetailView(
-              siteConnection: siteConnection,
-              siteConnectionStore: siteConnectionStore
-            )
-          ) {
-            SiteRow(
-              siteConnection: siteConnection
-            )
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                content
-                  .swipeActions(edge: .trailing) {
-                    Button(role: .destructive, action: {
-                      withAnimation {
-                        siteConnectionStore.removeAllPermissions(from: [siteConnection])
+      Section(
+        header: Text(Strings.Wallet.dappsSettingsConnectedSitesSectionTitle)
+      ) {
+        if visibleSiteConnections.isEmpty {
+          HStack {
+            Spacer()
+            Text(Strings.Wallet.dappsSettingsConnectedSitesSectionEmpty)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .font(.footnote)
+              .multilineTextAlignment(.center)
+            Spacer()
+          }
+          .padding(.vertical)
+        } else {
+          ForEach(visibleSiteConnections) { siteConnection in
+            NavigationLink(
+              destination: SiteConnectionDetailView(
+                siteConnection: siteConnection,
+                siteConnectionStore: siteConnectionStore
+              )
+            ) {
+              SiteRow(
+                siteConnection: siteConnection
+              )
+              .osAvailabilityModifiers { content in
+                if #available(iOS 15.0, *) {
+                  content
+                    .swipeActions(edge: .trailing) {
+                      Button(role: .destructive, action: {
+                        withAnimation {
+                          siteConnectionStore.removeAllPermissions(from: [siteConnection])
+                        }
+                      }) {
+                        Label(Strings.Wallet.delete, systemImage: "trash")
                       }
-                    }) {
-                      Label(Strings.Wallet.delete, systemImage: "trash")
                     }
-                  }
-              } else {
-                content
+                } else {
+                  content
+                }
               }
             }
           }
-        }
-        .onDelete { indexes in
-          let visibleSiteConnections = siteConnectionStore.siteConnections
-          let siteConnectionsToRemove = indexes.map { visibleSiteConnections[$0] }
-          withAnimation {
-            siteConnectionStore.removeAllPermissions(from: siteConnectionsToRemove)
+          .onDelete { indexes in
+            let visibleSiteConnections = siteConnectionStore.siteConnections
+            let siteConnectionsToRemove = indexes.map { visibleSiteConnections[$0] }
+            withAnimation {
+              siteConnectionStore.removeAllPermissions(from: siteConnectionsToRemove)
+            }
           }
         }
       }
@@ -240,7 +254,7 @@ private struct SiteConnectionDetailView: View {
   
   var body: some View {
     List {
-      Section(header: Text(Strings.Wallet.manageSiteConnectionsDetailHeader)) {
+      Section(header: Text(String.localizedStringWithFormat(Strings.Wallet.manageSiteConnectionsDetailHeader, siteConnection.coin.localizedTitle))) {
         ForEach(siteConnection.connectedAddresses, id: \.self) { address in
           AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "")
             .osAvailabilityModifiers { content in

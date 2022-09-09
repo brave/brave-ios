@@ -2315,14 +2315,14 @@ extension Strings {
       "wallet.web3PreferencesAllowEthProviderAccess",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Allow Sites to Access Ethereum Provider API",
+      value: "Allow Sites to Access the Ethereum Provider API",
       comment: "The title for the entry displaying the preferred option to allow web3 sites to access the Ethereum provider API."
     )
     public static let web3PreferencesAllowSolProviderAccess = NSLocalizedString(
       "wallet.web3PreferencesAllowSolProviderAccess",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Allow Sites to Access Solana Provider API",
+      value: "Allow Sites to Access the Solana Provider API",
       comment: "The title for the entry displaying the preferred option to allow web3 sites to access the Solana provider API."
     )
     public static let web3PreferencesDisplayWeb3Notifications = NSLocalizedString(
@@ -2343,7 +2343,7 @@ extension Strings {
       "wallet.manageSiteConnectionsFilterPlaceholder",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Filter Conneted Sites",
+      value: "Filter Connected DApps",
       comment: "The filter in the search bar for the screen to manage web3 sites account connections."
     )
     public static let manageSiteConnectionsRemoveAll = NSLocalizedString(
@@ -2406,8 +2406,8 @@ extension Strings {
       "wallet.manageSiteConnectionsDetailHeader",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Connected Ethereum Accounts",
-      comment: "The header shown above the list of connected accounts for a single website, shown after selecting/opening a website on the screen to manage web3 sites account connections."
+      value: "Connected %@ Accounts",
+      comment: "The header shown above the list of connected accounts for a single website, shown after selecting/opening a website on the screen to manage web3 sites account connections. '%@' will be replaced by a coin type title. For example, it could be 'Connected Ethereum Accounts' or 'Connected Solana Accounts' etc."
     )
     public static let walletTypeNone = NSLocalizedString(
       "wallet.walletTypeNone",
@@ -2756,8 +2756,15 @@ extension Strings {
       "wallet.dappsSettingsConnectedSitesSectionTitle",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Connected Sites",
+      value: "Connected DApps",
       comment: "The title of the section that will list all the permitted dapp connections"
+    )
+    public static let dappsSettingsConnectedSitesSectionEmpty = NSLocalizedString(
+      "wallet.dappsSettingsConnectedSitesSectionEmpty",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "DApps you connect to Brave Wallet will appear here",
+      comment: "A message that will be displayed under the section header when there is no dapps have been granted wallet connection."
     )
   }
 }
