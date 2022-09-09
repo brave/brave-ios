@@ -16,6 +16,7 @@ enum DomainUserScript: CaseIterable {
   case braveSearchHelper
   case braveTalkHelper
   case braveSkus
+  case bravePlaylistFolderSharingHelper
 
   /// Initialize this script with a URL
   init?(for url: URL) {
@@ -40,7 +41,7 @@ enum DomainUserScript: CaseIterable {
     switch self {
     case .youtubeAdBlock:
       return .AdblockAndTp
-    case .archive, .braveSearchHelper, .braveTalkHelper, .braveSkus:
+    case .archive, .braveSearchHelper, .braveTalkHelper, .bravePlaylistFolderSharingHelper, .braveSkus:
       return nil
     }
   }
@@ -59,6 +60,8 @@ enum DomainUserScript: CaseIterable {
                  "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
                  "dev.talk.brave.software", "beta.talk.brave.software",
                  "talk.brave.software"])
+    case .bravePlaylistFolderSharingHelper:
+      return Set(["playlist.bravesoftware.com", "playlist.brave.com"])
     case .braveSkus:
       // FIXME: Remove test domain once done with tests.
       return .init(arrayLiteral: "account.brave.com",

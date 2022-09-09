@@ -160,10 +160,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   fileprivate var contentBlockListCompiled: Bool = false
   private var cancellables: Set<AnyCancellable> = []
 
-  // Web filters
-
-  let safeBrowsing: SafeBrowsing?
-
   let rewards: BraveRewards
   var ledgerObserver: LedgerObserver?
   let legacyWallet: BraveLedger?
@@ -208,43 +204,25 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
   /// The currently open WalletStore
   weak var walletStore: WalletStore?
+  
+  var lastEnteredURLVisitType: VisitType = .unknown
 
   public init(
     profile: Profile,
     diskImageStore: DiskImageStore?,
     braveCore: BraveCoreMain,
     migration: Migration?,
-    crashedLastSession: Bool,
-    safeBrowsingManager: SafeBrowsing? = SafeBrowsing()
+    crashedLastSession: Bool
   ) {
     self.profile = profile
     self.braveCore = braveCore
     self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
     self.migration = migration
     self.crashedLastSession = crashedLastSession
-    self.safeBrowsing = safeBrowsingManager
 
-    let configuration: BraveRewards.Configuration
-    if AppConstants.buildChannel.isPublic {
-      configuration = .production
-    } else {
-      if let override = Preferences.Rewards.EnvironmentOverride(rawValue: Preferences.Rewards.environmentOverride.value), override != .none {
-        switch override {
-        case .dev:
-          configuration = .default
-        case .staging:
-          configuration = .staging
-        case .prod:
-          configuration = .production
-        default:
-          configuration = .staging
-        }
-      } else {
-        configuration = AppConstants.buildChannel == .debug ? .staging : .production
-      }
-    }
+    let configuration: BraveRewards.Configuration = .current()
 
-    let buildChannel = Ads.BuildChannel().then {
+    let buildChannel = Ads.BuildChannelInfo().then {
       $0.name = AppConstants.buildChannel.rawValue
       $0.isRelease = AppConstants.buildChannel == .release
     }
@@ -290,7 +268,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
     }
 
-    self.deviceCheckClient = DeviceCheckClient(environment: configuration.ledgerEnvironment)
+    self.deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
     if Locale.current.regionCode == "JP" {
       benchmarkBlockingDataSource = BlockingSummaryDataSource()
@@ -344,7 +322,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     // Check if we've already migrated the users wallet to the `legacy_rewards` folder
     if fm.fileExists(atPath: legacyLedger.path) {
-      BraveLedger.environment = config.ledgerEnvironment
       return BraveLedger(stateStoragePath: legacyLedger.path)
     }
 
@@ -375,7 +352,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       }
 
       Preferences.Rewards.migratedLegacyWallet.value = true
-      BraveLedger.environment = config.ledgerEnvironment
       return BraveLedger(stateStoragePath: legacyLedger.path)
     } catch {
       log.error("Failed to migrate legacy wallet into a new folder: \(error)")
@@ -432,10 +408,11 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     tabManager.addNavigationDelegate(self)
     tabManager.makeWalletEthProvider = { [weak self] tab in
       guard let self = self,
-            let provider = self.braveCore.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
+            let provider = self.braveCore.braveWalletAPI.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate),
+            let js = self.braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] else {
         return nil
       }
-      return (provider, js: self.braveCore.providerScript(for: .eth))
+      return (provider, js: js)
     }
     downloadQueue.delegate = self
 
@@ -452,6 +429,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     Preferences.Rewards.rewardsToggledOnce.observe(from: self)
     Preferences.Playlist.enablePlaylistMenuBadge.observe(from: self)
     Preferences.Playlist.enablePlaylistURLBarButton.observe(from: self)
+    Preferences.Playlist.syncSharedFoldersAutomatically.observe(from: self)
     
     pageZoomListener = NotificationCenter.default.addObserver(forName: PageZoomView.notificationName, object: nil, queue: .main) { [weak self] _ in
       self?.tabManager.allTabs.forEach({
@@ -896,6 +874,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         }
       }
       .store(in: &cancellables)
+    
+    syncPlaylistFolders()
   }
 
   public static let defaultBrowserNotificationId = "defaultBrowserNotification"
@@ -1412,7 +1392,8 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
       tab.loadRequest(URLRequest(url: url))
 
-      recordNavigationInTab(url, visitType: visitType)
+      // Recording the last Visit Type for the url submitted
+      lastEnteredURLVisitType = visitType
       updateWebViewPageZoom(tab: tab)
     }
   }
@@ -1651,7 +1632,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     DispatchQueue.main.async {
       if let item = tab.playlistItem {
-        if PlaylistItem.itemExists(item) {
+        if PlaylistItem.itemExists(uuid: item.tagId) || PlaylistItem.itemExists(pageSrc: item.pageSrc) {
           self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
         } else {
           self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)
@@ -2073,8 +2054,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         if !tab.isPrivate, !url.isReaderModeURL {
           // The visitType is checked If it is "typed" or not to determine the History object we are adding
           // should be synced or not. This limitation exists on browser side so we are aligning with this
-          if let visitType = typedNavigation.first(where: { $0.key.typedDisplayString == url.typedDisplayString })?.value,
-            visitType == .typed {
+          if let visitType = typedNavigation.first(where: {
+            $0.key.typedDisplayString == url.typedDisplayString
+          })?.value, visitType == .typed {
             braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
           } else {
             braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
@@ -2374,6 +2356,10 @@ extension BrowserViewController: TabDelegate {
     let playlistHelper = PlaylistHelper(tab: tab)
     playlistHelper.delegate = self
     tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), contentWorld: .page)
+    
+    let playlistFolderSharingHelper = PlaylistFolderSharingHelper(tab: tab)
+    playlistFolderSharingHelper.delegate = self
+    tab.addContentScript(playlistFolderSharingHelper, name: PlaylistFolderSharingHelper.name(), contentWorld: .page)
 
     tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.name(), contentWorld: .page)
     tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.name(), contentWorld: .defaultClient)
@@ -2893,7 +2879,7 @@ extension BrowserViewController: TabManagerDelegate {
           let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel)
           let closedTabsTitle = String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count)
           let closeAllAction = UIAlertAction(title: closedTabsTitle, style: .destructive) { _ in
-            tabManager.removeAll()
+            tabManager.removeAllForCurrentMode()
           }
           alert.addAction(closeAllAction)
           alert.addAction(cancelAction)
@@ -3550,6 +3536,8 @@ extension BrowserViewController: PreferencesObserver {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
+    case Preferences.Playlist.syncSharedFoldersAutomatically.key:
+      syncPlaylistFolders()
     default:
       log.debug("Received a preference change for an unknown key: \(key) on \(type(of: self))")
       break

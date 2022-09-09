@@ -157,8 +157,6 @@ extension BrowserViewController: WKNavigationDelegate {
       return
     }
 
-    webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = SafeBrowsing.isSafeBrowsingEnabledForURL(url)
-
     // Universal links do not work if the request originates from the app, manual handling is required.
     if let mainDocURL = navigationAction.request.mainDocumentURL,
       let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
@@ -203,11 +201,6 @@ extension BrowserViewController: WKNavigationDelegate {
 
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let tab = tab(for: webView)
-
-    let domainForRequestURL = Domain.getOrCreate(
-      forUrl: url,
-      persistent: !isPrivateBrowsing
-    )
     
     // Website redirection logic
     if url.isWebPage(includeDataURIs: false),
@@ -218,55 +211,63 @@ extension BrowserViewController: WKNavigationDelegate {
       tab?.loadRequest(URLRequest(url: redirectURL))
       return
     }
-        
-    // Debouncing logic
-    // Handle debouncing for main frame only and only if the site (etld+1) changes
-    // We also only handle `http` and `https` requests
-    if url.isWebPage(includeDataURIs: false),
-       let currentURL = tab?.webView?.url,
-       currentURL.baseDomain != url.baseDomain,
-       domainForRequestURL.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
-       navigationAction.targetFrame?.isMainFrame == true {
+    
+    if let mainDocumentURL = navigationAction.request.mainDocumentURL {
+      let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
+      // Enable safe browsing (frodulent website warnings)
+      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
       
-      // Lets get the redirect chain.
-      // Then we simply get all elements up until the user allows us to redirect
-      // (i.e. appropriate settings are enabled for that redirect rule)
-      let redirectChain = DebouncingResourceDownloader.shared
-        .redirectChain(for: url)
-        .contiguousUntil { _, rule in
-          return rule.preferences.allSatisfy { pref in
-            switch pref {
-            case .deAmpEnabled:
-              return Preferences.Shields.autoRedirectAMPPages.value
+      // Debouncing logic
+      // Handle debouncing for main frame only and only if the site (etld+1) changes
+      // We also only handle `http` and `https` requests
+      if url.isWebPage(includeDataURIs: false),
+         let currentURL = tab?.webView?.url,
+         currentURL.baseDomain != url.baseDomain,
+         domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
+         navigationAction.targetFrame?.isMainFrame == true {
+        // Lets get the redirect chain.
+        // Then we simply get all elements up until the user allows us to redirect
+        // (i.e. appropriate settings are enabled for that redirect rule)
+        let redirectChain = DebouncingResourceDownloader.shared
+          .redirectChain(for: url)
+          .contiguousUntil { _, rule in
+            return rule.preferences.allSatisfy { pref in
+              switch pref {
+              case .deAmpEnabled:
+                return Preferences.Shields.autoRedirectAMPPages.value
+              }
             }
           }
+        
+        // Once we check the redirect chain only need the last (final) url from our redirect chain
+        if let redirectURL = redirectChain.last?.url {
+          // Cancel the original request. We don't want it to load as it's tracking us
+          decisionHandler(.cancel, preferences)
+
+          // For now we only allow the `Referer`. The browser will add other headers during navigation.
+          var modifiedRequest = URLRequest(url: redirectURL)
+
+          for (headerKey, headerValue) in navigationAction.request.allHTTPHeaderFields ?? [:] {
+            guard headerKey == "Referer" else { continue }
+            modifiedRequest.setValue(headerValue, forHTTPHeaderField: headerKey)
+          }
+
+          tab?.loadRequest(modifiedRequest)
         }
+      }
       
-      // Once we check the redirect chain only need the last (final) url from our redirect chain
-      if let redirectURL = redirectChain.last?.url {
-        // Cancel the original request. We don't want it to load as it's tracking us
-        decisionHandler(.cancel, preferences)
-
-        // For now we only allow the `Referer`. The browser will add other headers during navigation.
-        var modifiedRequest = URLRequest(url: redirectURL)
-
-        for (headerKey, headerValue) in navigationAction.request.allHTTPHeaderFields ?? [:] {
-          guard headerKey == "Referer" else { continue }
-          modifiedRequest.setValue(headerValue, forHTTPHeaderField: headerKey)
-        }
-
-        tab?.loadRequest(modifiedRequest)
+      // Set some additional user scripts
+      if navigationAction.targetFrame?.isMainFrame == true {
+        // Add de-amp script
+        // The user script manager will take care to not reload scripts if this value doesn't change
+        tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value
+        
+        // Add request blocking script
+        // This script will block certian `xhr` and `window.fetch()` requests
+        tab?.userScriptManager?.isRequestBlockingEnabled = url.isWebPage(includeDataURIs: false) &&
+          domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
       }
     }
-    
-    // Add de-amp script
-    // The user script manager will take care to not reload scripts if this value doesn't change
-    tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value && navigationAction.targetFrame?.isMainFrame == true
-      
-    // Add request blocking script
-    // This script will block certian `xhr` and `window.fetch()` requests
-    tab?.userScriptManager?.isRequestBlockingEnabled = url.isWebPage(includeDataURIs: false) &&
-      domainForRequestURL.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
 
     // Check if custom user scripts must be added to or removed from the web view.
     tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
@@ -467,6 +468,16 @@ extension BrowserViewController: WKNavigationDelegate {
     // If none of our helpers are responsible for handling this response,
     // just let the webview handle it as normal.
     decisionHandler(.allow)
+    
+    guard let url = responseURL, let tab = tab else {
+      return
+    }
+    
+    // Record the navigation visit type for the URL after navigation actions
+    // this is done in decidePolicyFor to handle all the cases like redirects etc.
+    if !url.isReaderModeURL, !url.isFileURL, url.isWebPage(), !tab.isPrivate {
+      recordNavigationInTab(url, visitType: lastEnteredURLVisitType)
+    }
   }
 
   public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -555,7 +566,7 @@ extension BrowserViewController: WKNavigationDelegate {
       if let url = tab.url, tab.shouldClassifyLoadsForAds {
         let faviconURL = URL(string: tab.displayFavicon?.url ?? "")
         rewards.reportTabUpdated(
-          Int(tab.rewardsId),
+          tab: tab,
           url: url,
           faviconURL: faviconURL,
           isSelected: tabManager.selectedTab == tab,

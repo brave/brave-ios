@@ -577,7 +577,7 @@ extension BrowserViewController: ToolbarDelegate {
       activities = makeShareActivities(for: url, tab: tab, sourceView: view, sourceRect: self.view.convert(self.topToolbar.menuButton.frame, from: self.topToolbar.menuButton.superview), arrowDirection: .up)
     }
     let initialHeight: CGFloat = selectedTabURL != nil ? 470 : 500
-    let menuController = MenuViewController(
+    let menuController =  MenuViewController(
       initialHeight: initialHeight,
       content: { menuController in
         let isShownOnWebPage = selectedTabURL != nil
@@ -645,6 +645,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
       let pasteGoAction = UIAction(
         title: Strings.pasteAndGoTitle,
         image: UIImage(systemName: "doc.on.clipboard.fill"),
+        identifier: .backportedPasteAndGo,
         handler: UIAction.deferredActionHandler { _ in
           if let pasteboardContents = UIPasteboard.general.string {
             self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
@@ -654,6 +655,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
       let pasteAction = UIAction(
         title: Strings.pasteTitle,
         image: UIImage(systemName: "doc.on.clipboard"),
+        identifier: .backportedPaste,
         handler: UIAction.deferredActionHandler { _ in
           if let pasteboardContents = UIPasteboard.general.string {
             // Enter overlay mode and make the search controller appear.
