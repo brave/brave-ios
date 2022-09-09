@@ -208,8 +208,13 @@ class UserScriptManager {
       return
     }
     // inject the internal solana script
+    let script = """
+      (function($Object){
+        \(solanaInternalScript)
+      })(Object);
+      """
     await webView.evaluateSafeJavaScript(
-      functionName: "(function($Object){ \(solanaInternalScript) })(Object);",
+      functionName: script,
       args: [],
       contentWorld: .page,
       asFunction: false
