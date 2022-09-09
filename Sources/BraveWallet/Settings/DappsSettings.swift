@@ -29,8 +29,9 @@ struct DappsSettings: View {
       self.defaultWallet = Preferences.Wallet.defaultSolWallet
       self.allowProviderAccess = Preferences.Wallet.allowSolProviderAccess
     default:
-      self.defaultWallet = Preferences.Option(key: "Unsupported-Coin-Default-Wallet", default: -1)
-      self.allowProviderAccess = Preferences.Option(key: "Unsupported-Coin-Allow-Access", default: false)
+      assertionFailure("Not supported coin type.")
+      self.defaultWallet = Preferences.Wallet.defaultEthWallet
+      self.allowProviderAccess = Preferences.Wallet.allowEthProviderAccess
     }
   }
   

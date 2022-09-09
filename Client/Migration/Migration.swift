@@ -248,8 +248,8 @@ fileprivate extension Preferences {
       key: "migration.cd-completed",
       default: Preferences.Migration.completed.value)
     /// A new preference key will be introduced in 1.44.x, indicates if Wallet Preferences migration has completed
-    static let walletCompleted =
-    Option<Bool>(key: "migration.wallet-completed", default: false)
+    static let walletProviderAccountRequestCompleted =
+    Option<Bool>(key: "migration.wallet-provider-account-request-completed", default: false)
   }
 
   /// Migrate the users preferences from prior versions of the app (<2.0)
@@ -330,11 +330,11 @@ fileprivate extension Preferences {
   
   /// Migrate Wallet Preferences from version <1.43
   class func migrateWalletPreferences() {
-    guard Preferences.Migration.walletCompleted.value != true else { return }
+    guard Preferences.Migration.walletProviderAccountRequestCompleted.value != true else { return }
     
     // Migrate `allowDappProviderAccountRequests` to `allowEthProviderAccess`
     migrate(keyPrefix: "", key: "wallet.allow-eth-provider-account-requests", to: Preferences.Wallet.allowEthProviderAccess)
     
-    Preferences.Migration.walletCompleted.value = true
+    Preferences.Migration.walletProviderAccountRequestCompleted.value = true
   }
 }
