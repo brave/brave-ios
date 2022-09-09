@@ -63,6 +63,12 @@ public class ContentBlockerManager {
     }
   }
   
+  enum CompileError: Error {
+    case fileNotFound(identifier: String)
+    case noRuleListReturned(identifier: String)
+    case invalidResourceString(identifier: String)
+  }
+  
   /// Represents a resource that needs to be compiled
   struct Resource: Hashable {
     /// The local url of this resource
@@ -119,9 +125,16 @@ public class ContentBlockerManager {
   private var cachedCompileResults: [String: (sourceType: BlocklistSourceType, result: Result<WKContentRuleList, Error>)]
   /// The actor in which all of our sync data is stored on
   private var data: SyncData
-  
-  /// A timer that runs which continually compiles new resources if it is needed
-  private var timer: Timer?
+  /// The repeating task that contnually compiles new blocklists as they come in
+  private var endlessCompileTask: Task<(), Error>?
+  /// The amount of time to wait before checking if new entries came in
+  private static let compileSleepTime: TimeInterval = {
+    #if DEBUG
+    return 10
+    #else
+    return 1.minutes
+    #endif
+  }()
   
   init(ruleStore: WKContentRuleListStore = .default()) {
     self.ruleStore = ruleStore
@@ -201,13 +214,22 @@ public class ContentBlockerManager {
   
   /// Start the timer that will continually compile new resources
   public func startTimer() {
-    self.timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { _ in
-      Task {
-        guard await !self.data.isSynced else { return }
-        await self.compilePendingResources()
-        await self.cleanupRuleLists()
-      }
-    })
+    guard endlessCompileTask == nil else { return }
+    
+    self.endlessCompileTask = Task.detached {
+      try await withTaskCancellationHandler(operation: {
+        while true {
+          try await Task.sleep(seconds: Self.compileSleepTime)
+          guard await !self.data.isSynced else { return }
+          await self.compilePendingResources()
+          await self.cleanupRuleLists()
+        }
+      }, onCancel: {
+        Task { @MainActor in
+          self.endlessCompileTask = nil
+        }
+      })
+    }
   }
   
   /// Set a resource for the given rule type
@@ -276,17 +298,17 @@ public class ContentBlockerManager {
   /// Compile the given resource
   private func compile(resource: Resource, forIdentifier identifier: String) async throws -> WKContentRuleList {
     guard let jsonData = FileManager.default.contents(atPath: resource.url.path) else {
-      throw "File not found for resource for `\(identifier)`"
+      throw CompileError.fileNotFound(identifier: identifier)
     }
     
     guard let json = String(data: jsonData, encoding: .utf8) else {
-      throw "Resource is not a valid string for `\(identifier)`"
+      throw CompileError.invalidResourceString(identifier: identifier)
     }
                 
     let ruleList = try await ruleStore.compileContentRuleList(forIdentifier: identifier, encodedContentRuleList: json)
     
     guard let ruleList = ruleList else {
-      throw "No rule list found"
+      throw CompileError.noRuleListReturned(identifier: identifier)
     }
     
     return ruleList

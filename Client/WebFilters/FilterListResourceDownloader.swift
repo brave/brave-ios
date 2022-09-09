@@ -277,16 +277,17 @@ public class FilterListResourceDownloader: ObservableObject {
   private func subscribeToFilterListChanges() {
     // Subscribe to changes on the filter list states
     filterListSubscription = $filterLists
-      .receive(on: DispatchQueue.main)
       .sink { filterLists in
-        for filterList in filterLists {
-          self.handleUpdate(to: filterList)
+        DispatchQueue.main.async { [weak self] in
+          for filterList in filterLists {
+            self?.handleUpdate(to: filterList)
+          }
         }
       }
   }
   
   /// Ensures settings are saved for the given filter list and that our publisher is aware of the changes
-  private func handleUpdate(to filterList: FilterList) {
+  @MainActor private func handleUpdate(to filterList: FilterList) {
     settingsManager.upsertSetting(
       uuid: filterList.uuid,
       isEnabled: filterList.isEnabled,
@@ -358,19 +359,23 @@ public class FilterListResourceDownloader: ObservableObject {
         await self.handle(downloadedFileURL: fileURL, for: resource, filterListUUID: filterList.uuid, index: index)
       }
       
-      for try await result in self.resourceDownloader.downloadStream(for: resource) {
-        switch result {
-        case .success(let downloadResult):
-          await self.handle(
-            downloadedFileURL: downloadResult.fileURL,
-            for: resource, filterListUUID: filterList.uuid,
-            date: downloadResult.date,
-            index: index
-          )
-        case .failure(let error):
-          log.error(error)
+      try await withTaskCancellationHandler(operation: {
+        for try await result in self.resourceDownloader.downloadStream(for: resource) {
+          switch result {
+          case .success(let downloadResult):
+            await self.handle(
+              downloadedFileURL: downloadResult.fileURL,
+              for: resource, filterListUUID: filterList.uuid,
+              date: downloadResult.date,
+              index: index
+            )
+          case .failure(let error):
+            log.error(error)
+          }
         }
-      }
+      }, onCancel: {
+        self.fetchTasks.removeValue(forKey: resource)
+      })
     }
   }
   

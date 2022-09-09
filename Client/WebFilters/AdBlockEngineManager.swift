@@ -94,7 +94,7 @@ public class AdBlockEngineManager {
     /// The compile results
     var compileResults: [ResourceWithVersion: Result<Void, Error>]
     /// The current compile task. Ensures we don't try to compile while we're already compiling
-    var compileTask: Task<Void, Never>?
+    var compileTask: Task<Void, Error>?
     /// Cached engines
     var cachedEngines: [Source: AdblockEngine]
     
@@ -144,7 +144,7 @@ public class AdBlockEngineManager {
     }
     
     /// Set the current compile task to avoid overlaping compilations
-    func set(compileTask: Task<Void, Never>?) {
+    func set(compileTask: Task<Void, Error>?) {
       self.compileTask = compileTask
     }
     
@@ -211,7 +211,7 @@ public class AdBlockEngineManager {
   /// The repeating build task
   private var endlessBuildTask: Task<(), Error>?
   /// The amount of time to wait before checking if new entries came in
-  private static let sleepTime: TimeInterval = {
+  private static let buildSleepTime: TimeInterval = {
     #if DEBUG
     return 10
     #else
@@ -247,7 +247,7 @@ public class AdBlockEngineManager {
     self.endlessBuildTask = Task.detached {
       try await withTaskCancellationHandler(operation: {
         while true {
-          try await Task.sleep(seconds: Self.sleepTime)
+          try await Task.sleep(seconds: Self.buildSleepTime)
           guard await self.data.compileTask == nil else { continue }
           guard await !self.data.isSynced else { continue }
           await self.compileResources()
@@ -266,6 +266,8 @@ public class AdBlockEngineManager {
     await data.set(compileTask: nil)
     
     let task = Task.detached {
+      try Task.checkCancellation()
+      
       let resourcesWithVersion = await self.data.enabledResources.sorted(by: {
         $0.order < $1.order
       })
@@ -274,6 +276,8 @@ public class AdBlockEngineManager {
       var allEngines: [AdblockEngine] = []
       
       for (_, group) in self.group(resources: resourcesWithVersion) {
+        try Task.checkCancellation()
+        
         // Combine all rule lists that need to be injected during initialization
         let combinedRuleLists = await self.combineAllRuleLists(from: group)
         // Create an engine with the combined rule lists
@@ -289,10 +293,12 @@ public class AdBlockEngineManager {
       }
       
       // Set the results and clear some things
+      try Task.checkCancellation()
       await self.data.set(compileResults: allCompileResults)
       let engines = allEngines
       
-      await MainActor.run {
+      try await MainActor.run {
+        try Task.checkCancellation()
         self.stats.set(engines: engines)
       }
       
@@ -305,7 +311,13 @@ public class AdBlockEngineManager {
     }
     
     await data.set(compileTask: task)
-    await task.value
+    
+    do {
+      try await task.value
+    } catch {
+      log.error(error)
+    }
+    
     await data.set(compileTask: nil)
   }
   
