@@ -1232,7 +1232,7 @@
 "opentabs.activePeriodDeviceYesterdayTitle" = "Dün Etkindi";
 
 /* The description of the view showing no devices inside sync chain */
-"opentabs.noDevicesSyncChainPlaceholderViewDescription" = "Cihazlarınız ve etkin senkronizasyon türlerinizi görmek için bir senkronizasyon zincirine katılın";
+"opentabs.noDevicesSyncChainPlaceholderViewDescription" = "Cihazlarınızı ve etkin senkronizasyon türlerinizi görmek için bir senkronizasyon zincirine katılın";
 
 /* The title of the view showing no devices inside sync chain */
 "opentabs.noDevicesSyncChainPlaceholderViewTitle" = "Bu senkronizasyon zincirinde Cihaz yok";
