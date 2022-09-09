@@ -266,8 +266,6 @@ public class AdBlockEngineManager {
     await data.set(compileTask: nil)
     
     let task = Task.detached {
-      try Task.checkCancellation()
-      
       let resourcesWithVersion = await self.data.enabledResources.sorted(by: {
         $0.order < $1.order
       })
