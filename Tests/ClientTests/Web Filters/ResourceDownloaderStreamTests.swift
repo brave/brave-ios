@@ -18,15 +18,15 @@ class ResourceDownloaderStreamTests: XCTestCase {
     
     let sequence = ResourceDownloaderStream(resource: resource, resourceDownloader: downloader, fetchInterval: 0.5)
     
-    let task = Task.detached {
+    let task = Task { @MainActor in
       // When
       for try await result in sequence {
-        await self.ensureSuccessResult(result: result)
+        self.ensureSuccessResult(result: result)
         expectation.fulfill()
       }
     }
     
-    wait(for: [expectation], timeout: 5)
+    wait(for: [expectation], timeout: 10)
     task.cancel()
   }
   
@@ -40,15 +40,15 @@ class ResourceDownloaderStreamTests: XCTestCase {
     
     let sequence = ResourceDownloaderStream(resource: resource, resourceDownloader: downloader, fetchInterval: 1)
     
-    let task = Task.detached {
+    let task = Task { @MainActor in
       // When
       for try await result in sequence {
-        await self.ensureErrorResult(result: result)
+        self.ensureErrorResult(result: result)
         expectation.fulfill()
       }
     }
     
-    wait(for: [expectation], timeout: 5)
+    wait(for: [expectation], timeout: 10)
     task.cancel()
   }
   
