@@ -15,12 +15,12 @@ class LocationViewPositionPickerCell: UITableViewCell, Cell {
   }
   
   private let topBarButton = BarButton(
-    image: UIImage(systemName: "platter.filled.top.and.arrow.up.iphone")!,
+    image: UIImage(braveSystemNamed: "brave.platter.filled.top.and.arrow.up.phone")!,
     text: "Top Bar"
   )
   
   private let bottomBarButton = BarButton(
-    image: UIImage(systemName: "platter.filled.bottom.and.arrow.down.iphone")!,
+    image: UIImage(braveSystemNamed: "brave.platter.filled.bottom.and.arrow.down.phone")!,
     text: "Bottom Bar"
   )
   
@@ -83,7 +83,7 @@ class LocationViewPositionPickerCell: UITableViewCell, Cell {
       stackView.spacing = 2
       
       let imageView = UIImageView(image: image)
-      imageView.preferredSymbolConfiguration = .init(font: .systemFont(ofSize: 58, weight: .thin))
+      imageView.preferredSymbolConfiguration = .init(font: .systemFont(ofSize: 56))
       let label = UILabel()
       label.text = text
       label.font = .preferredFont(forTextStyle: .callout)
