@@ -7,8 +7,9 @@ import Shared
 import Data
 import BraveShared
 import Combine
+import os.log
 
-private let log = Logger.browserLogger
+private let log = ContentBlockerManager.log
 
 enum BlockerStatus: String {
   case Disabled
@@ -107,7 +108,7 @@ class ContentBlockerHelper {
     #if DEBUG
     let rulesString = loadedRuleTypeWithSourceTypes.map { ruleTypeWithSourceType -> String in
       let ruleTypeString: String
-
+      
       switch ruleTypeWithSourceType.ruleType {
       case .general(let type):
         ruleTypeString = type.rawValue
@@ -115,16 +116,19 @@ class ContentBlockerHelper {
         ruleTypeString = "filterList(\(uuid))"
       }
       
-      return [
-        "TEST \t{",
-        "TEST \t\truleType: \(ruleTypeString)",
-        "TEST \t\tsourceType: \(ruleTypeWithSourceType.sourceType)",
-        "TEST \t}"
-      ].joined(separator: "\n")
-    }.joined(separator: "\n")
+      let rulesDebugString =
+      """
+      {
+      ruleType: \(ruleTypeString)
+      sourceType: \(ruleTypeWithSourceType.sourceType)
+      }
+      """
+      
+      return rulesDebugString
+    }
     
-    print("TEST ======== ContentBlockerHelper")
-    print("TEST loaded \(loadedRuleTypeWithSourceTypes.count) tab rules:\n\(rulesString)")
+    log.debug("ContentBlockerHelper")
+    log.debug("loaded \(self.loadedRuleTypeWithSourceTypes.count, privacy: .public) tab rules:\n\(rulesString, privacy: .public)")
     #endif
   }
 }

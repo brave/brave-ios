@@ -8,11 +8,14 @@ import WebKit
 import Data
 import Shared
 import BraveShared
-
-private let log = Logger.browserLogger
+import os.log
 
 /// A class responsible for compiling content blocker lists
 public class ContentBlockerManager {
+  // TODO: Use a proper logger system once implemented and adblock files are moved to their own module(#5928).
+  /// Logger to use for debugging.
+  static let log = Logger(subsystem: "com.brave.ios", category: "adblock")
+  
   /// An object representing a rule type and a source type.
   public struct RuleTypeWithSourceType: Hashable {
     let ruleType: BlocklistRuleType
@@ -169,7 +172,7 @@ public class ContentBlockerManager {
           do {
             try await self.ruleStore.removeContentRuleList(forIdentifier: identifier)
           } catch {
-            log.error(error)
+            Self.log.error("\(error.localizedDescription)")
           }
         }
       }
@@ -275,7 +278,7 @@ public class ContentBlockerManager {
                 self.cachedCompileResults[identifier] = (resource.sourceType, .success(ruleList))
               }
             } catch {
-              log.error(error)
+              Self.log.error("\(error.localizedDescription)")
               
               await MainActor.run {
                 self.cachedCompileResults[identifier] = (resource.sourceType, .failure(error))
@@ -290,7 +293,7 @@ public class ContentBlockerManager {
     }
     
     #if DEBUG
-    print("TEST ======== ContentBlockerManager")
+    Self.log.debug("ContentBlockerManager")
     debug(resources: resources)
     #endif
   }
@@ -391,7 +394,7 @@ public class ContentBlockerManager {
           do {
             return try await self.loadRuleList(for: ruleType)
           } catch {
-            log.error(error)
+            Self.log.error("\(error.localizedDescription)")
             return nil
           }
         }
@@ -430,7 +433,7 @@ public class ContentBlockerManager {
   }
   
   #if DEBUG
-  /// A method that prints info on the given resources
+  /// A method that logs info on the given resources
   private func debug(resources: [String: Resource]) {
     let resourcesString = resources
       .sorted(by: { lhs, rhs in
@@ -459,18 +462,21 @@ public class ContentBlockerManager {
           resultString = "nil"
         }
         
-        return [
-          "TEST \t{",
-          "TEST \t\t identifier: \(identifier)",
-          "TEST \t\t fileName: \(compiledResource.url.lastPathComponent)",
-          "TEST \t\t source: \(sourceString)",
-          "TEST \t\t version: \(versionString)",
-          "TEST \t\t result: \(resultString)",
-          "TEST \t}"
-        ].joined(separator: "\n")
-      }.joined(separator: "\n")
+        let resourcesDebugString =
+        """
+        {
+        identifier: \(identifier)
+        fileName: \(compiledResource.url.lastPathComponent)
+        source: \(sourceString)
+        version: \(versionString)
+        result: \(resultString)
+        }
+        """
+        
+        return resourcesDebugString
+      }
 
-    print("TEST Compiled \(resources.count) additional block list resources: \n\(resourcesString))")
+    Self.log.debug("Compiled \(resources.count, privacy: .public) additional block list resources: \n\(resourcesString, privacy: .public))")
   }
   #endif
 }

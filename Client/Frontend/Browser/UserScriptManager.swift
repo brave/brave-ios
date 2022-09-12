@@ -101,17 +101,21 @@ class UserScriptManager {
       guard oldValue != userScriptTypes else { return }
       
       #if DEBUG
-      let debugString = [
-        "TEST ======== Set<UserScriptType>",
-        "TEST \tOld Values: [",
-        debugString(for: oldValue.sorted(by: { $0.order < $1.order })),
-        "TEST \t]",
-        "TEST \tNew Values: [",
-        debugString(for: userScriptTypes.sorted(by: { $0.order < $1.order })),
-        "TEST \t]"
-      ].joined(separator: "\n")
+      let oldValues = debugString(for: oldValue.sorted(by: { $0.order < $1.order }))
+      let newValues = debugString(for: userScriptTypes.sorted(by: { $0.order < $1.order }))
       
-      print(debugString)
+      let scriptDebugData =
+      """
+      Set<UserScriptType>
+      Old Values: [
+      \(oldValues)
+      ]
+      New Values: [
+      \(newValues)
+      ]
+      """
+      
+      ContentBlockerManager.log.debug("\(scriptDebugData, privacy: .public)")
       #endif
       
       reloadUserScripts()
@@ -134,7 +138,7 @@ class UserScriptManager {
         nameString = "siteStateListener"
       }
       
-      return ["TEST \t\t", nameString].joined()
+      return nameString
     }).joined(separator: "\n")
   }
   #endif

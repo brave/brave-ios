@@ -8,7 +8,7 @@ import BraveCore
 import BraveShared
 import Shared
 
-private let log = Logger.browserLogger
+private let log = ContentBlockerManager.log
 
 /// This class is responsible for loading the engine when new resources arrive.
 /// It ensures that we always have a fresh new engine as new data is downloaded
@@ -149,7 +149,7 @@ public class AdBlockEngineManager {
     }
     
     #if DEBUG
-    /// A method that prints info on the given resources
+    /// A method that logs info on the given resources
     func debug(resources: [ResourceWithVersion]) {
       let resourcesString = resources
         .map { resourceWithVersion -> String in
@@ -185,19 +185,22 @@ public class AdBlockEngineManager {
             resultString = "not compiled"
           }
           
-          return [
-            "TEST \t{",
-            "TEST \t\torder: \(resourceWithVersion.order)",
-            "TEST \t\tfileName: \(resourceWithVersion.fileURL.lastPathComponent)",
-            "TEST \t\tsource: \(sourceString)",
-            "TEST \t\tversion: \(resourceWithVersion.version ?? "nil")",
-            "TEST \t\ttype: \(type)",
-            "TEST \t\tresult: \(resultString)",
-            "TEST \t}"
-          ].joined(separator: "\n")
-        }.joined(separator: "\n")
+          let sourceDebugString =
+          """
+          {
+          order: \(resourceWithVersion.order)
+          fileName: \(resourceWithVersion.fileURL.lastPathComponent)
+          source: \(sourceString)
+          version: \(resourceWithVersion.version ?? "nil")
+          type: \(type)
+          result: \(resultString)
+          }
+          """
+          
+          return sourceDebugString
+        }
 
-      print("TEST Loaded \(enabledResources.count) (total) engine resources:\n\(resourcesString)")
+      log.debug("Loaded \(self.enabledResources.count, privacy: .public) (total) engine resources:\n\(resourcesString, privacy: .public)")
     }
     #endif
   }
@@ -302,7 +305,7 @@ public class AdBlockEngineManager {
       
       #if DEBUG
       Task {
-        print("TEST ======== AdblockEngineManager")
+        log.debug("AdblockEngineManager")
         await self.data.debug(resources: resourcesWithVersion)
       }
       #endif
@@ -313,7 +316,7 @@ public class AdBlockEngineManager {
     do {
       try await task.value
     } catch {
-      log.error(error)
+      log.error("\(error.localizedDescription)")
     }
     
     await data.set(compileTask: nil)
@@ -341,7 +344,7 @@ public class AdBlockEngineManager {
         compileResults[resourceWithVersion] = .success(Void())
       } catch {
         compileResults[resourceWithVersion] = .failure(error)
-        log.error(error)
+        log.error("\(error.localizedDescription)")
       }
     }
     
