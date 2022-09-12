@@ -60,8 +60,23 @@
         disconnect: function(payload) {
           return post('disconnect', payload)
         },
-        signAndSendTransaction: function(payload) {
-          return post('signAndSendTransaction', payload)
+        signAndSendTransaction: function(...payload) {
+          const transaction = payload[0];
+          const serializedMessage = transaction.serializeMessage();
+          const signatures = transaction.signatures;
+          function convertSignaturePubkeyPair(signaturePubkeyPair) {
+            const obj = new Object();
+            obj.publicKey = signaturePubkeyPair.publicKey.toBase58();
+            obj.signature = signaturePubkeyPair.signature;
+            return obj;
+          }
+          const signaturesMapped = signatures.map(convertSignaturePubkeyPair);
+          const object = new Object();
+          object.transaction = transaction;
+          object.serializedMessage = serializedMessage;
+          object.signatures = signaturesMapped;
+          object.sendOptions = payload[1];
+          return post('signAndSendTransaction', object)
         },
         signMessage: function(...payload) {
           return post('signMessage', payload)
