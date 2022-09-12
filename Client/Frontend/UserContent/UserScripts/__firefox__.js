@@ -6,20 +6,34 @@
 "use strict";
 
 if (!window.__firefox__) {
-  let $defineProperty = Object.defineProperty;
-  let $freeze = Object.freeze;
-  let $isExtensible = Object.isExtensible;
-  let $entries = Object.entries;
-  let $call = Function.prototype.call;
-  let $apply = Function.prototype.apply;
-  let $bind = Function.prototype.bind;
-  let $toString = Function.prototype.toString;
+  /*
+   *  Copies an object's signature to an object with no prototype to prevent prototype polution attacks
+   */
+  function secureCopy(value) {
+    let properties = Object.assign({},
+                                   Object.getOwnPropertyDescriptors(value),
+                                   value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : {});
+    
+    /// Making object not inherit from Object.prototype prevents prototype pollution attacks.
+    return Object.create(null, properties);
+  }
+  
+  /*
+   *  Any objects that need to be secured must be done now
+   */
+  let $Object = secureCopy(Object);
+  let $Function = secureCopy(Function);
+  let $Reflect = secureCopy(Reflect);
+  let $Array = secureCopy(Array);
+  
+  secureCopy = undefined;
+  let secureObjects = [$Object, $Function, $Reflect, $Array];
   
   /*
    *  Secures an object's attributes
    */
   let $ = function(value) {
-    if ($isExtensible(value)) {
+    if ($Object.isExtensible(value)) {
       const description = (typeof value === 'function') ?
                           `function () {\n\t[native code]\n}` :
                           '[object Object]';
@@ -34,20 +48,22 @@ if (!window.__firefox__) {
       
       if (typeof value === 'function') {
         const functionOverrides = {
-          'call': $call,
-          'apply': $apply,
-          'bind': $bind
+          'call': $Function.call,
+          'apply': $Function.apply,
+          'bind': $Function.bind
         };
         
-        for (const [key, value] of $entries(functionOverrides)) {
+        for (const [key, value] of $Object.entries(functionOverrides)) {
           overrides[key] = value;
         }
       }
       
-      for (const [name, property] of $entries(overrides)) {
-        toString[name] = property;
+      for (const [name, property] of $Object.entries(overrides)) {
+        if ((Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
+          toString[name] = property;
+        }
 
-        $defineProperty(toString, name, {
+        $Object.defineProperty(toString, name, {
           enumerable: false,
           configurable: false,
           writable: false,
@@ -61,10 +77,12 @@ if (!window.__firefox__) {
 
       $.deepFreeze(toString);
 
-      for (const [name, property] of $entries(overrides)) {
-        value[name] = property;
+      for (const [name, property] of $Object.entries(overrides)) {
+        if ((Object.getOwnPropertyDescriptor(value, name) || {}).writable) {
+          value[name] = property;
+        }
 
-        $defineProperty(value, name, {
+        $Object.defineProperty(value, name, {
           enumerable: false,
           configurable: false,
           writable: false,
@@ -77,17 +95,29 @@ if (!window.__firefox__) {
     return value;
   };
   
+  /*
+   *  Freeze an object and its prototype
+   */
   $.deepFreeze = function(value) {
-    $freeze(value);
-    $freeze(value.prototype);
+    $Object.freeze(value);
+    
+    if (value.prototype) {
+      $Object.freeze(value.prototype);
+    }
     return value;
   };
   
+  // Start securing functions before any other code can use them
   $($.deepFreeze);
   $($);
 
   $.deepFreeze($.deepFreeze);
   $.deepFreeze($);
+  
+  for (const value of Object.entries(secureObjects)) {
+    $(value);
+    $.deepFreeze(value);
+  }
   
   /*
    *  Creates a Proxy object that does the following to all objects using it:
@@ -102,16 +132,16 @@ if (!window.__firefox__) {
     let values = $({});
     return new Proxy({}, {
       get(target, property, receiver) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, property);
+        const descriptor = $Reflect.getOwnPropertyDescriptor(target, property);
         if (descriptor && !descriptor.configurable && !descriptor.writable) {
-          return Reflect.get(target, property, receiver);
+          return $Reflect.get(target, property, receiver);
         }
       
         if (hiddenProperties && hiddenProperties[property]) {
           return hiddenProperties[property];
         }
         
-        return Reflect.get(values, property, receiver);
+        return $Reflect.get(values, property, receiver);
       },
       
       set(target, name, value, receiver) {
@@ -128,7 +158,7 @@ if (!window.__firefox__) {
           value = $(value);
         }
         
-        return Reflect.set(values, name, value, receiver);
+        return $Reflect.set(values, name, value, receiver);
       },
       
       defineProperty(target, property, descriptor) {
@@ -142,7 +172,7 @@ if (!window.__firefox__) {
           }
 
           if (!descriptor.writable) {
-            return Reflect.defineProperty(target, property, descriptor);
+            return $Reflect.defineProperty(target, property, descriptor);
           }
         }
       
@@ -150,7 +180,7 @@ if (!window.__firefox__) {
           descriptor.value = $(descriptor.value);
         }
 
-        return Reflect.defineProperty(values, property, descriptor);
+        return $Reflect.defineProperty(values, property, descriptor);
       },
       
       getOwnPropertyDescriptor(target, property) {
@@ -159,14 +189,14 @@ if (!window.__firefox__) {
           return descriptor;
         }
         
-        return Reflect.getOwnPropertyDescriptor(values, property);
+        return $Reflect.getOwnPropertyDescriptor(values, property);
       },
       
       ownKeys(target) {
-        var keys = [];
+        let keys = new $Array();
         /*keys = keys.concat(Object.keys(target));
         keys = keys.concat(Object.getOwnPropertyNames(target));*/
-        keys = keys.concat(Reflect.ownKeys(target));
+        keys = keys.concat($Reflect.ownKeys(target));
         return keys;
       }
     });
@@ -175,7 +205,7 @@ if (!window.__firefox__) {
   /*
    *  Creates window.__firefox__ with a `Proxy` object as defined above
    */
-  $defineProperty(window, "__firefox__", {
+  $Object.defineProperty(window, "__firefox__", {
     enumerable: false,
     configurable: false,
     writable: false,
@@ -212,7 +242,7 @@ if (!window.__firefox__) {
     this.postMessage(message);
   });
   
-  $defineProperty(UserMessageHandler.prototype, 'postNativeMessage', {
+  $Object.defineProperty(UserMessageHandler.prototype, 'postNativeMessage', {
     enumerable: false,
     configurable: false,
     writable: false,
