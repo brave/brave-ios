@@ -45,6 +45,12 @@ class BraveSkusScriptHandler: TabContentScript {
       return
     }
     
+    guard let body = message.body as? [String: Any],
+          body["securitytoken"] as? String == UserScriptManager.securityTokenString else {
+      log.error("Failed to retrieve security token")
+      return
+    }
+    
     guard let response = message.body as? [String: Any],
           let methodId = response["method_id"] as? Int,
           let data = response["data"] as? [String: Any] else {
