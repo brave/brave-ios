@@ -110,12 +110,25 @@ class SolanaProviderHelper: TabContentScript {
         replyHandler("{:}", nil)
       case .signAndSendTransaction:
         guard let args = body.args,
-              let transaction = MojoBase.Value(jsonString: args)?.dictionaryValue,
-              let param = signTransactionParam(from: transaction),
-              let sendOptions = MojoBase.Value(jsonString: args)?.dictionaryValue else {
+              let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue else {
           replyHandler(nil, "Invalid args")
           return
         }
+        // get the serialized message
+        let serializedMessageValues = (arguments["serializedMessage"]?.dictionaryValue?["data"]?.listValue ?? []).map { UInt8($0.intValue) }
+        let encodedSerializedMsg = (Data(serializedMessageValues) as NSData).base58EncodedString()
+        // get the signatures array
+        let signaturesValues = (arguments["signatures"]?.listValue ?? []).compactMap { $0.dictionaryValue }
+        let signatures: [BraveWallet.SignaturePubkeyPair] = signaturesValues.map {
+          BraveWallet.SignaturePubkeyPair(
+            signature: ($0["signature"]?.dictionaryValue?["data"]?.listValue ?? []).map { NSNumber(value: $0.intValue) },
+            publicKey: $0["publicKey"]?.stringValue ?? ""
+          )
+        }
+        // get the send options dictionary
+        let sendOptions = arguments["sendOptions"]?.dictionaryValue
+        // pass info to solana provider
+        let param = BraveWallet.SolanaSignTransactionParam(encodedSerializedMsg: encodedSerializedMsg, signatures: signatures)
         let (status, errorMessage, result) = await provider.signAndSendTransaction(param, sendOptions: sendOptions)
         guard status == .success else {
           replyHandler(nil, errorMessage)
@@ -210,23 +223,5 @@ class SolanaProviderHelper: TabContentScript {
         replyHandler("", nil)
       }
     }
-  }
-  
-  private func serializedMessage(from transaction: [String: MojoBase.Value]) -> String? {
-    // TODO: GetSerializedMessage from transaction
-    return nil
-  }
-  
-  private func signatures(from transaction: [String: MojoBase.Value]) -> [BraveWallet.SignaturePubkeyPair] {
-    // TODO: GetSignatures from transaction
-    return []
-  }
-  
-  private func signTransactionParam(from transaction: [String: MojoBase.Value]) -> BraveWallet.SolanaSignTransactionParam? {
-    guard let serializedMessage = serializedMessage(from: transaction) else {
-      return nil
-    }
-    let signatures = signatures(from: transaction)
-    return .init(encodedSerializedMsg: serializedMessage, signatures: signatures)
   }
 }
