@@ -14,7 +14,6 @@ private let log = Logger.browserLogger
 public class BraveVPNSettingsViewController: TableViewController {
 
   public var faqButtonTapped: (() -> Void)?
-  public var manageBraveAccountSubscriptionTapped: (() -> Void)?
 
   public init() {
     super.init(style: .grouped)

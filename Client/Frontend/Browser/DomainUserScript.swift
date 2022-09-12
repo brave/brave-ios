@@ -63,10 +63,9 @@ enum DomainUserScript: CaseIterable {
     case .bravePlaylistFolderSharingHelper:
       return Set(["playlist.bravesoftware.com", "playlist.brave.com"])
     case .braveSkus:
-      // FIXME: Remove test domain once done with tests.
-      return .init(arrayLiteral: "account.brave.com",
+      return Set(["account.brave.com",
                    "account.bravesoftware.com",
-                   "account.brave.software", "iccub.github.io")
+                   "account.brave.software"])
     }
   }
 }

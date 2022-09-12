@@ -16,7 +16,7 @@ window.__firefox__.includeOnce("BraveSkusHelper", function() {
 
 Object.defineProperty(window.chrome, 'braveSkus', {
 enumerable: false,
-configurable: true,
+configurable: false,
 writable: false,
     value: {
     refresh_order(orderId) {

@@ -2486,9 +2486,9 @@ extension Strings {
         comment: "Table cell title for cell that shows when the VPN subscription expires.")
 
     public static let settingsManageSubscription =
-          NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .strings,
-          value: "Manage Subscription",
-          comment: "Button to manage your VPN subscription")
+      NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .strings,
+        value: "Manage Subscription",
+        comment: "Button to manage your VPN subscription")
 
     public static let settingsServerHost =
       NSLocalizedString("vpn.settingsServerHost", tableName: "BraveShared", bundle: .strings,

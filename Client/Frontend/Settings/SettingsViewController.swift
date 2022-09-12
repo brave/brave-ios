@@ -482,13 +482,7 @@ class SettingsViewController: TableViewController {
               self?.settingsDelegate?.settingsOpenURLInNewTab(BraveUX.braveVPNFaqURL)
               self?.dismiss(animated: true)
             }
-            vc.manageBraveAccountSubscriptionTapped = { [weak self] in
-              if let domain = Preferences.VPN.skusCredentialDomain.value,
-                 let url = URL(string: "https://\(domain)") {
-                self?.settingsDelegate?.settingsOpenURLInNewTab(url)
-                self?.dismiss(animated: true)
-              }
-            }
+            
             return vc
           }
         }()
