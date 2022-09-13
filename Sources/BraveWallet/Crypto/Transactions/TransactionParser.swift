@@ -381,11 +381,19 @@ enum TransactionParser {
           )
         )
       )
+    case .solanaDappSignAndSendTransaction, .solanaDappSignTransaction:
+      return .init(
+        transaction: transaction,
+        namedFromAddress: NamedAddresses.name(for: transaction.fromAddress, accounts: accountInfos),
+        fromAddress: transaction.fromAddress,
+        namedToAddress: "",
+        toAddress: "",
+        networkSymbol: network.symbol,
+        details: .solDappTransaction(
+          .init()
+        )
+      )
     case .erc1155SafeTransferFrom:
-      return nil
-    case .solanaDappSignAndSendTransaction:
-      return nil
-    case .solanaDappSignTransaction:
       return nil
     @unknown default:
       return nil
@@ -409,6 +417,7 @@ struct ParsedTransaction: Equatable {
     case erc721Transfer(Eth721TransferDetails)
     case solSystemTransfer(SendDetails)
     case solSplTokenTransfer(SendDetails)
+    case solDappTransaction(SolanaDappTxDetails)
     case other
   }
   
@@ -444,6 +453,8 @@ struct ParsedTransaction: Equatable {
     case let .ethErc20Approve(details):
       return details.gasFee
     case .erc721Transfer, .other:
+      return nil
+    case .solDappTransaction:
       return nil
     }
   }
@@ -541,6 +552,10 @@ struct Eth721TransferDetails: Equatable {
   let owner: String
   /// The token id
   let tokenId: String
+}
+
+struct SolanaDappTxDetails: Equatable {
+  
 }
 
 extension BraveWallet.TransactionInfo {
