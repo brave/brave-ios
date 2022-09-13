@@ -33,11 +33,11 @@ struct SignTransactionView: View {
           switch request {
           case let .signTransaction(request):
             cryptoStore.handleWebpageRequestResponse(
-              .signTransaction(approved: false, id: request.id, signature: nil, error: "Error message")
+              .signTransaction(approved: false, id: request.id, signature: nil, error: "User rejected the request")
             )
           case let .signAllTransactions(request):
             cryptoStore.handleWebpageRequestResponse(
-              .signAllTransactions(approved: false, id: request.id, signatures: nil, error: "Error message")
+              .signAllTransactions(approved: false, id: request.id, signatures: nil, error: "User rejected the request")
             )
           }
           onDismiss()
