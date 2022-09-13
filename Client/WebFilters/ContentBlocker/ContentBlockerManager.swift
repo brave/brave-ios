@@ -11,7 +11,7 @@ import BraveShared
 import os.log
 
 /// A class responsible for compiling content blocker lists
-public class ContentBlockerManager {
+final public class ContentBlockerManager {
   // TODO: Use a proper logger system once implemented and adblock files are moved to their own module(#5928).
   /// Logger to use for debugging.
   static let log = Logger(subsystem: "com.brave.ios", category: "adblock")
@@ -269,27 +269,17 @@ public class ContentBlockerManager {
     
     await withTaskGroup(of: Void.self) { group in
       for (identifier, resource) in resources {
-        group.addTask {
-          await Task.detached {
-            do {
-              let ruleList = try await self.compile(resource: resource, forIdentifier: identifier)
-              
-              await MainActor.run {
-                self.cachedCompileResults[identifier] = (resource.sourceType, .success(ruleList))
-              }
-            } catch {
-              Self.log.error("\(error.localizedDescription)")
-              
-              await MainActor.run {
-                self.cachedCompileResults[identifier] = (resource.sourceType, .failure(error))
-              }
-            }
-            
-            await self.data.movePendingResource(forIdentifier: identifier)
-          }.value
+        group.addTask { @MainActor in
+          do {
+            let ruleList = try await self.compile(resource: resource, forIdentifier: identifier)
+            self.cachedCompileResults[identifier] = (resource.sourceType, .success(ruleList))
+          } catch {
+            Self.log.error("\(error.localizedDescription)")
+            self.cachedCompileResults[identifier] = (resource.sourceType, .failure(error))
+          }
+          await self.data.movePendingResource(forIdentifier: identifier)
         }
       }
-      
     }
     
     #if DEBUG

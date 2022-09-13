@@ -539,9 +539,9 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       self.setupTabs()
       
       FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
-      AdblockResourceDownloader.shared.startFetching()
+      await AdblockResourceDownloader.shared.startFetching()
       ContentBlockerManager.shared.startTimer()
-      AdBlockEngineManager.shared.startTimer()
+      await AdBlockEngineManager.shared.startTimer()
     }
   }
 

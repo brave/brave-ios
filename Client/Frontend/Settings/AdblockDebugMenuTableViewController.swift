@@ -32,7 +32,6 @@ class AdblockDebugMenuTableViewController: TableViewController {
 
       self.dataSource.sections = [
         self.actionsSection,
-        self.fetchSection,
         self.datesSection,
         self.bundledListsSection(names: listNames),
         self.downloadedResourcesSection()
@@ -60,23 +59,6 @@ class AdblockDebugMenuTableViewController: TableViewController {
     let alert = UIAlertController(title: nil, message: "Recompiled Blockers", preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "OK", style: .default))
     present(alert, animated: true)
-  }
-
-  private var fetchSection: Section {
-    var section = Section(footer: "Last time we pinged the server for new data. If adblock list hasn't changed `Last Time Updated` section does not update.")
-    let dateFormatter = DateFormatter().then {
-      $0.dateStyle = .short
-      $0.timeStyle = .short
-    }
-
-    section.rows = [
-      .init(
-        text: "Last fetch time (adblock)",
-        detailText:
-          dateFormatter.string(from: AdblockResourceDownloader.shared.lastFetchDate))
-    ]
-
-    return section
   }
 
   private var datesSection: Section {

@@ -12,7 +12,7 @@ private let log = ContentBlockerManager.log
 
 /// This class is responsible for loading the engine when new resources arrive.
 /// It ensures that we always have a fresh new engine as new data is downloaded
-public class AdBlockEngineManager {
+public actor AdBlockEngineManager: Sendable {
   /// The source of a resource. In some cases we need to remove all resources for a given source.
   enum Source: Hashable {
     case adBlock
@@ -257,10 +257,14 @@ public class AdBlockEngineManager {
         }
       }, onCancel: {
         Task { @MainActor in
-          self.endlessBuildTask = nil
+          await self.removeBuildTask()
         }
       })
     }
+  }
+  
+  private func removeBuildTask() async {
+    endlessBuildTask = nil
   }
   
   /// Compile all resources
@@ -276,7 +280,7 @@ public class AdBlockEngineManager {
       var allCompileResults: [ResourceWithVersion: Result<Void, Error>] = [:]
       var allEngines: [AdblockEngine] = []
       
-      for (_, group) in self.group(resources: resourcesWithVersion) {
+      for (_, group) in await self.group(resources: resourcesWithVersion) {
         try Task.checkCancellation()
         
         // Combine all rule lists that need to be injected during initialization

@@ -360,7 +360,7 @@ public class FilterListResourceDownloader: ObservableObject {
       }
       
       try await withTaskCancellationHandler(operation: {
-        for try await result in self.resourceDownloader.downloadStream(for: resource) {
+        for try await result in await self.resourceDownloader.downloadStream(for: resource) {
           switch result {
           case .success(let downloadResult):
             await self.handle(

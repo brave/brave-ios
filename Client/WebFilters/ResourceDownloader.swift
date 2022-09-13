@@ -8,7 +8,7 @@ import Shared
 import BraveCore
 
 /// A ganeric resource downloader class that is responsible for fetching resources
-class ResourceDownloader {
+actor ResourceDownloader: Sendable {
   enum Resource: Hashable {
     /// Rules for debouncing links
     case debounceRules

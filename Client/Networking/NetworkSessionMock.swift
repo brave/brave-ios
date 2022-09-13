@@ -6,7 +6,7 @@ import Foundation
 import Combine
 
 /// An implemntation of `NetworkSession` which is able to return dynamic mock results as defined by a completion callback
-class BaseMockNetworkSession: NetworkSession {
+class BaseMockNetworkSession: NetworkSession, @unchecked Sendable {
   /// A completion block that returns dynamic responses based on the given URL
   var completion: @Sendable (URL) async throws -> NetworkSessionDataResponse
   

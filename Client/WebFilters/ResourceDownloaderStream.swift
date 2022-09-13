@@ -6,7 +6,7 @@
 import Foundation
 
 /// An endless sequence iterator for the given resource
-class ResourceDownloaderStream: AsyncSequence, AsyncIteratorProtocol {
+final class ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol {
   /// An object representing the download
   struct DownloadResult: Equatable {
     let date: Date
@@ -17,7 +17,6 @@ class ResourceDownloaderStream: AsyncSequence, AsyncIteratorProtocol {
   private let resource: ResourceDownloader.Resource
   private let resourceDownloader: ResourceDownloader
   private let fetchInterval: TimeInterval
-  private var initialFetch = true
   
   init(resource: ResourceDownloader.Resource, resourceDownloader: ResourceDownloader, fetchInterval: TimeInterval) {
     self.resource = resource
@@ -29,19 +28,6 @@ class ResourceDownloaderStream: AsyncSequence, AsyncIteratorProtocol {
   ///
   /// - Note: Only throws `CancellationError` error. Downloading errors are returned as a `Result` object
   func next() async throws -> Element? {
-    guard initialFetch else {
-      do {
-        let result = try await resourceDownloader.download(resource: resource)
-        
-        switch result {
-        case .downloaded(let url, let date), .notModified(let url, let date):
-          return .success(DownloadResult(date: date, fileURL: url))
-        }
-      } catch {
-        return .failure(error)
-      }
-    }
-    
     // Keep fetching new data until we get a new result
     while true {
       try await Task.sleep(seconds: fetchInterval)

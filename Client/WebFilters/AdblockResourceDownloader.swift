@@ -10,11 +10,11 @@ import BraveShared
 private let log = Logger.browserLogger
 
 /// A class responsible for downloading some generic ad-block resources
-public class AdblockResourceDownloader {
+public actor AdblockResourceDownloader: Sendable {
   public static let shared = AdblockResourceDownloader()
   
   /// A formatter that is used to format a version number
-  private lazy var fileVersionDateFormatter: DateFormatter = {
+  private let fileVersionDateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX")
     dateFormatter.dateFormat = "yyyy.MM.dd.HH.mm.ss"
@@ -30,9 +30,6 @@ public class AdblockResourceDownloader {
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
   }
-
-  /// Initialized with year 1970 to force adblock fetch at first launch.
-  private(set) var lastFetchDate = Date(timeIntervalSince1970: 0)
   
   /// Load the cached data and await the results
   public func loadCachedData() async {
@@ -47,7 +44,6 @@ public class AdblockResourceDownloader {
 
   /// Start fetching resources
   public func startFetching() {
-    assertIsMainThread("Not on main thread")
     let fetchInterval = AppConstants.buildChannel.isPublic ? 6.hours : 10.minutes
     
     for resource in handledResources {
@@ -63,7 +59,7 @@ public class AdblockResourceDownloader {
         await self.handle(downloadedFileURL: fileURL, for: resource, date: date)
       }
       
-      for try await result in self.resourceDownloader.downloadStream(for: resource, every: fetchInterval) {
+      for try await result in await self.resourceDownloader.downloadStream(for: resource, every: fetchInterval) {
         switch result {
         case .success(let downloadResult):
           await self.handle(downloadedFileURL: downloadResult.fileURL, for: resource, date: downloadResult.date)
