@@ -15,8 +15,14 @@ class SendTabToSelfController: SendTabTransitioningController {
     static let preferredSizePadding = 132.0
   }
   
+  // MARK: Internal
+  
   let contentNavigationController: UINavigationController
   private let sendTabContentController: SendTabToSelfContentController
+  
+  var sendWebSiteHandler: ((SendableTabInfoDataSource) -> Void)?
+
+  // MARK: Lifecycle
   
   init(sendTabAPI: BraveSendTabAPI, dataSource: SendableTabInfoDataSource) {
     sendTabContentController = SendTabToSelfContentController(sendTabAPI: sendTabAPI, dataSource: dataSource)
@@ -30,6 +36,14 @@ class SendTabToSelfController: SendTabTransitioningController {
         
     addChild(contentNavigationController)
     contentNavigationController.didMove(toParent: self)
+    
+    sendTabContentController.sendWebSiteHandler = { [weak self] dataSource in
+      guard let self = self else { return }
+      
+      self.dismiss(animated: true) {
+        self.sendWebSiteHandler?(dataSource)
+      }
+    }
   }
   
   @available(*, unavailable)
@@ -84,6 +98,8 @@ class SendTabToSelfContentController: UITableViewController {
   
   private var dataSource: SendableTabInfoDataSource?
   private var sendTabAPI: BraveSendTabAPI?
+  
+  var sendWebSiteHandler: ((SendableTabInfoDataSource) -> Void)?
 
   // MARK: Lifecycle
   
@@ -199,15 +215,8 @@ extension SendTabToSelfContentController {
   
   @objc private func tappedSendLabel(_ gesture: UITapGestureRecognizer) {
     guard let dataSource = dataSource, gesture.state == .ended else { return }
-
-    if let deviceCacheId = dataSource.deviceCacheID() {
-      sendTabAPI?.sendActiveTab(
-        toDevice: deviceCacheId,
-        tabTitle: dataSource.displayTitle,
-        activeURL: dataSource.sendableURL)
-    }
     
-    dismiss(animated: true)
+    sendWebSiteHandler?(dataSource)
   }
 }
 
