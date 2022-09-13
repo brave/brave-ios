@@ -69,6 +69,29 @@
           )
       })
     }
+    function postTransactions(method, payload) {
+      return new Promise((resolve, reject) => {
+        webkit.messageHandlers.$<handler>.postMessage({
+          "securitytoken": "$<security_token>",
+          "method": method,
+          "args": JSON.stringify(payload)
+        })
+        .then(
+            (serializedTxs) => {
+              /* Convert `serializedTxs` to array of `solanaWeb3.Transaction` */
+              const result = serializedTxs.map(window._brave_solana.createTransaction);
+              resolve(result)
+            },
+            (errorJSON) => {
+              try {
+                reject(JSON.parse(errorJSON))
+              } catch(e) {
+                reject(errorJSON)
+              }
+            }
+          )
+      })
+    }
     function convertTransaction(transaction) {
       const serializedMessage = transaction.serializeMessage();
       const signatures = transaction.signatures;
@@ -119,8 +142,9 @@
           return postTransaction('signTransaction', object)
         },
         /* Deprecated */
-        signAllTransactions: function(payload) { /* -> Promise<[solanaWeb3.Transaction]> */
-          return post('signAllTransactions', payload)
+        signAllTransactions: function(transactions) { /* -> Promise<[solanaWeb3.Transaction]> */
+          const objects = transactions.map(convertTransaction);
+          return postTransactions('signAllTransactions', objects)
         },
       }
     }

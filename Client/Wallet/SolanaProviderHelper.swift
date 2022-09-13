@@ -212,14 +212,33 @@ class SolanaProviderHelper: TabContentScript {
         }
         replyHandler(encodedSerializedTx, nil)
       case .signAllTransactions:
-        let params: [BraveWallet.SolanaSignTransactionParam] = []
+        guard let args = body.args,
+              let transactions = MojoBase.Value(jsonString: args)?.listValue else {
+          replyHandler(nil, "Invalid args")
+          return
+        }
+        let params: [BraveWallet.SolanaSignTransactionParam] = transactions.compactMap { tx in
+          guard let transaction = tx.dictionaryValue,
+                let serializedMessage = transaction["serializedMessage"],
+                let signatures = transaction["signatures"] else {
+            return nil
+          }
+          return createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
+        }
+        guard !params.isEmpty else {
+          replyHandler(nil, "Invalid args")
+          return
+        }
         let (status, errorMessage, serializedTxs) = await provider.signAllTransactions(params)
         guard status == .success else {
           replyHandler(nil, errorMessage)
           return
         }
-        // TODO: Reply with array of `solanaWeb3.Transaction`
-        replyHandler("", nil)
+        guard let encodedSerializedTxs = JSONSerialization.jsObject(withNative: serializedTxs) else {
+          replyHandler(nil, "Internal error")
+          return
+        }
+        replyHandler(encodedSerializedTxs, nil)
       }
     }
   }
