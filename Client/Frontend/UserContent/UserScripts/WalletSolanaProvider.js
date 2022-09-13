@@ -21,7 +21,7 @@
         })
       })
     }
-    function postConnect(method, payload) {
+    function postPublicKey(method, payload) {
       return new Promise((resolve, reject) => {
         webkit.messageHandlers.$<handler>.postMessage({
           "securitytoken": "$<security_token>",
@@ -54,13 +54,13 @@
         isConnected: false,
         publicKey: null,
         /* Methods */
-        connect: function(payload) {
-          return postConnect('connect', payload)
+        connect: function(payload) { /* -> {publicKey: solanaWeb3.PublicKey} */
+          return postPublicKey('connect', payload)
         },
-        disconnect: function(payload) {
+        disconnect: function(payload) { /* -> Promise<{}> */
           return post('disconnect', payload)
         },
-        signAndSendTransaction: function(...payload) {
+        signAndSendTransaction: function(...payload) { /* -> Promise<{publicKey: <base58 encoded string>, signature: <base58 encoded string>}> */
           const transaction = payload[0];
           const serializedMessage = transaction.serializeMessage();
           const signatures = transaction.signatures;
@@ -78,21 +78,21 @@
           object.sendOptions = payload[1];
           return post('signAndSendTransaction', object)
         },
-        signMessage: function(...payload) {
+        signMessage: function(...payload) { /* -> Promise<{publicKey: <base58 encoded string>, signature: <base58 encoded string>}> */
           return post('signMessage', payload)
         },
         request: function(args) /* -> Promise<unknown> */  {
           if (args["method"] == 'connect') {
-            return postConnect('request', args)
+            return postPublicKey('request', args)
           }
           return post('request', args)
         },
-          /* Deprecated */
-        signTransaction: function(payload) {
+        /* Deprecated */
+        signTransaction: function(payload) { /* -> Promise<solanaWeb3.Transaction> */
           return post('signTransaction', payload)
         },
-          /* Deprecated */
-        signAllTransactions: function(payload) {
+        /* Deprecated */
+        signAllTransactions: function(payload) { /* -> Promise<[solanaWeb3.Transaction]> */
           return post('signAllTransactions', payload)
         },
       }
