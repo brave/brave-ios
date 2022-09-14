@@ -124,8 +124,11 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
-        // TODO: Reply with `{publicKey: <base58 encoded string>, signature: <base58 encoded string>}`
-        replyHandler("", nil)
+        guard let encodedResult = JSONSerialization.jsObject(withNative: result) else {
+          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
+          return
+        }
+        replyHandler(encodedResult, nil)
       case .signMessage:
         guard let args = body.args,
               let argsList = MojoBase.Value(jsonString: args)?.listValue,
@@ -141,17 +144,16 @@ class SolanaProviderHelper: TabContentScript {
         let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
         guard status == .success,
               let publicKey = result["publicKey"]?.stringValue,
-              let signature = result["signature"]?.stringValue else {
+              let signature = result["signature"]?.stringValue,
+              let signatureDecoded = NSData(base58Encoded: signature) as? Data else {
           replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
-        // TODO: signature string needs decoded from base58
-        let resultDict = ["publicKey": publicKey, "signature": signature]
+        let resultDict: [String: Any] = ["publicKey": publicKey, "signature": signatureDecoded.getBytes()]
         guard let encodedResult = JSONSerialization.jsObject(withNative: resultDict) else {
           replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
           return
         }
-        // TODO: Reply with `{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}`
         replyHandler(encodedResult, nil)
       case .request:
         guard let args = body.args,
