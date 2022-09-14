@@ -17,18 +17,18 @@ class SendTabProcessController: SendTabTransitioningController {
     var processTitle: String {
       switch self {
       case .progress:
-        return "Sending…"
+        return Strings.OpenTabs.sendingWebpageProgressTitle
       case .completed:
-        return "Sent!"
+        return Strings.OpenTabs.sendingWebpageCompletedTitle
       }
     }
 
     var processImage: UIImage? {
       switch self {
       case .progress:
-        return UIImage(named: "sync-settings", in: .current, compatibleWith: nil)
+        return UIImage(named: "tab-progress", in: .current, compatibleWith: nil)
       case .completed:
-        return UIImage(named: "sync-settings", in: .current, compatibleWith: nil)
+        return UIImage(named: "tab-completed", in: .current, compatibleWith: nil)
       }
     }
   }

@@ -3147,6 +3147,20 @@ extension Strings {
         bundle: .strings,
         value: "To see your devices and enabled sync types, join a sync chain",
         comment: "The description of the view showing no devices inside sync chain")
+    public static let sendingWebpageProgressTitle =
+      NSLocalizedString(
+        "openTabs.sendingWebpageProgressTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Sending…",
+        comment: "The title displayed on screen showing webpage is being sent")
+    public static let sendingWebpageCompletedTitle =
+      NSLocalizedString(
+        "openTabs.sendingWebpageCompletedTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Sent!",
+        comment: "The title displayed on screen showing sending page is already completed")
   }
 }
 
