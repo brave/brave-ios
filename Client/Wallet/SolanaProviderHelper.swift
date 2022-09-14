@@ -192,7 +192,11 @@ class SolanaProviderHelper: TabContentScript {
           //                            signature: <base58 encoded string>[]}
           // - signMessage => { publicKey: <base58 encoded string>,
           //                    signature: <base58 encoded string>}
-          replyHandler("{:}", nil)
+          guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonString else {
+            replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
+            return
+          }
+          replyHandler(encodedResult, nil)
         }
       case .signTransaction:
         guard let args = body.args,
