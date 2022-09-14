@@ -138,14 +138,12 @@ class SendTabProcessController: SendTabTransitioningController {
         activeURL: dataSource.sendableURL)
     }
     
-    Task { @MainActor in
-      try await Task.sleep(nanoseconds: NSEC_PER_SEC * 3) // 3 Sec delay
+    Task.delayed(bySeconds: 3) { @MainActor in
+      self.statusType = .completed
       
-      statusType = .completed
-      
-      try await Task.sleep(nanoseconds: NSEC_PER_SEC * 2) // 2 Sec delay
-      
-      dismiss(animated: true)
+      Task.delayed(bySeconds: 2) { @MainActor in
+        self.dismiss(animated: true)
+      }
     }
   }
 }
