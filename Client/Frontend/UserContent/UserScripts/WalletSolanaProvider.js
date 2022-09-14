@@ -52,6 +52,36 @@
           )
       })
     }
+    function postPubkeySignature(method, payload) {
+      return new Promise((resolve, reject) => {
+        webkit.messageHandlers.$<handler>.postMessage({
+          "securitytoken": "$<security_token>",
+          "method": method,
+          "args": JSON.stringify(payload)
+        })
+        .then(
+            (dict) => {
+              const parsed = JSON.parse(dict);
+              const publicKey = parsed["publicKey"];
+              const signature = parsed["signature"];
+              const result = new Object();
+              result.publicKey = window._brave_solana.createPublickey(publicKey);
+              result.signature = new Uint8Array(signature);
+              resolve(result)
+            },
+            (errorJSON) => {
+              /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
+              const errorJSONString = new String(errorJSON);
+              const errorJSONStringSliced = errorJSONString.slice(errorJSONString.indexOf('{'));
+              try {
+                reject(JSON.parse(errorJSONStringSliced))
+              } catch(e) {
+                reject(errorJSON)
+              }
+            }
+          )
+      })
+    }
     function postTransaction(method, payload) {
       return new Promise((resolve, reject) => {
         webkit.messageHandlers.$<handler>.postMessage({
@@ -139,8 +169,8 @@
           object.sendOptions = payload[1];
           return post('signAndSendTransaction', object)
         },
-        signMessage: function(...payload) { /* -> Promise<{publicKey: <base58 encoded string>, signature: <base58 encoded string>}> */
-          return post('signMessage', payload)
+        signMessage: function(...payload) { /* -> Promise{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}> */
+          return postPubkeySignature('signMessage', payload)
         },
         request: function(args) /* -> Promise<unknown> */  {
           if (args["method"] == 'connect') {
