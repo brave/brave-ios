@@ -25,6 +25,8 @@ if (!window.__firefox__) {
   let $Function = secureCopy(Function);
   let $Reflect = secureCopy(Reflect);
   let $Array = secureCopy(Array);
+  let $webkit = window.webkit;
+  let $messageHandlers = $webkit.messageHandlers;
   
   secureCopy = undefined;
   let secureObjects = [$Object, $Function, $Reflect, $Array];
@@ -111,8 +113,8 @@ if (!window.__firefox__) {
     let webkit = window.webkit;
     delete window.webkit;
     delete window.webkit.messageHandlers;
-    delete window.webkit.messageHandlers[messageHandlerName].postMessage;
-    window.webkit.messageHandlers[messageHandlerName].postMessage(message);
+    delete $messageHandlers[messageHandlerName].postMessage;
+    $messageHandlers[messageHandlerName].postMessage(message);
     window.webkit = webkit;
   }
   

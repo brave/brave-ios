@@ -42,6 +42,7 @@ class ResourceDownloadManager: TabContentScript {
   static let scriptName = "ResourceDownloader"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .defaultClient
   private static let downloadName = "\(scriptName)_\(uniqueID)"
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
@@ -53,7 +54,7 @@ class ResourceDownloadManager: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentEnd,
                                forMainFrameOnly: false,
-                               in: .defaultClient)
+                               in: scriptSandbox)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

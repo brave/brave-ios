@@ -459,6 +459,7 @@ class PlaylistWebLoader: UIView {
     static let scriptName = "PlaylistWebLoaderContentHelper"
     static let scriptId = UUID().uuidString
     static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+    static let scriptSandbox: WKContentWorld = .page
     static let userScript: WKUserScript? = {
       guard var script = loadUserScript(named: scriptName) else {
         return nil
@@ -468,7 +469,7 @@ class PlaylistWebLoader: UIView {
                                                       script: script),
                                  injectionTime: .atDocumentStart,
                                  forMainFrameOnly: false,
-                                 in: .page)
+                                 in: scriptSandbox)
     }()
 
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

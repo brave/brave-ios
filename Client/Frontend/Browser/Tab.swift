@@ -19,6 +19,7 @@ protocol TabContentScript {
   static var scriptName: String { get }
   static var scriptId: String { get }
   static var messageHandlerName: String { get }
+  static var scriptSandbox: WKContentWorld { get }
   static var userScript: WKUserScript? { get }
   static func loadUserScript(named: String) -> String?
   

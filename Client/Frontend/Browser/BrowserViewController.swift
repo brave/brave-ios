@@ -2503,11 +2503,11 @@ extension BrowserViewController: TabDelegate {
 
     let playlistHelper = PlaylistHelper(tab: tab)
     playlistHelper.delegate = self
-    tab.addContentScript(playlistHelper, name: PlaylistHelper.name(), contentWorld: .page)
+    tab.addContentScript(playlistHelper, name: PlaylistHelper.scriptName, contentWorld: .page)
     
     let playlistFolderSharingHelper = PlaylistFolderSharingHelper(tab: tab)
     playlistFolderSharingHelper.delegate = self
-    tab.addContentScript(playlistFolderSharingHelper, name: PlaylistFolderSharingHelper.name(), contentWorld: .page)
+    tab.addContentScript(playlistFolderSharingHelper, name: PlaylistFolderSharingHelper.scriptName, contentWorld: .page)
 
     tab.addContentScript(RewardsReporting(rewards: rewards, tab: tab), name: RewardsReporting.scriptName, contentWorld: .page)
     tab.addContentScript(AdsMediaReporting(rewards: rewards, tab: tab), name: AdsMediaReporting.scriptName, contentWorld: .defaultClient)

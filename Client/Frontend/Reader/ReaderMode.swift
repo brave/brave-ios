@@ -245,6 +245,7 @@ class ReaderMode: TabContentScript {
   static let scriptName = "ReaderMode"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "readerModeMessageHandler"
+  static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = {
     return nil
   }()

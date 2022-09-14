@@ -18,6 +18,7 @@ class FocusHelper: TabContentScript {
   static let scriptName = "FocusHelper"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "focusHelper"
+  static let scriptSandbox: WKContentWorld = .page
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
@@ -27,7 +28,7 @@ class FocusHelper: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: false,
-                               in: .page)
+                               in: scriptSandbox)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

@@ -33,6 +33,7 @@ class LoginsHelper: TabContentScript {
 
   static let scriptName = "LoginsHelper"
   static let scriptId = UUID().uuidString
+  static let scriptSandbox: WKContentWorld = .page
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
@@ -43,7 +44,7 @@ class LoginsHelper: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: false,
-                               in: .page)
+                               in: scriptSandbox)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

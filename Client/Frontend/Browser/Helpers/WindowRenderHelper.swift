@@ -16,6 +16,7 @@ class WindowRenderHelper: TabContentScript {
   static let scriptName = "WindowRenderHelper"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .defaultClient
   private static let resizeWindowFunction = "\(scriptName)_\(uniqueID)"
   
   static let userScript: WKUserScript? = {
@@ -27,7 +28,7 @@ class WindowRenderHelper: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: false,
-                               in: .defaultClient)
+                               in: scriptSandbox)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

@@ -42,6 +42,7 @@ extension PaymentRequestExtension: TabContentScript {
   static let scriptName = "PaymentRequest"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .page
   
   static let userScript: WKUserScript? = {
     guard let script = loadUserScript(named: scriptName) else {
@@ -53,7 +54,7 @@ extension PaymentRequestExtension: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: true,
-                               in: .page)
+                               in: scriptSandbox)
   }()
 
   private func sendPaymentRequestError(errorName: String, errorMessage: String) {

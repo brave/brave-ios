@@ -22,6 +22,7 @@ public class DeAmpHelper: TabContentScript {
   static let scriptName = "DeAMP"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
@@ -31,7 +32,7 @@ public class DeAmpHelper: TabContentScript {
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: true,
-                               in: .defaultClient)
+                               in: scriptSandbox)
   }()
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
