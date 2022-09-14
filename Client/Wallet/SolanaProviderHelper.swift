@@ -93,7 +93,7 @@ class SolanaProviderHelper: TabContentScript {
         }
         let (status, errorMessage, publicKey) = await provider.connect(param)
         guard status == .success else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         // need to inject `_brave_solana.createPublickey` function before replying w/ success.
@@ -113,7 +113,7 @@ class SolanaProviderHelper: TabContentScript {
               let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let serializedMessage = arguments["serializedMessage"],
               let signatures = arguments["signatures"] else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         // get the send options dictionary
@@ -121,7 +121,7 @@ class SolanaProviderHelper: TabContentScript {
         let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
         let (status, errorMessage, result) = await provider.signAndSendTransaction(param, sendOptions: sendOptions)
         guard status == .success else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         // TODO: Reply with `{publicKey: <base58 encoded string>, signature: <base58 encoded string>}`
@@ -130,7 +130,7 @@ class SolanaProviderHelper: TabContentScript {
         guard let args = body.args,
               let argsList = MojoBase.Value(jsonString: args)?.listValue,
               let messageDict = argsList.first?.dictionaryValue else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         let blobMsg: [NSNumber] =  messageDict.keys
@@ -142,13 +142,13 @@ class SolanaProviderHelper: TabContentScript {
         guard status == .success,
               let publicKey = result["publicKey"]?.stringValue,
               let signature = result["signature"]?.stringValue else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         // TODO: signature string needs decoded from base58
         let resultDict = ["publicKey": publicKey, "signature": signature]
         guard let encodedResult = JSONSerialization.jsObject(withNative: resultDict) else {
-          replyHandler(nil, "Internal error")
+          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
           return
         }
         // TODO: Reply with `{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}`
@@ -157,12 +157,12 @@ class SolanaProviderHelper: TabContentScript {
         guard let args = body.args,
               let argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let method = argDict["method"]?.stringValue else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         let (status, errorMessage, result) = await provider.request(argDict)
         guard status == .success else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         if method == "connect",
@@ -197,24 +197,24 @@ class SolanaProviderHelper: TabContentScript {
               let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let serializedMessage = arguments["serializedMessage"],
               let signatures = arguments["signatures"] else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
         let (status, errorMessage, serializedTx) = await provider.signTransaction(param)
         guard status == .success else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         guard let encodedSerializedTx = JSONSerialization.jsObject(withNative: serializedTx) else {
-          replyHandler(nil, "Internal error")
+          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
           return
         }
         replyHandler(encodedSerializedTx, nil)
       case .signAllTransactions:
         guard let args = body.args,
               let transactions = MojoBase.Value(jsonString: args)?.listValue else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         let params: [BraveWallet.SolanaSignTransactionParam] = transactions.compactMap { tx in
@@ -226,16 +226,16 @@ class SolanaProviderHelper: TabContentScript {
           return createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
         }
         guard !params.isEmpty else {
-          replyHandler(nil, "Invalid args")
+          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
         let (status, errorMessage, serializedTxs) = await provider.signAllTransactions(params)
         guard status == .success else {
-          replyHandler(nil, errorMessage)
+          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
         guard let encodedSerializedTxs = JSONSerialization.jsObject(withNative: serializedTxs) else {
-          replyHandler(nil, "Internal error")
+          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
           return
         }
         replyHandler(encodedSerializedTxs, nil)
@@ -256,5 +256,9 @@ class SolanaProviderHelper: TabContentScript {
       )
     }
     return .init(encodedSerializedMsg: encodedSerializedMsg, signatures: signatures)
+  }
+  
+  private func buildErrorJson(status: BraveWallet.SolanaProviderError, errorMessage: String) -> String? {
+    JSONSerialization.jsObject(withNative: ["code": status.rawValue, "message": errorMessage])
   }
 }
