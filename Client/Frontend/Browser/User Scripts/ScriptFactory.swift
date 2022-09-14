@@ -121,7 +121,7 @@ class ScriptFactory {
         source = source
           .replacingOccurrences(of: "$<security_token>", with: securityToken)
         
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page)
       }
     }
     
