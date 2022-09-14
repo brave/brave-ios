@@ -4,7 +4,7 @@
 
 "use strict";
 
-window.__firefox__.includeOnce("PrintHandler", function($) {
+window.__firefox__.execute(function($) {
   if (webkit.messageHandlers.trackingProtectionStats) {
     install();
   }
@@ -35,8 +35,7 @@ window.__firefox__.includeOnce("PrintHandler", function($) {
       if (urlString) {
         try {
           let resourceURL = new URL(urlString, window.location.href)
-          
-          webkit.messageHandlers.trackingProtectionStats.postMessage({
+          $.postNativeMessage('trackingProtectionStats', {
             securityToken: SECURITY_TOKEN,
             data: {
               resourceURL: resourceURL.href,

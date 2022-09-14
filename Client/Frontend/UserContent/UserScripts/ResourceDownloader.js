@@ -8,7 +8,7 @@
 window.__firefox__.includeOnce("DownloadManager", function($) {
   let postMessage = $(function(message) {
     if (message) {
-      return webkit.messageHandlers.$<message_handler>.postNativeMessage(message);
+      return $.postNativeMessage('$<message_handler>', message);
     }
   });
   

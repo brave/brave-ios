@@ -5,7 +5,7 @@
 
 window.__firefox__.execute(function($) {
   let postMessage = $(function(message) {
-    window.webkit.messageHandlers.$<message_handler>.postNativeMessage({
+    $.postNativeMessage('$<message_handler>', {
       "securitytoken": SECURITY_TOKEN,
       "state": message
     });

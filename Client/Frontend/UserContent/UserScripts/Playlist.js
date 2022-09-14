@@ -5,7 +5,7 @@
 
 // MARK: - Media Detection
 
-window.__firefox__.includeOnce("Playlist", function() {
+window.__firefox__.includeOnce("Playlist", function($) {
   function is_nan(value) {
     return typeof value === "number" && value !== value;
   }
@@ -60,8 +60,8 @@ window.__firefox__.includeOnce("Playlist", function() {
   }
   
   function sendMessage(name, node, target, type, detected) {
-    if (window.webkit.messageHandlers.$<message_handler>) {
-      window.webkit.messageHandlers.$<message_handler>.postNativeMessage({
+    $(function() {
+      $.postNativeMessage('$<message_handler>', {
         "securitytoken": SECURITY_TOKEN,
         "name": name,
         "src": node.src,
@@ -72,7 +72,7 @@ window.__firefox__.includeOnce("Playlist", function() {
         "detected": detected,
         "tagId": target.$<tagUUID>
       });
-    }
+    })();
   }
   
   function notify(target, type, detected) {

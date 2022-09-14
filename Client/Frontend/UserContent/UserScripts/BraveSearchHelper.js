@@ -7,7 +7,7 @@
 
 window.__firefox__.includeOnce("BraveSearchHelper", function($) {
   let sendMessage = $(function(method_id) {
-    return webkit.messageHandlers.$<message_handler>.postNativeMessage({ 'securitytoken': SECURITY_TOKEN, 'method_id': method_id});
+    return $.postNativeMessage('$<message_handler>', { 'securitytoken': SECURITY_TOKEN, 'method_id': method_id});
   });
   
   Object.defineProperty(window, 'brave', {

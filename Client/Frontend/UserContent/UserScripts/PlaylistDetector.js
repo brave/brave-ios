@@ -5,7 +5,7 @@
 
 // MARK: - Media Detection
 
-window.__firefox__.includeOnce("PlaylistDetector", function() {
+window.__firefox__.includeOnce("PlaylistDetector", function($) {
     function is_nan(value) {
         return typeof value === "number" && value !== value;
     }
@@ -26,9 +26,9 @@ window.__firefox__.includeOnce("PlaylistDetector", function() {
     }
     
     function $<sendMessage>(message) {
-        if (window.webkit.messageHandlers.$<handler>) {
-            window.webkit.messageHandlers.$<handler>.postNativeMessage(message);
-        }
+      $(function() {
+        $.postNativeMessage('$<handler>', message);
+      })();
     }
     
     function $<notify>(target, type) {

@@ -5,7 +5,7 @@
 
 "use strict";
 
-window.__firefox__.includeOnce("PrintHandler", function($) {
+window.__firefox__.includeOnce("RewardsReporting", function($) {
   const mediaPublisherOrigins = [
     'https://www.twitch.tv', 'https://m.twitch.tv', 'https://player.twitch.tv',
     'https://www.youtube.com', 'https://m.youtube.com',
@@ -18,7 +18,7 @@ window.__firefox__.includeOnce("PrintHandler", function($) {
   
   function install() {
     let sendMessage = $(function(method, url, data, referrerUrl) {
-      webkit.messageHandlers.rewardsReporting.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {
+      $.postNativeMessage('rewardsReporting', {"securitytoken": SECURITY_TOKEN, "data": {
         method: method === undefined ? "GET" : method,
         url: url,
         data: (data === undefined || data instanceof Blob) ? null : data,

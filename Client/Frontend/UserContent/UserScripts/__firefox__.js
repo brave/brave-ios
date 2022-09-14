@@ -106,12 +106,23 @@ if (!window.__firefox__) {
     }
     return value;
   };
+    
+  $.postNativeMessage = function(messageHandlerName, message) {
+    let webkit = window.webkit;
+    delete window.webkit;
+    delete window.webkit.messageHandlers;
+    delete window.webkit.messageHandlers[messageHandlerName].postMessage;
+    window.webkit.messageHandlers[messageHandlerName].postMessage(message);
+    window.webkit = webkit;
+  }
   
   // Start securing functions before any other code can use them
   $($.deepFreeze);
+  $($.postNativeMessage);
   $($);
 
   $.deepFreeze($.deepFreeze);
+  $.deepFreeze($.postNativeMessage);
   $.deepFreeze($);
   
   for (const value of Object.entries(secureObjects)) {
@@ -250,16 +261,7 @@ if (!window.__firefox__) {
       return createProxy({'includeOnce': $.deepFreeze(includeOnce), 'execute': $.deepFreeze(execute)});
     }))()
   });
-  
-  let postNativeMessage = $(function(message) {
-    delete this.postMessage;
-    this.postMessage(message);
-  });
-  
-  $Object.defineProperty(UserMessageHandler.prototype, 'postNativeMessage', {
-    enumerable: false,
-    configurable: false,
-    writable: false,
-    value: $.deepFreeze(postNativeMessage)
-  });
+    
+  $.deepFreeze(UserMessageHandler);
+  $.deepFreeze(webkit.messageHandlers);
 }

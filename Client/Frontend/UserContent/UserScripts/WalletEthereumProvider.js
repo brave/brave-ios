@@ -8,7 +8,7 @@ window.__firefox__.execute(function($) {
 if (window.isSecureContext) {
   function post(method, payload) {
     let postMessage = $(function(message) {
-      return webkit.messageHandlers.$<handler>.postNativeMessage(message);
+      return $.postNativeMessage('$<handler>', message);
     });
     
     return new Promise($((resolve, reject) => {

@@ -7,7 +7,7 @@
 
 window.__firefox__.includeOnce("BraveTalkHelper", function($) {
   let sendMessage = $(function() {
-    return webkit.messageHandlers.$<message_handler>.postNativeMessage({ 'securitytoken': SECURITY_TOKEN });
+    return $.postNativeMessage('$<message_handler>', { 'securitytoken': SECURITY_TOKEN });
   });
   
   Object.defineProperty(window, 'chrome', {

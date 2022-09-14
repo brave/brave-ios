@@ -9,6 +9,6 @@
 // required for user scripts injected into all frames.
 window.__firefox__.includeOnce("PrintHandler", function($) {
   window.print = $(function() {
-    webkit.messageHandlers.printHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN});
+    $.postNativeMessage('printHandler', {"securitytoken": SECURITY_TOKEN});
   });
 });

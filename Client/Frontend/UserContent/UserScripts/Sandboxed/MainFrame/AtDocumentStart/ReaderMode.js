@@ -29,7 +29,7 @@ function checkReadability() {
   setTimeout(function() {
     if (document.location.href.match(readerModeURL)) {
       debug({Type: "ReaderModeStateChange", Value: "Active"});
-      webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Active"}});
+      webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Active"}});
       return;
     }
 
@@ -38,8 +38,8 @@ function checkReadability() {
       // back/forward: the page will be cached and the result will still be there.
       if (readabilityResult && readabilityResult.content) {
         debug({Type: "ReaderModeStateChange", Value: "Available"});
-        webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Available"}});
-        webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderContentParsed", Value: readabilityResult}});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Available"}});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderContentParsed", Value: readabilityResult}});
         return;
       }
 
@@ -61,7 +61,7 @@ function checkReadability() {
       // element. This causes the WKWebView content process to crash (Bug 1489543).
       if (docStr.indexOf("<frameset ") > -1) {
         debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
-        webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
         return;
       }
 
@@ -71,18 +71,18 @@ function checkReadability() {
 
       if (!readabilityResult) {
         debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
-        webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
+        webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
         return;
       }
 
       debug({Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"});
-      webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"}});
-      webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderContentParsed", Value: readabilityResult}});
+      webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: readabilityResult !== null ? "Available" : "Unavailable"}});
+      webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderContentParsed", Value: readabilityResult}});
       return;
     }
 
     debug({Type: "ReaderModeStateChange", Value: "Unavailable"});
-    webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
+    webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderModeStateChange", Value: "Unavailable"}});
   }, 100);
 }
 
@@ -224,7 +224,7 @@ window.addEventListener("pageshow", (function(){
   let pageShow = function(event) {
     // If this is an about:reader page that we are showing, fire an event to the native code
     if (document.location.href.match(readerModeURL)) {
-      webkit.messageHandlers.readerModeMessageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderPageEvent", Value: "PageShow"}});
+      webkit.messageHandlers.readerModeMessageHandler.postMessage({"securitytoken": SECURITY_TOKEN, "data": {Type: "ReaderPageEvent", Value: "PageShow"}});
     }
   }
 

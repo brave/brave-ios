@@ -12,7 +12,7 @@
 
     function install() {
       function sendMessage(playing) {
-        webkit.messageHandlers.adsMediaReporting.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {playing}});
+        webkit.messageHandlers.adsMediaReporting.postMessage({"securitytoken": SECURITY_TOKEN, "data": {playing}});
       }
 
       function checkVideoNode(node) {

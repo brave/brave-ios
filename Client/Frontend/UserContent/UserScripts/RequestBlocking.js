@@ -6,17 +6,17 @@
 "use strict";
 
 window.__firefox__.execute(function($) {
-  const messageHandler = webkit.messageHandlers.$<message_handler>;
+  const messageHandler = '$<message_handler>';
 
   const sendMessage = $((resourceURL) => {
-    return messageHandler.postNativeMessage({
+    return $.postNativeMessage(messageHandler, {
       securityToken: SECURITY_TOKEN,
       data: {
         resourceURL: resourceURL.href,
         sourceURL: window.location.href,
         resourceType: 'xmlhttprequest'
       }
-    })
+    });
   });
   
   const { fetch: originalFetch } = window

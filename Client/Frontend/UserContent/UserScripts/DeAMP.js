@@ -6,7 +6,7 @@
 "use strict";
 
 window.__firefox__.execute("DeAMP", function($) {
-  const messageHandler = webkit.messageHandlers.$<message_handler>;
+  const messageHandler = '$<message_handler>';
   const W = window;
   const D = W.document;
   
@@ -14,7 +14,7 @@ window.__firefox__.execute("DeAMP", function($) {
   let intervalId = 0;
   
   const sendMessage = $((destURL) => {
-    return messageHandler.postMessage({
+    return $.postNativeMessage(messageHandler, {
       securityToken: SECURITY_TOKEN,
       destURL: destURL.href
     });
