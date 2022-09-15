@@ -5,26 +5,7 @@
 
 (function($Object) {
   if (window.isSecureContext) {
-    function post(method, payload) {
-      return new Promise((resolve, reject) => {
-        webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "method": method,
-          "args": JSON.stringify(payload)
-        })
-        .then(resolve, (errorJSON) => {
-          /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
-          const errorJSONString = new String(errorJSON);
-          const errorJSONStringSliced = errorJSONString.slice(errorJSONString.indexOf('{'));
-          try {
-            reject(JSON.parse(errorJSONStringSliced))
-          } catch(e) {
-            reject(errorJSON)
-          }
-        })
-      })
-    }
-    function postPublicKey(method, payload) {
+    function post(method, payload, completion) {
       return new Promise((resolve, reject) => {
         webkit.messageHandlers.$<handler>.postMessage({
           "securitytoken": "$<security_token>",
@@ -32,12 +13,12 @@
           "args": JSON.stringify(payload)
         })
         .then(
-            (publicKey) => {
-              /* Convert `publicKey` to `solanaWeb3.PublicKey`
-               & wrap as {publicKey: solanaWeb3.PublicKey} for success response */
-              const result = new Object();
-              result.publicKey = window._brave_solana.createPublickey(publicKey);
-              resolve(result)
+            (result) => {
+              if (completion == undefined) {
+                resolve(result);
+              } else {
+                completion(result, resolve);
+              }
             },
             (errorJSON) => {
               /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
@@ -52,88 +33,10 @@
           )
       })
     }
-    function postPubkeySignature(method, payload) {
-      return new Promise((resolve, reject) => {
-        webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "method": method,
-          "args": JSON.stringify(payload)
-        })
-        .then(
-            (dict) => {
-              const parsed = JSON.parse(dict);
-              const publicKey = parsed["publicKey"];
-              const signature = parsed["signature"];
-              const result = new Object();
-              result.publicKey = window._brave_solana.createPublickey(publicKey);
-              result.signature = new Uint8Array(signature);
-              resolve(result)
-            },
-            (errorJSON) => {
-              /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
-              const errorJSONString = new String(errorJSON);
-              const errorJSONStringSliced = errorJSONString.slice(errorJSONString.indexOf('{'));
-              try {
-                reject(JSON.parse(errorJSONStringSliced))
-              } catch(e) {
-                reject(errorJSON)
-              }
-            }
-          )
-      })
-    }
-    function postTransaction(method, payload) {
-      return new Promise((resolve, reject) => {
-        webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "method": method,
-          "args": JSON.stringify(payload)
-        })
-        .then(
-            (serializedTx) => {
-              /* Convert `serializedTx` to `solanaWeb3.Transaction` */
-              const result = window._brave_solana.createTransaction(serializedTx);
-              resolve(result)
-            },
-            (errorJSON) => {
-              /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
-              const errorJSONString = new String(errorJSON);
-              const errorJSONStringSliced = errorJSONString.slice(errorJSONString.indexOf('{'));
-              try {
-                reject(JSON.parse(errorJSONStringSliced))
-              } catch(e) {
-                reject(errorJSON)
-              }
-            }
-          )
-      })
-    }
-    function postTransactions(method, payload) {
-      return new Promise((resolve, reject) => {
-        webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "method": method,
-          "args": JSON.stringify(payload)
-        })
-        .then(
-            (serializedTxs) => {
-              /* Convert `serializedTxs` to array of `solanaWeb3.Transaction` */
-              const result = serializedTxs.map(window._brave_solana.createTransaction);
-              resolve(result)
-            },
-            (errorJSON) => {
-              /* remove `Error: ` prefix. errorJSON=`Error: {code: 1, errorMessage: "Internal error"}` */
-              const errorJSONString = new String(errorJSON);
-              const errorJSONStringSliced = errorJSONString.slice(errorJSONString.indexOf('{'));
-              try {
-                reject(JSON.parse(errorJSONStringSliced))
-              } catch(e) {
-                reject(errorJSON)
-              }
-            }
-          )
-      })
-    }
+    /* <solanaWeb3.Transaction> ->
+      {transaction: <solanaWeb3.Transaction>,
+       serializedMessage: <base58 encoded string>,
+       signatures: [{publicKey: <base58 encoded string>, signature: <Buffer>}]} */
     function convertTransaction(transaction) {
       const serializedMessage = transaction.serializeMessage();
       const signatures = transaction.signatures;
@@ -159,7 +62,13 @@
         publicKey: null,
         /* Methods */
         connect: function(payload) { /* -> {publicKey: solanaWeb3.PublicKey} */
-          return postPublicKey('connect', payload)
+          function completion(publicKey, resolve) {
+            /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
+            const result = new Object();
+            result.publicKey = window._brave_solana.createPublickey(publicKey);
+            resolve(result);
+          }
+          return post('connect', payload, completion)
         },
         disconnect: function(payload) { /* -> Promise<{}> */
           return post('disconnect', payload)
@@ -170,23 +79,50 @@
           return post('signAndSendTransaction', object)
         },
         signMessage: function(...payload) { /* -> Promise{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}> */
-          return postPubkeySignature('signMessage', payload)
+          function completion(result, resolve) {
+            /* convert `{publicKey: <base58 encoded string>, signature: <[UInt8]>}}` ->
+             `{publicKey: <solanaWeb3.PublicKey>, signature: <Uint8Array>}` */
+            const parsed = JSON.parse(result);
+            const publicKey = parsed["publicKey"]; /* base58 encoded pubkey */
+            const signature = parsed["signature"]; /* array of uint8 */
+            const obj = new Object();
+            obj.publicKey = window._brave_solana.createPublickey(publicKey);
+            obj.signature = new Uint8Array(signature);
+            resolve(obj);
+          }
+          return post('signMessage', payload, completion)
         },
         request: function(args) /* -> Promise<unknown> */  {
           if (args["method"] == 'connect') {
-            return postPublicKey('request', args)
+            function completion(publicKey, resolve) {
+              /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
+              const result = new Object();
+              result.publicKey = window._brave_solana.createPublickey(publicKey);
+              resolve(result);
+            }
+            return post('request', args, completion)
           }
           return post('request', args)
         },
         /* Deprecated */
         signTransaction: function(transaction) { /* -> Promise<solanaWeb3.Transaction> */
           const object = convertTransaction(transaction);
-          return postTransaction('signTransaction', object)
+          function completion(serializedTx, resolve) {
+            /* Convert `<[UInt8]>` -> `solanaWeb3.Transaction` */
+            const result = window._brave_solana.createTransaction(serializedTx);
+            resolve(result);
+          }
+          return post('signTransaction', object, completion)
         },
         /* Deprecated */
         signAllTransactions: function(transactions) { /* -> Promise<[solanaWeb3.Transaction]> */
           const objects = transactions.map(convertTransaction);
-          return postTransactions('signAllTransactions', objects)
+          function completion(serializedTxs, resolve) {
+            /* Convert `<[[UInt8]]>` -> `[<solanaWeb3.Transaction>]` */
+            const result = serializedTxs.map(window._brave_solana.createTransaction);
+            resolve(result);
+          }
+          return post('signAllTransactions', objects, completion)
         },
       }
     }
