@@ -124,7 +124,7 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
-        guard let encodedResult = JSONSerialization.jsObject(withNative: result) else {
+        guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
           replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
           return
         }
@@ -192,7 +192,7 @@ class SolanaProviderHelper: TabContentScript {
           //                            signature: <base58 encoded string>[]}
           // - signMessage => { publicKey: <base58 encoded string>,
           //                    signature: <base58 encoded string>}
-          guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonString else {
+          guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
             replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
             return
           }
