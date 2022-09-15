@@ -14,23 +14,23 @@ window.__firefox__.includeOnce("BraveSkusHelper", function() {
     window.chrome = {};
   }
 
-Object.defineProperty(window.chrome, 'braveSkus', {
-enumerable: false,
-configurable: false,
-writable: false,
-    value: {
-    refresh_order(orderId) {
-        return sendMessage(1, { orderId });
-    },
-    fetch_order_credentials(orderId) {
-        return sendMessage(2, { orderId });
-    },
-    prepare_credentials_presentation(domain, path) {
-        return sendMessage(3, { domain, path });
-    },
-    credential_summary(domain) {
-        return sendMessage(4, { domain });
-    }
-}
-});
+  Object.defineProperty(window.chrome, 'braveSkus', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+      value: {
+        refresh_order(orderId) {
+          return sendMessage(1, { orderId });
+        },
+        fetch_order_credentials(orderId) {
+          return sendMessage(2, { orderId });
+        },
+        prepare_credentials_presentation(domain, path) {
+          return sendMessage(3, { domain, path });
+        },
+        credential_summary(domain) {
+          return sendMessage(4, { domain });
+        }
+      }
+  });
 });
