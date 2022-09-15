@@ -29,6 +29,7 @@ struct FilterListsView: View {
         }
       } header: {
         Text(Strings.filterListsDescription)
+          .textCase(.none)
       }
       
     }.navigationTitle(Strings.filterLists)
