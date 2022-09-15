@@ -224,7 +224,7 @@ extension Tab: BraveWalletProviderDelegate {
       }
       
       // add permission request to the queue
-      _ = permissionRequestManager.beginRequest(for: origin, coinType: coinType, providerHandler: completion, completion: { response in
+      let request = permissionRequestManager.beginRequest(for: origin, coinType: coinType, providerHandler: completion, completion: { response in
         switch response {
         case .granted(let accounts):
           completion(.none, accounts)
@@ -234,6 +234,7 @@ extension Tab: BraveWalletProviderDelegate {
         self.tabDelegate?.updateURLBarWalletButton()
       })
 
+      self.tabDelegate?.updateWebpagePermissionRequest(request)
       self.tabDelegate?.showWalletNotification(self, origin: origin)
     }
   }
@@ -306,7 +307,11 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
-    // TODO: Issue #6046 - Show account creation for given coin type
+    let origin = getOrigin()
+    // store the account creation request
+    WalletProviderAccountCreationRequestManager.shared.addRequest(or: origin, coinType: type)
+    // show wallet notification
+    self.tabDelegate?.showWalletNotification(self, origin: origin)
   }
   
   func isSolanaAccountConnected(_ account: String) -> Bool {
