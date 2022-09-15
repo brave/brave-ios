@@ -11,6 +11,9 @@ struct FilterList: Decodable, Identifiable {
     case uuid, title, componentId, description = "desc", urlString = "url"
   }
   
+  public static let mobileAnnoyancesComponentID = "ldbgldhcahahpffloggbbmjllggnkenk"
+  public static let mobileAnnoyancesUUID = "2F3DCE16-A19A-493C-A88F-2E110FBD37D6"
+  
   let uuid: String
   let title: String
   let description: String

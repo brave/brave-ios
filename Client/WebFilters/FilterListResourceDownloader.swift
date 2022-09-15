@@ -217,6 +217,18 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
+  /// Enables a filter list for the given uuid. Returns true if the filter list exists or not.
+  @discardableResult
+  public func enableFilterList(forFilterListUUID uuid: String, isEnabled: Bool) -> Bool {
+    // Enable the setting
+    if let index = filterLists.firstIndex(where: { $0.uuid == uuid }) {
+      filterLists[index].isEnabled = isEnabled
+      return true
+    } else {
+      return false
+    }
+  }
+  
   /// Tells us if the filter list is enabled for the given `UUID`
   @MainActor public func isEnabled(filterListUUID uuid: String) -> Bool {
     return settingsManager.isEnabled(forUUID: uuid)
@@ -265,11 +277,22 @@ public class FilterListResourceDownloader: ObservableObject {
     )
   }
   
+  /// This method allows us to enable selected lists by default for new users.
+  /// Make sure you use componentID to identify the filter list, as `uuid` will be deprecated in the future.
+  private func newFilterListEnabledOverride(for componentId: String) -> Bool? {
+    let componentIDsToOverride = [FilterList.mobileAnnoyancesComponentID]
+    
+    return componentIDsToOverride.contains(componentId) ? true : nil
+  }
+  
   /// Load filter lists from the ad block service
   private func loadFilterLists(from regionalFilterLists: [AdblockFilterList], filterListSettings: [FilterListSetting]) -> [FilterList] {
     return regionalFilterLists.map { adBlockFilterList in
       let setting = filterListSettings.first(where: { $0.uuid == adBlockFilterList.uuid })
-      return FilterList(from: adBlockFilterList, isEnabled: setting?.isEnabled ?? false)
+      return FilterList(from: adBlockFilterList,
+                        isEnabled: setting?.isEnabled
+                        ?? newFilterListEnabledOverride(for: adBlockFilterList.componentId)
+                        ?? false)
     }
   }
   

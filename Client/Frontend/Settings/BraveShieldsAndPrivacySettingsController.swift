@@ -110,7 +110,6 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             }
           }),
         .boolRow(title: Strings.fingerprintingProtection, detailText: Strings.fingerprintingProtectionDescription, option: Preferences.Shields.fingerprintingProtection),
-        
         Row(
           text: Strings.contentFiltering,
           detailText: Strings.contentFilteringDescription,
@@ -119,12 +118,27 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             self?.navigationController?.pushViewController(controller, animated: true)
           },
           accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self, uuid: "content-filtering"
-        )
+        ),
       ],
       footer: .title(Strings.shieldsDefaultsFooter)
     )
     return shields
   }()
+  
+  private var blockMobileAnnoyancesRow: Row {
+    let uuid = FilterList.mobileAnnoyancesUUID
+    let filterListDownloader = FilterListResourceDownloader.shared
+    
+    return Row(
+      text: Strings.blockMobileAnnoyances,
+      accessory:
+          .view(SwitchAccessoryView(
+            initialValue: filterListDownloader.isEnabled(filterListUUID: uuid),
+            valueChange: { value in
+              FilterListResourceDownloader.shared.enableFilterList(forFilterListUUID: uuid, isEnabled: value)
+            })), cellClass: MultilineSubtitleCell.self, uuid: "content-filtering"
+    )
+  }
 
   private lazy var toggles: [Bool] = {
     let savedToggles = Preferences.Privacy.clearPrivateDataToggles.value
@@ -221,6 +235,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
           }
         ),
         .boolRow(title: Strings.blockPopups, option: Preferences.General.blockPopups),
+        blockMobileAnnoyancesRow,
         .boolRow(title: Strings.followUniversalLinks, option: Preferences.General.followUniversalLinks),
       ]
     )
