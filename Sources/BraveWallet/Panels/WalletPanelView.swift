@@ -199,17 +199,26 @@ struct WalletPanelView: View {
       }))
     } label: {
       HStack {
-        if keyringStore.selectedAccount.coin == .sol {
-          Circle()
-            .strokeBorder(.white, lineWidth: 1)
-            .background(
-              Circle()
-                .foregroundColor(isConnected ? .green : .red)
-            )
-            .frame(width: 12, height: 12)
-          Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelDisconnected)
-            .fontWeight(.bold)
-            .lineLimit(1)
+        if WalletDebugFlags.isSolanaDappsEnabled {
+          if keyringStore.selectedAccount.coin == .sol {
+            Circle()
+              .strokeBorder(.white, lineWidth: 1)
+              .background(
+                Circle()
+                  .foregroundColor(isConnected ? .green : .red)
+              )
+              .frame(width: 12, height: 12)
+            Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelDisconnected)
+              .fontWeight(.bold)
+              .lineLimit(1)
+          } else {
+            if isConnected {
+              Image(systemName: "checkmark")
+            }
+            Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
+              .fontWeight(.bold)
+              .lineLimit(1)
+          }
         } else {
           if isConnected {
             Image(systemName: "checkmark")
@@ -279,6 +288,7 @@ struct WalletPanelView: View {
   
   /// A boolean value indicates to hide or unhide `Connect` button
   private var isConnectHidden: Bool {
+    guard WalletDebugFlags.isSolanaDappsEnabled else { return false }
     let account = keyringStore.selectedAccount
     if account.coin == .sol {
       for domain in Domain.allDomainsWithWalletPermissions(for: .sol) {
