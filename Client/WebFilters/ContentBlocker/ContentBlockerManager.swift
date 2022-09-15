@@ -4,14 +4,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import WebKit
+@preconcurrency import WebKit.WKContentRuleListStore
 import Data
 import Shared
 import BraveShared
 import os.log
 
+// TODO: Convert this class to `actor`(#6018)
 /// A class responsible for compiling content blocker lists
-final public class ContentBlockerManager {
+final public class ContentBlockerManager: Sendable {
   // TODO: Use a proper logger system once implemented and adblock files are moved to their own module(#5928).
   /// Logger to use for debugging.
   static let log = Logger(subsystem: "com.brave.ios", category: "adblock")
@@ -23,7 +24,7 @@ final public class ContentBlockerManager {
   }
   
   /// An object representing the source of a block-list
-  public enum BlocklistSourceType: Hashable {
+  public enum BlocklistSourceType: Hashable, Sendable {
     /// A block list that is bundled with this application
     case bundled
     /// A block list that is downloaded from a server
