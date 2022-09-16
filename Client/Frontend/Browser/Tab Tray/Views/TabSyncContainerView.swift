@@ -87,7 +87,7 @@ extension TabTrayController {
       case .openTabsDisabled:
         let disabledOpenTabsEmptyStateView = EmptyStateOverlayView(
           title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
-          description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
+          description: Strings.OpenTabs.enableOpenTabsPlaceHolderViewDescription,
           icon: UIImage(named: "sync-settings", in: .current, compatibleWith: nil),
           buttonText: Strings.OpenTabs.tabSyncEnableButtonTitle,
           action: { [weak self] in
@@ -99,9 +99,9 @@ extension TabTrayController {
       default:
         let noSessionsEmptyStateView = EmptyStateOverlayView(
           title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
-          description: "There are no active sessions to show from your other devices.",
+          description: Strings.OpenTabs.noSyncSessionPlaceHolderViewDescription,
           icon: UIImage(named: "sync-settings", in: .current, compatibleWith: nil),
-          buttonText: "Show Sync Settings",
+          buttonText: Strings.OpenTabs.showSettingsSyncButtonTitle,
           action: { [weak self] in
             self?.actionHandler?(.noSyncedSessions)
           },
