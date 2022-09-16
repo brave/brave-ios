@@ -20,7 +20,7 @@ extension TabTrayController {
     
     private(set) var tableView = UITableView(frame: .zero, style: .insetGrouped)
 
-    var actionHandler: ((SyncActionState) -> Void)?
+    var actionHandler: ((SyncStatusState) -> Void)?
     
     private var noSyncTabsOverlayView = EmptyStateOverlayView()
     
@@ -71,8 +71,8 @@ extension TabTrayController {
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError() }
     
-    private func createNewEmptyStateView(for actionType: SyncActionState) -> EmptyStateOverlayView {
-      switch actionType {
+    private func createNewEmptyStateView(for state: SyncStatusState) -> EmptyStateOverlayView {
+      switch state {
       case .noSyncChain:
         let noSyncChainEmptyStateView = EmptyStateOverlayView(
           title: Strings.OpenTabs.noSyncSessionPlaceHolderViewTitle,
@@ -114,12 +114,12 @@ extension TabTrayController {
     /// Update visibility of view shown when no synced session exists
     /// This view contains information about  how to join sync chain and enable open tabs
     /// - Parameter isHidden: Boolean to set isHidden
-    func updateNoSyncPanelState(actionType: SyncActionState) {
+    func updateSyncStatusPanel(for state: SyncStatusState) {
       noSyncTabsOverlayView.removeFromSuperview()
       
-      if actionType != .activeSessions {
+      if state != .activeSessions {
         noSyncTabsOverlayView.removeFromSuperview()
-        noSyncTabsOverlayView = createNewEmptyStateView(for: actionType)
+        noSyncTabsOverlayView = createNewEmptyStateView(for: state)
         
         if noSyncTabsOverlayView.superview == nil {
           addSubview(noSyncTabsOverlayView)

@@ -33,9 +33,9 @@ class TabTrayController: LoadingViewController {
     case sync
   }
   
-  // MARK: SyncActionState
+  // MARK: SyncStatusState
   
-  enum SyncActionState {
+  enum SyncStatusState {
     case noSyncChain
     case openTabsDisabled
     case noSyncedSessions
@@ -49,7 +49,7 @@ class TabTrayController: LoadingViewController {
   weak var delegate: TabTrayDelegate?
   weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
   
-  private var emptyPanelState: SyncActionState {
+  private var emptyPanelState: SyncStatusState {
     get {
       if Preferences.Chromium.syncEnabled.value {
         if !Preferences.Chromium.syncOpenTabsEnabled.value {
@@ -439,7 +439,7 @@ class TabTrayController: LoadingViewController {
     
     tabSyncView.do {
       $0.tableView.reloadData()
-      $0.updateNoSyncPanelState(actionType: emptyPanelState)
+      $0.updateSyncStatusPanel(for: emptyPanelState)
     }
     
     updateEmptyPanelState(isHidden: !(isTabTrayBeingSearched && sessionList.isEmpty && !(query?.isEmpty ?? true)))
@@ -558,7 +558,7 @@ class TabTrayController: LoadingViewController {
     applySnapshot()
   }
   
-  private func presentSyncSettings(status: SyncActionState) {
+  private func presentSyncSettings(status: SyncStatusState) {
     switch status {
       case .noSyncChain:
         openInsideSettingsNavigation(
