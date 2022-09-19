@@ -403,8 +403,13 @@ extension Tab: BraveWalletEventsListener {
 
 extension Tab: BraveWalletSolanaEventsListener {
   func accountChangedEvent(_ account: String?) {
-    emitSolanaEvent(.solanaAccountChanged(account: account ?? ""))
-    updateSolanaProperties()
+    Task { @MainActor in
+      if let webView = webView, let account = account {
+        let script = "window.solana.emit('accountChanged', _brave_solana.createPublickey('\(account)'))"
+        await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
+      }
+      updateSolanaProperties()
+    }
   }
 
   func emitSolanaEvent(_ event: Web3ProviderEvent) {
