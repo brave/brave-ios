@@ -114,10 +114,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.accessibilityLabel = Strings.quickActionScanQRCode
   }
 
-  let line = UIView().then {
-    $0.backgroundColor = .urlBarSeparator
-  }
-
   let tabsButton = TabsButton()
 
   fileprivate lazy var progressBar: GradientProgressBar = {
@@ -216,7 +212,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
     locationContainer.addSubview(locationView)
 
-    [scrollToTopButton, line, tabsButton, progressBar, cancelButton].forEach(addSubview(_:))
+    [scrollToTopButton, tabsButton, progressBar, cancelButton].forEach(addSubview(_:))
     addSubview(mainStackView)
 
     helper = ToolbarHelper(toolbar: self)
@@ -322,11 +318,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     mainStackView.snp.remakeConstraints { make in
       make.top.bottom.equalTo(self)
       make.leading.trailing.equalTo(self.safeAreaLayoutGuide)
-    }
-
-    line.snp.makeConstraints { make in
-      make.bottom.leading.trailing.equalTo(self)
-      make.height.equalTo(1.0 / UIScreen.main.scale)
     }
 
     scrollToTopButton.snp.makeConstraints { make in
