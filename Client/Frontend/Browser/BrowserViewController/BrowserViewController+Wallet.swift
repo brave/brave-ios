@@ -92,9 +92,8 @@ extension BrowserViewController {
     return walletStore
   }
   
-  func presentWalletPanel(tab: Tab) {
+  func presentWalletPanel(from origin: URLOrigin) {
     guard let walletStore = self.walletStore ?? newWalletStore() else { return }
-    let origin = tab.getOrigin()
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
       origin: origin,
