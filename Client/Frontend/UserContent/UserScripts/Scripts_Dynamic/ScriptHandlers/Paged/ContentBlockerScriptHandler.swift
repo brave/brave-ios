@@ -22,7 +22,7 @@ extension ContentBlockerHelper: TabContentScript {
     let data: ContentblockerDTOData
   }
   
-  static let scriptName = "ContentBlockerScript"
+  static let scriptName = "trackingProtectionStats"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
   static let scriptSandbox: WKContentWorld = .page

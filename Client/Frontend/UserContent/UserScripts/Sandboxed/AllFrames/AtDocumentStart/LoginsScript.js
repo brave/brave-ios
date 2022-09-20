@@ -62,7 +62,7 @@ window.__firefox__.includeOnce("LoginsScript", function() {
     _sendRequest: function(requestData, messageData) {
       var requestId = this._getRandomId();
       messageData.requestId = requestId;
-      webkit.messageHandlers.loginsManagerMessageHandler.postMessage({"securityToken": SECURITY_TOKEN, "data": messageData});
+      webkit.messageHandlers.loginsScriptMessageHandler.postMessage({"securityToken": SECURITY_TOKEN, "data": messageData});
 
       var self = this;
       return new Promise(function(resolve, reject) {
@@ -391,7 +391,7 @@ window.__firefox__.includeOnce("LoginsScript", function() {
       // Make sure to pass the opener's top in case it was in a frame.
       var opener = win.opener ? win.opener.top : null;
 
-      webkit.messageHandlers.loginsManagerMessageHandler.postMessage({"securityToken": SECURITY_TOKEN, "data":{
+      webkit.messageHandlers.loginsScriptMessageHandler.postMessage({"securityToken": SECURITY_TOKEN, "data":{
         type: "submit",
         hostname: hostname,
         username: mockUsername.value,

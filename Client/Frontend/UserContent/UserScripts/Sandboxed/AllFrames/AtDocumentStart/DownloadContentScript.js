@@ -39,7 +39,7 @@ Object.defineProperty(window.__firefox__, "download", {
         var blob = this.response;
 
         blobToBase64String(blob, function(base64String) {
-          webkit.messageHandlers.downloadManager.postMessage({
+          webkit.messageHandlers.downloadContentScript.postMessage({
             url: url,
             mimeType: blob.type,
             size: blob.size,

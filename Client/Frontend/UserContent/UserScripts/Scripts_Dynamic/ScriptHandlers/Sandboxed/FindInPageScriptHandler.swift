@@ -23,7 +23,7 @@ class FindInPageScriptHandler: TabContentScript {
 
   static let scriptName = "FindInPageScript"
   static let scriptId = UUID().uuidString
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let messageHandlerName = "findInPageHandler"
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
 

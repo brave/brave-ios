@@ -12,13 +12,13 @@ window.__firefox__.includeOnce("RewardsReporting", function($) {
     'https://vimeo.com',
   ]
 
-  if (mediaPublisherOrigins.includes(document.location.origin) && webkit.messageHandlers.rewardsReporting) {
+  if (mediaPublisherOrigins.includes(document.location.origin) && webkit.messageHandlers.$<message_handler>) {
     install();
   }
   
   function install() {
     let sendMessage = $(function(method, url, data, referrerUrl) {
-      $.postNativeMessage('rewardsReporting', {"securityToken": SECURITY_TOKEN, "data": {
+      $.postNativeMessage('$<message_handler>', {"securityToken": SECURITY_TOKEN, "data": {
         method: method === undefined ? "GET" : method,
         url: url,
         data: (data === undefined || data instanceof Blob) ? null : data,

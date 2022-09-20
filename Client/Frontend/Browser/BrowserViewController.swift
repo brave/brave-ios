@@ -2450,6 +2450,7 @@ extension BrowserViewController: TabDelegate {
       BraveTalkScriptHandler(tab: tab, rewards: rewards),
       BraveSkusScriptHandler(tab: tab),
       ResourceDownloadScriptHandler(tab: tab),
+      DownloadContentScriptHandler(browserController: self, tab: tab),
       WindowRenderScriptHandler(tab: tab),
       PlaylistScriptHandler(tab: tab),
       PlaylistFolderSharingScriptHandler(tab: tab),

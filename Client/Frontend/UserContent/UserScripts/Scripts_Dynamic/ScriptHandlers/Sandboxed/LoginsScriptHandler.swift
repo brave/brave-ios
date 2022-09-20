@@ -34,7 +34,7 @@ class LoginsScriptHandler: TabContentScript {
   static let scriptName = "LoginsScript"
   static let scriptId = UUID().uuidString
   static let scriptSandbox: WKContentWorld = .defaultClient
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let messageHandlerName = "loginsScriptMessageHandler"
   static let userScript: WKUserScript? = nil
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {

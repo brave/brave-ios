@@ -37,7 +37,7 @@ public class DeAmpScriptHandler: TabContentScript {
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     if !verifyMessage(message: message) {
-      assertionFailure("Invalid security token. Fix the `RequestBlocking.js` script")
+      assertionFailure("Missing required security token.")
       replyHandler(false, nil)
       return
     }

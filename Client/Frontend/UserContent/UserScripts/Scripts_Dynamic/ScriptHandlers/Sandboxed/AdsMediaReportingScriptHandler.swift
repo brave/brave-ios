@@ -20,14 +20,14 @@ class AdsMediaReportingScriptHandler: TabContentScript {
 
   static let scriptName = "AdsMediaReportingScript"
   static let scriptId = UUID().uuidString
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let messageHandlerName = "adsMediaReporting"
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
     
-    if !verifyMessage(message: message) {
+    if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
       return
     }

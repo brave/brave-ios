@@ -18,11 +18,11 @@ class UserScriptManager {
   static let securityToken = ScriptLoader.uniqueID
   
   private let alwaysEnabledScripts: [ScriptType] = [
+    .rewardsReporting,
     .playlist,
     .resourceDownloader,
     .windowRenderHelper,
-    .readyStateHelper,
-    .ethereumProvider
+    .readyStateHelper
   ]
   
   /// Scripts that are loaded after `staticScripts`
@@ -82,6 +82,7 @@ class UserScriptManager {
   
   enum ScriptType: String, CaseIterable {
     case cookieBlocking
+    case rewardsReporting
     case mediaBackgroundPlay
     case playlistMediaSource
     case playlist
@@ -102,13 +103,14 @@ class UserScriptManager {
       case .nightMode: return NightModeScriptHandler.userScript
       case .deAmp: return DeAmpScriptHandler.userScript
       case .requestBlocking: return RequestBlockingContentScriptHandler.userScript
+      case .ethereumProvider: return EthereumProviderScriptHandler.userScript
         
       // Always enabled scripts
+      case .rewardsReporting: return RewardsReportingScriptHandler.userScript
       case .playlist: return PlaylistScriptHandler.userScript
       case .resourceDownloader: return ResourceDownloadScriptHandler.userScript
       case .windowRenderHelper: return WindowRenderScriptHandler.userScript
       case .readyStateHelper: return ReadyStateScriptHandler.userScript
-      case .ethereumProvider: return EthereumProviderScriptHandler.userScript
       }
     }
     
