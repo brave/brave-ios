@@ -308,7 +308,9 @@ extension Tab: BraveWalletProviderDelegate {
   
   func clearSolanaConnectedAccounts() {
     tabDappStore.solConnectedAddresses = .init()
-    updateSolanaProperties()
+    Task { @MainActor in
+      await updateSolanaProperties()
+    }
   }
 }
 
@@ -406,7 +408,7 @@ extension Tab: BraveWalletSolanaEventsListener {
         let script = "window.solana.emit('accountChanged', _brave_solana.createPublickey('\(account)'))"
         await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
       }
-      updateSolanaProperties()
+      await updateSolanaProperties()
     }
   }
 
@@ -428,30 +430,26 @@ extension Tab: BraveWalletSolanaEventsListener {
     }
   }
 
-  func updateSolanaProperties() {
-    guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
+  @MainActor func updateSolanaProperties() async {
+    guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
+          let webView = webView,
+          let provider = walletSolProvider else {
       return
     }
-    Task { @MainActor in
-      guard let webView = webView,
-            let provider = walletSolProvider else {
-        return
-      }
-      let isConnected = await provider.isConnected()
+    let isConnected = await provider.isConnected()
+    await webView.evaluateSafeJavaScript(
+      functionName: "window.solana.isConnected = \(isConnected)",
+      contentWorld: .page,
+      asFunction: false
+    )
+    // publicKey
+    if let keyringService = walletKeyringService,
+       let publicKey = await keyringService.selectedAccount(.sol) {
       await webView.evaluateSafeJavaScript(
-        functionName: "window.solana.isConnected = \(isConnected)",
+        functionName: "if (window._brave_solana.createPublickey) { window.solana.publicKey = _brave_solana.createPublickey('\(publicKey)'); }",
         contentWorld: .page,
         asFunction: false
       )
-      // publicKey
-      if let keyringService = walletKeyringService,
-         let publicKey = await keyringService.selectedAccount(.sol) {
-        await webView.evaluateSafeJavaScript(
-          functionName: "window.solana.publicKey = _brave_solana.createPublickey('\(publicKey)');",
-          contentWorld: .page,
-          asFunction: false
-        )
-      }
     }
   }
 }

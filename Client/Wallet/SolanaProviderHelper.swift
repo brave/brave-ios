@@ -98,8 +98,8 @@ class SolanaProviderHelper: TabContentScript {
           replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
+        await tab.updateSolanaProperties()
         replyHandler(publicKey, nil)
-        tab.updateSolanaProperties()
         if let webView = tab.webView {
           let script = "window.solana.emit('connect', _brave_solana.createPublickey('\(publicKey)'))"
           await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
@@ -171,8 +171,8 @@ class SolanaProviderHelper: TabContentScript {
            let publicKey = result["publicKey"]?.stringValue {
           // need to inject `_brave_solana.createPublickey` function before replying w/ success.
           await tab.userScriptManager?.injectSolanaInternalScript()
+          await tab.updateSolanaProperties()
           replyHandler(publicKey, nil)
-          tab.updateSolanaProperties()
           if let webView = tab.webView {
             let script = "window.solana.emit('connect', _brave_solana.createPublickey('\(publicKey)'))"
             await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
