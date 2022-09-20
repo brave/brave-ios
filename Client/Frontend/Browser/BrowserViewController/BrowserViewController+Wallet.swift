@@ -294,7 +294,6 @@ extension Tab: BraveWalletProviderDelegate {
     // TODO: can be called when Solana dapp tries to connect but user does not have Solana account
   }
   
-  
   func isSolanaAccountConnected(_ account: String) -> Bool {
     tabDappStore.solConnectedAddresses.contains(account)
   }
