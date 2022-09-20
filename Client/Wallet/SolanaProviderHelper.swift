@@ -91,13 +91,13 @@ class SolanaProviderHelper: TabContentScript {
         if let args = body.args {
           param = MojoBase.Value(jsonString: args)?.dictionaryValue
         }
+        // need to inject `_brave_solana.createPublickey` function
+        await tab.userScriptManager?.injectSolanaInternalScript()
         let (status, errorMessage, publicKey) = await provider.connect(param)
         guard status == .success else {
           replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
           return
         }
-        // need to inject `_brave_solana.createPublickey` function before replying w/ success.
-        await tab.userScriptManager?.injectSolanaInternalScript()
         replyHandler(publicKey, nil)
         tab.updateSolanaProperties()
         if let webView = tab.webView {

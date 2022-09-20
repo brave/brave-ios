@@ -449,7 +449,7 @@ extension Tab: BraveWalletSolanaEventsListener {
       if let keyringService = walletKeyringService,
          let publicKey = await keyringService.selectedAccount(.sol) {
         await webView.evaluateSafeJavaScript(
-          functionName: "window.solana.publicKey = window._brave_solana.createPublickey('\(publicKey)');",
+          functionName: "window.solana.publicKey = _brave_solana.createPublickey('\(publicKey)');",
           contentWorld: .page,
           asFunction: false
         )
