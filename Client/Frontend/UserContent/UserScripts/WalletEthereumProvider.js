@@ -7,9 +7,17 @@
   
 if (window.isSecureContext) {
   function post(method, payload) {
+    let postMessage = function(message) {
+      return webkit.messageHandlers.$<handler>.postNativeMessage(message);
+    }
+    
+    postMessage.toString = function() {
+      return "function() {\n\t[native code]\n}";
+    }
+    
     return new Promise((resolve, reject) => {
-      webkit.messageHandlers.$<handler>.postMessage({
-        "securitytoken": "$<security_token>",
+      postMessage({
+        "securitytoken": SECURITY_TOKEN,
         "method": method,
         "args": JSON.stringify(payload)
       })

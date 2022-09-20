@@ -24,9 +24,20 @@ class BraveTalkScriptHandler: TabContentScript {
     }
   }
 
-  static func name() -> String { "BraveTalkHelper" }
-
-  func scriptMessageHandlerName() -> String? { "BraveTalkHelper_\(UserScriptManager.messageHandlerTokenString)" }
+  static let scriptName = "BraveTalkHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(
     _ userContentController: WKUserContentController,

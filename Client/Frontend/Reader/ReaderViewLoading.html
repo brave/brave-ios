@@ -72,7 +72,7 @@
       request.open("GET", "/reader-mode/page-exists" + document.location.search, true);
       request.onload = function() {
         if (request.status == 200) {
-          webkit.messageHandlers.localRequestHelper.postMessage({"securitytoken": SECURITY_TOKEN, "type": "reload" });
+          webkit.messageHandlers.localRequestHelper.postNativeMessage({"securitytoken": SECURITY_TOKEN, "type": "reload" });
         } else {
           triggerCheck();
         }

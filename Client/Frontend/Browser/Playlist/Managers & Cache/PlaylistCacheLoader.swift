@@ -419,7 +419,7 @@ class PlaylistWebLoader: UIView {
     // This webView is invisible and we don't want any UI being handled.
     webView.uiDelegate = nil
     webView.navigationDelegate = self
-    tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), contentWorld: .page)
+    tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.scriptName, contentWorld: .page)
 
     if let script = playlistDetectorScript {
       // Do NOT inject the PlaylistHelper script!
@@ -456,13 +456,20 @@ class PlaylistWebLoader: UIView {
       self.webLoader = webLoader
     }
 
-    static func name() -> String {
-      return "PlaylistWebLoader"
-    }
-
-    func scriptMessageHandlerName() -> String? {
-      return "playlistCacheLoader_\(UserScriptManager.messageHandlerTokenString)"
-    }
+    static let scriptName = "PlaylistWebLoaderContentHelper"
+    static let scriptId = UUID().uuidString
+    static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+    static let userScript: WKUserScript? = {
+      guard var script = loadUserScript(named: scriptName) else {
+        return nil
+      }
+      return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                      securityToken: scriptId,
+                                                      script: script),
+                                 injectionTime: .atDocumentStart,
+                                 forMainFrameOnly: false,
+                                 in: .page)
+    }()
 
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
       defer { replyHandler(nil, nil) }

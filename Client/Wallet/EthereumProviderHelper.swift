@@ -27,13 +27,20 @@ class EthereumProviderHelper: TabContentScript {
     self.tab = tab
   }
   
-  static func name() -> String {
-    return "walletEthereumProvider"
-  }
-  
-  func scriptMessageHandlerName() -> String? {
-    return "walletEthereumProvider_\(UserScriptManager.messageHandlerTokenString)"
-  }
+  static let scriptName = "EthereumProviderHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
   
   static func shouldInjectWalletProvider(_ completion: @escaping (Bool) -> Void) {
     BraveWallet.KeyringServiceFactory.get(privateMode: false)?

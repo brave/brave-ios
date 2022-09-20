@@ -12,16 +12,23 @@ class CustomSearchHelper: TabContentScript {
     self.tab = tab
   }
 
-  func scriptMessageHandlerName() -> String? {
-    return "customSearchHelper"
-  }
+  static let scriptName = "CustomSearchHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     replyHandler(nil, nil)
     // We don't listen to messages because the BVC calls the searchHelper script by itself.
-  }
-
-  class func name() -> String {
-    return "CustomSearchHelper"
   }
 }

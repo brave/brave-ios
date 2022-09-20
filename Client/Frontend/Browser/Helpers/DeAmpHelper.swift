@@ -19,17 +19,20 @@ public class DeAmpHelper: TabContentScript {
     self.tab = tab
   }
   
-  static func name() -> String {
-    return "DeAmpHelper"
-  }
-  
-  static func scriptMessageHandlerName() -> String {
-    return ["deAmpHelper", UserScriptManager.messageHandlerTokenString].joined(separator: "_")
-  }
-  
-  func scriptMessageHandlerName() -> String? {
-    return Self.scriptMessageHandlerName()
-  }
+  static let scriptName = "DeAMP"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: true,
+                               in: .defaultClient)
+  }()
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     do {

@@ -5,7 +5,7 @@
 
 "use strict";
 
-(function(){
+(function() {
     const mediaPublisherOrigins = [
         'https://www.twitch.tv', 'https://m.twitch.tv', 'https://player.twitch.tv',
         'https://www.youtube.com', 'https://m.youtube.com',
@@ -18,7 +18,7 @@
     
     function install() {
         function sendMessage(method, url, data, referrerUrl) {
-            webkit.messageHandlers.rewardsReporting.postMessage({"securitytoken": SECURITY_TOKEN, "data": {
+            webkit.messageHandlers.rewardsReporting.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {
                 method: method === undefined ? "GET" : method,
                 url: url,
                 data: (data === undefined || data instanceof Blob) ? null : data,

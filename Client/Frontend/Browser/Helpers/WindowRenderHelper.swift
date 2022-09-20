@@ -3,37 +3,39 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
 import WebKit
-import Data
-import BraveShared
 
-class FingerprintingProtection: TabContentScript {
+class WindowRenderHelper: TabContentScript {
   fileprivate weak var tab: Tab?
 
-  init(tab: Tab) {
+  required init(tab: Tab) {
     self.tab = tab
   }
 
-  static let scriptName = "FingerprintingProtection"
+  static let scriptName = "WindowRenderHelper"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  private static let resizeWindowFunction = "\(scriptName)_\(uniqueID)"
+  
   static let userScript: WKUserScript? = {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+    return WKUserScript.create(source: secureScript(handlerNamesMap: ["$<windowRenderHelper>": resizeWindowFunction],
                                                     securityToken: scriptId,
                                                     script: script),
                                injectionTime: .atDocumentStart,
                                forMainFrameOnly: false,
-                               in: .page)
+                               in: .defaultClient)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    if let stats = self.tab?.contentBlocker.stats {
-      self.tab?.contentBlocker.stats = stats.adding(fingerprintingCount: 1)
-      BraveGlobalShieldStats.shared.fpProtection += 1
-    }
+    // Do nothing with the messages received.
+    // For now.. It's useful for debugging though.
+  }
+
+  static func executeScript(for tab: Tab) {
+    tab.webView?.evaluateSafeJavaScript(functionName: "\(resizeWindowFunction).resizeWindow", contentWorld: .defaultClient)
   }
 }

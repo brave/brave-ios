@@ -7,7 +7,7 @@
 
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
-window.__firefox__.includeOnce("FocusHelper", function() {
+(function() {
   const isButton = (element) => {
     if (element.nodeName !== "INPUT") {
       return false;
@@ -24,7 +24,7 @@ window.__firefox__.includeOnce("FocusHelper", function() {
     // We should also not fire for buttons..
     if (elementType === "INPUT" || elementType === "TEXTAREA" || event.target.isContentEditable) {
       if (!isButton(event.target)) {
-        webkit.messageHandlers.focusHelper.postMessage({"securitytoken": SECURITY_TOKEN, "data": {eventType, elementType}});
+        webkit.messageHandlers.focusHelper.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {eventType, elementType}});
       }
     }
   };
@@ -38,4 +38,4 @@ window.__firefox__.includeOnce("FocusHelper", function() {
   ["focus", "blur"].forEach((eventType) => {
     body.addEventListener(eventType, handler, options);
   });
-});
+})();

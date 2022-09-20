@@ -16,8 +16,15 @@ import BraveWallet
 private let log = Logger.browserLogger
 
 protocol TabContentScript {
-  static func name() -> String
-  func scriptMessageHandlerName() -> String?
+  static var scriptName: String { get }
+  static var scriptId: String { get }
+  static var messageHandlerName: String { get }
+  static var userScript: WKUserScript? { get }
+  static func loadUserScript(named: String) -> String?
+  
+  static func secureScript(handlerName: String, securityToken: String, script: String) -> String
+  static func secureScript(handlerNamesMap: [String: String], securityToken: String, script: String) -> String
+  
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void)
 }
 
@@ -331,7 +338,6 @@ class Tab: NSObject {
       self.userScriptManager = UserScriptManager(
         tab: self,
         isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value,
-        isPaymentRequestEnabled: webView.hasOnlySecureContent,
         isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
         isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
         isNightModeEnabled: Preferences.General.nightModeEnabled.value,
@@ -787,19 +793,17 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandlerWithReply
 
   func uninstall(from tab: Tab) {
     helpers.forEach {
-      if let name = $0.value.scriptMessageHandlerName() {
-        tab.webView?.configuration.userContentController.removeScriptMessageHandler(forName: name)
-      }
+      let name = type(of: $0.value).messageHandlerName
+      tab.webView?.configuration.userContentController.removeScriptMessageHandler(forName: name)
     }
   }
 
   @objc func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     for helper in helpers.values {
-      if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
-        if scriptMessageHandlerName == message.name {
-          helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
-          return
-        }
+      let scriptMessageHandlerName = type(of: helper).messageHandlerName
+      if scriptMessageHandlerName == message.name {
+        helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
+        return
       }
     }
   }
@@ -813,12 +817,11 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandlerWithReply
 
     // If this helper handles script messages, then get the handler name and register it. The Tab
     // receives all messages and then dispatches them to the right TabHelper.
-    if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
-      if #available(iOS 14.3, *) {
-        tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
-      } else {
-        tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
-      }
+    let scriptMessageHandlerName = type(of: helper).messageHandlerName
+    if #available(iOS 14.3, *) {
+      tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
+    } else {
+      tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
     }
   }
 

@@ -24,13 +24,21 @@ class RequestBlockingContentHelper: TabContentScript {
     let data: RequestBlockingDTOData
   }
   
-  static func name() -> String {
-    return "RequestBlockingContentHelper"
-  }
-  
-  static func scriptMessageHandlerName() -> String {
-    return ["requestBlockingContentHelper", UserScriptManager.messageHandlerTokenString].joined(separator: "_")
-  }
+  static let scriptName = "RequestBlocking"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
   
   private weak var tab: Tab?
   private var blockedRequests: Set<URL> = []
@@ -41,10 +49,6 @@ class RequestBlockingContentHelper: TabContentScript {
   
   func clearBlockedRequests() {
     blockedRequests.removeAll()
-  }
-  
-  func scriptMessageHandlerName() -> String? {
-    return Self.scriptMessageHandlerName()
   }
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {

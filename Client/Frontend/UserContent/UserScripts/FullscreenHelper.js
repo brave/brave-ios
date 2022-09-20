@@ -13,48 +13,49 @@
     error: ["fullscreenerror", "webkitfullscreenerror", "mozfullscreenerror", "MSFullscreenError"]
 }*/
 
-Object.defineProperty(window, "isFullscreenSupportedNatively", {
-  value: document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled ? true : false
-});
+(function() {
+  let isFullscreenSupportedNatively = document.fullscreenEnabled ||
+                                      document.webkitFullscreenEnabled ||
+                                      document.mozFullScreenEnabled ||
+                                      document.msFullscreenEnabled ? true : false;
+  
+  let videosSupportFullscreen = HTMLVideoElement.prototype.webkitEnterFullscreen !== undefined
 
-Object.defineProperty(window, "videosSupportFullscreen", {
-  value:  HTMLVideoElement.prototype.webkitEnterFullscreen !== undefined
-});
-
-if (!isFullscreenSupportedNatively && videosSupportFullscreen && !/mobile/i.test(navigator.userAgent)) {
-    
-    HTMLElement.prototype.requestFullscreen = function() {
-        if (this.webkitRequestFullscreen !== undefined) {
-            this.webkitRequestFullscreen();
-            return true;
-        }
-        
-        if (this.webkitEnterFullscreen !== undefined) {
-            this.webkitEnterFullscreen();
-            return true;
-        }
-        
-        var video = this.querySelector("video")
-        if (video !== undefined) {
-            video.webkitEnterFullscreen();
-            return true;
-        }
-        return false;
-    };
-    
-    HTMLElement.prototype.requestFullscreen.toString = function() {
-        return "function () { [native code]; }";
-    };
-    
-    Object.defineProperty(document, 'fullscreenEnabled', {
-        get: function() {
-            return true;
-        }
-    });
-    
-    Object.defineProperty(document.documentElement, 'fullscreenEnabled', {
-        get: function() {
-            return true;
-        }
-    });
-}
+  if (!isFullscreenSupportedNatively && videosSupportFullscreen && !/mobile/i.test(navigator.userAgent)) {
+      
+      HTMLElement.prototype.requestFullscreen = function() {
+          if (this.webkitRequestFullscreen !== undefined) {
+              this.webkitRequestFullscreen();
+              return true;
+          }
+          
+          if (this.webkitEnterFullscreen !== undefined) {
+              this.webkitEnterFullscreen();
+              return true;
+          }
+          
+          var video = this.querySelector("video")
+          if (video !== undefined) {
+              video.webkitEnterFullscreen();
+              return true;
+          }
+          return false;
+      };
+      
+      HTMLElement.prototype.requestFullscreen.toString = function() {
+          return "function () { [native code]; }";
+      };
+      
+      Object.defineProperty(document, 'fullscreenEnabled', {
+          get: function() {
+              return true;
+          }
+      });
+      
+      Object.defineProperty(document.documentElement, 'fullscreenEnabled', {
+          get: function() {
+              return true;
+          }
+      });
+  }
+})();

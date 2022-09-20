@@ -26,7 +26,7 @@ function assemblePayload(selectors) {
 window.addEventListener("load", function() {
   var payload = assemblePayload(selectors);
   /* not used anymore */
-  webkit.messageHandlers.spotlightMessageHandler.postMessage(payload);
+  webkit.messageHandlers.spotlightMessageHandler.postNativeMessage(payload);
 });
 
 })();

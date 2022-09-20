@@ -16,18 +16,25 @@ class PrintHelper: TabContentScript {
   private var isBlocking = false
   private var currentDomain: String?
 
-  class func name() -> String {
-    return "PrintHelper"
-  }
-
   required init(browserController: BrowserViewController, tab: Tab) {
     self.browserController = browserController
     self.tab = tab
   }
 
-  func scriptMessageHandlerName() -> String? {
-    return "printHandler"
-  }
+  static let scriptName = "PrintHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }

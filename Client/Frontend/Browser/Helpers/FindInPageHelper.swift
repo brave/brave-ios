@@ -17,17 +17,24 @@ class FindInPageHelper: TabContentScript {
   weak var delegate: FindInPageHelperDelegate?
   fileprivate weak var tab: Tab?
 
-  class func name() -> String {
-    return "FindInPage"
-  }
-
   required init(tab: Tab) {
     self.tab = tab
   }
 
-  func scriptMessageHandlerName() -> String? {
-    return "findInPageHandler"
-  }
+  static let scriptName = "FindInPageHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }

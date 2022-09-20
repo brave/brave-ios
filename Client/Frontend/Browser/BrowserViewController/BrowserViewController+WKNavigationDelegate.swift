@@ -520,7 +520,7 @@ extension BrowserViewController: WKNavigationDelegate {
     // The challenge may come from a background tab, so ensure it's the one visible.
     tabManager.selectTab(tab)
 
-    let loginsHelper = tab.getContentScript(name: LoginsHelper.name()) as? LoginsHelper
+    let loginsHelper = tab.getContentScript(name: LoginsHelper.scriptName) as? LoginsHelper
     Task { @MainActor in
       do {
         let credentials = try await Authenticator.handleAuthRequest(self, challenge: challenge, loginsHelper: loginsHelper)

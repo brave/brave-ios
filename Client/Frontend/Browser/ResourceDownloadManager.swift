@@ -39,13 +39,22 @@ class ResourceDownloadManager: TabContentScript {
     self.tab = tab
   }
 
-  static func name() -> String {
-    return "ResourceDownloadManager"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "ResourceDownloadManager\(UserScriptManager.messageHandlerTokenString)"
-  }
+  static let scriptName = "ResourceDownloader"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  private static let downloadName = "\(scriptName)_\(uniqueID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
+                                                                      "$<downloadManager>": downloadName],
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentEnd,
+                               forMainFrameOnly: false,
+                               in: .defaultClient)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
@@ -59,9 +68,7 @@ class ResourceDownloadManager: TabContentScript {
   }
 
   static func downloadResource(for tab: Tab, url: URL) {
-    let token = UserScriptManager.securityTokenString
-
-    tab.webView?.evaluateSafeJavaScript(functionName: "D\(token).download", args: [url.absoluteString], contentWorld: .defaultClient) { _, error in
+    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(downloadName).download", args: [url.absoluteString], contentWorld: .defaultClient) { _, error in
       if let error = error {
         tab.temporaryDocument?.onDocumentDownloaded(document: nil, error: error)
       }

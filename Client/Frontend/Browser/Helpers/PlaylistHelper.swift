@@ -66,13 +66,22 @@ class PlaylistHelper: NSObject, TabContentScript {
     delegate?.updatePlaylistURLBar(tab: tab, state: .none, item: nil)
   }
 
-  static func name() -> String {
-    return "PlaylistHelper"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "playlistHelper_\(UserScriptManager.messageHandlerTokenString)"
-  }
+  static let scriptName = "Playlist"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    
+    return WKUserScript.create(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
+                                                                      "$<tagUUID>": "tagId_\(uniqueID)"],
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
@@ -210,9 +219,7 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
       Preferences.Playlist.enableLongPressAddToPlaylist.value {
       let touchPoint = gestureRecognizer.location(in: webView)
 
-      let token = UserScriptManager.securityTokenString
-
-      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, asFunction: true) { _, error in
+      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.playlistLongPressed", args: [touchPoint.x, touchPoint.y, PlaylistHelper.scriptId], contentWorld: .page, asFunction: true) { _, error in
 
         if let error = error {
           log.error("Error executing onLongPressActivated: \(error)")
@@ -239,10 +246,8 @@ extension PlaylistHelper {
       log.error("Unsanitized NodeTag.")
       return
     }
-
-    let token = UserScriptManager.securityTokenString
-
-    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, asFunction: true) { value, error in
+    
+    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag", args: [nodeTag, PlaylistHelper.scriptId], contentWorld: .page, asFunction: true) { value, error in
 
       if let error = error {
         log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
@@ -261,22 +266,17 @@ extension PlaylistHelper {
   static func stopPlayback(tab: Tab?) {
     guard let tab = tab else { return }
 
-    let token = UserScriptManager.securityTokenString
-    let javascript = String(format: "window.__firefox__.stopMediaPlayback_%@()", token)
-
-    tab.webView?.evaluateSafeJavaScript(
-      functionName: javascript, contentWorld: .page,
-      completion: { value, error in
-        if let error = error {
-          log.error("Error Retrieving Stopping Media Playback: \(error)")
-        }
-      })
+    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.stopMediaPlayback", args: [PlaylistHelper.scriptId], contentWorld: .page, asFunction: true) { value, error in
+      if let error = error {
+        log.error("Error Retrieving Stopping Media Playback: \(error)")
+      }
+    }
   }
 }
 
 extension PlaylistHelper {
   static func updatePlaylistTab(tab: Tab, item: PlaylistInfo?) {
-    if let helper = tab.getContentScript(name: PlaylistHelper.name()) as? PlaylistHelper {
+    if let helper = tab.getContentScript(name: PlaylistHelper.scriptName) as? PlaylistHelper {
       PlaylistHelper.processPlaylistInfo(helper: helper, item: item)
     }
   }

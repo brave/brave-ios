@@ -27,7 +27,7 @@ window.__firefox__.includeOnce("PlaylistDetector", function() {
     
     function $<sendMessage>(message) {
         if (window.webkit.messageHandlers.$<handler>) {
-            window.webkit.messageHandlers.$<handler>.postMessage(message);
+            window.webkit.messageHandlers.$<handler>.postNativeMessage(message);
         }
     }
     

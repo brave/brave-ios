@@ -238,17 +238,16 @@ class ReaderMode: TabContentScript {
   var state: ReaderModeState = ReaderModeState.unavailable
   fileprivate var originalURL: URL?
 
-  class func name() -> String {
-    return "ReaderMode"
-  }
-
   required init(tab: Tab) {
     self.tab = tab
   }
-
-  func scriptMessageHandlerName() -> String? {
-    return "readerModeMessageHandler"
-  }
+  
+  static let scriptName = "ReaderMode"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "readerModeMessageHandler"
+  static let userScript: WKUserScript? = {
+    return nil
+  }()
 
   fileprivate func handleReaderPageEvent(_ readerPageEvent: ReaderPageEvent) {
     switch readerPageEvent {

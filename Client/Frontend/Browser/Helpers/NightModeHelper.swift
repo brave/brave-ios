@@ -19,13 +19,17 @@ class NightModeHelper: TabContentScript {
     self.tab = tab
   }
 
-  static func name() -> String {
-    return "NightMode"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "NightMode"
-  }
+  static let scriptName = "NightModeHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: "window.__firefox__.NightMode.setEnabled(true);"),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: true,
+                               in: .defaultClient)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     // Do nothing.

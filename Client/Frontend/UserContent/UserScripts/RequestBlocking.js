@@ -3,20 +3,24 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+"use strict";
+
 (function() {
-  'use strict'
-  const args = $<request_blocking_args>;
-  const messageHandler = webkit.messageHandlers[args.handlerName]
-  const securityToken = args.securityToken
+  const messageHandler = webkit.messageHandlers.$<message_handler>;
+
   const sendMessage = (resourceURL) => {
-    return messageHandler.postMessage({
-      securityToken: securityToken,
+    return messageHandler.postNativeMessage({
+      securityToken: SECURITY_TOKEN,
       data: {
         resourceURL: resourceURL.href,
         sourceURL: window.location.href,
         resourceType: 'xmlhttprequest'
       }
     })
+  }
+  
+  sendMessage.toString = function() {
+    return "function() {\n\t[native code]\n}";
   }
   
   const { fetch: originalFetch } = window

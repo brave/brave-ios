@@ -39,13 +39,22 @@ class PaymentRequestExtension: NSObject {
 }
 
 extension PaymentRequestExtension: TabContentScript {
-  static func name() -> String {
-    return "PaymentRequest"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "\(PaymentRequestExtension.name())\(UserScriptManager.messageHandlerTokenString)"
-  }
+  static let scriptName = "PaymentRequest"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  
+  static let userScript: WKUserScript? = {
+    guard let script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: true,
+                               in: .page)
+  }()
 
   private func sendPaymentRequestError(errorName: String, errorMessage: String) {
     ensureMainThread {
@@ -60,7 +69,7 @@ extension PaymentRequestExtension: TabContentScript {
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
 
-    guard message.name == Self.name(), let body = message.body as? NSDictionary else { return }
+    guard message.name == Self.scriptName, let body = message.body as? NSDictionary else { return }
 
     do {
       let messageData = try JSONSerialization.data(withJSONObject: body, options: [])

@@ -50,7 +50,7 @@ window.__firefox__.includeOnce("Playlist", function() {
         });
     }
     
-    function $<tagNode>(node) {
+    function tagNode(node) {
         if (node) {
             if (!node.$<tagUUID>) {
                 node.addEventListener('webkitpresentationmodechanged', (e) => e.stopPropagation(), true);
@@ -60,64 +60,61 @@ window.__firefox__.includeOnce("Playlist", function() {
         }
     }
     
-    function $<sendMessage>(message) {
-        if (window.webkit.messageHandlers.$<handler>) {
-            window.webkit.messageHandlers.$<handler>.postMessage(message);
+    function sendMessage(name, node, target, type, detected) {
+        if (window.webkit.messageHandlers.$<message_handler>) {
+            window.webkit.messageHandlers.$<message_handler>.postNativeMessage({
+              "securitytoken": SECURITY_TOKEN,
+              "name": name,
+              "src": node.src,
+              "pageSrc": window.location.href,
+              "pageTitle": document.title,
+              "mimeType": type,
+              "duration": clamp_duration(target.duration),
+              "detected": detected,
+              "tagId": target.$<tagUUID>
+          });
         }
     }
+  
+    sendMessage.toString = function() {
+        return "function() {\n\t[native code]\n}";
+    }
     
-    function $<notify>(target, type) {
+    function notify(target, type, detected) {
         if (target) {
             var name = target.title;
-            if (!name) {
+            if (!name || name == "") {
                 name = document.title;
+            }
+          
+            if (!type || type == "") {
+                if (node.constructor.name == 'HTMLVideoElement') {
+                    type = 'video';
+                }
+
+                if (node.constructor.name == 'HTMLAudioElement') {
+                    type = 'audio';
+                }
+                
+                if (node.constructor.name == 'HTMLSourceElement') {
+                    if (node.closest('video')) {
+                        type = 'video'
+                    } else {
+                        type = 'audio'
+                    }
+                }
             }
             
             if (target.src && target.src !== "") {
-                $<tagNode>(target);
-                $<sendMessage>({
-                    "securitytoken": "$<security_token>",
-                    "name": name,
-                    "src": target.src,
-                    "pageSrc": window.location.href,
-                    "pageTitle": document.title,
-                    "mimeType": type,
-                    "duration": clamp_duration(target.duration),
-                    "detected": false,
-                    "tagId": target.$<tagUUID>
-                });
+                tagNode(target);
+                sendMessage(name, target, target, type, detected);
             }
             else {
                 target.querySelectorAll('source').forEach(function(node) {
                     if (node.src && node.src !== "") {
-                        if (node.closest('video') === target) {
-                            $<tagNode>(target);
-                            $<sendMessage>({
-                                "securitytoken": "$<security_token>",
-                                "name": name,
-                                "src": node.src,
-                                "pageSrc": window.location.href,
-                                "pageTitle": document.title,
-                                "mimeType": type,
-                                "duration": clamp_duration(target.duration),
-                                "detected": false,
-                                "tagId": target.$<tagUUID>
-                            });
-                        }
-                        
-                        if (node.closest('audio') === target) {
-                            $<tagNode>(target);
-                            $<sendMessage>({
-                                "securitytoken": "$<security_token>",
-                                "name": name,
-                                "src": node.src,
-                                "pageSrc": window.location.href,
-                                "pageTitle": document.title,
-                                "mimeType": type,
-                                "duration": clamp_duration(target.duration),
-                                "detected": false,
-                                "tagId": target.$<tagUUID>
-                            });
+                        if ((node.closest('video') === target) || (node.closest('audio') === target)) {
+                            tagNode(target);
+                            sendMessaage(name, node, target, type, detected);
                         }
                     }
                 });
@@ -125,12 +122,17 @@ window.__firefox__.includeOnce("Playlist", function() {
         }
     }
     
-    function $<setupLongPress>() {
-        Object.defineProperty(window.__firefox__, '$<onLongPressActivated>', {
+    function setupLongPress() {
+        Object.defineProperty(window.__firefox__, 'playlistLongPressed', {
             enumerable: false,
-            configurable: true,
+            configurable: false,
+            writable: false,
             value:
-            function(localX, localY) {
+            function(localX, localY, token) {
+                if (token != SECURITY_TOKEN) {
+                  return;
+                }
+              
                 function execute(page, offsetX, offsetY) {
                     var target = page.document.elementFromPoint(localX - offsetX, localY - offsetY);
                     var targetVideo = target ? target.closest("video") : null;
@@ -173,20 +175,19 @@ window.__firefox__.includeOnce("Playlist", function() {
                         
                         // No elements found nearby so do nothing..
                         if (!targetVideo && !targetAudio) {
-                            // webkit.messageHandlers.$<handler>.postMessage({});
                             return;
                         }
                     }
                     
                     // Elements found
                     if (targetVideo) {
-                        $<tagNode>(targetVideo);
-                        $<notify>(targetVideo, 'video');
+                        tagNode(targetVideo);
+                        notify(targetVideo, 'video', false);
                     }
 
                     if (targetAudio) {
-                        $<tagNode>(targetAudio);
-                        $<notify>(targetAudio, 'audio');
+                        tagNode(targetAudio);
+                        notify(targetAudio, 'audio', false);
                     }
                 }
                 
@@ -208,96 +209,20 @@ window.__firefox__.includeOnce("Playlist", function() {
     
     // MARK: ---------------------------------------
     
-    function $<setupDetector>() {
-        function $<notifyNodeSource>(node, src, mimeType) {
-            var name = node.title;
-            if (name == null || typeof name == 'undefined' || name == "") {
-                name = document.title;
-            }
-
-            if (mimeType == null || typeof mimeType == 'undefined' || mimeType == "") {
-                if (node.constructor.name == 'HTMLVideoElement') {
-                    mimeType = 'video';
-                }
-
-                if (node.constructor.name == 'HTMLAudioElement') {
-                    mimeType = 'audio';
-                }
-                
-                if (node.constructor.name == 'HTMLSourceElement') {
-                    videoNode = node.closest('video');
-                    if (videoNode != null && typeof videoNode != 'undefined') {
-                        mimeType = 'video'
-                    } else {
-                        mimeType = 'audio'
-                    }
-                }
-            }
-
-            if (src && src !== "") {
-                $<tagNode>(node);
-                $<sendMessage>({
-                    "securitytoken": "$<security_token>",
-                    "name": name,
-                    "src": src,
-                    "pageSrc": window.location.href,
-                    "pageTitle": document.title,
-                    "mimeType": mimeType,
-                    "duration": clamp_duration(node.duration),
-                    "detected": true,
-                    "tagId": node.$<tagUUID>
-                });
-            } else {
-                var target = node;
-                document.querySelectorAll('source').forEach(function(node) {
-                    if (node.src !== "") {
-                        if (node.closest('video') === target) {
-                            $<tagNode>(target);
-                            $<sendMessage>({
-                                "securitytoken": "$<security_token>",
-                                "name": name,
-                                "src": node.src,
-                                "pageSrc": window.location.href,
-                                "pageTitle": document.title,
-                                "mimeType": mimeType,
-                                "duration": clamp_duration(target.duration),
-                                "detected": true,
-                                "tagId": target.$<tagUUID>
-                            });
-                        }
-                        
-                        if (node.closest('audio') === target) {
-                            $<tagNode>(target);
-                            $<sendMessage>({
-                                "securitytoken": "$<security_token>",
-                                "name": name,
-                                "src": node.src,
-                                "pageSrc": window.location.href,
-                                "pageTitle": document.title,
-                                "mimeType": mimeType,
-                                "duration": clamp_duration(target.duration),
-                                "detected": true,
-                                "tagId": target.$<tagUUID>
-                            });
-                        }
-                    }
-                });
-            }
-        }
-
-        function $<notifyNode>(node) {
-            $<notifyNodeSource>(node, node.src, node.type);
-        }
-
-        function $<getAllVideoElements>() {
+    function setupDetector() {
+        function getAllVideoElements() {
             return document.querySelectorAll('video');
         }
 
-        function $<getAllAudioElements>() {
+        function getAllAudioElements() {
             return document.querySelectorAll('audio');
         }
         
-        function $<requestWhenIdleShim>(fn) {
+        function requestWhenIdleShim(fn) {
+          fn.toString = function() {
+              return "function(){\n\t[native code]\n}";
+          }
+          
           var start = Date.now()
           return setTimeout(function () {
             fn({
@@ -309,7 +234,11 @@ window.__firefox__.includeOnce("Playlist", function() {
           }, 2000);  // Resolution of 1000ms is fine for us.
         }
 
-        function $<onReady>(fn) {
+        function onReady(fn) {
+            fn.toString = function() {
+                return "function(){\n\t[native code]\n}";
+            }
+          
             if (document.readyState === "complete" || document.readyState === "ready") {
                 setTimeout(fn, 1);
             } else {
@@ -317,99 +246,73 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
         }
         
-        function $<observePage>() {
+        function observePage() {
             Object.defineProperty(HTMLMediaElement.prototype, '$<tagUUID>', {
                 enumerable: false,
                 configurable: false,
                 writable: true,
                 value: null
             });
-            
-            var descriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src');
-            Object.defineProperty(HTMLMediaElement.prototype, 'src', {
-                enumerable: descriptor.enumerable,
-                configurable: descriptor.configurable,
-                get: function(){
-                    return this.getAttribute('src')
-                },
-                set: function(value) {
-                    // Typically we'd call the original setter.
-                    // But since the property represents an attribute, this is okay.
-                    this.setAttribute('src', value);
-                    //$<notifyNode>(this); // Handled by `setVideoAttribute`
-                }
-            });
-            
-            var setVideoAttribute = HTMLVideoElement.prototype.setAttribute;
-            HTMLVideoElement.prototype.setAttribute = function(key, value) {
-                setVideoAttribute.call(this, key, value);
-                if (key.toLowerCase() == 'src') {
-                    $<notifyNode>(this);
-                }
-            };
-            
-            HTMLVideoElement.prototype.setAttribute.toString = function() {
-                return "function () { [native code] }";
-            };
-            
-            var setAudioAttribute = HTMLAudioElement.prototype.setAttribute;
-            HTMLAudioElement.prototype.setAttribute = function(key, value) {
-                setAudioAttribute.call(this, key, value);
-                if (key.toLowerCase() == 'src') {
-                    $<notifyNode>(this);
-                }
-            };
-            
-            HTMLAudioElement.prototype.setAttribute.toString = function() {
-                return "function () { [native code] }";
-            };
-            
-            // When the page is idle
-            // Fetch static video and audio elements
-            var fetchExistingNodes = () => {
-                $<requestWhenIdleShim>((deadline) => {
-                    var videos = $<getAllVideoElements>();
-                    var audios = $<getAllAudioElements>();
-                    if (!videos) {
-                        videos = [];
-                    }
-                    
-                    if (!audios) {
-                        audios = [];
-                    }
-                    
-                    // Only on the next frame/vsync we notify the nodes
-                    requestAnimationFrame(() => {
-                        videos.forEach((e) => {
-                            $<notifyNode>(e);
-                        });
+          
+            let observeNode = function(node) {
+                // Observe video or audio elements
+                let isVideoElement = (node.constructor.name == "HTMLVideoElement");
+                if (isVideoElement || (node.constructor.name == "HTMLAudioElement")) {
+                    let type = isVideoElement ? 'video' : 'audio';
+                    node.observer = new MutationObserver(function (mutations) {
+                        notify(node, type, true);
                     });
-                    
-                    // Only on the next frame/vsync we notify the nodes
-                    requestAnimationFrame(() => {
-                        audios.forEach((e) => {
-                            $<notifyNode>(e);
-                        });
+                  
+                    node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
+                    node.addEventListener('loadedmetadata', function() {
+                        notify(node, type, true);
+                    });
+                  
+                    notify(node, type, true);
+                }
+            };
+          
+            // Observe elements added to a Node
+            let documentObserver = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        observeNode(node);
                     });
                 });
-                
-                // This function runs only once, so we remove as soon as the page is ready or complete
-                document.removeEventListener("DOMContentLoaded", fetchExistingNodes);
+            });
+          
+            documentObserver.observe(document, { subtree: true, childList: true });
+          
+            /*var document_createElement = document.createElement;
+            document.createElement = function (tag) {
+                if (tag === 'audio' || tag === 'video') {
+                    var node = document_createElement.call(this, tag);
+                    observeNode(node);
+                    notify(node, tag, true);
+                    return node;
+                }
+                return document_createElement.call(this, tag);
             };
-            
-            // Listen for when the page is ready or complete
-            $<onReady>(fetchExistingNodes);
+
+            document.createElement.toString = function() {
+                return "function () { [native code] }";
+            };*/
         }
 
-        $<observePage>();
+        observePage();
     }
     
-    function $<setupTagNode>() {
-        Object.defineProperty(window.__firefox__, '$<mediaCurrentTimeFromTag>', {
+    function setupTagNode() {
+        Object.defineProperty(window.__firefox__, 'mediaCurrentTimeFromTag', {
             enumerable: false,
-            configurable: true,
+            configurable: false,
+            writable: false,
             value:
-            function(tag) {
+            function(tag, token) {
+                if (token != SECURITY_TOKEN) {
+                    return;
+                }
+              
                 for (element of document.querySelectorAll('video')) {
                     if (element.$<tagUUID> == tag) {
                         return clamp_duration(element.currentTime);
@@ -426,11 +329,16 @@ window.__firefox__.includeOnce("Playlist", function() {
             }
         });
         
-        Object.defineProperty(window.__firefox__, '$<stopMediaPlayback>', {
+        Object.defineProperty(window.__firefox__, 'stopMediaPlayback', {
             enumerable: false,
-            configurable: true,
+            configurable: false,
+            writable: false,
             value:
-            function(tag) {
+            function(token) {
+                if (token != SECURITY_TOKEN) {
+                    return;
+                }
+              
                 for (element of document.querySelectorAll('video')) {
                     element.pause();
                 }
@@ -446,7 +354,7 @@ window.__firefox__.includeOnce("Playlist", function() {
     
     // MARK: -----------------------------
     
-    $<setupLongPress>();
-    $<setupDetector>();
-    $<setupTagNode>();
+    setupLongPress();
+    setupDetector();
+    setupTagNode();
 });

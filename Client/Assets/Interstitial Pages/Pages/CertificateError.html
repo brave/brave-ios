@@ -117,7 +117,7 @@ You can obtain one at https://mozilla.org/MPL/2.0/.
             if (proceedAnywayLink != null) {
                 proceedAnywayLink.addEventListener('click', function(e) {
                     e.preventDefault();
-                    webkit.messageHandlers.errorPageHelperMessageManager.postMessage({
+                    webkit.messageHandlers.errorPageHelperMessageManager.postNativeMessage({
                         securitytoken: "%security_token%",
                         type: "certVisitOnce"
                     });

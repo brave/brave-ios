@@ -10,4 +10,4 @@ Object.defineProperty(navigator, 'globalPrivacyControl', {
   configurable: false,
   writable: false,
   value: true
-})
+});

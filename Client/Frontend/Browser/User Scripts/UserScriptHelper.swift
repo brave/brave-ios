@@ -70,7 +70,7 @@ class UserScriptHelper {
   
   static func makeDeAmpScriptParamters() throws -> String? {
     let arguments: [String: String] = [
-      "handlerName": DeAmpHelper.scriptMessageHandlerName(),
+      "handlerName": DeAmpHelper.messageHandlerName,
       "securityToken": UserScriptManager.securityTokenString
     ]
     

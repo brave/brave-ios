@@ -4,20 +4,25 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 (function() {
+  let postMessage = function(message) {
+    window.webkit.messageHandlers.$<message_handler>.postNativeMessage({
+      "securitytoken": SECURITY_TOKEN,
+      "state": message
+    });
+  }
+  
+  postMessage.toString = function() {
+    return "function() {\n\t[native code]\n}";
+  }
+  
   // Listen for document ready state
   document.addEventListener('readystatechange', (event) => {
-    window.webkit.messageHandlers.$<handler>.postMessage({
-      "securitytoken": "$<security_token>",
-      "state": document.readyState
-    });
+    postMessage(document.readyState);
   });
   
   // Listen for document load state
   window.addEventListener('load', (event) => {
-    window.webkit.messageHandlers.$<handler>.postMessage({
-      "securitytoken": "$<security_token>",
-      "state": "loaded"
-    });
+    postMessage("loaded");
   });
   
   // Listen for history popped
@@ -25,10 +30,7 @@
     if (event.state) {
       // Run on the browser's next run-loop
       setTimeout(() => {
-        window.webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "state": "popstate"
-        });
+        postMessage("popstate");
       }, 0);
     }
   });
@@ -41,10 +43,7 @@
     if (state) {
       // Run on the browser's next run-loop
       setTimeout(() => {
-        window.webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "state": "pushstate"
-        });
+        postMessage("pushstate");
       }, 0);
     }
   };
@@ -57,10 +56,7 @@
     if (state) {
       // Run on the browser's next run-loop
       setTimeout(() => {
-        window.webkit.messageHandlers.$<handler>.postMessage({
-          "securitytoken": "$<security_token>",
-          "state": "replacestate"
-        });
+        postMessage("replacestate");
       }, 0);
     }
   };

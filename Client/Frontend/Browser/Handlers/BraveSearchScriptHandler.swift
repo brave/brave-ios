@@ -29,12 +29,21 @@ class BraveSearchScriptHandler: TabContentScript {
     self.profile = profile
     self.rewards = rewards
   }
-
-  static func name() -> String { "BraveSearchHelper" }
-
-  func scriptMessageHandlerName() -> String? {
-    "BraveSearchHelper_\(UserScriptManager.messageHandlerTokenString)"
-  }
+  
+  static let scriptName = "BraveSearchHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   private enum Method: Int {
     case canSetBraveSearchAsDefault = 1

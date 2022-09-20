@@ -22,13 +22,20 @@ extension ContentBlockerHelper: TabContentScript {
     let data: ContentblockerDTOData
   }
   
-  class func name() -> String {
-    return "TrackingProtectionStats"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "trackingProtectionStats"
-  }
+  static let scriptName = "ContentBlockerHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func clearPageStats() {
     stats = TPPageStats()

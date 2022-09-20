@@ -55,13 +55,20 @@ class ReadyStateScriptHelper: TabContentScript {
     self.tab = tab
   }
   
-  class func name() -> String {
-    return "ReadyStateScriptHelper"
-  }
-
-  func scriptMessageHandlerName() -> String? {
-    return "ReadyState_\(UserScriptManager.messageHandlerTokenString)"
-  }
+  static let scriptName = "ReadyState"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: true,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     

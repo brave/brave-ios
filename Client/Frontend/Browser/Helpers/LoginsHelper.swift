@@ -25,19 +25,26 @@ class LoginsHelper: TabContentScript {
     return profile.logins
   }
 
-  class func name() -> String {
-    return "LoginsHelper"
-  }
-
   required init(tab: Tab, profile: Profile, passwordAPI: BravePasswordAPI) {
     self.tab = tab
     self.profile = profile
     self.passwordAPI = passwordAPI
   }
 
-  func scriptMessageHandlerName() -> String? {
-    return "loginsManagerMessageHandler"
-  }
+  static let scriptName = "LoginsHelper"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: .page)
+  }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
