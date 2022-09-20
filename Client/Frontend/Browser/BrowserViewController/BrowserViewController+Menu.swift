@@ -32,7 +32,7 @@ extension BrowserViewController {
     }
   }
 
-  func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {
+  func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {v
     VStack(alignment: .leading, spacing: 5) {
       Text(Strings.OptionsMenu.menuSectionTitle.capitalized)
         .font(.callout.weight(.semibold))
@@ -40,68 +40,19 @@ extension BrowserViewController {
         .padding(.horizontal, 14)
         .padding(.bottom, 5)
 
-      VPNMenuButton(
-        vpnProductInfo: self.vpnProductInfo,
-        description: Strings.OptionsMenu.braveVPNItemDescription,
-        displayVPNDestination: { [unowned self] vc in
-          (self.presentedViewController as? MenuViewController)?
-            .pushInnerMenu(vc)
-        },
-        enableInstalledVPN: { [unowned menuController] in
-          /// Donate Enable VPN Activity for suggestions
-          let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
-          menuController.userActivity = enableVPNActivity
-          enableVPNActivity.becomeCurrent()
-        }
-      )
-
-      MenuItemButton(
-        icon: UIImage(named: "playlist_menu", in: .current, compatibleWith: nil)!.template,
-        title: Strings.OptionsMenu.bravePlaylistItemTitle,
-        subtitle: Strings.OptionsMenu.bravePlaylistItemDescription
-      ) { [weak self] in
-        guard let self = self else { return }
-
-        self.presentPlaylistController()
-      }
-
+      vpnButton(menuController)
+      playlistButton()
+      
       // Add Brave Talk and News options only in normal browsing
       if !PrivateBrowsingManager.shared.isPrivateBrowsing {
         // Show Brave News if it is first launch and after first launch If the new is enabled
         if Preferences.General.isFirstLaunch.value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
-          MenuItemButton(
-            icon: UIImage(named: "menu_brave_news", in: .current, compatibleWith: nil)!.template,
-            title: Strings.OptionsMenu.braveNewsItemTitle,
-            subtitle: Strings.OptionsMenu.braveNewsItemDescription
-          ) { [weak self] in
-            guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
-              return
-            }
-
-            self.popToBVC()
-            newTabPageController.scrollToBraveNews()
-          }
+          newsButton()
         }
-
-        MenuItemButton(
-          icon: UIImage(named: "menu-brave-talk", in: .current, compatibleWith: nil)!.template,
-          title: Strings.OptionsMenu.braveTalkItemTitle,
-          subtitle: Strings.OptionsMenu.braveTalkItemDescription
-        ) { [weak self] in
-          guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
-
-          self.popToBVC()
-          self.finishEditingAndSubmit(url, visitType: .typed)
-        }
+        talkButton()
       }
 
-      MenuItemButton(
-        icon: UIImage(named: "menu-crypto", in: .current, compatibleWith: nil)!.template,
-        title: Strings.Wallet.wallet,
-        subtitle: Strings.OptionsMenu.braveWalletItemDescription
-      ) { [unowned self] in
-        self.presentWallet()
-      }
+      cryptoButton()
     }
     .fixedSize(horizontal: false, vertical: true)
     .padding(.top, 10)
@@ -179,6 +130,73 @@ extension BrowserViewController {
         vc.settingsDelegate = self
         menuController.pushInnerMenu(vc)
       }
+    }
+  }
+  
+  private func vpnButton(_ menuController: MenuViewController) -> VPNMenuButton {
+    VPNMenuButton(
+      vpnProductInfo: self.vpnProductInfo,
+      description: Strings.OptionsMenu.braveVPNItemDescription,
+      displayVPNDestination: { [unowned self] vc in
+        (self.presentedViewController as? MenuViewController)?
+          .pushInnerMenu(vc)
+      },
+      enableInstalledVPN: { [unowned menuController] in
+        /// Donate Enable VPN Activity for suggestions
+        let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+        menuController.userActivity = enableVPNActivity
+        enableVPNActivity.becomeCurrent()
+      }
+    )
+  }
+  
+  private func playlistButton() -> MenuItemButton {
+    MenuItemButton(
+      icon: UIImage(named: "playlist_menu", in: .current, compatibleWith: nil)!.template,
+      title: Strings.OptionsMenu.bravePlaylistItemTitle,
+      subtitle: Strings.OptionsMenu.bravePlaylistItemDescription
+    ) { [weak self] in
+      guard let self = self else { return }
+
+      self.presentPlaylistController()
+    }
+  }
+  
+  private func newsButton() -> MenuItemButton {
+    MenuItemButton(
+      icon: UIImage(named: "menu_brave_news", in: .current, compatibleWith: nil)!.template,
+      title: Strings.OptionsMenu.braveNewsItemTitle,
+      subtitle: Strings.OptionsMenu.braveNewsItemDescription
+    ) { [weak self] in
+      guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
+        return
+      }
+
+      self.popToBVC()
+      newTabPageController.scrollToBraveNews()
+    }
+  }
+  
+  private func talkButton() -> MenuItemButton {
+    MenuItemButton(
+      icon: UIImage(named: "menu-brave-talk", in: .current, compatibleWith: nil)!.template,
+      title: Strings.OptionsMenu.braveTalkItemTitle,
+      subtitle: Strings.OptionsMenu.braveTalkItemDescription
+    ) { [weak self] in
+      guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
+
+      self.popToBVC()
+      self.finishEditingAndSubmit(url, visitType: .typed)
+    }
+  }
+  
+  private func cryptoButton() -> MenuItemButton {
+    MenuItemButton(
+      icon: UIImage(named: "menu-crypto", in: .current, compatibleWith: nil)!.template,
+      title: Strings.Wallet.wallet,
+      subtitle: Strings.OptionsMenu.braveWalletItemDescription
+    ) { [unowned self] in
+      self.presentWallet()
     }
   }
 
