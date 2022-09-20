@@ -308,6 +308,7 @@ extension Tab: BraveWalletProviderDelegate {
   
   func clearSolanaConnectedAccounts() {
     tabDappStore.solConnectedAddresses = .init()
+    updateSolanaProperties()
   }
 }
 
