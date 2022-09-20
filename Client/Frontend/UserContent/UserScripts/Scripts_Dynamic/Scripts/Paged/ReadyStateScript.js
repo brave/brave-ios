@@ -12,14 +12,14 @@ window.__firefox__.execute(function($) {
   });
   
   // Listen for document ready state
-  document.addEventListener('readystatechange', (event) => {
+  document.addEventListener('readystatechange', $((event) => {
     postMessage(document.readyState);
-  });
+  }));
   
   // Listen for document load state
-  window.addEventListener('load', (event) => {
+  window.addEventListener('load', $((event) => {
     postMessage("loaded");
-  });
+  }));
   
   // Listen for history popped
   window.addEventListener('popstate', $((event) => {

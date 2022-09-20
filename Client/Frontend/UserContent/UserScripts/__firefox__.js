@@ -245,7 +245,7 @@ if (!window.__firefox__) {
         if (!userScripts[name]) {
           userScripts[name] = true;
           if (typeof fn === 'function') {
-            $(fn)($);
+            $(fn)($, $Object, $Array);
           }
           return true;
         }
@@ -255,7 +255,7 @@ if (!window.__firefox__) {
     
       let execute = $(function(fn) {
         if (typeof fn === 'function') {
-          $(fn)($);
+          $(fn)($, $Object, $Array);
           return true;
         }
         return false;
