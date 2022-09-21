@@ -258,30 +258,7 @@ extension BrowserViewController {
         MenuTabDetailsView(tab: browserViewController.tabManager.selectedTab, url: tabURL)
         VStack(spacing: 0) {
           if let activity = playlistActivity, activity.enabled, let item = activity.item {
-            PlaylistMenuButton(isAdded: isPlaylistItemAdded) {
-              if !isPlaylistItemAdded {
-                // Add to playlist
-                browserViewController.addToPlaylist(item: item) { didAddItem in
-                  log.debug("Playlist Item Added")
-                  if didAddItem {
-                    playlistItemAdded = true
-                  }
-                }
-              } else {
-                browserViewController.dismiss(animated: true) {
-                  let tab = browserViewController.tabManager.selectedTab
-
-                  if let webView = tab?.webView {
-                    PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak browserViewController] currentTime in
-                      browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
-                    }
-                  } else {
-                    browserViewController.openPlaylist(tab: nil, item: item, playbackOffset: 0.0)
-                  }
-                }
-              }
-            }
-            .animation(.default, value: playlistItemAdded)
+            playlistButton(item).animation(.default, value: playlistItemAdded)
           }
           MenuItemButton(icon: UIImage(named: "nav-share", in: .current, compatibleWith: nil)!.template, title: Strings.shareWithMenuItem) {
             browserViewController.dismiss(animated: true)
@@ -299,6 +276,32 @@ extension BrowserViewController {
             MenuItemButton(icon: activity.activityImage?.template ?? UIImage(), title: activity.activityTitle ?? "") {
               browserViewController.dismiss(animated: true)
               activity.perform()
+            }
+          }
+        }
+      }
+    }
+    
+    func playlistButton(_ item: PlaylistInfo) -> PlaylistMenuButton {
+      PlaylistMenuButton(isAdded: isPlaylistItemAdded) {
+        if !isPlaylistItemAdded {
+          // Add to playlist
+          browserViewController.addToPlaylist(item: item) { didAddItem in
+            log.debug("Playlist Item Added")
+            if didAddItem {
+              playlistItemAdded = true
+            }
+          }
+        } else {
+          browserViewController.dismiss(animated: true) {
+            let tab = browserViewController.tabManager.selectedTab
+
+            if let webView = tab?.webView {
+              PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak browserViewController] currentTime in
+                browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
+              }
+            } else {
+              browserViewController.openPlaylist(tab: nil, item: item, playbackOffset: 0.0)
             }
           }
         }
