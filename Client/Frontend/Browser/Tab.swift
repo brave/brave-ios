@@ -33,6 +33,7 @@ protocol TabDelegate {
   func stopMediaPlayback(_ tab: Tab)
   func showWalletNotification(_ tab: Tab, origin: URLOrigin)
   func updateURLBarWalletButton()
+  func updateSolanaConnectionStatus(_ connectedAddresses: Set<String>)
   func isTabVisible(_ tab: Tab) -> Bool
 }
 

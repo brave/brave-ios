@@ -2519,9 +2519,10 @@ extension BrowserViewController: TabDelegate {
       return
     }
     let origin = tab.getOrigin()
+    let solDappConnectedAddresses = tab.walletSolConnectedAddresses
     let walletNotificaton = WalletNotification(priority: .low, origin: origin) { [weak self] action in
       if action == .connectWallet {
-        self?.presentWalletPanel(from: origin)
+        self?.presentWalletPanel(from: origin, with: solDappConnectedAddresses)
       }
     }
     notificationsPresenter.display(notification: walletNotificaton, from: self)
@@ -2540,6 +2541,13 @@ extension BrowserViewController: TabDelegate {
       }
     } else {
       topToolbar.updateWalletButtonState(.inactive)
+    }
+  }
+  
+  func updateSolanaConnectionStatus(_ connectedAddresses: Set<String>) {
+    Task { @MainActor in
+      guard let walletStore = self.walletStore else { return }
+      walletStore.cryptoStore?.solDappConnectedAddresses = connectedAddresses
     }
   }
 

@@ -64,6 +64,8 @@ public class CryptoStore: ObservableObject {
     }
   }
   @Published private(set) var pendingRequest: PendingRequest?
+  /// This is a list of latest solana dapp connected addresses for the current tab
+  @Published public var solDappConnectedAddresses: Set<String>?
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService

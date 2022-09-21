@@ -339,7 +339,7 @@ extension BrowserViewController: TopToolbarDelegate {
     guard let selectedTab = tabManager.selectedTab else {
       return
     }
-    presentWalletPanel(from: selectedTab.getOrigin())
+    presentWalletPanel(from: selectedTab.getOrigin(), with: selectedTab.walletSolConnectedAddresses)
   }
     
   private func hideSearchController() {
