@@ -132,13 +132,12 @@ class SolanaProviderHelper: TabContentScript {
       case .signMessage:
         guard let args = body.args,
               let argsList = MojoBase.Value(jsonString: args)?.listValue,
-              let messageDict = argsList.first?.dictionaryValue else {
+              let messageList = argsList.first?.listValue else {
           replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
-        let blobMsg: [NSNumber] =  messageDict.keys
-          .sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending })
-          .compactMap { messageDict[$0]?.intValue }
+        let blobMsg = messageList
+          .compactMap { $0.intValue }
           .map { NSNumber(value: $0) }
         let displayEncoding = argsList[safe: 1]?.stringValue
         let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
@@ -157,10 +156,20 @@ class SolanaProviderHelper: TabContentScript {
         replyHandler(encodedResult, nil)
       case .request:
         guard let args = body.args,
-              let argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
+              var argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let method = argDict["method"]?.stringValue else {
           replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
+        }
+        if method == "signMessage",
+           let messageList = argDict["params"]?.dictionaryValue?["message"]?.listValue {
+          /* Convert from [UInt8] to data / blob (Mojo binaryValue). */
+          let blobMsg: [NSNumber] =  messageList
+            .compactMap { $0.intValue }
+            .map { NSNumber(value: $0) }
+          var updatedParamsDict = argDict["params"]?.dictionaryValue ?? [:]
+          updatedParamsDict["message"] = MojoBase.Value(binaryValue: blobMsg)
+          argDict["params"] = MojoBase.Value(dictionaryValue: updatedParamsDict)
         }
         let (status, errorMessage, result) = await provider.request(argDict)
         guard status == .success else {
@@ -181,7 +190,6 @@ class SolanaProviderHelper: TabContentScript {
           if method == "disconnect" {
             tab.emitSolanaEvent(.disconnect)
           }
-          // TODO: Handle non-connect/disconnect request. Reply with:
           // - connect => { publicKey: solanaWeb3.PublicKey}
           // - disconnect => {}
           // - signTransaction => { publicKey: <base58 encoded string>,
