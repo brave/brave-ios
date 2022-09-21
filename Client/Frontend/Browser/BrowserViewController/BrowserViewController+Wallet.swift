@@ -293,7 +293,7 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
-    // TODO: can be called when Solana dapp tries to connect but user does not have Solana account
+    // TODO: Issue #6046 - Show account creation for given coin type
   }
   
   func isSolanaAccountConnected(_ account: String) -> Bool {
@@ -425,7 +425,7 @@ extension Tab: BraveWalletSolanaEventsListener {
         arguments.append(eventArgs)
       }
       await webView.evaluateSafeJavaScript(
-        functionName: "window.solana.emit", // TODO: `window.braveSolana` ?
+        functionName: "window.solana.emit",
         args: arguments,
         contentWorld: .page
       )

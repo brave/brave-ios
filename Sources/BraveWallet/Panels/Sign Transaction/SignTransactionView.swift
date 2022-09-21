@@ -26,7 +26,7 @@ struct SignTransactionView: View {
     }
   }
   
-  var body: some View { // TODO: SignTransaction / SignAllTransactions panel #6005
+  var body: some View { // TODO: Issue #6005 - SignTransaction / SignAllTransactions panel
     Color.gray
       .overlay(
         Button(action: {
