@@ -73,6 +73,13 @@ class CollapsedURLBarView: UIView {
     }
   }
   
+  var isKeyboardVisible: Bool = false {
+    didSet {
+      setNeedsUpdateConstraints()
+      updateConstraints()
+    }
+  }
+  
   private var topConstraint: Constraint?
   private var bottomConstraint: Constraint?
   
@@ -120,9 +127,14 @@ class CollapsedURLBarView: UIView {
   override func updateConstraints() {
     super.updateConstraints()
     
-    let safeAreaInset = window.map(\.safeAreaInsets) ?? .zero
-    bottomConstraint?.update(inset: safeAreaInset.top > 0 && !isUsingBottomBar ? 4 : 0)
-    topConstraint?.update(inset: safeAreaInset.bottom > 0 && isUsingBottomBar ? 4 : 0)
+    if isKeyboardVisible && isUsingBottomBar {
+      bottomConstraint?.update(inset: 0)
+      topConstraint?.update(inset: 0)
+    } else {
+      let safeAreaInset = window.map(\.safeAreaInsets) ?? .zero
+      bottomConstraint?.update(inset: safeAreaInset.top > 0 && !isUsingBottomBar ? 4 : 0)
+      topConstraint?.update(inset: safeAreaInset.bottom > 0 && isUsingBottomBar ? 4 : 0)
+    }
   }
   
   @available(*, unavailable)

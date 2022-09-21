@@ -71,7 +71,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var pageZoomBar: UIHostingController<PageZoomView>?
   private var pageZoomListener: NSObjectProtocol?
   private var openTabsModelStateListener: SendTabToSelfModelStateListener?
-  private let collapsedURLBarView = CollapsedURLBarView()
+  let collapsedURLBarView = CollapsedURLBarView()
 
   // Single data source used for all favorites vcs
   public let backgroundDataSource = NTPDataSource()
@@ -1198,7 +1198,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
       let findInPageHeight = (findInPageBar == nil) ? 0 : UIConstants.toolbarHeight
       if self.isUsingBottomBar {
-        make.bottom.equalTo(self.footer.snp.top).offset(-(findInPageHeight + self.header.bounds.height))
+        make.bottom.equalTo(self.header.snp.top).offset(-findInPageHeight)
       } else {
         make.bottom.equalTo(self.footer.snp.top).offset(-findInPageHeight)
       }
@@ -1206,8 +1206,13 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     header.snp.remakeConstraints { make in
       if self.isUsingBottomBar {
-        if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0, topToolbar.inOverlayMode {
-          make.bottom.equalTo(self.view).offset(-keyboardHeight)
+        if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0 {
+          var offset = -keyboardHeight
+          if !topToolbar.inOverlayMode {
+            // Showing collapsed URL bar while the keyboard is up
+            offset += toolbarVisibilityViewModel.transitionDistance + (view.safeAreaInsets.bottom > 0 ? 4 : 0)
+          }
+          make.bottom.equalTo(self.view).offset(offset)
         } else {
           if topToolbar.inOverlayMode {
             make.bottom.equalTo(self.view.safeArea.bottom)
@@ -1426,7 +1431,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     }
 
     func shouldShowTabBar() -> Bool {
-      if topToolbar.inOverlayMode && isUsingBottomBar {
+      if (topToolbar.inOverlayMode || keyboardState != nil) && isUsingBottomBar {
         return false
       }
       let tabCount = tabManager.tabsForCurrentMode.count
