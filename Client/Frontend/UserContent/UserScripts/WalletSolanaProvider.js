@@ -10,7 +10,7 @@
         webkit.messageHandlers.$<handler>.postMessage({
           "securitytoken": "$<security_token>",
           "method": method,
-          "args": JSON.stringify(payload)
+          "args": JSON.stringify(payload, (key, value) => { return value instanceof Uint8Array ? Array.from(value) : value; })
         })
         .then(
             (result) => {
