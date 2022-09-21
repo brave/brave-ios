@@ -9,6 +9,7 @@ import BraveCore
 import DesignSystem
 import Strings
 import Data
+import BraveShared
 
 public protocol WalletSiteConnectionDelegate {
   /// A list of accounts connected to this webpage (addresses)
@@ -153,6 +154,7 @@ struct WalletPanelView: View {
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var accountActivityStore: AccountActivityStore
+  @ObservedObject var allowSolProviderAccess: Preferences.Option<Bool> = Preferences.Wallet.allowSolProviderAccess
   var origin: URLOrigin
   var presentWalletWithContext: (PresentingContext) -> Void
   var presentBuySendSwap: () -> Void
@@ -190,25 +192,67 @@ struct WalletPanelView: View {
   @State private var solConnectedAddresses: Set<String> = .init()
   @State private var isConnectHidden: Bool = false
   
-  private var isConnected: Bool {
+  enum ConnectionStatus {
+    case connected
+    case disconnected
+    case blocked
+    
+    func title(_ coin: BraveWallet.CoinType) -> String {
+      if WalletDebugFlags.isSolanaDappsEnabled {
+        switch self {
+        case .connected:
+          return Strings.Wallet.walletPanelConnected
+        case .disconnected:
+          if coin == .eth {
+            return Strings.Wallet.walletPanelConnect
+          } else {
+            return Strings.Wallet.walletPanelDisconnected
+          }
+        case .blocked:
+          return Strings.Wallet.walletPanelBlocked
+        }
+      } else {
+        if self == .connected {
+          return Strings.Wallet.walletPanelConnected
+        }
+        return Strings.Wallet.walletPanelConnect
+      }
+    }
+  }
+  
+  private var accountStatus: ConnectionStatus {
     let selectedAccount = keyringStore.selectedAccount
-    switch selectedAccount.coin {
-    case .eth:
-      return ethPermittedAccounts.contains(selectedAccount.address)
-    case .sol:
-      return solConnectedAddresses.contains(selectedAccount.address)
-    case .fil:
-      return false
-    @unknown default:
-      return false
+    if WalletDebugFlags.isSolanaDappsEnabled {
+      switch selectedAccount.coin {
+      case .eth:
+        return ethPermittedAccounts.contains(selectedAccount.address) ? .connected : .disconnected
+      case .sol:
+        if !allowSolProviderAccess.value {
+          return .blocked
+        } else {
+          return solConnectedAddresses.contains(selectedAccount.address) ? .connected : .disconnected
+        }
+      case .fil:
+        return .blocked
+      @unknown default:
+        return .blocked
+      }
+    } else {
+      return ethPermittedAccounts.contains(selectedAccount.address) ? .connected : .disconnected
     }
   }
   
   @ViewBuilder private var connectButton: some View {
     Button {
-      presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
-        ethPermittedAccounts = accounts
-      }))
+      if accountStatus == .blocked {
+        presentWalletWithContext(.settings)
+      } else {
+        presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
+          if keyringStore.selectedAccount.coin == .eth {
+            ethPermittedAccounts = accounts
+          }
+        }))
+      }
     } label: {
       HStack {
         if WalletDebugFlags.isSolanaDappsEnabled {
@@ -217,25 +261,25 @@ struct WalletPanelView: View {
               .strokeBorder(.white, lineWidth: 1)
               .background(
                 Circle()
-                  .foregroundColor(isConnected ? .green : .red)
+                  .foregroundColor(accountStatus == .connected ? .green : .red)
               )
               .frame(width: 12, height: 12)
-            Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelDisconnected)
+            Text(accountStatus.title(keyringStore.selectedAccount.coin))
               .fontWeight(.bold)
               .lineLimit(1)
           } else {
-            if isConnected {
+            if accountStatus == .connected {
               Image(systemName: "checkmark")
             }
-            Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
+            Text(accountStatus.title(keyringStore.selectedAccount.coin))
               .fontWeight(.bold)
               .lineLimit(1)
           }
         } else {
-          if isConnected {
+          if accountStatus == .connected {
             Image(systemName: "checkmark")
           }
-          Text(isConnected ? Strings.Wallet.walletPanelConnected : Strings.Wallet.walletPanelConnect)
+          Text(accountStatus.title(keyringStore.selectedAccount.coin))
             .fontWeight(.bold)
             .lineLimit(1)
         }
