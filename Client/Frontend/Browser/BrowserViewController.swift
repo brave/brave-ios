@@ -1210,7 +1210,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
           var offset = -keyboardHeight
           if !topToolbar.inOverlayMode {
             // Showing collapsed URL bar while the keyboard is up
-            offset += toolbarVisibilityViewModel.transitionDistance + (view.safeAreaInsets.bottom > 0 ? 4 : 0)
+            offset += toolbarVisibilityViewModel.transitionDistance
           }
           make.bottom.equalTo(self.view).offset(offset)
         } else {
@@ -1265,7 +1265,12 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       make.width.equalTo(self.view.safeArea.width)
       
       if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0 {
-        if self.isUsingBottomBar, topToolbar.inOverlayMode {
+        if self.isUsingBottomBar {
+          var offset = -keyboardHeight
+          if !topToolbar.inOverlayMode {
+            // Showing collapsed URL bar while the keyboard is up
+            offset += toolbarVisibilityViewModel.transitionDistance
+          }
           make.bottom.equalTo(header.snp.top)
         } else {
           make.bottom.equalTo(self.view).offset(-keyboardHeight)
