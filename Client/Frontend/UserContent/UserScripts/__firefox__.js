@@ -32,6 +32,24 @@ if (!window.__firefox__) {
   let secureObjects = [$Object, $Function, $Reflect, $Array];
   
   /*
+   *  Prevent recursive calls if a page overrides these.
+   *  These functions can be frozen, without freezing the Function.prototype functions.
+   */
+  let call = $Function.call;
+  let apply = $Function.apply;
+  let bind = $Function.bind;
+  
+  call.call = call;
+  call.apply = apply;
+  
+  apply.call = call;
+  apply.apply = apply;
+  
+  bind.call = call;
+  bind.apply = apply;
+  
+  
+  /*
    *  Secures an object's attributes
    */
   let $ = function(value) {
@@ -71,7 +89,7 @@ if (!window.__firefox__) {
           writable: false,
           value: property
         });
-        
+
         if (name !== 'toString') {
           $.deepFreeze(toString[name]);
         }
@@ -128,10 +146,10 @@ if (!window.__firefox__) {
   $.deepFreeze($.postNativeMessage);
   $.deepFreeze($);
   
-  for (const value of Object.entries(secureObjects)) {
-    $(value);
-    $.deepFreeze(value);
-  }
+//  for (const value of Object.entries(secureObjects)) {
+//    $(value);
+//    $.deepFreeze(value);
+//  }
   
   /*
    *  Creates a Proxy object that does the following to all objects using it:
