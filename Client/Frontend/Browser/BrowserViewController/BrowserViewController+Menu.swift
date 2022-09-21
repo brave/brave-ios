@@ -32,7 +32,7 @@ extension BrowserViewController {
     }
   }
 
-  func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {v
+  func privacyFeaturesMenuSection(_ menuController: MenuViewController) -> some View {
     VStack(alignment: .leading, spacing: 5) {
       Text(Strings.OptionsMenu.menuSectionTitle.capitalized)
         .font(.callout.weight(.semibold))
@@ -41,7 +41,7 @@ extension BrowserViewController {
         .padding(.bottom, 5)
 
       vpnButton(menuController)
-      playlistButton()
+      playlistButton(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription)
       
       // Add Brave Talk and News options only in normal browsing
       if !PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -52,7 +52,7 @@ extension BrowserViewController {
         talkButton()
       }
 
-      cryptoButton()
+      cryptoButton(subtitle: Strings.OptionsMenu.braveWalletItemDescription)
     }
     .fixedSize(horizontal: false, vertical: true)
     .padding(.top, 10)
@@ -61,75 +61,15 @@ extension BrowserViewController {
 
   func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {
     VStack(spacing: 0) {
-      MenuItemButton(icon: UIImage(named: "menu_bookmarks", in: .current, compatibleWith: nil)!.template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
-        let vc = BookmarksViewController(
-          folder: bookmarkManager.lastVisitedFolder(),
-          bookmarkManager: bookmarkManager,
-          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-        vc.toolbarUrlActionsDelegate = self
-        menuController.presentInnerMenu(vc)
-      }
+      bookmarksButton(menuController)
+      historyButton(menuController)
+      downloadsButton()
 
-      MenuItemButton(icon: UIImage(named: "menu-history", in: .current, compatibleWith: nil)!.template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-        let vc = HistoryViewController(
-          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
-          historyAPI: braveCore.historyAPI,
-          tabManager: tabManager)
-        vc.toolbarUrlActionsDelegate = self
-        menuController.pushInnerMenu(vc)
-      }
-      MenuItemButton(icon: UIImage(named: "menu-downloads", in: .current, compatibleWith: nil)!.template, title: Strings.downloadsMenuItem) { [unowned self] in
-        FileManager.default.openBraveDownloadsFolder { success in
-          if !success {
-            self.displayOpenDownloadsError()
-          }
-        }
-      }
       if isShownOnWebPage {
-        MenuItemButton(
-          icon: UIImage(named: "menu-crypto", in: .current, compatibleWith: nil)!.template,
-          title: Strings.Wallet.wallet
-        ) { [weak self] in
-          self?.presentWallet()
-        }
-        MenuItemButton(icon: UIImage(named: "playlist_menu", in: .current, compatibleWith: nil)!.template, title: Strings.playlistMenuItem) { [weak self] in
-          guard let self = self else { return }
-          self.presentPlaylistController()
-        }
+        cryptoButton()
+        playlistButton()
       }
-      MenuItemButton(icon: UIImage(named: "menu-settings", in: .current, compatibleWith: nil)!.template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
-        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: isPrivateMode)
-        let walletService = BraveWallet.ServiceFactory.get(privateMode: isPrivateMode)
-        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode)
-        
-        var keyringStore: KeyringStore?
-        if let keyringService = keyringService,
-           let walletService = walletService,
-           let rpcService = rpcService {
-          keyringStore = KeyringStore(
-            keyringService: keyringService,
-            walletService: walletService,
-            rpcService: rpcService
-          )
-        }
-        
-        let cryptoStore = CryptoStore.from(privateMode: isPrivateMode)
-
-        let vc = SettingsViewController(
-          profile: self.profile,
-          tabManager: self.tabManager,
-          feedDataSource: self.feedDataSource,
-          rewards: self.rewards,
-          legacyWallet: self.legacyWallet,
-          windowProtection: self.windowProtection,
-          braveCore: self.braveCore,
-          keyringStore: keyringStore,
-          cryptoStore: cryptoStore
-        )
-        vc.settingsDelegate = self
-        menuController.pushInnerMenu(vc)
-      }
+      settingsButton(menuController)
     }
   }
   
@@ -150,11 +90,11 @@ extension BrowserViewController {
     )
   }
   
-  private func playlistButton() -> MenuItemButton {
+  private func playlistButton(subtitle: String? = nil) -> MenuItemButton {
     MenuItemButton(
       icon: UIImage(named: "playlist_menu", in: .current, compatibleWith: nil)!.template,
       title: Strings.OptionsMenu.bravePlaylistItemTitle,
-      subtitle: Strings.OptionsMenu.bravePlaylistItemDescription
+      subtitle: subtitle
     ) { [weak self] in
       guard let self = self else { return }
 
@@ -190,11 +130,11 @@ extension BrowserViewController {
     }
   }
   
-  private func cryptoButton() -> MenuItemButton {
+  private func cryptoButton(subtitle: String? = nil) -> MenuItemButton {
     MenuItemButton(
       icon: UIImage(named: "menu-crypto", in: .current, compatibleWith: nil)!.template,
       title: Strings.Wallet.wallet,
-      subtitle: Strings.OptionsMenu.braveWalletItemDescription
+      subtitle: subtitle
     ) { [unowned self] in
       self.presentWallet()
     }
@@ -227,6 +167,74 @@ extension BrowserViewController {
           self.present(playlistController, animated: true)
         }
       }
+    }
+  }
+  
+  private func bookmarksButton(_ menuController: MenuViewController) -> MenuItemButton {
+    MenuItemButton(icon: UIImage(named: "menu_bookmarks", in: .current, compatibleWith: nil)!.template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
+      let vc = BookmarksViewController(
+        folder: bookmarkManager.lastVisitedFolder(),
+        bookmarkManager: bookmarkManager,
+        isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+      vc.toolbarUrlActionsDelegate = self
+      menuController.presentInnerMenu(vc)
+    }
+  }
+  
+  private func historyButton(_ menuController: MenuViewController) -> MenuItemButton {
+    MenuItemButton(icon: UIImage(named: "menu-history", in: .current, compatibleWith: nil)!.template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
+      let vc = HistoryViewController(
+        isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
+        historyAPI: braveCore.historyAPI,
+        tabManager: tabManager)
+      vc.toolbarUrlActionsDelegate = self
+      menuController.pushInnerMenu(vc)
+    }
+  }
+  
+  private func downloadsButton() -> MenuItemButton {
+    MenuItemButton(icon: UIImage(named: "menu-downloads", in: .current, compatibleWith: nil)!.template, title: Strings.downloadsMenuItem) { [unowned self] in
+      FileManager.default.openBraveDownloadsFolder { success in
+        if !success {
+          self.displayOpenDownloadsError()
+        }
+      }
+    }
+  }
+  
+  private func settingsButton(_ menuController: MenuViewController) -> MenuItemButton {
+    MenuItemButton(icon: UIImage(named: "menu-settings", in: .current, compatibleWith: nil)!.template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
+      let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+      let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: isPrivateMode)
+      let walletService = BraveWallet.ServiceFactory.get(privateMode: isPrivateMode)
+      let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode)
+      
+      var keyringStore: KeyringStore?
+      if let keyringService = keyringService,
+         let walletService = walletService,
+         let rpcService = rpcService {
+        keyringStore = KeyringStore(
+          keyringService: keyringService,
+          walletService: walletService,
+          rpcService: rpcService
+        )
+      }
+      
+      let cryptoStore = CryptoStore.from(privateMode: isPrivateMode)
+
+      let vc = SettingsViewController(
+        profile: self.profile,
+        tabManager: self.tabManager,
+        feedDataSource: self.feedDataSource,
+        rewards: self.rewards,
+        legacyWallet: self.legacyWallet,
+        windowProtection: self.windowProtection,
+        braveCore: self.braveCore,
+        keyringStore: keyringStore,
+        cryptoStore: cryptoStore
+      )
+      vc.settingsDelegate = self
+      menuController.pushInnerMenu(vc)
     }
   }
 
