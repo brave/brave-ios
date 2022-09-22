@@ -7,6 +7,7 @@ import Shared
 import Data
 import BraveCore
 import BraveShared
+import BraveWallet
 
 private let log = Logger.browserLogger
 
@@ -597,7 +598,8 @@ class UserScriptManager {
         }
       }
       
-      if let script = walletSolProviderScript,
+      if WalletDebugFlags.isSolanaDappsEnabled,
+         let script = walletSolProviderScript,
          tab?.isPrivate == false,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave {
         $0.addUserScript(script)
