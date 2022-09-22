@@ -7,6 +7,7 @@ import Shared
 import Data
 import BraveCore
 import BraveShared
+import BraveWallet
 import os.log
 
 private class ScriptLoader: TabContentScriptLoader { }
