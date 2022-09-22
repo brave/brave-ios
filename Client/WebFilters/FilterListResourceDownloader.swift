@@ -225,7 +225,7 @@ public class FilterListResourceDownloader: ObservableObject {
   /// Invoked when shield components are loaded
   ///
   /// This function will start fetching data and subscribe publishers once if it hasn't already done so.
-  private func didUpdateShieldComponent(folderPath: String, adBlockFilterLists: [AdblockFilterList]) {
+  private func didUpdateShieldComponent(folderPath: String, adBlockFilterLists: [AdblockFilterListCatalogEntry]) {
     if !startedFetching && !adBlockFilterLists.isEmpty {
       startedFetching = true
       let filterLists = loadFilterLists(from: adBlockFilterLists, filterListSettings: settingsManager.allFilterListSettings)
@@ -266,7 +266,7 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   /// Load filter lists from the ad block service
-  private func loadFilterLists(from regionalFilterLists: [AdblockFilterList], filterListSettings: [FilterListSetting]) -> [FilterList] {
+  private func loadFilterLists(from regionalFilterLists: [AdblockFilterListCatalogEntry], filterListSettings: [FilterListSetting]) -> [FilterList] {
     return regionalFilterLists.map { adBlockFilterList in
       let setting = filterListSettings.first(where: { $0.uuid == adBlockFilterList.uuid })
       return FilterList(from: adBlockFilterList, isEnabled: setting?.isEnabled ?? false)
