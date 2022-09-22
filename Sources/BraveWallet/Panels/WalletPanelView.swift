@@ -186,16 +186,28 @@ struct WalletPanelView: View {
     currencyFormatter.currencyCode = accountActivityStore.currencyCode
   }
   
-  @State private var permittedAccounts: [String] = []
+  @State private var ethPermittedAccounts: [String] = []
+  @State private var solConnectedAddresses: Set<String> = .init()
+  @State private var isConnectHidden: Bool = false
   
   private var isConnected: Bool {
-    return permittedAccounts.contains(keyringStore.selectedAccount.address)
+    let selectedAccount = keyringStore.selectedAccount
+    switch selectedAccount.coin {
+    case .eth:
+      return ethPermittedAccounts.contains(selectedAccount.address)
+    case .sol:
+      return solConnectedAddresses.contains(selectedAccount.address)
+    case .fil:
+      return false
+    @unknown default:
+      return false
+    }
   }
   
   @ViewBuilder private var connectButton: some View {
     Button {
       presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
-        permittedAccounts = accounts
+        ethPermittedAccounts = accounts
       }))
     } label: {
       HStack {
@@ -287,7 +299,7 @@ struct WalletPanelView: View {
   }
   
   /// A boolean value indicates to hide or unhide `Connect` button
-  private var isConnectHidden: Bool {
+  private func isConnectButtonHidden() -> Bool {
     guard WalletDebugFlags.isSolanaDappsEnabled else { return false }
     let account = keyringStore.selectedAccount
     if account.coin == .sol {
@@ -444,18 +456,37 @@ struct WalletPanelView: View {
         presentWalletWithContext(.pendingRequests)
       }
     }
+    .onChange(of: cryptoStore.solDappConnectedAddresses) { newValue in
+      if let addresses = newValue {
+        solConnectedAddresses = addresses
+      }
+    }
+    .onChange(of: keyringStore.selectedAccount) { _ in
+      isConnectHidden = isConnectButtonHidden()
+    }
     .onAppear {
       let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
       if let request = permissionRequestManager.pendingRequests(for: origin, coinType: .eth).first {
         presentWalletWithContext(.requestEthererumPermissions(request, onPermittedAccountsUpdated: { accounts in
-          permittedAccounts = accounts
+          if request.coinType == .eth {
+            ethPermittedAccounts = accounts
+          } else if request.coinType == .sol {
+            isConnectHidden = false
+          }
         }))
       } else {
         cryptoStore.prepare()
       }
       if let url = origin.url, let accounts = Domain.walletPermissions(forUrl: url, coin: .eth) {
-        permittedAccounts = accounts
+        ethPermittedAccounts = accounts
       }
+      
+      if let solAddresses = cryptoStore.solDappConnectedAddresses {
+        solConnectedAddresses = solAddresses
+      }
+      
+      isConnectHidden = isConnectButtonHidden()
+      
       accountActivityStore.update()
     }
   }

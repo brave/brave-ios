@@ -20,7 +20,8 @@ extension WalletStore {
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
-      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+      solDappConnectedAddresses: .init()
     )
   }
 }

@@ -17,7 +17,7 @@ private let log = Logger.browserLogger
 
 extension WalletStore {
   /// Creates a WalletStore based on whether or not the user is in Private Mode
-  static func from(privateMode: Bool) -> WalletStore? {
+  static func from(privateMode: Bool, solDappConnectedAddresses: Set<String>) -> WalletStore? {
     guard
       let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
       let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: privateMode),
@@ -40,7 +40,8 @@ extension WalletStore {
       blockchainRegistry: BraveWalletAPI.blockchainRegistry,
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
-      solTxManagerProxy: solTxManagerProxy
+      solTxManagerProxy: solTxManagerProxy,
+      solDappConnectedAddresses: solDappConnectedAddresses
     )
   }
 }
@@ -78,9 +79,12 @@ extension CryptoStore {
 extension BrowserViewController {
   /// Initializes a new WalletStore for displaying the wallet, setting up an observer to notify
   /// when the pending request is updated so we can update the wallet url bar button.
-  func newWalletStore() -> WalletStore? {
+  func newWalletStore(_ solDappConnectedAddresses: Set<String>) -> WalletStore? {
     let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    guard let walletStore = WalletStore.from(privateMode: privateMode) else {
+    guard let walletStore = WalletStore.from(
+      privateMode: privateMode,
+      solDappConnectedAddresses: solDappConnectedAddresses
+    ) else {
       log.error("Failed to load wallet. One or more services were unavailable")
       return nil
     }
@@ -92,9 +96,8 @@ extension BrowserViewController {
     return walletStore
   }
   
-  func presentWalletPanel(tab: Tab) {
-    guard let walletStore = self.walletStore ?? newWalletStore() else { return }
-    let origin = tab.getOrigin()
+  func presentWalletPanel(from origin: URLOrigin, with solDappConnectedAddresses: Set<String>) {
+    guard let walletStore = self.walletStore ?? newWalletStore(solDappConnectedAddresses) else { return }
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
       origin: origin,
@@ -182,7 +185,7 @@ extension Tab: BraveWalletProviderDelegate {
         return
       }
       
-      guard WalletStore.from(privateMode: isPrivate) != nil else {
+      guard WalletStore.from(privateMode: isPrivate, solDappConnectedAddresses: walletSolConnectedAddresses) != nil else {
         completion(.internal, nil)
         return
       }
@@ -277,9 +280,18 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func addSolanaConnectedAccount(_ account: String) {
+    walletSolConnectedAddresses.insert(account)
+    tabDelegate?.updateSolanaConnectionStatus(walletSolConnectedAddresses)
   }
   
   func removeSolanaConnectedAccount(_ account: String) {
+    walletSolConnectedAddresses.remove(account)
+    tabDelegate?.updateSolanaConnectionStatus(walletSolConnectedAddresses)
+  }
+  
+  func clearSolanaConnectedAccounts() {
+    walletSolConnectedAddresses = .init()
+    tabDelegate?.updateSolanaConnectionStatus(walletSolConnectedAddresses)
   }
 }
 

@@ -33,6 +33,7 @@ protocol TabDelegate {
   func stopMediaPlayback(_ tab: Tab)
   func showWalletNotification(_ tab: Tab, origin: URLOrigin)
   func updateURLBarWalletButton()
+  func updateSolanaConnectionStatus(_ connectedAddresses: Set<String>)
   func isTabVisible(_ tab: Tab) -> Bool
 }
 
@@ -71,6 +72,8 @@ class Tab: NSObject {
 
   var walletEthProvider: BraveWalletEthereumProvider?
   var walletEthProviderJS: String?
+  var walletSolConnectedAddresses: Set<String> = .init()
+  
   var isWalletIconVisible: Bool = false {
     didSet {
       tabDelegate?.updateURLBarWalletButton()
