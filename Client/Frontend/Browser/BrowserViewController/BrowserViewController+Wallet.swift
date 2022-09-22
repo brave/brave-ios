@@ -282,8 +282,10 @@ extension Tab: BraveWalletProviderDelegate {
   
   func isPermissionDenied(_ type: BraveWallet.CoinType) -> Bool {
     switch type {
-    case .eth, .sol:
+    case .eth:
       return false
+    case .sol:
+      return !WalletDebugFlags.isSolanaDappsEnabled
     case .fil:
       return true
     @unknown default:
