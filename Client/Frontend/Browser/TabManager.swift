@@ -10,6 +10,7 @@ import BraveShared
 import Data
 import CoreData
 import BraveCore
+import BraveWallet
 import os.log
 
 protocol TabManagerDelegate: AnyObject {
@@ -499,7 +500,7 @@ class TabManager: NSObject {
                                                         forMainFrameOnly: true,
                                                         in: .page)
     }
-    if let (provider, jsScripts) = makeWalletSolProvider?(tab) {
+    if WalletDebugFlags.isSolanaDappsEnabled, let (provider, jsScripts) = makeWalletSolProvider?(tab) {
       tab.walletSolProvider = provider
       tab.walletSolProvider?.`init`(tab)
       tab.walletSolProviderScripts = jsScripts
