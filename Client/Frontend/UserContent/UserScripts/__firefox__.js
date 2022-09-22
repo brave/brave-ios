@@ -12,7 +12,10 @@ if (!window.__firefox__) {
   function secureCopy(value) {
     let properties = Object.assign({},
                                    Object.getOwnPropertyDescriptors(value),
-                                   value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : {});
+                                   value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : undefined);
+    
+    // Do not copy the prototype.
+    delete properties['prototype'];
     
     /// Making object not inherit from Object.prototype prevents prototype pollution attacks.
     return Object.create(null, properties);
@@ -38,13 +41,13 @@ if (!window.__firefox__) {
   let call = $Function.call;
   let apply = $Function.apply;
   let bind = $Function.bind;
-  
+
   call.call = call;
   call.apply = apply;
-  
+
   apply.call = call;
   apply.apply = apply;
-  
+
   bind.call = call;
   bind.apply = apply;
   
@@ -79,7 +82,7 @@ if (!window.__firefox__) {
       }
       
       for (const [name, property] of $Object.entries(overrides)) {
-        if ((Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
+        if (($Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
           toString[name] = property;
         }
 
@@ -98,7 +101,7 @@ if (!window.__firefox__) {
       $.deepFreeze(toString);
 
       for (const [name, property] of $Object.entries(overrides)) {
-        if ((Object.getOwnPropertyDescriptor(value, name) || {}).writable) {
+        if (($Object.getOwnPropertyDescriptor(value, name) || {}).writable) {
           value[name] = property;
         }
 
@@ -146,10 +149,10 @@ if (!window.__firefox__) {
   $.deepFreeze($.postNativeMessage);
   $.deepFreeze($);
   
-//  for (const value of Object.entries(secureObjects)) {
-//    $(value);
-//    $.deepFreeze(value);
-//  }
+  for (const value of secureObjects) {
+    $(value);
+    $.deepFreeze(value);
+  }
   
   /*
    *  Creates a Proxy object that does the following to all objects using it:
