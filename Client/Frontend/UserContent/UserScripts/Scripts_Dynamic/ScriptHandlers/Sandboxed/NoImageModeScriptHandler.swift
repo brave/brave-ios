@@ -29,6 +29,6 @@ class NoImageModeScriptHandler: TabContentScript {
   }
   
   static func executeScript(for webView: WKWebView) {
-    webView.evaluateSafeJavaScript(functionName: "__firefox__.NoImageMode.setEnabled", args: [true], contentWorld: .defaultClient)
+    webView.evaluateSafeJavaScript(functionName: "__firefox__.NoImageMode.setEnabled", args: [true], contentWorld: NoImageModeScriptHandler.scriptSandbox)
   }
 }

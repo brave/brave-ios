@@ -225,7 +225,7 @@ extension PlaylistScriptHandler: UIGestureRecognizerDelegate {
       Preferences.Playlist.enableLongPressAddToPlaylist.value {
       let touchPoint = gestureRecognizer.location(in: webView)
 
-      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.playlistLongPressed", args: [touchPoint.x, touchPoint.y, Self.scriptId], contentWorld: .page, asFunction: true) { _, error in
+      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.playlistLongPressed", args: [touchPoint.x, touchPoint.y, Self.scriptId], contentWorld: Self.scriptSandbox, asFunction: true) { _, error in
 
         if let error = error {
           log.error("Error executing onLongPressActivated: \(error)")
@@ -253,7 +253,7 @@ extension PlaylistScriptHandler {
       return
     }
     
-    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag", args: [nodeTag, Self.scriptId], contentWorld: .page, asFunction: true) { value, error in
+    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag", args: [nodeTag, Self.scriptId], contentWorld: Self.scriptSandbox, asFunction: true) { value, error in
 
       if let error = error {
         log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
@@ -272,7 +272,7 @@ extension PlaylistScriptHandler {
   static func stopPlayback(tab: Tab?) {
     guard let tab = tab else { return }
 
-    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.stopMediaPlayback", args: [Self.scriptId], contentWorld: .page, asFunction: true) { value, error in
+    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.stopMediaPlayback", args: [Self.scriptId], contentWorld: Self.scriptSandbox, asFunction: true) { value, error in
       if let error = error {
         log.error("Error Retrieving Stopping Media Playback: \(error)")
       }

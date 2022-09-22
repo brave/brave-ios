@@ -1047,7 +1047,7 @@ extension TabManager: WKNavigationDelegate {
     guard let tab = self[webView] else { return }
 
     if !tab.contentBlocker.isEnabled {
-      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.TrackingProtectionStats.setEnabled", args: [false, UserScriptManager.securityToken], contentWorld: .page)
+      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.TrackingProtectionStats.setEnabled", args: [false, UserScriptManager.securityToken], contentWorld: ContentBlockerHelper.scriptSandbox)
     }
   }
 

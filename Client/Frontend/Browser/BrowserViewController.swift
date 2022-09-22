@@ -2115,7 +2115,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       findInPageBar.endEditing(true)
       let tab = tab ?? tabManager.selectedTab
       guard let webView = tab?.webView else { return }
-      webView.evaluateSafeJavaScript(functionName: "__firefox__.findDone", contentWorld: .defaultClient)
+      webView.evaluateSafeJavaScript(functionName: "__firefox__.findDone", contentWorld: FindInPageScriptHandler.scriptSandbox)
       findInPageBar.removeFromSuperview()
       self.findInPageBar = nil
       updateViewConstraints()
@@ -2193,7 +2193,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
         // because that event will not always fire due to unreliable page caching. This will either let us know that
         // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We
         // ignore the result because we are being called back asynchronous when the readermode status changes.
-        webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: .defaultClient)
+        webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: ReaderModeScriptHandler.scriptSandbox)
 
         // Re-run additional scripts in webView to extract updated favicons and metadata.
         runScriptsOnWebView(webView)
@@ -3388,7 +3388,7 @@ extension BrowserViewController: FindInPageBarDelegate, FindInPageScriptHandlerD
         self.findInPageBar?.currentResult = index
       }
     } else {
-      webView.evaluateSafeJavaScript(functionName: "__firefox__.\(function)", args: [text], contentWorld: .defaultClient)
+      webView.evaluateSafeJavaScript(functionName: "__firefox__.\(function)", args: [text], contentWorld: FindInPageScriptHandler.scriptSandbox)
     }
   }
 

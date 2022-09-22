@@ -150,7 +150,7 @@ extension BrowserViewController {
       PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
     } else {
       // Store the readability result in the cache and load it. This will later move to the ReadabilityHelper.
-      webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).readerize", contentWorld: .defaultClient) { (object, error) -> Void in
+      webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).readerize", contentWorld: ReaderModeScriptHandler.scriptSandbox) { (object, error) -> Void in
         if let readabilityResult = ReadabilityResult(object: object as AnyObject?) {
           let playlistItem = tab.playlistItem
           try? self.readerModeCache.put(currentURL, readabilityResult)

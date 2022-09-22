@@ -973,7 +973,7 @@ extension Tab {
         self.webView?.evaluateSafeJavaScript(
           functionName: "window.onFetchedBackupResults",
           args: [queryResult],
-          contentWorld: .page,
+          contentWorld: BraveSearchScriptHandler.scriptSandbox,
           escapeArgs: false)
 
         // Cleanup
@@ -988,7 +988,7 @@ extension Tab {
   func injectSessionStorageItem(key: String, value: String) {
     self.webView?.evaluateSafeJavaScript(functionName: "sessionStorage.setItem",
                                          args: [key, value],
-                                         contentWorld: .page)
+                                         contentWorld: BraveSkusScriptHandler.scriptSandbox)
   }
 }
 

@@ -333,7 +333,7 @@ class LoginsScriptHandler: TabContentScript {
     self.tab?.webView?.evaluateSafeJavaScript(
       functionName: "window.__firefox__.logins.inject",
       args: [jsonString],
-      contentWorld: .defaultClient,
+      contentWorld: LoginsScriptHandler.scriptSandbox,
       escapeArgs: false
     ) { (object, error) -> Void in
       if error != nil {
