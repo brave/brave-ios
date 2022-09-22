@@ -35,7 +35,7 @@ class BraveSkusScriptHandler: TabContentScript {
                                                     securityToken: scriptId,
                                                     script: script),
                                injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
+                               forMainFrameOnly: true,
                                in: scriptSandbox)
   }()
   
