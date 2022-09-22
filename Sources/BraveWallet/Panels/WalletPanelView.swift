@@ -21,6 +21,7 @@ public protocol WalletSiteConnectionDelegate {
 public struct WalletPanelContainerView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var tabDappStore: TabDappStore
   var origin: URLOrigin
   var presentWalletWithContext: ((PresentingContext) -> Void)?
   var presentBuySendSwap: (() -> Void)?
@@ -119,6 +120,7 @@ public struct WalletPanelContainerView: View {
             cryptoStore: cryptoStore,
             networkStore: cryptoStore.networkStore,
             accountActivityStore: cryptoStore.accountActivityStore(for: keyringStore.selectedAccount),
+            tabDappStore: tabDappStore,
             origin: origin,
             presentWalletWithContext: { context in
               self.presentWalletWithContext?(context)
@@ -155,6 +157,7 @@ struct WalletPanelView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var accountActivityStore: AccountActivityStore
   @ObservedObject var allowSolProviderAccess: Preferences.Option<Bool> = Preferences.Wallet.allowSolProviderAccess
+  @ObservedObject var tabDappStore: TabDappStore
   var origin: URLOrigin
   var presentWalletWithContext: (PresentingContext) -> Void
   var presentBuySendSwap: () -> Void
@@ -171,6 +174,7 @@ struct WalletPanelView: View {
     cryptoStore: CryptoStore,
     networkStore: NetworkStore,
     accountActivityStore: AccountActivityStore,
+    tabDappStore: TabDappStore,
     origin: URLOrigin,
     presentWalletWithContext: @escaping (PresentingContext) -> Void,
     presentBuySendSwap: @escaping () -> Void,
@@ -180,6 +184,7 @@ struct WalletPanelView: View {
     self.cryptoStore = cryptoStore
     self.networkStore = networkStore
     self.accountActivityStore = accountActivityStore
+    self.tabDappStore = tabDappStore
     self.origin = origin
     self.presentWalletWithContext = presentWalletWithContext
     self.presentBuySendSwap = presentBuySendSwap
@@ -500,10 +505,8 @@ struct WalletPanelView: View {
         presentWalletWithContext(.pendingRequests)
       }
     }
-    .onChange(of: cryptoStore.solDappConnectedAddresses) { newValue in
-      if let addresses = newValue {
-        solConnectedAddresses = addresses
-      }
+    .onChange(of: tabDappStore.solConnectedAddresses) { newValue in
+      solConnectedAddresses = newValue
     }
     .onChange(of: keyringStore.selectedAccount) { _ in
       isConnectHidden = isConnectButtonHidden()
@@ -525,9 +528,7 @@ struct WalletPanelView: View {
         ethPermittedAccounts = accounts
       }
       
-      if let solAddresses = cryptoStore.solDappConnectedAddresses {
-        solConnectedAddresses = solAddresses
-      }
+      solConnectedAddresses = tabDappStore.solConnectedAddresses
       
       isConnectHidden = isConnectButtonHidden()
       
@@ -555,6 +556,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         cryptoStore: .previewStore,
         networkStore: .previewStore,
         accountActivityStore: .previewStore,
+        tabDappStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},
@@ -565,6 +567,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         cryptoStore: .previewStore,
         networkStore: .previewStore,
         accountActivityStore: .previewStore,
+        tabDappStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},
@@ -579,6 +582,7 @@ struct WalletPanelView_Previews: PreviewProvider {
         cryptoStore: .previewStore,
         networkStore: .previewStore,
         accountActivityStore: .previewStore,
+        tabDappStore: .previewStore,
         origin: .init(url: URL(string: "https://app.uniswap.org")!),
         presentWalletWithContext: { _ in },
         presentBuySendSwap: {},

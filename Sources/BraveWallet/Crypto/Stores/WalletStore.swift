@@ -29,8 +29,7 @@ public class WalletStore {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    solDappConnectedAddresses: Set<String>
+    solTxManagerProxy: BraveWalletSolanaTxManagerProxy
   ) {
     self.keyringStore = .init(keyringService: keyringService, walletService: walletService, rpcService: rpcService)
     self.setUp(
@@ -42,8 +41,7 @@ public class WalletStore {
       blockchainRegistry: blockchainRegistry,
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
-      solTxManagerProxy: solTxManagerProxy,
-      solDappConnectedAddresses: solDappConnectedAddresses
+      solTxManagerProxy: solTxManagerProxy
     )
   }
 
@@ -56,8 +54,7 @@ public class WalletStore {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
-    solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    solDappConnectedAddresses: Set<String>
+    solTxManagerProxy: BraveWalletSolanaTxManagerProxy
   ) {
     self.cancellable = self.keyringStore.$defaultKeyring
       .map(\.isKeyringCreated)
@@ -83,7 +80,6 @@ public class WalletStore {
             .sink { [weak self] _ in
               self?.onPendingRequestUpdated.send()
             }
-          self.cryptoStore?.solDappConnectedAddresses = solDappConnectedAddresses
         }
       }
   }

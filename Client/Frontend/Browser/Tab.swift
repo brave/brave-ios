@@ -11,6 +11,7 @@ import BraveShared
 import SwiftyJSON
 import XCGLogger
 import Data
+import BraveWallet
 
 private let log = Logger.browserLogger
 
@@ -33,7 +34,6 @@ protocol TabDelegate {
   func stopMediaPlayback(_ tab: Tab)
   func showWalletNotification(_ tab: Tab, origin: URLOrigin)
   func updateURLBarWalletButton()
-  func updateSolanaConnectionStatus(_ connectedAddresses: Set<String>)
   func isTabVisible(_ tab: Tab) -> Bool
 }
 
@@ -74,7 +74,7 @@ class Tab: NSObject {
   var walletEthProviderJS: String?
   var walletSolProvider: BraveWalletSolanaProvider?
   var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
-  var walletSolConnectedAddresses: Set<String> = .init()
+  var tabDappStore: TabDappStore = .init()
   
   var isWalletIconVisible: Bool = false {
     didSet {
