@@ -285,8 +285,8 @@ extension BrowserViewController: WKNavigationDelegate {
     if let frameInfo = navigationAction.targetFrame {
       do {
         let sources = try AdBlockStats.shared.makeEngineScriptSouces(for: url)
-        let evaluations = sources.map { source -> Tab.FrameEvaluation in
-          return (frameInfo: frameInfo, source: source)
+        let evaluations = sources.map {
+          Tab.FrameEvaluation(frameInfo: frameInfo, source: $0)
         }
         
         tab?.frameEvaluations[url] = evaluations
