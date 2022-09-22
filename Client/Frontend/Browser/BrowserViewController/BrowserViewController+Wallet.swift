@@ -201,13 +201,24 @@ extension Tab: BraveWalletProviderDelegate {
         completion(.internal, nil)
         return
       }
-      let (success, accounts) = await allowedAccounts(coinType, accounts: accounts)
+      let (success, allowedAccounts) = await allowedAccounts(coinType, accounts: accounts)
       if !success {
         completion(.internal, [])
         return
       }
-      if success && !accounts.isEmpty {
-        completion(.none, accounts)
+      switch coinType {
+      case .eth:
+        if success, !allowedAccounts.isEmpty {
+          completion(.none, allowedAccounts)
+          return
+        }
+      case .sol:
+        if success, accounts.allSatisfy({ allowedAccounts.contains($0) }) {
+          completion(.none, allowedAccounts)
+          return
+        }
+      default:
+        completion(.internal, [])
         return
       }
       
