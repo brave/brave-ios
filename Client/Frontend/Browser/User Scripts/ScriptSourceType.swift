@@ -30,7 +30,7 @@ enum ScriptSourceType {
     case .braveSearchHelper: return "BraveSearchScript"
     case .braveTalkHelper: return "BraveTalkScript"
     case .bravePlaylistFolderSharingHelper: return "PlaylistFolderSharingScript"
-    case .braveSkus: return "BraveSkusHelper"
+    case .braveSkus: return "BraveSkusScript"
     }
   }
 

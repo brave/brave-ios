@@ -184,7 +184,6 @@ class UserScriptManager {
         // Inject ethereum provider
         scriptController.addUserScript(script)
         
-        // ?????
         if let walletEthProviderScript = walletEthProviderScript {
           scriptController.addUserScript(walletEthProviderScript)
         }

@@ -45,8 +45,8 @@ window.__firefox__.execute(function($) {
     const makeFailingPromiseFunction = $(function() {
       return $(function() {
         return Promise.reject(
-                              new DOMException('An attempt was made to break through the security policy of the user agent.')
-                              )
+          new DOMException('An attempt was made to break through the security policy of the user agent.')
+        )
       });
     });
     
