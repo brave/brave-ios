@@ -11,6 +11,7 @@ import XCGLogger
 import Data
 import CoreData
 import BraveCore
+import BraveWallet
 
 private let log = Logger.browserLogger
 private let rewardsLog = Logger.braveCoreLogger
@@ -491,7 +492,7 @@ class TabManager: NSObject {
       tab.walletEthProvider?.`init`(tab)
       tab.walletEthProviderJS = js
     }
-    if let (provider, jsScripts) = makeWalletSolProvider?(tab) {
+    if WalletDebugFlags.isSolanaDappsEnabled, let (provider, jsScripts) = makeWalletSolProvider?(tab) {
       tab.walletSolProvider = provider
       tab.walletSolProvider?.`init`(tab)
       tab.walletSolProviderScripts = jsScripts

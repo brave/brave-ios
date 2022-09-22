@@ -2319,7 +2319,9 @@ extension BrowserViewController: TabDelegate {
       let logins = LoginsHelper(tab: tab, profile: profile, passwordAPI: braveCore.passwordAPI)
       tab.addContentScript(logins, name: LoginsHelper.name(), contentWorld: .defaultClient)
       tab.addContentScript(EthereumProviderHelper(tab: tab), name: EthereumProviderHelper.name(), contentWorld: .page)
-      tab.addContentScript(SolanaProviderHelper(tab: tab), name: SolanaProviderHelper.name(), contentWorld: .page)
+      if WalletDebugFlags.isSolanaDappsEnabled {
+        tab.addContentScript(SolanaProviderHelper(tab: tab), name: SolanaProviderHelper.name(), contentWorld: .page)
+      }
     }
 
     let errorHelper = ErrorPageHelper(certStore: profile.certStore)
