@@ -689,6 +689,14 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       self.displayedPopoverController = nil
     }
   }
+  
+  @objc private func tappedCollapsedURLBar() {
+    if keyboardState != nil && isUsingBottomBar && !topToolbar.inOverlayMode {
+      view.endEditing(true)
+    } else {
+      tappedTopArea()
+    }
+  }
 
   @objc func tappedTopArea() {
     toolbarVisibilityViewModel.toolbarState = .expanded
@@ -812,7 +820,7 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
     tabsBar.delegate = self
 
     header.collapsedBarContainerView.addSubview(collapsedURLBarView)
-    header.collapsedBarContainerView.addTarget(self, action: #selector(tappedTopArea), for: .touchUpInside)
+    header.collapsedBarContainerView.addTarget(self, action: #selector(tappedCollapsedURLBar), for: .touchUpInside)
     
     addChild(tabsBar)
     tabsBar.didMove(toParent: self)

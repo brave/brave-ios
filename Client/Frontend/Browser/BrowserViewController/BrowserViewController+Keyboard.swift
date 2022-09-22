@@ -21,7 +21,6 @@ extension BrowserViewController: KeyboardHelperDelegate {
         header.expandedBarStackView.alpha = 0
         updateTabsBarVisibility()
       }
-      header.collapsedBarContainerView.isEnabled = false
       collapsedURLBarView.isKeyboardVisible = true
       toolbarVisibilityViewModel.isEnabled = false
     }
@@ -54,7 +53,6 @@ extension BrowserViewController: KeyboardHelperDelegate {
         updateTabsBarVisibility()
         toolbarVisibilityViewModel.isEnabled = true
       }
-      header.collapsedBarContainerView.isEnabled = true
       collapsedURLBarView.isKeyboardVisible = false
     }
     updateViewConstraints()
