@@ -24,7 +24,7 @@ enum ScriptSourceType {
 
   var fileName: String {
     switch self {
-    case .siteStateListener: return "SiteStateListener"
+    case .siteStateListener: return "SiteStateListenerScript"
     case .nacl: return "nacl.min"
     case .farblingProtection: return "FarblingProtectionScript"
     case .braveSearchHelper: return "BraveSearchScript"
