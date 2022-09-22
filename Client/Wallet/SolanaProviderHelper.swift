@@ -103,154 +103,185 @@ class SolanaProviderHelper: TabContentScript {
       
       switch body.method {
       case .connect:
-        var param: [String: MojoBase.Value]?
-        if let args = body.args {
-          param = MojoBase.Value(jsonString: args)?.dictionaryValue
+        let (publicKey, error) = await connect(args: body.args)
+        replyHandler(publicKey, error)
+        if let publicKey = publicKey as? String {
+          await emitConnectEvent(publicKey: publicKey)
         }
-        // need to inject `_brave_solana.createPublickey` function
-        await tab.userScriptManager?.injectSolanaInternalScript()
-        let (status, errorMessage, publicKey) = await provider.connect(param)
-        guard status == .success else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        await tab.updateSolanaProperties()
-        replyHandler(publicKey, nil)
-        await emitConnectEvent(publicKey: publicKey)
       case .disconnect:
         provider.disconnect()
         tab.emitSolanaEvent(.disconnect)
         replyHandler("{:}", nil)
       case .signAndSendTransaction:
-        guard let args = body.args,
-              let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
-              let serializedMessage = arguments[Keys.serializedMessage.rawValue],
-              let signatures = arguments[Keys.signatures.rawValue] else {
-          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
-          return
-        }
-        // get the send options dictionary
-        let sendOptions = arguments[Keys.sendOptions.rawValue]?.dictionaryValue
-        let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
-        let (status, errorMessage, result) = await provider.signAndSendTransaction(param, sendOptions: sendOptions)
-        guard status == .success else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
-          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
-          return
-        }
-        replyHandler(encodedResult, nil)
+        let (result, error) = await signAndSendTransaction(args: body.args)
+        replyHandler(result, error)
       case .signMessage:
-        guard let args = body.args,
-              let argsList = MojoBase.Value(jsonString: args)?.listValue,
-              let blobMsg = argsList.first?.numberArray else {
-          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
-          return
-        }
-        let displayEncoding = argsList[safe: 1]?.stringValue
-        let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
-        guard status == .success,
-              let publicKey = result[Keys.publicKey.rawValue]?.stringValue,
-              let signature = result[Keys.signature.rawValue]?.stringValue,
-              let signatureDecoded = NSData(base58Encoded: signature) as? Data else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        let resultDict: [String: Any] = [Keys.publicKey.rawValue: publicKey, Keys.signature.rawValue: signatureDecoded.getBytes()]
-        guard let encodedResult = JSONSerialization.jsObject(withNative: resultDict) else {
-          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
-          return
-        }
-        replyHandler(encodedResult, nil)
+        let (result, error) = await signMessage(args: body.args)
+        replyHandler(result, error)
       case .request:
         guard let args = body.args,
-              var argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
+              let argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
               let method = argDict[Keys.method.rawValue]?.stringValue else {
           replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
           return
         }
-        if method == Keys.signMessage.rawValue,
-           let blobMsg = argDict[Keys.params.rawValue]?.dictionaryValue?[Keys.message.rawValue]?.numberArray {
-          /* Convert from [UInt8] to data / blob (Mojo binaryValue). */
-          var updatedParamsDict = argDict[Keys.params.rawValue]?.dictionaryValue ?? [:]
-          updatedParamsDict[Keys.message.rawValue] = MojoBase.Value(binaryValue: blobMsg)
-          argDict[Keys.params.rawValue] = MojoBase.Value(dictionaryValue: updatedParamsDict)
-        }
-        let (status, errorMessage, result) = await provider.request(argDict)
-        guard status == .success else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        if method == Keys.connect.rawValue,
-           let publicKey = result[Keys.publicKey.rawValue]?.stringValue {
-          // need to inject `_brave_solana.createPublickey` function before replying w/ success.
-          await tab.userScriptManager?.injectSolanaInternalScript()
-          await tab.updateSolanaProperties()
-          replyHandler(publicKey, nil)
+        let (result, error) = await request(args: body.args)
+        replyHandler(result, error)
+        if method == Keys.connect.rawValue, let publicKey = result as? String {
           await emitConnectEvent(publicKey: publicKey)
-        } else {
-          if method == Keys.disconnect.rawValue {
-            tab.emitSolanaEvent(.disconnect)
-          }
-          guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
-            replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
-            return
-          }
-          replyHandler(encodedResult, nil)
+        } else if method == Keys.disconnect.rawValue {
+          tab.emitSolanaEvent(.disconnect)
         }
       case .signTransaction:
-        guard let args = body.args,
-              let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
-              let serializedMessage = arguments[Keys.serializedMessage.rawValue],
-              let signatures = arguments[Keys.signatures.rawValue] else {
-          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
-          return
-        }
-        let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
-        let (status, errorMessage, serializedTx) = await provider.signTransaction(param)
-        guard status == .success else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        guard let encodedSerializedTx = JSONSerialization.jsObject(withNative: serializedTx) else {
-          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
-          return
-        }
-        replyHandler(encodedSerializedTx, nil)
+        let (result, error) = await signTransaction(args: body.args)
+        replyHandler(result, error)
       case .signAllTransactions:
-        guard let args = body.args,
-              let transactions = MojoBase.Value(jsonString: args)?.listValue else {
-          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
-          return
-        }
-        let params: [BraveWallet.SolanaSignTransactionParam] = transactions.compactMap { tx in
-          guard let transaction = tx.dictionaryValue,
-                let serializedMessage = transaction[Keys.serializedMessage.rawValue],
-                let signatures = transaction[Keys.signatures.rawValue] else {
-            return nil
-          }
-          return createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
-        }
-        guard !params.isEmpty else {
-          replyHandler(nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
-          return
-        }
-        let (status, errorMessage, serializedTxs) = await provider.signAllTransactions(params)
-        guard status == .success else {
-          replyHandler(nil, buildErrorJson(status: status, errorMessage: errorMessage))
-          return
-        }
-        guard let encodedSerializedTxs = JSONSerialization.jsObject(withNative: serializedTxs) else {
-          replyHandler(nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
-          return
-        }
-        replyHandler(encodedSerializedTxs, nil)
+        let (result, error) = await signAllTransactions(args: body.args)
+        replyHandler(result, error)
       }
     }
   }
-
+  
+  @MainActor func connect(args: String?) async -> (Any?, String?) {
+    guard let tab = tab, let provider = tab.walletSolProvider else {
+      return (nil, buildErrorJson(status: .internalError, errorMessage: ""))
+    }
+    var param: [String: MojoBase.Value]?
+    if let args = args {
+      param = MojoBase.Value(jsonString: args)?.dictionaryValue
+    }
+    // need to inject `_brave_solana.createPublickey` function
+    await tab.userScriptManager?.injectSolanaInternalScript()
+    let (status, errorMessage, publicKey) = await provider.connect(param)
+    guard status == .success else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    await tab.updateSolanaProperties()
+    return (publicKey, nil)
+  }
+  
+  @MainActor func signAndSendTransaction(args: String?) async -> (Any?, String?) {
+    guard let args = args,
+          let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
+          let serializedMessage = arguments[Keys.serializedMessage.rawValue],
+          let signatures = arguments[Keys.signatures.rawValue],
+          let provider = tab?.walletSolProvider else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    // get the send options dictionary
+    let sendOptions = arguments[Keys.sendOptions.rawValue]?.dictionaryValue
+    let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
+    let (status, errorMessage, result) = await provider.signAndSendTransaction(param, sendOptions: sendOptions)
+    guard status == .success else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
+      return (nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
+    }
+    return (encodedResult, nil)
+  }
+  
+  @MainActor func signMessage(args: String?) async -> (Any?, String?) {
+    guard let args = args,
+          let argsList = MojoBase.Value(jsonString: args)?.listValue,
+          let blobMsg = argsList.first?.numberArray,
+          let provider = tab?.walletSolProvider else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    let displayEncoding = argsList[safe: 1]?.stringValue
+    let (status, errorMessage, result) = await provider.signMessage(blobMsg, displayEncoding: displayEncoding)
+    guard status == .success,
+          let publicKey = result[Keys.publicKey.rawValue]?.stringValue,
+          let signature = result[Keys.signature.rawValue]?.stringValue,
+          let signatureEncoded = NSData(base58Encoded: signature) as? Data else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    let resultDict: [String: Any] = [Keys.publicKey.rawValue: publicKey, Keys.signature.rawValue: signatureEncoded.getBytes()]
+    guard let encodedResult = JSONSerialization.jsObject(withNative: resultDict) else {
+      return (nil, buildErrorJson(status: .internalError, errorMessage: errorMessage))
+    }
+    return (encodedResult, nil)
+  }
+  
+  @MainActor func request(args: String?) async -> (Any?, String?) {
+    guard let args = args,
+          var argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
+          let method = argDict[Keys.method.rawValue]?.stringValue,
+          let tab = tab,
+          let provider = tab.walletSolProvider else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    if method == Keys.signMessage.rawValue,
+       let blobMsg = argDict[Keys.params.rawValue]?.dictionaryValue?[Keys.message.rawValue]?.numberArray {
+      /* Convert from [UInt8] to data / blob (Mojo binaryValue). */
+      var updatedParamsDict = argDict[Keys.params.rawValue]?.dictionaryValue ?? [:]
+      updatedParamsDict[Keys.message.rawValue] = MojoBase.Value(binaryValue: blobMsg)
+      argDict[Keys.params.rawValue] = MojoBase.Value(dictionaryValue: updatedParamsDict)
+    }
+    let (status, errorMessage, result) = await provider.request(argDict)
+    guard status == .success else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    if method == Keys.connect.rawValue,
+       let publicKey = result[Keys.publicKey.rawValue]?.stringValue {
+      // need to inject `_brave_solana.createPublickey` function before replying w/ success.
+      await tab.userScriptManager?.injectSolanaInternalScript()
+      await tab.updateSolanaProperties()
+      return (publicKey, nil)
+    } else {
+      guard let encodedResult = MojoBase.Value(dictionaryValue: result).jsonObject else {
+        return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
+      }
+      return (encodedResult, nil)
+    }
+  }
+  
+  @MainActor func signTransaction(args: String?) async -> (Any?, String?) {
+    guard let args = args,
+          let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
+          let serializedMessage = arguments[Keys.serializedMessage.rawValue],
+          let signatures = arguments[Keys.signatures.rawValue],
+          let provider = tab?.walletSolProvider else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
+    let (status, errorMessage, serializedTx) = await provider.signTransaction(param)
+    guard status == .success else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    guard let encodedSerializedTx = JSONSerialization.jsObject(withNative: serializedTx) else {
+      return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
+    }
+    return (encodedSerializedTx, nil)
+  }
+  
+  @MainActor func signAllTransactions(args: String?) async -> (Any?, String?) {
+    guard let args = args,
+          let transactions = MojoBase.Value(jsonString: args)?.listValue,
+          let provider = tab?.walletSolProvider else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    let params: [BraveWallet.SolanaSignTransactionParam] = transactions.compactMap { tx in
+      guard let transaction = tx.dictionaryValue,
+            let serializedMessage = transaction[Keys.serializedMessage.rawValue],
+            let signatures = transaction[Keys.signatures.rawValue] else {
+        return nil
+      }
+      return createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
+    }
+    guard !params.isEmpty else {
+      return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
+    }
+    let (status, errorMessage, serializedTxs) = await provider.signAllTransactions(params)
+    guard status == .success else {
+      return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
+    }
+    guard let encodedSerializedTxs = JSONSerialization.jsObject(withNative: serializedTxs) else {
+      return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
+    }
+    return (encodedSerializedTxs, nil)
+  }
+  
   private func createSignTransactionParam(serializedMessage: MojoBase.Value, signatures: MojoBase.Value) -> BraveWallet.SolanaSignTransactionParam {
     // get the serialized message
     let serializedMessageValues = serializedMessage.bufferToList?.map { UInt8($0.intValue) } ?? []
