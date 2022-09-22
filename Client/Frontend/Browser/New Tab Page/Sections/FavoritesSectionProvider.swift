@@ -87,7 +87,9 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
 
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     let fetchedCount = frc.fetchedObjects?.count ?? 0
-    let numberOfItems = min(fetchedCount, Self.numberOfItems(in: collectionView, availableWidth: fittingSizeForCollectionView(collectionView, section: section).width))
+    let numberOfItems = min(fetchedCount, Self.numberOfItems(
+      in: collectionView,
+      availableWidth: fittingSizeForCollectionView(collectionView, section: section).width))
     return Preferences.NewTabPage.showNewTabFavourites.value ? numberOfItems : 0
   }
 

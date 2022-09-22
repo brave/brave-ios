@@ -66,7 +66,7 @@ class NTPTableViewController: TableViewController {
     }
     
     let widgetSection = Section(
-      header: .title("Widgets".uppercased()),
+      header: .title(Strings.Widgets.widgetTitle.uppercased()),
       rows: [
         .boolRow(
           title: Strings.PrivacyHub.privacyReportsTitle,
@@ -107,7 +107,7 @@ class NTPTableViewController: TableViewController {
       // Show options for tab bar visibility
       let optionsViewController = OptionSelectionViewController<BackgroundImageType>(
         headerText: Strings.NTP.settingsBackgroundImageSubMenu,
-        footerText: "'Sponsored' are additional branded backgrounds you can earn from with Brave Rewards enabled.",
+        footerText: Strings.NTP.imageTypeSelectionDescription,
         style: .insetGrouped,
         options: self.backgroundImageOptions,
         selectedOption: self.selectedItem(),

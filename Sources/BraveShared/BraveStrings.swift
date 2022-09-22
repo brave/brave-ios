@@ -1225,6 +1225,14 @@ extension Strings {
         bundle: .strings,
         value: "Brave Support",
         comment: "Bookmark title for Brave Support")
+    
+    public static let imageTypeSelectionDescription =
+      NSLocalizedString(
+        "ntp.imageTypeSelectionDescription",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "'Sponsored' are additional branded backgrounds you can earn from with Brave Rewards enabled.",
+        comment: "The text description of image type which is being used NTP")
 
     public static let settingsTitle = NSLocalizedString("ntp.settingsTitle", tableName: "BraveShared", bundle: .strings, value: "New Tab Page", comment: "Title on settings page to adjust the primary home screen functionality.")
     public static let settingsBackgroundImages = NSLocalizedString("ntp.settingsBackgroundImages", tableName: "BraveShared", bundle: .strings, value: "Background Images", comment: "A setting to enable or disable background images on the main screen.")
@@ -3694,6 +3702,10 @@ extension Strings {
 // MARK: - Widgets
 extension Strings {
   public struct Widgets {
+    public static let widgetTitle = NSLocalizedString("widgets.widgetTitle", tableName: "BraveShared", bundle: .strings,
+      value: "Widgets",
+      comment: "Title of the settings for widgets part")
+    
     public static let noFavoritesFound = NSLocalizedString("widgets.noFavoritesFound", tableName: "BraveShared", bundle: .strings,
       value: "Please open Brave to view your favorites here",
       comment: "This shows when you add a widget but have no favorites added in your app")
@@ -4045,6 +4057,16 @@ extension Strings {
     public static let onboardingButtonTitle = NSLocalizedString("privacyHub.onboardingButtonTitle", tableName: "BraveShared", bundle: .strings,
       value: "Open Privacy Hub",
       comment: "Text of a button that opens up a Privacy Reports screen."
+    )
+    
+    public static let hidePrivacyHubWidgetActionTitle = NSLocalizedString("privacyHub.hidePrivacyHubWidgetActionTitle", tableName: "BraveShared", bundle: .strings,
+      value: "Hide Privacy Hub Widget",
+      comment: "The title of the button action which hides the privacy hub"
+    )
+    
+    public static let openPrivacyHubWidgetActionTitle = NSLocalizedString("privacyHub.openPrivacyHubWidgetActionTitle", tableName: "BraveShared", bundle: .strings,
+      value: "Open Privacy Hub",
+      comment: "The title of the button action which open the privacy hub"
     )
   }
 }

@@ -72,8 +72,8 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     let width = fittingSizeForCollectionView(collectionView, section: section).width
     let count = frc.fetchedObjects?.count ?? 0
     
-    let isShowShowMoreButtonVisible =
-      count > FavoritesSectionProvider.numberOfItems(in: collectionView, availableWidth: width) && Preferences.NewTabPage.showNewTabFavourites.value
+    let isShowShowMoreButtonVisible = count > FavoritesSectionProvider.numberOfItems(in: collectionView, availableWidth: width) &&
+      Preferences.NewTabPage.showNewTabFavourites.value
     return isShowShowMoreButtonVisible ? 1 : 0
   }
 

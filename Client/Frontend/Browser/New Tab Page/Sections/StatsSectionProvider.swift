@@ -166,16 +166,15 @@ class BraveShieldStatsView: SpringButton {
       }
             
       let hidePrivacyHub = UIAction(
-        title: "Hide Privacy Hub Widget",
+        title: Strings.PrivacyHub.hidePrivacyHubWidgetActionTitle,
         image: UIImage(braveSystemNamed: "brave.eye.slash"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
-          contentStackView.isHidden = true
           self.hidePrivacyHubPressed?()
         })
       
       let showPrivacyHub = UIAction(
-        title: "Open Privacy Hub",
-        image: UIImage(named: "privacy_reports_shield", in: .current, compatibleWith: nil),
+        title: Strings.PrivacyHub.openPrivacyHubWidgetActionTitle,
+        image: UIImage(named: "privacy_reports_shield", in: .current, compatibleWith: nil)?.template,
         handler: UIAction.deferredActionHandler { [unowned self] _ in
           self.openPrivacyHubPressed?()
         })
