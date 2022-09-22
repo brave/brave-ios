@@ -419,8 +419,13 @@ extension Tab: BraveWalletEventsListener {
 extension Tab: BraveWalletSolanaEventsListener {
   func accountChangedEvent(_ account: String?) {
     Task { @MainActor in
-      if let webView = webView, let account = account {
-        let script = "window.solana.emit('accountChanged', _brave_solana.createPublickey('\(account)'))"
+      if let webView = webView {
+        let script: String
+        if let account = account {
+          script = "window.solana.emit('accountChanged', _brave_solana.createPublickey('\(account)'))"
+        } else {
+          script = "window.solana.emit('accountChanged')"
+        }
         await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
       }
       await updateSolanaProperties()
