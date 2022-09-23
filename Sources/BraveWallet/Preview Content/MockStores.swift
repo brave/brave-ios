@@ -20,8 +20,7 @@ extension WalletStore {
       blockchainRegistry: MockBlockchainRegistry(),
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
-      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
-      solDappConnectedAddresses: .init()
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
     )
   }
 }
@@ -195,6 +194,12 @@ extension SettingsStore {
       txService: MockTxService(),
       keychain: TestableKeychain()
     )
+  }
+}
+
+extension TabDappStore {
+  static var previewStore: TabDappStore {
+    .init()
   }
 }
 
