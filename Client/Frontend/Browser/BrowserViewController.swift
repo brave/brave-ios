@@ -2628,7 +2628,7 @@ extension BrowserViewController: TabDelegate {
     }
     let origin = tab.getOrigin()
     let tabDappStore = tab.tabDappStore
-    let walletNotificaton = WalletNotification(priority: .low, origin: origin) { [weak self] action in
+    let walletNotificaton = WalletNotification(priority: .low, origin: origin, isUsingBottomBar: isUsingBottomBar) { [weak self] action in
       if action == .connectWallet {
         self?.presentWalletPanel(from: origin, with: tabDappStore)
       }
