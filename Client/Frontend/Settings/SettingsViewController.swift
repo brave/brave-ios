@@ -324,7 +324,7 @@ class SettingsViewController: TableViewController {
   }()
 
   private lazy var tabsSection: Static.Section = {
-    var tabs = Static.Section(header: .title("Tabs"), rows: [])
+    var tabs = Static.Section(header: .title(Strings.tabsSettingsSectionTitle), rows: [])
     
     if UIDevice.current.userInterfaceIdiom == .phone {
       tabs.rows.append(
@@ -332,23 +332,12 @@ class SettingsViewController: TableViewController {
       )
     }
     
-    tabs.rows.append(
-      Row(
-        text: Strings.NTP.settingsTitle,
-        selection: { [unowned self] in
-          self.navigationController?.pushViewController(NTPTableViewController(), animated: true)
-        },
-        image: UIImage(named: "settings-ntp", in: .current, compatibleWith: nil)!.template,
-        accessory: .disclosureIndicator,
-        cellClass: MultilineValue1Cell.self
-      ))
-    
     if UIDevice.current.userInterfaceIdiom == .pad {
       tabs.rows.append(
         Row(text: Strings.showTabsBar, image: UIImage(named: "settings-show-tab-bar", in: .current, compatibleWith: nil)!.template, accessory: .switchToggle(value: Preferences.General.tabBarVisibility.value == TabBarVisibility.always.rawValue, { Preferences.General.tabBarVisibility.value = $0 ? TabBarVisibility.always.rawValue : TabBarVisibility.never.rawValue }), cellClass: MultilineValue1Cell.self)
       )
     } else {
-      var row = Row(text: Strings.showTabsBar, detailText: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value)?.displayString, image: UIImage(named: "settings-show-tab-bar", in: .current, compatibleWith: nil)!.template, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
+      var row = Row(text: Strings.showTabsBar, detailText: TabBarVisibility(rawValue: Preferences.General.tabBarVisibility.value)?.displayString, image: UIImage(named: "settings-show-tab-bar", in: .current, compatibleWith: nil)!.template, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)
       row.selection = { [unowned self] in
         // Show options for tab bar visibility
         let optionsViewController = OptionSelectionViewController<TabBarVisibility>(
@@ -433,6 +422,15 @@ class SettingsViewController: TableViewController {
       self.navigationController?.pushViewController(optionsViewController, animated: true)
     }
     display.rows.append(row)
+    display.rows.append(Row(
+      text: Strings.NTP.settingsTitle,
+      selection: { [unowned self] in
+        self.navigationController?.pushViewController(NTPTableViewController(), animated: true)
+      },
+      image: UIImage(named: "settings-ntp", in: .current, compatibleWith: nil)!.template,
+      accessory: .disclosureIndicator,
+      cellClass: MultilineValue1Cell.self
+    ))
 
     // We do NOT persistently save page-zoom settings in Private Browsing
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {

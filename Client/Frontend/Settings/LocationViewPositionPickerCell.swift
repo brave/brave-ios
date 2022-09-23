@@ -16,12 +16,12 @@ class LocationViewPositionPickerCell: UITableViewCell, Cell {
   
   private let topBarButton = BarButton(
     image: UIImage(braveSystemNamed: "brave.platter.filled.top.and.arrow.up.phone")!,
-    text: "Top Bar"
+    text: Strings.tabsOptionTopBar
   )
   
   private let bottomBarButton = BarButton(
     image: UIImage(braveSystemNamed: "brave.platter.filled.bottom.and.arrow.down.phone")!,
-    text: "Bottom Bar"
+    text: Strings.tabsOptionBottomBar
   )
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
