@@ -89,10 +89,12 @@ class LocationViewPositionPickerCell: UITableViewCell, Cell {
       label.font = .preferredFont(forTextStyle: .callout)
       
       addSubview(stackView)
-      stackView.addArrangedSubview(imageView)
-      stackView.addArrangedSubview(label)
-      stackView.addArrangedSubview(checkmarkView)
-      stackView.setCustomSpacing(8, after: label)
+      stackView.addStackViewItems(
+        .view(imageView),
+        .view(label),
+        .customSpace(8),
+        .view(checkmarkView)
+      )
       
       stackView.snp.makeConstraints {
         $0.edges.equalToSuperview()
