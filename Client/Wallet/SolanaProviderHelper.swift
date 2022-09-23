@@ -142,6 +142,7 @@ class SolanaProviderHelper: TabContentScript {
     }
   }
   
+  /// Given optional args `{onlyIfTrusted: Bool}`, will return the base 58 encoded public key for success or the error dictionary for failures.
   @MainActor func connect(args: String?) async -> (Any?, String?) {
     guard let tab = tab, let provider = tab.walletSolProvider else {
       return (nil, buildErrorJson(status: .internalError, errorMessage: ""))
@@ -160,6 +161,9 @@ class SolanaProviderHelper: TabContentScript {
     return (publicKey, nil)
   }
   
+  /// Given args `{serializedMessage: [Uint8], signatures: [Buffer], sendOptions: [:]}`, will return
+  /// dictionary `{publicKey: <base58 encoded string>, signature: <base58 encoded string>}` for success
+  /// or an error dictionary for failures.
   @MainActor func signAndSendTransaction(args: String?) async -> (Any?, String?) {
     guard let args = args,
           let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
@@ -181,6 +185,9 @@ class SolanaProviderHelper: TabContentScript {
     return (encodedResult, nil)
   }
   
+  /// Given args `{[[UInt8], String]}` (second arg optional), will return
+  /// `{publicKey: <base58 encoded String>, signature: <base 58 decoded list>}` for success flow
+  /// or an error dictionary for failures
   @MainActor func signMessage(args: String?) async -> (Any?, String?) {
     guard let args = args,
           let argsList = MojoBase.Value(jsonString: args)?.listValue,
@@ -203,6 +210,8 @@ class SolanaProviderHelper: TabContentScript {
     return (encodedResult, nil)
   }
   
+  /// Given a request arg `{method: String, params: {}}`, will encode the response as a json object for success
+  /// or provide an error dictionary for failures
   @MainActor func request(args: String?) async -> (Any?, String?) {
     guard let args = args,
           var argDict = MojoBase.Value(jsonString: args)?.dictionaryValue,
@@ -236,6 +245,8 @@ class SolanaProviderHelper: TabContentScript {
     }
   }
   
+  /// Given args `{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}`,
+  /// will encoded the response as a json object for success or provide an error dictionary for failures
   @MainActor func signTransaction(args: String?) async -> (Any?, String?) {
     guard let args = args,
           let arguments = MojoBase.Value(jsonString: args)?.dictionaryValue,
@@ -255,6 +266,8 @@ class SolanaProviderHelper: TabContentScript {
     return (encodedSerializedTx, nil)
   }
   
+  /// Given args `[{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}]`,
+  /// will encoded the response as a json object for success or provide an error dictionary for failures
   @MainActor func signAllTransactions(args: String?) async -> (Any?, String?) {
     guard let args = args,
           let transactions = MojoBase.Value(jsonString: args)?.listValue,
@@ -282,6 +295,7 @@ class SolanaProviderHelper: TabContentScript {
     return (encodedSerializedTxs, nil)
   }
   
+  /// Helper function to build `SolanaSignTransactionParam` given the serializedMessage and signatures from the `solanaWeb3.Transaction`.
   private func createSignTransactionParam(serializedMessage: MojoBase.Value, signatures: MojoBase.Value) -> BraveWallet.SolanaSignTransactionParam {
     // get the serialized message
     let serializedMessageValues = serializedMessage.bufferToList?.map { UInt8($0.intValue) } ?? []
