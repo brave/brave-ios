@@ -156,7 +156,6 @@ extension AdblockEngine {
           const min = 0;
           const max = body.children.length;
           const index = Math.floor(Math.random() * (max - min)) + min;
-          console.log(index);
       
           const div = document.createElement('div');
           body.insertBefore(div, body.children[index]);
