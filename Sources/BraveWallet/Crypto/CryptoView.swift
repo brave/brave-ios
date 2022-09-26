@@ -195,6 +195,22 @@ public struct CryptoView: View {
                   dismissAction?()
                 }
               )
+            case .createAccount(let request):
+              NavigationView {
+                AddAccountView(
+                  keyringStore: keyringStore,
+                  preSelectedCoin: request.coinType,
+                  onCreate: {
+                    // request is fullfilled. remove the stored request
+                    WalletProviderAccountCreationRequestManager.shared.removeRequest(for: request)
+                  },
+                  onDismiss: {
+                    // request get declined by clicking `Cancel`
+                    WalletProviderAccountCreationRequestManager.shared.removeRequest(for: request)
+                  }
+                )
+              }
+              .navigationViewStyle(.stack)
             }
           }
           .transition(.asymmetric(insertion: .identity, removal: .opacity))

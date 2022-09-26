@@ -26,6 +26,8 @@ struct AddAccountView: View {
   private let maxIconSize: CGFloat = 80.0
   
   var preSelectedCoin: BraveWallet.CoinType?
+  var onCreate: (() -> Void)?
+  var onDismiss: (() -> Void)?
 
   private func addAccount(for coin: BraveWallet.CoinType) {
     if privateKey.isEmpty {
@@ -33,12 +35,14 @@ struct AddAccountView: View {
       let accountName = name.isEmpty ? defaultAccountName(for: coin, isPrimary: true) : name
       keyringStore.addPrimaryAccount(accountName, coin: coin) { success in
         if success {
+          onCreate?()
           presentationMode.dismiss()
         }
       }
     } else {
       let handler: (Bool, String) -> Void = { success, _ in
         if success {
+          onCreate?()
           presentationMode.dismiss()
         } else {
           failedToImport = true
@@ -80,7 +84,7 @@ struct AddAccountView: View {
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(Strings.Wallet.addAccountTitle)
+    .navigationTitle(String.localizedStringWithFormat(Strings.Wallet.addAccountTitle, preSelectedCoin?.localizedTitle ?? (selectedCoin?.localizedTitle ?? BraveWallet.CoinType.eth.localizedTitle)))
     .navigationBarItems(
       // Have to use this instead of toolbar placement to have a custom button style
       trailing: Button(action: {
@@ -151,6 +155,7 @@ struct AddAccountView: View {
     .toolbar {
       ToolbarItemGroup(placement: .cancellationAction) {
         Button(action: {
+          onDismiss?()
           presentationMode.dismiss()
         }) {
           Text(Strings.cancelButtonTitle)

@@ -257,8 +257,8 @@ extension Strings {
       "wallet.addAccountTitle",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Add Account",
-      comment: "The title of the add account screen"
+      value: "Add %@ Account",
+      comment: "The title of the add account screen. '%@' will be placed with a coin type title. For example, 'Add Ethereum Account'. "
     )
     public static let add = NSLocalizedString(
       "wallet.addAccountAddButton",
