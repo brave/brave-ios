@@ -44,7 +44,7 @@ public class WalletProviderAccountCreationRequestManager {
     }
   }
   
-  public func addRequest(or origin: URLOrigin, coinType: BraveWallet.CoinType) {
+  public func addRequest(for origin: URLOrigin, coinType: BraveWallet.CoinType) {
     if !hasPendingRequest(for: origin, coinType: coinType) {
       requests.append(WalletProviderAccountCreationRequest(requestingOrigin: origin, coinType: coinType))
     }
