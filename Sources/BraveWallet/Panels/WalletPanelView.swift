@@ -511,10 +511,16 @@ struct WalletPanelView: View {
     .onChange(of: keyringStore.selectedAccount) { _ in
       isConnectHidden = isConnectButtonHidden()
     }
-    .onChange(of: cryptoStore.latestPermissionRequest) { newValue in
+    .onChange(of: tabDappStore.latestPermissionRequest) { newValue in
       if let request = newValue, request.requestingOrigin == origin, request.coinType == keyringStore.selectedAccount.coin {
         presentWalletWithContext(.requestPermissions(request, onPermittedAccountsUpdated: { accounts in
-          permittedAccounts = accounts
+          if request.coinType == .eth {
+            ethPermittedAccounts = accounts
+          } else if request.coinType == .sol {
+            solConnectedAddresses = Set(accounts)
+            isConnectHidden = false
+          }
+          tabDappStore.latestPermissionRequest = nil
         }))
       }
     }
@@ -530,6 +536,7 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
+            solConnectedAddresses = Set(accounts)
             isConnectHidden = false
           }
         }))

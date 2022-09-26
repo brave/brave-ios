@@ -2543,11 +2543,6 @@ extension BrowserViewController: TabDelegate {
       topToolbar.updateWalletButtonState(.inactive)
     }
   }
-  
-  func updateWebpagePermissionRequest(_ request: WebpagePermissionRequest) {
-    guard let walletStore = self.walletStore ?? newWalletStore() else { return }
-    walletStore.cryptoStore?.latestPermissionRequest = request
-  }
 
   @MainActor
   private func isPendingRequestAvailable() async -> Bool {

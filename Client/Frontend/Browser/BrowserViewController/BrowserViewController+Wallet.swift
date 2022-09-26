@@ -234,7 +234,7 @@ extension Tab: BraveWalletProviderDelegate {
         self.tabDelegate?.updateURLBarWalletButton()
       })
 
-      self.tabDelegate?.updateWebpagePermissionRequest(request)
+      tabDappStore.latestPermissionRequest = request
       self.tabDelegate?.showWalletNotification(self, origin: origin)
     }
   }
@@ -319,16 +319,20 @@ extension Tab: BraveWalletProviderDelegate {
   }
   
   func addSolanaConnectedAccount(_ account: String) {
-    tabDappStore.solConnectedAddresses.insert(account)
+    Task { @MainActor in
+      tabDappStore.solConnectedAddresses.insert(account)
+    }
   }
   
   func removeSolanaConnectedAccount(_ account: String) {
-    tabDappStore.solConnectedAddresses.remove(account)
+    Task { @MainActor in
+      tabDappStore.solConnectedAddresses.remove(account)
+    }
   }
   
   func clearSolanaConnectedAccounts() {
-    tabDappStore.solConnectedAddresses = .init()
     Task { @MainActor in
+      tabDappStore.solConnectedAddresses = .init()
       await updateSolanaProperties()
     }
   }
