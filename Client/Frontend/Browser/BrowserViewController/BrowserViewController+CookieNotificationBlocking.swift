@@ -19,7 +19,6 @@ extension BrowserViewController {
     guard !Preferences.General.isFirstLaunch.value else { return }
     // Ensure we successfully shown basic onboarding first
     guard Preferences.FullScreenCallout.omniboxCalloutCompleted.value else { return }
-    guard Preferences.General.basicOnboardingProgress.value >= OnboardingProgress.newTabPage.rawValue else { return }
 
     // Make sure we didn't already show this popup
     guard presentedViewController == nil && FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .blockCookieConsentNotices) else {
