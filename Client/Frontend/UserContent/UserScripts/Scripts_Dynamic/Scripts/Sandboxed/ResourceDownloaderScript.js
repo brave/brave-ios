@@ -12,7 +12,7 @@ window.__firefox__.includeOnce("DownloadManager", function($) {
     }
   });
   
-  Object.defineProperty(window.__firefox__, "$<downloadManager>", {
+  Object.defineProperty(window.__firefox__, "downloadManager", {
     enumerable: false,
     configurable: false,
     writable: false,

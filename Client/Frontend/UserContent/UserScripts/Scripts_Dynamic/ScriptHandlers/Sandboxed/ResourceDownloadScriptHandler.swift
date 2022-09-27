@@ -49,8 +49,7 @@ class ResourceDownloadScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
-                                                                      "$<downloadManager>": downloadName],
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
                                                     securityToken: scriptId,
                                                     script: script),
                                injectionTime: .atDocumentEnd,
@@ -75,7 +74,7 @@ class ResourceDownloadScriptHandler: TabContentScript {
   }
 
   static func downloadResource(for tab: Tab, url: URL) {
-    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(downloadName).download", args: [url.absoluteString], contentWorld: self.scriptSandbox) { _, error in
+    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.downloadManager.download", args: [url.absoluteString], contentWorld: self.scriptSandbox) { _, error in
       if let error = error {
         tab.temporaryDocument?.onDocumentDownloaded(document: nil, error: error)
       }
