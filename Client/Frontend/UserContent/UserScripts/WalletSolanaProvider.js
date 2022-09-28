@@ -43,13 +43,13 @@
     function convertTransaction(transaction) {
       const serializedMessage = transaction.serializeMessage();
       const signatures = transaction.signatures;
-      function convertSignaturePubkeyPair(signaturePubkeyPair) {
+      function convertSignaturePubkeyTuple(signaturePubkeyTuple) {
         const obj = new Object();
-        obj.publicKey = signaturePubkeyPair.publicKey.toBase58();
-        obj.signature = signaturePubkeyPair.signature;
+        obj.publicKey = signaturePubkeyTuple.publicKey.toBase58();
+        obj.signature = signaturePubkeyTuple.signature;
         return obj;
       }
-      const signaturesMapped = signatures.map(convertSignaturePubkeyPair);
+      const signaturesMapped = signatures.map(convertSignaturePubkeyTuple);
       const object = new Object();
       object.transaction = transaction;
       object.serializedMessage = serializedMessage;
