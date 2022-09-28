@@ -607,10 +607,6 @@ window.__firefox__.includeOnce("LoginsHelper", function() {
       return [didFillForm, foundLogins];
     },
   }
-  
-  LoginManagerContent._sendRequest.toString = function() {
-    return "function(){\n\t[native code]\n}";
-  }
 
   var LoginUtils = {
     /*

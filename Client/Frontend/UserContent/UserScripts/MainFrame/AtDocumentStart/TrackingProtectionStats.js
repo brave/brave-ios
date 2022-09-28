@@ -4,7 +4,7 @@
 
 "use strict";
 
-(function() {
+window.__firefox__.includeOnce("PrintHandler", function($) {
   if (webkit.messageHandlers.trackingProtectionStats) {
     install();
   }
@@ -14,29 +14,24 @@
       enumerable: false,
       configurable: false,
       writable: false,
-      value: { enabled: false }
+      value: {
+        enabled: false,
+        setEnabled: $(function(enabled, securityToken) {
+          if (securityToken !== SECURITY_TOKEN) {
+            return;
+          }
+
+          if (enabled === window.__firefox__.TrackingProtectionStats.enabled) {
+            return;
+          }
+
+          window.__firefox__.TrackingProtectionStats.enabled = enabled;
+          injectStatsTracking(enabled);
+        })
+      }
     });
 
-    Object.defineProperty(window.__firefox__.TrackingProtectionStats, "setEnabled", {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: function(enabled, securityToken) {
-        if (securityToken !== SECURITY_TOKEN) {
-          return;
-        }
-
-        if (enabled === window.__firefox__.TrackingProtectionStats.enabled) {
-          return;
-        }
-
-        window.__firefox__.TrackingProtectionStats.enabled = enabled;
-
-        injectStatsTracking(enabled);
-      }
-    })
-
-    function sendMessage(urlString, resourceType) {
+    let sendMessage = $(function(urlString, resourceType) {
       if (urlString) {
         try {
           let resourceURL = new URL(urlString, window.location.href)
@@ -53,13 +48,9 @@
           
         }
       }
-    }
-    
-    sendMessage.toString = function() {
-      return "function() {\n\t[native code]\n}";
-    }
+    });
 
-    function onLoadNativeCallback() {
+    let onLoadNativeCallback = $(function() {
       // Send back the sources of every script and image in the DOM back to the host application.
       [].slice.apply(document.scripts).forEach(function(el) { sendMessage(el.src, "script"); });
       [].slice.apply(document.images).forEach(function(el) {
@@ -69,14 +60,14 @@
           sendMessage(el.src, "image");
         }
       });
-    }
+    });
 
     let originalOpen = null;
     let originalSend = null;
     let originalImageSrc = null;
     let mutationObserver = null;
 
-    function injectStatsTracking(enabled) {
+    let injectStatsTracking = $(function(enabled) {
       // This enable/disable section is a change from the original Focus iOS version.
       if (enabled) {
         if (originalOpen) {
@@ -106,15 +97,15 @@
         originalSend = xhrProto.send;
       }
 
-      xhrProto.open = function(method, url) {
+      xhrProto.open = $(function(method, url) {
         // Blocked async XMLHttpRequest are handled via RequestBlocking.js
         // We only handle sync requests
         this._shouldTrack = arguments[2] !== undefined && !arguments[2]
         this._url = url;
         return originalOpen.apply(this, arguments);
-      };
+      });
 
-      xhrProto.send = function(body) {
+      xhrProto.send = $(function(body) {
         if (this._url === undefined || !this._shouldTrack) {
           return originalSend.apply(this, arguments);
         }
@@ -124,13 +115,13 @@
         if (!this._tpErrorHandler) {
           // If this `XMLHttpRequest` instance fails to load, we
           // can assume it has been blocked.
-          this._tpErrorHandler = function() {
+          this._tpErrorHandler = $(function() {
             sendMessage(this._url, "xmlhttprequest");
-          };
+          });
           this.addEventListener("error", this._tpErrorHandler);
         }
         return originalSend.apply(this, arguments);
-      };
+      });
 
       // -------------------------------------------------
       // Detect when new sources get set on Image and send them to the host application
@@ -140,23 +131,23 @@
       }
       delete Image.prototype.src;
       Object.defineProperty(Image.prototype, "src", {
-        get: function() {
+        get: $(function() {
           return originalImageSrc.get.call(this);
-        },
-        set: function(value) {
+        }),
+        set: $(function(value) {
           // Only attach the `error` event listener once for this
           // Image instance.
           if (!this._tpErrorHandler) {
             // If this `Image` instance fails to load, we can assume
             // it has been blocked.
-            this._tpErrorHandler = function() {
+            this._tpErrorHandler = $(function() {
               sendMessage(this.src, "image");
-            };
+            });
             this.addEventListener("error", this._tpErrorHandler);
           }
 
           originalImageSrc.set.call(this, value);
-        },
+        }),
         enumerable: true,
         configurable: true
       });
@@ -165,27 +156,27 @@
       // Listen to when new <script> elements get added to the DOM
       // and send the source to the host application
       // -------------------------------------------------
-      mutationObserver = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-          mutation.addedNodes.forEach(function(node) {
+      mutationObserver = new MutationObserver($(function(mutations) {
+        mutations.forEach($(function(mutation) {
+          mutation.addedNodes.forEach($(function(node) {
             // Only consider `<script src="*">` elements.
             if (node.tagName === "SCRIPT" && node.src) {
               // Send all scripts that are added, we won't add it to the stats unless script blocking is enabled anyways
               sendMessage(node.src, "script");
             }
-          });
-        });
-      });
+          }));
+        }));
+      }));
 
       mutationObserver.observe(document.documentElement, {
         childList: true,
         subtree: true
       });
-    }
+    });
 
     // Default to on because there is a delay in being able to enable/disable
     // from native, and we don't want to miss events
     window.__firefox__.TrackingProtectionStats.enabled = true;
     injectStatsTracking(true);
   }
-})();
+});

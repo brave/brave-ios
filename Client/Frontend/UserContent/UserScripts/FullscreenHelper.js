@@ -13,7 +13,7 @@
     error: ["fullscreenerror", "webkitfullscreenerror", "mozfullscreenerror", "MSFullscreenError"]
 }*/
 
-(function() {
+window.__firefox__.execute(function($) {
   let isFullscreenSupportedNatively = document.fullscreenEnabled ||
                                       document.webkitFullscreenEnabled ||
                                       document.mozFullScreenEnabled ||
@@ -23,39 +23,35 @@
 
   if (!isFullscreenSupportedNatively && videosSupportFullscreen && !/mobile/i.test(navigator.userAgent)) {
       
-      HTMLElement.prototype.requestFullscreen = function() {
-          if (this.webkitRequestFullscreen !== undefined) {
-              this.webkitRequestFullscreen();
-              return true;
-          }
-          
-          if (this.webkitEnterFullscreen !== undefined) {
-              this.webkitEnterFullscreen();
-              return true;
-          }
-          
-          var video = this.querySelector("video")
-          if (video !== undefined) {
-              video.webkitEnterFullscreen();
-              return true;
-          }
-          return false;
-      };
+    HTMLElement.prototype.requestFullscreen = $(function() {
+      if (this.webkitRequestFullscreen !== undefined) {
+        this.webkitRequestFullscreen();
+        return true;
+      }
       
-      HTMLElement.prototype.requestFullscreen.toString = function() {
-          return "function () { [native code]; }";
-      };
+      if (this.webkitEnterFullscreen !== undefined) {
+        this.webkitEnterFullscreen();
+        return true;
+      }
       
-      Object.defineProperty(document, 'fullscreenEnabled', {
-          get: function() {
-              return true;
-          }
-      });
-      
-      Object.defineProperty(document.documentElement, 'fullscreenEnabled', {
-          get: function() {
-              return true;
-          }
-      });
+      var video = this.querySelector("video")
+      if (video !== undefined) {
+        video.webkitEnterFullscreen();
+        return true;
+      }
+      return false;
+    });
+    
+    Object.defineProperty(document, 'fullscreenEnabled', {
+      get: function() {
+        return true;
+      }
+    });
+    
+    Object.defineProperty(document.documentElement, 'fullscreenEnabled', {
+      get: function() {
+        return true;
+      }
+    });
   }
-})();
+});

@@ -7,7 +7,7 @@
 
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
-window.__firefox__.includeOnce("FocusHelper", function() {
+window.__firefox__.includeOnce("FocusHelper", function($) {
   const isButton = (element) => {
     if (element.nodeName !== "INPUT") {
       return false;
@@ -17,7 +17,7 @@ window.__firefox__.includeOnce("FocusHelper", function() {
     return (type == "BUTTON" || type == "SUBMIT" || type == "FILE");
   };
 
-  const handler = (event) => {
+  const handler = $((event) => {
     const eventType = event.type;
     const elementType = event.target.nodeName;
     // We can receive focus and blur events from `a` elements and anything with a `tabindex` attribute.
@@ -27,7 +27,7 @@ window.__firefox__.includeOnce("FocusHelper", function() {
         webkit.messageHandlers.focusHelper.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {eventType, elementType}});
       }
     }
-  };
+  });
 
   const options = {
     capture: true,
@@ -35,7 +35,7 @@ window.__firefox__.includeOnce("FocusHelper", function() {
   };
 
   const body = window.document.body;
-  ["focus", "blur"].forEach((eventType) => {
+  ["focus", "blur"].forEach($((eventType) => {
     body.addEventListener(eventType, handler, options);
-  });
+  }));
 });

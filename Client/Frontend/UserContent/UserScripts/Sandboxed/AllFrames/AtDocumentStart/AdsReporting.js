@@ -14,10 +14,6 @@
       function sendMessage(playing) {
         webkit.messageHandlers.adsMediaReporting.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": {playing}});
       }
-      
-      sendMessage.toString = function() {
-        return "function() {\n\t[native code]\n}";
-      }
 
       function checkVideoNode(node) {
         if (node.constructor.name == "HTMLVideoElement") {

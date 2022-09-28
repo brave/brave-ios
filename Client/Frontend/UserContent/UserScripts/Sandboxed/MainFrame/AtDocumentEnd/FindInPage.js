@@ -89,10 +89,6 @@ function find(query) {
   });
 }
 
-find.toString = function() {
-  return "function() {\n\t[native code]\n}";
-}
-
 function findNext() {
   if (lastHighlights) {
     activeHighlightIndex = (activeHighlightIndex + lastHighlights.length + 1) % lastHighlights.length;
@@ -157,10 +153,6 @@ function updateActiveHighlight() {
   } else {
     webkit.messageHandlers.findInPageHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "data": { currentResult: 0 }});
   }
-}
-
-updateActiveHighlight.toString = function() {
-  return "function(){\n\t[native code]\n}";
 }
 
 function removeHighlight(highlight) {

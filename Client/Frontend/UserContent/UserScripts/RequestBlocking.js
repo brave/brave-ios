@@ -5,10 +5,10 @@
 
 "use strict";
 
-(function() {
+window.__firefox__.execute(function($) {
   const messageHandler = webkit.messageHandlers.$<message_handler>;
 
-  const sendMessage = (resourceURL) => {
+  const sendMessage = $((resourceURL) => {
     return messageHandler.postNativeMessage({
       securityToken: SECURITY_TOKEN,
       data: {
@@ -17,14 +17,10 @@
         resourceType: 'xmlhttprequest'
       }
     })
-  }
-  
-  sendMessage.toString = function() {
-    return "function() {\n\t[native code]\n}";
-  }
+  });
   
   const { fetch: originalFetch } = window
-  window.fetch = function () {
+  window.fetch = $(function() {
     const [resource] = arguments
     
     // Extract the url
@@ -49,10 +45,10 @@
         return originalFetch.apply(this, arguments)
       }
     })
-  }
+  });
   
   const originalOpen = XMLHttpRequest.prototype.open
-  XMLHttpRequest.prototype.open = function () {
+  XMLHttpRequest.prototype.open = $(function() {
     // Check if we're async
     const isAsync = arguments[2]
     if (isAsync !== undefined && !isAsync) {
@@ -64,10 +60,10 @@
     const urlString = arguments[1]
     this._resourceURL = new URL(urlString, window.location.href)
     return originalOpen.apply(this, arguments)
-  }
+  });
   
   const originalSend = XMLHttpRequest.prototype.send
-  XMLHttpRequest.prototype.send = function () {
+  XMLHttpRequest.prototype.send = $(function () {
     if (this._resourceURL === undefined) {
       return originalSend.apply(this, arguments)
     }
@@ -83,5 +79,5 @@
         originalSend.apply(this, arguments)
       }
     })
-  }
-})();
+  });
+});

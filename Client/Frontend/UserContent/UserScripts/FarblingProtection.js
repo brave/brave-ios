@@ -5,7 +5,7 @@
 
 "use strict";
 
-window.__firefox__.includeOnce("FarblingProtection", function() {
+window.__firefox__.includeOnce("FarblingProtection", function($) {
   (function() {
     const args = $<farbling_protection_args>;
     const braveNacl = window.nacl
@@ -13,7 +13,7 @@ window.__firefox__.includeOnce("FarblingProtection", function() {
     // 1. Farble audio
     // Adds slight randization when reading data for audio files
     // Randomization is determined by the fudge factor
-    const farbleAudio = (fudgeFactor) => {
+    const farbleAudio = $((fudgeFactor) => {
       delete window.nacl
 
       const farbleArrayData = (destination) => {
@@ -81,7 +81,7 @@ window.__firefox__.includeOnce("FarblingProtection", function() {
           farbleArrayData(arguments[0])
         }
       }
-    }
+    });
 
     // 2. Farble plugin data
     // Injects fake plugins with fake mime-types

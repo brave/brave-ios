@@ -5,7 +5,7 @@
 
 "use strict";
 
-window.__firefox__.execute("DeAMP", function() {
+window.__firefox__.execute("DeAMP", function($) {
   const messageHandler = webkit.messageHandlers.$<message_handler>;
   const W = window;
   const D = W.document;
@@ -13,21 +13,21 @@ window.__firefox__.execute("DeAMP", function() {
   let timesToCheck = 20;
   let intervalId = 0;
   
-  const sendMessage = (destURL) => {
+  const sendMessage = $((destURL) => {
     return messageHandler.postMessage({
       securityToken: SECURITY_TOKEN,
       destURL: destURL.href
     });
-  }
+  });
 
-  const checkIfShouldStopChecking = _ => {
+  const checkIfShouldStopChecking = $(_ => {
     timesToCheck -= 1;
     if (timesToCheck === 0) {
       W.clearInterval(intervalId);
     }
-  }
+  });
 
-  const checkForAmp = _ => {
+  const checkForAmp = $(_ => {
     const htmlElm = document.documentElement;
     const headElm = document.head;
 
@@ -71,7 +71,7 @@ window.__firefox__.execute("DeAMP", function() {
       W.clearInterval(intervalId);
       return;
     }
-  }
+  });
 
   intervalId = W.setInterval(checkForAmp, 250);
   checkForAmp();

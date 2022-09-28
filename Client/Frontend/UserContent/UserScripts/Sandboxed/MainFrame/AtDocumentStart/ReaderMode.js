@@ -228,8 +228,5 @@ window.addEventListener("pageshow", (function(){
     }
   }
 
-  pageShow.toString = function() {
-    return "function() {\n\t[native code]\n}";
-  }
   return Object.freeze(pageShow);
 })());

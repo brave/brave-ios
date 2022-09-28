@@ -8,20 +8,7 @@
 // Ensure this module only gets included once. This is
 // required for user scripts injected into all frames.
 window.__firefox__.includeOnce("PrintHandler", function($) {
-  let postThisMesage = function() {
-    let obj = {};
-    obj.foo = function() {
-      console.log("TEST");
-    }
-    webkit.messageHandlers.printHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN, "test": obj});
-  }
-  
-  postThisMesage.toString = function() {
-    return "function() {\n\t[native code]\n}"
-  }
-  
-  window.print = function() {
-    console.log(document.currentScript);
-    postThisMesage();
-  };
+  window.print = $(function() {
+    webkit.messageHandlers.printHandler.postNativeMessage({"securitytoken": SECURITY_TOKEN});
+  });
 });

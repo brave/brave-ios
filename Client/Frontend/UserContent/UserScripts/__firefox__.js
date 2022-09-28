@@ -131,14 +131,28 @@ if (!window.__firefox__) {
   let createProxy = $(function(hiddenProperties) {
     let values = $({});
     return new Proxy({}, {
+      apply(target, thisArg, argumentsList) {
+        return $Reflect.apply(target, thisArg, argumentsList);
+      },
+      
+      deleteProperty(target, property) {
+        if (property in target) {
+          delete target[property];
+        }
+        
+        if (property in values) {
+          delete target[property];
+        }
+      },
+      
       get(target, property, receiver) {
+        if (hiddenProperties && hiddenProperties[property]) {
+          return hiddenProperties[property];
+        }
+        
         const descriptor = $Reflect.getOwnPropertyDescriptor(target, property);
         if (descriptor && !descriptor.configurable && !descriptor.writable) {
           return $Reflect.get(target, property, receiver);
-        }
-      
-        if (hiddenProperties && hiddenProperties[property]) {
-          return hiddenProperties[property];
         }
         
         return $Reflect.get(values, property, receiver);
@@ -148,8 +162,8 @@ if (!window.__firefox__) {
         if (hiddenProperties && hiddenProperties[name]) {
           return false;
         }
-        
-        const descriptor = getOwnPropertyDescriptor(target, property);
+
+        const descriptor = $Reflect.getOwnPropertyDescriptor(target, name);
         if (descriptor && !descriptor.configurable && !descriptor.writable) {
           return false;
         }
@@ -184,16 +198,16 @@ if (!window.__firefox__) {
       },
       
       getOwnPropertyDescriptor(target, property) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, property);
+        const descriptor = $Reflect.getOwnPropertyDescriptor(target, property);
         if (descriptor && !descriptor.configurable && !descriptor.writable) {
           return descriptor;
         }
-        
+
         return $Reflect.getOwnPropertyDescriptor(values, property);
       },
       
       ownKeys(target) {
-        let keys = new $Array();
+        let keys = [];
         /*keys = keys.concat(Object.keys(target));
         keys = keys.concat(Object.getOwnPropertyNames(target));*/
         keys = keys.concat($Reflect.ownKeys(target));

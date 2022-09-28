@@ -3,19 +3,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-(function() {
+window.__firefox__.execute(function($) {
   
 if (window.isSecureContext) {
   function post(method, payload) {
-    let postMessage = function(message) {
+    let postMessage = $(function(message) {
       return webkit.messageHandlers.$<handler>.postNativeMessage(message);
-    }
+    });
     
-    postMessage.toString = function() {
-      return "function() {\n\t[native code]\n}";
-    }
-    
-    return new Promise((resolve, reject) => {
+    return new Promise($((resolve, reject) => {
       postMessage({
         "securitytoken": SECURITY_TOKEN,
         "method": method,
@@ -28,7 +24,7 @@ if (window.isSecureContext) {
           reject(errorJSON)
         }
       })
-    })
+    }));
   }
   
   Object.defineProperty(window, 'ethereum', {
@@ -38,17 +34,17 @@ if (window.isSecureContext) {
       selectedAddress: undefined,
       isMetaMask: true,
       isBraveWallet: true,
-      request: function (args) /* -> Promise<unknown> */  {
+      request: $(function (args) /* -> Promise<unknown> */  {
         return post('request', args)
-      },
-      isConnected: function() /* -> bool */ {
+      }),
+      isConnected: $(function() /* -> bool */ {
         return true;
-      },
-      enable: function() /* -> void */ {
+      }),
+      enable: $(function() /* -> void */ {
         return post('enable', {})
-      },
+      }),
       // ethereum.sendAsync(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
-      sendAsync: function(payload, callback) {
+      sendAsync: $(function(payload, callback) {
         post('sendAsync', payload)
           .then((response) => {
             callback(null, response)
@@ -56,13 +52,13 @@ if (window.isSecureContext) {
           .catch((response) => {
             callback(response, null)
           })
-      },
+      }),
       /*
       Available overloads for send:
         ethereum.send(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
         ethereum.send(method: string, params?: Array<unknown>): Promise<JsonRpcResponse>;
       */
-      send: function(
+      send: $(function(
         methodOrPayload /* : string or JsonRpcRequest */,
         paramsOrCallback /*  : Array<unknown> or JsonRpcCallback */
       ) {
@@ -89,12 +85,12 @@ if (window.isSecureContext) {
             throw TypeError('Insufficient number of arguments.')
           }
         }
-      },
-      isUnlocked: function() /* -> Promise<boolean> */ {
+      }),
+      isUnlocked: $(function() /* -> Promise<boolean> */ {
         return post('isUnlocked', {})
-      },
+      }),
     }
   });
 }
   
-})();
+});
