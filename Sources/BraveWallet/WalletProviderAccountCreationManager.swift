@@ -7,10 +7,19 @@ import BraveCore
 
 /// A permission request for a specific dapp
 public struct WalletProviderAccountCreationRequest: Equatable {
+  /// A users response type
+  public enum Response {
+    /// The user rejected the prompt by dismissing the screen
+    case rejected
+    /// The user created a new account
+    case created
+  }
   /// The origin that requested this permission
-  public let requestingOrigin: URLOrigin
+  let requestingOrigin: URLOrigin
   /// The type of request
-  public let coinType: BraveWallet.CoinType
+  let coinType: BraveWallet.CoinType
+  /// A handler to be called when the user rejects to create a new account
+  let responseHandler: (Response) -> Void
   
   public static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.requestingOrigin == rhs.requestingOrigin && lhs.coinType == rhs.coinType
@@ -44,13 +53,24 @@ public class WalletProviderAccountCreationRequestManager {
     }
   }
   
-  public func addRequest(or origin: URLOrigin, coinType: BraveWallet.CoinType) {
-    if !hasPendingRequest(for: origin, coinType: coinType) {
-      requests.append(WalletProviderAccountCreationRequest(requestingOrigin: origin, coinType: coinType))
+  public func beginRequest(
+    for origin: URLOrigin,
+    coinType: BraveWallet.CoinType,
+    completion: (() -> Void)? = nil
+  ) {
+    let request = WalletProviderAccountCreationRequest(requestingOrigin: origin, coinType: coinType) { [weak self] response in
+      guard let self = self else { return }
+      self.removeRequest(for: origin, coinType: coinType)
+      completion?()
     }
+    requests.append(request)
   }
   
   public func firstPendingRequest(for origin: URLOrigin, coinTypes: [BraveWallet.CoinType]) -> WalletProviderAccountCreationRequest? {
     requests.filter { $0.requestingOrigin == origin && coinTypes.contains($0.coinType) }.first
+  }
+  
+  public func cancelAllPendingRequests(coins: [BraveWallet.CoinType]) {
+    requests = requests.filter { !coins.contains($0.coinType) }
   }
 }

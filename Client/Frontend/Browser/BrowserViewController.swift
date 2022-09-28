@@ -2555,6 +2555,9 @@ extension BrowserViewController: TabDelegate {
     if await cryptoStore.isPendingRequestAvailable() {
       return true
     } else if let selectedTabOrigin = tabManager.selectedTab?.url?.origin {
+      if WalletProviderAccountCreationRequestManager.shared.hasPendingRequest(for: selectedTabOrigin, coinType: .sol) {
+        return true
+      }
       return WalletProviderPermissionRequestsManager.shared.hasPendingRequest(for: selectedTabOrigin, coinType: .eth)
     }
     return false
@@ -2726,7 +2729,8 @@ extension BrowserViewController: TabManagerDelegate {
     updateInContentHomePanel(selected?.url as URL?)
 
     notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
-    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests()
+    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
+    WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
     updateURLBarWalletButton()
   }
 
@@ -3558,7 +3562,19 @@ extension BrowserViewController: PreferencesObserver {
       tabManager.reset()
       tabManager.reloadSelectedTab()
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
-      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests()
+      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.eth])
+      WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth])
+      let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+      if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
+        cryptoStore.rejectAllPendingWebpageRequests()
+      }
+      updateURLBarWalletButton()
+    case Preferences.Wallet.defaultSolWallet.key:
+      tabManager.reset()
+      tabManager.reloadSelectedTab()
+      notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
+      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.sol])
+      WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.sol])
       let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
       if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
         cryptoStore.rejectAllPendingWebpageRequests()
