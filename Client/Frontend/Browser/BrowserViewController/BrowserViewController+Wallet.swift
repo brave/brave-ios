@@ -212,7 +212,10 @@ extension Tab: BraveWalletProviderDelegate {
           return
         }
       case .sol:
-        if success, accounts.allSatisfy({ allowedAccounts.contains($0) }) {
+        if success,
+           accounts.count == 1, // only 1 Solana account connect at a time
+           let account = accounts.first,
+           allowedAccounts.contains(account) {
           completion(.none, allowedAccounts)
           return
         }

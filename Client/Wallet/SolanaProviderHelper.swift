@@ -145,7 +145,7 @@ class SolanaProviderHelper: TabContentScript {
   /// Given optional args `{onlyIfTrusted: Bool}`, will return the base 58 encoded public key for success or the error dictionary for failures.
   @MainActor func connect(args: String?) async -> (Any?, String?) {
     guard let tab = tab, let provider = tab.walletSolProvider else {
-      return (nil, buildErrorJson(status: .internalError, errorMessage: ""))
+      return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
     }
     var param: [String: MojoBase.Value]?
     if let args = args {
