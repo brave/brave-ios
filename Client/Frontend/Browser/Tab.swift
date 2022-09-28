@@ -995,17 +995,36 @@ extension Tab {
 // MARK: Script Injection
 extension Tab {
   func setScript(script: UserScriptManager.ScriptType, enabled: Bool) {
-    if (userScripts.contains(script) && enabled) || (!userScripts.contains(script) && !enabled) {
-      // Script already enabled or disabled
+    setScripts(scripts: [script: enabled])
+  }
+  
+  func setScripts(scripts: Set<UserScriptManager.ScriptType>, enabled: Bool) {
+    var scriptMap = [UserScriptManager.ScriptType: Bool]()
+    scripts.forEach({ scriptMap[$0] = enabled })
+    setScripts(scripts: scriptMap)
+  }
+  
+  func setScripts(scripts: [UserScriptManager.ScriptType: Bool]) {
+    var scriptsToAdd = Set<UserScriptManager.ScriptType>()
+    var scriptsToRemove = Set<UserScriptManager.ScriptType>()
+    
+    for (script, enabled) in scripts {
+      let scriptExists = userScripts.contains(script)
+      
+      if !scriptExists && enabled {
+        scriptsToAdd.insert(script)
+      } else if scriptExists && !enabled {
+        scriptsToRemove.insert(script)
+      }
+    }
+    
+    if scriptsToAdd.isEmpty && scriptsToRemove.isEmpty {
+      // Scripts already enabled or disabled
       return
     }
     
-    if enabled {
-      userScripts.insert(script)
-    } else {
-      userScripts.remove(script)
-    }
-    
+    userScripts.formUnion(scriptsToAdd)
+    userScripts.subtract(scriptsToRemove)
     updateInjectedScripts()
   }
   

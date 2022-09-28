@@ -258,14 +258,16 @@ extension BrowserViewController: WKNavigationDelegate {
       
       // Set some additional user scripts
       if navigationAction.targetFrame?.isMainFrame == true {
-        // Add de-amp script
-        // The user script manager will take care to not reload scripts if this value doesn't change
-        tab?.setScript(script: .deAmp, enabled: Preferences.Shields.autoRedirectAMPPages.value)
-        
-        // Add request blocking script
-        // This script will block certian `xhr` and `window.fetch()` requests
-        tab?.setScript(script: .requestBlocking, enabled: url.isWebPage(includeDataURIs: false) &&
-                       domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true))
+        tab?.setScripts(scripts: [
+          // Add de-amp script
+          // The user script manager will take care to not reload scripts if this value doesn't change
+          .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
+          
+          // Add request blocking script
+          // This script will block certian `xhr` and `window.fetch()` requests
+          .requestBlocking: url.isWebPage(includeDataURIs: false) &&
+                            domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
+        ])
       }
     }
 
@@ -274,6 +276,8 @@ extension BrowserViewController: WKNavigationDelegate {
       for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
     )
     
+    // TODO: Convert this to `UserScriptManagerType` so we can inject all scripts at once.
+    // IE: De-Amp, RequestBlocking + These.
     tab?.setCustomUserScript(scripts: scripts)
     
     // Load engine scripts for this request and add it to the tab
