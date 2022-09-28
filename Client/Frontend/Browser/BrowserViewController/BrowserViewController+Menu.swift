@@ -234,6 +234,7 @@ extension BrowserViewController {
                 }
               }
             }
+            .animation(.default, value: playlistItemAdded)
           }
           MenuItemButton(icon: UIImage(named: "nav-share", in: .current, compatibleWith: nil)!.template, title: Strings.shareWithMenuItem) {
             browserViewController.dismiss(animated: true)
