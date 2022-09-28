@@ -59,17 +59,21 @@ class ScriptFactory {
   /// - On the unmodified source file (per `ScriptSourceType`)
   /// - On the modfied source file (per `UserScriptType`)
   func makeScript(for domainType: UserScriptType) throws -> WKUserScript {
-    var source = try makeScriptSource(of: domainType.sourceType)
-
     // First check for and return cached value
     if let script = cachedDomainScriptsSources[domainType] {
       return script
     }
     
+    var source = try makeScriptSource(of: domainType.sourceType)
+    
     switch domainType {
     case .siteStateListener:
-      let fakeParams = try UserScriptHelper.makeSiteStateParams(securityToken: UserScriptManager.securityTokenString) ?? "{}"
-      source = source.replacingOccurrences(of: "$<args>", with: fakeParams)
+      guard let script = SiteStateListenerScriptHandler.userScript else {
+        assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
+        throw ScriptLoadFailure.notFound
+      }
+      cachedDomainScriptsSources[domainType] = script
+      return script
       
     case .farblingProtection(let etld):
       let randomConfiguration = RandomConfiguration(etld: etld)
@@ -96,14 +100,16 @@ class ScriptFactory {
           throw ScriptLoadFailure.notFound
         }
         cachedDomainScriptsSources[domainType] = script
-
-        case .braveSkus:
+        return script
+        
+      case .braveSkus:
         guard let script = BraveSkusScriptHandler.userScript else {
           assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
           throw ScriptLoadFailure.notFound
         }
         cachedDomainScriptsSources[domainType] = script
-
+        return script
+        
       case .bravePlaylistFolderSharingHelper:
         guard let script = PlaylistFolderSharingScriptHandler.userScript else {
           assertionFailure("Cannot load script. This should not happen as it's part of the codebase")

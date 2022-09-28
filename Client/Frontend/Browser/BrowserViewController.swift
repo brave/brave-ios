@@ -2448,6 +2448,7 @@ extension BrowserViewController: TabDelegate {
       BraveGetUA(tab: tab),
       BraveSearchScriptHandler(tab: tab, profile: profile, rewards: rewards),
       BraveTalkScriptHandler(tab: tab, rewards: rewards),
+      BraveSkusScriptHandler(tab: tab),
       ResourceDownloadScriptHandler(tab: tab),
       WindowRenderScriptHandler(tab: tab),
       PlaylistScriptHandler(tab: tab),
@@ -2456,10 +2457,10 @@ extension BrowserViewController: TabDelegate {
       AdsMediaReportingScriptHandler(rewards: rewards, tab: tab),
       ReadyStateScriptHandler(tab: tab),
       DeAmpScriptHandler(tab: tab),
+      SiteStateListenerScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
-      tab.addContentScript(SiteStateListenerContentHelper(tab: tab), name: SiteStateListenerContentHelper.name(), contentWorld: UserScriptType.siteStateListener.contentWorld)
     ]
     
     // Only add the logins handler and wallet provider if the tab is NOT a private browsing tab
@@ -2473,8 +2474,6 @@ extension BrowserViewController: TabDelegate {
     // XXX: Bug 1390200 - Disable NSUserActivity/CoreSpotlight temporarily
     // let spotlightHelper = SpotlightHelper(tab: tab)
     // tab.addHelper(spotlightHelper, name: SpotlightHelper.name())
-
-    tab.contentBlocker.setupTabTrackingProtection()
     
     injectedScripts.forEach {
       tab.addContentScript($0, name: type(of: $0).scriptName, contentWorld: type(of: $0).scriptSandbox)

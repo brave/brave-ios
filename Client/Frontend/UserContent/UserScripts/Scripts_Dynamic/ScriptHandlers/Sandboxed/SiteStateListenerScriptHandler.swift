@@ -9,22 +9,13 @@ import Shared
 
 private let log = Logger.braveCoreLogger
 
-class SiteStateListenerContentHelper: TabContentScript {
+class SiteStateListenerScriptHandler: TabContentScript {
   private struct MessageDTO: Decodable {
     struct MessageDTOData: Decodable, Hashable {
       let windowURL: String
     }
     
-    let securityToken: String
     let data: MessageDTOData
-  }
-  
-  static func name() -> String {
-    return "SiteStateListenerContentHelper"
-  }
-  
-  static func scriptMessageHandlerName() -> String {
-    return ["siteStateListenerContentHelper", UserScriptManager.messageHandlerTokenString].joined(separator: "_")
   }
   
   private weak var tab: Tab?
@@ -33,12 +24,31 @@ class SiteStateListenerContentHelper: TabContentScript {
     self.tab = tab
   }
   
-  func scriptMessageHandlerName() -> String? {
-    return Self.scriptMessageHandlerName()
-  }
+  static let scriptName = "SiteStateListenerScript"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .defaultClient
+  private static let downloadName = "\(scriptName)_\(uniqueID)"
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: scriptSandbox)
+  }()
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
+    
+    if !verifyMessage(message: message) {
+      assertionFailure("Missing required security token.")
+      return
+    }
+    
     guard let tab = tab, let webView = tab.webView else {
       assertionFailure("Should have a tab set")
       return
@@ -47,11 +57,6 @@ class SiteStateListenerContentHelper: TabContentScript {
     do {
       let data = try JSONSerialization.data(withJSONObject: message.body)
       let dto = try JSONDecoder().decode(MessageDTO.self, from: data)
-      
-      guard dto.securityToken == UserScriptManager.securityTokenString else {
-        assertionFailure("Invalid security token. Fix the `RequestBlocking.js` script")
-        return
-      }
       
       guard let frameURL = URL(string: dto.data.windowURL) else {
         return

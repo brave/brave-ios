@@ -16,17 +16,28 @@ class BraveSkusScriptHandler: TabContentScript {
   typealias ReplyHandler = (Any?, String?) -> Void
   
   private weak var tab: Tab?
-  
   private let sku: SkusSkusService?
   
   required init(tab: Tab) {
     self.tab = tab
     self.sku = Skus.SkusServiceFactory.get(privateMode: tab.isPrivate)
   }
-  
-  static func name() -> String { "BraveSkusHelper" }
-  
-  func scriptMessageHandlerName() -> String? { "braveSkusHelper" }
+    
+  static let scriptName = "BraveSkusScript"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .page
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: false,
+                               in: scriptSandbox)
+  }()
   
   private enum Method: Int {
     case refreshOrder = 1
@@ -36,18 +47,17 @@ class BraveSkusScriptHandler: TabContentScript {
   }
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+    if !verifyMessage(message: message) {
+      assertionFailure("Missing required security token.")
+      return
+    }
+    
     let allowedHosts = DomainUserScript.braveSkus.associatedDomains
     
     guard let requestHost = message.frameInfo.request.url?.host,
           allowedHosts.contains(requestHost),
           message.frameInfo.isMainFrame else {
       log.error("Brave skus request called from disallowed host")
-      return
-    }
-    
-    guard let body = message.body as? [String: Any],
-          body["securitytoken"] as? String == UserScriptManager.securityTokenString else {
-      log.error("Failed to retrieve security token")
       return
     }
     
