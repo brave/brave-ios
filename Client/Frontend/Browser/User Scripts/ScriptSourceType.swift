@@ -26,10 +26,10 @@ enum ScriptSourceType {
     switch self {
     case .siteStateListener: return "SiteStateListener"
     case .nacl: return "nacl.min"
-    case .farblingProtection: return "FarblingProtection"
-    case .braveSearchHelper: return "BraveSearchHelper"
-    case .braveTalkHelper: return "BraveTalkHelper"
-    case .bravePlaylistFolderSharingHelper: return "PlaylistFolderSharing"
+    case .farblingProtection: return "FarblingProtectionScript"
+    case .braveSearchHelper: return "BraveSearchScript"
+    case .braveTalkHelper: return "BraveTalkScript"
+    case .bravePlaylistFolderSharingHelper: return "PlaylistFolderSharingScript"
     case .braveSkus: return "BraveSkusHelper"
     }
   }

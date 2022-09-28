@@ -18,7 +18,7 @@ window.__firefox__.includeOnce("RewardsReporting", function($) {
   
   function install() {
     let sendMessage = $(function(method, url, data, referrerUrl) {
-      $.postNativeMessage('rewardsReporting', {"securitytoken": SECURITY_TOKEN, "data": {
+      $.postNativeMessage('rewardsReporting', {"securityToken": SECURITY_TOKEN, "data": {
         method: method === undefined ? "GET" : method,
         url: url,
         data: (data === undefined || data instanceof Blob) ? null : data,

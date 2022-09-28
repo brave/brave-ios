@@ -15,16 +15,21 @@ import BraveWallet
 
 private let log = Logger.browserLogger
 
-protocol TabContentScript {
+protocol TabContentScriptLoader {
+  static func loadUserScript(named: String) -> String?
+  static func secureScript(handlerName: String, securityToken: String, script: String) -> String
+  static func secureScript(handlerNamesMap: [String: String], securityToken: String, script: String) -> String
+}
+
+protocol TabContentScript: TabContentScriptLoader {
   static var scriptName: String { get }
   static var scriptId: String { get }
   static var messageHandlerName: String { get }
   static var scriptSandbox: WKContentWorld { get }
   static var userScript: WKUserScript? { get }
-  static func loadUserScript(named: String) -> String?
   
-  static func secureScript(handlerName: String, securityToken: String, script: String) -> String
-  static func secureScript(handlerNamesMap: [String: String], securityToken: String, script: String) -> String
+  func verifyMessage(message: WKScriptMessage) -> Bool
+  func verifyMessage(message: WKScriptMessage, securityToken: String) -> Bool
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void)
 }
@@ -79,9 +84,8 @@ class Tab: NSObject {
   var secureContentState: TabSecureContentState = .unknown
 
   var walletEthProvider: BraveWalletEthereumProvider?
-  var walletEthProviderJS: String?
+  var walletEthProviderScript: WKUserScript?
   var tabDappStore: TabDappStore = .init()
-  
   var isWalletIconVisible: Bool = false {
     didSet {
       tabDelegate?.updateURLBarWalletButton()
@@ -202,7 +206,7 @@ class Tab: NSObject {
 
   // There is no 'available macro' on props, we currently just need to store ownership.
   lazy var contentBlocker = ContentBlockerHelper(tab: self)
-  lazy var requestBlockingContentHelper = RequestBlockingContentHelper(tab: self)
+  lazy var requestBlockingContentHelper = RequestBlockingContentScriptHandler(tab: self)
 
   /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
   var lastTitle: String?
@@ -226,7 +230,7 @@ class Tab: NSObject {
   private var userAgentOverrides: [String: Bool] = [:]
 
   var readerModeAvailableOrActive: Bool {
-    if let readerMode = self.getContentScript(name: "ReaderMode") as? ReaderMode {
+    if let readerMode = self.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler {
       return readerMode.state != .unavailable
     }
     return false
@@ -244,7 +248,8 @@ class Tab: NSObject {
   var parent: Tab?
 
   fileprivate var contentScriptManager = TabContentScriptManager()
-  private(set) var userScriptManager: UserScriptManager?
+  private var userScripts = Set<UserScriptManager.ScriptType>()
+  private var customUserScripts = Set<UserScriptType>()
 
   fileprivate var configuration: WKWebViewConfiguration?
 
@@ -260,18 +265,11 @@ class Tab: NSObject {
         isNightModeEnabled = true
       }
       
-      webView?.evaluateSafeJavaScript(
-        functionName: "window.__firefox__.NightMode.setEnabled",
-        args: [isNightModeEnabled],
-        contentWorld: .defaultClient,
-        asFunction: true
-      ) { _, error in
-        if let error = error {
-          log.error("Error executing script: \(error)")
-        }
+      if let webView = webView {
+        NightModeScriptHandler.executeScript(for: webView, isNightModeEnabled: isNightModeEnabled)
       }
-
-      userScriptManager?.isNightModeEnabled = isNightModeEnabled
+      
+      self.setScript(script: .nightMode, enabled: isNightModeEnabled)
     }
   }
 
@@ -336,17 +334,18 @@ class Tab: NSObject {
 
       self.webView = webView
       self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
-      self.userScriptManager = UserScriptManager(
-        tab: self,
-        isCookieBlockingEnabled: Preferences.Privacy.blockAllCookies.value,
-        isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
-        isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
-        isNightModeEnabled: Preferences.General.nightModeEnabled.value,
-        isDeAMPEnabled: Preferences.Shields.autoRedirectAMPPages.value,
-        walletEthProviderJS: walletEthProviderJS
-      )
+      
+      let scriptPreferences: [UserScriptManager.ScriptType: Bool] = [
+        .cookieBlocking: Preferences.Privacy.blockAllCookies.value,
+        .playlistMediaSource: Preferences.Playlist.webMediaSourceCompatibility.value,
+        .mediaBackgroundPlay: Preferences.General.mediaAutoBackgrounding.value,
+        .nightMode: Preferences.General.nightModeEnabled.value,
+        .deAmp: Preferences.Shields.autoRedirectAMPPages.value
+      ]
+      
+      userScripts = Set(scriptPreferences.filter({ $0.value }).map({ $0.key }))
+      self.updateInjectedScripts()
       tabDelegate?.tab(self, didCreateWebView: webView)
-
       nightMode = Preferences.General.nightModeEnabled.value
     }
   }
@@ -859,7 +858,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
     if let string = UIPasteboard.general.string {
       evaluateSafeJavaScript(
         functionName: "window.__firefox__.forcePaste",
-        args: [string, UserScriptManager.messageHandlerTokenString],
+        args: [string, UserScriptManager.securityToken],
         contentWorld: .defaultClient
       ) { _, _ in }
     }
@@ -990,5 +989,37 @@ extension Tab {
     self.webView?.evaluateSafeJavaScript(functionName: "sessionStorage.setItem",
                                          args: [key, value],
                                          contentWorld: .page)
+  }
+}
+
+// MARK: Script Injection
+extension Tab {
+  func setScript(script: UserScriptManager.ScriptType, enabled: Bool) {
+    if (userScripts.contains(script) && enabled) || (!userScripts.contains(script) && !enabled) {
+      // Script already enabled or disabled
+      return
+    }
+    
+    if enabled {
+      userScripts.insert(script)
+    } else {
+      userScripts.remove(script)
+    }
+    
+    updateInjectedScripts()
+  }
+  
+  func setCustomUserScript(scripts: Set<UserScriptType>) {
+    if customUserScripts != scripts {
+      customUserScripts = scripts
+      updateInjectedScripts()
+    }
+  }
+  
+  private func updateInjectedScripts() {
+    UserScriptManager.shared.loadCustomScripts(into: self,
+                                               userScripts: userScripts,
+                                               customScripts: customUserScripts,
+                                               walletEthProviderScript: walletEthProviderScript)
   }
 }

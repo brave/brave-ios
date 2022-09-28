@@ -36,8 +36,8 @@ window.__firefox__.execute(function($) {
         try {
           let resourceURL = new URL(urlString, window.location.href)
           $.postNativeMessage('trackingProtectionStats', {
-            securityToken: SECURITY_TOKEN,
-            data: {
+            "securityToken": SECURITY_TOKEN,
+            "data": {
               resourceURL: resourceURL.href,
               sourceURL: window.location.href,
               resourceType: resourceType

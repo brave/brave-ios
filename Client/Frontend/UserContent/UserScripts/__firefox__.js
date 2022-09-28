@@ -114,8 +114,9 @@ if (!window.__firefox__) {
     delete window.webkit;
     delete window.webkit.messageHandlers;
     delete $messageHandlers[messageHandlerName].postMessage;
-    $messageHandlers[messageHandlerName].postMessage(message);
+    let result = $messageHandlers[messageHandlerName].postMessage(message);
     window.webkit = webkit;
+    return result;
   }
   
   // Start securing functions before any other code can use them

@@ -9,7 +9,7 @@ import Shared
 
 private let log = Logger.browserLogger
 
-extension TabContentScript {
+extension TabContentScriptLoader {
   static var uniqueID: String {
     UUID().uuidString.replacingOccurrences(of: "-", with: "")
   }
@@ -22,6 +22,7 @@ extension TabContentScript {
     guard let path = Bundle.current.path(forResource: named, ofType: "js"),
           let source: String = try? String(contentsOfFile: path) else {
       log.error("Failed to load script: \(named).js")
+      assertionFailure("Failed to Load Script: \(named).js")
       return nil
     }
     return source
@@ -42,11 +43,11 @@ extension TabContentScript {
         let handlers = "[\(handlerNamesMap.map({"'\($0.value)'"}).joined(separator: ", "))]"
         return """
         \(handlers).forEach(e => {
-          if (webkit.messageHandlers[e]) {
-            Object_freeze(webkit.messageHandlers[e]);
-            Object_freeze(webkit.messageHandlers[e].postMessage);
-          }
-        });
+            if (e && e.length > 0 && webkit.messageHandlers[e]) {
+              Object.freeze(webkit.messageHandlers[e]);
+              Object.freeze(webkit.messageHandlers[e].postMessage);
+            }
+          });
         """
       }
       return ""
@@ -55,27 +56,21 @@ extension TabContentScript {
     return """
     (function() {
       const SECURITY_TOKEN = '\(securityToken)';
-
-      const Object_assign = Object.assign;
-      const Object_create = Object.create;
-      const Object_defineProperties = Object.defineProperties;
-      const Object_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-      const Object_getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors;
-      const Object_getOwnPropertyNames = Object.getOwnPropertyNames;
-      const Object_getOwnPropertySymbols = Object.getOwnPropertySymbols;
-      const Object_getPrototypeOf = Object.getPrototypeOf;
-
-      const Object_freeze = Object.freeze;
-      const Object_seal = Object.seal;
-      const Object_preventExtensions = Object.preventExtensions;
-    
-      const Function_prototype_apply = Function.prototype.apply;
-      const Function_prototype_call = Function.prototype.call;
     
       \(messageHandlers)
     
       \(script)
     })();
     """
+  }
+}
+
+extension TabContentScript {
+  func verifyMessage(message: WKScriptMessage) -> Bool {
+    verifyMessage(message: message, securityToken: Self.scriptId)
+  }
+  
+  func verifyMessage(message: WKScriptMessage, securityToken: String) -> Bool {
+    (message.body as? [String: Any])?["securityToken"] as? String == securityToken
   }
 }

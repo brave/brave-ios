@@ -43,9 +43,9 @@ class ReadabilityOperation: Operation {
       self.tab.createWebview()
       self.tab.navigationDelegate = self
 
-      let readerMode = ReaderMode(tab: self.tab)
+      let readerMode = ReaderModeScriptHandler(tab: self.tab)
       readerMode.delegate = self
-      self.tab.addContentScript(readerMode, name: ReaderMode.scriptName, contentWorld: .defaultClient)
+      self.tab.addContentScript(readerMode, name: ReaderModeScriptHandler.scriptName, contentWorld: ReaderModeScriptHandler.scriptSandbox)
 
       // Load the page in the webview. This either fails with a navigation error, or we
       // get a readability callback. Or it takes too long, in which case the semaphore
@@ -95,14 +95,14 @@ extension ReadabilityOperation: WKNavigationDelegate {
   }
 }
 
-extension ReadabilityOperation: ReaderModeDelegate {
-  func readerMode(_ readerMode: ReaderMode, didChangeReaderModeState state: ReaderModeState, forTab tab: Tab) {
+extension ReadabilityOperation: ReaderModeScriptHandlerDelegate {
+  func readerMode(_ readerMode: ReaderModeScriptHandler, didChangeReaderModeState state: ReaderModeState, forTab tab: Tab) {
   }
 
-  func readerMode(_ readerMode: ReaderMode, didDisplayReaderizedContentForTab tab: Tab) {
+  func readerMode(_ readerMode: ReaderModeScriptHandler, didDisplayReaderizedContentForTab tab: Tab) {
   }
 
-  func readerMode(_ readerMode: ReaderMode, didParseReadabilityResult readabilityResult: ReadabilityResult, forTab tab: Tab) {
+  func readerMode(_ readerMode: ReaderModeScriptHandler, didParseReadabilityResult readabilityResult: ReadabilityResult, forTab tab: Tab) {
     guard tab == self.tab else {
       return
     }

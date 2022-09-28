@@ -5,10 +5,8 @@ import Shared
 import BraveShared
 import Storage
 
-fileprivate let MozDomain = "mozilla"
-fileprivate let MozErrorDownloadsNotEnabled = 100
-fileprivate let MessageOpenInSafari = "openInSafari"
-fileprivate let MessageCertVisitOnce = "certVisitOnce"
+private let MozDomain = "mozilla"
+private let MozErrorDownloadsNotEnabled = 100
 
 struct ErrorPageModel {
   let requestURL: URL
@@ -191,49 +189,8 @@ extension ErrorPageHelper {
     
     return certs.joined(separator: ",")
   }
-}
-
-extension ErrorPageHelper: TabContentScript {
   
-  static let scriptName = "ErrorPageHelper"
-  static let scriptId = UUID().uuidString
-  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
-  static let scriptSandbox: WKContentWorld = .page
-  static let userScript: WKUserScript? = {
-    guard var script = loadUserScript(named: scriptName) else {
-      return nil
-    }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
-  }()
-
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    guard let errorURL = message.frameInfo.request.url,
-      let internalUrl = InternalURL(errorURL),
-      internalUrl.isErrorPage,
-      let originalURL = internalUrl.originalURLFromErrorPage,
-      let res = message.body as? [String: String],
-      let type = res["type"]
-    else { return }
-
-    switch type {
-    case MessageOpenInSafari:
-      UIApplication.shared.open(originalURL, options: [:])
-    case MessageCertVisitOnce:
-      if let cert = CertificateErrorPageHandler.certsFromErrorURL(errorURL)?.first,
-        let host = originalURL.host {
-        let origin = "\(host):\(originalURL.port ?? 443)"
-        certStore?.addCertificate(cert, forOrigin: origin)
-        message.webView?.replaceLocation(with: originalURL)
-        // webview.reload will not change the error URL back to the original URL
-      }
-    default:
-      assertionFailure("Unknown error message")
-    }
+  func addCertificate(_ cert: SecCertificate, forOrigin origin: String) {
+    certStore?.addCertificate(cert, forOrigin: origin)
   }
 }

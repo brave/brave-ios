@@ -83,33 +83,34 @@ class ScriptFactory {
     case .domainUserScript(let domainUserScript):
       switch domainUserScript {
       case .braveSearchHelper:
-        let securityToken = UserScriptManager.securityTokenString
-        let messageToken = "BraveSearchHelper_\(UserScriptManager.messageHandlerTokenString)"
-        
-        source = source
-          .replacingOccurrences(of: "$<brave-search-helper>", with: messageToken, options: .literal)
-          .replacingOccurrences(of: "$<security_token>", with: securityToken)
+        guard let script = BraveSearchScriptHandler.userScript else {
+          assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
+          throw ScriptLoadFailure.notFound
+        }
+        cachedDomainScriptsSources[domainType] = script
+        return script
         
       case .braveTalkHelper:
-        let securityToken = UserScriptManager.securityTokenString
-        let messageToken = "BraveTalkHelper_\(UserScriptManager.messageHandlerTokenString)"
-        
-        source = source
-          .replacingOccurrences(of: "$<brave-talk-helper>", with: messageToken, options: .literal)
-          .replacingOccurrences(of: "$<security_token>", with: securityToken)
-        
+        guard let script = BraveTalkScriptHandler.userScript else {
+          assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
+          throw ScriptLoadFailure.notFound
+        }
+        cachedDomainScriptsSources[domainType] = script
+
+        case .braveSkus:
+        guard let script = BraveSkusScriptHandler.userScript else {
+          assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
+          throw ScriptLoadFailure.notFound
+        }
+        cachedDomainScriptsSources[domainType] = script
+
       case .bravePlaylistFolderSharingHelper:
-        let securityToken = UserScriptManager.securityTokenString
-        
-        source = source
-          .replacingOccurrences(of: "$<handler>", with: "playlistFolderSharingHelper_\(UserScriptManager.messageHandlerTokenString)", options: .literal)
-          .replacingOccurrences(of: "$<security_token>", with: securityToken, options: .literal)
-      case .braveSkus:
-        let securityToken = UserScriptManager.securityTokenString
-        source = source
-          .replacingOccurrences(of: "$<security_token>", with: securityToken)
-        
-        return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page)
+        guard let script = PlaylistFolderSharingScriptHandler.userScript else {
+          assertionFailure("Cannot load script. This should not happen as it's part of the codebase")
+          throw ScriptLoadFailure.notFound
+        }
+        cachedDomainScriptsSources[domainType] = script
+        return script
       }
     }
     

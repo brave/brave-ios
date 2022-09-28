@@ -14,27 +14,10 @@ const MainFrameAtDocumentEnd = glob.sync("./Client/Frontend/UserContent/UserScri
 const MainFrameAtDocumentStartSandboxed = glob.sync("./Client/Frontend/UserContent/UserScripts/Sandboxed/MainFrame/AtDocumentStart/*.js");
 const MainFrameAtDocumentEndSandboxed = glob.sync("./Client/Frontend/UserContent/UserScripts/Sandboxed/MainFrame/AtDocumentEnd/*.js");
 
-//// Ensure the first script loaded at document start is __firefox__.js
-//// since it defines the `window.__firefox__` global.
-//// ----
-//// Ensure the first script loaded at document end is __firefox__.js
-//// since it also defines the `window.__firefox__` global because PDF
-//// content does not execute user scripts designated to run at document
-//// start for some reason. ¯\_(ツ)_/¯
-[AllFramesAtDocumentStart,
- AllFramesAtDocumentEnd,
- AllFramesAtDocumentStartSandboxed,
- AllFramesAtDocumentEndSandboxed].forEach(e => {
-  e.unshift(__firefox__);
-  
-  if (path.basename(e[0]) !== "__firefox__.js") {
-    throw `ERROR: __firefox__.js is expected to be the first script in AllFrames script`
-  }
-});
-
 module.exports = {
   mode: "production",
   entry: {
+    "__firefox__": __firefox__,
     AllFramesAtDocumentStart: AllFramesAtDocumentStart,
     AllFramesAtDocumentStartSandboxed: AllFramesAtDocumentStartSandboxed,
     AllFramesAtDocumentEnd: AllFramesAtDocumentEnd,

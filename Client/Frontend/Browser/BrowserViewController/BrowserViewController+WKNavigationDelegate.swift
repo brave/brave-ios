@@ -260,20 +260,21 @@ extension BrowserViewController: WKNavigationDelegate {
       if navigationAction.targetFrame?.isMainFrame == true {
         // Add de-amp script
         // The user script manager will take care to not reload scripts if this value doesn't change
-        tab?.userScriptManager?.isDeAMPEnabled = Preferences.Shields.autoRedirectAMPPages.value
+        tab?.setScript(script: .deAmp, enabled: Preferences.Shields.autoRedirectAMPPages.value)
         
         // Add request blocking script
         // This script will block certian `xhr` and `window.fetch()` requests
-        tab?.userScriptManager?.isRequestBlockingEnabled = url.isWebPage(includeDataURIs: false) &&
-          domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
+        tab?.setScript(script: .requestBlocking, enabled: url.isWebPage(includeDataURIs: false) &&
+                       domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true))
       }
     }
 
     // Check if custom user scripts must be added to or removed from the web view.
-    tab?.userScriptManager?.userScriptTypes = UserScriptHelper.getUserScriptTypes(
-      for: navigationAction,
-      options: isPrivateBrowsing ? .privateBrowsing : .default
+    let scripts = UserScriptHelper.getUserScriptTypes(
+      for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
     )
+    
+    tab?.setCustomUserScript(scripts: scripts)
     
     // Load engine scripts for this request and add it to the tab
     // We can't execute them yet because the page is not yet ready
@@ -376,7 +377,9 @@ extension BrowserViewController: WKNavigationDelegate {
       }
 
       // Cookie Blocking code below
-      tab?.userScriptManager?.isCookieBlockingEnabled = Preferences.Privacy.blockAllCookies.value
+      if let tab = tab {
+        tab.setScript(script: .cookieBlocking, enabled: Preferences.Privacy.blockAllCookies.value)
+      }
 
       // Reset the block alert bool on new host.
       if let newHost: String = url.host, let oldHost: String = webView.url?.host, newHost != oldHost {
@@ -520,7 +523,7 @@ extension BrowserViewController: WKNavigationDelegate {
     // The challenge may come from a background tab, so ensure it's the one visible.
     tabManager.selectTab(tab)
 
-    let loginsHelper = tab.getContentScript(name: LoginsHelper.scriptName) as? LoginsHelper
+    let loginsHelper = tab.getContentScript(name: LoginsScriptHandler.scriptName) as? LoginsScriptHandler
     Task { @MainActor in
       do {
         let credentials = try await Authenticator.handleAuthRequest(self, challenge: challenge, loginsHelper: loginsHelper)
