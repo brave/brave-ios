@@ -162,18 +162,14 @@ public class FilterListResourceDownloader: ObservableObject {
     _ = await (cachedFilterLists, cachedDefaultFilterList)
   }
   
-  /// Tells us if the filter list is enabled for the given `UUID`
-  @MainActor public func isEnabled(filterListUUID uuid: String) -> Bool {
-    return settingsManager.isEnabled(forUUID: uuid)
-  }
-  
   private func loadCachedFilterLists() async {
-    let settingsInfo: [(index: Int, uuid: String, folderURL: URL?, resources: [ResourceDownloader.Resource])] = await MainActor.run {
+    let settingsInfo: [(index: Int, uuid: String, componentId: String, folderURL: URL?, resources: [ResourceDownloader.Resource])] = await MainActor.run {
       let filterListSettings = settingsManager.allFilterListSettings
       
       return filterListSettings.enumerated().compactMap { (index, setting) in
         guard setting.isEnabled else { return nil }
-        return (index, setting.uuid, setting.folderURL, setting.resources)
+        guard let componentId = setting.componentId else { return nil }
+        return (index, setting.uuid, componentId, setting.folderURL, setting.resources)
       }
     }
     
@@ -182,7 +178,7 @@ public class FilterListResourceDownloader: ObservableObject {
         group.addTask {
           // Load cached component updater files
           if let folderURL = settingInfo.folderURL, FileManager.default.fileExists(atPath: folderURL.path) {
-            await self.handle(downloadedFolderURL: folderURL, forFilterListUUID: settingInfo.uuid, index: settingInfo.index)
+            await self.handle(downloadedFolderURL: folderURL, forFilterListUUID: settingInfo.uuid, componentId: settingInfo.componentId, index: settingInfo.index)
           }
           
           // Load cached download resources
@@ -191,7 +187,7 @@ public class FilterListResourceDownloader: ObservableObject {
               group.addTask {
                 guard let fileURL = ResourceDownloader.downloadedFileURL(for: resource) else { return }
                 let date = try? ResourceDownloader.creationDate(for: resource)
-                await self.handle(downloadedFileURL: fileURL, for: resource, filterListUUID: settingInfo.uuid, date: date, index: settingInfo.index)
+                await self.handle(downloadedFileURL: fileURL, for: resource, componentId: settingInfo.componentId, date: date, index: settingInfo.index)
               }
             }
           }
@@ -355,8 +351,8 @@ public class FilterListResourceDownloader: ObservableObject {
     adBlockServiceTasks[filterList.uuid] = Task { @MainActor in
       for await folderURL in await adBlockService.register(filterListUUID: filterList.uuid) {
         guard let folderURL = folderURL else { continue }
-        guard self.isEnabled(filterListUUID: filterList.uuid) else { return }
-        await self.handle(downloadedFolderURL: folderURL, forFilterListUUID: filterList.uuid, index: index)
+        guard self.isEnabled(for: filterList.componentId) else { return }
+        await self.handle(downloadedFolderURL: folderURL, forFilterListUUID: filterList.uuid, componentId: filterList.componentId, index: index)
         
         // Save the downloaded folder for later (caching) purposes
         self.settingsManager.set(folderURL: folderURL, forUUID: filterList.uuid)
@@ -374,8 +370,8 @@ public class FilterListResourceDownloader: ObservableObject {
     }
     
     Task {
-      async let removeContentBlockerResource: Void = ContentBlockerManager.shared.removeResource(for: .filterList(uuid: filterList.uuid))
-      async let removeAdBlockEngineResource: Void = AdBlockEngineManager.shared.removeResources(for: .filterList(uuid: filterList.uuid))
+      async let removeContentBlockerResource: Void = ContentBlockerManager.shared.removeResource(for: .filterList(componentId: filterList.componentId))
+      async let removeAdBlockEngineResource: Void = AdBlockEngineManager.shared.removeResources(for: .filterList(componentId: filterList.componentId))
       _ = await (removeContentBlockerResource, removeAdBlockEngineResource)
     }
   }
@@ -389,7 +385,7 @@ public class FilterListResourceDownloader: ObservableObject {
     
     fetchTasks[resource] = Task { @MainActor in
       if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
-        await self.handle(downloadedFileURL: fileURL, for: resource, filterListUUID: filterList.uuid, index: index)
+        await self.handle(downloadedFileURL: fileURL, for: resource, componentId: filterList.componentId, index: index)
       }
       
       try await withTaskCancellationHandler(operation: {
@@ -398,7 +394,7 @@ public class FilterListResourceDownloader: ObservableObject {
           case .success(let downloadResult):
             await self.handle(
               downloadedFileURL: downloadResult.fileURL,
-              for: resource, filterListUUID: filterList.uuid,
+              for: resource, componentId: filterList.componentId,
               date: downloadResult.date,
               index: index
             )
@@ -419,8 +415,8 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   /// Handle resource downloads for the given filter list
-  private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, filterListUUID uuid: String, date: Date? = nil, index: Int) async {
-    guard await isEnabled(filterListUUID: uuid) else {
+  private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, componentId: String, date: Date? = nil, index: Int) async {
+    guard await isEnabled(for: componentId) else {
       return
     }
     
@@ -431,19 +427,19 @@ public class FilterListResourceDownloader: ObservableObject {
       await ContentBlockerManager.shared.set(resource: ContentBlockerManager.Resource(
         url: downloadedFileURL,
         sourceType: .downloaded(version: version)
-      ), for: .filterList(uuid: uuid))
+      ), for: .filterList(componentId: componentId))
       
     case .filterListAdBlockRules:
       // TODO: Compile rulelist to blocklist
       // Make sure we remove the old resource if there is one
       await AdBlockEngineManager.shared.removeResources(
-        for: .filterList(uuid: uuid),
+        for: .filterList(componentId: componentId),
         resourceTypes: [.ruleList]
       )
       
       // Add the new one back in
       await AdBlockEngineManager.shared.add(
-        resource: AdBlockEngineManager.Resource(type: .ruleList, source: .filterList(uuid: uuid)),
+        resource: AdBlockEngineManager.Resource(type: .ruleList, source: .filterList(componentId: componentId)),
         fileURL: downloadedFileURL,
         version: version,
         relativeOrder: index
@@ -455,21 +451,21 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Handle the downloaded folder url for the given filter list. The folder URL should point to a `AdblockFilterList` resource
   /// This will also start fetching any additional resources for the given filter list given it is still enabled.
-  private func handle(downloadedFolderURL: URL, forFilterListUUID uuid: String, index: Int) async {
+  private func handle(downloadedFolderURL: URL, forFilterListUUID uuid: String, componentId: String, index: Int) async {
     // Make sure we remove the old resource if there is one
     await AdBlockEngineManager.shared.removeResources(
-      for: .filterList(uuid: uuid),
+      for: .filterList(componentId: componentId),
       resourceTypes: [.jsonResources, .dat]
     )
     
     // Let's add the new ones in
     await AdBlockEngineManager.shared.add(
-      resource: AdBlockEngineManager.Resource(type: .dat, source: .filterList(uuid: uuid)),
+      resource: AdBlockEngineManager.Resource(type: .dat, source: .filterList(componentId: componentId)),
       fileURL: downloadedFolderURL.appendingPathComponent("rs-\(uuid).dat"),
       version: downloadedFolderURL.lastPathComponent, relativeOrder: index
     )
     await AdBlockEngineManager.shared.add(
-      resource: AdBlockEngineManager.Resource(type: .jsonResources, source: .filterList(uuid: uuid)),
+      resource: AdBlockEngineManager.Resource(type: .jsonResources, source: .filterList(componentId: componentId)),
       fileURL: downloadedFolderURL.appendingPathComponent("resources.json"),
       version: downloadedFolderURL.lastPathComponent,
       relativeOrder: index

@@ -37,6 +37,6 @@ struct FilterList: Decodable, Identifiable {
   }
   
   func makeRuleType() -> ContentBlockerManager.BlocklistRuleType {
-    return .filterList(uuid: uuid)
+    return .filterList(componentId: componentId)
   }
 }

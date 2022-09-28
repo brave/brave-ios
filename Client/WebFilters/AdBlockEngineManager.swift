@@ -17,7 +17,7 @@ public actor AdBlockEngineManager: Sendable {
   enum Source: Hashable {
     case adBlock
     case cosmeticFilters
-    case filterList(uuid: String)
+    case filterList(componentId: String)
     
     /// The order of this source relative to other sources.
     ///
@@ -168,8 +168,8 @@ public actor AdBlockEngineManager: Sendable {
           }
           
           switch resource.source {
-          case .filterList(let uuid):
-            sourceString = "filterList(\(uuid))"
+          case .filterList(let componentId):
+            sourceString = "filterList(\(componentId))"
           case .adBlock:
             sourceString = "adBlock"
           case .cosmeticFilters:

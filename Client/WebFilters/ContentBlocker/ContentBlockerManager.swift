@@ -57,14 +57,14 @@ final public class ContentBlockerManager: Sendable {
   /// Represents the rule type
   public enum BlocklistRuleType: Hashable {
     case general(GeneralBlocklistTypes)
-    case filterList(uuid: String)
+    case filterList(componentId: String)
     
     var identifier: String {
       switch self {
       case .general(let storedType):
         return ["stored-type", storedType.fileName].joined(separator: "-")
-      case .filterList(let uuid):
-        return ["filter-list", uuid].joined(separator: "-")
+      case .filterList(let componentId):
+        return ["filter-list", componentId].joined(separator: "-")
       }
     }
   }
