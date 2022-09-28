@@ -40,19 +40,50 @@ extension BrowserViewController {
         .padding(.horizontal, 14)
         .padding(.bottom, 5)
 
-      vpnButton(menuController)
-      MenuItemFactory.button(for: .playlist(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription), completion: presentPlaylistController)
+      VPNMenuButton(
+        vpnProductInfo: self.vpnProductInfo,
+        description: Strings.OptionsMenu.braveVPNItemDescription,
+        displayVPNDestination: { [unowned self] vc in
+          (self.presentedViewController as? MenuViewController)?
+            .pushInnerMenu(vc)
+        },
+        enableInstalledVPN: { [unowned menuController] in
+          /// Donate Enable VPN Activity for suggestions
+          let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+          menuController.userActivity = enableVPNActivity
+          enableVPNActivity.becomeCurrent()
+        }
+      )
+
+      MenuItemFactory.button(for: .playlist(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription)) { [weak self] in
+        guard let self = self else { return }
+        self.presentPlaylistController()
+      }
       
       // Add Brave Talk and News options only in normal browsing
       if !PrivateBrowsingManager.shared.isPrivateBrowsing {
         // Show Brave News if it is first launch and after first launch If the new is enabled
         if Preferences.General.isFirstLaunch.value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
-          MenuItemFactory.button(for: .news, completion: navigateToBraveNews)
+          MenuItemFactory.button(for: .news) { [weak self] in
+            guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
+              return
+            }
+
+            self.popToBVC()
+            newTabPageController.scrollToBraveNews()
+          }
         }
-        MenuItemFactory.button(for: .talk, completion: finishEditingAndSubmit)
+        MenuItemFactory.button(for: .talk) {
+          guard let url = URL(string: "https://talk.brave.com/") else { return }
+
+          self.popToBVC()
+          self.finishEditingAndSubmit(url, visitType: .typed)
+        }
       }
       
-      MenuItemFactory.button(for: .wallet(subtitle: Strings.OptionsMenu.braveWalletItemDescription), completion: presentWallet)
+      MenuItemFactory.button(for: .wallet(subtitle: Strings.OptionsMenu.braveWalletItemDescription)) { [unowned self] in
+        self.presentWallet()
+      }
     }
     .fixedSize(horizontal: false, vertical: true)
     .padding(.top, 10)
@@ -61,39 +92,73 @@ extension BrowserViewController {
 
   func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {
     VStack(spacing: 0) {
-      MenuItemFactory.button(for: .bookmarks) { [weak self] in
-        self?.presentBookmarks(menuController)
+      MenuItemFactory.button(for: .bookmarks) { [unowned self, unowned menuController] in
+          let vc = BookmarksViewController(
+            folder: bookmarkManager.lastVisitedFolder(),
+            bookmarkManager: bookmarkManager,
+            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+          vc.toolbarUrlActionsDelegate = self
+          menuController.presentInnerMenu(vc)
       }
-      MenuItemFactory.button(for: .history) { [weak self] in
-        self?.presentHistory(menuController)
+      MenuItemFactory.button(for: .history) { [unowned self, unowned menuController] in
+          let vc = HistoryViewController(
+            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
+            historyAPI: self.braveCore.historyAPI,
+            tabManager: self.tabManager)
+          vc.toolbarUrlActionsDelegate = self
+          menuController.pushInnerMenu(vc)
       }
-      MenuItemFactory.button(for: .downloads, completion: openBraveDownloadsFolder)
+      MenuItemFactory.button(for: .downloads) {
+        FileManager.default.openBraveDownloadsFolder { success in
+          if !success {
+            self.displayOpenDownloadsError()
+          }
+        }
+      }
 
       if isShownOnWebPage {
-        MenuItemFactory.button(for: .wallet(), completion: presentWallet)
-        MenuItemFactory.button(for: .playlist(), completion: presentPlaylistController)
+        MenuItemFactory.button(for: .wallet()) {[weak self] in
+          self?.presentWallet()
+        }
+        MenuItemFactory.button(for: .playlist()) { [weak self] in
+          guard let self = self else { return }
+          self.presentPlaylistController()
+        }
       }
-      MenuItemFactory.button(for: .settings) { [weak self] in
-        self?.presentSettings(menuController)
+      MenuItemFactory.button(for: .settings) { [unowned self, unowned menuController] in
+        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: isPrivateMode)
+        let walletService = BraveWallet.ServiceFactory.get(privateMode: isPrivateMode)
+        let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode)
+        
+        var keyringStore: KeyringStore?
+        if let keyringService = keyringService,
+           let walletService = walletService,
+           let rpcService = rpcService {
+          keyringStore = KeyringStore(
+            keyringService: keyringService,
+            walletService: walletService,
+            rpcService: rpcService
+          )
+        }
+        
+        let cryptoStore = CryptoStore.from(privateMode: isPrivateMode)
+
+        let vc = SettingsViewController(
+          profile: self.profile,
+          tabManager: self.tabManager,
+          feedDataSource: self.feedDataSource,
+          rewards: self.rewards,
+          legacyWallet: self.legacyWallet,
+          windowProtection: self.windowProtection,
+          braveCore: self.braveCore,
+          keyringStore: keyringStore,
+          cryptoStore: cryptoStore
+        )
+        vc.settingsDelegate = self
+        menuController.pushInnerMenu(vc)
       }
     }
-  }
-  
-  private func vpnButton(_ menuController: MenuViewController) -> VPNMenuButton {
-    VPNMenuButton(
-      vpnProductInfo: self.vpnProductInfo,
-      description: Strings.OptionsMenu.braveVPNItemDescription,
-      displayVPNDestination: { [unowned self] vc in
-        (self.presentedViewController as? MenuViewController)?
-          .pushInnerMenu(vc)
-      },
-      enableInstalledVPN: { [unowned menuController] in
-        /// Donate Enable VPN Activity for suggestions
-        let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
-        menuController.userActivity = enableVPNActivity
-        enableVPNActivity.becomeCurrent()
-      }
-    )
   }
 
   private func presentWallet() {
@@ -124,81 +189,6 @@ extension BrowserViewController {
         }
       }
     }
-  }
-  
-  private func navigateToBraveNews() {
-    guard let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
-      return
-    }
-    self.popToBVC()
-    newTabPageController.scrollToBraveNews()
-  }
-  
-  private func finishEditingAndSubmit() {
-    guard let url = URL(string: "https://talk.brave.com/") else { return }
-
-    self.popToBVC()
-    self.finishEditingAndSubmit(url, visitType: .typed)
-  }
-  
-  private func presentBookmarks(_ menuController: MenuViewController) {
-    let vc = BookmarksViewController(
-      folder: bookmarkManager.lastVisitedFolder(),
-      bookmarkManager: bookmarkManager,
-      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-    vc.toolbarUrlActionsDelegate = self
-    menuController.presentInnerMenu(vc)
-  }
-  
-  private func presentHistory(_ menuController: MenuViewController) {
-    let vc = HistoryViewController(
-      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
-      historyAPI: braveCore.historyAPI,
-      tabManager: tabManager)
-    vc.toolbarUrlActionsDelegate = self
-    menuController.pushInnerMenu(vc)
-  }
-  
-  private func openBraveDownloadsFolder() {
-    FileManager.default.openBraveDownloadsFolder { success in
-      if !success {
-        self.displayOpenDownloadsError()
-      }
-    }
-  }
-  
-  private func presentSettings(_ menuController: MenuViewController) {
-    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: isPrivateMode)
-    let walletService = BraveWallet.ServiceFactory.get(privateMode: isPrivateMode)
-    let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode)
-    
-    var keyringStore: KeyringStore?
-    if let keyringService = keyringService,
-       let walletService = walletService,
-       let rpcService = rpcService {
-      keyringStore = KeyringStore(
-        keyringService: keyringService,
-        walletService: walletService,
-        rpcService: rpcService
-      )
-    }
-    
-    let cryptoStore = CryptoStore.from(privateMode: isPrivateMode)
-
-    let vc = SettingsViewController(
-      profile: self.profile,
-      tabManager: self.tabManager,
-      feedDataSource: self.feedDataSource,
-      rewards: self.rewards,
-      legacyWallet: self.legacyWallet,
-      windowProtection: self.windowProtection,
-      braveCore: self.braveCore,
-      keyringStore: keyringStore,
-      cryptoStore: cryptoStore
-    )
-    vc.settingsDelegate = self
-    menuController.pushInnerMenu(vc)
   }
 
   struct PageActionsMenuSection: View {
