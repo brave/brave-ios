@@ -59,7 +59,7 @@ extension BrowserViewController {
         guard let self = self else { return }
         self.presentPlaylistController()
       }
-      
+
       // Add Brave Talk and News options only in normal browsing
       if !PrivateBrowsingManager.shared.isPrivateBrowsing {
         // Show Brave News if it is first launch and after first launch If the new is enabled
@@ -93,20 +93,20 @@ extension BrowserViewController {
   func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {
     VStack(spacing: 0) {
       MenuItemFactory.button(for: .bookmarks) { [unowned self, unowned menuController] in
-          let vc = BookmarksViewController(
-            folder: bookmarkManager.lastVisitedFolder(),
-            bookmarkManager: bookmarkManager,
-            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
-          vc.toolbarUrlActionsDelegate = self
-          menuController.presentInnerMenu(vc)
+        let vc = BookmarksViewController(
+          folder: bookmarkManager.lastVisitedFolder(),
+          bookmarkManager: bookmarkManager,
+          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        vc.toolbarUrlActionsDelegate = self
+        menuController.presentInnerMenu(vc)
       }
       MenuItemFactory.button(for: .history) { [unowned self, unowned menuController] in
-          let vc = HistoryViewController(
-            isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
-            historyAPI: self.braveCore.historyAPI,
-            tabManager: self.tabManager)
-          vc.toolbarUrlActionsDelegate = self
-          menuController.pushInnerMenu(vc)
+        let vc = HistoryViewController(
+          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
+          historyAPI: self.braveCore.historyAPI,
+          tabManager: self.tabManager)
+        vc.toolbarUrlActionsDelegate = self
+        menuController.pushInnerMenu(vc)
       }
       MenuItemFactory.button(for: .downloads) {
         FileManager.default.openBraveDownloadsFolder { success in
