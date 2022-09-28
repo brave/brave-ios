@@ -136,7 +136,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             initialValue: filterListDownloader.isEnabled(for: mobileAnnoyancesComponentID),
             valueChange: { value in
               FilterListResourceDownloader.shared.enableFilterList(for: mobileAnnoyancesComponentID, isEnabled: value)
-            })), cellClass: MultilineSubtitleCell.self, uuid: "content-filtering"
+            })), cellClass: MultilineSubtitleCell.self, uuid: "blockMobileAnnoyances"
     )
   }
 
