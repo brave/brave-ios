@@ -126,16 +126,16 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   }()
   
   private var blockMobileAnnoyancesRow: Row {
-    let uuid = FilterList.mobileAnnoyancesUUID
+    let mobileAnnoyancesComponentID = FilterList.mobileAnnoyancesComponentID
     let filterListDownloader = FilterListResourceDownloader.shared
     
     return Row(
       text: Strings.blockMobileAnnoyances,
       accessory:
           .view(SwitchAccessoryView(
-            initialValue: filterListDownloader.isEnabled(filterListUUID: uuid),
+            initialValue: filterListDownloader.isEnabled(for: mobileAnnoyancesComponentID),
             valueChange: { value in
-              FilterListResourceDownloader.shared.enableFilterList(forFilterListUUID: uuid, isEnabled: value)
+              FilterListResourceDownloader.shared.enableFilterList(for: mobileAnnoyancesComponentID, isEnabled: value)
             })), cellClass: MultilineSubtitleCell.self, uuid: "content-filtering"
     )
   }

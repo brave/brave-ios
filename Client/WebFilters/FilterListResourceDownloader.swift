@@ -35,6 +35,11 @@ public class FilterListResourceDownloader: ObservableObject {
       return allFilterListSettings.first(where: { $0.uuid == uuid })?.isEnabled ?? false
     }
     
+    /// - Warning: Do not call this before we load core data
+    public func isEnabled(for componentID: String) -> Bool {
+      return allFilterListSettings.first(where: { $0.componentId == componentID })?.isEnabled ?? false
+    }
+    
     /// Set the enabled status of a filter list setting
     /// Otherwise it will create a new setting with the specified properties
     ///
@@ -217,11 +222,11 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
-  /// Enables a filter list for the given uuid. Returns true if the filter list exists or not.
+  /// Enables a filter list for the given component ID. Returns true if the filter list exists or not.
   @discardableResult
-  public func enableFilterList(forFilterListUUID uuid: String, isEnabled: Bool) -> Bool {
+  public func enableFilterList(for componentID: String, isEnabled: Bool) -> Bool {
     // Enable the setting
-    if let index = filterLists.firstIndex(where: { $0.uuid == uuid }) {
+    if let index = filterLists.firstIndex(where: { $0.componentId == componentID }) {
       filterLists[index].isEnabled = isEnabled
       return true
     } else {
@@ -232,6 +237,11 @@ public class FilterListResourceDownloader: ObservableObject {
   /// Tells us if the filter list is enabled for the given `UUID`
   @MainActor public func isEnabled(filterListUUID uuid: String) -> Bool {
     return settingsManager.isEnabled(forUUID: uuid)
+  }
+  
+  /// Tells us if the filter list is enabled for the given `componentID`
+  @MainActor public func isEnabled(for componentID: String) -> Bool {
+    return settingsManager.isEnabled(for: componentID)
   }
   
   /// Invoked when shield components are loaded
