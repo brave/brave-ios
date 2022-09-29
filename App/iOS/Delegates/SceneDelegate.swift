@@ -22,10 +22,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   // This property must be non-null because even though it's optional,
   // Chromium force unwraps it and uses it. For this reason, we always set this window property to the scene's main window.
-  internal var window: UIWindow?
+  internal var window: BraveWindow?
   private var windowProtection: WindowProtection?
   private var sceneInfo: AppDelegate.SceneInfoModel?
   static var shouldHandleUrpLookup = false
+  var shouldEnableNightMode = Preferences.General.nightModeEnabled
 
   private var cancellables: Set<AnyCancellable> = []
 
@@ -66,6 +67,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self?.updateTheme()
       }
       .store(in: &cancellables)
+    
+    NotificationCenter.default.addObserver(forName: traitCollectionDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+      print("isDark: \(UITraitCollection.current.userInterfaceStyle == .dark)")
+      
+      self?.updateTheme()
+    }
 
     // Create a browser instance
     guard
@@ -108,7 +115,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     // Assign each browser a window of its own
-    let window = UIWindow(windowScene: windowScene).then {
+    let window = BraveWindow(windowScene: windowScene).then {
       $0.backgroundColor = .black
       $0.overrideUserInterfaceStyle = expectedThemeOverride
       $0.tintColor = UIColor {
@@ -366,10 +373,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension SceneDelegate {
   private var expectedThemeOverride: UIUserInterfaceStyle {
-
     // The expected appearance theme should be dark mode when night mode is enabled for websites
-    let themeValue = Preferences.General.nightModeEnabled.value ? DefaultTheme.dark.rawValue : Preferences.General.themeNormalMode.value
-
+    var themeValue = Preferences.General.nightModeEnabled.value ? DefaultTheme.dark.rawValue : Preferences.General.themeNormalMode.value
+    
+    if UITraitCollection.current.userInterfaceStyle == .light, Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+      themeValue = DefaultTheme.light.rawValue
+      Preferences.General.automaticNightModeEnabled.value = false
+    }
+    
     let themeOverride = DefaultTheme(rawValue: themeValue)?.userInterfaceStyleOverride ?? .unspecified
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     return isPrivateBrowsing ? .dark : themeOverride

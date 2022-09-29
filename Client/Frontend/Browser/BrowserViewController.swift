@@ -750,6 +750,10 @@ public class BrowserViewController: UIViewController {
         self, selector: #selector(updateShieldNotifications),
         name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
     }
+    
+    NotificationCenter.default.addObserver(forName: Notification.Name("traitCollectionDidChangeNotification"), object: nil, queue: .main) { _ in
+      
+    }
 
     view.backgroundColor = .braveBackground
     KeyboardHelper.defaultHelper.addDelegate(self)

@@ -412,6 +412,17 @@ class SettingsViewController: TableViewController {
             onValueChange: { [unowned self] enabled in
               NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: enabled)
             },
+            image: UIImage(systemName: "moon")),
+          .boolRow(
+            title: "Enable Automatic Night Mode",
+            detailText: "Automatic Apperance is respected",
+            option: Preferences.General.automaticNightModeEnabled,
+            onValueChange: { [unowned self] enabled in
+              
+              print("Trait Collec \(traitCollection.userInterfaceStyle)")
+              print("Preferences \(Preferences.General.themeNormalMode.value)")
+
+            },
             image: UIImage(systemName: "moon"))
         ],
         footer: .title(Strings.NightMode.sectionDescription)
