@@ -11,7 +11,7 @@ import struct Shared.Logger
 
 private let log = Logger.browserLogger
 
-class SolanaProviderHelper: TabContentScript {
+class SolanaProviderScriptHandler: TabContentScript {
   
   fileprivate enum Keys: String {
     case connect
@@ -29,18 +29,26 @@ class SolanaProviderHelper: TabContentScript {
     case data
   }
   
+  static let scriptName = "WalletSolanaProviderScript"
+  static let scriptId = UUID().uuidString
+  static let messageHandlerName = "\(scriptName)_\(messageUUID)"
+  static let scriptSandbox: WKContentWorld = .page
+  static let userScript: WKUserScript? = {
+    guard var script = loadUserScript(named: scriptName) else {
+      return nil
+    }
+    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+                                                    securityToken: scriptId,
+                                                    script: script),
+                               injectionTime: .atDocumentStart,
+                               forMainFrameOnly: true,
+                               in: scriptSandbox)
+  }()
+  
   private weak var tab: Tab?
   
   init(tab: Tab) {
     self.tab = tab
-  }
-  
-  static func name() -> String {
-    return "walletSolanaProvider"
-  }
-  
-  func scriptMessageHandlerName() -> String? {
-    return "walletSolanaProvider_\(UserScriptManager.messageHandlerTokenString)"
   }
   
   static func shouldInjectWalletProvider(_ completion: @escaping (Bool) -> Void) {
@@ -60,12 +68,10 @@ class SolanaProviderHelper: TabContentScript {
       case signTransaction
       case signAllTransactions
     }
-    var securityToken: String
     var method: Method
     var args: String?
     
     private enum CodingKeys: String, CodingKey {
-      case securityToken = "securitytoken"
       case method
       case args
     }
@@ -73,6 +79,11 @@ class SolanaProviderHelper: TabContentScript {
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     Task { @MainActor in
+      if !verifyMessage(message: message) {
+        assertionFailure("Missing required security token.")
+        return
+      }
+      
       guard let tab = tab,
             !tab.isPrivate,
             let provider = tab.walletSolProvider,
@@ -80,8 +91,7 @@ class SolanaProviderHelper: TabContentScript {
             message.frameInfo.isMainFrame, // Fail the request came from 3p origin
             JSONSerialization.isValidJSONObject(message.body),
             let messageData = try? JSONSerialization.data(withJSONObject: message.body, options: []),
-            let body = try? JSONDecoder().decode(MessageBody.self, from: messageData),
-            body.securityToken == UserScriptManager.securityTokenString
+            let body = try? JSONDecoder().decode(MessageBody.self, from: messageData)
       else {
         log.error("Failed to handle solana provider communication")
         return
@@ -152,7 +162,7 @@ class SolanaProviderHelper: TabContentScript {
       param = MojoBase.Value(jsonString: args)?.dictionaryValue
     }
     // need to inject `_brave_solana.createPublickey` function
-    await tab.userScriptManager?.injectSolanaInternalScript()
+    await UserScriptManager.shared.injectSolanaInternalScript(tab: tab, solanaInternalScript: tab.walletSolProviderScripts[.solanaInternal])
     let (status, errorMessage, publicKey) = await provider.connect(param)
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
@@ -234,7 +244,7 @@ class SolanaProviderHelper: TabContentScript {
     if method == Keys.connect.rawValue,
        let publicKey = result[Keys.publicKey.rawValue]?.stringValue {
       // need to inject `_brave_solana.createPublickey` function before replying w/ success.
-      await tab.userScriptManager?.injectSolanaInternalScript()
+      await UserScriptManager.shared.injectSolanaInternalScript(tab: tab, solanaInternalScript: tab.walletSolProviderScripts[.solanaInternal])
       await tab.updateSolanaProperties()
       return (publicKey, nil)
     } else {
@@ -327,7 +337,7 @@ private extension MojoBase.Value {
   /// Returns the array of numbers given a Buffer as MojoBase.Value.
   /// `Buffer` comes as ["data": [UInt8], "type": "Buffer"].
   var bufferToList: [MojoBase.Value]? {
-    dictionaryValue?[SolanaProviderHelper.Keys.data.rawValue]?.listValue
+    dictionaryValue?[SolanaProviderScriptHandler.Keys.data.rawValue]?.listValue
   }
   
   var numberArray: [NSNumber]? {

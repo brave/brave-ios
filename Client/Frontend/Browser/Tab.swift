@@ -1077,6 +1077,7 @@ extension Tab {
     UserScriptManager.shared.loadCustomScripts(into: self,
                                                userScripts: userScripts,
                                                customScripts: customUserScripts,
-                                               walletEthProviderScript: walletEthProviderScript)
+                                               walletEthProviderScript: walletEthProviderScript,
+                                               walletSolProviderScripts: walletSolProviderScripts)
   }
 }

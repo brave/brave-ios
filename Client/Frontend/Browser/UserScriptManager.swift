@@ -93,6 +93,7 @@ class UserScriptManager {
     case windowRenderHelper
     case readyStateHelper
     case ethereumProvider
+    case solanaProvider
     
     fileprivate var script: WKUserScript? {
       switch self {
@@ -104,6 +105,7 @@ class UserScriptManager {
       case .deAmp: return DeAmpScriptHandler.userScript
       case .requestBlocking: return RequestBlockingContentScriptHandler.userScript
       case .ethereumProvider: return EthereumProviderScriptHandler.userScript
+      case .solanaProvider: return SolanaProviderScriptHandler.userScript
         
       // Always enabled scripts
       case .rewardsReporting: return RewardsReportingScriptHandler.userScript
@@ -165,7 +167,13 @@ class UserScriptManager {
   }
   
   // TODO: Get rid of this OR refactor wallet and domain scripts
-  func loadCustomScripts(into tab: Tab, userScripts: Set<ScriptType>, customScripts: Set<UserScriptType>, walletEthProviderScript: WKUserScript?) {
+  func loadCustomScripts(
+    into tab: Tab,
+    userScripts: Set<ScriptType>,
+    customScripts: Set<UserScriptType>,
+    walletEthProviderScript: WKUserScript?,
+    walletSolProviderScripts: [BraveWalletProviderScriptKey: String]
+  ) {
     guard let webView = tab.webView else {
       assertionFailure("Injecting Scripts into a Tab that has no WebView")
       return
@@ -189,6 +197,29 @@ class UserScriptManager {
         }
       }
       
+      if WalletDebugFlags.isSolanaDappsEnabled,
+         tab.isPrivate == false,
+         Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave,
+         let script = self.dynamicScripts[.solanaProvider] {
+
+        // Inject solana provider
+        scriptController.addUserScript(script)
+
+        if let walletSolProviderScript = walletSolProviderScripts[.solana] {
+          let script = """
+          window.__firefox__.execute(function($, $Object) {
+            \(walletSolProviderScript)
+          });
+          """
+          let wkScript = WKUserScript.create(
+            source: script,
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true,
+            in: SolanaProviderScriptHandler.scriptSandbox)
+          scriptController.addUserScript(wkScript)
+        }
+      }
+      
       // TODO: Refactor this and get rid of the `UserScriptType`
       // Inject Custom scripts
       for userScriptType in customScripts.sorted(by: { $0.order < $1.order }) {
@@ -203,17 +234,17 @@ class UserScriptManager {
     }
   }
   
-  @MainActor func injectSolanaInternalScript() async {
-    guard let webView = tab?.webView,
-          let solanaInternalScript = walletSolProviderScripts[.solanaInternal] else {
+  @MainActor func injectSolanaInternalScript(tab: Tab, solanaInternalScript: String?) async {
+    guard let webView = tab.webView,
+          let solanaInternalScript = solanaInternalScript else {
       return
     }
     // inject the internal solana script
     let script = """
-      (function($Object){
-        \(solanaInternalScript)
-      })(Object);
-      """
+    window.__firefox__.execute(function($, $Object) {
+      \(solanaInternalScript)
+    })
+    """
     await webView.evaluateSafeJavaScript(
       functionName: script,
       args: [],
