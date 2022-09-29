@@ -11,21 +11,30 @@ struct FilterList: Decodable, Identifiable {
     case uuid, title, componentId, description = "desc", urlString = "url"
   }
   
-  /// The component ID of the "Fanboy's Mobile Notifications List"
-  /// This is a special filter list that is enabled by default
-  public static let mobileAnnoyancesComponentID = "bfpgedeaaibpoidldhjcknekahbikncb"
-  /// The component id of the cookie consent notices filter list.
-  /// This is a special filter list that has more accessible UI to control it
+  /// The component ID of the filter list that blocks "Open in app" notices
+  public static let mobileNotificationsComponentID = "bfpgedeaaibpoidldhjcknekahbikncb"
+  /// The component ID of the filter list that blocks cookie consent notices.
   public static let cookieConsentNoticesComponentID = "cdbbhgbmjhfnhnmgeddbliobbofkgdhe"
   
-  let uuid: String
+  // TODO: @JS Remove these values once we compile block lists from raw filter list text files: #5975
+  /// The UUID of the filter list that blocks cookie consent notices.
+  /// We need this in case the user enables this filter list before our filter lists have loaded.
+  public static let cookieConsentNoticesUUID = "AC023D22-AE88-4060-A978-4FEEEC4221693"
+  /// The UUID of the filter list that blocks "Open in app" notices
+  /// We need this in case the user enables this filter list before our filter lists have loaded.
+  public static let mobileNotificationsUUID = "2F3DCE16-A19A-493C-A88F-2E110FBD37D6"
+  
+  let componentId: String
   let title: String
   let description: String
-  let componentId: String
   let urlString: String
   var isEnabled: Bool = false
   
-  var id: String { return uuid }
+  // TODO: @JS Remove this value once we compile block lists from raw filter list text files: #5975
+  @available(*, deprecated, message: "Use `componentId` instead")
+  let uuid: String
+  
+  var id: String { return componentId }
   
   init(from filterList: AdblockFilterListCatalogEntry, isEnabled: Bool) {
     self.uuid = filterList.uuid

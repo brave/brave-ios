@@ -174,7 +174,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
     }
     
     var resources = FilterListResourceDownloader.shared.filterLists.flatMap { filterList -> [ResourceDownloader.Resource] in
-      return filterList.resources
+      return filterList.makeResources()
     }
     
     resources.append(contentsOf: [

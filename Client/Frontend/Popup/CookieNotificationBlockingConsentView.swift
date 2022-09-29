@@ -28,9 +28,10 @@ struct CookieNotificationBlockingConsentView: View {
         self.showAnimation = true
       }
 
-      if !FilterListResourceDownloader.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: true) {
-        assertionFailure("This filter list should exist or this UI is completely useless")
-      }
+      FilterListResourceDownloader.shared.enableFilterList(
+        for: FilterList.cookieConsentNoticesComponentID, isEnabled: true,
+        uuid: FilterList.cookieConsentNoticesUUID
+      )
       
       Task { @MainActor in
         try await Task.sleep(seconds: 3.5)

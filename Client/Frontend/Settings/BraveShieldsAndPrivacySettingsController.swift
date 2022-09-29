@@ -167,16 +167,19 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   }()
   
   private var blockMobileAnnoyancesRow: Row {
-    let mobileAnnoyancesComponentID = FilterList.mobileAnnoyancesComponentID
+    let mobileNotificationsComponentID = FilterList.mobileNotificationsComponentID
     let filterListDownloader = FilterListResourceDownloader.shared
     
     return Row(
       text: Strings.blockMobileAnnoyances,
       accessory:
           .view(SwitchAccessoryView(
-            initialValue: filterListDownloader.isEnabled(for: mobileAnnoyancesComponentID),
+            initialValue: filterListDownloader.isEnabled(for: mobileNotificationsComponentID),
             valueChange: { value in
-              FilterListResourceDownloader.shared.enableFilterList(for: mobileAnnoyancesComponentID, isEnabled: value)
+              FilterListResourceDownloader.shared.enableFilterList(
+                for: mobileNotificationsComponentID, isEnabled: value,
+                uuid: FilterList.mobileNotificationsUUID
+              )
             })), cellClass: MultilineSubtitleCell.self, uuid: "blockMobileAnnoyances"
     )
   }
@@ -303,9 +306,10 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         for: FilterList.cookieConsentNoticesComponentID
       ),
       valueChange: { isEnabled in
-        if !FilterListResourceDownloader.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: isEnabled) {
-          assertionFailure("This filter list should exist or this UI is completely useless")
-        }
+        FilterListResourceDownloader.shared.enableFilterList(
+          for: FilterList.cookieConsentNoticesComponentID, isEnabled: isEnabled,
+          uuid: FilterList.cookieConsentNoticesUUID
+        )
       }, cellReuseId: "blockCookieConsentNoticesReuseIdentifier"
     )
   }

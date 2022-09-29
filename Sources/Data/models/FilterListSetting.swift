@@ -15,10 +15,13 @@ public final class FilterListSetting: NSManagedObject, CRUD {
     return FileManager.default.urls(for: location, in: .userDomainMask).first
   }
   
-  @NSManaged public var uuid: String
-  @NSManaged public var componentId: String?
+  @NSManaged public var componentId: String
   @NSManaged public var isEnabled: Bool
   @NSManaged private var folderPath: String?
+  
+  // TODO: @JS Remove this value once we compile block lists from raw filter list text files: #5975
+  @available(*, deprecated, message: "Use `componentId`")
+  @NSManaged public var uuid: String
 
   public var folderURL: URL? {
     get {
@@ -36,7 +39,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   }
   
   /// Create a filter list setting for the given UUID and enabled status
-  public class func create(uuid: String, componentId: String?, isEnabled: Bool, inMemory: Bool) -> FilterListSetting {
+  public class func create(componentId: String, uuid: String, isEnabled: Bool, inMemory: Bool) -> FilterListSetting {
     var newSetting: FilterListSetting!
 
     // Settings are usually accesed on view context, but when the setting doesn't exist,

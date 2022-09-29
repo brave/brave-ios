@@ -7,24 +7,17 @@ import Foundation
 import Data
 
 protocol FilterListInterface {
+  var componentId: String { get }
   var uuid: String { get }
-  var filterListComponentId: String? { get }
 }
  
 extension FilterListInterface {
-  var resources: [ResourceDownloader.Resource] {
-    guard let filterListComponentId = self.filterListComponentId else { return [] }
-    
+  func makeResources() -> [ResourceDownloader.Resource] {
     return [
-      .filterListContentBlockingBehaviors(uuid: uuid, componentId: filterListComponentId)
+      .filterListContentBlockingBehaviors(uuid: uuid, componentId: componentId)
     ]
   }
 }
 
-extension FilterListSetting: FilterListInterface {
-  var filterListComponentId: String? { return componentId }
-}
-
-extension FilterList: FilterListInterface {
-  var filterListComponentId: String? { return componentId }
-}
+extension FilterListSetting: FilterListInterface {}
+extension FilterList: FilterListInterface {}
