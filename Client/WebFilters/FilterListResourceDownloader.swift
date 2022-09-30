@@ -116,15 +116,6 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
-  /// The uuid of the cookie consent notices filter list.
-  ///
-  /// This is a special filter list that has more accessible UI to control it
-  public static let cookieConsentNoticesUUID = "AC023D22-AE88-4060-A978-4FEEEC4221693"
-  /// The uuid of the "Remove Web annoyances" filter list
-  ///
-  /// This is a special filter list that has more accessible UI to control it
-  public static let removeWebAnnoyancesUUID = "67E792D4-AE03-4D1A-9EDE-80E01C81F9B8"
-  
   /// A shared instance of this class
   ///
   /// - Warning: You need to wait for `DataController.shared.initializeOnce()` to be called before using this instance
@@ -169,17 +160,6 @@ public class FilterListResourceDownloader: ObservableObject {
     async let cachedFilterLists: Void = self.loadCachedFilterLists()
     async let cachedDefaultFilterList: Void = self.loadCachedDefaultFilterList()
     _ = await (cachedFilterLists, cachedDefaultFilterList)
-  }
-  
-  /// Enables a filter list for the given uuid. Returns true if the filter list exists or not.
-  public func enableFilterList(forFilterListUUID uuid: String, isEnabled: Bool) -> Bool {
-    // Enable the setting
-    if let index = filterLists.firstIndex(where: { $0.uuid == Self.cookieConsentNoticesUUID }) {
-      filterLists[index].isEnabled = isEnabled
-      return true
-    } else {
-      return false
-    }
   }
   
   /// Tells us if the filter list is enabled for the given `UUID`

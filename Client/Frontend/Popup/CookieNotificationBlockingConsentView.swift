@@ -9,85 +9,100 @@ import DesignSystem
 import BraveShared
 
 struct CookieNotificationBlockingConsentView: View {
-  public static let contentHeight: CGFloat = 480
-  private static let topSectionHeight: CGFloat = 328
-  private static let bottomSectionHeight = contentHeight - topSectionHeight
+  public static let contentHeight = 480.0
+  public static let contentWidth = 344.0
+  private static let gifHeight = 328.0
+  private static let bottomSectionHeight = contentHeight - gifHeight
+  private static let textPadding = 16.0
   
   private let animation = Animation.easeOut(duration: 0.5).delay(0)
   private let transition = AnyTransition.scale(scale: 1.1).combined(with: .opacity)
-  private let textPadding: CGFloat = 16
   
-  @Environment(\.presentationMode) var presentationMode
+  @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var showAnimation = false
+  var onDismiss: (() -> Void)?
+  
+  private var yesButton: some View {
+    Button(Strings.yesBlockCookieConsentNotices) {
+      withAnimation(animation) {
+        self.showAnimation = true
+      }
+
+      if !FilterListResourceDownloader.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: true) {
+        assertionFailure("This filter list should exist or this UI is completely useless")
+      }
+      
+      Task { @MainActor in
+        try await Task.sleep(seconds: 3.5)
+        self.dismiss()
+      }
+    }
+    .buttonStyle(BraveFilledButtonStyle(size: .large))
+    .multilineTextAlignment(.center)
+    .transition(transition)
+  }
+  
+  private var noButton: some View {
+    Button(Strings.noThanks) {
+      self.dismiss()
+    }
+    .font(Font.body.weight(.semibold))
+    .foregroundColor(.accentColor)
+    .multilineTextAlignment(.center)
+    .transition(transition)
+  }
   
   var body: some View {
-    VStack(spacing: 0) {
-      ZStack {
-        ZStack {
+    ScrollView {
+      VStack {
+        VStack {
+          if !showAnimation {
+            VStack(spacing: Self.textPadding) {
+              Text(Strings.blockCookieConsentNoticesPopupTitle).font(.title)
+              Text(Strings.blockCookieConsentNoticesPopupDescription).font(.body)
+            }
+            .transition(transition)
+            .padding(Self.textPadding)
+            .padding(.top, 80)
+            .foregroundColor(Color(UIColor.braveLabel))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+          }
+        }
+        .frame(width: Self.contentWidth)
+        .frame(minHeight: Self.gifHeight)
+        .background(
           GIFImage(asset: "cookie-consent-animation", animate: showAnimation)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(width: Self.contentWidth, height: Self.gifHeight, alignment: .top),
+          alignment: .top
+        )
         
-        if !showAnimation {
-          VStack(alignment: .center, spacing: textPadding) {
-            Text(Strings.blockCookieConsentNoticesPopupTitle)
-              .font(.title)
-              .foregroundColor(Color(UIColor.braveLabel))
-              .multilineTextAlignment(.center)
-              .transition(transition)
-              .padding(.horizontal, textPadding)
-            Text(Strings.blockCookieConsentNoticesPopupDescription)
-              .font(.body)
-              .foregroundColor(Color(UIColor.braveLabel))
-              .multilineTextAlignment(.center)
-              .transition(transition)
-              .padding(.horizontal, textPadding)
+        VStack(spacing: Self.textPadding) {
+          if !showAnimation {
+            yesButton
+            noButton
           }
-          .padding(.top, 80)
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
+        .padding(Self.textPadding)
       }
-      .frame(height: Self.topSectionHeight, alignment: Alignment.center)
-      
-      VStack(alignment: .center, spacing: textPadding) {
-        if !showAnimation {
-          Button(Strings.yesBlockCookieConsentNotices) {
-            withAnimation(animation) {
-              self.showAnimation = true
-            }
-
-            if !FilterListResourceDownloader.shared.enableFilterList(forFilterListUUID: FilterListResourceDownloader.cookieConsentNoticesUUID, isEnabled: true) {
-              assertionFailure("This filter list should exist or this UI is completely useless")
-            }
-            
-            Task {
-              try await Task.sleep(seconds: 3.5)
-              self.presentationMode.wrappedValue.dismiss()
-            }
-          }
-          .buttonStyle(BraveFilledButtonStyle(size: .large))
-          .multilineTextAlignment(.center)
-          .transition(transition)
-          .padding(.horizontal, textPadding)
-
-          Button(Strings.noThanks) {
-            self.presentationMode.wrappedValue.dismiss()
-          }
-          .font(Font.body.weight(.semibold))
-          .foregroundColor(.accentColor)
-          .multilineTextAlignment(.center)
-          .transition(transition)
-          .padding(.horizontal, textPadding)
-        }
-      }
-      .frame(height: Self.bottomSectionHeight, alignment: .center)
     }
+    .frame(width: Self.contentWidth, height: Self.contentHeight)
     .background(
       Image("cookie-consent-background", bundle: .module),
       alignment: .bottomLeading
     )
     .background(Color(UIColor.braveBackground))
-    .padding(0)
+  }
+  
+  private func dismiss() {
+    // Dismiss on presentation mode does not work on iOS 14
+    // when using the UIHostingController is parent view.
+    // As a workaround a completion handler is used instead.
+    if #available(iOS 15, *) {
+      presentationMode.dismiss()
+    } else {
+      onDismiss?()
+    }
   }
 }
 

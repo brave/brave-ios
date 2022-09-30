@@ -77,10 +77,6 @@ class GIFImageView: UIView, CAAnimationDelegate {
       imageView.stopAnimating()
     }
   }
-  
-  func animationDidStop(_ anim: CAAnimation, finished: Bool) {
-    print(finished)
-  }
 
   private func initView() {
     imageView.contentMode = .scaleAspectFit

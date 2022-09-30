@@ -12,7 +12,7 @@ import Data
 extension BrowserViewController {
   func presentCookieNotificationBlockingCalloutIfNeeded() {
     // Don't show this if we already enabled the setting
-    guard !FilterListResourceDownloader.shared.isEnabled(filterListUUID: FilterListResourceDownloader.cookieConsentNoticesUUID) else { return }
+    guard !FilterListResourceDownloader.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID) else { return }
     // Don't show this if we are presenting another popup already
     guard !isOnboardingOrFullScreenCalloutPresented else { return }
     // We only show the popup on second launch
@@ -25,7 +25,9 @@ extension BrowserViewController {
       return
     }
     
-    let popover = PopoverController(contentController: CookieNotificationBlockingConsentViewController(), contentSizeBehavior: .preferredContentSize)
+    let popover = PopoverController(
+      contentController: CookieNotificationBlockingConsentViewController(),
+      contentSizeBehavior: .preferredContentSize)
     popover.addsConvenientDismissalMargins = false
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
   }
@@ -34,7 +36,15 @@ extension BrowserViewController {
 class CookieNotificationBlockingConsentViewController: UIHostingController<CookieNotificationBlockingConsentView>, PopoverContentComponent {
   init() {
     super.init(rootView: CookieNotificationBlockingConsentView())
-    self.preferredContentSize = CGSize(width: 344, height: CookieNotificationBlockingConsentView.contentHeight)
+    
+    self.preferredContentSize = CGSize(
+      width: CookieNotificationBlockingConsentView.contentWidth,
+      height: CookieNotificationBlockingConsentView.contentHeight
+    )
+    
+    self.rootView.onDismiss = { [weak self] in
+      self?.dismiss(animated: true)
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {

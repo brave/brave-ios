@@ -32,7 +32,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     self.historyAPI = historyAPI
     
     self.currentCookieConsentNoticeBlockingState = FilterListResourceDownloader.shared.isEnabled(
-      filterListUUID: FilterListResourceDownloader.cookieConsentNoticesUUID
+      for: FilterList.cookieConsentNoticesComponentID
     )
     
     super.init(style: .insetGrouped)
@@ -59,8 +59,8 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     filterListsSubscription = FilterListResourceDownloader.shared.$filterLists
       .receive(on: DispatchQueue.main)
       .sink { filterLists in
-        let filterList = filterLists.first(where: { $0.uuid == FilterListResourceDownloader.cookieConsentNoticesUUID })
-        let isEnabled = filterList?.isEnabled ?? false
+        let filterList = filterLists.first(where: { $0.componentId == FilterList.cookieConsentNoticesComponentID })
+        let isEnabled = filterList?.isEnabled == true
         
         if isEnabled != self.currentCookieConsentNoticeBlockingState {
           self.currentCookieConsentNoticeBlockingState = isEnabled
@@ -300,10 +300,10 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       uuid: self.cookieConsentNoticesRowUUID,
       title: Strings.blockCookieConsentNotices,
       toggleValue: FilterListResourceDownloader.shared.isEnabled(
-        filterListUUID: FilterListResourceDownloader.cookieConsentNoticesUUID
+        for: FilterList.cookieConsentNoticesComponentID
       ),
       valueChange: { isEnabled in
-        if !FilterListResourceDownloader.shared.enableFilterList(forFilterListUUID: FilterListResourceDownloader.cookieConsentNoticesUUID, isEnabled: isEnabled) {
+        if !FilterListResourceDownloader.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: isEnabled) {
           assertionFailure("This filter list should exist or this UI is completely useless")
         }
       }, cellReuseId: "blockCookieConsentNoticesReuseIdentifier"
