@@ -260,19 +260,3 @@ extension AddressQRCodeScannerViewController: AVCaptureMetadataOutputObjectsDele
     isFinishScanning = false
   }
 }
-
-private extension String {
-  /// Strip prefix if it exists, ex. 'ethereum:'
-  var strippedETHAddress: String {
-    guard !isETHAddress else { return self }
-    if !starts(with: "0x"),
-       contains("0x"),
-       let range = range(of: "0x"),
-       case let updatedAddressSubstring = self[range.lowerBound...],
-       case let updatedAddress = String(updatedAddressSubstring),
-       updatedAddress.isETHAddress {
-      return updatedAddress
-    }
-    return self
-  }
-}
