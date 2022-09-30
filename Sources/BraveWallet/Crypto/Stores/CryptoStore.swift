@@ -13,8 +13,8 @@ enum PendingRequest: Equatable {
   case signMessage([BraveWallet.SignMessageRequest])
   case getEncryptionPublicKey(BraveWallet.GetEncryptionPublicKeyRequest)
   case decrypt(BraveWallet.DecryptRequest)
-  case signTransaction(BraveWallet.SignTransactionRequest)
-  case signAllTransactions(BraveWallet.SignAllTransactionsRequest)
+  case signTransaction([BraveWallet.SignTransactionRequest])
+  case signAllTransactions([BraveWallet.SignAllTransactionsRequest])
 }
 
 extension PendingRequest: Identifiable {
@@ -27,8 +27,8 @@ extension PendingRequest: Identifiable {
     case let .signMessage(signRequests): return "signMessage-\(signRequests.map(\.id))"
     case let .getEncryptionPublicKey(request): return "getEncryptionPublicKey-\(request.address)-\(request.originInfo.origin)"
     case let .decrypt(request): return "decrypt-\(request.address)-\(request.originInfo.origin)"
-    case let .signTransaction(request): return "signTransaction-\(request.id)"
-    case let .signAllTransactions(request): return "signAllTransactions-\(request.id)"
+    case let .signTransaction(requests): return "signTransaction-\(requests.map(\.id))"
+    case let .signAllTransactions(requests): return "signAllTransactions-\(requests.map(\.id))"
     }
   }
 }
@@ -281,13 +281,12 @@ public class CryptoStore: ObservableObject {
 
   @MainActor
   func fetchPendingWebpageRequest() async -> PendingRequest? {
-    // TODO: Add check for eth permissions… get first eth request
     if let chainRequest = await rpcService.pendingAddChainRequests().first {
       return .addChain(chainRequest)
-    } else if let signTransactionRequest = await walletService.pendingSignTransactionRequests().first {
-      return .signTransaction(signTransactionRequest)
-    } else if let signAllTransactionsRequest = await walletService.pendingSignAllTransactionsRequests().first {
-      return .signAllTransactions(signAllTransactionsRequest)
+    } else if case let signTransactionRequests = await walletService.pendingSignTransactionRequests(), !signTransactionRequests.isEmpty {
+      return .signTransaction(signTransactionRequests)
+    } else if case let signAllTransactionsRequests = await walletService.pendingSignAllTransactionsRequests(), !signAllTransactionsRequests.isEmpty {
+      return .signAllTransactions(signAllTransactionsRequests)
     } else if case let signMessageRequests = await walletService.pendingSignMessageRequests(), !signMessageRequests.isEmpty {
       return .signMessage(signMessageRequests)
     } else if let switchRequest = await rpcService.pendingSwitchChainRequests().first {
