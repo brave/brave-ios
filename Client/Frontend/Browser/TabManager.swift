@@ -849,11 +849,11 @@ class TabManager: NSObject {
     assert(Thread.isMainThread)
     
     let tab = allTabs.filter {
-      if let webViewURL = $0.webView?.url {
-        return  webViewURL.schemelessAbsoluteDisplayString == url.schemelessAbsoluteDisplayString
+      guard let webViewURL = $0.webView?.url else {
+        return  false
       }
       
-      return false
+      return webViewURL.schemelessAbsoluteDisplayString == url.schemelessAbsoluteDisplayString
     }.first
     
     return tab

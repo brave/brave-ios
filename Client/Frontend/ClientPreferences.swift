@@ -74,6 +74,8 @@ extension Preferences {
     static let autocloseTabs = Option<Int>(
       key: "general.autoclose-tabs",
       default: AutoCloseTabsOption.manually.rawValue)
+    /// Whether external and internal links should switch existing tabs
+    static let switchOpenTabs = Option<Bool>(key: "general.switch-tabs", default: false)
     /// Defines the user's normal browsing theme
     /// `system`, follows the current OS display mode
     public static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: DefaultTheme.system.rawValue)
