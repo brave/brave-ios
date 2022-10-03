@@ -376,9 +376,10 @@ extension SceneDelegate {
     // The expected appearance theme should be dark mode when night mode is enabled for websites
     var themeValue = Preferences.General.nightModeEnabled.value ? DefaultTheme.dark.rawValue : Preferences.General.themeNormalMode.value
     
-    if UITraitCollection.current.userInterfaceStyle == .light, Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+    if UITraitCollection.current.userInterfaceStyle == .light,
+       Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue,
+       Preferences.General.automaticNightModeEnabled.value {
       themeValue = DefaultTheme.light.rawValue
-      Preferences.General.automaticNightModeEnabled.value = false
     }
     
     let themeOverride = DefaultTheme(rawValue: themeValue)?.userInterfaceStyleOverride ?? .unspecified

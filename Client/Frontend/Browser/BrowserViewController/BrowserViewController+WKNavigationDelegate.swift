@@ -544,7 +544,13 @@ extension BrowserViewController: WKNavigationDelegate {
     tab.committedURL = webView.url
     
     // Need to evaluate Night mode script injection after url is set inside the Tab
-    tab.nightMode = SceneDelegate.shouldEnableNightMode
+    if UITraitCollection.current.userInterfaceStyle == .light,
+       Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue,
+       Preferences.General.automaticNightModeEnabled.value {
+      tab.nightMode = false
+    } else {
+      tab.nightMode = Preferences.General.nightModeEnabled.value
+    }
 
     rewards.reportTabNavigation(tabId: tab.rewardsId)
 

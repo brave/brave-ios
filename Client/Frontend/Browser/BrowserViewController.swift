@@ -752,7 +752,11 @@ public class BrowserViewController: UIViewController {
     }
     
     NotificationCenter.default.addObserver(forName: Notification.Name("traitCollectionDidChangeNotification"), object: nil, queue: .main) { _ in
-      
+      if UITraitCollection.current.userInterfaceStyle == .light,
+         Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue,
+         Preferences.General.nightModeEnabled.value {
+        NightModeScriptHandler.setNightMode(tabManager: self.tabManager, enabled: !Preferences.General.automaticNightModeEnabled.value)
+      }
     }
 
     view.backgroundColor = .braveBackground

@@ -410,7 +410,13 @@ class SettingsViewController: TableViewController {
             detailText: Strings.NightMode.settingsDescription,
             option: Preferences.General.nightModeEnabled,
             onValueChange: { [unowned self] enabled in
-              NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: enabled)
+              var nightModeEnabled = enabled
+              
+              if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+                nightModeEnabled = !Preferences.General.automaticNightModeEnabled.value
+              }
+              
+              NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
             },
             image: UIImage(systemName: "moon")),
           .boolRow(
@@ -418,10 +424,13 @@ class SettingsViewController: TableViewController {
             detailText: "Automatic Apperance is respected",
             option: Preferences.General.automaticNightModeEnabled,
             onValueChange: { [unowned self] enabled in
+              var nightModeEnabled = Preferences.General.nightModeEnabled.value
               
-              print("Trait Collec \(traitCollection.userInterfaceStyle)")
-              print("Preferences \(Preferences.General.themeNormalMode.value)")
-
+              if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+                nightModeEnabled = !enabled
+              }
+              
+              NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
             },
             image: UIImage(systemName: "moon"))
         ],
