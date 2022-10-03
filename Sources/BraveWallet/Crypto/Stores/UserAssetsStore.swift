@@ -196,9 +196,7 @@ extension UserAssetsStore: BraveWalletJsonRpcServiceObserver {
 
 extension UserAssetsStore: BraveWalletKeyringServiceObserver {
   public func keyringCreated(_ keyringId: String) {
-    Task { @MainActor in
-      self.fetchVisibleAssets()
-    }
+    fetchVisibleAssets()
   }
   
   public func keyringRestored(_ keyringId: String) {
