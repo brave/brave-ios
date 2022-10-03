@@ -77,7 +77,7 @@ class NSURLExtensionsTests: XCTestCase {
 
   func testKeepsHTTPSAndTrailingSlashInURL() {
     let url = URL(string: "https://google.com/foo/")
-    if let actual = url?.schemelessAbsoluteDisplayString {
+    if let actual = url?.absoluteDisplayString {
       XCTAssertEqual(actual, "https://google.com/foo/")
     } else {
       XCTFail("Actual url is nil")
@@ -131,6 +131,14 @@ class NSURLExtensionsTests: XCTestCase {
     let testURL6 = URL(string: "https://brave.com/foo/")
     if let actual = testURL6?.schemelessAbsoluteDisplayString {
       XCTAssertEqual(actual, "brave.com/foo/")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTPS scheme and www
+    let testURL7 = URL(string: "https://www.brave.com")
+    if let actual = testURL7?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com")
     } else {
       XCTFail("Actual url is nil")
     }

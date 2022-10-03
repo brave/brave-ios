@@ -161,7 +161,7 @@ extension URL {
   }
   
   public var schemelessAbsoluteDisplayString: String {
-    var urlString = schemelessAbsoluteString
+    var urlString = withoutWWW.schemelessAbsoluteString
     
     // For http URLs, get rid of the trailing slash if the path is empty or '/'
     if self.path == "/", urlString.hasSuffix("/") {
