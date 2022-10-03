@@ -383,7 +383,7 @@ class SettingsViewController: TableViewController {
       title: "Switch to an open tab",
       detailText: "External and internal links will switch to an open tab If that URL is already open. (Normal Mode Only)",
       option: Preferences.General.switchOpenTabs,
-      image: UIImage(named: "settings-passcode", in: .current, compatibleWith: nil)!.template)
+      image: UIImage(braveSystemNamed: "brave.rectangle.on.rectangle")!.template)
     
     tabs.rows.append(switchOpenTabSetting)
     

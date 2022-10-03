@@ -1732,7 +1732,7 @@ public class BrowserViewController: UIViewController {
       popToBVC()
     }
 
-    if let tab = tabManager.getTabForURL(url) {
+    if let tab = tabManager.getTabForURL(url), Preferences.General.switchOpenTabs.value {
       tabManager.selectTab(tab)
     } else {
       openURLInNewTab(url, isPrivate: isPrivate, isPrivileged: isPrivileged)
@@ -3090,7 +3090,13 @@ extension BrowserViewController: WKUIDelegate {
             title: Strings.openNewTabButtonTitle,
             image: UIImage(systemName: "plus")
           ) { _ in
-            self.addTab(url: url, inPrivateMode: false, currentTab: currentTab)
+            if !PrivateBrowsingManager.shared.isPrivateBrowsing,
+                Preferences.General.switchOpenTabs.value,
+                let tab = self.tabManager.getTabForURL(url) {
+              self.tabManager.selectTab(tab)
+            } else {
+              self.addTab(url: url, inPrivateMode: false, currentTab: currentTab)
+            }
           }
 
           openNewTabAction.accessibilityLabel = "linkContextMenu.openInNewTab"
@@ -3251,7 +3257,14 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
 
   func openInNewTab(_ url: URL, isPrivate: Bool) {
     topToolbar.leaveOverlayMode()
-    select(url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+    
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing,
+        Preferences.General.switchOpenTabs.value,
+        let tab = self.tabManager.getTabForURL(url) {
+      tabManager.selectTab(tab)
+    } else {
+      select(url, visitType: .unknown, action: .openInNewTab(isPrivate: isPrivate))
+    }
   }
 
   func copy(_ url: URL) {
