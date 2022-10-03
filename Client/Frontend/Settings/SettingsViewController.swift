@@ -380,8 +380,8 @@ class SettingsViewController: TableViewController {
     tabs.rows.append(autoCloseTabsRow)
     
     let switchOpenTabSetting: Row = .boolRow(
-      title: "Switch to an open tab",
-      detailText: "External and internal links will switch to an open tab If that URL is already open. (Normal Mode Only)",
+      title: Strings.Settings.switchToAnOpenTabSettingsTitle,
+      detailText: Strings.Settings.switchToAnOpenTabSettingsDescription,
       option: Preferences.General.switchOpenTabs,
       image: UIImage(braveSystemNamed: "brave.rectangle.on.rectangle")!.template)
     

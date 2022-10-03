@@ -77,8 +77,60 @@ class NSURLExtensionsTests: XCTestCase {
 
   func testKeepsHTTPSAndTrailingSlashInURL() {
     let url = URL(string: "https://google.com/foo/")
-    if let actual = url?.absoluteDisplayString {
+    if let actual = url?.schemelessAbsoluteDisplayString {
       XCTAssertEqual(actual, "https://google.com/foo/")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+  }
+  
+  func testSchemelessAbsouluteDisplayString() {
+    // Test removes HTTP scheme from URL
+    let testURL1 = URL(string: "http://brave.com")
+    
+    if let actual = testURL1?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTP scheme and trailing slash from URL
+    let testURL2 = URL(string: "http://brave.com/")
+    
+    if let actual = testURL2?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTP scheme but not trailing slash because path is not empty
+    let testURL3 = URL(string: "http://brave.com/foo/")
+    if let actual = testURL3?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com/foo/")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTPS scheme from URL
+    let testURL4 = URL(string: "https://brave.com")
+    if let actual = testURL4?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTPS scheme and trailing slash from URL
+    let testURL5 = URL(string: "https://brave.com/")
+    if let actual = testURL5?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com")
+    } else {
+      XCTFail("Actual url is nil")
+    }
+    
+    // Test removes HTTPS scheme but not trailing slash because path is not empty
+    let testURL6 = URL(string: "https://brave.com/foo/")
+    if let actual = testURL6?.schemelessAbsoluteDisplayString {
+      XCTAssertEqual(actual, "brave.com/foo/")
     } else {
       XCTFail("Actual url is nil")
     }

@@ -773,6 +773,18 @@ extension Strings {
         bundle: .strings,
         value: "After One Month",
         comment: "Settings option to close old tabs after 1 month")
+    public static let switchToAnOpenTabSettingsTitle =
+      NSLocalizedString(
+        "settings.switchToAnOpenTabSettingsTitle", tableName: "BraveShared",
+        bundle: .strings,
+        value: "Switch to an open tab",
+        comment: "Settings option title which enables switching to an open tab if the tabs exists instead of making a new tab")
+    public static let switchToAnOpenTabSettingsDescription =
+      NSLocalizedString(
+        "settings.switchToAnOpenTabSettingsDescription", tableName: "BraveShared",
+        bundle: .strings,
+        value: "External and internal links will switch to an open tab If that URL is already open. (Normal Mode Only)",
+        comment: "Settings option description which explains this setting will switch to an open tab if the tabs exists instead of making a new tab")
   }
 }
 
