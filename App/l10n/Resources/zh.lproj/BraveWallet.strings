@@ -344,7 +344,7 @@
 "wallet.dappsSettingsNavTitle" = "%@ 设置";
 
 /* The warning message in a confirmation dialog when attempting to remove all wallet connection to a dapp. */
-"wallet.dappsSettingsRemoveAllWarning" = "这将删除 %1$d %2$@ 的所有电子钱包关联权限";
+"wallet.dappsSettingsRemoveAllWarning" = "这将删除 %1$d个 %2$@ 的所有电子钱包关联权限";
 
 /* The plural word that will be used in `manageSiteConnectionsAccount`. */
 "wallet.dappsSettingsWebsitePlural" = "网站";

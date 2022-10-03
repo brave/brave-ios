@@ -344,7 +344,7 @@
 "wallet.dappsSettingsNavTitle" = "%@ Ayarları";
 
 /* The warning message in a confirmation dialog when attempting to remove all wallet connection to a dapp. */
-"wallet.dappsSettingsRemoveAllWarning" = "Bunu yapmak %1$d %2$@ için tüm Cüzdan bağlantısı izinlerini kaldırır";
+"wallet.dappsSettingsRemoveAllWarning" = "Bunu yapmak %1$d websitesi için tüm Cüzdan bağlantısı izinlerini kaldırır";
 
 /* The plural word that will be used in `manageSiteConnectionsAccount`. */
 "wallet.dappsSettingsWebsitePlural" = "web siteleri";

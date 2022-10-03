@@ -2597,10 +2597,10 @@
 "SettingsMenuItem" = "Ayarlar";
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
-"SettingsTabsOptionBottomBar" = "Alt Çubuk";
+"SettingsTabsOptionBottomBar" = "Alt Sekme Çubuğu";
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
-"SettingsTabsOptionTopBar" = "Üst çubuk";
+"SettingsTabsOptionTopBar" = "Üst Sekme Çubuğu";
 
 /* Tabs settings section title */
 "SettingsTabsSectionTitle" = "Sekmeler";
