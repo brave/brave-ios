@@ -1539,14 +1539,8 @@ public class BrowserViewController: UIViewController {
         topToolbar.hideProgressBar()
       }
     case .loading:
-      guard let loading = change?[.newKey] as? Bool else { break }
-
       if tab === tabManager.selectedTab {
         topToolbar.locationView.loading = tab.loading
-      }
-
-      if !loading {
-        runScriptsOnWebView(webView)
       }
     case .URL:
       guard let tab = tabManager[webView] else { break }
@@ -1685,15 +1679,6 @@ public class BrowserViewController: UIViewController {
           }
         }
       }
-    }
-  }
-
-  fileprivate func runScriptsOnWebView(_ webView: WKWebView) {
-    guard let url = webView.url, url.isWebPage(), !url.isLocal else {
-      return
-    }
-    if NoImageModeScriptHandler.isActivated {
-      NoImageModeScriptHandler.executeScript(for: webView)
     }
   }
 
@@ -2147,9 +2132,6 @@ public class BrowserViewController: UIViewController {
         // ignore the result because we are being called back asynchronous when the readermode status changes.
         webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: ReaderModeScriptHandler.scriptSandbox)
 
-        // Re-run additional scripts in webView to extract updated favicons and metadata.
-        runScriptsOnWebView(webView)
-
         // Only add history of a url which is not a localhost url
         if !tab.isPrivate, !url.isReaderModeURL {
           // The visitType is checked If it is "typed" or not to determine the History object we are adding
@@ -2223,10 +2205,6 @@ public class BrowserViewController: UIViewController {
       alert.addAction(UIAlertAction(title: Strings.scanQRCodeErrorOKButton, style: .default, handler: nil))
       self.present(alert, animated: true, completion: nil)
     }
-  }
-
-  private func focusLocationField() {
-    topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
   }
   
   private func handleToolbarVisibilityStateChange(
@@ -2329,10 +2307,6 @@ extension BrowserViewController: SettingsDelegate {
     let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
     self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
   }
-
-  func settingsDidFinish(_ settingsViewController: SettingsViewController) {
-    settingsViewController.dismiss(animated: true)
-  }
 }
 
 extension BrowserViewController: PresentingModalViewControllerDelegate {
@@ -2386,7 +2360,6 @@ extension BrowserViewController: TabDelegate {
       ErrorPageHelper(certStore: profile.certStore),
       SessionRestoreScriptHandler(tab: tab),
       FindInPageScriptHandler(tab: tab),
-      NoImageModeScriptHandler(tab: tab),
       PrintScriptHandler(browserController: self, tab: tab),
       CustomSearchScriptHandler(tab: tab),
       NightModeScriptHandler(tab: tab),
@@ -2440,14 +2413,6 @@ extension BrowserViewController: TabDelegate {
     webView.uiDelegate = nil
     webView.scrollView.delegate = nil
     webView.removeFromSuperview()
-  }
-
-  fileprivate func findSnackbar(_ barToFind: SnackBar) -> Int? {
-    let bars = alertStackView.arrangedSubviews
-    for (index, bar) in bars.enumerated() where bar === barToFind {
-      return index
-    }
-    return nil
   }
 
   func showBar(_ bar: SnackBar, animated: Bool) {
@@ -3480,7 +3445,7 @@ extension BrowserViewController: NewTabPageDelegate {
   }
 
   func focusURLBar() {
-    focusLocationField()
+    topToolbar.tabLocationViewDidTapLocation(topToolbar.locationView)
   }
 
   func brandedImageCalloutActioned(_ state: BrandedImageCalloutState) {
