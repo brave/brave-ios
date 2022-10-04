@@ -42,7 +42,6 @@ public class BrowserViewController: UIViewController {
   var webViewContainer: UIView!
   var topToolbar: TopToolbarView!
   var tabsBar: TabsBarViewController!
-  var clipboardBarDisplayHandler: ClipboardBarDisplayHandler?
   var readerModeBar: ReaderModeBarView?
   var readerModeCache: ReaderModeCache
   var statusBarOverlay: UIView!
@@ -810,9 +809,6 @@ public class BrowserViewController: UIViewController {
     view.addSubview(statusBarOverlay)
     alertStackView.axis = .vertical
     alertStackView.alignment = .center
-
-    clipboardBarDisplayHandler = ClipboardBarDisplayHandler(tabManager: tabManager)
-    clipboardBarDisplayHandler?.delegate = self
     
     view.addLayoutGuide(toolbarLayoutGuide)
     toolbarLayoutGuide.snp.makeConstraints {
@@ -1051,7 +1047,6 @@ public class BrowserViewController: UIViewController {
     checkCrashRestoration()
 
     updateToolbarUsingTabManager(tabManager)
-    clipboardBarDisplayHandler?.checkIfShouldDisplayBar()
 
     if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
       rewards.ledger?.selectedTabId = tabId
@@ -2318,12 +2313,6 @@ public class BrowserViewController: UIViewController {
       self.view.layoutIfNeeded()
     }
     animator.startAnimation()
-  }
-}
-
-extension BrowserViewController: ClipboardBarDisplayHandlerDelegate {
-  func shouldDisplay(clipboardBar bar: ButtonToast) {
-    show(toast: bar, duration: ClipboardBarToastUX.toastDelay)
   }
 }
 
