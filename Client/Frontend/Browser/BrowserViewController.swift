@@ -1135,21 +1135,6 @@ public class BrowserViewController: UIViewController {
     rewards.ledger?.selectedTabId = 0
   }
 
-  override public func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-  }
-
-  func resetBrowserChrome() {
-    // animate and reset transform for tab chrome
-    topToolbar.updateAlphaForSubviews(1)
-    footer.alpha = 1
-
-    [header, footer, readerModeBar].forEach { view in
-      view?.transform = .identity
-    }
-    statusBarOverlay.isHidden = false
-  }
-
   /// A layout guide defining where the favorites and NTP overlay are placed
   let pageOverlayLayoutGuide = UILayoutGuide()
 
@@ -1700,8 +1685,6 @@ public class BrowserViewController: UIViewController {
           }
         }
       }
-    default:
-      assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
     }
   }
 
