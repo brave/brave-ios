@@ -3,18 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
-import Photos
 import UIKit
 import WebKit
 import Shared
 import Storage
 import SnapKit
 import XCGLogger
-import MobileCoreServices
 import SwiftyJSON
 import Data
 import BraveShared
-import SwiftKeychainWrapper
 import BraveCore
 import CoreData
 import StoreKit
@@ -41,18 +38,7 @@ private let KVOs: [KVOConstants] = [
   .serverTrust,
 ]
 
-private struct BrowserViewControllerUX {
-  fileprivate static let showHeaderTapAreaHeight: CGFloat = 32
-  fileprivate static let showFooterTapAreaHeight: CGFloat = 44
-  fileprivate static let bookmarkStarAnimationDuration: Double = 0.5
-  fileprivate static let bookmarkStarAnimationOffset: CGFloat = 80
-}
-
-protocol BrowserViewControllerDelegate: AnyObject {
-  func openInNewTab(_ url: URL, isPrivate: Bool)
-}
-
-public class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
+public class BrowserViewController: UIViewController {
   var webViewContainer: UIView!
   var topToolbar: TopToolbarView!
   var tabsBar: TabsBarViewController!
@@ -64,7 +50,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var searchController: SearchViewController?
   var favoritesController: FavoritesViewController?
   var screenshotHelper: ScreenshotHelper!
-  fileprivate var homePanelIsInline = false
   var searchLoader: SearchLoader?
   let alertStackView = UIStackView()  // All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
   var findInPageBar: FindInPageBar?
@@ -140,9 +125,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
   var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)?  // A boolean to determine If AddToListActivity should be added
   var openInPlaylistActivityItem: (enabled: Bool, item: PlaylistInfo?)?  // A boolean to determine if OpenInPlaylistActivity should be shown
 
-  // Tracking navigation items to record history types.
-  // TODO: weak references?
-  var ignoredNavigation = Set<WKNavigation>()
   var typedNavigation = [URL: VisitType]()
   var navigationToolbar: ToolbarProtocol {
     return toolbar ?? topToolbar
@@ -671,14 +653,6 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       })
   }
 
-  override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-
-    if UITraitCollection.current.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
-      // Reload UI
-    }
-  }
-
   func dismissVisibleMenus() {
     displayedPopoverController?.dismiss(animated: true)
   }
@@ -1032,12 +1006,12 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
 
     topTouchArea.snp.makeConstraints { make in
       make.top.left.right.equalTo(self.view)
-      make.height.equalTo(BrowserViewControllerUX.showHeaderTapAreaHeight)
+      make.height.equalTo(32)
     }
 
     bottomTouchArea.snp.makeConstraints { make in
       make.bottom.left.right.equalTo(self.view)
-      make.height.equalTo(BrowserViewControllerUX.showFooterTapAreaHeight)
+      make.height.equalTo(44)
     }
   }
 
