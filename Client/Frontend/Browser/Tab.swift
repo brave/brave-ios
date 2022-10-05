@@ -276,7 +276,7 @@ class Tab: NSObject {
   init(configuration: WKWebViewConfiguration, type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil) {
     self.configuration = configuration
     rewardsId = UInt32.random(in: 1...UInt32.max)
-    nightMode = Preferences.General.nightModeEnabled.value
+    nightMode = NightModeScriptHandler.isActivated
     syncTab = tabGeneratorAPI?.createBraveSyncTab()
 
     super.init()
@@ -340,13 +340,13 @@ class Tab: NSObject {
         .cookieBlocking: Preferences.Privacy.blockAllCookies.value,
         .playlistMediaSource: Preferences.Playlist.webMediaSourceCompatibility.value,
         .mediaBackgroundPlay: Preferences.General.mediaAutoBackgrounding.value,
-        .nightMode: Preferences.General.nightModeEnabled.value,
+        .nightMode: NightModeScriptHandler.isActivated,
         .deAmp: Preferences.Shields.autoRedirectAMPPages.value
       ]
       
       userScripts = Set(scriptPreferences.filter({ $0.value }).map({ $0.key }))
       self.updateInjectedScripts()
-      nightMode = Preferences.General.nightModeEnabled.value
+      nightMode = NightModeScriptHandler.isActivated
     }
   }
 
@@ -623,7 +623,7 @@ class Tab: NSObject {
     }
 
     if let _ = webView?.reloadFromOrigin() {
-      nightMode = Preferences.General.nightModeEnabled.value
+      nightMode = NightModeScriptHandler.isActivated
       log.debug("reloaded zombified tab from origin")
       return
     }

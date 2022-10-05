@@ -12,7 +12,15 @@ class NightModeScriptHandler: TabContentScript {
   fileprivate weak var tab: Tab?
 
   static var isActivated: Bool {
-    return Preferences.General.nightModeEnabled.value
+    var activated = Preferences.General.nightModeEnabled.value
+    
+    if UITraitCollection.current.userInterfaceStyle == .light,
+       Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue,
+       Preferences.General.automaticNightModeEnabled.value {
+      activated = false
+    }
+    
+    return activated
   }
 
   required init(tab: Tab) {
@@ -37,8 +45,6 @@ class NightModeScriptHandler: TabContentScript {
   }
 
   static func setNightMode(tabManager: TabManager, enabled: Bool) {
-    Preferences.General.nightModeEnabled.value = enabled
-
     for tab in tabManager.allTabs {
 
       if let fetchedTabURL = tab.fetchedURL, !fetchedTabURL.isNightModeBlockedURL {

@@ -93,7 +93,7 @@ class HeaderContainerView: UIView {
     if isPrivateBrowsing {
       backgroundColor = .privateModeBackground
     } else {
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+      backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     }
   }
   

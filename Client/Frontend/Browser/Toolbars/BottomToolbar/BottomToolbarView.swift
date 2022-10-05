@@ -32,7 +32,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     super.init(frame: frame)
     setupAccessibility()
 
-    backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
 
     addSubview(contentView)
     addSubview(line)
@@ -73,7 +73,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     } else {
       overrideUserInterfaceStyle = DefaultTheme(
         rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride ?? .unspecified
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+      backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     }
   }
 

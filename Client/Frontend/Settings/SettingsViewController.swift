@@ -410,8 +410,9 @@ class SettingsViewController: TableViewController {
             detailText: Strings.NightMode.settingsDescription,
             option: Preferences.General.nightModeEnabled,
             onValueChange: { [unowned self] enabled in
-              var nightModeEnabled = enabled
+              Preferences.General.nightModeEnabled.value = enabled
               
+              var nightModeEnabled = enabled
               if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
                 nightModeEnabled = !Preferences.General.automaticNightModeEnabled.value
               }
@@ -424,8 +425,9 @@ class SettingsViewController: TableViewController {
             detailText: "Automatic Apperance is respected",
             option: Preferences.General.automaticNightModeEnabled,
             onValueChange: { [unowned self] enabled in
-              var nightModeEnabled = Preferences.General.nightModeEnabled.value
+              Preferences.General.automaticNightModeEnabled.value = enabled
               
+              var nightModeEnabled = Preferences.General.nightModeEnabled.value
               if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
                 nightModeEnabled = !enabled
               }

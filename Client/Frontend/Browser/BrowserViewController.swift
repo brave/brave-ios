@@ -775,7 +775,7 @@ public class BrowserViewController: UIViewController {
 
     // Temporary work around for covering the non-clipped web view content
     statusBarOverlay = UIView()
-    statusBarOverlay.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    statusBarOverlay.backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
 
     topTouchArea = UIButton()
     topTouchArea.isAccessibilityElement = false
@@ -881,7 +881,7 @@ public class BrowserViewController: UIViewController {
           self?.statusBarOverlay.backgroundColor = .privateModeBackground
         } else {
           self?.statusBarOverlay.backgroundColor =
-          Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+          NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
         }
         self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
       })
@@ -893,7 +893,7 @@ public class BrowserViewController: UIViewController {
           self?.statusBarOverlay.backgroundColor = .privateModeBackground
         } else {
           self?.statusBarOverlay.backgroundColor =
-          Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+          NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
         }
         self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
       }

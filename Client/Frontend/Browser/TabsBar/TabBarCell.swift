@@ -55,7 +55,7 @@ class TabBarCell: UICollectionViewCell {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     
     [deselectedOverlayView, closeButton, titleLabel, separatorLine, separatorLineRight].forEach { contentView.addSubview($0) }
     initConstraints()
@@ -85,7 +85,7 @@ class TabBarCell: UICollectionViewCell {
     } else {
       overrideUserInterfaceStyle = DefaultTheme(
         rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride ?? .unspecified
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+      backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     }
   }
 

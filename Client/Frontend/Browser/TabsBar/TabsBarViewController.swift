@@ -68,7 +68,7 @@ class TabsBarViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    view.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    view.backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     collectionView.backgroundColor = view.backgroundColor
 
     tabManager?.addDelegate(self)
@@ -142,7 +142,7 @@ class TabsBarViewController: UIViewController {
     if isPrivateBrowsing {
       backgroundColor = .privateModeBackground
     } else {
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+      backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     }
     view.backgroundColor = backgroundColor
     collectionView.backgroundColor = view.backgroundColor

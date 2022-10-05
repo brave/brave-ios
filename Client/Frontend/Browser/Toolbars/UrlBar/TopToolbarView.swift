@@ -201,7 +201,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     if isPrivateBrowsing {
       backgroundColor = .privateModeBackground
     } else {
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+      backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
     }
   }
   
@@ -210,7 +210,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   override init(frame: CGRect) {
     super.init(frame: frame)
 
-    backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    backgroundColor = NightModeScriptHandler.isActivated ? .nightModeBackground : .urlBarBackground
 
     locationContainer.addSubview(locationView)
 
