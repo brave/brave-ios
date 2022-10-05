@@ -38,8 +38,6 @@ extension Strings {
   public static let reloadPageTitle = NSLocalizedString("ReloadPageTitle", bundle: .strings, value: "Reload Page", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let backTitle = NSLocalizedString("BackTitle", bundle: .strings, value: "Back", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let forwardTitle = NSLocalizedString("ForwardTitle", bundle: .strings, value: "Forward", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
-
-//  public static let findTitle = NSLocalizedString("FindTitle", bundle: .strings, value: "Find", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let selectLocationBarTitle = NSLocalizedString("SelectLocationBarTitle", bundle: .strings, value: "Select Location Bar", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let newTabTitle = NSLocalizedString("NewTabTitle", bundle: .strings, value: "New Tab", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
   public static let newPrivateTabTitle = NSLocalizedString("NewPrivateTabTitle", bundle: .strings, value: "New Private Tab", comment: "Label to display in the Discoverability overlay for keyboard shortcuts")
