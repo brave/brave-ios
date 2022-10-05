@@ -532,13 +532,15 @@ public class BrowserViewController: UIViewController, BrowserViewControllerDeleg
       
       // Load cached data
       // This is done first because compileResources and compilePendingResource need their results
-      await FilterListResourceDownloader.shared.loadCachedData()
-      await AdblockResourceDownloader.shared.loadCachedData()
-      
+      async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
+      async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
+      _ = await (filterListCache, adblockResourceCache)
+
       // Compile some ad-block data
-      await AdBlockEngineManager.shared.compileResources()
-      await ContentBlockerManager.shared.compilePendingResources()
-      
+      async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
+      async let pendingResourcesCompile: Void = await ContentBlockerManager.shared.compilePendingResources()
+      _ = await (compiledResourcesCompile, pendingResourcesCompile)
+  
       FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
       await AdblockResourceDownloader.shared.startFetching()
       ContentBlockerManager.shared.startTimer()
