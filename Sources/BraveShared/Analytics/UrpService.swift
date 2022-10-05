@@ -56,8 +56,8 @@ struct UrpService {
     sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
       switch response {
       case .success(let data):
-        if let d = data as? Data {
-          Logger.module.debug("Referral code lookup response: \(String(data: d, encoding: .utf8) ?? "nil")")
+        if let data = data as? Data {
+          Logger.module.debug("Referral code lookup response: \(String(data: data, encoding: .utf8) ?? "nil")")
         }
         
         UrpLog.log("Referral code lookup response: \(data)")
@@ -90,8 +90,8 @@ struct UrpService {
     sessionManager.urpApiRequest(endPoint: endPoint, params: params) { response in
       switch response {
       case .success(let data):
-        if let d = data as? Data {
-          Logger.module.debug("Check if authorized for grant response: \(String(data: d, encoding: .utf8) ?? "nil")")
+        if let data = data as? Data {
+          Logger.module.debug("Check if authorized for grant response: \(String(data: data, encoding: .utf8) ?? "nil")")
         }
         let json = JSON(data)
         completion(json["finalized"].boolValue, nil)

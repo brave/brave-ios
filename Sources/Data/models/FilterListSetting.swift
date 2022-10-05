@@ -71,7 +71,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
         do {
           try writeContext.save()
         } catch {
-          Logger.module.error("FilterListSetting save error: \(error)")
+          Logger.module.error("FilterListSetting save error: \(error.localizedDescription)")
         }
       }
     }
