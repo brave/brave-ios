@@ -234,19 +234,14 @@ class UserScriptManager {
     }
   }
   
-  @MainActor func injectSolanaInternalScript(tab: Tab, solanaInternalScript: String?) async {
+  @MainActor func injectSolanaWeb3Script(tab: Tab, solanaWeb3Script: String?) async {
     guard let webView = tab.webView,
-          let solanaInternalScript = solanaInternalScript else {
+          let solanaWeb3Script = solanaWeb3Script else {
       return
     }
-    // inject the internal solana script
-    let script = """
-    window.__firefox__.execute(function($, $Object) {
-      \(solanaInternalScript)
-    })
-    """
+    // inject the Solana Web3 Library
     await webView.evaluateSafeJavaScript(
-      functionName: script,
+      functionName: solanaWeb3Script,
       args: [],
       contentWorld: .page,
       asFunction: false

@@ -60,6 +60,9 @@ window.__firefox__.execute(function($, $Object) {
       object.signatures = signaturesMapped;
       return object;
     })
+    let createTransaction = $(function(serializedTx) {
+      return solanaWeb3.Transaction.from(new Uint8Array(serializedTx))
+    })
     const provider = {
       value: {
         /* Properties */
@@ -72,7 +75,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(publicKey, resolve) {
             /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
             const result = new Object();
-            result.publicKey = window._brave_solana.createPublickey(publicKey);
+            result.publicKey = new solanaWeb3.PublicKey(publicKey);
             resolve(result);
           }
           return post('connect', payload, completion)
@@ -93,7 +96,7 @@ window.__firefox__.execute(function($, $Object) {
             const publicKey = parsed["publicKey"]; /* base58 encoded pubkey */
             const signature = parsed["signature"]; /* array of uint8 */
             const obj = new Object();
-            obj.publicKey = window._brave_solana.createPublickey(publicKey);
+            obj.publicKey = new solanaWeb3.PublicKey(publicKey);
             obj.signature = new Uint8Array(signature);
             resolve(obj);
           }
@@ -104,7 +107,7 @@ window.__firefox__.execute(function($, $Object) {
             function completion(publicKey, resolve) {
               /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
               const result = new Object();
-              result.publicKey = window._brave_solana.createPublickey(publicKey);
+              result.publicKey = new solanaWeb3.PublicKey(publicKey);
               resolve(result);
             }
             return post('request', args, completion)
@@ -116,7 +119,7 @@ window.__firefox__.execute(function($, $Object) {
           const object = convertTransaction(transaction);
           function completion(serializedTx, resolve) {
             /* Convert `<[UInt8]>` -> `solanaWeb3.Transaction` */
-            const result = window._brave_solana.createTransaction(serializedTx);
+            const result = createTransaction(serializedTx);
             resolve(result);
           }
           return post('signTransaction', object, completion)
@@ -126,7 +129,7 @@ window.__firefox__.execute(function($, $Object) {
           const objects = transactions.map(convertTransaction);
           function completion(serializedTxs, resolve) {
             /* Convert `<[[UInt8]]>` -> `[<solanaWeb3.Transaction>]` */
-            const result = serializedTxs.map(window._brave_solana.createTransaction);
+            const result = serializedTxs.map(createTransaction);
             resolve(result);
           }
           return post('signAllTransactions', objects, completion)
@@ -135,9 +138,5 @@ window.__firefox__.execute(function($, $Object) {
     }
     $Object.defineProperty(window, 'solana', provider);
     $Object.defineProperty(window, 'braveSolana', provider);
-    $Object.defineProperty(window, '_brave_solana', {
-      value: {},
-      writable: false
-    });
   }
 });

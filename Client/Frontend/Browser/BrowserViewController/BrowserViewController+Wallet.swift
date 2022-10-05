@@ -423,7 +423,7 @@ extension Tab: BraveWalletSolanaEventsListener {
       if let webView = webView {
         let script: String
         if let account = account {
-          script = "window.solana.emit('accountChanged', _brave_solana.createPublickey('\(account)'))"
+          script = "if (solanaWeb3) { window.solana.emit('accountChanged', new solanaWeb3.PublicKey('\(account)')) }"
         } else {
           script = "window.solana.emit('accountChanged')"
         }
@@ -469,7 +469,7 @@ extension Tab: BraveWalletSolanaEventsListener {
        let publicKey = await keyringService.selectedAccount(.sol),
        self.isSolanaAccountConnected(publicKey) {
       await webView.evaluateSafeJavaScript(
-        functionName: "if (window._brave_solana.createPublickey) { window.solana.publicKey = _brave_solana.createPublickey('\(publicKey)'); }",
+        functionName: "if (solanaWeb3) { window.solana.publicKey = new solanaWeb3.PublicKey('\(publicKey)'); }",
         contentWorld: .page,
         asFunction: false
       )

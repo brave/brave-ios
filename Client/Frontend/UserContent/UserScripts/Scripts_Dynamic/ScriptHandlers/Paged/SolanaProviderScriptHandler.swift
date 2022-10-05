@@ -161,8 +161,8 @@ class SolanaProviderScriptHandler: TabContentScript {
     if let args = args {
       param = MojoBase.Value(jsonString: args)?.dictionaryValue
     }
-    // need to inject `_brave_solana.createPublickey` function
-    await UserScriptManager.shared.injectSolanaInternalScript(tab: tab, solanaInternalScript: tab.walletSolProviderScripts[.solanaInternal])
+    // need to inject Solana Web3 Library
+    await UserScriptManager.shared.injectSolanaWeb3Script(tab: tab, solanaWeb3Script: tab.walletSolProviderScripts[.solanaWeb3])
     let (status, errorMessage, publicKey) = await provider.connect(param)
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
@@ -243,8 +243,8 @@ class SolanaProviderScriptHandler: TabContentScript {
     }
     if method == Keys.connect.rawValue,
        let publicKey = result[Keys.publicKey.rawValue]?.stringValue {
-      // need to inject `_brave_solana.createPublickey` function before replying w/ success.
-      await UserScriptManager.shared.injectSolanaInternalScript(tab: tab, solanaInternalScript: tab.walletSolProviderScripts[.solanaInternal])
+      // need to inject Solana Web3 Library before replying with success
+      await UserScriptManager.shared.injectSolanaWeb3Script(tab: tab, solanaWeb3Script: tab.walletSolProviderScripts[.solanaWeb3])
       await tab.updateSolanaProperties()
       return (publicKey, nil)
     } else {
@@ -327,7 +327,7 @@ class SolanaProviderScriptHandler: TabContentScript {
   
   @MainActor private func emitConnectEvent(publicKey: String) async {
     if let webView = tab?.webView {
-      let script = "window.solana.emit('connect', _brave_solana.createPublickey('\(publicKey)'))"
+      let script = "window.solana.emit('connect', new solanaWeb3.PublicKey('\(publicKey)'))"
       await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
     }
   }
