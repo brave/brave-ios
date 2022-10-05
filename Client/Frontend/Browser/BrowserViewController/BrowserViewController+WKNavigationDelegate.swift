@@ -424,6 +424,14 @@ extension BrowserViewController: WKNavigationDelegate {
     let response = navigationResponse.response
     let responseURL = response.url
     let tab = tab(for: webView)
+    
+    /// Check if we upgraded to https and if so we need to update the url of frame evaluations
+    if let url = responseURL, var components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.scheme == "https" {
+      components.scheme = "http"
+      if tab?.frameEvaluations[url] == nil, let downgradedURL = components.url {
+        tab?.frameEvaluations[url] = tab?.frameEvaluations[downgradedURL]
+      }
+    }
 
     if let tab = tab,
       let responseURL = responseURL,
