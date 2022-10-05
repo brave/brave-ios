@@ -6,6 +6,7 @@ import Foundation
 import Shared
 import Combine
 import Dispatch
+import os.log
 
 enum NetworkManagerError: Error {
   /// The eTag in the response headers matched one on file
@@ -173,7 +174,7 @@ extension NetworkManager {
         Failed to download, status code: \(response.statusCode),\
         URL:\(response.url?.absoluteString ?? "nil")
         """
-      log.error(error)
+      Logger.module.error("\(error)")
       throw URLError(.badServerResponse)
 
     case fileNotModifiedStatusCode:

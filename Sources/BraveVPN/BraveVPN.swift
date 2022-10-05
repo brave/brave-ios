@@ -54,7 +54,7 @@ public class BraveVPN {
     helper.verifyMainCredentials { valid, error in
       logAndStoreError("Initialize credentials valid: \(valid)")
       if let error = error {
-        logAndStoreError("Initialize credentials error: \(error.localizedDescription)")
+        logAndStoreError("Initialize credentials error: \(error)")
       }
     }
 
@@ -255,7 +255,7 @@ public class BraveVPN {
       // just configure & connect, no need for 'first user' setup
       helper.configureAndConnectVPN { error, status in
         if let error = error {
-          logAndStoreError("configureAndConnectVPN: \(error.localizedDescription)")
+          logAndStoreError("configureAndConnectVPN: \(error)")
         }
         
         reconnectPending = false
@@ -265,7 +265,7 @@ public class BraveVPN {
       // New user or no credentials and have to remake them.
       helper.configureFirstTimeUserPostCredential(nil) { success, error in
         if let error = error {
-          logAndStoreError("configureFirstTimeUserPostCredential \(error.localizedDescription)")
+          logAndStoreError("configureFirstTimeUserPostCredential \(error)")
         }
         
         reconnectPending = false
@@ -347,7 +347,7 @@ public class BraveVPN {
       if !success {
         Logger.module.error("VPN getEvents call failed")
         if let error = error {
-          Logger.module.warning("\(error.localizedDescription)")
+          Logger.module.warning("\(error)")
         }
         
         return

@@ -650,7 +650,7 @@ public class NTPDownloader {
 
   private func ntpETagFileURL(type: ResourceType) -> URL? {
     guard let saveLocation = type.saveLocation else {
-      logger.error("Can't find location to save")
+      Logger.module.error("Can't find location to save")
       return nil
     }
     return saveLocation.appendingPathComponent(NTPDownloader.etagFile)
@@ -658,7 +658,7 @@ public class NTPDownloader {
 
   private func ntpMetadataFileURL(type: ResourceType) -> URL? {
     guard let saveLocation = type.saveLocation else {
-      logger.error("Can't find location to save")
+      Logger.module.error("Can't find location to save")
       return nil
     }
     return saveLocation.appendingPathComponent(type.resourceName)

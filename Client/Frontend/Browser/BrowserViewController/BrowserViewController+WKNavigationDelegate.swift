@@ -293,7 +293,7 @@ extension BrowserViewController: WKNavigationDelegate {
         
         tab?.frameEvaluations[url] = evaluations
       } catch {
-        log.error(error)
+        Logger.module.error("\(error.localizedDescription)")
       }
     }
 

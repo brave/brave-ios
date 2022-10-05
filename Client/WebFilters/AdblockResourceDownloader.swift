@@ -63,7 +63,7 @@ public actor AdblockResourceDownloader: Sendable {
         case .success(let downloadResult):
           await self.handle(downloadedFileURL: downloadResult.fileURL, for: resource, date: downloadResult.date)
         case .failure(let error):
-          log.error(error)
+          Logger.module.error("\(error.localizedDescription)")
         }
       }
     }

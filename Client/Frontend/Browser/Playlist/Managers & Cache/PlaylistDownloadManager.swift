@@ -402,7 +402,7 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     } else {
       do {
         guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(assetUrl.lastPathComponent) else {
-          log.error("Failed to create unique path for playlist item.")
+          Logger.module.error("Failed to create unique path for playlist item.")
           throw PlaylistDownloadError.uniquePathNotCreated
         }
 
@@ -610,7 +610,7 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
 
       do {
         guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)") else {
-          log.error("Failed to create unique path for playlist item.")
+          Logger.module.error("Failed to create unique path for playlist item.")
           throw PlaylistDownloadError.uniquePathNotCreated
         }
 
