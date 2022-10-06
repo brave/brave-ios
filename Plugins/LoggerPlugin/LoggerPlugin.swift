@@ -26,11 +26,15 @@ struct LoggerPlugin: BuildToolPlugin {
       }
     }
     """
-    try source.write(
-      toFile: outputDirectory.appending("logger.swift").string,
-      atomically: true,
-      encoding: .utf8
-    )
+    
+    let filePath = outputDirectory.appending("logger.swift")
+    if !FileManager.default.fileExists(atPath: filePath.string) {
+      try source.write(
+        toFile: filePath.string,
+        atomically: true,
+        encoding: .utf8
+      )
+    }
     // TODO: Generate the above file in an `executableTarget` when SPM supports building Mac tools while targetting iOS
     return [
       .buildCommand(
