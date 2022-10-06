@@ -31,24 +31,13 @@ class UserAgentTests: XCTestCase {
   }
 
   // Simple test to make sure the WKWebView UA matches the expected FxiOS pattern.
-  func testBraveWebViewUserAgentOnPhone() {
-    if UIDevice.current.userInterfaceIdiom != .phone { return }
-
+  func testBraveWebViewUserAgentOnPhone() throws {
+    try XCTSkipIf(UIDevice.current.userInterfaceIdiom != .phone, "Must be run on an iPhone")
+    
     XCTAssertTrue(mobileUARegex(UserAgent.mobile), "User agent computes correctly.")
 
-    let expectation = self.expectation(description: "Found Firefox user agent")
-
     let webView = BraveWebView(frame: .zero, isPrivate: false)
-
-    webView.evaluateSafeJavaScript(functionName: "navigator.userAgent", contentWorld: .page, asFunction: false) { result, error in
-      let userAgent = result as! String
-      if !self.mobileUARegex(userAgent) || self.desktopUARegex(userAgent) {
-        XCTFail("User agent did not match expected pattern! \(userAgent)")
-      }
-      expectation.fulfill()
-    }
-
-    waitForExpectations(timeout: 60, handler: nil)
+    XCTAssertTrue(mobileUARegex(try XCTUnwrap(webView.value(forKey: "userAgent") as? String)))
   }
 
   // WKWebView doesn't give us all UA parts of Safari
