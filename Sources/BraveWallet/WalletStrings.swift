@@ -2780,5 +2780,12 @@ extension Strings {
       value: "DApps you connect to Brave Wallet will appear here",
       comment: "A message that will be displayed under the section header when there is no dapps have been granted wallet connection."
     )
+    public static let verifyPasswordTitle = NSLocalizedString(
+      "wallet.verifyPasswordTitle",
+      tableName: "BraveWallet",
+      bundle: .strings,
+      value: "Verify Password",
+      comment: "The title displayed in the navigation of the confirmation view where a user tries to remove a secondary account."
+    )
   }
 }
