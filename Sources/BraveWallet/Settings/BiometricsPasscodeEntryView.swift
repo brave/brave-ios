@@ -22,7 +22,7 @@ struct BiometricsPasscodeEntryView: View {
             // store password in keychain
             if case let status = keyringStore.storePasswordInKeychain(password),
                status != errSecSuccess {
-              completion(.init(message: Strings.Wallet.biometricsSetupErrorMessage))
+              completion(.incorrectPassword)
             } else {
               // password stored in keychain
               completion(nil)

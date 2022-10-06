@@ -290,8 +290,10 @@ public class KeyringStore: ObservableObject {
 
   func removeSecondaryAccount(for account: BraveWallet.AccountInfo, password: String, completion: ((Bool) -> Void)? = nil) {
     keyringService.removeImportedAccount(account.address, password: password, coin: account.coin) { success in
-      self.updateKeyringInfo()
       completion?(success)
+      if success {
+        self.updateKeyringInfo()
+      }
     }
   }
 

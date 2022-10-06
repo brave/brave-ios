@@ -9,25 +9,27 @@ import SwiftUI
 import BraveCore
 import LocalAuthentication
 
-struct PasswordEntryView: View {
+struct PasswordEntryError: LocalizedError, Equatable {
+  let message: String
+  var errorDescription: String? { message }
   
-  struct EntryError: LocalizedError, Equatable {
-    let message: String
-    var errorDescription: String? { message }
-  }
+  static let incorrectPassword = Self(message: Strings.Wallet.incorrectPasswordErrorMessage)
+}
+
+struct PasswordEntryView: View {
   
   let keyringStore: KeyringStore
   let title: String
   let message: String
   let shouldShowBiometrics: Bool
-  let action: (_ password: String, _ completion: @escaping (EntryError?) -> Void) -> Void
+  let action: (_ password: String, _ completion: @escaping (PasswordEntryError?) -> Void) -> Void
   
   init(
     keyringStore: KeyringStore,
-    title: String = Strings.Wallet.verifyPasswordTitle,
+    title: String = Strings.Wallet.confirmPasswordTitle,
     message: String,
     shouldShowBiometrics: Bool = true,
-    action: @escaping (_ password: String, _ completion: @escaping (EntryError?) -> Void) -> Void
+    action: @escaping (_ password: String, _ completion: @escaping (PasswordEntryError?) -> Void) -> Void
   ) {
     self.keyringStore = keyringStore
     self.title = title
@@ -37,7 +39,7 @@ struct PasswordEntryView: View {
   }
   
   @State private var password = ""
-  @State private var error: EntryError?
+  @State private var error: PasswordEntryError?
   @State private var attemptedBiometricsUnlock: Bool = false
   @Environment(\.presentationMode) @Binding private var presentationMode
   
