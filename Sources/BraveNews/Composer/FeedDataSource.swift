@@ -401,7 +401,7 @@ public class FeedDataSource {
     var varianceBySource: [String: Double] = [:]
     return rssItems.map {
       var content = $0
-      let recency = Darwin.log(max(1, -content.publishTime.timeIntervalSinceNow))
+      let recency = log(max(1, -content.publishTime.timeIntervalSinceNow))
       let variance = (varianceBySource[content.publisherID] ?? 1.0) * 2.0
       varianceBySource[content.publisherID] = variance
       content.baseScore = recency * variance

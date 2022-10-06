@@ -1522,7 +1522,7 @@ public class BrowserViewController: UIViewController {
 
     // WebView is a zombie and somehow still has an observer attached to it
     guard let tab = tabManager[webView] else {
-      Logger.module.error("WebView: \(webView, privacy: .public) has been removed from TabManager but still has attached observers")
+      Logger.module.error("WebView has been removed from TabManager but still has attached observers")
       return
     }
 
