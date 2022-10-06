@@ -40,6 +40,10 @@
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
+		442FA8CB28EF4AD600FA095B /* TabSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442FA8CA28EF4AD600FA095B /* TabSessionTests.swift */; };
+		442FA8CD28EF4B5000FA095B /* TabManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442FA8CC28EF4B5000FA095B /* TabManagerTests.swift */; };
+		442FA8CF28EF4C1C00FA095B /* MockProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442FA8CE28EF4C1C00FA095B /* MockProfile.swift */; };
+		442FA8D128EF4E0700FA095B /* HttpCookieExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442FA8D028EF4E0700FA095B /* HttpCookieExtensionTest.swift */; };
 		44C169EF28EF440200597743 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C169EE28EF440200597743 /* UserAgentTests.swift */; };
 		44C169FC28EF477C00597743 /* Brave in Frameworks */ = {isa = PBXBuildFile; productRef = 44C169FB28EF477C00597743 /* Brave */; };
 		44C169FE28EF477C00597743 /* BraveCore in Frameworks */ = {isa = PBXBuildFile; productRef = 44C169FD28EF477C00597743 /* BraveCore */; };
@@ -268,6 +272,10 @@
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
+		442FA8CA28EF4AD600FA095B /* TabSessionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabSessionTests.swift; sourceTree = "<group>"; };
+		442FA8CC28EF4B5000FA095B /* TabManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabManagerTests.swift; sourceTree = "<group>"; };
+		442FA8CE28EF4C1C00FA095B /* MockProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProfile.swift; sourceTree = "<group>"; };
+		442FA8D028EF4E0700FA095B /* HttpCookieExtensionTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpCookieExtensionTest.swift; sourceTree = "<group>"; };
 		445ABC0527319C000089710D /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC0727319C030089710D /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/BraveWidgets.strings"; sourceTree = "<group>"; };
 		445ABC0927319C060089710D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
@@ -567,7 +575,11 @@
 		44C169ED28EF440200597743 /* HostedTests */ = {
 			isa = PBXGroup;
 			children = (
+				442FA8CA28EF4AD600FA095B /* TabSessionTests.swift */,
 				44C169EE28EF440200597743 /* UserAgentTests.swift */,
+				442FA8CC28EF4B5000FA095B /* TabManagerTests.swift */,
+				442FA8CE28EF4C1C00FA095B /* MockProfile.swift */,
+				442FA8D028EF4E0700FA095B /* HttpCookieExtensionTest.swift */,
 			);
 			path = HostedTests;
 			sourceTree = "<group>";
@@ -1076,7 +1088,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				442FA8CB28EF4AD600FA095B /* TabSessionTests.swift in Sources */,
 				44C169EF28EF440200597743 /* UserAgentTests.swift in Sources */,
+				442FA8CD28EF4B5000FA095B /* TabManagerTests.swift in Sources */,
+				442FA8CF28EF4C1C00FA095B /* MockProfile.swift in Sources */,
+				442FA8D128EF4E0700FA095B /* HttpCookieExtensionTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

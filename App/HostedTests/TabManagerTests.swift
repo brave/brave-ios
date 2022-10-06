@@ -552,4 +552,10 @@ class TabManagerTests: XCTestCase {
     // Shouldn't be storing any private tabs
     XCTAssertEqual(storedTabs.count, 1)
   }
+  
+  func wait(_ time: TimeInterval) {
+    let expectation = self.expectation(description: "Wait")
+    DispatchQueue.main.asyncAfter(deadline: .now() + time, execute: { expectation.fulfill() })
+    waitForExpectations(timeout: time + 1, handler: nil)
+  }
 }
