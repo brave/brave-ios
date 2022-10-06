@@ -42,7 +42,7 @@ class UserAgentTests: XCTestCase {
 
   // WKWebView doesn't give us all UA parts of Safari
   // we are able to compare only the first part.
-  func testFirstUAPart() {
+  func testFirstUAPart() throws {
     let expectation = self.expectation(description: "First part of UA comparison")
 
     let webView = BraveWebView(frame: .zero, isPrivate: false)
@@ -77,12 +77,8 @@ class UserAgentTests: XCTestCase {
 
   // MARK: iPad only tests - must run on iPad
 
-  func testDesktopUserAgent() {
-    // Must run on iPad iOS 13+
-    if UIDevice.current.userInterfaceIdiom != .pad
-      || ProcessInfo().operatingSystemVersion.majorVersion < 13 {
-      return
-    }
+  func testDesktopUserAgent() throws {
+    try XCTSkipIf(UIDevice.current.userInterfaceIdiom != .pad, "Must be run on an iPad")
 
     XCTAssertTrue(desktopUARegex(UserAgent.desktop), "User agent computes correctly.")
 
@@ -100,12 +96,8 @@ class UserAgentTests: XCTestCase {
     waitForExpectations(timeout: 60, handler: nil)
   }
 
-  func testIpadMobileUserAgent() {
-    // Must run on iPad iOS 13+
-    if UIDevice.current.userInterfaceIdiom != .pad
-      || ProcessInfo().operatingSystemVersion.majorVersion < 13 {
-      return
-    }
+  func testIpadMobileUserAgent() throws {
+    try XCTSkipIf(UIDevice.current.userInterfaceIdiom != .pad, "Must be run on an iPad")
 
     Preferences.General.alwaysRequestDesktopSite.value = false
 

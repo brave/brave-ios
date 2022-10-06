@@ -83,6 +83,13 @@
         "identifier" : "StorageTests",
         "name" : "StorageTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Client.xcodeproj",
+        "identifier" : "44C169EB28EF440100597743",
+        "name" : "HostedTests"
+      }
     }
   ],
   "version" : 1

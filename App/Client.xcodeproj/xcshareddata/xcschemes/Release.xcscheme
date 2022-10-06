@@ -109,6 +109,17 @@
                ReferencedContainer = "container:Client.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "44C169EB28EF440100597743"
+               BuildableName = "HostedTests.xctest"
+               BlueprintName = "HostedTests"
+               ReferencedContainer = "container:Client.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
