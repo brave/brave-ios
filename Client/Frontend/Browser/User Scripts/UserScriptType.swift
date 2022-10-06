@@ -17,31 +17,8 @@ enum UserScriptType: Hashable {
   case farblingProtection(etld: String)
   /// Scripts specific to certain domains
   case domainUserScript(DomainUserScript)
-
-  /// Return a source typ for this script type
-  var sourceType: ScriptSourceType {
-    switch self {
-    case .siteStateListener:
-      return .siteStateListener
-    case .farblingProtection:
-      return .farblingProtection
-    case .domainUserScript(let domainUserScript):
-      switch domainUserScript {
-      case .braveSearchHelper:
-        return .braveSearchHelper
-      case .braveTalkHelper:
-        return .braveTalkHelper
-      case .bravePlaylistFolderSharingHelper:
-        return .bravePlaylistFolderSharingHelper
-      case .braveSkus:
-        return .braveSkus
-      case .youtubeAdblock:
-        return .youtubeAdblock
-      }
-    case .nacl:
-      return .nacl
-    }
-  }
+  /// Any custom script
+  case engineScript(url: URL, source: String, order: Int)
 
   /// The order in which we want to inject the scripts
   var order: Int {
@@ -50,29 +27,7 @@ enum UserScriptType: Hashable {
     case .nacl: return 1
     case .farblingProtection: return 2
     case .domainUserScript: return 3
-    }
-  }
-
-  var injectionTime: WKUserScriptInjectionTime {
-    switch self {
-    case .siteStateListener, .farblingProtection, .domainUserScript, .nacl:
-      return .atDocumentStart
-    }
-  }
-
-  var forMainFrameOnly: Bool {
-    switch self {
-    case .siteStateListener, .farblingProtection, .domainUserScript, .nacl:
-      return false
-    }
-  }
-
-  var contentWorld: WKContentWorld {
-    switch self {
-    case .siteStateListener:
-      return .defaultClient
-    case .farblingProtection, .domainUserScript, .nacl:
-      return .page
+    case .engineScript(_, _, let order): return 4 + order
     }
   }
 }

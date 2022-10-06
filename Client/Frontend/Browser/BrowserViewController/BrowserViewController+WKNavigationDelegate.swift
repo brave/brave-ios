@@ -297,13 +297,21 @@ extension BrowserViewController: WKNavigationDelegate {
     if let frameInfo = navigationAction.targetFrame {
       do {
         let sources = try AdBlockStats.shared.makeEngineScriptSouces(for: url)
-        let evaluations = sources.map {
-          Tab.FrameEvaluation(frameInfo: frameInfo, source: $0)
+        
+        var evaluations: [Tab.FrameEvaluation] = sources.cssInjectScripts.map { source in
+          return Tab.FrameEvaluation(frameInfo: frameInfo, source: source)
+        }
+        
+        // We add general scripts only from non-main frames. Main frame scripts will be injected rather than executed
+        if !frameInfo.isMainFrame {
+          evaluations.append(contentsOf: sources.generalScripts.map({ source in
+            return Tab.FrameEvaluation(frameInfo: frameInfo, source: source)
+          }))
         }
         
         tab?.frameEvaluations[url] = evaluations
       } catch {
-        Logger.module.error("\(error.localizedDescription)")
+        assertionFailure()
       }
     }
 

@@ -81,16 +81,13 @@ class AdBlockEngineManagerTests: XCTestCase {
       
       Task { @MainActor in
         XCTAssertEqual(stats.engines.count, 3)
+        let sources = try stats.makeEngineScriptSouces(for: URL(string:  "https://stackoverflow.com")!)
+        XCTAssertEqual(sources.generalScripts.count, 0)
+        XCTAssertEqual(sources.cssInjectScripts.count, 3)
         
-        XCTAssertEqual(
-          try stats.makeEngineScriptSouces(for: URL(string:  "https://stackoverflow.com")!).count,
-          3
-        )
-        
-        XCTAssertEqual(
-          try stats.makeEngineScriptSouces(for: URL(string:  "https://reddit.com")!).count,
-          4
-        )
+        let sources2 = try stats.makeEngineScriptSouces(for: URL(string:  "https://reddit.com")!)
+        XCTAssertEqual(sources2.generalScripts.count, 1)
+        XCTAssertEqual(sources2.cssInjectScripts.count, 3)
         expectation.fulfill()
       }
     }

@@ -41,8 +41,10 @@ struct CosmeticFilterModel: Codable {
 
 public class AdBlockStats {
   public static let shared = AdBlockStats()
-
-  fileprivate var fifoCacheOfUrlsChecked = FifoDict<Bool>()
+  typealias ScriptSources = (cssInjectScripts: [String], generalScripts: [String])
+  
+  private var fifoCacheOfUrlsChecked = FifoDict<String, Bool>()
+  private var cachedScriptSources = FifoDict<URL, ScriptSources>()
 
   // Adblock engine for general adblock lists.
   private(set) var engines: [AdblockEngine]
@@ -57,7 +59,8 @@ public class AdBlockStats {
   static let adblockSerialQueue = DispatchQueue(label: "com.brave.adblock-dispatch-queue")
   
   func clearCaches() {
-    fifoCacheOfUrlsChecked = FifoDict<Bool>()
+    fifoCacheOfUrlsChecked = FifoDict()
+    cachedScriptSources = FifoDict()
   }
   
   /// Checks the general and regional engines to see if the request should be blocked.
@@ -100,25 +103,33 @@ public class AdBlockStats {
     self.clearCaches()
   }
   
-  func makeEngineScriptSouces(for url: URL) throws -> [String] {
-    return try engines.flatMap { engine -> [String] in
-      var results: [String] = []
+  func makeEngineScriptSouces(for url: URL) throws -> ScriptSources {
+    if let result = cachedScriptSources.getElement(url) {
+      return result
+    }
+    
+    var cssInjectScripts: [String] = []
+    var generalScripts: [String] = []
+    
+    try engines.forEach { engine in
       let sources = try engine.makeEngineScriptSources(for: url)
       
       if let source = sources.cssInjectScript {
-        results.append(source)
+        cssInjectScripts.append(source)
       }
       
       if let source = sources.generalScript {
-        results.append(source)
+        generalScripts.append(source)
       }
-      
-      return results
     }
+    
+    let result = (cssInjectScripts, generalScripts)
+    cachedScriptSources.addElement(result, forKey: url)
+    return result
   }
 }
 
-extension AdblockEngine {
+private extension AdblockEngine {
   func makeEngineScriptSources(for url: URL) throws -> (cssInjectScript: String?, generalScript: String?) {
     let rules = cosmeticResourcesForURL(url.absoluteString)
     guard let data = rules.data(using: .utf8) else { return (nil, nil) }
