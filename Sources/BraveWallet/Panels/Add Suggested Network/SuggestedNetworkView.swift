@@ -327,7 +327,7 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
         onDismiss: { }
       )
       SuggestedNetworkView(
-        mode: .switchNetworks(chainId: BraveWallet.RopstenChainId),
+        mode: .switchNetworks(chainId: BraveWallet.GoerliChainId),
         originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
         cryptoStore: .previewStore,
         keyringStore: .previewStoreWithWalletCreated,

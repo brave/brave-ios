@@ -168,9 +168,9 @@ extension BraveWallet.NetworkInfo {
     isEip1559: true
   )
   static let mockRinkeby: BraveWallet.NetworkInfo = .init(
-    chainId: BraveWallet.RinkebyChainId,
-    chainName: "Rinkeby",
-    blockExplorerUrls: ["https://rinkeby.etherscan.io"],
+    chainId: BraveWallet.GoerliChainId,
+    chainName: "Goerli",
+    blockExplorerUrls: ["https://goerli.etherscan.io"],
     iconUrls: [],
     activeRpcEndpointIndex: 0,
     rpcEndpoints: [URL(string: "https://rpc.mockchain.com")!],
@@ -181,9 +181,9 @@ extension BraveWallet.NetworkInfo {
     isEip1559: true
   )
   static let mockRopsten: BraveWallet.NetworkInfo = .init(
-    chainId: BraveWallet.RopstenChainId,
-    chainName: "Ropsten",
-    blockExplorerUrls: ["https://ropsten.etherscan.io"],
+    chainId: BraveWallet.SepoliaChainId,
+    chainName: "Sepolia",
+    blockExplorerUrls: ["https://sepolia.etherscan.io"],
     iconUrls: [],
     activeRpcEndpointIndex: 0,
     rpcEndpoints: [URL(string: "https://rpc.mockchain.com")!],
