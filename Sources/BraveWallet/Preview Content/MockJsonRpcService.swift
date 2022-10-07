@@ -15,7 +15,7 @@ import BraveCore
 class MockJsonRpcService: BraveWalletJsonRpcService {
   
   private var chainId: String = BraveWallet.MainnetChainId
-  private var networks: [BraveWallet.NetworkInfo] = [.mockMainnet, .mockGoerli, .mockSepolia]
+  private var networks: [BraveWallet.NetworkInfo] = [.mockMainnet, .mockGoerli, .mockSepolia, .mockPolygon]
   private var networkURL: URL?
   private var observers: NSHashTable<BraveWalletJsonRpcServiceObserver> = .weakObjects()
   
