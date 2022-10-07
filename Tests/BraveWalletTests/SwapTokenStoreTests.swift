@@ -64,38 +64,6 @@ class SwapStoreTests: XCTestCase {
     }
   }
 
-  func testDefaultSellBuyTokensOnRopstenWithPrefilledToken() {
-    let daiToken: BraveWallet.BlockchainToken = .init(contractAddress: "", name: "DAI Stablecoin", logo: "", isErc20: true, isErc721: false, symbol: "DAI", decimals: 18, visible: false, tokenId: "", coingeckoId: "", chainId: "", coin: .eth)
-    let rpcService = MockJsonRpcService()
-    let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
-      rpcService: rpcService,
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
-      prefilledToken: daiToken
-    )
-    let ex = expectation(description: "default-sell-buy-token-on-ropsten")
-    XCTAssertNotNil(store.selectedFromToken)
-    XCTAssertNil(store.selectedToToken)
-
-    rpcService.setNetwork(BraveWallet.GoerliChainId, coin: .eth) { success in
-      XCTAssertTrue(success)
-      let testAccountInfo: BraveWallet.AccountInfo = .init()
-      store.prepare(with: testAccountInfo) {
-        defer { ex.fulfill() }
-        XCTAssertEqual(store.selectedFromToken?.symbol.lowercased(), daiToken.symbol.lowercased())
-        XCTAssertNotNil(store.selectedToToken)
-        XCTAssertNotEqual(store.selectedToToken!.symbol.lowercased(), daiToken.symbol.lowercased())
-      }
-    }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
-  }
-
   func testFetchPriceQuote() {
     let store = SwapTokenStore(
       keyringService: MockKeyringService(),
@@ -235,8 +203,8 @@ class SwapStoreTests: XCTestCase {
     let mockBalanceWei = formatter.weiString(from: mockBalance, radix: .hex, decimals: 18) ?? ""
     
     let rpcService = BraveWallet.TestJsonRpcService()
-    rpcService._chainId = { $1(BraveWallet.NetworkInfo.mockRopsten.chainId) }
-    rpcService._network = { $1(BraveWallet.NetworkInfo.mockRopsten)}
+    rpcService._chainId = { $1(BraveWallet.NetworkInfo.mockGoerli.chainId) }
+    rpcService._network = { $1(BraveWallet.NetworkInfo.mockGoerli)}
     rpcService._balance = { _, _, _, completion in
       completion(mockBalanceWei, .success, "")
     }
