@@ -26,7 +26,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   private var windowProtection: WindowProtection?
   private var sceneInfo: AppDelegate.SceneInfoModel?
   static var shouldHandleUrpLookup = false
-  var shouldEnableNightMode = Preferences.General.nightModeEnabled
 
   private var cancellables: Set<AnyCancellable> = []
 

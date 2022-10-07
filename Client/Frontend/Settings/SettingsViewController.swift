@@ -391,56 +391,34 @@ class SettingsViewController: TableViewController {
     let themeSubtitle = DefaultTheme(rawValue: Preferences.General.themeNormalMode.value)?.displayString
     var row = Row(text: Strings.themesDisplayBrightness, detailText: themeSubtitle, image: UIImage(named: "settings-appearance", in: .current, compatibleWith: nil)!.template, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
     row.selection = { [unowned self] in
-      let optionsViewController = OptionSelectionViewController<DefaultTheme>(
-        options: DefaultTheme.normalThemesOptions,
-        selectedOption: DefaultTheme(rawValue: Preferences.General.themeNormalMode.value),
-        optionChanged: { [unowned self] _, option in
+      let appereanceDetailsViewController = AppearanceDetailsViewController(
+        themeChanged: { [unowned self] option in
           Preferences.General.themeNormalMode.value = option.rawValue
           self.dataSource.reloadCell(row: row, section: display, displayText: option.displayString)
+        },
+        nightModeEnabled: { [unowned self] enabled in
+          Preferences.General.nightModeEnabled.value = enabled
+
+          var nightModeEnabled = enabled
+          if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+            nightModeEnabled = !Preferences.General.automaticNightModeEnabled.value
+          }
+
+          NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
+        },
+        autoNightModeEnabled: { [unowned self] enabled in
+          Preferences.General.automaticNightModeEnabled.value = enabled
+
+          var nightModeEnabled = Preferences.General.nightModeEnabled.value
+          if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
+            nightModeEnabled = !enabled
+          }
+
+          NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
         }
       )
-      optionsViewController.headerText = Strings.themesDisplayBrightness
-      optionsViewController.footerText = Strings.themesDisplayBrightnessFooter
-
-      let nightModeSection = Section(
-        header: .title(Strings.NightMode.sectionTitle.uppercased()),
-        rows: [
-          .boolRow(
-            title: Strings.NightMode.settingsTitle,
-            detailText: Strings.NightMode.settingsDescription,
-            option: Preferences.General.nightModeEnabled,
-            onValueChange: { [unowned self] enabled in
-              Preferences.General.nightModeEnabled.value = enabled
-              
-              var nightModeEnabled = enabled
-              if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
-                nightModeEnabled = !Preferences.General.automaticNightModeEnabled.value
-              }
-              
-              NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
-            },
-            image: UIImage(systemName: "moon")),
-          .boolRow(
-            title: "Enable Automatic Night Mode",
-            detailText: "Automatic Apperance is respected",
-            option: Preferences.General.automaticNightModeEnabled,
-            onValueChange: { [unowned self] enabled in
-              Preferences.General.automaticNightModeEnabled.value = enabled
-              
-              var nightModeEnabled = Preferences.General.nightModeEnabled.value
-              if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {
-                nightModeEnabled = !enabled
-              }
-              
-              NightModeScriptHandler.setNightMode(tabManager: tabManager, enabled: nightModeEnabled)
-            },
-            image: UIImage(systemName: "moon"))
-        ],
-        footer: .title(Strings.NightMode.sectionDescription)
-      )
-
-      optionsViewController.dataSource.sections.append(nightModeSection)
-      self.navigationController?.pushViewController(optionsViewController, animated: true)
+      
+      self.navigationController?.pushViewController(appereanceDetailsViewController, animated: true)
     }
     display.rows.append(row)
     display.rows.append(Row(
