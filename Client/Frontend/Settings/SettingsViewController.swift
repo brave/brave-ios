@@ -398,6 +398,10 @@ class SettingsViewController: TableViewController {
         },
         nightModeEnabled: { [unowned self] enabled in
           Preferences.General.nightModeEnabled.value = enabled
+          
+          if !enabled {
+            Preferences.General.automaticNightModeEnabled.value = false
+          }
 
           var nightModeEnabled = enabled
           if UITraitCollection.current.userInterfaceStyle == .light && Preferences.General.themeNormalMode.value ==  DefaultTheme.system.rawValue {

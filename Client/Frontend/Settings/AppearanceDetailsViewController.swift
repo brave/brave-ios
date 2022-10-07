@@ -33,45 +33,6 @@ class AppearanceDetailsViewController: TableViewController {
     self.autoNightModeEnabled = autoNightModeEnabled
     
     super.init(style: .insetGrouped)
-
-    dataSource.sections = [
-      Section(
-        header: .title(Strings.themesDisplayBrightness),
-        rows: themeOptions.map { option in
-          Row(
-            text: option.displayString,
-            selection: { [unowned self] in
-              // Update selected option
-              self.selectedTheme = option
-              self.updateRowsForSelectedOption()
-            },
-            image: option.image,
-            accessory: option == selectedTheme ? .checkmark : .none)
-        },
-        footer: .title(Strings.themesDisplayBrightnessFooter)
-      ),
-      Section(
-        header: .title(Strings.NightMode.sectionTitle.uppercased()),
-        rows: [
-          .boolRow(
-            title: Strings.NightMode.settingsTitle,
-            detailText: Strings.NightMode.settingsDescription,
-            option: Preferences.General.nightModeEnabled,
-            onValueChange: { [unowned self] enabled in
-              self.nightModeEnabled(enabled)
-            },
-            image: UIImage(systemName: "moon")),
-          .boolRow(
-            title: "Enable Automatic Night Mode",
-            detailText: "Automatic Apperance is respected",
-            option: Preferences.General.automaticNightModeEnabled,
-            onValueChange: { [unowned self] enabled in
-              self.autoNightModeEnabled(enabled)
-            })
-        ],
-        footer: .title(Strings.NightMode.sectionDescription)
-      )
-    ]
   }
 
   public override func viewDidLoad() {
@@ -79,6 +40,10 @@ class AppearanceDetailsViewController: TableViewController {
 
     view.backgroundColor = .braveGroupedBackground
     view.tintColor = .braveOrange
+    
+    loadSections()
+
+    Preferences.General.nightModeEnabled.observe(from: self)
   }
 
   @available(*, unavailable)
@@ -97,7 +62,50 @@ class AppearanceDetailsViewController: TableViewController {
   }
   
   public func loadSections() {
+    let appearanceSection = Section(
+      header: .title(Strings.themesDisplayBrightness),
+      rows: themeOptions.map { option in
+        Row(
+          text: option.displayString,
+          selection: { [unowned self] in
+            // Update selected option
+            self.selectedTheme = option
+            self.updateRowsForSelectedOption()
+          },
+          image: option.image,
+          accessory: option == selectedTheme ? .checkmark : .none)
+      },
+      footer: .title(Strings.themesDisplayBrightnessFooter)
+    )
     
+    var nightModeSection = Section(
+      header: .title(Strings.NightMode.sectionTitle.uppercased()),
+      rows: [
+        .boolRow(
+          title: Strings.NightMode.settingsTitle,
+          detailText: Strings.NightMode.settingsDescription,
+          option: Preferences.General.nightModeEnabled,
+          onValueChange: { [unowned self] enabled in
+            self.nightModeEnabled(enabled)
+          },
+          image: UIImage(systemName: "moon"))
+      ],
+      footer: .title(Strings.NightMode.sectionDescription)
+    )
+    
+    if Preferences.General.nightModeEnabled.value {
+      nightModeSection.rows.append(
+        .boolRow(
+          title: Strings.NightMode.autoModeSettingsTitle,
+          detailText: Strings.NightMode.autoModeSettingsDescription,
+          option: Preferences.General.automaticNightModeEnabled,
+          onValueChange: { [unowned self] enabled in
+            self.autoNightModeEnabled(enabled)
+          })
+      )
+    }
+
+    dataSource.sections = [appearanceSection, nightModeSection]
   }
 }
 

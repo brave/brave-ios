@@ -3776,6 +3776,10 @@ extension Strings {
       value: "Mode",
       comment: "It refers to a night mode, to a type of mode a user can change referring to website appearance."
     )
+    public static let sectionDescription = NSLocalizedString("nightMode.sectionDescription", tableName: "BraveShared", bundle: .strings,
+      value: "Night mode will effect website appearance and general system appearance at the same time.",
+      comment: "A table cell subtitle for Night Mode - explanatory element for the toggle preference"
+    )
     public static let settingsTitle = NSLocalizedString("nightMode.settingsTitle", tableName: "BraveShared", bundle: .strings,
       value: "Night Mode",
       comment: "A table cell title for Night Mode - defining element for the toggle"
@@ -3784,9 +3788,13 @@ extension Strings {
       value: "Turn on/off Night Mode",
       comment: "A table cell subtitle for Night Mode - explanatory element for the toggle preference"
     )
-    public static let sectionDescription = NSLocalizedString("nightMode.sectionDescription", tableName: "BraveShared", bundle: .strings,
-      value: "Night mode will effect website appearance and general system appearance at the same time.",
-      comment: "A table cell subtitle for Night Mode - explanatory element for the toggle preference"
+    public static let autoModeSettingsTitle = NSLocalizedString("nightMode.autoModeSettingsTitle", tableName: "BraveShared", bundle: .strings,
+      value: "Enable Automatic Night Mode",
+      comment: "A table cell title for Auto Night Mode - defining element for the toggle"
+    )
+    public static let autoModeSettingsDescription = NSLocalizedString("nightMode.autoModeSettingsDescription", tableName: "BraveShared", bundle: .strings,
+      value: "Automatic Apperance is respected",
+      comment: "A table cell subtitle for Auto Night Mode - explanatory element for the toggle preference"
     )
   }
 }
