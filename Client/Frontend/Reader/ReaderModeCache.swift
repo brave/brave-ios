@@ -11,11 +11,6 @@ private let log = Logger.browserLogger
 private let DiskReaderModeCacheSharedInstance = DiskReaderModeCache()
 private let MemoryReaderModeCacheSharedInstance = MemoryReaderModeCache()
 
-let ReaderModeCacheErrorDomain = "com.mozilla.client.readermodecache."
-enum ReaderModeCacheErrorCode: Int {
-  case noPathsFound = 0
-}
-
 // NSObject wrapper around ReadabilityResult Swift struct for adding into the NSCache
 private class ReadabilityResultWrapper: NSObject {
   let result: ReadabilityResult
@@ -29,7 +24,7 @@ private class ReadabilityResultWrapper: NSObject {
 protocol ReaderModeCache {
   func put(_ url: URL, _ readabilityResult: ReadabilityResult)
 
-  func get(_ url: URL) throws -> ReadabilityResult
+  func get(_ url: URL) -> ReadabilityResult?
 
   func delete(_ url: URL, error: NSErrorPointer)
 
@@ -53,9 +48,10 @@ class MemoryReaderModeCache: ReaderModeCache {
     cache.setObject(ReadabilityResultWrapper(readabilityResult: readabilityResult), forKey: url as AnyObject)
   }
 
-  func get(_ url: URL) throws -> ReadabilityResult {
+  func get(_ url: URL) -> ReadabilityResult? {
     guard let resultWrapper = cache.object(forKey: url as AnyObject) as? ReadabilityResultWrapper else {
-      throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+      log.error("No path found")
+      return nil
     }
     return resultWrapper.result
   }
@@ -96,15 +92,18 @@ class DiskReaderModeCache: ReaderModeCache {
     
   }
 
-  func get(_ url: URL) throws -> ReadabilityResult {
-    if let (_, contentFilePath) = cachePathsForURL(url), FileManager.default.fileExists(atPath: contentFilePath) {
-      let string = try String(contentsOfFile: contentFilePath, encoding: .utf8)
-      if let value = ReadabilityResult.from(string: string) {
-        return value
+  func get(_ url: URL) -> ReadabilityResult? {
+    do {
+      if let (_, contentFilePath) = cachePathsForURL(url), FileManager.default.fileExists(atPath: contentFilePath) {
+        let string = try String(contentsOfFile: contentFilePath, encoding: .utf8)
+        return ReadabilityResult.from(string: string)
       }
+    } catch {
+      log.error("ReaderMode cache get error: \(error)")
+      return nil
     }
-
-    throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+    
+    return nil
   }
 
   func delete(_ url: URL, error: NSErrorPointer) {

@@ -10,13 +10,13 @@ private let log = Logger.browserLogger
 
 let ReaderModeProfileKeyStyle = "readermode.style"
 
-enum ReaderModeMessageType: String {
+private enum ReaderModeMessageType: String {
   case stateChange = "ReaderModeStateChange"
   case pageEvent = "ReaderPageEvent"
   case contentParsed = "ReaderContentParsed"
 }
 
-enum ReaderPageEvent: String {
+private enum ReaderPageEvent: String {
   case pageShow = "PageShow"
 }
 
@@ -118,7 +118,7 @@ struct ReaderModeStyle {
   var fontSize: ReaderModeFontSize
 
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
-  func encode() -> String {
+  var asJSON: String {
     let styleJSON =
     """
     { \
@@ -303,7 +303,10 @@ class ReaderModeScriptHandler: TabContentScript {
   var style: ReaderModeStyle = DefaultReaderModeStyle {
     didSet {
       if state == ReaderModeState.active {
-        tab?.webView?.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).setStyle", args: [style.encode()], contentWorld: Self.scriptSandbox, escapeArgs: false) { (object, error) -> Void in
+        tab?.webView?.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).setStyle",
+                                             args: [style.asJSON],
+                                             contentWorld: Self.scriptSandbox,
+                                             escapeArgs: false) { (object, error) -> Void in
           return
         }
       }

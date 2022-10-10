@@ -35,29 +35,8 @@ public struct ReaderModeHandlers {
     webServer.registerHandlerForMethod("GET", module: "reader-mode", resource: "page") { (request: GCDWebServerRequest?) -> GCDWebServerResponse? in
       if let query = request?.query, let url = query["url"] {
         if let url = URL(string: url), url.isWebPage() {
-          do {
-            let readabilityResult = try readerModeCache.get(url)
-            // We have this page in our cache, so we can display it. Just grab the correct style from the
-            // profile and then generate HTML from the Readability results.
-            var readerModeStyle = DefaultReaderModeStyle
-            if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
-              if let style = ReaderModeStyle(dict: dict) {
-                readerModeStyle = style
-              }
-            }
-
-            // Must generate a unique nonce, every single time as per Content-Policy spec.
-            let setTitleNonce = UUID().uuidString.replacingOccurrences(of: "-", with: "")
-
-            if let html = ReaderModeUtils.generateReaderContent(
-              readabilityResult, initialStyle: readerModeStyle,
-              titleNonce: setTitleNonce),
-              let response = GCDWebServerDataResponse(html: html) {
-              // Apply a Content Security Policy that disallows everything except images from anywhere and fonts and css from our internal server
-              response.setValue("default-src 'none'; img-src *; style-src http://localhost:* '\(readerModeStyleHash)'; font-src http://localhost:*; script-src 'nonce-\(setTitleNonce)'", forAdditionalHeader: "Content-Security-Policy")
-              return response
-            }
-          } catch _ {
+          
+          guard let readabilityResult = readerModeCache.get(url) else {
             // This page has not been converted to reader mode yet. This happens when you for example add an
             // item via the app extension and the application has not yet had a change to readerize that
             // page in the background.
@@ -86,6 +65,28 @@ public struct ReaderModeHandlers {
                 assertionFailure("CANNOT LOAD  ReaderViewLoading.html: \(error)")
               }
             }
+            return GCDWebServerDataResponse(html: Strings.readerModeErrorConvertDisplayText)
+          }
+          
+          // We have this page in our cache, so we can display it. Just grab the correct style from the
+          // profile and then generate HTML from the Readability results.
+          var readerModeStyle = DefaultReaderModeStyle
+          if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
+            if let style = ReaderModeStyle(dict: dict) {
+              readerModeStyle = style
+            }
+          }
+
+          // Must generate a unique nonce, every single time as per Content-Policy spec.
+          let setTitleNonce = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+          if let html = ReaderModeUtils.generateReaderContent(
+            readabilityResult, initialStyle: readerModeStyle,
+            titleNonce: setTitleNonce),
+            let response = GCDWebServerDataResponse(html: html) {
+            // Apply a Content Security Policy that disallows everything except images from anywhere and fonts and css from our internal server
+            response.setValue("default-src 'none'; img-src *; style-src http://localhost:* '\(readerModeStyleHash)'; font-src http://localhost:*; script-src 'nonce-\(setTitleNonce)'", forAdditionalHeader: "Content-Security-Policy")
+            return response
           }
         }
       }

@@ -14,7 +14,7 @@ struct ReaderModeUtils {
     else { return nil }
 
     return tmpl.replacingOccurrences(of: "%READER-TITLE-NONCE%", with: titleNonce)  // This MUST be the first line/replacement!
-      .replacingOccurrences(of: "%READER-STYLE%", with: initialStyle.encode())
+      .replacingOccurrences(of: "%READER-STYLE%", with: initialStyle.asJSON)
       .replacingOccurrences(of: "%READER-TITLE%",
                             with: readabilityResult.title?.javaScriptEscapedString?.unquotedIfNecessary ??
                             readabilityResult.title?.htmlEntityEncodedString ?? "")
