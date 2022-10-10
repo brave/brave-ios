@@ -185,6 +185,10 @@ struct ReadabilityResult {
       if let credits = dict["byline"] as? String {
         self.credits = credits
       }
+      
+      if !JSONSerialization.isValidJSONObject(dict) {
+        return nil
+      }
     } else {
       return nil
     }
@@ -298,6 +302,8 @@ class ReaderModeScriptHandler: TabContentScript {
         case .contentParsed:
           if let readabilityResult = ReadabilityResult(object: msg["Value"] as AnyObject?) {
             handleReaderContentParsed(readabilityResult)
+          } else {
+            handleReaderModeStateChange(.unavailable)
           }
         }
       }
