@@ -5,7 +5,6 @@
 import Foundation
 import Shared
 import WebKit
-import SwiftyJSON
 
 private let log = Logger.browserLogger
 
@@ -120,7 +119,16 @@ struct ReaderModeStyle {
 
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
   func encode() -> String {
-    return JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]).stringValue() ?? ""
+    let styleJSON =
+    """
+    { \
+    "theme": "\(theme.rawValue)", \
+    "fontType": "\(fontType.rawValue)", \
+    "fontSize": "\(fontSize.rawValue)" \
+    }
+    """
+    
+    return styleJSON
   }
 
   /// Encode the style to a dictionary that can be stored in the profile
@@ -192,22 +200,35 @@ struct ReadabilityResult {
 
   /// Initialize from a JSON encoded string
   init?(string: String) {
-    let object = JSON(parseJSON: string)
-    let domain = object["domain"].string
-    let url = object["url"].string
-    let content = object["content"].string
-    let title = object["title"].string
-    let credits = object["credits"].string
-
-    if domain == nil || url == nil || content == nil || title == nil || credits == nil {
+    
+    guard let data = string.data(using: .utf8) else {
       return nil
     }
+    
+    do {
+      guard let object = try JSONSerialization.jsonObject(with: data) as? [String: String] else {
+        return nil
+      }
+      
+      let domain = object["domain"]
+      let url = object["url"]
+      let content = object["content"]
+      let title = object["title"]
+      let credits = object["credits"]
 
-    self.domain = domain!
-    self.url = url!
-    self.content = content!
-    self.title = title!
-    self.credits = credits!
+      if domain == nil || url == nil || content == nil || title == nil || credits == nil {
+        return nil
+      }
+
+      self.domain = domain!
+      self.url = url!
+      self.content = content!
+      self.title = title!
+      self.credits = credits!
+    } catch {
+      log.error("Failed to initialize json from a string: \(error)")
+      return nil
+    }
   }
 
   /// Encode to a dictionary, which can then for example be json encoded
@@ -218,7 +239,20 @@ struct ReadabilityResult {
   /// Encode to a JSON encoded string
   func encode() -> String {
     let dict: [String: Any] = self.encode()
-    return JSON(dict).stringValue()!
+    
+    do {
+      let jsonData = try JSONSerialization.data(withJSONObject: dict)
+      
+      guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+        assertionFailure("Failed to encode a reader mode result")
+        return ""
+      }
+      
+      return jsonString
+    } catch {
+      assertionFailure("Failed to encode a reader mode result")
+      return ""
+    }
   }
 }
 
