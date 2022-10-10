@@ -186,7 +186,7 @@ struct ReaderModeStyle {
     self.fontSize = fontSize
   }
   
-  /// Initialize the style from a dictionary, taken from the profile. If the dictionary can't be parsed returns default values instead
+  /// Initialize the style from a dictionary,. If the dictionary can't be parsed returns default style settings instead.
   init(dict: [String: Int]) {
     guard let themeRawValue = dict["theme"],
           let fontTypeRawValue = dict["fontType"],
