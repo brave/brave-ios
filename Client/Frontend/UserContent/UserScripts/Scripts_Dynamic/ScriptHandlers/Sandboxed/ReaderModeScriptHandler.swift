@@ -8,8 +8,6 @@ import WebKit
 
 private let log = Logger.browserLogger
 
-let ReaderModeProfileKeyStyle = "readermode.style"
-
 private enum ReaderModeMessageType: String {
   case stateChange = "ReaderModeStateChange"
   case pageEvent = "ReaderPageEvent"
@@ -26,11 +24,24 @@ enum ReaderModeState: String {
   case active = "Active"
 }
 
-enum ReaderModeTheme: String {
-  case light = "light"
-  case dark = "dark"
-  case sepia = "sepia"
-  case black = "black"
+enum ReaderModeTheme: Int {
+  case light
+  case dark
+  case sepia
+  case black
+  
+  var styleName: String {
+    switch self {
+    case .light:
+      return "light"
+    case .dark:
+      return "dark"
+    case .sepia:
+      return "sepia"
+    case .black:
+      return "black"
+    }
+  }
 
   var backgroundColor: UIColor {
     switch self {
@@ -44,11 +55,24 @@ enum ReaderModeTheme: String {
       return .black
     }
   }
+  
+  static var `default`: Self { .light }
 }
 
-enum ReaderModeFontType: String {
-  case serif = "serif"
-  case sansSerif = "sans-serif"
+enum ReaderModeFontType: Int {
+  case serif
+  case sansSerif
+  
+  var fontAssetName: String {
+    switch self {
+    case .serif:
+      return "serif"
+    case .sansSerif:
+      return "sans-serif"
+    }
+  }
+  
+  static var `default`: Self { .serif }
 }
 
 enum ReaderModeFontSize: Int {
@@ -82,8 +106,15 @@ enum ReaderModeFontSize: Int {
     return self == ReaderModeFontSize.size13
   }
 
-  static var defaultSize: ReaderModeFontSize {
-    switch UIApplication.shared.preferredContentSizeCategory {
+  static var `default`: ReaderModeFontSize {
+    var category: UIContentSizeCategory?
+    DispatchQueue.main.async {
+      category = UIApplication.shared.preferredContentSizeCategory
+    }
+    
+    guard let category = category else { return .size5 }
+    
+    switch category {
     case .extraSmall:
       return .size1
     case .small:
@@ -116,14 +147,27 @@ struct ReaderModeStyle {
   var theme: ReaderModeTheme
   var fontType: ReaderModeFontType
   var fontSize: ReaderModeFontSize
+  
+  /// Converts this structure to a [String: Int] dictionary so it can be saved in Preferences.
+  var toPreferences: [String: Int] {
+    return ["theme": theme.rawValue,
+            "fontType": fontType.rawValue,
+            "fontSize": fontSize.rawValue]
+  }
+  
+  static var `default`: Self {
+    return .init(theme: ReaderModeTheme.default,
+                 fontType: ReaderModeFontType.default,
+                 fontSize: ReaderModeFontSize.default)
+  }
 
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
   var asJSON: String {
     let styleJSON =
     """
     { \
-    "theme": "\(theme.rawValue)", \
-    "fontType": "\(fontType.rawValue)", \
+    "theme": "\(theme.styleName)", \
+    "fontType": "\(fontType.fontAssetName)", \
     "fontSize": "\(fontSize.rawValue)" \
     }
     """
@@ -132,7 +176,7 @@ struct ReaderModeStyle {
   }
 
   /// Encode the style to a dictionary that can be stored in the profile
-  func encodeAsDictionary() -> [String: Any] {
+  func encodeAsDictionary() -> [String: Int] {
     return ["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]
   }
 
@@ -141,30 +185,27 @@ struct ReaderModeStyle {
     self.fontType = fontType
     self.fontSize = fontSize
   }
-
-  /// Initialize the style from a dictionary, taken from the profile. Returns nil if the object cannot be decoded.
-  init?(dict: [String: Any]) {
-    let themeRawValue = dict["theme"] as? String
-    let fontTypeRawValue = dict["fontType"] as? String
-    let fontSizeRawValue = dict["fontSize"] as? Int
-    if themeRawValue == nil || fontTypeRawValue == nil || fontSizeRawValue == nil {
-      return nil
+  
+  /// Initialize the style from a dictionary, taken from the profile. If the dictionary can't be parsed returns default values instead
+  init(dict: [String: Int]) {
+    guard let themeRawValue = dict["theme"],
+          let fontTypeRawValue = dict["fontType"],
+          let fontSizeRawValue = dict["fontSize"],
+          let theme = ReaderModeTheme(rawValue: themeRawValue),
+          let fontType = ReaderModeFontType(rawValue: fontTypeRawValue),
+          let fontSize = ReaderModeFontSize(rawValue: fontSizeRawValue) else {
+      
+      self.theme = ReaderModeTheme.default
+      self.fontType = ReaderModeFontType.default
+      self.fontSize = ReaderModeFontSize.`default`
+      return
     }
 
-    let theme = ReaderModeTheme(rawValue: themeRawValue!)
-    let fontType = ReaderModeFontType(rawValue: fontTypeRawValue!)
-    let fontSize = ReaderModeFontSize(rawValue: fontSizeRawValue!)
-    if theme == nil || fontType == nil || fontSize == nil {
-      return nil
-    }
-
-    self.theme = theme!
-    self.fontType = fontType!
-    self.fontSize = fontSize!
+    self.theme = theme
+    self.fontType = fontType
+    self.fontSize = fontSize
   }
 }
-
-let DefaultReaderModeStyle = ReaderModeStyle(theme: .light, fontType: .sansSerif, fontSize: ReaderModeFontSize.defaultSize)
 
 /// This struct captures the response from the Readability.js code.
 struct ReadabilityResult: Codable {
@@ -300,7 +341,7 @@ class ReaderModeScriptHandler: TabContentScript {
     }
   }
 
-  var style: ReaderModeStyle = DefaultReaderModeStyle {
+  var style: ReaderModeStyle = .default {
     didSet {
       if state == ReaderModeState.active {
         tab?.webView?.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).setStyle",

@@ -123,6 +123,11 @@ extension Preferences {
     static var defaultPageZoomLevel = Option<Double>(key: "general.default-page-zoom-level", default: 1.0)
     
     static let isUsingBottomBar = Option<Bool>(key: "general.bottom-bar", default: false)
+    
+    /// Reader Mode options the user chose.
+    static let readerModeSettings =
+      Option<Dictionary<String, Int>>(key: "general.reader-mode-settings",
+                                    default: ReaderModeStyle.default.toPreferences)
   }
 
   final public class FullScreenCallout {

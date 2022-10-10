@@ -5,6 +5,7 @@
 import Foundation
 import GCDWebServers
 import Shared
+import BraveShared
 
 public struct ReaderModeHandlers {
   static let readerModeStyleHash = "sha256-L2W8+0446ay9/L1oMrgucknQXag570zwgQrHwE68qbQ="
@@ -68,14 +69,7 @@ public struct ReaderModeHandlers {
             return GCDWebServerDataResponse(html: Strings.readerModeErrorConvertDisplayText)
           }
           
-          // We have this page in our cache, so we can display it. Just grab the correct style from the
-          // profile and then generate HTML from the Readability results.
-          var readerModeStyle = DefaultReaderModeStyle
-          if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
-            if let style = ReaderModeStyle(dict: dict) {
-              readerModeStyle = style
-            }
-          }
+          let readerModeStyle = ReaderModeStyle(dict: Preferences.General.readerModeSettings.value)
 
           // Must generate a unique nonce, every single time as per Content-Policy spec.
           let setTitleNonce = UUID().uuidString.replacingOccurrences(of: "-", with: "")

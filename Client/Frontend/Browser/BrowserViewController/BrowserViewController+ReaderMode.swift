@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Shared
+import BraveShared
 import WebKit
 import Storage
 
@@ -44,9 +45,7 @@ extension BrowserViewController: ReaderModeScriptHandlerDelegate {
 
 extension BrowserViewController: ReaderModeStyleViewControllerDelegate {
   func readerModeStyleViewController(_ readerModeStyleViewController: ReaderModeStyleViewController, didConfigureStyle style: ReaderModeStyle) {
-    // Persist the new style to the profile
-    let encodedStyle: [String: Any] = style.encodeAsDictionary()
-    profile.prefs.setObject(encodedStyle, forKey: ReaderModeProfileKeyStyle)
+    Preferences.General.readerModeSettings.value = style.encodeAsDictionary()
     // Change the reader mode style on all tabs that have reader mode active
     for tabIndex in 0..<tabManager.count {
       if let tab = tabManager[tabIndex] {
@@ -70,12 +69,7 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
       return
     }
 
-    var readerModeStyle = DefaultReaderModeStyle
-    if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
-      if let style = ReaderModeStyle(dict: dict as [String: AnyObject]) {
-        readerModeStyle = style
-      }
-    }
+    let readerModeStyle = ReaderModeStyle(dict: Preferences.General.readerModeSettings.value)
 
     let readerModeStyleViewController = ReaderModeStyleViewController(selectedStyle: readerModeStyle)
     readerModeStyleViewController.delegate = self
@@ -197,13 +191,8 @@ extension BrowserViewController {
   @objc func dynamicFontChanged(_ notification: Notification) {
     guard notification.name == .dynamicFontChanged else { return }
 
-    var readerModeStyle = DefaultReaderModeStyle
-    if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
-      if let style = ReaderModeStyle(dict: dict as [String: AnyObject]) {
-        readerModeStyle = style
-      }
-    }
-    readerModeStyle.fontSize = ReaderModeFontSize.defaultSize
+    var readerModeStyle = ReaderModeStyle(dict: Preferences.General.readerModeSettings.value)
+    readerModeStyle.fontSize = ReaderModeFontSize.`default`
     self.readerModeStyleViewController(
       ReaderModeStyleViewController(selectedStyle: readerModeStyle),
       didConfigureStyle: readerModeStyle)

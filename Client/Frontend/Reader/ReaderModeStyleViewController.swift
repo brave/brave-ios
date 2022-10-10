@@ -228,7 +228,7 @@ class ReaderModeStyleViewController: UIViewController {
     case .bigger:
       readerModeStyle.fontSize = readerModeStyle.fontSize.bigger()
     case .reset:
-      readerModeStyle.fontSize = ReaderModeFontSize.defaultSize
+      readerModeStyle.fontSize = ReaderModeFontSize.`default`
     }
     updateFontSizeButtons()
     delegate?.readerModeStyleViewController(self, didConfigureStyle: readerModeStyle)
