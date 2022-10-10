@@ -168,22 +168,13 @@ let DefaultReaderModeStyle = ReaderModeStyle(theme: .light, fontType: .sansSerif
 
 /// This struct captures the response from the Readability.js code.
 struct ReadabilityResult {
-  var domain = ""
-  var url = ""
   var content = ""
   var title = ""
   var credits = ""
 
   init?(object: AnyObject?) {
     if let dict = object as? NSDictionary {
-      if let uri = dict["uri"] as? NSDictionary {
-        if let url = uri["spec"] as? String {
-          self.url = url
-        }
-        if let host = uri["host"] as? String {
-          self.domain = host
-        }
-      }
+      
       if let content = dict["content"] as? String {
         self.content = content
       }
@@ -210,18 +201,14 @@ struct ReadabilityResult {
         return nil
       }
       
-      let domain = object["domain"]
-      let url = object["url"]
       let content = object["content"]
       let title = object["title"]
       let credits = object["credits"]
 
-      if domain == nil || url == nil || content == nil || title == nil || credits == nil {
+      if content == nil || title == nil || credits == nil {
         return nil
       }
 
-      self.domain = domain!
-      self.url = url!
       self.content = content!
       self.title = title!
       self.credits = credits!
@@ -233,7 +220,7 @@ struct ReadabilityResult {
 
   /// Encode to a dictionary, which can then for example be json encoded
   func encode() -> [String: Any] {
-    return ["domain": domain, "url": url, "content": content, "title": title, "credits": credits]
+    return ["content": content, "title": title, "credits": credits]
   }
 
   /// Encode to a JSON encoded string
