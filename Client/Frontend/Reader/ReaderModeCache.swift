@@ -3,6 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import Shared
+import BraveShared
+
+private let log = Logger.browserLogger
 
 private let DiskReaderModeCacheSharedInstance = DiskReaderModeCache()
 private let MemoryReaderModeCacheSharedInstance = MemoryReaderModeCache()
@@ -23,7 +27,7 @@ private class ReadabilityResultWrapper: NSObject {
 }
 
 protocol ReaderModeCache {
-  func put(_ url: URL, _ readabilityResult: ReadabilityResult) throws
+  func put(_ url: URL, _ readabilityResult: ReadabilityResult)
 
   func get(_ url: URL) throws -> ReadabilityResult
 
@@ -45,7 +49,7 @@ class MemoryReaderModeCache: ReaderModeCache {
     return MemoryReaderModeCacheSharedInstance
   }
 
-  func put(_ url: URL, _ readabilityResult: ReadabilityResult) throws {
+  func put(_ url: URL, _ readabilityResult: ReadabilityResult) {
     cache.setObject(ReadabilityResultWrapper(readabilityResult: readabilityResult), forKey: url as AnyObject)
   }
 
@@ -76,21 +80,26 @@ class DiskReaderModeCache: ReaderModeCache {
     return DiskReaderModeCacheSharedInstance
   }
 
-  func put(_ url: URL, _ readabilityResult: ReadabilityResult) throws {
+  func put(_ url: URL, _ readabilityResult: ReadabilityResult) {
     guard let (cacheDirectoryPath, contentFilePath) = cachePathsForURL(url) else {
-      throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+      log.error("No reader mode cache paths found")
+      return
     }
 
-    try FileManager.default.createDirectory(atPath: cacheDirectoryPath, withIntermediateDirectories: true, attributes: nil)
-    let string: String = readabilityResult.encode()
-    try string.write(toFile: contentFilePath, atomically: true, encoding: .utf8)
-    return
+    do {
+      try FileManager.default.createDirectory(atPath: cacheDirectoryPath, withIntermediateDirectories: true, attributes: nil)
+      let string: String = readabilityResult.toJSONString() ?? ""
+      try string.write(toFile: contentFilePath, atomically: true, encoding: .utf8)
+    } catch {
+      log.error("Failed to persist reader mode result: \(error)")
+    }
+    
   }
 
   func get(_ url: URL) throws -> ReadabilityResult {
     if let (_, contentFilePath) = cachePathsForURL(url), FileManager.default.fileExists(atPath: contentFilePath) {
       let string = try String(contentsOfFile: contentFilePath, encoding: .utf8)
-      if let value = ReadabilityResult(string: string) {
+      if let value = ReadabilityResult.from(string: string) {
         return value
       }
     }

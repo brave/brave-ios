@@ -167,78 +167,54 @@ struct ReaderModeStyle {
 let DefaultReaderModeStyle = ReaderModeStyle(theme: .light, fontType: .sansSerif, fontSize: ReaderModeFontSize.defaultSize)
 
 /// This struct captures the response from the Readability.js code.
-struct ReadabilityResult {
-  var content = ""
-  var title = ""
-  var credits = ""
-
-  init?(object: AnyObject?) {
-    if let dict = object as? NSDictionary {
-      
-      if let content = dict["content"] as? String {
-        self.content = content
-      }
-      if let title = dict["title"] as? String {
-        self.title = title
-      }
-      if let credits = dict["byline"] as? String {
-        self.credits = credits
-      }
-    } else {
+struct ReadabilityResult: Codable {
+  let content: String
+  let title: String?
+  let credits: String?
+  
+  private enum CodingKeys: String, CodingKey {
+    case content
+    case title
+    case credits = "byline"
+  }
+  
+  /// Returns a ReadabilityResult from a json object.
+  static func from(json: Any) -> Self? {
+    do {
+      let data = try JSONSerialization.data(withJSONObject: json)
+      return try JSONDecoder().decode(ReadabilityResult.self, from: data)
+    } catch {
+      log.warning("Failed to decode ReadabilityResult: \(error)")
       return nil
     }
   }
 
-  /// Initialize from a JSON encoded string
-  init?(string: String) {
-    
-    guard let data = string.data(using: .utf8) else {
-      return nil
-    }
-    
+  /// Returns a ReadabilityResult from a json string.
+  static func from(string: String) -> Self? {
     do {
-      guard let object = try JSONSerialization.jsonObject(with: data) as? [String: String] else {
+      guard let data = string.data(using: .utf8),
+              let object = try JSONSerialization.jsonObject(with: data) as? [String: String] else {
         return nil
       }
       
-      let content = object["content"]
-      let title = object["title"]
-      let credits = object["credits"]
-
-      if content == nil || title == nil || credits == nil {
-        return nil
-      }
-
-      self.content = content!
-      self.title = title!
-      self.credits = credits!
+      return Self.from(json: object)
     } catch {
       log.error("Failed to initialize json from a string: \(error)")
       return nil
     }
   }
 
-  /// Encode to a dictionary, which can then for example be json encoded
-  func encode() -> [String: Any] {
-    return ["content": content, "title": title, "credits": credits]
-  }
-
-  /// Encode to a JSON encoded string
-  func encode() -> String {
-    let dict: [String: Any] = self.encode()
-    
+  func toJSONString() -> String? {
     do {
-      let jsonData = try JSONSerialization.data(withJSONObject: dict)
-      
-      guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-        assertionFailure("Failed to encode a reader mode result")
-        return ""
+      let data = try JSONEncoder().encode(self)
+      guard let json = String(data: data, encoding: .utf8) else {
+        return nil
       }
       
-      return jsonString
+      return json
     } catch {
-      assertionFailure("Failed to encode a reader mode result")
-      return ""
+      assertionFailure("Failed to encode readable result data: \(error)")
+      return nil
     }
   }
 }
@@ -317,9 +293,8 @@ class ReaderModeScriptHandler: TabContentScript {
             handleReaderModeStateChange(readerModeState)
           }
         case .contentParsed:
-          if let readabilityResult = ReadabilityResult(object: msg["Value"] as AnyObject?) {
-            handleReaderContentParsed(readabilityResult)
-          }
+          guard let json = msg["Value"], let result = ReadabilityResult.from(json: json) else { return }
+          handleReaderContentParsed(result)
         }
       }
     }
