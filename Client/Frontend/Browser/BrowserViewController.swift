@@ -9,7 +9,6 @@ import Shared
 import Storage
 import SnapKit
 import XCGLogger
-import SwiftyJSON
 import Data
 import BraveShared
 import BraveCore

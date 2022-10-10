@@ -326,7 +326,7 @@ class LoginsScriptHandler: TabContentScript {
     }
 
     let json = JSON(jsonObj)
-    guard let jsonString = json.stringValue() else {
+    guard let jsonString = json.rawString(.utf8, options: []) else {
       return
     }
 

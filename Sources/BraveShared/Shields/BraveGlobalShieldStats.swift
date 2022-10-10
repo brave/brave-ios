@@ -4,7 +4,6 @@
 
 import Foundation
 import Strings
-import SwiftyJSON
 
 open class BraveGlobalShieldStats {
   public static let shared = BraveGlobalShieldStats()
