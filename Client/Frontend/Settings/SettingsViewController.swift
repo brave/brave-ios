@@ -379,14 +379,6 @@ class SettingsViewController: TableViewController {
     
     tabs.rows.append(autoCloseTabsRow)
     
-    let switchOpenTabSetting: Row = .boolRow(
-      title: Strings.Settings.switchToAnOpenTabSettingsTitle,
-      detailText: Strings.Settings.switchToAnOpenTabSettingsDescription,
-      option: Preferences.General.switchOpenTabs,
-      image: UIImage(braveSystemNamed: "brave.rectangle.on.rectangle")!.template)
-    
-    tabs.rows.append(switchOpenTabSetting)
-    
     return tabs
   }()
   
