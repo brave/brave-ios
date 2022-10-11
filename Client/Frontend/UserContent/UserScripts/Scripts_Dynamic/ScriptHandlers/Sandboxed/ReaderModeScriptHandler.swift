@@ -167,6 +167,10 @@ struct ReadabilityResult {
   var credits = ""
 
   init?(object: AnyObject?) {
+    guard JSONSerialization.isValidJSONObject(dict) { else
+      return nil
+    }
+    
     if let dict = object as? NSDictionary {
       if let uri = dict["uri"] as? NSDictionary {
         if let url = uri["spec"] as? String {
@@ -184,10 +188,6 @@ struct ReadabilityResult {
       }
       if let credits = dict["byline"] as? String {
         self.credits = credits
-      }
-      
-      if !JSONSerialization.isValidJSONObject(dict) {
-        return nil
       }
     } else {
       return nil
