@@ -29,6 +29,16 @@ class ProfileFileAccessor: FileAccessor {
     var rootPath: String
     let sharedContainerIdentifier = AppInfo.sharedContainerIdentifier
     if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: sharedContainerIdentifier) {
+      var isDirectory: ObjCBool = false
+
+      if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
+        do {
+          try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        } catch {
+          log.error("Unable to find the shared container directory and error while trying tpo create a new directory. ")
+        }
+      }
+      
       rootPath = url.path
     } else {
       log.error("Unable to find the shared container. Defaulting profile location to ~/Library/Application Support/ instead.")
