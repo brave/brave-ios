@@ -167,11 +167,11 @@ struct ReadabilityResult {
   var credits = ""
 
   init?(object: AnyObject?) {
-    guard JSONSerialization.isValidJSONObject(dict) { else
-      return nil
-    }
-    
     if let dict = object as? NSDictionary {
+      guard JSONSerialization.isValidJSONObject(dict) else {
+        return nil
+      }
+      
       if let uri = dict["uri"] as? NSDictionary {
         if let url = uri["spec"] as? String {
           self.url = url
