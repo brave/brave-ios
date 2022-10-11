@@ -171,13 +171,19 @@ struct PasswordEntryView: View {
           }
           .buttonStyle(BraveFilledButtonStyle(size: .normal))
           .disabled(!isPasswordValid)
-          .frame(maxWidth: .infinity)
-          .listRowInsets(.zero)
         }
         .padding()
         .padding(.vertical)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle(title)
+        .toolbar {
+          ToolbarItemGroup(placement: .cancellationAction) {
+            Button(action: { presentationMode.dismiss() }) {
+              Text(Strings.cancelButtonTitle)
+                .foregroundColor(Color(.braveOrange))
+            }
+          }
+        }
       }
     }
   }
