@@ -12,7 +12,6 @@ extension BrowserViewController {
       for: room,
       token: token,
       onEnterCall: { [weak tab] in
-        // TODO: Determine if we want to stop the load, close the tab, etc.
         tab?.webView?.stopLoading()
       },
       onExitCall: { [weak self] in
