@@ -125,6 +125,12 @@ class ScriptFactory {
       
     case .domainUserScript(let domainUserScript):
       resultingScript = try self.makeScript(for: domainUserScript)
+
+    case .engineSubframeScript(let url, let source):
+      var sourceWrapper = try makeScriptSource(of: .engineScriptWrapper)
+      sourceWrapper = sourceWrapper.replacingOccurrences(of: "$<scriplet>", with: source)
+      sourceWrapper = sourceWrapper.replacingOccurrences(of: "$<required_href>", with: url.absoluteString)
+      resultingScript = WKUserScript(source: sourceWrapper, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
       
     case .engineScript(_, let source, _):
       resultingScript = WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true, in: .page)

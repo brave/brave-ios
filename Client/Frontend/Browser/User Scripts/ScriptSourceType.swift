@@ -15,11 +15,14 @@ enum ScriptSourceType {
   /// This script farbles certian system methods to output slightly randomized output.
   /// This script has a dependency on `nacl`.
   case farblingProtection
+  /// This script wraps engine scripts and executes them for the correct frame
+  case engineScriptWrapper
 
   var fileName: String {
     switch self {
     case .nacl: return "nacl.min"
     case .farblingProtection: return "FarblingProtectionScript"
+    case .engineScriptWrapper: return "EngineScriptWrapper"
     }
   }
 

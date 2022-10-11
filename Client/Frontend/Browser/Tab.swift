@@ -135,12 +135,10 @@ class Tab: NSObject {
   var restoring: Bool = false
   var pendingScreenshot = false
   
-  typealias FrameEvaluation = (frameInfo: WKFrameInfo, source: String)
-  
-  /// A list of pending frames that are loaded per main frame
+  /// This object holds on to information regarding the current web page
   ///
-  /// We need this information in order to execute scripts on a per-frame basis once navigation is comitted and finished
-  var frameEvaluations: [URL: [FrameEvaluation]] = [:]
+  /// The page data is cleared when the user leaves the page (i.e. when the main frame url changes)
+  var currentPageData: PageData?
   
   /// The url set after a successful navigation. This will also set the `url` property.
   ///
@@ -249,7 +247,7 @@ class Tab: NSObject {
 
   fileprivate var contentScriptManager = TabContentScriptManager()
   private var userScripts = Set<UserScriptManager.ScriptType>()
-  private var customUserScripts = Set<UserScriptType>()
+  private(set) var customUserScripts = Set<UserScriptType>()
 
   fileprivate var configuration: WKWebViewConfiguration?
 

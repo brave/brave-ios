@@ -17,7 +17,9 @@ enum UserScriptType: Hashable {
   case farblingProtection(etld: String)
   /// Scripts specific to certain domains
   case domainUserScript(DomainUserScript)
-  /// Any custom script
+  /// A set of engine scripts for all subframes
+  case engineSubframeScript(url: URL, source: String)
+  /// An engine script on the main frame
   case engineScript(url: URL, source: String, order: Int)
 
   /// The order in which we want to inject the scripts
@@ -27,7 +29,8 @@ enum UserScriptType: Hashable {
     case .nacl: return 1
     case .farblingProtection: return 2
     case .domainUserScript: return 3
-    case .engineScript(_, _, let order): return 4 + order
+    case .engineSubframeScript: return 4
+    case .engineScript(_, _, let order): return 5 + order
     }
   }
 }

@@ -221,6 +221,12 @@ extension BrowserViewController: WKNavigationDelegate {
     }
     
     if let mainDocumentURL = navigationAction.request.mainDocumentURL {
+      if mainDocumentURL != tab?.currentPageData?.mainFrameURL {
+        // Clear the current page data if the page changes.
+        // Do this before anything else so that we have a clean slate.
+        tab?.currentPageData = PageData(mainFrameURL: mainDocumentURL)
+      }
+      
       let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
       // Enable safe browsing (frodulent website warnings)
       webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
@@ -280,13 +286,11 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     // Check if custom user scripts must be added to or removed from the web view.
-    let scripts = UserScriptHelper.getUserScriptTypes(
-      for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default
-    )
-    
     // TODO: Convert this to `UserScriptManagerType` so we can inject all scripts at once.
     // IE: De-Amp, RequestBlocking + These.
-    tab?.setCustomUserScript(scripts: scripts)
+    if let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default) {
+      tab?.setCustomUserScript(scripts: scriptTypes)
+    }
     
     // Load engine scripts for this request and add it to the tab
     // We can't execute them yet because the page is not yet ready
@@ -298,18 +302,11 @@ extension BrowserViewController: WKNavigationDelegate {
       do {
         let sources = try AdBlockStats.shared.makeEngineScriptSouces(for: url)
         
-        var evaluations: [Tab.FrameEvaluation] = sources.cssInjectScripts.map { source in
-          return Tab.FrameEvaluation(frameInfo: frameInfo, source: source)
+        let evaluations = sources.cssInjectScripts.map { source -> PageData.FrameEvaluation in
+          return PageData.FrameEvaluation(frameInfo: frameInfo, source: source)
         }
         
-        // We add general scripts only from non-main frames. Main frame scripts will be injected rather than executed
-        if !frameInfo.isMainFrame {
-          evaluations.append(contentsOf: sources.generalScripts.map({ source in
-            return Tab.FrameEvaluation(frameInfo: frameInfo, source: source)
-          }))
-        }
-        
-        tab?.frameEvaluations[url] = evaluations
+        tab?.currentPageData?.frameEvaluations[url] = evaluations
       } catch {
         assertionFailure()
       }
@@ -433,12 +430,16 @@ extension BrowserViewController: WKNavigationDelegate {
     let responseURL = response.url
     let tab = tab(for: webView)
     
-    /// Check if we upgraded to https and if so we need to update the url of frame evaluations
-    if let url = responseURL, var components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.scheme == "https" {
-      components.scheme = "http"
-      if tab?.frameEvaluations[url] == nil, let downgradedURL = components.url {
-        tab?.frameEvaluations[url] = tab?.frameEvaluations[downgradedURL]
-      }
+    // Check if we upgraded to https and if so we need to update the url of frame evaluations
+    if let responseURL = responseURL {
+      tab?.currentPageData?.upgradeFrameEvaluations(forResponseURL: responseURL)
+    }
+    
+    // We also add subframe urls in case a frame upgraded to https
+    if let tab = tab, let additionalTypes = tab.currentPageData?.makeAdditionalScriptTypes(for: navigationResponse), !additionalTypes.isEmpty {
+      var scriptTypes = tab.customUserScripts
+      scriptTypes.formUnion(additionalTypes)
+      tab.setCustomUserScript(scripts: scriptTypes)
     }
 
     if let tab = tab,
@@ -633,20 +634,11 @@ extension BrowserViewController: WKNavigationDelegate {
       if tab.walletEthProvider != nil {
         tab.emitEthereumEvent(.connect)
       }
-
-      // Clear all the frame evaluations.
-      // We don't want to execute scripts that don't belong to this site
-      tab.frameEvaluations.removeAll()
     }
 
     // Added this method to determine long press menu actions better
     // Since these actions are depending on tabmanager opened WebsiteCount
     updateToolbarUsingTabManager(tabManager)
-  }
-  
-  public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    let tab = tabManager[webView]
-    tab?.frameEvaluations.removeAll()
   }
 
   public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
