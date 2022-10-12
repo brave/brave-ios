@@ -399,6 +399,7 @@
 				2F69320A260D021D00ECEB38 /* BrowserIntentsDebug.entitlements */,
 				2F6931CD260CFB5300ECEB38 /* BrowserIntents.entitlements */,
 				2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */,
+				27D67621282DAD3700BCE16E /* BrowserIntents.intentdefinition */,
 				2F6931B8260CFB3700ECEB38 /* Info.plist */,
 			);
 			path = BrowserIntents;
@@ -484,7 +485,6 @@
 			isa = PBXGroup;
 			children = (
 				270ECFC628381E270089B8B7 /* brave-ios */,
-				27D67621282DAD3700BCE16E /* BrowserIntents.intentdefinition */,
 				0A60A1882358AF9E00953CA8 /* Brave.xctestplan */,
 				0A66550D23E9EA540047EF2A /* Brave_iPad.xctestplan */,
 				0A24F7DE233E8EF2004D2F3A /* Config */,
