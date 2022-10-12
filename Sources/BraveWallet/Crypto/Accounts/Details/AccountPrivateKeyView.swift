@@ -19,8 +19,12 @@ struct AccountPrivateKeyView: View {
 
   @Environment(\.pixelLength) private var pixelLength
   
-  private var isPasswordValid: Bool {
-    !password.isEmpty
+  private var isShowHideButtonDisabled: Bool {
+    if key != nil {
+      return false
+    } else {
+      return password.isEmpty
+    }
   }
   
   private func validateAndShowPrivateKey() {
@@ -82,7 +86,7 @@ struct AccountPrivateKeyView: View {
           Text(isKeyVisible ? Strings.Wallet.hidePrivateKeyButtonTitle : Strings.Wallet.showPrivateKeyButtonTitle)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .normal))
-        .disabled(!isPasswordValid)
+        .disabled(isShowHideButtonDisabled)
       }
       .padding()
     }
