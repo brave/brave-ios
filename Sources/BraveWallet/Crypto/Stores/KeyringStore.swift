@@ -150,11 +150,12 @@ public class KeyringStore: ObservableObject {
     Task { @MainActor in // fetch all KeyringInfo for all coin types
       let selectedCoin = await walletService.selectedCoin()
       let selectedAccountAddress = await keyringService.selectedAccount(selectedCoin)
-      self.allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+      let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       self.defaultAccounts = await keyringService.defaultAccounts(for: WalletConstants.supportedCoinTypes)
       if let defaultKeyring = allKeyrings.first(where: { $0.id == BraveWallet.DefaultKeyringId }) {
         self.defaultKeyring = defaultKeyring
       }
+      self.allKeyrings = allKeyrings
       if let selectedAccountKeyring = allKeyrings.first(where: { $0.coin == selectedCoin }) {
         if self.selectedAccount.address != selectedAccountAddress {
           if let selectedAccount = selectedAccountKeyring.accountInfos.first(where: { $0.address == selectedAccountAddress }) {
