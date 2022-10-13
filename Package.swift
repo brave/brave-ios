@@ -182,7 +182,7 @@ let package = Package(
         .copy("WebFilters/ShieldStats/Adblock/Resources/ABPFilterParserData.dat"),
         .copy("WebFilters/ShieldStats/Httpse/httpse.leveldb.tgz"),
       ],
-      plugins: ["CurrentBundleGenPlugin", "LoggerPlugin"]
+      plugins: ["LoggerPlugin"]
     ),
     .target(
       name: "HTTPSE",

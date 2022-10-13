@@ -33,7 +33,7 @@ extension AppDelegate {
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-  private let log = Logger(subsystem: "com.brave.ios", category: "app-delegate")
+  private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "app-delegate")
   
   var window: UIWindow?
   lazy var braveCore: BraveCoreMain = {
@@ -126,7 +126,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }()
       
       // Every brave-core log has public visibiity, otherwise nothing will be recorded.
-      let braveCoreLogger = Logger(subsystem: "com.brave.ios", category: "brave-core")
+      let braveCoreLogger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "brave-core")
       braveCoreLogger.log(level: level, "\(message)")
       return true
     }

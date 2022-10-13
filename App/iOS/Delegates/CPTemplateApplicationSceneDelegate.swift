@@ -12,7 +12,7 @@ import os.log
 
 class CarplayTemplateApplicationSceneDelegate: NSObject {
   private static let configurationName = "CPTemplateSceneConfiguration"
-  private let log = Logger(subsystem: "com.brave.ios", category: "carplay-delegate")
+  private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "carplay-delegate")
 
   // MARK: UISceneDelegate
 

@@ -13,7 +13,7 @@ import WebKit
 import os.log
 
 // TODO: Move this log to the Rewards/Ads target once we move Rewards/Ads files.
-let adsRewardsLog = Logger(subsystem: "com.brave.ios", category: "ads-rewards")
+let adsRewardsLog = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ads-rewards")
 
 extension BrowserViewController {
   func updateRewardsButtonState() {

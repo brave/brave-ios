@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   private var cancellables: Set<AnyCancellable> = []
   
-  private let log = Logger(subsystem: "com.brave.ios", category: "scene-delegate")
+  private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "scene-delegate")
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }

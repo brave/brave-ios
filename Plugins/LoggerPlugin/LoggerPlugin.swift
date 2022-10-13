@@ -20,9 +20,9 @@ struct LoggerPlugin: BuildToolPlugin {
     import Foundation
     import os.log
     
-    public extension Logger {
+    extension Logger {
       static var module: Logger {
-        .init(subsystem: "\\(Bundle.main.bundleIdentifier ?? "com.brave.ios")", category: "\(target.moduleName.lowercased())")
+        .init(subsystem: "\\(Bundle.main.bundleIdentifier ?? "com.brave.ios")", category: "\(target.moduleName)")
       }
     }
     """
