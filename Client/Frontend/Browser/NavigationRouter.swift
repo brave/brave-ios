@@ -103,7 +103,11 @@ public enum NavigationPath: Equatable {
     switch path {
     case .unknown, .search:
       // Search
-      bvc.focusURLBar()
+      if let url = bvc.tabManager.selectedTab?.url, InternalURL(url)?.isAboutHomeURL == true {
+        bvc.focusURLBar()
+      } else {
+        bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+      }
     case .newTab:
       bvc.openBlankNewTab(attemptLocationFieldFocus: true, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
     case .newPrivateTab:
@@ -122,6 +126,8 @@ public enum NavigationPath: Equatable {
       bvc.navigationHelper.openPlaylist()
     case .wallet:
       bvc.navigationHelper.openWallet()
+    case .scanQRCode:
+      bvc.scanQRCode()
     @unknown default:
       assertionFailure()
       break

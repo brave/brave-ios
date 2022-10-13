@@ -134,6 +134,8 @@ extension WidgetShortcut {
       return Strings.Widgets.searchShortcutTitle
     case .wallet:
       return Strings.Widgets.walletShortcutTitle
+    case .scanQRCode:
+      return Strings.QRCode
     @unknown default:
       assertionFailure()
       return ""
@@ -161,6 +163,8 @@ extension WidgetShortcut {
       return Image(braveSystemName: "brave.magnifyingglass")
     case .wallet:
       return Image(braveSystemName: "brave.wallet")
+    case .scanQRCode:
+      return Image(braveSystemName: "brave.qr-code")
     @unknown default:
       assertionFailure()
       return Image(systemName: "xmark.octagon")
@@ -219,7 +223,7 @@ struct ShortcutsWidget_Previews: PreviewProvider {
       .previewContext(WidgetPreviewContext(family: .systemMedium))
     ShortcutsView(slots: [.downloads, .history, .playlist])
       .previewContext(WidgetPreviewContext(family: .systemMedium))
-    ShortcutsView(slots: [.wallet, .search, .newTab])
+    ShortcutsView(slots: [.wallet, .search, .scanQRCode])
       .previewContext(WidgetPreviewContext(family: .systemMedium))
   }
 }

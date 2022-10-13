@@ -158,6 +158,16 @@
 					<key>INEnumValueName</key>
 					<string>wallet</string>
 				</dict>
+				<dict>
+					<key>INEnumValueDisplayName</key>
+					<string>Scan QR Code</string>
+					<key>INEnumValueDisplayNameID</key>
+					<string>qKrzyX</string>
+					<key>INEnumValueIndex</key>
+					<integer>9</integer>
+					<key>INEnumValueName</key>
+					<string>scanQRCode</string>
+				</dict>
 			</array>
 		</dict>
 	</array>
