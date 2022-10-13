@@ -20,9 +20,9 @@ struct SignTransactionView: View {
   var navigationTitle: String {
     switch request {
     case .signTransaction:
-      return "Sign Transaction"
+      return Strings.Wallet.signTransactionTitle
     case .signAllTransactions:
-      return "Sign All Transactions"
+      return Strings.Wallet.signAllTransactionsTitle
     }
   }
   
@@ -42,7 +42,7 @@ struct SignTransactionView: View {
           }
           onDismiss()
         }) {
-          Text("Reject")
+          Text(Strings.Wallet.rejectTransactionButtonTitle)
         }
           .buttonStyle(BraveFilledButtonStyle(size: .large))
       )

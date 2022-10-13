@@ -325,7 +325,7 @@ class SolanaProviderScriptHandler: TabContentScript {
   
   @MainActor private func emitConnectEvent(publicKey: String) async {
     if let webView = tab?.webView {
-      let script = "window.solana.emit('connect', new solanaWeb3.PublicKey('\(publicKey)'))"
+      let script = "window.solana.emit('connect', new solanaWeb3.PublicKey('\(publicKey.htmlEntityEncodedString)'))"
       await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
     }
   }
