@@ -164,7 +164,8 @@ class TabTrayController: LoadingViewController {
   private var searchBarView: TabTraySearchBar?
   let tabTraySearchController = UISearchController(searchResultsController: nil)
 
-  private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(title: Strings.noSearchResultsfound)
+  private lazy var emptyStateOverlayView: UIView = EmptyStateOverlayView(
+    overlayDetails: EmptyOverlayStateDetails(title: Strings.noSearchResultsfound))
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
@@ -279,6 +280,13 @@ class TabTrayController: LoadingViewController {
       })
   
     reloadOpenTabsSession()
+  }
+  
+  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    
+      tabSyncView.setNeedsLayout()
+      tabSyncView.layoutIfNeeded()
   }
   
   override func loadView() {
