@@ -97,15 +97,24 @@ class EmptyStateOverlayView: UIView {
     super.layoutSubviews()
     
     doLayout(details: overlayDetails)
+    
+    let heightOffset = traitCollection.verticalSizeClass == .compact ? 0 : -50
+    
+    containerView.snp.remakeConstraints {
+      $0.centerX.equalToSuperview()
+      $0.centerY.equalToSuperview().offset(heightOffset)
+    }
   }
   
   private func doLayout(details: EmptyOverlayStateDetails) {
     backgroundColor = .secondaryBraveBackground
+    
+    let heightOffset = traitCollection.verticalSizeClass == .compact ? 0 : -50
 
     addSubview(containerView)
     containerView.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.centerY.equalToSuperview().offset(traitCollection.verticalSizeClass == .compact ? 0 : -50)
+      $0.centerY.equalToSuperview().offset(heightOffset)
       $0.width.equalToSuperview().multipliedBy(0.75)
       $0.size.lessThanOrEqualToSuperview()
     }
@@ -115,22 +124,22 @@ class EmptyStateOverlayView: UIView {
       containerView.addArrangedSubview(iconImageView)
       
       iconImageView.snp.makeConstraints {
-        $0.size.equalTo(traitCollection.verticalSizeClass == .compact ? 40 : 60)
+        $0.size.equalTo(45)
        }
       
-      containerView.setCustomSpacing(35, after: iconImageView)
+      containerView.setCustomSpacing(25, after: iconImageView)
     }
     
     if let title = details.title {
       informationLabel.text = title
       containerView.addArrangedSubview(informationLabel)
-      containerView.setCustomSpacing(25, after: informationLabel)
+      containerView.setCustomSpacing(20, after: informationLabel)
     }
     
     if let description = details.description {
       descriptionLabel.text = description
       containerView.addArrangedSubview(descriptionLabel)
-      containerView.setCustomSpacing(45, after: descriptionLabel)
+      containerView.setCustomSpacing(35, after: descriptionLabel)
     }
     
     if let buttonText = details.buttonText {

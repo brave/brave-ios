@@ -282,13 +282,6 @@ class TabTrayController: LoadingViewController {
     reloadOpenTabsSession()
   }
   
-  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-    super.viewWillTransition(to: size, with: coordinator)
-    
-      tabSyncView.setNeedsLayout()
-      tabSyncView.layoutIfNeeded()
-  }
-  
   override func loadView() {
     createTypeSelectorItems()
     layoutTabTray()
