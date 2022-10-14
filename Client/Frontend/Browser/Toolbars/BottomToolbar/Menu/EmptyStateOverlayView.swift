@@ -115,7 +115,7 @@ class EmptyStateOverlayView: UIView {
       containerView.addArrangedSubview(iconImageView)
       
       iconImageView.snp.makeConstraints {
-        $0.size.equalTo(60)
+        $0.size.equalTo(traitCollection.verticalSizeClass == .compact ? 40 : 60)
        }
       
       containerView.setCustomSpacing(35, after: iconImageView)
