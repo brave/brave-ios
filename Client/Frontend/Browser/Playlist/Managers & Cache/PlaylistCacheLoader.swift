@@ -565,7 +565,13 @@ extension PlaylistWebLoader: WKNavigationDelegate {
       webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
     }
 
-    if let customUserScripts = tab.currentPageData?.makeUserScriptTypes(for: navigationAction, options: .playlistCacheLoader) {
+    if let requestURL = navigationAction.request.url,
+       let targetFrame = navigationAction.targetFrame,
+       let customUserScripts = tab.currentPageData?.makeUserScriptTypes(
+        forRequestURL: requestURL,
+        isForMainFrame: targetFrame.isMainFrame,
+        options: .playlistCacheLoader
+       ) {
       tab.setCustomUserScript(scripts: customUserScripts)
     }
 
@@ -629,6 +635,16 @@ extension PlaylistWebLoader: WKNavigationDelegate {
       let internalURL = InternalURL(responseURL),
       internalURL.isSessionRestore {
       tab.shouldClassifyLoadsForAds = false
+    }
+    
+    // We also add subframe urls in case a frame upgraded to https
+    if let responseURL = responseURL,
+       let scriptTypes = tab.currentPageData?.makeUserScriptTypes(
+        forResponseURL: responseURL,
+        isForMainFrame: navigationResponse.isForMainFrame,
+        options: .playlistCacheLoader
+       ) {
+      tab.setCustomUserScript(scripts: scriptTypes)
     }
 
     var request: URLRequest?

@@ -80,14 +80,20 @@ class AdBlockEngineManagerTests: XCTestCase {
       await engineManager.compileResources()
       
       Task { @MainActor in
-        XCTAssertEqual(stats.engines.count, 3)
-        let sources = try stats.makeEngineScriptSouces(for: URL(string:  "https://stackoverflow.com")!)
-        XCTAssertEqual(sources.generalScripts.count, 0)
-        XCTAssertEqual(sources.cssInjectScripts.count, 3)
+        XCTAssertEqual(stats.cachedEngines.count, 3)
+        let types = stats.makeEngineScriptTypes(frameURL: URL(string:  "https://stackoverflow.com")!, isMainFrame: true)
+        // We should have no scripts injected
+        XCTAssertEqual(types.count, 0)
         
-        let sources2 = try stats.makeEngineScriptSouces(for: URL(string:  "https://reddit.com")!)
-        XCTAssertEqual(sources2.generalScripts.count, 1)
-        XCTAssertEqual(sources2.cssInjectScripts.count, 3)
+        let types2 = stats.makeEngineScriptTypes(frameURL: URL(string:  "https://reddit.com")!, isMainFrame: true)
+        // We should have 1 engine script injected
+        XCTAssertEqual(types2.count, 1)
+        XCTAssertTrue(types2.contains(where: { scriptType in
+          switch scriptType {
+          case .engineScript: return true
+          default: return false
+          }
+        }))
         expectation.fulfill()
       }
     }

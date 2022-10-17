@@ -247,7 +247,7 @@ class Tab: NSObject {
 
   fileprivate var contentScriptManager = TabContentScriptManager()
   private var userScripts = Set<UserScriptManager.ScriptType>()
-  private(set) var customUserScripts = Set<UserScriptType>()
+  private var customUserScripts = Set<UserScriptType>()
 
   fileprivate var configuration: WKWebViewConfiguration?
 

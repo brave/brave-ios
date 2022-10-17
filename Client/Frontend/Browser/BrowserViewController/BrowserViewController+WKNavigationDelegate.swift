@@ -286,30 +286,18 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     // Check if custom user scripts must be added to or removed from the web view.
-    // TODO: Convert this to `UserScriptManagerType` so we can inject all scripts at once.
-    // IE: De-Amp, RequestBlocking + These.
-    if let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(for: navigationAction, options: isPrivateBrowsing ? .privateBrowsing : .default) {
+    if let targetFrame = navigationAction.targetFrame,
+       let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(
+        forRequestURL: url,
+        isForMainFrame: targetFrame.isMainFrame,
+        options: isPrivateBrowsing ? .privateBrowsing : .default
+       ) {
       tab?.setCustomUserScript(scripts: scriptTypes)
     }
     
-    // Load engine scripts for this request and add it to the tab
-    // We can't execute them yet because the page is not yet ready
-    // But we can't load them later because we lose the frame information
-    // So we have to store it on the tab for now and execute them later
-    // They will be executed on `SiteStateListenerContentHelper`
-    // which will inform us of a frame load
-    if let frameInfo = navigationAction.targetFrame {
-      do {
-        let sources = try AdBlockStats.shared.makeEngineScriptSouces(for: url)
-        
-        let evaluations = sources.cssInjectScripts.map { source -> PageData.FrameEvaluation in
-          return PageData.FrameEvaluation(frameInfo: frameInfo, source: source)
-        }
-        
-        tab?.currentPageData?.frameEvaluations[url] = evaluations
-      } catch {
-        assertionFailure()
-      }
+    if let targetFrame = navigationAction.targetFrame {
+      // Add the frame info so that we can execute scripts later on
+      tab?.currentPageData?.framesInfo[url] = targetFrame
     }
 
     // Brave Search logic.
@@ -426,20 +414,24 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+    let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let response = navigationResponse.response
     let responseURL = response.url
     let tab = tab(for: webView)
     
     // Check if we upgraded to https and if so we need to update the url of frame evaluations
     if let responseURL = responseURL {
-      tab?.currentPageData?.upgradeFrameEvaluations(forResponseURL: responseURL)
+      tab?.currentPageData?.upgradeFrames(forResponseURL: responseURL)
     }
     
     // We also add subframe urls in case a frame upgraded to https
-    if let tab = tab, let additionalTypes = tab.currentPageData?.makeAdditionalScriptTypes(for: navigationResponse), !additionalTypes.isEmpty {
-      var scriptTypes = tab.customUserScripts
-      scriptTypes.formUnion(additionalTypes)
-      tab.setCustomUserScript(scripts: scriptTypes)
+    if let responseURL = responseURL,
+       let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(
+        forResponseURL: responseURL,
+        isForMainFrame: navigationResponse.isForMainFrame,
+        options: isPrivateBrowsing ? .privateBrowsing : .default
+       ) {
+      tab?.setCustomUserScript(scripts: scriptTypes)
     }
 
     if let tab = tab,

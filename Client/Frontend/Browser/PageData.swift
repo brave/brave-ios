@@ -5,91 +5,136 @@
 
 import Foundation
 import WebKit
+import Data
+import BraveShared
+import BraveCore
+import Shared
 
 /// The data for the current web-page which is needed for loading and executing privacy scripts
 ///
 /// Since frames may be loaded as the user scrolls which may need additional scripts to be injected,
 /// We cache information about frames in order to prevent excessive reloading of scripts.
 struct PageData {
-  typealias FrameEvaluation = (frameInfo: WKFrameInfo, source: String)
+  /// Object that represent the settings when returning deomian script types.
+  struct DomainScriptOptions: OptionSet {
+    let rawValue: Int
+
+    /// Wether or not we should persist shield settings
+    static let persistShieldSettings = DomainScriptOptions(rawValue: 1 << 0)
+
+    /// These settings are tuned for a regular browsing session:
+    /// - Persist shield settings
+    static let `default`: DomainScriptOptions = [persistShieldSettings]
+
+    /// These settings are tuned for a private browsing session:
+    /// - Does not persist shield settings
+    static let privateBrowsing: DomainScriptOptions = []
+
+    /// These options are tuned for the `PlaylistCacheLoader`:
+    /// - Does not persist shield settings
+    static let playlistCacheLoader: DomainScriptOptions = []
+  }
   
   /// The url of the page (i.e. main frame)
-  let mainFrameURL: URL
-  
-  /// A list of pending frames that are loaded for this web-page
-  ///
-  /// We need this information in order to execute scripts on a per-frame basis once navigation is comitted and finished
-  var frameEvaluations: [URL: [FrameEvaluation]] = [:]
-  
+  private(set) var mainFrameURL: URL
   /// A list of all currently available subframes for this current page
   /// These are loaded dyncamically as the user scrolls through the page
-  var allSubframeURLs: Set<URL> = []
+  private var allSubframeURLs: Set<URL> = []
+  /// The stats class to get the engine data from
+  private var adBlockStats: AdBlockStats
+  /// A list of known frames for this page
+  var framesInfo: [URL: WKFrameInfo] = [:]
   
-  /// Check if we upgraded to https and if so we need to update the url of frame evaluations
-  mutating func upgradeFrameEvaluations(forResponseURL responseURL: URL) {
-    if var components = URLComponents(url: responseURL, resolvingAgainstBaseURL: false), components.scheme == "https" {
-      components.scheme = "http"
-      if frameEvaluations[responseURL] == nil, let downgradedURL = components.url {
-        frameEvaluations[responseURL] = frameEvaluations[downgradedURL]
-      }
-    }
+  init(mainFrameURL: URL, adBlockStats: AdBlockStats = AdBlockStats.shared) {
+    self.mainFrameURL = mainFrameURL
+    self.adBlockStats = adBlockStats
   }
   
-  /// Return all subframe user scripts that are already known for this page.
-  ///
-  /// Since we may load more frames as we scroll we have to cache the subframe urls so we don't reload scripts too often on page reloads.
-  private func makeSubframeEngineScripts() -> Set<UserScriptType> {
-    let scriptTypes = allSubframeURLs.flatMap { url -> [UserScriptType] in
-      do {
-        return try makeSubframeScripts(for: url)
-      } catch {
-        assertionFailure()
-        return []
-      }
-    }
-    
-    return Set(scriptTypes)
-  }
-  
-  private func makeSubframeScripts(for url: URL) throws -> [UserScriptType] {
-    let sources = try AdBlockStats.shared.makeEngineScriptSouces(for: url)
-    
-    return sources.generalScripts.map { source -> UserScriptType in
-      return .engineSubframeScript(url: url, source: source)
-    }
-  }
-  
-  mutating func makeUserScriptTypes(for navigationAction: WKNavigationAction, options: UserScriptHelper.DomainScriptOptions) -> Set<UserScriptType> {
-    if navigationAction.targetFrame?.isMainFrame == false, let url = navigationAction.request.url {
+  /// This method builds all the user scripts that should be included for this page
+  mutating func makeUserScriptTypes(forRequestURL requestURL: URL, isForMainFrame: Bool, options: DomainScriptOptions) -> Set<UserScriptType>? {
+    if !isForMainFrame {
       // We need to add any non-main frame urls to our site data
       // We will need this to construct all non-main frame scripts
-      allSubframeURLs.insert(url)
+      allSubframeURLs.insert(requestURL)
     }
     
-    var scriptTypes = UserScriptHelper.getUserScriptTypes(
-      for: navigationAction, options: options
-    )
-    
-    let additionalTypes = makeSubframeEngineScripts()
-    scriptTypes.formUnion(additionalTypes)
-    
-    return scriptTypes
+    return makeUserScriptTypes(options: options)
   }
   
-  mutating func makeAdditionalScriptTypes(for navigationResponse: WKNavigationResponse) -> Set<UserScriptType>? {
-    // We also add subframe urls in case a frame upgraded to https
-    guard !navigationResponse.isForMainFrame, let url = navigationResponse.response.url, !allSubframeURLs.contains(url) else {
+  /// A new list of scripts is returned only if a change is detected in the response (for example an HTTPs upgrade).
+  /// In some cases (like during an https upgrade) the scripts may change on the response. So we need to update the user scripts
+  mutating func makeUserScriptTypes(forResponseURL responseURL: URL, isForMainFrame: Bool, options: DomainScriptOptions) -> Set<UserScriptType>? {
+    if isForMainFrame {
+      // If it's the main frame url that was upgraded,
+      // we need to update it and rebuild the types
+      guard mainFrameURL != responseURL else { return nil }
+      mainFrameURL = responseURL
+      
+      // And now we rebuild the scripts and set them
+      return makeUserScriptTypes(options: options)
+    } else if !allSubframeURLs.contains(responseURL) {
+      // first try to remove the old unwanted `http` frame URL
+      if var components = URLComponents(url: responseURL, resolvingAgainstBaseURL: false), components.scheme == "https" {
+        components.scheme = "http"
+        if let downgradedURL = components.url {
+          allSubframeURLs.remove(downgradedURL)
+        }
+      }
+      
+      // Now add the new subframe url
+      allSubframeURLs.insert(responseURL)
+    } else {
+      // Nothing changed. Return nil
       return nil
     }
     
-    // This probably means that one of the subframe urls was upgraded to https
-    allSubframeURLs.insert(url)
-    
-    do {
-      return try Set(makeSubframeScripts(for: url))
-    } catch {
-      assertionFailure(error.localizedDescription)
-      return nil
+    // And now we rebuild the scripts and set them
+    return makeUserScriptTypes(options: options)
+  }
+  
+  /// Check if we upgraded to https and if so we need to update the url of frame evaluations
+  mutating func upgradeFrames(forResponseURL responseURL: URL) {
+    if var components = URLComponents(url: responseURL, resolvingAgainstBaseURL: false), components.scheme == "https" {
+      components.scheme = "http"
+      if framesInfo[responseURL] == nil, let downgradedURL = components.url {
+        framesInfo[responseURL] = framesInfo[downgradedURL]
+      }
     }
+  }
+  
+  mutating private func makeUserScriptTypes(options: DomainScriptOptions) -> Set<UserScriptType> {
+    var userScriptTypes: Set<UserScriptType> = [.siteStateListener]
+
+    // Handle dynamic domain level scripts on the main document.
+    // These are scripts that change depending on the domain and the main document
+    let domainForShields = Domain.getOrCreate(forUrl: mainFrameURL, persistent: options.contains(.persistShieldSettings))
+    let isFPProtectionOn = domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
+    // Add the `farblingProtection` script if needed
+    // Note: The added farbling protection script based on the document url, not the frame's url.
+    // It is also added for every frame, including subframes.
+    if isFPProtectionOn, let etldP1 = mainFrameURL.baseDomain {
+      userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
+      userScriptTypes.insert(.farblingProtection(etld: etldP1))
+    }
+    
+    // Handle dynamic domain level scripts on the request that don't use shields
+    // This shield is always on and doesn't need sheild settings
+    if let domainUserScript = DomainUserScript(for: mainFrameURL) {
+      userScriptTypes.insert(.domainUserScript(domainUserScript))
+    }
+    
+    // Add engine scripts for the main frame
+    userScriptTypes = userScriptTypes.union(
+      adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true)
+    )
+    
+    // Add engine scripts for all of the known sub-frames
+    for frameURL in allSubframeURLs {
+      userScriptTypes = userScriptTypes.union(
+        adBlockStats.makeEngineScriptTypes(frameURL: frameURL, isMainFrame: false)
+      )
+    }
+    
+    return userScriptTypes
   }
 }

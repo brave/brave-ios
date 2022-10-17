@@ -382,6 +382,7 @@ public class BrowserViewController: UIViewController {
   override public func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     ScriptFactory.shared.clearCaches()
+    AdBlockStats.shared.clearCaches()
 
     for tab in tabManager.tabsForCurrentMode where tab.id != tabManager.selectedTab?.id {
       tab.newTabPageViewController = nil
@@ -2371,6 +2372,7 @@ extension BrowserViewController: TabDelegate {
       ReadyStateScriptHandler(tab: tab),
       DeAmpScriptHandler(tab: tab),
       SiteStateListenerScriptHandler(tab: tab),
+      CosmeticFiltersScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,

@@ -16,13 +16,16 @@ enum ScriptSourceType {
   /// This script has a dependency on `nacl`.
   case farblingProtection
   /// This script wraps engine scripts and executes them for the correct frame
-  case engineScriptWrapper
+  case frameCheckWrapper
+  /// A script that polls selectors from a frame and sends it to iOS which then returns the hidden elements
+  case selectorsPoller
 
   var fileName: String {
     switch self {
     case .nacl: return "nacl.min"
     case .farblingProtection: return "FarblingProtectionScript"
-    case .engineScriptWrapper: return "EngineScriptWrapper"
+    case .frameCheckWrapper: return "FrameCheckWrapper"
+    case .selectorsPoller: return "SelectorsPollerScript"
     }
   }
 
