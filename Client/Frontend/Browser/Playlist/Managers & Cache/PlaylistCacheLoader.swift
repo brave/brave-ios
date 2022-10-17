@@ -338,41 +338,6 @@ class PlaylistWebLoader: UIView {
     $0.webView?.scrollView.layer.masksToBounds = true
   }
 
-  private let playlistDetectorScript = { () -> WKUserScript? in
-    guard let path = Bundle.current.path(forResource: "PlaylistDetectorScript", ofType: "js"), let source = try? String(contentsOfFile: path) else {
-      log.error("Failed to load PlaylistDetector.js")
-      return nil
-    }
-
-    var alteredSource = source
-    let token = UserScriptManager.securityToken
-
-    let replacements = [
-      "$<PlaylistDetector>": "PlaylistDetector_\(token)",
-      "$<security_token>": "\(token)",
-      "$<sendMessage>": "playlistDetector_sendMessage_\(token)",
-      "$<handler>": PlaylistWebLoaderContentHelper.messageHandlerName,
-      "$<notify>": "notify_\(token)",
-      "$<onLongPressActivated>": "onLongPressActivated_\(token)",
-      "$<setupLongPress>": "setupLongPress_\(token)",
-      "$<setupDetector>": "setupDetector_\(token)",
-      "$<notifyNodeSource>": "notifyNodeSource_\(token)",
-      "$<notifyNode>": "notifyNode_\(token)",
-      "$<observeNode>": "observeNode_\(token)",
-      "$<observeDocument>": "observeDocument_\(token)",
-      "$<observeDynamicElements>": "observeDynamicElements_\(token)",
-      "$<getAllVideoElements>": "getAllVideoElements_\(token)",
-      "$<getAllAudioElements>": "getAllAudioElements_\(token)",
-      "$<onReady>": "onReady_\(token)",
-      "$<observePage>": "observePage_\(token)",
-    ]
-
-    replacements.forEach({
-      alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
-    })
-    return WKUserScript.create(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
-  }()
-
   private weak var certStore: CertStore?
   private var handler: (PlaylistInfo?) -> Void
 
@@ -419,19 +384,10 @@ class PlaylistWebLoader: UIView {
     // This webView is invisible and we don't want any UI being handled.
     webView.uiDelegate = nil
     webView.navigationDelegate = self
-    tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.scriptName, contentWorld: .page)
-
-    if let script = playlistDetectorScript {
-      // Do NOT inject the PlaylistHelper script!
-      // The Playlist Detector script will interfere with it.
-      // The detector script is only to be used in the background in an invisible webView
-      // but the helper script is to be used in the foreground!
-      tab.setScript(script: .playlist, enabled: false)
-
-      tab.webView?.configuration.userContentController.do {
-        $0.addUserScript(script)
-      }
-    }
+    
+    tab.replaceContentScript(PlaylistWebLoaderContentHelper(self),
+                             name: PlaylistWebLoaderContentHelper.scriptName,
+                             forTab: tab)
     
     webView.frame = superview?.bounds ?? self.bounds
     webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
@@ -454,43 +410,27 @@ class PlaylistWebLoader: UIView {
 
     init(_ webLoader: PlaylistWebLoader) {
       self.webLoader = webLoader
+      
+      timeout = DispatchWorkItem(block: { [weak self] in
+        guard let self = self else { return }
+        self.webLoader?.handler(nil)
+        self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        self.webLoader = nil
+      })
+
+      if let timeout = timeout {
+        DispatchQueue.main.asyncAfter(deadline: .now() + PlaylistWebLoader.pageLoadTimeout, execute: timeout)
+      }
     }
 
-    static let scriptName = "PlaylistWebLoaderContentHelper"
-    static let scriptId = UUID().uuidString
-    static let messageHandlerName = "\(scriptName)_\(messageUUID)"
-    static let scriptSandbox: WKContentWorld = .page
-    static let userScript: WKUserScript? = {
-      guard var script = loadUserScript(named: scriptName) else {
-        return nil
-      }
-      return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                      securityToken: scriptId,
-                                                      script: script),
-                                 injectionTime: .atDocumentStart,
-                                 forMainFrameOnly: false,
-                                 in: scriptSandbox)
-    }()
+    static let scriptName = "PlaylistScript"
+    static let scriptId = PlaylistScriptHandler.scriptId
+    static let messageHandlerName = PlaylistScriptHandler.messageHandlerName
+    static let scriptSandbox = PlaylistScriptHandler.scriptSandbox
+    static let userScript: WKUserScript? = nil
 
     func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
       defer { replyHandler(nil, nil) }
-      if let info = PageInfo.from(message: message) {
-        isPageLoaded = info.pageLoad
-
-        if isPageLoaded {
-          timeout?.cancel()
-          timeout = DispatchWorkItem(block: { [weak self] in
-            guard let self = self else { return }
-            self.webLoader?.handler(nil)
-            self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
-          })
-
-          if let timeout = timeout {
-            DispatchQueue.main.asyncAfter(deadline: .now() + PlaylistWebLoader.pageLoadTimeout, execute: timeout)
-          }
-        }
-        return
-      }
 
       guard let item = PlaylistInfo.from(message: message),
         item.detected
@@ -498,7 +438,8 @@ class PlaylistWebLoader: UIView {
         timeout?.cancel()
         timeout = nil
         webLoader?.handler(nil)
-        self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader = nil
         return
       }
 
@@ -507,7 +448,8 @@ class PlaylistWebLoader: UIView {
         timeout?.cancel()
         timeout = nil
         webLoader?.handler(nil)
-        self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader = nil
         return
       }
 
@@ -519,7 +461,8 @@ class PlaylistWebLoader: UIView {
         timeout?.cancel()
         timeout = nil
         webLoader?.handler(nil)
-        self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        webLoader = nil
         return
       }
 
@@ -529,6 +472,7 @@ class PlaylistWebLoader: UIView {
         timeout?.cancel()
         timeout = nil
         webLoader?.handler(item)
+        webLoader = nil
       }
 
       // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
@@ -538,26 +482,8 @@ class PlaylistWebLoader: UIView {
       // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
       DispatchQueue.main.async {
         self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        self.webLoader = nil
       }
-    }
-  }
-
-  private struct PageInfo: Codable {
-    let pageLoad: Bool
-
-    public static func from(message: WKScriptMessage) -> PageInfo? {
-      if !JSONSerialization.isValidJSONObject(message.body) {
-        return nil
-      }
-
-      do {
-        let data = try JSONSerialization.data(withJSONObject: message.body, options: [.fragmentsAllowed])
-        return try JSONDecoder().decode(PageInfo.self, from: data)
-      } catch {
-        log.error("Error Decoding PageInfo: \(error)")
-      }
-
-      return nil
     }
   }
 }
@@ -639,13 +565,6 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     )
     
     tab.setCustomUserScript(scripts: customUserScripts)
-
-    // For Playlist automatic detection since the above `handleDomainUserScript` removes ALL scripts!
-    if let script = playlistDetectorScript {
-      tab.webView?.configuration.userContentController.do {
-        $0.addUserScript(script)
-      }
-    }
 
     if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
       if navigationAction.targetFrame?.isMainFrame == true {
