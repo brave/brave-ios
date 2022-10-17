@@ -186,6 +186,7 @@ struct PasswordEntryView: View {
         }
       }
     }
+    .navigationViewStyle(.stack)
   }
 }
 
