@@ -108,7 +108,6 @@ struct BackupWalletView: View {
         label: {
           EmptyView()
         })
-      .accentColor(Color(.braveOrange))
     )
   }
   

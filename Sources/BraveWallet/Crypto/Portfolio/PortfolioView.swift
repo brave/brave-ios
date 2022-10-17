@@ -48,6 +48,7 @@ struct PortfolioView: View {
             )
           }
           .environment(\.modalPresentationMode, $isPresentingBackup)
+          .accentColor(Color(.braveOrange))
         }
       }
       BalanceHeaderView(
