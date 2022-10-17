@@ -189,6 +189,11 @@ public class BraveNewsSettingsViewController: TableViewController {
   }
 
   @objc private func tappedDone() {
-    dismiss(animated: true)
+    dismiss(animated: true) {
+      if Preferences.Review.braveNewsCriteriaPassed.value {
+        AppReviewManager.shared.isReviewRequired = true
+        Preferences.Review.braveNewsCriteriaPassed.value = false
+      }
+    }
   }
 }

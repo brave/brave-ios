@@ -69,6 +69,9 @@ extension Preferences {
     static let threshold = Option<Int>(key: "review.threshold", default: AppReview.firstThreshold)
     /// Last Review Date
     static let lastReviewDate = Option<Date?>(key: "review.last-date", default: nil)
+    
+    public static let braveNewsCriteriaPassed = Option<Bool>(key: "review.brave-new.criteria", default: false)
+
   }
 
   final class BlockStats {

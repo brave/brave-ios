@@ -64,6 +64,7 @@ public class BrowserViewController: UIViewController {
   private var setupTasksCompleted: Bool = false
 
   private var privateModeCancellable: AnyCancellable?
+  private var appReviewCancelable: AnyCancellable?
   var onPendingRequestUpdatedCancellable: AnyCancellable?
 
   /// Custom Search Engine
@@ -890,6 +891,16 @@ public class BrowserViewController: UIViewController {
           Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
         }
         self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
+      })
+    
+    appReviewCancelable = AppReviewManager.shared
+      .$isReviewRequired
+      .removeDuplicates()
+      .sink(receiveValue: { [weak self] isReviewRequired in
+        guard let self = self else { return }
+        if isReviewRequired {
+          AppReviewManager.shared.handleAppReview(for: self.currentScene)
+        }
       })
     
     Preferences.General.nightModeEnabled.objectWillChange
