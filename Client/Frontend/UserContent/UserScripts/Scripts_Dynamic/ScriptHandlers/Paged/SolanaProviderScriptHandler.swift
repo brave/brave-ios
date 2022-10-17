@@ -49,13 +49,6 @@ class SolanaProviderScriptHandler: TabContentScript {
     self.tab = tab
   }
   
-  static func shouldInjectWalletProvider(_ completion: @escaping (Bool) -> Void) {
-    BraveWallet.KeyringServiceFactory.get(privateMode: false)?
-      .keyringInfo(BraveWallet.SolanaKeyringId, completion: { keyring in
-        completion(keyring.isKeyringCreated)
-      })
-  }
-  
   private struct MessageBody: Decodable {
     enum Method: String, Decodable {
       case connect
@@ -76,39 +69,39 @@ class SolanaProviderScriptHandler: TabContentScript {
   }
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+    if !verifyMessage(message: message) {
+      assertionFailure("Missing required security token.")
+      return
+    }
+    
+    guard let tab = tab,
+          !tab.isPrivate,
+          let provider = tab.walletSolProvider,
+          !message.frameInfo.securityOrigin.host.isEmpty, // Fail if there is no last committed URL yet
+          message.frameInfo.isMainFrame, // Fail the request came from 3p origin
+          JSONSerialization.isValidJSONObject(message.body),
+          let messageData = try? JSONSerialization.data(withJSONObject: message.body, options: []),
+          let body = try? JSONDecoder().decode(MessageBody.self, from: messageData)
+    else {
+      Logger.module.error("Failed to handle solana provider communication")
+      return
+    }
+    
+    if message.webView?.url?.isLocal == false,
+       message.webView?.hasOnlySecureContent == false { // prevent communication in mixed-content scenarios
+      Logger.module.error("Failed solana provider communication security test")
+      return
+    }
+    
+    if !Preferences.Wallet.allowSolProviderAccess.value {
+      Logger.module.error("Solana provider access is disabled")
+      return
+    }
+    
+    // The web page has communicated with `window.solana`, so we should show the wallet icon
+    tab.isWalletIconVisible = true
+    
     Task { @MainActor in
-      if !verifyMessage(message: message) {
-        assertionFailure("Missing required security token.")
-        return
-      }
-      
-      guard let tab = tab,
-            !tab.isPrivate,
-            let provider = tab.walletSolProvider,
-            !message.frameInfo.securityOrigin.host.isEmpty, // Fail if there is no last committed URL yet
-            message.frameInfo.isMainFrame, // Fail the request came from 3p origin
-            JSONSerialization.isValidJSONObject(message.body),
-            let messageData = try? JSONSerialization.data(withJSONObject: message.body, options: []),
-            let body = try? JSONDecoder().decode(MessageBody.self, from: messageData)
-      else {
-        Logger.module.error("Failed to handle solana provider communication")
-        return
-      }
-      
-      if message.webView?.url?.isLocal == false,
-         message.webView?.hasOnlySecureContent == false { // prevent communication in mixed-content scenarios
-        Logger.module.error("Failed solana provider communication security test")
-        return
-      }
-      
-      if !Preferences.Wallet.allowSolProviderAccess.value {
-        Logger.module.error("Solana provider access is disabled")
-        return
-      }
-      
-      // The web page has communicated with `window.solana`, so we should show the wallet icon
-      tab.isWalletIconVisible = true
-      
       switch body.method {
       case .connect:
         let (publicKey, error) = await connect(args: body.args)

@@ -600,7 +600,7 @@ extension BrowserViewController: WKNavigationDelegate {
         )
       }
       tab.updateEthereumProperties()
-      Task { @MainActor in
+      Task {
         await tab.updateSolanaProperties()
       }
       tab.reportPageLoad(to: rewards, redirectionURLs: tab.redirectURLs)

@@ -324,7 +324,7 @@ extension Tab: BraveWalletProviderDelegate {
   
   func clearSolanaConnectedAccounts() {
     tabDappStore.solConnectedAddresses = .init()
-    Task { @MainActor in
+    Task {
       await updateSolanaProperties()
     }
   }
@@ -419,7 +419,7 @@ extension Tab: BraveWalletEventsListener {
 
 extension Tab: BraveWalletSolanaEventsListener {
   func accountChangedEvent(_ account: String?) {
-    Task { @MainActor in
+    Task {
       if let webView = webView {
         let script: String
         if let account = account {
@@ -438,7 +438,7 @@ extension Tab: BraveWalletSolanaEventsListener {
           let webView = webView else {
       return
     }
-    Task { @MainActor in
+    Task {
       var arguments: [Any] = [event.name]
       if let eventArgs = event.arguments {
         arguments.append(eventArgs)
