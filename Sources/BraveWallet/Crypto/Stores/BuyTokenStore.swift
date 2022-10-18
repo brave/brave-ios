@@ -5,55 +5,175 @@
 
 import Foundation
 import BraveCore
+import OrderedCollections
 
 /// A store contains data for buying tokens
 public class BuyTokenStore: ObservableObject {
   /// The current selected token to buy. Default with nil value.
   @Published var selectedBuyToken: BraveWallet.BlockchainToken?
-  /// All available buyable tokens
-  @Published var buyTokens: [BraveWallet.BlockchainToken] = []
+  /// The supported currencies for purchasing
+  @Published var supportedCurrencies: [BraveWallet.OnRampCurrency] = []
+  /// A boolean indicates if the current selected network supports `Buy`
+  @Published var isSelectedNetworkSupported: Bool = false
+  /// The amount user wishes to purchase
+  @Published var buyAmount: String = ""
+  /// The currency user wishes to purchase with
+  @Published var selectedCurrency: BraveWallet.OnRampCurrency = .init()
+  
+  /// A map of list of available tokens to a certain on ramp provider
+  var buyTokens: [BraveWallet.OnRampProvider: [BraveWallet.BlockchainToken]] = [.ramp: [], .wyre: [], .sardine: []]
+  /// A list of all available tokens for all providers
+  var allTokens: [BraveWallet.BlockchainToken] = []
+  /// A list of on ramp providers for `selectedBuyToken`
+  var supportedBuyOptionsByToken: [BraveWallet.OnRampProvider] {
+    var providers = [BraveWallet.OnRampProvider]()
+    for provider in buyTokens.keys {
+      if let token = selectedBuyToken,
+         let tokens = buyTokens[provider],
+         tokens.contains(where: {
+           $0.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame && $0.contractAddress.caseInsensitiveCompare(token.contractAddress) == .orderedSame && $0.chainId.caseInsensitiveCompare(token.chainId) == .orderedSame
+         }) {
+        providers.append(provider)
+      }
+    }
+    return providers.sorted {
+      $0.name < $1.name
+    }
+  }
 
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let rpcService: BraveWalletJsonRpcService
+  private let walletService: BraveWalletBraveWalletService
+  private let assetRatioService: BraveWalletAssetRatioService
+  private var selectedNetwork: BraveWallet.NetworkInfo = .init()
+  private var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
     rpcService: BraveWalletJsonRpcService,
+    walletService: BraveWalletBraveWalletService,
+    assetRatioService: BraveWalletAssetRatioService,
     prefilledToken: BraveWallet.BlockchainToken?
   ) {
     self.blockchainRegistry = blockchainRegistry
     self.rpcService = rpcService
+    self.walletService = walletService
+    self.assetRatioService = assetRatioService
     self.selectedBuyToken = prefilledToken
     
     self.rpcService.add(self)
+    
+    Task { @MainActor in
+      await updateInfo()
+    }
   }
 
   func fetchBuyUrl(
-    chainId: String,
-    account: BraveWallet.AccountInfo,
-    amount: String,
-    completion: @escaping (_ url: String?) -> Void
-  ) {
-    guard let token = selectedBuyToken else {
-      completion(nil)
-      return
-    }
+    provider: BraveWallet.OnRampProvider,
+    account: BraveWallet.AccountInfo
+  ) async -> String? {
+    guard let token = selectedBuyToken else { return nil }
+    
+    let (url, error) = await assetRatioService.buyUrlV1(
+      provider,
+      chainId: selectedNetwork.chainId,
+      address: account.address,
+      symbol: token.symbol,
+      amount: buyAmount,
+      currencyCode: "usd"
+    )
 
-    blockchainRegistry.buyUrl(.wyre, chainId: chainId, address: account.address, symbol: token.symbol, amount: amount) { url, error  in
-      completion(error != nil ? nil : url)
+    guard error == nil else { return nil }
+    
+    // some adjustment
+    if provider == .wyre {
+      if selectedNetwork.chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
+        return url.replacingOccurrences(of: "dest=ethereum", with: "dest=avalanche")
+      } else if selectedNetwork.chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
+        return url.replacingOccurrences(of: "dest=ethereum", with: "dest=matic")
+      }
     }
+    
+    return url
   }
 
-  func fetchBuyTokens(network: BraveWallet.NetworkInfo) {
-    blockchainRegistry.buyTokens(.wyre, chainId: network.chainId) { [self] tokens in
-      buyTokens = tokens.sorted(by: { $0.symbol < $1.symbol })
-      if selectedBuyToken == nil || selectedBuyToken?.chainId != network.chainId {
-        if let index = buyTokens.firstIndex(where: { network.isNativeAsset($0) }) {
-          selectedBuyToken = buyTokens[safe: index]
+  @MainActor
+  private func fetchBuyTokens(network: BraveWallet.NetworkInfo) async {
+    allTokens = []
+    for provider in buyTokens.keys {
+      let tokens = await blockchainRegistry.buyTokens(provider, chainId: network.chainId)
+      let sortedTokenList = tokens.sorted(by: {
+        if $0.isGasToken, !$01.isGasToken {
+          return true
+        } else if !$0.isGasToken, $1.isGasToken {
+          return false
+        } else if $0.isBatToken, !$1.isBatToken {
+          return true
+        } else if !$0.isBatToken, $1.isBatToken {
+          return false
         } else {
-          selectedBuyToken = buyTokens.first
+          return $0.symbol < $1.symbol
+        }
+      })
+      buyTokens[provider] = sortedTokenList
+    }
+    
+    for provider in orderedSupportedBuyOptions {
+      if let tokens = buyTokens[provider] {
+        for token in tokens {
+          if !allTokens.contains(where: {
+            $0.contractAddress.caseInsensitiveCompare(token.contractAddress) == .orderedSame && $0.chainId.caseInsensitiveCompare(token.chainId) == .orderedSame
+          }) {
+            allTokens.append(token)
+          }
         }
       }
+    }
+    
+    if selectedBuyToken == nil || selectedBuyToken?.chainId != network.chainId {
+      selectedBuyToken = allTokens.first
+    }
+  }
+  
+  @MainActor
+  private func updateInfo() async {
+    // check device language to determine if we support `Sardine`
+    if Locale.preferredLanguages.first?.caseInsensitiveCompare("en-us") == .orderedSame {
+      orderedSupportedBuyOptions = [.ramp, .wyre, .sardine]
+    } else {
+      orderedSupportedBuyOptions = [.ramp, .wyre]
+    }
+    
+    let coin = await walletService.selectedCoin()
+    selectedNetwork = await rpcService.network(coin)
+    await fetchBuyTokens(network: selectedNetwork)
+  
+    // exclude all buy options that its available buy tokens list does not include the
+    // `selectedBuyToken`
+    orderedSupportedBuyOptions = OrderedSet(orderedSupportedBuyOptions
+      .filter { [weak self] provider in
+      guard let self = self,
+            let tokens = self.buyTokens[provider],
+            let selectedBuyToken = self.selectedBuyToken
+      else { return false }
+      return tokens.contains(where: { token in
+        return token.contractAddress.caseInsensitiveCompare(selectedBuyToken.contractAddress) == .orderedSame && token.chainId == selectedBuyToken.chainId && token.symbol.caseInsensitiveCompare(selectedBuyToken.symbol) == .orderedSame
+      })
+    })
+    
+    // check if current selected network supports buy
+    if WalletConstants.supportedTestNetworkChainIds.contains(selectedNetwork.chainId) {
+      isSelectedNetworkSupported = false
+    } else {
+      isSelectedNetworkSupported = allTokens.contains(where: { token in
+        return token.chainId.caseInsensitiveCompare(selectedNetwork.chainId) == .orderedSame
+      })
+    }
+    
+    // fetch all available currencies for on ramp providers
+    supportedCurrencies = await blockchainRegistry.onRampCurrencies()
+    if let firstCurrency = supportedCurrencies.first {
+      selectedCurrency = firstCurrency
     }
   }
 }
@@ -61,8 +181,7 @@ public class BuyTokenStore: ObservableObject {
 extension BuyTokenStore: BraveWalletJsonRpcServiceObserver {
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
     Task { @MainActor in
-      let network = await rpcService.network(coin)
-      fetchBuyTokens(network: network)
+      await updateInfo()
     }
   }
   

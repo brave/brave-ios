@@ -233,4 +233,68 @@ extension BraveWallet.BlockchainToken {
       .contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
     return (contractAddress.isEmpty || isSupportedContractAddress) && chainId == BraveWallet.MainnetChainId
   }
+  
+  var isGasToken: Bool {
+    // swiftlint:disable:next line_length
+    return (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("matic") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("ftm") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("celo") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("bnb") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("sol") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame) || (symbol.caseInsensitiveCompare("fil") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame) || (symbol.caseInsensitiveCompare("avax") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("avaxc") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame)
+  }
+  
+  var isBatToken: Bool {
+    // BAT/wormhole BAT/Avalanche C-Chain BAT
+    return symbol.caseInsensitiveCompare("bat") == .orderedSame || symbol.caseInsensitiveCompare("wbat") == .orderedSame || symbol.caseInsensitiveCompare("bat.e") == .orderedSame
+  }
+}
+
+extension BraveWallet.OnRampProvider {
+  var name: String {
+    switch self {
+    case .ramp:
+      return Strings.Wallet.rampNetworkProviderName
+    case .sardine:
+      return Strings.Wallet.sardineProviderName
+    case .wyre:
+      return Strings.Wallet.wyreProviderName
+    @unknown default:
+      return ""
+    }
+  }
+  
+  var shortName: String {
+    switch self {
+    case .ramp:
+      return Strings.Wallet.rampNetworkProviderShortName
+    case .sardine:
+      return Strings.Wallet.sardineProviderShortName
+    case .wyre:
+      return Strings.Wallet.wyreProviderShortName
+    @unknown default:
+      return ""
+    }
+  }
+  
+  var localizedDescription: String {
+    switch self {
+    case .ramp:
+      return Strings.Wallet.rampNetworkProviderDescription
+    case .sardine:
+      return Strings.Wallet.sardineProviderDescription
+    case .wyre:
+      return Strings.Wallet.wyreProviderDescription
+    @unknown default:
+      return ""
+    }
+  }
+  
+  var iconName: String {
+    switch self {
+    case .ramp:
+      return "ramp-network-icon"
+    case .sardine:
+      return "sardine-icon"
+    case .wyre:
+      return "wyre-icon"
+    @unknown default:
+      return ""
+    }
+  }
 }
