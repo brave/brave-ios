@@ -455,7 +455,9 @@ class PlaylistListViewController: UIViewController {
 
   @objc
   private func onExit(_ button: UIBarButtonItem) {
-    dismiss(animated: true, completion: nil)
+    dismiss(animated: true) {
+      AppReviewManager.shared.handleAppReview(for: self.currentScene)
+    }
   }
 
   @objc

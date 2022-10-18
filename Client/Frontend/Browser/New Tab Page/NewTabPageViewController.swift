@@ -138,8 +138,10 @@ class NewTabPageViewController: UIViewController {
         }
         
         let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
-        host.rootView.onDismiss = { [weak host] in
+        host.rootView.onDismiss = { [weak self, weak host] in
           host?.dismiss(animated: true)
+          // Check for review condition after closing privacy report
+          AppReviewManager.shared.handleAppReview(for: self?.currentScene)
         }
         
         host.rootView.openPrivacyReportsUrl = { [weak self] in
