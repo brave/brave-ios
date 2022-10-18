@@ -91,7 +91,7 @@ public class WalletProviderPermissionRequestsManager {
   }
   
   /// Cancels all an in-flight requests without executing any decision
-  public func cancelAllPendingRequests(coins: [BraveWallet.CoinType]) {
+  public func cancelAllPendingRequests(for coins: [BraveWallet.CoinType]) {
     requests = requests.filter { !coins.contains($0.coinType) }
   }
 }

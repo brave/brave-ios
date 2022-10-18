@@ -2720,7 +2720,7 @@ extension BrowserViewController: TabManagerDelegate {
     updateInContentHomePanel(selected?.url as URL?)
 
     notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
-    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
+    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth, .sol])
     WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
     updateURLBarWalletButton()
   }
@@ -3490,7 +3490,7 @@ extension BrowserViewController: PreferencesObserver {
       tabManager.reset()
       tabManager.reloadSelectedTab()
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
-      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.eth])
+      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth])
       let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
       if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
@@ -3501,7 +3501,7 @@ extension BrowserViewController: PreferencesObserver {
       tabManager.reset()
       tabManager.reloadSelectedTab()
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
-      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(coins: [.sol])
+      WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.sol])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.sol])
       let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
       if let cryptoStore = CryptoStore.from(privateMode: privateMode) {

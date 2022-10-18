@@ -9,8 +9,8 @@ import Foundation
 public class TabDappStore: ObservableObject {
   /// A set of solana account addresses that are currently connected to the dapp
   @Published public var solConnectedAddresses: Set<String> = .init()
-  /// The latest dapp permission request 
-  @Published public var latestPermissionRequest: WebpagePermissionRequest?
+  /// The latest pending dapp permission request 
+  @Published public var latestPendingPermissionRequest: WebpagePermissionRequest?
   
   public init() {}
 }

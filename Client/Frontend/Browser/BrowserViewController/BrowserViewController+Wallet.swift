@@ -235,7 +235,7 @@ extension Tab: BraveWalletProviderDelegate {
         self.tabDelegate?.updateURLBarWalletButton()
       })
 
-      tabDappStore.latestPermissionRequest = request
+      tabDappStore.latestPendingPermissionRequest = request
       self.tabDelegate?.showWalletNotification(self, origin: origin)
     }
   }
@@ -310,8 +310,8 @@ extension Tab: BraveWalletProviderDelegate {
   func showAccountCreation(_ type: BraveWallet.CoinType) {
     let origin = getOrigin()
     // store the account creation request
-    WalletProviderAccountCreationRequestManager.shared.beginRequest(for: origin, coinType: type) {
-      self.tabDelegate?.updateURLBarWalletButton()
+    WalletProviderAccountCreationRequestManager.shared.beginRequest(for: origin, coinType: type) { [weak self] in
+      self?.tabDelegate?.updateURLBarWalletButton()
     }
     // show wallet notification
     self.tabDelegate?.showWalletNotification(self, origin: origin)
