@@ -513,7 +513,7 @@ struct WalletPanelView: View {
     }
     .onChange(of: tabDappStore.latestPermissionRequest) { newValue in
       if let request = newValue, request.requestingOrigin == origin, request.coinType == keyringStore.selectedAccount.coin {
-        presentWalletWithContext(.requestEthererumPermissions(request, onPermittedAccountsUpdated: { accounts in
+        presentWalletWithContext(.requestPermissions(request, onPermittedAccountsUpdated: { accounts in
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
