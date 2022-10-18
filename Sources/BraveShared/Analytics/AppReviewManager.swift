@@ -12,6 +12,22 @@ import UIKit
 /// Singleton Manager handles App Review Criteria
 public final class AppReviewManager: ObservableObject {
   
+  /// A main criteria that should be satisfied before checking sub-criteria
+  enum AppReviewMainCriteriaType: CaseIterable {
+    case launchCount
+    case daysInUse
+    case sessionCrash
+  }
+  
+  /// A sub-criteria that should be satisfied if one of the main criterias are valid
+  enum AppReviewSubCriteriaType: CaseIterable {
+    case numberOfBookmarks
+    case paidVPNSubscription
+    case walletConnectedDapp
+    case numberOfPlaylistItems
+    case syncEnabledWithTabSync
+  }
+  
   @Published public var isReviewRequired = false
   
   // MARK: Lifecycle
@@ -30,8 +46,63 @@ public final class AppReviewManager: ObservableObject {
     }
   }
   
+  /// <#Description#>
+  /// - Returns: <#description#>
   private func shouldRequestReview() -> Bool {
-    return true
+    var mainCriteriaSatisfied = false
+    var subCriteriaSatisfied = false
+        
+    // One of the main criterias should be met before additional situation can be checked
+    for mainCriteria in AppReviewMainCriteriaType.allCases {
+      mainCriteriaSatisfied = checkMainCriteriaSatisfied(for: mainCriteria)
+      if mainCriteriaSatisfied {
+        break
+      }
+    }
+    
+    // Additionally if a main criteria is accomplished one of following conditions must also be met
+    if mainCriteriaSatisfied {
+      // One of the sub criterias also should be satisfied
+      for subCriteria in AppReviewSubCriteriaType.allCases {
+        subCriteriaSatisfied = checkSubCriteriaSatisfied(for: subCriteria)
+        if subCriteriaSatisfied {
+          break
+        }
+      }
+    }
+    
+    return mainCriteriaSatisfied && subCriteriaSatisfied
   }
   
+  /// <#Description#>
+  /// - Parameter type: <#type description#>
+  /// - Returns: <#description#>
+  private func checkMainCriteriaSatisfied(for type: AppReviewMainCriteriaType) -> Bool {
+    switch type {
+    case .launchCount:
+      return true
+    case .daysInUse:
+      return true
+    case .sessionCrash:
+      return true
+    }
+  }
+  
+  /// <#Description#>
+  /// - Parameter type: <#type description#>
+  /// - Returns: <#description#>
+  private func checkSubCriteriaSatisfied(for type: AppReviewSubCriteriaType) -> Bool {
+    switch type {
+    case .numberOfBookmarks:
+      return true
+    case .paidVPNSubscription:
+      return true
+    case .walletConnectedDapp:
+      return true
+    case .numberOfPlaylistItems:
+      return true
+    case .syncEnabledWithTabSync:
+      return true
+    }
+  }
 }
