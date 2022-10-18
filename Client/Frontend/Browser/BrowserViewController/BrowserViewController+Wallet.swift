@@ -108,6 +108,10 @@ extension BrowserViewController {
 extension WalletPanelHostingController: PopoverContentComponent {}
 
 extension BrowserViewController: BraveWalletDelegate {
+  public func requestAppReview() {
+    AppReviewManager.shared.handleAppReview(for: currentScene)
+  }
+  
   public func openWalletURL(_ destinationURL: URL) {
     if presentedViewController != nil {
       // dismiss to show the new tab
