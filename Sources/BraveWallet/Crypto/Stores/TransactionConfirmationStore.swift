@@ -372,8 +372,34 @@ public class TransactionConfirmationStore: ObservableObject {
     case let .erc721Transfer(details):
       symbol = details.fromToken?.symbol ?? ""
       value = details.fromAmount
-    case .solDappTransaction:
-      break
+    case let .solDappTransaction(details):
+      symbol = ""
+      value = details.fromAmount
+      transactionDetails = details.instructions
+        .map { TransactionParser.solanaInstructionFormatted($0) }
+        .enumerated()
+        .map { (index, formattedInstruction) in "Instruction #\(index + 1)\n\(formattedInstruction)" }
+        .joined(separator: "\n\n") // separator between each instruction
+      
+      if let gasFee = details.gasFee {
+        gasValue = gasFee.fee
+        gasFiat = gasFee.fiat
+        gasSymbol = activeParsedTransaction.networkSymbol
+        gasAssetRatio = assetRatios[activeParsedTransaction.networkSymbol.lowercased(), default: 0]
+        
+        if let gasBalance = gasTokenBalanceCache["\(network.nativeToken.symbol)\(activeParsedTransaction.fromAddress)"] {
+          if let gasValue = BDouble(gasFee.fee),
+             BDouble(gasBalance) > gasValue {
+            isBalanceSufficient = true
+          } else {
+            isBalanceSufficient = false
+          }
+        } else if shouldFetchGasTokenBalance {
+          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+            await fetchGasTokenBalance(token: network.nativeToken, account: account)
+          }
+        }
+      }
     case .other:
       break
     }

@@ -38,7 +38,14 @@ struct TransactionConfirmationView: View {
     if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
       return Strings.Wallet.transactionTypeApprove
     }
-    return confirmationStore.activeParsedTransaction.transaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
+    switch confirmationStore.activeParsedTransaction.transaction.txType {
+    case .erc20Approve:
+      return Strings.Wallet.transactionTypeApprove
+    case .solanaDappSignTransaction, .solanaDappSignAndSendTransaction:
+      return Strings.Wallet.solanaDappTransactionTitle
+    default:
+      return confirmationStore.activeParsedTransaction.transaction.isSwap ? Strings.Wallet.swap : Strings.Wallet.send
+    }
   }
 
   /// View showing the currently selected account with a blockie
