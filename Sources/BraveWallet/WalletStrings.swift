@@ -425,7 +425,7 @@ extension Strings {
       "wallet.buyDescription",
       tableName: "BraveWallet",
       bundle: .strings,
-      value: "Buy crypto with Apple Pay, credit or debit card through Wyre.",
+      value: "Buy crypto with Apple Pay, credit or debit card.",
       comment: "The description of a buy button on the buy/send/swap modal"
     )
     public static let send = NSLocalizedString(
