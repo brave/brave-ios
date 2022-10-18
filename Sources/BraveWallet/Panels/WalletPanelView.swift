@@ -527,11 +527,7 @@ struct WalletPanelView: View {
     .onAppear {
       if let accountCreationRequest = WalletProviderAccountCreationRequestManager.shared.firstPendingRequest(for: origin, coinTypes: Array(WalletConstants.supportedCoinTypes)) {
         presentWalletWithContext(.createAccount(accountCreationRequest))
-        return
-      }
-      
-      let permissionRequestManager = WalletProviderPermissionRequestsManager.shared
-      if let request = permissionRequestManager.firstPendingRequest(for: origin, coinTypes: [.eth, .sol]) {
+      } else if let request = WalletProviderPermissionRequestsManager.shared.firstPendingRequest(for: origin, coinTypes: [.eth, .sol]) {
         presentWalletWithContext(.requestPermissions(request, onPermittedAccountsUpdated: { accounts in
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
