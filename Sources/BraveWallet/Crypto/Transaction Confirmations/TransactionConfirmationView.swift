@@ -416,19 +416,11 @@ struct TransactionConfirmationView: View {
       .navigationBarTitleDisplayMode(.inline)
       .foregroundColor(Color(.braveLabel))
       .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
-      .toolbar {
-        ToolbarItemGroup(placement: .cancellationAction) {
-          Button(action: { presentationMode.dismiss() }) {
-            Text(Strings.cancelButtonTitle)
-              .foregroundColor(Color(.braveOrange))
-          }
+      .onAppear {
+        Task { @MainActor in
+          await confirmationStore.prepare()
         }
       }
-    .onAppear {
-      Task { @MainActor in
-        await confirmationStore.prepare()
-      }
-    }
   }
 
   @ViewBuilder private var rejectConfirmContainer: some View {
