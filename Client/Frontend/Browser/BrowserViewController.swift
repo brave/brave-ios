@@ -1918,8 +1918,10 @@ public class BrowserViewController: UIViewController {
       // We don't allow to have 2 same favorites.
       if !FavoritesHelper.isAlreadyAdded(url) {
         activities.append(
-          AddToFavoritesActivity() { [weak tab] in
+          AddToFavoritesActivity() { [weak self, weak tab] in
             FavoritesHelper.add(url: url, title: tab?.displayTitle)
+            // Check for review condition after adding a bookmark
+            AppReviewManager.shared.handleAppReview(for: self?.currentScene)
           })
       }
 
