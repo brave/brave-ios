@@ -29,13 +29,14 @@ class AppReviewManager: ObservableObject {
     case numberOfPlaylistItems
     case syncEnabledWithTabSync
   }
-  
-  @Published var isReviewRequired = false
+    @Published var isReviewRequired = false
   
   private let launchCountLimit = 5
   private let bookmarksCountLimit = 5
   private let playlistCountLimit = 5
   private let dappConnectionPeriod = 7
+  private let daysInUseMaxPeriod = 7
+  private let daysInUseRequiredPeriod = 4
   
   // MARK: Lifecycle
   
@@ -55,11 +56,32 @@ class AppReviewManager: ObservableObject {
     }
   }
   
-  func processMainCriteriaDaysInUse() {
-    var daysInUse = Preferences.Review.daysInUse.value
-    daysInUse = daysInUse.filter { $0 < Date().addingTimeInterval(7.days) }
-    
-    Preferences.Review.daysInUse.value = daysInUse
+  func processMainCriteria(for mainCriteria: AppReviewMainCriteriaType) {
+    switch mainCriteria {
+    case .daysInUse:
+      var daysInUse = Preferences.Review.daysInUse.value
+      daysInUse = daysInUse.filter { $0 < Date().addingTimeInterval(daysInUseMaxPeriod.days) }
+      
+      Preferences.Review.daysInUse.value = daysInUse
+    default:
+      break
+    }
+  }
+  
+  func processSubCriteria(for subCriteria: AppReviewSubCriteriaType) {
+    switch subCriteria {
+    case .walletConnectedDapp:
+      // Saving when a user is connected its wallet to a Dapp
+      Preferences.Review.dateWalletConnectedToDapp.value = Date()
+    case .numberOfPlaylistItems:
+      // Increase the number of playlist items added by the user
+      Preferences.Review.numberPlaylistItemsAdded.value += 1
+    case .numberOfBookmarks:
+      // Increase the number of bookmarks added by the user
+      Preferences.Review.numberBookmarksAdded.value += 1
+    default:
+      break
+    }
   }
   
   /// Method checking If all main criterias are handled including at least one additional sub-criteria
@@ -98,7 +120,7 @@ class AppReviewManager: ObservableObject {
     case .launchCount:
       return Preferences.Review.launchCount.value >= launchCountLimit
     case .daysInUse:
-      return Preferences.Review.daysInUse.value.count > 4
+      return Preferences.Review.daysInUse.value.count > daysInUseRequiredPeriod
     case .sessionCrash:
       return !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
     }

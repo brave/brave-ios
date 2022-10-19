@@ -237,7 +237,7 @@ extension Tab: BraveWalletProviderDelegate {
         completion: { response in
           switch response {
           case .granted(let accounts):
-            Preferences.Review.dateWalletConnectedToDapp.value = Date()
+            AppReviewManager.shared.processSubCriteria(for: .walletConnectedDapp)
             completion(.none, accounts)
           case .rejected:
             completion(.none, [])

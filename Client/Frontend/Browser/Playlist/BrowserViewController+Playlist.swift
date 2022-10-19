@@ -356,9 +356,7 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
             self.openInPlaylistActivityItem = (enabled: true, item: item)
             self.addToPlayListActivityItem = nil
 
-            // Count the number of bookmarks added by the user
-            // Used in App Rating criteria
-            Preferences.Review.numberPlaylistItemsAdded.value += 1
+            AppReviewManager.shared.processSubCriteria(for: .numberOfPlaylistItems)
             PlaylistItem.addItem(item, cachedData: nil) { [weak self] in
               guard let self = self else { return }
               PlaylistManager.shared.autoDownload(item: item)
@@ -386,9 +384,7 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
       openInPlaylistActivityItem = (enabled: true, item: item)
       addToPlayListActivityItem = nil
 
-      // Count the number of bookmarks added by the user
-      // Used in App Rating criteria
-      Preferences.Review.numberPlaylistItemsAdded.value += 1
+      AppReviewManager.shared.processSubCriteria(for: .numberOfPlaylistItems)
       PlaylistItem.addItem(item, cachedData: nil) { [weak self] in
         guard let self = self else { return }
         PlaylistManager.shared.autoDownload(item: item)

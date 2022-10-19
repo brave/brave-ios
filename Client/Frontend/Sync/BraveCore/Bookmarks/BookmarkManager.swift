@@ -152,9 +152,7 @@ class BookmarkManager {
       bookmarksAPI.createBookmark(withTitle: title ?? "", url: url)
     }
     
-    // Count the number of bookmarks added by the user
-    // Used in App Rating criteria
-    Preferences.Review.numberBookmarksAdded.value += 1
+    AppReviewManager.shared.processSubCriteria(for: .numberOfBookmarks)
   }
 
   public func frc(parent: Bookmarkv2?) -> BookmarksV2FetchResultsController? {
