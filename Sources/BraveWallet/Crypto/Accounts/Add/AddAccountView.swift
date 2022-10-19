@@ -73,6 +73,13 @@ struct AddAccountView: View {
     preSelectedCoin == nil && WalletConstants.supportedCoinTypes.count > 1
   }
   
+  private var navigationTitle: String {
+    if preSelectedCoin == nil, selectedCoin == nil {
+      return Strings.Wallet.addAccountTitle
+    }
+    return String.localizedStringWithFormat(Strings.Wallet.addAccountWithCoinTypeTitle, preSelectedCoin?.localizedTitle ?? (selectedCoin?.localizedTitle ?? BraveWallet.CoinType.eth.localizedTitle))
+  }
+  
   @ViewBuilder private var addAccountView: some View {
     List {
       accountNameSection
@@ -84,7 +91,7 @@ struct AddAccountView: View {
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(String.localizedStringWithFormat(Strings.Wallet.addAccountTitle, preSelectedCoin?.localizedTitle ?? (selectedCoin?.localizedTitle ?? BraveWallet.CoinType.eth.localizedTitle)))
+    .navigationTitle(navigationTitle)
     .navigationBarItems(
       // Have to use this instead of toolbar placement to have a custom button style
       trailing: Button(action: {
