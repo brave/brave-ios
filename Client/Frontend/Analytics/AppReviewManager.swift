@@ -71,7 +71,6 @@ class AppReviewManager: ObservableObject {
     }
   }
   
-  
   /// Method for handling changes to main criteriainside the various parts in application
   /// - Parameter mainCriteria: Type of the main Criteria
   func processSubCriteria(for subCriteria: AppReviewSubCriteriaType) {

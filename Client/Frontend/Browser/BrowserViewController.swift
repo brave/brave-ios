@@ -845,14 +845,6 @@ public class BrowserViewController: UIViewController {
     let dropInteraction = UIDropInteraction(delegate: self)
     view.addInteraction(dropInteraction)
 
-    if AppConstants.buildChannel.isPublic && AppReview.shouldRequestReview() {
-      // Request Review when the main-queue is free or on the next cycle.
-      DispatchQueue.main.async {
-        guard let windowScene = self.currentScene else { return }
-        SKStoreReviewController.requestReview(in: windowScene)
-      }
-    }
-
     LegacyBookmarksHelper.restore_1_12_Bookmarks() {
       Logger.module.info("Bookmarks from old database were successfully restored")
     }
