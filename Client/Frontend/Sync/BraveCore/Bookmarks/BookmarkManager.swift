@@ -151,6 +151,10 @@ class BookmarkManager {
     } else {
       bookmarksAPI.createBookmark(withTitle: title ?? "", url: url)
     }
+    
+    // Count the number of bookmarks added by the user
+    // Used in App Rating criteria
+    Preferences.Review.numberBookmarksAdded.value += 1
   }
 
   public func frc(parent: Bookmarkv2?) -> BookmarksV2FetchResultsController? {

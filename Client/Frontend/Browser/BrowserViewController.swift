@@ -540,6 +540,10 @@ public class BrowserViewController: UIViewController {
       ContentBlockerManager.shared.startTimer()
       await AdBlockEngineManager.shared.startTimer()
     }
+    
+    // Eliminate the older usage days
+    // Used in App Rating criteria
+    AppReviewManager.shared.processMainCriteriaDaysInUse()
   }
 
   private func setupAdsNotificationHandler() {

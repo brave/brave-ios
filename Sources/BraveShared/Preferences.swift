@@ -71,7 +71,10 @@ extension Preferences {
     static let lastReviewDate = Option<Date?>(key: "review.last-date", default: nil)
     
     public static let braveNewsCriteriaPassed = Option<Bool>(key: "review.brave-new.criteria", default: false)
-
+    public static let numberBookmarksAdded =  Option<Int>(key: "review.numberBookmarksAdded", default: 0)
+    public static let numberPlaylistItemsAdded =  Option<Int>(key: "review.numberBookmarksAdded", default: 0)
+    public static let dateWalletConnectedToDapp =  Option<Date?>(key: "review.connect-dapp.wallet", default: nil)
+    public static let daysInUse = Option<[Date]>(key: "review.in-use", default: [])
   }
 
   final class BlockStats {

@@ -744,6 +744,9 @@ class NewTabPageViewController: UIViewController {
 
   @objc private func tappedBraveNewsSettings() {
     let controller = BraveNewsSettingsViewController(dataSource: feedDataSource, ads: rewards.ads)
+    controller.newsSettingsDidDismiss = {
+      AppReviewManager.shared.isReviewRequired = true
+    }
     let container = UINavigationController(rootViewController: controller)
     present(container, animated: true)
   }
