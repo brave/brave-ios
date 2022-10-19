@@ -42,13 +42,9 @@ struct SignTransactionView: View {
     request.instructions
       .map { instructionsForOneTx in
         instructionsForOneTx
-          .map { TransactionParser.solanaInstructionFormatted($0) }
-          .enumerated()
-          .map { (index, formattedInstruction) in "Instruction #\(index + 1)\n\(formattedInstruction)" }
+          .map { TransactionParser.parseSolanaInstruction($0).toString }
           .joined(separator: "\n\n") // separator between each instruction
       }
-      .enumerated()
-      .map { (index, formattedTxInstructions) in "Transaction #\(index + 1)\n\(formattedTxInstructions)" }
       .joined(separator: "\n\n\n\n") // separator between each transaction
   }
   

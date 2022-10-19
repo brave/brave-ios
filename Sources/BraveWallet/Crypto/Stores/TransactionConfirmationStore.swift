@@ -376,7 +376,7 @@ public class TransactionConfirmationStore: ObservableObject {
       symbol = ""
       value = details.fromAmount
       transactionDetails = details.instructions
-        .map { TransactionParser.solanaInstructionFormatted($0) }
+        .map(\.toString)
         .joined(separator: "\n\n") // separator between each instruction
       
       if let gasFee = details.gasFee {
