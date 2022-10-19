@@ -489,14 +489,14 @@ enum TransactionParser {
     _ instruction: BraveWallet.SolanaInstruction
   ) -> SolanaDappTxDetails.ParsedSolanaInstruction {
     guard let decodedData = instruction.decodedData else {
-      let title = "Unknown"
+      let title = Strings.Wallet.solanaUnknownInstructionName
       let programId = SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue(
-        key: "Program Id", value: instruction.programId)
+        key: Strings.Wallet.solanaInstructionProgramId, value: instruction.programId)
       let accountPubkeys = instruction.accountMetas.map(\.pubkey)
       let accounts = SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue(
-        key: "Accounts", value: accountPubkeys.isEmpty ? "[]" : accountPubkeys.joined(separator: "\n"))
+        key: Strings.Wallet.solanaInstructionAccounts, value: accountPubkeys.isEmpty ? "[]" : accountPubkeys.joined(separator: "\n"))
       let data = SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue(
-        key: "Data", value: "\(instruction.data)")
+        key: Strings.Wallet.solanaInstructionData, value: "\(instruction.data)")
       return .init(name: title, details: [programId, accounts, data], instruction: instruction)
     }
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
@@ -514,11 +514,10 @@ enum TransactionParser {
       
       if let lamportsParam = decodedData.paramFor(.lamports),
          let lamportsValue = formatter.decimalString(for: lamportsParam.value, radix: .decimal, decimals: 9)?.trimmingTrailingZeros {
-        details.append(.init(key: lamportsParam.localizedName, value: "\(lamportsValue) SOL"))
+        details.append(.init(key: Strings.Wallet.solanaAmount, value: "\(lamportsValue) SOL"))
       }
       
       let params = decodedData.params
-        .filter { $0.name != BraveWallet.DecodedSolanaInstructionData.ParamKey.lamports.rawValue } // shown above
       if !params.isEmpty {
         let params = params.map { param in
           SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue(key: param.localizedName, value: param.value)
@@ -550,14 +549,10 @@ enum TransactionParser {
          let decimalsParam = decodedData.paramFor(.decimals),
          let decimals = Int(decimalsParam.value),
          let amountValue = formatter.decimalString(for: amountParam.value, radix: .decimal, decimals: decimals)?.trimmingTrailingZeros {
-        details.append(.init(key: amountParam.localizedName, value: amountValue))
+        details.append(.init(key: Strings.Wallet.solanaAmount, value: amountValue))
       }
       
       let params = decodedData.params
-        .filter {
-          $0.name != BraveWallet.DecodedSolanaInstructionData.ParamKey.amount.rawValue // shown above
-          && $0.name != BraveWallet.DecodedSolanaInstructionData.ParamKey.decimals.rawValue // shown above
-        }
       if !params.isEmpty {
         let params = params.map { param in
           SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue(key: param.localizedName, value: param.value)

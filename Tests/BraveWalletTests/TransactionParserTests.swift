@@ -809,7 +809,8 @@ class TransactionParserTests: XCTestCase {
       details: [
         .init(key: "From Account", value: fromPubkey),
         .init(key: "To Account", value: toPubkey),
-        .init(key: "Lamports", value: "0.00001 SOL")
+        .init(key: "Amount", value: "0.00001 SOL"),
+        .init(key: "Lamports", value: "10000")
       ],
       instruction: transferInstruction
     )
@@ -840,14 +841,15 @@ class TransactionParserTests: XCTestCase {
       )
     )
     let expectedParsedWithdrawNonceAccount = SolanaDappTxDetails.ParsedSolanaInstruction(
-      name: "System Program - WithdrawNonceAccount",
+      name: "System Program - Withdraw Nonce Account",
       details: [
         .init(key: "Nonce Account", value: fromPubkey),
         .init(key: "To Account", value: toPubkey),
         .init(key: "RecentBlockhashes sysvar", value: "SysvarRecentB1ockHashes11111111111111111111"),
         .init(key: "Rent sysvar", value: "SysvarRent111111111111111111111111111111111"),
         .init(key: "Nonce Authority", value: toPubkey),
-        .init(key: "Lamports", value: "0.00000004 SOL")
+        .init(key: "Amount", value: "0.00000004 SOL"),
+        .init(key: "Lamports", value: "40")
       ],
       instruction: withdrawNonceAccountInstruction
     )
@@ -874,11 +876,12 @@ class TransactionParserTests: XCTestCase {
       )
     )
     let expectedParsedCreateAccount = SolanaDappTxDetails.ParsedSolanaInstruction(
-      name: "System Program - CreateAccount",
+      name: "System Program - Create Account",
       details: [
         .init(key: "From Account", value: fromPubkey),
         .init(key: "New Account", value: toPubkey),
-        .init(key: "Lamports", value: "0.000002 SOL"),
+        .init(key: "Amount", value: "0.000002 SOL"),
+        .init(key: "Lamports", value: "2000"),
         .init(key: "Space", value: "1"),
         .init(key: "Owner Program", value: toPubkey)
       ],
@@ -909,11 +912,12 @@ class TransactionParserTests: XCTestCase {
       )
     )
     let expectedParsedCreateAccountWithSeed = SolanaDappTxDetails.ParsedSolanaInstruction(
-      name: "System Program - CreateAccountWithSeed",
+      name: "System Program - Create Account With Seed",
       details: [
         .init(key: "From Account", value: fromPubkey),
         .init(key: "Created Account", value: toPubkey),
-        .init(key: "Lamports", value: "0.0000003 SOL"),
+        .init(key: "Amount", value: "0.0000003 SOL"),
+        .init(key: "Lamports", value: "300"),
         .init(key: "Base", value: toPubkey),
         .init(key: "Seed", value: ""),
         .init(key: "Space", value: "1"),

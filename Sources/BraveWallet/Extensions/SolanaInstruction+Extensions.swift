@@ -25,17 +25,17 @@ extension BraveWallet.SolanaInstruction {
   
   var instructionName: String {
     guard let decodedData = self.decodedData else {
-      return "Unknown"
+      return Strings.Wallet.solanaUnknownInstructionName
     }
     if isSystemProgram,
        let instructionType = BraveWallet.SolanaSystemInstruction(rawValue: Int(decodedData.instructionType)) {
       let name = instructionType.name
-      return "System Program - \(name)"
+      return String.localizedStringWithFormat(Strings.Wallet.solanaSystemProgramName, name)
     } else if isTokenProgram, let instructionType = BraveWallet.SolanaTokenInstruction(rawValue: Int(decodedData.instructionType)) {
       let name = instructionType.name
-      return "Token Program - \(name)"
+      return String.localizedStringWithFormat(Strings.Wallet.solanaTokenProgramName, name)
     }
-    return "Unknown"
+    return Strings.Wallet.solanaUnknownInstructionName
   }
 }
 
@@ -43,33 +43,33 @@ extension BraveWallet.SolanaSystemInstruction {
   var name: String {
     switch self {
     case .transfer:
-      return "Transfer"
+      return Strings.Wallet.solanaTransferInstructionName
     case .transferWithSeed:
-      return "TransferWithSeed"
+      return Strings.Wallet.solanaTransferWithSeedInstructionName
     case .withdrawNonceAccount:
-      return "WithdrawNonceAccount"
+      return Strings.Wallet.solanaWithdrawNonceAccountInstructionName
     case .createAccount:
-      return "CreateAccount"
+      return Strings.Wallet.solanaCreateAccountInstructionName
     case .createAccountWithSeed:
-      return "CreateAccountWithSeed"
+      return Strings.Wallet.solanaCreateAccountWithSeedInstructionName
     case .assign:
-      return "Assign"
+      return Strings.Wallet.solanaAssignInstructionName
     case .assignWithSeed:
-      return "AssignWithSeed"
+      return Strings.Wallet.solanaAssignWithSeedInstructionName
     case .allocate:
-      return "Allocate"
+      return Strings.Wallet.solanaAllocateInstructionName
     case .allocateWithSeed:
-      return "AllocateWithSeed"
+      return Strings.Wallet.solanaAllocateWithSeedInstructionName
     case .advanceNonceAccount:
-      return "AdvanceNonceAccount"
+      return Strings.Wallet.solanaAdvanceNonceAccountInstructionName
     case .initializeNonceAccount:
-      return "InitializeNonceAccount"
+      return Strings.Wallet.solanaInitializeNonceAccountInstructionName
     case .authorizeNonceAccount:
-      return "AuthorizeNonceAccount"
+      return Strings.Wallet.solanaAuthorizeNonceAccountInstructionName
     case .upgradeNonceAccount:
-      return "UpgradeNonceAccount"
+      return Strings.Wallet.solanaUpgradeNonceAccountInstructionName
     default:
-      return "Unknown"
+      return Strings.Wallet.solanaUnknownInstructionName
     }
   }
 }
@@ -78,49 +78,49 @@ extension BraveWallet.SolanaTokenInstruction {
   var name: String {
     switch self {
     case .initializeMint:
-      return "InitializeMint"
+      return Strings.Wallet.solanaInitializeMintInstructionName
     case .initializeMint2:
-      return "InitializeMint2"
+      return Strings.Wallet.solanaInitializeMint2InstructionName
     case .initializeAccount:
-      return "InitializeAccount"
+      return Strings.Wallet.solanaInitializeAccountInstructionName
     case .initializeAccount2:
-      return "InitializeAccount2"
+      return Strings.Wallet.solanaInitializeAccount2InstructionName
     case .initializeAccount3:
-      return "InitializeAccount3"
+      return Strings.Wallet.solanaInitializeAccount3InstructionName
     case .initializeMultisig:
-      return "InitializeMultisig"
+      return Strings.Wallet.solanaInitializeMultisigInstructionName
     case .initializeMultisig2:
-      return "InitializeMultisig2"
+      return Strings.Wallet.solanaInitializeMultisig2InstructionName
     case .approve:
-      return "Approve"
+      return Strings.Wallet.solanaApproveInstructionName
     case .transfer:
-      return "Transfer"
+      return Strings.Wallet.solanaTransferInstructionName
     case .revoke:
-      return "Revoke"
+      return Strings.Wallet.solanaRevokeInstructionName
     case .setAuthority:
-      return "SetAuthority"
+      return Strings.Wallet.solanaSetAuthorityInstructionName
     case .mintTo:
-      return "MintTo"
+      return Strings.Wallet.solanaMintToInstructionName
     case .burn:
-      return "Burn"
+      return Strings.Wallet.solanaBurnInstructionName
     case .closeAccount:
-      return "CloseAccount"
+      return Strings.Wallet.solanaCloseAccountInstructionName
     case .freezeAccount:
-      return "FreezeAccount"
+      return Strings.Wallet.solanaFreezeAccountInstructionName
     case .thawAccount:
-      return "ThawAccount"
+      return Strings.Wallet.solanaThawAccountInstructionName
     case .approveChecked:
-      return "ApproveChecked"
+      return Strings.Wallet.solanaApproveCheckedInstructionName
     case .transferChecked:
-      return "TransferChecked"
+      return Strings.Wallet.solanaTransferCheckedInstructionName
     case .mintToChecked:
-      return "MintToChecked"
+      return Strings.Wallet.solanaMintToInstructionName
     case .burnChecked:
-      return "BurnChecked"
+      return Strings.Wallet.solanaBurnCheckedInstructionName
     case .syncNative:
-      return "SyncNative"
+      return Strings.Wallet.solanaSyncNativeInstructionName
     @unknown default:
-      return "Unknown"
+      return Strings.Wallet.solanaUnknownInstructionName
     }
   }
 }
@@ -142,7 +142,6 @@ extension BraveWallet.DecodedSolanaInstructionData {
     case seed
     case fromSeed = "from_seed"
     case fromOwner = "from_owner"
-    /// should be moved to `accountMetas`, not available in params
     case nonceAccount = "nonce_account"
     case authorityType = "authority_type"
     case newAuthority = "new_authority"
