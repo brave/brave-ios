@@ -309,8 +309,14 @@ extension Tab: BraveWalletProviderDelegate {
   
   func showAccountCreation(_ type: BraveWallet.CoinType) {
     let origin = getOrigin()
+    let accountCreationRequestManager = WalletProviderAccountCreationRequestManager.shared
+    
+    // check if same account creation request exists
+    guard !accountCreationRequestManager.hasPendingRequest(for: origin, coinType: type)
+    else { return }
+    
     // store the account creation request
-    WalletProviderAccountCreationRequestManager.shared.beginRequest(for: origin, coinType: type) { [weak self] in
+    accountCreationRequestManager.beginRequest(for: origin, coinType: type) { [weak self] in
       self?.tabDelegate?.updateURLBarWalletButton()
     }
     // show wallet notification
