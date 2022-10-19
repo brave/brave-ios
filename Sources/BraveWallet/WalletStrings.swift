@@ -2876,7 +2876,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .strings,
       value: "Buy crypto with Visa or Mastercard.",
-      comment: "The descrition of one of the 'Ramp.Network' provider."
+      comment: "The description of one of the 'Ramp.Network' provider."
     )
     public static let sardineProviderName = NSLocalizedString(
       "wallet.sardineProviderName",
@@ -2897,7 +2897,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .strings,
       value: "Instant buy with your bank account. Lower fees.",
-      comment: "The descrition of one of the 'Sardine' provider."
+      comment: "The description of one of the 'Sardine' provider."
     )
     public static let wyreProviderName = NSLocalizedString(
       "wallet.wyreProviderName",
@@ -2918,7 +2918,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .strings,
       value: "Buy crypto with Visa or Mastercard.",
-      comment: "The descrition of one of the 'Wyre' provider."
+      comment: "The description of one of the 'Wyre' provider."
     )
   }
 }

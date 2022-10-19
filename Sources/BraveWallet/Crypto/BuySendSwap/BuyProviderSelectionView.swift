@@ -75,11 +75,11 @@ struct BuyProviderSelectionView: View {
 
 #if DEBUG
 struct BuyProviderSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-      BuyProviderSelectionView(
-        buyTokenStore: .previewStore,
-        keyringStore: .previewStore
-      )
-    }
+  static var previews: some View {
+    BuyProviderSelectionView(
+      buyTokenStore: .previewStore,
+      keyringStore: .previewStore
+    )
+  }
 }
 #endif

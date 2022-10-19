@@ -91,6 +91,20 @@ struct WalletConstants {
   
   /// The link for users to open Aurora site
   static let auroraBridgeLink: URL? = URL(string: "https://rainbowbridge.app")
+  
+  /// A map between chain id and gas token's symbol
+  static let gasTokens: [String: [String]] = [
+    BraveWallet.MainnetChainId: ["eth"],
+    BraveWallet.OptimismMainnetChainId: ["eth"],
+    BraveWallet.AuroraMainnetChainId: ["eth"],
+    BraveWallet.PolygonMainnetChainId: ["matic"],
+    BraveWallet.FantomMainnetChainId: ["ftm"],
+    BraveWallet.CeloMainnetChainId: ["celo"],
+    BraveWallet.BinanceSmartChainMainnetChainId: ["bnb"],
+    BraveWallet.SolanaMainnet: ["sol"],
+    BraveWallet.FilecoinMainnet: ["fil"],
+    BraveWallet.AvalancheMainnetChainId: ["avax", "avaxc"]
+  ]
 }
 
 public struct WalletDebugFlags {

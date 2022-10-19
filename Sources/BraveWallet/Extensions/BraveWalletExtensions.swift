@@ -235,13 +235,67 @@ extension BraveWallet.BlockchainToken {
   }
   
   var isGasToken: Bool {
-    // swiftlint:disable:next line_length
-    return (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("eth") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("matic") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("ftm") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("celo") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("bnb") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("sol") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame) || (symbol.caseInsensitiveCompare("fil") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame) || (symbol.caseInsensitiveCompare("avax") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame) || (symbol.caseInsensitiveCompare("avaxc") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame)
+    guard let gasTokensByChain = WalletConstants.gasTokens[chainId] else { return false }
+    return gasTokensByChain.contains { $0.caseInsensitiveCompare(symbol) == .orderedSame }
   }
   
   var isBatToken: Bool {
     // BAT/wormhole BAT/Avalanche C-Chain BAT
     return symbol.caseInsensitiveCompare("bat") == .orderedSame || symbol.caseInsensitiveCompare("wbat") == .orderedSame || symbol.caseInsensitiveCompare("bat.e") == .orderedSame
+  }
+  
+  // a special symbol to fetch correct ramp.network buy url
+  var rampNetworkSymbol: String {
+    if symbol.caseInsensitiveCompare("bat") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
+      // BAT is the only token on Ethereum Mainnet with a prefix on Ramp.Network
+      return "ETH_BAT"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame && contractAddress.isEmpty {
+      // AVAX native token has no prefix
+      return symbol
+    } else {
+      let rampNetworkPrefix: String
+      switch chainId.lowercased() {
+      case BraveWallet.MainnetChainId.lowercased(),
+        BraveWallet.CeloMainnetChainId.lowercased():
+        rampNetworkPrefix = ""
+      case BraveWallet.AvalancheMainnetChainId.lowercased():
+        rampNetworkPrefix = "AVAXC"
+      case BraveWallet.BinanceSmartChainMainnetChainId.lowercased():
+        rampNetworkPrefix = "BSC"
+      case BraveWallet.PolygonMainnetChainId.lowercased():
+        rampNetworkPrefix = "MATIC"
+      case BraveWallet.SolanaMainnet.lowercased():
+        rampNetworkPrefix = "SOLANA"
+      case BraveWallet.OptimismMainnetChainId.lowercased():
+        rampNetworkPrefix = "OPTIMISM"
+      case BraveWallet.FilecoinMainnet.lowercased():
+        rampNetworkPrefix = "FILECOIN"
+      default:
+        rampNetworkPrefix = ""
+      }
+      
+      return rampNetworkPrefix.isEmpty ? symbol : "\(rampNetworkPrefix)_\(symbol.uppercased())"
+    }
+  }
+  
+  // a special symbol to fetch correct wyre buy url
+  var wyreSymbol: String {
+    if contractAddress.isEmpty || chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
+      return symbol
+    } else {
+      let wyrePrefix: String
+      switch chainId.lowercased() {
+      case BraveWallet.PolygonMainnetChainId.lowercased():
+        wyrePrefix = "M"
+      case BraveWallet.AvalancheMainnetChainId.lowercased():
+        wyrePrefix = "AVAXC"
+      case BraveWallet.MainnetChainId.lowercased():
+        wyrePrefix = ""
+      default:
+        wyrePrefix = ""
+      }
+      return wyrePrefix.isEmpty ? symbol : "\(wyrePrefix)\(symbol.uppercased())"
+    }
   }
 }
 

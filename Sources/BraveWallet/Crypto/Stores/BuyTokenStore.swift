@@ -30,9 +30,7 @@ public class BuyTokenStore: ObservableObject {
     for provider in buyTokens.keys {
       if let token = selectedBuyToken,
          let tokens = buyTokens[provider],
-         tokens.contains(where: {
-           $0.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame && $0.contractAddress.caseInsensitiveCompare(token.contractAddress) == .orderedSame && $0.chainId.caseInsensitiveCompare(token.chainId) == .orderedSame
-         }) {
+         tokens.includes(token) {
         providers.append(provider)
       }
     }
@@ -74,13 +72,25 @@ public class BuyTokenStore: ObservableObject {
   ) async -> String? {
     guard let token = selectedBuyToken else { return nil }
     
+    let symbol: String
+    switch provider {
+    case .ramp:
+      symbol = token.rampNetworkSymbol
+    case .wyre:
+      symbol = token.wyreSymbol
+    case .sardine:
+      symbol = token.symbol
+    @unknown default:
+      symbol = token.symbol
+    }
+    
     let (url, error) = await assetRatioService.buyUrlV1(
       provider,
       chainId: selectedNetwork.chainId,
       address: account.address,
-      symbol: token.symbol,
+      symbol: symbol,
       amount: buyAmount,
-      currencyCode: "usd"
+      currencyCode: selectedCurrency.currencyCode
     )
 
     guard error == nil else { return nil }
@@ -103,7 +113,7 @@ public class BuyTokenStore: ObservableObject {
     for provider in buyTokens.keys {
       let tokens = await blockchainRegistry.buyTokens(provider, chainId: network.chainId)
       let sortedTokenList = tokens.sorted(by: {
-        if $0.isGasToken, !$01.isGasToken {
+        if $0.isGasToken, !$1.isGasToken {
           return true
         } else if !$0.isGasToken, $1.isGasToken {
           return false
@@ -121,9 +131,7 @@ public class BuyTokenStore: ObservableObject {
     for provider in orderedSupportedBuyOptions {
       if let tokens = buyTokens[provider] {
         for token in tokens {
-          if !allTokens.contains(where: {
-            $0.contractAddress.caseInsensitiveCompare(token.contractAddress) == .orderedSame && $0.chainId.caseInsensitiveCompare(token.chainId) == .orderedSame
-          }) {
+          if !allTokens.includes(token) {
             allTokens.append(token)
           }
         }
@@ -156,9 +164,7 @@ public class BuyTokenStore: ObservableObject {
             let tokens = self.buyTokens[provider],
             let selectedBuyToken = self.selectedBuyToken
       else { return false }
-      return tokens.contains(where: { token in
-        return token.contractAddress.caseInsensitiveCompare(selectedBuyToken.contractAddress) == .orderedSame && token.chainId == selectedBuyToken.chainId && token.symbol.caseInsensitiveCompare(selectedBuyToken.symbol) == .orderedSame
-      })
+      return tokens.includes(selectedBuyToken)
     })
     
     // check if current selected network supports buy
