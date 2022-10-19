@@ -29,7 +29,8 @@ class AppReviewManager: ObservableObject {
     case numberOfPlaylistItems
     case syncEnabledWithTabSync
   }
-    @Published var isReviewRequired = false
+    
+  @Published var isReviewRequired = false
   
   private let launchCountLimit = 5
   private let bookmarksCountLimit = 5
@@ -44,8 +45,8 @@ class AppReviewManager: ObservableObject {
   
   // MARK: Review Handler Methods
   
-  /// <#Description#>
-  /// - Parameter currentScene: <#currentScene description#>
+  /// Method that handles If App Rating should be requested and request if condition is sucessful
+  /// - Parameter currentScene: Current Scene where App Rating will be asked
   func handleAppReview(for currentScene: UIWindowScene?) {
     if AppConstants.buildChannel.isPublic && shouldRequestReview() {
       // Request Review when the main-queue is free or on the next cycle.
@@ -56,6 +57,8 @@ class AppReviewManager: ObservableObject {
     }
   }
   
+  /// Method for handling changes to main criteriainside the various parts in application
+  /// - Parameter mainCriteria: Type of the main Criteria
   func processMainCriteria(for mainCriteria: AppReviewMainCriteriaType) {
     switch mainCriteria {
     case .daysInUse:
@@ -68,6 +71,9 @@ class AppReviewManager: ObservableObject {
     }
   }
   
+  
+  /// Method for handling changes to main criteriainside the various parts in application
+  /// - Parameter mainCriteria: Type of the main Criteria
   func processSubCriteria(for subCriteria: AppReviewSubCriteriaType) {
     switch subCriteria {
     case .walletConnectedDapp:
