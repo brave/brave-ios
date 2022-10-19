@@ -80,6 +80,16 @@ struct BackupWalletView: View {
         }
         .buttonStyle(BraveFilledButtonStyle(size: .normal))
         .disabled(isContinueButtonDisabled)
+        
+        if keyringStore.isOnboardingVisible {
+          Button(action: {
+            keyringStore.markOnboardingCompleted()
+          }) {
+            Text(Strings.Wallet.skipButtonTitle)
+              .font(Font.subheadline.weight(.medium))
+              .foregroundColor(Color(.braveLabel))
+          }
+        }
       }
       .padding()
       .padding()
