@@ -487,20 +487,20 @@ enum TransactionParser {
   
   static func solanaInstructionFormatted(
     _ instruction: BraveWallet.SolanaInstruction,
-    keyIndent: String = " ",
     valueIndent: String = "  "
   ) -> String {
     let formattedKeyValuePair: (_ key: String, _ value: String) -> String = { key, value in
-      "\(keyIndent)\(key):\n\(valueIndent)\(value)"
+      guard !value.isEmpty else { return "\(key):" }
+      return "\(key):\n\(valueIndent)\(value)"
     }
     
     guard let decodedData = instruction.decodedData else {
       let title = "Unknown"
       let programId = formattedKeyValuePair("Program Id", instruction.programId)
-      let data = formattedKeyValuePair("Data", "\(instruction.data)")
       let accountPubkeys = instruction.accountMetas.map(\.pubkey)
-      let accounts = formattedKeyValuePair("Accounts", accountPubkeys.isEmpty ? "[]" : accountPubkeys.joined(separator: "\n  "))
-      return "\(title)\n\(programId)\n\(data)"
+      let accounts = formattedKeyValuePair("Accounts", accountPubkeys.isEmpty ? "[]" : accountPubkeys.joined(separator: "\n\(valueIndent)"))
+      let data = formattedKeyValuePair("Data", "\(instruction.data)")
+      return "\(title)\n\(programId)\n\(accounts)\n\(data)"
     }
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     var formatted = instruction.instructionName
@@ -526,7 +526,7 @@ enum TransactionParser {
         let paramsFormatted = params.map { param in
           formattedKeyValuePair(param.localizedName, param.value)
         }.joined(separator: "\n")
-        formatted.append("\nParams:\n\(paramsFormatted)")
+        formatted.append("\n\(paramsFormatted)")
       }
       
     } else if instruction.isTokenProgram {
@@ -536,9 +536,9 @@ enum TransactionParser {
           // its possible to have any number of signers, including 0
           if instruction.accountMetas[safe: index] != nil {
             let signers = instruction.accountMetas[index...].map(\.pubkey)
-              .map { pubkey in "\n\(keyIndent)\(pubkey)" }
+              .map { pubkey in "\n\(pubkey)" }
               .joined(separator: "\n\(valueIndent)")
-            return "\n\(keyIndent)\(param.localizedName):\n\(signers)"
+            return "\n\(param.localizedName):\n\(signers)"
           } else {
             return nil // no signers
           }
@@ -553,7 +553,7 @@ enum TransactionParser {
          let decimalsParam = decodedData.paramFor(.decimals),
          let decimals = Int(decimalsParam.value),
          let amountValue = formatter.decimalString(for: amountParam.value, radix: .decimal, decimals: decimals)?.trimmingTrailingZeros {
-        formatted.append("\n\(formattedKeyValuePair(amountParam.localizedName, amountValue))") // TODO: token symbol?
+        formatted.append("\n\(formattedKeyValuePair(amountParam.localizedName, amountValue))")
       }
       
       let params = decodedData.params
@@ -565,7 +565,7 @@ enum TransactionParser {
         let paramsFormatted = params.map { param in
           formattedKeyValuePair(param.localizedName, param.value)
         }.joined(separator: "\n")
-        formatted.append("\nParams:\n\(paramsFormatted)")
+        formatted.append("\n\(paramsFormatted)")
       }
     }
     return formatted

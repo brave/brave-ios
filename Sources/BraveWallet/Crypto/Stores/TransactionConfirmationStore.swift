@@ -377,8 +377,6 @@ public class TransactionConfirmationStore: ObservableObject {
       value = details.fromAmount
       transactionDetails = details.instructions
         .map { TransactionParser.solanaInstructionFormatted($0) }
-        .enumerated()
-        .map { (index, formattedInstruction) in "Instruction #\(index + 1)\n\(formattedInstruction)" }
         .joined(separator: "\n\n") // separator between each instruction
       
       if let gasFee = details.gasFee {
