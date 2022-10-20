@@ -91,7 +91,7 @@ class AppReviewManager: ObservableObject {
   
   /// Method checking If all main criterias are handled including at least one additional sub-criteria
   /// - Returns: Boolean value showing If App RAting should be requested
-  private func shouldRequestReview() -> Bool {
+  func shouldRequestReview() -> Bool {
     var mainCriteriaSatisfied = true
     var subCriteriaSatisfied = false
         
@@ -103,7 +103,7 @@ class AppReviewManager: ObservableObject {
       }
     }
     
-    // Additionally if a main criteria is accomplished one of following conditions must also be met
+    // Additionally if all main criterias are accomplished one of following conditions must also be met
     if mainCriteriaSatisfied {
       // One of the sub criterias also should be satisfied
       for subCriteria in AppReviewSubCriteriaType.allCases {
@@ -125,9 +125,9 @@ class AppReviewManager: ObservableObject {
     case .launchCount:
       return Preferences.Review.launchCount.value >= launchCountLimit
     case .daysInUse:
-      return Preferences.Review.daysInUse.value.count > daysInUseRequiredPeriod
+      return Preferences.Review.daysInUse.value.count >= daysInUseRequiredPeriod
     case .sessionCrash:
-      return !Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug
+      return !(!Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug)
     }
   }
   
