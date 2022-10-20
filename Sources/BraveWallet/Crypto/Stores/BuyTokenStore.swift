@@ -24,20 +24,6 @@ public class BuyTokenStore: ObservableObject {
   var buyTokens: [BraveWallet.OnRampProvider: [BraveWallet.BlockchainToken]] = [.ramp: [], .wyre: [], .sardine: []]
   /// A list of all available tokens for all providers
   var allTokens: [BraveWallet.BlockchainToken] = []
-  /// A list of on ramp providers for `selectedBuyToken`
-  var supportedBuyOptionsByToken: [BraveWallet.OnRampProvider] {
-    var providers = [BraveWallet.OnRampProvider]()
-    for provider in buyTokens.keys {
-      if let token = selectedBuyToken,
-         let tokens = buyTokens[provider],
-         tokens.includes(token) {
-        providers.append(provider)
-      }
-    }
-    return providers.sorted {
-      $0.name < $1.name
-    }
-  }
 
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let rpcService: BraveWalletJsonRpcService
@@ -121,7 +107,6 @@ public class BuyTokenStore: ObservableObject {
     return url
   }
 
-  @MainActor
   private func fetchBuyTokens(network: BraveWallet.NetworkInfo) async {
     allTokens = []
     for provider in buyTokens.keys {
@@ -155,11 +140,10 @@ public class BuyTokenStore: ObservableObject {
     }
   }
   
-  @MainActor
-  private func updateInfo() async {
+  func updateInfo() async {
     // check device language to determine if we support `Sardine`
     if Locale.preferredLanguages.first?.caseInsensitiveCompare("en-us") == .orderedSame {
-      orderedSupportedBuyOptions = [.ramp, .wyre, .sardine]
+      orderedSupportedBuyOptions = [.ramp, .sardine, .wyre]
     } else {
       orderedSupportedBuyOptions = [.ramp, .wyre]
     }

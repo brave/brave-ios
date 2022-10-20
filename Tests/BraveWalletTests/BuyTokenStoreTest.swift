@@ -109,7 +109,7 @@ class BuyTokenStoreTests: XCTestCase {
     wait(for: [isSelectedNetworkSupportedExpectation], timeout: 2)
   }
   
-  func testOrderedSupportedBuyOptions() {
+  func testOrderedSupportedBuyOptions() async {
     let (_, rpcService, walletService, assetRatioService) = setupServices()
     let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
     blockchainRegistry._buyTokens = {
@@ -129,17 +129,17 @@ class BuyTokenStoreTests: XCTestCase {
       prefilledToken: nil
     )
     
+    await store.updateInfo()
+    
     let orderSupportedBuyOptionsExpectation = expectation(description: "buyTokenStore-orderSupportedBuyOptions")
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      XCTAssertEqual(store.orderedSupportedBuyOptions.count, 1)
-      XCTAssertNotNil(store.orderedSupportedBuyOptions.first)
-      XCTAssertEqual(store.orderedSupportedBuyOptions.first!, .ramp)
-      orderSupportedBuyOptionsExpectation.fulfill()
-    }
-    waitForExpectations(timeout: 2)
+    XCTAssertEqual(store.orderedSupportedBuyOptions.count, 1)
+    XCTAssertNotNil(store.orderedSupportedBuyOptions.first)
+    XCTAssertEqual(store.orderedSupportedBuyOptions.first!, .ramp)
+    orderSupportedBuyOptionsExpectation.fulfill()
+    await waitForExpectations(timeout: 2)
   }
   
-  func testAllTokens() {
+  func testAllTokens() async {
     let selectedNetwork: BraveWallet.NetworkInfo = .mockSolana
     let (_, rpcService, walletService, assetRatioService) = setupServices(selectedNetwork: selectedNetwork)
     let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
@@ -160,14 +160,15 @@ class BuyTokenStoreTests: XCTestCase {
       prefilledToken: nil
     )
     
+    await store.updateInfo()
+    
     let allTokensExpectation = expectation(description: "buyTokenStore-allTokensExpectation")
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      XCTAssertEqual(store.allTokens.count, 2)
-      for token in store.allTokens {
-        XCTAssertEqual(token.chainId, selectedNetwork.chainId)
-      }
-      allTokensExpectation.fulfill()
+    XCTAssertEqual(store.allTokens.count, 2)
+    for token in store.allTokens {
+      XCTAssertEqual(token.chainId, selectedNetwork.chainId)
     }
-    waitForExpectations(timeout: 2)
+    allTokensExpectation.fulfill()
+    
+    await waitForExpectations(timeout: 2)
   }
 }

@@ -22,7 +22,7 @@ struct BuyProviderSelectionView: View {
           title: Text(Strings.Wallet.providerSelectionSectionHeader)
         )
       ) {
-        ForEach(buyTokenStore.supportedBuyOptionsByToken) { provider in
+        ForEach(buyTokenStore.orderedSupportedBuyOptions) { provider in
           VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
               Image(provider.iconName, bundle: .module)
