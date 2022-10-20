@@ -45,6 +45,20 @@ public class BuyTokenStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private var selectedNetwork: BraveWallet.NetworkInfo = .init()
   private var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
+  
+  /// A map between chain id and gas token's symbol
+  static let gasTokens: [String: [String]] = [
+    BraveWallet.MainnetChainId: ["eth"],
+    BraveWallet.OptimismMainnetChainId: ["eth"],
+    BraveWallet.AuroraMainnetChainId: ["eth"],
+    BraveWallet.PolygonMainnetChainId: ["matic"],
+    BraveWallet.FantomMainnetChainId: ["ftm"],
+    BraveWallet.CeloMainnetChainId: ["celo"],
+    BraveWallet.BinanceSmartChainMainnetChainId: ["bnb"],
+    BraveWallet.SolanaMainnet: ["sol"],
+    BraveWallet.FilecoinMainnet: ["fil"],
+    BraveWallet.AvalancheMainnetChainId: ["avax", "avaxc"]
+  ]
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
@@ -130,10 +144,8 @@ public class BuyTokenStore: ObservableObject {
     
     for provider in orderedSupportedBuyOptions {
       if let tokens = buyTokens[provider] {
-        for token in tokens {
-          if !allTokens.includes(token) {
-            allTokens.append(token)
-          }
+        for token in tokens where !allTokens.includes(token) {
+          allTokens.append(token)
         }
       }
     }
@@ -195,5 +207,71 @@ extension BuyTokenStore: BraveWalletJsonRpcServiceObserver {
   }
   
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
+  }
+}
+
+private extension BraveWallet.BlockchainToken {
+  var isGasToken: Bool {
+    guard let gasTokensByChain = BuyTokenStore.gasTokens[chainId] else { return false }
+    return gasTokensByChain.contains { $0.caseInsensitiveCompare(symbol) == .orderedSame }
+  }
+  
+  var isBatToken: Bool {
+    // BAT/wormhole BAT/Avalanche C-Chain BAT
+    return symbol.caseInsensitiveCompare("bat") == .orderedSame || symbol.caseInsensitiveCompare("wbat") == .orderedSame || symbol.caseInsensitiveCompare("bat.e") == .orderedSame
+  }
+  
+  // a special symbol to fetch correct ramp.network buy url
+  var rampNetworkSymbol: String {
+    if symbol.caseInsensitiveCompare("bat") == .orderedSame && chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
+      // BAT is the only token on Ethereum Mainnet with a prefix on Ramp.Network
+      return "ETH_BAT"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame && contractAddress.isEmpty {
+      // AVAX native token has no prefix
+      return symbol
+    } else {
+      let rampNetworkPrefix: String
+      switch chainId.lowercased() {
+      case BraveWallet.MainnetChainId.lowercased(),
+        BraveWallet.CeloMainnetChainId.lowercased():
+        rampNetworkPrefix = ""
+      case BraveWallet.AvalancheMainnetChainId.lowercased():
+        rampNetworkPrefix = "AVAXC"
+      case BraveWallet.BinanceSmartChainMainnetChainId.lowercased():
+        rampNetworkPrefix = "BSC"
+      case BraveWallet.PolygonMainnetChainId.lowercased():
+        rampNetworkPrefix = "MATIC"
+      case BraveWallet.SolanaMainnet.lowercased():
+        rampNetworkPrefix = "SOLANA"
+      case BraveWallet.OptimismMainnetChainId.lowercased():
+        rampNetworkPrefix = "OPTIMISM"
+      case BraveWallet.FilecoinMainnet.lowercased():
+        rampNetworkPrefix = "FILECOIN"
+      default:
+        rampNetworkPrefix = ""
+      }
+      
+      return rampNetworkPrefix.isEmpty ? symbol : "\(rampNetworkPrefix)_\(symbol.uppercased())"
+    }
+  }
+  
+  // a special symbol to fetch correct wyre buy url
+  var wyreSymbol: String {
+    if contractAddress.isEmpty || chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
+      return symbol
+    } else {
+      let wyrePrefix: String
+      switch chainId.lowercased() {
+      case BraveWallet.PolygonMainnetChainId.lowercased():
+        wyrePrefix = "M"
+      case BraveWallet.AvalancheMainnetChainId.lowercased():
+        wyrePrefix = "AVAXC"
+      case BraveWallet.MainnetChainId.lowercased():
+        wyrePrefix = ""
+      default:
+        wyrePrefix = ""
+      }
+      return wyrePrefix.isEmpty ? symbol : "\(wyrePrefix)\(symbol.uppercased())"
+    }
   }
 }
