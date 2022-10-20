@@ -44,7 +44,7 @@ public class BuyTokenStore: ObservableObject {
   private let walletService: BraveWalletBraveWalletService
   private let assetRatioService: BraveWalletAssetRatioService
   private var selectedNetwork: BraveWallet.NetworkInfo = .init()
-  private var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
+  private(set) var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
   
   /// A map between chain id and gas token's symbol
   static let gasTokens: [String: [String]] = [

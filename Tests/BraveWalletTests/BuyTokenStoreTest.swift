@@ -108,4 +108,66 @@ class BuyTokenStoreTests: XCTestCase {
       .store(in: &cancellables)
     wait(for: [isSelectedNetworkSupportedExpectation], timeout: 2)
   }
+  
+  func testOrderedSupportedBuyOptions() {
+    let (_, rpcService, walletService, assetRatioService) = setupServices()
+    let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
+    blockchainRegistry._buyTokens = {
+      if $0 == .ramp {
+        $2([.mockSolToken])
+      } else {
+        $2([.mockUSDCToken])
+      }
+    }
+    blockchainRegistry._onRampCurrencies = { $0([.init(currencyCode: "usd", currencyName: "United States Dollar", providers: [.init(value: 0)])]) }
+    
+    let store = BuyTokenStore(
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      walletService: walletService,
+      assetRatioService: assetRatioService,
+      prefilledToken: nil
+    )
+    
+    let orderSupportedBuyOptionsExpectation = expectation(description: "buyTokenStore-orderSupportedBuyOptions")
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+      XCTAssertEqual(store.orderedSupportedBuyOptions.count, 1)
+      XCTAssertNotNil(store.orderedSupportedBuyOptions.first)
+      XCTAssertEqual(store.orderedSupportedBuyOptions.first!, .ramp)
+      orderSupportedBuyOptionsExpectation.fulfill()
+    }
+    waitForExpectations(timeout: 2)
+  }
+  
+  func testAllTokens() {
+    let selectedNetwork: BraveWallet.NetworkInfo = .mockSolana
+    let (_, rpcService, walletService, assetRatioService) = setupServices(selectedNetwork: selectedNetwork)
+    let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
+    blockchainRegistry._buyTokens = {
+      if $0 == .ramp {
+        $2([.mockSolToken, .mockSpdToken])
+      } else {
+        $2([.mockSpdToken])
+      }
+    }
+    blockchainRegistry._onRampCurrencies = { $0([.init(currencyCode: "usd", currencyName: "United States Dollar", providers: [.init(value: 0)])]) }
+    
+    let store = BuyTokenStore(
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      walletService: walletService,
+      assetRatioService: assetRatioService,
+      prefilledToken: nil
+    )
+    
+    let allTokensExpectation = expectation(description: "buyTokenStore-allTokensExpectation")
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+      XCTAssertEqual(store.allTokens.count, 2)
+      for token in store.allTokens {
+        XCTAssertEqual(token.chainId, selectedNetwork.chainId)
+      }
+      allTokensExpectation.fulfill()
+    }
+    waitForExpectations(timeout: 2)
+  }
 }
