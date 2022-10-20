@@ -61,7 +61,7 @@ public class BuyTokenStore: ObservableObject {
     
     self.rpcService.add(self)
     
-    Task { @MainActor in
+    Task {
       await updateInfo()
     }
   }
@@ -107,6 +107,7 @@ public class BuyTokenStore: ObservableObject {
     return url
   }
 
+  @MainActor
   private func fetchBuyTokens(network: BraveWallet.NetworkInfo) async {
     allTokens = []
     for provider in buyTokens.keys {
@@ -140,6 +141,7 @@ public class BuyTokenStore: ObservableObject {
     }
   }
   
+  @MainActor
   func updateInfo() async {
     // check device language to determine if we support `Sardine`
     if Locale.preferredLanguages.first?.caseInsensitiveCompare("en-us") == .orderedSame {
@@ -182,7 +184,7 @@ public class BuyTokenStore: ObservableObject {
 
 extension BuyTokenStore: BraveWalletJsonRpcServiceObserver {
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
-    Task { @MainActor in
+    Task {
       await updateInfo()
     }
   }
