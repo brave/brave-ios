@@ -130,7 +130,7 @@ public class BraveVPNSettingsViewController: TableViewController {
         UIApplication.shared.open(url, options: [:])
       }
     }, cellClass: ButtonCell.self)] + linkReceiptRows,
-            footer: .title(Strings.VPN.settingsLinkReceipFooter))
+            footer: .title(Strings.VPN.settingsLinkReceiptFooter))
     
     let location = BraveVPN.serverLocation ?? "-"
     
