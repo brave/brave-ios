@@ -2515,7 +2515,7 @@ extension Strings {
         comment: "Button to link your VPN receipt to other devices.")
     
     public static let settingsLinkReceipFooter =
-      NSLocalizedString("vpn.settingsLinkReceipFootert", tableName: "BraveShared", bundle: .strings,
+      NSLocalizedString("vpn.settingsLinkReceipFooter", tableName: "BraveShared", bundle: .strings,
         value: "Link your App Store purchase to your Brave account to use Brave VPN on other devices.",
         comment: "Footer text to link your VPN receipt to other devices.")
 
