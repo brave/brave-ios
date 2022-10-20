@@ -65,6 +65,30 @@ public class BraveVPNSettingsViewController: TableViewController {
       overlayView = overlay
     }
   }
+  
+  private var linkReceiptRows: [Row] {
+    var rows = [Row]()
+    
+    if BraveVPN.linkReceiptEnabled {
+      rows.append(Row(text: Strings.VPN.settingsLinkReceipt,
+                      selection: { [unowned self] in
+        openURL?(BraveUX.braveVPNLinkReceiptProd)
+      }, accessory: .disclosureIndicator, cellClass: ButtonCell.self))
+    }
+    
+    if BraveVPN.isSandbox {
+      rows += [Row(text: "[Staging] Link Receipt",
+                   selection: { [unowned self] in
+        openURL?(BraveUX.braveVPNLinkReceiptStaging)
+      }, accessory: .disclosureIndicator, cellClass: ButtonCell.self),
+               Row(text: "[Dev] Link Receipt",
+                   selection: { [unowned self] in
+        openURL?(BraveUX.braveVPNLinkReceiptDev)
+      }, accessory: .disclosureIndicator, cellClass: ButtonCell.self)]
+    }
+    
+    return rows
+  }
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -105,16 +129,7 @@ public class BraveVPNSettingsViewController: TableViewController {
         // Opens Apple's 'manage subscription' screen.
         UIApplication.shared.open(url, options: [:])
       }
-    }, cellClass: ButtonCell.self),
-                   Row(text: Strings.VPN.settingsLinkReceipt,
-                       selection: { [unowned self] in
-      guard let url = URL(string: "https://account.brave.com") else {
-        assertionFailure("Could not create link receipt url")
-        return
-      }
-      
-      openURL?(url)
-    }, accessory: .disclosureIndicator, cellClass: ButtonCell.self)],
+    }, cellClass: ButtonCell.self)] + linkReceiptRows,
             footer: .title(Strings.VPN.settingsLinkReceipFooter))
     
     let location = BraveVPN.serverLocation ?? "-"
