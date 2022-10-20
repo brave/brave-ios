@@ -3640,6 +3640,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Ouvrez Brave pour afficher vos favoris ici";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Rechercher";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Un résumé de la manière dont Brave vous fait gagner du temps et vous protège en ligne.";
 
@@ -3672,6 +3675,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "Statistique de confidentialité";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Portefeuille Brave";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "Widgets";

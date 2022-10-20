@@ -31,9 +31,6 @@
 /* The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree. */
 "wallet.addAccountAddButton" = "Tambahkan";
 
-/* The title of the add account screen */
-"wallet.addAccountTitle" = "Tambahkan Akun";
-
 /* The title of the button that is located in the same area of the assets list header but on the right side. Users will click it and go to add custom asset screen. */
 "wallet.addCustomAsset" = "Tambahkan aset khusus";
 
@@ -228,6 +225,9 @@
 
 /* The warning shown on transaction confirmation for an ERC 20 Approve transaction when the proposed allowance is unlimited. */
 "wallet.confirmationViewUnlimitedWarning" = "Persetujuan tanpa batas diminta";
+
+/* The title displayed in the navigation of the confirmation view where a user tries to remove a secondary account. */
+"wallet.confirmPasswordTitle" = "Konfirmasi Sandi";
 
 /* The title of the transaction confirmation panel UI when there are multiple transactions to confirm */
 "wallet.confirmTransactionsTitle" = "Konfirmasi Transaksi";
