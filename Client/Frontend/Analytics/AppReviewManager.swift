@@ -63,6 +63,8 @@ class AppReviewManager: ObservableObject {
     switch mainCriteria {
     case .daysInUse:
       var daysInUse = Preferences.Review.daysInUse.value
+      
+      daysInUse.append(Date())
       daysInUse = daysInUse.filter { $0 < Date().addingTimeInterval(daysInUseMaxPeriod.days) }
       
       Preferences.Review.daysInUse.value = daysInUse
