@@ -64,9 +64,25 @@ extension TabTrayController {
       }
       
       tableView.tableHeaderView = headerView
+      
+      let tableFooterLabel = UILabel().then {
+        $0.textColor = .braveLabel
+        $0.textAlignment = .left
+        $0.numberOfLines = 0
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.text = Strings.OpenTabs.openTabsListFooterTitle
+      }
+                 
+      let footerView = UIView(frame: .init(
+        width: tableView.frame.width, height: 60))
+      footerView.addSubview(tableFooterLabel)
 
-      // Set an empty footer to prevent empty cells from appearing in the list.
-      tableView.tableFooterView = UIView()
+      tableFooterLabel.snp.makeConstraints {
+        $0.leading.equalToSuperview().inset(16)
+        $0.top.bottom.trailing.equalToSuperview()
+      }
+      
+      tableView.tableFooterView = footerView
     }
     
     @available(*, unavailable)

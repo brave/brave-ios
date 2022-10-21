@@ -447,7 +447,17 @@ class TabTrayController: LoadingViewController {
   }
   
   private func fetchSyncedSessions(for query: String? = nil) -> [OpenDistantSession] {
-    let allSessions = braveCore.openTabsAPI.getSyncedSessions()
+    var allSessions = braveCore.openTabsAPI.getSyncedSessions()
+    
+    // Filter all the Open Tab Sessions older than 1 month
+    allSessions = allSessions.filter {
+      guard let modifiedTime = $0.modifiedTime else {
+        return true
+      }
+      
+      return Date() < modifiedTime.addingTimeInterval(30.days)
+    }
+    
     var queriedSessions = [OpenDistantSession]()
     
     if let query = query, !query.isEmpty {

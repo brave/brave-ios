@@ -3197,6 +3197,13 @@ extension Strings {
         bundle: .strings,
         value: "Devices",
         comment: "The title displayed on table header for open tabs list from other devices")
+    public static let openTabsListFooterTitle =
+      NSLocalizedString(
+        "opentabs.openTabsListFooterTitle",
+        tableName: "BraveShared",
+        bundle: .strings,
+        value: "Open Tab Sessions older than 1 month will be filtered automatically.",
+        comment: "The title displayed on table footer for open tabs list from other devices indicating sessions older than a month is going to hidden")
   }
 }
 
