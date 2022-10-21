@@ -417,7 +417,7 @@ struct TransactionConfirmationView: View {
       .foregroundColor(Color(.braveLabel))
       .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
       .onAppear {
-        Task { @MainActor in
+        Task {
           await confirmationStore.prepare()
         }
       }

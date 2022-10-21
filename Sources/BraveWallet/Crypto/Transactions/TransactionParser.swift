@@ -388,10 +388,12 @@ enum TransactionParser {
       var toAddress = transaction.txDataUnion.solanaTxData?.toWalletAddress
       var fromValue = ""
       var fromAmount = ""
+      var symbol: String?
       let instructions = transaction.txDataUnion.solanaTxData?.instructions ?? []
-      let parsedInstructions = instructions.map { TransactionParser.parseSolanaInstruction($0) }
+      let parsedInstructions = instructions.map {
+        TransactionParser.parseSolanaInstruction($0, decimalFormatStyle: decimalFormatStyle)
+      }
       
-      let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
       // Calculate lamports from the transaction instructions
       var valueFromInstructions = BDouble(0)
       instructions.forEach { instruction in
@@ -400,6 +402,7 @@ enum TransactionParser {
         }
         if instruction.isSystemProgram,
            let instructionType = BraveWallet.SolanaSystemInstruction(rawValue: Int(instructionTypeValue)) {
+          symbol = "SOL"
           switch instructionType {
           case .transfer, .transferWithSeed:
             if toAddress == nil || toAddress?.isEmpty == true,
@@ -450,7 +453,7 @@ enum TransactionParser {
           if let transactionLamports = transactionLamports,
              let transactionValueString = formatter.decimalString(for: "\(transactionLamports)", decimals: 9),
              let transactionValue = BDouble(transactionValueString) {
-            fromValue = (transactionValue + valueFromInstructions).decimalExpansion(precisionAfterDecimalPoint: 18).trimmingTrailingZeros
+            fromValue = (transactionValue + valueFromInstructions).decimalExpansion(precisionAfterDecimalPoint: Int(network.decimals)).trimmingTrailingZeros
           }
           fromAmount = "\(fromValue) SOL"
         }
@@ -467,6 +470,7 @@ enum TransactionParser {
           .init(
             fromValue: fromValue,
             fromAmount: fromAmount,
+            symbol: symbol,
             gasFee: gasFee(
               from: transaction,
               network: network,
@@ -486,7 +490,8 @@ enum TransactionParser {
   }
   
   static func parseSolanaInstruction(
-    _ instruction: BraveWallet.SolanaInstruction
+    _ instruction: BraveWallet.SolanaInstruction,
+    decimalFormatStyle: WeiFormatter.DecimalFormatStyle? = nil
   ) -> SolanaDappTxDetails.ParsedSolanaInstruction {
     guard let decodedData = instruction.decodedData else {
       let title = Strings.Wallet.solanaUnknownInstructionName
@@ -499,7 +504,7 @@ enum TransactionParser {
         key: Strings.Wallet.solanaInstructionData, value: "\(instruction.data)")
       return .init(name: title, details: [programId, accounts, data], instruction: instruction)
     }
-    let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+    let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle ?? .decimals(precision: 9))
     var details: [SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue] = []
     if instruction.isSystemProgram {
       let accounts = decodedData.accountParams.enumerated().compactMap { (index, param) -> SolanaDappTxDetails.ParsedSolanaInstruction.KeyValue? in
@@ -744,6 +749,8 @@ struct SolanaDappTxDetails: Equatable {
   let fromValue: String
   /// From amount formatted
   let fromAmount: String
+  /// The token symbol (if available). Token/symbol may be unavailable for Token Program instruction types.
+  let symbol: String?
   /// Gas fee for the transaction
   let gasFee: GasFee?
   /// Instructions for the transaction

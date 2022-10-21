@@ -19,13 +19,15 @@ struct TransactionHeader: View {
   let fiat: String?
   
   @Environment(\.sizeCategory) private var sizeCategory
+  @ScaledMetric private var blockieSize = 48
+  private let maxBlockieSize: CGFloat = 96
   
   var body: some View {
     VStack(spacing: 8) {
       VStack(spacing: 8) {
         if fromAccountAddress == toAccountAddress {
           Blockie(address: fromAccountAddress)
-            .frame(width: 48, height: 48)
+            .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
           AddressView(address: fromAccountAddress) {
             Text(fromAccountName)
           }
@@ -33,7 +35,7 @@ struct TransactionHeader: View {
           BlockieGroup(
             fromAddress: fromAccountAddress,
             toAddress: toAccountAddress,
-            size: 48
+            size: min(blockieSize, maxBlockieSize)
           )
           Group {
             if sizeCategory.isAccessibilityCategory {

@@ -373,7 +373,7 @@ public class TransactionConfirmationStore: ObservableObject {
       symbol = details.fromToken?.symbol ?? ""
       value = details.fromAmount
     case let .solDappTransaction(details):
-      symbol = ""
+      symbol = details.symbol ?? ""
       value = details.fromAmount
       transactionDetails = details.instructions
         .map(\.toString)
