@@ -1,4 +1,4 @@
-// Copyright 2021 The Brave Authors. All rights reserved.
+// Copyright 2022 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -35,8 +35,8 @@ class AppReviewManager: ObservableObject {
   private let launchCountLimit = 5
   private let bookmarksCountLimit = 5
   private let playlistCountLimit = 5
-  private let dappConnectionPeriod = 7
-  private let daysInUseMaxPeriod = 7
+  private let dappConnectionPeriod = 7.days
+  private let daysInUseMaxPeriod = 7.days
   private let daysInUseRequiredPeriod = 4
   
   // MARK: Lifecycle
@@ -65,7 +65,7 @@ class AppReviewManager: ObservableObject {
       var daysInUse = Preferences.Review.daysInUse.value
       
       daysInUse.append(Date())
-      daysInUse = daysInUse.filter { $0 < Date().addingTimeInterval(daysInUseMaxPeriod.days) }
+      daysInUse = daysInUse.filter { $0 < Date().addingTimeInterval(daysInUseMaxPeriod) }
       
       Preferences.Review.daysInUse.value = daysInUse
     default:
@@ -73,8 +73,8 @@ class AppReviewManager: ObservableObject {
     }
   }
   
-  /// Method for handling changes to main criteriainside the various parts in application
-  /// - Parameter mainCriteria: Type of the main Criteria
+  /// Method for handling changes to sub criteria inside the various parts in application
+  /// - Parameter subCriteria: Type of the sub Criteria
   func processSubCriteria(for subCriteria: AppReviewSubCriteriaType) {
     switch subCriteria {
     case .walletConnectedDapp:
@@ -149,7 +149,7 @@ class AppReviewManager: ObservableObject {
       guard let connectedDappDate = Preferences.Review.dateWalletConnectedToDapp.value else {
         return false
       }
-      return Date() < connectedDappDate.addingTimeInterval(dappConnectionPeriod.days)
+      return Date() < connectedDappDate.addingTimeInterval(dappConnectionPeriod)
     case .numberOfPlaylistItems:
       return Preferences.Review.numberPlaylistItemsAdded.value >= playlistCountLimit
     case .syncEnabledWithTabSync:
