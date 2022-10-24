@@ -35,7 +35,8 @@ class SolanaProviderScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
+    return WKUserScript.create(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
+                                                                      "$<walletSolanaNameSpace>": UserScriptManager.walletSolanaNameSpace],
                                                     securityToken: scriptId,
                                                     script: script),
                                injectionTime: .atDocumentStart,
@@ -325,7 +326,7 @@ class SolanaProviderScriptHandler: TabContentScript {
   
   @MainActor private func emitConnectEvent(publicKey: String) async {
     if let webView = tab?.webView {
-      let script = "window.solana.emit('connect', new solanaWeb3.PublicKey('\(publicKey.htmlEntityEncodedString)'))"
+      let script = "window.solana.emit('connect', new \(UserScriptManager.walletSolanaNameSpace).solanaWeb3.PublicKey('\(publicKey.htmlEntityEncodedString)'))"
       await webView.evaluateSafeJavaScript(functionName: script, contentWorld: .page, asFunction: false)
     }
   }

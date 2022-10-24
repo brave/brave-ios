@@ -16,6 +16,7 @@ class UserScriptManager {
   static let shared = UserScriptManager()
   
   static let securityToken = ScriptLoader.uniqueID
+  static let walletSolanaNameSpace = "W\(ScriptLoader.uniqueID)"
   
   private let alwaysEnabledScripts: [ScriptType] = [
     .rewardsReporting,
@@ -239,12 +240,43 @@ class UserScriptManager {
           let solanaWeb3Script = solanaWeb3Script else {
       return
     }
-    // inject the Solana Web3 Library
-    await webView.evaluateSafeJavaScript(
-      functionName: solanaWeb3Script,
-      args: [],
-      contentWorld: .page,
-      asFunction: false
-    )
+    
+    let (isInjected, error) = await webView.evaluateSafeJavaScript(functionName: "typeof \(UserScriptManager.walletSolanaNameSpace) !== 'undefined'", args: [], contentWorld: .page, asFunction: false)
+    
+    if isInjected as? Bool ?? false == false {
+      let script = """
+      // Define a global variable with a random name
+      // Local variables are NOT enumerable!
+      let \(UserScriptManager.walletSolanaNameSpace);
+      
+      window.__firefox__.execute(function($, $Object) {
+        // Inject Solana as a Local Variable.
+        \(solanaWeb3Script)
+      
+        \(UserScriptManager.walletSolanaNameSpace) = $({
+          solanaWeb3: $(solanaWeb3)
+        });
+      
+        $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);
+        $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace));
+      });
+      """
+      
+      // inject the Solana Web3 Library
+      let (_, error) = await webView.evaluateSafeJavaScript(
+        functionName: script,
+        args: [],
+        contentWorld: .page,
+        asFunction: false
+      )
+      
+      if let error = error {
+        Logger.module.error("Error Injecting SOLANA-WEB-3: \(error.localizedDescription)")
+      }
+    }
+    
+    if let error = error {
+      Logger.module.error("Error Detecting SOLANA-WEB-3: \(error.localizedDescription)")
+    }
   }
 }

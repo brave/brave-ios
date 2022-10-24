@@ -5,7 +5,7 @@
 
 window.__firefox__.execute(function($, $Object) {
   if (window.isSecureContext) {
-    function post(method, payload, completion) {
+    let post = $(function(method, payload, completion) {
       let postMessage = $(function(message) {
         return $.postNativeMessage('$<message_handler>', message);
       });
@@ -39,7 +39,7 @@ window.__firefox__.execute(function($, $Object) {
             }
           )
       }))
-    }
+    })
     /* <solanaWeb3.Transaction> ->
       {transaction: <solanaWeb3.Transaction>,
        serializedMessage: <base58 encoded string>,
@@ -61,7 +61,7 @@ window.__firefox__.execute(function($, $Object) {
       return object;
     })
     let createTransaction = $(function(serializedTx) {
-      return solanaWeb3.Transaction.from(new Uint8Array(serializedTx))
+      return $<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx))
     })
     const provider = {
       value: {
@@ -75,7 +75,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(publicKey, resolve) {
             /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
             const result = new Object();
-            result.publicKey = new solanaWeb3.PublicKey(publicKey);
+            result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
             resolve(result);
           }
           return post('connect', payload, completion)
@@ -96,7 +96,7 @@ window.__firefox__.execute(function($, $Object) {
             const publicKey = parsed["publicKey"]; /* base58 encoded pubkey */
             const signature = parsed["signature"]; /* array of uint8 */
             const obj = new Object();
-            obj.publicKey = new solanaWeb3.PublicKey(publicKey);
+            obj.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
             obj.signature = new Uint8Array(signature);
             resolve(obj);
           }
@@ -107,7 +107,7 @@ window.__firefox__.execute(function($, $Object) {
             function completion(publicKey, resolve) {
               /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
               const result = new Object();
-              result.publicKey = new solanaWeb3.PublicKey(publicKey);
+              result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
               resolve(result);
             }
             return post('request', args, completion)
