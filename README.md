@@ -8,12 +8,6 @@ Download on the [App Store](https://apps.apple.com/app/brave-web-browser/id10528
 This branch (development)
 -----------
 
-This branch is for mainline development that will ship in the next release.
-
-This branch currently supports iOS 14+, and is written in Swift 5.
-
-Please make sure you aim your pull requests in the right direction.
-
 For bug fixes and features for the upcoming release, please see the associated [GitHub milestones](https://github.com/brave/brave-ios/milestones) (e.g. *2.1.3*).
 
 Getting involved
