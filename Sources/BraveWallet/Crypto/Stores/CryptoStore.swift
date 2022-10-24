@@ -40,8 +40,8 @@ enum WebpageRequestResponse: Equatable {
   case signMessage(approved: Bool, id: Int32)
   case getEncryptionPublicKey(approved: Bool, originInfo: BraveWallet.OriginInfo)
   case decrypt(approved: Bool, originInfo: BraveWallet.OriginInfo)
-  case signTransaction(approved: Bool, id: Int32, signature: BraveWallet.ByteArrayStringUnion?, error: String?)
-  case signAllTransactions(approved: Bool, id: Int32, signatures: [BraveWallet.ByteArrayStringUnion]?, error: String?)
+  case signTransaction(approved: Bool, id: Int32)
+  case signAllTransactions(approved: Bool, id: Int32)
 }
 
 public class CryptoStore: ObservableObject {
@@ -330,10 +330,10 @@ public class CryptoStore: ObservableObject {
       walletService.notifyGetPublicKeyRequestProcessed(approved, origin: originInfo.origin)
     case let .decrypt(approved, originInfo):
       walletService.notifyDecryptRequestProcessed(approved, origin: originInfo.origin)
-    case let .signTransaction(approved, id, signature, error):
-      walletService.notifySignTransactionRequestProcessed(approved, id: id, signature: signature, error: error)
-    case let .signAllTransactions(approved, id, signatures, error):
-      walletService.notifySignAllTransactionsRequestProcessed(approved, id: id, signatures: signatures, error: error)
+    case let .signTransaction(approved, id):
+      walletService.notifySignTransactionRequestProcessed(approved, id: id, signature: nil, error: nil)
+    case let .signAllTransactions(approved, id):
+      walletService.notifySignAllTransactionsRequestProcessed(approved, id: id, signatures: nil, error: nil)
     }
     pendingRequest = nil
   }

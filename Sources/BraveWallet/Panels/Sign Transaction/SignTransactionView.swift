@@ -99,28 +99,16 @@ struct SignTransactionView: View {
   private var currentRequest: SignTransactionRequestUnion {
     normalizedRequests[txIndex]
   }
-  
-  private var instructions: [[BraveWallet.SolanaInstruction]] {
-    return currentRequest.txDatas.map { $0.solanaTxData?.instructions ?? [] }
-    //      switch self {
-    //      case let .signTransaction(request):
-    //        if let instructions = request.txData.solanaTxData?.instructions {
-    //          return [instructions]
-    //        }
-    //        return []
-    //      case let .signAllTransactions(request):
-    //        return request.txDatas.map { $0.solanaTxData?.instructions ?? [] }
-    //      }
-  }
 
   private func instructionsDisplayString() -> String {
-    instructions
-     .map { instructionsForOneTx in
+    currentRequest.txDatas
+      .map { $0.solanaTxData?.instructions ?? [] }
+      .map { instructionsForOneTx in
        instructionsForOneTx
          .map { TransactionParser.parseSolanaInstruction($0).toString }
          .joined(separator: "\n\n") // separator between each instruction
-     }
-     .joined(separator: "\n\n\n\n") // separator between each transaction
+      }
+      .joined(separator: "\n\n\n\n") // separator between each transaction
   }
 
   private var account: BraveWallet.AccountInfo {
@@ -179,7 +167,7 @@ struct SignTransactionView: View {
         } else {
           divider
             .padding(.top, 8)
-          StaticTextView(text: instructionsDisplayString(), isMonospaced: false)
+          StaticTextView(text: instructionsDisplayString(), isMonospaced: true)
             .frame(maxWidth: .infinity)
             .frame(height: 200)
             .background(Color(.tertiaryBraveGroupedBackground))
@@ -217,10 +205,12 @@ struct SignTransactionView: View {
       Button(action: { // cancel
         switch request {
         case .signTransaction(_):
-          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id, signature: nil, error: nil))
-          onDismiss()
+          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id))
         case .signAllTransactions(_):
-          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id, signatures: nil, error: nil))
+          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id))
+        }
+        if normalizedRequests.count == 1 {
+          onDismiss()
         }
       }) {
         Text(Strings.cancelButtonTitle)
@@ -233,40 +223,45 @@ struct SignTransactionView: View {
           .imageScale(.large)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
+      .disabled(txIndex != 0)
     } else {
       Button(action: { // cancel
         switch request {
         case .signTransaction(_):
-          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id, signature: nil, error: nil))
-          onDismiss()
+          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id))
         case .signAllTransactions(_):
-          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id, signatures: nil, error: nil))
+          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id))
+        }
+        if normalizedRequests.count == 1 {
+          onDismiss()
         }
       }) {
         Text(Strings.cancelButtonTitle)
       }
       .buttonStyle(BraveOutlineButtonStyle(size: .large))
-      //    .disabled(isButtonsDisabled)
       Button(action: { // approve
         switch request {
         case .signTransaction(_):
-          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: true, id: currentRequest.id, signature: nil, error: nil))
-          onDismiss()
+          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: true, id: currentRequest.id))
+          
         case .signAllTransactions(_):
-          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: true, id: currentRequest.id, signatures: nil, error: nil))
+          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: true, id: currentRequest.id))
+        }
+        if normalizedRequests.count == 1 {
+          onDismiss()
         }
       }) {
         Label(Strings.Wallet.sign, braveSystemImage: "brave.key")
           .imageScale(.large)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
-      //    .disabled(isButtonsDisabled)
+      .disabled(txIndex != 0)
     }
   }
   
   @ViewBuilder private var divider: some View {
     VStack {
-      Text("Details")
+      Text(Strings.Wallet.solanaSignTransactionDetails)
         .font(.subheadline.weight(.semibold))
         .foregroundColor(Color(.bravePrimary))
       HStack {
@@ -284,7 +279,7 @@ struct SignTransactionView: View {
           .font(.subheadline.weight(.semibold))
           .foregroundColor(Color(.braveErrorLabel))
           .padding(.top, 12)
-        Text("Note that Brave can’t verify what will happen if you sign. A signature could authorize nearly any operation in your account or on your behalf, including (but not limited to) giving total control of your account and crypto assets to the site making the request. Only sign if you’re sure you want to take this action, and trust the requesting site.")
+        Text(Strings.Wallet.solanaSignTransactionWarning)
           .font(.subheadline)
           .foregroundColor(Color(.braveErrorLabel))
         Button(action: {
