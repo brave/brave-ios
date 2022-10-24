@@ -367,7 +367,7 @@ public class PlaylistManager: NSObject {
         }
         return true
       } catch {
-        log.error("An error occured deleting Playlist Cached Item \(cacheItem.name ?? itemId): \(error)")
+        log.error("An error occured deleting Playlist Cached Item")
         return false
       }
     }
