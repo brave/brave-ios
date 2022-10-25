@@ -472,6 +472,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "Potwierdź";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "Filtrowanie treści";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Włącz filtry niestandardowe, które blokują oprogramowanie śledzące i przeszkadzające, konkretne dla danego regionu oraz języka";
 
@@ -631,8 +634,14 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Nie wysyłaj";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "Pobrane";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Pobierane pliki";
+
+/* A label representing the state of a filter list that is currently being downloaded */
+"Downloading" = "Pobieranie";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Pobrane";
@@ -750,6 +759,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "Funkcje";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "Listy filtrów";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "Dodatkowe, popularne listy społeczności. Pamiętaj, że włącznie zbyt dużej liczby filtrów spowolni prędkość przeglądania.";
 
 /* Share action title */
 "FindInPage" = "Znajdź na stronie";
@@ -1258,6 +1273,9 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Wczoraj o %@";
 
+/* The title displayed on table header for open tabs list from other devices */
+"openTabs.openTabsListTableHeaderTitle" = "Urządzenia";
+
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Wyślij na swoje urządzenie";
 
@@ -1284,6 +1302,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Szukaj kart z innych urządzeń";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "Otwarte karty";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Otwórz stronę";
@@ -2565,6 +2586,9 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Pasek górny";
+
+/* Tabs settings section title */
+"SettingsTabsSectionTitle" = "Karty";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Udostępnij łącze";

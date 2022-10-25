@@ -478,6 +478,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "確認";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "內容過濾";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "啟用自訂過濾器，封鎖特定區域和語言的追蹤器，以及惱人的內容";
 
@@ -637,8 +640,14 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "不要傳送";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "已下載";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "下載的檔案";
+
+/* A label representing the state of a filter list that is currently being downloaded */
+"Downloading" = "下載中";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "下載";
@@ -756,6 +765,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "功能";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "篩選清單";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "其他熱門社群清單。請注意，啟用太多過濾器可能會導致瀏覽速度變慢。";
 
 /* Share action title */
 "FindInPage" = "在頁面中尋找";
@@ -1270,6 +1285,9 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "昨天 %@";
 
+/* The title displayed on table header for open tabs list from other devices */
+"openTabs.openTabsListTableHeaderTitle" = "裝置";
+
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "傳送至您的裝置";
 
@@ -1296,6 +1314,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "其他裝置的搜尋分頁";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "開啟的分頁";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "開啟網站";
@@ -2577,6 +2598,9 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "頂端列";
+
+/* Tabs settings section title */
+"SettingsTabsSectionTitle" = "分頁";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "分享連結";

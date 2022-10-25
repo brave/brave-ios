@@ -100,6 +100,9 @@
 /* A text link for user to click inside the custom alert, It will redirect user to the website explaining the risk of using Rainbow Bridge. */
 "wallet.auroraBridgeRisk" = "Dowiedz się jak zmniejszyć ryzyko korzystania z Rainbow Bridge";
 
+/* A text button for user to click so this pop up will not show again. */
+"wallet.auroraPopupDontShowAgain" = "Nie pokazuj ponownie";
+
 /* The footer beneath the auto-lock title and interval duration */
 "wallet.autoLockFooter" = "Czas oczekiwania w minutach do automatycznego zablokowania Brave Wallet";
 
@@ -159,6 +162,9 @@
 
 /* The title of the button for users to click when they are ready to buy using Wyre payment */
 "wallet.buyButtonTitle" = "Przejdź do Wyre";
+
+/* The description of a buy button on the buy/send/swap modal */
+"wallet.buyDescription" = "Kupuj kryptowalutę za pomocą Apple Pay, karty kredytowej lub debetowej poprzez Wyre.";
 
 /* The x-axis label on an asset or portfolio chart describing that x-axis values are defined by the date of the price */
 "wallet.chartAxisDateLabel" = "Data";
@@ -466,8 +472,14 @@
 /* The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen. */
 "wallet.editSiteConnectionAccountActionDisconnect" = "Rozłącz";
 
+/* The title of the button for users to click so that they remove wallet account permission from the Solana Dapp. It will be displayed at the right hand side of each account option in edit site connection screen */
+"wallet.editSiteConnectionAccountActionRevoke" = "Unieważnij";
+
 /* The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen. */
 "wallet.editSiteConnectionAccountActionSwitch" = "Zmień";
+
+/* The title of the button for users to click so that they grant wallet account permission for the Solana Dapp. It will be displayed at the right hand side of each account option in edit site connection screen. */
+"wallet.editSiteConnectionAccountActionTrust" = "Dodaj do zaufanych";
 
 /* The plural word that will beused in `editSiteConnectionConnectedAccount`. */
 "wallet.editSiteConnectionAccountPlural" = "konta/kont";
@@ -1134,6 +1146,9 @@
 
 /* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected any his/her wallet account to the dapp. */
 "wallet.walletPanelConnect" = "Połącz";
+
+/* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently connected his/her wallet account to the dapp. The title will be displayed to the right of a checkmark. */
+"wallet.walletPanelConnected" = "Połączone";
 
 /* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected his/her current selected Solana account to the Solana Dapp. */
 "wallet.walletPanelDisconnected" = "Odłączono";

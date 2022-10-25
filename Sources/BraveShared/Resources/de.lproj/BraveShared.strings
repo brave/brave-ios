@@ -478,6 +478,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "Bestätigen";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "Inhaltsfilterung";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Aktivieren Sie benutzerdefinierte Filter, die regionale und sprachspezifische Tracker und Belästigungen blockieren.";
 
@@ -637,8 +640,14 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Nicht senden";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "Heruntergeladen";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Heruntergeladene Dateien";
+
+/* A label representing the state of a filter list that is currently being downloaded */
+"Downloading" = "Download wird ausgeführt...";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Downloads";
@@ -756,6 +765,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "Funktionen";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "Listen filtern";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "Weitere beliebte Community-Listen. Bitte beachten Sie, dass die Aktivierung von zu vielen Filtern die Surfgeschwindigkeit verringert.";
 
 /* Share action title */
 "FindInPage" = "Auf Seite suchen";
@@ -958,6 +973,9 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "Tippen Sie, um Ihre kostenlosen Token anzufordern.";
 
+/* The title of the notification that goes out monthly to users who can claim an ads grant */
+"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
+
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Tippen Sie hier, um mehr zu erfahren.";
 
@@ -1035,6 +1053,9 @@
 
 /* No comment provided by engineer. */
 "ntp.hideSponsoredImages" = "Gesponserte Bilder ausblenden";
+
+/* The text description of image type which is being used NTP */
+"ntp.imageTypeSelectionDescription" = "„Gesponsert“ zeigt zusätzliche gebrandete Hintergrunde, über die Sie etwas verdienen können, wenn die Brave-Belohnungen aktiviert sind.";
 
 /* No comment provided by engineer. */
 "ntp.learnMoreAboutRewards" = "Mehr über Brave Rewards erfahren";
@@ -1293,6 +1314,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Tabs anderer Geräte durchsuchen";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "Geöffnete Tabs";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Website öffnen";
@@ -2575,6 +2599,9 @@
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Obere Leiste";
 
+/* Tabs settings section title */
+"SettingsTabsSectionTitle" = "Tabs";
+
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Link teilen";
 
@@ -3144,9 +3171,6 @@
 
 /* No comment provided by engineer. */
 "today.allSources" = "Alle Quellen";
-
-/* The name of the feature */
-"today.braveToday" = "Brave News";
 
 /* No comment provided by engineer. */
 "today.contentAvailableButtonTitle" = "Neue Inhalte verfügbar";

@@ -478,6 +478,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "Onayla";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "İçerik Filtreleme";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Bölge ve dile özgü izleyicileri ve Rahatsızlık verici şeyleri engelleyen özel filtreleri etkinleştirin";
 
@@ -637,8 +640,14 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Gönderme";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "İndirildi";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "İndirilen dosyalar";
+
+/* A label representing the state of a filter list that is currently being downloaded */
+"Downloading" = "İndiriliyor";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "İndirilenler";
@@ -756,6 +765,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "Özellik";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "FilterLists";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "Ek popüler topluluklar listeleri. Çok fazla filtre etkinleştirmenin tarama hızını düşürebileceğini unutmayın.";
 
 /* Share action title */
 "FindInPage" = "Sayfada Bul";
@@ -1273,6 +1288,9 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Dün %@";
 
+/* The title displayed on table header for open tabs list from other devices */
+"openTabs.openTabsListTableHeaderTitle" = "Cihazlar";
+
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Cihazınıza Gönderin";
 
@@ -1299,6 +1317,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Diğer Cihazlardaki Sekmeleri Ara";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "Açık Sekmeler";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Web Sitesi Aç";
@@ -2580,6 +2601,9 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Üst Sekme Çubuğu";
+
+/* Tabs settings section title */
+"SettingsTabsSectionTitle" = "Sekmeler";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Bağlantıyı Paylaş";

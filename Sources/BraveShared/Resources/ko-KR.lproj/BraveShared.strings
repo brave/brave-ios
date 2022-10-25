@@ -472,6 +472,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "확인";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "콘텐츠 필터링";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "맞춤 필터를 활성화하여 특정 지역 및 언어에 특화된 트래커 등 짜증 나는 요소를 차단합니다.";
 
@@ -631,6 +634,9 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "보내지 않음";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "다운로드됨";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "파일 다운로드";
 
@@ -750,6 +756,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "기능";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "필터 목록";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "추가적인 인기 커뮤니티 목록입니다. 너무 많은 필터를 활성화하면 브라우징 속도가 느려집니다.";
 
 /* Share action title */
 "FindInPage" = "페이지에서 찾기";
@@ -1258,6 +1270,9 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "어제 %@";
 
+/* The title displayed on table header for open tabs list from other devices */
+"openTabs.openTabsListTableHeaderTitle" = "기기";
+
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "내 기기로 보내기";
 
@@ -1284,6 +1299,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "다른 기기에 열린 탭 검색";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "열린 탭";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "웹사이트 열기";
@@ -2562,6 +2580,9 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "상단 바";
+
+/* Tabs settings section title */
+"SettingsTabsSectionTitle" = "탭";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "링크 공유";

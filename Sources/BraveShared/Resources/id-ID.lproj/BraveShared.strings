@@ -229,9 +229,6 @@
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Untuk memulai, Anda perlu memasang Brave di semua perangkat yang ingin disinkronisasi. Untuk menyinkronkan, mulai rantai sinkronisasi yang akan Anda gunakan untuk menghubungkan semua perangkat dengan aman.";
 
-/* The name of the feature */
-"bravetalk.braveTalkTitle" = "Brave Talk";
-
 /* Setting to enable the browser lock privacy feature */
 "BrowserLock" = "Kunci Peramban";
 
@@ -472,6 +469,9 @@
 /* No comment provided by engineer. */
 "Confirm" = "Konfirmasi";
 
+/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
+"ContentFiltering" = "Penyaringan Konten";
+
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Mengaktifkan filter khusus yang memblokir pelacak serta Gangguan regional dan berbahasa tertentu";
 
@@ -631,8 +631,14 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Jangan kirim";
 
+/* A label representing the state of a filter list that is downloaded */
+"Downloaded" = "Telah Didownload";
+
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "File unduhan";
+
+/* A label representing the state of a filter list that is currently being downloaded */
+"Downloading" = "Mendownload";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Unduhan";
@@ -750,6 +756,12 @@
 
 /* No comment provided by engineer. */
 "Features" = "Fitur";
+
+/* A title on the content filtering screen that allows you to enable/disable filter lists */
+"FilterLists" = "Daftar Filter";
+
+/* A description on the content filtering screen for the filter lists section. */
+"FilterListsDescription" = "Daftar komunitas populer tambahan. Perhatikanlah bahwa mengaktifkan terlalu banyak filter akan menurunkan kecepatan perambanan.";
 
 /* Share action title */
 "FindInPage" = "Temukan di Halaman";
@@ -1287,6 +1299,9 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Cari Tab dari Perangkat Lain";
+
+/* Title for open tabs menu item */
+"OpenTabsMenuItem" = "Tab Terbuka";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Buka Situs Web";
