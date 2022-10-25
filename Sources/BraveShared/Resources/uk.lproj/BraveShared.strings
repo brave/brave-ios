@@ -478,9 +478,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Підтвердити";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Фільтрація вмісту";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Увімкніть користувацькі фільтри, які блокують трекери й дратівні елементи, специфічні для регіону чи мови";
 
@@ -640,14 +637,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Не надсилати";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Завантажено";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Завантажені файли";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Завантаження";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Завантаження";
@@ -765,12 +756,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Функції";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Фільтрувати списки";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Додаткові популярні списки спільноти. Зауважте, що через увімкнення надто багатьох фільтрів може зменшитися швидкість завантаження даних.";
 
 /* Share action title */
 "FindInPage" = "Знайти на сторінці";
@@ -1317,9 +1302,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Шукати вкладки з інших пристроїв";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Відкриті вкладки";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Відкрити вебсайт";
@@ -2602,9 +2584,6 @@
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Верхня панель";
 
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "Вкладки";
-
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Поділитися посиланням";
 
@@ -3640,6 +3619,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Відкрийте Brave, щоб переглянути свій перелік вибраного";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Пошук";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Короткий опис того, як Brave заощаджує ваш час і захищає вас в Інтернеті.";
 
@@ -3672,6 +3654,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "Звіт про конфіденційність";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Гаманець Brave";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "Віджети";

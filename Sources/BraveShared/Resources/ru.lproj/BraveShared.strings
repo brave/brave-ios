@@ -478,9 +478,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Подтвердить";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Фильтры контента";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Настройте фильтры, чтобы блокировать навязчивую рекламу, а также трекеры, отслеживающие пользователей по региону и языку.";
 
@@ -640,14 +637,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Не отправлять";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Сохранено";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Скачанные файлы";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Скачивается";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Скачанные файлы";
@@ -765,12 +756,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Функции";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Списки фильтров";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Дополнительные популярные списки сообщества. Если включить слишком много фильтров, браузер будет работать медленнее.";
 
 /* Share action title */
 "FindInPage" = "Поиск на странице";
@@ -972,9 +957,6 @@
 
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "Нажмите, чтобы получить бесплатные баллы.";
-
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
 
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Нажмите, чтобы узнать больше.";
@@ -1288,9 +1270,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Вчера в %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "Устройства";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Отправить на другое устройство";
 
@@ -1317,9 +1296,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Найти вкладки с других устройств";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Вкладки";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Открыть сайт";
@@ -1718,7 +1694,7 @@
 "playlistFolderSharing.addButtonAccessibilityTitle" = "Кнопка «Добавить в плейлист Brave»";
 
 /* Title for the button that adds the playlist to the database. */
-"playlistFolderSharing.addButtonTitle" = "Add";
+"playlistFolderSharing.addButtonTitle" = "Добавить";
 
 /* Menu Title for removing offline data/cache */
 "playlistFolderSharing.deleteOfflineDataMenuTitle" = "Удаление офлайн-данных";
@@ -2100,9 +2076,6 @@
 
 /* Body for Brave Talk rewards opt-in screen */
 "rewards.braveTalkRewardsOptInBody" = "С Brave Rewards вы можете просматривать рекламу из Brave Ads без замедления работы и отслеживания активности. Ваши данные находятся под надежной защитой. ";
-
-/* Title for Brave Talk rewards opt-in screen button */
-"rewards.braveTalkRewardsOptInButtonTitle" = "Включить Brave Rewards";
 
 /* Body for successful Brave Talk rewards opt-in */
 "rewards.braveTalkRewardsOptInSuccessBody" = "Чтобы открыть Brave Talk, нажмите на любое место экрана.";
@@ -2601,9 +2574,6 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Строка вверху";
-
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "Вкладки";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Поделиться ссылкой";
@@ -3639,6 +3609,9 @@
 
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Откройте Brave, чтобы добавить сюда избранные сайты.";
+
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Поиск";
 
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Информация о том, как Brave экономит ваше время и обеспечивает конфиденциальность в Интернете.";

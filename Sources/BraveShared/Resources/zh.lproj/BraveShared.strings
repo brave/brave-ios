@@ -478,9 +478,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "确认";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "內容過濾";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "启用自定义过滤器来屏蔽特定区域和语言的追踪器和烦人的内容。";
 
@@ -640,14 +637,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "不发送";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "已下載";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "已下载文件";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "下載中";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "下载";
@@ -765,12 +756,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "功能";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "过滤列表";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "其他熱門社群清單。請注意，啟用太多過濾器可能會導致瀏覽速度變慢。";
 
 /* Share action title */
 "FindInPage" = "在页面中查找";
@@ -972,9 +957,6 @@
 
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "点按以领取免费代币。";
-
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
 
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "点击此处了解更多信息。";
@@ -1288,9 +1270,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "昨天 %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "裝置";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "发送到您的设备上";
 
@@ -1317,9 +1296,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "搜索从其他设备发送的标签页";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "開啟的分頁";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "打开网站";
@@ -2102,7 +2078,7 @@
 "rewards.braveTalkRewardsOptInBody" = "借助 Brave Rewards，您可以查看来自 Brave Ads 网络的隐私保护广告。无需跟踪器，无需减速，而您的数据绝对安全。";
 
 /* Title for Brave Talk rewards opt-in screen button */
-"rewards.braveTalkRewardsOptInButtonTitle" = "开启 Rewards";
+"rewards.braveTalkRewardsOptInButtonTitle" = "開啟 Rewards";
 
 /* Body for successful Brave Talk rewards opt-in */
 "rewards.braveTalkRewardsOptInSuccessBody" = "点击屏幕上的任意位置即可继续 Brave Talk。";
@@ -2601,9 +2577,6 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "顶栏";
-
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "分頁";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "分享链接";
@@ -3175,9 +3148,6 @@
 /* No comment provided by engineer. */
 "today.allSources" = "所有来源";
 
-/* The name of the feature */
-"today.braveToday" = "Brave News";
-
 /* No comment provided by engineer. */
 "today.contentAvailableButtonTitle" = "新内容可供查阅";
 
@@ -3640,6 +3610,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "请打开 Brave，在此查看您的收藏夹";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "搜索";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "一览 Brave 是如何节省时间以及提供在线保护的。";
 
@@ -3672,6 +3645,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "隐私统计数据";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Brave 钱包";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "小部件";

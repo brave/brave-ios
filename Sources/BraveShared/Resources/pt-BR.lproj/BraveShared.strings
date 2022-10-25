@@ -478,9 +478,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Confirmar";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Filtragem de conteúdo";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Ative filtros personalizados que bloqueiam rastreadores e outros incômodos regionais e específicos ao idioma";
 
@@ -640,14 +637,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Não enviar";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Download concluído";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Arquivos baixados";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Fazendo download";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Downloads";
@@ -765,12 +756,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Recursos";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Listas de filtros";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Outras listas populares da comunidade. Tenha em mente que a ativação de um número excessivo de filtros prejudicará a velocidade de navegação.";
 
 /* Share action title */
 "FindInPage" = "Encontrar na página";
@@ -973,9 +958,6 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "Toque para reivindicar seus tokens gratuitos.";
 
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
-
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Toque aqui para saber mais.";
 
@@ -1055,7 +1037,7 @@
 "ntp.hideSponsoredImages" = "Ocultar imagens patrocinadas";
 
 /* The text description of image type which is being used NTP */
-"ntp.imageTypeSelectionDescription" = "As imagens \"Patrocinadas\" são planos de fundo adicionais com identificação de marca que você pode usar para ganhar tokens com as Recompensas Brave ativadas.";
+"ntp.imageTypeSelectionDescription" = "'Patrocinado' são fundos adicionais que pode ganhar com a ativação de Brave Rewards.";
 
 /* No comment provided by engineer. */
 "ntp.learnMoreAboutRewards" = "Saiba mais sobre o Brave Rewards";
@@ -1288,9 +1270,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Ontem, às %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "Dispositivos";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Enviar para seu dispositivo";
 
@@ -1317,9 +1296,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Pesquisar guias de outros dispositivos";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Guias abertas";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Abrir site";
@@ -2101,9 +2077,6 @@
 /* Body for Brave Talk rewards opt-in screen */
 "rewards.braveTalkRewardsOptInBody" = "Com o Brave Rewards, você pode visualizar anúncios da rede do Brave Ads que preservam sua privacidade. Sem rastreadores. Sem lentidão. E seus dados ficam totalmente seguros.";
 
-/* Title for Brave Talk rewards opt-in screen button */
-"rewards.braveTalkRewardsOptInButtonTitle" = "Ativar o Rewards";
-
 /* Body for successful Brave Talk rewards opt-in */
 "rewards.braveTalkRewardsOptInSuccessBody" = "Clique em qualquer parte da tela para ir para o Brave Talk.";
 
@@ -2601,9 +2574,6 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Barra superior";
-
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "Guias";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Compartilhar link";
@@ -3640,6 +3610,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Abra o Brave para ver seus favoritos aqui";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Pesquisa";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Um resumo de como o Brave economiza seu tempo e protege você on-line.";
 
@@ -3672,6 +3645,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "Estatística de privacidade";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Carteira Brave";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "Widgets";

@@ -31,9 +31,6 @@
 /* The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree. */
 "wallet.addAccountAddButton" = "Добавить";
 
-/* The title of the add account screen */
-"wallet.addAccountTitle" = "Добавление счета";
-
 /* The title of the button that is located in the same area of the assets list header but on the right side. Users will click it and go to add custom asset screen. */
 "wallet.addCustomAsset" = "Добавить пользовательский актив";
 
@@ -103,9 +100,6 @@
 /* A text link for user to click inside the custom alert, It will redirect user to the website explaining the risk of using Rainbow Bridge. */
 "wallet.auroraBridgeRisk" = "Узнать о рисках использования Rainbow Bridge";
 
-/* A text button for user to click so this pop up will not show again. */
-"wallet.auroraPopupDontShowAgain" = "Не показывать снова";
-
 /* The footer beneath the auto-lock title and interval duration */
 "wallet.autoLockFooter" = "Через сколько минут кошелек Brave автоматически блокируется.";
 
@@ -165,9 +159,6 @@
 
 /* The title of the button for users to click when they are ready to buy using Wyre payment */
 "wallet.buyButtonTitle" = "Перейти в Wyre";
-
-/* The description of a buy button on the buy/send/swap modal */
-"wallet.buyDescription" = "Покупайте криптовалюту в Wyre с помощью Apple Pay или банковских карт.";
 
 /* The x-axis label on an asset or portfolio chart describing that x-axis values are defined by the date of the price */
 "wallet.chartAxisDateLabel" = "Дата";
@@ -259,9 +250,6 @@
 /* The title of the create wallet screen */
 "wallet.createWalletTitle" = "Защитите криптоактивы с помощью пароля";
 
-/* The title of the crypto tab */
-"wallet.cryptoTitle" = "Brave Кошелек";
-
 /* The title above the input fields for users to input network block explorer urls in Custom Network Details Screen. */
 "wallet.customNetworkBlockExplorerUrlsTitle" = "URL блок-проводников";
 
@@ -338,13 +326,10 @@
 "wallet.dappsSettingsConnectedSitesSectionTitle" = "Подключенные приложения DApp";
 
 /* The title of the section that will display settings for default wallet and dapp provider api access permission */
-"wallet.dappsSettingsGeneralSectionTitle" = "Общие";
+"wallet.dappsSettingsGeneralSectionTitle" = "Основные";
 
 /* The navigation title of the settings screen for each Dapp. '%@' will be relpaced by the name of the coin type. For example, the title could 'Ethereum Settings', 'Solana Settings' etc. */
 "wallet.dappsSettingsNavTitle" = "Настройки %@";
-
-/* The warning message in a confirmation dialog when attempting to remove all wallet connection to a dapp. */
-"wallet.dappsSettingsRemoveAllWarning" = "Будут удалены все разрешения на подключение Кошелька для %1$d %2$@";
 
 /* The plural word that will be used in `manageSiteConnectionsAccount`. */
 "wallet.dappsSettingsWebsitePlural" = "сайты";
@@ -475,14 +460,8 @@
 /* The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen. */
 "wallet.editSiteConnectionAccountActionDisconnect" = "Отключить";
 
-/* The title of the button for users to click so that they remove wallet account permission from the Solana Dapp. It will be displayed at the right hand side of each account option in edit site connection screen */
-"wallet.editSiteConnectionAccountActionRevoke" = "Отменить";
-
 /* The title of the button for users to click so that they disconnect wallet account to the dapp site(also permission removed). It will be displayed at the right hand side of each account option in edit site connection screen. */
 "wallet.editSiteConnectionAccountActionSwitch" = "Переключиться";
-
-/* The title of the button for users to click so that they grant wallet account permission for the Solana Dapp. It will be displayed at the right hand side of each account option in edit site connection screen. */
-"wallet.editSiteConnectionAccountActionTrust" = "Доверять";
 
 /* The plural word that will beused in `editSiteConnectionConnectedAccount`. */
 "wallet.editSiteConnectionAccountPlural" = "Счета";
@@ -655,9 +634,6 @@
 /* The title of the edit gas fee screen for EIP-1559 transactions */
 "wallet.maxPriorityFeeTitle" = "Максимальная комиссия за приоритет";
 
-/* The title shown on the wallet settings page, and the value shown when selecting the default wallet as Brave Wallet in wallet settings. */
-"wallet.module" = "Brave Кошелек";
-
 /* The footer beneath the networks title in settings screen. */
 "wallet.networkFooter" = "Настройка сетей";
 
@@ -744,6 +720,9 @@
 
 /* The message displayed when the user takes a screenshot of their private key */
 "wallet.privateKeyScreenshotDetectedMessage" = "Внимание! Копия скриншота могла сохраниться в облачном сервисе. В этом случае ваш секретный ключ сможет узнать любой с помощью приложения для просмотра фото. Brave рекомендует удалить скриншот как можно скорее.";
+
+/* The button title for users to click. It will redirect user to that specific provider website. '%@' will be replaced provider's short name. For example, Buy with Ramp'. */
+"wallet.providerSelectionButtonTitle" = "Оплатить с помощью %@";
 
 /* The message displayed when the user takes a screenshot of their recovery phrase */
 "wallet.recoveryPhraseScreenshotDetectedMessage" = "Внимание! Копия скриншота могла сохраниться в облачном сервисе. В этом случае вашу секретную фразу сможет узнать любой с помощью приложения для просмотра фото. Brave рекомендует удалить скриншот как можно скорее.";
@@ -1146,9 +1125,6 @@
 
 /* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected any his/her wallet account to the dapp. */
 "wallet.walletPanelConnect" = "Подключиться";
-
-/* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently connected his/her wallet account to the dapp. The title will be displayed to the right of a checkmark. */
-"wallet.walletPanelConnected" = "Подключено";
 
 /* The title of the button for users to click to go to edit site connection screen. This title indicates the user is currently not connected his/her current selected Solana account to the Solana Dapp. */
 "wallet.walletPanelDisconnected" = "Отключен";

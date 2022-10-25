@@ -478,9 +478,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Bekräfta";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Innehållsfiltrering";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Aktivera anpassade filter som blockerar regionala och språkspecifika spårare och irritationsmoment.";
 
@@ -640,14 +637,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Skicka inte";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Nedladdad";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Hämtade filer";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Nedladdning";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Nedladdningar";
@@ -765,12 +756,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Funktioner";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Filtrera listor";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Ytterligare populära listor från gemenskapen. Observera att webbläsarens hastighet försämras om för många filter aktiveras.";
 
 /* Share action title */
 "FindInPage" = "Sök på sidan";
@@ -1288,9 +1273,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Igår %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "Enheter";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Skicka till din enhet";
 
@@ -1317,9 +1299,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Sök efter flikar från andra enheter";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Öppna flikar";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Öppna webbplats";
@@ -2602,9 +2581,6 @@
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Övre fält";
 
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "Flikar";
-
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Dela länk";
 
@@ -3640,6 +3616,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Öppna Brave för att se dina favoriter här";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Sök";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "En sammanfattning av hur Brave gör att du sparar tid och skyddar dig online.";
 
@@ -3672,6 +3651,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "Integritetsstatistik";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Brave-plånbok";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "Widgetar";

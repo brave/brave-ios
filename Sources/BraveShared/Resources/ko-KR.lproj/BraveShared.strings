@@ -170,13 +170,7 @@
 "BravePanel" = "Brave 패널";
 
 /* No comment provided by engineer. */
-"BraveRewardsAdNotificationTitle" = "Brave Rewards";
-
-/* No comment provided by engineer. */
 "BraveRewardsOpen" = "열기";
-
-/* Brave Rewards settings title */
-"BraveRewardsTitle" = "Brave Rewards";
 
 /* Brave Search Banner Promotion description content in Search Suggestions */
 "braveSearchPromotion.bannerDescription" = "Brave 검색은 사용자의 신원이나 검색어, 클릭 활동을 추적하지 않습니다.";
@@ -478,9 +472,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "확인";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "콘텐츠 필터링";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "맞춤 필터를 활성화하여 특정 지역 및 언어에 특화된 트래커 등 짜증 나는 요소를 차단합니다.";
 
@@ -640,14 +631,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "보내지 않음";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "다운로드됨";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "파일 다운로드";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "다운로드 중";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "다운로드";
@@ -765,12 +750,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "기능";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "필터 목록";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "추가적인 인기 커뮤니티 목록입니다. 너무 많은 필터를 활성화하면 브라우징 속도가 느려집니다.";
 
 /* Share action title */
 "FindInPage" = "페이지에서 찾기";
@@ -973,9 +952,6 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "무료 토큰을 받으려면 탭하세요.";
 
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
-
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "자세히 알아보려면 여기를 탭하세요.";
 
@@ -1147,9 +1123,6 @@
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailsAnd" = "및";
 
-/* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards";
-
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetail" = "Brave Private Ads를 선택하면 광고를 보고 게시자와 콘텐츠 제작자를 지원할 수 있습니다.";
 
@@ -1158,9 +1131,6 @@
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsPrivacyPolicyDetailLink" = "개인정보 취급방침";
-
-/* Title for rewards onboarding screen */
-"OBRewardsTitle" = "Brave Rewards";
 
 /* Save button to save current selection */
 "OBSaveButton" = "저장";
@@ -1288,9 +1258,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "어제 %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "기기";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "내 기기로 보내기";
 
@@ -1317,9 +1284,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "다른 기기에 열린 탭 검색";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "열린 탭";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "웹사이트 열기";
@@ -2101,9 +2065,6 @@
 /* Body for Brave Talk rewards opt-in screen */
 "rewards.braveTalkRewardsOptInBody" = "Brave Rewards를 이용하면 Brave Ads 네트워크에서 프라이버시 보장 광고를 볼 수 있습니다. 트래커가 없어 느려지지 않습니다. 그리고 데이터가 완벽히 안전하게 보호됩니다.";
 
-/* Title for Brave Talk rewards opt-in screen button */
-"rewards.braveTalkRewardsOptInButtonTitle" = "Rewards 켜기";
-
 /* Body for successful Brave Talk rewards opt-in */
 "rewards.braveTalkRewardsOptInSuccessBody" = "Brave Talk로 계속하려면 화면의 아무데나 클릭하세요.";
 
@@ -2601,9 +2562,6 @@
 
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "상단 바";
-
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "탭";
 
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "링크 공유";
@@ -3640,6 +3598,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "여기서 즐겨찾기를 보려면 Brave를 여세요.";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "검색";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Brave가 어떻게 시간을 절약하고 온라인 프라이버시를 보호하는지에 대한 개요가 제공됩니다.";
 
@@ -3672,6 +3633,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "프라이버시 통계";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Brave 월렛";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "위젯";

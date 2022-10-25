@@ -170,13 +170,7 @@
 "BravePanel" = "Panel Brave";
 
 /* No comment provided by engineer. */
-"BraveRewardsAdNotificationTitle" = "Brave Rewards";
-
-/* No comment provided by engineer. */
 "BraveRewardsOpen" = "Buka";
-
-/* Brave Rewards settings title */
-"BraveRewardsTitle" = "Brave Rewards";
 
 /* Brave Search Banner Promotion description content in Search Suggestions */
 "braveSearchPromotion.bannerDescription" = "Pencarian Brave tidak melacak Anda, pertanyaan Anda, atau klik Anda.";
@@ -478,9 +472,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Konfirmasi";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Penyaringan Konten";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Mengaktifkan filter khusus yang memblokir pelacak serta Gangguan regional dan berbahasa tertentu";
 
@@ -640,14 +631,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Jangan kirim";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Telah Didownload";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "File unduhan";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Mendownload";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Unduhan";
@@ -765,12 +750,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Fitur";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Daftar Filter";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Daftar komunitas populer tambahan. Perhatikanlah bahwa mengaktifkan terlalu banyak filter akan menurunkan kecepatan perambanan.";
 
 /* Share action title */
 "FindInPage" = "Temukan di Halaman";
@@ -973,9 +952,6 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "Ketuk untuk mengklaim token gratis Anda.";
 
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
-
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Ketuk di sini untuk mempelajari selengkapnya.";
 
@@ -1147,9 +1123,6 @@
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailsAnd" = "dan";
 
-/* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards";
-
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetail" = "Memilih untuk menggunakan Brave Private Ads akan mendukung penerbit dan pembuat konten melalui setiap iklan yang dilihat.";
 
@@ -1158,9 +1131,6 @@
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsPrivacyPolicyDetailLink" = "Kebijakan Privasi";
-
-/* Title for rewards onboarding screen */
-"OBRewardsTitle" = "Brave Rewards";
 
 /* Save button to save current selection */
 "OBSaveButton" = "Simpan";
@@ -1317,9 +1287,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Cari Tab dari Perangkat Lain";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Tab Terbuka";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Buka Situs Web";
@@ -2100,9 +2067,6 @@
 
 /* Body for Brave Talk rewards opt-in screen */
 "rewards.braveTalkRewardsOptInBody" = "Dengan Brave Rewards, Anda dapat melihat iklan yang menghormati privasi dari jaringan Brave Ads. Tanpa pelacak. Tanpa hambatan. Dan data Anda akan tetap aman sepenuhnya.";
-
-/* Title for Brave Talk rewards opt-in screen button */
-"rewards.braveTalkRewardsOptInButtonTitle" = "Aktifkan Rewards";
 
 /* Body for successful Brave Talk rewards opt-in */
 "rewards.braveTalkRewardsOptInSuccessBody" = "Klik di mana saja pada layar untuk melanjutkan ke Brave Talk.";
@@ -3175,9 +3139,6 @@
 /* No comment provided by engineer. */
 "today.allSources" = "Semua Sumber";
 
-/* The name of the feature */
-"today.braveToday" = "Brave News";
-
 /* No comment provided by engineer. */
 "today.contentAvailableButtonTitle" = "Konten Baru Telah Tersedia";
 
@@ -3639,6 +3600,9 @@
 
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Silakan buka Brave untuk melihat favorit Anda di sini";
+
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Cari";
 
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Rangkuman cara Brave menghemat waktu Anda dan melindungi Anda secara daring.";

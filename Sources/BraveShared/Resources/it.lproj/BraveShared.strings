@@ -170,13 +170,7 @@
 "BravePanel" = "Pannello Brave";
 
 /* No comment provided by engineer. */
-"BraveRewardsAdNotificationTitle" = "Brave Rewards";
-
-/* No comment provided by engineer. */
 "BraveRewardsOpen" = "Apri";
-
-/* Brave Rewards settings title */
-"BraveRewardsTitle" = "Brave Rewards";
 
 /* Brave Search Banner Promotion description content in Search Suggestions */
 "braveSearchPromotion.bannerDescription" = "Brave Search non tiene traccia delle tue query né dei tuoi clic.";
@@ -234,9 +228,6 @@
 
 /* Sync settings welcome */
 "BraveSyncWelcome" = "Per iniziare, avrai bisogno che Brave sia installato su tutti i dispositivi che prevedi di sincronizzare. Per metterli in collegamento, crea una catena di sincronizzazione che userai per collegare in modo sicuro tutti i tuoi dispositivi.";
-
-/* The name of the feature */
-"bravetalk.braveTalkTitle" = "Brave Talk";
 
 /* Setting to enable the browser lock privacy feature */
 "BrowserLock" = "Blocco del browser";
@@ -478,9 +469,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "Conferma";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "Applicazione di filtri ai contenuti";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "Attiva i filtri personalizzati che bloccano i tracker e gli elementi indesiderati specifici dell’area geografica o della lingua";
 
@@ -640,14 +628,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "Non inviare";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "Scaricato";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "Scarica file";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "Download in corso";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "Download";
@@ -765,12 +747,6 @@
 
 /* No comment provided by engineer. */
 "Features" = "Funzioni";
-
-/* A title on the content filtering screen that allows you to enable/disable filter lists */
-"FilterLists" = "Liste dei filtri";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "Altre liste popolari della community. Tieni presente che l’attivazione di troppi filtri ridurrà la velocità di navigazione.";
 
 /* Share action title */
 "FindInPage" = "Trova nella pagina";
@@ -973,9 +949,6 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "Tocca per ricevere i token gratuiti.";
 
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
-
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "Tocca qui per maggiori informazioni.";
 
@@ -1147,9 +1120,6 @@
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailsAnd" = "e";
 
-/* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards";
-
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetail" = "L’attivazione di Brave Private Ads sostiene editori e creatori di contenuti con ogni annuncio visualizzato.";
 
@@ -1158,9 +1128,6 @@
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsPrivacyPolicyDetailLink" = "Politica sulla privacy";
-
-/* Title for rewards onboarding screen */
-"OBRewardsTitle" = "Brave Rewards";
 
 /* Save button to save current selection */
 "OBSaveButton" = "Salva";
@@ -1288,9 +1255,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "Ieri %@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "Dispositivi";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "Invia al tuo dispositivo";
 
@@ -1317,9 +1281,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "Cerca le schede di altri dispositivi";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "Schede aperte";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "Apri sito web";
@@ -2602,9 +2563,6 @@
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "Barra superiore";
 
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "Schede";
-
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "Condividi link";
 
@@ -3175,9 +3133,6 @@
 /* No comment provided by engineer. */
 "today.allSources" = "Tutte le fonti";
 
-/* The name of the feature */
-"today.braveToday" = "Brave News";
-
 /* No comment provided by engineer. */
 "today.contentAvailableButtonTitle" = "Nuovi contenuti disponibili";
 
@@ -3640,6 +3595,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Apri Brave per visualizzare qui i tuoi preferiti";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "Ricerca";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Un riepilogo di come Brave ti fa risparmiare tempo e ti protegge online.";
 
@@ -3672,6 +3630,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "Statistica sulla privacy";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Portafoglio Brave";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "Widget";

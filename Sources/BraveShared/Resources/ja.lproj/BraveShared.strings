@@ -170,13 +170,7 @@
 "BravePanel" = "Brave パネル";
 
 /* No comment provided by engineer. */
-"BraveRewardsAdNotificationTitle" = "Brave Rewards";
-
-/* No comment provided by engineer. */
 "BraveRewardsOpen" = "開く";
-
-/* Brave Rewards settings title */
-"BraveRewardsTitle" = "Brave Rewards";
 
 /* Brave Search Banner Promotion description content in Search Suggestions */
 "braveSearchPromotion.bannerDescription" = "Brave検索はあなたの個人情報、クエリ、クリックした内容を追跡しません。";
@@ -215,7 +209,7 @@
 "BraveShieldsSiteBroken" = "サイトの表示が崩れている場合は、Shieldをオフにしてみてください";
 
 /* Context: 'Brave Shields Up' or 'Brave Shields Down' */
-"BraveShieldsStatusTitle" = "Brave Shield";
+"BraveShieldsStatusTitle" = "Brave Shields";
 
 /* Context: The 'Down' in 'Brave Shields Down' */
 "BraveShieldsStatusValueDown" = "オフ";
@@ -478,9 +472,6 @@
 /* No comment provided by engineer. */
 "Confirm" = "確認する";
 
-/* A title to the content filtering page under global shield settings and the title on the Content filtering page */
-"ContentFiltering" = "コンテンツフィルター";
-
 /* A description of the content filtering page. */
 "ContentFilteringDescription" = "カスタムフィルターを有効にすると、地域や言語に応じたトラッカーや不快な表示をブロックできます";
 
@@ -640,14 +631,8 @@
 /* Used as a button label for crash dialog prompt */
 "DontSendButtonTitle" = "送信しない";
 
-/* A label representing the state of a filter list that is downloaded */
-"Downloaded" = "ダウンロード済み";
-
 /* Settings item for clearing downloaded files. */
 "DownloadedFiles" = "ダウンロード済みのファイル";
-
-/* A label representing the state of a filter list that is currently being downloaded */
-"Downloading" = "ダウンロードしています";
 
 /* Title for downloads menu item */
 "DownloadsMenuItem" = "ダウンロード";
@@ -768,9 +753,6 @@
 
 /* A title on the content filtering screen that allows you to enable/disable filter lists */
 "FilterLists" = "フィルターリスト";
-
-/* A description on the content filtering screen for the filter lists section. */
-"FilterListsDescription" = "その他の人気コミュニティリスト。フィルターが多すぎると、ブラウジング速度が遅くなる場合があります。";
 
 /* Share action title */
 "FindInPage" = "ページを検索";
@@ -973,9 +955,6 @@
 /* The body of the notification that goes out monthly to users who can claim an ads grant */
 "MonthlyAdsClaimNotificationBody" = "タップしてTAPポイントを受け取る";
 
-/* The title of the notification that goes out monthly to users who can claim an ads grant */
-"MonthlyAdsClaimNotificationTitle" = "Brave Rewards 💵🎁";
-
 /* No comment provided by engineer. */
 "MyFirstAdBody" = "詳しくはこちら";
 
@@ -1147,9 +1126,6 @@
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsAgreementDetailsAnd" = "、";
 
-/* Title for rewards agreement onboarding screen */
-"OBRewardsAgreementTitle" = "Brave Rewards";
-
 /* Detail text for rewards onboarding screen */
 "OBRewardsDetail" = "Braveプライベート広告を受け入れることで、広告を見るだけでウェブサイトやコンテンツクリエイターを支援することができます。";
 
@@ -1158,9 +1134,6 @@
 
 /* Detail text for rewards agreement onboarding screen */
 "OBRewardsPrivacyPolicyDetailLink" = "プライバシーポリシー";
-
-/* Title for rewards onboarding screen */
-"OBRewardsTitle" = "Brave Rewards";
 
 /* Save button to save current selection */
 "OBSaveButton" = "保存する";
@@ -1175,7 +1148,7 @@
 "OBShieldsDetail" = "プライバシーを侵害するトラッカーをブロックすることで、インターネット上でつきまとわれずにブラウジングすることができます。";
 
 /* Title for shields onboarding screen */
-"OBShieldsTitle" = "Brave Shield";
+"OBShieldsTitle" = "Brave Shields";
 
 /* Button to show the Brave Rewards Ads. */
 "OBShowMeButton" = "表示する";
@@ -1288,9 +1261,6 @@
 /* The description indicating when is the open tab synced. The parameter substituted for \"%@\" is the actual string representation of the exact time. E.g.: Yesterday 12:00 PM */
 "opentabs.openTabsItemLastSyncedYesterdayTitle" = "昨日の%@";
 
-/* The title displayed on table header for open tabs list from other devices */
-"openTabs.openTabsListTableHeaderTitle" = "デバイス";
-
 /* Title action button for sending webpage to selected other device */
 "opentabs.sendDeviceButtonTitle" = "お使いのデバイスに送信";
 
@@ -1317,9 +1287,6 @@
 
 /* The placeholder written in seach bar while tab-tray is showing open tabs. */
 "opentabs.tabTrayOpenSearchBarTitle" = "他のデバイスからの検索タブ";
-
-/* Title for open tabs menu item */
-"OpenTabsMenuItem" = "開いているタブ";
 
 /* Button title to that opens a website. */
 "OpenWebsite" = "ウェブサイトを開く";
@@ -1718,7 +1685,7 @@
 "playlistFolderSharing.addButtonAccessibilityTitle" = "ボタンをクリックするとBrave Playlistに追加します";
 
 /* Title for the button that adds the playlist to the database. */
-"playlistFolderSharing.addButtonTitle" = "追加";
+"playlistFolderSharing.addButtonTitle" = "追加する";
 
 /* Menu Title for removing offline data/cache */
 "playlistFolderSharing.deleteOfflineDataMenuTitle" = "オフライン再生用データを消去する";
@@ -1739,7 +1706,7 @@
 "playlistFolderSharing.offlineManagementViewDescription" = "オフライン用に自動保存をオンにすると、Playlist (共有プレイリストを含む) に新しく追加されたデータがオフライン再生用としてデバイスに保存され、お使いのデバイスの通信量を大きく消費する可能性があります。\n\nオフラインでの自動保存は、プレイリストの設定で管理することができます。";
 
 /* Button that takes the user to the settings menu */
-"playlistFolderSharing.offlineManagementViewSettingsButtonTitle" = "Settings";
+"playlistFolderSharing.offlineManagementViewSettingsButtonTitle" = "設定";
 
 /* Title of the playlist offline data management view */
 "playlistFolderSharing.offlineManagementViewTitle" = "Playlistのデータを管理する";
@@ -2602,9 +2569,6 @@
 /* An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar */
 "SettingsTabsOptionTopBar" = "上部バー";
 
-/* Tabs settings section title */
-"SettingsTabsSectionTitle" = "タブ";
-
 /* Context menu item for sharing a link URL */
 "ShareLinkActionTitle" = "リンクを共有";
 
@@ -3175,9 +3139,6 @@
 /* No comment provided by engineer. */
 "today.allSources" = "全てのソース";
 
-/* The name of the feature */
-"today.braveToday" = "Brave News";
-
 /* No comment provided by engineer. */
 "today.contentAvailableButtonTitle" = "利用可能な新しいコンテンツ";
 
@@ -3640,6 +3601,9 @@
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Braveを開いてお気に入りのサイトを追加してください";
 
+/* Description for the search option on the 'shortcuts' widget. */
+"widgets.searchShortcutTitle" = "検索";
+
 /* Description for Brave Shields widget on 'add widget' screen. */
 "widgets.shieldStatsDescription" = "Braveによって時間がどれだけ節約され、オンライン上でプライバシーが保護されたかのまとめです。";
 
@@ -3672,6 +3636,9 @@
 
 /* Title for Brave Shields single stat widget on 'add widget' screen. */
 "widgets.singleStatTitle" = "プライバシー統計";
+
+/* Description for the Brave Wallet option on the 'shortcuts' widget. */
+"widgets.walletShortcutTitle" = "Braveウォレット";
 
 /* Title of the settings for widgets part */
 "widgets.widgetTitle" = "ウィジェット";
