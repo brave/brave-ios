@@ -358,8 +358,9 @@ class AddEditBookmarkTableViewController: UITableViewController {
       navigationController?.popViewController(animated: true)
     } else {
       dismiss(animated: true) {
+        // Handle App Rating
         // Check for review condition after adding a bookmark
-        AppReviewManager.shared.handleAppReview(for: self.currentScene)
+        AppReviewManager.shared.handleAppReview(for: self)
       }
     }
   }

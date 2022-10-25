@@ -94,8 +94,10 @@ class PlaylistFolderController: UIViewController {
 
   @objc
   private func onDonePressed(_ button: UIBarButtonItem) {
-    self.dismiss(animated: true) {
-      AppReviewManager.shared.handleAppReview(for: self.currentScene)
+    dismiss(animated: true) {
+      // Handle App Rating
+      // User finished viewing the playlist folder view.
+      AppReviewManager.shared.handleAppReview(for: self)
     }
   }
   

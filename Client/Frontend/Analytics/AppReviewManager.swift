@@ -35,8 +35,8 @@ class AppReviewManager: ObservableObject {
   private let launchCountLimit = 5
   private let bookmarksCountLimit = 5
   private let playlistCountLimit = 5
-  private let dappConnectionPeriod = 7.days
-  private let daysInUseMaxPeriod = 7.days
+  private let dappConnectionPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
+  private let daysInUseMaxPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
   private let daysInUseRequiredPeriod = 4
   
   // MARK: Lifecycle
@@ -47,12 +47,21 @@ class AppReviewManager: ObservableObject {
   
   /// Method that handles If App Rating should be requested and request if condition is sucessful
   /// - Parameter currentScene: Current Scene where App Rating will be asked
-  func handleAppReview(for currentScene: UIWindowScene?) {
-    if AppConstants.buildChannel.isPublic && shouldRequestReview() {
-      // Request Review when the main-queue is free or on the next cycle.
-      DispatchQueue.main.async {
-        guard let windowScene = currentScene else { return }
-        SKStoreReviewController.requestReview(in: windowScene)
+  func handleAppReview(for controller: UIViewController) {
+    if shouldRequestReview() {
+      if AppConstants.buildChannel.isPublic {
+        // Request Review when the main-queue is free or on the next cycle.
+        DispatchQueue.main.async {
+          guard let windowScene = controller.currentScene else { return }
+          SKStoreReviewController.requestReview(in: windowScene)
+        }
+      } else {
+        let alert = UIAlertController(
+          title: "Show App Rating",
+          message: "Criteria is satified to Request Review",
+          preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        controller.present(alert, animated: true)
       }
     }
   }

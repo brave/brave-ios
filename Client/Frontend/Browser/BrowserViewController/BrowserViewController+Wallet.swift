@@ -5,12 +5,12 @@
 
 import Foundation
 import BraveWallet
-import struct Shared.InternalURL
 import BraveCore
 import SwiftUI
 import BraveUI
-import Data
+import Shared
 import BraveShared
+import Data
 import os.log
 
 extension WalletStore {
@@ -109,7 +109,9 @@ extension WalletPanelHostingController: PopoverContentComponent {}
 
 extension BrowserViewController: BraveWalletDelegate {
   public func requestAppReview() {
-    AppReviewManager.shared.handleAppReview(for: currentScene)
+    // Handle App Rating
+    // User is either finished sending/swapping a crypto token or added an account to wallet.
+    AppReviewManager.shared.handleAppReview(for: self)
   }
   
   public func openWalletURL(_ destinationURL: URL) {

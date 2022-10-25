@@ -895,7 +895,9 @@ public class BrowserViewController: UIViewController {
       .sink(receiveValue: { [weak self] isReviewRequired in
         guard let self = self else { return }
         if isReviewRequired {
-          AppReviewManager.shared.handleAppReview(for: self.currentScene)
+          // Handle App Rating
+          // User made changes to the Brave News sources (tapped close)
+          AppReviewManager.shared.handleAppReview(for: self)
         }
       })
     
@@ -1915,9 +1917,12 @@ public class BrowserViewController: UIViewController {
       if !FavoritesHelper.isAlreadyAdded(url) {
         activities.append(
           AddToFavoritesActivity() { [weak self, weak tab] in
+            guard let self = self else { return }
+            
             FavoritesHelper.add(url: url, title: tab?.displayTitle)
-            // Check for review condition after adding a bookmark
-            AppReviewManager.shared.handleAppReview(for: self?.currentScene)
+            // Handle App Rating
+            // Check for review condition after adding a favorite
+            AppReviewManager.shared.handleAppReview(for: self)
           })
       }
 
