@@ -290,7 +290,9 @@ class SolanaProviderScriptHandler: TabContentScript {
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
     }
-    guard let encodedSerializedTxs = JSONSerialization.jsObject(withNative: serializedTxs) else {
+    let encodedSerializedTxs = serializedTxs.compactMap {  JSONSerialization.jsObject(withNative: $0)
+    }
+    if encodedSerializedTxs.isEmpty {
       return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
     }
     return (encodedSerializedTxs, nil)
