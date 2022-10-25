@@ -129,12 +129,6 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       }
     }
   }
-  
-  public static func clearMemoryContext() {
-      DataController.perform(context: .existing(DataController.viewContextInMemory), save: true) { context in
-        context.reset()
-      }
-    }
 
   public static func getOtherFoldersCount() -> Int {
     PlaylistFolder.count(predicate: NSPredicate(format: "uuid != %@", PlaylistFolder.savedFolderUUID)) ?? 0
