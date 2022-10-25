@@ -151,8 +151,12 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
       })
 
       PlaylistItem.reorderItems(context: context)
-      PlaylistItem.saveContext(context)
 
+      let policy = context.mergePolicy
+      context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+      PlaylistItem.saveContext(context)
+      context.mergePolicy = policy
+      
       DispatchQueue.main.async {
         completion?()
       }

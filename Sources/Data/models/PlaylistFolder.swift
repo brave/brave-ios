@@ -118,13 +118,23 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
       playlistFolder.creatorLink = folder.creatorLink
       
       PlaylistFolder.reorderItems(context: context)
+      
+      let policy = context.mergePolicy
+      context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
       PlaylistFolder.saveContext(context)
+      context.mergePolicy = policy
       
       DispatchQueue.main.async {
         completion?(folderId)
       }
     }
   }
+  
+  public static func clearMemoryContext() {
+      DataController.perform(context: .existing(DataController.viewContextInMemory), save: true) { context in
+        context.reset()
+      }
+    }
 
   public static func getOtherFoldersCount() -> Int {
     PlaylistFolder.count(predicate: NSPredicate(format: "uuid != %@", PlaylistFolder.savedFolderUUID)) ?? 0
