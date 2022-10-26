@@ -179,7 +179,11 @@ extension BrowserViewController: WKNavigationDelegate {
     // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
     // gives us the exact same behaviour as Safari.
     if ["sms", "tel", "facetime", "facetime-audio"].contains(url.scheme) {
-      handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      
+      // Do not allow opening external URLs from child tabs
+      if (webView as? TabWebView)?.tab?.parent == nil {
+        handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      }
       decisionHandler(.cancel, preferences)
       return
     }
@@ -189,20 +193,29 @@ extension BrowserViewController: WKNavigationDelegate {
     // iOS will always say yes. TODO Is this the same as isWhitelisted?
 
     if isAppleMapsURL(url) {
-      handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      // Do not allow opening external URLs from child tabs
+      if (webView as? TabWebView)?.tab?.parent == nil {
+        handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      }
       decisionHandler(.cancel, preferences)
       return
     }
 
     if isStoreURL(url) {
-      handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      // Do not allow opening external URLs from child tabs
+      if (webView as? TabWebView)?.tab?.parent == nil {
+        handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      }
       decisionHandler(.cancel, preferences)
       return
     }
 
     // Handles custom mailto URL schemes.
     if url.scheme == "mailto" {
-      handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      // Do not allow opening external URLs from child tabs
+      if (webView as? TabWebView)?.tab?.parent == nil {
+        handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true)
+      }
       decisionHandler(.cancel, preferences)
       return
     }
@@ -407,13 +420,16 @@ extension BrowserViewController: WKNavigationDelegate {
     // This check handles custom app schemes to open external apps.
     // Our own 'brave' scheme does not require the switch-app prompt.
     if url.scheme?.contains("brave") == false {
-      handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true) { didOpenURL in
-        // Do not show error message for JS navigated links or redirect
-        // as it's not the result of a user action.
-        if !didOpenURL, navigationAction.navigationType == .linkActivated {
-          let alert = UIAlertController(title: Strings.unableToOpenURLErrorTitle, message: Strings.unableToOpenURLError, preferredStyle: .alert)
-          alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-          self.present(alert, animated: true, completion: nil)
+      // Do not allow opening external URLs from child tabs
+      if (webView as? TabWebView)?.tab?.parent == nil {
+        handleExternalURL(url, isMainFrame: navigationAction.targetFrame?.isMainFrame == true) { didOpenURL in
+          // Do not show error message for JS navigated links or redirect
+          // as it's not the result of a user action.
+          if !didOpenURL, navigationAction.navigationType == .linkActivated {
+            let alert = UIAlertController(title: Strings.unableToOpenURLErrorTitle, message: Strings.unableToOpenURLError, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+          }
         }
       }
     }
