@@ -261,7 +261,7 @@ class SolanaProviderScriptHandler: TabContentScript {
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
     }
-    let listMojoInt = serializedTx.map({ MojoBase.Value(intValue: $0.int32Value) })
+    let listMojoInt = serializedTx.map { MojoBase.Value(intValue: $0.int32Value) }
     guard let encodedSerializedTx = MojoBase.Value(listValue: listMojoInt).jsonObject else {
       return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
     }

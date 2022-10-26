@@ -3210,14 +3210,14 @@ extension Strings {
     public static let solanaSignTransactionWarning = NSLocalizedString(
       "wallet.solanaSignTransactionWarning",
       tableName: "BraveWallet",
-      bundle: .strings,
+      bundle: .module,
       value: "Note that Brave can’t verify what will happen if you sign. A signature could authorize nearly any operation in your account or on your behalf, including (but not limited to) giving total control of your account and crypto assets to the site making the request. Only sign if you’re sure you want to take this action, and trust the requesting site.",
       comment: "The warning message to let users understand the risk of using Brave Wallet to sign any transaction."
     )
     public static let solanaSignTransactionDetails = NSLocalizedString(
       "wallet.solanaSignTransactionDetails",
       tableName: "BraveWallet",
-      bundle: .strings,
+      bundle: .module,
       value: "Details",
       comment: "The title on top of a separater, and the transaction details will be displayed below the separater."
     )

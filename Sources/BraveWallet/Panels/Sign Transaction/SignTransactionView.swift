@@ -104,9 +104,9 @@ struct SignTransactionView: View {
     currentRequest.txDatas
       .map { $0.solanaTxData?.instructions ?? [] }
       .map { instructionsForOneTx in
-       instructionsForOneTx
-         .map { TransactionParser.parseSolanaInstruction($0).toString }
-         .joined(separator: "\n\n") // separator between each instruction
+        instructionsForOneTx
+          .map { TransactionParser.parseSolanaInstruction($0).toString }
+          .joined(separator: "\n\n") // separator between each instruction
       }
       .joined(separator: "\n\n\n\n") // separator between each transaction
   }
@@ -121,7 +121,7 @@ struct SignTransactionView: View {
         VStack(spacing: 12) {
           HStack {
             Text(networkStore.selectedChain.chainName)
-              .font(.subheadline)
+              .font(.callout)
               .foregroundColor(Color(.braveLabel))
             Spacer()
             if normalizedRequests.count > 1 {
@@ -140,25 +140,21 @@ struct SignTransactionView: View {
           VStack(spacing: 12) {
             Blockie(address: account.address)
               .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
-            Text(urlOrigin: currentRequest.originInfo.origin)
-              .font(.caption)
-              .foregroundColor(Color(.braveLabel))
-              .multilineTextAlignment(.center)
             AddressView(address: account.address) {
-              VStack(spacing: 4) {
-                Text(account.name)
-                  .font(.subheadline.weight(.semibold))
-                  .foregroundColor(Color(.braveLabel))
-              }
+              Text(account.name)
             }
+            .foregroundColor(Color(.bravePrimary))
+            .font(.callout)
+            Text(urlOrigin: currentRequest.originInfo.origin)
+              .foregroundColor(Color(.braveLabel))
+              .font(.subheadline)
+              .multilineTextAlignment(.center)
           }
           .accessibilityElement(children: .combine)
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.title3.weight(.semibold))
             .foregroundColor(Color(.bravePrimary))
-            .multilineTextAlignment(.center)
         }
-        .padding(.vertical, 16)
         .padding(.horizontal, 8)
         if showWarning {
           warningView
@@ -166,26 +162,30 @@ struct SignTransactionView: View {
             .padding(.horizontal, 20)
         } else {
           divider
-            .padding(.top, 8)
-          StaticTextView(text: instructionsDisplayString(), isMonospaced: true)
-            .frame(maxWidth: .infinity)
-            .frame(height: 200)
-            .background(Color(.tertiaryBraveGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .padding()
-            .background(
-              Color(.secondaryBraveGroupedBackground)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .padding(.vertical, 8)
+          VStack(alignment: .leading) {
+            StaticTextView(text: instructionsDisplayString())
+              .frame(maxWidth: .infinity)
+              .frame(height: 200)
+              .background(Color(.tertiaryBraveGroupedBackground))
+              .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+              .padding()
+          }
+          .background(
+            Color(.secondaryBraveGroupedBackground)
+          )
+          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         buttonsContainer
           .padding(.top)
           .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
           .accessibility(hidden: sizeCategory.isAccessibilityCategory)
       }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle(Text(navigationTitle))
+      .padding()
     }
+    .navigationBarTitleDisplayMode(.inline)
+    .navigationTitle(Text(navigationTitle))
+    .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
   }
   
   @ViewBuilder private var buttonsContainer: some View {
@@ -202,20 +202,7 @@ struct SignTransactionView: View {
   
   @ViewBuilder private var buttons: some View {
     if showWarning {
-      Button(action: { // cancel
-        switch request {
-        case .signTransaction(_):
-          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id))
-        case .signAllTransactions(_):
-          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id))
-        }
-        if normalizedRequests.count == 1 {
-          onDismiss()
-        }
-      }) {
-        Text(Strings.cancelButtonTitle)
-      }
-      .buttonStyle(BraveOutlineButtonStyle(size: .large))
+      cancelButton
       Button(action: { // Continue
         showWarning = false
       }) {
@@ -225,20 +212,7 @@ struct SignTransactionView: View {
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       .disabled(txIndex != 0)
     } else {
-      Button(action: { // cancel
-        switch request {
-        case .signTransaction(_):
-          cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id))
-        case .signAllTransactions(_):
-          cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id))
-        }
-        if normalizedRequests.count == 1 {
-          onDismiss()
-        }
-      }) {
-        Text(Strings.cancelButtonTitle)
-      }
-      .buttonStyle(BraveOutlineButtonStyle(size: .large))
+      cancelButton
       Button(action: { // approve
         switch request {
         case .signTransaction(_):
@@ -259,6 +233,23 @@ struct SignTransactionView: View {
     }
   }
   
+  @ViewBuilder private var cancelButton: some View {
+    Button(action: { // cancel
+      switch request {
+      case .signTransaction(_):
+        cryptoStore.handleWebpageRequestResponse(.signTransaction(approved: false, id: currentRequest.id))
+      case .signAllTransactions(_):
+        cryptoStore.handleWebpageRequestResponse(.signAllTransactions(approved: false, id: currentRequest.id))
+      }
+      if normalizedRequests.count == 1 {
+        onDismiss()
+      }
+    }) {
+      Text(Strings.cancelButtonTitle)
+    }
+    .buttonStyle(BraveOutlineButtonStyle(size: .large))
+  }
+  
   @ViewBuilder private var divider: some View {
     VStack {
       Text(Strings.Wallet.solanaSignTransactionDetails)
@@ -268,7 +259,6 @@ struct SignTransactionView: View {
         LinearGradient(braveGradient: colorScheme == .dark ? .darkGradient02 : .lightGradient02)
       }
       .frame(height: 4)
-      .padding(.horizontal, 20)
     }
   }
   
@@ -317,7 +307,7 @@ struct SignTransaction_Previews: PreviewProvider {
       request: .signTransaction([BraveWallet.SignTransactionRequest(
         originInfo: .init(),
         id: 0,
-        fromAddress: "2xyURwxRjuLZh89YGjywEJauh2fxnkbtUEyAU9pdvHA1",
+        fromAddress: BraveWallet.AccountInfo.previewAccount.address,
         txData: .init(),
         rawMessage: .init(),
         coin: .sol
