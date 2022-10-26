@@ -18,6 +18,9 @@ enum ScriptSourceType {
   /// This script wraps engine scripts and executes them for the correct frame
   case frameCheckWrapper
   /// A script that polls selectors from a frame and sends it to iOS which then returns the hidden elements
+  ///
+  /// This script is a modification of the android and desktop script found here:
+  /// https://github.com/brave/brave-core/blob/master/components/cosmetic_filters/resources/data/content_cosmetic.ts
   case selectorsPoller
 
   var fileName: String {
