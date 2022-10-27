@@ -18,16 +18,10 @@ public enum OnboardingRewardsState {
 }
 
 public class OnboardingRewardsAgreementViewController: UIViewController {
-  // TODO: UI
-//  private let rewards: BraveRewards
-
   public var onOnboardingStateChanged: ((OnboardingRewardsAgreementViewController, _ state: OnboardingRewardsState) -> Void)?
+  public var onRewardsStatusChanged: ((Bool) -> Void)?
 
-  // TODO: UI
-//  init(rewards: BraveRewards) {
   public init() {
-    // TODO: UI
-//    self.rewards = rewards
     super.init(nibName: nil, bundle: nil)
 
     modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
@@ -75,7 +69,7 @@ public class OnboardingRewardsAgreementViewController: UIViewController {
   @objc
   private func turnOnTapped() {
     Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-  
+    onRewardsStatusChanged?(true)
 //    rewards.isEnabled = true
     onOnboardingStateChanged?(self, .complete)
   }

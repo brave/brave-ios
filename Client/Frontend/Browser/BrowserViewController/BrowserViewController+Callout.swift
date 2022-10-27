@@ -114,6 +114,9 @@ extension BrowserViewController {
       controller.onOnboardingStateChanged = { [weak self] controller, state in
         self?.completeOnboarding(controller)
       }
+      controller.onRewardsStatusChanged = { [weak self] status in
+        self?.rewards.isEnabled = status
+      }
       present(controller, animated: true)
       isOnboardingOrFullScreenCalloutPresented = true
 
