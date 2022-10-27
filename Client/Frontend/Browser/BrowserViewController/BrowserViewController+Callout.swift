@@ -83,18 +83,23 @@ extension BrowserViewController {
             }
 
             Preferences.General.defaultBrowserCalloutDismissed.value = true
+            self?.isOnboardingOrFullScreenCalloutPresented = true
+
             UIApplication.shared.open(settingsUrl)
             self?.dismiss(animated: false)
           },
           secondaryAction: { [weak self] in
+            self?.isOnboardingOrFullScreenCalloutPresented = true
+
             self?.dismiss(animated: false)
           }
         )
       )
     )
 
-    present(onboardingController, animated: true)
-    isOnboardingOrFullScreenCalloutPresented = true
+    if !isOnboardingOrFullScreenCalloutPresented {
+      present(onboardingController, animated: true)
+    }
   }
 
   func presentBraveRewardsScreenCallout() {

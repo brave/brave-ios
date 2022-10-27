@@ -10,6 +10,7 @@ import Lottie
 import UIKit
 import Storage
 import SnapKit
+import BraveUI
 
 public enum OnboardingRewardsState {
   case skipped
@@ -75,9 +76,8 @@ public class OnboardingRewardsAgreementViewController: UIViewController {
 
   @objc
   private func turnOnTapped() {
-    // TODO: UI
-//    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
-
+    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
+  
 //    rewards.isEnabled = true
     onOnboardingStateChanged?(self, .complete)
   }
@@ -251,10 +251,9 @@ extension OnboardingRewardsAgreementViewController {
       }
 
       descriptionView.addSubview(descriptionStackView)
-      // TODO: UI
-//      descriptionStackView.snp.makeConstraints {
-//        $0.edges.equalTo(descriptionView.safeArea.edges).inset(OnboardingCommon.UX.descriptionContentInset)
-//      }
+      descriptionStackView.snp.makeConstraints {
+        $0.edges.equalTo(descriptionView.safeAreaLayoutGuide.snp.edges).inset(OnboardingCommon.UX.descriptionContentInset)
+      }
 
       mainStackView.addArrangedSubview(descriptionView)
 

@@ -362,26 +362,19 @@ public class WelcomeViewController: UIViewController {
 
   private func close() {
     var presenting: UIViewController = self
-    // TODO: UI
-//    while true {
-//      if let presentingController = presenting.presentingViewController {
-//        presenting = presentingController
-//        if presenting.isKind(of: BrowserViewController.self) {
-//          break
-//        }
-//        continue
-//      }
-//
-//      if let presentingController = presenting as? UINavigationController,
-//        let topController = presentingController.topViewController {
-//        presenting = topController
-//        if presenting.isKind(of: BrowserViewController.self) {
-//          break
-//        }
-//      }
-//
-//      break
-//    }
+    while true {
+      if let presentingController = presenting.presentingViewController {
+        presenting = presentingController
+        continue
+      }
+
+      if let presentingController = presenting as? UINavigationController,
+        let topController = presentingController.topViewController {
+        presenting = topController
+      }
+
+      break
+    }
     
     Preferences.General.basicOnboardingProgress.value = OnboardingProgress.newTabPage.rawValue
     presenting.dismiss(animated: true, completion: nil)

@@ -52,7 +52,7 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         .init(
           text: "Start Onboarding",
           selection: { [unowned self] in
-            let onboardingController = WelcomeViewController(state: .loading)
+            let onboardingController = WelcomeViewController()
             onboardingController.modalPresentationStyle = .fullScreen
 
             present(onboardingController, animated: false)
