@@ -18,9 +18,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 
   private let urlType: URLType
-  // TODO: UI
-//  private var helpers = [String: TabContentScript]()
-  private var certStore: CertStore
 
   private let KVOs: [KVOConstants] = [
     .loading,
@@ -54,8 +51,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
   }
 
-  init(certStore: CertStore, url: URLType) {
-    self.certStore = certStore
+  init(url: URLType) {
     self.urlType = url
     super.init(nibName: nil, bundle: nil)
   }
@@ -81,7 +77,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
 
     webView.navigationDelegate = self
-    setupScripts()
 
     switch urlType {
     case .termsOfService:
@@ -93,12 +88,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     toolbar.exitButton.addTarget(self, action: #selector(onExit), for: .touchUpInside)
     toolbar.backButton.addTarget(self, action: #selector(onBack), for: .touchUpInside)
     toolbar.forwardButton.addTarget(self, action: #selector(onForward), for: .touchUpInside)
-  }
-
-  private func setupScripts() {
-    // TODO: UI
-//    let errorHelper = ErrorPageHelper(certStore: certStore)
-//    addScript(errorHelper, for: ErrorPageHelper.scriptName)
   }
 
   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -186,7 +175,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-
     let error = error as NSError
     if error.domain == "WebKitErrorDomain" && error.code == 102 {
       return
@@ -200,46 +188,12 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     if error.code == Int(CFNetworkErrors.cfurlErrorCancelled.rawValue) {
       return
     }
-
-    if let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL {
-      // TODO: UI
-//      ErrorPageHelper(certStore: certStore).loadPage(error, forUrl: url, inWebView: webView)
-    }
   }
 
   func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-//    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
-//      return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
-//    }
-
-    let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
-    if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-      let trust = challenge.protectionSpace.serverTrust,
-      let cert = SecTrustGetCertificateAtIndex(trust, 0), certStore.containsCertificate(cert, forOrigin: origin) {
-      return completionHandler(.useCredential, URLCredential(trust: trust))
-    }
-
     completionHandler(.performDefaultHandling, nil)
   }
 }
-
-// TODO: UI
-//extension OnboardingWebViewController: WKScriptMessageHandlerWithReply {
-//  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-//    for helper in helpers.values {
-//      let scriptMessageHandlerName = type(of: helper).messageHandlerName
-//      if scriptMessageHandlerName == message.name {
-//        return helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
-//      }
-//    }
-//  }
-//
-//  private func addScript(_ helper: TabContentScript, for name: String) {
-//    helpers[name] = helper
-//    let scriptMessageHandlerName = type(of: helper).messageHandlerName
-//    webView.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
-//  }
-//}
 
 extension OnboardingWebViewController {
   private struct UX {

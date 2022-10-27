@@ -18,16 +18,14 @@ public enum OnboardingRewardsState {
 }
 
 public class OnboardingRewardsAgreementViewController: UIViewController {
-  private let certStore: CertStore
   // TODO: UI
 //  private let rewards: BraveRewards
 
   public var onOnboardingStateChanged: ((OnboardingRewardsAgreementViewController, _ state: OnboardingRewardsState) -> Void)?
 
   // TODO: UI
-//  init(certStore: CertStore, rewards: BraveRewards) {
-  public init(certStore: CertStore) {
-    self.certStore = certStore
+//  init(rewards: BraveRewards) {
+  public init() {
     // TODO: UI
 //    self.rewards = rewards
     super.init(nibName: nil, bundle: nil)
@@ -60,12 +58,12 @@ public class OnboardingRewardsAgreementViewController: UIViewController {
 
     contentView.onTermsOfServicePressed = { [weak self] in
       guard let self = self else { return }
-      self.present(OnboardingWebViewController(certStore: self.certStore, url: .termsOfService), animated: true, completion: nil)
+      self.present(OnboardingWebViewController(url: .termsOfService), animated: true, completion: nil)
     }
 
     contentView.onPrivacyPolicyPressed = { [weak self] in
       guard let self = self else { return }
-      self.present(OnboardingWebViewController(certStore: self.certStore, url: .privacyPolicy), animated: true, completion: nil)
+      self.present(OnboardingWebViewController(url: .privacyPolicy), animated: true, completion: nil)
     }
   }
 

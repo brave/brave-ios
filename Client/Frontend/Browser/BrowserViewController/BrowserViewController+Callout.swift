@@ -110,7 +110,7 @@ extension BrowserViewController {
     }
 
     if BraveRewards.isAvailable, !Preferences.Rewards.rewardsToggledOnce.value {
-      let controller = OnboardingRewardsAgreementViewController(certStore: profile.certStore)
+      let controller = OnboardingRewardsAgreementViewController()
       controller.onOnboardingStateChanged = { [weak self] controller, state in
         self?.completeOnboarding(controller)
       }
