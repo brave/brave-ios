@@ -980,7 +980,7 @@ extension Strings {
   public static let HTTPSEverywhere = NSLocalizedString("HTTPSEverywhere", tableName: "BraveShared", bundle: .module, value: "Upgrade Connections to HTTPS", comment: "")
   public static let HTTPSEverywhereDescription = NSLocalizedString("HTTPSEverywhereDescription", tableName: "BraveShared", bundle: .module, value: "Opens sites using secure HTTPS instead of HTTP when possible.", comment: "")
   public static let blockPhishingAndMalware = NSLocalizedString("BlockPhishingAndMalware", tableName: "BraveShared", bundle: .module, value: "Block Phishing and Malware", comment: "")
-  public static let googleSafeBrowsing = NSLocalizedString("GoogleSafeBrowsing", tableName: "BraveShared", bundle: .module, value: "Block dangerous sites", comment: "")
+  public static let googleSafeBrowsing = NSLocalizedString("GoogleSafeBrowsing", tableName: "BraveShared", bundle: .module, value: "Block Dangerous Sites", comment: "")
   public static let googleSafeBrowsingUsingWebKitDescription = NSLocalizedString("GoogleSafeBrowsingUsingWebKitDescription", tableName: "BraveShared", bundle: .module, value: "Sends obfuscated URLs of some pages you visit to the Google Safe Browsing service, when your security is at risk.", comment: "")
   public static let contentFiltering = NSLocalizedString("ContentFiltering", tableName: "BraveShared", bundle: .module, value: "Content Filtering", comment: "A title to the content filtering page under global shield settings and the title on the Content filtering page")
   public static let blockMobileAnnoyances = NSLocalizedString("blockMobileAnnoyances", tableName: "BraveShared", bundle: .module, value: "Block 'Switch to App' Notices", comment: "A title for setting which blocks 'switch to app' popups")
@@ -4090,6 +4090,19 @@ extension Strings {
       value: "Open Privacy Hub",
       comment: "The title of the button action which open the privacy hub"
     )
+  }
+}
+
+// P3A
+extension Strings {
+  public struct P3A {
+    public static let settingTitle = NSLocalizedString("p3a.settingTitle", tableName: "BraveShared", bundle: .module,
+                                                       value: "Allow Privacy-Preserving Product Analytics (P3A)",
+                                                       comment: "The title for the setting that will allow a user to toggle sending privacy preserving analytics to Brave. P3A is the name of a Brave Product")
+    
+    public static let settingSubtitle = NSLocalizedString("p3a.settingSubtitle", tableName: "BraveShared", bundle: .module,
+                                                          value: "Anonymized P3A info helps Brave estimate overall usage and ensure we're improving popular features",
+                                                          comment: "A subtitle shown on the setting that toggles analytics on Brave. P3A is the name of a Brave Product")
   }
 }
 
