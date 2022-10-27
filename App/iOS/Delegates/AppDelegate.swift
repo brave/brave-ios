@@ -21,6 +21,7 @@ import BraveVPN
 import RuntimeWarnings
 import BraveNews
 import BraveTalk
+import BraveOnboarding
 import os
 
 extension AppDelegate {

@@ -7,16 +7,16 @@ import Foundation
 import Shared
 import os.log
 
-struct OnboardingDisconnectItem: Codable {
-  let properties: [String]
-  let resources: [String]
+public struct OnboardingDisconnectItem: Codable {
+  public let properties: [String]
+  public let resources: [String]
 }
 
-struct OnboardingDisconnectList: Codable {
-  let license: String
-  let entities: [String: OnboardingDisconnectItem]
+public struct OnboardingDisconnectList: Codable {
+  public let license: String
+  public let entities: [String: OnboardingDisconnectItem]
 
-  static func loadFromFile() -> OnboardingDisconnectList? {
+  public static func loadFromFile() -> OnboardingDisconnectList? {
     do {
       if let path = Bundle.module.path(forResource: "disconnect-entitylist", ofType: "json"),
         let contents = try String(contentsOfFile: path).data(using: .utf8) {

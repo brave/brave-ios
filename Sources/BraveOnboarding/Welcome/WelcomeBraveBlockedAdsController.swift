@@ -11,7 +11,7 @@ import DesignSystem
 import BraveShared
 import Shared
 
-class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponent {
+public class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponent {
   
   private struct UX {
     static let detailsViewEdgeInset = UIEdgeInsets(equalInset: 15)
@@ -95,7 +95,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
   
   private var gradientView = BraveGradientView.gradient01
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     informationStackView.addBackground(color: .black.withAlphaComponent(0.1), cornerRadius: 6.0)
@@ -120,7 +120,7 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
     )
   }
   
-  func setData(displayTrackers: [String], trackerCount: Int) {
+  public func setData(displayTrackers: [String], trackerCount: Int) {
     if displayTrackers.isEmpty {
       numberOfTrackersTextLabel.text = "\(trackerCount)"
       informationTextLabel.text = Strings.Onboarding.blockedAdsOnboardingNoBigTechInformationText

@@ -6,6 +6,9 @@ import BraveShared
 import Foundation
 import WebKit
 import Shared
+import BraveUI
+import UIKit
+import Storage
 
 class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
 
@@ -15,8 +18,9 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 
   private let urlType: URLType
-  private var helpers = [String: TabContentScript]()
-  private var profile: Profile
+  // TODO: UI
+//  private var helpers = [String: TabContentScript]()
+  private var certStore: CertStore
 
   private let KVOs: [KVOConstants] = [
     .loading,
@@ -50,8 +54,8 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
   }
 
-  init(profile: Profile, url: URLType) {
-    self.profile = profile
+  init(certStore: CertStore, url: URLType) {
+    self.certStore = certStore
     self.urlType = url
     super.init(nibName: nil, bundle: nil)
   }
@@ -92,8 +96,9 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 
   private func setupScripts() {
-    let errorHelper = ErrorPageHelper(certStore: profile.certStore)
-    addScript(errorHelper, for: ErrorPageHelper.scriptName)
+    // TODO: UI
+//    let errorHelper = ErrorPageHelper(certStore: certStore)
+//    addScript(errorHelper, for: ErrorPageHelper.scriptName)
   }
 
   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -197,19 +202,20 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     }
 
     if let url = error.userInfo[NSURLErrorFailingURLErrorKey] as? URL {
-      ErrorPageHelper(certStore: profile.certStore).loadPage(error, forUrl: url, inWebView: webView)
+      // TODO: UI
+//      ErrorPageHelper(certStore: certStore).loadPage(error, forUrl: url, inWebView: webView)
     }
   }
 
   func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
-      return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
-    }
+//    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
+//      return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
+//    }
 
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
       let trust = challenge.protectionSpace.serverTrust,
-      let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
+      let cert = SecTrustGetCertificateAtIndex(trust, 0), certStore.containsCertificate(cert, forOrigin: origin) {
       return completionHandler(.useCredential, URLCredential(trust: trust))
     }
 
@@ -217,22 +223,23 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 }
 
-extension OnboardingWebViewController: WKScriptMessageHandlerWithReply {
-  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-    for helper in helpers.values {
-      let scriptMessageHandlerName = type(of: helper).messageHandlerName
-      if scriptMessageHandlerName == message.name {
-        return helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
-      }
-    }
-  }
-
-  private func addScript(_ helper: TabContentScript, for name: String) {
-    helpers[name] = helper
-    let scriptMessageHandlerName = type(of: helper).messageHandlerName
-    webView.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
-  }
-}
+// TODO: UI
+//extension OnboardingWebViewController: WKScriptMessageHandlerWithReply {
+//  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+//    for helper in helpers.values {
+//      let scriptMessageHandlerName = type(of: helper).messageHandlerName
+//      if scriptMessageHandlerName == message.name {
+//        return helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
+//      }
+//    }
+//  }
+//
+//  private func addScript(_ helper: TabContentScript, for name: String) {
+//    helpers[name] = helper
+//    let scriptMessageHandlerName = type(of: helper).messageHandlerName
+//    webView.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
+//  }
+//}
 
 extension OnboardingWebViewController {
   private struct UX {

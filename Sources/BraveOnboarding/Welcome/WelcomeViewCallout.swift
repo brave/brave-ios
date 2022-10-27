@@ -10,14 +10,29 @@ import BraveUI
 import Shared
 import BraveShared
 
-enum WelcomeViewCalloutState {
-  struct WelcomeViewDefaultBrowserDetails {
+public enum WelcomeViewCalloutState {
+  public struct WelcomeViewDefaultBrowserDetails {
     var title: String
     var details: String
     var primaryButtonTitle: String
     var secondaryButtonTitle: String
     var primaryAction: (() -> Void)
     var secondaryAction: (() -> Void)
+    
+    public init(
+      title: String,
+      details: String,
+      primaryButtonTitle: String,
+      secondaryButtonTitle: String,
+      primaryAction: @escaping () -> Void,
+      secondaryAction: @escaping () -> Void) {
+      self.title = title
+      self.details = details
+      self.primaryButtonTitle = primaryButtonTitle
+      self.secondaryButtonTitle = secondaryButtonTitle
+      self.primaryAction = primaryAction
+      self.secondaryAction = secondaryAction
+    }
   }
 
   case loading
@@ -49,6 +64,7 @@ class WelcomeViewCallout: UIView {
   }
 
   // MARK: - Content
+  
   private let titleLabel = UILabel().then {
     $0.textColor = .bravePrimary
     $0.textAlignment = .center

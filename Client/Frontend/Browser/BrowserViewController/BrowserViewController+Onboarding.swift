@@ -8,6 +8,7 @@ import BraveUI
 import Shared
 import BraveCore
 import UIKit
+import BraveOnboarding
 
 // MARK: - Onboarding
 
@@ -32,9 +33,7 @@ extension BrowserViewController {
     // 2. User hasn't completed onboarding
     if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue,
        Preferences.General.isNewRetentionUser.value == true {
-      let onboardingController = WelcomeViewController(
-        profile: profile,
-        rewards: rewards)
+      let onboardingController = WelcomeViewController()
       onboardingController.modalPresentationStyle = .fullScreen
       parentController.present(onboardingController, animated: false)
       isOnboardingOrFullScreenCalloutPresented = true

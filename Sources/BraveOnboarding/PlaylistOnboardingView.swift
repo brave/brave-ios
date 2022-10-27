@@ -8,10 +8,10 @@ import BraveUI
 import Shared
 import BraveShared
 
-struct PlaylistOnboardingView: View {
-  var onButtonPressed: (() -> Void)?
+public struct PlaylistOnboardingView: View {
+  public var onButtonPressed: (() -> Void)?
 
-  var body: some View {
+  public var body: some View {
     HStack(alignment: .top, spacing: 14.0) {
       Image("welcome-view-playlist-brave-logo", bundle: .module)
 
@@ -59,9 +59,9 @@ struct PlaylistOnboardingView_Previews: PreviewProvider {
 }
 #endif
 
-class PlaylistOnboardingViewController: UIHostingController<PlaylistOnboardingView>, PopoverContentComponent {
+public class PlaylistOnboardingViewController: UIHostingController<PlaylistOnboardingView>, PopoverContentComponent {
 
-  init() {
+  public init() {
     super.init(rootView: PlaylistOnboardingView())
   }
 

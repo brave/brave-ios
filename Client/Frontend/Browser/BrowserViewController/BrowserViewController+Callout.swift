@@ -10,6 +10,7 @@ import Shared
 import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
+import BraveOnboarding
 
 // MARK: - Callouts
 
@@ -70,8 +71,6 @@ extension BrowserViewController {
     }
 
     let onboardingController = WelcomeViewController(
-      profile: nil,
-      rewards: nil,
       state: WelcomeViewCalloutState.defaultBrowserCallout(
         info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
           title: Strings.Callout.defaultBrowserCalloutTitle,
@@ -106,7 +105,7 @@ extension BrowserViewController {
     }
 
     if BraveRewards.isAvailable, !Preferences.Rewards.rewardsToggledOnce.value {
-      let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+      let controller = OnboardingRewardsAgreementViewController(certStore: profile.certStore)
       controller.onOnboardingStateChanged = { [weak self] controller, state in
         self?.completeOnboarding(controller)
       }

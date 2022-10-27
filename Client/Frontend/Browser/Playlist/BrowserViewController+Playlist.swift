@@ -10,6 +10,7 @@ import BraveShared
 import BraveUI
 import UIKit
 import os.log
+import BraveOnboarding
 
 extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSharingScriptHandlerDelegate {
 

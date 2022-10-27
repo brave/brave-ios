@@ -8,21 +8,27 @@ import BraveShared
 import BraveCore
 import Lottie
 import UIKit
+import Storage
+import SnapKit
 
-enum OnboardingRewardsState {
+public enum OnboardingRewardsState {
   case skipped
   case complete
 }
 
-class OnboardingRewardsAgreementViewController: UIViewController {
-  private let profile: Profile
-  private let rewards: BraveRewards
+public class OnboardingRewardsAgreementViewController: UIViewController {
+  private let certStore: CertStore
+  // TODO: UI
+//  private let rewards: BraveRewards
 
-  var onOnboardingStateChanged: ((OnboardingRewardsAgreementViewController, _ state: OnboardingRewardsState) -> Void)?
+  public var onOnboardingStateChanged: ((OnboardingRewardsAgreementViewController, _ state: OnboardingRewardsState) -> Void)?
 
-  init(profile: Profile, rewards: BraveRewards) {
-    self.profile = profile
-    self.rewards = rewards
+  // TODO: UI
+//  init(certStore: CertStore, rewards: BraveRewards) {
+  public init(certStore: CertStore) {
+    self.certStore = certStore
+    // TODO: UI
+//    self.rewards = rewards
     super.init(nibName: nil, bundle: nil)
 
     modalPresentationStyle = UIDevice.current.userInterfaceIdiom == .phone ? .fullScreen : .formSheet
@@ -39,11 +45,11 @@ class OnboardingRewardsAgreementViewController: UIViewController {
     return view as! View  // swiftlint:disable:this force_cast
   }
 
-  override func loadView() {
+  public override func loadView() {
     view = View()
   }
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .black
@@ -53,12 +59,12 @@ class OnboardingRewardsAgreementViewController: UIViewController {
 
     contentView.onTermsOfServicePressed = { [weak self] in
       guard let self = self else { return }
-      self.present(OnboardingWebViewController(profile: self.profile, url: .termsOfService), animated: true, completion: nil)
+      self.present(OnboardingWebViewController(certStore: self.certStore, url: .termsOfService), animated: true, completion: nil)
     }
 
     contentView.onPrivacyPolicyPressed = { [weak self] in
       guard let self = self else { return }
-      self.present(OnboardingWebViewController(profile: self.profile, url: .privacyPolicy), animated: true, completion: nil)
+      self.present(OnboardingWebViewController(certStore: self.certStore, url: .privacyPolicy), animated: true, completion: nil)
     }
   }
 
@@ -69,9 +75,10 @@ class OnboardingRewardsAgreementViewController: UIViewController {
 
   @objc
   private func turnOnTapped() {
-    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
+    // TODO: UI
+//    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.rewards.rawValue
 
-    rewards.isEnabled = true
+//    rewards.isEnabled = true
     onOnboardingStateChanged?(self, .complete)
   }
 }
@@ -244,9 +251,10 @@ extension OnboardingRewardsAgreementViewController {
       }
 
       descriptionView.addSubview(descriptionStackView)
-      descriptionStackView.snp.makeConstraints {
-        $0.edges.equalTo(descriptionView.safeArea.edges).inset(OnboardingCommon.UX.descriptionContentInset)
-      }
+      // TODO: UI
+//      descriptionStackView.snp.makeConstraints {
+//        $0.edges.equalTo(descriptionView.safeArea.edges).inset(OnboardingCommon.UX.descriptionContentInset)
+//      }
 
       mainStackView.addArrangedSubview(descriptionView)
 
@@ -302,19 +310,19 @@ extension OnboardingRewardsAgreementViewController.View: UITextViewDelegate {
 
 // Disabling orientation changes
 extension OnboardingRewardsAgreementViewController {
-  override var preferredStatusBarStyle: UIStatusBarStyle {
+  public override var preferredStatusBarStyle: UIStatusBarStyle {
     return .default
   }
 
-  override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+  public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     return .portrait
   }
 
-  override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+  public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
     return .portrait
   }
 
-  override var shouldAutorotate: Bool {
+  public override var shouldAutorotate: Bool {
     return false
   }
 }

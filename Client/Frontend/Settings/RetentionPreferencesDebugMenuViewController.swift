@@ -9,6 +9,7 @@ import Shared
 import BraveShared
 import UIKit
 import BraveUI
+import BraveOnboarding
 
 class RetentionPreferencesDebugMenuViewController: TableViewController {
 
@@ -51,9 +52,7 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         .init(
           text: "Start Onboarding",
           selection: { [unowned self] in
-            let onboardingController = WelcomeViewController(
-              profile: nil,
-              rewards: nil)
+            let onboardingController = WelcomeViewController(state: .loading)
             onboardingController.modalPresentationStyle = .fullScreen
 
             present(onboardingController, animated: false)

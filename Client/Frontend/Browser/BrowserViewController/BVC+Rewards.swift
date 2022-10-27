@@ -8,6 +8,7 @@ import Data
 import Shared
 import BraveShared
 import BraveUI
+import BraveOnboarding
 import Storage
 import WebKit
 import os.log
@@ -39,7 +40,7 @@ extension BrowserViewController {
       Preferences.General.isNewRetentionUser.value == true,
       !Preferences.Rewards.rewardsToggledOnce.value {
 
-      let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
+      let controller = OnboardingRewardsAgreementViewController(certStore: profile.certStore)
       controller.onOnboardingStateChanged = { [weak self] controller, state in
         self?.completeOnboarding(controller)
       }

@@ -20,23 +20,17 @@ private enum WelcomeViewID: Int {
   case iconBackground = 8
 }
 
-class WelcomeViewController: UIViewController {
-  private let profile: Profile?
-  private let rewards: BraveRewards?
+public class WelcomeViewController: UIViewController {
   private var state: WelcomeViewCalloutState?
 
-  convenience init(profile: Profile?, rewards: BraveRewards?) {
-    self.init(
-      profile: profile,
-      rewards: rewards,
-      state: .loading)
+  public convenience init() {
+    self.init(state: .loading)
   }
 
-  init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
-    self.profile = profile
-    self.rewards = rewards
+  public init(state: WelcomeViewCalloutState?) {
     self.state = state
     super.init(nibName: nil, bundle: nil)
+    
     self.transitioningDelegate = self
     self.modalPresentationStyle = .fullScreen
     self.loadViewIfNeeded()
@@ -89,7 +83,7 @@ class WelcomeViewController: UIViewController {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     doLayout()
@@ -99,7 +93,7 @@ class WelcomeViewController: UIViewController {
     }
   }
 
-  override func viewDidAppear(_ animated: Bool) {
+  public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
     Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
@@ -319,20 +313,14 @@ class WelcomeViewController: UIViewController {
   }
 
   private func animateToWelcomeState() {
-    let nextController = WelcomeViewController(
-      profile: profile,
-      rewards: rewards,
-      state: nil).then {
+    let nextController = WelcomeViewController(state: nil).then {
         $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
       }
     present(nextController, animated: true)
   }
 
   private func animateToDefaultBrowserState() {
-    let nextController = WelcomeViewController(
-      profile: profile,
-      rewards: rewards,
-      state: nil)
+    let nextController = WelcomeViewController(state: nil)
     let state = WelcomeViewCalloutState.defaultBrowser(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.defaultBrowserCalloutTitle,
@@ -352,10 +340,7 @@ class WelcomeViewController: UIViewController {
   }
   
   private func animateToDefaultSettingsState() {
-    let nextController = WelcomeViewController(
-      profile: profile,
-      rewards: rewards,
-      state: nil).then {
+    let nextController = WelcomeViewController(state: nil).then {
         $0.setLayoutState(
           state: WelcomeViewCalloutState.settings(
             title: Strings.Onboarding.navigateSettingsOnboardingScreenTitle,
@@ -377,25 +362,26 @@ class WelcomeViewController: UIViewController {
 
   private func close() {
     var presenting: UIViewController = self
-    while true {
-      if let presentingController = presenting.presentingViewController {
-        presenting = presentingController
-        if presenting.isKind(of: BrowserViewController.self) {
-          break
-        }
-        continue
-      }
-
-      if let presentingController = presenting as? UINavigationController,
-        let topController = presentingController.topViewController {
-        presenting = topController
-        if presenting.isKind(of: BrowserViewController.self) {
-          break
-        }
-      }
-
-      break
-    }
+    // TODO: UI
+//    while true {
+//      if let presentingController = presenting.presentingViewController {
+//        presenting = presentingController
+//        if presenting.isKind(of: BrowserViewController.self) {
+//          break
+//        }
+//        continue
+//      }
+//
+//      if let presentingController = presenting as? UINavigationController,
+//        let topController = presentingController.topViewController {
+//        presenting = topController
+//        if presenting.isKind(of: BrowserViewController.self) {
+//          break
+//        }
+//      }
+//
+//      break
+//    }
     
     Preferences.General.basicOnboardingProgress.value = OnboardingProgress.newTabPage.rawValue
     presenting.dismiss(animated: true, completion: nil)
@@ -403,30 +389,30 @@ class WelcomeViewController: UIViewController {
 }
 
 extension WelcomeViewController: UIViewControllerTransitioningDelegate {
-  func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+  public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
     return WelcomeAnimator(isPresenting: true)
   }
 
-  func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+  public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
     return WelcomeAnimator(isPresenting: false)
   }
 }
 
 // Disabling orientation changes
 extension WelcomeViewController {
-  override var preferredStatusBarStyle: UIStatusBarStyle {
+  public override var preferredStatusBarStyle: UIStatusBarStyle {
     return .lightContent
   }
 
-  override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+  public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     return .portrait
   }
 
-  override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+  public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
     return .portrait
   }
 
-  override var shouldAutorotate: Bool {
+  public override var shouldAutorotate: Bool {
     return false
   }
 }

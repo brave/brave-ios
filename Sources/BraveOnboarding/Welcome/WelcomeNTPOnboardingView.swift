@@ -9,7 +9,7 @@ import SnapKit
 import BraveUI
 import DesignSystem
 
-class WelcomeNTPOnboardingController: UIViewController, PopoverContentComponent {
+public class WelcomeNTPOnboardingController: UIViewController, PopoverContentComponent {
   private let textStackView = UIStackView().then {
     $0.spacing = 8.0
     $0.alignment = .top
@@ -50,11 +50,11 @@ class WelcomeNTPOnboardingController: UIViewController, PopoverContentComponent 
     $0.contentEdgeInsets = .init(top: 0, left: 16, bottom: 0, right: 16)
   }
   
-  var buttonText: String?
+  public var buttonText: String?
   
-  var buttonTapped: (() -> Void)?
+  public var buttonTapped: (() -> Void)?
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     view.addSubview(contentStackView)
@@ -81,7 +81,7 @@ class WelcomeNTPOnboardingController: UIViewController, PopoverContentComponent 
     dismiss(animated: true)
   }
 
-  func setText(title: String? = nil, details: String) {
+  public func setText(title: String? = nil, details: String) {
     let attributedString = NSMutableAttributedString()
     if let title = title {
       attributedString.append(
@@ -126,7 +126,7 @@ class WelcomeNTPOnboardingController: UIViewController, PopoverContentComponent 
   }
 }
 
-class WelcomeOmniBoxOnboardingController: UIViewController, PopoverContentComponent {
+public class WelcomeOmniBoxOnboardingController: UIViewController, PopoverContentComponent {
   
   private let stackView = UIStackView().then {
     $0.spacing = 20.0
@@ -158,7 +158,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController, PopoverContentCompon
   
   private let gradientView = BraveGradientView.gradient01
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
     
     view.addSubview(gradientView)
@@ -176,7 +176,7 @@ class WelcomeOmniBoxOnboardingController: UIViewController, PopoverContentCompon
     }
   }
 
-  func setText(title: String, details: String) {
+  public func setText(title: String, details: String) {
     titleLabel.text = title
     textLabel.text = details
   }
