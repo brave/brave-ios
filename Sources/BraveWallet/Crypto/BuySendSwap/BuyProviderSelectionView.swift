@@ -64,10 +64,10 @@ struct BuyProviderSelectionView: View {
           }
           .padding(.vertical, 10)
         }
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
     }
     .listStyle(InsetGroupedListStyle())
-    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(Strings.Wallet.providerSelectionScreenTitle)
   }
