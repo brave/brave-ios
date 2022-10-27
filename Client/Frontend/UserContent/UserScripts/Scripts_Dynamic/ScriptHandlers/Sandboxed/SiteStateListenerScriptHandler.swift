@@ -62,7 +62,6 @@ class SiteStateListenerScriptHandler: TabContentScript {
       }
       
       if let frameInfo = tab.currentPageData?.framesInfo[frameURL] {
-        print(frameInfo)
         let models = AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL)
         
         let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
