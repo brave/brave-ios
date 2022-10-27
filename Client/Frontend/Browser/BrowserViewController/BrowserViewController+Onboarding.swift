@@ -258,7 +258,7 @@ extension BrowserViewController {
       icon: topToolbar.locationView.shieldsButton.imageView?.image,
       from: topToolbar.locationView.shieldsButton,
       on: popover,
-      browser: self)
+      controller: self)
 
     pulseAnimationView.animationViewPressed = { [weak self] in
       popover.dismissPopover() {

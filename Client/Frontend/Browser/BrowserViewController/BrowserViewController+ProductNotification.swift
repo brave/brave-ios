@@ -8,6 +8,7 @@ import BraveUI
 import Shared
 import Data
 import UIKit
+import BraveOnboarding
 
 // MARK: - ProductNotification
 
@@ -143,7 +144,7 @@ extension BrowserViewController {
       icon: topToolbar.locationView.shieldsButton.imageView?.image,
       from: topToolbar.locationView.shieldsButton,
       on: popover,
-      browser: self)
+      controller: self)
     popover.popoverDidDismiss = { _ in
       pulseAnimation.removeFromSuperview()
     }

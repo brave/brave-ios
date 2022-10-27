@@ -342,19 +342,17 @@ let package = Package(
         "Data",
         "BraveUI",
         "DesignSystem",
-        "CodableHelpers",
         "BraveCore",
-        "MaterialComponents",
-        "Static",
-        "FeedKit",
         "Fuzi",
+        "Storage",
         .product(name: "Lottie", package: "lottie-ios")
       ],
       resources: [
-        .copy("Lottie Assets/onboarding-ads.json"),
-        .copy("Lottie Assets/onboarding-rewards.json"),
-        .copy("Lottie Assets/onboarding-shields.json"),
-        .copy("Welcome/Resources/disconnect-entitylist.json")
+        .copy("LottieAssets/onboarding-ads.json"),
+        .copy("LottieAssets/onboarding-rewards.json"),
+        .copy("LottieAssets/onboarding-shields.json"),
+        .copy("Welcome/Resources/disconnect-entitylist.json"),
+        .copy("ProductNotifications/blocking-summary.json")
       ],
       plugins: ["LoggerPlugin"]
     ),

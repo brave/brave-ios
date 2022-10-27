@@ -53,17 +53,17 @@ struct BlockingSummary: Codable {
 
 // MARK: - BlockingSummaryDataSource
 
-class BlockingSummaryDataSource {
+public class BlockingSummaryDataSource {
 
   // MARK: Lifecycle
 
-  init(with fileName: String = "blocking-summary", bundle: Bundle = Bundle.module) {
-    blockingSummaryList = fetchBlockingSummaryObjects(with: fileName, for: bundle)
+  public init(with filePath: String?) {
+    blockingSummaryList = fetchBlockingSummaryObjects(with: filePath)
   }
 
   // MARK: Internal
 
-  func fetchDomainFetchedSiteSavings(_ url: URL) -> String? {
+  public func fetchDomainFetchedSiteSavings(_ url: URL) -> String? {
     let domain = url.baseDomain ?? url.host ?? url.hostSLD
 
     return blockingSummaryList.first(where: { $0.site.contains(domain) })?.avgsavings
@@ -75,10 +75,10 @@ class BlockingSummaryDataSource {
   private var blockingSummaryList = [BlockingSummary]()
 
   /// The function which uses the Data from Local JSON file to fetch list of objects
-  private func fetchBlockingSummaryObjects(with fileName: String, for bundle: Bundle) -> [BlockingSummary] {
+  private func fetchBlockingSummaryObjects(with filePath: String?) -> [BlockingSummary] {
     var blockingSummaryList = [BlockingSummary]()
 
-    guard let blockSummaryData = createJSONDataFrom(fileName: fileName, bundle: bundle) else {
+    guard let blockSummaryData = createJSONDataFrom(filePath: filePath) else {
       return blockingSummaryList
     }
 
@@ -92,15 +92,13 @@ class BlockingSummaryDataSource {
   }
 
   /// The helper function with created the Data from parametrized file path
-  private func createJSONDataFrom(fileName: String, bundle: Bundle) -> Data? {
-    guard let filePath = bundle.path(forResource: fileName, ofType: "json") else {
-      return nil
-    }
+  private func createJSONDataFrom(filePath: String?) -> Data? {
+    guard let path = filePath else { return nil }
 
     do {
-      return try Data(contentsOf: URL(fileURLWithPath: filePath))
+      return try Data(contentsOf: URL(fileURLWithPath: path))
     } catch {
-      Logger.module.error("Failed to get bundle path for \(fileName)")
+      Logger.module.error("Failed to get bundle path for \(path)")
     }
 
     return nil

@@ -6,10 +6,11 @@ import Foundation
 import UIKit
 
 // MARK: - NSAttributedString
+
 extension NSAttributedString {
 
   /// Add Line Spacing to Text
-  func withLineSpacing(_ spacing: CGFloat) -> NSAttributedString {
+  public func withLineSpacing(_ spacing: CGFloat) -> NSAttributedString {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineSpacing = spacing
 

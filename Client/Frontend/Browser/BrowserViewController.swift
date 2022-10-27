@@ -25,6 +25,7 @@ import BraveVPN
 import BraveNews
 import os.log
 import BraveTalk
+import BraveOnboarding
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -260,7 +261,7 @@ public class BrowserViewController: UIViewController {
     self.deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
     if Locale.current.regionCode == "JP" {
-      benchmarkBlockingDataSource = BlockingSummaryDataSource()
+      benchmarkBlockingDataSource = BlockingSummaryDataSource(with: Bundle.module.path(forResource: "blocking-summary", ofType: "json"))
     }
 
     super.init(nibName: nil, bundle: nil)

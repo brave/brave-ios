@@ -11,7 +11,7 @@ import Shared
 
 // MARK: TrackingType
 
-enum TrackingType: Equatable {
+public enum TrackingType: Equatable {
   case trackerCountShare(count: Int, description: String)
   case videoAdBlock
   case domainSpecificDataSaved(dataSaved: String)
@@ -41,11 +41,11 @@ enum TrackingType: Equatable {
 
 // MARK: - ShareTrackersController
 
-class ShareTrackersController: UIViewController, PopoverContentComponent {
+public class ShareTrackersController: UIViewController, PopoverContentComponent {
 
   // MARK: Action
 
-  enum Action {
+  public enum Action {
     case shareTheNewsTapped
     case dontShowAgainTapped
   }
@@ -56,11 +56,11 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
 
   private let shareTrackersView: ShareTrackersView
 
-  var actionHandler: ((Action) -> Void)?
+  public var actionHandler: ((Action) -> Void)?
 
   // MARK: Lifecycle
 
-  init(trackingType: TrackingType) {
+  public init(trackingType: TrackingType) {
     self.trackingType = trackingType
     shareTrackersView = ShareTrackersView(trackingType: trackingType)
 
@@ -74,7 +74,7 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
 
   // MARK: Internal
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .braveBackground

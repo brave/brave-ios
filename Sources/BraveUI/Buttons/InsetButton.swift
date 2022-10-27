@@ -7,15 +7,15 @@ import UIKit
 /**
  * Button whose insets are included in its intrinsic size.
  */
-class InsetButton: UIButton {
-  override var intrinsicContentSize: CGSize {
+public class InsetButton: UIButton {
+  public override var intrinsicContentSize: CGSize {
     let size = super.intrinsicContentSize
     return CGSize(
       width: size.width + titleEdgeInsets.left + titleEdgeInsets.right,
       height: size.height + titleEdgeInsets.top + titleEdgeInsets.bottom)
   }
 
-  func addTrailingImageIcon(image: UIImage, inset: CGFloat = 15) {
+  public func addTrailingImageIcon(image: UIImage, inset: CGFloat = 15) {
     let imageView = UIImageView(image: image).then {
       $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
@@ -36,5 +36,37 @@ class InsetButton: UIButton {
       $0.width.equalTo(inset)
       $0.height.equalTo(inset)
     }
+  }
+}
+
+public class SelectedInsetButton: InsetButton {
+  public override var isSelected: Bool {
+    didSet {
+      backgroundColor = isSelected ? selectedBackgroundColor : .clear
+      setTitleColor(isSelected ? .white : .braveLabel, for: .normal)
+    }
+  }
+
+  var selectedBackgroundColor: UIColor? {
+    didSet {
+      if isSelected {
+        backgroundColor = selectedBackgroundColor
+      }
+    }
+  }
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+
+    contentEdgeInsets = UIEdgeInsets(top: 3, left: 6, bottom: 3, right: 6)
+    layer.cornerRadius = 4.0
+    layer.cornerCurve = .continuous
+
+    setTitleColor(.braveLabel, for: .normal)
+    selectedBackgroundColor = .braveOrange
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 }

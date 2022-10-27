@@ -4,16 +4,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveUI
 import UIKit
 
-class RadialPulsingAnimation: UIView {
+public class RadialPulsingAnimation: UIView {
   private var pulseLayers = [CAShapeLayer]()
   private var isBreathing: Bool
   
   public var animationViewPressed: (() -> Void)?
 
-  init(ringCount: Int, isBreathing: Bool = false) {
+  public init(ringCount: Int, isBreathing: Bool = false) {
     self.isBreathing = isBreathing
     super.init(frame: .zero)
     
@@ -36,7 +35,7 @@ class RadialPulsingAnimation: UIView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func layoutSubviews() {
+  public override func layoutSubviews() {
     super.layoutSubviews()
 
     for i in 0..<pulseLayers.count {
@@ -88,8 +87,8 @@ class RadialPulsingAnimation: UIView {
     }
   }
 
-  func present(icon: UIImage?, from view: UIView, on popoverController: PopoverController, browser: BrowserViewController) {
-    let origin = browser.view.convert(view.center, from: view.superview)
+  public func present(icon: UIImage?, from view: UIView, on popoverController: PopoverController, controller: UIViewController) {
+    let origin = controller.view.convert(view.center, from: view.superview)
     popoverController.view.insertSubview(self, aboveSubview: popoverController.view)
     
     let tap = UITapGestureRecognizer(target: self, action: #selector(onPresentShields(_:)))
