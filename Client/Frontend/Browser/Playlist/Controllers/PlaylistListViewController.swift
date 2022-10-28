@@ -18,6 +18,7 @@ import BraveShared
 import Shared
 import Data
 import SwiftUI
+import BraveTelemetry
 
 // MARK: - PlaylistListViewController
 
@@ -466,7 +467,7 @@ class PlaylistListViewController: UIViewController {
     dismiss(animated: true) {
       // Handle App Rating
       // User finished viewing the playlist list view.
-      AppReviewManager.shared.handleAppReview(for: self)
+      AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
     }
   }
 

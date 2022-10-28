@@ -232,7 +232,7 @@ let package = Package(
     ),
     .target(
       name: "BraveTelemetry",
-      dependencies: ["SDWebImage", "Shared", "BraveShared", "Strings", "SnapKit"],
+      dependencies: ["BraveVPN", "Shared", "BraveShared", "Strings", "SnapKit"],
       plugins: ["LoggerPlugin"]
     ),
     .target(

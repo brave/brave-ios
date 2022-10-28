@@ -12,6 +12,7 @@ import SwiftUI
 import Shared
 import BraveShared
 import os.log
+import BraveTelemetry
 
 private enum Section: Int, CaseIterable {
   case savedItems
@@ -97,7 +98,7 @@ class PlaylistFolderController: UIViewController {
     dismiss(animated: true) {
       // Handle App Rating
       // User finished viewing the playlist folder view.
-      AppReviewManager.shared.handleAppReview(for: self)
+      AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
     }
   }
   

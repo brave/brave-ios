@@ -159,6 +159,45 @@ extension Preferences {
     /// Each key is a `BraveCoreSwitch`
     public static let switchValues = Option<[String: String]>(key: "brave-core.switches.values", default: [:])
   }
+  
+  public final class AppState {
+    /// A flag for determining if the app exited with user interaction in the previous session
+    ///
+    /// Value should only be checked on launch
+    public static let backgroundedCleanly = Option<Bool>(key: "appstate.backgrounded-cleanly", default: true)
+    
+    /// A cached value for the last folder path we got for filter lists
+    ///
+    /// This is a useful setting because it take too long for filter lists to load during launch
+    /// and therefore we can try to load them right away and have them ready on the first tab load
+    public static let lastDefaultFilterListFolderPath =
+      Option<String?>(key: "caching.last-default-filter-list-folder-path", default: nil)
+  }
+  
+  public final class Chromium {
+    /// The boolean determine Bookmark Migration is finished on client side
+    public static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: false)
+    /// The boolean determine History Migration is finished on client side
+    public static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
+    /// The boolean determine Password Migration is finished on client side
+    public static let syncV2PasswordMigrationCompleted = Option<Bool>(key: "chromium.migration.password", default: false)
+    /// The boolean determine Password Migration is started on client side
+    public static let syncV2PasswordMigrationStarted = Option<Bool>(key: "chromium.migration.password.started", default: false)
+    /// The count of how many times migration is performed on client side - the value increases with every fail attempt and after 3 tries migration marked as successful
+    public static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.attempt.count", default: 0)
+    /// Whether the device is in sync chain
+    public static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
+    /// The sync type bookmarks enabled for the device in sync chain
+    public static let syncBookmarksEnabled = Option<Bool>(key: "chromium.sync.syncBookmarksEnabled", default: true)
+    /// The sync type history enabled for the device in sync chain
+    public static let syncHistoryEnabled = Option<Bool>(key: "chromium.sync.syncHistoryEnabled", default: false)
+    /// The sync type passwords enabled the device in sync chain
+    public static let syncPasswordsEnabled = Option<Bool>(key: "chromium.sync.syncPasswordsEnabled", default: false)
+    /// The sync type open tabs enabled the device in sync chain
+    public static let syncOpenTabsEnabled = Option<Bool>(key: "chromium.sync.openTabsEnabled", default: false)
+    /// Node Id for last bookmark folder
+    public static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
+  }
 }
 
 extension Preferences {

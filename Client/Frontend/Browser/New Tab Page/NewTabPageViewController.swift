@@ -15,6 +15,7 @@ import SwiftUI
 import BraveNews
 import Combine
 import DesignSystem
+import BraveTelemetry
 
 /// The behavior for sizing sections when the user is in landscape orientation
 enum NTPLandscapeSizingBehavior {
@@ -159,7 +160,7 @@ class NewTabPageViewController: UIViewController {
             
             // Handle App Rating
             // User finished viewing the privacy report (tapped close)
-            AppReviewManager.shared.handleAppReview(for: self)
+            AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
           }
         }
         

@@ -26,6 +26,7 @@ import BraveNews
 import os.log
 import BraveTalk
 import Onboarding
+import BraveTelemetry
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -899,7 +900,7 @@ public class BrowserViewController: UIViewController {
         if isReviewRequired {
           // Handle App Rating
           // User made changes to the Brave News sources (tapped close)
-          AppReviewManager.shared.handleAppReview(for: self)
+          AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
         }
       })
     
@@ -1925,7 +1926,7 @@ public class BrowserViewController: UIViewController {
             FavoritesHelper.add(url: url, title: tab?.displayTitle)
             // Handle App Rating
             // Check for review condition after adding a favorite
-            AppReviewManager.shared.handleAppReview(for: self)
+            AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
           })
       }
 

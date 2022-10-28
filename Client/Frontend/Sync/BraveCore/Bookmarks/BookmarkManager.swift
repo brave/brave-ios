@@ -9,6 +9,7 @@ import BraveCore
 import BraveShared
 import CoreData
 import Shared
+import BraveTelemetry
 import os.log
 
 class BookmarkManager {
