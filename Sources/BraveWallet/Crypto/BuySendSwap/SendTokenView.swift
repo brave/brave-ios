@@ -46,7 +46,7 @@ struct SendTokenView: View {
             keyringStore: keyringStore,
             networkStore: networkStore
           )
-          .listRowBackground(Color.clear)
+          .listRowBackground(Color(UIColor.braveGroupedBackground))
           .resetListHeaderStyle()
         }
         Section(
