@@ -30,6 +30,10 @@ class NewTabPageBackgroundView: UIView {
     startPoint: .zero,
     endPoint: CGPoint(x: 0, y: 1)
   )
+  
+  func updateImageXOffset(by x: CGFloat) {
+    bounds = .init(x: -x, y: 0, width: bounds.width, height: bounds.height)
+  }
 
   override init(frame: CGRect) {
     super.init(frame: frame)

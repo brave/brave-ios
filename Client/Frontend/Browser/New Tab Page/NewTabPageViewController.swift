@@ -14,6 +14,7 @@ import SnapKit
 import SwiftUI
 import BraveNews
 import Combine
+import DesignSystem
 
 /// The behavior for sizing sections when the user is in landscape orientation
 enum NTPLandscapeSizingBehavior {
@@ -302,6 +303,13 @@ class NewTabPageViewController: UIViewController {
 
     backgroundView.imageView.image = parent == nil ? nil : background.backgroundImage
   }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    if previousTraitCollection?.verticalSizeClass
+      != traitCollection.verticalSizeClass {
+      calculateBackgroundCenterPoints()
+    }
+  }
 
   // MARK: - Background
 
@@ -366,66 +374,41 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func calculateBackgroundCenterPoints() {
-    guard let image = backgroundView.imageView.image else { return }
-    enum ScaleAspectFillAlignment { case horizontal, vertical }
     
-    let alignment: ScaleAspectFillAlignment = {
-      // To see whether the image with `scaleAspectFill` is aligned to horizontal or vertical edges
-      // We check which edge is proportionally shorter relative to the image's edge.
-      // This edge is most likely going to be that the imag  aligns to.
-      let proportionalHeight = view.frame.height / image.size.height
-      let proportionalWidth = view.frame.width / image.size.width
-      
-      let isVerticallyAligned = proportionalHeight > proportionalWidth
-      return isVerticallyAligned ? .vertical : .horizontal
-    }()
-    
-    switch alignment {
-    case .vertical:
-      // If no focal point provided we do nothing. The image is centered by default.
-      guard let focalX = background.currentBackground?.wallpaper.focalPoint?.x else {
-        return
-      }
-      
-      // Calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio.
-      // Most image calculations have to use this property to get coordinates right.
-      let sizeRatio = backgroundView.imageView.frame.size.height / image.size.height
-      
-      // How much the image should be offset according to the set focal point coordinate.
-      // We calculate it by looking how much to move the image away from the center of the image.
-      let focalXOffset = ((image.size.width / 2) - focalX) * sizeRatio
-      
-      // Amount of image space which is cropped on one side, not visible on the screen.
-      // We use this info to prevent going of out image bounds when updating the `x` offset.
-      let extraHorizontalSpaceOnOneSide = ((image.size.width * sizeRatio) - backgroundView.frame.width) / 2
-          
-      // The offset proposed by the focal point might be too far away from image's center
-      // resulting in not having anough image space to cover entire width of the view and leaving blank space.
-      // If the focal offset goes out of bounds we center it to the maximum amount we can where the entire
-      // image is able to cover the view.
-      let realisticXOffset = abs(focalXOffset) > extraHorizontalSpaceOnOneSide ?
-        extraHorizontalSpaceOnOneSide : focalXOffset
-      
-      backgroundView.bounds = .init(x: -realisticXOffset, y: 0,
-                                    width: backgroundView.bounds.width, height: backgroundView.bounds.height)
-    case .horizontal:
-      // See comments under .vertical case for logic explanation. Similar logic applies.
-      guard let focalY = background.currentBackground?.wallpaper.focalPoint?.y else {
-        return
-      }
-      
-      let sizeRatio = backgroundView.imageView.frame.size.width / image.size.width
-      
-      let focalYOffset = ((image.size.height / 2) - focalY) * sizeRatio
-      
-      let extraVerticalSpaceOnOneSide = ((image.size.height * sizeRatio) - backgroundView.frame.height) / 2
-      
-      let realisticYOffset = abs(focalYOffset) > extraVerticalSpaceOnOneSide ?
-        extraVerticalSpaceOnOneSide : focalYOffset
-      
-      backgroundView.bounds = .init(x: 0, y: realisticYOffset,
-                                    width: backgroundView.bounds.width, height: backgroundView.bounds.height)
+    // Only iPhone portrait looking devices have their center of the image offset adjusted.
+    // In other cases the image is always centered.
+    guard let image = backgroundView.imageView.image,
+            traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular else {
+      // Reset the previously calculated offset.
+      backgroundView.updateImageXOffset(by: 0)
+      return
     }
+    
+    // If no focal point provided we do nothing. The image is centered by default.
+    guard let focalX = background.currentBackground?.wallpaper.focalPoint?.x else {
+      return
+    }
+    
+    // Calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio.
+    // Most image calculations have to use this property to get coordinates right.
+    let sizeRatio = backgroundView.imageView.frame.size.height / image.size.height
+    
+    // How much the image should be offset according to the set focal point coordinate.
+    // We calculate it by looking how much to move the image away from the center of the image.
+    let focalXOffset = ((image.size.width / 2) - focalX) * sizeRatio
+    
+    // Amount of image space which is cropped on one side, not visible on the screen.
+    // We use this info to prevent going of out image bounds when updating the `x` offset.
+    let extraHorizontalSpaceOnOneSide = ((image.size.width * sizeRatio) - backgroundView.frame.width) / 2
+        
+    // The offset proposed by the focal point might be too far away from image's center
+    // resulting in not having anough image space to cover entire width of the view and leaving blank space.
+    // If the focal offset goes out of bounds we center it to the maximum amount we can where the entire
+    // image is able to cover the view.
+    let realisticXOffset = abs(focalXOffset) > extraHorizontalSpaceOnOneSide ?
+      extraHorizontalSpaceOnOneSide : focalXOffset
+    
+    backgroundView.updateImageXOffset(by: realisticXOffset)
   }
 
   private func reportSponsoredImageBackgroundEvent(_ event: Ads.NewTabPageAdEventType) {
