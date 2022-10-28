@@ -27,19 +27,6 @@ public class Preferences {
 }
 
 extension Preferences {
-  public final class DAU {
-    public static let lastLaunchInfo = Option<[Int?]?>(key: "dau.last-launch-info", default: nil)
-    static let weekOfInstallation = Option<String?>(key: "dau.week-of-installation", default: nil)
-    // On old codebase we checked existence of `dau_stat` to determine whether it's first server ping.
-    // We need to translate that to use the new `firstPingParam` preference.
-    static let firstPingParam: Option<Bool> =
-      Option<Bool>(key: "dau.first-ping", default: Preferences.DAU.lastLaunchInfo.value == nil)
-    /// Date of installation, this preference is removed after 14 days of usage.
-    public static let installationDate = Option<Date?>(key: "dau.installation-date", default: nil)
-    /// The app launch date after retention
-    public static let appRetentionLaunchDate = Option<Date?>(key: "dau.app-retention-launch-date", default: nil)
-  }
-
   public final class NTP {
     public static let ntpCheckDate = Option<TimeInterval?>(key: "ntp.next-check-date", default: nil)
   }
@@ -63,14 +50,14 @@ extension Preferences {
     public static let daysInUse = Option<[Date]>(key: "review.in-use", default: [])
   }
 
-  final class BlockStats {
-    static let adsCount = Option<Int>(key: "stats.adblock", default: 0)
-    static let trackersCount = Option<Int>(key: "stats.tracking", default: 0)
+  public final class BlockStats {
+    public static let adsCount = Option<Int>(key: "stats.adblock", default: 0)
+    public static let trackersCount = Option<Int>(key: "stats.tracking", default: 0)
     static let scriptsCount = Option<Int>(key: "stats.scripts", default: 0)
     static let imagesCount = Option<Int>(key: "stats.images", default: 0)
-    static let phishingCount = Option<Int>(key: "stats.phishing", default: 0)
-    static let httpsUpgradeCount = Option<Int>(key: "stats.http-upgrade", default: 0)
-    static let fingerprintingCount = Option<Int>(key: "stats.fingerprinting", default: 0)
+    public static let phishingCount = Option<Int>(key: "stats.phishing", default: 0)
+    public static let httpsUpgradeCount = Option<Int>(key: "stats.http-upgrade", default: 0)
+    public static let fingerprintingCount = Option<Int>(key: "stats.fingerprinting", default: 0)
   }
   public final class BlockFileVersion {
     public static let adblock = Option<String?>(key: "blockfile.adblock", default: nil)
@@ -249,45 +236,3 @@ extension Data: UserDefaultsEncodable {}
 extension Date: UserDefaultsEncodable {}
 extension Array: UserDefaultsEncodable where Element: UserDefaultsEncodable {}
 extension Dictionary: UserDefaultsEncodable where Key: StringProtocol, Value: UserDefaultsEncodable {}
-
-extension Preferences {
-  /// Migrate a given key from `Prefs` into a specific option
-  public class func migrate<T>(keyPrefix: String, key: String, to option: Preferences.Option<T>, transform: ((T) -> T)? = nil) {
-    let userDefaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)
-
-    let profileKey = "\(keyPrefix)\(key)"
-    // Have to do two checks because T may be an Optional, since object(forKey:) returns Any? it will succeed
-    // as casting to T if T is Optional even if the key doesnt exist.
-    let value = userDefaults?.object(forKey: profileKey)
-    if value != nil, let value = value as? T {
-      if let transform = transform {
-        option.value = transform(value)
-      } else {
-        option.value = value
-      }
-      userDefaults?.removeObject(forKey: profileKey)
-    } else {
-      Logger.module.info("Could not migrate legacy pref with key: \"\(profileKey)\".")
-    }
-  }
-
-  public class func migrateBraveShared(keyPrefix: String) {
-    // DAU
-    migrate(keyPrefix: keyPrefix, key: "dau_stat", to: Preferences.DAU.lastLaunchInfo)
-    migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
-
-    // URP
-//    migrate(keyPrefix: keyPrefix, key: "urpDateCheckPrefsKey", to: Preferences.URP.nextCheckDate)
-//    migrate(keyPrefix: keyPrefix, key: "urpRetryCountdownPrefsKey", to: Preferences.URP.retryCountdown)
-//    migrate(keyPrefix: keyPrefix, key: "downloadIdPrefsKey", to: Preferences.URP.downloadId)
-//    migrate(keyPrefix: keyPrefix, key: "referralCodePrefsKey", to: Preferences.URP.referralCode)
-//    migrate(keyPrefix: keyPrefix, key: "referralCodeDeleteTimePrefsKey", to: Preferences.URP.referralCodeDeleteDate)
-
-    // Block Stats
-    migrate(keyPrefix: keyPrefix, key: "adblock", to: Preferences.BlockStats.adsCount)
-    migrate(keyPrefix: keyPrefix, key: "tracking_protection", to: Preferences.BlockStats.trackersCount)
-    migrate(keyPrefix: keyPrefix, key: "httpse", to: Preferences.BlockStats.httpsUpgradeCount)
-    migrate(keyPrefix: keyPrefix, key: "fp_protection", to: Preferences.BlockStats.fingerprintingCount)
-    migrate(keyPrefix: keyPrefix, key: "safebrowsing", to: Preferences.BlockStats.phishingCount)
-  }
-}

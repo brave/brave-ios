@@ -111,30 +111,30 @@ public class DAU {
       request.setValue(value, forHTTPHeaderField: key)
     }
 
-//    let task = URLSession.shared.dataTask(with: request) { [self] _, _, error in
-//      defer {
-//        self.processingPing = false
-//      }
-//
-//      if let e = error {
-//        Logger.module.error("status update error: \(e.localizedDescription)")
-//        UrpLog.log("status update error: \(e)")
-//        return
-//      }
-//
-//      // Ping was successful, next ping should be sent with `first` parameter set to false.
-//      // This preference is set for future DAU pings.
-//      Preferences.DAU.firstPingParam.value = false
-//
-//      // This preference is used to calculate whether user used the app in this month and/or day.
-//      Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
-//      
-//      DispatchQueue.main.async { [self] in
-//        braveCoreStats?.notifyPingSent()
-//      }
-//    }
-//
-//    task.resume()
+    let task = URLSession.shared.dataTask(with: request) { [self] _, _, error in
+      defer {
+        self.processingPing = false
+      }
+
+      if let e = error {
+        Logger.module.error("status update error: \(e.localizedDescription)")
+        UrpLog.log("status update error: \(e)")
+        return
+      }
+
+      // Ping was successful, next ping should be sent with `first` parameter set to false.
+      // This preference is set for future DAU pings.
+      Preferences.DAU.firstPingParam.value = false
+
+      // This preference is used to calculate whether user used the app in this month and/or day.
+      Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
+      
+      DispatchQueue.main.async { [self] in
+        braveCoreStats?.notifyPingSent()
+      }
+    }
+
+    task.resume()
   }
 
   /// A helper struct that stores all data from params setup.
@@ -149,8 +149,7 @@ public class DAU {
   func paramsAndPrefsSetup(for date: Date) -> ParamsAndPrefs? {
     var params = [channelParam(), versionParam()]
 
-    // TODO: UI
-    let firstLaunch = true //Preferences.DAU.firstPingParam.value
+    let firstLaunch = Preferences.DAU.firstPingParam.value
 
     // All installs prior to this key existing (e.g. intallWeek == unknown) were set to `defaultWoiDate`
     // Enough time has passed where accounting for installs prior to this DAU improvement is unnecessary
@@ -159,8 +158,7 @@ public class DAU {
 
     // This could lead to an upgraded device having no `woi`, and that's fine
     if firstLaunch {
-      // TODO: UI
-//      Preferences.DAU.weekOfInstallation.value = date.mondayOfCurrentWeekFormatted
+      Preferences.DAU.weekOfInstallation.value = date.mondayOfCurrentWeekFormatted
     }
 
     guard let dauStatParams = dauStatParams(for: date, firstPing: firstLaunch) else {
@@ -256,9 +254,7 @@ public class DAU {
 
   /// All first app installs are normalized to first day of the week.
   /// e.g. user installs app on wednesday 2017-22-11, his install date is recorded as of 2017-20-11(Monday)
-  // TODO: UI
-//  func weekOfInstallationParam(for woi: String? = Preferences.DAU.weekOfInstallation.value) -> URLQueryItem {
-  func weekOfInstallationParam(for woi: String? = "") -> URLQueryItem {
+  func weekOfInstallationParam(for woi: String? = Preferences.DAU.weekOfInstallation.value) -> URLQueryItem {
     var woi = woi
     // This _should_ be set all the time
     if woi == nil {

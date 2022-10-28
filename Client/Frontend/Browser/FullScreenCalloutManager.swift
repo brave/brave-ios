@@ -6,6 +6,7 @@
 import Foundation
 import Shared
 import BraveShared
+import BraveTelemetry
 
 struct FullScreenCalloutManager {
 
