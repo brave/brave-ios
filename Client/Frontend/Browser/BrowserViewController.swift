@@ -261,7 +261,7 @@ public class BrowserViewController: UIViewController {
     self.deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
 
     if Locale.current.regionCode == "JP" {
-      benchmarkBlockingDataSource = BlockingSummaryDataSource(with: Bundle.module.path(forResource: "blocking-summary", ofType: "json"))
+      benchmarkBlockingDataSource = BlockingSummaryDataSource()
     }
 
     super.init(nibName: nil, bundle: nil)

@@ -57,8 +57,10 @@ public class BlockingSummaryDataSource {
 
   // MARK: Lifecycle
 
-  public init(with filePath: String?) {
-    blockingSummaryList = fetchBlockingSummaryObjects(with: filePath)
+  public init(with filePath: String? = nil) {
+    let path = filePath ?? Bundle.module.path(forResource: "blocking-summary-test", ofType: "json")
+ 
+    blockingSummaryList = fetchBlockingSummaryObjects(with: path)
   }
 
   // MARK: Internal

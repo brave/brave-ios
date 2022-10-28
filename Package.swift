@@ -154,7 +154,6 @@ let package = Package(
         .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_desert.jpg"),
         .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_fern.jpg"),
         .copy("Frontend/Browser/New Tab Page/Backgrounds/Assets/NTP_Images/spencer-moore_ocean.jpg"),
-        .copy("Frontend/Browser/BrowserViewController/ProductNotifications/blocking-summary.json"),
         .copy("Frontend/Sync/WebFilter/Bookmarks/Bookmarks.html"),
         .copy("Frontend/UserContent/UserScripts/Scripts_Dynamic/Scripts/DomainSpecific/Paged/BraveSearchScript.js"),
         .copy("Frontend/UserContent/UserScripts/Scripts_Dynamic/Scripts/DomainSpecific/Paged/BraveSkusScript.js"),
