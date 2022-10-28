@@ -8,7 +8,7 @@ import struct Shared.Strings
 import BraveCore
 
 extension Preferences {
-  public final class General {
+  public final class Onboarding {
     /// Whether or not new user onboarding has completed.
     /// User skipping(tapping on skip) onboarding does NOT count as completed.
     /// If user kills the app before completing onboarding, it should be treated as unfinished.

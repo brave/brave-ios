@@ -26,7 +26,7 @@ let package = Package(
     .library(name: "Strings", targets: ["Strings"]),
     .library(name: "BraveVPN", targets: ["BraveVPN"]),
     .library(name: "BraveNews", targets: ["BraveNews"]),
-    .library(name: "BraveOnboarding", targets: ["BraveOnboarding"]),
+    .library(name: "Onboarding", targets: ["Onboarding"]),
     .library(name: "BraveTalk", targets: ["BraveTalk"]),
     .library(name: "RuntimeWarnings", targets: ["RuntimeWarnings"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
@@ -80,7 +80,7 @@ let package = Package(
         "BraveWidgetsModels",
         "BraveVPN",
         "BraveNews",
-        "BraveOnboarding",
+        "Onboarding",
         "CodableHelpers",
         "BraveTalk",
         .product(name: "Lottie", package: "lottie-ios"),
@@ -333,7 +333,7 @@ let package = Package(
       plugins: ["LoggerPlugin"]
     ),
     .target(
-      name: "BraveOnboarding",
+      name: "Onboarding",
       dependencies: [
         "BraveShared",
         "Strings",

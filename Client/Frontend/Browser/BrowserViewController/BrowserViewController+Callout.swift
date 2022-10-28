@@ -10,7 +10,7 @@ import Shared
 import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
-import BraveOnboarding
+import Onboarding
 
 // MARK: - Callouts
 
@@ -38,7 +38,7 @@ extension BrowserViewController {
     }
 
     let onboardingNotCompleted =
-      Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue
+      Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue
 
     let showedPopup = Preferences.VPN.popupShowed
 

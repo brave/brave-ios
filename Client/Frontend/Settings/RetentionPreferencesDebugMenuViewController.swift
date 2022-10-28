@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import UIKit
 import BraveUI
-import BraveOnboarding
+import Onboarding
 
 class RetentionPreferencesDebugMenuViewController: TableViewController {
 

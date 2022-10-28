@@ -96,7 +96,7 @@ public class WelcomeViewController: UIViewController {
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
-    Preferences.General.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+    Preferences.Onboarding.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
     
     switch state {
     case .loading:
@@ -348,7 +348,7 @@ public class WelcomeViewController: UIViewController {
       }
 
     present(nextController, animated: true) {
-      Preferences.General.basicOnboardingDefaultBrowserSelected.value = true
+      Preferences.Onboarding.basicOnboardingDefaultBrowserSelected.value = true
     }
   }
 
@@ -376,7 +376,7 @@ public class WelcomeViewController: UIViewController {
       break
     }
     
-    Preferences.General.basicOnboardingProgress.value = OnboardingProgress.newTabPage.rawValue
+    Preferences.Onboarding.basicOnboardingProgress.value = OnboardingProgress.newTabPage.rawValue
     presenting.dismiss(animated: true, completion: nil)
   }
 }

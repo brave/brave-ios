@@ -6,7 +6,7 @@
 import Foundation
 import XCTest
 import Storage
-import BraveOnboarding
+import Onboarding
 
 @testable import Brave
 

@@ -6,7 +6,7 @@
 import Foundation
 import Shared
 import BraveShared
-import BraveOnboarding
+import Onboarding
 
 public enum AdBlockTrackerType: String, CaseIterable {
   case google

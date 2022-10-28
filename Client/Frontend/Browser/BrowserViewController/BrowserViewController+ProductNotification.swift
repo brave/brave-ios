@@ -8,7 +8,7 @@ import BraveUI
 import Shared
 import Data
 import UIKit
-import BraveOnboarding
+import Onboarding
 
 // MARK: - ProductNotification
 

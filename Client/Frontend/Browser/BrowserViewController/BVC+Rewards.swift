@@ -8,7 +8,7 @@ import Data
 import Shared
 import BraveShared
 import BraveUI
-import BraveOnboarding
+import Onboarding
 import Storage
 import WebKit
 import os.log

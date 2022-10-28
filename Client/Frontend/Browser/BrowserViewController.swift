@@ -25,7 +25,7 @@ import BraveVPN
 import BraveNews
 import os.log
 import BraveTalk
-import BraveOnboarding
+import Onboarding
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
