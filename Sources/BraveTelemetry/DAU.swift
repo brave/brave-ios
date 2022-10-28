@@ -60,7 +60,7 @@ public class DAU {
   /// A user needs to be active for a certain amount of time before we ping the server.
   @discardableResult public func sendPingToServer() -> Bool {
     if AppConstants.buildChannel == .debug || AppConstants.buildChannel == .enterprise {
-//      Logger.module.info("Development build detected, no server ping.")
+      Logger.module.info("Development build detected, no server ping.")
       return false
     }
 
@@ -83,13 +83,13 @@ public class DAU {
 
   @objc public func sendPingToServerInternal() {
     guard let paramsAndPrefs = paramsAndPrefsSetup(for: Date()) else {
-//      Logger.module.debug("dau, no changes detected, no server ping")
+      Logger.module.debug("dau, no changes detected, no server ping")
       UrpLog.log("dau, no changes detected, no server ping")
       return
     }
 
     if processingPing {
-//      Logger.module.info("Currently processing a ping, blocking ping re-attempt")
+      Logger.module.info("Currently processing a ping, blocking ping re-attempt")
       return
     }
     processingPing = true
@@ -99,11 +99,11 @@ public class DAU {
     pingRequest?.queryItems = paramsAndPrefs.queryParams
 
     guard let pingRequestUrl = pingRequest?.url else {
-//      Logger.module.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
+      Logger.module.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
       return
     }
 
-//    Logger.module.debug("send ping to server, url: \(pingRequestUrl)")
+    Logger.module.debug("send ping to server, url: \(pingRequestUrl)")
     UrpLog.log("send ping to server, url: \(pingRequestUrl)")
 
     var request = URLRequest(url: pingRequestUrl)
@@ -245,7 +245,7 @@ public class DAU {
 
       return match != nil
     } catch {
-//      Logger.module.error("Version regex pattern error")
+      Logger.module.error("Version regex pattern error")
       return false
     }
   }
@@ -263,7 +263,7 @@ public class DAU {
     // This _should_ be set all the time
     if woi == nil {
       woi = DAU.defaultWoiDate
-//      Logger.module.error("woi, is nil, using default: \(woi ?? "")")
+      Logger.module.error("woi, is nil, using default: \(woi ?? "")")
     }
     return URLQueryItem(name: "woi", value: woi)
   }
@@ -339,12 +339,12 @@ public class DAU {
     }
 
     guard let stat = dauStat?.compactMap({ $0 }) else {
-//      Logger.module.error("Cannot cast dauStat to [Int]")
+      Logger.module.error("Cannot cast dauStat to [Int]")
       return nil
     }
 
     guard let lastPingStat = stat.first else {
-//      Logger.module.error("Can't get last ping timestamp from dauStats")
+      Logger.module.error("Can't get last ping timestamp from dauStats")
       return nil
     }
 
