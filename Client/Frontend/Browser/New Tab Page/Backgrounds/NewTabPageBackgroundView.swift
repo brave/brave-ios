@@ -33,6 +33,9 @@ class NewTabPageBackgroundView: UIView {
     }
 
     addSubview(imageView)
+    imageView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
   }
 
   @available(*, unavailable)

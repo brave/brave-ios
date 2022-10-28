@@ -377,18 +377,6 @@ class NewTabPageViewController: UIViewController {
 
     gradientView.isHidden = background.backgroundImage == nil
     backgroundView.imageView.image = background.backgroundImage
-
-    guard let _ = backgroundView.imageView.image else {
-      backgroundView.imageView.snp.removeConstraints()
-      return
-    }
-    
-    let imageView = backgroundView.imageView
-    imageView.snp.remakeConstraints {
-      $0.edges.equalToSuperview()
-    }
-    imageView.contentMode = .scaleAspectFill
-    imageView.clipsToBounds = false
   }
 
   private func calculateBackgroundCenterPoints() {
