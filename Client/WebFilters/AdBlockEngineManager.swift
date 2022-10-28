@@ -113,7 +113,7 @@ public actor AdBlockEngineManager: Sendable {
     }
     
     /// Tells this manager to add this resource next time it compiles this engine
-    func add(resource: ResourceWithVersion) {
+    fileprivate func add(resource: ResourceWithVersion) {
       self.enabledResources = enabledResources.filter({ resourceWithVersion in
         guard resourceWithVersion.resource == resource.resource else { return true }
         // Remove these compile results so we have to compile again
@@ -125,7 +125,7 @@ public actor AdBlockEngineManager: Sendable {
     }
     
     /// Tells this manager to remove all resources for the given source next time it compiles this engine
-    func removeResources(for source: Source, resourceTypes: Set<ResourceType> = Set(ResourceType.allCases)) {
+    fileprivate func removeResources(for source: Source, resourceTypes: Set<ResourceType> = Set(ResourceType.allCases)) {
       self.enabledResources = self.enabledResources.filter { resourceWithVersion in
         let resource = resourceWithVersion.resource
         guard resource.source == source && resourceTypes.contains(resource.type) else { return true }
@@ -134,23 +134,23 @@ public actor AdBlockEngineManager: Sendable {
     }
     
     /// Set the compile results so this manager can compute if its in sync or not
-    func set(compileResults: [ResourceWithVersion: Result<Void, Error>]) {
+    fileprivate func set(compileResults: [ResourceWithVersion: Result<Void, Error>]) {
       self.compileResults = compileResults
     }
     
     /// Set the compile results so this manager can compute if its in sync or not
-    func add(engine: AdblockEngine, for source: Source) {
+    fileprivate func add(engine: AdblockEngine, for source: Source) {
       self.cachedEngines[source] = engine
     }
     
     /// Set the current compile task to avoid overlaping compilations
-    func set(compileTask: Task<Void, Error>?) {
+    fileprivate func set(compileTask: Task<Void, Error>?) {
       self.compileTask = compileTask
     }
     
     #if DEBUG
     /// A method that logs info on the given resources
-    func debug(resources: [ResourceWithVersion]) {
+    fileprivate func debug(resources: [ResourceWithVersion]) {
       let resourcesString = resources
         .map { resourceWithVersion -> String in
           let resource = resourceWithVersion.resource
@@ -305,10 +305,7 @@ public actor AdBlockEngineManager: Sendable {
       }
       
       #if DEBUG
-      Task {
-        log.debug("AdblockEngineManager")
-        await self.data.debug(resources: resourcesWithVersion)
-      }
+      await self.data.debug(resources: resourcesWithVersion)
       #endif
     }
     

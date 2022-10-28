@@ -40,6 +40,8 @@ private let KVOs: [KVOConstants] = [
 ]
 
 public class BrowserViewController: UIViewController {
+  public static var isFirstLaunch = true
+  
   var webViewContainer: UIView!
   var topToolbar: TopToolbarView!
   var tabsBar: TabsBarViewController!
@@ -522,22 +524,31 @@ public class BrowserViewController: UIViewController {
     updateWidgetFavoritesData()
     
     Task { @MainActor in
-      self.setupTabs()
-      
-      await ContentBlockerManager.shared.loadBundledResources()
-      await ContentBlockerManager.shared.loadCachedCompileResults()
+      if Self.isFirstLaunch {
+        // There is too much to load on the first tab load. Let's just setup the first tab
+        // Hopefully everything will be ready when the user puts in their first web page.
+        self.checkCrashRestorationOrSetupTabs()
+      }
       
       // Load cached data
-      // This is done first because compileResources and compilePendingResource need their results
+      // This is done first because compileResources and loadCachedRuleLists need their results
+      async let loadBundledResources: Void = await ContentBlockerManager.shared.loadBundledResources()
       async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
       async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
-      _ = await (filterListCache, adblockResourceCache)
+      _ = await (loadBundledResources, filterListCache, adblockResourceCache)
 
-      // Compile some ad-block data
+      // Compile some engines and load cached rule lists
       async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
-      async let pendingResourcesCompile: Void = await ContentBlockerManager.shared.compilePendingResources()
-      _ = await (compiledResourcesCompile, pendingResourcesCompile)
+      async let cachedRuleListLoad: Void = await ContentBlockerManager.shared.loadCachedRuleLists()
+      _ = await (compiledResourcesCompile, cachedRuleListLoad)
+      
+      if !Self.isFirstLaunch {
+        self.checkCrashRestorationOrSetupTabs()
+      }
   
+      // Followed by some heavier but non essential operations
+      await ContentBlockerManager.shared.cleanupDeadRuleLists()
+      await ContentBlockerManager.shared.compilePendingResources()
       FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
       await AdblockResourceDownloader.shared.startFetching()
       ContentBlockerManager.shared.startTimer()
@@ -1071,9 +1082,6 @@ public class BrowserViewController: UIViewController {
 
   override public func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
-    checkCrashRestoration()
-
     updateToolbarUsingTabManager(tabManager)
 
     if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
@@ -1081,14 +1089,13 @@ public class BrowserViewController: UIViewController {
     }
   }
 
-  fileprivate lazy var checkCrashRestoration: () -> Void = {
+  private func checkCrashRestorationOrSetupTabs() {
     if crashedLastSession {
       showRestoreTabsAlert()
     } else {
       setupTabs()
     }
-    return {}
-  }()
+  }
 
   fileprivate func showRestoreTabsAlert() {
     guard canRestoreTabs() else {
