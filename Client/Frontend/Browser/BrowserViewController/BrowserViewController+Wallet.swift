@@ -118,7 +118,7 @@ extension BrowserViewController: BraveWalletDelegate {
       }
       // Handle App Rating
       // User is either finished sending/swapping a crypto token or added an account to wallet.
-      AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
+      AppReviewManager.shared.handleAppReview(for: self)
     }
   }
   

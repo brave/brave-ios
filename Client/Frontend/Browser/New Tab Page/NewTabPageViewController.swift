@@ -160,7 +160,7 @@ class NewTabPageViewController: UIViewController {
             
             // Handle App Rating
             // User finished viewing the privacy report (tapped close)
-            AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
+            AppReviewManager.shared.handleAppReview(for: self)
           }
         }
         

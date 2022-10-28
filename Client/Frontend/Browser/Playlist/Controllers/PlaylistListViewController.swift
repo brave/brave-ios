@@ -467,7 +467,7 @@ class PlaylistListViewController: UIViewController {
     dismiss(animated: true) {
       // Handle App Rating
       // User finished viewing the playlist list view.
-      AppReviewManager.shared.handleAppReview(for: self.currentScene, and: self)
+      AppReviewManager.shared.handleAppReview(for: self)
     }
   }
 

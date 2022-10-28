@@ -47,12 +47,12 @@ public class AppReviewManager: ObservableObject {
   
   /// Method that handles If App Rating should be requested and request if condition is sucessful
   /// - Parameter currentScene: Current Scene where App Rating will be asked
-  public func handleAppReview(for currentScene: UIWindowScene?, and controller: UIViewController) {
+  public func handleAppReview(for controller: UIViewController) {
     if shouldRequestReview() {
       if AppConstants.buildChannel.isPublic {
         // Request Review when the main-queue is free or on the next cycle.
         DispatchQueue.main.async {
-          guard let windowScene = currentScene else { return }
+          guard let windowScene = controller.currentScene else { return }
           SKStoreReviewController.requestReview(in: windowScene)
         }
       } else {
