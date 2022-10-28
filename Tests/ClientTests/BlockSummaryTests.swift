@@ -14,8 +14,6 @@ class BlockSummaryTests: XCTestCase {
 
   override func setUp() {
     // The test json is loaded from Client Tests Target
-
-//    subject = BlockingSummaryDataSource(with: "blocking-summary-test", bundle: Bundle.module)
     subject = BlockingSummaryDataSource(with: Bundle.module.path(forResource: "blocking-summary-test", ofType: "json"))
   }
 
