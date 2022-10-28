@@ -14,6 +14,7 @@ import Brave
 import BrowserIntentsModels
 import BraveWidgetsModels
 import BraveVPN
+import BraveTelemetry
 import os.log
 import BraveCore
 

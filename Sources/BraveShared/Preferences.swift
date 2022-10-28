@@ -39,15 +39,6 @@ extension Preferences {
     /// The app launch date after retention
     public static let appRetentionLaunchDate = Option<Date?>(key: "dau.app-retention-launch-date", default: nil)
   }
-  public final class URP {
-    static let nextCheckDate = Option<TimeInterval?>(key: "urp.next-check-date", default: nil)
-    static let retryCountdown = Option<Int?>(key: "urp.retry-countdown", default: nil)
-    static let downloadId = Option<String?>(key: "urp.referral.download-id", default: nil)
-    public static let referralCode = Option<String?>(key: "urp.referral.code", default: nil)
-    static let referralCodeDeleteDate = Option<TimeInterval?>(key: "urp.referral.delete-date", default: nil)
-    /// Whether the ref code lookup has still yet to occur
-    public static let referralLookupOutstanding = Option<Bool?>(key: "urp.referral.lookkup-completed", default: nil)
-  }
 
   public final class NTP {
     public static let ntpCheckDate = Option<TimeInterval?>(key: "ntp.next-check-date", default: nil)
@@ -286,11 +277,11 @@ extension Preferences {
     migrate(keyPrefix: keyPrefix, key: "week_of_installation", to: Preferences.DAU.weekOfInstallation)
 
     // URP
-    migrate(keyPrefix: keyPrefix, key: "urpDateCheckPrefsKey", to: Preferences.URP.nextCheckDate)
-    migrate(keyPrefix: keyPrefix, key: "urpRetryCountdownPrefsKey", to: Preferences.URP.retryCountdown)
-    migrate(keyPrefix: keyPrefix, key: "downloadIdPrefsKey", to: Preferences.URP.downloadId)
-    migrate(keyPrefix: keyPrefix, key: "referralCodePrefsKey", to: Preferences.URP.referralCode)
-    migrate(keyPrefix: keyPrefix, key: "referralCodeDeleteTimePrefsKey", to: Preferences.URP.referralCodeDeleteDate)
+//    migrate(keyPrefix: keyPrefix, key: "urpDateCheckPrefsKey", to: Preferences.URP.nextCheckDate)
+//    migrate(keyPrefix: keyPrefix, key: "urpRetryCountdownPrefsKey", to: Preferences.URP.retryCountdown)
+//    migrate(keyPrefix: keyPrefix, key: "downloadIdPrefsKey", to: Preferences.URP.downloadId)
+//    migrate(keyPrefix: keyPrefix, key: "referralCodePrefsKey", to: Preferences.URP.referralCode)
+//    migrate(keyPrefix: keyPrefix, key: "referralCodeDeleteTimePrefsKey", to: Preferences.URP.referralCodeDeleteDate)
 
     // Block Stats
     migrate(keyPrefix: keyPrefix, key: "adblock", to: Preferences.BlockStats.adsCount)

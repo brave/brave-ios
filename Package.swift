@@ -28,6 +28,7 @@ let package = Package(
     .library(name: "BraveNews", targets: ["BraveNews"]),
     .library(name: "Onboarding", targets: ["Onboarding"]),
     .library(name: "BraveTalk", targets: ["BraveTalk"]),
+    .library(name: "BraveTelemetry", targets: ["BraveTelemetry"]),
     .library(name: "RuntimeWarnings", targets: ["RuntimeWarnings"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
     .plugin(name: "LoggerPlugin", targets: ["LoggerPlugin"])
@@ -81,6 +82,7 @@ let package = Package(
         "BraveVPN",
         "BraveNews",
         "Onboarding",
+        "BraveTelemetry",
         "CodableHelpers",
         "BraveTalk",
         .product(name: "Lottie", package: "lottie-ios"),
@@ -226,6 +228,11 @@ let package = Package(
         .copy("Certificates/ISRGRootCA_X2.cer"),
         .copy("Certificates/SFSRootCAG2.cer"),
       ],
+      plugins: ["LoggerPlugin"]
+    ),
+    .target(
+      name: "BraveTelemetry",
+      dependencies: ["SDWebImage", "Shared", "BraveShared", "Strings", "SnapKit"],
       plugins: ["LoggerPlugin"]
     ),
     .target(

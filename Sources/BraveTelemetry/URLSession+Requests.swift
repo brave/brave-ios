@@ -40,7 +40,7 @@ extension URLSession {
       task.resume()
       return task
     } catch {
-      Logger.module.error("\(error.localizedDescription)")
+//      Logger.module.error("\(error.localizedDescription)")
       return nil
     }
   }

@@ -4,6 +4,7 @@ import Foundation
 import Shared
 import BraveCore
 import os.log
+import BraveShared
 
 public class DAU {
 
@@ -59,7 +60,7 @@ public class DAU {
   /// A user needs to be active for a certain amount of time before we ping the server.
   @discardableResult public func sendPingToServer() -> Bool {
     if AppConstants.buildChannel == .debug || AppConstants.buildChannel == .enterprise {
-      Logger.module.info("Development build detected, no server ping.")
+//      Logger.module.info("Development build detected, no server ping.")
       return false
     }
 
@@ -82,13 +83,13 @@ public class DAU {
 
   @objc public func sendPingToServerInternal() {
     guard let paramsAndPrefs = paramsAndPrefsSetup(for: Date()) else {
-      Logger.module.debug("dau, no changes detected, no server ping")
+//      Logger.module.debug("dau, no changes detected, no server ping")
       UrpLog.log("dau, no changes detected, no server ping")
       return
     }
 
     if processingPing {
-      Logger.module.info("Currently processing a ping, blocking ping re-attempt")
+//      Logger.module.info("Currently processing a ping, blocking ping re-attempt")
       return
     }
     processingPing = true
@@ -98,11 +99,11 @@ public class DAU {
     pingRequest?.queryItems = paramsAndPrefs.queryParams
 
     guard let pingRequestUrl = pingRequest?.url else {
-      Logger.module.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
+//      Logger.module.error("Stats failed to update, via invalud URL: \(pingRequest?.description ?? "😡")")
       return
     }
 
-    Logger.module.debug("send ping to server, url: \(pingRequestUrl)")
+//    Logger.module.debug("send ping to server, url: \(pingRequestUrl)")
     UrpLog.log("send ping to server, url: \(pingRequestUrl)")
 
     var request = URLRequest(url: pingRequestUrl)
@@ -110,30 +111,30 @@ public class DAU {
       request.setValue(value, forHTTPHeaderField: key)
     }
 
-    let task = URLSession.shared.dataTask(with: request) { [self] _, _, error in
-      defer {
-        self.processingPing = false
-      }
-
-      if let e = error {
-        Logger.module.error("status update error: \(e.localizedDescription)")
-        UrpLog.log("status update error: \(e)")
-        return
-      }
-
-      // Ping was successful, next ping should be sent with `first` parameter set to false.
-      // This preference is set for future DAU pings.
-      Preferences.DAU.firstPingParam.value = false
-
-      // This preference is used to calculate whether user used the app in this month and/or day.
-      Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
-      
-      DispatchQueue.main.async { [self] in
-        braveCoreStats?.notifyPingSent()
-      }
-    }
-
-    task.resume()
+//    let task = URLSession.shared.dataTask(with: request) { [self] _, _, error in
+//      defer {
+//        self.processingPing = false
+//      }
+//
+//      if let e = error {
+//        Logger.module.error("status update error: \(e.localizedDescription)")
+//        UrpLog.log("status update error: \(e)")
+//        return
+//      }
+//
+//      // Ping was successful, next ping should be sent with `first` parameter set to false.
+//      // This preference is set for future DAU pings.
+//      Preferences.DAU.firstPingParam.value = false
+//
+//      // This preference is used to calculate whether user used the app in this month and/or day.
+//      Preferences.DAU.lastLaunchInfo.value = paramsAndPrefs.lastLaunchInfoPreference
+//      
+//      DispatchQueue.main.async { [self] in
+//        braveCoreStats?.notifyPingSent()
+//      }
+//    }
+//
+//    task.resume()
   }
 
   /// A helper struct that stores all data from params setup.
@@ -148,7 +149,8 @@ public class DAU {
   func paramsAndPrefsSetup(for date: Date) -> ParamsAndPrefs? {
     var params = [channelParam(), versionParam()]
 
-    let firstLaunch = Preferences.DAU.firstPingParam.value
+    // TODO: UI
+    let firstLaunch = true //Preferences.DAU.firstPingParam.value
 
     // All installs prior to this key existing (e.g. intallWeek == unknown) were set to `defaultWoiDate`
     // Enough time has passed where accounting for installs prior to this DAU improvement is unnecessary
@@ -157,7 +159,8 @@ public class DAU {
 
     // This could lead to an upgraded device having no `woi`, and that's fine
     if firstLaunch {
-      Preferences.DAU.weekOfInstallation.value = date.mondayOfCurrentWeekFormatted
+      // TODO: UI
+//      Preferences.DAU.weekOfInstallation.value = date.mondayOfCurrentWeekFormatted
     }
 
     guard let dauStatParams = dauStatParams(for: date, firstPing: firstLaunch) else {
@@ -242,7 +245,7 @@ public class DAU {
 
       return match != nil
     } catch {
-      Logger.module.error("Version regex pattern error")
+//      Logger.module.error("Version regex pattern error")
       return false
     }
   }
@@ -253,12 +256,14 @@ public class DAU {
 
   /// All first app installs are normalized to first day of the week.
   /// e.g. user installs app on wednesday 2017-22-11, his install date is recorded as of 2017-20-11(Monday)
-  func weekOfInstallationParam(for woi: String? = Preferences.DAU.weekOfInstallation.value) -> URLQueryItem {
+  // TODO: UI
+//  func weekOfInstallationParam(for woi: String? = Preferences.DAU.weekOfInstallation.value) -> URLQueryItem {
+  func weekOfInstallationParam(for woi: String? = "") -> URLQueryItem {
     var woi = woi
     // This _should_ be set all the time
     if woi == nil {
       woi = DAU.defaultWoiDate
-      Logger.module.error("woi, is nil, using default: \(woi ?? "")")
+//      Logger.module.error("woi, is nil, using default: \(woi ?? "")")
     }
     return URLQueryItem(name: "woi", value: woi)
   }
@@ -334,12 +339,12 @@ public class DAU {
     }
 
     guard let stat = dauStat?.compactMap({ $0 }) else {
-      Logger.module.error("Cannot cast dauStat to [Int]")
+//      Logger.module.error("Cannot cast dauStat to [Int]")
       return nil
     }
 
     guard let lastPingStat = stat.first else {
-      Logger.module.error("Can't get last ping timestamp from dauStats")
+//      Logger.module.error("Can't get last ping timestamp from dauStats")
       return nil
     }
 
