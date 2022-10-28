@@ -106,6 +106,20 @@ class NewTabPageViewController: UIViewController {
   private var background: NewTabPageBackground
   private let backgroundView = NewTabPageBackgroundView()
   private let backgroundButtonsView = NewTabPageBackgroundButtonsView()
+  /// A gradient to display over background images to ensure visibility of
+  /// the NTP contents and sponsored logo
+  ///
+  /// Only should be displayed when the user has background images enabled
+  let gradientView = GradientView(
+    colors: [
+      UIColor(white: 0.0, alpha: 0.5),
+      UIColor(white: 0.0, alpha: 0.0),
+      UIColor(white: 0.0, alpha: 0.3),
+    ],
+    positions: [0, 0.5, 0.8],
+    startPoint: .zero,
+    endPoint: CGPoint(x: 0, y: 1)
+  )
 
   private let feedDataSource: FeedDataSource
   private let feedOverlayView = NewTabPageFeedOverlayView()
@@ -226,6 +240,7 @@ class NewTabPageViewController: UIViewController {
     super.viewDidLoad()
 
     view.addSubview(backgroundView)
+    view.insertSubview(gradientView, aboveSubview: backgroundView)
     view.addSubview(collectionView)
     view.addSubview(feedOverlayView)
 
@@ -250,6 +265,10 @@ class NewTabPageViewController: UIViewController {
     }
     feedOverlayView.snp.makeConstraints {
       $0.edges.equalToSuperview()
+    }
+    
+    gradientView.snp.makeConstraints {
+      $0.edges.equalTo(backgroundView)
     }
 
     sections.enumerated().forEach { (index, provider) in
@@ -356,12 +375,11 @@ class NewTabPageViewController: UIViewController {
       backgroundButtonsView.activeButton = .none
     }
 
-    backgroundView.gradientView.isHidden = background.backgroundImage == nil
+    gradientView.isHidden = background.backgroundImage == nil
     backgroundView.imageView.image = background.backgroundImage
 
-    guard let image = backgroundView.imageView.image else {
+    guard let _ = backgroundView.imageView.image else {
       backgroundView.imageView.snp.removeConstraints()
-      backgroundView.imageConstraints = nil
       return
     }
     
