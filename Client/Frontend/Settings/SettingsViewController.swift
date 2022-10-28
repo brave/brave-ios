@@ -17,7 +17,7 @@ import BraveWallet
 import BraveUI
 import BraveVPN
 import BraveNews
-import BraveTelemetry
+import Growth
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {

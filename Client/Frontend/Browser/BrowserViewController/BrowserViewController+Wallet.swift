@@ -12,7 +12,7 @@ import Shared
 import BraveShared
 import Data
 import os.log
-import BraveTelemetry
+import Growth
 
 extension WalletStore {
   /// Creates a WalletStore based on whether or not the user is in Private Mode

@@ -8,7 +8,7 @@ import BraveShared
 import SwiftKeychainWrapper
 import Data
 import BraveCore
-import BraveTelemetry
+import Growth
 import os.log
 
 public class Migration {

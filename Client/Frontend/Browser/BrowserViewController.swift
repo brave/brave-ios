@@ -26,7 +26,7 @@ import BraveNews
 import os.log
 import BraveTalk
 import Onboarding
-import BraveTelemetry
+import Growth
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,

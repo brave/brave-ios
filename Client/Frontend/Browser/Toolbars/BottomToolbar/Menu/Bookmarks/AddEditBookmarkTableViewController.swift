@@ -7,7 +7,7 @@ import CoreData
 import Data
 import Shared
 import BraveShared
-import BraveTelemetry
+import Growth
 import os.log
 
 class AddEditBookmarkTableViewController: UITableViewController {

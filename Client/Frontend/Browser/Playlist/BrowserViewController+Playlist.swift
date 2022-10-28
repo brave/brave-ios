@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import BraveUI
 import UIKit
-import BraveTelemetry
+import Growth
 import os.log
 import Onboarding
 
