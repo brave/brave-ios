@@ -284,7 +284,29 @@ public class WelcomeViewController: UIViewController {
         $0.height.equalTo(180.0)
       }
       calloutView.setState(state: state)
-      
+    case .p3a:
+      let topTransform = { () -> CGAffineTransform in
+        var transformation = CGAffineTransform.identity
+        transformation = transformation.scaledBy(x: 1.5, y: 1.5)
+        transformation = transformation.translatedBy(x: 0.0, y: -70.0)
+        return transformation
+      }()
+
+      let bottomTransform = { () -> CGAffineTransform in
+        var transformation = CGAffineTransform.identity
+        transformation = transformation.scaledBy(x: 2.0, y: 2.0)
+        transformation = transformation.translatedBy(x: 0.0, y: 40.0)
+        return transformation
+      }()
+
+      topImageView.transform = topTransform
+      bottomImageView.transform = bottomTransform
+      contentContainer.spacing = 20.0
+      iconBackgroundView.alpha = 1.0
+      iconView.snp.remakeConstraints {
+        $0.height.equalTo(180.0)
+      }
+      calloutView.setState(state: state)
     case .defaultBrowserCallout:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
