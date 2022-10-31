@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "shields-share.png",
       "idiom" : "universal",
-      "filename" : "thankyou-check-o-min.png",
       "scale" : "1x"
     },
     {
+      "filename" : "shields-share@2x.png",
       "idiom" : "universal",
-      "filename" : "thankyou-check-o@2x-min.png",
       "scale" : "2x"
     },
     {
+      "filename" : "share-shields@3x.png",
       "idiom" : "universal",
-      "filename" : "thankyou-check-o@3x-min.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }
