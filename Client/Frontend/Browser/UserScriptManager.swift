@@ -221,6 +221,35 @@ class UserScriptManager {
         }
       }
       
+      if let solanaWeb3Script = tab.walletSolProviderScripts[.solanaWeb3] {
+        let script = """
+        // Define a global variable with a random name
+        // Local variables are NOT enumerable!
+        let \(UserScriptManager.walletSolanaNameSpace);
+        
+        window.__firefox__.execute(function($, $Object) {
+          // Inject Solana as a Local Variable.
+          \(solanaWeb3Script)
+        
+          \(UserScriptManager.walletSolanaNameSpace) = $({
+            solanaWeb3: $(solanaWeb3)
+          });
+          
+          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).PublicKey);
+          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).Transaction);
+          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);
+          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace));
+        });
+        """
+        
+        let wkScript = WKUserScript.create(
+          source: script,
+          injectionTime: .atDocumentStart,
+          forMainFrameOnly: true,
+          in: SolanaProviderScriptHandler.scriptSandbox)
+        scriptController.addUserScript(wkScript)
+      }
+      
       // TODO: Refactor this and get rid of the `UserScriptType`
       // Inject Custom scripts
       for userScriptType in customScripts.sorted(by: { $0.order < $1.order }) {
@@ -241,39 +270,14 @@ class UserScriptManager {
       return
     }
     
-    let (isInjected, error) = await webView.evaluateSafeJavaScript(functionName: "typeof \(UserScriptManager.walletSolanaNameSpace) !== 'undefined'", args: [], contentWorld: .page, asFunction: false)
-    
-    if isInjected as? Bool ?? false == false {
-      let script = """
-      // Define a global variable with a random name
-      // Local variables are NOT enumerable!
-      let \(UserScriptManager.walletSolanaNameSpace);
-      
-      window.__firefox__.execute(function($, $Object) {
-        // Inject Solana as a Local Variable.
-        \(solanaWeb3Script)
-      
-        \(UserScriptManager.walletSolanaNameSpace) = $({
-          solanaWeb3: $(solanaWeb3)
-        });
-      
-        $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);
-        $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace));
-      });
-      """
-      
-      // inject the Solana Web3 Library
-      let (_, error) = await webView.evaluateSafeJavaScript(
-        functionName: script,
-        args: [],
-        contentWorld: .page,
-        asFunction: false
-      )
-      
-      if let error = error {
-        Logger.module.error("Error Injecting SOLANA-WEB-3: \(error.localizedDescription)")
-      }
-    }
+    let (result, error) = await webView.evaluateSafeJavaScript(
+      functionName: """
+      console.log(\(UserScriptManager.walletSolanaNameSpace));
+      """,
+      args: [],
+      contentWorld: .page,
+      asFunction: false
+    )
     
     if let error = error {
       Logger.module.error("Error Detecting SOLANA-WEB-3: \(error.localizedDescription)")
