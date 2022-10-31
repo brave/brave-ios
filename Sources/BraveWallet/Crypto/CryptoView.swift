@@ -125,7 +125,7 @@ public struct CryptoView: View {
                   keyringStore: walletStore.keyringStore,
                   activityStore: store.accountActivityStore(
                     for: walletStore.keyringStore.selectedAccount,
-                    isSelectedAccount: true
+                    observeAccountUpdates: true
                   ),
                   networkStore: store.networkStore
                 )

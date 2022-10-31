@@ -121,7 +121,7 @@ public struct WalletPanelContainerView: View {
             networkStore: cryptoStore.networkStore,
             accountActivityStore: cryptoStore.accountActivityStore(
               for: keyringStore.selectedAccount,
-              isSelectedAccount: true
+              observeAccountUpdates: true
             ),
             tabDappStore: tabDappStore,
             origin: origin,

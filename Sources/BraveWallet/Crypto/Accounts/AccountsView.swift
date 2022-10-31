@@ -91,7 +91,7 @@ struct AccountsView: View {
               keyringStore: keyringStore,
               activityStore: cryptoStore.accountActivityStore(
                 for: account,
-                isSelectedAccount: false
+                observeAccountUpdates: false
               ),
               networkStore: cryptoStore.networkStore
             )
