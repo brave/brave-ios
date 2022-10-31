@@ -119,7 +119,10 @@ public struct WalletPanelContainerView: View {
             keyringStore: keyringStore,
             cryptoStore: cryptoStore,
             networkStore: cryptoStore.networkStore,
-            accountActivityStore: cryptoStore.accountActivityStore(for: keyringStore.selectedAccount),
+            accountActivityStore: cryptoStore.accountActivityStore(
+              for: keyringStore.selectedAccount,
+              isSelectedAccount: true
+            ),
             tabDappStore: tabDappStore,
             origin: origin,
             presentWalletWithContext: { context in
