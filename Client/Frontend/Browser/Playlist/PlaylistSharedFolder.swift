@@ -138,10 +138,10 @@ struct PlaylistSharedFolderNetwork {
     })
   }
   
-  static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async -> [PlaylistInfo] {
+  static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async throws -> [PlaylistInfo] {
     @Sendable @MainActor
-    func fetchTask(item: PlaylistInfo) async -> PlaylistInfo {
-      await withCheckedContinuation { continuation in
+    func fetchTask(item: PlaylistInfo) async throws -> PlaylistInfo {
+      try await withCheckedThrowingContinuation { continuation in
         var webLoader: PlaylistWebLoader?
         webLoader = PlaylistWebLoader(handler: { newItem in
             if let newItem = newItem {
@@ -181,15 +181,17 @@ struct PlaylistSharedFolderNetwork {
       }
     }
 
-    return await withTaskGroup(of: PlaylistInfo.self, returning: [PlaylistInfo].self) { group in
-      item.mediaItems.forEach { item in
+    return try await withThrowingTaskGroup(of: PlaylistInfo.self, returning: [PlaylistInfo].self) { group in
+      try item.mediaItems.forEach { item in
+        try Task.checkCancellation()
+        
         group.addTask {
-          return await fetchTask(item: item)
+          return try await fetchTask(item: item)
         }
       }
       
       var result = [PlaylistInfo]()
-      for await value in group {
+      for try await value in group {
         result.append(value)
       }
       return result
