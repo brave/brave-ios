@@ -425,14 +425,28 @@ class WelcomeViewCallout: UIView {
         $0.alpha = 1.0
         $0.isHidden = false
       }
-
-      detailsLabel.do {
-        $0.text = info.details
+      
+      actionLabel.do {
+        $0.text = info.actionTitle
         $0.font = .preferredFont(for: .body, weight: .regular)
         $0.alpha = 1.0
         $0.isHidden = false
       }
 
+      detailsLabel.do {
+        $0.text = info.details
+        $0.font = .preferredFont(for: .footnote, weight: .regular)
+        $0.alpha = 1.0
+        $0.isHidden = false
+      }
+      
+      actionDescriptionLabel.do {
+        $0.text = info.actionDescription
+        $0.font = .preferredFont(for: .footnote, weight: .regular)
+        $0.alpha = 1.0
+        $0.isHidden = false
+      }
+      
       primaryButton.do {
         $0.setTitle(info.primaryButtonTitle, for: .normal)
         $0.titleLabel?.font = .preferredFont(for: .body, weight: .regular)
@@ -462,7 +476,9 @@ class WelcomeViewCallout: UIView {
       }
 
       contentStackView.setCustomSpacing(horizontalLayoutMargin, after: titleLabel)
-      contentStackView.setCustomSpacing(3 * horizontalLayoutMargin, after: detailsLabel)
+      contentStackView.setCustomSpacing(horizontalLayoutMargin, after: actionLabel)
+      contentStackView.setCustomSpacing(horizontalLayoutMargin, after: detailsLabel)
+      contentStackView.setCustomSpacing(3 * horizontalLayoutMargin, after: actionDescriptionLabel)
       contentStackView.setCustomSpacing(horizontalLayoutMargin, after: primaryButton)
     case .defaultBrowserCallout(let info):
       contentStackView.do {

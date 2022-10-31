@@ -261,30 +261,7 @@ public class WelcomeViewController: UIViewController {
         $0.height.equalTo(180.0)
       }
       calloutView.setState(state: state)
-    case .settings:
-      let topTransform = { () -> CGAffineTransform in
-        var transformation = CGAffineTransform.identity
-        transformation = transformation.scaledBy(x: 1.5, y: 1.5)
-        transformation = transformation.translatedBy(x: 0.0, y: -70.0)
-        return transformation
-      }()
-
-      let bottomTransform = { () -> CGAffineTransform in
-        var transformation = CGAffineTransform.identity
-        transformation = transformation.scaledBy(x: 2.0, y: 2.0)
-        transformation = transformation.translatedBy(x: 0.0, y: 40.0)
-        return transformation
-      }()
-
-      topImageView.transform = topTransform
-      bottomImageView.transform = bottomTransform
-      contentContainer.spacing = 20.0
-      iconBackgroundView.alpha = 1.0
-      iconView.snp.remakeConstraints {
-        $0.height.equalTo(180.0)
-      }
-      calloutView.setState(state: state)
-    case .p3a:
+    case .p3a, .settings:
       let topTransform = { () -> CGAffineTransform in
         var transformation = CGAffineTransform.identity
         transformation = transformation.scaledBy(x: 1.5, y: 1.5)
@@ -353,7 +330,7 @@ public class WelcomeViewController: UIViewController {
           nextController.animateToDefaultSettingsState()
         },
         secondaryAction: {
-          self.close()
+          nextController.animateToP3aState()
         }
       )
     )
@@ -373,13 +350,35 @@ public class WelcomeViewController: UIViewController {
       Preferences.Onboarding.basicOnboardingDefaultBrowserSelected.value = true
     }
   }
+  
+  private func animateToP3aState() {
+    let nextController = WelcomeViewController(state: nil).then {
+        $0.setLayoutState(
+          state: WelcomeViewCalloutState.p3a(
+            info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+              title: "Help make Brave better.",
+              actionTitle: "Share anonymous, private product insights.",
+              details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
+              actionDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+              primaryButtonTitle: "Done",
+              primaryAction: { [weak self] in
+                self?.close()
+              }
+            )
+          )
+        )
+      }
+
+    present(nextController, animated: true)
+  }
 
   private func onSetDefaultBrowser() {
     guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
       return
     }
     UIApplication.shared.open(settingsUrl)
-    self.close()
+    
+    animateToP3aState()
   }
 
   private func close() {
