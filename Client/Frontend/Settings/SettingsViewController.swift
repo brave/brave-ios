@@ -671,7 +671,7 @@ class SettingsViewController: TableViewController {
         Row(
           text: "Retention Preferences Debug Menu",
           selection: { [unowned self] in
-            self.navigationController?.pushViewController(RetentionPreferencesDebugMenuViewController(), animated: true)
+            self.navigationController?.pushViewController(RetentionPreferencesDebugMenuViewController(p3aUtilities: p3aUtilities), animated: true)
           }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
         Row(
           text: "Load all QA Links",

@@ -77,7 +77,7 @@ extension BrowserViewController {
           details: Strings.Callout.defaultBrowserCalloutDescription,
           primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
           secondaryButtonTitle: Strings.Callout.defaultBrowserCalloutSecondaryButtonTitle,
-          primaryAction: { [weak self] in
+          primaryButtonAction: { [weak self] in
             guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
               return
             }
@@ -88,13 +88,13 @@ extension BrowserViewController {
             UIApplication.shared.open(settingsUrl)
             self?.dismiss(animated: false)
           },
-          secondaryAction: { [weak self] in
+          secondaryButtonAction: { [weak self] in
             self?.isOnboardingOrFullScreenCalloutPresented = true
 
             self?.dismiss(animated: false)
           }
         )
-      )
+      ), p3aUtilities: braveCore.p3aUtils
     )
 
     if !isOnboardingOrFullScreenCalloutPresented {

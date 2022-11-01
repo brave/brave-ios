@@ -33,7 +33,7 @@ extension BrowserViewController {
     // 2. User hasn't completed onboarding
     if Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue,
        Preferences.General.isNewRetentionUser.value == true {
-      let onboardingController = WelcomeViewController()
+      let onboardingController = WelcomeViewController(p3aUtilities: braveCore.p3aUtils)
       onboardingController.modalPresentationStyle = .fullScreen
       parentController.present(onboardingController, animated: false)
       isOnboardingOrFullScreenCalloutPresented = true

@@ -13,34 +13,40 @@ import BraveShared
 public enum WelcomeViewCalloutState {
   public struct WelcomeViewDefaultBrowserDetails {
     var title: String
-    var actionTitle: String?
+    var toggleTitle: String?
+    var toggleStatus: Bool
     var details: String
-    var actionDescription: String?
+    var linkDescription: String?
     var primaryButtonTitle: String
     var secondaryButtonTitle: String?
-    var primaryAction: (() -> Void)
-    var secondaryAction: (() -> Void)?
+    var toggleAction: ((Bool) -> Void)?
     var linkAction: ((URL) -> Void)?
-    
+    var primaryButtonAction: (() -> Void)
+    var secondaryButtonAction: (() -> Void)?
+
     public init(
       title: String,
-      actionTitle: String? = nil,
+      toggleTitle: String? = nil,
+      toggleStatus: Bool = true,
       details: String,
-      actionDescription: String? = nil,
+      linkDescription: String? = nil,
       primaryButtonTitle: String,
       secondaryButtonTitle: String? = nil,
-      primaryAction: @escaping () -> Void,
-      secondaryAction: (() -> Void)? = nil,
-      linkAction: ((URL) -> Void)? = nil) {
-      self.title = title
-      self.actionTitle = actionTitle
-      self.details = details
-      self.actionDescription = actionDescription
-      self.primaryButtonTitle = primaryButtonTitle
-      self.secondaryButtonTitle = secondaryButtonTitle
-      self.primaryAction = primaryAction
-      self.secondaryAction = secondaryAction
-      self.linkAction = linkAction
+      toggleAction: ((Bool) -> Void)? = nil,
+      linkAction: ((URL) -> Void)? = nil,
+      primaryButtonAction: @escaping () -> Void,
+      secondaryButtonAction: (() -> Void)? = nil) {
+        self.title = title
+        self.toggleTitle = toggleTitle
+        self.toggleStatus = toggleStatus
+        self.details = details
+        self.linkDescription = linkDescription
+        self.primaryButtonTitle = primaryButtonTitle
+        self.secondaryButtonTitle = secondaryButtonTitle
+        self.toggleAction = toggleAction
+        self.linkAction = linkAction
+        self.primaryButtonAction = primaryButtonAction
+        self.secondaryButtonAction = secondaryButtonAction
     }
   }
 
@@ -85,17 +91,7 @@ class WelcomeViewCallout: UIView {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
   
-  // TODO: UIX
-  private let actionLabel = UILabel().then {
-    $0.textColor = .bravePrimary
-    $0.textAlignment = .left
-    $0.numberOfLines = 0
-    $0.minimumScaleFactor = 0.5
-    $0.adjustsFontSizeToFitWidth = true
-    $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-    $0.setContentHuggingPriority(.required, for: .horizontal)
-    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-  }
+  private let actionToggle = WelcomeShareActionToggle()
 
   private let detailsLabel = UILabel().then {
     $0.textColor = .bravePrimary
@@ -108,7 +104,6 @@ class WelcomeViewCallout: UIView {
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
   }
   
-  // TODO: UIX
   private let actionDescriptionLabel = LinkLabel().then {
     $0.textColor = .bravePrimary
     $0.textAlignment = .left
@@ -165,7 +160,7 @@ class WelcomeViewCallout: UIView {
     super.init(frame: .zero)
     doLayout()
 
-    [titleLabel, actionLabel, detailsLabel, actionDescriptionLabel, primaryButton, secondaryButtonContentView].forEach {
+    [titleLabel, actionToggle, detailsLabel, actionDescriptionLabel, primaryButton, secondaryButtonContentView].forEach {
       contentStackView.addArrangedSubview($0)
 
       $0.alpha = 0.0
@@ -183,7 +178,7 @@ class WelcomeViewCallout: UIView {
       secondaryButtonContentView.addArrangedSubview($0)
     }
 
-    [titleLabel, actionLabel, detailsLabel, actionDescriptionLabel].forEach {
+    [titleLabel, actionToggle, detailsLabel, actionDescriptionLabel].forEach {
       $0.contentMode = .top
     }
     
@@ -336,7 +331,7 @@ class WelcomeViewCallout: UIView {
           UIAction(
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
-              info.primaryAction()
+              info.primaryButtonAction()
             }), for: .touchUpInside)
         $0.alpha = 1.0
         $0.isHidden = false
@@ -354,7 +349,7 @@ class WelcomeViewCallout: UIView {
           UIAction(
             identifier: .init(rawValue: "secondary.action"),
             handler: { _ in
-              info.secondaryAction?()
+              info.secondaryButtonAction?()
             }), for: .touchUpInside)
         $0.alpha = 1.0
         $0.isHidden = false
@@ -428,9 +423,11 @@ class WelcomeViewCallout: UIView {
         $0.isHidden = false
       }
       
-      actionLabel.do {
-        $0.text = info.actionTitle
+      actionToggle.do {
+        $0.text = info.toggleTitle
         $0.font = .preferredFont(for: .body, weight: .regular)
+        $0.isOn = info.toggleStatus
+        $0.onToggleChanged = info.toggleAction
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -443,16 +440,14 @@ class WelcomeViewCallout: UIView {
       }
       
       actionDescriptionLabel.do {
-        $0.text = String(
-          format: "Learn more about our Privacy Preserving Product Analytics (P3A).")
         $0.font = .preferredFont(for: .footnote, weight: .regular)
+        $0.onLinkedTapped = info.linkAction
+        if let linkDescription = info.linkDescription {
+          $0.text = String(format: linkDescription)
+          $0.setURLInfo([linkDescription: "p3a"])
+        }
         $0.alpha = 1.0
         $0.isHidden = false
-        $0.setURLInfo([
-          "Learn more about our Privacy Preserving Product Analytics (P3A).": "tos"
-        ])
-        
-        $0.onLinkedTapped = info.linkAction
       }
       
       primaryButton.do {
@@ -462,7 +457,7 @@ class WelcomeViewCallout: UIView {
           UIAction(
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
-              info.primaryAction()
+              info.primaryButtonAction()
             }), for: .touchUpInside)
         $0.alpha = 1.0
         $0.isHidden = false
@@ -484,7 +479,7 @@ class WelcomeViewCallout: UIView {
       }
 
       contentStackView.setCustomSpacing(horizontalLayoutMargin, after: titleLabel)
-      contentStackView.setCustomSpacing(horizontalLayoutMargin, after: actionLabel)
+      contentStackView.setCustomSpacing(horizontalLayoutMargin, after: actionToggle)
       contentStackView.setCustomSpacing(horizontalLayoutMargin, after: detailsLabel)
       contentStackView.setCustomSpacing(3 * horizontalLayoutMargin, after: actionDescriptionLabel)
       contentStackView.setCustomSpacing(horizontalLayoutMargin, after: primaryButton)
@@ -515,7 +510,7 @@ class WelcomeViewCallout: UIView {
           UIAction(
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
-              info.primaryAction()
+              info.primaryButtonAction()
             }), for: .touchUpInside)
         $0.alpha = 1.0
         $0.isHidden = false
@@ -539,7 +534,7 @@ class WelcomeViewCallout: UIView {
           UIAction(
             identifier: .init(rawValue: "secondary.action"),
             handler: { _ in
-              info.secondaryAction?()
+              info.secondaryButtonAction?()
             }), for: .touchUpInside)
         $0.alpha = 1.0
         $0.isHidden = false

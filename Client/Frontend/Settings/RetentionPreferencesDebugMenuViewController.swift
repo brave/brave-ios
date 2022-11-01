@@ -10,10 +10,13 @@ import BraveShared
 import UIKit
 import BraveUI
 import Onboarding
+import BraveCore
 
 class RetentionPreferencesDebugMenuViewController: TableViewController {
+  private let p3aUtilities: BraveP3AUtils
 
-  init() {
+  init(p3aUtilities: BraveP3AUtils) {
+    self.p3aUtilities = p3aUtilities
     super.init(style: .insetGrouped)
   }
 
@@ -52,7 +55,7 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         .init(
           text: "Start Onboarding",
           selection: { [unowned self] in
-            let onboardingController = WelcomeViewController()
+            let onboardingController = WelcomeViewController(state: .loading, p3aUtilities: self.p3aUtilities)
             onboardingController.modalPresentationStyle = .fullScreen
 
             present(onboardingController, animated: false)

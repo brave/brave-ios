@@ -8,6 +8,7 @@ import UIKit
 import SnapKit
 import BraveShared
 import Shared
+import BraveCore
 
 private enum WelcomeViewID: Int {
   case background = 1
@@ -22,13 +23,16 @@ private enum WelcomeViewID: Int {
 
 public class WelcomeViewController: UIViewController {
   private var state: WelcomeViewCalloutState?
+  private let p3aUtilities: BraveP3AUtils
 
-  public convenience init() {
-    self.init(state: .loading)
+  public convenience init(p3aUtilities: BraveP3AUtils) {
+    self.init(state: .loading, p3aUtilities: p3aUtilities)
   }
 
-  public init(state: WelcomeViewCalloutState?) {
+  
+  public init(state: WelcomeViewCalloutState?, p3aUtilities: BraveP3AUtils) {
     self.state = state
+    self.p3aUtilities = p3aUtilities
     super.init(nibName: nil, bundle: nil)
     
     self.transitioningDelegate = self
@@ -312,24 +316,24 @@ public class WelcomeViewController: UIViewController {
   }
 
   private func animateToWelcomeState() {
-    let nextController = WelcomeViewController(state: nil).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities).then {
         $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
       }
     present(nextController, animated: true)
   }
 
   private func animateToDefaultBrowserState() {
-    let nextController = WelcomeViewController(state: nil)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities)
     let state = WelcomeViewCalloutState.defaultBrowser(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.defaultBrowserCalloutTitle,
         details: Strings.Callout.defaultBrowserCalloutDescription,
         primaryButtonTitle: Strings.Callout.defaultBrowserCalloutPrimaryButtonTitle,
         secondaryButtonTitle: Strings.DefaultBrowserCallout.introSkipButtonText,
-        primaryAction: {
+        primaryButtonAction: {
           nextController.animateToDefaultSettingsState()
         },
-        secondaryAction: {
+        secondaryButtonAction: {
           nextController.animateToP3aState()
         }
       )
@@ -339,7 +343,7 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToDefaultSettingsState() {
-    let nextController = WelcomeViewController(state: nil).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities).then {
         $0.setLayoutState(
           state: WelcomeViewCalloutState.settings(
             title: Strings.Onboarding.navigateSettingsOnboardingScreenTitle,
@@ -352,19 +356,23 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToP3aState() {
-    let nextController = WelcomeViewController(state: nil)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities)
       let state = WelcomeViewCalloutState.p3a(
         info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
           title: "Help make Brave better.",
-          actionTitle: "Share anonymous, private product insights.",
+          toggleTitle: "Share anonymous, private product insights.",
           details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
-          actionDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+          linkDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
           primaryButtonTitle: "Done",
-          primaryAction: { [weak self] in
-            self?.close()
+          toggleAction: { [weak self] isOn in
+            self?.p3aUtilities.isP3AEnabled = isOn
           },
-          linkAction: { [weak self] url in
-            nextController.present(OnboardingWebViewController(url: .termsOfService), animated: true, completion: nil)
+          linkAction: { url in
+            nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+          },
+          
+          primaryButtonAction: { [weak self] in
+            self?.close()
           }
         )
       )
