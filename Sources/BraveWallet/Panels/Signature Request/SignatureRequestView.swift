@@ -17,10 +17,13 @@ struct SignatureRequestView: View {
   var onDismiss: () -> Void
 
   @State private var requestIndex: Int = 0
+  @State private var renderUnknownUnicodes: Bool = false
+  @State private var needPilcrowFormatted: Bool = false
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
   @ScaledMetric private var blockieSize = 54
   private let maxBlockieSize: CGFloat = 108
+  private let staticTextViewHeight: CGFloat = 200
   
   private var currentRequest: BraveWallet.SignMessageRequest {
     requests[requestIndex]
@@ -28,6 +31,60 @@ struct SignatureRequestView: View {
   
   private var account: BraveWallet.AccountInfo {
     keyringStore.allAccounts.first(where: { $0.address == currentRequest.address }) ?? keyringStore.selectedAccount
+  }
+  
+  private var requestMessage: String {
+    var result = currentRequest.message
+    
+    if needPilcrowFormatted {
+      var copy = currentRequest.message
+      while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
+        if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
+          let newlines = String(copy[range])
+          result.replaceSubrange(range, with: "\n\u{00B6} <\(newlines.count)>\n")
+          copy.replaceSubrange(range, with: "\n\u{00B6} <\(newlines.count)>\n")
+        }
+      }
+    }
+    
+    if renderUnknownUnicodes {
+      result = result.printableWithUnknownUnicode
+    }
+    
+    return result
+  }
+  
+  private struct WarningView<Button: View>: View {
+    var warningMsg: String
+    var button: () -> Button
+    
+    @Environment(\.pixelLength) private var pixelLength
+    
+    init(
+      warningMsg: String,
+      @ViewBuilder button: @escaping () -> Button
+    ) {
+      self.warningMsg = warningMsg
+      self.button = button
+    }
+    
+    var body: some View {
+      VStack(alignment: .leading, spacing: 8) {
+        Text("\(Image(systemName: "exclamationmark.triangle.fill"))  \(warningMsg)")
+          .font(.subheadline.weight(.medium))
+          .foregroundColor(Color(.braveLabel))
+        button()
+      }
+      .padding(12)
+      .background(
+        Color(.braveWarningBackground)
+          .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+              .strokeBorder(Color(.braveWarningBorder), style: StrokeStyle(lineWidth: pixelLength))
+          )
+          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+      )
+    }
   }
   
   init(
@@ -81,11 +138,27 @@ struct SignatureRequestView: View {
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.headline)
             .foregroundColor(Color(.bravePrimary))
+          VStack(alignment: .leading, spacing: 8) {
+            if needPilcrowFormatted {
+              WarningView(warningMsg: Strings.Wallet.signMessageConsecutiveNewlineWarning) {}
+            }
+            if currentRequest.message.hasUnknownUnicode {
+              WarningView(warningMsg: Strings.Wallet.signMessageRequestUnknownUnicodeWarning) {
+                Button {
+                  renderUnknownUnicodes.toggle()
+                } label: {
+                  Text(renderUnknownUnicodes ? Strings.Wallet.signMessageShowOriginalMessage : Strings.Wallet.signMessageShowUnknownUnicode)
+                    .font(.subheadline)
+                    .foregroundColor(Color(.braveBlurple))
+                }
+              }
+            }
+          }
         }
         .padding(.vertical, 32)
-        StaticTextView(text: currentRequest.message, isMonospaced: false)
+        StaticTextView(text: requestMessage, isMonospaced: false)
           .frame(maxWidth: .infinity)
-          .frame(height: 200)
+          .frame(height: staticTextViewHeight)
           .background(Color(.tertiaryBraveGroupedBackground))
           .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
           .padding()
@@ -128,6 +201,13 @@ struct SignatureRequestView: View {
     .navigationBarTitleDisplayMode(.inline)
     .foregroundColor(Color(.braveLabel))
     .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
+    .introspectTextView { textView in
+      // A flash to show users message is overflowing the text view (related to issue https://github.com/brave/brave-ios/issues/6277)
+      textView.flashScrollIndicators()
+      if textView.contentSize.height > staticTextViewHeight && requestMessage.hasConsecutiveNewLines {
+        needPilcrowFormatted = true
+      }
+    }
   }
   
   private var isButtonsDisabled: Bool {
@@ -177,6 +257,43 @@ struct SignatureRequestView: View {
     } else {
       requestIndex = 0
     }
+  }
+}
+
+extension String {
+  var hasUnknownUnicode: Bool {
+    // same requirement as desktop. Valid: [0, 127]
+    for c in unicodeScalars {
+      let ci = Int(c.value)
+      if ci > 127 {
+        return true
+      }
+    }
+    return false
+  }
+  
+  var hasConsecutiveNewLines: Bool {
+    // return true if string has two or more consecutive newline chars
+    return range(of: "\\n{2,}", options: .regularExpression) != nil
+  }
+  
+  var printableWithUnknownUnicode: String {
+    var result = ""
+    for c in unicodeScalars {
+      let ci = Int(c.value)
+      if let unicodeScalar = Unicode.Scalar(ci) {
+        if ci == 10 { // will keep newline char as it is
+          result += "\n"
+        } else if ci == 182 {
+          result += unicodeScalar.escaped(asASCII: false) // will display pilcrow sign
+        } else {
+          // ascii char will be displayed as it is
+          // unknown (> 127) will be displayed as hex-encoded
+          result += unicodeScalar.escaped(asASCII: true)
+        }
+      }
+    }
+    return result
   }
 }
 
