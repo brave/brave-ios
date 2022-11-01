@@ -118,6 +118,7 @@ class PlaylistViewController: UIViewController {
     }
 
     // Cancel all loading.
+    listController.stopLoadingSharedPlaylist()
     assetLoadingStateObservers.removeAll()
     assetStateObservers.removeAll()
 

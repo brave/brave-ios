@@ -207,7 +207,7 @@ class PlaylistListViewController: UIViewController {
     folderObserver = nil
     if isMovingFromParent || isBeingDismissed {
       delegate?.stopPlaying()
-      sharedFolderLoadingTask?.cancel()
+      stopLoadingSharedPlaylist()
       PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.send()
     }
   }
@@ -216,6 +216,11 @@ class PlaylistListViewController: UIViewController {
     super.viewDidLayoutSubviews()
 
     updateTableBackgroundView()
+  }
+  
+  deinit {
+    folderObserver = nil
+    stopLoadingSharedPlaylist()
   }
 
   // MARK: Internal
@@ -669,7 +674,7 @@ extension PlaylistListViewController {
   }
   
   func loadSharedPlaylist(folderSharingUrl: String) {
-    sharedFolderLoadingTask?.cancel()
+    stopLoadingSharedPlaylist()
     
     sharedFolderLoadingTask = Task { @MainActor in
       // Shared Folder already exists
@@ -688,9 +693,10 @@ extension PlaylistListViewController {
         self.loadingState = .partial
         
         if let folderImageUrl = model.folderImage {
-          Task { @MainActor in
-            let authManager = BasicAuthCredentialsManager(for: [folderImageUrl.absoluteString])
-            let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
+          let authManager = BasicAuthCredentialsManager(for: [folderImageUrl.absoluteString])
+          let session = URLSession(configuration: .ephemeral, delegate: authManager, delegateQueue: .main)
+          
+          try await withTaskCancellationHandler {
             defer { session.finishTasksAndInvalidate() }
             
             let (data, response) = try await NetworkManager(session: session).dataRequest(with: folderImageUrl)
@@ -701,28 +707,28 @@ extension PlaylistListViewController {
             if let image = UIImage(data: data, scale: UIScreen.main.scale) {
               self.playerView.setStaticImage(image: image)
             }
+          } onCancel: {
+            session.invalidateAndCancel()
           }
         }
         
-        Task { @MainActor in
-          let items = try await PlaylistSharedFolderNetwork.fetchMediaItemInfo(item: model, viewForInvisibleWebView: self.view)
-          try folder.playlistItems?.forEach({ playlistItem in
-            try Task.checkCancellation()
-            
-            if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
-              playlistItem.name = item.name
-              playlistItem.pageTitle = item.pageTitle
-              playlistItem.pageSrc = item.pageSrc
-              playlistItem.duration = item.duration
-              playlistItem.mimeType = item.mimeType
-              playlistItem.mediaSrc = item.src
-              playlistItem.uuid = item.tagId
-              playlistItem.order = item.order
-            }
-          })
+        let items = try await PlaylistSharedFolderNetwork.fetchMediaItemInfo(item: model, viewForInvisibleWebView: self.view)
+        try folder.playlistItems?.forEach({ playlistItem in
+          try Task.checkCancellation()
           
-          self.loadingState = .fullyLoaded
-        }
+          if let item = items.first(where: { $0.tagId == playlistItem.uuid }) {
+            playlistItem.name = item.name
+            playlistItem.pageTitle = item.pageTitle
+            playlistItem.pageSrc = item.pageSrc
+            playlistItem.duration = item.duration
+            playlistItem.mimeType = item.mimeType
+            playlistItem.mediaSrc = item.src
+            playlistItem.uuid = item.tagId
+            playlistItem.order = item.order
+          }
+        })
+        
+        self.loadingState = .fullyLoaded
       } catch {
         if let error = error as? PlaylistSharedFolderNetwork.Status {
           Logger.module.error("\(error.localizedDescription)")
@@ -733,6 +739,11 @@ extension PlaylistListViewController {
         displayLoadingResourceError()
       }
     }
+  }
+  
+  func stopLoadingSharedPlaylist() {
+    sharedFolderLoadingTask?.cancel()
+    sharedFolderLoadingTask = nil
   }
 }
 

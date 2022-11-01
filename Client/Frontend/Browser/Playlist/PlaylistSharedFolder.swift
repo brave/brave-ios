@@ -141,41 +141,49 @@ struct PlaylistSharedFolderNetwork {
   static func fetchMediaItemInfo(item: PlaylistSharedFolderModel, viewForInvisibleWebView: UIView) async throws -> [PlaylistInfo] {
     @Sendable @MainActor
     func fetchTask(item: PlaylistInfo) async throws -> PlaylistInfo {
-      try await withCheckedThrowingContinuation { continuation in
-        var webLoader: PlaylistWebLoader?
-        webLoader = PlaylistWebLoader(handler: { newItem in
-            if let newItem = newItem {
-              PlaylistManager.shared.getAssetDuration(item: newItem) { duration in
-                let item = PlaylistInfo(name: item.name,
-                                   src: newItem.src,
-                                   pageSrc: newItem.pageSrc,
-                                   pageTitle: item.pageTitle,
-                                   mimeType: newItem.mimeType,
-                                   duration: duration ?? newItem.duration,
-                                   detected: newItem.detected,
-                                   dateAdded: newItem.dateAdded,
-                                   tagId: item.tagId,
-                                   order: item.order)
-                
+      var webLoader: PlaylistWebLoader?
+      return try await withTaskCancellationHandler {
+        try await withCheckedThrowingContinuation { continuation in
+          webLoader = PlaylistWebLoader(handler: { newItem in
+              if let newItem = newItem {
+                PlaylistManager.shared.getAssetDuration(item: newItem) { duration in
+                  let item = PlaylistInfo(name: item.name,
+                                     src: newItem.src,
+                                     pageSrc: newItem.pageSrc,
+                                     pageTitle: item.pageTitle,
+                                     mimeType: newItem.mimeType,
+                                     duration: duration ?? newItem.duration,
+                                     detected: newItem.detected,
+                                     dateAdded: newItem.dateAdded,
+                                     tagId: item.tagId,
+                                     order: item.order)
+                  
+                  // Destroy the web loader when the callback is complete.
+                  webLoader?.removeFromSuperview()
+                  webLoader = nil
+                  continuation.resume(returning: item)
+                }
+              } else {
                 // Destroy the web loader when the callback is complete.
                 webLoader?.removeFromSuperview()
                 webLoader = nil
                 continuation.resume(returning: item)
               }
-            } else {
-              // Destroy the web loader when the callback is complete.
-              webLoader?.removeFromSuperview()
-              webLoader = nil
-              continuation.resume(returning: item)
             }
+          ).then {
+            viewForInvisibleWebView.insertSubview($0, at: 0)
           }
-        ).then {
-          viewForInvisibleWebView.insertSubview($0, at: 0)
-        }
 
-        if let url = URL(string: item.pageSrc) {
-          webLoader?.load(url: url)
-        } else {
+          if let url = URL(string: item.pageSrc) {
+            webLoader?.load(url: url)
+          } else {
+            webLoader = nil
+          }
+        }
+      } onCancel: {
+        Task { @MainActor in
+          webLoader?.stop()
+          webLoader?.removeFromSuperview()
           webLoader = nil
         }
       }
