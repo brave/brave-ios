@@ -352,23 +352,24 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToP3aState() {
-    let nextController = WelcomeViewController(state: nil).then {
-        $0.setLayoutState(
-          state: WelcomeViewCalloutState.p3a(
-            info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
-              title: "Help make Brave better.",
-              actionTitle: "Share anonymous, private product insights.",
-              details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
-              actionDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
-              primaryButtonTitle: "Done",
-              primaryAction: { [weak self] in
-                self?.close()
-              }
-            )
-          )
+    let nextController = WelcomeViewController(state: nil)
+      let state = WelcomeViewCalloutState.p3a(
+        info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+          title: "Help make Brave better.",
+          actionTitle: "Share anonymous, private product insights.",
+          details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
+          actionDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+          primaryButtonTitle: "Done",
+          primaryAction: { [weak self] in
+            self?.close()
+          },
+          linkAction: { [weak self] url in
+            nextController.present(OnboardingWebViewController(url: .termsOfService), animated: true, completion: nil)
+          }
         )
-      }
-
+      )
+   
+    nextController.setLayoutState(state: state)
     present(nextController, animated: true)
   }
 

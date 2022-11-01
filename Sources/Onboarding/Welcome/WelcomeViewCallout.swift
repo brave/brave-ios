@@ -20,6 +20,7 @@ public enum WelcomeViewCalloutState {
     var secondaryButtonTitle: String?
     var primaryAction: (() -> Void)
     var secondaryAction: (() -> Void)?
+    var linkAction: ((URL) -> Void)?
     
     public init(
       title: String,
@@ -29,7 +30,8 @@ public enum WelcomeViewCalloutState {
       primaryButtonTitle: String,
       secondaryButtonTitle: String? = nil,
       primaryAction: @escaping () -> Void,
-      secondaryAction: (() -> Void)? = nil) {
+      secondaryAction: (() -> Void)? = nil,
+      linkAction: ((URL) -> Void)? = nil) {
       self.title = title
       self.actionTitle = actionTitle
       self.details = details
@@ -38,6 +40,7 @@ public enum WelcomeViewCalloutState {
       self.secondaryButtonTitle = secondaryButtonTitle
       self.primaryAction = primaryAction
       self.secondaryAction = secondaryAction
+      self.linkAction = linkAction
     }
   }
 
@@ -106,12 +109,11 @@ class WelcomeViewCallout: UIView {
   }
   
   // TODO: UIX
-  private let actionDescriptionLabel = UILabel().then {
+  private let actionDescriptionLabel = LinkLabel().then {
     $0.textColor = .bravePrimary
     $0.textAlignment = .left
-    $0.numberOfLines = 0
-    $0.minimumScaleFactor = 0.5
-    $0.adjustsFontSizeToFitWidth = true
+    $0.textContainer.lineFragmentPadding = 0
+    $0.textContainerInset = .zero
     $0.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -441,10 +443,16 @@ class WelcomeViewCallout: UIView {
       }
       
       actionDescriptionLabel.do {
-        $0.text = info.actionDescription
+        $0.text = String(
+          format: "Learn more about our Privacy Preserving Product Analytics (P3A).")
         $0.font = .preferredFont(for: .footnote, weight: .regular)
         $0.alpha = 1.0
         $0.isHidden = false
+        $0.setURLInfo([
+          "Learn more about our Privacy Preserving Product Analytics (P3A).": "tos"
+        ])
+        
+        $0.onLinkedTapped = info.linkAction
       }
       
       primaryButton.do {
