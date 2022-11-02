@@ -425,6 +425,7 @@ let package = Package(
     .target(name: "RuntimeWarnings"),
     .target(name: "BraveTalk", dependencies: ["Shared", "JitsiMeet"]),
     .testTarget(name: "BraveTalkTests", dependencies: ["BraveTalk", "Shared"]),
+    .testTarget(name: "GrowthTests", dependencies: ["Growth", "Shared", "BraveShared", "BraveVPN"]),
     .plugin(name: "IntentBuilderPlugin", capability: .buildTool()),
     .plugin(name: "LoggerPlugin", capability: .buildTool()),
   ],
