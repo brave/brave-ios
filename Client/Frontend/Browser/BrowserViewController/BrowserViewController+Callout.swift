@@ -29,6 +29,46 @@ extension BrowserViewController {
       present(controller, animated: false)
     }
   }
+  
+  func presentP3AScreenCallout() {
+//    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+//
+//    if presentedViewController != nil || !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .p3a) {
+//      return
+//    }
+
+//    let onboardingP3ACalloutController = WelcomeViewController(p3aUtilities: braveCore.p3aUtils)
+    
+    let onboardingP3ACalloutController = Welcome3PAViewController(p3aUtilities: braveCore.p3aUtils)
+
+    let state = WelcomeViewCalloutState.p3a(
+      info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+        title: "Help make Brave better.",
+        toggleTitle: "Share anonymous, private product insights.",
+        details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
+        linkDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+        primaryButtonTitle: "Done",
+        toggleAction: { [weak self] isOn in
+          self?.braveCore.p3aUtils.isP3AEnabled = isOn
+        },
+        linkAction: { url in
+          onboardingP3ACalloutController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+        },
+        primaryButtonAction: { [weak self] in
+          Preferences.Onboarding.p3aOnboardingShown.value = true
+
+          self?.isOnboardingOrFullScreenCalloutPresented = true
+          self?.dismiss(animated: false)
+        }
+      )
+    )
+
+    onboardingP3ACalloutController.setLayoutState(state: state)
+    
+    if !isOnboardingOrFullScreenCalloutPresented {
+      present(onboardingP3ACalloutController, animated: true)
+    }
+  }
 
   func presentVPNAlertCallout() {
     if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }

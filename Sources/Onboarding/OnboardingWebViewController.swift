@@ -10,9 +10,9 @@ import BraveUI
 import UIKit
 import Storage
 
-class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
+public class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
 
-  enum URLType {
+  public enum URLType {
     case termsOfService
     case privacyPolicy
     case p3aDescription
@@ -52,7 +52,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
   }
 
-  init(url: URLType) {
+  public init(url: URLType) {
     self.urlType = url
     super.init(nibName: nil, bundle: nil)
   }
@@ -61,7 +61,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     let stackView = UIStackView().then {
@@ -93,7 +93,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     toolbar.forwardButton.addTarget(self, action: #selector(onForward), for: .touchUpInside)
   }
 
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+  public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
     guard let webView = object as? WKWebView, let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
       return
     }
@@ -181,7 +181,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     toolbar.forwardButton.tintColor = webView.canGoForward ? UX.buttonEnabledColor : UX.buttonDisabledColor
   }
 
-  func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+  public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
     let error = error as NSError
     if error.domain == "WebKitErrorDomain" && error.code == 102 {
       return
@@ -197,7 +197,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     }
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+  public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
     completionHandler(.performDefaultHandling, nil)
   }
 }

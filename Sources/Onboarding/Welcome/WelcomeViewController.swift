@@ -9,6 +9,7 @@ import SnapKit
 import BraveShared
 import Shared
 import BraveCore
+import BraveUI
 
 private enum WelcomeViewID: Int {
   case background = 1
@@ -29,7 +30,6 @@ public class WelcomeViewController: UIViewController {
     self.init(state: .loading, p3aUtilities: p3aUtilities)
   }
 
-  
   public init(state: WelcomeViewCalloutState?, p3aUtilities: BraveP3AUtils) {
     self.state = state
     self.p3aUtilities = p3aUtilities
@@ -200,7 +200,7 @@ public class WelcomeViewController: UIViewController {
     }
   }
 
-  private func setLayoutState(state: WelcomeViewCalloutState) {
+  public func setLayoutState(state: WelcomeViewCalloutState) {
     self.state = state
 
     switch state {
@@ -357,28 +357,30 @@ public class WelcomeViewController: UIViewController {
   
   private func animateToP3aState() {
     let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities)
-      let state = WelcomeViewCalloutState.p3a(
-        info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
-          title: "Help make Brave better.",
-          toggleTitle: "Share anonymous, private product insights.",
-          details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
-          linkDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
-          primaryButtonTitle: "Done",
-          toggleAction: { [weak self] isOn in
-            self?.p3aUtilities.isP3AEnabled = isOn
-          },
-          linkAction: { url in
-            nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
-          },
-          
-          primaryButtonAction: { [weak self] in
-            self?.close()
-          }
-        )
+    let state = WelcomeViewCalloutState.p3a(
+      info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
+        title: "Help make Brave better.",
+        toggleTitle: "Share anonymous, private product insights.",
+        details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
+        linkDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+        primaryButtonTitle: "Done",
+        toggleAction: { [weak self] isOn in
+          self?.p3aUtilities.isP3AEnabled = isOn
+        },
+        linkAction: { url in
+          nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+        },
+        
+        primaryButtonAction: { [weak self] in
+          self?.close()
+        }
       )
+    )
    
     nextController.setLayoutState(state: state)
-    present(nextController, animated: true)
+    present(nextController, animated: true) {
+      Preferences.Onboarding.p3aOnboardingShown.value = true
+    }
   }
 
   private func onSetDefaultBrowser() {

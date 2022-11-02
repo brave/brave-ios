@@ -270,8 +270,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // Check if user has launched the application before and determine if it is a new retention user
-    if Preferences.General.isFirstLaunch.value, Preferences.General.isNewRetentionUser.value == nil {
-      Preferences.General.isNewRetentionUser.value = true
+    if Preferences.General.isFirstLaunch.value, Preferences.Onboarding.isNewRetentionUser.value == nil {
+      Preferences.Onboarding.isNewRetentionUser.value = true
     }
 
     if Preferences.DAU.appRetentionLaunchDate.value == nil {

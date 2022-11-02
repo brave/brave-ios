@@ -107,11 +107,11 @@ class RetentionPreferencesDebugMenuViewController: TableViewController {
         .boolRow(
           title: "Retention User",
           detailText: "Flag showing if the user installed the application after new onboarding is added.",
-          toggleValue: Preferences.General.isNewRetentionUser.value ?? false,
+          toggleValue: Preferences.Onboarding.isNewRetentionUser.value ?? false,
           valueChange: {
             if $0 {
               let status = $0
-              Preferences.General.isNewRetentionUser.value = status
+              Preferences.Onboarding.isNewRetentionUser.value = status
             }
           },
           cellReuseId: "RetentionUserCell"),
