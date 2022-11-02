@@ -153,8 +153,13 @@ class WelcomeViewCallout: UIView {
   private var verticalLayoutMargin = UX.verticalLayoutMargin
   private var horizontalLayoutMargin = UX.horizontalLayoutMargin
 
-  // MARK: - State
   private(set) var state: WelcomeViewCalloutState?
+  
+  var isBottomArrowHidden: Bool = false {
+    didSet {
+      arrowView.isHidden = isBottomArrowHidden
+    }
+  }
 
   init() {
     super.init(frame: .zero)

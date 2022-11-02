@@ -39,7 +39,10 @@ extension BrowserViewController {
 
 //    let onboardingP3ACalloutController = WelcomeViewController(p3aUtilities: braveCore.p3aUtils)
     
-    let onboardingP3ACalloutController = Welcome3PAViewController(p3aUtilities: braveCore.p3aUtils)
+    let onboardingP3ACalloutController = Welcome3PAViewController().then {
+      $0.isModalInPresentation = true
+      $0.modalPresentationStyle = .overFullScreen
+    }
 
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
@@ -66,7 +69,7 @@ extension BrowserViewController {
     onboardingP3ACalloutController.setLayoutState(state: state)
     
     if !isOnboardingOrFullScreenCalloutPresented {
-      present(onboardingP3ACalloutController, animated: true)
+      present(onboardingP3ACalloutController, animated: false)
     }
   }
 
