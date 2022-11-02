@@ -30,7 +30,7 @@ class WalletStringExtensionTests: XCTestCase {
   
   func testPrintableWithUnknownUnicode() {
     let string = "Main Message\nEvil payload is below \n¶\npaylod still loooks good\nNew Line\n¶\n\u{202E} EVIL"
-    let printable = "Main Message\nEvil payload is below \n\u{00B6}\npaylod still loooks good\nNew Line\n\u{00B6}\n\\u{202E} EVIL"
+    let printable = "Main Message\nEvil payload is below \n\\u{00B6}\npaylod still loooks good\nNew Line\n\\u{00B6}\n\\u{202E} EVIL"
     XCTAssertEqual(string.printableWithUnknownUnicode, printable)
   }
 }

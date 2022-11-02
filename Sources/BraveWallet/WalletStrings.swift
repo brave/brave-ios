@@ -3232,14 +3232,14 @@ extension Strings {
       "wallet.signMessageRequestUnknownUnicodeWarning",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Multiple consecutive new-line characters detected! Replaced with Pilcrow Sign(s).",
+      value: "Consecutive newline characters detected!",
       comment: "A warning message to tell users that the sign request message contains consecutive new-line characters."
     )
     public static let signMessageShowUnknownUnicode = NSLocalizedString(
       "wallet.signMessageRequestUnknownUnicodeWarning",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "View message in ASCII encoding",
+      value: "Show encoded message",
       comment: "The title of the button that users can click to display the sign request message in ASCII encoding."
     )
     public static let signMessageShowOriginalMessage = NSLocalizedString(

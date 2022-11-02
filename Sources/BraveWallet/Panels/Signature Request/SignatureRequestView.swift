@@ -17,10 +17,11 @@ struct SignatureRequestView: View {
   var onDismiss: () -> Void
 
   @State private var requestIndex: Int = 0
-  @State private var renderUnknownUnicodes: Bool = false
-  @State private var needPilcrowFormatted: Bool = false
+  @State private var needPilcrowFormatted: [Int: Bool] = [0: false]
+  @State private var showOrignalMessage: [Int: Bool] = [0: true]
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.pixelLength) private var pixelLength
   @ScaledMetric private var blockieSize = 54
   private let maxBlockieSize: CGFloat = 108
   private let staticTextViewHeight: CGFloat = 200
@@ -34,56 +35,26 @@ struct SignatureRequestView: View {
   }
   
   private var requestMessage: String {
-    var result = currentRequest.message
-    
-    if needPilcrowFormatted {
-      var copy = currentRequest.message
-      while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
-        if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
-          let newlines = String(copy[range])
-          result.replaceSubrange(range, with: "\n\u{00B6} <\(newlines.count)>\n")
-          copy.replaceSubrange(range, with: "\n\u{00B6} <\(newlines.count)>\n")
+    if showOrignalMessage[requestIndex] == true {
+      return currentRequest.message
+    } else {
+      let uuid = UUID()
+      var result = currentRequest.message
+      if needPilcrowFormatted[requestIndex] == true {
+        var copy = currentRequest.message
+        while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
+          if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
+            let newlines = String(copy[range])
+            result.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
+            copy.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
+          }
         }
       }
-    }
-    
-    if renderUnknownUnicodes {
-      result = result.printableWithUnknownUnicode
-    }
-    
-    return result
-  }
-  
-  private struct WarningView<Button: View>: View {
-    var warningMsg: String
-    var button: () -> Button
-    
-    @Environment(\.pixelLength) private var pixelLength
-    
-    init(
-      warningMsg: String,
-      @ViewBuilder button: @escaping () -> Button
-    ) {
-      self.warningMsg = warningMsg
-      self.button = button
-    }
-    
-    var body: some View {
-      VStack(alignment: .leading, spacing: 8) {
-        Text("\(Image(systemName: "exclamationmark.triangle.fill"))  \(warningMsg)")
-          .font(.subheadline.weight(.medium))
-          .foregroundColor(Color(.braveLabel))
-        button()
+      if currentRequest.message.hasUnknownUnicode {
+        result = result.printableWithUnknownUnicode
       }
-      .padding(12)
-      .background(
-        Color(.braveWarningBackground)
-          .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-              .strokeBorder(Color(.braveWarningBorder), style: StrokeStyle(lineWidth: pixelLength))
-          )
-          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-      )
+      
+      return result.replacingOccurrences(of: uuid.uuidString, with: "\u{00B6}")
     }
   }
   
@@ -138,21 +109,39 @@ struct SignatureRequestView: View {
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.headline)
             .foregroundColor(Color(.bravePrimary))
-          VStack(alignment: .leading, spacing: 8) {
-            if needPilcrowFormatted {
-              WarningView(warningMsg: Strings.Wallet.signMessageConsecutiveNewlineWarning) {}
-            }
-            if currentRequest.message.hasUnknownUnicode {
-              WarningView(warningMsg: Strings.Wallet.signMessageRequestUnknownUnicodeWarning) {
-                Button {
-                  renderUnknownUnicodes.toggle()
-                } label: {
-                  Text(renderUnknownUnicodes ? Strings.Wallet.signMessageShowOriginalMessage : Strings.Wallet.signMessageShowUnknownUnicode)
-                    .font(.subheadline)
-                    .foregroundColor(Color(.braveBlurple))
-                }
+          if needPilcrowFormatted[requestIndex] == true || currentRequest.message.hasUnknownUnicode == true {
+            VStack(spacing: 8) {
+              if needPilcrowFormatted[requestIndex] == true {
+                Text("\(Image(systemName: "exclamationmark.triangle.fill")) \(Strings.Wallet.signMessageConsecutiveNewlineWarning)")
+                  .font(.subheadline.weight(.medium))
+                  .foregroundColor(Color(.braveLabel))
+                  .multilineTextAlignment(.center)
+              }
+              if currentRequest.message.hasUnknownUnicode == true {
+                Text("\(Image(systemName: "exclamationmark.triangle.fill"))  \(Strings.Wallet.signMessageRequestUnknownUnicodeWarning)")
+                  .font(.subheadline.weight(.medium))
+                  .foregroundColor(Color(.braveLabel))
+                  .multilineTextAlignment(.center)
+              }
+              Button {
+                let value = showOrignalMessage[requestIndex] ?? false
+                showOrignalMessage[requestIndex] = !value
+              } label: {
+                Text(showOrignalMessage[requestIndex] == true ? Strings.Wallet.signMessageShowUnknownUnicode : Strings.Wallet.signMessageShowOriginalMessage)
+                  .font(.subheadline)
+                  .foregroundColor(Color(.braveBlurple))
               }
             }
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(
+              Color(.braveWarningBackground)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Color(.braveWarningBorder), style: StrokeStyle(lineWidth: pixelLength))
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            )
           }
         }
         .padding(.vertical, 32)
@@ -162,10 +151,10 @@ struct SignatureRequestView: View {
           .background(Color(.tertiaryBraveGroupedBackground))
           .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
           .padding()
-        .background(
-          Color(.secondaryBraveGroupedBackground)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+          .background(
+            Color(.secondaryBraveGroupedBackground)
+          )
+          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         buttonsContainer
           .padding(.top)
           .opacity(sizeCategory.isAccessibilityCategory ? 0 : 1)
@@ -203,9 +192,13 @@ struct SignatureRequestView: View {
     .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
     .introspectTextView { textView in
       // A flash to show users message is overflowing the text view (related to issue https://github.com/brave/brave-ios/issues/6277)
-      textView.flashScrollIndicators()
-      if textView.contentSize.height > staticTextViewHeight && requestMessage.hasConsecutiveNewLines {
-        needPilcrowFormatted = true
+      if showOrignalMessage[requestIndex] == true {
+        if textView.contentSize.height > staticTextViewHeight && currentRequest.message.hasConsecutiveNewLines {
+          needPilcrowFormatted[requestIndex] = true
+          textView.flashScrollIndicators()
+        } else {
+          needPilcrowFormatted[requestIndex] = false
+        }
       }
     }
   }
@@ -253,7 +246,11 @@ struct SignatureRequestView: View {
   
   private func next() {
     if requestIndex + 1 < requests.count {
-      requestIndex += 1
+      let value = requestIndex + 1
+      if showOrignalMessage[value] == nil {
+        showOrignalMessage[value] = true
+      }
+      requestIndex = value
     } else {
       requestIndex = 0
     }
@@ -284,8 +281,6 @@ extension String {
       if let unicodeScalar = Unicode.Scalar(ci) {
         if ci == 10 { // will keep newline char as it is
           result += "\n"
-        } else if ci == 182 {
-          result += unicodeScalar.escaped(asASCII: false) // will display pilcrow sign
         } else {
           // ascii char will be displayed as it is
           // unknown (> 127) will be displayed as hex-encoded
