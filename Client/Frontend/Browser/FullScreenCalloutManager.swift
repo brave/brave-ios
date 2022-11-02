@@ -32,11 +32,6 @@ struct FullScreenCalloutManager {
       }
     }
   }
-  
-  /// Allows this popup to re-appear for the given callout type
-  static func enable(for calloutType: FullScreenCalloutType) {
-    calloutType.preferenceValue.value = false
-  }
 
   /// It determines whether we should show show the designated callout or not and sets corresponding preferences accordingly.
   /// Returns true if the callout should be shown.
