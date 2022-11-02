@@ -522,39 +522,7 @@ public class BrowserViewController: UIViewController {
     try? widgetBookmarksFRC?.performFetch()
 
     updateWidgetFavoritesData()
-    
-    Task { @MainActor in
-      if Self.isFirstLaunch {
-        // There is too much to load on the first tab load. Let's just setup the first tab
-        // Hopefully everything will be ready when the user puts in their first web page.
-        self.checkCrashRestorationOrSetupTabs()
-      }
-      
-      // Load cached data
-      // This is done first because compileResources and loadCachedRuleLists need their results
-      async let loadBundledResources: Void = await ContentBlockerManager.shared.loadBundledResources()
-      async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
-      async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
-      _ = await (loadBundledResources, filterListCache, adblockResourceCache)
 
-      // Compile some engines and load cached rule lists
-      async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
-      async let cachedRuleListLoad: Void = await ContentBlockerManager.shared.loadCachedRuleLists()
-      _ = await (compiledResourcesCompile, cachedRuleListLoad)
-      
-      if !Self.isFirstLaunch {
-        self.checkCrashRestorationOrSetupTabs()
-      }
-  
-      // Followed by some heavier but non essential operations
-      await ContentBlockerManager.shared.cleanupDeadRuleLists()
-      await ContentBlockerManager.shared.compilePendingResources()
-      FilterListResourceDownloader.shared.start(with: self.braveCore.adblockService)
-      await AdblockResourceDownloader.shared.startFetching()
-      ContentBlockerManager.shared.startTimer()
-      await AdBlockEngineManager.shared.startTimer()
-    }
-    
     // Eliminate the older usage days
     // Used in App Rating criteria
     AppReviewManager.shared.processMainCriteria(for: .daysInUse)
@@ -938,6 +906,7 @@ public class BrowserViewController: UIViewController {
       .store(in: &cancellables)
     
     syncPlaylistFolders()
+    checkCrashRestorationOrSetupTabs()
   }
 
   public static let defaultBrowserNotificationId = "defaultBrowserNotification"

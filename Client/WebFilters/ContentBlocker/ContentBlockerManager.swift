@@ -149,7 +149,7 @@ final public class ContentBlockerManager: Sendable {
   }
   
   
-  func cleanupDeadRuleLists() async {
+  public func cleanupDeadRuleLists() async {
     guard let identifiers = await ruleStore.availableIdentifiers() else { return }
     let enabledResources = await data.enabledResources
     
@@ -252,7 +252,7 @@ final public class ContentBlockerManager: Sendable {
   }
   
   /// Compile all the resources
-  func compilePendingResources() async {
+  public func compilePendingResources() async {
     let resources = await self.data.pendingResources
     
     await withTaskGroup(of: Void.self) { group in
@@ -276,7 +276,7 @@ final public class ContentBlockerManager: Sendable {
   }
   
   /// This method goes through all the resources and loads any available from the rule store so they are ready when displaying the page
-  func loadCachedRuleLists() async {
+  public func loadCachedRuleLists() async {
     await withTaskGroup(of: Void.self) { group in
       for (identifier, resource) in await data.pendingResources {
         group.addTask {

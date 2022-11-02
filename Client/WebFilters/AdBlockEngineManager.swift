@@ -26,7 +26,7 @@ public actor AdBlockEngineManager: Sendable {
       switch self {
       case .adBlock: return 0
       case .cosmeticFilters: return 3
-      case .filterList: return 7
+      case .filterList: return 100
       }
     }
   }
@@ -151,7 +151,7 @@ public actor AdBlockEngineManager: Sendable {
     #if DEBUG
     /// A method that logs info on the given resources
     fileprivate func debug(resources: [ResourceWithVersion]) {
-      let resourcesString = resources
+      let resourcesString = resources.sorted(by: { $0.order < $1.order })
         .map { resourceWithVersion -> String in
           let resource = resourceWithVersion.resource
           let type: String
@@ -265,7 +265,7 @@ public actor AdBlockEngineManager: Sendable {
   }
   
   /// Compile all resources
-  func compileResources() async {
+  public func compileResources() async {
     await data.compileTask?.cancel()
     await data.set(compileTask: nil)
     
