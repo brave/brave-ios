@@ -266,6 +266,30 @@ extension Strings {
         tableName: "BraveShared", bundle: .module,
         value: "Tab Received",
         comment: "Title for 'Tab Received' Callout, This is shown in the message when a Tab information is received from another sync device. ")
+    public static let p3aCalloutTitle =
+      NSLocalizedString(
+        "callout.p3aCalloutTitle",
+        tableName: "BraveShared", bundle: .module,
+        value: "Help make Brave better.",
+        comment: "Title for p3a (Privacy Preserving Analytics) Full Screen Callout")
+    public static let p3aCalloutDescription =
+      NSLocalizedString(
+        "callout.p3aCalloutDescription",
+        tableName: "BraveShared", bundle: .module,
+        value: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
+        comment: "Subtitle - Description for p3a (Privacy Preserving Analytics) Full Screen Callout")
+    public static let p3aCalloutToggleTitle =
+      NSLocalizedString(
+        "callout.p3aCalloutToggleTitle",
+        tableName: "BraveShared", bundle: .module,
+        value: "Share anonymous, private product insights. ",
+        comment: "Title for toggle for enabling p3a (Privacy Preserving Analytics) Full Screen Callout")
+    public static let p3aCalloutLinkTitle =
+      NSLocalizedString(
+        "callout.p3aCalloutLinkTitle",
+        tableName: "BraveShared", bundle: .module,
+        value: "Learn more about our Privacy Preserving Product Analytics (P3A).",
+        comment: "Title for the link that vaviagtes information about p3a (Privacy Preserving Analytics)")
   }
 }
 
@@ -4096,13 +4120,15 @@ extension Strings {
 // P3A
 extension Strings {
   public struct P3A {
-    public static let settingTitle = NSLocalizedString("p3a.settingTitle", tableName: "BraveShared", bundle: .module,
-                                                       value: "Allow Privacy-Preserving Product Analytics (P3A)",
-                                                       comment: "The title for the setting that will allow a user to toggle sending privacy preserving analytics to Brave. P3A is the name of a Brave Product")
+    public static let settingTitle = NSLocalizedString(
+      "p3a.settingTitle", tableName: "BraveShared", bundle: .module,
+      value: "Product Analytics",
+      comment: "The title for the setting that will allow a user to toggle sending privacy preserving analytics to Brave.")
     
-    public static let settingSubtitle = NSLocalizedString("p3a.settingSubtitle", tableName: "BraveShared", bundle: .module,
-                                                          value: "Anonymized P3A info helps Brave estimate overall usage and ensure we're improving popular features",
-                                                          comment: "A subtitle shown on the setting that toggles analytics on Brave. P3A is the name of a Brave Product")
+    public static let settingSubtitle = NSLocalizedString(
+      "p3a.settingSubtitle", tableName: "BraveShared", bundle: .module,
+      value: "Share anonymous, private product insights. This helps us learn what Brave features are used most often.",
+      comment: "A subtitle shown on the setting that toggles analytics on Brave.")
   }
 }
 

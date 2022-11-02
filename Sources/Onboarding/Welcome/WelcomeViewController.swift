@@ -359,11 +359,11 @@ public class WelcomeViewController: UIViewController {
     let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities)
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
-        title: "Help make Brave better.",
-        toggleTitle: "Share anonymous, private product insights.",
-        details: "This helps us learn what Brave features are used most often. Change this at any time in Brave Settings under ‘Brave Shields and Privacy’.",
-        linkDescription: "Learn more about our Privacy Preserving Product Analytics (P3A).",
-        primaryButtonTitle: "Done",
+        title: Strings.Callout.p3aCalloutTitle,
+        toggleTitle: Strings.Callout.p3aCalloutToggleTitle,
+        details: Strings.Callout.p3aCalloutDescription,
+        linkDescription: Strings.Callout.p3aCalloutLinkTitle,
+        primaryButtonTitle: Strings.done,
         toggleAction: { [weak self] isOn in
           self?.p3aUtilities.isP3AEnabled = isOn
         },

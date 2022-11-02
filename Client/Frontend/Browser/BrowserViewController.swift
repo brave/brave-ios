@@ -1113,22 +1113,22 @@ public class BrowserViewController: UIViewController {
   }
 
   override public func viewDidAppear(_ animated: Bool) {
-//    // Passcode Migration has highest priority, it should be presented over everything else
-//    presentPassCodeMigration()
-//
-//    // Present Onboarding to new users, existing users will not see the onboarding
-//    presentOnboardingIntro()
-//
-//    // Full Screen Callout Presentation
-//    // Priority: P3A - VPN - Default Browser - Rewards
-//    // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
-//    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+    // Passcode Migration has highest priority, it should be presented over everything else
+    presentPassCodeMigration()
+
+    // Present Onboarding to new users, existing users will not see the onboarding
+    presentOnboardingIntro()
+
+    // Full Screen Callout Presentation
+    // Priority: P3A - VPN - Default Browser - Rewards
+    // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
       self.presentP3AScreenCallout()
       self.presentVPNAlertCallout()
       self.presentDefaultBrowserScreenCallout()
       self.presentBraveRewardsScreenCallout()
       self.presentCookieNotificationBlockingCalloutIfNeeded()
-//    }
+    }
 
     screenshotHelper.viewIsVisible = true
     screenshotHelper.takePendingScreenshots(tabManager.allTabs)
