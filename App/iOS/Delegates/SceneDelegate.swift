@@ -104,30 +104,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     Task { @MainActor in
-      // Load cached data
-      // This is done first because compileResources and loadCachedRuleLists need their results
-      async let loadBundledResources: Void = await ContentBlockerManager.shared.loadBundledResources()
-      async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
-      async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
-      _ = await (loadBundledResources, filterListCache, adblockResourceCache)
-
-      // Compile some engines and load cached rule lists
-      async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
-      async let cachedRuleListLoad: Void = await ContentBlockerManager.shared.loadCachedRuleLists()
-      _ = await (compiledResourcesCompile, cachedRuleListLoad)
+      await LaunchHelper.shared.prepareAdBlockServices(
+        adBlockService: appDelegate.braveCore.adblockService
+      )
       
       self.present(
         browserViewController: browserViewController,
         windowScene: windowScene,
         connectionOptions: connectionOptions
       )
-      
-      await ContentBlockerManager.shared.cleanupDeadRuleLists()
-      await ContentBlockerManager.shared.compilePendingResources()
-      FilterListResourceDownloader.shared.start(with: appDelegate.braveCore.adblockService)
-      await AdblockResourceDownloader.shared.startFetching()
-      ContentBlockerManager.shared.startTimer()
-      await AdBlockEngineManager.shared.startTimer()
     }
         
     PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
