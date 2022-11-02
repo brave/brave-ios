@@ -17,7 +17,10 @@ struct SignatureRequestView: View {
   var onDismiss: () -> Void
 
   @State private var requestIndex: Int = 0
+  /// A map between request index and a boolean value indicates this request message needs pilcrow formating
   @State private var needPilcrowFormatted: [Int: Bool] = [0: false]
+  /// A map between request index and a boolean value indicates this request message is displayed as
+  /// its original content
   @State private var showOrignalMessage: [Int: Bool] = [0: true]
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.presentationMode) @Binding private var presentationMode
