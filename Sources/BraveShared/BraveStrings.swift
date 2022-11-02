@@ -289,7 +289,7 @@ extension Strings {
         "callout.p3aCalloutLinkTitle",
         tableName: "BraveShared", bundle: .module,
         value: "Learn more about our Privacy Preserving Product Analytics (P3A).",
-        comment: "Title for the link that vaviagtes information about p3a (Privacy Preserving Analytics)")
+        comment: "Title for the link that navigates to a webpage showing information about p3a (Privacy Preserving Analytics)")
   }
 }
 
