@@ -222,6 +222,7 @@ struct SignatureRequestView: View {
   @ViewBuilder private var buttons: some View {
     Button(action: { // cancel
       cryptoStore.handleWebpageRequestResponse(.signMessage(approved: false, id: currentRequest.id))
+      updateState()
       if requests.count == 1 {
         onDismiss()
       }
@@ -233,6 +234,7 @@ struct SignatureRequestView: View {
     .disabled(isButtonsDisabled)
     Button(action: { // approve
       cryptoStore.handleWebpageRequestResponse(.signMessage(approved: true, id: currentRequest.id))
+      updateState()
       if requests.count == 1 {
         onDismiss()
       }
@@ -242,6 +244,24 @@ struct SignatureRequestView: View {
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
     .disabled(isButtonsDisabled)
+  }
+  
+  private func updateState() {
+    var newShowOrignalMessage: [Int: Bool] = [:]
+    showOrignalMessage.forEach { key, value in
+      if key != 0 {
+        newShowOrignalMessage[key - 1] = value
+      }
+    }
+    showOrignalMessage = newShowOrignalMessage
+    
+    var newNeedPilcrowFormatted: [Int: Bool] = [:]
+    needPilcrowFormatted.forEach { key, value in
+      if key != 0 {
+        newNeedPilcrowFormatted[key - 1] = value
+      }
+    }
+    needPilcrowFormatted = newNeedPilcrowFormatted
   }
   
   private func next() {
