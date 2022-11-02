@@ -138,7 +138,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       return true
     }
 
-    BrowserViewController.isFirstLaunch = Preferences.General.isFirstLaunch.value
     migration = Migration(braveCore: braveCore)
 
     // TODO: Downgrade to 14.5 once api becomes available.

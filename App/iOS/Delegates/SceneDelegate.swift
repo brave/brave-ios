@@ -103,17 +103,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       $0.browserController = browserViewController
     }
     
-    Task { @MainActor in
-      await LaunchHelper.shared.prepareAdBlockServices(
-        adBlockService: appDelegate.braveCore.adblockService
-      )
-      
-      self.present(
-        browserViewController: browserViewController,
-        windowScene: windowScene,
-        connectionOptions: connectionOptions
-      )
-    }
+    self.present(
+      browserViewController: browserViewController,
+      windowScene: windowScene,
+      connectionOptions: connectionOptions
+    )
         
     PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     PrivacyReportsManager.consolidateData()
