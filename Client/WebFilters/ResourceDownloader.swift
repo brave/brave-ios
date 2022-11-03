@@ -20,26 +20,20 @@ actor ResourceDownloader: Sendable {
     case generalCosmeticFilters
     /// Resources for cosmetic filters
     case generalScriptletResources
-    /// Adblock rules for a filter list
-    case filterListAdBlockRules(uuid: String, componentId: String)
     /// iOS only content blocking behaviours used for the iOS content blocker for a given filter list
     case filterListContentBlockingBehaviors(uuid: String, componentId: String)
-    /// General external file
-    case dataFile(URL, cacheFolderName: String, cacheFileName: String)
     
     /// The folder name under which this data should be saved under
     var cacheFolderName: String {
       switch self {
       case .debounceRules:
         return "debounce-data"
-      case .filterListContentBlockingBehaviors(_, let componentId), .filterListAdBlockRules(_, let componentId):
+      case .filterListContentBlockingBehaviors(_, let componentId):
         return ["filter-lists", componentId].joined(separator: "/")
       case .genericFilterRules, .genericContentBlockingBehaviors:
         return "abp-data"
       case .generalCosmeticFilters, .generalScriptletResources:
         return "cmf-data"
-      case .dataFile(_, let cacheFolderName, _):
-        return cacheFolderName
       }
     }
     
@@ -53,8 +47,6 @@ actor ResourceDownloader: Sendable {
       switch self {
       case .debounceRules:
         return "ios-debouce.json"
-      case .filterListAdBlockRules(let uuid, _):
-        return "\(uuid)-latest.txt"
       case .filterListContentBlockingBehaviors(let uuid, _):
         return "\(uuid)-latest.json"
       case .genericFilterRules:
@@ -65,8 +57,6 @@ actor ResourceDownloader: Sendable {
         return "ios-cosmetic-filters.dat"
       case .generalScriptletResources:
         return "scriptlet-resources.json"
-      case .dataFile(_, _, let cacheFileName):
-        return cacheFileName
       }
     }
     
@@ -87,8 +77,6 @@ actor ResourceDownloader: Sendable {
         return Self.baseResourceURL.appendingPathComponent("/ios/debounce.json")
       case .filterListContentBlockingBehaviors(let uuid, _):
         return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.json")
-      case .filterListAdBlockRules(let uuid, _):
-        return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.txt")
       case .genericFilterRules:
         return Self.baseResourceURL.appendingPathComponent("/ios/latest.txt")
       case .genericContentBlockingBehaviors:
@@ -97,8 +85,6 @@ actor ResourceDownloader: Sendable {
         return Self.baseResourceURL.appendingPathComponent("/ios/ios-cosmetic-filters.dat")
       case .generalScriptletResources:
         return Self.baseResourceURL.appendingPathComponent("/ios/scriptlet-resources.json")
-      case .dataFile(let url, _, _):
-        return url
       }
     }
   }

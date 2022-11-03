@@ -189,7 +189,9 @@ public class FilterListResourceDownloader: ObservableObject {
               group.addTask {
                 guard let fileURL = ResourceDownloader.downloadedFileURL(for: resource) else { return }
                 let date = try? ResourceDownloader.creationDate(for: resource)
-                await self.handle(downloadedFileURL: fileURL, for: resource, componentId: settingInfo.componentId, date: date, index: settingInfo.index)
+                await self.handle(
+                  downloadedFileURL: fileURL, for: resource,
+                  componentId: settingInfo.componentId, date: date)
               }
             }
           }
@@ -388,7 +390,7 @@ public class FilterListResourceDownloader: ObservableObject {
     
     fetchTasks[resource] = Task { @MainActor in
       if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
-        await self.handle(downloadedFileURL: fileURL, for: resource, componentId: filterList.componentId, index: index)
+        await self.handle(downloadedFileURL: fileURL, for: resource, componentId: filterList.componentId)
       }
       
       try await withTaskCancellationHandler(operation: {
@@ -398,8 +400,7 @@ public class FilterListResourceDownloader: ObservableObject {
             await self.handle(
               downloadedFileURL: downloadResult.fileURL,
               for: resource, componentId: filterList.componentId,
-              date: downloadResult.date,
-              index: index
+              date: downloadResult.date
             )
           case .failure(let error):
             Logger.module.error("\(error.localizedDescription)")
@@ -418,7 +419,7 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   /// Handle resource downloads for the given filter list
-  private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, componentId: String, date: Date? = nil, index: Int) async {
+  private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, componentId: String, date: Date? = nil) async {
     guard await isEnabled(for: componentId) else {
       return
     }
@@ -432,21 +433,6 @@ public class FilterListResourceDownloader: ObservableObject {
         sourceType: .downloaded(version: version)
       ), for: .filterList(componentId: componentId))
       
-    case .filterListAdBlockRules:
-      // TODO: Compile rulelist to blocklist
-      // Make sure we remove the old resource if there is one
-      await AdBlockEngineManager.shared.removeResources(
-        for: .filterList(componentId: componentId),
-        resourceTypes: [.ruleList]
-      )
-      
-      // Add the new one back in
-      await AdBlockEngineManager.shared.add(
-        resource: AdBlockEngineManager.Resource(type: .ruleList, source: .filterList(componentId: componentId)),
-        fileURL: downloadedFileURL,
-        version: version,
-        relativeOrder: index
-      )
     default:
       assertionFailure("Should not be handling this resource")
     }
