@@ -136,7 +136,8 @@ public class AppReviewManager: ObservableObject {
     case .launchCount:
       return Preferences.Review.launchCount.value >= launchCountLimit
     case .daysInUse:
-      return Preferences.Review.daysInUse.value.count >= daysInUseRequiredPeriod
+      return AppConstants.buildChannel.isPublic ?
+        Preferences.Review.daysInUse.value.count >= daysInUseRequiredPeriod : true
     case .sessionCrash:
       return !(!Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug)
     }
