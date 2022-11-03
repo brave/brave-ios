@@ -11,6 +11,7 @@ import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
 import Onboarding
+import SafariServices
 
 // MARK: - Callouts
 
@@ -117,9 +118,9 @@ extension BrowserViewController {
       controller.onRewardsStatusChanged = { [weak self] status in
         self?.rewards.isEnabled = status
       }
+      
       present(controller, animated: true)
       isOnboardingOrFullScreenCalloutPresented = true
-
     }
   }
   
