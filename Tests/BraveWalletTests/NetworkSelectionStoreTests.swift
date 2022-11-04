@@ -60,7 +60,7 @@ import BraveShared
     return (keyringService, rpcService, walletService, swapService)
   }
   
-  func testUpdate() {
+  func testUpdateSelectMode() {
     Preferences.Wallet.showTestNetworks.value = false
 
     let (keyringService, rpcService, walletService, swapService) = setupServices()
@@ -99,7 +99,7 @@ import BraveShared
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
   }
   
-  func testUpdateTestNetworksEnabled() {
+  func testUpdateTestNetworksEnabledSelectMode() {
     Preferences.Wallet.showTestNetworks.value = true
     
     let (keyringService, rpcService, walletService, swapService) = setupServices()
@@ -128,6 +128,92 @@ import BraveShared
     store.update()
     
     let expectedPrimaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockSolana), subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
+      .init(network: .network(.mockMainnet), subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
+    ]
+    let expectedSecondaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
+    ]
+    XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
+    XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
+  }
+  
+  func testUpdateFilterMode() {
+    Preferences.Wallet.showTestNetworks.value = false
+
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    
+    let networkStore = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService
+    )
+    
+    // wait for all chains to populate in `NetworkStore`
+    let allChainsException = expectation(description: "networkStore-allChains")
+    networkStore.$allChains
+      .dropFirst()
+      .sink { allChains in
+        allChainsException.fulfill()
+      }
+      .store(in: &cancellables)
+    wait(for: [allChainsException], timeout: 1)
+    
+    let store = NetworkSelectionStore(
+      mode: .filter,
+      networkStore: networkStore
+    )
+    XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
+    XCTAssertTrue(store.secondaryNetworks.isEmpty, "Test setup failed, expected empty secondary networks")
+    
+    store.update()
+    
+    let expectedPrimaryNetworks: [NetworkPresentation] = [
+      .allNetworks,
+      .init(network: .network(.mockSolana), subNetworks: [], isPrimaryNetwork: true),
+      .init(network: .network(.mockMainnet), subNetworks: [], isPrimaryNetwork: true)
+    ]
+    let expectedSecondaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
+    ]
+    XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
+    XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
+  }
+  
+  func testUpdateTestNetworksEnabledFilterMode() {
+    Preferences.Wallet.showTestNetworks.value = true
+    
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    
+    let networkStore = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService
+    )
+    
+    // wait for all chains to populate in `NetworkStore`
+    let allChainsException = expectation(description: "networkStore-allChains")
+    networkStore.$allChains
+      .dropFirst()
+      .sink { allChains in
+        allChainsException.fulfill()
+      }
+      .store(in: &cancellables)
+    wait(for: [allChainsException], timeout: 1)
+    
+    let store = NetworkSelectionStore(
+      mode: .filter,
+      networkStore: networkStore
+    )
+    XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
+    XCTAssertTrue(store.secondaryNetworks.isEmpty, "Test setup failed, expected empty secondary networks")
+    
+    store.update()
+    
+    let expectedPrimaryNetworks: [NetworkPresentation] = [
+      .allNetworks,
       .init(network: .network(.mockSolana), subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
       .init(network: .network(.mockMainnet), subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
     ]
@@ -169,6 +255,44 @@ import BraveShared
     XCTAssertFalse(success, "Expected failure for selecting Solana because we have no Solana accounts.")
     XCTAssertTrue(store.isPresentingNextNetworkAlert, "Expected to set isPresentingNextNetworkAlert to true to show alert asking user to create Solana account")
     XCTAssertNil(store.detailNetwork, "Expected to reset detail network to nil to pop detail view")
+  }
+  
+  func testSelectNetworkFilterMode() async {
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    
+    let networkStore = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService
+    )
+    
+    let store = NetworkSelectionStore(
+      mode: .filter,
+      networkStore: networkStore
+    )
+    let success = await store.selectNetwork(.network(.mockMainnet))
+    XCTAssertTrue(success, "Expected success for selecting Ethereum Mainnet.")
+    XCTAssertEqual(networkStore.networkFilter, .network(.mockMainnet))
+  }
+  
+  func testSelectNetworkFilterModeAllNetworks() async {
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    
+    let networkStore = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService
+    )
+    
+    let store = NetworkSelectionStore(
+      mode: .filter,
+      networkStore: networkStore
+    )
+    let success = await store.selectNetwork(.allNetworks)
+    XCTAssertTrue(success, "Expected success for selecting All Networks.")
+    XCTAssertEqual(networkStore.networkFilter, .allNetworks)
   }
   
   func testAlertResponseCreateAccount() {
