@@ -92,7 +92,7 @@ struct NetworkSelectionView: View {
           if let detailNetwork = store.detailNetwork {
             NetworkSelectionDetailView(
               networks: detailNetwork.subNetworks,
-              selectedNetwork: networkStore.selectedChain,
+              selectedNetwork: selectedNetwork,
               selectedNetworkHandler: { network in
                 selectNetwork(.network(network))
               }
@@ -277,7 +277,7 @@ struct NetworkRowView_Previews: PreviewProvider {
 private struct NetworkSelectionDetailView: View {
   
   var networks: [BraveWallet.NetworkInfo]
-  var selectedNetwork: BraveWallet.NetworkInfo
+  var selectedNetwork: NetworkPresentation.Network
   var selectedNetworkHandler: (BraveWallet.NetworkInfo) -> Void
   
   var body: some View {
@@ -285,7 +285,7 @@ private struct NetworkSelectionDetailView: View {
       ForEach(networks) { network in
         Button(action: { selectedNetworkHandler(network) }) {
           NetworkSelectionDetailRow(
-            isSelected: selectedNetwork == network,
+            isSelected: isSelected(network),
             network: network
           )
           .contentShape(Rectangle())
@@ -297,6 +297,13 @@ private struct NetworkSelectionDetailView: View {
     .navigationTitle(networks.first?.shortChainName ?? Strings.Wallet.networkSelectionTitle)
     .navigationBarTitleDisplayMode(.inline)
   }
+  
+  private func isSelected(_ network: BraveWallet.NetworkInfo) -> Bool {
+    if case let .network(selectedNetwork) = self.selectedNetwork {
+      return network == selectedNetwork
+    }
+    return false
+  }
 }
 
 #if DEBUG
@@ -305,7 +312,7 @@ struct NetworkSelectionDetailView_Previews: PreviewProvider {
     NavigationView {
       NetworkSelectionDetailView(
         networks: [.mockMainnet, .mockGoerli, .mockSepolia],
-        selectedNetwork: .mockMainnet,
+        selectedNetwork: .network(.mockMainnet),
         selectedNetworkHandler: { _ in }
       )
     }
