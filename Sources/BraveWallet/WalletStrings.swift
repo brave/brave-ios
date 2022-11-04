@@ -3249,5 +3249,12 @@ extension Strings {
       value: "View original message",
       comment: "The title of the button that users can click to display the sign request message as its original content."
     )
+    public static let allNetworksTitle = NSLocalizedString(
+      "wallet.allNetworksTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "All Networks",
+      comment: "The title of the option to filter by all networks, displayed in a view to filter assets between 'All Networks' or a specific Crypto network."
+    )
   }
 }

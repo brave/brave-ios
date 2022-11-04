@@ -88,12 +88,12 @@ import BraveShared
     
     store.update()
     
-    let expectedPrimaryNetworks: [NetworkSelectionStore.NetworkPresentation] = [
-      .init(network: .mockSolana, subNetworks: [], isPrimaryNetwork: true),
-      .init(network: .mockMainnet, subNetworks: [], isPrimaryNetwork: true)
+    let expectedPrimaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockSolana), subNetworks: [], isPrimaryNetwork: true),
+      .init(network: .network(.mockMainnet), subNetworks: [], isPrimaryNetwork: true)
     ]
-    let expectedSecondaryNetworks: [NetworkSelectionStore.NetworkPresentation] = [
-      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
+    let expectedSecondaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
     ]
     XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
@@ -127,12 +127,12 @@ import BraveShared
     
     store.update()
     
-    let expectedPrimaryNetworks: [NetworkSelectionStore.NetworkPresentation] = [
-      .init(network: .mockSolana, subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
-      .init(network: .mockMainnet, subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
+    let expectedPrimaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockSolana), subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
+      .init(network: .network(.mockMainnet), subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
     ]
-    let expectedSecondaryNetworks: [NetworkSelectionStore.NetworkPresentation] = [
-      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
+    let expectedSecondaryNetworks: [NetworkPresentation] = [
+      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
     ]
     XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
@@ -149,7 +149,7 @@ import BraveShared
     )
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    let success = await store.selectNetwork(network: .mockGoerli)
+    let success = await store.selectNetwork(.network(.mockGoerli))
     XCTAssertTrue(success, "Expected success for selecting Ropsten because we have ethereum accounts.")
     XCTAssertNil(store.detailNetwork, "Expected to reset detail network to nil to pop detail view")
   }
@@ -165,7 +165,7 @@ import BraveShared
     )
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    let success = await store.selectNetwork(network: .mockSolana)
+    let success = await store.selectNetwork(.network(.mockSolana))
     XCTAssertFalse(success, "Expected failure for selecting Solana because we have no Solana accounts.")
     XCTAssertTrue(store.isPresentingNextNetworkAlert, "Expected to set isPresentingNextNetworkAlert to true to show alert asking user to create Solana account")
     XCTAssertNil(store.detailNetwork, "Expected to reset detail network to nil to pop detail view")
@@ -182,7 +182,7 @@ import BraveShared
     )
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    store.detailNetwork = .init(network: .mockSolana, subNetworks: [.mockSolana], isPrimaryNetwork: true)
+    store.detailNetwork = .init(network: .network(.mockSolana), subNetworks: [.mockSolana], isPrimaryNetwork: true)
     
     store.handleCreateAccountAlertResponse(shouldCreateAccount: true)
     
@@ -201,7 +201,7 @@ import BraveShared
     )
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    store.detailNetwork = .init(network: .mockSolana, subNetworks: [.mockSolana], isPrimaryNetwork: true)
+    store.detailNetwork = .init(network: .network(.mockSolana), subNetworks: [.mockSolana], isPrimaryNetwork: true)
     store.isPresentingNextNetworkAlert = true
     
     store.handleCreateAccountAlertResponse(shouldCreateAccount: false)
@@ -267,7 +267,7 @@ import BraveShared
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     
-    let success = await store.selectNetwork(network: .mockSolana)
+    let success = await store.selectNetwork(.network(.mockSolana))
     XCTAssertFalse(success, "Expected failure to select network due to no accounts")
     XCTAssertTrue(store.isPresentingNextNetworkAlert, "Expected to present next network alert")
     
