@@ -11,7 +11,6 @@ import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
 import Onboarding
-import SafariServices
 
 // MARK: - Callouts
 
