@@ -32,12 +32,16 @@ struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol 
     if firstLoad {
       // On a first load, we return the result so that they are available right away.
       // After that we wait only for changes while sleeping
-      self.firstLoad = false
-      let result = try await resourceDownloader.download(resource: resource)
-      
-      switch result {
-      case .downloaded(let url, let date), .notModified(let url, let date):
-        return .success(DownloadResult(date: date, fileURL: url))
+      do {
+        self.firstLoad = false
+        let result = try await resourceDownloader.download(resource: resource)
+        
+        switch result {
+        case .downloaded(let url, let date), .notModified(let url, let date):
+          return .success(DownloadResult(date: date, fileURL: url))
+        }
+      } catch {
+        return .failure(error)
       }
     }
     
