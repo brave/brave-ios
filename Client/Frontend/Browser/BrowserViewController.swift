@@ -1521,8 +1521,11 @@ public class BrowserViewController: UIViewController {
         return
       }
 
-      tab.loadRequest(URLRequest(url: url))
+      // BREAKPOINT
+      print("Breakpoint")
 
+      tab.loadRequest(URLRequest(url: url))
+          
       // Recording the last Visit Type for the url submitted
       lastEnteredURLVisitType = visitType
       updateWebViewPageZoom(tab: tab)
@@ -1565,6 +1568,9 @@ public class BrowserViewController: UIViewController {
 
     switch path {
     case .estimatedProgress:
+      // BREAKPOINT
+      print("Breakpoint")
+      
       guard tab === tabManager.selectedTab,
         // `WKWebView.estimatedProgress` is a `Double` type so it must be casted as such
         let progress = change?[.newKey] as? Double
@@ -1579,6 +1585,9 @@ public class BrowserViewController: UIViewController {
         topToolbar.locationView.loading = tab.loading
       }
     case .URL:
+      // BREAKPOINT
+      print("Breakpoint")
+      
       guard let tab = tabManager[webView] else { break }
 
       // Special case for "about:blank" popups, if the webView.url is nil, keep the tab url as "about:blank"
@@ -1768,11 +1777,34 @@ public class BrowserViewController: UIViewController {
     if !isExternal {
       popToBVC()
     }
-
-    if let tab = tabManager.getTabForURL(url) {
-      tabManager.selectTab(tab)
-    } else {
-      openURLInNewTab(url, isPrivate: isPrivate, isPrivileged: isPrivileged)
+//
+//    if let tab = tabManager.getTabForURL(url) {
+//      tabManager.selectTab(tab)
+//    } else {
+//      openURLInNewTab(url, isPrivate: isPrivate, isPrivileged: isPrivileged)
+//    }
+    
+    // BREAKPOINT
+    print("Breakpoint")
+    
+    if let fixupURL = URIFixup.getURL(url.absoluteString) {
+      // Do not allow users to enter URLs with the following schemes.
+      // Instead, submit them to the search engine like Chrome-iOS does.
+      if !["file"].contains(fixupURL.scheme) {
+        // BREAKPOINT
+        print("Breakpoint")
+        
+        // The user entered a URL, so use it.
+        openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: isPrivate)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+          // BREAKPOINT
+          print("Breakpoint")
+          self.finishEditingAndSubmit(fixupURL, visitType: .link)
+        }
+ 
+        return
+      }
     }
   }
   

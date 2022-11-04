@@ -406,7 +406,13 @@ class TabManager: NSObject {
   @discardableResult
   func addTabAndSelect(_ request: URLRequest! = nil, configuration: WKWebViewConfiguration! = nil, afterTab: Tab? = nil, isPrivate: Bool) -> Tab {
     let tab = addTab(request, configuration: configuration, afterTab: afterTab, isPrivate: isPrivate)
+    // BREAKPOINT
+    print("Breakpoint")
+    
     selectTab(tab)
+    
+    // BREAKPOINT
+    print("Breakpoint")
     return tab
   }
 
@@ -440,6 +446,9 @@ class TabManager: NSObject {
     let tab = Tab(configuration: configuration, type: type, tabGeneratorAPI: tabGeneratorAPI)
 
     configureTab(tab, request: request, afterTab: afterTab, flushToDisk: flushToDisk, zombie: zombie, id: id)
+    // BREAKPOINT
+    print("Breakpoint")
+    
     return tab
   }
 
@@ -475,7 +484,10 @@ class TabManager: NSObject {
 
   func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, id: String? = nil, isPopup: Bool = false) {
     assert(Thread.isMainThread)
-
+    
+    // BREAKPOINT
+    print("Breakpoint")
+    
     let isPrivate = tab.type == .private
     if isPrivate {
       // Creating random tab id for private mode, as we don't want to save to database.
@@ -519,6 +531,9 @@ class TabManager: NSObject {
       allTabs.insert(tab, at: insertIndex)
     }
 
+    // BREAKPOINT
+    print("Breakpoint")
+    
     delegates.forEach { $0.get()?.tabManager(self, didAddTab: tab) }
 
     if !zombie {
@@ -529,20 +544,27 @@ class TabManager: NSObject {
     if let request = request {
       tab.loadRequest(request)
     } else if !isPopup {
-      
+      // BREAKPOINT
+      print("Breakpoint")
       tab.loadRequest(PrivilegedRequest(url: ntpInteralURL) as URLRequest)
       tab.url = ntpInteralURL
     }
 
     // Ignore on restore.
     if flushToDisk && !zombie && !isPrivate {
-      saveTab(tab, saveOrder: true)
+      self.saveTab(tab, saveOrder: true)
     }
+      
+    // BREAKPOINT
+    print("Breakpoint")
     
     // When the state of the page changes, we debounce a call to save the screenshots and tab information
     // This fixes pages that have dynamic URL via changing history
     // as well as regular pages that load DOM normally.
     tab.onPageReadyStateChanged = { [weak tab] state in
+      // BREAKPOINT
+      print("Breakpoint")
+      
       guard let tab = tab else { return }
       tab.webStateDebounceTimer?.invalidate()
       tab.webStateDebounceTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self, weak tab] _ in
@@ -558,6 +580,7 @@ class TabManager: NSObject {
         }
       }
     }
+
   }
 
   func indexOfWebView(_ webView: WKWebView) -> UInt? {
