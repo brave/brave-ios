@@ -36,6 +36,8 @@ struct NetworkSelectionView: View {
       case let .network(network):
         return .network(network)
       }
+    case .formSelection:
+      return .networkSelection(store.networkSelectionInForm)
     }
   }
   
@@ -149,8 +151,14 @@ struct NetworkSelectionView: View {
   
   private func selectNetwork(_ presentation: NetworkPresentation.Network) {
     Task { @MainActor in
-      if await store.selectNetwork(presentation) {
+      if case .formSelection = store.mode {
+        guard case let .network(network) = presentation else { return }
+        store.networkSelectionInForm = network
         presentationMode.dismiss()
+      } else {
+        if await store.selectNetwork(presentation) {
+          presentationMode.dismiss()
+        }
       }
     }
   }
@@ -179,6 +187,9 @@ private struct NetworkRowView: View {
       return true
     } else if case .network(let selectedNetwork) = self.selectedNetwork {
       return presentation.subNetworks.contains(selectedNetwork)
+    } else if case .networkSelection(let networkInfo) = selectedNetwork {
+      guard case .network(let presentationNetwork) = presentation.network else { return false}
+      return networkInfo == presentationNetwork
     }
     return false
   }
@@ -199,6 +210,11 @@ private struct NetworkRowView: View {
       return Strings.Wallet.allNetworksTitle
     case let .network(network):
       return showShortChainName ? network.shortChainName : network.chainName
+    case let .networkSelection(network):
+      if let network = network {
+        return showShortChainName ? network.shortChainName : network.chainName
+      }
+      return ""
     }
   }
 

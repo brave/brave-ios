@@ -1450,6 +1450,20 @@ extension Strings {
       value: "Unknown",
       comment: "A transaction status that the app currently does not support displaying"
     )
+    public static let customTokenNetworkHeader = NSLocalizedString(
+      "wallet.customTokenNetworkHeader",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Select network",
+      comment: "A title that will be displayed on top of the text field for users to choose a network they are willing to add the custom asset in."
+    )
+    public static let customTokenNetworkButtonTitle = NSLocalizedString(
+      "wallet.customTokenNetworkButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Select network",
+      comment: "A title for the btton that users can click to choose the network they are willing to add custom asset in."
+    )
     public static let customTokenTitle = NSLocalizedString(
       "wallet.customTokenTitle",
       tableName: "BraveWallet",
@@ -1464,26 +1478,12 @@ extension Strings {
       value: "Token name",
       comment: "A title that will be displayed on top of the text field for users to input the custom token name"
     )
-    public static let enterTokenName = NSLocalizedString(
-      "wallet.enterTokenName",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enter token name",
-      comment: "A placeholder for the text field that users will input the custom token name"
-    )
     public static let tokenContractAddress = NSLocalizedString(
       "wallet.tokenContractAddress",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Token contract address",
       comment: "A title that will be displayed on top of the text field for users to input the custom token contract address"
-    )
-    public static let enterContractAddress = NSLocalizedString(
-      "wallet.enterContractAddress",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enter contract address",
-      comment: "A placeholder for the text field that users will input the custom token contract address"
     )
     public static let tokenSymbol = NSLocalizedString(
       "wallet.tokenSymbol",
@@ -1492,19 +1492,33 @@ extension Strings {
       value: "Token symbol",
       comment: "A title that will be displayed on top of the text field for users to input the custom token symbol"
     )
-    public static let enterTokenSymbol = NSLocalizedString(
-      "wallet.enterTokenSymbol",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enter token symbol",
-      comment: "A placeholder for the text field that users will input the custom token symbol"
-    )
     public static let decimalsPrecision = NSLocalizedString(
       "wallet.decimalsPrecision",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Decimals of precision",
       comment: "A title that will be displayed on top of the text field for users to input the custom token's decimals of precision"
+    )
+    public static let addCustomTokenAdvanced = NSLocalizedString(
+      "wallet.addCustomTokenAdvanced",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Advanced",
+      comment: "A title of an initally hidden section in Add custom asset screen for users to input icon url and coingecko id."
+    )
+    public static let addCustomTokenIconURL = NSLocalizedString(
+      "wallet.addCustomTokenIconURL",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Icon URL",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token's icon URL."
+    )
+    public static let addCustomTokenCoingeckoId = NSLocalizedString(
+      "wallet.addCustomTokenCoingeckoId",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Coingecko ID",
+      comment: "A title that will be displayed on top of the text field for users to input the custom token's coingecko id."
     )
     public static let addCustomTokenErrorTitle = NSLocalizedString(
       "wallet.addCustomTokenErrorTitle",

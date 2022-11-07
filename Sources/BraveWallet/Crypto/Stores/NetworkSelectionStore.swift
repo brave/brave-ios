@@ -11,12 +11,14 @@ struct NetworkPresentation: Equatable, Hashable, Identifiable {
   enum Network: Equatable, Hashable {
     case allNetworks
     case network(BraveWallet.NetworkInfo)
+    case networkSelection(BraveWallet.NetworkInfo?)
   }
   
   var id: String {
     switch network {
     case .allNetworks: return "allNetworks"
     case let .network(network): return network.id
+    case let .networkSelection(network): return network?.id ?? "empty"
     }
   }
   let network: Network
@@ -45,6 +47,7 @@ class NetworkSelectionStore: ObservableObject {
   enum Mode: Equatable {
     case select
     case filter
+    case formSelection
     
     var isSelectMode: Bool { self == .select }
     var isFilterMode: Bool { self == .filter }
@@ -64,6 +67,8 @@ class NetworkSelectionStore: ObservableObject {
   @Published var nextNetwork: BraveWallet.NetworkInfo?
   /// If we are prompting the user to create a new account for the `nextNetwork.coin` type
   @Published var isPresentingAddAccount: Bool = false
+  /// The network the user wishes to choose for adding a custom asset
+  @Published var networkSelectionInForm: BraveWallet.NetworkInfo?
   
   init(
     mode: Mode = .select,
@@ -143,8 +148,12 @@ class NetworkSelectionStore: ObservableObject {
         networkStore.networkFilter = .allNetworks
       case let .network(network):
         networkStore.networkFilter = .network(network)
+      default:
+        return false
       }
       return true
+    case .formSelection:
+      return false
     }
   }
   
