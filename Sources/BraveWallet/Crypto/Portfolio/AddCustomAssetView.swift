@@ -62,6 +62,8 @@ struct AddCustomAssetView: View {
         ) {
           HStack {
             TextField("", text: $nameInput)
+              .autocapitalization(.none)
+              .autocorrectionDisabled()
               .disabled(userAssetStore.isSearchingToken)
             if userAssetStore.isSearchingToken && nameInput.isEmpty {
               ProgressView()
@@ -90,6 +92,8 @@ struct AddCustomAssetView: View {
                 }
               }
             }
+            .autocapitalization(.none)
+            .autocorrectionDisabled()
             .disabled(userAssetStore.isSearchingToken)
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
@@ -98,6 +102,8 @@ struct AddCustomAssetView: View {
         ) {
           HStack {
             TextField("", text: $symbolInput)
+              .autocapitalization(.none)
+              .autocorrectionDisabled()
               .disabled(userAssetStore.isSearchingToken)
             if userAssetStore.isSearchingToken && symbolInput.isEmpty {
               ProgressView()
@@ -155,6 +161,8 @@ struct AddCustomAssetView: View {
           ) {
             HStack {
               TextField("", text: $logo)
+                .autocapitalization(.none)
+                .autocorrectionDisabled()
                 .disabled(userAssetStore.isSearchingToken)
               if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
                 ProgressView()
@@ -167,6 +175,8 @@ struct AddCustomAssetView: View {
           ) {
             HStack {
               TextField("", text: $coingeckoId)
+                .autocapitalization(.none)
+                .autocorrectionDisabled()
                 .disabled(userAssetStore.isSearchingToken)
               if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
                 ProgressView()
