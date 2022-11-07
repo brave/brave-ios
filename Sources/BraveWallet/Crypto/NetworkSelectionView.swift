@@ -39,6 +39,13 @@ struct NetworkSelectionView: View {
     }
   }
   
+  private var navigationTitle: String {
+    switch store.mode {
+    case .select: return Strings.Wallet.networkSelectionTitle
+    case .filter: return Strings.Wallet.networkFilterTitle
+    }
+  }
+  
   var body: some View {
     List {
       Section {
@@ -69,7 +76,7 @@ struct NetworkSelectionView: View {
     }
     .listStyle(.insetGrouped)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .navigationTitle(Strings.Wallet.networkSelectionTitle)
+    .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .cancellationAction) {
@@ -93,6 +100,7 @@ struct NetworkSelectionView: View {
             NetworkSelectionDetailView(
               networks: detailNetwork.subNetworks,
               selectedNetwork: selectedNetwork,
+              navigationTitle: navigationTitle,
               selectedNetworkHandler: { network in
                 selectNetwork(.network(network))
               }
@@ -278,6 +286,7 @@ private struct NetworkSelectionDetailView: View {
   
   var networks: [BraveWallet.NetworkInfo]
   var selectedNetwork: NetworkPresentation.Network
+  let navigationTitle: String
   var selectedNetworkHandler: (BraveWallet.NetworkInfo) -> Void
   
   var body: some View {
@@ -294,7 +303,7 @@ private struct NetworkSelectionDetailView: View {
     }
     .listStyle(.insetGrouped)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .navigationTitle(networks.first?.shortChainName ?? Strings.Wallet.networkSelectionTitle)
+    .navigationTitle(networks.first?.shortChainName ?? navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
   }
   
@@ -313,6 +322,7 @@ struct NetworkSelectionDetailView_Previews: PreviewProvider {
       NetworkSelectionDetailView(
         networks: [.mockMainnet, .mockGoerli, .mockSepolia],
         selectedNetwork: .network(.mockMainnet),
+        navigationTitle: Strings.Wallet.networkFilterTitle,
         selectedNetworkHandler: { _ in }
       )
     }
