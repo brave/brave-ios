@@ -3527,7 +3527,7 @@
 "vpn.settingsLinkReceipt" = "Satın alımı Brave hesabınıza bağlayın";
 
 /* Footer text to link your VPN receipt to other devices. */
-"vpn.settingsLinkReceiptFooter" = "Brave VPN'i ve diğer cihazları kullanmak için App Store satın alımınızı Brave hesabınıza bağlayın";
+"vpn.settingsLinkReceiptFooter" = "Brave VPN'i ve diğer cihazlarda kullanmak için App Store satın alımınızı Brave hesabınıza bağlayın";
 
 /* Button to manage your VPN subscription */
 "vpn.settingsManageSubscription" = "Aboneliği Yönet";
