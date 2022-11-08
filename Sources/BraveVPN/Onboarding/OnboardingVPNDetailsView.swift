@@ -11,10 +11,10 @@ import BraveShared
 public struct OnboardingVPNDetailsView: View {
   public var learnMore: (() -> Void)?
   
-  let descriptionItems = ["Blocks unwanted network connections",
-                          "Secures all connections",
-                          "Supports speeds up to 100 Mbps",
-                          "24/7 support"]
+  private let descriptionItems = [Strings.VPN.checkboxBlockAds,
+                          Strings.VPN.popupCheckmarkSecureConnections,
+                          Strings.VPN.checkboxFast,
+                          Strings.VPN.popupCheckmark247Support]
 
   public init() {}
 
@@ -24,12 +24,12 @@ public struct OnboardingVPNDetailsView: View {
         Image("vpn_popup_shield", bundle: .module)
           .padding(.bottom)
           .accessibilityHidden(true)
-        Text("Brave Firewall + VPN")
+        Text(Strings.VPN.vpnName)
           .font(.title.weight(.heavy))
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.center)
         HStack(spacing: 8) {
-          Text("Powered by")
+          Text(Strings.VPN.poweredBy)
             .font(.footnote)
             .foregroundColor(Color(.bravePrimary))
             .multilineTextAlignment(.center)
@@ -59,7 +59,7 @@ public struct OnboardingVPNDetailsView: View {
       Button(action: {
         learnMore?()
       }) {
-        Text("Learn More")
+        Text(Strings.learnMore)
           .font(.title3.weight(.medium))
           .padding(EdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24))
       }
