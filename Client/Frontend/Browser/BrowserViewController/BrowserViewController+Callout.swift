@@ -11,6 +11,7 @@ import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
 import Onboarding
+import SafariServices
 
 // MARK: - Callouts
 
@@ -53,7 +54,10 @@ extension BrowserViewController {
           self?.braveCore.p3aUtils.isP3AEnabled = isOn
         },
         linkAction: { url in
-//          onboardingP3ACalloutController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+          let p3aLearnMoreController = SFSafariViewController(url: BraveUX.braveP3ALearnMoreURL, configuration: .init())
+          p3aLearnMoreController.modalPresentationStyle = .currentContext
+          
+          onboardingP3ACalloutController.present(p3aLearnMoreController, animated: true)
         },
         primaryButtonAction: { [weak self] in
           Preferences.Onboarding.p3aOnboardingShown.value = true

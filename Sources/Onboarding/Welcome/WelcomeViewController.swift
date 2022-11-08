@@ -10,6 +10,7 @@ import BraveShared
 import Shared
 import BraveCore
 import BraveUI
+import SafariServices
 
 private enum WelcomeViewID: Int {
   case background = 1
@@ -368,7 +369,10 @@ public class WelcomeViewController: UIViewController {
           self?.p3aUtilities.isP3AEnabled = isOn
         },
         linkAction: { url in
-//          nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+          let p3aLearnMoreController = SFSafariViewController(url: BraveUX.braveP3ALearnMoreURL, configuration: .init())
+          p3aLearnMoreController.modalPresentationStyle = .currentContext
+          
+          nextController.present(p3aLearnMoreController, animated: true)
         },
         
         primaryButtonAction: { [weak self] in
