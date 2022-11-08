@@ -35,7 +35,7 @@ public struct OnboardingVPNDetailsView: View {
             .multilineTextAlignment(.center)
           Image(sharedName: "vpn_brand")
             .renderingMode(.template)
-            .foregroundColor(.black)
+            .foregroundColor(Color(.bravePrimary))
         }
         .padding(.vertical, 12)
       }
