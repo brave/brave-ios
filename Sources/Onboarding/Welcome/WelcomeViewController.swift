@@ -368,7 +368,7 @@ public class WelcomeViewController: UIViewController {
           self?.p3aUtilities.isP3AEnabled = isOn
         },
         linkAction: { url in
-          nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+//          nextController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
         },
         
         primaryButtonAction: { [weak self] in

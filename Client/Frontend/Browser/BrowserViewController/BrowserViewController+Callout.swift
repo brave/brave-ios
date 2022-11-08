@@ -53,7 +53,7 @@ extension BrowserViewController {
           self?.braveCore.p3aUtils.isP3AEnabled = isOn
         },
         linkAction: { url in
-          onboardingP3ACalloutController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
+//          onboardingP3ACalloutController.present(OnboardingWebViewController(url: .p3aDescription), animated: true, completion: nil)
         },
         primaryButtonAction: { [weak self] in
           Preferences.Onboarding.p3aOnboardingShown.value = true

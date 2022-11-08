@@ -352,6 +352,7 @@ let package = Package(
         "BraveCore",
         "Fuzi",
         "Storage",
+        "Growth",
         .product(name: "Lottie", package: "lottie-ios")
       ],
       resources: [
