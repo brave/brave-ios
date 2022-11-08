@@ -48,11 +48,11 @@ extension BrowserViewController {
       FullScreenCalloutManager.FullScreenCalloutType.vpn.preferenceValue.value = false
       return
     }
-    
+
     var vpnDetailsView = OnboardingVPNDetailsView()
     vpnDetailsView.learnMore = { [weak self] in
       guard let self = self else { return }
-      
+    
       self.dismiss(animated: false) {
         self.presentCorrespondingVPNViewController()
       }

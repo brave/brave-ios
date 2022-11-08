@@ -33,7 +33,7 @@ public struct OnboardingVPNDetailsView: View {
             .font(.footnote)
             .foregroundColor(Color(.bravePrimary))
             .multilineTextAlignment(.center)
-          Image("vpn_brand", bundle: .module)
+          Image(sharedName: "vpn_brand")
             .renderingMode(.template)
             .foregroundColor(.black)
         }
@@ -43,7 +43,7 @@ public struct OnboardingVPNDetailsView: View {
       VStack(alignment: .leading, spacing: 8) {
         ForEach(descriptionItems, id: \.self) { itemDescription in
           HStack(spacing: 8) {
-            Image("vpn_checkmark_popup", bundle: .module)
+            Image(sharedName: "vpn_checkmark_popup")
               .renderingMode(.template)
               .foregroundColor(.black)
               .frame(alignment: .leading)
