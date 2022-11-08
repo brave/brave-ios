@@ -112,25 +112,31 @@ public class UserAssetsStore: ObservableObject {
     coingeckoId: String,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    let token = BraveWallet.BlockchainToken(
-      contractAddress: address,
-      name: name,
-      logo: logo,
-      isErc20: network.coin == .eth,
-      isErc721: false,
-      symbol: symbol,
-      decimals: Int32(decimals),
-      visible: true,
-      tokenId: "",
-      coingeckoId: coingeckoId,
-      chainId: network.chainId,
-      coin: network.coin
-    )
-    self.walletService.addUserAsset(token) { success in
-      if success {
-        self.updateSelectedAssets(network)
+    walletService.selectedCoin { [weak self] coinType in
+      guard let self = self else { return }
+      
+      self.rpcService.network(coinType) { currentNetwork in
+        let token = BraveWallet.BlockchainToken(
+          contractAddress: address,
+          name: name,
+          logo: logo,
+          isErc20: network.coin == .eth,
+          isErc721: false,
+          symbol: symbol,
+          decimals: Int32(decimals),
+          visible: true,
+          tokenId: "",
+          coingeckoId: coingeckoId,
+          chainId: network.chainId,
+          coin: network.coin
+        )
+        self.walletService.addUserAsset(token) { success in
+          if success, network == currentNetwork {
+            self.updateSelectedAssets(network)
+          }
+          completion(success)
+        }
       }
-      completion(success)
     }
   }
 

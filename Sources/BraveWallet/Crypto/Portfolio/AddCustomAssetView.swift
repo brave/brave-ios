@@ -48,12 +48,12 @@ struct AddCustomAssetView: View {
               isPresentingNetworkSelection = true
             }) {
               Text(networkSelectionStore.networkSelectionInForm?.chainName ?? Strings.Wallet.customTokenNetworkButtonTitle)
-                .foregroundColor(networkSelectionStore.networkSelectionInForm == nil ? .secondary : Color(.braveLabel))
+                .foregroundColor(networkSelectionStore.networkSelectionInForm == nil ? .gray.opacity(0.6) : Color(.braveLabel))
             }
             .disabled(userAssetStore.isSearchingToken)
             Spacer()
             Image(systemName: "chevron.down.circle")
-              .foregroundColor(.gray)
+              .foregroundColor(Color(.braveBlurple))
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
@@ -61,7 +61,7 @@ struct AddCustomAssetView: View {
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenName))
         ) {
           HStack {
-            TextField("", text: $nameInput)
+            TextField(Strings.Wallet.enterTokenName, text: $nameInput)
               .autocapitalization(.none)
               .autocorrectionDisabled()
               .disabled(userAssetStore.isSearchingToken)
@@ -74,7 +74,7 @@ struct AddCustomAssetView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenContractAddress))
         ) {
-          TextField("", text: $addressInput)
+          TextField(Strings.Wallet.enterContractAddress, text: $addressInput)
             .onChange(of: addressInput) { newValue in
               if !newValue.isEmpty, newValue.isETHAddress {
                 userAssetStore.tokenInfo(by: newValue) { token in
@@ -101,7 +101,7 @@ struct AddCustomAssetView: View {
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenSymbol))
         ) {
           HStack {
-            TextField("", text: $symbolInput)
+            TextField(Strings.Wallet.enterTokenSymbol, text: $symbolInput)
               .autocapitalization(.none)
               .autocorrectionDisabled()
               .disabled(userAssetStore.isSearchingToken)
@@ -115,7 +115,7 @@ struct AddCustomAssetView: View {
           header: WalletListHeaderView(title: Text(Strings.Wallet.decimalsPrecision))
         ) {
           HStack {
-            TextField("", text: $decimalsInput)
+            TextField(NumberFormatter().string(from: NSNumber(value: 0)) ?? "0", text: $decimalsInput)
               .keyboardType(.numberPad)
               .disabled(userAssetStore.isSearchingToken)
             if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
@@ -160,7 +160,7 @@ struct AddCustomAssetView: View {
             header: WalletListHeaderView(title: Text(Strings.Wallet.addCustomTokenIconURL))
           ) {
             HStack {
-              TextField("", text: $logo)
+              TextField(Strings.Wallet.enterTokenIconURL, text: $logo)
                 .autocapitalization(.none)
                 .autocorrectionDisabled()
                 .disabled(userAssetStore.isSearchingToken)
@@ -174,7 +174,7 @@ struct AddCustomAssetView: View {
             header: WalletListHeaderView(title: Text(Strings.Wallet.addCustomTokenCoingeckoId))
           ) {
             HStack {
-              TextField("", text: $coingeckoId)
+              TextField(Strings.Wallet.enterTokenCoingeckoId, text: $coingeckoId)
                 .autocapitalization(.none)
                 .autocorrectionDisabled()
                 .disabled(userAssetStore.isSearchingToken)

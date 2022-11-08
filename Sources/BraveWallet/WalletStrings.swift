@@ -1478,6 +1478,13 @@ extension Strings {
       value: "Token name",
       comment: "A title that will be displayed on top of the text field for users to input the custom token name"
     )
+    public static let enterTokenName = NSLocalizedString(
+      "wallet.enterTokenName",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter token name",
+      comment: "A placeholder for the text field that users will input the custom token name"
+    )
     public static let tokenContractAddress = NSLocalizedString(
       "wallet.tokenContractAddress",
       tableName: "BraveWallet",
@@ -1485,12 +1492,26 @@ extension Strings {
       value: "Token contract address",
       comment: "A title that will be displayed on top of the text field for users to input the custom token contract address"
     )
+    public static let enterContractAddress = NSLocalizedString(
+      "wallet.enterContractAddress",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter contract address",
+      comment: "A placeholder for the text field that users will input the custom token contract address"
+    )
     public static let tokenSymbol = NSLocalizedString(
       "wallet.tokenSymbol",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Token symbol",
       comment: "A title that will be displayed on top of the text field for users to input the custom token symbol"
+    )
+    public static let enterTokenSymbol = NSLocalizedString(
+      "wallet.enterTokenSymbol",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter token symbol",
+      comment: "A placeholder for the text field that users will input the custom token symbol"
     )
     public static let decimalsPrecision = NSLocalizedString(
       "wallet.decimalsPrecision",
@@ -1513,12 +1534,26 @@ extension Strings {
       value: "Icon URL",
       comment: "A title that will be displayed on top of the text field for users to input the custom token's icon URL."
     )
+    public static let enterTokenIconURL = NSLocalizedString(
+      "wallet.enterTokenIconURL",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter token icon URL",
+      comment: "A placeholder for the text field that users will input the custom token icon URL"
+    )
     public static let addCustomTokenCoingeckoId = NSLocalizedString(
       "wallet.addCustomTokenCoingeckoId",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Coingecko ID",
-      comment: "A title that will be displayed on top of the text field for users to input the custom token's coingecko id."
+      comment: "A title that will be displayed on top of the text field for users to input the custom token's coingecko ID."
+    )
+    public static let enterTokenCoingeckoId = NSLocalizedString(
+      "wallet.enterTokenCoingeckoId",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter token Coingecko ID",
+      comment: "A placeholder for the text field that users will input the custom token Coingecko ID."
     )
     public static let addCustomTokenErrorTitle = NSLocalizedString(
       "wallet.addCustomTokenErrorTitle",
