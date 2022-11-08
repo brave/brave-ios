@@ -45,7 +45,7 @@ public struct OnboardingVPNDetailsView: View {
           HStack(spacing: 8) {
             Image(sharedName: "vpn_checkmark_popup")
               .renderingMode(.template)
-              .foregroundColor(.black)
+              .foregroundColor(Color(.bravePrimary))
               .frame(alignment: .leading)
             Text(itemDescription)
               .multilineTextAlignment(.leading)
