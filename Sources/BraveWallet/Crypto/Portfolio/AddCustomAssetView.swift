@@ -93,7 +93,6 @@ struct AddCustomAssetView: View {
               Text(networkSelectionStore.networkSelectionInForm?.chainName ?? Strings.Wallet.customTokenNetworkButtonTitle)
                 .foregroundColor(networkSelectionStore.networkSelectionInForm == nil ? .gray.opacity(0.6) : Color(.braveLabel))
             }
-            .disabled(userAssetStore.isSearchingToken)
             Spacer()
             Image(systemName: "chevron.down.circle")
               .foregroundColor(Color(.braveBlurple))
@@ -210,10 +209,6 @@ struct AddCustomAssetView: View {
                 TextField(Strings.Wallet.enterTokenIconURL, text: $logo)
                   .autocapitalization(.none)
                   .autocorrectionDisabled()
-                  .disabled(userAssetStore.isSearchingToken)
-                if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
-                  ProgressView()
-                }
               }
               .listRowBackground(Color(.secondaryBraveGroupedBackground))
             }
@@ -224,10 +219,6 @@ struct AddCustomAssetView: View {
                 TextField(Strings.Wallet.enterTokenCoingeckoId, text: $coingeckoId)
                   .autocapitalization(.none)
                   .autocorrectionDisabled()
-                  .disabled(userAssetStore.isSearchingToken)
-                if userAssetStore.isSearchingToken && decimalsInput.isEmpty {
-                  ProgressView()
-                }
               }
               .listRowBackground(Color(.secondaryBraveGroupedBackground))
             }
@@ -240,10 +231,6 @@ struct AddCustomAssetView: View {
               HStack {
                 TextField(Strings.Wallet.enterTokenId, text: $tokenId)
                   .keyboardType(.numberPad)
-                  .disabled(userAssetStore.isSearchingToken)
-                if userAssetStore.isSearchingToken && nameInput.isEmpty {
-                  ProgressView()
-                }
               }
               .listRowBackground(Color(.secondaryBraveGroupedBackground))
             }
