@@ -28,5 +28,6 @@ extension Preferences {
       static let vpnHostDisplayName = Option<String?>(key: "vpn.host-location", default: nil)
       public static let skusCredential = Option<String?>(key: "skus.credential", default: nil)
       public static let skusCredentialDomain = Option<String?>(key: "skus.credential-domain", default: nil)
+      public static let skusCredentialExpirationDate = Option<Date?>(key: "skus.credential-expiration", default: nil)
     }
 }

@@ -78,7 +78,7 @@ class BraveSkusScriptHandler: TabContentScript {
       }
     case Method.prepareCredentialsPresentation.rawValue:
       if let domain = data["domain"] as? String, let path = data["path"] as? String {
-        handlePrepareCredentialsSummary(for: domain, path: path, replyHandler: replyHandler)
+        handlePrepareCredentialsPresentation(for: domain, path: path, replyHandler: replyHandler)
       }
     case Method.credentialsSummary.rawValue:
       if let domain = data["domain"] as? String {
@@ -112,15 +112,16 @@ class BraveSkusScriptHandler: TabContentScript {
   
   /// If no reply handler is passed, this function will not send the callback back to the website.
   /// Reason is this method may be called from within another web handler, and the callback can be called only once or it crashes.
-  private func handlePrepareCredentialsSummary(for domain: String, path: String, replyHandler: ReplyHandler?) {
+  private func handlePrepareCredentialsPresentation(for domain: String, path: String, replyHandler: ReplyHandler?) {
     Logger.module.debug("skus prepareCredentialsPresentation")
     sku?.prepareCredentialsPresentation(domain, path: path) { credential in
       if !credential.isEmpty {
         if let vpnCredential = BraveSkusWebHelper.fetchVPNCredential(credential, domain: domain) {
           Preferences.VPN.skusCredential.value = credential
           Preferences.VPN.skusCredentialDomain.value = domain
+          Preferences.VPN.skusCredentialExpirationDate.value = vpnCredential.expirationDate
           
-          BraveVPN.setCustomVPNCredential(vpnCredential.credential, environment: vpnCredential.environment)
+          BraveVPN.setCustomVPNCredential(vpnCredential)
         }
       } else {
         Logger.module.debug("skus empty credential from prepareCredentialsPresentation call")
@@ -147,7 +148,7 @@ class BraveSkusScriptHandler: TabContentScript {
           assertionFailure("Failed to parse date")
         }
         
-        self?.handlePrepareCredentialsSummary(for: domain, path: "*", replyHandler: nil)
+        self?.handlePrepareCredentialsPresentation(for: domain, path: "*", replyHandler: nil)
       } catch {
         Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
       }
