@@ -40,7 +40,6 @@ struct TPPageStats {
 
 class TPStatsBlocklistChecker {
   static let shared = TPStatsBlocklistChecker()
-  private let adblockSerialQueue = AdBlockStats.adblockSerialQueue
   
   enum BlockedType {
     case image
@@ -59,14 +58,10 @@ class TPStatsBlocklistChecker {
       callback(.image)
     }
 
-    adblockSerialQueue.async {
+    Task { @MainActor in
       if (loadedRuleTypes.contains(.general(.blockAds)) || loadedRuleTypes.contains(.general(.blockTrackers)))
           && AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) {
-        DispatchQueue.main.async {
-          callback(.ad)
-        }
-        
-        return
+        callback(.ad)
       }
 
       // TODO: Downgrade to 14.5 once api becomes available.
@@ -81,9 +76,7 @@ class TPStatsBlocklistChecker {
           }
         }
       } else {
-        DispatchQueue.main.async {
-          callback(nil)
-        }
+        callback(nil)
       }
     }
   }

@@ -74,12 +74,12 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
       guard let domainURLString = domain.url else { return }
       
-      AdBlockStats.shared.shouldBlock(
-        requestURL: requestURL,
-        sourceURL: sourceURL,
-        resourceType: dto.data.resourceType
-      ) { [weak self] shouldBlock in
-        assertIsMainThread("Result should happen on the main thread")
+      Task { @MainActor in
+        let shouldBlock = AdBlockStats.shared.shouldBlock(
+          requestURL: requestURL,
+          sourceURL: sourceURL,
+          resourceType: dto.data.resourceType
+        )
         
         if shouldBlock, Preferences.PrivacyReports.captureShieldsData.value,
            let domainURL = URL(string: domainURLString),
@@ -87,12 +87,12 @@ class RequestBlockingContentScriptHandler: TabContentScript {
            !PrivateBrowsingManager.shared.isPrivateBrowsing {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, domainURL, Date()))
         }
-
-        if shouldBlock && !(self?.blockedRequests.contains(requestURL) ?? true) {
+        
+        if shouldBlock && !(self.blockedRequests.contains(requestURL)) {
           BraveGlobalShieldStats.shared.adblock += 1
           let stats = tab.contentBlocker.stats
           tab.contentBlocker.stats = stats.adding(adCount: 1)
-          self?.blockedRequests.insert(requestURL)
+          self.blockedRequests.insert(requestURL)
         }
         
         replyHandler(shouldBlock, nil)

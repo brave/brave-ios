@@ -155,31 +155,16 @@ public class AdBlockStats {
   init() {
     cachedEngines = []
   }
-
-  static let adblockSerialQueue = DispatchQueue(label: "com.brave.adblock-dispatch-queue")
   
   func clearCaches(clearEngineCaches: Bool = true) {
     guard clearEngineCaches else { return }
     cachedEngines.forEach({ $0.clearCaches() })
   }
   
-  /// Checks the general and regional engines to see if the request should be blocked.
-  ///
-  /// - Note: This method is should not be synced on `AdBlockStatus.adblockSerialQueue` and the result is synced on the main thread.
-  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, callback: @escaping (Bool) -> Void) {
-    Self.adblockSerialQueue.async { [weak self] in
-      let shouldBlock = self?.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) == true
-      
-      DispatchQueue.main.async {
-        callback(shouldBlock)
-      }
-    }
-  }
-  
   /// Checks the general and regional engines to see if the request should be blocked
   ///
   /// - Warning: This method needs to be synced on `AdBlockStatus.adblockSerialQueue`
-  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) -> Bool {
+  @MainActor func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) -> Bool {
     return cachedEngines.contains(where: { cachedEngine in
       return cachedEngine.shouldBlock(
         requestURL: requestURL,
