@@ -382,7 +382,9 @@ public class WelcomeViewController: UIViewController {
     )
    
     nextController.setLayoutState(state: state)
-    present(nextController, animated: true) {
+    
+    present(nextController, animated: true) { [unowned self] in
+      self.p3aUtilities.isNoticeAcknowledged = true
       Preferences.Onboarding.p3aOnboardingShown.value = true
     }
   }

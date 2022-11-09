@@ -71,6 +71,7 @@ extension BrowserViewController {
     onboardingP3ACalloutController.setLayoutState(state: state)
     
     if !isOnboardingOrFullScreenCalloutPresented {
+      braveCore.p3aUtils.isNoticeAcknowledged = true
       present(onboardingP3ACalloutController, animated: false)
     }
   }
