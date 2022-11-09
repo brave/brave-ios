@@ -17,6 +17,16 @@ public struct AssetViewModel: Identifiable, Equatable {
   }
 }
 
+public struct NFTAssetViewModel: Identifiable, Equatable {
+  var token: BraveWallet.BlockchainToken
+  var balance: Int
+  var imageUrl: URL?
+
+  public var id: String {
+    token.id
+  }
+}
+
 struct BalanceTimePrice: DataPoint, Equatable {
   var date: Date
   var price: Double
@@ -33,6 +43,8 @@ public class PortfolioStore: ObservableObject {
   @Published private(set) var balance: String = "$0.00"
   /// The users visible assets
   @Published private(set) var userVisibleAssets: [AssetViewModel] = []
+  /// The users visible NFTs
+  @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
   /// The timeframe of the portfolio
   @Published var timeframe: BraveWallet.AssetPriceTimeframe = .oneDay {
     didSet {
@@ -106,7 +118,9 @@ public class PortfolioStore: ObservableObject {
       self.isLoadingBalances = true
       let coin = await walletService.selectedCoin()
       let network = await rpcService.network(coin)
-      let userAssets = await walletService.userAssets(network.chainId, coin: coin)
+      let allUserAssets = await walletService.userAssets(network.chainId, coin: coin)
+      let nftAssets = allUserAssets.filter(\.isErc721)
+      let userAssets = allUserAssets.filter { !$0.isErc721 }
       // if the task was cancelled, don't update the UI
       guard !Task.isCancelled else { return }
       // update userVisibleAssets on display immediately with empty values. Issue #5567
@@ -118,17 +132,25 @@ public class PortfolioStore: ObservableObject {
           history: []
         )
       }
+      if WalletDebugFlags.isNFTEnabled {
+        userVisibleNFTs = nftAssets.map { asset in
+          NFTAssetViewModel(
+            token: asset,
+            balance: 0
+          )
+        }
+      }
       
       let keyring = await keyringService.keyringInfo(coin.keyringId)
       guard !Task.isCancelled else { return } // limit network request(s) if cancelled
-      let balances = await fetchBalances(for: userAssets, accounts: keyring.accountInfos)
+      let balances = await fetchBalances(for: allUserAssets, accounts: keyring.accountInfos)
       guard !Task.isCancelled else { return } // limit network request(s) if cancelled
       let nonZeroBalanceTokens = balances.filter { $1 > 0 }.map { $0.key }
       let nonZeroBalanceTokensPriceIds = userAssets.filter({ nonZeroBalanceTokens.contains($0.assetBalanceId.lowercased())}).map { $0.assetRatioId }
       let priceHistories = await fetchPriceHistory(for: nonZeroBalanceTokensPriceIds)
       guard !Task.isCancelled else { return } // limit network request(s) if cancelled
-      let visibleTokens = userAssets.filter(\.visible).map { $0.assetRatioId.lowercased() }
-      let prices = await fetchPrices(for: visibleTokens)
+      let visibleAssetRatioIds = userAssets.filter(\.visible).map { $0.assetRatioId.lowercased() }
+      let prices = await fetchPrices(for: visibleAssetRatioIds)
       
       // if the task was cancelled, don't update the UI
       guard !Task.isCancelled else { return }
@@ -143,6 +165,15 @@ public class PortfolioStore: ObservableObject {
           price: prices[priceId] ?? "",
           history: priceHistories[priceId] ?? []
         )
+      }
+      if WalletDebugFlags.isNFTEnabled {
+        userVisibleNFTs = nftAssets.map { token in
+          NFTAssetViewModel(
+            token: token,
+            balance: Int(balances[token.assetBalanceId.lowercased()] ?? 0),
+            imageUrl: nil // TODO: fetch image url from erc721Metadata / erc1155Metadata / solana metadata
+          )
+        }
       }
       // Compute balance based on current prices
       let currentBalance = userVisibleAssets
