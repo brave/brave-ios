@@ -16,13 +16,11 @@ struct AddCustomAssetView: View {
   
   @ObservedObject private var networkSelectionStore: NetworkSelectionStore
 
-  enum TokenType: Int, Identifiable {
+  enum TokenType: Int, Identifiable, CaseIterable {
     case token
     case nft
     
-    var id: Int {
-      return rawValue
-    }
+    var id: Self { self }
     
     var title: String {
       switch self {
@@ -34,7 +32,7 @@ struct AddCustomAssetView: View {
     }
   }
   
-  @State private var tokenType: Int = TokenType.token.id
+  @State private var selectedTokenType: TokenType = .token
   @State private var nameInput = ""
   @State private var addressInput = ""
   @State private var symbolInput = ""
@@ -57,13 +55,12 @@ struct AddCustomAssetView: View {
     self.networkSelectionStore = .init(mode: .formSelection, networkStore: networkStore)
   }
   
-  private var assetTypes: [TokenType] = [.token, .nft]
-  
   private var addButtonDisabled: Bool {
-    if tokenType == TokenType.nft.rawValue {
-      return nameInput.isEmpty || symbolInput.isEmpty || (networkSelectionStore.networkSelectionInForm?.coin != .sol && tokenId.isEmpty) || addressInput.isEmpty || networkSelectionStore.networkSelectionInForm == nil || (networkSelectionStore.networkSelectionInForm?.coin != .sol && !addressInput.isETHAddress)
-    } else {
+    switch selectedTokenType {
+    case .token:
       return nameInput.isEmpty || symbolInput.isEmpty || decimalsInput.isEmpty || addressInput.isEmpty || networkSelectionStore.networkSelectionInForm == nil || (networkSelectionStore.networkSelectionInForm?.coin != .sol && !addressInput.isETHAddress)
+    case .nft:
+      return nameInput.isEmpty || symbolInput.isEmpty || (networkSelectionStore.networkSelectionInForm?.coin != .sol && tokenId.isEmpty) || addressInput.isEmpty || networkSelectionStore.networkSelectionInForm == nil || (networkSelectionStore.networkSelectionInForm?.coin != .sol && !addressInput.isETHAddress)
     }
   }
   
@@ -79,8 +76,8 @@ struct AddCustomAssetView: View {
       Form {
         Section {
         } header: {
-          Picker("What kind of asset do you want to add", selection: $tokenType) {
-            ForEach(assetTypes) { type in
+          Picker("", selection: $selectedTokenType) {
+            ForEach(TokenType.allCases) { type in
               Text(type.title)
             }
           }
@@ -159,7 +156,8 @@ struct AddCustomAssetView: View {
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
-        if tokenType == TokenType.token.rawValue {
+        switch selectedTokenType {
+        case .token:
           Section(
             header: WalletListHeaderView(title: Text(Strings.Wallet.decimalsPrecision))
           ) {
@@ -234,7 +232,7 @@ struct AddCustomAssetView: View {
               .listRowBackground(Color(.secondaryBraveGroupedBackground))
             }
           }
-        } else {
+        case .nft:
           if showTokenID {
             Section(
               header: WalletListHeaderView(title: Text(Strings.Wallet.addCustomTokenId))
@@ -253,7 +251,7 @@ struct AddCustomAssetView: View {
         }
       }
       .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-      .onChange(of: tokenType, perform: { _ in
+      .onChange(of: selectedTokenType, perform: { _ in
         resignFirstResponder()
         clearInput()
       })
@@ -325,7 +323,8 @@ struct AddCustomAssetView: View {
   private func addCustomToken() {
     let network = networkSelectionStore.networkSelectionInForm ?? networkStore.selectedChain
     let token: BraveWallet.BlockchainToken
-    if tokenType == TokenType.token.rawValue {
+    switch selectedTokenType {
+    case .token:
       token = BraveWallet.BlockchainToken(
         contractAddress: addressInput,
         name: nameInput,
@@ -340,21 +339,21 @@ struct AddCustomAssetView: View {
         chainId: network.chainId,
         coin: network.coin
       )
-    } else {
-      var tokenIdTHex = ""
+    case .nft:
+      var tokenIdToHex = ""
       if let tokenIdValue = Int16(tokenId) {
-        tokenIdTHex = "0x\(String(format: "%02x", tokenIdValue))"
+        tokenIdToHex = "0x\(String(format: "%02x", tokenIdValue))"
       }
       token = BraveWallet.BlockchainToken(
         contractAddress: addressInput,
         name: nameInput,
         logo: "",
         isErc20: false,
-        isErc721: network.coin != .sol && !tokenIdTHex.isEmpty,
+        isErc721: network.coin != .sol && !tokenIdToHex.isEmpty,
         symbol: symbolInput,
         decimals: 0,
         visible: true,
-        tokenId: tokenIdTHex,
+        tokenId: tokenIdToHex,
         coingeckoId: coingeckoId,
         chainId: network.chainId,
         coin: network.coin
