@@ -133,7 +133,7 @@ struct PortfolioView: View {
                     network: networkStore.selectedChain,
                     url: nftAsset.imageUrl
                   ),
-                  title: nftAsset.token.name,
+                  title: nftAsset.token.nftTokenTitle,
                   symbol: nftAsset.token.symbol,
                   quantity: "\(nftAsset.balance)"
                 )
@@ -295,3 +295,13 @@ struct PortfolioViewController_Previews: PreviewProvider {
   }
 }
 #endif
+
+private extension BraveWallet.BlockchainToken {
+  var nftTokenTitle: String {
+    if isErc721, let tokenId = Int(tokenId.removingHexPrefix, radix: 16) {
+      return "\(name) #\(tokenId)"
+    } else {
+      return name
+    }
+  }
+}
