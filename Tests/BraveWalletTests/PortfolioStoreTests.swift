@@ -13,15 +13,20 @@ class PortfolioStoreTests: XCTestCase {
   private var cancellables: Set<AnyCancellable> = .init()
 
   func testUpdateEthereum() {
+    WalletDebugFlags.isNFTEnabled = true
     // config test
     let mockAccountInfos: [BraveWallet.AccountInfo] = [.mockEthAccount]
     let chainId = BraveWallet.MainnetChainId
     let network: BraveWallet.NetworkInfo = .mockMainnet
-    let mockUserAssets: [BraveWallet.BlockchainToken] = [.previewToken.then { $0.visible = true }]
+    let mockUserAssets: [BraveWallet.BlockchainToken] = [
+      .previewToken.then { $0.visible = true },
+      .mockNFTToken
+    ]
     let mockDecimalBalance: Double = 0.0896
     let numDecimals = Int(mockUserAssets[0].decimals)
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: numDecimals))
     let mockBalanceWei = formatter.weiString(from: 0.0896, radix: .hex, decimals: numDecimals) ?? ""
+    let mockNFTBalanceWei = formatter.weiString(from: 1, radix: .hex, decimals: 0) ?? ""
     let mockEthAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23")
     let mockEthPriceHistory: [BraveWallet.AssetTimePrice] = [.init(date: Date(timeIntervalSinceNow: -1000), price: "$3000.00"), .init(date: Date(), price: "3059.99")]
     let totalEthBalanceValue: Double = (Double(mockEthAssetPrice.price) ?? 0) * mockDecimalBalance
@@ -50,6 +55,9 @@ class PortfolioStoreTests: XCTestCase {
     rpcService._network = { $1(network) }
     rpcService._balance = { _, _, _, completion in
       completion(mockBalanceWei, .success, "")
+    }
+    rpcService._erc721TokenBalance = { _, _, _, _, completion in
+      completion(mockNFTBalanceWei, .success, "")
     }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._userAssets = { _, _, completion in
@@ -90,6 +98,22 @@ class PortfolioStoreTests: XCTestCase {
         XCTAssertEqual(lastUpdatedVisibleAssets[0].decimalBalance, mockDecimalBalance)
         XCTAssertEqual(lastUpdatedVisibleAssets[0].price, mockEthAssetPrice.price)
         XCTAssertEqual(lastUpdatedVisibleAssets[0].history, mockEthPriceHistory)
+      }.store(in: &cancellables)
+    // test that `update()` will assign new value to `userVisibleNFTs` publisher
+    let userVisibleNFTsException = expectation(description: "update-userVisibleNFTs")
+    XCTAssertTrue(store.userVisibleNFTs.isEmpty)  // Initial state
+    store.$userVisibleNFTs
+      .dropFirst()
+      .collect(2)
+      .sink { userVisibleNFTs in
+        defer { userVisibleNFTsException.fulfill() }
+        XCTAssertEqual(userVisibleNFTs.count, 2) // empty nfts, populated nfts
+        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+          XCTFail("Unexpected test result")
+          return
+        }
+        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 1)
+        XCTAssertEqual(lastUpdatedVisibleNFTs[0].balance, Int(mockNFTBalanceWei))
       }.store(in: &cancellables)
     // test that `update()` will assign new value to `balance` publisher
     let balanceException = expectation(description: "update-balance")
