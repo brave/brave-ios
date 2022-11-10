@@ -142,9 +142,14 @@ struct PlaylistSharedFolderNetwork {
     @Sendable @MainActor
     func fetchTask(item: PlaylistInfo) async throws -> PlaylistInfo {
       var webLoader: PlaylistWebLoader?
-      return try await withTaskCancellationHandler {
-        try await withCheckedThrowingContinuation { continuation in
-          webLoader = PlaylistWebLoader(handler: { newItem in
+      webLoader = PlaylistWebLoader().then {
+        viewForInvisibleWebView.insertSubview($0, at: 0)
+      }
+      
+      return try await withCheckedThrowingContinuation { continuation in
+        if let url = URL(string: item.pageSrc) {
+          DispatchQueue.main.async {
+            webLoader?.load(url: url) { newItem in
               if let newItem = newItem {
                 PlaylistManager.shared.getAssetDuration(item: newItem) { duration in
                   let item = PlaylistInfo(name: item.name,
@@ -170,21 +175,13 @@ struct PlaylistSharedFolderNetwork {
                 continuation.resume(returning: item)
               }
             }
-          ).then {
-            viewForInvisibleWebView.insertSubview($0, at: 0)
           }
-
-          if let url = URL(string: item.pageSrc) {
-            webLoader?.load(url: url)
-          } else {
+        } else {
+          Task { @MainActor in
+            webLoader?.stop()
+            webLoader?.removeFromSuperview()
             webLoader = nil
           }
-        }
-      } onCancel: {
-        Task { @MainActor in
-          webLoader?.stop()
-          webLoader?.removeFromSuperview()
-          webLoader = nil
         }
       }
     }

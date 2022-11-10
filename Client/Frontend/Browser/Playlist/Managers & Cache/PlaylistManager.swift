@@ -593,9 +593,6 @@ extension PlaylistManager {
     // So we first need to check the track status before attempting to access it!
     var error: NSError?
     let trackStatus = asset.statusOfValue(forKey: "tracks", error: &error)
-    if let error = error {
-      Logger.module.error("AVAsset.statusOfValue error occurred: \(error.localizedDescription)")
-    }
 
     if trackStatus == .loaded {
       if !asset.tracks.isEmpty,
@@ -607,17 +604,11 @@ extension PlaylistManager {
         }
         return
       }
-    } else if trackStatus != .loading {
-      Logger.module.debug("AVAsset.statusOfValue not loaded. Status: \(String(describing: trackStatus))")
     }
 
     // Accessing duration or commonMetadata blocks the main-thread if not already loaded
     // So we first need to check the track status before attempting to access it!
     let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
-    if let error = error {
-      Logger.module.error("AVAsset.statusOfValue error occurred: \(error.localizedDescription)")
-    }
-
     if durationStatus == .loaded {
       // If it's live/indefinite
       if asset.duration.isIndefinite {
@@ -630,8 +621,6 @@ extension PlaylistManager {
         completion(asset.duration.seconds)
         return
       }
-    } else if durationStatus != .loading {
-      Logger.module.debug("AVAsset.statusOfValue not loaded. Status: \(durationStatus.rawValue)")
     }
 
     switch Reach().connectionStatus() {
