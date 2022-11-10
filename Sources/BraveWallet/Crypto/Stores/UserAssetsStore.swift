@@ -115,6 +115,7 @@ public class UserAssetsStore: ObservableObject {
           logo: "",
           isErc20: coinType == .eth,
           isErc721: false,
+          isNft: false,
           symbol: symbol,
           decimals: Int32(decimals),
           visible: true,
