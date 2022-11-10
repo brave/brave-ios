@@ -129,12 +129,13 @@ class TabLocationView: UIView {
     urlTextField.backgroundColor = .clear
     urlTextField.clipsToBounds = true
     urlTextField.isEnabled = false
-    urlTextField.defaultTextAttributes = {
-      var attributes = urlTextField.defaultTextAttributes
-      let style = (attributes[.paragraphStyle, default: NSParagraphStyle.default] as! NSParagraphStyle).mutableCopy() as! NSMutableParagraphStyle // swiftlint:disable:this force_cast
-      style.lineBreakMode = .byClipping
-      attributes[.paragraphStyle] = style
-      return attributes
+    urlTextField.defaultTextAttributes[.paragraphStyle] = {
+      let paragraphStyle = (urlTextField
+        .defaultTextAttributes[.paragraphStyle, default: NSParagraphStyle.default] as! NSParagraphStyle)
+        .mutableCopy() as! NSMutableParagraphStyle
+      paragraphStyle.alignment = .center
+      paragraphStyle.lineBreakMode = .byTruncatingHead
+      return paragraphStyle
     }()
     // Remove the default drop interaction from the URL text field so that our
     // custom drop interaction on the BVC can accept dropped URLs.
@@ -347,8 +348,6 @@ class TabLocationView: UIView {
   }
   
   private func updateURLBarWithText() {
-    (urlTextField as? DisplayTextField)?.hostString = url?.withoutWWW.host ?? ""
-    
     // Note: Only use `URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)`
     // If displaying the host ONLY! This follows Google Chrome and Safari.
     // However, for Brave as no decision has been made on what shows YET, we will display the entire URL (truncated!)
@@ -357,7 +356,7 @@ class TabLocationView: UIView {
     // --
     // The requirement to remove scheme comes from Desktop. Also we do not remove the path like in other browsers either.
     // Therefore, we follow Brave Desktop instead of Chrome or Safari iOS
-    urlTextField.text = URLFormatter.formatURL(url?.withoutWWW.absoluteString ?? "", formatTypes: [.omitDefaults], unescapeOptions: []).removeSchemeFromURLString(url?.scheme)
+    urlTextField.text = URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)
     
     reloadButton.isHidden = url == nil
     voiceSearchButton.isHidden = (url != nil) || !isVoiceSearchAvailable
@@ -430,7 +429,6 @@ extension TabLocationView {
 
 class DisplayTextField: UITextField {
   weak var accessibilityActionsSource: AccessibilityActionsSource?
-  var hostString: String = ""
   let pathPadding: CGFloat = 5.0
   
   private let leadingClippingFade = GradientView(
@@ -495,7 +493,7 @@ class DisplayTextField: UITextField {
   override func textRect(forBounds bounds: CGRect) -> CGRect {
     var rect: CGRect = super.textRect(forBounds: bounds)
 
-    if let size: CGSize = (self.hostString as NSString?)?.size(withAttributes: [.font: self.font!]) {
+    if let size: CGSize = (self.text as NSString?)?.size(withAttributes: [.font: self.font!]) {
       if size.width > self.bounds.width {
         rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
         rect.size.width = size.width + pathPadding
