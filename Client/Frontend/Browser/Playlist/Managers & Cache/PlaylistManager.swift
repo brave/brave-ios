@@ -543,11 +543,15 @@ extension PlaylistManager: NSFetchedResultsControllerDelegate {
 extension PlaylistManager {
   func getAssetDuration(item: PlaylistInfo, _ completion: @escaping (TimeInterval?) -> Void) {
     if assetInformation.contains(where: { $0.itemId == item.tagId }) {
+      completion(nil)
       return
     }
 
     fetchAssetDuration(item: item) { [weak self] duration in
-      guard let self = self else { return }
+      guard let self = self else {
+        completion(nil)
+        return
+      }
 
       if let index = self.assetInformation.firstIndex(where: { $0.itemId == item.tagId }) {
         let assetFetcher = self.assetInformation.remove(at: index)

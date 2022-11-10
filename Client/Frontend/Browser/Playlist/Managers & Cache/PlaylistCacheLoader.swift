@@ -320,7 +320,7 @@ public class PlaylistMimeTypeDetector {
 }
 
 class PlaylistWebLoader: UIView {
-  fileprivate static var pageLoadTimeout = 10.0
+  fileprivate static var pageLoadTimeout = 300.0
   private var pendingHTTPUpgrades = [String: URLRequest]()
   private var pendingRequests = [String: URLRequest]()
 
@@ -456,36 +456,24 @@ class PlaylistWebLoader: UIView {
         cancelRequest()
         return
       }
-      
-      guard let url = URL(string: item.src) else {
-        cancelRequest()
-        return
-      }
-      
-      PlaylistMediaStreamer.loadAssetPlayability(asset: AVURLAsset(url: url)) { isPlayable in
-        if !isPlayable {
-          cancelRequest()
-          return
-        }
         
-        DispatchQueue.main.async {
-          if !self.playlistItems.contains(item.src) {
-            self.playlistItems.insert(item.src)
-            
-            self.timeout?.cancel()
-            self.timeout = nil
-            self.webLoader?.handler?(item)
-            self.webLoader = nil
-          }
+      DispatchQueue.main.async {
+        if !self.playlistItems.contains(item.src) {
+          self.playlistItems.insert(item.src)
           
-          // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
-          // If the second we receive the src, we reload the page by doing the below HTML,
-          // It may not have received all info necessary to play the item such as MetadataInfo
-          // For now it works 100% of the time and it is safe to do it. If we come across such a website, that causes problems,
-          // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
-          self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+          self.timeout?.cancel()
+          self.timeout = nil
+          self.webLoader?.handler?(item)
           self.webLoader = nil
         }
+        
+        // This line MAY cause problems.. because some websites have a loading delay for the source of the media item
+        // If the second we receive the src, we reload the page by doing the below HTML,
+        // It may not have received all info necessary to play the item such as MetadataInfo
+        // For now it works 100% of the time and it is safe to do it. If we come across such a website, that causes problems,
+        // we'll need to find a different way of forcing the WebView to STOP loading metadata in the background
+        self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
+        self.webLoader = nil
       }
     }
   }
