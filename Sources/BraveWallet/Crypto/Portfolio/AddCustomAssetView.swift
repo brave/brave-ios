@@ -13,8 +13,6 @@ struct AddCustomAssetView: View {
   var keyringStore: KeyringStore
   @ObservedObject var userAssetStore: UserAssetsStore
   @Environment(\.presentationMode) @Binding private var presentationMode
-  
-  @ObservedObject private var networkSelectionStore: NetworkSelectionStore
 
   enum TokenType: Int, Identifiable, CaseIterable {
     case token
@@ -32,6 +30,8 @@ struct AddCustomAssetView: View {
     }
   }
   
+  @State private var selectedNetwork: BraveWallet.NetworkInfo?
+  @State private var networkSelectionStore: NetworkSelectionStore?
   @State private var selectedTokenType: TokenType = .token
   @State private var nameInput = ""
   @State private var addressInput = ""
@@ -42,30 +42,18 @@ struct AddCustomAssetView: View {
   @State private var coingeckoId = ""
   @State private var showError = false
   @State private var showAdvanced = false
-  @State private var isPresentingNetworkSelection = false
-  
-  init(
-    networkStore: NetworkStore,
-    keyringStore: KeyringStore,
-    userAssetStore: UserAssetsStore
-  ) {
-    self.networkStore = networkStore
-    self.keyringStore = keyringStore
-    self.userAssetStore = userAssetStore
-    self.networkSelectionStore = .init(mode: .formSelection, networkStore: networkStore)
-  }
   
   private var addButtonDisabled: Bool {
     switch selectedTokenType {
     case .token:
-      return nameInput.isEmpty || symbolInput.isEmpty || decimalsInput.isEmpty || addressInput.isEmpty || networkSelectionStore.networkSelectionInForm == nil || (networkSelectionStore.networkSelectionInForm?.coin != .sol && !addressInput.isETHAddress)
+      return nameInput.isEmpty || symbolInput.isEmpty || decimalsInput.isEmpty || addressInput.isEmpty || selectedNetwork == nil || (selectedNetwork?.coin != .sol && !addressInput.isETHAddress)
     case .nft:
-      return nameInput.isEmpty || symbolInput.isEmpty || (networkSelectionStore.networkSelectionInForm?.coin != .sol && tokenId.isEmpty) || addressInput.isEmpty || networkSelectionStore.networkSelectionInForm == nil || (networkSelectionStore.networkSelectionInForm?.coin != .sol && !addressInput.isETHAddress)
+      return nameInput.isEmpty || symbolInput.isEmpty || (selectedNetwork?.coin != .sol && tokenId.isEmpty) || addressInput.isEmpty || selectedNetwork == nil || (selectedNetwork?.coin != .sol && !addressInput.isETHAddress)
     }
   }
   
   private var showTokenID: Bool {
-    if let customAssetNetwork = networkSelectionStore.networkSelectionInForm, customAssetNetwork.coin == .sol {
+    if let customAssetNetwork = selectedNetwork, customAssetNetwork.coin == .sol {
       return false
     }
     return true
@@ -88,10 +76,10 @@ struct AddCustomAssetView: View {
         ) {
           HStack {
             Button(action: {
-              isPresentingNetworkSelection = true
+              networkSelectionStore = .init(mode: .formSelection, networkStore: networkStore)
             }) {
-              Text(networkSelectionStore.networkSelectionInForm?.chainName ?? Strings.Wallet.customTokenNetworkButtonTitle)
-                .foregroundColor(networkSelectionStore.networkSelectionInForm == nil ? .gray.opacity(0.6) : Color(.braveLabel))
+              Text(selectedNetwork?.chainName ?? Strings.Wallet.customTokenNetworkButtonTitle)
+                .foregroundColor(selectedNetwork == nil ? .gray.opacity(0.6) : Color(.braveLabel))
             }
             Spacer()
             Image(systemName: "chevron.down.circle")
@@ -274,7 +262,10 @@ struct AddCustomAssetView: View {
       .background(
         Color.clear
           .sheet(
-            isPresented: $isPresentingNetworkSelection
+            isPresented: Binding(
+              get: { self.networkSelectionStore != nil },
+              set: { if !$0 { self.networkSelectionStore = nil } }
+            )
           ) {
             if let networkSelectionStore = networkSelectionStore {
               NavigationView {
@@ -283,6 +274,11 @@ struct AddCustomAssetView: View {
                   networkStore: networkStore,
                   networkSelectionStore: networkSelectionStore
                 )
+              }
+              .onDisappear {
+                if let network = networkSelectionStore.networkSelectionInForm {
+                  selectedNetwork = network
+                }
               }
               .accentColor(Color(.braveOrange))
               .navigationViewStyle(.stack)
@@ -304,11 +300,11 @@ struct AddCustomAssetView: View {
     tokenId = ""
     logo = ""
     coingeckoId = ""
-    networkSelectionStore.networkSelectionInForm = nil
+    selectedNetwork = nil
   }
 
   private func addCustomToken() {
-    let network = networkSelectionStore.networkSelectionInForm ?? networkStore.selectedChain
+    let network = selectedNetwork ?? networkStore.selectedChain
     let token: BraveWallet.BlockchainToken
     switch selectedTokenType {
     case .token:
@@ -319,7 +315,7 @@ struct AddCustomAssetView: View {
         isErc20: network.coin != .sol,
         isErc721: false,
         symbol: symbolInput,
-        decimals: Int32(decimalsInput) ?? Int32((networkSelectionStore.networkSelectionInForm?.decimals ?? 18)),
+        decimals: Int32(decimalsInput) ?? Int32((selectedNetwork?.decimals ?? 18)),
         visible: true,
         tokenId: "",
         coingeckoId: coingeckoId,
