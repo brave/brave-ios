@@ -39,6 +39,20 @@ public class NetworkStore: ObservableObject {
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
   private let swapService: BraveWalletSwapService
+  
+  private weak var networkSelectionStore: NetworkSelectionStore?
+  
+  func openNetworkSelectionStore(mode: NetworkSelectionStore.Mode = .select) -> NetworkSelectionStore {
+    if let store = networkSelectionStore {
+      return store
+    }
+    let store = NetworkSelectionStore(mode: mode, networkStore: self)
+    networkSelectionStore = store
+    return store
+  }
+  func closeNetworkSelectionStore() {
+    networkSelectionStore = nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
