@@ -134,6 +134,14 @@ class TabLocationView: UIView {
     urlTextField.clipsToBounds = true
     urlTextField.textColor = .braveLabel
     urlTextField.isEnabled = false
+    urlTextField.defaultTextAttributes[.paragraphStyle] = {
+      let paragraphStyle = (urlTextField
+        .defaultTextAttributes[.paragraphStyle, default: NSParagraphStyle.default] as! NSParagraphStyle)
+        .mutableCopy() as! NSMutableParagraphStyle
+      paragraphStyle.alignment = .center
+      paragraphStyle.lineBreakMode = .byTruncatingHead
+      return paragraphStyle
+    }()
     // Remove the default drop interaction from the URL text field so that our
     // custom drop interaction on the BVC can accept dropped URLs.
     if let dropInteraction = urlTextField.textDropInteraction {
@@ -406,8 +414,7 @@ class TabLocationView: UIView {
   }
   
   fileprivate func updateTextWithURL() {
-    (urlTextField as? DisplayTextField)?.hostString = url?.withoutWWW.host ?? ""
-    urlTextField.text = url?.withoutWWW.schemelessAbsoluteString.trim("/")
+    urlTextField.text = url?.origin.url?.schemelessAbsoluteDisplayString
   }
 }
 
@@ -474,8 +481,6 @@ extension TabLocationView {
 
 class DisplayTextField: UITextField {
   weak var accessibilityActionsSource: AccessibilityActionsSource?
-  var hostString: String = ""
-  let pathPadding: CGFloat = 5.0
 
   override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
     get {
@@ -493,21 +498,6 @@ class DisplayTextField: UITextField {
 
   override var canBecomeFirstResponder: Bool {
     return false
-  }
-
-  // This override is done in case the eTLD+1 string overflows the width of textField.
-  // In that case the textRect is adjusted to show right aligned and truncate left.
-  // Since this textField changes with WebView domain change, performance implications are low.
-  override func textRect(forBounds bounds: CGRect) -> CGRect {
-    var rect: CGRect = super.textRect(forBounds: bounds)
-
-    if let size: CGSize = (self.hostString as NSString?)?.size(withAttributes: [.font: self.font!]) {
-      if size.width > self.bounds.width {
-        rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
-        rect.size.width = size.width + pathPadding
-      }
-    }
-    return rect
   }
 }
 
