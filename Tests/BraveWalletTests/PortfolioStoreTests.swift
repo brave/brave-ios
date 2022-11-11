@@ -13,7 +13,6 @@ class PortfolioStoreTests: XCTestCase {
   private var cancellables: Set<AnyCancellable> = .init()
 
   func testUpdateEthereum() {
-    WalletDebugFlags.isNFTEnabled = true
     // config test
     let mockAccountInfos: [BraveWallet.AccountInfo] = [.mockEthAccount]
     let chainId = BraveWallet.MainnetChainId
@@ -144,7 +143,6 @@ class PortfolioStoreTests: XCTestCase {
   }
   
   func testUpdateSolana() {
-    WalletDebugFlags.isNFTEnabled = true
     // config test
     let mockAccountInfos: [BraveWallet.AccountInfo] = [.mockSolAccount]
     let network: BraveWallet.NetworkInfo = .mockSolana

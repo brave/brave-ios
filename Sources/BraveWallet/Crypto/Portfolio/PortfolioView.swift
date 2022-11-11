@@ -120,7 +120,7 @@ struct PortfolioView: View {
         WalletListHeaderView(title: Text(Strings.Wallet.assetsTitle))
       })
       
-      if WalletDebugFlags.isNFTEnabled, !portfolioStore.userVisibleNFTs.isEmpty {
+      if !portfolioStore.userVisibleNFTs.isEmpty {
         Section(content: {
           Group {
             ForEach(portfolioStore.userVisibleNFTs) { nftAsset in

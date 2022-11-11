@@ -132,13 +132,11 @@ public class PortfolioStore: ObservableObject {
           history: []
         )
       }
-      if WalletDebugFlags.isNFTEnabled {
-        userVisibleNFTs = nftAssets.map { asset in
-          NFTAssetViewModel(
-            token: asset,
-            balance: 0
-          )
-        }
+      userVisibleNFTs = nftAssets.map { asset in
+        NFTAssetViewModel(
+          token: asset,
+          balance: 0
+        )
       }
       
       let keyring = await keyringService.keyringInfo(coin.keyringId)
@@ -166,14 +164,12 @@ public class PortfolioStore: ObservableObject {
           history: priceHistories[priceId] ?? []
         )
       }
-      if WalletDebugFlags.isNFTEnabled {
-        userVisibleNFTs = nftAssets.map { token in
-          NFTAssetViewModel(
-            token: token,
-            balance: Int(balances[token.assetBalanceId.lowercased()] ?? 0),
-            imageUrl: nil // TODO: fetch image url from erc721Metadata / erc1155Metadata / solana metadata
-          )
-        }
+      userVisibleNFTs = nftAssets.map { token in
+        NFTAssetViewModel(
+          token: token,
+          balance: Int(balances[token.assetBalanceId.lowercased()] ?? 0),
+          imageUrl: nil // TODO: fetch image url from erc721Metadata / erc1155Metadata / solana metadata
+        )
       }
       // Compute balance based on current prices
       let currentBalance = userVisibleAssets
