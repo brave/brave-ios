@@ -59,14 +59,15 @@ public class URIFixup {
   }
 
   public static func getURL(_ entry: String) -> URL? {
+    let trimmed = entry.trimmingCharacters(in: .whitespacesAndNewlines)
+    
     // NSURL: idnString from brave core handles the puny code represantation of Hostnames
     // Using Punycode, host names containing Unicode characters are transcoded to a subset of ASCII
-    let entryURL = URL(string: entry) ?? NSURL(idnString: entry) as URL? ?? NSURL(idnString: "http://\(entry)") as URL?
+    let entryURL = URL(string: trimmed) ?? NSURL(idnString: trimmed) as URL?
     if let url = entryURL, InternalURL.isValid(url: url) {
       return url
     }
 
-    let trimmed = entry.trimmingCharacters(in: .whitespacesAndNewlines)
     guard let escaped = trimmed.addingPercentEncoding(withAllowedCharacters: .URLAllowed) else {
       return nil
     }
@@ -98,7 +99,7 @@ public class URIFixup {
       if isValidIPAddressURL(trimmed) {
         // IP Addresses do NOT require a Scheme.
         // However, Brave requires that URLs have a scheme.
-        return NSURL(idnString: escaped) as URL?
+        return NSURL(idnString: "http://\(escaped)") as URL?
       } else {
         // If host is NOT an IP-Address, it should never contain a colon
         // This is because it also doesn't contain a "." so it isn't a domain at all.
@@ -120,7 +121,7 @@ public class URIFixup {
     //    - Safari passes on the entire url to the Search Engine just like it does
     //      without a path or query.
     if URL(string: trimmed)?.user != nil || URL(string: escaped)?.user != nil ||
-        (NSURL(idnString: "http://\(trimmed)") as URL?)?.user != nil || (NSURL(idnString: "http://\(escaped)") as URL?)?.user != nil {
+        URL(string: "http://\(trimmed)")?.user != nil || URL(string: "http://\(escaped)")?.user != nil {
       return nil
     }
 
