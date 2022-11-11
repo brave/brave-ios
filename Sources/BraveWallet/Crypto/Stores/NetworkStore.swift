@@ -44,7 +44,11 @@ public class NetworkStore: ObservableObject {
   
   func openNetworkSelectionStore(mode: NetworkSelectionStore.Mode = .select) -> NetworkSelectionStore {
     if let store = networkSelectionStore {
-      return store
+      if store.mode == mode {
+        return store
+      } else {
+        networkSelectionStore = nil
+      }
     }
     let store = NetworkSelectionStore(mode: mode, networkStore: self)
     networkSelectionStore = store
