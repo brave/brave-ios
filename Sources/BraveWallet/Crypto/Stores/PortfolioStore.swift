@@ -119,8 +119,8 @@ public class PortfolioStore: ObservableObject {
       let coin = await walletService.selectedCoin()
       let network = await rpcService.network(coin)
       let allUserAssets = await walletService.userAssets(network.chainId, coin: coin)
-      let nftAssets = allUserAssets.filter(\.isErc721)
-      let userAssets = allUserAssets.filter { !$0.isErc721 }
+      let nftAssets = allUserAssets.filter { $0.isErc721 || $0.isNft }
+      let userAssets = allUserAssets.filter { !$0.isErc721 && !$0.isNft }
       // if the task was cancelled, don't update the UI
       guard !Task.isCancelled else { return }
       // update userVisibleAssets on display immediately with empty values. Issue #5567

@@ -20,7 +20,7 @@ class PortfolioStoreTests: XCTestCase {
     let network: BraveWallet.NetworkInfo = .mockMainnet
     let mockUserAssets: [BraveWallet.BlockchainToken] = [
       .previewToken.then { $0.visible = true },
-      .mockNFTToken
+      .mockERC721NFTToken
     ]
     let mockDecimalBalance: Double = 0.0896
     let numDecimals = Int(mockUserAssets[0].decimals)

@@ -89,12 +89,13 @@ extension BraveWallet.BlockchainToken {
     coin: .sol
   )
   
-  static let mockNFTToken: BraveWallet.BlockchainToken = .init(
+  static let mockERC721NFTToken: BraveWallet.BlockchainToken = .init(
     contractAddress: "0xaaaaaaaaaa222222222233333333334444444444",
     name: "XENFT",
     logo: "",
     isErc20: false,
     isErc721: true,
+    isNft: true,
     symbol: "XENFT",
     decimals: 0,
     visible: true,
