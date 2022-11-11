@@ -104,6 +104,22 @@ extension BraveWallet.BlockchainToken {
     chainId: "0x1",
     coin: .eth
   )
+  
+  static let mockSolanaNFTToken: BraveWallet.BlockchainToken = .init(
+    contractAddress: "0xaaaaaaaaaa222222222233333333334444444444",
+    name: "SOLNFT",
+    logo: "",
+    isErc20: false,
+    isErc721: false,
+    isNft: true,
+    symbol: "SOLNFT",
+    decimals: 0,
+    visible: true,
+    tokenId: "",
+    coingeckoId: "",
+    chainId: "0x65",
+    coin: .sol
+  )
 }
 
 extension BraveWallet.AccountInfo {
