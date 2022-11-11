@@ -69,7 +69,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .module,
       value: "NFTs",
-      comment: "The title which is displayed above a list of NFTs"
+      comment: "The title which is displayed above a list of NFTs. 'NFT' is an acronym for Non-Fungible Token."
     )
     public static let transactionsTitle = NSLocalizedString(
       "wallet.transactionsTitle",

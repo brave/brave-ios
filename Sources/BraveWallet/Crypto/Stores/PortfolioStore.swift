@@ -17,7 +17,7 @@ public struct AssetViewModel: Identifiable, Equatable {
   }
 }
 
-public struct NFTAssetViewModel: Identifiable, Equatable {
+struct NFTAssetViewModel: Identifiable, Equatable {
   var token: BraveWallet.BlockchainToken
   var balance: Int
   var imageUrl: URL?
@@ -168,7 +168,7 @@ public class PortfolioStore: ObservableObject {
         NFTAssetViewModel(
           token: token,
           balance: Int(balances[token.assetBalanceId.lowercased()] ?? 0),
-          imageUrl: nil // TODO: fetch image url from erc721Metadata / erc1155Metadata / solana metadata
+          imageUrl: nil // TODO: fetch image url from erc721Metadata / erc1155Metadata / solana metadata in #6361
         )
       }
       // Compute balance based on current prices
