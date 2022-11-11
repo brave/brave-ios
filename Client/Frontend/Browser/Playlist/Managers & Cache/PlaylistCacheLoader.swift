@@ -567,16 +567,16 @@ extension PlaylistWebLoader: WKNavigationDelegate {
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
       let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
       webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
-    }
-
-    if let requestURL = navigationAction.request.url,
-       let targetFrame = navigationAction.targetFrame,
-       let customUserScripts = tab.currentPageData?.makeUserScriptTypes(
-        forRequestURL: requestURL,
-        isForMainFrame: targetFrame.isMainFrame,
-        persistentDomain: false
-       ) {
-      tab.setCustomUserScript(scripts: customUserScripts)
+      
+      if let requestURL = navigationAction.request.url,
+         let targetFrame = navigationAction.targetFrame,
+         let customUserScripts = tab.currentPageData?.makeUserScriptTypes(
+          forRequestURL: requestURL,
+          isForMainFrame: targetFrame.isMainFrame,
+          domain: domainForMainFrame
+         ) {
+        tab.setCustomUserScript(scripts: customUserScripts)
+      }
     }
 
     if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
@@ -643,10 +643,11 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     
     // We also add subframe urls in case a frame upgraded to https
     if let responseURL = responseURL,
+       let domain = tab.currentPageData?.domain(persistent: false),
        let scriptTypes = tab.currentPageData?.makeUserScriptTypes(
         forResponseURL: responseURL,
         isForMainFrame: navigationResponse.isForMainFrame,
-        persistentDomain: false
+        domain: domain
        ) {
       tab.setCustomUserScript(scripts: scriptTypes)
     }

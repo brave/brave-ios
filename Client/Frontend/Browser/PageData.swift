@@ -31,19 +31,19 @@ struct PageData {
   }
   
   /// This method builds all the user scripts that should be included for this page
-  mutating func makeUserScriptTypes(forRequestURL requestURL: URL, isForMainFrame: Bool, persistentDomain: Bool) -> Set<UserScriptType>? {
+  mutating func makeUserScriptTypes(forRequestURL requestURL: URL, isForMainFrame: Bool, domain: Domain) -> Set<UserScriptType>? {
     if !isForMainFrame {
       // We need to add any non-main frame urls to our site data
       // We will need this to construct all non-main frame scripts
       allSubframeURLs.insert(requestURL)
     }
     
-    return makeUserScriptTypes(persistentDomain: persistentDomain)
+    return makeUserScriptTypes(domain: domain)
   }
   
   /// A new list of scripts is returned only if a change is detected in the response (for example an HTTPs upgrade).
   /// In some cases (like during an https upgrade) the scripts may change on the response. So we need to update the user scripts
-  mutating func makeUserScriptTypes(forResponseURL responseURL: URL, isForMainFrame: Bool, persistentDomain: Bool) -> Set<UserScriptType>? {
+  mutating func makeUserScriptTypes(forResponseURL responseURL: URL, isForMainFrame: Bool, domain: Domain) -> Set<UserScriptType>? {
     if isForMainFrame {
       // If it's the main frame url that was upgraded,
       // we need to update it and rebuild the types
@@ -51,7 +51,7 @@ struct PageData {
       mainFrameURL = responseURL
       
       // And now we rebuild the scripts and set them
-      return makeUserScriptTypes(persistentDomain: persistentDomain)
+      return makeUserScriptTypes(domain: domain)
     } else if !allSubframeURLs.contains(responseURL) {
       // first try to remove the old unwanted `http` frame URL
       if var components = URLComponents(url: responseURL, resolvingAgainstBaseURL: false), components.scheme == "https" {
@@ -69,7 +69,7 @@ struct PageData {
     }
     
     // And now we rebuild the scripts and set them
-    return makeUserScriptTypes(persistentDomain: persistentDomain)
+    return makeUserScriptTypes(domain: domain)
   }
   
   /// Check if we upgraded to https and if so we need to update the url of frame evaluations
@@ -88,13 +88,12 @@ struct PageData {
   }
   
   /// Return all the user script types for this page. The number of script types grows as more frames are loaded.
-  mutating private func makeUserScriptTypes(persistentDomain: Bool) -> Set<UserScriptType> {
+  mutating private func makeUserScriptTypes(domain: Domain) -> Set<UserScriptType> {
     var userScriptTypes: Set<UserScriptType> = [.siteStateListener]
 
     // Handle dynamic domain level scripts on the main document.
     // These are scripts that change depending on the domain and the main document
-    let domainForShields = self.domain(persistent: persistentDomain)
-    let isFPProtectionOn = domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
+    let isFPProtectionOn = domain.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
     // Add the `farblingProtection` script if needed
     // Note: The added farbling protection script based on the document url, not the frame's url.
     // It is also added for every frame, including subframes.
@@ -108,7 +107,7 @@ struct PageData {
     if let domainUserScript = DomainUserScript(for: mainFrameURL) {
       if let shield = domainUserScript.requiredShield {
         // If a shield is required check that shield
-        if domainForShields.isShieldExpected(shield, considerAllShieldsOption: true) {
+        if domain.isShieldExpected(shield, considerAllShieldsOption: true) {
           userScriptTypes.insert(.domainUserScript(domainUserScript))
         }
       } else {
@@ -119,13 +118,13 @@ struct PageData {
     
     // Add engine scripts for the main frame
     userScriptTypes = userScriptTypes.union(
-      adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, domain: domainForShields)
+      adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, domain: domain)
     )
     
     // Add engine scripts for all of the known sub-frames
     for frameURL in allSubframeURLs {
       userScriptTypes = userScriptTypes.union(
-        adBlockStats.makeEngineScriptTypes(frameURL: frameURL, isMainFrame: false, domain: domainForShields)
+        adBlockStats.makeEngineScriptTypes(frameURL: frameURL, isMainFrame: false, domain: domain)
       )
     }
     
