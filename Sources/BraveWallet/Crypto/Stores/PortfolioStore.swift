@@ -41,7 +41,7 @@ struct BalanceTimePrice: DataPoint, Equatable {
 public class PortfolioStore: ObservableObject {
   /// The dollar amount of your portfolio
   @Published private(set) var balance: String = "$0.00"
-  /// The users visible assets
+  /// The users visible fungible tokens. NFTs are separated into `userVisibleNFTs`.
   @Published private(set) var userVisibleAssets: [AssetViewModel] = []
   /// The users visible NFTs
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
