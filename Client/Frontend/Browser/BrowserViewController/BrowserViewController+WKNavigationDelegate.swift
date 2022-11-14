@@ -46,28 +46,24 @@ extension BrowserViewController: WKNavigationDelegate {
     }
   }
 
-  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
     guard let url = navigationAction.request.url, let tab = tab(for: webView) else {
-      decisionHandler(.cancel, preferences)
-      return
+      return (.cancel, preferences)
     }
 
     // Handle special urls that require a policy to be returned right away
     if let policy = handleInternalLinks(for: navigationAction)
         ?? handleUniversalLinks(for: navigationAction)
         ?? handleSpecialSchemes(for: navigationAction) {
-      decisionHandler(policy, preferences)
-      return
+      return (policy, preferences)
     }
     
     // Website redirection logic
     if url.isWebPage(includeDataURIs: false),
        navigationAction.targetFrame?.isMainFrame == true,
        let redirectURL = WebsiteRedirects.redirect(for: url) {
-      
-      decisionHandler(.cancel, preferences)
       tab.loadRequest(URLRequest(url: redirectURL))
-      return
+      return (.cancel, preferences)
     }
     
     // If we haven't cancelled the request due to the special cases above,
@@ -80,9 +76,8 @@ extension BrowserViewController: WKNavigationDelegate {
       let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
       
       if let request = makeDebounceRequest(for: navigationAction, on: tab, domain: domainForMainFrame) {
-        decisionHandler(.cancel, preferences)
         tab.loadRequest(request)
-        return
+        return (.cancel, preferences)
       }
       
       configureTabScripts(for: navigationAction, on: tab, domain: domainForMainFrame)
@@ -110,9 +105,9 @@ extension BrowserViewController: WKNavigationDelegate {
         self.tabManager.selectedTab?.blockAllAlerts = false
       }
       
-      decisionHandler(.allow, updatedPreferences)
+      return (.allow, updatedPreferences)
     } else {
-      decisionHandler(.cancel, preferences)
+      return (.cancel, preferences)
     }
   }
 
