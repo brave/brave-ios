@@ -244,13 +244,18 @@ public class SendTokenStore: ObservableObject {
     amount: String,
     completion: @escaping (_ success: Bool, _ errMsg: String?) -> Void
   ) {
+    guard let token = self.selectedSendToken else {
+      completion(false, "An Internal Error")
+      return
+    }
+    let amount = (token.isErc721 || token.isNft) ? "1" : amount
     walletService.selectedCoin { [weak self] coin in
       guard let self = self else { return }
       switch coin {
       case .eth:
-        self.sendTokenOnEth(amount: amount, completion: completion)
+        self.sendTokenOnEth(amount: amount, token: token, completion: completion)
       case .sol:
-        self.sendTokenOnSol(amount: amount, completion: completion)
+        self.sendTokenOnSol(amount: amount, token: token, completion: completion)
       default:
         break
       }
@@ -259,14 +264,15 @@ public class SendTokenStore: ObservableObject {
 
   func sendTokenOnEth(
     amount: String,
+    token: BraveWallet.BlockchainToken,
     completion: @escaping (_ success: Bool, _ errMsg: String?) -> Void
   ) {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
-    guard
-      let token = selectedSendToken,
-      let weiHexString = weiFormatter.weiString(from: amount.normalizedDecimals, radix: .hex, decimals: Int(token.decimals)),
-      let fromAddress = currentAccountAddress
-    else { return }
+    guard let weiHexString = weiFormatter.weiString(from: amount.normalizedDecimals, radix: .hex, decimals: Int(token.decimals)),
+          let fromAddress = currentAccountAddress else {
+      completion(false, "An Internal Error")
+      return
+    }
 
     isMakingTx = true
     rpcService.network(.eth) { [weak self] network in
@@ -279,6 +285,19 @@ public class SendTokenStore: ObservableObject {
             completion(success, errorMessage)
           }
         } else {
+          let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
+          self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil, groupId: nil) { success, txMetaId, errorMessage in
+            self.isMakingTx = false
+            completion(success, errorMessage)
+          }
+        }
+      } else if token.isErc721 {
+        self.ethTxManagerProxy.makeErc721Transfer(fromData: fromAddress, to: self.sendAddress, tokenId: token.tokenId, contractAddress: token.contractAddress) { success, data in
+          guard success else {
+            completion(false, nil)
+            return
+          }
+          let baseData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: token.contractAddress, value: "0x0", data: data)
           let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
           self.txService.addUnapprovedTransaction(txDataUnion, from: fromAddress, origin: nil, groupId: nil) { success, txMetaId, errorMessage in
             self.isMakingTx = false
@@ -311,12 +330,11 @@ public class SendTokenStore: ObservableObject {
   
   private func sendTokenOnSol(
     amount: String,
+    token: BraveWallet.BlockchainToken,
     completion: @escaping (_ success: Bool, _ errMsg: String?) -> Void
   ) {
-    guard let token = selectedSendToken,
-          let fromAddress = currentAccountAddress,
-          let amount = WeiFormatter.decimalToAmount(amount.normalizedDecimals, tokenDecimals: Int(token.decimals))
-    else {
+    guard let fromAddress = currentAccountAddress,
+          let amount = WeiFormatter.decimalToAmount(amount.normalizedDecimals, tokenDecimals: Int(token.decimals)) else {
       completion(false, "An Internal Error")
       return
     }

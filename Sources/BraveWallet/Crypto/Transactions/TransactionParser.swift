@@ -295,7 +295,13 @@ enum TransactionParser {
             fromValue: "1", // Can only send 1 erc721 at a time
             fromAmount: "1",
             owner: owner,
-            tokenId: tokenId
+            tokenId: tokenId,
+            gasFee: gasFee(
+              from: transaction,
+              network: network,
+              assetRatios: assetRatios,
+              currencyFormatter: currencyFormatter
+            )
           )
         )
       )
@@ -720,6 +726,8 @@ struct Eth721TransferDetails: Equatable {
   let owner: String
   /// The token id
   let tokenId: String
+  /// Gas fee for the transaction
+  let gasFee: GasFee?
 }
 
 struct SolanaDappTxDetails: Equatable {
