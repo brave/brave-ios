@@ -111,7 +111,7 @@ extension BrowserViewController: WKNavigationDelegate {
     }
   }
 
-  public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let tab = tab(for: webView)
     
@@ -165,8 +165,7 @@ extension BrowserViewController: WKNavigationDelegate {
     ) {
       // Open our helper and cancel this response from the webview.
       passbookHelper.open()
-      decisionHandler(.cancel)
-      return
+      return .cancel
     }
 
     // Check if this response should be downloaded.
@@ -188,8 +187,7 @@ extension BrowserViewController: WKNavigationDelegate {
       if let downloadAlert = downloadHelper.downloadAlert(from: view, okAction: downloadAlertAction) {
         present(downloadAlert, animated: true, completion: nil)
       }
-      decisionHandler(.cancel)
-      return
+      return .cancel
     }
 
     // If the content type is not HTML, create a temporary document so it can be downloaded and
@@ -205,10 +203,6 @@ extension BrowserViewController: WKNavigationDelegate {
 
       tab.mimeType = navigationResponse.response.mimeType
     }
-
-    // If none of our helpers are responsible for handling this response,
-    // just let the webview handle it as normal.
-    decisionHandler(.allow)
     
     // Record the navigation visit type for the URL after navigation actions
     // this is done in decidePolicyFor to handle all the cases like redirects etc.
@@ -216,6 +210,10 @@ extension BrowserViewController: WKNavigationDelegate {
        !responseURL.isReaderModeURL, !responseURL.isFileURL, responseURL.isWebPage(), !tab.isPrivate {
       recordNavigationInTab(responseURL, visitType: lastEnteredURLVisitType)
     }
+    
+    // If none of our helpers are responsible for handling this response,
+    // just let the webview handle it as normal.
+    return .allow
   }
 
   public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
