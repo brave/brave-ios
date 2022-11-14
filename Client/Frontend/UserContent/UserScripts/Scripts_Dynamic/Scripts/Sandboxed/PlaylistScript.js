@@ -237,7 +237,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
 
     function onReady(fn) {
       if (document.readyState === "complete" || document.readyState === "ready") {
-        setTimeout(fn, 1);
+        fn();
       } else {
         document.addEventListener("DOMContentLoaded", fn);
       }
@@ -324,7 +324,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
           });
           
           // Timeinterval is needed for DailyMotion as their DOM is bad
-          var interval = setInterval(function() {
+          let interval = setInterval(function() {
             getAllVideoElements().forEach(function(node) {
               observeNode(node);
               notifyNode(node, 'video', true, true);
@@ -336,9 +336,8 @@ window.__firefox__.includeOnce("Playlist", function($) {
             });
           }, 1000);
 
-          var timeout = setTimeout(function() {
+          let timeout = setTimeout(function() {
             clearInterval(interval);
-            clearTimeout(timeout);
           }, 10000);
         }
       });
