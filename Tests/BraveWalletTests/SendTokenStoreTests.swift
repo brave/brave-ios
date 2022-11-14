@@ -204,6 +204,43 @@ class SendTokenStoreTests: XCTestCase {
     }
   }
   
+  func testMakeSendERC721Transaction() {
+    let rpcService = BraveWallet.TestJsonRpcService()
+    rpcService._network = { $1(.mockGoerli) }
+    rpcService._addObserver = { _ in }
+    
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(.eth) }
+    
+    let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
+    ethTxManagerProxy._makeErc721TransferFromData = { _, _, _, _, completion in
+      completion(true, .init())
+    }
+    
+    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
+    
+    let store = SendTokenStore(
+      keyringService: MockKeyringService(),
+      rpcService: rpcService,
+      walletService: MockBraveWalletService(),
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: .mockERC721NFTToken
+    )
+    store.setUpTest()
+
+    let ex = expectation(description: "send-NFT-transaction")
+    store.sendToken(amount: "") { success, _ in
+      defer { ex.fulfill() }
+      XCTAssertTrue(success)
+    }
+    waitForExpectations(timeout: 3) { error in
+      XCTAssertNil(error)
+    }
+  }
+  
   func testSendFullBalanceNoRounding() {
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     let mockBalance = "47.156499657504857477"

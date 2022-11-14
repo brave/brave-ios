@@ -600,7 +600,11 @@ class TransactionParserTests: XCTestCase {
           fromValue: "1",
           fromAmount: "1",
           owner: "0x1111111111aaaaaaaaaa2222222222bbbbbbbbbb",
-          tokenId: "token.id"
+          tokenId: "token.id",
+          gasFee: .init(
+            fee: "0.000031",
+            fiat: "$0.000031"
+          )
         )
       )
     )
@@ -618,7 +622,7 @@ class TransactionParserTests: XCTestCase {
       XCTFail("Failed to parse erc721TransferFrom transaction")
       return
     }
-    XCTAssertEqual(expectedParsedTransaction, parsedTransaction)
+    XCTAssertNoDifference(expectedParsedTransaction, parsedTransaction)
   }
   
   func testSolanaSystemTransfer() {
