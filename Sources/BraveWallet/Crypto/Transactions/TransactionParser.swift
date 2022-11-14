@@ -355,7 +355,12 @@ enum TransactionParser {
       }
       let fromValue = "\(amount)"
       let fromValueFormatted = formatter.decimalString(for: fromValue, radix: .decimal, decimals: Int(fromToken.decimals))?.trimmingTrailingZeros ?? ""
-      let fromFiat = currencyFormatter.string(from: NSNumber(value: assetRatios[fromToken.assetRatioId.lowercased(), default: 0] * (Double(fromValueFormatted) ?? 0))) ?? "$0.00"
+      let fromFiat: String
+      if fromToken.isNft {
+        fromFiat = "" // don't show fiat for NFTs
+      } else {
+        fromFiat = currencyFormatter.string(from: NSNumber(value: assetRatios[fromToken.assetRatioId.lowercased(), default: 0] * (Double(fromValueFormatted) ?? 0))) ?? "$0.00"
+      }
       /* Example:
        Send 0.1234 SMB
        
