@@ -12,16 +12,14 @@ import os.log
 
 public class BraveSkusManager {
   private let sku: SkusSkusService
-  private let considerCachedCredentials: Bool
   
-  public init?(isPrivateMode: Bool, considerCachedCredentials: Bool) {
+  public init?(isPrivateMode: Bool) {
     guard let skusService = Skus.SkusServiceFactory.get(privateMode: isPrivateMode) else {
       assertionFailure("Failed to create SkusService")
       return nil
     }
     
     self.sku = skusService
-    self.considerCachedCredentials = considerCachedCredentials
   }
   
   public static func refreshSKUCredential(isPrivate: Bool) {
@@ -37,7 +35,7 @@ public class BraveSkusManager {
       return
     }
     
-    guard let manager = BraveSkusManager(isPrivateMode: isPrivate, considerCachedCredentials: true) else {
+    guard let manager = BraveSkusManager(isPrivateMode: isPrivate) else {
       assertionFailure()
       return
     }

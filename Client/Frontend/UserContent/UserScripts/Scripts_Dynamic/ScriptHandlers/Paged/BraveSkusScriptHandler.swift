@@ -17,7 +17,7 @@ class BraveSkusScriptHandler: TabContentScript {
   private let braveSkusManager: BraveSkusManager
   
   required init?(tab: Tab) {
-    guard let manager = BraveSkusManager(isPrivateMode: tab.isPrivate, considerCachedCredentials: false) else {
+    guard let manager = BraveSkusManager(isPrivateMode: tab.isPrivate) else {
       assertionFailure()
       return nil
     }
