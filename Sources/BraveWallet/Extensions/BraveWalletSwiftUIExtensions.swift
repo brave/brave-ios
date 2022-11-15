@@ -97,14 +97,6 @@ extension BraveWallet.BlockchainToken: Identifiable {
     // since there is no swap support for custom networks.
     return symbol == network.symbol ? BraveWallet.ethSwapAddress : contractAddress
   }
-  
-  var nftTokenTitle: String {
-    if isErc721, let tokenId = Int(tokenId.removingHexPrefix, radix: 16) {
-      return "\(name) #\(tokenId)"
-    } else {
-      return name
-    }
-  }
 }
 
 extension BraveWallet {
