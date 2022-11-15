@@ -49,6 +49,12 @@ public class BraveVPN {
     }
     
     if let customCredential = customCredential {
+      if hasExpired == true {
+        clearConfiguration()
+        logAndStoreError("Skus credential expired, resetting configuration")
+        return
+      }
+      
       setCustomVPNCredential(customCredential)
     }
     
@@ -300,6 +306,10 @@ public class BraveVPN {
   public static func clearCredentials() {
     GRDKeychain.removeGuardianKeychainItems()
     GRDKeychain.removeSubscriberCredential(withRetries: 3)
+    
+    Preferences.VPN.skusCredential.reset()
+    Preferences.VPN.skusCredentialDomain.reset()
+    Preferences.VPN.skusCredentialExpirationDate.reset()
   }
 
   // MARK: - Region selection

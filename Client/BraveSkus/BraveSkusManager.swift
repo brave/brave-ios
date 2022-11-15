@@ -43,8 +43,9 @@ public class BraveSkusManager {
     }
     
     Logger.module.debug("Refreshing sku credential")
-    manager.prepareCredentialsPresentation(for: domain, path: "*") { newCredential in
-      Logger.module.debug("Sku")
+    
+    manager.credentialSummary(for: domain) { completion in
+      Logger.module.debug("credentialSummary response")
     }
   }
   
@@ -104,11 +105,15 @@ public class BraveSkusManager {
         if let expiresDate = (json as? [String: Any])?["expires_at"] as? String,
            let date = BraveSkusWebHelper.milisecondsOptionalDate(from: expiresDate) {
           Preferences.VPN.expirationDate.value = date
+          
+          // The credential has not expired yet, we can proceed with preparing it.
+          if date > Date() {
+            self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
+          }
         } else {
           assertionFailure("Failed to parse date")
         }
         
-        self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
       } catch {
         Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
       }

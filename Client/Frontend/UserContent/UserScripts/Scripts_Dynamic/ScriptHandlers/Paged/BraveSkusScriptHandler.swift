@@ -87,11 +87,7 @@ class BraveSkusScriptHandler: TabContentScript {
         }
       }
     case Method.prepareCredentialsPresentation.rawValue:
-      if let domain = data["domain"] as? String, let path = data["path"] as? String {
-        braveSkusManager.prepareCredentialsPresentation(for: domain, path: path) { result in
-          replyHandler(result, nil)
-        }
-      }
+      assertionFailure("The website should never call the credentialsPresentation.")
     case Method.credentialsSummary.rawValue:
       if let domain = data["domain"] as? String {
         braveSkusManager.credentialSummary(for: domain) { result in
