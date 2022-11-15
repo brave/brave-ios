@@ -42,7 +42,11 @@ public class BraveSkusManager {
       return
     }
     
-    Logger.module.debug("Refreshing sku credential")
+    Logger.module.debug("Refreshing sku credential. Clearing old credential from persistence.")
+    
+    Preferences.VPN.skusCredential.reset()
+    Preferences.VPN.skusCredentialDomain.reset()
+    Preferences.VPN.skusCredentialExpirationDate.reset()
     
     manager.credentialSummary(for: domain) { completion in
       Logger.module.debug("credentialSummary response")
@@ -102,21 +106,41 @@ public class BraveSkusManager {
         
         resultJSON(json)
         
-        if let expiresDate = (json as? [String: Any])?["expires_at"] as? String,
-           let date = BraveSkusWebHelper.milisecondsOptionalDate(from: expiresDate) {
-          Preferences.VPN.expirationDate.value = date
-          
-          // The credential has not expired yet, we can proceed with preparing it.
-          if date > Date() {
-            self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
-          }
-        } else {
-          assertionFailure("Failed to parse date")
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
+        
+        if credentialSummaryJson.expirationDate == nil {
+          assertionFailure("Failed to parse expiration date")
         }
         
+        if credentialSummaryJson.isValid, let expirationDate = credentialSummaryJson.expirationDate {
+          Preferences.VPN.expirationDate.value = expirationDate
+          
+          // The credential has not expired yet, we can proceed with preparing it.
+          if expirationDate > Date() {
+            self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
+          }
+        }
       } catch {
         Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
       }
+    }
+  }
+  
+  private struct CredentialSummary: Codable {
+    let expiresAt: String
+    let active: Bool
+    let remainingCredentialCount: Int
+    // The json for credential summary has additional fields. They are not used in the app at the moment.
+    
+    var isValid: Bool {
+      active && remainingCredentialCount > 0
+    }
+    
+    // FIXME: Convert right away at init-from-decoder
+    var expirationDate: Date? {
+      BraveSkusWebHelper.milisecondsOptionalDate(from: expiresAt)
     }
   }
 }
