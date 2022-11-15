@@ -275,6 +275,7 @@ struct AddCustomAssetView: View {
                 networkSelectionStore: networkSelectionStore
               )
             }
+            .onDisappear { networkSelectionStore.detailNetwork = nil }
             .accentColor(Color(.braveOrange))
             .navigationViewStyle(.stack)
           }
