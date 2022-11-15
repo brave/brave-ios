@@ -28,7 +28,8 @@ struct SendTokenView: View {
           let token = sendTokenStore.selectedSendToken,
           !sendTokenStore.isMakingTx,
           !sendTokenStore.sendAddress.isEmpty,
-          sendTokenStore.addressError == nil else {
+          sendTokenStore.addressError == nil,
+          sendTokenStore.sendError == nil else {
       return true
     }
     if token.isErc721 || token.isNft {
@@ -42,6 +43,14 @@ struct SendTokenView: View {
       return true
     }
     return sendAmount == 0 || sendAmount > balance || sendTokenStore.sendAmount.isEmpty
+  }
+  
+  private var sendButtonTitle: String {
+    if let error = sendTokenStore.sendError {
+      return error.localizedDescription
+    } else {
+      return Strings.Wallet.sendCryptoSendButtonTitle
+    }
   }
 
   var body: some View {
@@ -161,7 +170,7 @@ struct SendTokenView: View {
         Section(
           header:
             WalletLoadingButton(
-              isLoading: sendTokenStore.isMakingTx,
+              isLoading: sendTokenStore.isLoading || sendTokenStore.isMakingTx,
               action: {
                 sendTokenStore.sendToken(
                   amount: sendTokenStore.sendAmount
@@ -174,7 +183,7 @@ struct SendTokenView: View {
                 }
               },
               label: {
-                Text(Strings.Wallet.sendCryptoSendButtonTitle)
+                Text(sendButtonTitle)
               }
             )
             .buttonStyle(BraveFilledButtonStyle(size: .normal))
@@ -213,7 +222,7 @@ struct SendTokenView: View {
       }
     }
     .onAppear {
-      sendTokenStore.fetchAssets()
+      sendTokenStore.update()
     }
     .navigationViewStyle(.stack)
   }
