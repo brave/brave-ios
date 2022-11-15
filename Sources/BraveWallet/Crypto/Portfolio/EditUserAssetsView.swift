@@ -15,6 +15,14 @@ private struct EditTokenView: View {
   
   @Binding var tokenNeedsTokenId: BraveWallet.BlockchainToken?
   
+  private var tokenName: String {
+    if (assetStore.token.isErc721 || assetStore.token.isNft), !assetStore.token.tokenId.isEmpty {
+      return assetStore.token.nftTokenTitle
+    } else {
+      return assetStore.token.name
+    }
+  }
+  
   var body: some View {
     Button(action: {
       if assetStore.token.isErc721, assetStore.token.tokenId.isEmpty {
@@ -26,7 +34,7 @@ private struct EditTokenView: View {
       HStack(spacing: 8) {
         AssetIconView(token: assetStore.token, network: assetStore.network)
         VStack(alignment: .leading) {
-          Text(assetStore.token.name)
+          Text(tokenName)
             .fontWeight(.semibold)
             .foregroundColor(Color(.bravePrimary))
           Text(assetStore.token.symbol.uppercased())

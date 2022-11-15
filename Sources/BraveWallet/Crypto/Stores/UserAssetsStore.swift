@@ -184,9 +184,9 @@ public class UserAssetsStore: ObservableObject {
     }
   }
   
-  @MainActor func ethMainnet() async -> BraveWallet.NetworkInfo? {
-    let allNetworks = await rpcService.allNetworks(.eth)
-    return allNetworks.first { $0.chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame }
+  @MainActor func networkInfo(by chainId: String, coin: BraveWallet.CoinType) async -> BraveWallet.NetworkInfo? {
+    let allNetworks = await rpcService.allNetworks(coin)
+    return allNetworks.first { $0.chainId.caseInsensitiveCompare(chainId) == .orderedSame }
   }
 }
 

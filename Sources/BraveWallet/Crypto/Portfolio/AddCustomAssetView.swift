@@ -283,7 +283,7 @@ struct AddCustomAssetView: View {
         if let token = tokenNeedsTokenId {
           Task { @MainActor in
             selectedTokenType = .nft
-            networkSelectionStore.networkSelectionInForm = await userAssetStore.ethMainnet()
+            networkSelectionStore.networkSelectionInForm = await userAssetStore.networkInfo(by: token.chainId, coin: token.coin)
             nameInput = token.name
             symbolInput = token.symbol
             addressInput = token.contractAddress
@@ -335,7 +335,9 @@ struct AddCustomAssetView: View {
       }
       if let knownERC721Token = tokenNeedsTokenId {
         knownERC721Token.tokenId = tokenIdToHex
-        knownERC721Token.chainId = networkSelectionStore.networkSelectionInForm?.chainId ?? BraveWallet.MainnetChainId
+        if let userSelectedNetworkId = networkSelectionStore.networkSelectionInForm?.chainId {
+          knownERC721Token.chainId = userSelectedNetworkId
+        }
         if knownERC721Token.name != nameInput {
           knownERC721Token.name = nameInput
         }
