@@ -10,18 +10,42 @@ import BraveCore
 import BraveVPN
 import os.log
 
-class BraveSkusManager {
+public class BraveSkusManager {
   private let sku: SkusSkusService
   private let considerCachedCredentials: Bool
   
-  init?(tab: Tab, considerCachedCredentials: Bool) {
-    guard let skusService = Skus.SkusServiceFactory.get(privateMode: tab.isPrivate) else {
-      assertionFailure()
+  public init?(isPrivateMode: Bool, considerCachedCredentials: Bool) {
+    guard let skusService = Skus.SkusServiceFactory.get(privateMode: isPrivateMode) else {
+      assertionFailure("Failed to create SkusService")
       return nil
     }
     
     self.sku = skusService
     self.considerCachedCredentials = considerCachedCredentials
+  }
+  
+  public static func refreshSKUCredential(isPrivate: Bool) {
+    guard let _ = Preferences.VPN.skusCredential.value,
+          let domain = Preferences.VPN.skusCredentialDomain.value,
+          let expirationDate = Preferences.VPN.skusCredentialExpirationDate.value else {
+      Logger.module.debug("No skus credentials stored in the app.")
+      return
+    }
+    
+    guard expirationDate < Date() else {
+      Logger.module.debug("Existing sku credential has not expired yet, no need to refresh it.")
+      return
+    }
+    
+    guard let manager = BraveSkusManager(isPrivateMode: isPrivate, considerCachedCredentials: true) else {
+      assertionFailure()
+      return
+    }
+    
+    Logger.module.debug("Refreshing sku credential")
+    manager.prepareCredentialsPresentation(for: domain, path: "*") { newCredential in
+      Logger.module.debug("Sku")
+    }
   }
   
   // MARK: - Handling SKU methods.
@@ -48,7 +72,7 @@ class BraveSkusManager {
   }
   
   func prepareCredentialsPresentation(for domain: String, path: String,
-                                              resultCredential: ((String) -> Void)?) {
+                                      resultCredential: ((String) -> Void)?) {
     Logger.module.debug("skus prepareCredentialsPresentation")
     sku.prepareCredentialsPresentation(domain, path: path) { credential in
       if !credential.isEmpty {
