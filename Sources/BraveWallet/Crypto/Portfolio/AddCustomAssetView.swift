@@ -266,7 +266,15 @@ struct AddCustomAssetView: View {
       .background(
         Color.clear
           .sheet(
-            isPresented: $isPresentingNetworkSelection
+            isPresented: Binding(
+              get: { isPresentingNetworkSelection },
+              set: {
+                isPresentingNetworkSelection = $0
+                if !$0, networkSelectionStore.detailNetwork != nil {
+                  networkSelectionStore.detailNetwork = nil
+                }
+              }
+            )
           ) {
             NavigationView {
               NetworkSelectionView(
@@ -275,7 +283,6 @@ struct AddCustomAssetView: View {
                 networkSelectionStore: networkSelectionStore
               )
             }
-            .onDisappear { networkSelectionStore.detailNetwork = nil }
             .accentColor(Color(.braveOrange))
             .navigationViewStyle(.stack)
           }
