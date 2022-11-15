@@ -62,6 +62,7 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
               // after log in to account.brave website.
               Preferences.VPN.skusCredential.reset()
               Preferences.VPN.skusCredentialDomain.reset()
+              Preferences.VPN.skusCredentialExpirationDate.reset()
             } else {
               // Receipt either expired or receipt validation returned some error.
               self.delegate?.purchaseFailed(error: .receiptError)
