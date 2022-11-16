@@ -154,7 +154,11 @@ class AssetDetailStore: ObservableObject {
     for tokenBalance in tokenBalances {
       if let index = accounts.firstIndex(where: { $0.account.address == tokenBalance.account.address }) {
         accountAssetViewModels[index].decimalBalance = tokenBalance.balance ?? 0.0
-        accountAssetViewModels[index].balance = String(format: "%.4f", tokenBalance.balance ?? 0.0)
+        if token.isErc721 || token.isNft {
+          accountAssetViewModels[index].balance = (tokenBalance.balance ?? 0) > 0 ? "1" : "0"
+        } else {
+          accountAssetViewModels[index].balance = String(format: "%.4f", tokenBalance.balance ?? 0.0)
+        }
         accountAssetViewModels[index].fiatBalance = self.currencyFormatter.string(from: NSNumber(value: accountAssetViewModels[index].decimalBalance * assetPriceValue)) ?? ""
       }
     }

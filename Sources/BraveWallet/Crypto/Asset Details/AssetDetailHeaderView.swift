@@ -131,7 +131,7 @@ struct AssetDetailHeaderView: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(alignment: assetDetailStore.token.isFungibleToken ? .center : .leading, spacing: 0) {
       if assetDetailStore.token.isFungibleToken {
         VStack(alignment: .leading) {
           if sizeCategory.isAccessibilityCategory {
@@ -221,7 +221,7 @@ struct AssetDetailHeaderView: View {
       } else {
         HStack {
           AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
-          Text(assetDetailStore.token.name)
+          Text(assetDetailStore.token.nftTokenTitle)
             .fixedSize(horizontal: false, vertical: true)
             .font(.title3.weight(.semibold))
           Spacer()
@@ -233,6 +233,7 @@ struct AssetDetailHeaderView: View {
           .padding(.bottom)
       }
       actionButtonsContainer
+        .padding(.horizontal, assetDetailStore.token.isFungibleToken ? 0 : 16)
     }
   }
 }
