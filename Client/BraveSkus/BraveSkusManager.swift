@@ -106,16 +106,20 @@ public class BraveSkusManager {
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
         let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
         
-        if credentialSummaryJson.expirationDate == nil {
-          assertionFailure("Failed to parse expiration date")
-        }
-        
-        if credentialSummaryJson.isValid, let expirationDate = credentialSummaryJson.expirationDate {
-          Preferences.VPN.expirationDate.value = expirationDate
+        if credentialSummaryJson.isValid {
+          Preferences.VPN.expirationDate.value = credentialSummaryJson.expiresAt
           
           // The credential has not expired yet, we can proceed with preparing it.
-          if expirationDate > Date() {
+          if credentialSummaryJson.expiresAt > Date() {
             self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
+          }
+        } else {
+          if !credentialSummaryJson.active {
+            Logger.module.debug("The credential summary is not active")
+          }
+          
+          if credentialSummaryJson.remainingCredentialCount <= 0 {
+            Logger.module.debug("The credential summary does not have any remaining credentials")
           }
         }
       } catch {
@@ -125,7 +129,7 @@ public class BraveSkusManager {
   }
   
   private struct CredentialSummary: Codable {
-    let expiresAt: String
+    let expiresAt: Date
     let active: Bool
     let remainingCredentialCount: Int
     // The json for credential summary has additional fields. They are not used in the app at the moment.
@@ -134,9 +138,17 @@ public class BraveSkusManager {
       active && remainingCredentialCount > 0
     }
     
-    // FIXME: Convert right away at init-from-decoder
-    var expirationDate: Date? {
-      BraveSkusWebHelper.milisecondsOptionalDate(from: expiresAt)
+    init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      self.active = try container.decode(Bool.self, forKey: .active)
+      self.remainingCredentialCount = try container.decode(Int.self, forKey: .remainingCredentialCount)
+      guard let expiresAt =
+              BraveSkusWebHelper.milisecondsOptionalDate(from: try container.decode(String.self, forKey: .expiresAt)) else {
+        throw DecodingError.typeMismatch(Data.self, .init(codingPath: [],
+                                                            debugDescription: "Failed to decode Data from String"))
+      }
+      
+      self.expiresAt = expiresAt
     }
   }
 }
