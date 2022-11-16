@@ -229,7 +229,7 @@ class UserScriptManager {
         // Local variables are NOT enumerable!
         let \(UserScriptManager.walletSolanaNameSpace);
         
-        window.__firefox__.execute(function($, $Object) {
+        window.__firefox__.execute(function($, $Object, $Function, $Array) {
           // Inject Solana as a Local Variable.
           \(solanaWeb3Script)
         

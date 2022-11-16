@@ -1,7 +1,7 @@
 var solanaWeb3 = $(function (exports) {
   "use strict";
 
-  var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof __webpack_require__.g !== "undefined" ? __webpack_require__.g : typeof self !== "undefined" ? self : {};
+  var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof __webpack_require__.g !== "undefined" ? __webpack_require__.g : typeof self !== "undefined" ? self : $Object.create(null, undefined);
   function getAugmentedNamespace(n) {
     var f = n.default;
     if (typeof f == "function") {
@@ -10,29 +10,33 @@ var solanaWeb3 = $(function (exports) {
       };
       $(a);
       a.prototype = f.prototype;
-    } else a = {};
-    $Object.defineProperty(a, "__esModule", {
-      value: true
-    });
+    } else a = $Object.create(null, undefined);
+    $Object.defineProperty(a, "__esModule", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = true;
+      return result;
+    })());
     $Object.keys(n).forEach($(function (k) {
       var d = $Object.getOwnPropertyDescriptor(n, k);
-      $Object.defineProperty(a, k, d.get ? d : {
-        enumerable: true,
-        get: $(function () {
+      $Object.defineProperty(a, k, d.get ? d : $(function () {
+        let result = $Object.create(null, undefined);
+        result.enumerable = true;
+        result.get = $(function () {
           return n[k];
-        })
-      });
+        });
+        return result;
+      })());
     }));
     return a;
   }
   $(getAugmentedNamespace);
-  var buffer = {};
-  var base64Js = {};
+  var buffer = $Object.create(null, undefined);
+  var base64Js = $Object.create(null, undefined);
   base64Js.byteLength = byteLength;
   base64Js.toByteArray = toByteArray;
   base64Js.fromByteArray = fromByteArray;
-  var lookup = [];
-  var revLookup = [];
+  var lookup = $Array.of();
+  var revLookup = $Array.of();
   var Arr = typeof Uint8Array !== "undefined" ? Uint8Array : Array;
   var code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   for (var i$1 = 0, len = code.length; i$1 < len; ++i$1) {
@@ -49,7 +53,7 @@ var solanaWeb3 = $(function (exports) {
     var validLen = b64.indexOf("=");
     if (validLen === -1) validLen = len;
     var placeHoldersLen = validLen === len ? 0 : 4 - validLen % 4;
-    return [validLen, placeHoldersLen];
+    return $Array.of(validLen, placeHoldersLen);
   }
   $(getLens);
   function byteLength(b64) {
@@ -96,7 +100,7 @@ var solanaWeb3 = $(function (exports) {
   $(tripletToBase64);
   function encodeChunk(uint8, start, end) {
     var tmp;
-    var output = [];
+    var output = $Array.of();
     for (var i = start; i < end; i += 3) {
       tmp = (uint8[i] << 16 & 16711680) + (uint8[i + 1] << 8 & 65280) + (uint8[i + 2] & 255);
       output.push(tripletToBase64(tmp));
@@ -108,7 +112,7 @@ var solanaWeb3 = $(function (exports) {
     var tmp;
     var len = uint8.length;
     var extraBytes = len % 3;
-    var parts = [];
+    var parts = $Array.of();
     var maxChunkLength = 16383;
     for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
       parts.push(encodeChunk(uint8, i, i + maxChunkLength > len2 ? len2 : i + maxChunkLength));
@@ -123,7 +127,7 @@ var solanaWeb3 = $(function (exports) {
     return parts.join("");
   }
   $(fromByteArray);
-  var ieee754 = {};
+  var ieee754 = $Object.create(null, undefined);
   /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
   ieee754.read = $(function (buffer, offset, isLE, mLen, nBytes) {
     var e, m;
@@ -220,11 +224,13 @@ var solanaWeb3 = $(function (exports) {
     function typedArraySupport() {
       try {
         const arr = new Uint8Array(1);
-        const proto = {
-          foo: $(function () {
+        const proto = $(function () {
+          let result = $Object.create(null, undefined);
+          result.foo = $(function () {
             return 42;
-          })
-        };
+          });
+          return result;
+        })();
         $Object.setPrototypeOf(proto, Uint8Array.prototype);
         $Object.setPrototypeOf(arr, proto);
         return arr.foo() === 42;
@@ -233,20 +239,24 @@ var solanaWeb3 = $(function (exports) {
       }
     }
     $(typedArraySupport);
-    $Object.defineProperty(Buffer.prototype, "parent", {
-      enumerable: true,
-      get: $(function () {
+    $Object.defineProperty(Buffer.prototype, "parent", $(function () {
+      let result = $Object.create(null, undefined);
+      result.enumerable = true;
+      result.get = $(function () {
         if (!Buffer.isBuffer(this)) return undefined;
         return this.buffer;
-      })
-    });
-    $Object.defineProperty(Buffer.prototype, "offset", {
-      enumerable: true,
-      get: $(function () {
+      });
+      return result;
+    })());
+    $Object.defineProperty(Buffer.prototype, "offset", $(function () {
+      let result = $Object.create(null, undefined);
+      result.enumerable = true;
+      result.get = $(function () {
         if (!Buffer.isBuffer(this)) return undefined;
         return this.byteOffset;
-      })
-    });
+      });
+      return result;
+    })());
     function createBuffer(length) {
       if (length > K_MAX_LENGTH) {
         throw new RangeError('The value "' + length + '" is invalid for option "size"');
@@ -404,7 +414,7 @@ var solanaWeb3 = $(function (exports) {
         }
         return fromArrayLike(obj);
       }
-      if (obj.type === "Buffer" && Array.isArray(obj.data)) {
+      if (obj.type === "Buffer" && $Array.isArray(obj.data)) {
         return fromArrayLike(obj.data);
       }
     }
@@ -465,7 +475,7 @@ var solanaWeb3 = $(function (exports) {
       }
     });
     Buffer.concat = $(function concat(list, length) {
-      if (!Array.isArray(list)) {
+      if (!$Array.isArray(list)) {
         throw new TypeError('"list" argument must be an Array of Buffers');
       }
       if (list.length === 0) {
@@ -740,7 +750,7 @@ var solanaWeb3 = $(function (exports) {
             return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset);
           }
         }
-        return arrayIndexOf(buffer, [val], byteOffset, encoding, dir);
+        return arrayIndexOf(buffer, $Array.of(val), byteOffset, encoding, dir);
       }
       throw new TypeError("val must be string, number or Buffer");
     }
@@ -900,10 +910,12 @@ var solanaWeb3 = $(function (exports) {
       }
     });
     Buffer.prototype.toJSON = $(function toJSON() {
-      return {
-        type: "Buffer",
-        data: Array.prototype.slice.call(this._arr || this, 0)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.type = "Buffer";
+        result.data = $Array.prototype.slice.call(this._arr || this, 0);
+        return result;
+      })();
     });
     function base64Slice(buf, start, end) {
       if (start === 0 && end === buf.length) {
@@ -915,7 +927,7 @@ var solanaWeb3 = $(function (exports) {
     $(base64Slice);
     function utf8Slice(buf, start, end) {
       end = Math.min(buf.length, end);
-      const res = [];
+      const res = $Array.of();
       let i = start;
       while (i < end) {
         const firstByte = buf[i];
@@ -1558,16 +1570,18 @@ var solanaWeb3 = $(function (exports) {
       }
       return this;
     });
-    const errors = {};
+    const errors = $Object.create(null, undefined);
     function E(sym, getMessage, Base) {
       errors[sym] = class NodeError extends Base {
         constructor() {
           super();
-          $Object.defineProperty(this, "message", {
-            value: getMessage.apply(this, arguments),
-            writable: true,
-            configurable: true
-          });
+          $Object.defineProperty(this, "message", $(function () {
+            let result = $Object.create(null, undefined);
+            result.value = getMessage.apply(this, arguments);
+            result.writable = true;
+            result.configurable = true;
+            return result;
+          }).bind(this)());
           this.name = `${this.name} [${sym}]`;
           this.stack;
           delete this.name;
@@ -1576,12 +1590,14 @@ var solanaWeb3 = $(function (exports) {
           return sym;
         }
         set code(value) {
-          $Object.defineProperty(this, "code", {
-            configurable: true,
-            enumerable: true,
-            value: value,
-            writable: true
-          });
+          $Object.defineProperty(this, "code", $(function () {
+            let result = $Object.create(null, undefined);
+            result.configurable = true;
+            result.enumerable = true;
+            result.value = value;
+            result.writable = true;
+            return result;
+          })());
         }
         toString() {
           return `${this.name} [${sym}]: ${this.message}`;
@@ -1681,7 +1697,7 @@ var solanaWeb3 = $(function (exports) {
       let codePoint;
       const length = string.length;
       let leadSurrogate = null;
-      const bytes = [];
+      const bytes = $Array.of();
       for (let i = 0; i < length; ++i) {
         codePoint = string.charCodeAt(i);
         if (codePoint > 55295 && codePoint < 57344) {
@@ -1726,7 +1742,7 @@ var solanaWeb3 = $(function (exports) {
     }
     $(utf8ToBytes);
     function asciiToBytes(str) {
-      const byteArray = [];
+      const byteArray = $Array.of();
       for (let i = 0; i < str.length; ++i) {
         byteArray.push(str.charCodeAt(i) & 255);
       }
@@ -1735,7 +1751,7 @@ var solanaWeb3 = $(function (exports) {
     $(asciiToBytes);
     function utf16leToBytes(str, units) {
       let c, hi, lo;
-      const byteArray = [];
+      const byteArray = $Array.of();
       for (let i = 0; i < str.length; ++i) {
         if ((units -= 2) < 0) break;
         c = str.charCodeAt(i);
@@ -1820,14 +1836,16 @@ var solanaWeb3 = $(function (exports) {
     }
   }
   $(output);
-  const assert$2 = {
-    number: number$1,
-    bool: bool,
-    bytes: bytes,
-    hash: hash,
-    exists: exists,
-    output: output
-  };
+  const assert$2 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.number = number$1;
+    result.bool = bool;
+    result.bytes = bytes;
+    result.hash = hash;
+    result.exists = exists;
+    result.output = output;
+    return result;
+  })();
   var assert$3 = assert$2;
   /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
   const u32$1 = arr => new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
@@ -1836,11 +1854,13 @@ var solanaWeb3 = $(function (exports) {
   $(createView);
   const rotr = (word, shift) => word << 32 - shift | word >>> shift;
   $(rotr);
-  const isLE = new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68;
+  const isLE = new Uint8Array(new Uint32Array($Array.of(287454020)).buffer)[0] === 68;
   if (!isLE) throw new Error("Non little-endian hardware is not supported");
-  Array.from({
-    length: 256
-  }, $((v, i) => i.toString(16).padStart(2, "0")));
+  $Array.from($(function () {
+    let result = $Object.create(null, undefined);
+    result.length = 256;
+    return result;
+  })(), $((v, i) => i.toString(16).padStart(2, "0")));
   function utf8ToBytes(str) {
     if (typeof str !== "string") {
       throw new TypeError(`utf8ToBytes expected string, got ${typeof str}`);
@@ -1872,7 +1892,7 @@ var solanaWeb3 = $(function (exports) {
   function wrapConstructorWithOpts(hashCons) {
     const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
     $(hashC);
-    const tmp = hashCons({});
+    const tmp = hashCons($Object.create(null, undefined));
     hashC.outputLen = tmp.outputLen;
     hashC.blockLen = tmp.blockLen;
     hashC.create = $(opts => hashCons(opts));
@@ -1990,14 +2010,18 @@ var solanaWeb3 = $(function (exports) {
   const U32_MASK64 = BigInt(2 ** 32 - 1);
   const _32n = BigInt(32);
   function fromBig(n, le = false) {
-    if (le) return {
-      h: Number(n & U32_MASK64),
-      l: Number(n >> _32n & U32_MASK64)
-    };
-    return {
-      h: Number(n >> _32n & U32_MASK64) | 0,
-      l: Number(n & U32_MASK64) | 0
-    };
+    if (le) return $(function () {
+      let result = $Object.create(null, undefined);
+      result.h = Number(n & U32_MASK64);
+      result.l = Number(n >> _32n & U32_MASK64);
+      return result;
+    })();
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.h = Number(n >> _32n & U32_MASK64) | 0;
+      result.l = Number(n & U32_MASK64) | 0;
+      return result;
+    })();
   }
   $(fromBig);
   function split(lst, le = false) {
@@ -2008,9 +2032,9 @@ var solanaWeb3 = $(function (exports) {
         h: h,
         l: l
       } = fromBig(lst[i], le);
-      [Ah[i], Al[i]] = [h, l];
+      [Ah[i], Al[i]] = $Array.of(h, l);
     }
-    return [Ah, Al];
+    return $Array.of(Ah, Al);
   }
   $(split);
   const toBig = (h, l) => BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
@@ -2041,10 +2065,12 @@ var solanaWeb3 = $(function (exports) {
   $(rotlBL);
   function add(Ah, Al, Bh, Bl) {
     const l = (Al >>> 0) + (Bl >>> 0);
-    return {
-      h: Ah + Bh + (l / 2 ** 32 | 0) | 0,
-      l: l | 0
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.h = Ah + Bh + (l / 2 ** 32 | 0) | 0;
+      result.l = l | 0;
+      return result;
+    })();
   }
   $(add);
   const add3L = (Al, Bl, Cl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
@@ -2059,32 +2085,34 @@ var solanaWeb3 = $(function (exports) {
   $(add5L);
   const add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
   $(add5H);
-  const u64$1 = {
-    fromBig: fromBig,
-    split: split,
-    toBig: toBig,
-    shrSH: shrSH,
-    shrSL: shrSL,
-    rotrSH: rotrSH,
-    rotrSL: rotrSL,
-    rotrBH: rotrBH,
-    rotrBL: rotrBL,
-    rotr32H: rotr32H,
-    rotr32L: rotr32L,
-    rotlSH: rotlSH,
-    rotlSL: rotlSL,
-    rotlBH: rotlBH,
-    rotlBL: rotlBL,
-    add: add,
-    add3L: add3L,
-    add3H: add3H,
-    add4L: add4L,
-    add4H: add4H,
-    add5H: add5H,
-    add5L: add5L
-  };
+  const u64$1 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.fromBig = fromBig;
+    result.split = split;
+    result.toBig = toBig;
+    result.shrSH = shrSH;
+    result.shrSL = shrSL;
+    result.rotrSH = rotrSH;
+    result.rotrSL = rotrSL;
+    result.rotrBH = rotrBH;
+    result.rotrBL = rotrBL;
+    result.rotr32H = rotr32H;
+    result.rotr32L = rotr32L;
+    result.rotlSH = rotlSH;
+    result.rotlSL = rotlSL;
+    result.rotlBH = rotlBH;
+    result.rotlBL = rotlBL;
+    result.add = add;
+    result.add3L = add3L;
+    result.add3H = add3H;
+    result.add4L = add4L;
+    result.add4H = add4H;
+    result.add5H = add5H;
+    result.add5L = add5L;
+    return result;
+  })();
   var u64$2 = u64$1;
-  const [SHA512_Kh, SHA512_Kl] = u64$2.split(["0x428a2f98d728ae22", "0x7137449123ef65cd", "0xb5c0fbcfec4d3b2f", "0xe9b5dba58189dbbc", "0x3956c25bf348b538", "0x59f111f1b605d019", "0x923f82a4af194f9b", "0xab1c5ed5da6d8118", "0xd807aa98a3030242", "0x12835b0145706fbe", "0x243185be4ee4b28c", "0x550c7dc3d5ffb4e2", "0x72be5d74f27b896f", "0x80deb1fe3b1696b1", "0x9bdc06a725c71235", "0xc19bf174cf692694", "0xe49b69c19ef14ad2", "0xefbe4786384f25e3", "0x0fc19dc68b8cd5b5", "0x240ca1cc77ac9c65", "0x2de92c6f592b0275", "0x4a7484aa6ea6e483", "0x5cb0a9dcbd41fbd4", "0x76f988da831153b5", "0x983e5152ee66dfab", "0xa831c66d2db43210", "0xb00327c898fb213f", "0xbf597fc7beef0ee4", "0xc6e00bf33da88fc2", "0xd5a79147930aa725", "0x06ca6351e003826f", "0x142929670a0e6e70", "0x27b70a8546d22ffc", "0x2e1b21385c26c926", "0x4d2c6dfc5ac42aed", "0x53380d139d95b3df", "0x650a73548baf63de", "0x766a0abb3c77b2a8", "0x81c2c92e47edaee6", "0x92722c851482353b", "0xa2bfe8a14cf10364", "0xa81a664bbc423001", "0xc24b8b70d0f89791", "0xc76c51a30654be30", "0xd192e819d6ef5218", "0xd69906245565a910", "0xf40e35855771202a", "0x106aa07032bbd1b8", "0x19a4c116b8d2d0c8", "0x1e376c085141ab53", "0x2748774cdf8eeb99", "0x34b0bcb5e19b48a8", "0x391c0cb3c5c95a63", "0x4ed8aa4ae3418acb", "0x5b9cca4f7763e373", "0x682e6ff3d6b2b8a3", "0x748f82ee5defb2fc", "0x78a5636f43172f60", "0x84c87814a1f0ab72", "0x8cc702081a6439ec", "0x90befffa23631e28", "0xa4506cebde82bde9", "0xbef9a3f7b2c67915", "0xc67178f2e372532b", "0xca273eceea26619c", "0xd186b8c721c0c207", "0xeada7dd6cde0eb1e", "0xf57d4f7fee6ed178", "0x06f067aa72176fba", "0x0a637dc5a2c898a6", "0x113f9804bef90dae", "0x1b710b35131c471b", "0x28db77f523047d84", "0x32caab7b40c72493", "0x3c9ebe0a15c9bebc", "0x431d67c49c100d4c", "0x4cc5d4becb3e42b6", "0x597f299cfc657e2a", "0x5fcb6fab3ad6faec", "0x6c44198c4a475817"].map($(n => BigInt(n))));
+  const [SHA512_Kh, SHA512_Kl] = u64$2.split($Array.of("0x428a2f98d728ae22", "0x7137449123ef65cd", "0xb5c0fbcfec4d3b2f", "0xe9b5dba58189dbbc", "0x3956c25bf348b538", "0x59f111f1b605d019", "0x923f82a4af194f9b", "0xab1c5ed5da6d8118", "0xd807aa98a3030242", "0x12835b0145706fbe", "0x243185be4ee4b28c", "0x550c7dc3d5ffb4e2", "0x72be5d74f27b896f", "0x80deb1fe3b1696b1", "0x9bdc06a725c71235", "0xc19bf174cf692694", "0xe49b69c19ef14ad2", "0xefbe4786384f25e3", "0x0fc19dc68b8cd5b5", "0x240ca1cc77ac9c65", "0x2de92c6f592b0275", "0x4a7484aa6ea6e483", "0x5cb0a9dcbd41fbd4", "0x76f988da831153b5", "0x983e5152ee66dfab", "0xa831c66d2db43210", "0xb00327c898fb213f", "0xbf597fc7beef0ee4", "0xc6e00bf33da88fc2", "0xd5a79147930aa725", "0x06ca6351e003826f", "0x142929670a0e6e70", "0x27b70a8546d22ffc", "0x2e1b21385c26c926", "0x4d2c6dfc5ac42aed", "0x53380d139d95b3df", "0x650a73548baf63de", "0x766a0abb3c77b2a8", "0x81c2c92e47edaee6", "0x92722c851482353b", "0xa2bfe8a14cf10364", "0xa81a664bbc423001", "0xc24b8b70d0f89791", "0xc76c51a30654be30", "0xd192e819d6ef5218", "0xd69906245565a910", "0xf40e35855771202a", "0x106aa07032bbd1b8", "0x19a4c116b8d2d0c8", "0x1e376c085141ab53", "0x2748774cdf8eeb99", "0x34b0bcb5e19b48a8", "0x391c0cb3c5c95a63", "0x4ed8aa4ae3418acb", "0x5b9cca4f7763e373", "0x682e6ff3d6b2b8a3", "0x748f82ee5defb2fc", "0x78a5636f43172f60", "0x84c87814a1f0ab72", "0x8cc702081a6439ec", "0x90befffa23631e28", "0xa4506cebde82bde9", "0xbef9a3f7b2c67915", "0xc67178f2e372532b", "0xca273eceea26619c", "0xd186b8c721c0c207", "0xeada7dd6cde0eb1e", "0xf57d4f7fee6ed178", "0x06f067aa72176fba", "0x0a637dc5a2c898a6", "0x113f9804bef90dae", "0x1b710b35131c471b", "0x28db77f523047d84", "0x32caab7b40c72493", "0x3c9ebe0a15c9bebc", "0x431d67c49c100d4c", "0x4cc5d4becb3e42b6", "0x597f299cfc657e2a", "0x5fcb6fab3ad6faec", "0x6c44198c4a475817").map($(n => BigInt(n))));
   const SHA512_W_H = new Uint32Array(80);
   const SHA512_W_L = new Uint32Array(80);
   class SHA512 extends SHA2 {
@@ -2126,7 +2154,7 @@ var solanaWeb3 = $(function (exports) {
         Hh: Hh,
         Hl: Hl
       } = this;
-      return [Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl];
+      return $Array.of(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl);
     }
     set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl) {
       this.Ah = Ah | 0;
@@ -2305,27 +2333,31 @@ var solanaWeb3 = $(function (exports) {
   const sha512 = wrapConstructor($(() => new SHA512()));
   wrapConstructor($(() => new SHA512_256()));
   wrapConstructor($(() => new SHA384()));
-  var _nodeResolve_empty = {};
-  var nodeCrypto = $Object.freeze({
-    __proto__: null,
-    default: _nodeResolve_empty
-  });
+  var _nodeResolve_empty = $Object.create(null, undefined);
+  var nodeCrypto = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.__proto__ = null;
+    result.default = _nodeResolve_empty;
+    return result;
+  })());
   /*! noble-ed25519 - MIT License (c) 2019 Paul Miller (paulmillr.com) */
   const _0n$2 = BigInt(0);
   const _1n$2 = BigInt(1);
   const _2n$2 = BigInt(2);
   const _255n = BigInt(255);
   const CURVE_ORDER = _2n$2 ** BigInt(252) + BigInt("27742317777372353535851937790883648493");
-  const CURVE$1 = $Object.freeze({
-    a: BigInt(-1),
-    d: BigInt("37095705934669439343138083508754565189542113879843219016388785533085940283555"),
-    P: _2n$2 ** _255n - BigInt(19),
-    l: CURVE_ORDER,
-    n: CURVE_ORDER,
-    h: BigInt(8),
-    Gx: BigInt("15112221349535400772501151409588531511454012693041857206046113283949847762202"),
-    Gy: BigInt("46316835694926478169428394003475163141307993866256225615783033603165251855960")
-  });
+  const CURVE$1 = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.a = BigInt(-1);
+    result.d = BigInt("37095705934669439343138083508754565189542113879843219016388785533085940283555");
+    result.P = _2n$2 ** _255n - BigInt(19);
+    result.l = CURVE_ORDER;
+    result.n = CURVE_ORDER;
+    result.h = BigInt(8);
+    result.Gx = BigInt("15112221349535400772501151409588531511454012693041857206046113283949847762202");
+    result.Gy = BigInt("46316835694926478169428394003475163141307993866256225615783033603165251855960");
+    return result;
+  })());
   const MAX_256B = _2n$2 ** BigInt(256);
   const SQRT_M1 = BigInt("19681161376707505956807079304988542015446066515923890162744021073123829784752");
   BigInt("6853475219497561581579357271197624642482790079785650197046958215289687604742");
@@ -2432,7 +2464,7 @@ var solanaWeb3 = $(function (exports) {
     }
     precomputeWindow(W) {
       const windows = 1 + 256 / W;
-      const points = [];
+      const points = $Array.of();
       let p = this;
       let base = p;
       for (let window = 0; window < windows; window++) {
@@ -2485,7 +2517,7 @@ var solanaWeb3 = $(function (exports) {
           p = p.add(cached);
         }
       }
-      return ExtendedPoint.normalizeZ([p, f])[0];
+      return ExtendedPoint.normalizeZ($Array.of(p, f))[0];
     }
     multiply(scalar, affinePoint) {
       return this.wNAF(normalizeScalar$1(scalar, CURVE$1.l), affinePoint);
@@ -2663,9 +2695,11 @@ var solanaWeb3 = $(function (exports) {
     return result;
   }
   $(concatBytes$1);
-  const hexes$1 = Array.from({
-    length: 256
-  }, $((v, i) => i.toString(16).padStart(2, "0")));
+  const hexes$1 = $Array.from($(function () {
+    let result = $Object.create(null, undefined);
+    result.length = 256;
+    return result;
+  })(), $((v, i) => i.toString(16).padStart(2, "0")));
   function bytesToHex$1(uint8a) {
     if (!(uint8a instanceof Uint8Array)) throw new Error("Uint8Array expected");
     let hex = "";
@@ -2783,10 +2817,12 @@ var solanaWeb3 = $(function (exports) {
     const b240 = pow2$1(b160, _80n) * b80 % P;
     const b250 = pow2$1(b240, _10n) * b10 % P;
     const pow_p_5_8 = pow2$1(b250, _2n$2) * x % P;
-    return {
-      pow_p_5_8: pow_p_5_8,
-      b2: b2
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.pow_p_5_8 = pow_p_5_8;
+      result.b2 = b2;
+      return result;
+    })();
   }
   $(pow_2_252_3);
   function uvRatio(u, v) {
@@ -2803,10 +2839,12 @@ var solanaWeb3 = $(function (exports) {
     if (useRoot1) x = root1;
     if (useRoot2 || noRoot) x = root2;
     if (edIsNegative(x)) x = mod$1(-x);
-    return {
-      isValid: useRoot1 || useRoot2,
-      value: x
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.isValid = useRoot1 || useRoot2;
+      result.value = x;
+      return result;
+    })();
   }
   $(uvRatio);
   function modlLE(hash) {
@@ -2851,13 +2889,15 @@ var solanaWeb3 = $(function (exports) {
     const scalar = modlLE(head);
     const point = Point$1.BASE.multiply(scalar);
     const pointBytes = point.toRawBytes();
-    return {
-      head: head,
-      prefix: prefix,
-      scalar: scalar,
-      point: point,
-      pointBytes: pointBytes
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.head = head;
+      result.prefix = prefix;
+      result.scalar = scalar;
+      result.point = point;
+      result.pointBytes = pointBytes;
+      return result;
+    })();
   }
   $(getKeyFromHash);
   let _sha512Sync;
@@ -2900,13 +2940,15 @@ var solanaWeb3 = $(function (exports) {
       s: s
     } = sig instanceof Signature$1 ? sig.assertValidity() : Signature$1.fromHex(sig);
     const SB = ExtendedPoint.BASE.multiplyUnsafe(s);
-    return {
-      r: r,
-      s: s,
-      SB: SB,
-      pub: publicKey,
-      msg: message
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.r = r;
+      result.s = s;
+      result.SB = SB;
+      result.pub = publicKey;
+      result.msg = message;
+      return result;
+    })();
   }
   $(prepareVerification);
   function finishVerification(publicKey, r, SB, hashed) {
@@ -2927,31 +2969,36 @@ var solanaWeb3 = $(function (exports) {
     return finishVerification(pub, r, SB, hashed);
   }
   $(verifySync);
-  const sync = {
-    getExtendedPublicKey: getExtendedPublicKeySync,
-    getPublicKey: getPublicKeySync,
-    sign: signSync$1,
-    verify: verifySync
-  };
+  const sync = $(function () {
+    let result = $Object.create(null, undefined);
+    result.getExtendedPublicKey = getExtendedPublicKeySync;
+    result.getPublicKey = getPublicKeySync;
+    result.sign = signSync$1;
+    result.verify = verifySync;
+    return result;
+  })();
   Point$1.BASE._setWindowSize(8);
-  const crypto$2 = {
-    node: nodeCrypto,
-    web: typeof self === "object" && "crypto" in self ? self.crypto : undefined
-  };
-  const utils$1 = {
-    TORSION_SUBGROUP: ["0100000000000000000000000000000000000000000000000000000000000000", "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a", "0000000000000000000000000000000000000000000000000000000000000080", "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05", "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f", "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85", "0000000000000000000000000000000000000000000000000000000000000000", "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa"],
-    bytesToHex: bytesToHex$1,
-    hexToBytes: hexToBytes$1,
-    concatBytes: concatBytes$1,
-    getExtendedPublicKey: getExtendedPublicKey,
-    mod: mod$1,
-    invert: invert$1,
-    hashToPrivateScalar: $(hash => {
+  const crypto$2 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.node = nodeCrypto;
+    result.web = typeof self === "object" && "crypto" in self ? self.crypto : undefined;
+    return result;
+  })();
+  const utils$1 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.TORSION_SUBGROUP = $Array.of("0100000000000000000000000000000000000000000000000000000000000000", "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a", "0000000000000000000000000000000000000000000000000000000000000080", "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05", "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f", "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85", "0000000000000000000000000000000000000000000000000000000000000000", "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa");
+    result.bytesToHex = bytesToHex$1;
+    result.hexToBytes = hexToBytes$1;
+    result.concatBytes = concatBytes$1;
+    result.getExtendedPublicKey = getExtendedPublicKey;
+    result.mod = mod$1;
+    result.invert = invert$1;
+    result.hashToPrivateScalar = $(hash => {
       hash = ensureBytes$1(hash);
       if (hash.length < 40 || hash.length > 1024) throw new Error("Expected 40-1024 bytes of private key as per FIPS 186");
       return mod$1(bytesToNumberLE(hash), CURVE$1.l - _1n$2) + _1n$2;
-    }),
-    randomBytes: $((bytesLength = 32) => {
+    });
+    result.randomBytes = $((bytesLength = 32) => {
       if (crypto$2.web) {
         return crypto$2.web.getRandomValues(new Uint8Array(bytesLength));
       } else if (crypto$2.node) {
@@ -2962,9 +3009,9 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error("The environment doesn't have randomBytes function");
       }
-    }),
-    randomPrivateKey: $(() => utils$1.randomBytes(32)),
-    sha512: $(async (...messages) => {
+    });
+    result.randomPrivateKey = $(() => utils$1.randomBytes(32));
+    result.sha512 = $(async (...messages) => {
       const message = concatBytes$1(...messages);
       if (crypto$2.web) {
         const buffer = await crypto$2.web.subtle.digest("SHA-512", message.buffer);
@@ -2974,26 +3021,31 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error("The environment doesn't have sha512 function");
       }
-    }),
-    precompute(windowSize = 8, point = Point$1.BASE) {
+    });
+    result.precompute = $(function (windowSize = 8, point = Point$1.BASE) {
       const cached = point.equals(Point$1.BASE) ? point : new Point$1(point.x, point.y);
       cached._setWindowSize(windowSize);
       cached.multiply(_2n$2);
       return cached;
-    },
-    sha512Sync: undefined
-  };
-  $Object.defineProperties(utils$1, {
-    sha512Sync: {
-      configurable: false,
-      get() {
+    });
+    result.sha512Sync = undefined;
+    return result;
+  })();
+  $Object.defineProperties(utils$1, $(function () {
+    let result = $Object.create(null, undefined);
+    result.sha512Sync = $(function () {
+      let result = $Object.create(null, undefined);
+      result.configurable = false;
+      result.get = $(function () {
         return _sha512Sync;
-      },
-      set(val) {
+      });
+      result.set = $(function (val) {
         if (!_sha512Sync) _sha512Sync = val;
-      }
-    }
-  });
+      });
+      return result;
+    })();
+    return result;
+  })());
   utils$1.sha512Sync = $((...m) => sha512(utils$1.concatBytes(...m)));
   const generatePrivateKey = utils$1.randomPrivateKey;
   const generateKeypair = () => {
@@ -3002,10 +3054,12 @@ var solanaWeb3 = $(function (exports) {
     const secretKey = new Uint8Array(64);
     secretKey.set(privateScalar);
     secretKey.set(publicKey, 32);
-    return {
-      publicKey: publicKey,
-      secretKey: secretKey
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.publicKey = publicKey;
+      result.secretKey = secretKey;
+      return result;
+    })();
   };
   $(generateKeypair);
   const getPublicKey$1 = sync.getPublicKey;
@@ -3031,9 +3085,11 @@ var solanaWeb3 = $(function (exports) {
     }
   };
   $(toBuffer);
-  var bn = {
-    exports: {}
-  };
+  var bn = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var require$$0$1 = getAugmentedNamespace(nodeCrypto);
   $(function (module) {
     $(function (module, exports) {
@@ -3086,7 +3142,7 @@ var solanaWeb3 = $(function (exports) {
         if (num instanceof BN) {
           return true;
         }
-        return num !== null && typeof num === "object" && num.constructor.wordSize === BN.wordSize && Array.isArray(num.words);
+        return num !== null && typeof num === "object" && num.constructor.wordSize === BN.wordSize && $Array.isArray(num.words);
       });
       BN.max = $(function max(left, right) {
         if (left.cmp(right) > 0) return left;
@@ -3130,14 +3186,14 @@ var solanaWeb3 = $(function (exports) {
           number = -number;
         }
         if (number < 67108864) {
-          this.words = [number & 67108863];
+          this.words = $Array.of(number & 67108863);
           this.length = 1;
         } else if (number < 4503599627370496) {
-          this.words = [number & 67108863, number / 67108864 & 67108863];
+          this.words = $Array.of(number & 67108863, number / 67108864 & 67108863);
           this.length = 2;
         } else {
           assert(number < 9007199254740992);
-          this.words = [number & 67108863, number / 67108864 & 67108863, 1];
+          this.words = $Array.of(number & 67108863, number / 67108864 & 67108863, 1);
           this.length = 3;
         }
         if (endian !== "le") return;
@@ -3146,7 +3202,7 @@ var solanaWeb3 = $(function (exports) {
       BN.prototype._initArray = $(function _initArray(number, base, endian) {
         assert(typeof number.length === "number");
         if (number.length <= 0) {
-          this.words = [0];
+          this.words = $Array.of(0);
           this.length = 1;
           return this;
         }
@@ -3261,7 +3317,7 @@ var solanaWeb3 = $(function (exports) {
       }
       $(parseBase);
       BN.prototype._parseBase = $(function _parseBase(number, base, start) {
-        this.words = [0];
+        this.words = $Array.of(0);
         this.length = 1;
         for (var limbLen = 0, limbPow = 1; limbPow <= 67108863; limbPow *= base) {
           limbLen++;
@@ -3351,9 +3407,9 @@ var solanaWeb3 = $(function (exports) {
         return (this.red ? "<BN-R: " : "<BN: ") + this.toString(16) + ">";
       }
       $(inspect);
-      var zeros = ["", "0", "00", "000", "0000", "00000", "000000", "0000000", "00000000", "000000000", "0000000000", "00000000000", "000000000000", "0000000000000", "00000000000000", "000000000000000", "0000000000000000", "00000000000000000", "000000000000000000", "0000000000000000000", "00000000000000000000", "000000000000000000000", "0000000000000000000000", "00000000000000000000000", "000000000000000000000000", "0000000000000000000000000"];
-      var groupSizes = [0, 0, 25, 16, 12, 11, 10, 9, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
-      var groupBases = [0, 0, 33554432, 43046721, 16777216, 48828125, 60466176, 40353607, 16777216, 43046721, 1e7, 19487171, 35831808, 62748517, 7529536, 11390625, 16777216, 24137569, 34012224, 47045881, 64e6, 4084101, 5153632, 6436343, 7962624, 9765625, 11881376, 14348907, 17210368, 20511149, 243e5, 28629151, 33554432, 39135393, 45435424, 52521875, 60466176];
+      var zeros = $Array.of("", "0", "00", "000", "0000", "00000", "000000", "0000000", "00000000", "000000000", "0000000000", "00000000000", "000000000000", "0000000000000", "00000000000000", "000000000000000", "0000000000000000", "00000000000000000", "000000000000000000", "0000000000000000000", "00000000000000000000", "000000000000000000000", "0000000000000000000000", "00000000000000000000000", "000000000000000000000000", "0000000000000000000000000");
+      var groupSizes = $Array.of(0, 0, 25, 16, 12, 11, 10, 9, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+      var groupBases = $Array.of(0, 0, 33554432, 43046721, 16777216, 48828125, 60466176, 40353607, 16777216, 43046721, 1e7, 19487171, 35831808, 62748517, 7529536, 11390625, 16777216, 24137569, 34012224, 47045881, 64e6, 4084101, 5153632, 6436343, 7962624, 9765625, 11881376, 14348907, 17210368, 20511149, 243e5, 28629151, 33554432, 39135393, 45435424, 52521875, 60466176);
       BN.prototype.toString = $(function toString(base, padding) {
         base = base || 10;
         padding = padding | 0 || 1;
@@ -4811,18 +4867,22 @@ var solanaWeb3 = $(function (exports) {
         if (mode !== "div" && shift !== 0) {
           a.iushrn(shift);
         }
-        return {
-          div: q || null,
-          mod: a
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.div = q || null;
+          result.mod = a;
+          return result;
+        })();
       });
       BN.prototype.divmod = $(function divmod(num, mode, positive) {
         assert(!num.isZero());
         if (this.isZero()) {
-          return {
-            div: new BN(0),
-            mod: new BN(0)
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = new BN(0);
+            result.mod = new BN(0);
+            return result;
+          })();
         }
         var div, mod, res;
         if (this.negative !== 0 && num.negative === 0) {
@@ -4836,20 +4896,24 @@ var solanaWeb3 = $(function (exports) {
               mod.iadd(num);
             }
           }
-          return {
-            div: div,
-            mod: mod
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = div;
+            result.mod = mod;
+            return result;
+          })();
         }
         if (this.negative === 0 && num.negative !== 0) {
           res = this.divmod(num.neg(), mode);
           if (mode !== "mod") {
             div = res.div.neg();
           }
-          return {
-            div: div,
-            mod: res.mod
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = div;
+            result.mod = res.mod;
+            return result;
+          })();
         }
         if ((this.negative & num.negative) !== 0) {
           res = this.neg().divmod(num.neg(), mode);
@@ -4859,34 +4923,44 @@ var solanaWeb3 = $(function (exports) {
               mod.isub(num);
             }
           }
-          return {
-            div: res.div,
-            mod: mod
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = res.div;
+            result.mod = mod;
+            return result;
+          })();
         }
         if (num.length > this.length || this.cmp(num) < 0) {
-          return {
-            div: new BN(0),
-            mod: this
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = new BN(0);
+            result.mod = this;
+            return result;
+          })();
         }
         if (num.length === 1) {
           if (mode === "div") {
-            return {
-              div: this.divn(num.words[0]),
-              mod: null
-            };
+            return $(function () {
+              let result = $Object.create(null, undefined);
+              result.div = this.divn(num.words[0]);
+              result.mod = null;
+              return result;
+            })();
           }
           if (mode === "mod") {
-            return {
-              div: null,
-              mod: new BN(this.modrn(num.words[0]))
-            };
+            return $(function () {
+              let result = $Object.create(null, undefined);
+              result.div = null;
+              result.mod = new BN(this.modrn(num.words[0]));
+              return result;
+            })();
           }
-          return {
-            div: this.divn(num.words[0]),
-            mod: new BN(this.modrn(num.words[0]))
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.div = this.divn(num.words[0]);
+            result.mod = new BN(this.modrn(num.words[0]));
+            return result;
+          })();
         }
         return this._wordDiv(num, mode);
       });
@@ -4996,11 +5070,13 @@ var solanaWeb3 = $(function (exports) {
             D.isub(B);
           }
         }
-        return {
-          a: C,
-          b: D,
-          gcd: y.iushln(g)
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.a = C;
+          result.b = D;
+          result.gcd = y.iushln(g);
+          return result;
+        })();
       });
       BN.prototype._invmp = $(function _invmp(p) {
         assert(p.negative === 0);
@@ -5277,12 +5353,14 @@ var solanaWeb3 = $(function (exports) {
         this.red._verify1(this);
         return this.red.pow(this, num);
       });
-      var primes = {
-        k256: null,
-        p224: null,
-        p192: null,
-        p25519: null
-      };
+      var primes = $(function () {
+        let result = $Object.create(null, undefined);
+        result.k256 = null;
+        result.p224 = null;
+        result.p192 = null;
+        result.p25519 = null;
+        return result;
+      })();
       function MPrime(name, p) {
         this.name = name;
         this.p = new BN(p, 16);
@@ -5666,9 +5744,11 @@ var solanaWeb3 = $(function (exports) {
     })(module, commonjsGlobal);
   })(bn);
   var BN = bn.exports;
-  var safeBuffer = {
-    exports: {}
-  };
+  var safeBuffer = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
   $(function (module, exports) {
     var buffer$1 = buffer;
@@ -5748,7 +5828,7 @@ var solanaWeb3 = $(function (exports) {
     var FACTOR = Math.log(BASE) / Math.log(256);
     var iFACTOR = Math.log(256) / Math.log(BASE);
     function encode(source) {
-      if (Array.isArray(source) || source instanceof Uint8Array) {
+      if ($Array.isArray(source) || source instanceof Uint8Array) {
         source = _Buffer.from(source);
       }
       if (!_Buffer.isBuffer(source)) {
@@ -5846,11 +5926,13 @@ var solanaWeb3 = $(function (exports) {
       throw new Error("Non-base" + BASE + " character");
     }
     $(decode);
-    return {
-      encode: encode,
-      decodeUnsafe: decodeUnsafe,
-      decode: decode
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.encode = encode;
+      result.decodeUnsafe = decodeUnsafe;
+      result.decode = decode;
+      return result;
+    })();
   }
   $(base);
   var src = base;
@@ -5862,8 +5944,8 @@ var solanaWeb3 = $(function (exports) {
   $(Chi);
   const Maj = (a, b, c) => a & b ^ a & c ^ b & c;
   $(Maj);
-  const SHA256_K = new Uint32Array([1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298]);
-  const IV = new Uint32Array([1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]);
+  const SHA256_K = new Uint32Array($Array.of(1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298));
+  const IV = new Uint32Array($Array.of(1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225));
   const SHA256_W = new Uint32Array(64);
   class SHA256 extends SHA2 {
     constructor() {
@@ -5888,7 +5970,7 @@ var solanaWeb3 = $(function (exports) {
         G: G,
         H: H
       } = this;
-      return [A, B, C, D, E, F, G, H];
+      return $Array.of(A, B, C, D, E, F, G, H);
     }
     set(A, B, C, D, E, F, G, H) {
       this.A = A | 0;
@@ -5952,14 +6034,14 @@ var solanaWeb3 = $(function (exports) {
     }
   }
   const sha256 = wrapConstructor($(() => new SHA256()));
-  var lib = {};
-  var encoding_lib = {};
+  var lib = $Object.create(null, undefined);
+  var encoding_lib = $Object.create(null, undefined);
   function inRange(a, min, max) {
     return min <= a && a <= max;
   }
   $(inRange);
   function ToDictionary(o) {
-    if (o === undefined) return {};
+    if (o === undefined) return $Object.create(null, undefined);
     if (o === Object(o)) return o;
     throw TypeError("Could not convert argument to dictionary");
   }
@@ -5968,7 +6050,7 @@ var solanaWeb3 = $(function (exports) {
     var s = String(string);
     var n = s.length;
     var i = 0;
-    var u = [];
+    var u = $Array.of();
     while (i < n) {
       var c = s.charCodeAt(i);
       if (c < 55296 || c > 57343) {
@@ -6011,34 +6093,36 @@ var solanaWeb3 = $(function (exports) {
   $(codePointsToString);
   var end_of_stream = -1;
   function Stream(tokens) {
-    this.tokens = [].slice.call(tokens);
+    this.tokens = $Array.of().slice.call(tokens);
   }
   $(Stream);
-  Stream.prototype = {
-    endOfStream: $(function () {
+  Stream.prototype = $(function () {
+    let result = $Object.create(null, undefined);
+    result.endOfStream = $(function () {
       return !this.tokens.length;
-    }),
-    read: $(function () {
+    });
+    result.read = $(function () {
       if (!this.tokens.length) return end_of_stream;
       return this.tokens.shift();
-    }),
-    prepend: $(function (token) {
-      if (Array.isArray(token)) {
+    });
+    result.prepend = $(function (token) {
+      if ($Array.isArray(token)) {
         var tokens = token;
         while (tokens.length) this.tokens.unshift(tokens.pop());
       } else {
         this.tokens.unshift(token);
       }
-    }),
-    push: $(function (token) {
-      if (Array.isArray(token)) {
+    });
+    result.push = $(function (token) {
+      if ($Array.isArray(token)) {
         var tokens = token;
         while (tokens.length) this.tokens.push(tokens.shift());
       } else {
         this.tokens.push(token);
       }
-    })
-  };
+    });
+    return result;
+  })();
   var finished = -1;
   function decoderError(fatal, opt_code_point) {
     if (fatal) throw TypeError("Decoder error");
@@ -6060,19 +6144,26 @@ var solanaWeb3 = $(function (exports) {
     this._decoder = null;
     this._fatal = Boolean(options["fatal"]);
     this._ignoreBOM = Boolean(options["ignoreBOM"]);
-    $Object.defineProperty(this, "encoding", {
-      value: "utf-8"
-    });
-    $Object.defineProperty(this, "fatal", {
-      value: this._fatal
-    });
-    $Object.defineProperty(this, "ignoreBOM", {
-      value: this._ignoreBOM
-    });
+    $Object.defineProperty(this, "encoding", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = "utf-8";
+      return result;
+    })());
+    $Object.defineProperty(this, "fatal", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = this._fatal;
+      return result;
+    })());
+    $Object.defineProperty(this, "ignoreBOM", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = this._ignoreBOM;
+      return result;
+    })());
   }
   $(TextDecoder$1);
-  TextDecoder$1.prototype = {
-    decode: $(function decode(input, options) {
+  TextDecoder$1.prototype = $(function () {
+    let result = $Object.create(null, undefined);
+    result.decode = $(function decode(input, options) {
       var bytes;
       if (typeof input === "object" && input instanceof ArrayBuffer) {
         bytes = new Uint8Array(input);
@@ -6083,32 +6174,34 @@ var solanaWeb3 = $(function (exports) {
       }
       options = ToDictionary(options);
       if (!this._streaming) {
-        this._decoder = new UTF8Decoder({
-          fatal: this._fatal
-        });
+        this._decoder = new UTF8Decoder($(function () {
+          let result = $Object.create(null, undefined);
+          result.fatal = this._fatal;
+          return result;
+        })());
         this._BOMseen = false;
       }
       this._streaming = Boolean(options["stream"]);
       var input_stream = new Stream(bytes);
-      var code_points = [];
+      var code_points = $Array.of();
       var result;
       while (!input_stream.endOfStream()) {
         result = this._decoder.handler(input_stream, input_stream.read());
         if (result === finished) break;
         if (result === null) continue;
-        if (Array.isArray(result)) code_points.push.apply(code_points, result);else code_points.push(result);
+        if ($Array.isArray(result)) code_points.push.apply(code_points, result);else code_points.push(result);
       }
       if (!this._streaming) {
         do {
           result = this._decoder.handler(input_stream, input_stream.read());
           if (result === finished) break;
           if (result === null) continue;
-          if (Array.isArray(result)) code_points.push.apply(code_points, result);else code_points.push(result);
+          if ($Array.isArray(result)) code_points.push.apply(code_points, result);else code_points.push(result);
         } while (!input_stream.endOfStream());
         this._decoder = null;
       }
       if (code_points.length) {
-        if (["utf-8"].indexOf(this.encoding) !== -1 && !this._ignoreBOM && !this._BOMseen) {
+        if ($Array.of("utf-8").indexOf(this.encoding) !== -1 && !this._ignoreBOM && !this._BOMseen) {
           if (code_points[0] === 65279) {
             this._BOMseen = true;
             code_points.shift();
@@ -6118,8 +6211,9 @@ var solanaWeb3 = $(function (exports) {
         }
       }
       return codePointsToString(code_points);
-    })
-  };
+    });
+    return result;
+  })();
   function TextEncoder$1(encoding, options) {
     if (!(this instanceof TextEncoder$1)) return new TextEncoder$1(encoding, options);
     encoding = encoding !== undefined ? String(encoding).toLowerCase() : DEFAULT_ENCODING;
@@ -6129,39 +6223,45 @@ var solanaWeb3 = $(function (exports) {
     options = ToDictionary(options);
     this._streaming = false;
     this._encoder = null;
-    this._options = {
-      fatal: Boolean(options["fatal"])
-    };
-    $Object.defineProperty(this, "encoding", {
-      value: "utf-8"
-    });
+    this._options = $(function () {
+      let result = $Object.create(null, undefined);
+      result.fatal = Boolean(options["fatal"]);
+      return result;
+    })();
+    $Object.defineProperty(this, "encoding", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = "utf-8";
+      return result;
+    })());
   }
   $(TextEncoder$1);
-  TextEncoder$1.prototype = {
-    encode: $(function encode(opt_string, options) {
+  TextEncoder$1.prototype = $(function () {
+    let result = $Object.create(null, undefined);
+    result.encode = $(function encode(opt_string, options) {
       opt_string = opt_string ? String(opt_string) : "";
       options = ToDictionary(options);
       if (!this._streaming) this._encoder = new UTF8Encoder(this._options);
       this._streaming = Boolean(options["stream"]);
-      var bytes = [];
+      var bytes = $Array.of();
       var input_stream = new Stream(stringToCodePoints(opt_string));
       var result;
       while (!input_stream.endOfStream()) {
         result = this._encoder.handler(input_stream, input_stream.read());
         if (result === finished) break;
-        if (Array.isArray(result)) bytes.push.apply(bytes, result);else bytes.push(result);
+        if ($Array.isArray(result)) bytes.push.apply(bytes, result);else bytes.push(result);
       }
       if (!this._streaming) {
         while (true) {
           result = this._encoder.handler(input_stream, input_stream.read());
           if (result === finished) break;
-          if (Array.isArray(result)) bytes.push.apply(bytes, result);else bytes.push(result);
+          if ($Array.isArray(result)) bytes.push.apply(bytes, result);else bytes.push(result);
         }
         this._encoder = null;
       }
       return new Uint8Array(bytes);
-    })
-  };
+    });
+    return result;
+  })();
   function UTF8Decoder(options) {
     var fatal = options.fatal;
     var utf8_code_point = 0,
@@ -6232,7 +6332,7 @@ var solanaWeb3 = $(function (exports) {
         count = 3;
         offset = 240;
       }
-      var bytes = [(code_point >> 6 * count) + offset];
+      var bytes = $Array.of((code_point >> 6 * count) + offset);
       while (count > 0) {
         var temp = code_point >> 6 * (count - 1);
         bytes.push(128 | temp & 63);
@@ -6246,21 +6346,25 @@ var solanaWeb3 = $(function (exports) {
   encoding_lib.TextDecoder = TextDecoder$1;
   var __createBinding = commonjsGlobal && commonjsGlobal.__createBinding || ($Object.create ? $(function (o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    $Object.defineProperty(o, k2, {
-      enumerable: true,
-      get: $(function () {
+    $Object.defineProperty(o, k2, $(function () {
+      let result = $Object.create(null, undefined);
+      result.enumerable = true;
+      result.get = $(function () {
         return m[k];
-      })
-    });
+      });
+      return result;
+    })());
   }) : $(function (o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
   }));
   var __setModuleDefault = commonjsGlobal && commonjsGlobal.__setModuleDefault || ($Object.create ? $(function (o, v) {
-    $Object.defineProperty(o, "default", {
-      enumerable: true,
-      value: v
-    });
+    $Object.defineProperty(o, "default", $(function () {
+      let result = $Object.create(null, undefined);
+      result.enumerable = true;
+      result.value = v;
+      return result;
+    })());
   }) : $(function (o, v) {
     o["default"] = v;
   }));
@@ -6273,27 +6377,33 @@ var solanaWeb3 = $(function (exports) {
   });
   var __importStar = commonjsGlobal && commonjsGlobal.__importStar || $(function (mod) {
     if (mod && mod.__esModule) return mod;
-    var result = {};
+    var result = $Object.create(null, undefined);
     if (mod != null) for (var k in mod) if (k !== "default" && $Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
   });
   var __importDefault = commonjsGlobal && commonjsGlobal.__importDefault || $(function (mod) {
-    return mod && mod.__esModule ? mod : {
-      default: mod
-    };
+    return mod && mod.__esModule ? mod : $(function () {
+      let result = $Object.create(null, undefined);
+      result.default = mod;
+      return result;
+    })();
   });
-  $Object.defineProperty(lib, "__esModule", {
-    value: true
-  });
+  $Object.defineProperty(lib, "__esModule", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = true;
+    return result;
+  })());
   var deserializeUnchecked_1 = lib.deserializeUnchecked = deserialize_1 = lib.deserialize = serialize_1 = lib.serialize = lib.BinaryReader = lib.BinaryWriter = lib.BorshError = lib.baseDecode = lib.baseEncode = void 0;
   const bn_js_1 = __importDefault(bn.exports);
   const bs58_1 = __importDefault(bs58);
   const encoding = __importStar(encoding_lib);
   const ResolvedTextDecoder = typeof TextDecoder !== "function" ? encoding.TextDecoder : TextDecoder;
-  const textDecoder = new ResolvedTextDecoder("utf-8", {
-    fatal: true
-  });
+  const textDecoder = new ResolvedTextDecoder("utf-8", $(function () {
+    let result = $Object.create(null, undefined);
+    result.fatal = true;
+    return result;
+  })());
   function baseEncode(value) {
     if (typeof value === "string") {
       value = Buffer.from(value, "utf8");
@@ -6311,7 +6421,7 @@ var solanaWeb3 = $(function (exports) {
   class BorshError extends Error {
     constructor(message) {
       super(message);
-      this.fieldPath = [];
+      this.fieldPath = $Array.of();
       this.originalMessage = message;
     }
     addToFieldPath(fieldName) {
@@ -6327,7 +6437,7 @@ var solanaWeb3 = $(function (exports) {
     }
     maybeResize() {
       if (this.buf.length < 16 + this.length) {
-        this.buf = Buffer.concat([this.buf, Buffer.alloc(INITIAL_LENGTH)]);
+        this.buf = Buffer.concat($Array.of(this.buf, Buffer.alloc(INITIAL_LENGTH)));
       }
     }
     writeU8(value) {
@@ -6362,7 +6472,7 @@ var solanaWeb3 = $(function (exports) {
       this.writeBuffer(Buffer.from(new bn_js_1.default(value).toArray("le", 64)));
     }
     writeBuffer(buffer) {
-      this.buf = Buffer.concat([Buffer.from(this.buf.subarray(0, this.length)), buffer, Buffer.alloc(INITIAL_LENGTH)]);
+      this.buf = Buffer.concat($Array.of(Buffer.from(this.buf.subarray(0, this.length)), buffer, Buffer.alloc(INITIAL_LENGTH)));
       this.length += buffer.length;
     }
     writeString(str) {
@@ -6395,7 +6505,7 @@ var solanaWeb3 = $(function (exports) {
       } catch (e) {
         if (e instanceof RangeError) {
           const code = e.code;
-          if (["ERR_BUFFER_OUT_OF_BOUNDS", "ERR_OUT_OF_RANGE"].indexOf(code) >= 0) {
+          if ($Array.of("ERR_BUFFER_OUT_OF_BOUNDS", "ERR_OUT_OF_RANGE").indexOf(code) >= 0) {
             throw new BorshError("Reached the end of buffer when deserializing");
           }
         }
@@ -6469,16 +6579,16 @@ var solanaWeb3 = $(function (exports) {
       return result;
     }
   }
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU8", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU16", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU32", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU64", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU128", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU256", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readU512", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readString", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readFixedArray", null);
-  __decorate([handlingRangeError], BinaryReader.prototype, "readArray", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU8", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU16", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU32", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU64", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU128", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU256", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readU512", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readString", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readFixedArray", null);
+  __decorate($Array.of(handlingRangeError), BinaryReader.prototype, "readArray", null);
   lib.BinaryReader = BinaryReader;
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -6585,7 +6695,7 @@ var solanaWeb3 = $(function (exports) {
         if (typeof fieldType[0] === "number") {
           return reader.readFixedArray(fieldType[0]);
         } else if (typeof fieldType[1] === "number") {
-          const arr = [];
+          const arr = $Array.of();
           for (let i = 0; i < fieldType[1]; i++) {
             arr.push(deserializeField(schema, null, fieldType[0], reader));
           }
@@ -6629,7 +6739,7 @@ var solanaWeb3 = $(function (exports) {
       throw new BorshError(`Class ${classType.name} is missing in schema`);
     }
     if (structSchema.kind === "struct") {
-      const result = {};
+      const result = $Object.create(null, undefined);
       for (const [fieldName, fieldType] of schema.get(classType).fields) {
         result[fieldName] = deserializeField(schema, fieldName, fieldType, reader);
       }
@@ -6642,9 +6752,11 @@ var solanaWeb3 = $(function (exports) {
       }
       const [fieldName, fieldType] = structSchema.values[idx];
       const fieldValue = deserializeField(schema, fieldName, fieldType, reader);
-      return new classType({
-        [fieldName]: fieldValue
-      });
+      return new classType($(function () {
+        let result = $Object.create(null, undefined);
+        result.fieldName = fieldValue;
+        return result;
+      })());
     }
     throw new BorshError(`Unexpected schema kind: ${structSchema.kind} for ${classType.constructor.name}`);
   }
@@ -6701,7 +6813,7 @@ var solanaWeb3 = $(function (exports) {
   let uniquePublicKeyCounter = 1;
   class PublicKey extends Struct$1 {
     constructor(value) {
-      super({});
+      super($Object.create(null, undefined));
       this._bn = void 0;
       if (isPublicKeyData(value)) {
         this._bn = value._bn;
@@ -6750,7 +6862,7 @@ var solanaWeb3 = $(function (exports) {
       return this.toBase58();
     }
     static async createWithSeed(fromPublicKey, seed, programId) {
-      const buffer$1 = buffer.Buffer.concat([fromPublicKey.toBuffer(), buffer.Buffer.from(seed), programId.toBuffer()]);
+      const buffer$1 = buffer.Buffer.concat($Array.of(fromPublicKey.toBuffer(), buffer.Buffer.from(seed), programId.toBuffer()));
       const publicKeyBytes = sha256(buffer$1);
       return new PublicKey(publicKeyBytes);
     }
@@ -6760,9 +6872,9 @@ var solanaWeb3 = $(function (exports) {
         if (seed.length > MAX_SEED_LENGTH) {
           throw new TypeError(`Max seed length exceeded`);
         }
-        buffer$1 = buffer.Buffer.concat([buffer$1, toBuffer(seed)]);
+        buffer$1 = buffer.Buffer.concat($Array.of(buffer$1, toBuffer(seed)));
       }));
-      buffer$1 = buffer.Buffer.concat([buffer$1, programId.toBuffer(), buffer.Buffer.from("ProgramDerivedAddress")]);
+      buffer$1 = buffer.Buffer.concat($Array.of(buffer$1, programId.toBuffer(), buffer.Buffer.from("ProgramDerivedAddress")));
       const publicKeyBytes = sha256(buffer$1);
       if (isOnCurve(publicKeyBytes)) {
         throw new Error(`Invalid seeds, address must fall off the curve`);
@@ -6777,7 +6889,7 @@ var solanaWeb3 = $(function (exports) {
       let address;
       while (nonce != 0) {
         try {
-          const seedsWithNonce = seeds.concat(buffer.Buffer.from([nonce]));
+          const seedsWithNonce = seeds.concat(buffer.Buffer.from($Array.of(nonce)));
           address = this.createProgramAddressSync(seedsWithNonce, programId);
         } catch (err) {
           if (err instanceof TypeError) {
@@ -6786,7 +6898,7 @@ var solanaWeb3 = $(function (exports) {
           nonce--;
           continue;
         }
-        return [address, nonce];
+        return $Array.of(address, nonce);
       }
       throw new Error(`Unable to find a viable program address nonce`);
     }
@@ -6799,10 +6911,12 @@ var solanaWeb3 = $(function (exports) {
     }
   }
   PublicKey.default = new PublicKey("11111111111111111111111111111111");
-  SOLANA_SCHEMA.set(PublicKey, {
-    kind: "struct",
-    fields: [["_bn", "u256"]]
-  });
+  SOLANA_SCHEMA.set(PublicKey, $(function () {
+    let result = $Object.create(null, undefined);
+    result.kind = "struct";
+    result.fields = $Array.of($Array.of("_bn", "u256"));
+    return result;
+  })());
   class Account {
     constructor(secretKey) {
       this._publicKey = void 0;
@@ -6823,14 +6937,16 @@ var solanaWeb3 = $(function (exports) {
       return new PublicKey(this._publicKey);
     }
     get secretKey() {
-      return buffer.Buffer.concat([this._secretKey, this._publicKey], 64);
+      return buffer.Buffer.concat($Array.of(this._secretKey, this._publicKey), 64);
     }
   }
   const BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey("BPFLoader1111111111111111111111111111111111");
-  var Layout$1 = {};
-  $Object.defineProperty(Layout$1, "__esModule", {
-    value: true
-  });
+  var Layout$1 = $Object.create(null, undefined);
+  $Object.defineProperty(Layout$1, "__esModule", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = true;
+    return result;
+  })());
   Layout$1.s16 = Layout$1.s8 = Layout$1.nu64be = Layout$1.u48be = Layout$1.u40be = Layout$1.u32be = Layout$1.u24be = Layout$1.u16be = nu64 = Layout$1.nu64 = Layout$1.u48 = Layout$1.u40 = u32 = Layout$1.u32 = Layout$1.u24 = u16 = Layout$1.u16 = u8 = Layout$1.u8 = offset = Layout$1.offset = Layout$1.greedy = Layout$1.Constant = Layout$1.UTF8 = Layout$1.CString = Layout$1.Blob = Layout$1.Boolean = Layout$1.BitField = Layout$1.BitStructure = Layout$1.VariantLayout = Layout$1.Union = Layout$1.UnionLayoutDiscriminator = Layout$1.UnionDiscriminator = Layout$1.Structure = Layout$1.Sequence = Layout$1.DoubleBE = Layout$1.Double = Layout$1.FloatBE = Layout$1.Float = Layout$1.NearInt64BE = Layout$1.NearInt64 = Layout$1.NearUInt64BE = Layout$1.NearUInt64 = Layout$1.IntBE = Layout$1.Int = Layout$1.UIntBE = Layout$1.UInt = Layout$1.OffsetLayout = Layout$1.GreedyCount = Layout$1.ExternalLayout = Layout$1.bindConstructorLayout = Layout$1.nameWithProperty = Layout$1.Layout = Layout$1.uint8ArrayToBuffer = Layout$1.checkUint8Array = void 0;
   Layout$1.constant = Layout$1.utf8 = Layout$1.cstr = blob = Layout$1.blob = Layout$1.unionLayoutDiscriminator = Layout$1.union = seq = Layout$1.seq = Layout$1.bits = struct = Layout$1.struct = Layout$1.f64be = Layout$1.f64 = Layout$1.f32be = Layout$1.f32 = Layout$1.ns64be = Layout$1.s48be = Layout$1.s40be = Layout$1.s32be = Layout$1.s24be = Layout$1.s16be = ns64 = Layout$1.ns64 = Layout$1.s48 = Layout$1.s40 = Layout$1.s32 = Layout$1.s24 = void 0;
   const buffer_1 = buffer;
@@ -6856,7 +6972,7 @@ var solanaWeb3 = $(function (exports) {
       this.property = property;
     }
     makeDestinationObject() {
-      return {};
+      return $Object.create(null, undefined);
     }
     getSpan(b, offset) {
       if (0 > this.span) {
@@ -6899,18 +7015,22 @@ var solanaWeb3 = $(function (exports) {
     Class.layout_ = layout;
     layout.boundConstructor_ = Class;
     layout.makeDestinationObject = $(() => new Class());
-    $Object.defineProperty(Class.prototype, "encode", {
-      value(b, offset) {
+    $Object.defineProperty(Class.prototype, "encode", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = $(function (b, offset) {
         return layout.encode(this, b, offset);
-      },
-      writable: true
-    });
-    $Object.defineProperty(Class, "decode", {
-      value(b, offset) {
+      });
+      result.writable = true;
+      return result;
+    })());
+    $Object.defineProperty(Class, "decode", $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = $(function (b, offset) {
         return layout.decode(b, offset);
-      },
-      writable: true
-    });
+      });
+      result.writable = true;
+      return result;
+    })());
   }
   $(bindConstructorLayout);
   Layout$1.bindConstructorLayout = bindConstructorLayout;
@@ -7032,10 +7152,12 @@ var solanaWeb3 = $(function (exports) {
   function divmodInt64(src) {
     const hi32 = Math.floor(src / V2E32);
     const lo32 = src - hi32 * V2E32;
-    return {
-      hi32: hi32,
-      lo32: lo32
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.hi32 = hi32;
+      result.lo32 = lo32;
+      return result;
+    })();
   }
   $(divmodInt64);
   function roundedInt64(hi32, lo32) {
@@ -7207,7 +7329,7 @@ var solanaWeb3 = $(function (exports) {
       return span;
     }
     decode(b, offset = 0) {
-      const rv = [];
+      const rv = $Array.of();
       let i = 0;
       let count = this.count;
       if (count instanceof ExternalLayout) {
@@ -7232,7 +7354,7 @@ var solanaWeb3 = $(function (exports) {
   Layout$1.Sequence = Sequence;
   class Structure extends Layout {
     constructor(fields, property, decodePrefixes) {
-      if (!(Array.isArray(fields) && fields.reduce($((acc, v) => acc && v instanceof Layout), true))) {
+      if (!($Array.isArray(fields) && fields.reduce($((acc, v) => acc && v instanceof Layout), true))) {
         throw new TypeError("fields must be array of Layout instances");
       }
       if ("boolean" === typeof property && undefined === decodePrefixes) {
@@ -7407,7 +7529,7 @@ var solanaWeb3 = $(function (exports) {
       this.discriminator = discriminator;
       this.usesPrefixDiscriminator = discr instanceof UInt || discr instanceof UIntBE;
       this.defaultLayout = defaultLayout;
-      this.registry = {};
+      this.registry = $Object.create(null, undefined);
       let boundGetSourceVariant = this.defaultGetSourceVariant.bind(this);
       this.getSourceVariant = $(function (src) {
         return boundGetSourceVariant(src);
@@ -7610,7 +7732,7 @@ var solanaWeb3 = $(function (exports) {
       super(word.span, property);
       this.word = word;
       this.msb = !!msb;
-      this.fields = [];
+      this.fields = $Array.of();
       let value = 0;
       this._packedSetValue = $(function (v) {
         value = fixBitwiseResult(v);
@@ -7908,9 +8030,11 @@ var solanaWeb3 = $(function (exports) {
       this.signature = signature;
     }
   }
-  $Object.defineProperty(TransactionExpiredBlockheightExceededError.prototype, "name", {
-    value: "TransactionExpiredBlockheightExceededError"
-  });
+  $Object.defineProperty(TransactionExpiredBlockheightExceededError.prototype, "name", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = "TransactionExpiredBlockheightExceededError";
+    return result;
+  })());
   class TransactionExpiredTimeoutError extends Error {
     constructor(signature, timeoutSeconds) {
       super(`Transaction was not confirmed in ${timeoutSeconds.toFixed(2)} seconds. It is ` + "unknown if it succeeded or failed. Check signature " + `${signature} using the Solana Explorer or CLI tools.`);
@@ -7918,9 +8042,11 @@ var solanaWeb3 = $(function (exports) {
       this.signature = signature;
     }
   }
-  $Object.defineProperty(TransactionExpiredTimeoutError.prototype, "name", {
-    value: "TransactionExpiredTimeoutError"
-  });
+  $Object.defineProperty(TransactionExpiredTimeoutError.prototype, "name", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = "TransactionExpiredTimeoutError";
+    return result;
+  })());
   class MessageAccountKeys {
     constructor(staticAccountKeys, accountKeysFromLookups) {
       this.staticAccountKeys = void 0;
@@ -7929,7 +8055,7 @@ var solanaWeb3 = $(function (exports) {
       this.accountKeysFromLookups = accountKeysFromLookups;
     }
     keySegments() {
-      const keySegments = [this.staticAccountKeys];
+      const keySegments = $Array.of(this.staticAccountKeys);
       if (this.accountKeysFromLookups) {
         keySegments.push(this.accountKeysFromLookups.writable);
         keySegments.push(this.accountKeysFromLookups.readonly);
@@ -7964,11 +8090,13 @@ var solanaWeb3 = $(function (exports) {
         return keyIndex;
       };
       $(findKeyIndex);
-      return instructions.map($(instruction => ({
-        programIdIndex: findKeyIndex(instruction.programId),
-        accountKeyIndexes: instruction.keys.map($(meta => findKeyIndex(meta.pubkey))),
-        data: instruction.data
-      })));
+      return instructions.map($(instruction => $(function () {
+        let result = $Object.create(null, undefined);
+        result.programIdIndex = findKeyIndex(instruction.programId);
+        result.accountKeyIndexes = instruction.keys.map($(meta => findKeyIndex(meta.pubkey)));
+        result.data = instruction.data;
+        return result;
+      })()));
     }
   }
   const publicKey = (property = "publicKey") => blob(32, property);
@@ -7976,7 +8104,7 @@ var solanaWeb3 = $(function (exports) {
   const signature = (property = "signature") => blob(64, property);
   $(signature);
   const rustString = (property = "string") => {
-    const rsl = struct([u32("length"), u32("lengthPadding"), blob(offset(u32(), -8), "chars")], property);
+    const rsl = struct($Array.of(u32("length"), u32("lengthPadding"), blob(offset(u32(), -8), "chars")), property);
     const _decode = rsl.decode.bind(rsl);
     const _encode = rsl.encode.bind(rsl);
     const rslShim = rsl;
@@ -7985,22 +8113,24 @@ var solanaWeb3 = $(function (exports) {
       return data["chars"].toString();
     });
     rslShim.encode = $((str, b, offset) => {
-      const data = {
-        chars: buffer.Buffer.from(str, "utf8")
-      };
+      const data = $(function () {
+        let result = $Object.create(null, undefined);
+        result.chars = buffer.Buffer.from(str, "utf8");
+        return result;
+      })();
       return _encode(data, b, offset);
     });
     rslShim.alloc = $(str => u32().span + u32().span + buffer.Buffer.from(str, "utf8").length);
     return rslShim;
   };
   $(rustString);
-  const authorized = (property = "authorized") => struct([publicKey("staker"), publicKey("withdrawer")], property);
+  const authorized = (property = "authorized") => struct($Array.of(publicKey("staker"), publicKey("withdrawer")), property);
   $(authorized);
-  const lockup = (property = "lockup") => struct([ns64("unixTimestamp"), ns64("epoch"), publicKey("custodian")], property);
+  const lockup = (property = "lockup") => struct($Array.of(ns64("unixTimestamp"), ns64("epoch"), publicKey("custodian")), property);
   $(lockup);
-  const voteInit = (property = "voteInit") => struct([publicKey("nodePubkey"), publicKey("authorizedVoter"), publicKey("authorizedWithdrawer"), u8("commission")], property);
+  const voteInit = (property = "voteInit") => struct($Array.of(publicKey("nodePubkey"), publicKey("authorizedVoter"), publicKey("authorizedWithdrawer"), u8("commission")), property);
   $(voteInit);
-  const voteAuthorizeWithSeedArgs = (property = "voteAuthorizeWithSeedArgs") => struct([u32("voteAuthorizationType"), publicKey("currentAuthorityDerivedKeyOwnerPubkey"), rustString("currentAuthorityDerivedKeySeed"), publicKey("newAuthorized")], property);
+  const voteAuthorizeWithSeedArgs = (property = "voteAuthorizeWithSeedArgs") => struct($Array.of(u32("voteAuthorizationType"), publicKey("currentAuthorityDerivedKeyOwnerPubkey"), rustString("currentAuthorityDerivedKeySeed"), publicKey("newAuthorized")), property);
   $(voteAuthorizeWithSeedArgs);
   function getAlloc(type, fields) {
     const getItemAlloc = item => {
@@ -8010,13 +8140,15 @@ var solanaWeb3 = $(function (exports) {
         return item.alloc(fields[item.property]);
       } else if ("count" in item && "elementLayout" in item) {
         const field = fields[item.property];
-        if (Array.isArray(field)) {
+        if ($Array.isArray(field)) {
           return field.length * getItemAlloc(item.elementLayout);
         }
       } else if ("fields" in item) {
-        return getAlloc({
-          layout: item
-        }, fields[item.property]);
+        return getAlloc($(function () {
+          let result = $Object.create(null, undefined);
+          result.layout = item;
+          return result;
+        })(), fields[item.property]);
       }
       return 0;
     };
@@ -8076,11 +8208,13 @@ var solanaWeb3 = $(function (exports) {
         const address = pubkey.toBase58();
         let keyMeta = keyMetaMap.get(address);
         if (keyMeta === undefined) {
-          keyMeta = {
-            isSigner: false,
-            isWritable: false,
-            isInvoked: false
-          };
+          keyMeta = $(function () {
+            let result = $Object.create(null, undefined);
+            result.isSigner = false;
+            result.isWritable = false;
+            result.isInvoked = false;
+            return result;
+          })();
           keyMetaMap.set(address, keyMeta);
         }
         return keyMeta;
@@ -8100,24 +8234,26 @@ var solanaWeb3 = $(function (exports) {
       return new CompiledKeys(payer, keyMetaMap);
     }
     getMessageComponents() {
-      const mapEntries = [...this.keyMetaMap.entries()];
+      const mapEntries = $Array.of(...this.keyMetaMap.entries());
       assert$1(mapEntries.length <= 256, "Max static account keys length exceeded");
       const writableSigners = mapEntries.filter($(([, meta]) => meta.isSigner && meta.isWritable));
       const readonlySigners = mapEntries.filter($(([, meta]) => meta.isSigner && !meta.isWritable));
       const writableNonSigners = mapEntries.filter($(([, meta]) => !meta.isSigner && meta.isWritable));
       const readonlyNonSigners = mapEntries.filter($(([, meta]) => !meta.isSigner && !meta.isWritable));
-      const header = {
-        numRequiredSignatures: writableSigners.length + readonlySigners.length,
-        numReadonlySignedAccounts: readonlySigners.length,
-        numReadonlyUnsignedAccounts: readonlyNonSigners.length
-      };
+      const header = $(function () {
+        let result = $Object.create(null, undefined);
+        result.numRequiredSignatures = writableSigners.length + readonlySigners.length;
+        result.numReadonlySignedAccounts = readonlySigners.length;
+        result.numReadonlyUnsignedAccounts = readonlyNonSigners.length;
+        return result;
+      })();
       {
         assert$1(writableSigners.length > 0, "Expected at least one writable signer key");
         const [payerAddress] = writableSigners[0];
         assert$1(payerAddress === this.payer.toBase58(), "Expected first writable signer key to be the fee payer");
       }
-      const staticAccountKeys = [...writableSigners.map($(([address]) => new PublicKey(address))), ...readonlySigners.map($(([address]) => new PublicKey(address))), ...writableNonSigners.map($(([address]) => new PublicKey(address))), ...readonlyNonSigners.map($(([address]) => new PublicKey(address)))];
-      return [header, staticAccountKeys];
+      const staticAccountKeys = $Array.of(...writableSigners.map($(([address]) => new PublicKey(address))), ...readonlySigners.map($(([address]) => new PublicKey(address))), ...writableNonSigners.map($(([address]) => new PublicKey(address))), ...readonlyNonSigners.map($(([address]) => new PublicKey(address))));
+      return $Array.of(header, staticAccountKeys);
     }
     extractTableLookup(lookupTable) {
       const [writableIndexes, drainedWritableKeys] = this.drainKeysFoundInLookupTable(lookupTable.state.addresses, $(keyMeta => !keyMeta.isSigner && !keyMeta.isInvoked && keyMeta.isWritable));
@@ -8125,14 +8261,18 @@ var solanaWeb3 = $(function (exports) {
       if (writableIndexes.length === 0 && readonlyIndexes.length === 0) {
         return;
       }
-      return [{
-        accountKey: lookupTable.key,
-        writableIndexes: writableIndexes,
-        readonlyIndexes: readonlyIndexes
-      }, {
-        writable: drainedWritableKeys,
-        readonly: drainedReadonlyKeys
-      }];
+      return $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.accountKey = lookupTable.key;
+        result.writableIndexes = writableIndexes;
+        result.readonlyIndexes = readonlyIndexes;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.writable = drainedWritableKeys;
+        result.readonly = drainedReadonlyKeys;
+        return result;
+      })());
     }
     drainKeysFoundInLookupTable(lookupTableEntries, keyMetaFilter) {
       const lookupTableIndexes = new Array();
@@ -8149,7 +8289,7 @@ var solanaWeb3 = $(function (exports) {
           }
         }
       }
-      return [lookupTableIndexes, drainedKeys];
+      return $Array.of(lookupTableIndexes, drainedKeys);
     }
   }
   class Message {
@@ -8172,14 +8312,16 @@ var solanaWeb3 = $(function (exports) {
       return this.accountKeys;
     }
     get compiledInstructions() {
-      return this.instructions.map($(ix => ({
-        programIdIndex: ix.programIdIndex,
-        accountKeyIndexes: ix.accounts,
-        data: bs58$1.decode(ix.data)
-      })));
+      return this.instructions.map($(ix => $(function () {
+        let result = $Object.create(null, undefined);
+        result.programIdIndex = ix.programIdIndex;
+        result.accountKeyIndexes = ix.accounts;
+        result.data = bs58$1.decode(ix.data);
+        return result;
+      })()));
     }
     get addressTableLookups() {
-      return [];
+      return $Array.of();
     }
     getAccountKeys() {
       return new MessageAccountKeys(this.staticAccountKeys);
@@ -8188,17 +8330,21 @@ var solanaWeb3 = $(function (exports) {
       const compiledKeys = CompiledKeys.compile(args.instructions, args.payerKey);
       const [header, staticAccountKeys] = compiledKeys.getMessageComponents();
       const accountKeys = new MessageAccountKeys(staticAccountKeys);
-      const instructions = accountKeys.compileInstructions(args.instructions).map($(ix => ({
-        programIdIndex: ix.programIdIndex,
-        accounts: ix.accountKeyIndexes,
-        data: bs58$1.encode(ix.data)
-      })));
-      return new Message({
-        header: header,
-        accountKeys: staticAccountKeys,
-        recentBlockhash: args.recentBlockhash,
-        instructions: instructions
-      });
+      const instructions = accountKeys.compileInstructions(args.instructions).map($(ix => $(function () {
+        let result = $Object.create(null, undefined);
+        result.programIdIndex = ix.programIdIndex;
+        result.accounts = ix.accountKeyIndexes;
+        result.data = bs58$1.encode(ix.data);
+        return result;
+      })()));
+      return new Message($(function () {
+        let result = $Object.create(null, undefined);
+        result.header = header;
+        result.accountKeys = staticAccountKeys;
+        result.recentBlockhash = args.recentBlockhash;
+        result.instructions = instructions;
+        return result;
+      })());
     }
     isAccountSigner(index) {
       return index < this.header.numRequiredSignatures;
@@ -8219,60 +8365,64 @@ var solanaWeb3 = $(function (exports) {
       return this.indexToProgramIds.has(index);
     }
     programIds() {
-      return [...this.indexToProgramIds.values()];
+      return $Array.of(...this.indexToProgramIds.values());
     }
     nonProgramIds() {
       return this.accountKeys.filter($((_, index) => !this.isProgramId(index)));
     }
     serialize() {
       const numKeys = this.accountKeys.length;
-      let keyCount = [];
+      let keyCount = $Array.of();
       encodeLength(keyCount, numKeys);
       const instructions = this.instructions.map($(instruction => {
         const {
           accounts: accounts,
           programIdIndex: programIdIndex
         } = instruction;
-        const data = Array.from(bs58$1.decode(instruction.data));
-        let keyIndicesCount = [];
+        const data = $Array.from(bs58$1.decode(instruction.data));
+        let keyIndicesCount = $Array.of();
         encodeLength(keyIndicesCount, accounts.length);
-        let dataCount = [];
+        let dataCount = $Array.of();
         encodeLength(dataCount, data.length);
-        return {
-          programIdIndex: programIdIndex,
-          keyIndicesCount: buffer.Buffer.from(keyIndicesCount),
-          keyIndices: accounts,
-          dataLength: buffer.Buffer.from(dataCount),
-          data: data
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = programIdIndex;
+          result.keyIndicesCount = buffer.Buffer.from(keyIndicesCount);
+          result.keyIndices = accounts;
+          result.dataLength = buffer.Buffer.from(dataCount);
+          result.data = data;
+          return result;
+        })();
       }));
-      let instructionCount = [];
+      let instructionCount = $Array.of();
       encodeLength(instructionCount, instructions.length);
       let instructionBuffer = buffer.Buffer.alloc(PACKET_DATA_SIZE);
       buffer.Buffer.from(instructionCount).copy(instructionBuffer);
       let instructionBufferLength = instructionCount.length;
       instructions.forEach($(instruction => {
-        const instructionLayout = struct([u8("programIdIndex"), blob(instruction.keyIndicesCount.length, "keyIndicesCount"), seq(u8("keyIndex"), instruction.keyIndices.length, "keyIndices"), blob(instruction.dataLength.length, "dataLength"), seq(u8("userdatum"), instruction.data.length, "data")]);
+        const instructionLayout = struct($Array.of(u8("programIdIndex"), blob(instruction.keyIndicesCount.length, "keyIndicesCount"), seq(u8("keyIndex"), instruction.keyIndices.length, "keyIndices"), blob(instruction.dataLength.length, "dataLength"), seq(u8("userdatum"), instruction.data.length, "data")));
         const length = instructionLayout.encode(instruction, instructionBuffer, instructionBufferLength);
         instructionBufferLength += length;
       }));
       instructionBuffer = instructionBuffer.slice(0, instructionBufferLength);
-      const signDataLayout = struct([blob(1, "numRequiredSignatures"), blob(1, "numReadonlySignedAccounts"), blob(1, "numReadonlyUnsignedAccounts"), blob(keyCount.length, "keyCount"), seq(publicKey("key"), numKeys, "keys"), publicKey("recentBlockhash")]);
-      const transaction = {
-        numRequiredSignatures: buffer.Buffer.from([this.header.numRequiredSignatures]),
-        numReadonlySignedAccounts: buffer.Buffer.from([this.header.numReadonlySignedAccounts]),
-        numReadonlyUnsignedAccounts: buffer.Buffer.from([this.header.numReadonlyUnsignedAccounts]),
-        keyCount: buffer.Buffer.from(keyCount),
-        keys: this.accountKeys.map($(key => toBuffer(key.toBytes()))),
-        recentBlockhash: bs58$1.decode(this.recentBlockhash)
-      };
+      const signDataLayout = struct($Array.of(blob(1, "numRequiredSignatures"), blob(1, "numReadonlySignedAccounts"), blob(1, "numReadonlyUnsignedAccounts"), blob(keyCount.length, "keyCount"), seq(publicKey("key"), numKeys, "keys"), publicKey("recentBlockhash")));
+      const transaction = $(function () {
+        let result = $Object.create(null, undefined);
+        result.numRequiredSignatures = buffer.Buffer.from($Array.of(this.header.numRequiredSignatures));
+        result.numReadonlySignedAccounts = buffer.Buffer.from($Array.of(this.header.numReadonlySignedAccounts));
+        result.numReadonlyUnsignedAccounts = buffer.Buffer.from($Array.of(this.header.numReadonlyUnsignedAccounts));
+        result.keyCount = buffer.Buffer.from(keyCount);
+        result.keys = this.accountKeys.map($(key => toBuffer(key.toBytes())));
+        result.recentBlockhash = bs58$1.decode(this.recentBlockhash);
+        return result;
+      }).bind(this)();
       let signData = buffer.Buffer.alloc(2048);
       const length = signDataLayout.encode(transaction, signData);
       instructionBuffer.copy(signData, length);
       return signData.slice(0, length + instructionBuffer.length);
     }
     static from(buffer$1) {
-      let byteArray = [...buffer$1];
+      let byteArray = $Array.of(...buffer$1);
       const numRequiredSignatures = byteArray.shift();
       if (numRequiredSignatures !== (numRequiredSignatures & VERSION_PREFIX_MASK)) {
         throw new Error("Versioned messages must be deserialized with VersionedMessage.deserialize()");
@@ -8280,7 +8430,7 @@ var solanaWeb3 = $(function (exports) {
       const numReadonlySignedAccounts = byteArray.shift();
       const numReadonlyUnsignedAccounts = byteArray.shift();
       const accountCount = decodeLength(byteArray);
-      let accountKeys = [];
+      let accountKeys = $Array.of();
       for (let i = 0; i < accountCount; i++) {
         const account = byteArray.slice(0, PUBLIC_KEY_LENGTH);
         byteArray = byteArray.slice(PUBLIC_KEY_LENGTH);
@@ -8289,7 +8439,7 @@ var solanaWeb3 = $(function (exports) {
       const recentBlockhash = byteArray.slice(0, PUBLIC_KEY_LENGTH);
       byteArray = byteArray.slice(PUBLIC_KEY_LENGTH);
       const instructionCount = decodeLength(byteArray);
-      let instructions = [];
+      let instructions = $Array.of();
       for (let i = 0; i < instructionCount; i++) {
         const programIdIndex = byteArray.shift();
         const accountCount = decodeLength(byteArray);
@@ -8299,22 +8449,28 @@ var solanaWeb3 = $(function (exports) {
         const dataSlice = byteArray.slice(0, dataLength);
         const data = bs58$1.encode(buffer.Buffer.from(dataSlice));
         byteArray = byteArray.slice(dataLength);
-        instructions.push({
-          programIdIndex: programIdIndex,
-          accounts: accounts,
-          data: data
-        });
+        instructions.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = programIdIndex;
+          result.accounts = accounts;
+          result.data = data;
+          return result;
+        })());
       }
-      const messageArgs = {
-        header: {
-          numRequiredSignatures: numRequiredSignatures,
-          numReadonlySignedAccounts: numReadonlySignedAccounts,
-          numReadonlyUnsignedAccounts: numReadonlyUnsignedAccounts
-        },
-        recentBlockhash: bs58$1.encode(buffer.Buffer.from(recentBlockhash)),
-        accountKeys: accountKeys,
-        instructions: instructions
-      };
+      const messageArgs = $(function () {
+        let result = $Object.create(null, undefined);
+        result.header = $(function () {
+          let result = $Object.create(null, undefined);
+          result.numRequiredSignatures = numRequiredSignatures;
+          result.numReadonlySignedAccounts = numReadonlySignedAccounts;
+          result.numReadonlyUnsignedAccounts = numReadonlyUnsignedAccounts;
+          return result;
+        })();
+        result.recentBlockhash = bs58$1.encode(buffer.Buffer.from(recentBlockhash));
+        result.accountKeys = accountKeys;
+        result.instructions = instructions;
+        return result;
+      })();
       return new Message(messageArgs);
     }
   }
@@ -8376,10 +8532,12 @@ var solanaWeb3 = $(function (exports) {
       }
     }
     resolveAddressTableLookups(addressLookupTableAccounts) {
-      const accountKeysFromLookups = {
-        writable: [],
-        readonly: []
-      };
+      const accountKeysFromLookups = $(function () {
+        let result = $Object.create(null, undefined);
+        result.writable = $Array.of();
+        result.readonly = $Array.of();
+        return result;
+      })();
       for (const tableLookup of this.addressTableLookups) {
         const tableAccount = addressLookupTableAccounts.find($(account => account.key.equals(tableLookup.accountKey)));
         if (!tableAccount) {
@@ -8405,11 +8563,13 @@ var solanaWeb3 = $(function (exports) {
     static compile(args) {
       const compiledKeys = CompiledKeys.compile(args.instructions, args.payerKey);
       const addressTableLookups = new Array();
-      const accountKeysFromLookups = {
-        writable: new Array(),
-        readonly: new Array()
-      };
-      const lookupTableAccounts = args.addressLookupTableAccounts || [];
+      const accountKeysFromLookups = $(function () {
+        let result = $Object.create(null, undefined);
+        result.writable = new Array();
+        result.readonly = new Array();
+        return result;
+      })();
+      const lookupTableAccounts = args.addressLookupTableAccounts || $Array.of();
       for (const lookupTable of lookupTableAccounts) {
         const extractResult = compiledKeys.extractTableLookup(lookupTable);
         if (extractResult !== undefined) {
@@ -8425,13 +8585,15 @@ var solanaWeb3 = $(function (exports) {
       const [header, staticAccountKeys] = compiledKeys.getMessageComponents();
       const accountKeys = new MessageAccountKeys(staticAccountKeys, accountKeysFromLookups);
       const compiledInstructions = accountKeys.compileInstructions(args.instructions);
-      return new MessageV0({
-        header: header,
-        staticAccountKeys: staticAccountKeys,
-        recentBlockhash: args.recentBlockhash,
-        compiledInstructions: compiledInstructions,
-        addressTableLookups: addressTableLookups
-      });
+      return new MessageV0($(function () {
+        let result = $Object.create(null, undefined);
+        result.header = header;
+        result.staticAccountKeys = staticAccountKeys;
+        result.recentBlockhash = args.recentBlockhash;
+        result.compiledInstructions = compiledInstructions;
+        result.addressTableLookups = addressTableLookups;
+        return result;
+      })());
     }
     serialize() {
       const encodedStaticAccountKeysLength = Array();
@@ -8442,20 +8604,22 @@ var solanaWeb3 = $(function (exports) {
       const serializedAddressTableLookups = this.serializeAddressTableLookups();
       const encodedAddressTableLookupsLength = Array();
       encodeLength(encodedAddressTableLookupsLength, this.addressTableLookups.length);
-      const messageLayout = struct([u8("prefix"), struct([u8("numRequiredSignatures"), u8("numReadonlySignedAccounts"), u8("numReadonlyUnsignedAccounts")], "header"), blob(encodedStaticAccountKeysLength.length, "staticAccountKeysLength"), seq(publicKey(), this.staticAccountKeys.length, "staticAccountKeys"), publicKey("recentBlockhash"), blob(encodedInstructionsLength.length, "instructionsLength"), blob(serializedInstructions.length, "serializedInstructions"), blob(encodedAddressTableLookupsLength.length, "addressTableLookupsLength"), blob(serializedAddressTableLookups.length, "serializedAddressTableLookups")]);
+      const messageLayout = struct($Array.of(u8("prefix"), struct($Array.of(u8("numRequiredSignatures"), u8("numReadonlySignedAccounts"), u8("numReadonlyUnsignedAccounts")), "header"), blob(encodedStaticAccountKeysLength.length, "staticAccountKeysLength"), seq(publicKey(), this.staticAccountKeys.length, "staticAccountKeys"), publicKey("recentBlockhash"), blob(encodedInstructionsLength.length, "instructionsLength"), blob(serializedInstructions.length, "serializedInstructions"), blob(encodedAddressTableLookupsLength.length, "addressTableLookupsLength"), blob(serializedAddressTableLookups.length, "serializedAddressTableLookups")));
       const serializedMessage = new Uint8Array(PACKET_DATA_SIZE);
       const MESSAGE_VERSION_0_PREFIX = 1 << 7;
-      const serializedMessageLength = messageLayout.encode({
-        prefix: MESSAGE_VERSION_0_PREFIX,
-        header: this.header,
-        staticAccountKeysLength: new Uint8Array(encodedStaticAccountKeysLength),
-        staticAccountKeys: this.staticAccountKeys.map($(key => key.toBytes())),
-        recentBlockhash: bs58$1.decode(this.recentBlockhash),
-        instructionsLength: new Uint8Array(encodedInstructionsLength),
-        serializedInstructions: serializedInstructions,
-        addressTableLookupsLength: new Uint8Array(encodedAddressTableLookupsLength),
-        serializedAddressTableLookups: serializedAddressTableLookups
-      }, serializedMessage);
+      const serializedMessageLength = messageLayout.encode($(function () {
+        let result = $Object.create(null, undefined);
+        result.prefix = MESSAGE_VERSION_0_PREFIX;
+        result.header = this.header;
+        result.staticAccountKeysLength = new Uint8Array(encodedStaticAccountKeysLength);
+        result.staticAccountKeys = this.staticAccountKeys.map($(key => key.toBytes()));
+        result.recentBlockhash = bs58$1.decode(this.recentBlockhash);
+        result.instructionsLength = new Uint8Array(encodedInstructionsLength);
+        result.serializedInstructions = serializedInstructions;
+        result.addressTableLookupsLength = new Uint8Array(encodedAddressTableLookupsLength);
+        result.serializedAddressTableLookups = serializedAddressTableLookups;
+        return result;
+      }).bind(this)(), serializedMessage);
       return serializedMessage.slice(0, serializedMessageLength);
     }
     serializeInstructions() {
@@ -8466,14 +8630,16 @@ var solanaWeb3 = $(function (exports) {
         encodeLength(encodedAccountKeyIndexesLength, instruction.accountKeyIndexes.length);
         const encodedDataLength = Array();
         encodeLength(encodedDataLength, instruction.data.length);
-        const instructionLayout = struct([u8("programIdIndex"), blob(encodedAccountKeyIndexesLength.length, "encodedAccountKeyIndexesLength"), seq(u8(), instruction.accountKeyIndexes.length, "accountKeyIndexes"), blob(encodedDataLength.length, "encodedDataLength"), blob(instruction.data.length, "data")]);
-        serializedLength += instructionLayout.encode({
-          programIdIndex: instruction.programIdIndex,
-          encodedAccountKeyIndexesLength: new Uint8Array(encodedAccountKeyIndexesLength),
-          accountKeyIndexes: instruction.accountKeyIndexes,
-          encodedDataLength: new Uint8Array(encodedDataLength),
-          data: instruction.data
-        }, serializedInstructions, serializedLength);
+        const instructionLayout = struct($Array.of(u8("programIdIndex"), blob(encodedAccountKeyIndexesLength.length, "encodedAccountKeyIndexesLength"), seq(u8(), instruction.accountKeyIndexes.length, "accountKeyIndexes"), blob(encodedDataLength.length, "encodedDataLength"), blob(instruction.data.length, "data")));
+        serializedLength += instructionLayout.encode($(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = instruction.programIdIndex;
+          result.encodedAccountKeyIndexesLength = new Uint8Array(encodedAccountKeyIndexesLength);
+          result.accountKeyIndexes = instruction.accountKeyIndexes;
+          result.encodedDataLength = new Uint8Array(encodedDataLength);
+          result.data = instruction.data;
+          return result;
+        })(), serializedInstructions, serializedLength);
       }
       return serializedInstructions.slice(0, serializedLength);
     }
@@ -8485,82 +8651,93 @@ var solanaWeb3 = $(function (exports) {
         encodeLength(encodedWritableIndexesLength, lookup.writableIndexes.length);
         const encodedReadonlyIndexesLength = Array();
         encodeLength(encodedReadonlyIndexesLength, lookup.readonlyIndexes.length);
-        const addressTableLookupLayout = struct([publicKey("accountKey"), blob(encodedWritableIndexesLength.length, "encodedWritableIndexesLength"), seq(u8(), lookup.writableIndexes.length, "writableIndexes"), blob(encodedReadonlyIndexesLength.length, "encodedReadonlyIndexesLength"), seq(u8(), lookup.readonlyIndexes.length, "readonlyIndexes")]);
-        serializedLength += addressTableLookupLayout.encode({
-          accountKey: lookup.accountKey.toBytes(),
-          encodedWritableIndexesLength: new Uint8Array(encodedWritableIndexesLength),
-          writableIndexes: lookup.writableIndexes,
-          encodedReadonlyIndexesLength: new Uint8Array(encodedReadonlyIndexesLength),
-          readonlyIndexes: lookup.readonlyIndexes
-        }, serializedAddressTableLookups, serializedLength);
+        const addressTableLookupLayout = struct($Array.of(publicKey("accountKey"), blob(encodedWritableIndexesLength.length, "encodedWritableIndexesLength"), seq(u8(), lookup.writableIndexes.length, "writableIndexes"), blob(encodedReadonlyIndexesLength.length, "encodedReadonlyIndexesLength"), seq(u8(), lookup.readonlyIndexes.length, "readonlyIndexes")));
+        serializedLength += addressTableLookupLayout.encode($(function () {
+          let result = $Object.create(null, undefined);
+          result.accountKey = lookup.accountKey.toBytes();
+          result.encodedWritableIndexesLength = new Uint8Array(encodedWritableIndexesLength);
+          result.writableIndexes = lookup.writableIndexes;
+          result.encodedReadonlyIndexesLength = new Uint8Array(encodedReadonlyIndexesLength);
+          result.readonlyIndexes = lookup.readonlyIndexes;
+          return result;
+        })(), serializedAddressTableLookups, serializedLength);
       }
       return serializedAddressTableLookups.slice(0, serializedLength);
     }
     static deserialize(serializedMessage) {
-      let byteArray = [...serializedMessage];
+      let byteArray = $Array.of(...serializedMessage);
       const prefix = byteArray.shift();
       const maskedPrefix = prefix & VERSION_PREFIX_MASK;
       assert$1(prefix !== maskedPrefix, `Expected versioned message but received legacy message`);
       const version = maskedPrefix;
       assert$1(version === 0, `Expected versioned message with version 0 but found version ${version}`);
-      const header = {
-        numRequiredSignatures: byteArray.shift(),
-        numReadonlySignedAccounts: byteArray.shift(),
-        numReadonlyUnsignedAccounts: byteArray.shift()
-      };
-      const staticAccountKeys = [];
+      const header = $(function () {
+        let result = $Object.create(null, undefined);
+        result.numRequiredSignatures = byteArray.shift();
+        result.numReadonlySignedAccounts = byteArray.shift();
+        result.numReadonlyUnsignedAccounts = byteArray.shift();
+        return result;
+      })();
+      const staticAccountKeys = $Array.of();
       const staticAccountKeysLength = decodeLength(byteArray);
       for (let i = 0; i < staticAccountKeysLength; i++) {
         staticAccountKeys.push(new PublicKey(byteArray.splice(0, PUBLIC_KEY_LENGTH)));
       }
       const recentBlockhash = bs58$1.encode(byteArray.splice(0, PUBLIC_KEY_LENGTH));
       const instructionCount = decodeLength(byteArray);
-      const compiledInstructions = [];
+      const compiledInstructions = $Array.of();
       for (let i = 0; i < instructionCount; i++) {
         const programIdIndex = byteArray.shift();
         const accountKeyIndexesLength = decodeLength(byteArray);
         const accountKeyIndexes = byteArray.splice(0, accountKeyIndexesLength);
         const dataLength = decodeLength(byteArray);
         const data = new Uint8Array(byteArray.splice(0, dataLength));
-        compiledInstructions.push({
-          programIdIndex: programIdIndex,
-          accountKeyIndexes: accountKeyIndexes,
-          data: data
-        });
+        compiledInstructions.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = programIdIndex;
+          result.accountKeyIndexes = accountKeyIndexes;
+          result.data = data;
+          return result;
+        })());
       }
       const addressTableLookupsCount = decodeLength(byteArray);
-      const addressTableLookups = [];
+      const addressTableLookups = $Array.of();
       for (let i = 0; i < addressTableLookupsCount; i++) {
         const accountKey = new PublicKey(byteArray.splice(0, PUBLIC_KEY_LENGTH));
         const writableIndexesLength = decodeLength(byteArray);
         const writableIndexes = byteArray.splice(0, writableIndexesLength);
         const readonlyIndexesLength = decodeLength(byteArray);
         const readonlyIndexes = byteArray.splice(0, readonlyIndexesLength);
-        addressTableLookups.push({
-          accountKey: accountKey,
-          writableIndexes: writableIndexes,
-          readonlyIndexes: readonlyIndexes
-        });
+        addressTableLookups.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.accountKey = accountKey;
+          result.writableIndexes = writableIndexes;
+          result.readonlyIndexes = readonlyIndexes;
+          return result;
+        })());
       }
-      return new MessageV0({
-        header: header,
-        staticAccountKeys: staticAccountKeys,
-        recentBlockhash: recentBlockhash,
-        compiledInstructions: compiledInstructions,
-        addressTableLookups: addressTableLookups
-      });
+      return new MessageV0($(function () {
+        let result = $Object.create(null, undefined);
+        result.header = header;
+        result.staticAccountKeys = staticAccountKeys;
+        result.recentBlockhash = recentBlockhash;
+        result.compiledInstructions = compiledInstructions;
+        result.addressTableLookups = addressTableLookups;
+        return result;
+      })());
     }
   }
-  const VersionedMessage = {
-    deserializeMessageVersion(serializedMessage) {
+  const VersionedMessage = $(function () {
+    let result = $Object.create(null, undefined);
+    result.deserializeMessageVersion = $(function (serializedMessage) {
       const prefix = serializedMessage[0];
       const maskedPrefix = prefix & VERSION_PREFIX_MASK;
       if (maskedPrefix === prefix) {
         return "legacy";
       }
       return maskedPrefix;
-    },
-    deserialize: $(serializedMessage => {
+    });
+    result.deserialize = $(serializedMessage => {
       const version = VersionedMessage.deserializeMessageVersion(serializedMessage);
       if (version === "legacy") {
         return Message.from(serializedMessage);
@@ -8570,14 +8747,15 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error(`Transaction message version ${version} deserialization is not supported`);
       }
-    })
-  };
+    });
+    return result;
+  })();
   exports.TransactionStatus = void 0;
   $(function (TransactionStatus) {
     TransactionStatus[TransactionStatus["BLOCKHEIGHT_EXCEEDED"] = 0] = "BLOCKHEIGHT_EXCEEDED";
     TransactionStatus[TransactionStatus["PROCESSED"] = 1] = "PROCESSED";
     TransactionStatus[TransactionStatus["TIMED_OUT"] = 2] = "TIMED_OUT";
-  })(exports.TransactionStatus || (exports.TransactionStatus = {}));
+  })(exports.TransactionStatus || (exports.TransactionStatus = $Object.create(null, undefined)));
   const DEFAULT_SIGNATURE = buffer.Buffer.alloc(SIGNATURE_LENGTH_IN_BYTES).fill(0);
   class TransactionInstruction {
     constructor(opts) {
@@ -8591,19 +8769,23 @@ var solanaWeb3 = $(function (exports) {
       }
     }
     toJSON() {
-      return {
-        keys: this.keys.map($(({
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = this.keys.map($(({
           pubkey: pubkey,
           isSigner: isSigner,
           isWritable: isWritable
-        }) => ({
-          pubkey: pubkey.toJSON(),
-          isSigner: isSigner,
-          isWritable: isWritable
-        }))),
-        programId: this.programId.toJSON(),
-        data: [...this.data]
-      };
+        }) => $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = pubkey.toJSON();
+          result.isSigner = isSigner;
+          result.isWritable = isWritable;
+          return result;
+        })()));
+        result.programId = this.programId.toJSON();
+        result.data = $Array.of(...this.data);
+        return result;
+      }).bind(this)();
     }
   }
   class Transaction {
@@ -8614,9 +8796,9 @@ var solanaWeb3 = $(function (exports) {
       return null;
     }
     constructor(opts) {
-      this.signatures = [];
+      this.signatures = $Array.of();
       this.feePayer = void 0;
-      this.instructions = [];
+      this.instructions = $Array.of();
       this.recentBlockhash = void 0;
       this.lastValidBlockHeight = void 0;
       this.nonceInfo = void 0;
@@ -8650,18 +8832,22 @@ var solanaWeb3 = $(function (exports) {
       }
     }
     toJSON() {
-      return {
-        recentBlockhash: this.recentBlockhash || null,
-        feePayer: this.feePayer ? this.feePayer.toJSON() : null,
-        nonceInfo: this.nonceInfo ? {
-          nonce: this.nonceInfo.nonce,
-          nonceInstruction: this.nonceInfo.nonceInstruction.toJSON()
-        } : null,
-        instructions: this.instructions.map($(instruction => instruction.toJSON())),
-        signers: this.signatures.map($(({
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.recentBlockhash = this.recentBlockhash || null;
+        result.feePayer = this.feePayer ? this.feePayer.toJSON() : null;
+        result.nonceInfo = this.nonceInfo ? $(function () {
+          let result = $Object.create(null, undefined);
+          result.nonce = this.nonceInfo.nonce;
+          result.nonceInstruction = this.nonceInfo.nonceInstruction.toJSON();
+          return result;
+        })() : null;
+        result.instructions = this.instructions.map($(instruction => instruction.toJSON()));
+        result.signers = this.signatures.map($(({
           publicKey: publicKey
-        }) => publicKey.toJSON()))
-      };
+        }) => publicKey.toJSON()));
+        return result;
+      }).bind(this)();
     }
     add(...items) {
       if (items.length === 0) {
@@ -8687,7 +8873,7 @@ var solanaWeb3 = $(function (exports) {
       if (this.nonceInfo) {
         recentBlockhash = this.nonceInfo.nonce;
         if (this.instructions[0] != this.nonceInfo.nonceInstruction) {
-          instructions = [this.nonceInfo.nonceInstruction, ...this.instructions];
+          instructions = $Array.of(this.nonceInfo.nonceInstruction, ...this.instructions);
         } else {
           instructions = this.instructions;
         }
@@ -8714,13 +8900,15 @@ var solanaWeb3 = $(function (exports) {
           throw new Error(`Transaction instruction index ${i} has undefined program id`);
         }
       }
-      const programIds = [];
-      const accountMetas = [];
+      const programIds = $Array.of();
+      const accountMetas = $Array.of();
       instructions.forEach($(instruction => {
         instruction.keys.forEach($(accountMeta => {
-          accountMetas.push({
-            ...accountMeta
-          });
+          accountMetas.push($(function () {
+            let result = $Object.create(null, undefined);
+            $Object.assign(result, accountMeta);
+            return result;
+          })());
         }));
         const programId = instruction.programId.toString();
         if (!programIds.includes(programId)) {
@@ -8728,13 +8916,15 @@ var solanaWeb3 = $(function (exports) {
         }
       }));
       programIds.forEach($(programId => {
-        accountMetas.push({
-          pubkey: new PublicKey(programId),
-          isSigner: false,
-          isWritable: false
-        });
+        accountMetas.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = new PublicKey(programId);
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
       }));
-      const uniqueMetas = [];
+      const uniqueMetas = $Array.of();
       accountMetas.forEach($(accountMeta => {
         const pubkeyString = accountMeta.pubkey.toString();
         const uniqueIndex = uniqueMetas.findIndex($(x => x.pubkey.toString() === pubkeyString));
@@ -8761,11 +8951,13 @@ var solanaWeb3 = $(function (exports) {
         payerMeta.isWritable = true;
         uniqueMetas.unshift(payerMeta);
       } else {
-        uniqueMetas.unshift({
-          pubkey: feePayer,
-          isSigner: true,
-          isWritable: true
-        });
+        uniqueMetas.unshift($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = feePayer;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })());
       }
       for (const signature of this.signatures) {
         const uniqueIndex = uniqueMetas.findIndex($(x => x.pubkey.equals(signature.publicKey)));
@@ -8781,8 +8973,8 @@ var solanaWeb3 = $(function (exports) {
       let numRequiredSignatures = 0;
       let numReadonlySignedAccounts = 0;
       let numReadonlyUnsignedAccounts = 0;
-      const signedKeys = [];
-      const unsignedKeys = [];
+      const signedKeys = $Array.of();
+      const unsignedKeys = $Array.of();
       uniqueMetas.forEach($(({
         pubkey: pubkey,
         isSigner: isSigner,
@@ -8807,26 +8999,32 @@ var solanaWeb3 = $(function (exports) {
           data: data,
           programId: programId
         } = instruction;
-        return {
-          programIdIndex: accountKeys.indexOf(programId.toString()),
-          accounts: instruction.keys.map($(meta => accountKeys.indexOf(meta.pubkey.toString()))),
-          data: bs58$1.encode(data)
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = accountKeys.indexOf(programId.toString());
+          result.accounts = instruction.keys.map($(meta => accountKeys.indexOf(meta.pubkey.toString())));
+          result.data = bs58$1.encode(data);
+          return result;
+        })();
       }));
       compiledInstructions.forEach($(instruction => {
         assert$1(instruction.programIdIndex >= 0);
         instruction.accounts.forEach($(keyIndex => assert$1(keyIndex >= 0)));
       }));
-      return new Message({
-        header: {
-          numRequiredSignatures: numRequiredSignatures,
-          numReadonlySignedAccounts: numReadonlySignedAccounts,
-          numReadonlyUnsignedAccounts: numReadonlyUnsignedAccounts
-        },
-        accountKeys: accountKeys,
-        recentBlockhash: recentBlockhash,
-        instructions: compiledInstructions
-      });
+      return new Message($(function () {
+        let result = $Object.create(null, undefined);
+        result.header = $(function () {
+          let result = $Object.create(null, undefined);
+          result.numRequiredSignatures = numRequiredSignatures;
+          result.numReadonlySignedAccounts = numReadonlySignedAccounts;
+          result.numReadonlyUnsignedAccounts = numReadonlyUnsignedAccounts;
+          return result;
+        })();
+        result.accountKeys = accountKeys;
+        result.recentBlockhash = recentBlockhash;
+        result.instructions = compiledInstructions;
+        return result;
+      })());
     }
     _compile() {
       const message = this.compileMessage();
@@ -8835,10 +9033,12 @@ var solanaWeb3 = $(function (exports) {
         const valid = this.signatures.every($((pair, index) => signedKeys[index].equals(pair.publicKey)));
         if (valid) return message;
       }
-      this.signatures = signedKeys.map($(publicKey => ({
-        signature: null,
-        publicKey: publicKey
-      })));
+      this.signatures = signedKeys.map($(publicKey => $(function () {
+        let result = $Object.create(null, undefined);
+        result.signature = null;
+        result.publicKey = publicKey;
+        return result;
+      })()));
       return message;
     }
     serializeMessage() {
@@ -8860,17 +9060,19 @@ var solanaWeb3 = $(function (exports) {
           seen.add(key);
           return true;
         }
-      })).map($(publicKey => ({
-        signature: null,
-        publicKey: publicKey
-      })));
+      })).map($(publicKey => $(function () {
+        let result = $Object.create(null, undefined);
+        result.signature = null;
+        result.publicKey = publicKey;
+        return result;
+      })()));
     }
     sign(...signers) {
       if (signers.length === 0) {
         throw new Error("No signers");
       }
       const seen = new Set();
-      const uniqueSigners = [];
+      const uniqueSigners = $Array.of();
       for (const signer of signers) {
         const key = signer.publicKey.toString();
         if (seen.has(key)) {
@@ -8880,10 +9082,12 @@ var solanaWeb3 = $(function (exports) {
           uniqueSigners.push(signer);
         }
       }
-      this.signatures = uniqueSigners.map($(signer => ({
-        signature: null,
-        publicKey: signer.publicKey
-      })));
+      this.signatures = uniqueSigners.map($(signer => $(function () {
+        let result = $Object.create(null, undefined);
+        result.signature = null;
+        result.publicKey = signer.publicKey;
+        return result;
+      })()));
       const message = this._compile();
       this._partialSign(message, ...uniqueSigners);
     }
@@ -8892,7 +9096,7 @@ var solanaWeb3 = $(function (exports) {
         throw new Error("No signers");
       }
       const seen = new Set();
-      const uniqueSigners = [];
+      const uniqueSigners = $Array.of();
       for (const signer of signers) {
         const key = signer.publicKey.toString();
         if (seen.has(key)) {
@@ -8948,10 +9152,12 @@ var solanaWeb3 = $(function (exports) {
       const {
         requireAllSignatures: requireAllSignatures,
         verifySignatures: verifySignatures
-      } = $Object.assign({
-        requireAllSignatures: true,
-        verifySignatures: true
-      }, config);
+      } = $Object.assign($(function () {
+        let result = $Object.create(null, undefined);
+        result.requireAllSignatures = true;
+        result.verifySignatures = true;
+        return result;
+      })(), config);
       const signData = this.serializeMessage();
       if (verifySignatures && !this._verifySignatures(signData, requireAllSignatures)) {
         throw new Error("Signature verification failed");
@@ -8962,7 +9168,7 @@ var solanaWeb3 = $(function (exports) {
       const {
         signatures: signatures
       } = this;
-      const signatureCount = [];
+      const signatureCount = $Array.of();
       encodeLength(signatureCount, signatures.length);
       const transactionLength = signatureCount.length + signatures.length * 64 + signData.length;
       const wireTransaction = buffer.Buffer.alloc(transactionLength);
@@ -8993,9 +9199,9 @@ var solanaWeb3 = $(function (exports) {
       return this.instructions[0].data;
     }
     static from(buffer$1) {
-      let byteArray = [...buffer$1];
+      let byteArray = $Array.of(...buffer$1);
       const signatureCount = decodeLength(byteArray);
-      let signatures = [];
+      let signatures = $Array.of();
       for (let i = 0; i < signatureCount; i++) {
         const signature = byteArray.slice(0, SIGNATURE_LENGTH_IN_BYTES);
         byteArray = byteArray.slice(SIGNATURE_LENGTH_IN_BYTES);
@@ -9003,33 +9209,39 @@ var solanaWeb3 = $(function (exports) {
       }
       return Transaction.populate(Message.from(byteArray), signatures);
     }
-    static populate(message, signatures = []) {
+    static populate(message, signatures = $Array.of()) {
       const transaction = new Transaction();
       transaction.recentBlockhash = message.recentBlockhash;
       if (message.header.numRequiredSignatures > 0) {
         transaction.feePayer = message.accountKeys[0];
       }
       signatures.forEach($((signature, index) => {
-        const sigPubkeyPair = {
-          signature: signature == bs58$1.encode(DEFAULT_SIGNATURE) ? null : bs58$1.decode(signature),
-          publicKey: message.accountKeys[index]
-        };
+        const sigPubkeyPair = $(function () {
+          let result = $Object.create(null, undefined);
+          result.signature = signature == bs58$1.encode(DEFAULT_SIGNATURE) ? null : bs58$1.decode(signature);
+          result.publicKey = message.accountKeys[index];
+          return result;
+        })();
         transaction.signatures.push(sigPubkeyPair);
       }));
       message.instructions.forEach($(instruction => {
         const keys = instruction.accounts.map($(account => {
           const pubkey = message.accountKeys[account];
-          return {
-            pubkey: pubkey,
-            isSigner: transaction.signatures.some($(keyObj => keyObj.publicKey.toString() === pubkey.toString())) || message.isAccountSigner(account),
-            isWritable: message.isAccountWritable(account)
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.pubkey = pubkey;
+            result.isSigner = transaction.signatures.some($(keyObj => keyObj.publicKey.toString() === pubkey.toString())) || message.isAccountSigner(account);
+            result.isWritable = message.isAccountWritable(account);
+            return result;
+          })();
         }));
-        transaction.instructions.push(new TransactionInstruction({
-          keys: keys,
-          programId: message.accountKeys[instruction.programIdIndex],
-          data: bs58$1.decode(instruction.data)
-        }));
+        transaction.instructions.push(new TransactionInstruction($(function () {
+          let result = $Object.create(null, undefined);
+          result.keys = keys;
+          result.programId = message.accountKeys[instruction.programIdIndex];
+          result.data = bs58$1.decode(instruction.data);
+          return result;
+        })()));
       }));
       transaction._message = message;
       transaction._json = transaction.toJSON();
@@ -9065,9 +9277,9 @@ var solanaWeb3 = $(function (exports) {
       if (payerKey === undefined) {
         throw new Error("Failed to decompile message because no account keys were found");
       }
-      const instructions = [];
+      const instructions = $Array.of();
       for (const compiledIx of compiledInstructions) {
-        const keys = [];
+        const keys = $Array.of();
         for (const keyIndex of compiledIx.accountKeyIndexes) {
           const pubkey = accountKeys.get(keyIndex);
           if (pubkey === undefined) {
@@ -9082,42 +9294,52 @@ var solanaWeb3 = $(function (exports) {
           } else {
             isWritable = keyIndex - accountKeys.staticAccountKeys.length < accountKeys.accountKeysFromLookups.writable.length;
           }
-          keys.push({
-            pubkey: pubkey,
-            isSigner: keyIndex < header.numRequiredSignatures,
-            isWritable: isWritable
-          });
+          keys.push($(function () {
+            let result = $Object.create(null, undefined);
+            result.pubkey = pubkey;
+            result.isSigner = keyIndex < header.numRequiredSignatures;
+            result.isWritable = isWritable;
+            return result;
+          })());
         }
         const programId = accountKeys.get(compiledIx.programIdIndex);
         if (programId === undefined) {
           throw new Error(`Failed to find program id for program id index ${compiledIx.programIdIndex}`);
         }
-        instructions.push(new TransactionInstruction({
-          programId: programId,
-          data: toBuffer(compiledIx.data),
-          keys: keys
-        }));
+        instructions.push(new TransactionInstruction($(function () {
+          let result = $Object.create(null, undefined);
+          result.programId = programId;
+          result.data = toBuffer(compiledIx.data);
+          result.keys = keys;
+          return result;
+        })()));
       }
-      return new TransactionMessage({
-        payerKey: payerKey,
-        instructions: instructions,
-        recentBlockhash: recentBlockhash
-      });
+      return new TransactionMessage($(function () {
+        let result = $Object.create(null, undefined);
+        result.payerKey = payerKey;
+        result.instructions = instructions;
+        result.recentBlockhash = recentBlockhash;
+        return result;
+      })());
     }
     compileToLegacyMessage() {
-      return Message.compile({
-        payerKey: this.payerKey,
-        recentBlockhash: this.recentBlockhash,
-        instructions: this.instructions
-      });
+      return Message.compile($(function () {
+        let result = $Object.create(null, undefined);
+        result.payerKey = this.payerKey;
+        result.recentBlockhash = this.recentBlockhash;
+        result.instructions = this.instructions;
+        return result;
+      }).bind(this)());
     }
     compileToV0Message(addressLookupTableAccounts) {
-      return MessageV0.compile({
-        payerKey: this.payerKey,
-        recentBlockhash: this.recentBlockhash,
-        instructions: this.instructions,
-        addressLookupTableAccounts: addressLookupTableAccounts
-      });
+      return MessageV0.compile($(function () {
+        let result = $Object.create(null, undefined);
+        result.payerKey = this.payerKey;
+        result.recentBlockhash = this.recentBlockhash;
+        result.instructions = this.instructions;
+        result.addressLookupTableAccounts = addressLookupTableAccounts;
+        return result;
+      }).bind(this)());
     }
   }
   class VersionedTransaction {
@@ -9131,7 +9353,7 @@ var solanaWeb3 = $(function (exports) {
         assert$1(signatures.length === message.header.numRequiredSignatures, "Expected signatures length to be equal to the number of required signatures");
         this.signatures = signatures;
       } else {
-        const defaultSignatures = [];
+        const defaultSignatures = $Array.of();
         for (let i = 0; i < message.header.numRequiredSignatures; i++) {
           defaultSignatures.push(new Uint8Array(SIGNATURE_LENGTH_IN_BYTES));
         }
@@ -9143,18 +9365,20 @@ var solanaWeb3 = $(function (exports) {
       const serializedMessage = this.message.serialize();
       const encodedSignaturesLength = Array();
       encodeLength(encodedSignaturesLength, this.signatures.length);
-      const transactionLayout = struct([blob(encodedSignaturesLength.length, "encodedSignaturesLength"), seq(signature(), this.signatures.length, "signatures"), blob(serializedMessage.length, "serializedMessage")]);
+      const transactionLayout = struct($Array.of(blob(encodedSignaturesLength.length, "encodedSignaturesLength"), seq(signature(), this.signatures.length, "signatures"), blob(serializedMessage.length, "serializedMessage")));
       const serializedTransaction = new Uint8Array(2048);
-      const serializedTransactionLength = transactionLayout.encode({
-        encodedSignaturesLength: new Uint8Array(encodedSignaturesLength),
-        signatures: this.signatures,
-        serializedMessage: serializedMessage
-      }, serializedTransaction);
+      const serializedTransactionLength = transactionLayout.encode($(function () {
+        let result = $Object.create(null, undefined);
+        result.encodedSignaturesLength = new Uint8Array(encodedSignaturesLength);
+        result.signatures = this.signatures;
+        result.serializedMessage = serializedMessage;
+        return result;
+      }).bind(this)(), serializedTransaction);
       return serializedTransaction.slice(0, serializedTransactionLength);
     }
     static deserialize(serializedTransaction) {
-      let byteArray = [...serializedTransaction];
-      const signatures = [];
+      let byteArray = $Array.of(...serializedTransaction);
+      const signatures = $Array.of();
       const signaturesLength = decodeLength(byteArray);
       for (let i = 0; i < signaturesLength; i++) {
         signatures.push(new Uint8Array(byteArray.splice(0, SIGNATURE_LENGTH_IN_BYTES)));
@@ -9189,18 +9413,22 @@ var solanaWeb3 = $(function (exports) {
   const SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey("SysvarS1otHistory11111111111111111111111111");
   const SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey("SysvarStakeHistory1111111111111111111111111");
   async function sendAndConfirmTransaction(connection, transaction, signers, options) {
-    const sendOptions = options && {
-      skipPreflight: options.skipPreflight,
-      preflightCommitment: options.preflightCommitment || options.commitment,
-      maxRetries: options.maxRetries,
-      minContextSlot: options.minContextSlot
-    };
+    const sendOptions = options && $(function () {
+      let result = $Object.create(null, undefined);
+      result.skipPreflight = options.skipPreflight;
+      result.preflightCommitment = options.preflightCommitment || options.commitment;
+      result.maxRetries = options.maxRetries;
+      result.minContextSlot = options.minContextSlot;
+      return result;
+    })();
     const signature = await connection.sendTransaction(transaction, signers, sendOptions);
-    const status = transaction.recentBlockhash != null && transaction.lastValidBlockHeight != null ? (await connection.confirmTransaction({
-      signature: signature,
-      blockhash: transaction.recentBlockhash,
-      lastValidBlockHeight: transaction.lastValidBlockHeight
-    }, options && options.commitment)).value : (await connection.confirmTransaction(signature, options && options.commitment)).value;
+    const status = transaction.recentBlockhash != null && transaction.lastValidBlockHeight != null ? (await connection.confirmTransaction($(function () {
+      let result = $Object.create(null, undefined);
+      result.signature = signature;
+      result.blockhash = transaction.recentBlockhash;
+      result.lastValidBlockHeight = transaction.lastValidBlockHeight;
+      return result;
+    })(), options && options.commitment)).value : (await connection.confirmTransaction(signature, options && options.commitment)).value;
     if (status.err) {
       throw new Error(`Transaction ${signature} failed (${JSON.stringify(status)})`);
     }
@@ -9214,9 +9442,11 @@ var solanaWeb3 = $(function (exports) {
   function encodeData(type, fields) {
     const allocLength = type.layout.span >= 0 ? type.layout.span : getAlloc(type, fields);
     const data = buffer.Buffer.alloc(allocLength);
-    const layoutFields = $Object.assign({
-      instruction: type.index
-    }, fields);
+    const layoutFields = $Object.assign($(function () {
+      let result = $Object.create(null, undefined);
+      result.instruction = type.index;
+      return result;
+    })(), fields);
     type.layout.encode(layoutFields, data);
     return data;
   }
@@ -9235,7 +9465,7 @@ var solanaWeb3 = $(function (exports) {
   }
   $(decodeData$1);
   const FeeCalculatorLayout = nu64("lamportsPerSignature");
-  const NonceAccountLayout = struct([u32("version"), u32("state"), publicKey("authorizedPubkey"), publicKey("nonce"), struct([FeeCalculatorLayout], "feeCalculator")]);
+  const NonceAccountLayout = struct($Array.of(u32("version"), u32("state"), publicKey("authorizedPubkey"), publicKey("nonce"), struct($Array.of(FeeCalculatorLayout), "feeCalculator")));
   const NONCE_ACCOUNT_LENGTH = NonceAccountLayout.span;
   class NonceAccount {
     constructor(args) {
@@ -9248,17 +9478,21 @@ var solanaWeb3 = $(function (exports) {
     }
     static fromAccountData(buffer) {
       const nonceAccount = NonceAccountLayout.decode(toBuffer(buffer), 0);
-      return new NonceAccount({
-        authorizedPubkey: new PublicKey(nonceAccount.authorizedPubkey),
-        nonce: new PublicKey(nonceAccount.nonce).toString(),
-        feeCalculator: nonceAccount.feeCalculator
-      });
+      return new NonceAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.authorizedPubkey = new PublicKey(nonceAccount.authorizedPubkey);
+        result.nonce = new PublicKey(nonceAccount.nonce).toString();
+        result.feeCalculator = nonceAccount.feeCalculator;
+        return result;
+      })());
     }
   }
-  var browser$1 = {};
-  $Object.defineProperty(browser$1, "__esModule", {
-    value: true
-  });
+  var browser$1 = $Object.create(null, undefined);
+  $Object.defineProperty(browser$1, "__esModule", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = true;
+    return result;
+  })());
   function toBigIntLE(buf) {
     {
       const reversed = Buffer.from(buf);
@@ -9304,10 +9538,12 @@ var solanaWeb3 = $(function (exports) {
   const encodeDecode = layout => {
     const decode = layout.decode.bind(layout);
     const encode = layout.encode.bind(layout);
-    return {
-      decode: decode,
-      encode: encode
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.decode = decode;
+      result.encode = encode;
+      return result;
+    })();
   };
   $(encodeDecode);
   const bigInt = length => $(property => {
@@ -9355,13 +9591,15 @@ var solanaWeb3 = $(function (exports) {
         space: space,
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Create, instruction.data);
-      return {
-        fromPubkey: instruction.keys[0].pubkey,
-        newAccountPubkey: instruction.keys[1].pubkey,
-        lamports: lamports,
-        space: space,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = instruction.keys[0].pubkey;
+        result.newAccountPubkey = instruction.keys[1].pubkey;
+        result.lamports = lamports;
+        result.space = space;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeTransfer(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9369,11 +9607,13 @@ var solanaWeb3 = $(function (exports) {
       const {
         lamports: lamports
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Transfer, instruction.data);
-      return {
-        fromPubkey: instruction.keys[0].pubkey,
-        toPubkey: instruction.keys[1].pubkey,
-        lamports: lamports
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = instruction.keys[0].pubkey;
+        result.toPubkey = instruction.keys[1].pubkey;
+        result.lamports = lamports;
+        return result;
+      })();
     }
     static decodeTransferWithSeed(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9383,14 +9623,16 @@ var solanaWeb3 = $(function (exports) {
         seed: seed,
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.TransferWithSeed, instruction.data);
-      return {
-        fromPubkey: instruction.keys[0].pubkey,
-        basePubkey: instruction.keys[1].pubkey,
-        toPubkey: instruction.keys[2].pubkey,
-        lamports: lamports,
-        seed: seed,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = instruction.keys[0].pubkey;
+        result.basePubkey = instruction.keys[1].pubkey;
+        result.toPubkey = instruction.keys[2].pubkey;
+        result.lamports = lamports;
+        result.seed = seed;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeAllocate(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9398,10 +9640,12 @@ var solanaWeb3 = $(function (exports) {
       const {
         space: space
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Allocate, instruction.data);
-      return {
-        accountPubkey: instruction.keys[0].pubkey,
-        space: space
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.accountPubkey = instruction.keys[0].pubkey;
+        result.space = space;
+        return result;
+      })();
     }
     static decodeAllocateWithSeed(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9412,13 +9656,15 @@ var solanaWeb3 = $(function (exports) {
         space: space,
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AllocateWithSeed, instruction.data);
-      return {
-        accountPubkey: instruction.keys[0].pubkey,
-        basePubkey: new PublicKey(base),
-        seed: seed,
-        space: space,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.accountPubkey = instruction.keys[0].pubkey;
+        result.basePubkey = new PublicKey(base);
+        result.seed = seed;
+        result.space = space;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeAssign(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9426,10 +9672,12 @@ var solanaWeb3 = $(function (exports) {
       const {
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Assign, instruction.data);
-      return {
-        accountPubkey: instruction.keys[0].pubkey,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.accountPubkey = instruction.keys[0].pubkey;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeAssignWithSeed(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9439,12 +9687,14 @@ var solanaWeb3 = $(function (exports) {
         seed: seed,
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AssignWithSeed, instruction.data);
-      return {
-        accountPubkey: instruction.keys[0].pubkey,
-        basePubkey: new PublicKey(base),
-        seed: seed,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.accountPubkey = instruction.keys[0].pubkey;
+        result.basePubkey = new PublicKey(base);
+        result.seed = seed;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeCreateWithSeed(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9456,15 +9706,17 @@ var solanaWeb3 = $(function (exports) {
         space: space,
         programId: programId
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.CreateWithSeed, instruction.data);
-      return {
-        fromPubkey: instruction.keys[0].pubkey,
-        newAccountPubkey: instruction.keys[1].pubkey,
-        basePubkey: new PublicKey(base),
-        seed: seed,
-        lamports: lamports,
-        space: space,
-        programId: new PublicKey(programId)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = instruction.keys[0].pubkey;
+        result.newAccountPubkey = instruction.keys[1].pubkey;
+        result.basePubkey = new PublicKey(base);
+        result.seed = seed;
+        result.lamports = lamports;
+        result.space = space;
+        result.programId = new PublicKey(programId);
+        return result;
+      })();
     }
     static decodeNonceInitialize(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9472,19 +9724,23 @@ var solanaWeb3 = $(function (exports) {
       const {
         authorized: authorized
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.InitializeNonceAccount, instruction.data);
-      return {
-        noncePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: new PublicKey(authorized)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.noncePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = new PublicKey(authorized);
+        return result;
+      })();
     }
     static decodeNonceAdvance(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeyLength(instruction.keys, 3);
       decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AdvanceNonceAccount, instruction.data);
-      return {
-        noncePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: instruction.keys[2].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.noncePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = instruction.keys[2].pubkey;
+        return result;
+      })();
     }
     static decodeNonceWithdraw(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9492,12 +9748,14 @@ var solanaWeb3 = $(function (exports) {
       const {
         lamports: lamports
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.WithdrawNonceAccount, instruction.data);
-      return {
-        noncePubkey: instruction.keys[0].pubkey,
-        toPubkey: instruction.keys[1].pubkey,
-        authorizedPubkey: instruction.keys[4].pubkey,
-        lamports: lamports
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.noncePubkey = instruction.keys[0].pubkey;
+        result.toPubkey = instruction.keys[1].pubkey;
+        result.authorizedPubkey = instruction.keys[4].pubkey;
+        result.lamports = lamports;
+        return result;
+      })();
     }
     static decodeNonceAuthorize(instruction) {
       this.checkProgramId(instruction.programId);
@@ -9505,11 +9763,13 @@ var solanaWeb3 = $(function (exports) {
       const {
         authorized: authorized
       } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AuthorizeNonceAccount, instruction.data);
-      return {
-        noncePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: instruction.keys[1].pubkey,
-        newAuthorizedPubkey: new PublicKey(authorized)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.noncePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = instruction.keys[1].pubkey;
+        result.newAuthorizedPubkey = new PublicKey(authorized);
+        return result;
+      })();
     }
     static checkProgramId(programId) {
       if (!programId.equals(SystemProgram.programId)) {
@@ -9522,354 +9782,486 @@ var solanaWeb3 = $(function (exports) {
       }
     }
   }
-  const SYSTEM_INSTRUCTION_LAYOUTS = $Object.freeze({
-    Create: {
-      index: 0,
-      layout: struct([u32("instruction"), ns64("lamports"), ns64("space"), publicKey("programId")])
-    },
-    Assign: {
-      index: 1,
-      layout: struct([u32("instruction"), publicKey("programId")])
-    },
-    Transfer: {
-      index: 2,
-      layout: struct([u32("instruction"), u64("lamports")])
-    },
-    CreateWithSeed: {
-      index: 3,
-      layout: struct([u32("instruction"), publicKey("base"), rustString("seed"), ns64("lamports"), ns64("space"), publicKey("programId")])
-    },
-    AdvanceNonceAccount: {
-      index: 4,
-      layout: struct([u32("instruction")])
-    },
-    WithdrawNonceAccount: {
-      index: 5,
-      layout: struct([u32("instruction"), ns64("lamports")])
-    },
-    InitializeNonceAccount: {
-      index: 6,
-      layout: struct([u32("instruction"), publicKey("authorized")])
-    },
-    AuthorizeNonceAccount: {
-      index: 7,
-      layout: struct([u32("instruction"), publicKey("authorized")])
-    },
-    Allocate: {
-      index: 8,
-      layout: struct([u32("instruction"), ns64("space")])
-    },
-    AllocateWithSeed: {
-      index: 9,
-      layout: struct([u32("instruction"), publicKey("base"), rustString("seed"), ns64("space"), publicKey("programId")])
-    },
-    AssignWithSeed: {
-      index: 10,
-      layout: struct([u32("instruction"), publicKey("base"), rustString("seed"), publicKey("programId")])
-    },
-    TransferWithSeed: {
-      index: 11,
-      layout: struct([u32("instruction"), u64("lamports"), rustString("seed"), publicKey("programId")])
-    },
-    UpgradeNonceAccount: {
-      index: 12,
-      layout: struct([u32("instruction")])
-    }
-  });
+  const SYSTEM_INSTRUCTION_LAYOUTS = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.Create = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      result.layout = struct($Array.of(u32("instruction"), ns64("lamports"), ns64("space"), publicKey("programId")));
+      return result;
+    })();
+    result.Assign = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("programId")));
+      return result;
+    })();
+    result.Transfer = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 2;
+      result.layout = struct($Array.of(u32("instruction"), u64("lamports")));
+      return result;
+    })();
+    result.CreateWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 3;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("base"), rustString("seed"), ns64("lamports"), ns64("space"), publicKey("programId")));
+      return result;
+    })();
+    result.AdvanceNonceAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 4;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.WithdrawNonceAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 5;
+      result.layout = struct($Array.of(u32("instruction"), ns64("lamports")));
+      return result;
+    })();
+    result.InitializeNonceAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 6;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("authorized")));
+      return result;
+    })();
+    result.AuthorizeNonceAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 7;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("authorized")));
+      return result;
+    })();
+    result.Allocate = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 8;
+      result.layout = struct($Array.of(u32("instruction"), ns64("space")));
+      return result;
+    })();
+    result.AllocateWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 9;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("base"), rustString("seed"), ns64("space"), publicKey("programId")));
+      return result;
+    })();
+    result.AssignWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 10;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("base"), rustString("seed"), publicKey("programId")));
+      return result;
+    })();
+    result.TransferWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 11;
+      result.layout = struct($Array.of(u32("instruction"), u64("lamports"), rustString("seed"), publicKey("programId")));
+      return result;
+    })();
+    result.UpgradeNonceAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 12;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    return result;
+  })());
   class SystemProgram {
     constructor() {}
     static createAccount(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.Create;
-      const data = encodeData(type, {
-        lamports: params.lamports,
-        space: params.space,
-        programId: toBuffer(params.programId.toBuffer())
-      });
-      return new TransactionInstruction({
-        keys: [{
-          pubkey: params.fromPubkey,
-          isSigner: true,
-          isWritable: true
-        }, {
-          pubkey: params.newAccountPubkey,
-          isSigner: true,
-          isWritable: true
-        }],
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.lamports = params.lamports;
+        result.space = params.space;
+        result.programId = toBuffer(params.programId.toBuffer());
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.fromPubkey;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.newAccountPubkey;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static transfer(params) {
       let data;
       let keys;
       if ("basePubkey" in params) {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.TransferWithSeed;
-        data = encodeData(type, {
-          lamports: BigInt(params.lamports),
-          seed: params.seed,
-          programId: toBuffer(params.programId.toBuffer())
-        });
-        keys = [{
-          pubkey: params.fromPubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: params.basePubkey,
-          isSigner: true,
-          isWritable: false
-        }, {
-          pubkey: params.toPubkey,
-          isSigner: false,
-          isWritable: true
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.lamports = BigInt(params.lamports);
+          result.seed = params.seed;
+          result.programId = toBuffer(params.programId.toBuffer());
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.fromPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.basePubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.toPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })());
       } else {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.Transfer;
-        data = encodeData(type, {
-          lamports: BigInt(params.lamports)
-        });
-        keys = [{
-          pubkey: params.fromPubkey,
-          isSigner: true,
-          isWritable: true
-        }, {
-          pubkey: params.toPubkey,
-          isSigner: false,
-          isWritable: true
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.lamports = BigInt(params.lamports);
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.fromPubkey;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.toPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })());
       }
-      return new TransactionInstruction({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static assign(params) {
       let data;
       let keys;
       if ("basePubkey" in params) {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.AssignWithSeed;
-        data = encodeData(type, {
-          base: toBuffer(params.basePubkey.toBuffer()),
-          seed: params.seed,
-          programId: toBuffer(params.programId.toBuffer())
-        });
-        keys = [{
-          pubkey: params.accountPubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: params.basePubkey,
-          isSigner: true,
-          isWritable: false
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.base = toBuffer(params.basePubkey.toBuffer());
+          result.seed = params.seed;
+          result.programId = toBuffer(params.programId.toBuffer());
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.accountPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.basePubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
       } else {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.Assign;
-        data = encodeData(type, {
-          programId: toBuffer(params.programId.toBuffer())
-        });
-        keys = [{
-          pubkey: params.accountPubkey,
-          isSigner: true,
-          isWritable: true
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.programId = toBuffer(params.programId.toBuffer());
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.accountPubkey;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })());
       }
-      return new TransactionInstruction({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static createAccountWithSeed(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.CreateWithSeed;
-      const data = encodeData(type, {
-        base: toBuffer(params.basePubkey.toBuffer()),
-        seed: params.seed,
-        lamports: params.lamports,
-        space: params.space,
-        programId: toBuffer(params.programId.toBuffer())
-      });
-      let keys = [{
-        pubkey: params.fromPubkey,
-        isSigner: true,
-        isWritable: true
-      }, {
-        pubkey: params.newAccountPubkey,
-        isSigner: false,
-        isWritable: true
-      }];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.base = toBuffer(params.basePubkey.toBuffer());
+        result.seed = params.seed;
+        result.lamports = params.lamports;
+        result.space = params.space;
+        result.programId = toBuffer(params.programId.toBuffer());
+        return result;
+      })());
+      let keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.fromPubkey;
+        result.isSigner = true;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.newAccountPubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })());
       if (params.basePubkey != params.fromPubkey) {
-        keys.push({
-          pubkey: params.basePubkey,
-          isSigner: true,
-          isWritable: false
-        });
+        keys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.basePubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
       }
-      return new TransactionInstruction({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static createNonceAccount(params) {
       const transaction = new Transaction();
       if ("basePubkey" in params && "seed" in params) {
-        transaction.add(SystemProgram.createAccountWithSeed({
-          fromPubkey: params.fromPubkey,
-          newAccountPubkey: params.noncePubkey,
-          basePubkey: params.basePubkey,
-          seed: params.seed,
-          lamports: params.lamports,
-          space: NONCE_ACCOUNT_LENGTH,
-          programId: this.programId
-        }));
+        transaction.add(SystemProgram.createAccountWithSeed($(function () {
+          let result = $Object.create(null, undefined);
+          result.fromPubkey = params.fromPubkey;
+          result.newAccountPubkey = params.noncePubkey;
+          result.basePubkey = params.basePubkey;
+          result.seed = params.seed;
+          result.lamports = params.lamports;
+          result.space = NONCE_ACCOUNT_LENGTH;
+          result.programId = this.programId;
+          return result;
+        }).bind(this)()));
       } else {
-        transaction.add(SystemProgram.createAccount({
-          fromPubkey: params.fromPubkey,
-          newAccountPubkey: params.noncePubkey,
-          lamports: params.lamports,
-          space: NONCE_ACCOUNT_LENGTH,
-          programId: this.programId
-        }));
+        transaction.add(SystemProgram.createAccount($(function () {
+          let result = $Object.create(null, undefined);
+          result.fromPubkey = params.fromPubkey;
+          result.newAccountPubkey = params.noncePubkey;
+          result.lamports = params.lamports;
+          result.space = NONCE_ACCOUNT_LENGTH;
+          result.programId = this.programId;
+          return result;
+        }).bind(this)()));
       }
-      const initParams = {
-        noncePubkey: params.noncePubkey,
-        authorizedPubkey: params.authorizedPubkey
-      };
+      const initParams = $(function () {
+        let result = $Object.create(null, undefined);
+        result.noncePubkey = params.noncePubkey;
+        result.authorizedPubkey = params.authorizedPubkey;
+        return result;
+      })();
       transaction.add(this.nonceInitialize(initParams));
       return transaction;
     }
     static nonceInitialize(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.InitializeNonceAccount;
-      const data = encodeData(type, {
-        authorized: toBuffer(params.authorizedPubkey.toBuffer())
-      });
-      const instructionData = {
-        keys: [{
-          pubkey: params.noncePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_RENT_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      };
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.authorized = toBuffer(params.authorizedPubkey.toBuffer());
+        return result;
+      })());
+      const instructionData = $(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.noncePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RECENT_BLOCKHASHES_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RENT_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)();
       return new TransactionInstruction(instructionData);
     }
     static nonceAdvance(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.AdvanceNonceAccount;
       const data = encodeData(type);
-      const instructionData = {
-        keys: [{
-          pubkey: params.noncePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: params.authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      };
+      const instructionData = $(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.noncePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RECENT_BLOCKHASHES_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)();
       return new TransactionInstruction(instructionData);
     }
     static nonceWithdraw(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.WithdrawNonceAccount;
-      const data = encodeData(type, {
-        lamports: params.lamports
-      });
-      return new TransactionInstruction({
-        keys: [{
-          pubkey: params.noncePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: params.toPubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_RENT_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: params.authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.lamports = params.lamports;
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.noncePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.toPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RECENT_BLOCKHASHES_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RENT_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static nonceAuthorize(params) {
       const type = SYSTEM_INSTRUCTION_LAYOUTS.AuthorizeNonceAccount;
-      const data = encodeData(type, {
-        authorized: toBuffer(params.newAuthorizedPubkey.toBuffer())
-      });
-      return new TransactionInstruction({
-        keys: [{
-          pubkey: params.noncePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: params.authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.authorized = toBuffer(params.newAuthorizedPubkey.toBuffer());
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.noncePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static allocate(params) {
       let data;
       let keys;
       if ("basePubkey" in params) {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.AllocateWithSeed;
-        data = encodeData(type, {
-          base: toBuffer(params.basePubkey.toBuffer()),
-          seed: params.seed,
-          space: params.space,
-          programId: toBuffer(params.programId.toBuffer())
-        });
-        keys = [{
-          pubkey: params.accountPubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: params.basePubkey,
-          isSigner: true,
-          isWritable: false
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.base = toBuffer(params.basePubkey.toBuffer());
+          result.seed = params.seed;
+          result.space = params.space;
+          result.programId = toBuffer(params.programId.toBuffer());
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.accountPubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.basePubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
       } else {
         const type = SYSTEM_INSTRUCTION_LAYOUTS.Allocate;
-        data = encodeData(type, {
-          space: params.space
-        });
-        keys = [{
-          pubkey: params.accountPubkey,
-          isSigner: true,
-          isWritable: true
-        }];
+        data = encodeData(type, $(function () {
+          let result = $Object.create(null, undefined);
+          result.space = params.space;
+          return result;
+        })());
+        keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.accountPubkey;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })());
       }
-      return new TransactionInstruction({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
   }
   SystemProgram.programId = new PublicKey("11111111111111111111111111111111");
@@ -9891,68 +10283,86 @@ var solanaWeb3 = $(function (exports) {
           }
           if (programInfo.data.length !== data.length) {
             transaction = transaction || new Transaction();
-            transaction.add(SystemProgram.allocate({
-              accountPubkey: program.publicKey,
-              space: data.length
-            }));
+            transaction.add(SystemProgram.allocate($(function () {
+              let result = $Object.create(null, undefined);
+              result.accountPubkey = program.publicKey;
+              result.space = data.length;
+              return result;
+            })()));
           }
           if (!programInfo.owner.equals(programId)) {
             transaction = transaction || new Transaction();
-            transaction.add(SystemProgram.assign({
-              accountPubkey: program.publicKey,
-              programId: programId
-            }));
+            transaction.add(SystemProgram.assign($(function () {
+              let result = $Object.create(null, undefined);
+              result.accountPubkey = program.publicKey;
+              result.programId = programId;
+              return result;
+            })()));
           }
           if (programInfo.lamports < balanceNeeded) {
             transaction = transaction || new Transaction();
-            transaction.add(SystemProgram.transfer({
-              fromPubkey: payer.publicKey,
-              toPubkey: program.publicKey,
-              lamports: balanceNeeded - programInfo.lamports
-            }));
+            transaction.add(SystemProgram.transfer($(function () {
+              let result = $Object.create(null, undefined);
+              result.fromPubkey = payer.publicKey;
+              result.toPubkey = program.publicKey;
+              result.lamports = balanceNeeded - programInfo.lamports;
+              return result;
+            })()));
           }
         } else {
-          transaction = new Transaction().add(SystemProgram.createAccount({
-            fromPubkey: payer.publicKey,
-            newAccountPubkey: program.publicKey,
-            lamports: balanceNeeded > 0 ? balanceNeeded : 1,
-            space: data.length,
-            programId: programId
-          }));
+          transaction = new Transaction().add(SystemProgram.createAccount($(function () {
+            let result = $Object.create(null, undefined);
+            result.fromPubkey = payer.publicKey;
+            result.newAccountPubkey = program.publicKey;
+            result.lamports = balanceNeeded > 0 ? balanceNeeded : 1;
+            result.space = data.length;
+            result.programId = programId;
+            return result;
+          })()));
         }
         if (transaction !== null) {
-          await sendAndConfirmTransaction(connection, transaction, [payer, program], {
-            commitment: "confirmed"
-          });
+          await sendAndConfirmTransaction(connection, transaction, $Array.of(payer, program), $(function () {
+            let result = $Object.create(null, undefined);
+            result.commitment = "confirmed";
+            return result;
+          })());
         }
       }
-      const dataLayout = struct([u32("instruction"), u32("offset"), u32("bytesLength"), u32("bytesLengthPadding"), seq(u8("byte"), offset(u32(), -8), "bytes")]);
+      const dataLayout = struct($Array.of(u32("instruction"), u32("offset"), u32("bytesLength"), u32("bytesLengthPadding"), seq(u8("byte"), offset(u32(), -8), "bytes")));
       const chunkSize = Loader.chunkSize;
       let offset$1 = 0;
       let array = data;
-      let transactions = [];
+      let transactions = $Array.of();
       while (array.length > 0) {
         const bytes = array.slice(0, chunkSize);
         const data = buffer.Buffer.alloc(chunkSize + 16);
-        dataLayout.encode({
-          instruction: 0,
-          offset: offset$1,
-          bytes: bytes,
-          bytesLength: 0,
-          bytesLengthPadding: 0
-        }, data);
-        const transaction = new Transaction().add({
-          keys: [{
-            pubkey: program.publicKey,
-            isSigner: true,
-            isWritable: true
-          }],
-          programId: programId,
-          data: data
-        });
-        transactions.push(sendAndConfirmTransaction(connection, transaction, [payer, program], {
-          commitment: "confirmed"
-        }));
+        dataLayout.encode($(function () {
+          let result = $Object.create(null, undefined);
+          result.instruction = 0;
+          result.offset = offset$1;
+          result.bytes = bytes;
+          result.bytesLength = 0;
+          result.bytesLengthPadding = 0;
+          return result;
+        })(), data);
+        const transaction = new Transaction().add($(function () {
+          let result = $Object.create(null, undefined);
+          result.keys = $Array.of($(function () {
+            let result = $Object.create(null, undefined);
+            result.pubkey = program.publicKey;
+            result.isSigner = true;
+            result.isWritable = true;
+            return result;
+          })());
+          result.programId = programId;
+          result.data = data;
+          return result;
+        })());
+        transactions.push(sendAndConfirmTransaction(connection, transaction, $Array.of(payer, program), $(function () {
+          let result = $Object.create(null, undefined);
+          result.commitment = "confirmed";
+          return result;
+        })()));
         if (connection._rpcEndpoint.includes("solana.com")) {
           const REQUESTS_PER_SECOND = 4;
           await sleep(1e3 / REQUESTS_PER_SECOND);
@@ -9962,27 +10372,37 @@ var solanaWeb3 = $(function (exports) {
       }
       await Promise.all(transactions);
       {
-        const dataLayout = struct([u32("instruction")]);
+        const dataLayout = struct($Array.of(u32("instruction")));
         const data = buffer.Buffer.alloc(dataLayout.span);
-        dataLayout.encode({
-          instruction: 1
-        }, data);
-        const transaction = new Transaction().add({
-          keys: [{
-            pubkey: program.publicKey,
-            isSigner: true,
-            isWritable: true
-          }, {
-            pubkey: SYSVAR_RENT_PUBKEY,
-            isSigner: false,
-            isWritable: false
-          }],
-          programId: programId,
-          data: data
-        });
-        await sendAndConfirmTransaction(connection, transaction, [payer, program], {
-          commitment: "confirmed"
-        });
+        dataLayout.encode($(function () {
+          let result = $Object.create(null, undefined);
+          result.instruction = 1;
+          return result;
+        })(), data);
+        const transaction = new Transaction().add($(function () {
+          let result = $Object.create(null, undefined);
+          result.keys = $Array.of($(function () {
+            let result = $Object.create(null, undefined);
+            result.pubkey = program.publicKey;
+            result.isSigner = true;
+            result.isWritable = true;
+            return result;
+          })(), $(function () {
+            let result = $Object.create(null, undefined);
+            result.pubkey = SYSVAR_RENT_PUBKEY;
+            result.isSigner = false;
+            result.isWritable = false;
+            return result;
+          })());
+          result.programId = programId;
+          result.data = data;
+          return result;
+        })());
+        await sendAndConfirmTransaction(connection, transaction, $Array.of(payer, program), $(function () {
+          let result = $Object.create(null, undefined);
+          result.commitment = "confirmed";
+          return result;
+        })());
       }
       return true;
     }
@@ -9999,7 +10419,7 @@ var solanaWeb3 = $(function (exports) {
   }
   var objToString = $Object.prototype.toString;
   var objKeys = $Object.keys || $(function (obj) {
-    var keys = [];
+    var keys = $Array.of();
     for (var name in obj) {
       keys.push(name);
     }
@@ -10086,7 +10506,7 @@ var solanaWeb3 = $(function (exports) {
       this.name = this.constructor.name;
       this.failures = $(() => {
         var _cached;
-        return (_cached = cached) != null ? _cached : cached = [failure, ...failures()];
+        return (_cached = cached) != null ? _cached : cached = $Array.of(failure, ...failures());
       });
     }
   }
@@ -10114,11 +10534,13 @@ var solanaWeb3 = $(function (exports) {
     if (result === true) {
       return;
     } else if (result === false) {
-      result = {};
+      result = $Object.create(null, undefined);
     } else if (typeof result === "string") {
-      result = {
-        message: result
-      };
+      result = $(function () {
+        let result = $Object.create(null, undefined);
+        result.message = result;
+        return result;
+      })();
     }
     const {
       path: path,
@@ -10131,21 +10553,23 @@ var solanaWeb3 = $(function (exports) {
       refinement: refinement,
       message = "Expected a value of type `" + type + "`" + (refinement ? " with refinement `" + refinement + "`" : "") + ", but received: `" + print(value) + "`"
     } = result;
-    return {
-      value: value,
-      type: type,
-      refinement: refinement,
-      key: path[path.length - 1],
-      path: path,
-      branch: branch,
-      ...result,
-      message: message
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.value = value;
+      result.type = type;
+      result.refinement = refinement;
+      result.key = path[path.length - 1];
+      result.path = path;
+      result.branch = branch;
+      $Object.assign(result, result);
+      result.message = message;
+      return result;
+    })();
   }
   $(toFailure);
   function* toFailures(result, context, struct, value) {
     if (!isIterable(result)) {
-      result = [result];
+      result = $Array.of(result);
     }
     for (const r of result) {
       const failure = toFailure(r, context, struct, value);
@@ -10155,20 +10579,22 @@ var solanaWeb3 = $(function (exports) {
     }
   }
   $(toFailures);
-  function* run(value, struct, options = {}) {
+  function* run(value, struct, options = $Object.create(null, undefined)) {
     const {
-      path = [],
-      branch = [value],
+      path = $Array.of(),
+      branch = $Array.of(value),
       coerce = false,
       mask = false
     } = options;
-    const ctx = {
-      path: path,
-      branch: branch
-    };
+    const ctx = $(function () {
+      let result = $Object.create(null, undefined);
+      result.path = path;
+      result.branch = branch;
+      return result;
+    })();
     if (coerce) {
       value = struct.coercer(value, ctx);
-      if (mask && struct.type !== "type" && isObject(struct.schema) && isObject(value) && !Array.isArray(value)) {
+      if (mask && struct.type !== "type" && isObject(struct.schema) && isObject(value) && !$Array.isArray(value)) {
         for (const key in value) {
           if (struct.schema[key] === undefined) {
             delete value[key];
@@ -10179,19 +10605,21 @@ var solanaWeb3 = $(function (exports) {
     let valid = true;
     for (const failure of struct.validator(value, ctx)) {
       valid = false;
-      yield [failure, undefined];
+      yield $Array.of(failure, undefined);
     }
     for (let [k, v, s] of struct.entries(value, ctx)) {
-      const ts = run(v, s, {
-        path: k === undefined ? path : [...path, k],
-        branch: k === undefined ? branch : [...branch, v],
-        coerce: coerce,
-        mask: mask
-      });
+      const ts = run(v, s, $(function () {
+        let result = $Object.create(null, undefined);
+        result.path = k === undefined ? path : $Array.of(...path, k);
+        result.branch = k === undefined ? branch : $Array.of(...branch, v);
+        result.coerce = coerce;
+        result.mask = mask;
+        return result;
+      })());
       for (const t of ts) {
         if (t[0]) {
           valid = false;
-          yield [t[0], undefined];
+          yield $Array.of(t[0], undefined);
         } else if (coerce) {
           v = t[1];
           if (k === undefined) {
@@ -10209,11 +10637,11 @@ var solanaWeb3 = $(function (exports) {
     if (valid) {
       for (const failure of struct.refiner(value, ctx)) {
         valid = false;
-        yield [failure, undefined];
+        yield $Array.of(failure, undefined);
       }
     }
     if (valid) {
-      yield [undefined, value];
+      yield $Array.of(undefined, value);
     }
   }
   $(run);
@@ -10237,7 +10665,7 @@ var solanaWeb3 = $(function (exports) {
           return toFailures(result, context, this, value);
         });
       } else {
-        this.validator = $(() => []);
+        this.validator = $(() => $Array.of());
       }
       if (refiner) {
         this.refiner = $((value, context) => {
@@ -10245,7 +10673,7 @@ var solanaWeb3 = $(function (exports) {
           return toFailures(result, context, this, value);
         });
       } else {
-        this.refiner = $(() => []);
+        this.refiner = $(() => $Array.of());
       }
     }
     assert(value) {
@@ -10260,7 +10688,7 @@ var solanaWeb3 = $(function (exports) {
     mask(value) {
       return mask(value, this);
     }
-    validate(value, options = {}) {
+    validate(value, options = $Object.create(null, undefined)) {
       return validate$1(value, this, options);
     }
   }
@@ -10272,9 +10700,11 @@ var solanaWeb3 = $(function (exports) {
   }
   $(assert);
   function create(value, struct) {
-    const result = validate$1(value, struct, {
-      coerce: true
-    });
+    const result = validate$1(value, struct, $(function () {
+      let result = $Object.create(null, undefined);
+      result.coerce = true;
+      return result;
+    })());
     if (result[0]) {
       throw result[0];
     } else {
@@ -10283,10 +10713,12 @@ var solanaWeb3 = $(function (exports) {
   }
   $(create);
   function mask(value, struct) {
-    const result = validate$1(value, struct, {
-      coerce: true,
-      mask: true
-    });
+    const result = validate$1(value, struct, $(function () {
+      let result = $Object.create(null, undefined);
+      result.coerce = true;
+      result.mask = true;
+      return result;
+    })());
     if (result[0]) {
       throw result[0];
     } else {
@@ -10299,7 +10731,7 @@ var solanaWeb3 = $(function (exports) {
     return !result[0];
   }
   $(is);
-  function validate$1(value, struct, options = {}) {
+  function validate$1(value, struct, options = $Object.create(null, undefined)) {
     const tuples = run(value, struct, options);
     const tuple = shiftIterator(tuples);
     if (tuple[0]) {
@@ -10310,19 +10742,21 @@ var solanaWeb3 = $(function (exports) {
           }
         }
       }));
-      return [error, undefined];
+      return $Array.of(error, undefined);
     } else {
       const v = tuple[1];
-      return [undefined, v];
+      return $Array.of(undefined, v);
     }
   }
   $(validate$1);
   function define(name, validator) {
-    return new Struct({
-      type: name,
-      schema: null,
-      validator: validator
-    });
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = name;
+      result.schema = null;
+      result.validator = validator;
+      return result;
+    })());
   }
   $(define);
   function any() {
@@ -10330,23 +10764,25 @@ var solanaWeb3 = $(function (exports) {
   }
   $(any);
   function array(Element) {
-    return new Struct({
-      type: "array",
-      schema: Element,
-      *entries(value) {
-        if (Element && Array.isArray(value)) {
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "array";
+      result.schema = Element;
+      result.entries = $(function* (value) {
+        if (Element && $Array.isArray(value)) {
           for (const [i, v] of value.entries()) {
-            yield [i, v, Element];
+            yield $Array.of(i, v, Element);
           }
         }
-      },
-      coercer(value) {
-        return Array.isArray(value) ? value.slice() : value;
-      },
-      validator(value) {
-        return Array.isArray(value) || "Expected an array value, but received: " + print(value);
-      }
-    });
+      });
+      result.coercer = $(function (value) {
+        return $Array.isArray(value) ? value.slice() : value;
+      });
+      result.validator = $(function (value) {
+        return $Array.isArray(value) || "Expected an array value, but received: " + print(value);
+      });
+      return result;
+    })());
   }
   $(array);
   function boolean() {
@@ -10360,13 +10796,15 @@ var solanaWeb3 = $(function (exports) {
   function literal(constant) {
     const description = print(constant);
     const t = typeof constant;
-    return new Struct({
-      type: "literal",
-      schema: t === "string" || t === "number" || t === "boolean" ? constant : null,
-      validator(value) {
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "literal";
+      result.schema = t === "string" || t === "number" || t === "boolean" ? constant : null;
+      result.validator = $(function (value) {
         return value === constant || "Expected the literal `" + description + "`, but received: " + print(value);
-      }
-    });
+      });
+      return result;
+    })());
   }
   $(literal);
   function never() {
@@ -10374,11 +10812,13 @@ var solanaWeb3 = $(function (exports) {
   }
   $(never);
   function nullable(struct) {
-    return new Struct({
-      ...struct,
-      validator: $((value, ctx) => value === null || struct.validator(value, ctx)),
-      refiner: $((value, ctx) => value === null || struct.refiner(value, ctx))
-    });
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      $Object.assign(result, struct);
+      result.validator = $((value, ctx) => value === null || struct.validator(value, ctx));
+      result.refiner = $((value, ctx) => value === null || struct.refiner(value, ctx));
+      return result;
+    })());
   }
   $(nullable);
   function number() {
@@ -10386,30 +10826,34 @@ var solanaWeb3 = $(function (exports) {
   }
   $(number);
   function optional(struct) {
-    return new Struct({
-      ...struct,
-      validator: $((value, ctx) => value === undefined || struct.validator(value, ctx)),
-      refiner: $((value, ctx) => value === undefined || struct.refiner(value, ctx))
-    });
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      $Object.assign(result, struct);
+      result.validator = $((value, ctx) => value === undefined || struct.validator(value, ctx));
+      result.refiner = $((value, ctx) => value === undefined || struct.refiner(value, ctx));
+      return result;
+    })());
   }
   $(optional);
   function record(Key, Value) {
-    return new Struct({
-      type: "record",
-      schema: null,
-      *entries(value) {
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "record";
+      result.schema = null;
+      result.entries = $(function* (value) {
         if (isObject(value)) {
           for (const k in value) {
             const v = value[k];
-            yield [k, k, Key];
-            yield [k, v, Value];
+            yield $Array.of(k, k, Key);
+            yield $Array.of(k, v, Value);
           }
         }
-      },
-      validator(value) {
+      });
+      result.validator = $(function (value) {
         return isObject(value) || "Expected an object, but received: " + print(value);
-      }
-    });
+      });
+      return result;
+    })());
   }
   $(record);
   function string() {
@@ -10418,53 +10862,58 @@ var solanaWeb3 = $(function (exports) {
   $(string);
   function tuple(Elements) {
     const Never = never();
-    return new Struct({
-      type: "tuple",
-      schema: null,
-      *entries(value) {
-        if (Array.isArray(value)) {
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "tuple";
+      result.schema = null;
+      result.entries = $(function* (value) {
+        if ($Array.isArray(value)) {
           const length = Math.max(Elements.length, value.length);
           for (let i = 0; i < length; i++) {
-            yield [i, value[i], Elements[i] || Never];
+            yield $Array.of(i, value[i], Elements[i] || Never);
           }
         }
-      },
-      validator(value) {
-        return Array.isArray(value) || "Expected an array, but received: " + print(value);
-      }
-    });
+      });
+      result.validator = $(function (value) {
+        return $Array.isArray(value) || "Expected an array, but received: " + print(value);
+      });
+      return result;
+    })());
   }
   $(tuple);
   function type(schema) {
     const keys = $Object.keys(schema);
-    return new Struct({
-      type: "type",
-      schema: schema,
-      *entries(value) {
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "type";
+      result.schema = schema;
+      result.entries = $(function* (value) {
         if (isObject(value)) {
           for (const k of keys) {
-            yield [k, value[k], schema[k]];
+            yield $Array.of(k, value[k], schema[k]);
           }
         }
-      },
-      validator(value) {
+      });
+      result.validator = $(function (value) {
         return isObject(value) || "Expected an object, but received: " + print(value);
-      }
-    });
+      });
+      return result;
+    })());
   }
   $(type);
   function union(Structs) {
     const description = Structs.map($(s => s.type)).join(" | ");
-    return new Struct({
-      type: "union",
-      schema: null,
-      validator(value, ctx) {
-        const failures = [];
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      result.type = "union";
+      result.schema = null;
+      result.validator = $(function (value, ctx) {
+        const failures = $Array.of();
         for (const S of Structs) {
           const [...tuples] = run(value, S, ctx);
           const [first] = tuples;
           if (!first[0]) {
-            return [];
+            return $Array.of();
           } else {
             for (const [failure] of tuples) {
               if (failure) {
@@ -10473,9 +10922,10 @@ var solanaWeb3 = $(function (exports) {
             }
           }
         }
-        return ["Expected the value to satisfy a union of `" + description + "`, but received: " + print(value), ...failures];
-      }
-    });
+        return $Array.of("Expected the value to satisfy a union of `" + description + "`, but received: " + print(value), ...failures);
+      });
+      return result;
+    })());
   }
   $(union);
   function unknown() {
@@ -10483,28 +10933,36 @@ var solanaWeb3 = $(function (exports) {
   }
   $(unknown);
   function coerce(struct, condition, coercer) {
-    return new Struct({
-      ...struct,
-      coercer: $((value, ctx) => is(value, condition) ? struct.coercer(coercer(value, ctx), ctx) : struct.coercer(value, ctx))
-    });
+    return new Struct($(function () {
+      let result = $Object.create(null, undefined);
+      $Object.assign(result, struct);
+      result.coercer = $((value, ctx) => is(value, condition) ? struct.coercer(coercer(value, ctx), ctx) : struct.coercer(value, ctx));
+      return result;
+    })());
   }
   $(coerce);
-  var index_browser = {};
-  var interopRequireDefault = {
-    exports: {}
-  };
+  var index_browser = $Object.create(null, undefined);
+  var interopRequireDefault = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   $(function (module) {
     function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : {
-        default: obj
-      };
+      return obj && obj.__esModule ? obj : $(function () {
+        let result = $Object.create(null, undefined);
+        result.default = obj;
+        return result;
+      })();
     }
     $(_interopRequireDefault);
     module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
   })(interopRequireDefault);
-  var createClass = {
-    exports: {}
-  };
+  var createClass = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredCreateClass;
   function requireCreateClass() {
     if (hasRequiredCreateClass) return createClass.exports;
@@ -10523,9 +10981,11 @@ var solanaWeb3 = $(function (exports) {
       function _createClass(Constructor, protoProps, staticProps) {
         if (protoProps) _defineProperties(Constructor.prototype, protoProps);
         if (staticProps) _defineProperties(Constructor, staticProps);
-        $Object.defineProperty(Constructor, "prototype", {
-          writable: false
-        });
+        $Object.defineProperty(Constructor, "prototype", $(function () {
+          let result = $Object.create(null, undefined);
+          result.writable = false;
+          return result;
+        })());
         return Constructor;
       }
       $(_createClass);
@@ -10534,9 +10994,11 @@ var solanaWeb3 = $(function (exports) {
     return createClass.exports;
   }
   $(requireCreateClass);
-  var classCallCheck = {
-    exports: {}
-  };
+  var classCallCheck = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredClassCallCheck;
   function requireClassCallCheck() {
     if (hasRequiredClassCallCheck) return classCallCheck.exports;
@@ -10553,12 +11015,16 @@ var solanaWeb3 = $(function (exports) {
     return classCallCheck.exports;
   }
   $(requireClassCallCheck);
-  var inherits = {
-    exports: {}
-  };
-  var setPrototypeOf = {
-    exports: {}
-  };
+  var inherits = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
+  var setPrototypeOf = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredSetPrototypeOf;
   function requireSetPrototypeOf() {
     if (hasRequiredSetPrototypeOf) return setPrototypeOf.exports;
@@ -10587,16 +11053,22 @@ var solanaWeb3 = $(function (exports) {
         if (typeof superClass !== "function" && superClass !== null) {
           throw new TypeError("Super expression must either be null or a function");
         }
-        subClass.prototype = $Object.create(superClass && superClass.prototype, {
-          constructor: {
-            value: subClass,
-            writable: true,
-            configurable: true
-          }
-        });
-        $Object.defineProperty(subClass, "prototype", {
-          writable: false
-        });
+        subClass.prototype = $Object.create(superClass && superClass.prototype, $(function () {
+          let result = $Object.create(null, undefined);
+          result.constructor = $(function () {
+            let result = $Object.create(null, undefined);
+            result.value = subClass;
+            result.writable = true;
+            result.configurable = true;
+            return result;
+          })();
+          return result;
+        })());
+        $Object.defineProperty(subClass, "prototype", $(function () {
+          let result = $Object.create(null, undefined);
+          result.writable = false;
+          return result;
+        })());
         if (superClass) setPrototypeOf(subClass, superClass);
       }
       $(_inherits);
@@ -10605,12 +11077,16 @@ var solanaWeb3 = $(function (exports) {
     return inherits.exports;
   }
   $(requireInherits);
-  var possibleConstructorReturn = {
-    exports: {}
-  };
-  var _typeof = {
-    exports: {}
-  };
+  var possibleConstructorReturn = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
+  var _typeof = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequired_typeof;
   function require_typeof() {
     if (hasRequired_typeof) return _typeof.exports;
@@ -10631,9 +11107,11 @@ var solanaWeb3 = $(function (exports) {
     return _typeof.exports;
   }
   $(require_typeof);
-  var assertThisInitialized = {
-    exports: {}
-  };
+  var assertThisInitialized = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredAssertThisInitialized;
   function requireAssertThisInitialized() {
     if (hasRequiredAssertThisInitialized) return assertThisInitialized.exports;
@@ -10672,9 +11150,11 @@ var solanaWeb3 = $(function (exports) {
     return possibleConstructorReturn.exports;
   }
   $(requirePossibleConstructorReturn);
-  var getPrototypeOf = {
-    exports: {}
-  };
+  var getPrototypeOf = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredGetPrototypeOf;
   function requireGetPrototypeOf() {
     if (hasRequiredGetPrototypeOf) return getPrototypeOf.exports;
@@ -10692,10 +11172,12 @@ var solanaWeb3 = $(function (exports) {
     return getPrototypeOf.exports;
   }
   $(requireGetPrototypeOf);
-  var websocket_browser = {};
-  var eventemitter3 = {
-    exports: {}
-  };
+  var websocket_browser = $Object.create(null, undefined);
+  var eventemitter3 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredEventemitter3;
   function requireEventemitter3() {
     if (hasRequiredEventemitter3) return eventemitter3.exports;
@@ -10721,7 +11203,7 @@ var solanaWeb3 = $(function (exports) {
         }
         var listener = new EE(fn, context || emitter, once),
           evt = prefix ? prefix + event : event;
-        if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);else emitter._events[evt] = [emitter._events[evt], listener];
+        if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);else emitter._events[evt] = $Array.of(emitter._events[evt], listener);
         return emitter;
       }
       $(addListener);
@@ -10735,7 +11217,7 @@ var solanaWeb3 = $(function (exports) {
       }
       $(EventEmitter);
       EventEmitter.prototype.eventNames = $(function eventNames() {
-        var names = [],
+        var names = $Array.of(),
           events,
           name;
         if (this._eventsCount === 0) return names;
@@ -10750,8 +11232,8 @@ var solanaWeb3 = $(function (exports) {
       EventEmitter.prototype.listeners = $(function listeners(event) {
         var evt = prefix ? prefix + event : event,
           handlers = this._events[evt];
-        if (!handlers) return [];
-        if (handlers.fn) return [handlers.fn];
+        if (!handlers) return $Array.of();
+        if (handlers.fn) return $Array.of(handlers.fn);
         for (var i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
           ee[i] = handlers[i].fn;
         }
@@ -10838,7 +11320,7 @@ var solanaWeb3 = $(function (exports) {
             clearEvent(this, evt);
           }
         } else {
-          for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+          for (var i = 0, events = $Array.of(), length = listeners.length; i < length; i++) {
             if (listeners[i].fn !== fn || once && !listeners[i].once || context && listeners[i].context !== context) {
               events.push(listeners[i]);
             }
@@ -10875,9 +11357,11 @@ var solanaWeb3 = $(function (exports) {
     hasRequiredWebsocket_browser = 1;
     $(function (exports) {
       var _interopRequireDefault = interopRequireDefault.exports;
-      $Object.defineProperty(exports, "__esModule", {
-        value: true
-      });
+      $Object.defineProperty(exports, "__esModule", $(function () {
+        let result = $Object.create(null, undefined);
+        result.value = true;
+        return result;
+      })());
       exports["default"] = _default;
       var _classCallCheck2 = _interopRequireDefault(requireClassCallCheck());
       var _createClass2 = _interopRequireDefault(requireCreateClass());
@@ -10905,7 +11389,7 @@ var solanaWeb3 = $(function (exports) {
         if (Reflect.construct.sham) return false;
         if (typeof Proxy === "function") return true;
         try {
-          Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], $(function () {})));
+          Boolean.prototype.valueOf.call(Reflect.construct(Boolean, $Array.of(), $(function () {})));
           return true;
         } catch (e) {
           return false;
@@ -10935,9 +11419,10 @@ var solanaWeb3 = $(function (exports) {
           return _this;
         }
         $(WebSocketBrowserImpl);
-        (0, _createClass2["default"])(WebSocketBrowserImpl, [{
-          key: "send",
-          value: $(function send(data, optionsOrCallback, callback) {
+        (0, _createClass2["default"])(WebSocketBrowserImpl, $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "send";
+          result.value = $(function send(data, optionsOrCallback, callback) {
             var cb = callback || optionsOrCallback;
             try {
               this.socket.send(data);
@@ -10945,18 +11430,23 @@ var solanaWeb3 = $(function (exports) {
             } catch (error) {
               cb(error);
             }
-          })
-        }, {
-          key: "close",
-          value: $(function close(code, reason) {
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "close";
+          result.value = $(function close(code, reason) {
             this.socket.close(code, reason);
-          })
-        }, {
-          key: "addEventListener",
-          value: $(function addEventListener(type, listener, options) {
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "addEventListener";
+          result.value = $(function addEventListener(type, listener, options) {
             this.socket.addEventListener(type, listener, options);
-          })
-        }]);
+          });
+          return result;
+        })()));
         return WebSocketBrowserImpl;
       })(_eventemitter.EventEmitter);
       function _default(address, options) {
@@ -10967,10 +11457,12 @@ var solanaWeb3 = $(function (exports) {
     return websocket_browser;
   }
   $(requireWebsocket_browser);
-  var client = {};
-  var regeneratorRuntime = {
-    exports: {}
-  };
+  var client = $Object.create(null, undefined);
+  var regeneratorRuntime = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredRegeneratorRuntime;
   function requireRegeneratorRuntime() {
     if (hasRequiredRegeneratorRuntime) return regeneratorRuntime.exports;
@@ -10982,24 +11474,26 @@ var solanaWeb3 = $(function (exports) {
         module.exports = _regeneratorRuntime = $(function _regeneratorRuntime() {
           return exports;
         }), module.exports.__esModule = true, module.exports["default"] = module.exports;
-        var exports = {},
+        var exports = $Object.create(null, undefined),
           Op = $Object.prototype,
           hasOwn = Op.hasOwnProperty,
-          $Symbol = "function" == typeof Symbol ? Symbol : {},
+          $Symbol = "function" == typeof Symbol ? Symbol : $Object.create(null, undefined),
           iteratorSymbol = $Symbol.iterator || "@@iterator",
           asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator",
           toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
         function define(obj, key, value) {
-          return $Object.defineProperty(obj, key, {
-            value: value,
-            enumerable: !0,
-            configurable: !0,
-            writable: !0
-          }), obj[key];
+          return $Object.defineProperty(obj, key, $(function () {
+            let result = $Object.create(null, undefined);
+            result.value = value;
+            result.enumerable = !0;
+            result.configurable = !0;
+            result.writable = !0;
+            return result;
+          })()), obj[key];
         }
         $(define);
         try {
-          define({}, "");
+          define($Object.create(null, undefined), "");
         } catch (err) {
           define = $(function define(obj, key, value) {
             return obj[key] = value;
@@ -11008,7 +11502,7 @@ var solanaWeb3 = $(function (exports) {
         function wrap(innerFn, outerFn, self, tryLocsList) {
           var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator,
             generator = $Object.create(protoGenerator.prototype),
-            context = new Context(tryLocsList || []);
+            context = new Context(tryLocsList || $Array.of());
           return generator._invoke = $(function (innerFn, self, context) {
             var state = "suspendedStart";
             return $(function (method, arg) {
@@ -11034,10 +11528,12 @@ var solanaWeb3 = $(function (exports) {
                 var record = tryCatch(innerFn, self, context);
                 if ("normal" === record.type) {
                   if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue;
-                  return {
-                    value: record.arg,
-                    done: context.done
-                  };
+                  return $(function () {
+                    let result = $Object.create(null, undefined);
+                    result.value = record.arg;
+                    result.done = context.done;
+                    return result;
+                  })();
                 }
                 "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg);
               }
@@ -11047,36 +11543,40 @@ var solanaWeb3 = $(function (exports) {
         $(wrap);
         function tryCatch(fn, obj, arg) {
           try {
-            return {
-              type: "normal",
-              arg: fn.call(obj, arg)
-            };
+            return $(function () {
+              let result = $Object.create(null, undefined);
+              result.type = "normal";
+              result.arg = fn.call(obj, arg);
+              return result;
+            })();
           } catch (err) {
-            return {
-              type: "throw",
-              arg: err
-            };
+            return $(function () {
+              let result = $Object.create(null, undefined);
+              result.type = "throw";
+              result.arg = err;
+              return result;
+            })();
           }
         }
         $(tryCatch);
         exports.wrap = wrap;
-        var ContinueSentinel = {};
+        var ContinueSentinel = $Object.create(null, undefined);
         function Generator() {}
         $(Generator);
         function GeneratorFunction() {}
         $(GeneratorFunction);
         function GeneratorFunctionPrototype() {}
         $(GeneratorFunctionPrototype);
-        var IteratorPrototype = {};
+        var IteratorPrototype = $Object.create(null, undefined);
         define(IteratorPrototype, iteratorSymbol, $(function () {
           return this;
         }));
         var getProto = $Object.getPrototypeOf,
-          NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+          NativeIteratorPrototype = getProto && getProto(getProto(values($Array.of())));
         NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype);
         var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = $Object.create(IteratorPrototype);
         function defineIteratorMethods(prototype) {
-          ["next", "throw", "return"].forEach($(function (method) {
+          $Array.of("next", "throw", "return").forEach($(function (method) {
             define(prototype, method, $(function (arg) {
               return this._invoke(method, arg);
             }));
@@ -11130,21 +11630,25 @@ var solanaWeb3 = $(function (exports) {
         }
         $(maybeInvokeDelegate);
         function pushTryEntry(locs) {
-          var entry = {
-            tryLoc: locs[0]
-          };
+          var entry = $(function () {
+            let result = $Object.create(null, undefined);
+            result.tryLoc = locs[0];
+            return result;
+          })();
           1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry);
         }
         $(pushTryEntry);
         function resetTryEntry(entry) {
-          var record = entry.completion || {};
+          var record = entry.completion || $Object.create(null, undefined);
           record.type = "normal", delete record.arg, entry.completion = record;
         }
         $(resetTryEntry);
         function Context(tryLocsList) {
-          this.tryEntries = [{
-            tryLoc: "root"
-          }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0);
+          this.tryEntries = $Array.of($(function () {
+            let result = $Object.create(null, undefined);
+            result.tryLoc = "root";
+            return result;
+          })()), tryLocsList.forEach(pushTryEntry, this), this.reset(!0);
         }
         $(Context);
         function values(iterable) {
@@ -11164,16 +11668,20 @@ var solanaWeb3 = $(function (exports) {
               return next.next = next;
             }
           }
-          return {
-            next: doneResult
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.next = doneResult;
+            return result;
+          })();
         }
         $(values);
         function doneResult() {
-          return {
-            value: undefined,
-            done: !0
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.value = undefined;
+            result.done = !0;
+            return result;
+          })();
         }
         $(doneResult);
         return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = $(function (genFun) {
@@ -11182,9 +11690,11 @@ var solanaWeb3 = $(function (exports) {
         }), exports.mark = $(function (genFun) {
           return $Object.setPrototypeOf ? $Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = $Object.create(Gp), genFun;
         }), exports.awrap = $(function (arg) {
-          return {
-            __await: arg
-          };
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.__await = arg;
+            return result;
+          })();
         }), defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, $(function () {
           return this;
         })), exports.AsyncIterator = AsyncIterator, exports.async = $(function (innerFn, outerFn, self, tryLocsList, PromiseImpl) {
@@ -11198,7 +11708,7 @@ var solanaWeb3 = $(function (exports) {
         })), define(Gp, "toString", $(function () {
           return "[object Generator]";
         })), exports.keys = $(function (object) {
-          var keys = [];
+          var keys = $Array.of();
           for (var key in object) {
             keys.push(key);
           }
@@ -11209,20 +11719,21 @@ var solanaWeb3 = $(function (exports) {
             }
             return next.done = !0, next;
           });
-        }), exports.values = values, Context.prototype = {
-          constructor: Context,
-          reset: $(function reset(skipTempReset) {
+        }), exports.values = values, Context.prototype = $(function () {
+          let result = $Object.create(null, undefined);
+          result.constructor = Context;
+          result.reset = $(function reset(skipTempReset) {
             if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) {
               "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined);
             }
-          }),
-          stop: $(function stop() {
+          });
+          result.stop = $(function stop() {
             this.done = !0;
             var rootRecord = this.tryEntries[0].completion;
             if ("throw" === rootRecord.type) throw rootRecord.arg;
             return this.rval;
-          }),
-          dispatchException: $(function dispatchException(exception) {
+          });
+          result.dispatchException = $(function dispatchException(exception) {
             if (this.done) throw exception;
             var context = this;
             function handle(loc, caught) {
@@ -11247,8 +11758,8 @@ var solanaWeb3 = $(function (exports) {
                 }
               }
             }
-          }),
-          abrupt: $(function abrupt(type, arg) {
+          });
+          result.abrupt = $(function abrupt(type, arg) {
             for (var i = this.tryEntries.length - 1; i >= 0; --i) {
               var entry = this.tryEntries[i];
               if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) {
@@ -11257,20 +11768,20 @@ var solanaWeb3 = $(function (exports) {
               }
             }
             finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null);
-            var record = finallyEntry ? finallyEntry.completion : {};
+            var record = finallyEntry ? finallyEntry.completion : $Object.create(null, undefined);
             return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record);
-          }),
-          complete: $(function complete(record, afterLoc) {
+          });
+          result.complete = $(function complete(record, afterLoc) {
             if ("throw" === record.type) throw record.arg;
             return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel;
-          }),
-          finish: $(function finish(finallyLoc) {
+          });
+          result.finish = $(function finish(finallyLoc) {
             for (var i = this.tryEntries.length - 1; i >= 0; --i) {
               var entry = this.tryEntries[i];
               if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel;
             }
-          }),
-          catch: $(function _catch(tryLoc) {
+          });
+          result.catch = $(function _catch(tryLoc) {
             for (var i = this.tryEntries.length - 1; i >= 0; --i) {
               var entry = this.tryEntries[i];
               if (entry.tryLoc === tryLoc) {
@@ -11283,15 +11794,18 @@ var solanaWeb3 = $(function (exports) {
               }
             }
             throw new Error("illegal catch attempt");
-          }),
-          delegateYield: $(function delegateYield(iterable, resultName, nextLoc) {
-            return this.delegate = {
-              iterator: values(iterable),
-              resultName: resultName,
-              nextLoc: nextLoc
-            }, "next" === this.method && (this.arg = undefined), ContinueSentinel;
-          })
-        }, exports;
+          });
+          result.delegateYield = $(function delegateYield(iterable, resultName, nextLoc) {
+            return this.delegate = $(function () {
+              let result = $Object.create(null, undefined);
+              result.iterator = values(iterable);
+              result.resultName = resultName;
+              result.nextLoc = nextLoc;
+              return result;
+            })(), "next" === this.method && (this.arg = undefined), ContinueSentinel;
+          });
+          return result;
+        })(), exports;
       }
       $(_regeneratorRuntime);
       module.exports = _regeneratorRuntime, module.exports.__esModule = true, module.exports["default"] = module.exports;
@@ -11308,9 +11822,11 @@ var solanaWeb3 = $(function (exports) {
     return regenerator;
   }
   $(requireRegenerator);
-  var asyncToGenerator = {
-    exports: {}
-  };
+  var asyncToGenerator = $(function () {
+    let result = $Object.create(null, undefined);
+    result.exports = $Object.create(null, undefined);
+    return result;
+  })();
   var hasRequiredAsyncToGenerator;
   function requireAsyncToGenerator() {
     if (hasRequiredAsyncToGenerator) return asyncToGenerator.exports;
@@ -11361,9 +11877,11 @@ var solanaWeb3 = $(function (exports) {
     hasRequiredClient = 1;
     $(function (exports) {
       var _interopRequireDefault = interopRequireDefault.exports;
-      $Object.defineProperty(exports, "__esModule", {
-        value: true
-      });
+      $Object.defineProperty(exports, "__esModule", $(function () {
+        let result = $Object.create(null, undefined);
+        result.value = true;
+        return result;
+      })());
       exports["default"] = void 0;
       var _regenerator = _interopRequireDefault(requireRegenerator());
       var _asyncToGenerator2 = _interopRequireDefault(requireAsyncToGenerator());
@@ -11394,7 +11912,7 @@ var solanaWeb3 = $(function (exports) {
         if (Reflect.construct.sham) return false;
         if (typeof Proxy === "function") return true;
         try {
-          Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], $(function () {})));
+          Boolean.prototype.valueOf.call(Reflect.construct(Boolean, $Array.of(), $(function () {})));
           return true;
         } catch (e) {
           return false;
@@ -11402,7 +11920,7 @@ var solanaWeb3 = $(function (exports) {
       }
       $(_isNativeReflectConstruct);
       var __rest = function (s, e) {
-        var t = {};
+        var t = $Object.create(null, undefined);
         for (var p in s) {
           if ($Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
         }
@@ -11418,7 +11936,7 @@ var solanaWeb3 = $(function (exports) {
         function CommonClient(webSocketFactory) {
           var _this;
           var address = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "ws://localhost:8080";
-          var _a = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+          var _a = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : $Object.create(null, undefined);
           var generate_request_id = arguments.length > 3 ? arguments[3] : undefined;
           (0, _classCallCheck2["default"])(this, CommonClient);
           var _a$autoconnect = _a.autoconnect,
@@ -11429,10 +11947,10 @@ var solanaWeb3 = $(function (exports) {
             reconnect_interval = _a$reconnect_interval === void 0 ? 1e3 : _a$reconnect_interval,
             _a$max_reconnects = _a.max_reconnects,
             max_reconnects = _a$max_reconnects === void 0 ? 5 : _a$max_reconnects,
-            rest_options = __rest(_a, ["autoconnect", "reconnect", "reconnect_interval", "max_reconnects"]);
+            rest_options = __rest(_a, $Array.of("autoconnect", "reconnect", "reconnect_interval", "max_reconnects"));
           _this = _super.call(this);
           _this.webSocketFactory = webSocketFactory;
-          _this.queue = {};
+          _this.queue = $Object.create(null, undefined);
           _this.rpc_id = 0;
           _this.address = address;
           _this.autoconnect = autoconnect;
@@ -11445,29 +11963,36 @@ var solanaWeb3 = $(function (exports) {
           _this.generate_request_id = generate_request_id || $(function () {
             return ++_this.rpc_id;
           });
-          if (_this.autoconnect) _this._connect(_this.address, $Object.assign({
-            autoconnect: _this.autoconnect,
-            reconnect: _this.reconnect,
-            reconnect_interval: _this.reconnect_interval,
-            max_reconnects: _this.max_reconnects
-          }, _this.rest_options));
+          if (_this.autoconnect) _this._connect(_this.address, $Object.assign($(function () {
+            let result = $Object.create(null, undefined);
+            result.autoconnect = _this.autoconnect;
+            result.reconnect = _this.reconnect;
+            result.reconnect_interval = _this.reconnect_interval;
+            result.max_reconnects = _this.max_reconnects;
+            return result;
+          })(), _this.rest_options));
           return _this;
         }
         $(CommonClient);
-        (0, _createClass2["default"])(CommonClient, [{
-          key: "connect",
-          value: $(function connect() {
+        (0, _createClass2["default"])(CommonClient, $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "connect";
+          result.value = $(function connect() {
             if (this.socket) return;
-            this._connect(this.address, $Object.assign({
-              autoconnect: this.autoconnect,
-              reconnect: this.reconnect,
-              reconnect_interval: this.reconnect_interval,
-              max_reconnects: this.max_reconnects
-            }, this.rest_options));
-          })
-        }, {
-          key: "call",
-          value: $(function call(method, params, timeout, ws_opts) {
+            this._connect(this.address, $Object.assign($(function () {
+              let result = $Object.create(null, undefined);
+              result.autoconnect = this.autoconnect;
+              result.reconnect = this.reconnect;
+              result.reconnect_interval = this.reconnect_interval;
+              result.max_reconnects = this.max_reconnects;
+              return result;
+            })(), this.rest_options));
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "call";
+          result.value = $(function call(method, params, timeout, ws_opts) {
             var _this2 = this;
             if (!ws_opts && "object" === (0, _typeof2["default"])(timeout)) {
               ws_opts = timeout;
@@ -11476,17 +12001,21 @@ var solanaWeb3 = $(function (exports) {
             return new Promise($(function (resolve, reject) {
               if (!_this2.ready) return reject(new Error("socket not ready"));
               var rpc_id = _this2.generate_request_id(method, params);
-              var message = {
-                jsonrpc: "2.0",
-                method: method,
-                params: params || null,
-                id: rpc_id
-              };
+              var message = $(function () {
+                let result = $Object.create(null, undefined);
+                result.jsonrpc = "2.0";
+                result.method = method;
+                result.params = params || null;
+                result.id = rpc_id;
+                return result;
+              })();
               _this2.socket.send(JSON.stringify(message), ws_opts, $(function (error) {
                 if (error) return reject(error);
-                _this2.queue[rpc_id] = {
-                  promise: [resolve, reject]
-                };
+                _this2.queue[rpc_id] = $(function () {
+                  let result = $Object.create(null, undefined);
+                  result.promise = $Array.of(resolve, reject);
+                  return result;
+                })();
                 if (timeout) {
                   _this2.queue[rpc_id].timeout = setTimeout($(function () {
                     delete _this2.queue[rpc_id];
@@ -11495,10 +12024,12 @@ var solanaWeb3 = $(function (exports) {
                 }
               }));
             }));
-          })
-        }, {
-          key: "login",
-          value: $(function () {
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "login";
+          result.value = $(function () {
             var _login = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark($(function _callee(params) {
               var resp;
               return _regenerator["default"].wrap($(function _callee$(_context) {
@@ -11528,10 +12059,12 @@ var solanaWeb3 = $(function (exports) {
             }
             $(login);
             return login;
-          })()
-        }, {
-          key: "listMethods",
-          value: $(function () {
+          })();
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "listMethods";
+          result.value = $(function () {
             var _listMethods = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark($(function _callee2() {
               return _regenerator["default"].wrap($(function _callee2$(_context2) {
                 while (1) {
@@ -11553,34 +12086,40 @@ var solanaWeb3 = $(function (exports) {
             }
             $(listMethods);
             return listMethods;
-          })()
-        }, {
-          key: "notify",
-          value: $(function notify(method, params) {
+          })();
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "notify";
+          result.value = $(function notify(method, params) {
             var _this3 = this;
             return new Promise($(function (resolve, reject) {
               if (!_this3.ready) return reject(new Error("socket not ready"));
-              var message = {
-                jsonrpc: "2.0",
-                method: method,
-                params: params || null
-              };
+              var message = $(function () {
+                let result = $Object.create(null, undefined);
+                result.jsonrpc = "2.0";
+                result.method = method;
+                result.params = params || null;
+                return result;
+              })();
               _this3.socket.send(JSON.stringify(message), $(function (error) {
                 if (error) return reject(error);
                 resolve();
               }));
             }));
-          })
-        }, {
-          key: "subscribe",
-          value: $(function () {
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "subscribe";
+          result.value = $(function () {
             var _subscribe = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark($(function _callee3(event) {
               var result;
               return _regenerator["default"].wrap($(function _callee3$(_context3) {
                 while (1) {
                   switch (_context3.prev = _context3.next) {
                     case 0:
-                      if (typeof event === "string") event = [event];
+                      if (typeof event === "string") event = $Array.of(event);
                       _context3.next = 3;
                       return this.call("rpc.on", event);
                     case 3:
@@ -11604,17 +12143,19 @@ var solanaWeb3 = $(function (exports) {
             }
             $(subscribe);
             return subscribe;
-          })()
-        }, {
-          key: "unsubscribe",
-          value: $(function () {
+          })();
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "unsubscribe";
+          result.value = $(function () {
             var _unsubscribe = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark($(function _callee4(event) {
               var result;
               return _regenerator["default"].wrap($(function _callee4$(_context4) {
                 while (1) {
                   switch (_context4.prev = _context4.next) {
                     case 0:
-                      if (typeof event === "string") event = [event];
+                      if (typeof event === "string") event = $Array.of(event);
                       _context4.next = 3;
                       return this.call("rpc.off", event);
                     case 3:
@@ -11638,15 +12179,19 @@ var solanaWeb3 = $(function (exports) {
             }
             $(unsubscribe);
             return unsubscribe;
-          })()
-        }, {
-          key: "close",
-          value: $(function close(code, data) {
+          })();
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "close";
+          result.value = $(function close(code, data) {
             this.socket.close(code || 1e3, data);
-          })
-        }, {
-          key: "_connect",
-          value: $(function _connect(address, options) {
+          });
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.key = "_connect";
+          result.value = $(function _connect(address, options) {
             var _this4 = this;
             this.socket = this.webSocketFactory(address, options);
             this.socket.addEventListener("open", $(function () {
@@ -11664,7 +12209,7 @@ var solanaWeb3 = $(function (exports) {
               }
               if (message.notification && _this4.listeners(message.notification).length) {
                 if (!$Object.keys(message.params).length) return _this4.emit(message.notification);
-                var args = [message.notification];
+                var args = $Array.of(message.notification);
                 if (message.params.constructor === Object) args.push(message.params);else for (var i = 0; i < message.params.length; i++) {
                   args.push(message.params[i]);
                 }
@@ -11702,8 +12247,9 @@ var solanaWeb3 = $(function (exports) {
                 return _this4._connect(address, options);
               }), _this4.reconnect_interval);
             }));
-          })
-        }]);
+          });
+          return result;
+        })()));
         return CommonClient;
       })(_eventemitter.EventEmitter);
       exports["default"] = CommonClient;
@@ -11712,9 +12258,11 @@ var solanaWeb3 = $(function (exports) {
   }
   $(requireClient);
   var _interopRequireDefault = interopRequireDefault.exports;
-  $Object.defineProperty(index_browser, "__esModule", {
-    value: true
-  });
+  $Object.defineProperty(index_browser, "__esModule", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = true;
+    return result;
+  })());
   var Client_1 = index_browser.Client = void 0;
   var _createClass2 = _interopRequireDefault(requireCreateClass());
   var _classCallCheck2 = _interopRequireDefault(requireClassCallCheck());
@@ -11743,7 +12291,7 @@ var solanaWeb3 = $(function (exports) {
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
     try {
-      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], $(function () {})));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, $Array.of(), $(function () {})));
       return true;
     } catch (e) {
       return false;
@@ -11755,7 +12303,7 @@ var solanaWeb3 = $(function (exports) {
     var _super = _createSuper(Client);
     function Client() {
       var address = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "ws://localhost:8080";
-      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : $Object.create(null, undefined),
         _ref$autoconnect = _ref.autoconnect,
         autoconnect = _ref$autoconnect === void 0 ? true : _ref$autoconnect,
         _ref$reconnect = _ref.reconnect,
@@ -11766,12 +12314,14 @@ var solanaWeb3 = $(function (exports) {
         max_reconnects = _ref$max_reconnects === void 0 ? 5 : _ref$max_reconnects;
       var generate_request_id = arguments.length > 2 ? arguments[2] : undefined;
       (0, _classCallCheck2["default"])(this, Client);
-      return _super.call(this, _websocket["default"], address, {
-        autoconnect: autoconnect,
-        reconnect: reconnect,
-        reconnect_interval: reconnect_interval,
-        max_reconnects: max_reconnects
-      }, generate_request_id);
+      return _super.call(this, _websocket["default"], address, $(function () {
+        let result = $Object.create(null, undefined);
+        result.autoconnect = autoconnect;
+        result.reconnect = reconnect;
+        result.reconnect_interval = reconnect_interval;
+        result.max_reconnects = max_reconnects;
+        return result;
+      })(), generate_request_id);
     }
     $(Client);
     return (0, _createClass2["default"])(Client);
@@ -11794,7 +12344,7 @@ var solanaWeb3 = $(function (exports) {
     return typeof uuid === "string" && REGEX.test(uuid);
   }
   $(validate);
-  var byteToHex = [];
+  var byteToHex = $Array.of();
   for (var i = 0; i < 256; ++i) {
     byteToHex.push((i + 256).toString(16).substr(1));
   }
@@ -11814,13 +12364,13 @@ var solanaWeb3 = $(function (exports) {
   function v1(options, buf, offset) {
     var i = buf && offset || 0;
     var b = buf || new Array(16);
-    options = options || {};
+    options = options || $Object.create(null, undefined);
     var node = options.node || _nodeId;
     var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
     if (node == null || clockseq == null) {
       var seedBytes = options.random || (options.rng || rng)();
       if (node == null) {
-        node = _nodeId = [seedBytes[0] | 1, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
+        node = _nodeId = $Array.of(seedBytes[0] | 1, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]);
       }
       if (clockseq == null) {
         clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 16383;
@@ -11887,7 +12437,7 @@ var solanaWeb3 = $(function (exports) {
   $(parse);
   function stringToBytes(str) {
     str = unescape(encodeURIComponent(str));
-    var bytes = [];
+    var bytes = $Array.of();
     for (var i = 0; i < str.length; ++i) {
       bytes.push(str.charCodeAt(i));
     }
@@ -11943,7 +12493,7 @@ var solanaWeb3 = $(function (exports) {
   }
   $(md5);
   function md5ToHexEncodedArray(input) {
-    var output = [];
+    var output = $Array.of();
     var length32 = input.length * 32;
     var hexTab = "0123456789abcdef";
     for (var i = 0; i < length32; i += 8) {
@@ -12039,12 +12589,12 @@ var solanaWeb3 = $(function (exports) {
       c = safeAdd(c, oldc);
       d = safeAdd(d, oldd);
     }
-    return [a, b, c, d];
+    return $Array.of(a, b, c, d);
   }
   $(wordsToMd5);
   function bytesToWords(input) {
     if (input.length === 0) {
-      return [];
+      return $Array.of();
     }
     var length8 = input.length * 8;
     var output = new Uint32Array(getOutputLength(length8));
@@ -12087,7 +12637,7 @@ var solanaWeb3 = $(function (exports) {
   var v3 = v35("v3", 48, md5);
   var v3$1 = v3;
   function v4(options, buf, offset) {
-    options = options || {};
+    options = options || $Object.create(null, undefined);
     var rnds = options.random || (options.rng || rng)();
     rnds[6] = rnds[6] & 15 | 64;
     rnds[8] = rnds[8] & 63 | 128;
@@ -12119,16 +12669,16 @@ var solanaWeb3 = $(function (exports) {
   }
   $(ROTL);
   function sha1(bytes) {
-    var K = [1518500249, 1859775393, 2400959708, 3395469782];
-    var H = [1732584193, 4023233417, 2562383102, 271733878, 3285377520];
+    var K = $Array.of(1518500249, 1859775393, 2400959708, 3395469782);
+    var H = $Array.of(1732584193, 4023233417, 2562383102, 271733878, 3285377520);
     if (typeof bytes === "string") {
       var msg = unescape(encodeURIComponent(bytes));
-      bytes = [];
+      bytes = $Array.of();
       for (var i = 0; i < msg.length; ++i) {
         bytes.push(msg.charCodeAt(i));
       }
-    } else if (!Array.isArray(bytes)) {
-      bytes = Array.prototype.slice.call(bytes);
+    } else if (!$Array.isArray(bytes)) {
+      bytes = $Array.prototype.slice.call(bytes);
     }
     bytes.push(128);
     var l = bytes.length / 4 + 2;
@@ -12172,7 +12722,7 @@ var solanaWeb3 = $(function (exports) {
       H[3] = H[3] + d >>> 0;
       H[4] = H[4] + e >>> 0;
     }
-    return [H[0] >> 24 & 255, H[0] >> 16 & 255, H[0] >> 8 & 255, H[0] & 255, H[1] >> 24 & 255, H[1] >> 16 & 255, H[1] >> 8 & 255, H[1] & 255, H[2] >> 24 & 255, H[2] >> 16 & 255, H[2] >> 8 & 255, H[2] & 255, H[3] >> 24 & 255, H[3] >> 16 & 255, H[3] >> 8 & 255, H[3] & 255, H[4] >> 24 & 255, H[4] >> 16 & 255, H[4] >> 8 & 255, H[4] & 255];
+    return $Array.of(H[0] >> 24 & 255, H[0] >> 16 & 255, H[0] >> 8 & 255, H[0] & 255, H[1] >> 24 & 255, H[1] >> 16 & 255, H[1] >> 8 & 255, H[1] & 255, H[2] >> 24 & 255, H[2] >> 16 & 255, H[2] >> 8 & 255, H[2] & 255, H[3] >> 24 & 255, H[3] >> 16 & 255, H[3] >> 8 & 255, H[3] & 255, H[4] >> 24 & 255, H[4] >> 16 & 255, H[4] >> 8 & 255, H[4] & 255);
   }
   $(sha1);
   var v5 = v35("v5", 80, sha1);
@@ -12185,37 +12735,41 @@ var solanaWeb3 = $(function (exports) {
     return parseInt(uuid.substr(14, 1), 16);
   }
   $(version);
-  var esmBrowser = $Object.freeze({
-    __proto__: null,
-    v1: v1,
-    v3: v3$1,
-    v4: v4,
-    v5: v5$1,
-    NIL: nil,
-    version: version,
-    validate: validate,
-    stringify: stringify,
-    parse: parse
-  });
+  var esmBrowser = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.__proto__ = null;
+    result.v1 = v1;
+    result.v3 = v3$1;
+    result.v4 = v4;
+    result.v5 = v5$1;
+    result.NIL = nil;
+    result.version = version;
+    result.validate = validate;
+    result.stringify = stringify;
+    result.parse = parse;
+    return result;
+  })());
   var require$$0 = getAugmentedNamespace(esmBrowser);
   const uuid$1 = require$$0.v4;
   const generateRequest$1 = function (method, params, id, options) {
     if (typeof method !== "string") {
       throw new TypeError(method + " must be a string");
     }
-    options = options || {};
+    options = options || $Object.create(null, undefined);
     const version = typeof options.version === "number" ? options.version : 2;
     if (version !== 1 && version !== 2) {
       throw new TypeError(version + " must be 1 or 2");
     }
-    const request = {
-      method: method
-    };
+    const request = $(function () {
+      let result = $Object.create(null, undefined);
+      result.method = method;
+      return result;
+    })();
     if (version === 2) {
       request.jsonrpc = "2.0";
     }
     if (params) {
-      if (typeof params !== "object" && !Array.isArray(params)) {
+      if (typeof params !== "object" && !$Array.isArray(params)) {
         throw new TypeError(params + " must be an object, array or omitted");
       }
       request.params = params;
@@ -12243,17 +12797,19 @@ var solanaWeb3 = $(function (exports) {
       return new ClientBrowser(callServer, options);
     }
     if (!options) {
-      options = {};
+      options = $Object.create(null, undefined);
     }
-    this.options = {
-      reviver: typeof options.reviver !== "undefined" ? options.reviver : null,
-      replacer: typeof options.replacer !== "undefined" ? options.replacer : null,
-      generator: typeof options.generator !== "undefined" ? options.generator : $(function () {
+    this.options = $(function () {
+      let result = $Object.create(null, undefined);
+      result.reviver = typeof options.reviver !== "undefined" ? options.reviver : null;
+      result.replacer = typeof options.replacer !== "undefined" ? options.replacer : null;
+      result.generator = typeof options.generator !== "undefined" ? options.generator : $(function () {
         return uuid();
-      }),
-      version: typeof options.version !== "undefined" ? options.version : 2,
-      notificationIdNull: typeof options.notificationIdNull === "boolean" ? options.notificationIdNull : false
-    };
+      });
+      result.version = typeof options.version !== "undefined" ? options.version : 2;
+      result.notificationIdNull = typeof options.notificationIdNull === "boolean" ? options.notificationIdNull : false;
+      return result;
+    })();
     this.callServer = callServer;
   };
   $(ClientBrowser);
@@ -12261,7 +12817,7 @@ var solanaWeb3 = $(function (exports) {
   ClientBrowser.prototype.request = $(function (method, params, id, callback) {
     const self = this;
     let request = null;
-    const isBatch = Array.isArray(method) && typeof params === "function";
+    const isBatch = $Array.isArray(method) && typeof params === "function";
     if (this.options.version === 1 && isBatch) {
       throw new TypeError("JSON-RPC 1.0 does not support batching");
     }
@@ -12276,11 +12832,13 @@ var solanaWeb3 = $(function (exports) {
       }
       const hasCallback = typeof callback === "function";
       try {
-        request = generateRequest(method, params, id, {
-          generator: this.options.generator,
-          version: this.options.version,
-          notificationIdNull: this.options.notificationIdNull
-        });
+        request = generateRequest(method, params, id, $(function () {
+          let result = $Object.create(null, undefined);
+          result.generator = this.options.generator;
+          result.version = this.options.version;
+          result.notificationIdNull = this.options.notificationIdNull;
+          return result;
+        })());
       } catch (err) {
         if (hasCallback) {
           return callback(err);
@@ -12317,7 +12875,7 @@ var solanaWeb3 = $(function (exports) {
       return callback(err);
     }
     if (callback.length === 3) {
-      if (Array.isArray(response)) {
+      if ($Array.isArray(response)) {
         const isError = function (res) {
           return typeof res.error !== "undefined";
         };
@@ -12377,13 +12935,13 @@ var solanaWeb3 = $(function (exports) {
         const epoch = trailingZeros(nextPowerOfTwo(slot + MINIMUM_SLOT_PER_EPOCH + 1)) - trailingZeros(MINIMUM_SLOT_PER_EPOCH) - 1;
         const epochLen = this.getSlotsInEpoch(epoch);
         const slotIndex = slot - (epochLen - MINIMUM_SLOT_PER_EPOCH);
-        return [epoch, slotIndex];
+        return $Array.of(epoch, slotIndex);
       } else {
         const normalSlotIndex = slot - this.firstNormalSlot;
         const normalEpochIndex = Math.floor(normalSlotIndex / this.slotsPerEpoch);
         const epoch = this.firstNormalEpoch + normalEpochIndex;
         const slotIndex = normalSlotIndex % this.slotsPerEpoch;
-        return [epoch, slotIndex];
+        return $Array.of(epoch, slotIndex);
       }
     }
     getFirstSlotInEpoch(epoch) {
@@ -12411,24 +12969,26 @@ var solanaWeb3 = $(function (exports) {
       this.logs = logs;
     }
   }
-  const SolanaJSONRPCErrorCode = {
-    JSON_RPC_SERVER_ERROR_BLOCK_CLEANED_UP: -32001,
-    JSON_RPC_SERVER_ERROR_SEND_TRANSACTION_PREFLIGHT_FAILURE: -32002,
-    JSON_RPC_SERVER_ERROR_TRANSACTION_SIGNATURE_VERIFICATION_FAILURE: -32003,
-    JSON_RPC_SERVER_ERROR_BLOCK_NOT_AVAILABLE: -32004,
-    JSON_RPC_SERVER_ERROR_NODE_UNHEALTHY: -32005,
-    JSON_RPC_SERVER_ERROR_TRANSACTION_PRECOMPILE_VERIFICATION_FAILURE: -32006,
-    JSON_RPC_SERVER_ERROR_SLOT_SKIPPED: -32007,
-    JSON_RPC_SERVER_ERROR_NO_SNAPSHOT: -32008,
-    JSON_RPC_SERVER_ERROR_LONG_TERM_STORAGE_SLOT_SKIPPED: -32009,
-    JSON_RPC_SERVER_ERROR_KEY_EXCLUDED_FROM_SECONDARY_INDEX: -32010,
-    JSON_RPC_SERVER_ERROR_TRANSACTION_HISTORY_NOT_AVAILABLE: -32011,
-    JSON_RPC_SCAN_ERROR: -32012,
-    JSON_RPC_SERVER_ERROR_TRANSACTION_SIGNATURE_LEN_MISMATCH: -32013,
-    JSON_RPC_SERVER_ERROR_BLOCK_STATUS_NOT_AVAILABLE_YET: -32014,
-    JSON_RPC_SERVER_ERROR_UNSUPPORTED_TRANSACTION_VERSION: -32015,
-    JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED: -32016
-  };
+  const SolanaJSONRPCErrorCode = $(function () {
+    let result = $Object.create(null, undefined);
+    result.JSON_RPC_SERVER_ERROR_BLOCK_CLEANED_UP = -32001;
+    result.JSON_RPC_SERVER_ERROR_SEND_TRANSACTION_PREFLIGHT_FAILURE = -32002;
+    result.JSON_RPC_SERVER_ERROR_TRANSACTION_SIGNATURE_VERIFICATION_FAILURE = -32003;
+    result.JSON_RPC_SERVER_ERROR_BLOCK_NOT_AVAILABLE = -32004;
+    result.JSON_RPC_SERVER_ERROR_NODE_UNHEALTHY = -32005;
+    result.JSON_RPC_SERVER_ERROR_TRANSACTION_PRECOMPILE_VERIFICATION_FAILURE = -32006;
+    result.JSON_RPC_SERVER_ERROR_SLOT_SKIPPED = -32007;
+    result.JSON_RPC_SERVER_ERROR_NO_SNAPSHOT = -32008;
+    result.JSON_RPC_SERVER_ERROR_LONG_TERM_STORAGE_SLOT_SKIPPED = -32009;
+    result.JSON_RPC_SERVER_ERROR_KEY_EXCLUDED_FROM_SECONDARY_INDEX = -32010;
+    result.JSON_RPC_SERVER_ERROR_TRANSACTION_HISTORY_NOT_AVAILABLE = -32011;
+    result.JSON_RPC_SCAN_ERROR = -32012;
+    result.JSON_RPC_SERVER_ERROR_TRANSACTION_SIGNATURE_LEN_MISMATCH = -32013;
+    result.JSON_RPC_SERVER_ERROR_BLOCK_STATUS_NOT_AVAILABLE_YET = -32014;
+    result.JSON_RPC_SERVER_ERROR_UNSUPPORTED_TRANSACTION_VERSION = -32015;
+    result.JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED = -32016;
+    return result;
+  })();
   class SolanaJSONRPCError extends Error {
     constructor({
       code: code,
@@ -12481,20 +13041,24 @@ var solanaWeb3 = $(function (exports) {
       const numSerializedAddresses = serializedAddressesLen / 32;
       const {
         addresses: addresses
-      } = struct([seq(publicKey(), numSerializedAddresses, "addresses")]).decode(accountData.slice(LOOKUP_TABLE_META_SIZE));
-      return {
-        deactivationSlot: meta.deactivationSlot,
-        lastExtendedSlot: meta.lastExtendedSlot,
-        lastExtendedSlotStartIndex: meta.lastExtendedStartIndex,
-        authority: meta.authority.length !== 0 ? new PublicKey(meta.authority[0]) : undefined,
-        addresses: addresses.map($(address => new PublicKey(address)))
-      };
+      } = struct($Array.of(seq(publicKey(), numSerializedAddresses, "addresses"))).decode(accountData.slice(LOOKUP_TABLE_META_SIZE));
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.deactivationSlot = meta.deactivationSlot;
+        result.lastExtendedSlot = meta.lastExtendedSlot;
+        result.lastExtendedSlotStartIndex = meta.lastExtendedStartIndex;
+        result.authority = meta.authority.length !== 0 ? new PublicKey(meta.authority[0]) : undefined;
+        result.addresses = addresses.map($(address => new PublicKey(address)));
+        return result;
+      })();
     }
   }
-  const LookupTableMetaLayout = {
-    index: 1,
-    layout: struct([u32("typeIndex"), u64("deactivationSlot"), nu64("lastExtendedSlot"), u8("lastExtendedStartIndex"), u8(), seq(publicKey(), offset(u8(), -1), "authority")])
-  };
+  const LookupTableMetaLayout = $(function () {
+    let result = $Object.create(null, undefined);
+    result.index = 1;
+    result.layout = struct($Array.of(u32("typeIndex"), u64("deactivationSlot"), nu64("lastExtendedSlot"), u8("lastExtendedStartIndex"), u8(), seq(publicKey(), offset(u8(), -1), "authority")));
+    return result;
+  })();
   const URL_RE = /^[^:]+:\/\/([^:[]+|\[[^\]]+\])(:\d+)?(.*)/i;
   function makeWebsocketUrl(endpoint) {
     const matches = endpoint.match(URL_RE);
@@ -12510,7 +13074,7 @@ var solanaWeb3 = $(function (exports) {
   $(makeWebsocketUrl);
   var _process$env$npm_pack;
   const PublicKeyFromString = coerce(instance(PublicKey), string(), $(value => new PublicKey(value)));
-  const RawAccountDataResult = tuple([string(), literal("base64")]);
+  const RawAccountDataResult = tuple($Array.of(string(), literal("base64")));
   const BufferFromRawAccountData = coerce(instance(buffer.Buffer), RawAccountDataResult, $(value => buffer.Buffer.from(value[0], "base64")));
   const BLOCKHASH_CACHE_TIMEOUT_MS = 30 * 1e3;
   function assertEndpointUrl(putativeUrl) {
@@ -12533,26 +13097,34 @@ var solanaWeb3 = $(function (exports) {
       commitment = specifiedCommitment;
       config = specifiedConfig;
     }
-    return {
-      commitment: commitment,
-      config: config
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.commitment = commitment;
+      result.config = config;
+      return result;
+    })();
   }
   $(extractCommitmentFromConfig);
   function createRpcResult(result) {
-    return union([type({
-      jsonrpc: literal("2.0"),
-      id: string(),
-      result: result
-    }), type({
-      jsonrpc: literal("2.0"),
-      id: string(),
-      error: type({
-        code: unknown(),
-        message: string(),
-        data: optional(any())
-      })
-    })]);
+    return union($Array.of(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.jsonrpc = literal("2.0");
+      result.id = string();
+      result.result = result;
+      return result;
+    })()), type($(function () {
+      let result = $Object.create(null, undefined);
+      result.jsonrpc = literal("2.0");
+      result.id = string();
+      result.error = type($(function () {
+        let result = $Object.create(null, undefined);
+        result.code = unknown();
+        result.message = string();
+        result.data = optional(any());
+        return result;
+      })());
+      return result;
+    })())));
   }
   $(createRpcResult);
   const UnknownRpcResult = createRpcResult(unknown());
@@ -12561,111 +13133,147 @@ var solanaWeb3 = $(function (exports) {
       if ("error" in value) {
         return value;
       } else {
-        return {
-          ...value,
-          result: create(value.result, schema)
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, value);
+          result.result = create(value.result, schema);
+          return result;
+        })();
       }
     }));
   }
   $(jsonRpcResult);
   function jsonRpcResultAndContext(value) {
-    return jsonRpcResult(type({
-      context: type({
-        slot: number()
-      }),
-      value: value
-    }));
+    return jsonRpcResult(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.context = type($(function () {
+        let result = $Object.create(null, undefined);
+        result.slot = number();
+        return result;
+      })());
+      result.value = value;
+      return result;
+    })()));
   }
   $(jsonRpcResultAndContext);
   function notificationResultAndContext(value) {
-    return type({
-      context: type({
-        slot: number()
-      }),
-      value: value
-    });
+    return type($(function () {
+      let result = $Object.create(null, undefined);
+      result.context = type($(function () {
+        let result = $Object.create(null, undefined);
+        result.slot = number();
+        return result;
+      })());
+      result.value = value;
+      return result;
+    })());
   }
   $(notificationResultAndContext);
   function versionedMessageFromResponse(version, response) {
     if (version === 0) {
-      return new MessageV0({
-        header: response.header,
-        staticAccountKeys: response.accountKeys.map($(accountKey => new PublicKey(accountKey))),
-        recentBlockhash: response.recentBlockhash,
-        compiledInstructions: response.instructions.map($(ix => ({
-          programIdIndex: ix.programIdIndex,
-          accountKeyIndexes: ix.accounts,
-          data: bs58$1.decode(ix.data)
-        }))),
-        addressTableLookups: response.addressTableLookups
-      });
+      return new MessageV0($(function () {
+        let result = $Object.create(null, undefined);
+        result.header = response.header;
+        result.staticAccountKeys = response.accountKeys.map($(accountKey => new PublicKey(accountKey)));
+        result.recentBlockhash = response.recentBlockhash;
+        result.compiledInstructions = response.instructions.map($(ix => $(function () {
+          let result = $Object.create(null, undefined);
+          result.programIdIndex = ix.programIdIndex;
+          result.accountKeyIndexes = ix.accounts;
+          result.data = bs58$1.decode(ix.data);
+          return result;
+        })()));
+        result.addressTableLookups = response.addressTableLookups;
+        return result;
+      })());
     } else {
       return new Message(response);
     }
   }
   $(versionedMessageFromResponse);
-  const GetInflationGovernorResult = type({
-    foundation: number(),
-    foundationTerm: number(),
-    initial: number(),
-    taper: number(),
-    terminal: number()
-  });
-  const GetInflationRewardResult = jsonRpcResult(array(nullable(type({
-    epoch: number(),
-    effectiveSlot: number(),
-    amount: number(),
-    postBalance: number()
-  }))));
-  const GetEpochInfoResult = type({
-    epoch: number(),
-    slotIndex: number(),
-    slotsInEpoch: number(),
-    absoluteSlot: number(),
-    blockHeight: optional(number()),
-    transactionCount: optional(number())
-  });
-  const GetEpochScheduleResult = type({
-    slotsPerEpoch: number(),
-    leaderScheduleSlotOffset: number(),
-    warmup: boolean(),
-    firstNormalEpoch: number(),
-    firstNormalSlot: number()
-  });
+  const GetInflationGovernorResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.foundation = number();
+    result.foundationTerm = number();
+    result.initial = number();
+    result.taper = number();
+    result.terminal = number();
+    return result;
+  })());
+  const GetInflationRewardResult = jsonRpcResult(array(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.epoch = number();
+    result.effectiveSlot = number();
+    result.amount = number();
+    result.postBalance = number();
+    return result;
+  })()))));
+  const GetEpochInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.epoch = number();
+    result.slotIndex = number();
+    result.slotsInEpoch = number();
+    result.absoluteSlot = number();
+    result.blockHeight = optional(number());
+    result.transactionCount = optional(number());
+    return result;
+  })());
+  const GetEpochScheduleResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.slotsPerEpoch = number();
+    result.leaderScheduleSlotOffset = number();
+    result.warmup = boolean();
+    result.firstNormalEpoch = number();
+    result.firstNormalSlot = number();
+    return result;
+  })());
   const GetLeaderScheduleResult = record(string(), array(number()));
-  const TransactionErrorResult = nullable(union([type({}), string()]));
-  const SignatureStatusResult = type({
-    err: TransactionErrorResult
-  });
+  const TransactionErrorResult = nullable(union($Array.of(type($Object.create(null, undefined)), string())));
+  const SignatureStatusResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.err = TransactionErrorResult;
+    return result;
+  })());
   const SignatureReceivedResult = literal("receivedSignature");
-  const VersionResult = type({
-    "solana-core": string(),
-    "feature-set": optional(number())
-  });
-  const SimulatedTransactionResponseStruct = jsonRpcResultAndContext(type({
-    err: nullable(union([type({}), string()])),
-    logs: nullable(array(string())),
-    accounts: optional(nullable(array(nullable(type({
-      executable: boolean(),
-      owner: string(),
-      lamports: number(),
-      data: array(string()),
-      rentEpoch: optional(number())
-    }))))),
-    unitsConsumed: optional(number()),
-    returnData: optional(nullable(type({
-      programId: string(),
-      data: tuple([string(), literal("base64")])
-    })))
-  }));
-  const BlockProductionResponseStruct = jsonRpcResultAndContext(type({
-    byIdentity: record(string(), array(number())),
-    range: type({
-      firstSlot: number(),
-      lastSlot: number()
-    })
-  }));
+  const VersionResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result["solana-core"] = string();
+    result["feature-set"] = optional(number());
+    return result;
+  })());
+  const SimulatedTransactionResponseStruct = jsonRpcResultAndContext(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.err = nullable(union($Array.of(type($Object.create(null, undefined)), string())));
+    result.logs = nullable(array(string()));
+    result.accounts = optional(nullable(array(nullable(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.executable = boolean();
+      result.owner = string();
+      result.lamports = number();
+      result.data = array(string());
+      result.rentEpoch = optional(number());
+      return result;
+    })())))));
+    result.unitsConsumed = optional(number());
+    result.returnData = optional(nullable(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.programId = string();
+      result.data = tuple($Array.of(string(), literal("base64")));
+      return result;
+    })())));
+    return result;
+  })()));
+  const BlockProductionResponseStruct = jsonRpcResultAndContext(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.byIdentity = record(string(), array(number()));
+    result.range = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.firstSlot = number();
+      result.lastSlot = number();
+      return result;
+    })());
+    return result;
+  })()));
   function createRpcClient(url, httpHeaders, customFetch, fetchMiddleware, disableRetryOnRateLimit) {
     const fetch = customFetch ? customFetch : fetchImpl;
     let fetchWithMiddleware;
@@ -12673,7 +13281,7 @@ var solanaWeb3 = $(function (exports) {
       fetchWithMiddleware = $(async (info, init) => {
         const modifiedFetchArgs = await new Promise($((resolve, reject) => {
           try {
-            fetchMiddleware(info, init, $((modifiedInfo, modifiedInit) => resolve([modifiedInfo, modifiedInit])));
+            fetchMiddleware(info, init, $((modifiedInfo, modifiedInit) => resolve($Array.of(modifiedInfo, modifiedInit))));
           } catch (error) {
             reject(error);
           }
@@ -12683,14 +13291,18 @@ var solanaWeb3 = $(function (exports) {
     }
     const clientBrowser = new RpcClient($(async (request, callback) => {
       const agent = undefined;
-      const options = {
-        method: "POST",
-        body: request,
-        agent: agent,
-        headers: $Object.assign({
-          "Content-Type": "application/json"
-        }, httpHeaders || {}, COMMON_HTTP_HEADERS)
-      };
+      const options = $(function () {
+        let result = $Object.create(null, undefined);
+        result.method = "POST";
+        result.body = request;
+        result.agent = agent;
+        result.headers = $Object.assign($(function () {
+          let result = $Object.create(null, undefined);
+          result["Content-Type"] = "application/json";
+          return result;
+        })(), httpHeaders || $Object.create(null, undefined), COMMON_HTTP_HEADERS);
+        return result;
+      })();
       try {
         let too_many_requests_retries = 5;
         let res;
@@ -12724,7 +13336,7 @@ var solanaWeb3 = $(function (exports) {
       } catch (err) {
         if (err instanceof Error) callback(err);
       } finally {}
-    }), {});
+    }), $Object.create(null, undefined));
     return clientBrowser;
   }
   $(createRpcClient);
@@ -12742,7 +13354,7 @@ var solanaWeb3 = $(function (exports) {
   $(createRpcRequest);
   function createRpcBatchRequest(client) {
     return $(requests => new Promise($((resolve, reject) => {
-      if (requests.length === 0) resolve([]);
+      if (requests.length === 0) resolve($Array.of());
       const batch = requests.map($(params => client.request(params.methodName, params.args)));
       client.request(batch, $((err, response) => {
         if (err) {
@@ -12759,233 +13371,317 @@ var solanaWeb3 = $(function (exports) {
   const GetEpochScheduleRpcResult = jsonRpcResult(GetEpochScheduleResult);
   const GetLeaderScheduleRpcResult = jsonRpcResult(GetLeaderScheduleResult);
   const SlotRpcResult = jsonRpcResult(number());
-  const GetSupplyRpcResult = jsonRpcResultAndContext(type({
-    total: number(),
-    circulating: number(),
-    nonCirculating: number(),
-    nonCirculatingAccounts: array(PublicKeyFromString)
-  }));
-  const TokenAmountResult = type({
-    amount: string(),
-    uiAmount: nullable(number()),
-    decimals: number(),
-    uiAmountString: optional(string())
-  });
-  const GetTokenLargestAccountsResult = jsonRpcResultAndContext(array(type({
-    address: PublicKeyFromString,
-    amount: string(),
-    uiAmount: nullable(number()),
-    decimals: number(),
-    uiAmountString: optional(string())
-  })));
-  const GetTokenAccountsByOwner = jsonRpcResultAndContext(array(type({
-    pubkey: PublicKeyFromString,
-    account: type({
-      executable: boolean(),
-      owner: PublicKeyFromString,
-      lamports: number(),
-      data: BufferFromRawAccountData,
-      rentEpoch: number()
-    })
-  })));
-  const ParsedAccountDataResult = type({
-    program: string(),
-    parsed: unknown(),
-    space: number()
-  });
-  const GetParsedTokenAccountsByOwner = jsonRpcResultAndContext(array(type({
-    pubkey: PublicKeyFromString,
-    account: type({
-      executable: boolean(),
-      owner: PublicKeyFromString,
-      lamports: number(),
-      data: ParsedAccountDataResult,
-      rentEpoch: number()
-    })
-  })));
-  const GetLargestAccountsRpcResult = jsonRpcResultAndContext(array(type({
-    lamports: number(),
-    address: PublicKeyFromString
-  })));
-  const AccountInfoResult = type({
-    executable: boolean(),
-    owner: PublicKeyFromString,
-    lamports: number(),
-    data: BufferFromRawAccountData,
-    rentEpoch: number()
-  });
-  const KeyedAccountInfoResult = type({
-    pubkey: PublicKeyFromString,
-    account: AccountInfoResult
-  });
-  const ParsedOrRawAccountData = coerce(union([instance(buffer.Buffer), ParsedAccountDataResult]), union([RawAccountDataResult, ParsedAccountDataResult]), $(value => {
-    if (Array.isArray(value)) {
+  const GetSupplyRpcResult = jsonRpcResultAndContext(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.total = number();
+    result.circulating = number();
+    result.nonCirculating = number();
+    result.nonCirculatingAccounts = array(PublicKeyFromString);
+    return result;
+  })()));
+  const TokenAmountResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.amount = string();
+    result.uiAmount = nullable(number());
+    result.decimals = number();
+    result.uiAmountString = optional(string());
+    return result;
+  })());
+  const GetTokenLargestAccountsResult = jsonRpcResultAndContext(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.address = PublicKeyFromString;
+    result.amount = string();
+    result.uiAmount = nullable(number());
+    result.decimals = number();
+    result.uiAmountString = optional(string());
+    return result;
+  })())));
+  const GetTokenAccountsByOwner = jsonRpcResultAndContext(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = PublicKeyFromString;
+    result.account = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.executable = boolean();
+      result.owner = PublicKeyFromString;
+      result.lamports = number();
+      result.data = BufferFromRawAccountData;
+      result.rentEpoch = number();
+      return result;
+    })());
+    return result;
+  })())));
+  const ParsedAccountDataResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.program = string();
+    result.parsed = unknown();
+    result.space = number();
+    return result;
+  })());
+  const GetParsedTokenAccountsByOwner = jsonRpcResultAndContext(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = PublicKeyFromString;
+    result.account = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.executable = boolean();
+      result.owner = PublicKeyFromString;
+      result.lamports = number();
+      result.data = ParsedAccountDataResult;
+      result.rentEpoch = number();
+      return result;
+    })());
+    return result;
+  })())));
+  const GetLargestAccountsRpcResult = jsonRpcResultAndContext(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.lamports = number();
+    result.address = PublicKeyFromString;
+    return result;
+  })())));
+  const AccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.executable = boolean();
+    result.owner = PublicKeyFromString;
+    result.lamports = number();
+    result.data = BufferFromRawAccountData;
+    result.rentEpoch = number();
+    return result;
+  })());
+  const KeyedAccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = PublicKeyFromString;
+    result.account = AccountInfoResult;
+    return result;
+  })());
+  const ParsedOrRawAccountData = coerce(union($Array.of(instance(buffer.Buffer), ParsedAccountDataResult)), union($Array.of(RawAccountDataResult, ParsedAccountDataResult)), $(value => {
+    if ($Array.isArray(value)) {
       return create(value, BufferFromRawAccountData);
     } else {
       return value;
     }
   }));
-  const ParsedAccountInfoResult = type({
-    executable: boolean(),
-    owner: PublicKeyFromString,
-    lamports: number(),
-    data: ParsedOrRawAccountData,
-    rentEpoch: number()
-  });
-  const KeyedParsedAccountInfoResult = type({
-    pubkey: PublicKeyFromString,
-    account: ParsedAccountInfoResult
-  });
-  const StakeActivationResult = type({
-    state: union([literal("active"), literal("inactive"), literal("activating"), literal("deactivating")]),
-    active: number(),
-    inactive: number()
-  });
-  const GetConfirmedSignaturesForAddress2RpcResult = jsonRpcResult(array(type({
-    signature: string(),
-    slot: number(),
-    err: TransactionErrorResult,
-    memo: nullable(string()),
-    blockTime: optional(nullable(number()))
-  })));
-  const GetSignaturesForAddressRpcResult = jsonRpcResult(array(type({
-    signature: string(),
-    slot: number(),
-    err: TransactionErrorResult,
-    memo: nullable(string()),
-    blockTime: optional(nullable(number()))
-  })));
-  const AccountNotificationResult = type({
-    subscription: number(),
-    result: notificationResultAndContext(AccountInfoResult)
-  });
-  const ProgramAccountInfoResult = type({
-    pubkey: PublicKeyFromString,
-    account: AccountInfoResult
-  });
-  const ProgramAccountNotificationResult = type({
-    subscription: number(),
-    result: notificationResultAndContext(ProgramAccountInfoResult)
-  });
-  const SlotInfoResult = type({
-    parent: number(),
-    slot: number(),
-    root: number()
-  });
-  const SlotNotificationResult = type({
-    subscription: number(),
-    result: SlotInfoResult
-  });
-  const SlotUpdateResult = union([type({
-    type: union([literal("firstShredReceived"), literal("completed"), literal("optimisticConfirmation"), literal("root")]),
-    slot: number(),
-    timestamp: number()
-  }), type({
-    type: literal("createdBank"),
-    parent: number(),
-    slot: number(),
-    timestamp: number()
-  }), type({
-    type: literal("frozen"),
-    slot: number(),
-    timestamp: number(),
-    stats: type({
-      numTransactionEntries: number(),
-      numSuccessfulTransactions: number(),
-      numFailedTransactions: number(),
-      maxTransactionsPerEntry: number()
-    })
-  }), type({
-    type: literal("dead"),
-    slot: number(),
-    timestamp: number(),
-    err: string()
-  })]);
-  const SlotUpdateNotificationResult = type({
-    subscription: number(),
-    result: SlotUpdateResult
-  });
-  const SignatureNotificationResult = type({
-    subscription: number(),
-    result: notificationResultAndContext(union([SignatureStatusResult, SignatureReceivedResult]))
-  });
-  const RootNotificationResult = type({
-    subscription: number(),
-    result: number()
-  });
-  const ContactInfoResult = type({
-    pubkey: string(),
-    gossip: nullable(string()),
-    tpu: nullable(string()),
-    rpc: nullable(string()),
-    version: nullable(string())
-  });
-  const VoteAccountInfoResult = type({
-    votePubkey: string(),
-    nodePubkey: string(),
-    activatedStake: number(),
-    epochVoteAccount: boolean(),
-    epochCredits: array(tuple([number(), number(), number()])),
-    commission: number(),
-    lastVote: number(),
-    rootSlot: nullable(number())
-  });
-  const GetVoteAccounts = jsonRpcResult(type({
-    current: array(VoteAccountInfoResult),
-    delinquent: array(VoteAccountInfoResult)
-  }));
-  const ConfirmationStatus = union([literal("processed"), literal("confirmed"), literal("finalized")]);
-  const SignatureStatusResponse = type({
-    slot: number(),
-    confirmations: nullable(number()),
-    err: TransactionErrorResult,
-    confirmationStatus: optional(ConfirmationStatus)
-  });
+  const ParsedAccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.executable = boolean();
+    result.owner = PublicKeyFromString;
+    result.lamports = number();
+    result.data = ParsedOrRawAccountData;
+    result.rentEpoch = number();
+    return result;
+  })());
+  const KeyedParsedAccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = PublicKeyFromString;
+    result.account = ParsedAccountInfoResult;
+    return result;
+  })());
+  const StakeActivationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.state = union($Array.of(literal("active"), literal("inactive"), literal("activating"), literal("deactivating")));
+    result.active = number();
+    result.inactive = number();
+    return result;
+  })());
+  const GetConfirmedSignaturesForAddress2RpcResult = jsonRpcResult(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.signature = string();
+    result.slot = number();
+    result.err = TransactionErrorResult;
+    result.memo = nullable(string());
+    result.blockTime = optional(nullable(number()));
+    return result;
+  })())));
+  const GetSignaturesForAddressRpcResult = jsonRpcResult(array(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.signature = string();
+    result.slot = number();
+    result.err = TransactionErrorResult;
+    result.memo = nullable(string());
+    result.blockTime = optional(nullable(number()));
+    return result;
+  })())));
+  const AccountNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = notificationResultAndContext(AccountInfoResult);
+    return result;
+  })());
+  const ProgramAccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = PublicKeyFromString;
+    result.account = AccountInfoResult;
+    return result;
+  })());
+  const ProgramAccountNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = notificationResultAndContext(ProgramAccountInfoResult);
+    return result;
+  })());
+  const SlotInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.parent = number();
+    result.slot = number();
+    result.root = number();
+    return result;
+  })());
+  const SlotNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = SlotInfoResult;
+    return result;
+  })());
+  const SlotUpdateResult = union($Array.of(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.type = union($Array.of(literal("firstShredReceived"), literal("completed"), literal("optimisticConfirmation"), literal("root")));
+    result.slot = number();
+    result.timestamp = number();
+    return result;
+  })()), type($(function () {
+    let result = $Object.create(null, undefined);
+    result.type = literal("createdBank");
+    result.parent = number();
+    result.slot = number();
+    result.timestamp = number();
+    return result;
+  })()), type($(function () {
+    let result = $Object.create(null, undefined);
+    result.type = literal("frozen");
+    result.slot = number();
+    result.timestamp = number();
+    result.stats = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.numTransactionEntries = number();
+      result.numSuccessfulTransactions = number();
+      result.numFailedTransactions = number();
+      result.maxTransactionsPerEntry = number();
+      return result;
+    })());
+    return result;
+  })()), type($(function () {
+    let result = $Object.create(null, undefined);
+    result.type = literal("dead");
+    result.slot = number();
+    result.timestamp = number();
+    result.err = string();
+    return result;
+  })())));
+  const SlotUpdateNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = SlotUpdateResult;
+    return result;
+  })());
+  const SignatureNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = notificationResultAndContext(union($Array.of(SignatureStatusResult, SignatureReceivedResult)));
+    return result;
+  })());
+  const RootNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.subscription = number();
+    result.result = number();
+    return result;
+  })());
+  const ContactInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.pubkey = string();
+    result.gossip = nullable(string());
+    result.tpu = nullable(string());
+    result.rpc = nullable(string());
+    result.version = nullable(string());
+    return result;
+  })());
+  const VoteAccountInfoResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.votePubkey = string();
+    result.nodePubkey = string();
+    result.activatedStake = number();
+    result.epochVoteAccount = boolean();
+    result.epochCredits = array(tuple($Array.of(number(), number(), number())));
+    result.commission = number();
+    result.lastVote = number();
+    result.rootSlot = nullable(number());
+    return result;
+  })());
+  const GetVoteAccounts = jsonRpcResult(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.current = array(VoteAccountInfoResult);
+    result.delinquent = array(VoteAccountInfoResult);
+    return result;
+  })()));
+  const ConfirmationStatus = union($Array.of(literal("processed"), literal("confirmed"), literal("finalized")));
+  const SignatureStatusResponse = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.slot = number();
+    result.confirmations = nullable(number());
+    result.err = TransactionErrorResult;
+    result.confirmationStatus = optional(ConfirmationStatus);
+    return result;
+  })());
   const GetSignatureStatusesRpcResult = jsonRpcResultAndContext(array(nullable(SignatureStatusResponse)));
   const GetMinimumBalanceForRentExemptionRpcResult = jsonRpcResult(number());
-  const AddressTableLookupStruct = type({
-    accountKey: PublicKeyFromString,
-    writableIndexes: array(number()),
-    readonlyIndexes: array(number())
-  });
-  const ConfirmedTransactionResult = type({
-    signatures: array(string()),
-    message: type({
-      accountKeys: array(string()),
-      header: type({
-        numRequiredSignatures: number(),
-        numReadonlySignedAccounts: number(),
-        numReadonlyUnsignedAccounts: number()
-      }),
-      instructions: array(type({
-        accounts: array(number()),
-        data: string(),
-        programIdIndex: number()
-      })),
-      recentBlockhash: string(),
-      addressTableLookups: optional(array(AddressTableLookupStruct))
-    })
-  });
-  const ParsedInstructionResult = type({
-    parsed: unknown(),
-    program: string(),
-    programId: PublicKeyFromString
-  });
-  const RawInstructionResult = type({
-    accounts: array(PublicKeyFromString),
-    data: string(),
-    programId: PublicKeyFromString
-  });
-  const InstructionResult = union([RawInstructionResult, ParsedInstructionResult]);
-  const UnknownInstructionResult = union([type({
-    parsed: unknown(),
-    program: string(),
-    programId: string()
-  }), type({
-    accounts: array(string()),
-    data: string(),
-    programId: string()
-  })]);
+  const AddressTableLookupStruct = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.accountKey = PublicKeyFromString;
+    result.writableIndexes = array(number());
+    result.readonlyIndexes = array(number());
+    return result;
+  })());
+  const ConfirmedTransactionResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.signatures = array(string());
+    result.message = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.accountKeys = array(string());
+      result.header = type($(function () {
+        let result = $Object.create(null, undefined);
+        result.numRequiredSignatures = number();
+        result.numReadonlySignedAccounts = number();
+        result.numReadonlyUnsignedAccounts = number();
+        return result;
+      })());
+      result.instructions = array(type($(function () {
+        let result = $Object.create(null, undefined);
+        result.accounts = array(number());
+        result.data = string();
+        result.programIdIndex = number();
+        return result;
+      })()));
+      result.recentBlockhash = string();
+      result.addressTableLookups = optional(array(AddressTableLookupStruct));
+      return result;
+    })());
+    return result;
+  })());
+  const ParsedInstructionResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.parsed = unknown();
+    result.program = string();
+    result.programId = PublicKeyFromString;
+    return result;
+  })());
+  const RawInstructionResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.accounts = array(PublicKeyFromString);
+    result.data = string();
+    result.programId = PublicKeyFromString;
+    return result;
+  })());
+  const InstructionResult = union($Array.of(RawInstructionResult, ParsedInstructionResult));
+  const UnknownInstructionResult = union($Array.of(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.parsed = unknown();
+    result.program = string();
+    result.programId = string();
+    return result;
+  })()), type($(function () {
+    let result = $Object.create(null, undefined);
+    result.accounts = array(string());
+    result.data = string();
+    result.programId = string();
+    return result;
+  })())));
   const ParsedOrRawInstruction = coerce(InstructionResult, UnknownInstructionResult, $(value => {
     if ("accounts" in value) {
       return create(value, RawInstructionResult);
@@ -12993,174 +13689,236 @@ var solanaWeb3 = $(function (exports) {
       return create(value, ParsedInstructionResult);
     }
   }));
-  const ParsedConfirmedTransactionResult = type({
-    signatures: array(string()),
-    message: type({
-      accountKeys: array(type({
-        pubkey: PublicKeyFromString,
-        signer: boolean(),
-        writable: boolean(),
-        source: optional(union([literal("transaction"), literal("lookupTable")]))
-      })),
-      instructions: array(ParsedOrRawInstruction),
-      recentBlockhash: string(),
-      addressTableLookups: optional(nullable(array(AddressTableLookupStruct)))
-    })
-  });
-  const TokenBalanceResult = type({
-    accountIndex: number(),
-    mint: string(),
-    owner: optional(string()),
-    uiTokenAmount: TokenAmountResult
-  });
-  const LoadedAddressesResult = type({
-    writable: array(PublicKeyFromString),
-    readonly: array(PublicKeyFromString)
-  });
-  const ConfirmedTransactionMetaResult = type({
-    err: TransactionErrorResult,
-    fee: number(),
-    innerInstructions: optional(nullable(array(type({
-      index: number(),
-      instructions: array(type({
-        accounts: array(number()),
-        data: string(),
-        programIdIndex: number()
-      }))
-    })))),
-    preBalances: array(number()),
-    postBalances: array(number()),
-    logMessages: optional(nullable(array(string()))),
-    preTokenBalances: optional(nullable(array(TokenBalanceResult))),
-    postTokenBalances: optional(nullable(array(TokenBalanceResult))),
-    loadedAddresses: optional(LoadedAddressesResult),
-    computeUnitsConsumed: optional(number())
-  });
-  const ParsedConfirmedTransactionMetaResult = type({
-    err: TransactionErrorResult,
-    fee: number(),
-    innerInstructions: optional(nullable(array(type({
-      index: number(),
-      instructions: array(ParsedOrRawInstruction)
-    })))),
-    preBalances: array(number()),
-    postBalances: array(number()),
-    logMessages: optional(nullable(array(string()))),
-    preTokenBalances: optional(nullable(array(TokenBalanceResult))),
-    postTokenBalances: optional(nullable(array(TokenBalanceResult))),
-    loadedAddresses: optional(LoadedAddressesResult),
-    computeUnitsConsumed: optional(number())
-  });
-  const TransactionVersionStruct = union([literal(0), literal("legacy")]);
-  const GetBlockRpcResult = jsonRpcResult(nullable(type({
-    blockhash: string(),
-    previousBlockhash: string(),
-    parentSlot: number(),
-    transactions: array(type({
-      transaction: ConfirmedTransactionResult,
-      meta: nullable(ConfirmedTransactionMetaResult),
-      version: optional(TransactionVersionStruct)
-    })),
-    rewards: optional(array(type({
-      pubkey: string(),
-      lamports: number(),
-      postBalance: nullable(number()),
-      rewardType: nullable(string())
-    }))),
-    blockTime: nullable(number()),
-    blockHeight: nullable(number())
-  })));
-  const GetParsedBlockRpcResult = jsonRpcResult(nullable(type({
-    blockhash: string(),
-    previousBlockhash: string(),
-    parentSlot: number(),
-    transactions: array(type({
-      transaction: ParsedConfirmedTransactionResult,
-      meta: nullable(ParsedConfirmedTransactionMetaResult),
-      version: optional(TransactionVersionStruct)
-    })),
-    rewards: optional(array(type({
-      pubkey: string(),
-      lamports: number(),
-      postBalance: nullable(number()),
-      rewardType: nullable(string())
-    }))),
-    blockTime: nullable(number()),
-    blockHeight: nullable(number())
-  })));
-  const GetConfirmedBlockRpcResult = jsonRpcResult(nullable(type({
-    blockhash: string(),
-    previousBlockhash: string(),
-    parentSlot: number(),
-    transactions: array(type({
-      transaction: ConfirmedTransactionResult,
-      meta: nullable(ConfirmedTransactionMetaResult)
-    })),
-    rewards: optional(array(type({
-      pubkey: string(),
-      lamports: number(),
-      postBalance: nullable(number()),
-      rewardType: nullable(string())
-    }))),
-    blockTime: nullable(number())
-  })));
-  const GetBlockSignaturesRpcResult = jsonRpcResult(nullable(type({
-    blockhash: string(),
-    previousBlockhash: string(),
-    parentSlot: number(),
-    signatures: array(string()),
-    blockTime: nullable(number())
-  })));
-  const GetTransactionRpcResult = jsonRpcResult(nullable(type({
-    slot: number(),
-    meta: ConfirmedTransactionMetaResult,
-    blockTime: optional(nullable(number())),
-    transaction: ConfirmedTransactionResult,
-    version: optional(TransactionVersionStruct)
-  })));
-  const GetParsedTransactionRpcResult = jsonRpcResult(nullable(type({
-    slot: number(),
-    transaction: ParsedConfirmedTransactionResult,
-    meta: nullable(ParsedConfirmedTransactionMetaResult),
-    blockTime: optional(nullable(number())),
-    version: optional(TransactionVersionStruct)
-  })));
-  const GetRecentBlockhashAndContextRpcResult = jsonRpcResultAndContext(type({
-    blockhash: string(),
-    feeCalculator: type({
-      lamportsPerSignature: number()
-    })
-  }));
-  const GetLatestBlockhashRpcResult = jsonRpcResultAndContext(type({
-    blockhash: string(),
-    lastValidBlockHeight: number()
-  }));
-  const PerfSampleResult = type({
-    slot: number(),
-    numTransactions: number(),
-    numSlots: number(),
-    samplePeriodSecs: number()
-  });
+  const ParsedConfirmedTransactionResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.signatures = array(string());
+    result.message = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.accountKeys = array(type($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = PublicKeyFromString;
+        result.signer = boolean();
+        result.writable = boolean();
+        result.source = optional(union($Array.of(literal("transaction"), literal("lookupTable"))));
+        return result;
+      })()));
+      result.instructions = array(ParsedOrRawInstruction);
+      result.recentBlockhash = string();
+      result.addressTableLookups = optional(nullable(array(AddressTableLookupStruct)));
+      return result;
+    })());
+    return result;
+  })());
+  const TokenBalanceResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.accountIndex = number();
+    result.mint = string();
+    result.owner = optional(string());
+    result.uiTokenAmount = TokenAmountResult;
+    return result;
+  })());
+  const LoadedAddressesResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.writable = array(PublicKeyFromString);
+    result.readonly = array(PublicKeyFromString);
+    return result;
+  })());
+  const ConfirmedTransactionMetaResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.err = TransactionErrorResult;
+    result.fee = number();
+    result.innerInstructions = optional(nullable(array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.index = number();
+      result.instructions = array(type($(function () {
+        let result = $Object.create(null, undefined);
+        result.accounts = array(number());
+        result.data = string();
+        result.programIdIndex = number();
+        return result;
+      })()));
+      return result;
+    })()))));
+    result.preBalances = array(number());
+    result.postBalances = array(number());
+    result.logMessages = optional(nullable(array(string())));
+    result.preTokenBalances = optional(nullable(array(TokenBalanceResult)));
+    result.postTokenBalances = optional(nullable(array(TokenBalanceResult)));
+    result.loadedAddresses = optional(LoadedAddressesResult);
+    result.computeUnitsConsumed = optional(number());
+    return result;
+  })());
+  const ParsedConfirmedTransactionMetaResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.err = TransactionErrorResult;
+    result.fee = number();
+    result.innerInstructions = optional(nullable(array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.index = number();
+      result.instructions = array(ParsedOrRawInstruction);
+      return result;
+    })()))));
+    result.preBalances = array(number());
+    result.postBalances = array(number());
+    result.logMessages = optional(nullable(array(string())));
+    result.preTokenBalances = optional(nullable(array(TokenBalanceResult)));
+    result.postTokenBalances = optional(nullable(array(TokenBalanceResult)));
+    result.loadedAddresses = optional(LoadedAddressesResult);
+    result.computeUnitsConsumed = optional(number());
+    return result;
+  })());
+  const TransactionVersionStruct = union($Array.of(literal(0), literal("legacy")));
+  const GetBlockRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.previousBlockhash = string();
+    result.parentSlot = number();
+    result.transactions = array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.transaction = ConfirmedTransactionResult;
+      result.meta = nullable(ConfirmedTransactionMetaResult);
+      result.version = optional(TransactionVersionStruct);
+      return result;
+    })()));
+    result.rewards = optional(array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.pubkey = string();
+      result.lamports = number();
+      result.postBalance = nullable(number());
+      result.rewardType = nullable(string());
+      return result;
+    })())));
+    result.blockTime = nullable(number());
+    result.blockHeight = nullable(number());
+    return result;
+  })())));
+  const GetParsedBlockRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.previousBlockhash = string();
+    result.parentSlot = number();
+    result.transactions = array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.transaction = ParsedConfirmedTransactionResult;
+      result.meta = nullable(ParsedConfirmedTransactionMetaResult);
+      result.version = optional(TransactionVersionStruct);
+      return result;
+    })()));
+    result.rewards = optional(array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.pubkey = string();
+      result.lamports = number();
+      result.postBalance = nullable(number());
+      result.rewardType = nullable(string());
+      return result;
+    })())));
+    result.blockTime = nullable(number());
+    result.blockHeight = nullable(number());
+    return result;
+  })())));
+  const GetConfirmedBlockRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.previousBlockhash = string();
+    result.parentSlot = number();
+    result.transactions = array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.transaction = ConfirmedTransactionResult;
+      result.meta = nullable(ConfirmedTransactionMetaResult);
+      return result;
+    })()));
+    result.rewards = optional(array(type($(function () {
+      let result = $Object.create(null, undefined);
+      result.pubkey = string();
+      result.lamports = number();
+      result.postBalance = nullable(number());
+      result.rewardType = nullable(string());
+      return result;
+    })())));
+    result.blockTime = nullable(number());
+    return result;
+  })())));
+  const GetBlockSignaturesRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.previousBlockhash = string();
+    result.parentSlot = number();
+    result.signatures = array(string());
+    result.blockTime = nullable(number());
+    return result;
+  })())));
+  const GetTransactionRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.slot = number();
+    result.meta = ConfirmedTransactionMetaResult;
+    result.blockTime = optional(nullable(number()));
+    result.transaction = ConfirmedTransactionResult;
+    result.version = optional(TransactionVersionStruct);
+    return result;
+  })())));
+  const GetParsedTransactionRpcResult = jsonRpcResult(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.slot = number();
+    result.transaction = ParsedConfirmedTransactionResult;
+    result.meta = nullable(ParsedConfirmedTransactionMetaResult);
+    result.blockTime = optional(nullable(number()));
+    result.version = optional(TransactionVersionStruct);
+    return result;
+  })())));
+  const GetRecentBlockhashAndContextRpcResult = jsonRpcResultAndContext(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.feeCalculator = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.lamportsPerSignature = number();
+      return result;
+    })());
+    return result;
+  })()));
+  const GetLatestBlockhashRpcResult = jsonRpcResultAndContext(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.blockhash = string();
+    result.lastValidBlockHeight = number();
+    return result;
+  })()));
+  const PerfSampleResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.slot = number();
+    result.numTransactions = number();
+    result.numSlots = number();
+    result.samplePeriodSecs = number();
+    return result;
+  })());
   const GetRecentPerformanceSamplesRpcResult = jsonRpcResult(array(PerfSampleResult));
-  const GetFeeCalculatorRpcResult = jsonRpcResultAndContext(nullable(type({
-    feeCalculator: type({
-      lamportsPerSignature: number()
-    })
-  })));
+  const GetFeeCalculatorRpcResult = jsonRpcResultAndContext(nullable(type($(function () {
+    let result = $Object.create(null, undefined);
+    result.feeCalculator = type($(function () {
+      let result = $Object.create(null, undefined);
+      result.lamportsPerSignature = number();
+      return result;
+    })());
+    return result;
+  })())));
   const RequestAirdropRpcResult = jsonRpcResult(string());
   const SendTransactionRpcResult = jsonRpcResult(string());
-  const LogsResult = type({
-    err: TransactionErrorResult,
-    logs: array(string()),
-    signature: string()
-  });
-  const LogsNotificationResult = type({
-    result: notificationResultAndContext(LogsResult),
-    subscription: number()
-  });
-  const COMMON_HTTP_HEADERS = {
-    "solana-client": `js/${(_process$env$npm_pack = "0.0.0-development") !== null && _process$env$npm_pack !== void 0 ? _process$env$npm_pack : "UNKNOWN"}`
-  };
+  const LogsResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.err = TransactionErrorResult;
+    result.logs = array(string());
+    result.signature = string();
+    return result;
+  })());
+  const LogsNotificationResult = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.result = notificationResultAndContext(LogsResult);
+    result.subscription = number();
+    return result;
+  })());
+  const COMMON_HTTP_HEADERS = $(function () {
+    let result = $Object.create(null, undefined);
+    result["solana-client"] = `js/${(_process$env$npm_pack = "0.0.0-development") !== null && _process$env$npm_pack !== void 0 ? _process$env$npm_pack : "UNKNOWN"}`;
+    return result;
+  })();
   class Connection {
     constructor(endpoint, commitmentOrConfig) {
       this._commitment = void 0;
@@ -13177,16 +13935,18 @@ var solanaWeb3 = $(function (exports) {
       this._rpcWebSocketGeneration = 0;
       this._disableBlockhashCaching = false;
       this._pollingBlockhash = false;
-      this._blockhashInfo = {
-        latestBlockhash: null,
-        lastFetch: 0,
-        transactionSignatures: [],
-        simulatedSignatures: []
-      };
+      this._blockhashInfo = $(function () {
+        let result = $Object.create(null, undefined);
+        result.latestBlockhash = null;
+        result.lastFetch = 0;
+        result.transactionSignatures = $Array.of();
+        result.simulatedSignatures = $Array.of();
+        return result;
+      })();
       this._nextClientSubscriptionId = 0;
-      this._subscriptionDisposeFunctionsByClientSubscriptionId = {};
-      this._subscriptionCallbacksByServerSubscriptionId = {};
-      this._subscriptionsByHash = {};
+      this._subscriptionDisposeFunctionsByClientSubscriptionId = $Object.create(null, undefined);
+      this._subscriptionCallbacksByServerSubscriptionId = $Object.create(null, undefined);
+      this._subscriptionsByHash = $Object.create(null, undefined);
       this._subscriptionsAutoDisposedByRpc = new Set();
       let wsEndpoint;
       let httpHeaders;
@@ -13209,10 +13969,12 @@ var solanaWeb3 = $(function (exports) {
       this._rpcClient = createRpcClient(endpoint, httpHeaders, fetch, fetchMiddleware, disableRetryOnRateLimit);
       this._rpcRequest = createRpcRequest(this._rpcClient);
       this._rpcBatchRequest = createRpcBatchRequest(this._rpcClient);
-      this._rpcWebSocket = new Client_1(this._rpcWsEndpoint, {
-        autoconnect: false,
-        max_reconnects: Infinity
-      });
+      this._rpcWebSocket = new Client_1(this._rpcWsEndpoint, $(function () {
+        let result = $Object.create(null, undefined);
+        result.autoconnect = false;
+        result.max_reconnects = Infinity;
+        return result;
+      })());
       this._rpcWebSocket.on("open", this._wsOnOpen.bind(this));
       this._rpcWebSocket.on("error", this._wsOnError.bind(this));
       this._rpcWebSocket.on("close", this._wsOnClose.bind(this));
@@ -13235,7 +13997,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([publicKey.toBase58()], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(publicKey.toBase58()), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getBalance", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(number()));
       if ("error" in res) {
@@ -13249,7 +14011,7 @@ var solanaWeb3 = $(function (exports) {
       }));
     }
     async getBlockTime(slot) {
-      const unsafeRes = await this._rpcRequest("getBlockTime", [slot]);
+      const unsafeRes = await this._rpcRequest("getBlockTime", $Array.of(slot));
       const res = create(unsafeRes, jsonRpcResult(nullable(number())));
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, `failed to get block time for slot ${slot}`);
@@ -13257,7 +14019,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getMinimumLedgerSlot() {
-      const unsafeRes = await this._rpcRequest("minimumLedgerSlot", []);
+      const unsafeRes = await this._rpcRequest("minimumLedgerSlot", $Array.of());
       const res = create(unsafeRes, jsonRpcResult(number()));
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get minimum ledger slot");
@@ -13265,7 +14027,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getFirstAvailableBlock() {
-      const unsafeRes = await this._rpcRequest("getFirstAvailableBlock", []);
+      const unsafeRes = await this._rpcRequest("getFirstAvailableBlock", $Array.of());
       const res = create(unsafeRes, SlotRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get first available block");
@@ -13273,22 +14035,28 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getSupply(config) {
-      let configArg = {};
+      let configArg = $Object.create(null, undefined);
       if (typeof config === "string") {
-        configArg = {
-          commitment: config
-        };
+        configArg = $(function () {
+          let result = $Object.create(null, undefined);
+          result.commitment = config;
+          return result;
+        })();
       } else if (config) {
-        configArg = {
-          ...config,
-          commitment: config && config.commitment || this.commitment
-        };
+        configArg = $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, config);
+          result.commitment = config && config.commitment || this.commitment;
+          return result;
+        }).bind(this)();
       } else {
-        configArg = {
-          commitment: this.commitment
-        };
+        configArg = $(function () {
+          let result = $Object.create(null, undefined);
+          result.commitment = this.commitment;
+          return result;
+        }).bind(this)();
       }
-      const unsafeRes = await this._rpcRequest("getSupply", [configArg]);
+      const unsafeRes = await this._rpcRequest("getSupply", $Array.of(configArg));
       const res = create(unsafeRes, GetSupplyRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get supply");
@@ -13296,7 +14064,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getTokenSupply(tokenMintAddress, commitment) {
-      const args = this._buildArgs([tokenMintAddress.toBase58()], commitment);
+      const args = this._buildArgs($Array.of(tokenMintAddress.toBase58()), commitment);
       const unsafeRes = await this._rpcRequest("getTokenSupply", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(TokenAmountResult));
       if ("error" in res) {
@@ -13305,7 +14073,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getTokenAccountBalance(tokenAddress, commitment) {
-      const args = this._buildArgs([tokenAddress.toBase58()], commitment);
+      const args = this._buildArgs($Array.of(tokenAddress.toBase58()), commitment);
       const unsafeRes = await this._rpcRequest("getTokenAccountBalance", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(TokenAmountResult));
       if ("error" in res) {
@@ -13318,15 +14086,19 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      let _args = [ownerAddress.toBase58()];
+      let _args = $Array.of(ownerAddress.toBase58());
       if ("mint" in filter) {
-        _args.push({
-          mint: filter.mint.toBase58()
-        });
+        _args.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.mint = filter.mint.toBase58();
+          return result;
+        })());
       } else {
-        _args.push({
-          programId: filter.programId.toBase58()
-        });
+        _args.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.programId = filter.programId.toBase58();
+          return result;
+        })());
       }
       const args = this._buildArgs(_args, commitment, "base64", config);
       const unsafeRes = await this._rpcRequest("getTokenAccountsByOwner", args);
@@ -13337,15 +14109,19 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getParsedTokenAccountsByOwner(ownerAddress, filter, commitment) {
-      let _args = [ownerAddress.toBase58()];
+      let _args = $Array.of(ownerAddress.toBase58());
       if ("mint" in filter) {
-        _args.push({
-          mint: filter.mint.toBase58()
-        });
+        _args.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.mint = filter.mint.toBase58();
+          return result;
+        })());
       } else {
-        _args.push({
-          programId: filter.programId.toBase58()
-        });
+        _args.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.programId = filter.programId.toBase58();
+          return result;
+        })());
       }
       const args = this._buildArgs(_args, commitment, "jsonParsed");
       const unsafeRes = await this._rpcRequest("getTokenAccountsByOwner", args);
@@ -13356,11 +14132,13 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getLargestAccounts(config) {
-      const arg = {
-        ...config,
-        commitment: config && config.commitment || this.commitment
-      };
-      const args = arg.filter || arg.commitment ? [arg] : [];
+      const arg = $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, config);
+        result.commitment = config && config.commitment || this.commitment;
+        return result;
+      }).bind(this)();
+      const args = arg.filter || arg.commitment ? $Array.of(arg) : $Array.of();
       const unsafeRes = await this._rpcRequest("getLargestAccounts", args);
       const res = create(unsafeRes, GetLargestAccountsRpcResult);
       if ("error" in res) {
@@ -13369,7 +14147,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getTokenLargestAccounts(mintAddress, commitment) {
-      const args = this._buildArgs([mintAddress.toBase58()], commitment);
+      const args = this._buildArgs($Array.of(mintAddress.toBase58()), commitment);
       const unsafeRes = await this._rpcRequest("getTokenLargestAccounts", args);
       const res = create(unsafeRes, GetTokenLargestAccountsResult);
       if ("error" in res) {
@@ -13382,7 +14160,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([publicKey.toBase58()], commitment, "base64", config);
+      const args = this._buildArgs($Array.of(publicKey.toBase58()), commitment, "base64", config);
       const unsafeRes = await this._rpcRequest("getAccountInfo", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(nullable(AccountInfoResult)));
       if ("error" in res) {
@@ -13395,7 +14173,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([publicKey.toBase58()], commitment, "jsonParsed", config);
+      const args = this._buildArgs($Array.of(publicKey.toBase58()), commitment, "jsonParsed", config);
       const unsafeRes = await this._rpcRequest("getAccountInfo", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(nullable(ParsedAccountInfoResult)));
       if ("error" in res) {
@@ -13417,7 +14195,7 @@ var solanaWeb3 = $(function (exports) {
         config: config
       } = extractCommitmentFromConfig(rawConfig);
       const keys = publicKeys.map($(key => key.toBase58()));
-      const args = this._buildArgs([keys], commitment, "jsonParsed", config);
+      const args = this._buildArgs($Array.of(keys), commitment, "jsonParsed", config);
       const unsafeRes = await this._rpcRequest("getMultipleAccounts", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(array(nullable(ParsedAccountInfoResult))));
       if ("error" in res) {
@@ -13431,7 +14209,7 @@ var solanaWeb3 = $(function (exports) {
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
       const keys = publicKeys.map($(key => key.toBase58()));
-      const args = this._buildArgs([keys], commitment, "base64", config);
+      const args = this._buildArgs($Array.of(keys), commitment, "base64", config);
       const unsafeRes = await this._rpcRequest("getMultipleAccounts", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(array(nullable(AccountInfoResult))));
       if ("error" in res) {
@@ -13448,10 +14226,12 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([publicKey.toBase58()], commitment, undefined, {
-        ...config,
-        epoch: epoch != null ? epoch : config === null || config === void 0 ? void 0 : config.epoch
-      });
+      const args = this._buildArgs($Array.of(publicKey.toBase58()), commitment, undefined, $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, config);
+        result.epoch = epoch != null ? epoch : config === null || config === void 0 ? void 0 : config.epoch;
+        return result;
+      })());
       const unsafeRes = await this._rpcRequest("getStakeActivation", args);
       const res = create(unsafeRes, jsonRpcResult(StakeActivationResult));
       if ("error" in res) {
@@ -13467,8 +14247,8 @@ var solanaWeb3 = $(function (exports) {
       const {
         encoding: encoding,
         ...configWithoutEncoding
-      } = config || {};
-      const args = this._buildArgs([programId.toBase58()], commitment, encoding || "base64", configWithoutEncoding);
+      } = config || $Object.create(null, undefined);
+      const args = this._buildArgs($Array.of(programId.toBase58()), commitment, encoding || "base64", configWithoutEncoding);
       const unsafeRes = await this._rpcRequest("getProgramAccounts", args);
       const res = create(unsafeRes, jsonRpcResult(array(KeyedAccountInfoResult)));
       if ("error" in res) {
@@ -13481,7 +14261,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(configOrCommitment);
-      const args = this._buildArgs([programId.toBase58()], commitment, "jsonParsed", config);
+      const args = this._buildArgs($Array.of(programId.toBase58()), commitment, "jsonParsed", config);
       const unsafeRes = await this._rpcRequest("getProgramAccounts", args);
       const res = create(unsafeRes, jsonRpcResult(array(KeyedParsedAccountInfoResult)));
       if ("error" in res) {
@@ -13512,15 +14292,19 @@ var solanaWeb3 = $(function (exports) {
         try {
           subscriptionId = this.onSignature(rawSignature, $((result, context) => {
             subscriptionId = undefined;
-            const response = {
-              context: context,
-              value: result
-            };
+            const response = $(function () {
+              let result = $Object.create(null, undefined);
+              result.context = context;
+              result.value = result;
+              return result;
+            })();
             done = true;
-            resolve({
-              __type: exports.TransactionStatus.PROCESSED,
-              response: response
-            });
+            resolve($(function () {
+              let result = $Object.create(null, undefined);
+              result.__type = exports.TransactionStatus.PROCESSED;
+              result.response = response;
+              return result;
+            })());
           }), subscriptionCommitment);
         } catch (err) {
           reject(err);
@@ -13540,10 +14324,12 @@ var solanaWeb3 = $(function (exports) {
                 break;
               }
           }
-          timeoutId = setTimeout($(() => resolve({
-            __type: exports.TransactionStatus.TIMED_OUT,
-            timeoutMs: timeoutMs
-          })), timeoutMs);
+          timeoutId = setTimeout($(() => resolve($(function () {
+            let result = $Object.create(null, undefined);
+            result.__type = exports.TransactionStatus.TIMED_OUT;
+            result.timeoutMs = timeoutMs;
+            return result;
+          })())), timeoutMs);
         } else {
           let config = strategy;
           const checkBlockHeight = async () => {
@@ -13564,15 +14350,17 @@ var solanaWeb3 = $(function (exports) {
               currentBlockHeight = await checkBlockHeight();
               if (done) return;
             }
-            resolve({
-              __type: exports.TransactionStatus.BLOCKHEIGHT_EXCEEDED
-            });
+            resolve($(function () {
+              let result = $Object.create(null, undefined);
+              result.__type = exports.TransactionStatus.BLOCKHEIGHT_EXCEEDED;
+              return result;
+            })());
           })();
         }
       }));
       let result;
       try {
-        const outcome = await Promise.race([confirmationPromise, expiryPromise]);
+        const outcome = await Promise.race($Array.of(confirmationPromise, expiryPromise));
         switch (outcome.__type) {
           case exports.TransactionStatus.BLOCKHEIGHT_EXCEEDED:
             throw new TransactionExpiredBlockheightExceededError(rawSignature);
@@ -13591,7 +14379,7 @@ var solanaWeb3 = $(function (exports) {
       return result;
     }
     async getClusterNodes() {
-      const unsafeRes = await this._rpcRequest("getClusterNodes", []);
+      const unsafeRes = await this._rpcRequest("getClusterNodes", $Array.of());
       const res = create(unsafeRes, jsonRpcResult(array(ContactInfoResult)));
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get cluster nodes");
@@ -13599,7 +14387,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getVoteAccounts(commitment) {
-      const args = this._buildArgs([], commitment);
+      const args = this._buildArgs($Array.of(), commitment);
       const unsafeRes = await this._rpcRequest("getVoteAccounts", args);
       const res = create(unsafeRes, GetVoteAccounts);
       if ("error" in res) {
@@ -13612,7 +14400,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getSlot", args);
       const res = create(unsafeRes, jsonRpcResult(number()));
       if ("error" in res) {
@@ -13625,7 +14413,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getSlotLeader", args);
       const res = create(unsafeRes, jsonRpcResult(string()));
       if ("error" in res) {
@@ -13634,7 +14422,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getSlotLeaders(startSlot, limit) {
-      const args = [startSlot, limit];
+      const args = $Array.of(startSlot, limit);
       const unsafeRes = await this._rpcRequest("getSlotLeaders", args);
       const res = create(unsafeRes, jsonRpcResult(array(PublicKeyFromString)));
       if ("error" in res) {
@@ -13646,16 +14434,18 @@ var solanaWeb3 = $(function (exports) {
       const {
         context: context,
         value: values
-      } = await this.getSignatureStatuses([signature], config);
+      } = await this.getSignatureStatuses($Array.of(signature), config);
       assert$1(values.length === 1);
       const value = values[0];
-      return {
-        context: context,
-        value: value
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.context = context;
+        result.value = value;
+        return result;
+      })();
     }
     async getSignatureStatuses(signatures, config) {
-      const params = [signatures];
+      const params = $Array.of(signatures);
       if (config) {
         params.push(config);
       }
@@ -13671,7 +14461,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getTransactionCount", args);
       const res = create(unsafeRes, jsonRpcResult(number()));
       if ("error" in res) {
@@ -13680,14 +14470,16 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getTotalSupply(commitment) {
-      const result = await this.getSupply({
-        commitment: commitment,
-        excludeNonCirculatingAccountsList: true
-      });
+      const result = await this.getSupply($(function () {
+        let result = $Object.create(null, undefined);
+        result.commitment = commitment;
+        result.excludeNonCirculatingAccountsList = true;
+        return result;
+      })());
       return result.value.total;
     }
     async getInflationGovernor(commitment) {
-      const args = this._buildArgs([], commitment);
+      const args = this._buildArgs($Array.of(), commitment);
       const unsafeRes = await this._rpcRequest("getInflationGovernor", args);
       const res = create(unsafeRes, GetInflationGovernorRpcResult);
       if ("error" in res) {
@@ -13700,10 +14492,12 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([addresses.map($(pubkey => pubkey.toBase58()))], commitment, undefined, {
-        ...config,
-        epoch: epoch != null ? epoch : config === null || config === void 0 ? void 0 : config.epoch
-      });
+      const args = this._buildArgs($Array.of(addresses.map($(pubkey => pubkey.toBase58()))), commitment, undefined, $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, config);
+        result.epoch = epoch != null ? epoch : config === null || config === void 0 ? void 0 : config.epoch;
+        return result;
+      })());
       const unsafeRes = await this._rpcRequest("getInflationReward", args);
       const res = create(unsafeRes, GetInflationRewardResult);
       if ("error" in res) {
@@ -13716,7 +14510,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getEpochInfo", args);
       const res = create(unsafeRes, GetEpochInfoRpcResult);
       if ("error" in res) {
@@ -13725,7 +14519,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getEpochSchedule() {
-      const unsafeRes = await this._rpcRequest("getEpochSchedule", []);
+      const unsafeRes = await this._rpcRequest("getEpochSchedule", $Array.of());
       const res = create(unsafeRes, GetEpochScheduleRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get epoch schedule");
@@ -13734,7 +14528,7 @@ var solanaWeb3 = $(function (exports) {
       return new EpochSchedule(epochSchedule.slotsPerEpoch, epochSchedule.leaderScheduleSlotOffset, epochSchedule.warmup, epochSchedule.firstNormalEpoch, epochSchedule.firstNormalSlot);
     }
     async getLeaderSchedule() {
-      const unsafeRes = await this._rpcRequest("getLeaderSchedule", []);
+      const unsafeRes = await this._rpcRequest("getLeaderSchedule", $Array.of());
       const res = create(unsafeRes, GetLeaderScheduleRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get leader schedule");
@@ -13742,7 +14536,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getMinimumBalanceForRentExemption(dataLength, commitment) {
-      const args = this._buildArgs([dataLength], commitment);
+      const args = this._buildArgs($Array.of(dataLength), commitment);
       const unsafeRes = await this._rpcRequest("getMinimumBalanceForRentExemption", args);
       const res = create(unsafeRes, GetMinimumBalanceForRentExemptionRpcResult);
       if ("error" in res) {
@@ -13752,7 +14546,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getRecentBlockhashAndContext(commitment) {
-      const args = this._buildArgs([], commitment);
+      const args = this._buildArgs($Array.of(), commitment);
       const unsafeRes = await this._rpcRequest("getRecentBlockhash", args);
       const res = create(unsafeRes, GetRecentBlockhashAndContextRpcResult);
       if ("error" in res) {
@@ -13761,7 +14555,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getRecentPerformanceSamples(limit) {
-      const unsafeRes = await this._rpcRequest("getRecentPerformanceSamples", limit ? [limit] : []);
+      const unsafeRes = await this._rpcRequest("getRecentPerformanceSamples", limit ? $Array.of(limit) : $Array.of());
       const res = create(unsafeRes, GetRecentPerformanceSamplesRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get recent performance samples");
@@ -13769,7 +14563,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getFeeCalculatorForBlockhash(blockhash, commitment) {
-      const args = this._buildArgs([blockhash], commitment);
+      const args = this._buildArgs($Array.of(blockhash), commitment);
       const unsafeRes = await this._rpcRequest("getFeeCalculatorForBlockhash", args);
       const res = create(unsafeRes, GetFeeCalculatorRpcResult);
       if ("error" in res) {
@@ -13779,14 +14573,16 @@ var solanaWeb3 = $(function (exports) {
         context: context,
         value: value
       } = res.result;
-      return {
-        context: context,
-        value: value !== null ? value.feeCalculator : null
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.context = context;
+        result.value = value !== null ? value.feeCalculator : null;
+        return result;
+      })();
     }
     async getFeeForMessage(message, commitment) {
       const wireMessage = message.serialize().toString("base64");
-      const args = this._buildArgs([wireMessage], commitment);
+      const args = this._buildArgs($Array.of(wireMessage), commitment);
       const unsafeRes = await this._rpcRequest("getFeeForMessage", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(nullable(number())));
       if ("error" in res) {
@@ -13818,7 +14614,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getLatestBlockhash", args);
       const res = create(unsafeRes, GetLatestBlockhashRpcResult);
       if ("error" in res) {
@@ -13827,7 +14623,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getVersion() {
-      const unsafeRes = await this._rpcRequest("getVersion", []);
+      const unsafeRes = await this._rpcRequest("getVersion", $Array.of());
       const res = create(unsafeRes, jsonRpcResult(VersionResult));
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get version");
@@ -13835,7 +14631,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getGenesisHash() {
-      const unsafeRes = await this._rpcRequest("getGenesisHash", []);
+      const unsafeRes = await this._rpcRequest("getGenesisHash", $Array.of());
       const res = create(unsafeRes, jsonRpcResult(string()));
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, "failed to get genesis hash");
@@ -13847,7 +14643,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(rawConfig);
-      const args = this._buildArgsAtLeastConfirmed([slot], commitment, undefined, config);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(slot), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getBlock", args);
       const res = create(unsafeRes, GetBlockRpcResult);
       if ("error" in res) {
@@ -13855,28 +14651,34 @@ var solanaWeb3 = $(function (exports) {
       }
       const result = res.result;
       if (!result) return result;
-      return {
-        ...result,
-        transactions: result.transactions.map($(({
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, result);
+        result.transactions = result.transactions.map($(({
           transaction: transaction,
           meta: meta,
           version: version
-        }) => ({
-          meta: meta,
-          transaction: {
-            ...transaction,
-            message: versionedMessageFromResponse(version, transaction.message)
-          },
-          version: version
-        })))
-      };
+        }) => $(function () {
+          let result = $Object.create(null, undefined);
+          result.meta = meta;
+          result.transaction = $(function () {
+            let result = $Object.create(null, undefined);
+            $Object.assign(result, transaction);
+            result.message = versionedMessageFromResponse(version, transaction.message);
+            return result;
+          })();
+          result.version = version;
+          return result;
+        })()));
+        return result;
+      })();
     }
     async getParsedBlock(slot, rawConfig) {
       const {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(rawConfig);
-      const args = this._buildArgsAtLeastConfirmed([slot], commitment, "jsonParsed", config);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(slot), commitment, "jsonParsed", config);
       const unsafeRes = await this._rpcRequest("getBlock", args);
       const res = create(unsafeRes, GetParsedBlockRpcResult);
       if ("error" in res) {
@@ -13889,7 +14691,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgs([], commitment, undefined, config);
+      const args = this._buildArgs($Array.of(), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getBlockHeight", args);
       const res = create(unsafeRes, jsonRpcResult(number()));
       if ("error" in res) {
@@ -13910,7 +14712,7 @@ var solanaWeb3 = $(function (exports) {
         commitment = c;
         extra = rest;
       }
-      const args = this._buildArgs([], commitment, "base64", extra);
+      const args = this._buildArgs($Array.of(), commitment, "base64", extra);
       const unsafeRes = await this._rpcRequest("getBlockProduction", args);
       const res = create(unsafeRes, BlockProductionResponseStruct);
       if ("error" in res) {
@@ -13923,7 +14725,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(rawConfig);
-      const args = this._buildArgsAtLeastConfirmed([signature], commitment, undefined, config);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, undefined, config);
       const unsafeRes = await this._rpcRequest("getTransaction", args);
       const res = create(unsafeRes, GetTransactionRpcResult);
       if ("error" in res) {
@@ -13931,20 +14733,24 @@ var solanaWeb3 = $(function (exports) {
       }
       const result = res.result;
       if (!result) return result;
-      return {
-        ...result,
-        transaction: {
-          ...result.transaction,
-          message: versionedMessageFromResponse(result.version, result.transaction.message)
-        }
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, result);
+        result.transaction = $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, result.transaction);
+          result.message = versionedMessageFromResponse(result.version, result.transaction.message);
+          return result;
+        })();
+        return result;
+      })();
     }
     async getParsedTransaction(signature, commitmentOrConfig) {
       const {
         commitment: commitment,
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
-      const args = this._buildArgsAtLeastConfirmed([signature], commitment, "jsonParsed", config);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, "jsonParsed", config);
       const unsafeRes = await this._rpcRequest("getTransaction", args);
       const res = create(unsafeRes, GetParsedTransactionRpcResult);
       if ("error" in res) {
@@ -13958,11 +14764,13 @@ var solanaWeb3 = $(function (exports) {
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
       const batch = signatures.map($(signature => {
-        const args = this._buildArgsAtLeastConfirmed([signature], commitment, "jsonParsed", config);
-        return {
-          methodName: "getTransaction",
-          args: args
-        };
+        const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, "jsonParsed", config);
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.methodName = "getTransaction";
+          result.args = args;
+          return result;
+        })();
       }));
       const unsafeRes = await this._rpcBatchRequest(batch);
       const res = unsafeRes.map($(unsafeRes => {
@@ -13980,11 +14788,13 @@ var solanaWeb3 = $(function (exports) {
         config: config
       } = extractCommitmentFromConfig(commitmentOrConfig);
       const batch = signatures.map($(signature => {
-        const args = this._buildArgsAtLeastConfirmed([signature], commitment, undefined, config);
-        return {
-          methodName: "getTransaction",
-          args: args
-        };
+        const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, undefined, config);
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.methodName = "getTransaction";
+          result.args = args;
+          return result;
+        })();
       }));
       const unsafeRes = await this._rpcBatchRequest(batch);
       const res = unsafeRes.map($(unsafeRes => {
@@ -13994,18 +14804,22 @@ var solanaWeb3 = $(function (exports) {
         }
         const result = res.result;
         if (!result) return result;
-        return {
-          ...result,
-          transaction: {
-            ...result.transaction,
-            message: versionedMessageFromResponse(result.version, result.transaction.message)
-          }
-        };
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, result);
+          result.transaction = $(function () {
+            let result = $Object.create(null, undefined);
+            $Object.assign(result, result.transaction);
+            result.message = versionedMessageFromResponse(result.version, result.transaction.message);
+            return result;
+          })();
+          return result;
+        })();
       }));
       return res;
     }
     async getConfirmedBlock(slot, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([slot], commitment);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(slot), commitment);
       const unsafeRes = await this._rpcRequest("getConfirmedBlock", args);
       const res = create(unsafeRes, GetConfirmedBlockRpcResult);
       if ("error" in res) {
@@ -14015,35 +14829,45 @@ var solanaWeb3 = $(function (exports) {
       if (!result) {
         throw new Error("Confirmed block " + slot + " not found");
       }
-      const block = {
-        ...result,
-        transactions: result.transactions.map($(({
+      const block = $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, result);
+        result.transactions = result.transactions.map($(({
           transaction: transaction,
           meta: meta
         }) => {
           const message = new Message(transaction.message);
-          return {
-            meta: meta,
-            transaction: {
-              ...transaction,
-              message: message
-            }
-          };
-        }))
-      };
-      return {
-        ...block,
-        transactions: block.transactions.map($(({
+          return $(function () {
+            let result = $Object.create(null, undefined);
+            result.meta = meta;
+            result.transaction = $(function () {
+              let result = $Object.create(null, undefined);
+              $Object.assign(result, transaction);
+              result.message = message;
+              return result;
+            })();
+            return result;
+          })();
+        }));
+        return result;
+      })();
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, block);
+        result.transactions = block.transactions.map($(({
           transaction: transaction,
           meta: meta
-        }) => ({
-          meta: meta,
-          transaction: Transaction.populate(transaction.message, transaction.signatures)
-        })))
-      };
+        }) => $(function () {
+          let result = $Object.create(null, undefined);
+          result.meta = meta;
+          result.transaction = Transaction.populate(transaction.message, transaction.signatures);
+          return result;
+        })()));
+        return result;
+      })();
     }
     async getBlocks(startSlot, endSlot, commitment) {
-      const args = this._buildArgsAtLeastConfirmed(endSlot !== undefined ? [startSlot, endSlot] : [startSlot], commitment);
+      const args = this._buildArgsAtLeastConfirmed(endSlot !== undefined ? $Array.of(startSlot, endSlot) : $Array.of(startSlot), commitment);
       const unsafeRes = await this._rpcRequest("getBlocks", args);
       const res = create(unsafeRes, jsonRpcResult(array(number())));
       if ("error" in res) {
@@ -14052,10 +14876,12 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getBlockSignatures(slot, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([slot], commitment, undefined, {
-        transactionDetails: "signatures",
-        rewards: false
-      });
+      const args = this._buildArgsAtLeastConfirmed($Array.of(slot), commitment, undefined, $(function () {
+        let result = $Object.create(null, undefined);
+        result.transactionDetails = "signatures";
+        result.rewards = false;
+        return result;
+      })());
       const unsafeRes = await this._rpcRequest("getBlock", args);
       const res = create(unsafeRes, GetBlockSignaturesRpcResult);
       if ("error" in res) {
@@ -14068,10 +14894,12 @@ var solanaWeb3 = $(function (exports) {
       return result;
     }
     async getConfirmedBlockSignatures(slot, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([slot], commitment, undefined, {
-        transactionDetails: "signatures",
-        rewards: false
-      });
+      const args = this._buildArgsAtLeastConfirmed($Array.of(slot), commitment, undefined, $(function () {
+        let result = $Object.create(null, undefined);
+        result.transactionDetails = "signatures";
+        result.rewards = false;
+        return result;
+      })());
       const unsafeRes = await this._rpcRequest("getConfirmedBlock", args);
       const res = create(unsafeRes, GetBlockSignaturesRpcResult);
       if ("error" in res) {
@@ -14084,7 +14912,7 @@ var solanaWeb3 = $(function (exports) {
       return result;
     }
     async getConfirmedTransaction(signature, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([signature], commitment);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment);
       const unsafeRes = await this._rpcRequest("getConfirmedTransaction", args);
       const res = create(unsafeRes, GetTransactionRpcResult);
       if ("error" in res) {
@@ -14094,13 +14922,15 @@ var solanaWeb3 = $(function (exports) {
       if (!result) return result;
       const message = new Message(result.transaction.message);
       const signatures = result.transaction.signatures;
-      return {
-        ...result,
-        transaction: Transaction.populate(message, signatures)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, result);
+        result.transaction = Transaction.populate(message, signatures);
+        return result;
+      })();
     }
     async getParsedConfirmedTransaction(signature, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([signature], commitment, "jsonParsed");
+      const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, "jsonParsed");
       const unsafeRes = await this._rpcRequest("getConfirmedTransaction", args);
       const res = create(unsafeRes, GetParsedTransactionRpcResult);
       if ("error" in res) {
@@ -14110,11 +14940,13 @@ var solanaWeb3 = $(function (exports) {
     }
     async getParsedConfirmedTransactions(signatures, commitment) {
       const batch = signatures.map($(signature => {
-        const args = this._buildArgsAtLeastConfirmed([signature], commitment, "jsonParsed");
-        return {
-          methodName: "getConfirmedTransaction",
-          args: args
-        };
+        const args = this._buildArgsAtLeastConfirmed($Array.of(signature), commitment, "jsonParsed");
+        return $(function () {
+          let result = $Object.create(null, undefined);
+          result.methodName = "getConfirmedTransaction";
+          result.args = args;
+          return result;
+        })();
       }));
       const unsafeRes = await this._rpcBatchRequest(batch);
       const res = unsafeRes.map($(unsafeRes => {
@@ -14127,7 +14959,7 @@ var solanaWeb3 = $(function (exports) {
       return res;
     }
     async getConfirmedSignaturesForAddress(address, startSlot, endSlot) {
-      let options = {};
+      let options = $Object.create(null, undefined);
       let firstAvailableBlock = await this.getFirstAvailableBlock();
       while (!("until" in options)) {
         startSlot--;
@@ -14170,7 +15002,7 @@ var solanaWeb3 = $(function (exports) {
       return confirmedSignatureInfo.map($(info => info.signature));
     }
     async getConfirmedSignaturesForAddress2(address, options, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([address.toBase58()], commitment, undefined, options);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(address.toBase58()), commitment, undefined, options);
       const unsafeRes = await this._rpcRequest("getConfirmedSignaturesForAddress2", args);
       const res = create(unsafeRes, GetConfirmedSignaturesForAddress2RpcResult);
       if ("error" in res) {
@@ -14179,7 +15011,7 @@ var solanaWeb3 = $(function (exports) {
       return res.result;
     }
     async getSignaturesForAddress(address, options, commitment) {
-      const args = this._buildArgsAtLeastConfirmed([address.toBase58()], commitment, undefined, options);
+      const args = this._buildArgsAtLeastConfirmed($Array.of(address.toBase58()), commitment, undefined, options);
       const unsafeRes = await this._rpcRequest("getSignaturesForAddress", args);
       const res = create(unsafeRes, GetSignaturesForAddressRpcResult);
       if ("error" in res) {
@@ -14194,15 +15026,19 @@ var solanaWeb3 = $(function (exports) {
       } = await this.getAccountInfoAndContext(accountKey, config);
       let value = null;
       if (accountInfo !== null) {
-        value = new AddressLookupTableAccount({
-          key: accountKey,
-          state: AddressLookupTableAccount.deserialize(accountInfo.data)
-        });
+        value = new AddressLookupTableAccount($(function () {
+          let result = $Object.create(null, undefined);
+          result.key = accountKey;
+          result.state = AddressLookupTableAccount.deserialize(accountInfo.data);
+          return result;
+        })());
       }
-      return {
-        context: context,
-        value: value
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.context = context;
+        result.value = value;
+        return result;
+      })();
     }
     async getNonceAndContext(nonceAccount, commitment) {
       const {
@@ -14213,10 +15049,12 @@ var solanaWeb3 = $(function (exports) {
       if (accountInfo !== null) {
         value = NonceAccount.fromAccountData(accountInfo.data);
       }
-      return {
-        context: context,
-        value: value
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.context = context;
+        result.value = value;
+        return result;
+      })();
     }
     async getNonce(nonceAccount, commitment) {
       return await this.getNonceAndContext(nonceAccount, commitment).then($(x => x.value)).catch($(e => {
@@ -14224,7 +15062,7 @@ var solanaWeb3 = $(function (exports) {
       }));
     }
     async requestAirdrop(to, lamports) {
-      const unsafeRes = await this._rpcRequest("requestAirdrop", [to.toBase58(), lamports]);
+      const unsafeRes = await this._rpcRequest("requestAirdrop", $Array.of(to.toBase58(), lamports));
       const res = create(unsafeRes, RequestAirdropRpcResult);
       if ("error" in res) {
         throw new SolanaJSONRPCError(res.error, `airdrop to ${to.toBase58()} failed`);
@@ -14253,12 +15091,14 @@ var solanaWeb3 = $(function (exports) {
         for (let i = 0; i < 50; i++) {
           const latestBlockhash = await this.getLatestBlockhash("finalized");
           if (cachedBlockhash !== latestBlockhash.blockhash) {
-            this._blockhashInfo = {
-              latestBlockhash: latestBlockhash,
-              lastFetch: Date.now(),
-              transactionSignatures: [],
-              simulatedSignatures: []
-            };
+            this._blockhashInfo = $(function () {
+              let result = $Object.create(null, undefined);
+              result.latestBlockhash = latestBlockhash;
+              result.lastFetch = Date.now();
+              result.transactionSignatures = $Array.of();
+              result.simulatedSignatures = $Array.of();
+              return result;
+            })();
             return latestBlockhash;
           }
           await sleep(MS_PER_SLOT / 2);
@@ -14273,7 +15113,7 @@ var solanaWeb3 = $(function (exports) {
         commitment: commitment,
         config: configArg
       } = extractCommitmentFromConfig(config);
-      const args = this._buildArgs([], commitment, "base64", configArg);
+      const args = this._buildArgs($Array.of(), commitment, "base64", configArg);
       const unsafeRes = await this._rpcRequest("getStakeMinimumDelegation", args);
       const res = create(unsafeRes, jsonRpcResultAndContext(number()));
       if ("error" in res) {
@@ -14286,15 +15126,15 @@ var solanaWeb3 = $(function (exports) {
         const versionedTx = transactionOrMessage;
         const wireTransaction = versionedTx.serialize();
         const encodedTransaction = buffer.Buffer.from(wireTransaction).toString("base64");
-        if (Array.isArray(configOrSigners) || includeAccounts !== undefined) {
+        if ($Array.isArray(configOrSigners) || includeAccounts !== undefined) {
           throw new Error("Invalid arguments");
         }
-        const config = configOrSigners || {};
+        const config = configOrSigners || $Object.create(null, undefined);
         config.encoding = "base64";
         if (!("commitment" in config)) {
           config.commitment = this.commitment;
         }
-        const args = [encodedTransaction, config];
+        const args = $Array.of(encodedTransaction, config);
         const unsafeRes = await this._rpcRequest("simulateTransaction", args);
         const res = create(unsafeRes, SimulatedTransactionResponseStruct);
         if ("error" in res) {
@@ -14314,7 +15154,7 @@ var solanaWeb3 = $(function (exports) {
         transaction = Transaction.populate(transactionOrMessage);
         transaction._message = transaction._json = undefined;
       }
-      if (configOrSigners !== undefined && !Array.isArray(configOrSigners)) {
+      if (configOrSigners !== undefined && !$Array.isArray(configOrSigners)) {
         throw new Error("Invalid arguments");
       }
       const signers = configOrSigners;
@@ -14344,28 +15184,32 @@ var solanaWeb3 = $(function (exports) {
       const signData = message.serialize();
       const wireTransaction = transaction._serialize(signData);
       const encodedTransaction = wireTransaction.toString("base64");
-      const config = {
-        encoding: "base64",
-        commitment: this.commitment
-      };
+      const config = $(function () {
+        let result = $Object.create(null, undefined);
+        result.encoding = "base64";
+        result.commitment = this.commitment;
+        return result;
+      }).bind(this)();
       if (includeAccounts) {
-        const addresses = (Array.isArray(includeAccounts) ? includeAccounts : message.nonProgramIds()).map($(key => key.toBase58()));
-        config["accounts"] = {
-          encoding: "base64",
-          addresses: addresses
-        };
+        const addresses = ($Array.isArray(includeAccounts) ? includeAccounts : message.nonProgramIds()).map($(key => key.toBase58()));
+        config["accounts"] = $(function () {
+          let result = $Object.create(null, undefined);
+          result.encoding = "base64";
+          result.addresses = addresses;
+          return result;
+        })();
       }
       if (signers) {
         config.sigVerify = true;
       }
-      const args = [encodedTransaction, config];
+      const args = $Array.of(encodedTransaction, config);
       const unsafeRes = await this._rpcRequest("simulateTransaction", args);
       const res = create(unsafeRes, SimulatedTransactionResponseStruct);
       if ("error" in res) {
         let logs;
         if ("data" in res.error) {
           logs = res.error.data.logs;
-          if (logs && Array.isArray(logs)) {
+          if (logs && $Array.isArray(logs)) {
             const traceIndent = "\n    ";
             const logTrace = traceIndent + logs.join(traceIndent);
             console.error(res.error.message, logTrace);
@@ -14377,13 +15221,13 @@ var solanaWeb3 = $(function (exports) {
     }
     async sendTransaction(transaction, signersOrOptions, options) {
       if ("version" in transaction) {
-        if (signersOrOptions && Array.isArray(signersOrOptions)) {
+        if (signersOrOptions && $Array.isArray(signersOrOptions)) {
           throw new Error("Invalid arguments");
         }
         const wireTransaction = transaction.serialize();
         return await this.sendRawTransaction(wireTransaction, options);
       }
-      if (signersOrOptions === undefined || !Array.isArray(signersOrOptions)) {
+      if (signersOrOptions === undefined || !$Array.isArray(signersOrOptions)) {
         throw new Error("Invalid arguments");
       }
       const signers = signersOrOptions;
@@ -14417,9 +15261,11 @@ var solanaWeb3 = $(function (exports) {
       return result;
     }
     async sendEncodedTransaction(encodedTransaction, options) {
-      const config = {
-        encoding: "base64"
-      };
+      const config = $(function () {
+        let result = $Object.create(null, undefined);
+        result.encoding = "base64";
+        return result;
+      })();
       const skipPreflight = options && options.skipPreflight;
       const preflightCommitment = options && options.preflightCommitment || this.commitment;
       if (options && options.maxRetries != null) {
@@ -14434,7 +15280,7 @@ var solanaWeb3 = $(function (exports) {
       if (preflightCommitment) {
         config.preflightCommitment = preflightCommitment;
       }
-      const args = [encodedTransaction, config];
+      const args = $Array.of(encodedTransaction, config);
       const unsafeRes = await this._rpcRequest("sendTransaction", args);
       const res = create(unsafeRes, SendTransactionRpcResult);
       if ("error" in res) {
@@ -14472,12 +15318,14 @@ var solanaWeb3 = $(function (exports) {
         this._updateSubscriptions();
         return;
       }
-      this._subscriptionCallbacksByServerSubscriptionId = {};
+      this._subscriptionCallbacksByServerSubscriptionId = $Object.create(null, undefined);
       $Object.entries(this._subscriptionsByHash).forEach($(([hash, subscription]) => {
-        this._subscriptionsByHash[hash] = {
-          ...subscription,
-          state: "pending"
-        };
+        this._subscriptionsByHash[hash] = $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, subscription);
+          result.state = "pending";
+          return result;
+        })();
       }));
     }
     async _updateSubscriptions() {
@@ -14531,16 +15379,20 @@ var solanaWeb3 = $(function (exports) {
                 method: method
               } = subscription;
               try {
-                this._subscriptionsByHash[hash] = {
-                  ...subscription,
-                  state: "subscribing"
-                };
+                this._subscriptionsByHash[hash] = $(function () {
+                  let result = $Object.create(null, undefined);
+                  $Object.assign(result, subscription);
+                  result.state = "subscribing";
+                  return result;
+                })();
                 const serverSubscriptionId = await this._rpcWebSocket.call(method, args);
-                this._subscriptionsByHash[hash] = {
-                  ...subscription,
-                  serverSubscriptionId: serverSubscriptionId,
-                  state: "subscribed"
-                };
+                this._subscriptionsByHash[hash] = $(function () {
+                  let result = $Object.create(null, undefined);
+                  $Object.assign(result, subscription);
+                  result.serverSubscriptionId = serverSubscriptionId;
+                  result.state = "subscribed";
+                  return result;
+                })();
                 this._subscriptionCallbacksByServerSubscriptionId[serverSubscriptionId] = subscription.callbacks;
                 await this._updateSubscriptions();
               } catch (e) {
@@ -14550,10 +15402,12 @@ var solanaWeb3 = $(function (exports) {
                 if (!isCurrentConnectionStillActive()) {
                   return;
                 }
-                this._subscriptionsByHash[hash] = {
-                  ...subscription,
-                  state: "pending"
-                };
+                this._subscriptionsByHash[hash] = $(function () {
+                  let result = $Object.create(null, undefined);
+                  $Object.assign(result, subscription);
+                  result.state = "pending";
+                  return result;
+                })();
                 await this._updateSubscriptions();
               }
             })();
@@ -14568,12 +15422,14 @@ var solanaWeb3 = $(function (exports) {
                 if (this._subscriptionsAutoDisposedByRpc.has(serverSubscriptionId)) {
                   this._subscriptionsAutoDisposedByRpc.delete(serverSubscriptionId);
                 } else {
-                  this._subscriptionsByHash[hash] = {
-                    ...subscription,
-                    state: "unsubscribing"
-                  };
+                  this._subscriptionsByHash[hash] = $(function () {
+                    let result = $Object.create(null, undefined);
+                    $Object.assign(result, subscription);
+                    result.state = "unsubscribing";
+                    return result;
+                  })();
                   try {
-                    await this._rpcWebSocket.call(unsubscribeMethod, [serverSubscriptionId]);
+                    await this._rpcWebSocket.call(unsubscribeMethod, $Array.of(serverSubscriptionId));
                   } catch (e) {
                     if (e instanceof Error) {
                       console.error(`${unsubscribeMethod} error:`, e.message);
@@ -14581,18 +15437,22 @@ var solanaWeb3 = $(function (exports) {
                     if (!isCurrentConnectionStillActive()) {
                       return;
                     }
-                    this._subscriptionsByHash[hash] = {
-                      ...subscription,
-                      state: "subscribed"
-                    };
+                    this._subscriptionsByHash[hash] = $(function () {
+                      let result = $Object.create(null, undefined);
+                      $Object.assign(result, subscription);
+                      result.state = "subscribed";
+                      return result;
+                    })();
                     await this._updateSubscriptions();
                     return;
                   }
                 }
-                this._subscriptionsByHash[hash] = {
-                  ...subscription,
-                  state: "unsubscribed"
-                };
+                this._subscriptionsByHash[hash] = $(function () {
+                  let result = $Object.create(null, undefined);
+                  $Object.assign(result, subscription);
+                  result.state = "unsubscribed";
+                  return result;
+                })();
                 await this._updateSubscriptions();
               })();
             }
@@ -14618,19 +15478,21 @@ var solanaWeb3 = $(function (exports) {
         result: result,
         subscription: subscription
       } = create(notification, AccountNotificationResult);
-      this._handleServerNotification(subscription, [result.value, result.context]);
+      this._handleServerNotification(subscription, $Array.of(result.value, result.context));
     }
     _makeSubscription(subscriptionConfig, args) {
       const clientSubscriptionId = this._nextClientSubscriptionId++;
-      const hash = fastStableStringify$1([subscriptionConfig.method, args], true);
+      const hash = fastStableStringify$1($Array.of(subscriptionConfig.method, args), true);
       const existingSubscription = this._subscriptionsByHash[hash];
       if (existingSubscription === undefined) {
-        this._subscriptionsByHash[hash] = {
-          ...subscriptionConfig,
-          args: args,
-          callbacks: new Set([subscriptionConfig.callback]),
-          state: "pending"
-        };
+        this._subscriptionsByHash[hash] = $(function () {
+          let result = $Object.create(null, undefined);
+          $Object.assign(result, subscriptionConfig);
+          result.args = args;
+          result.callbacks = new Set($Array.of(subscriptionConfig.callback));
+          result.state = "pending";
+          return result;
+        })();
       } else {
         existingSubscription.callbacks.add(subscriptionConfig.callback);
       }
@@ -14645,12 +15507,14 @@ var solanaWeb3 = $(function (exports) {
       return clientSubscriptionId;
     }
     onAccountChange(publicKey, callback, commitment) {
-      const args = this._buildArgs([publicKey.toBase58()], commitment || this._commitment || "finalized", "base64");
-      return this._makeSubscription({
-        callback: callback,
-        method: "accountSubscribe",
-        unsubscribeMethod: "accountUnsubscribe"
-      }, args);
+      const args = this._buildArgs($Array.of(publicKey.toBase58()), commitment || this._commitment || "finalized", "base64");
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "accountSubscribe";
+        result.unsubscribeMethod = "accountUnsubscribe";
+        return result;
+      })(), args);
     }
     async removeAccountChangeListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "account change");
@@ -14660,33 +15524,43 @@ var solanaWeb3 = $(function (exports) {
         result: result,
         subscription: subscription
       } = create(notification, ProgramAccountNotificationResult);
-      this._handleServerNotification(subscription, [{
-        accountId: result.value.pubkey,
-        accountInfo: result.value.account
-      }, result.context]);
+      this._handleServerNotification(subscription, $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.accountId = result.value.pubkey;
+        result.accountInfo = result.value.account;
+        return result;
+      })(), result.context));
     }
     onProgramAccountChange(programId, callback, commitment, filters) {
-      const args = this._buildArgs([programId.toBase58()], commitment || this._commitment || "finalized", "base64", filters ? {
-        filters: filters
-      } : undefined);
-      return this._makeSubscription({
-        callback: callback,
-        method: "programSubscribe",
-        unsubscribeMethod: "programUnsubscribe"
-      }, args);
+      const args = this._buildArgs($Array.of(programId.toBase58()), commitment || this._commitment || "finalized", "base64", filters ? $(function () {
+        let result = $Object.create(null, undefined);
+        result.filters = filters;
+        return result;
+      })() : undefined);
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "programSubscribe";
+        result.unsubscribeMethod = "programUnsubscribe";
+        return result;
+      })(), args);
     }
     async removeProgramAccountChangeListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "program account change");
     }
     onLogs(filter, callback, commitment) {
-      const args = this._buildArgs([typeof filter === "object" ? {
-        mentions: [filter.toString()]
-      } : filter], commitment || this._commitment || "finalized");
-      return this._makeSubscription({
-        callback: callback,
-        method: "logsSubscribe",
-        unsubscribeMethod: "logsUnsubscribe"
-      }, args);
+      const args = this._buildArgs($Array.of(typeof filter === "object" ? $(function () {
+        let result = $Object.create(null, undefined);
+        result.mentions = $Array.of(filter.toString());
+        return result;
+      })() : filter), commitment || this._commitment || "finalized");
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "logsSubscribe";
+        result.unsubscribeMethod = "logsUnsubscribe";
+        return result;
+      })(), args);
     }
     async removeOnLogsListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "logs");
@@ -14696,21 +15570,23 @@ var solanaWeb3 = $(function (exports) {
         result: result,
         subscription: subscription
       } = create(notification, LogsNotificationResult);
-      this._handleServerNotification(subscription, [result.value, result.context]);
+      this._handleServerNotification(subscription, $Array.of(result.value, result.context));
     }
     _wsOnSlotNotification(notification) {
       const {
         result: result,
         subscription: subscription
       } = create(notification, SlotNotificationResult);
-      this._handleServerNotification(subscription, [result]);
+      this._handleServerNotification(subscription, $Array.of(result));
     }
     onSlotChange(callback) {
-      return this._makeSubscription({
-        callback: callback,
-        method: "slotSubscribe",
-        unsubscribeMethod: "slotUnsubscribe"
-      }, []);
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "slotSubscribe";
+        result.unsubscribeMethod = "slotUnsubscribe";
+        return result;
+      })(), $Array.of());
     }
     async removeSlotChangeListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "slot change");
@@ -14720,14 +15596,16 @@ var solanaWeb3 = $(function (exports) {
         result: result,
         subscription: subscription
       } = create(notification, SlotUpdateNotificationResult);
-      this._handleServerNotification(subscription, [result]);
+      this._handleServerNotification(subscription, $Array.of(result));
     }
     onSlotUpdate(callback) {
-      return this._makeSubscription({
-        callback: callback,
-        method: "slotsUpdatesSubscribe",
-        unsubscribeMethod: "slotsUpdatesUnsubscribe"
-      }, []);
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "slotsUpdatesSubscribe";
+        result.unsubscribeMethod = "slotsUpdatesUnsubscribe";
+        return result;
+      })(), $Array.of());
     }
     async removeSlotUpdateListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "slot update");
@@ -14743,7 +15621,7 @@ var solanaWeb3 = $(function (exports) {
     _buildArgs(args, override, encoding, extra) {
       const commitment = override || this._commitment;
       if (commitment || encoding || extra) {
-        let options = {};
+        let options = $Object.create(null, undefined);
         if (encoding) {
           options.encoding = encoding;
         }
@@ -14759,7 +15637,7 @@ var solanaWeb3 = $(function (exports) {
     }
     _buildArgsAtLeastConfirmed(args, override, encoding, extra) {
       const commitment = override || this._commitment;
-      if (commitment && !["confirmed", "finalized"].includes(commitment)) {
+      if (commitment && !$Array.of("confirmed", "finalized").includes(commitment)) {
         throw new Error("Using Connection with default commitment: `" + this._commitment + "`, but method requires at least `confirmed`");
       }
       return this._buildArgs(args, override, encoding, extra);
@@ -14772,48 +15650,58 @@ var solanaWeb3 = $(function (exports) {
       if (result.value !== "receivedSignature") {
         this._subscriptionsAutoDisposedByRpc.add(subscription);
       }
-      this._handleServerNotification(subscription, result.value === "receivedSignature" ? [{
-        type: "received"
-      }, result.context] : [{
-        type: "status",
-        result: result.value
-      }, result.context]);
+      this._handleServerNotification(subscription, result.value === "receivedSignature" ? $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.type = "received";
+        return result;
+      })(), result.context) : $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.type = "status";
+        result.result = result.value;
+        return result;
+      })(), result.context));
     }
     onSignature(signature, callback, commitment) {
-      const args = this._buildArgs([signature], commitment || this._commitment || "finalized");
-      const clientSubscriptionId = this._makeSubscription({
-        callback: $((notification, context) => {
+      const args = this._buildArgs($Array.of(signature), commitment || this._commitment || "finalized");
+      const clientSubscriptionId = this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = $((notification, context) => {
           if (notification.type === "status") {
             callback(notification.result, context);
             try {
               this.removeSignatureListener(clientSubscriptionId);
             } catch (_err) {}
           }
-        }),
-        method: "signatureSubscribe",
-        unsubscribeMethod: "signatureUnsubscribe"
-      }, args);
+        });
+        result.method = "signatureSubscribe";
+        result.unsubscribeMethod = "signatureUnsubscribe";
+        return result;
+      }).bind(this)(), args);
       return clientSubscriptionId;
     }
     onSignatureWithOptions(signature, callback, options) {
       const {
         commitment: commitment,
         ...extra
-      } = {
-        ...options,
-        commitment: options && options.commitment || this._commitment || "finalized"
-      };
-      const args = this._buildArgs([signature], commitment, undefined, extra);
-      const clientSubscriptionId = this._makeSubscription({
-        callback: $((notification, context) => {
+      } = $(function () {
+        let result = $Object.create(null, undefined);
+        $Object.assign(result, options);
+        result.commitment = options && options.commitment || this._commitment || "finalized";
+        return result;
+      }).bind(this)();
+      const args = this._buildArgs($Array.of(signature), commitment, undefined, extra);
+      const clientSubscriptionId = this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = $((notification, context) => {
           callback(notification, context);
           try {
             this.removeSignatureListener(clientSubscriptionId);
           } catch (_err) {}
-        }),
-        method: "signatureSubscribe",
-        unsubscribeMethod: "signatureUnsubscribe"
-      }, args);
+        });
+        result.method = "signatureSubscribe";
+        result.unsubscribeMethod = "signatureUnsubscribe";
+        return result;
+      }).bind(this)(), args);
       return clientSubscriptionId;
     }
     async removeSignatureListener(clientSubscriptionId) {
@@ -14824,14 +15712,16 @@ var solanaWeb3 = $(function (exports) {
         result: result,
         subscription: subscription
       } = create(notification, RootNotificationResult);
-      this._handleServerNotification(subscription, [result]);
+      this._handleServerNotification(subscription, $Array.of(result));
     }
     onRootChange(callback) {
-      return this._makeSubscription({
-        callback: callback,
-        method: "rootSubscribe",
-        unsubscribeMethod: "rootUnsubscribe"
-      }, []);
+      return this._makeSubscription($(function () {
+        let result = $Object.create(null, undefined);
+        result.callback = callback;
+        result.method = "rootSubscribe";
+        result.unsubscribeMethod = "rootUnsubscribe";
+        return result;
+      })(), $Array.of());
     }
     async removeRootChangeListener(clientSubscriptionId) {
       await this._unsubscribeClientSubscription(clientSubscriptionId, "root change");
@@ -14859,20 +15749,24 @@ var solanaWeb3 = $(function (exports) {
           }
         }
       }
-      return new Keypair({
-        publicKey: publicKey,
-        secretKey: secretKey
-      });
+      return new Keypair($(function () {
+        let result = $Object.create(null, undefined);
+        result.publicKey = publicKey;
+        result.secretKey = secretKey;
+        return result;
+      })());
     }
     static fromSeed(seed) {
       const publicKey = getPublicKey$1(seed);
       const secretKey = new Uint8Array(64);
       secretKey.set(seed);
       secretKey.set(publicKey, 32);
-      return new Keypair({
-        publicKey: publicKey,
-        secretKey: secretKey
-      });
+      return new Keypair($(function () {
+        let result = $Object.create(null, undefined);
+        result.publicKey = publicKey;
+        result.secretKey = secretKey;
+        return result;
+      })());
     }
     get publicKey() {
       return new PublicKey(this._keypair.publicKey);
@@ -14881,28 +15775,40 @@ var solanaWeb3 = $(function (exports) {
       return new Uint8Array(this._keypair.secretKey);
     }
   }
-  const LOOKUP_TABLE_INSTRUCTION_LAYOUTS = $Object.freeze({
-    CreateLookupTable: {
-      index: 0,
-      layout: struct([u32("instruction"), u64("recentSlot"), u8("bumpSeed")])
-    },
-    FreezeLookupTable: {
-      index: 1,
-      layout: struct([u32("instruction")])
-    },
-    ExtendLookupTable: {
-      index: 2,
-      layout: struct([u32("instruction"), u64(), seq(publicKey(), offset(u32(), -8), "addresses")])
-    },
-    DeactivateLookupTable: {
-      index: 3,
-      layout: struct([u32("instruction")])
-    },
-    CloseLookupTable: {
-      index: 4,
-      layout: struct([u32("instruction")])
-    }
-  });
+  const LOOKUP_TABLE_INSTRUCTION_LAYOUTS = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.CreateLookupTable = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      result.layout = struct($Array.of(u32("instruction"), u64("recentSlot"), u8("bumpSeed")));
+      return result;
+    })();
+    result.FreezeLookupTable = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.ExtendLookupTable = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 2;
+      result.layout = struct($Array.of(u32("instruction"), u64(), seq(publicKey(), offset(u32(), -8), "addresses")));
+      return result;
+    })();
+    result.DeactivateLookupTable = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 3;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.CloseLookupTable = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 4;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    return result;
+  })());
   class AddressLookupTableInstruction {
     constructor() {}
     static decodeInstructionType(instruction) {
@@ -14927,11 +15833,13 @@ var solanaWeb3 = $(function (exports) {
       const {
         recentSlot: recentSlot
       } = decodeData$1(LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CreateLookupTable, instruction.data);
-      return {
-        authority: instruction.keys[1].pubkey,
-        payer: instruction.keys[2].pubkey,
-        recentSlot: Number(recentSlot)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.authority = instruction.keys[1].pubkey;
+        result.payer = instruction.keys[2].pubkey;
+        result.recentSlot = Number(recentSlot);
+        return result;
+      })();
     }
     static decodeExtendLookupTable(instruction) {
       this.checkProgramId(instruction.programId);
@@ -14941,37 +15849,45 @@ var solanaWeb3 = $(function (exports) {
       const {
         addresses: addresses
       } = decodeData$1(LOOKUP_TABLE_INSTRUCTION_LAYOUTS.ExtendLookupTable, instruction.data);
-      return {
-        lookupTable: instruction.keys[0].pubkey,
-        authority: instruction.keys[1].pubkey,
-        payer: instruction.keys.length > 2 ? instruction.keys[2].pubkey : undefined,
-        addresses: addresses.map($(buffer => new PublicKey(buffer)))
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.lookupTable = instruction.keys[0].pubkey;
+        result.authority = instruction.keys[1].pubkey;
+        result.payer = instruction.keys.length > 2 ? instruction.keys[2].pubkey : undefined;
+        result.addresses = addresses.map($(buffer => new PublicKey(buffer)));
+        return result;
+      })();
     }
     static decodeCloseLookupTable(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeysLength(instruction.keys, 3);
-      return {
-        lookupTable: instruction.keys[0].pubkey,
-        authority: instruction.keys[1].pubkey,
-        recipient: instruction.keys[2].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.lookupTable = instruction.keys[0].pubkey;
+        result.authority = instruction.keys[1].pubkey;
+        result.recipient = instruction.keys[2].pubkey;
+        return result;
+      })();
     }
     static decodeFreezeLookupTable(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeysLength(instruction.keys, 2);
-      return {
-        lookupTable: instruction.keys[0].pubkey,
-        authority: instruction.keys[1].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.lookupTable = instruction.keys[0].pubkey;
+        result.authority = instruction.keys[1].pubkey;
+        return result;
+      })();
     }
     static decodeDeactivateLookupTable(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeysLength(instruction.keys, 2);
-      return {
-        lookupTable: instruction.keys[0].pubkey,
-        authority: instruction.keys[1].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.lookupTable = instruction.keys[0].pubkey;
+        result.authority = instruction.keys[1].pubkey;
+        return result;
+      })();
     }
     static checkProgramId(programId) {
       if (!programId.equals(AddressLookupTableProgram.programId)) {
@@ -14987,123 +15903,167 @@ var solanaWeb3 = $(function (exports) {
   class AddressLookupTableProgram {
     constructor() {}
     static createLookupTable(params) {
-      const [lookupTableAddress, bumpSeed] = PublicKey.findProgramAddressSync([params.authority.toBuffer(), toBufferLE_1(BigInt(params.recentSlot), 8)], this.programId);
+      const [lookupTableAddress, bumpSeed] = PublicKey.findProgramAddressSync($Array.of(params.authority.toBuffer(), toBufferLE_1(BigInt(params.recentSlot), 8)), this.programId);
       const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CreateLookupTable;
-      const data = encodeData(type, {
-        recentSlot: BigInt(params.recentSlot),
-        bumpSeed: bumpSeed
-      });
-      const keys = [{
-        pubkey: lookupTableAddress,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: params.authority,
-        isSigner: true,
-        isWritable: false
-      }, {
-        pubkey: params.payer,
-        isSigner: true,
-        isWritable: true
-      }, {
-        pubkey: SystemProgram.programId,
-        isSigner: false,
-        isWritable: false
-      }];
-      return [new TransactionInstruction({
-        programId: this.programId,
-        keys: keys,
-        data: data
-      }), lookupTableAddress];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.recentSlot = BigInt(params.recentSlot);
+        result.bumpSeed = bumpSeed;
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = lookupTableAddress;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.authority;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.payer;
+        result.isSigner = true;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SystemProgram.programId;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })());
+      return $Array.of(new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.programId = this.programId;
+        result.keys = keys;
+        result.data = data;
+        return result;
+      }).bind(this)()), lookupTableAddress);
     }
     static freezeLookupTable(params) {
       const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.FreezeLookupTable;
       const data = encodeData(type);
-      const keys = [{
-        pubkey: params.lookupTable,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: params.authority,
-        isSigner: true,
-        isWritable: false
-      }];
-      return new TransactionInstruction({
-        programId: this.programId,
-        keys: keys,
-        data: data
-      });
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.lookupTable;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.authority;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.programId = this.programId;
+        result.keys = keys;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static extendLookupTable(params) {
       const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.ExtendLookupTable;
-      const data = encodeData(type, {
-        addresses: params.addresses.map($(addr => addr.toBytes()))
-      });
-      const keys = [{
-        pubkey: params.lookupTable,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: params.authority,
-        isSigner: true,
-        isWritable: false
-      }];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.addresses = params.addresses.map($(addr => addr.toBytes()));
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.lookupTable;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.authority;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
       if (params.payer) {
-        keys.push({
-          pubkey: params.payer,
-          isSigner: true,
-          isWritable: true
-        }, {
-          pubkey: SystemProgram.programId,
-          isSigner: false,
-          isWritable: false
-        });
+        keys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = params.payer;
+          result.isSigner = true;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SystemProgram.programId;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
       }
-      return new TransactionInstruction({
-        programId: this.programId,
-        keys: keys,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.programId = this.programId;
+        result.keys = keys;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static deactivateLookupTable(params) {
       const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.DeactivateLookupTable;
       const data = encodeData(type);
-      const keys = [{
-        pubkey: params.lookupTable,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: params.authority,
-        isSigner: true,
-        isWritable: false
-      }];
-      return new TransactionInstruction({
-        programId: this.programId,
-        keys: keys,
-        data: data
-      });
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.lookupTable;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.authority;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.programId = this.programId;
+        result.keys = keys;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static closeLookupTable(params) {
       const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CloseLookupTable;
       const data = encodeData(type);
-      const keys = [{
-        pubkey: params.lookupTable,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: params.authority,
-        isSigner: true,
-        isWritable: false
-      }, {
-        pubkey: params.recipient,
-        isSigner: false,
-        isWritable: true
-      }];
-      return new TransactionInstruction({
-        programId: this.programId,
-        keys: keys,
-        data: data
-      });
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.lookupTable;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.authority;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = params.recipient;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.programId = this.programId;
+        result.keys = keys;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
   }
   AddressLookupTableProgram.programId = new PublicKey("AddressLookupTab1e1111111111111111111111111");
@@ -15131,37 +16091,45 @@ var solanaWeb3 = $(function (exports) {
         units: units,
         additionalFee: additionalFee
       } = decodeData$1(COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestUnits, instruction.data);
-      return {
-        units: units,
-        additionalFee: additionalFee
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.units = units;
+        result.additionalFee = additionalFee;
+        return result;
+      })();
     }
     static decodeRequestHeapFrame(instruction) {
       this.checkProgramId(instruction.programId);
       const {
         bytes: bytes
       } = decodeData$1(COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestHeapFrame, instruction.data);
-      return {
-        bytes: bytes
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.bytes = bytes;
+        return result;
+      })();
     }
     static decodeSetComputeUnitLimit(instruction) {
       this.checkProgramId(instruction.programId);
       const {
         units: units
       } = decodeData$1(COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.SetComputeUnitLimit, instruction.data);
-      return {
-        units: units
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.units = units;
+        return result;
+      })();
     }
     static decodeSetComputeUnitPrice(instruction) {
       this.checkProgramId(instruction.programId);
       const {
         microLamports: microLamports
       } = decodeData$1(COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.SetComputeUnitPrice, instruction.data);
-      return {
-        microLamports: microLamports
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.microLamports = microLamports;
+        return result;
+      })();
     }
     static checkProgramId(programId) {
       if (!programId.equals(ComputeBudgetProgram.programId)) {
@@ -15169,70 +16137,90 @@ var solanaWeb3 = $(function (exports) {
       }
     }
   }
-  const COMPUTE_BUDGET_INSTRUCTION_LAYOUTS = $Object.freeze({
-    RequestUnits: {
-      index: 0,
-      layout: struct([u8("instruction"), u32("units"), u32("additionalFee")])
-    },
-    RequestHeapFrame: {
-      index: 1,
-      layout: struct([u8("instruction"), u32("bytes")])
-    },
-    SetComputeUnitLimit: {
-      index: 2,
-      layout: struct([u8("instruction"), u32("units")])
-    },
-    SetComputeUnitPrice: {
-      index: 3,
-      layout: struct([u8("instruction"), u64("microLamports")])
-    }
-  });
+  const COMPUTE_BUDGET_INSTRUCTION_LAYOUTS = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.RequestUnits = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      result.layout = struct($Array.of(u8("instruction"), u32("units"), u32("additionalFee")));
+      return result;
+    })();
+    result.RequestHeapFrame = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      result.layout = struct($Array.of(u8("instruction"), u32("bytes")));
+      return result;
+    })();
+    result.SetComputeUnitLimit = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 2;
+      result.layout = struct($Array.of(u8("instruction"), u32("units")));
+      return result;
+    })();
+    result.SetComputeUnitPrice = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 3;
+      result.layout = struct($Array.of(u8("instruction"), u64("microLamports")));
+      return result;
+    })();
+    return result;
+  })());
   class ComputeBudgetProgram {
     constructor() {}
     static requestUnits(params) {
       const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestUnits;
       const data = encodeData(type, params);
-      return new TransactionInstruction({
-        keys: [],
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static requestHeapFrame(params) {
       const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestHeapFrame;
       const data = encodeData(type, params);
-      return new TransactionInstruction({
-        keys: [],
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static setComputeUnitLimit(params) {
       const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.SetComputeUnitLimit;
       const data = encodeData(type, params);
-      return new TransactionInstruction({
-        keys: [],
-        programId: this.programId,
-        data: data
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static setComputeUnitPrice(params) {
       const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.SetComputeUnitPrice;
-      const data = encodeData(type, {
-        microLamports: BigInt(params.microLamports)
-      });
-      return new TransactionInstruction({
-        keys: [],
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.microLamports = BigInt(params.microLamports);
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
   }
   ComputeBudgetProgram.programId = new PublicKey("ComputeBudget111111111111111111111111111111");
   const PRIVATE_KEY_BYTES$1 = 64;
   const PUBLIC_KEY_BYTES$1 = 32;
   const SIGNATURE_BYTES = 64;
-  const ED25519_INSTRUCTION_LAYOUT = struct([u8("numSignatures"), u8("padding"), u16("signatureOffset"), u16("signatureInstructionIndex"), u16("publicKeyOffset"), u16("publicKeyInstructionIndex"), u16("messageDataOffset"), u16("messageDataSize"), u16("messageInstructionIndex")]);
+  const ED25519_INSTRUCTION_LAYOUT = struct($Array.of(u8("numSignatures"), u8("padding"), u16("signatureOffset"), u16("signatureInstructionIndex"), u16("publicKeyOffset"), u16("publicKeyInstructionIndex"), u16("messageDataOffset"), u16("messageDataSize"), u16("messageInstructionIndex")));
   class Ed25519Program {
     constructor() {}
     static createInstructionWithPublicKey(params) {
@@ -15250,25 +16238,29 @@ var solanaWeb3 = $(function (exports) {
       const numSignatures = 1;
       const instructionData = buffer.Buffer.alloc(messageDataOffset + message.length);
       const index = instructionIndex == null ? 65535 : instructionIndex;
-      ED25519_INSTRUCTION_LAYOUT.encode({
-        numSignatures: numSignatures,
-        padding: 0,
-        signatureOffset: signatureOffset,
-        signatureInstructionIndex: index,
-        publicKeyOffset: publicKeyOffset,
-        publicKeyInstructionIndex: index,
-        messageDataOffset: messageDataOffset,
-        messageDataSize: message.length,
-        messageInstructionIndex: index
-      }, instructionData);
+      ED25519_INSTRUCTION_LAYOUT.encode($(function () {
+        let result = $Object.create(null, undefined);
+        result.numSignatures = numSignatures;
+        result.padding = 0;
+        result.signatureOffset = signatureOffset;
+        result.signatureInstructionIndex = index;
+        result.publicKeyOffset = publicKeyOffset;
+        result.publicKeyInstructionIndex = index;
+        result.messageDataOffset = messageDataOffset;
+        result.messageDataSize = message.length;
+        result.messageInstructionIndex = index;
+        return result;
+      })(), instructionData);
       instructionData.fill(publicKey, publicKeyOffset);
       instructionData.fill(signature, signatureOffset);
       instructionData.fill(message, messageDataOffset);
-      return new TransactionInstruction({
-        keys: [],
-        programId: Ed25519Program.programId,
-        data: instructionData
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = Ed25519Program.programId;
+        result.data = instructionData;
+        return result;
+      })());
     }
     static createInstructionWithPrivateKey(params) {
       const {
@@ -15281,19 +16273,21 @@ var solanaWeb3 = $(function (exports) {
         const keypair = Keypair.fromSecretKey(privateKey);
         const publicKey = keypair.publicKey.toBytes();
         const signature = sign(message, keypair.secretKey);
-        return this.createInstructionWithPublicKey({
-          publicKey: publicKey,
-          message: message,
-          signature: signature,
-          instructionIndex: instructionIndex
-        });
+        return this.createInstructionWithPublicKey($(function () {
+          let result = $Object.create(null, undefined);
+          result.publicKey = publicKey;
+          result.message = message;
+          result.signature = signature;
+          result.instructionIndex = instructionIndex;
+          return result;
+        })());
       } catch (error) {
         throw new Error(`Error creating instruction; ${error}`);
       }
     }
   }
   Ed25519Program.programId = new PublicKey("Ed25519SigVerify111111111111111111111111111");
-  const [SHA3_PI, SHA3_ROTL, _SHA3_IOTA] = [[], [], []];
+  const [SHA3_PI, SHA3_ROTL, _SHA3_IOTA] = $Array.of($Array.of(), $Array.of(), $Array.of());
   const _0n$1 = BigInt(0);
   const _1n$1 = BigInt(1);
   const _2n$1 = BigInt(2);
@@ -15301,7 +16295,7 @@ var solanaWeb3 = $(function (exports) {
   const _256n = BigInt(256);
   const _0x71n = BigInt(113);
   for (let round = 0, R = _1n$1, x = 1, y = 0; round < 24; round++) {
-    [x, y] = [y, (2 * x + 3 * y) % 5];
+    [x, y] = $Array.of(y, (2 * x + 3 * y) % 5);
     SHA3_PI.push(2 * (5 * y + x));
     SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
     let t = _0n$1;
@@ -15475,7 +16469,7 @@ var solanaWeb3 = $(function (exports) {
   const keccak_256 = gen(1, 136, 256 / 8);
   gen(1, 104, 384 / 8);
   gen(1, 72, 512 / 8);
-  const genShake = (suffix, blockLen, outputLen) => wrapConstructorWithOpts($((opts = {}) => new Keccak(blockLen, suffix, opts.dkLen === undefined ? outputLen : opts.dkLen, true)));
+  const genShake = (suffix, blockLen, outputLen) => wrapConstructorWithOpts($((opts = $Object.create(null, undefined)) => new Keccak(blockLen, suffix, opts.dkLen === undefined ? outputLen : opts.dkLen, true)));
   $(genShake);
   genShake(31, 168, 128 / 8);
   genShake(31, 136, 256 / 8);
@@ -15519,7 +16513,7 @@ var solanaWeb3 = $(function (exports) {
       return out;
     }
     _cloneInto(to) {
-      to || (to = $Object.create($Object.getPrototypeOf(this), {}));
+      to || (to = $Object.create($Object.getPrototypeOf(this), $Object.create(null, undefined)));
       const {
         oHash: oHash,
         iHash: iHash,
@@ -15553,16 +16547,18 @@ var solanaWeb3 = $(function (exports) {
   const _3n = BigInt(3);
   const _8n = BigInt(8);
   const POW_2_256 = _2n ** BigInt(256);
-  const CURVE = {
-    a: _0n,
-    b: BigInt(7),
-    P: POW_2_256 - _2n ** BigInt(32) - BigInt(977),
-    n: POW_2_256 - BigInt("432420386565659656852420866394968145599"),
-    h: _1n,
-    Gx: BigInt("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
-    Gy: BigInt("32670510020758816978083085130507043184471273380659243275938904335757337482424"),
-    beta: BigInt("0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee")
-  };
+  const CURVE = $(function () {
+    let result = $Object.create(null, undefined);
+    result.a = _0n;
+    result.b = BigInt(7);
+    result.P = POW_2_256 - _2n ** BigInt(32) - BigInt(977);
+    result.n = POW_2_256 - BigInt("432420386565659656852420866394968145599");
+    result.h = _1n;
+    result.Gx = BigInt("55066263022277343669578718895168534326250603453777594175500187360389116729240");
+    result.Gy = BigInt("32670510020758816978083085130507043184471273380659243275938904335757337482424");
+    result.beta = BigInt("0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee");
+    return result;
+  })();
   function weistrass(x) {
     const {
       a: a,
@@ -15711,7 +16707,7 @@ var solanaWeb3 = $(function (exports) {
     }
     precomputeWindow(W) {
       const windows = USE_ENDOMORPHISM ? 128 / W + 1 : 256 / W + 1;
-      const points = [];
+      const points = $Array.of();
       let p = this;
       let base = p;
       for (let window = 0; window < windows; window++) {
@@ -15764,10 +16760,12 @@ var solanaWeb3 = $(function (exports) {
           p = p.add(cached);
         }
       }
-      return {
-        p: p,
-        f: f
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.p = p;
+        result.f = f;
+        return result;
+      })();
     }
     multiply(scalar, affinePoint) {
       let n = normalizeScalar(scalar);
@@ -15801,7 +16799,7 @@ var solanaWeb3 = $(function (exports) {
         point = p;
         fake = f;
       }
-      return JacobianPoint.normalizeZ([point, fake])[0];
+      return JacobianPoint.normalizeZ($Array.of(point, fake))[0];
     }
     toAffine(invZ = invert(this.z)) {
       const {
@@ -15964,10 +16962,12 @@ var solanaWeb3 = $(function (exports) {
     if (res[0] === 0 && res[1] <= 127) {
       throw new Error("Invalid signature integer: trailing length");
     }
-    return {
-      data: bytesToNumber(res),
-      left: data.subarray(len + 2)
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.data = bytesToNumber(res);
+      result.left = data.subarray(len + 2);
+      return result;
+    })();
   }
   $(parseDERInt);
   function parseDERSignature(data) {
@@ -15988,10 +16988,12 @@ var solanaWeb3 = $(function (exports) {
     if (rBytesLeft.length) {
       throw new Error(`Invalid signature: left bytes after parsing: ${bytesToHex(rBytesLeft)}`);
     }
-    return {
-      r: r,
-      s: s
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.r = r;
+      result.s = s;
+      return result;
+    })();
   }
   $(parseDERSignature);
   class Signature {
@@ -16077,9 +17079,11 @@ var solanaWeb3 = $(function (exports) {
     return bytes instanceof Uint8Array;
   }
   $(isUint8a);
-  const hexes = Array.from({
-    length: 256
-  }, $((v, i) => i.toString(16).padStart(2, "0")));
+  const hexes = $Array.from($(function () {
+    let result = $Object.create(null, undefined);
+    result.length = 256;
+    return result;
+  })(), $((v, i) => i.toString(16).padStart(2, "0")));
   function bytesToHex(uint8a) {
     if (!(uint8a instanceof Uint8Array)) throw new Error("Expected Uint8Array");
     let hex = "";
@@ -16240,12 +17244,14 @@ var solanaWeb3 = $(function (exports) {
     if (k1 > POW_2_128 || k2 > POW_2_128) {
       throw new Error("splitScalarEndo: Endomorphism failed, k=" + k);
     }
-    return {
-      k1neg: k1neg,
-      k1: k1,
-      k2neg: k2neg,
-      k2: k2
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.k1neg = k1neg;
+      result.k1 = k1;
+      result.k2neg = k2neg;
+      result.k2 = k2;
+      return result;
+    })();
   }
   $(splitScalarEndo);
   function truncateHash(hash) {
@@ -16282,17 +17288,17 @@ var solanaWeb3 = $(function (exports) {
       this.counter += 1;
     }
     async reseed(seed = new Uint8Array()) {
-      this.k = await this.hmac(this.v, Uint8Array.from([0]), seed);
+      this.k = await this.hmac(this.v, Uint8Array.from($Array.of(0)), seed);
       this.v = await this.hmac(this.v);
       if (seed.length === 0) return;
-      this.k = await this.hmac(this.v, Uint8Array.from([1]), seed);
+      this.k = await this.hmac(this.v, Uint8Array.from($Array.of(1)), seed);
       this.v = await this.hmac(this.v);
     }
     reseedSync(seed = new Uint8Array()) {
-      this.k = this.hmacSync(this.v, Uint8Array.from([0]), seed);
+      this.k = this.hmacSync(this.v, Uint8Array.from($Array.of(0)), seed);
       this.v = this.hmacSync(this.v);
       if (seed.length === 0) return;
-      this.k = this.hmacSync(this.v, Uint8Array.from([1]), seed);
+      this.k = this.hmacSync(this.v, Uint8Array.from($Array.of(1)), seed);
       this.v = this.hmacSync(this.v);
     }
     async generate() {
@@ -16327,10 +17333,12 @@ var solanaWeb3 = $(function (exports) {
     if (s === _0n) return;
     const sig = new Signature(r, s);
     const recovery = (q.x === sig.r ? 0 : 2) | Number(q.y & _1n);
-    return {
-      sig: sig,
-      recovery: recovery
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.sig = sig;
+      result.recovery = recovery;
+      return result;
+    })();
   }
   $(kmdToSig);
   function normalizePrivateKey(key) {
@@ -16389,7 +17397,7 @@ var solanaWeb3 = $(function (exports) {
     if (msgHash == null) throw new Error(`sign: expected valid message hash, not "${msgHash}"`);
     const h1 = ensureBytes(msgHash);
     const d = normalizePrivateKey(privateKey);
-    const seedArgs = [int2octets(d), bits2octets(h1)];
+    const seedArgs = $Array.of(int2octets(d), bits2octets(h1));
     if (extraEntropy != null) {
       if (extraEntropy === true) extraEntropy = utils.randomBytes(32);
       const e = ensureBytes(extraEntropy);
@@ -16398,11 +17406,13 @@ var solanaWeb3 = $(function (exports) {
     }
     const seed = concatBytes(...seedArgs);
     const m = bits2int(h1);
-    return {
-      seed: seed,
-      m: m,
-      d: d
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.seed = seed;
+      result.m = m;
+      result.d = d;
+      return result;
+    })();
   }
   $(initSigArgs);
   function finalizeSig(recSig, opts) {
@@ -16414,19 +17424,21 @@ var solanaWeb3 = $(function (exports) {
       canonical: canonical,
       der: der,
       recovered: recovered
-    } = $Object.assign({
-      canonical: true,
-      der: true
-    }, opts);
+    } = $Object.assign($(function () {
+      let result = $Object.create(null, undefined);
+      result.canonical = true;
+      result.der = true;
+      return result;
+    })(), opts);
     if (canonical && sig.hasHighS()) {
       sig = sig.normalizeS();
       recovery ^= 1;
     }
     const hashed = der ? sig.toDERRawBytes() : sig.toCompactRawBytes();
-    return recovered ? [hashed, recovery] : hashed;
+    return recovered ? $Array.of(hashed, recovery) : hashed;
   }
   $(finalizeSig);
-  function signSync(msgHash, privKey, opts = {}) {
+  function signSync(msgHash, privKey, opts = $Object.create(null, undefined)) {
     const {
       seed: seed,
       m: m,
@@ -16440,48 +17452,51 @@ var solanaWeb3 = $(function (exports) {
   }
   $(signSync);
   Point.BASE._setWindowSize(8);
-  const crypto$1 = {
-    node: nodeCrypto,
-    web: typeof self === "object" && "crypto" in self ? self.crypto : undefined
-  };
-  const TAGGED_HASH_PREFIXES = {};
-  const utils = {
-    isValidPrivateKey(privateKey) {
+  const crypto$1 = $(function () {
+    let result = $Object.create(null, undefined);
+    result.node = nodeCrypto;
+    result.web = typeof self === "object" && "crypto" in self ? self.crypto : undefined;
+    return result;
+  })();
+  const TAGGED_HASH_PREFIXES = $Object.create(null, undefined);
+  const utils = $(function () {
+    let result = $Object.create(null, undefined);
+    result.isValidPrivateKey = $(function (privateKey) {
       try {
         normalizePrivateKey(privateKey);
         return true;
       } catch (error) {
         return false;
       }
-    },
-    privateAdd: $((privateKey, tweak) => {
+    });
+    result.privateAdd = $((privateKey, tweak) => {
       const p = normalizePrivateKey(privateKey);
       const t = normalizePrivateKey(tweak);
       return numTo32b(mod(p + t, CURVE.n));
-    }),
-    privateNegate: $(privateKey => {
+    });
+    result.privateNegate = $(privateKey => {
       const p = normalizePrivateKey(privateKey);
       return numTo32b(CURVE.n - p);
-    }),
-    pointAddScalar: $((p, tweak, isCompressed) => {
+    });
+    result.pointAddScalar = $((p, tweak, isCompressed) => {
       const P = Point.fromHex(p);
       const t = normalizePrivateKey(tweak);
       const Q = Point.BASE.multiplyAndAddUnsafe(P, t, _1n);
       if (!Q) throw new Error("Tweaked point at infinity");
       return Q.toRawBytes(isCompressed);
-    }),
-    pointMultiply: $((p, tweak, isCompressed) => {
+    });
+    result.pointMultiply = $((p, tweak, isCompressed) => {
       const P = Point.fromHex(p);
       const t = bytesToNumber(ensureBytes(tweak));
       return P.multiply(t).toRawBytes(isCompressed);
-    }),
-    hashToPrivateKey: $(hash => {
+    });
+    result.hashToPrivateKey = $(hash => {
       hash = ensureBytes(hash);
       if (hash.length < 40 || hash.length > 1024) throw new Error("Expected 40-1024 bytes of private key as per FIPS 186");
       const num = mod(bytesToNumber(hash), CURVE.n - _1n) + _1n;
       return numTo32b(num);
-    }),
-    randomBytes: $((bytesLength = 32) => {
+    });
+    result.randomBytes = $((bytesLength = 32) => {
       if (crypto$1.web) {
         return crypto$1.web.getRandomValues(new Uint8Array(bytesLength));
       } else if (crypto$1.node) {
@@ -16492,14 +17507,14 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error("The environment doesn't have randomBytes function");
       }
-    }),
-    randomPrivateKey: $(() => utils.hashToPrivateKey(utils.randomBytes(40))),
-    bytesToHex: bytesToHex,
-    hexToBytes: hexToBytes,
-    concatBytes: concatBytes,
-    mod: mod,
-    invert: invert,
-    sha256: $(async (...messages) => {
+    });
+    result.randomPrivateKey = $(() => utils.hashToPrivateKey(utils.randomBytes(40)));
+    result.bytesToHex = bytesToHex;
+    result.hexToBytes = hexToBytes;
+    result.concatBytes = concatBytes;
+    result.mod = mod;
+    result.invert = invert;
+    result.sha256 = $(async (...messages) => {
       if (crypto$1.web) {
         const buffer = await crypto$1.web.subtle.digest("SHA-256", concatBytes(...messages));
         return new Uint8Array(buffer);
@@ -16513,15 +17528,19 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error("The environment doesn't have sha256 function");
       }
-    }),
-    hmacSha256: $(async (key, ...messages) => {
+    });
+    result.hmacSha256 = $(async (key, ...messages) => {
       if (crypto$1.web) {
-        const ckey = await crypto$1.web.subtle.importKey("raw", key, {
-          name: "HMAC",
-          hash: {
-            name: "SHA-256"
-          }
-        }, false, ["sign"]);
+        const ckey = await crypto$1.web.subtle.importKey("raw", key, $(function () {
+          let result = $Object.create(null, undefined);
+          result.name = "HMAC";
+          result.hash = $(function () {
+            let result = $Object.create(null, undefined);
+            result.name = "SHA-256";
+            return result;
+          })();
+          return result;
+        })(), false, $Array.of("sign"));
         const message = concatBytes(...messages);
         const buffer = await crypto$1.web.subtle.sign("HMAC", ckey, message);
         return new Uint8Array(buffer);
@@ -16535,10 +17554,10 @@ var solanaWeb3 = $(function (exports) {
       } else {
         throw new Error("The environment doesn't have hmac-sha256 function");
       }
-    }),
-    sha256Sync: undefined,
-    hmacSha256Sync: undefined,
-    taggedHash: $(async (tag, ...messages) => {
+    });
+    result.sha256Sync = undefined;
+    result.hmacSha256Sync = undefined;
+    result.taggedHash = $(async (tag, ...messages) => {
       let tagP = TAGGED_HASH_PREFIXES[tag];
       if (tagP === undefined) {
         const tagH = await utils.sha256(Uint8Array.from(tag, $(c => c.charCodeAt(0))));
@@ -16546,8 +17565,8 @@ var solanaWeb3 = $(function (exports) {
         TAGGED_HASH_PREFIXES[tag] = tagP;
       }
       return utils.sha256(tagP, ...messages);
-    }),
-    taggedHashSync: $((tag, ...messages) => {
+    });
+    result.taggedHashSync = $((tag, ...messages) => {
       if (typeof utils.sha256Sync !== "function") throw new Error("utils.sha256Sync is undefined, you need to set it");
       let tagP = TAGGED_HASH_PREFIXES[tag];
       if (tagP === undefined) {
@@ -16556,23 +17575,26 @@ var solanaWeb3 = $(function (exports) {
         TAGGED_HASH_PREFIXES[tag] = tagP;
       }
       return utils.sha256Sync(tagP, ...messages);
-    }),
-    precompute(windowSize = 8, point = Point.BASE) {
+    });
+    result.precompute = $(function (windowSize = 8, point = Point.BASE) {
       const cached = point === Point.BASE ? point : new Point(point.x, point.y);
       cached._setWindowSize(windowSize);
       cached.multiply(_3n);
       return cached;
-    }
-  };
+    });
+    return result;
+  })();
   utils.hmacSha256Sync = $((key, ...msgs) => {
     const h = hmac.create(sha256, key);
     msgs.forEach($(msg => h.update(msg)));
     return h.digest();
   });
-  const ecdsaSign = (msgHash, privKey) => signSync(msgHash, privKey, {
-    der: false,
-    recovered: true
-  });
+  const ecdsaSign = (msgHash, privKey) => signSync(msgHash, privKey, $(function () {
+    let result = $Object.create(null, undefined);
+    result.der = false;
+    result.recovered = true;
+    return result;
+  })());
   $(ecdsaSign);
   utils.isValidPrivateKey;
   const publicKeyCreate = getPublicKey;
@@ -16580,7 +17602,7 @@ var solanaWeb3 = $(function (exports) {
   const ETHEREUM_ADDRESS_BYTES = 20;
   const PUBLIC_KEY_BYTES = 64;
   const SIGNATURE_OFFSETS_SERIALIZED_SIZE = 11;
-  const SECP256K1_INSTRUCTION_LAYOUT = struct([u8("numSignatures"), u16("signatureOffset"), u8("signatureInstructionIndex"), u16("ethAddressOffset"), u8("ethAddressInstructionIndex"), u16("messageDataOffset"), u16("messageDataSize"), u8("messageInstructionIndex"), blob(20, "ethAddress"), blob(64, "signature"), u8("recoveryId")]);
+  const SECP256K1_INSTRUCTION_LAYOUT = struct($Array.of(u8("numSignatures"), u16("signatureOffset"), u8("signatureInstructionIndex"), u16("ethAddressOffset"), u8("ethAddressInstructionIndex"), u16("messageDataOffset"), u16("messageDataSize"), u8("messageInstructionIndex"), blob(20, "ethAddress"), blob(64, "signature"), u8("recoveryId")));
   class Secp256k1Program {
     constructor() {}
     static publicKeyToEthAddress(publicKey) {
@@ -16599,13 +17621,15 @@ var solanaWeb3 = $(function (exports) {
         recoveryId: recoveryId,
         instructionIndex: instructionIndex
       } = params;
-      return Secp256k1Program.createInstructionWithEthAddress({
-        ethAddress: Secp256k1Program.publicKeyToEthAddress(publicKey),
-        message: message,
-        signature: signature,
-        recoveryId: recoveryId,
-        instructionIndex: instructionIndex
-      });
+      return Secp256k1Program.createInstructionWithEthAddress($(function () {
+        let result = $Object.create(null, undefined);
+        result.ethAddress = Secp256k1Program.publicKeyToEthAddress(publicKey);
+        result.message = message;
+        result.signature = signature;
+        result.recoveryId = recoveryId;
+        result.instructionIndex = instructionIndex;
+        return result;
+      })());
     }
     static createInstructionWithEthAddress(params) {
       const {
@@ -16632,25 +17656,29 @@ var solanaWeb3 = $(function (exports) {
       const messageDataOffset = signatureOffset + signature.length + 1;
       const numSignatures = 1;
       const instructionData = buffer.Buffer.alloc(SECP256K1_INSTRUCTION_LAYOUT.span + message.length);
-      SECP256K1_INSTRUCTION_LAYOUT.encode({
-        numSignatures: numSignatures,
-        signatureOffset: signatureOffset,
-        signatureInstructionIndex: instructionIndex,
-        ethAddressOffset: ethAddressOffset,
-        ethAddressInstructionIndex: instructionIndex,
-        messageDataOffset: messageDataOffset,
-        messageDataSize: message.length,
-        messageInstructionIndex: instructionIndex,
-        signature: toBuffer(signature),
-        ethAddress: toBuffer(ethAddress),
-        recoveryId: recoveryId
-      }, instructionData);
+      SECP256K1_INSTRUCTION_LAYOUT.encode($(function () {
+        let result = $Object.create(null, undefined);
+        result.numSignatures = numSignatures;
+        result.signatureOffset = signatureOffset;
+        result.signatureInstructionIndex = instructionIndex;
+        result.ethAddressOffset = ethAddressOffset;
+        result.ethAddressInstructionIndex = instructionIndex;
+        result.messageDataOffset = messageDataOffset;
+        result.messageDataSize = message.length;
+        result.messageInstructionIndex = instructionIndex;
+        result.signature = toBuffer(signature);
+        result.ethAddress = toBuffer(ethAddress);
+        result.recoveryId = recoveryId;
+        return result;
+      })(), instructionData);
       instructionData.fill(toBuffer(message), SECP256K1_INSTRUCTION_LAYOUT.span);
-      return new TransactionInstruction({
-        keys: [],
-        programId: Secp256k1Program.programId,
-        data: instructionData
-      });
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of();
+        result.programId = Secp256k1Program.programId;
+        result.data = instructionData;
+        return result;
+      })());
     }
     static createInstructionWithPrivateKey(params) {
       const {
@@ -16664,13 +17692,15 @@ var solanaWeb3 = $(function (exports) {
         const publicKey = publicKeyCreate(privateKey, false).slice(1);
         const messageHash = buffer.Buffer.from(keccak_256(toBuffer(message)));
         const [signature, recoveryId] = ecdsaSign(messageHash, privateKey);
-        return this.createInstructionWithPublicKey({
-          publicKey: publicKey,
-          message: message,
-          signature: signature,
-          recoveryId: recoveryId,
-          instructionIndex: instructionIndex
-        });
+        return this.createInstructionWithPublicKey($(function () {
+          let result = $Object.create(null, undefined);
+          result.publicKey = publicKey;
+          result.message = message;
+          result.signature = signature;
+          result.recoveryId = recoveryId;
+          result.instructionIndex = instructionIndex;
+          return result;
+        })());
       } catch (error) {
         throw new Error(`Error creating instruction; ${error}`);
       }
@@ -16722,21 +17752,25 @@ var solanaWeb3 = $(function (exports) {
         authorized: authorized,
         lockup: lockup
       } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Initialize, instruction.data);
-      return {
-        stakePubkey: instruction.keys[0].pubkey,
-        authorized: new Authorized(new PublicKey(authorized.staker), new PublicKey(authorized.withdrawer)),
-        lockup: new Lockup(lockup.unixTimestamp, lockup.epoch, new PublicKey(lockup.custodian))
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.authorized = new Authorized(new PublicKey(authorized.staker), new PublicKey(authorized.withdrawer));
+        result.lockup = new Lockup(lockup.unixTimestamp, lockup.epoch, new PublicKey(lockup.custodian));
+        return result;
+      })();
     }
     static decodeDelegate(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeyLength(instruction.keys, 6);
       decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Delegate, instruction.data);
-      return {
-        stakePubkey: instruction.keys[0].pubkey,
-        votePubkey: instruction.keys[1].pubkey,
-        authorizedPubkey: instruction.keys[5].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.votePubkey = instruction.keys[1].pubkey;
+        result.authorizedPubkey = instruction.keys[5].pubkey;
+        return result;
+      })();
     }
     static decodeAuthorize(instruction) {
       this.checkProgramId(instruction.programId);
@@ -16745,14 +17779,18 @@ var solanaWeb3 = $(function (exports) {
         newAuthorized: newAuthorized,
         stakeAuthorizationType: stakeAuthorizationType
       } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Authorize, instruction.data);
-      const o = {
-        stakePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: instruction.keys[2].pubkey,
-        newAuthorizedPubkey: new PublicKey(newAuthorized),
-        stakeAuthorizationType: {
-          index: stakeAuthorizationType
-        }
-      };
+      const o = $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = instruction.keys[2].pubkey;
+        result.newAuthorizedPubkey = new PublicKey(newAuthorized);
+        result.stakeAuthorizationType = $(function () {
+          let result = $Object.create(null, undefined);
+          result.index = stakeAuthorizationType;
+          return result;
+        })();
+        return result;
+      })();
       if (instruction.keys.length > 3) {
         o.custodianPubkey = instruction.keys[3].pubkey;
       }
@@ -16767,16 +17805,20 @@ var solanaWeb3 = $(function (exports) {
         authoritySeed: authoritySeed,
         authorityOwner: authorityOwner
       } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed, instruction.data);
-      const o = {
-        stakePubkey: instruction.keys[0].pubkey,
-        authorityBase: instruction.keys[1].pubkey,
-        authoritySeed: authoritySeed,
-        authorityOwner: new PublicKey(authorityOwner),
-        newAuthorizedPubkey: new PublicKey(newAuthorized),
-        stakeAuthorizationType: {
-          index: stakeAuthorizationType
-        }
-      };
+      const o = $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.authorityBase = instruction.keys[1].pubkey;
+        result.authoritySeed = authoritySeed;
+        result.authorityOwner = new PublicKey(authorityOwner);
+        result.newAuthorizedPubkey = new PublicKey(newAuthorized);
+        result.stakeAuthorizationType = $(function () {
+          let result = $Object.create(null, undefined);
+          result.index = stakeAuthorizationType;
+          return result;
+        })();
+        return result;
+      })();
       if (instruction.keys.length > 3) {
         o.custodianPubkey = instruction.keys[3].pubkey;
       }
@@ -16788,22 +17830,26 @@ var solanaWeb3 = $(function (exports) {
       const {
         lamports: lamports
       } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Split, instruction.data);
-      return {
-        stakePubkey: instruction.keys[0].pubkey,
-        splitStakePubkey: instruction.keys[1].pubkey,
-        authorizedPubkey: instruction.keys[2].pubkey,
-        lamports: lamports
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.splitStakePubkey = instruction.keys[1].pubkey;
+        result.authorizedPubkey = instruction.keys[2].pubkey;
+        result.lamports = lamports;
+        return result;
+      })();
     }
     static decodeMerge(instruction) {
       this.checkProgramId(instruction.programId);
       this.checkKeyLength(instruction.keys, 3);
       decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Merge, instruction.data);
-      return {
-        stakePubkey: instruction.keys[0].pubkey,
-        sourceStakePubKey: instruction.keys[1].pubkey,
-        authorizedPubkey: instruction.keys[4].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.sourceStakePubKey = instruction.keys[1].pubkey;
+        result.authorizedPubkey = instruction.keys[4].pubkey;
+        return result;
+      })();
     }
     static decodeWithdraw(instruction) {
       this.checkProgramId(instruction.programId);
@@ -16811,12 +17857,14 @@ var solanaWeb3 = $(function (exports) {
       const {
         lamports: lamports
       } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Withdraw, instruction.data);
-      const o = {
-        stakePubkey: instruction.keys[0].pubkey,
-        toPubkey: instruction.keys[1].pubkey,
-        authorizedPubkey: instruction.keys[4].pubkey,
-        lamports: lamports
-      };
+      const o = $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.toPubkey = instruction.keys[1].pubkey;
+        result.authorizedPubkey = instruction.keys[4].pubkey;
+        result.lamports = lamports;
+        return result;
+      })();
       if (instruction.keys.length > 5) {
         o.custodianPubkey = instruction.keys[5].pubkey;
       }
@@ -16826,10 +17874,12 @@ var solanaWeb3 = $(function (exports) {
       this.checkProgramId(instruction.programId);
       this.checkKeyLength(instruction.keys, 3);
       decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Deactivate, instruction.data);
-      return {
-        stakePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: instruction.keys[2].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = instruction.keys[2].pubkey;
+        return result;
+      })();
     }
     static checkProgramId(programId) {
       if (!programId.equals(StakeProgram.programId)) {
@@ -16842,48 +17892,72 @@ var solanaWeb3 = $(function (exports) {
       }
     }
   }
-  const STAKE_INSTRUCTION_LAYOUTS = $Object.freeze({
-    Initialize: {
-      index: 0,
-      layout: struct([u32("instruction"), authorized(), lockup()])
-    },
-    Authorize: {
-      index: 1,
-      layout: struct([u32("instruction"), publicKey("newAuthorized"), u32("stakeAuthorizationType")])
-    },
-    Delegate: {
-      index: 2,
-      layout: struct([u32("instruction")])
-    },
-    Split: {
-      index: 3,
-      layout: struct([u32("instruction"), ns64("lamports")])
-    },
-    Withdraw: {
-      index: 4,
-      layout: struct([u32("instruction"), ns64("lamports")])
-    },
-    Deactivate: {
-      index: 5,
-      layout: struct([u32("instruction")])
-    },
-    Merge: {
-      index: 7,
-      layout: struct([u32("instruction")])
-    },
-    AuthorizeWithSeed: {
-      index: 8,
-      layout: struct([u32("instruction"), publicKey("newAuthorized"), u32("stakeAuthorizationType"), rustString("authoritySeed"), publicKey("authorityOwner")])
-    }
-  });
-  const StakeAuthorizationLayout = $Object.freeze({
-    Staker: {
-      index: 0
-    },
-    Withdrawer: {
-      index: 1
-    }
-  });
+  const STAKE_INSTRUCTION_LAYOUTS = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.Initialize = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      result.layout = struct($Array.of(u32("instruction"), authorized(), lockup()));
+      return result;
+    })();
+    result.Authorize = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("newAuthorized"), u32("stakeAuthorizationType")));
+      return result;
+    })();
+    result.Delegate = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 2;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.Split = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 3;
+      result.layout = struct($Array.of(u32("instruction"), ns64("lamports")));
+      return result;
+    })();
+    result.Withdraw = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 4;
+      result.layout = struct($Array.of(u32("instruction"), ns64("lamports")));
+      return result;
+    })();
+    result.Deactivate = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 5;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.Merge = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 7;
+      result.layout = struct($Array.of(u32("instruction")));
+      return result;
+    })();
+    result.AuthorizeWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 8;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("newAuthorized"), u32("stakeAuthorizationType"), rustString("authoritySeed"), publicKey("authorityOwner")));
+      return result;
+    })();
+    return result;
+  })());
+  const StakeAuthorizationLayout = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.Staker = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      return result;
+    })();
+    result.Withdrawer = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      return result;
+    })();
+    return result;
+  })());
   class StakeProgram {
     constructor() {}
     static initialize(params) {
@@ -16894,73 +17968,93 @@ var solanaWeb3 = $(function (exports) {
       } = params;
       const lockup = maybeLockup || Lockup.default;
       const type = STAKE_INSTRUCTION_LAYOUTS.Initialize;
-      const data = encodeData(type, {
-        authorized: {
-          staker: toBuffer(authorized.staker.toBuffer()),
-          withdrawer: toBuffer(authorized.withdrawer.toBuffer())
-        },
-        lockup: {
-          unixTimestamp: lockup.unixTimestamp,
-          epoch: lockup.epoch,
-          custodian: toBuffer(lockup.custodian.toBuffer())
-        }
-      });
-      const instructionData = {
-        keys: [{
-          pubkey: stakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_RENT_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      };
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.authorized = $(function () {
+          let result = $Object.create(null, undefined);
+          result.staker = toBuffer(authorized.staker.toBuffer());
+          result.withdrawer = toBuffer(authorized.withdrawer.toBuffer());
+          return result;
+        })();
+        result.lockup = $(function () {
+          let result = $Object.create(null, undefined);
+          result.unixTimestamp = lockup.unixTimestamp;
+          result.epoch = lockup.epoch;
+          result.custodian = toBuffer(lockup.custodian.toBuffer());
+          return result;
+        })();
+        return result;
+      })());
+      const instructionData = $(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = stakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RENT_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)();
       return new TransactionInstruction(instructionData);
     }
     static createAccountWithSeed(params) {
       const transaction = new Transaction();
-      transaction.add(SystemProgram.createAccountWithSeed({
-        fromPubkey: params.fromPubkey,
-        newAccountPubkey: params.stakePubkey,
-        basePubkey: params.basePubkey,
-        seed: params.seed,
-        lamports: params.lamports,
-        space: this.space,
-        programId: this.programId
-      }));
+      transaction.add(SystemProgram.createAccountWithSeed($(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = params.fromPubkey;
+        result.newAccountPubkey = params.stakePubkey;
+        result.basePubkey = params.basePubkey;
+        result.seed = params.seed;
+        result.lamports = params.lamports;
+        result.space = this.space;
+        result.programId = this.programId;
+        return result;
+      }).bind(this)()));
       const {
         stakePubkey: stakePubkey,
         authorized: authorized,
         lockup: lockup
       } = params;
-      return transaction.add(this.initialize({
-        stakePubkey: stakePubkey,
-        authorized: authorized,
-        lockup: lockup
-      }));
+      return transaction.add(this.initialize($(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = stakePubkey;
+        result.authorized = authorized;
+        result.lockup = lockup;
+        return result;
+      })()));
     }
     static createAccount(params) {
       const transaction = new Transaction();
-      transaction.add(SystemProgram.createAccount({
-        fromPubkey: params.fromPubkey,
-        newAccountPubkey: params.stakePubkey,
-        lamports: params.lamports,
-        space: this.space,
-        programId: this.programId
-      }));
+      transaction.add(SystemProgram.createAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = params.fromPubkey;
+        result.newAccountPubkey = params.stakePubkey;
+        result.lamports = params.lamports;
+        result.space = this.space;
+        result.programId = this.programId;
+        return result;
+      }).bind(this)()));
       const {
         stakePubkey: stakePubkey,
         authorized: authorized,
         lockup: lockup
       } = params;
-      return transaction.add(this.initialize({
-        stakePubkey: stakePubkey,
-        authorized: authorized,
-        lockup: lockup
-      }));
+      return transaction.add(this.initialize($(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = stakePubkey;
+        result.authorized = authorized;
+        result.lockup = lockup;
+        return result;
+      })()));
     }
     static delegate(params) {
       const {
@@ -16970,35 +18064,49 @@ var solanaWeb3 = $(function (exports) {
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Delegate;
       const data = encodeData(type);
-      return new Transaction().add({
-        keys: [{
-          pubkey: stakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: votePubkey,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_CLOCK_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_STAKE_HISTORY_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: STAKE_CONFIG_ID,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = stakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = votePubkey;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_CLOCK_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_STAKE_HISTORY_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = STAKE_CONFIG_ID;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static authorize(params) {
       const {
@@ -17009,35 +18117,47 @@ var solanaWeb3 = $(function (exports) {
         custodianPubkey: custodianPubkey
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Authorize;
-      const data = encodeData(type, {
-        newAuthorized: toBuffer(newAuthorizedPubkey.toBuffer()),
-        stakeAuthorizationType: stakeAuthorizationType.index
-      });
-      const keys = [{
-        pubkey: stakePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: authorizedPubkey,
-        isSigner: true,
-        isWritable: false
-      }];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.newAuthorized = toBuffer(newAuthorizedPubkey.toBuffer());
+        result.stakeAuthorizationType = stakeAuthorizationType.index;
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = stakePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_CLOCK_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = authorizedPubkey;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
       if (custodianPubkey) {
-        keys.push({
-          pubkey: custodianPubkey,
-          isSigner: false,
-          isWritable: false
-        });
+        keys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = custodianPubkey;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
       }
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static authorizeWithSeed(params) {
       const {
@@ -17050,37 +18170,49 @@ var solanaWeb3 = $(function (exports) {
         custodianPubkey: custodianPubkey
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed;
-      const data = encodeData(type, {
-        newAuthorized: toBuffer(newAuthorizedPubkey.toBuffer()),
-        stakeAuthorizationType: stakeAuthorizationType.index,
-        authoritySeed: authoritySeed,
-        authorityOwner: toBuffer(authorityOwner.toBuffer())
-      });
-      const keys = [{
-        pubkey: stakePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: authorityBase,
-        isSigner: true,
-        isWritable: false
-      }, {
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isSigner: false,
-        isWritable: false
-      }];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.newAuthorized = toBuffer(newAuthorizedPubkey.toBuffer());
+        result.stakeAuthorizationType = stakeAuthorizationType.index;
+        result.authoritySeed = authoritySeed;
+        result.authorityOwner = toBuffer(authorityOwner.toBuffer());
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = stakePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = authorityBase;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_CLOCK_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })());
       if (custodianPubkey) {
-        keys.push({
-          pubkey: custodianPubkey,
-          isSigner: false,
-          isWritable: false
-        });
+        keys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = custodianPubkey;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
       }
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static splitInstruction(params) {
       const {
@@ -17090,36 +18222,48 @@ var solanaWeb3 = $(function (exports) {
         lamports: lamports
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Split;
-      const data = encodeData(type, {
-        lamports: lamports
-      });
-      return new TransactionInstruction({
-        keys: [{
-          pubkey: stakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: splitStakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.lamports = lamports;
+        return result;
+      })());
+      return new TransactionInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = stakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = splitStakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static split(params) {
       const transaction = new Transaction();
-      transaction.add(SystemProgram.createAccount({
-        fromPubkey: params.authorizedPubkey,
-        newAccountPubkey: params.splitStakePubkey,
-        lamports: 0,
-        space: this.space,
-        programId: this.programId
-      }));
+      transaction.add(SystemProgram.createAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = params.authorizedPubkey;
+        result.newAccountPubkey = params.splitStakePubkey;
+        result.lamports = 0;
+        result.space = this.space;
+        result.programId = this.programId;
+        return result;
+      }).bind(this)()));
       return transaction.add(this.splitInstruction(params));
     }
     static splitWithSeed(params) {
@@ -17132,19 +18276,23 @@ var solanaWeb3 = $(function (exports) {
         lamports: lamports
       } = params;
       const transaction = new Transaction();
-      transaction.add(SystemProgram.allocate({
-        accountPubkey: splitStakePubkey,
-        basePubkey: basePubkey,
-        seed: seed,
-        space: this.space,
-        programId: this.programId
-      }));
-      return transaction.add(this.splitInstruction({
-        stakePubkey: stakePubkey,
-        authorizedPubkey: authorizedPubkey,
-        splitStakePubkey: splitStakePubkey,
-        lamports: lamports
-      }));
+      transaction.add(SystemProgram.allocate($(function () {
+        let result = $Object.create(null, undefined);
+        result.accountPubkey = splitStakePubkey;
+        result.basePubkey = basePubkey;
+        result.seed = seed;
+        result.space = this.space;
+        result.programId = this.programId;
+        return result;
+      }).bind(this)()));
+      return transaction.add(this.splitInstruction($(function () {
+        let result = $Object.create(null, undefined);
+        result.stakePubkey = stakePubkey;
+        result.authorizedPubkey = authorizedPubkey;
+        result.splitStakePubkey = splitStakePubkey;
+        result.lamports = lamports;
+        return result;
+      })()));
     }
     static merge(params) {
       const {
@@ -17154,31 +18302,43 @@ var solanaWeb3 = $(function (exports) {
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Merge;
       const data = encodeData(type);
-      return new Transaction().add({
-        keys: [{
-          pubkey: stakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: sourceStakePubKey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_CLOCK_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_STAKE_HISTORY_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = stakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = sourceStakePubKey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_CLOCK_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_STAKE_HISTORY_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static withdraw(params) {
       const {
@@ -17189,42 +18349,58 @@ var solanaWeb3 = $(function (exports) {
         custodianPubkey: custodianPubkey
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Withdraw;
-      const data = encodeData(type, {
-        lamports: lamports
-      });
-      const keys = [{
-        pubkey: stakePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: toPubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isSigner: false,
-        isWritable: false
-      }, {
-        pubkey: SYSVAR_STAKE_HISTORY_PUBKEY,
-        isSigner: false,
-        isWritable: false
-      }, {
-        pubkey: authorizedPubkey,
-        isSigner: true,
-        isWritable: false
-      }];
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.lamports = lamports;
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = stakePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = toPubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_CLOCK_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_STAKE_HISTORY_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = authorizedPubkey;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
       if (custodianPubkey) {
-        keys.push({
-          pubkey: custodianPubkey,
-          isSigner: false,
-          isWritable: false
-        });
+        keys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = custodianPubkey;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })());
       }
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static deactivate(params) {
       const {
@@ -17233,23 +18409,31 @@ var solanaWeb3 = $(function (exports) {
       } = params;
       const type = STAKE_INSTRUCTION_LAYOUTS.Deactivate;
       const data = encodeData(type);
-      return new Transaction().add({
-        keys: [{
-          pubkey: stakePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_CLOCK_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: authorizedPubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      });
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = stakePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_CLOCK_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = authorizedPubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
   }
   StakeProgram.programId = new PublicKey("Stake11111111111111111111111111111111111111");
@@ -17290,11 +18474,13 @@ var solanaWeb3 = $(function (exports) {
       const {
         voteInit: voteInit
       } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.InitializeAccount, instruction.data);
-      return {
-        votePubkey: instruction.keys[0].pubkey,
-        nodePubkey: instruction.keys[3].pubkey,
-        voteInit: new VoteInit(new PublicKey(voteInit.nodePubkey), new PublicKey(voteInit.authorizedVoter), new PublicKey(voteInit.authorizedWithdrawer), voteInit.commission)
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.votePubkey = instruction.keys[0].pubkey;
+        result.nodePubkey = instruction.keys[3].pubkey;
+        result.voteInit = new VoteInit(new PublicKey(voteInit.nodePubkey), new PublicKey(voteInit.authorizedVoter), new PublicKey(voteInit.authorizedWithdrawer), voteInit.commission);
+        return result;
+      })();
     }
     static decodeAuthorize(instruction) {
       this.checkProgramId(instruction.programId);
@@ -17303,14 +18489,18 @@ var solanaWeb3 = $(function (exports) {
         newAuthorized: newAuthorized,
         voteAuthorizationType: voteAuthorizationType
       } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.Authorize, instruction.data);
-      return {
-        votePubkey: instruction.keys[0].pubkey,
-        authorizedPubkey: instruction.keys[2].pubkey,
-        newAuthorizedPubkey: new PublicKey(newAuthorized),
-        voteAuthorizationType: {
-          index: voteAuthorizationType
-        }
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.votePubkey = instruction.keys[0].pubkey;
+        result.authorizedPubkey = instruction.keys[2].pubkey;
+        result.newAuthorizedPubkey = new PublicKey(newAuthorized);
+        result.voteAuthorizationType = $(function () {
+          let result = $Object.create(null, undefined);
+          result.index = voteAuthorizationType;
+          return result;
+        })();
+        return result;
+      })();
     }
     static decodeAuthorizeWithSeed(instruction) {
       this.checkProgramId(instruction.programId);
@@ -17323,16 +18513,20 @@ var solanaWeb3 = $(function (exports) {
           voteAuthorizationType: voteAuthorizationType
         }
       } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed, instruction.data);
-      return {
-        currentAuthorityDerivedKeyBasePubkey: instruction.keys[2].pubkey,
-        currentAuthorityDerivedKeyOwnerPubkey: new PublicKey(currentAuthorityDerivedKeyOwnerPubkey),
-        currentAuthorityDerivedKeySeed: currentAuthorityDerivedKeySeed,
-        newAuthorizedPubkey: new PublicKey(newAuthorized),
-        voteAuthorizationType: {
-          index: voteAuthorizationType
-        },
-        votePubkey: instruction.keys[0].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.currentAuthorityDerivedKeyBasePubkey = instruction.keys[2].pubkey;
+        result.currentAuthorityDerivedKeyOwnerPubkey = new PublicKey(currentAuthorityDerivedKeyOwnerPubkey);
+        result.currentAuthorityDerivedKeySeed = currentAuthorityDerivedKeySeed;
+        result.newAuthorizedPubkey = new PublicKey(newAuthorized);
+        result.voteAuthorizationType = $(function () {
+          let result = $Object.create(null, undefined);
+          result.index = voteAuthorizationType;
+          return result;
+        })();
+        result.votePubkey = instruction.keys[0].pubkey;
+        return result;
+      })();
     }
     static decodeWithdraw(instruction) {
       this.checkProgramId(instruction.programId);
@@ -17340,12 +18534,14 @@ var solanaWeb3 = $(function (exports) {
       const {
         lamports: lamports
       } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.Withdraw, instruction.data);
-      return {
-        votePubkey: instruction.keys[0].pubkey,
-        authorizedWithdrawerPubkey: instruction.keys[2].pubkey,
-        lamports: lamports,
-        toPubkey: instruction.keys[1].pubkey
-      };
+      return $(function () {
+        let result = $Object.create(null, undefined);
+        result.votePubkey = instruction.keys[0].pubkey;
+        result.authorizedWithdrawerPubkey = instruction.keys[2].pubkey;
+        result.lamports = lamports;
+        result.toPubkey = instruction.keys[1].pubkey;
+        return result;
+      })();
     }
     static checkProgramId(programId) {
       if (!programId.equals(VoteProgram.programId)) {
@@ -17358,32 +18554,48 @@ var solanaWeb3 = $(function (exports) {
       }
     }
   }
-  const VOTE_INSTRUCTION_LAYOUTS = $Object.freeze({
-    InitializeAccount: {
-      index: 0,
-      layout: struct([u32("instruction"), voteInit()])
-    },
-    Authorize: {
-      index: 1,
-      layout: struct([u32("instruction"), publicKey("newAuthorized"), u32("voteAuthorizationType")])
-    },
-    Withdraw: {
-      index: 3,
-      layout: struct([u32("instruction"), ns64("lamports")])
-    },
-    AuthorizeWithSeed: {
-      index: 10,
-      layout: struct([u32("instruction"), voteAuthorizeWithSeedArgs()])
-    }
-  });
-  const VoteAuthorizationLayout = $Object.freeze({
-    Voter: {
-      index: 0
-    },
-    Withdrawer: {
-      index: 1
-    }
-  });
+  const VOTE_INSTRUCTION_LAYOUTS = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.InitializeAccount = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      result.layout = struct($Array.of(u32("instruction"), voteInit()));
+      return result;
+    })();
+    result.Authorize = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      result.layout = struct($Array.of(u32("instruction"), publicKey("newAuthorized"), u32("voteAuthorizationType")));
+      return result;
+    })();
+    result.Withdraw = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 3;
+      result.layout = struct($Array.of(u32("instruction"), ns64("lamports")));
+      return result;
+    })();
+    result.AuthorizeWithSeed = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 10;
+      result.layout = struct($Array.of(u32("instruction"), voteAuthorizeWithSeedArgs()));
+      return result;
+    })();
+    return result;
+  })());
+  const VoteAuthorizationLayout = $Object.freeze($(function () {
+    let result = $Object.create(null, undefined);
+    result.Voter = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 0;
+      return result;
+    })();
+    result.Withdrawer = $(function () {
+      let result = $Object.create(null, undefined);
+      result.index = 1;
+      return result;
+    })();
+    return result;
+  })());
   class VoteProgram {
     constructor() {}
     static initializeAccount(params) {
@@ -17393,51 +18605,69 @@ var solanaWeb3 = $(function (exports) {
         voteInit: voteInit
       } = params;
       const type = VOTE_INSTRUCTION_LAYOUTS.InitializeAccount;
-      const data = encodeData(type, {
-        voteInit: {
-          nodePubkey: toBuffer(voteInit.nodePubkey.toBuffer()),
-          authorizedVoter: toBuffer(voteInit.authorizedVoter.toBuffer()),
-          authorizedWithdrawer: toBuffer(voteInit.authorizedWithdrawer.toBuffer()),
-          commission: voteInit.commission
-        }
-      });
-      const instructionData = {
-        keys: [{
-          pubkey: votePubkey,
-          isSigner: false,
-          isWritable: true
-        }, {
-          pubkey: SYSVAR_RENT_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: SYSVAR_CLOCK_PUBKEY,
-          isSigner: false,
-          isWritable: false
-        }, {
-          pubkey: nodePubkey,
-          isSigner: true,
-          isWritable: false
-        }],
-        programId: this.programId,
-        data: data
-      };
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.voteInit = $(function () {
+          let result = $Object.create(null, undefined);
+          result.nodePubkey = toBuffer(voteInit.nodePubkey.toBuffer());
+          result.authorizedVoter = toBuffer(voteInit.authorizedVoter.toBuffer());
+          result.authorizedWithdrawer = toBuffer(voteInit.authorizedWithdrawer.toBuffer());
+          result.commission = voteInit.commission;
+          return result;
+        })();
+        return result;
+      })());
+      const instructionData = $(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = $Array.of($(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = votePubkey;
+          result.isSigner = false;
+          result.isWritable = true;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_RENT_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = SYSVAR_CLOCK_PUBKEY;
+          result.isSigner = false;
+          result.isWritable = false;
+          return result;
+        })(), $(function () {
+          let result = $Object.create(null, undefined);
+          result.pubkey = nodePubkey;
+          result.isSigner = true;
+          result.isWritable = false;
+          return result;
+        })());
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)();
       return new TransactionInstruction(instructionData);
     }
     static createAccount(params) {
       const transaction = new Transaction();
-      transaction.add(SystemProgram.createAccount({
-        fromPubkey: params.fromPubkey,
-        newAccountPubkey: params.votePubkey,
-        lamports: params.lamports,
-        space: this.space,
-        programId: this.programId
-      }));
-      return transaction.add(this.initializeAccount({
-        votePubkey: params.votePubkey,
-        nodePubkey: params.voteInit.nodePubkey,
-        voteInit: params.voteInit
-      }));
+      transaction.add(SystemProgram.createAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.fromPubkey = params.fromPubkey;
+        result.newAccountPubkey = params.votePubkey;
+        result.lamports = params.lamports;
+        result.space = this.space;
+        result.programId = this.programId;
+        return result;
+      }).bind(this)()));
+      return transaction.add(this.initializeAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.votePubkey = params.votePubkey;
+        result.nodePubkey = params.voteInit.nodePubkey;
+        result.voteInit = params.voteInit;
+        return result;
+      })()));
     }
     static authorize(params) {
       const {
@@ -17447,28 +18677,38 @@ var solanaWeb3 = $(function (exports) {
         voteAuthorizationType: voteAuthorizationType
       } = params;
       const type = VOTE_INSTRUCTION_LAYOUTS.Authorize;
-      const data = encodeData(type, {
-        newAuthorized: toBuffer(newAuthorizedPubkey.toBuffer()),
-        voteAuthorizationType: voteAuthorizationType.index
-      });
-      const keys = [{
-        pubkey: votePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isSigner: false,
-        isWritable: false
-      }, {
-        pubkey: authorizedPubkey,
-        isSigner: true,
-        isWritable: false
-      }];
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.newAuthorized = toBuffer(newAuthorizedPubkey.toBuffer());
+        result.voteAuthorizationType = voteAuthorizationType.index;
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = votePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_CLOCK_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = authorizedPubkey;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static authorizeWithSeed(params) {
       const {
@@ -17480,32 +18720,44 @@ var solanaWeb3 = $(function (exports) {
         votePubkey: votePubkey
       } = params;
       const type = VOTE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed;
-      const data = encodeData(type, {
-        voteAuthorizeWithSeedArgs: {
-          currentAuthorityDerivedKeyOwnerPubkey: toBuffer(currentAuthorityDerivedKeyOwnerPubkey.toBuffer()),
-          currentAuthorityDerivedKeySeed: currentAuthorityDerivedKeySeed,
-          newAuthorized: toBuffer(newAuthorizedPubkey.toBuffer()),
-          voteAuthorizationType: voteAuthorizationType.index
-        }
-      });
-      const keys = [{
-        pubkey: votePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: SYSVAR_CLOCK_PUBKEY,
-        isSigner: false,
-        isWritable: false
-      }, {
-        pubkey: currentAuthorityDerivedKeyBasePubkey,
-        isSigner: true,
-        isWritable: false
-      }];
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.voteAuthorizeWithSeedArgs = $(function () {
+          let result = $Object.create(null, undefined);
+          result.currentAuthorityDerivedKeyOwnerPubkey = toBuffer(currentAuthorityDerivedKeyOwnerPubkey.toBuffer());
+          result.currentAuthorityDerivedKeySeed = currentAuthorityDerivedKeySeed;
+          result.newAuthorized = toBuffer(newAuthorizedPubkey.toBuffer());
+          result.voteAuthorizationType = voteAuthorizationType.index;
+          return result;
+        })();
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = votePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = SYSVAR_CLOCK_PUBKEY;
+        result.isSigner = false;
+        result.isWritable = false;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = currentAuthorityDerivedKeyBasePubkey;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static withdraw(params) {
       const {
@@ -17515,27 +18767,37 @@ var solanaWeb3 = $(function (exports) {
         toPubkey: toPubkey
       } = params;
       const type = VOTE_INSTRUCTION_LAYOUTS.Withdraw;
-      const data = encodeData(type, {
-        lamports: lamports
-      });
-      const keys = [{
-        pubkey: votePubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: toPubkey,
-        isSigner: false,
-        isWritable: true
-      }, {
-        pubkey: authorizedWithdrawerPubkey,
-        isSigner: true,
-        isWritable: false
-      }];
-      return new Transaction().add({
-        keys: keys,
-        programId: this.programId,
-        data: data
-      });
+      const data = encodeData(type, $(function () {
+        let result = $Object.create(null, undefined);
+        result.lamports = lamports;
+        return result;
+      })());
+      const keys = $Array.of($(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = votePubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = toPubkey;
+        result.isSigner = false;
+        result.isWritable = true;
+        return result;
+      })(), $(function () {
+        let result = $Object.create(null, undefined);
+        result.pubkey = authorizedWithdrawerPubkey;
+        result.isSigner = true;
+        result.isWritable = false;
+        return result;
+      })());
+      return new Transaction().add($(function () {
+        let result = $Object.create(null, undefined);
+        result.keys = keys;
+        result.programId = this.programId;
+        result.data = data;
+        return result;
+      }).bind(this)());
     }
     static safeWithdraw(params, currentVoteAccountBalance, rentExemptMinimum) {
       if (params.lamports > currentVoteAccountBalance - rentExemptMinimum) {
@@ -17547,12 +18809,14 @@ var solanaWeb3 = $(function (exports) {
   VoteProgram.programId = new PublicKey("Vote111111111111111111111111111111111111111");
   VoteProgram.space = 3731;
   const VALIDATOR_INFO_KEY = new PublicKey("Va1idator1nfo111111111111111111111111111111");
-  const InfoString = type({
-    name: string(),
-    website: optional(string()),
-    details: optional(string()),
-    keybaseUsername: optional(string())
-  });
+  const InfoString = type($(function () {
+    let result = $Object.create(null, undefined);
+    result.name = string();
+    result.website = optional(string());
+    result.details = optional(string());
+    result.keybaseUsername = optional(string());
+    return result;
+  })());
   class ValidatorInfo {
     constructor(key, info) {
       this.key = void 0;
@@ -17561,19 +18825,21 @@ var solanaWeb3 = $(function (exports) {
       this.info = info;
     }
     static fromConfigData(buffer$1) {
-      let byteArray = [...buffer$1];
+      let byteArray = $Array.of(...buffer$1);
       const configKeyCount = decodeLength(byteArray);
       if (configKeyCount !== 2) return null;
-      const configKeys = [];
+      const configKeys = $Array.of();
       for (let i = 0; i < 2; i++) {
         const publicKey = new PublicKey(byteArray.slice(0, PUBLIC_KEY_LENGTH));
         byteArray = byteArray.slice(PUBLIC_KEY_LENGTH);
         const isSigner = byteArray.slice(0, 1)[0] === 1;
         byteArray = byteArray.slice(1);
-        configKeys.push({
-          publicKey: publicKey,
-          isSigner: isSigner
-        });
+        configKeys.push($(function () {
+          let result = $Object.create(null, undefined);
+          result.publicKey = publicKey;
+          result.isSigner = isSigner;
+          return result;
+        })());
       }
       if (configKeys[0].publicKey.equals(VALIDATOR_INFO_KEY)) {
         if (configKeys[1].isSigner) {
@@ -17587,7 +18853,7 @@ var solanaWeb3 = $(function (exports) {
     }
   }
   const VOTE_PROGRAM_ID = new PublicKey("Vote111111111111111111111111111111111111111");
-  const VoteAccountLayout = struct([publicKey("nodePubkey"), publicKey("authorizedWithdrawer"), u8("commission"), nu64(), seq(struct([nu64("slot"), u32("confirmationCount")]), offset(u32(), -8), "votes"), u8("rootSlotValid"), nu64("rootSlot"), nu64(), seq(struct([nu64("epoch"), publicKey("authorizedVoter")]), offset(u32(), -8), "authorizedVoters"), struct([seq(struct([publicKey("authorizedPubkey"), nu64("epochOfLastAuthorizedSwitch"), nu64("targetEpoch")]), 32, "buf"), nu64("idx"), u8("isEmpty")], "priorVoters"), nu64(), seq(struct([nu64("epoch"), nu64("credits"), nu64("prevCredits")]), offset(u32(), -8), "epochCredits"), struct([nu64("slot"), nu64("timestamp")], "lastTimestamp")]);
+  const VoteAccountLayout = struct($Array.of(publicKey("nodePubkey"), publicKey("authorizedWithdrawer"), u8("commission"), nu64(), seq(struct($Array.of(nu64("slot"), u32("confirmationCount"))), offset(u32(), -8), "votes"), u8("rootSlotValid"), nu64("rootSlot"), nu64(), seq(struct($Array.of(nu64("epoch"), publicKey("authorizedVoter"))), offset(u32(), -8), "authorizedVoters"), struct($Array.of(seq(struct($Array.of(publicKey("authorizedPubkey"), nu64("epochOfLastAuthorizedSwitch"), nu64("targetEpoch"))), 32, "buf"), nu64("idx"), u8("isEmpty")), "priorVoters"), nu64(), seq(struct($Array.of(nu64("epoch"), nu64("credits"), nu64("prevCredits"))), offset(u32(), -8), "epochCredits"), struct($Array.of(nu64("slot"), nu64("timestamp")), "lastTimestamp")));
   class VoteAccount {
     constructor(args) {
       this.nodePubkey = void 0;
@@ -17616,27 +18882,31 @@ var solanaWeb3 = $(function (exports) {
       if (!va.rootSlotValid) {
         rootSlot = null;
       }
-      return new VoteAccount({
-        nodePubkey: new PublicKey(va.nodePubkey),
-        authorizedWithdrawer: new PublicKey(va.authorizedWithdrawer),
-        commission: va.commission,
-        votes: va.votes,
-        rootSlot: rootSlot,
-        authorizedVoters: va.authorizedVoters.map(parseAuthorizedVoter),
-        priorVoters: getPriorVoters(va.priorVoters),
-        epochCredits: va.epochCredits,
-        lastTimestamp: va.lastTimestamp
-      });
+      return new VoteAccount($(function () {
+        let result = $Object.create(null, undefined);
+        result.nodePubkey = new PublicKey(va.nodePubkey);
+        result.authorizedWithdrawer = new PublicKey(va.authorizedWithdrawer);
+        result.commission = va.commission;
+        result.votes = va.votes;
+        result.rootSlot = rootSlot;
+        result.authorizedVoters = va.authorizedVoters.map(parseAuthorizedVoter);
+        result.priorVoters = getPriorVoters(va.priorVoters);
+        result.epochCredits = va.epochCredits;
+        result.lastTimestamp = va.lastTimestamp;
+        return result;
+      })());
     }
   }
   function parseAuthorizedVoter({
     authorizedVoter: authorizedVoter,
     epoch: epoch
   }) {
-    return {
-      epoch: epoch,
-      authorizedVoter: new PublicKey(authorizedVoter)
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.epoch = epoch;
+      result.authorizedVoter = new PublicKey(authorizedVoter);
+      return result;
+    })();
   }
   $(parseAuthorizedVoter);
   function parsePriorVoters({
@@ -17644,11 +18914,13 @@ var solanaWeb3 = $(function (exports) {
     epochOfLastAuthorizedSwitch: epochOfLastAuthorizedSwitch,
     targetEpoch: targetEpoch
   }) {
-    return {
-      authorizedPubkey: new PublicKey(authorizedPubkey),
-      epochOfLastAuthorizedSwitch: epochOfLastAuthorizedSwitch,
-      targetEpoch: targetEpoch
-    };
+    return $(function () {
+      let result = $Object.create(null, undefined);
+      result.authorizedPubkey = new PublicKey(authorizedPubkey);
+      result.epochOfLastAuthorizedSwitch = epochOfLastAuthorizedSwitch;
+      result.targetEpoch = targetEpoch;
+      return result;
+    })();
   }
   $(parsePriorVoters);
   function getPriorVoters({
@@ -17657,23 +18929,29 @@ var solanaWeb3 = $(function (exports) {
     isEmpty: isEmpty
   }) {
     if (isEmpty) {
-      return [];
+      return $Array.of();
     }
-    return [...buf.slice(idx + 1).map(parsePriorVoters), ...buf.slice(0, idx).map(parsePriorVoters)];
+    return $Array.of(...buf.slice(idx + 1).map(parsePriorVoters), ...buf.slice(0, idx).map(parsePriorVoters));
   }
   $(getPriorVoters);
-  const endpoint = {
-    http: {
-      devnet: "http://api.devnet.solana.com",
-      testnet: "http://api.testnet.solana.com",
-      "mainnet-beta": "http://api.mainnet-beta.solana.com/"
-    },
-    https: {
-      devnet: "https://api.devnet.solana.com",
-      testnet: "https://api.testnet.solana.com",
-      "mainnet-beta": "https://api.mainnet-beta.solana.com/"
-    }
-  };
+  const endpoint = $(function () {
+    let result = $Object.create(null, undefined);
+    result.http = $(function () {
+      let result = $Object.create(null, undefined);
+      result.devnet = "http://api.devnet.solana.com";
+      result.testnet = "http://api.testnet.solana.com";
+      result["mainnet-beta"] = "http://api.mainnet-beta.solana.com/";
+      return result;
+    })();
+    result.https = $(function () {
+      let result = $Object.create(null, undefined);
+      result.devnet = "https://api.devnet.solana.com";
+      result.testnet = "https://api.testnet.solana.com";
+      result["mainnet-beta"] = "https://api.mainnet-beta.solana.com/";
+      return result;
+    })();
+    return result;
+  })();
   function clusterApiUrl(cluster, tls) {
     const key = tls === false ? "http" : "https";
     if (!cluster) {
@@ -17695,11 +18973,13 @@ var solanaWeb3 = $(function (exports) {
     } else {
       options = confirmationStrategyOrConfirmOptions;
     }
-    const sendOptions = options && {
-      skipPreflight: options.skipPreflight,
-      preflightCommitment: options.preflightCommitment || options.commitment,
-      minContextSlot: options.minContextSlot
-    };
+    const sendOptions = options && $(function () {
+      let result = $Object.create(null, undefined);
+      result.skipPreflight = options.skipPreflight;
+      result.preflightCommitment = options.preflightCommitment || options.commitment;
+      result.minContextSlot = options.minContextSlot;
+      return result;
+    })();
     const signature = await connection.sendRawTransaction(rawTransaction, sendOptions);
     const commitment = options && options.commitment;
     const confirmationPromise = confirmationStrategy ? connection.confirmTransaction(confirmationStrategy, commitment) : connection.confirmTransaction(signature, commitment);
@@ -17785,8 +19065,10 @@ var solanaWeb3 = $(function (exports) {
   exports.clusterApiUrl = clusterApiUrl;
   exports.sendAndConfirmRawTransaction = sendAndConfirmRawTransaction;
   exports.sendAndConfirmTransaction = sendAndConfirmTransaction;
-  $Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+  $Object.defineProperty(exports, "__esModule", $(function () {
+    let result = $Object.create(null, undefined);
+    result.value = true;
+    return result;
+  })());
   return exports;
-})({});
+})($Object.create(null, undefined));

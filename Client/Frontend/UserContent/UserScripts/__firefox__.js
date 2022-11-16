@@ -13,7 +13,7 @@ if (!window.__firefox__) {
     let prototypeProperties = Object.create(null, value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : undefined);
     delete prototypeProperties['prototype'];
     
-    let properties = Object.assign({},
+    let properties = Object.assign(Object.create(null, undefined),
                                    Object.getOwnPropertyDescriptors(value),
                                    value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : undefined);
     
@@ -21,31 +21,16 @@ if (!window.__firefox__) {
     delete properties['prototype'];
     
     /// Making object not inherit from Object.prototype prevents prototype pollution attacks.
-    // return Object.create(null, properties);
+    //return Object.create(null, properties);
     
     // Create a Proxy so we can add an Object.prototype that has a null prototype and is read-only.
     return new Proxy(Object.create(null, properties), {
-      apply(target, thisArg, argumentsList) { return undefined; },
-      deleteProperty(target, property) { return false; },
-      defineProperty(target, property, descriptor) {
-        return $Reflect.defineProperty(target, property, descriptor);
-      },
-      
       get(target, property, receiver) {
         if (property == 'prototype') {
-          $Object.freeze(prototypeProperties);
           return prototypeProperties;
         }
-        
+
         return target[property];
-      },
-      
-      set(target, name, value, receiver) {
-        if (name == 'toString') {
-          target[name] = value;
-          return true;
-        }
-        return false;
       }
     });
   }
@@ -304,7 +289,7 @@ if (!window.__firefox__) {
         if (!userScripts[name]) {
           userScripts[name] = true;
           if (typeof fn === 'function') {
-            $(fn)($, $Object, $Array);
+            $(fn)($, $Object, $Function, $Array);
           }
           return true;
         }
@@ -314,7 +299,7 @@ if (!window.__firefox__) {
     
       let execute = $(function(fn) {
         if (typeof fn === 'function') {
-          $(fn)($, $Object, $Array);
+          $(fn)($, $Object, $Function, $Array);
           return true;
         }
         return false;
