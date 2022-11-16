@@ -221,7 +221,9 @@ class UserScriptManager {
         }
       }
       
-      if let solanaWeb3Script = tab.walletSolProviderScripts[.solanaWeb3] {
+      let script = ScriptLoader.loadUserScript(named: "SolanaWeb3Script") ?? tab.walletSolProviderScripts[.solanaWeb3]
+      
+      if let solanaWeb3Script = script {
         let script = """
         // Define a global variable with a random name
         // Local variables are NOT enumerable!
@@ -234,9 +236,11 @@ class UserScriptManager {
           \(UserScriptManager.walletSolanaNameSpace) = $({
             solanaWeb3: $(solanaWeb3)
           });
-          
-          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).PublicKey);
-          $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).Transaction);
+
+          for (const [key, value] of $Object.entries(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3)) {
+            $.deepFreeze(value);
+          }
+        
           $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);
           $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace));
         });

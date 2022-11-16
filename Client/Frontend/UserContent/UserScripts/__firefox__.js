@@ -10,6 +10,9 @@ if (!window.__firefox__) {
    *  Copies an object's signature to an object with no prototype to prevent prototype polution attacks
    */
   function secureCopy(value) {
+    let prototypeProperties = Object.create(null, value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : undefined);
+    delete prototypeProperties['prototype'];
+    
     let properties = Object.assign({},
                                    Object.getOwnPropertyDescriptors(value),
                                    value.prototype ? Object.getOwnPropertyDescriptors(value.prototype) : undefined);
@@ -18,7 +21,33 @@ if (!window.__firefox__) {
     delete properties['prototype'];
     
     /// Making object not inherit from Object.prototype prevents prototype pollution attacks.
-    return Object.create(null, properties);
+    // return Object.create(null, properties);
+    
+    // Create a Proxy so we can add an Object.prototype that has a null prototype and is read-only.
+    return new Proxy(Object.create(null, properties), {
+      apply(target, thisArg, argumentsList) { return undefined; },
+      deleteProperty(target, property) { return false; },
+      defineProperty(target, property, descriptor) {
+        return $Reflect.defineProperty(target, property, descriptor);
+      },
+      
+      get(target, property, receiver) {
+        if (property == 'prototype') {
+          $Object.freeze(prototypeProperties);
+          return prototypeProperties;
+        }
+        
+        return target[property];
+      },
+      
+      set(target, name, value, receiver) {
+        if (name == 'toString') {
+          target[name] = value;
+          return true;
+        }
+        return false;
+      }
+    });
   }
   
   /*
@@ -122,6 +151,10 @@ if (!window.__firefox__) {
    *  Freeze an object and its prototype
    */
   $.deepFreeze = function(value) {
+    if (!value) {
+      return value;
+    }
+    
     $Object.freeze(value);
     
     if (value.prototype) {
