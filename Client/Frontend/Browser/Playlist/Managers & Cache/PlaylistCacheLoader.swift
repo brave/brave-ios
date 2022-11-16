@@ -4,320 +4,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import AVFoundation
 import WebKit
-import MobileCoreServices
 import Data
 import Shared
 import BraveShared
 import Storage
 import os.log
-
-// IANA List of Audio types: https://www.iana.org/assignments/media-types/media-types.xhtml#audio
-// IANA List of Video types: https://www.iana.org/assignments/media-types/media-types.xhtml#video
-// APPLE List of UTI types: https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/UTIRef/Articles/System-DeclaredUniformTypeIdentifiers.html
-
-public class PlaylistMimeTypeDetector {
-  private(set) var mimeType: String?
-  private(set) var fileExtension: String?  // When nil, assume `mpg` format.
-
-  init(url: URL) {
-    let possibleFileExtension = url.pathExtension.lowercased()
-    if let supportedExtension = knownFileExtensions.first(where: { $0.lowercased() == possibleFileExtension }) {
-      self.fileExtension = supportedExtension
-      self.mimeType = mimeTypeMap.first(where: { $0.value == supportedExtension })?.key
-    } else if let fileExtension = PlaylistMimeTypeDetector.supportedAVAssetFileExtensions().first(where: { $0.lowercased() == possibleFileExtension }) {
-      self.fileExtension = fileExtension
-      self.mimeType = PlaylistMimeTypeDetector.fileExtensionToMimeType(fileExtension)
-    }
-  }
-
-  init(mimeType: String) {
-    if let fileExtension = mimeTypeMap[mimeType.lowercased()] {
-      self.mimeType = mimeType
-      self.fileExtension = fileExtension
-    } else if let mimeType = PlaylistMimeTypeDetector.supportedAVAssetMimeTypes().first(where: { $0.lowercased() == mimeType.lowercased() }) {
-      self.mimeType = mimeType
-      self.fileExtension = PlaylistMimeTypeDetector.mimeTypeToFileExtension(mimeType)
-    }
-  }
-
-  init(data: Data) {
-    // Assume mpg by default. If it can't play, it will fail anyway..
-    // AVPlayer REQUIRES that you give a file extension no matter what and will refuse to determine the extension for you without an
-    // AVResourceLoaderDelegate :S
-
-    if findHeader(offset: 0, data: data, header: [0x1A, 0x45, 0xDF, 0xA3]) {
-      mimeType = "video/webm"
-      fileExtension = "webm"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x1A, 0x45, 0xDF, 0xA3]) {
-      mimeType = "video/matroska"
-      fileExtension = "mkv"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x4F, 0x67, 0x67, 0x53]) {
-      mimeType = "application/ogg"
-      fileExtension = "ogg"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) && findHeader(offset: 8, data: data, header: [0x57, 0x41, 0x56, 0x45]) {
-      mimeType = "audio/x-wav"
-      fileExtension = "wav"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) || findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) {
-      mimeType = "audio/mpeg"
-      fileExtension = "mp4"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x66, 0x4C, 0x61, 0x43]) {
-      mimeType = "audio/flac"
-      fileExtension = "flac"
-      return
-    }
-
-    if findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x53, 0x4E, 0x56]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32]) || findHeader(offset: 0, data: data, header: [0x33, 0x67, 0x70, 0x35]) {
-      mimeType = "video/mp4"
-      fileExtension = "mp4"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x56]) {
-      mimeType = "video/x-m4v"
-      fileExtension = "m4v"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70]) {
-      mimeType = "video/quicktime"
-      fileExtension = "mov"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) && findHeader(offset: 8, data: data, header: [0x41, 0x56, 0x49]) {
-      mimeType = "video/x-msvideo"
-      fileExtension = "avi"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11, 0xA6, 0xD9]) {
-      mimeType = "video/x-ms-wmv"
-      fileExtension = "wmv"
-      return
-    }
-
-    // Maybe
-    if findHeader(offset: 0, data: data, header: [0x00, 0x00, 0x01]) {
-      mimeType = "video/mpeg"
-      fileExtension = "mpg"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) || findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) {
-      mimeType = "audio/mpeg"
-      fileExtension = "mp3"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x4D, 0x34, 0x41, 0x20]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x41]) {
-      mimeType = "audio/m4a"
-      fileExtension = "m4a"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x23, 0x21, 0x41, 0x4D, 0x52, 0x0A]) {
-      mimeType = "audio/amr"
-      fileExtension = "amr"
-      return
-    }
-
-    if findHeader(offset: 0, data: data, header: [0x46, 0x4C, 0x56, 0x01]) {
-      mimeType = "video/x-flv"
-      fileExtension = "flv"
-      return
-    }
-
-    mimeType = "application/x-mpegURL"  // application/vnd.apple.mpegurl
-    fileExtension = nil
-  }
-
-  private func findHeader(offset: Int, data: Data, header: [UInt8]) -> Bool {
-    if offset < 0 || data.count < offset + header.count {
-      return false
-    }
-
-    return [UInt8](data[offset..<(offset + header.count)]) == header
-  }
-
-  /// Converts a File Extension to a Mime-Type
-  private static func fileExtensionToMimeType(_ fileExtension: String) -> String? {
-    if #available(iOS 14.0, *) {
-      return UTType(tag: fileExtension, tagClass: .filenameExtension, conformingTo: nil)?.preferredMIMEType
-    } else {
-      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue() {
-        return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassMIMEType)?.takeRetainedValue() as String?
-      }
-      return nil
-    }
-  }
-
-  /// Converts a Mime-Type to File Extension
-  private static func mimeTypeToFileExtension(_ mimeType: String) -> String? {
-    if #available(iOS 14.0, *) {
-      return UTType(tag: mimeType, tagClass: .mimeType, conformingTo: nil)?.preferredFilenameExtension
-    } else {
-      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() {
-        return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
-      }
-      return nil
-    }
-  }
-
-  /// Converts a list of AVFileType to a list of file extensions
-  private static func supportedAVAssetFileExtensions() -> [String] {
-    if #available(iOS 14.0, *) {
-      let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTType($0.rawValue)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
-    } else {
-      let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassFilenameExtension)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
-    }
-  }
-
-  /// Converts a list of AVFileType to a list of mime-types
-  private static func supportedAVAssetMimeTypes() -> [String] {
-    if #available(iOS 14.0, *) {
-      let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTType($0.rawValue)?.preferredMIMEType }).filter({ !$0.isEmpty })
-    } else {
-      let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassMIMEType)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
-    }
-  }
-
-  private let knownFileExtensions = [
-    "mov",
-    "qt",
-    "mp4",
-    "m4v",
-    "m4a",
-    "m4b",  // DRM protected
-    "m4p",  // DRM protected
-    "3gp",
-    "3gpp",
-    "sdv",
-    "3g2",
-    "3gp2",
-    "caf",
-    "wav",
-    "wave",
-    "bwf",
-    "aif",
-    "aiff",
-    "aifc",
-    "cdda",
-    "amr",
-    "mp3",
-    "au",
-    "snd",
-    "ac3",
-    "eac3",
-    "flac",
-    "aac",
-    "mp2",
-    "pls",
-    "avi",
-    "webm",
-    "ogg",
-    "mpg",
-    "mpg4",
-    "mpeg",
-    "mpg3",
-    "wma",
-    "wmv",
-    "swf",
-    "flv",
-    "mng",
-    "asx",
-    "asf",
-    "mkv",
-  ]
-
-  private let mimeTypeMap = [
-    "audio/x-wav": "wav",
-    "audio/vnd.wave": "wav",
-    "audio/aacp": "aacp",
-    "audio/mpeg3": "mp3",
-    "audio/mp3": "mp3",
-    "audio/x-caf": "caf",
-    "audio/mpeg": "mp3",  // mpg3
-    "audio/x-mpeg3": "mp3",
-    "audio/wav": "wav",
-    "audio/flac": "flac",
-    "audio/x-flac": "flac",
-    "audio/mp4": "mp4",
-    "audio/x-mpg": "mp3",  // maybe mpg3
-    "audio/scpls": "pls",
-    "audio/x-aiff": "aiff",
-    "audio/usac": "eac3",  // Extended AC3
-    "audio/x-mpeg": "mp3",
-    "audio/wave": "wav",
-    "audio/x-m4r": "m4r",
-    "audio/x-mp3": "mp3",
-    "audio/amr": "amr",
-    "audio/aiff": "aiff",
-    "audio/3gpp2": "3gp2",
-    "audio/aac": "aac",
-    "audio/mpg": "mp3",  // mpg3
-    "audio/mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
-    "audio/x-m4b": "m4b",
-    "audio/x-m4p": "m4p",
-    "audio/x-scpls": "pls",
-    "audio/x-mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
-    "audio/x-aac": "aac",
-    "audio/3gpp": "3gp",
-    "audio/basic": "au",
-    "audio/au": "au",
-    "audio/snd": "snd",
-    "audio/x-m4a": "m4a",
-    "audio/x-realaudio": "ra",
-    "video/3gpp2": "3gp2",
-    "video/quicktime": "mov",
-    "video/mp4": "mp4",
-    "video/mp4v": "mp4",
-    "video/mpg": "mpg",
-    "video/mpeg": "mpeg",
-    "video/x-mpg": "mpg",
-    "video/x-mpeg": "mpeg",
-    "video/avi": "avi",
-    "video/x-m4v": "m4v",
-    "video/mp2t": "ts",
-    "application/vnd.apple.mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
-    "video/3gpp": "3gp",
-    "text/vtt": "vtt",  // Subtitles format
-    "application/mp4": "mp4",
-    "application/x-mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
-    "video/webm": "webm",
-    "application/ogg": "ogg",
-    "video/msvideo": "avi",
-    "video/x-msvideo": "avi",
-    "video/x-ms-wmv": "wmv",
-    "video/x-ms-wma": "wma",
-    "application/x-shockwave-flash": "swf",
-    "video/x-flv": "flv",
-    "video/x-mng": "mng",
-    "video/x-ms-asx": "asx",
-    "video/x-ms-asf": "asf",
-    "video/matroska": "mkv",
-  ]
-}
 
 class PlaylistWebLoader: UIView {
   fileprivate static var pageLoadTimeout = 300.0
@@ -485,33 +177,6 @@ class PlaylistWebLoader: UIView {
 }
 
 extension PlaylistWebLoader: WKNavigationDelegate {
-  // Recognize an Apple Maps URL. This will trigger the native app. But only if a search query is present. Otherwise
-  // it could just be a visit to a regular page on maps.apple.com.
-  fileprivate func isAppleMapsURL(_ url: URL) -> Bool {
-    if url.scheme == "http" || url.scheme == "https" {
-      if url.host == "maps.apple.com" && url.query != nil {
-        return true
-      }
-    }
-    return false
-  }
-
-  // Recognize a iTunes Store URL. These all trigger the native apps. Note that appstore.com and phobos.apple.com
-  // used to be in this list. I have removed them because they now redirect to itunes.apple.com. If we special case
-  // them then iOS will actually first open Safari, which then redirects to the app store. This works but it will
-  // leave a 'Back to Safari' button in the status bar, which we do not want.
-  fileprivate func isStoreURL(_ url: URL) -> Bool {
-    if url.scheme == "http" || url.scheme == "https" {
-      if url.host == "itunes.apple.com" {
-        return true
-      }
-    }
-    if url.scheme == "itms-appss" || url.scheme == "itmss" {
-      return true
-    }
-    return false
-  }
-  
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     webView.evaluateSafeJavaScript(functionName: "window.__firefox__.playlistProcessDocumentLoad()",
                                    args: [],
@@ -523,115 +188,40 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     self.handler?(nil)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
     guard let url = navigationAction.request.url else {
-      decisionHandler(.cancel, preferences)
-      return
+      return (.cancel, preferences)
     }
-
-    if url.scheme == "about" || url.isBookmarklet {
-      decisionHandler(.cancel, preferences)
-      return
+    
+    if let policy = handleSpecialActions(for: navigationAction) {
+      return (policy, preferences)
     }
-
-    if navigationAction.isInternalUnprivileged && navigationAction.navigationType != .backForward {
-      decisionHandler(.cancel, preferences)
-      return
-    }
-
-    // Universal links do not work if the request originates from the app, manual handling is required.
-    if let mainDocURL = navigationAction.request.mainDocumentURL,
-      let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
-      switch universalLink {
-      case .buyVPN:
-        decisionHandler(.cancel, preferences)
-        return
-      }
-    }
-
-    // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
-    // gives us the exact same behaviour as Safari.
-    if url.scheme == "tel" || url.scheme == "facetime" || url.scheme == "facetime-audio" || url.scheme == "mailto" || isAppleMapsURL(url) || isStoreURL(url) {
-      decisionHandler(.cancel, preferences)
-      return
-    }
+    
+    NavigationActionHelper.configurePageData(for: navigationAction, on: tab)
     
     // Ad-blocking checks
     if let mainDocumentURL = navigationAction.request.mainDocumentURL {
-      if mainDocumentURL != tab.currentPageData?.mainFrameURL {
-        // Clear the current page data if the page changes.
-        // Do this before anything else so that we have a clean slate.
-        tab.currentPageData = PageData(mainFrameURL: mainDocumentURL)
-      }
-      
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
       let domainForMainFrame = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
-      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
-      
-      if let requestURL = navigationAction.request.url,
-         let targetFrame = navigationAction.targetFrame,
-         let customUserScripts = tab.currentPageData?.makeUserScriptTypes(
-          forRequestURL: requestURL,
-          isForMainFrame: targetFrame.isMainFrame,
-          domain: domainForMainFrame
-         ) {
-        tab.setCustomUserScript(scripts: customUserScripts)
-      }
+      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled =
+        domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
+      NavigationActionHelper.configureTabScripts(for: navigationAction, on: tab, domain: domainForMainFrame)
     }
 
+    // The next part requires that the request has a valid scheme
+    // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
+    // always allow this. Additionally, data URIs are also handled just like normal web pages.
     if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
-      if navigationAction.targetFrame?.isMainFrame == true {
-        tab.updateUserAgent(webView, newURL: url)
-      }
-
-      pendingRequests[url.absoluteString] = navigationAction.request
-
-      // TODO: Downgrade to 14.5 once api becomes available.
-      if #unavailable(iOS 15.0) {
-        if Preferences.Shields.httpsEverywhere.value,
-          url.scheme == "http",
-          let urlHost = url.normalizedHost() {
-          HttpsEverywhereStats.shared.shouldUpgrade(url) { shouldupgrade in
-            DispatchQueue.main.async {
-              if shouldupgrade {
-                self.pendingHTTPUpgrades[urlHost] = navigationAction.request
-              }
-            }
-          }
-        }
-      }
-
-      if let mainDocumentURL = navigationAction.request.mainDocumentURL,
-        mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
-        !(InternalURL(url)?.isSessionRestore ?? false),
-        navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
-
-        // Identify specific block lists that need to be applied to the requesting domain
-        let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: false)
-
-        // Force adblocking on
-        domainForShields.shield_allOff = 0
-        domainForShields.shield_adblockAndTp = true
-        
-        // Load block lists
-        let enabledRuleTypes = ContentBlockerManager.shared.compiledRuleTypes(for: domainForShields)
-        tab.contentBlocker.ruleListTypes = enabledRuleTypes
-
-        let isScriptsEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
-        preferences.allowsContentJavaScript = isScriptsEnabled
-      }
-
-      // Cookie Blocking code below
-      tab.setScript(script: .cookieBlocking, enabled: Preferences.Privacy.blockAllCookies.value)
-
-      decisionHandler(.allow, preferences)
-      return
+      NavigationActionHelper.ensureUserAgent(for: navigationAction, on: tab, webView: webView)
+      handleHTTPSUpgrades(for: navigationAction)
+      let updatedPreferences = setupAdBlock(for: navigationAction, on: tab, preferences: preferences)
+      return (.allow, updatedPreferences)
+    } else {
+      return (.cancel, preferences)
     }
-
-    decisionHandler(.cancel, preferences)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     let response = navigationResponse.response
     let responseURL = response.url
 
@@ -669,15 +259,13 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     if let browserController = webView.currentScene?.browserViewController {
       // Check if this response should be handed off to Passbook.
       if OpenPassBookHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
-        decisionHandler(.cancel)
-        return
+        return .cancel
       }
     }
 
     if navigationResponse.isForMainFrame {
       if response.mimeType?.isKindOfHTML == false, request != nil {
-        decisionHandler(.cancel)
-        return
+        return .cancel
       } else {
         tab.temporaryDocument = nil
       }
@@ -685,23 +273,93 @@ extension PlaylistWebLoader: WKNavigationDelegate {
       tab.mimeType = response.mimeType
     }
 
-    decisionHandler(.allow)
+    return .allow
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+  public func webView(_ webView: WKWebView, respondTo challenge: URLAuthenticationChallenge) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
       let trust = challenge.protectionSpace.serverTrust,
       let cert = SecTrustGetCertificateAtIndex(trust, 0), certStore?.containsCertificate(cert, forOrigin: origin) == true {
-      completionHandler(.useCredential, URLCredential(trust: trust))
-      return
+      return (.useCredential, URLCredential(trust: trust))
     }
 
     guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
-      completionHandler(.performDefaultHandling, nil)
-      return
+      return (.performDefaultHandling, nil)
     }
 
-    completionHandler(.rejectProtectionSpace, nil)
+    return (.rejectProtectionSpace, nil)
+  }
+}
+
+private extension PlaylistWebLoader {
+  func handleSpecialActions(for navigationAction: WKNavigationAction) -> WKNavigationActionPolicy? {
+    switch NavigationActionHelper.handleSpecialActions(for: navigationAction) {
+    case .aboutScheme, .bookmarklet, .buyVPN, .appleMapsURL, .storeURL, .externalAppScheme:
+      return .cancel
+    case .internalLink(let isPrivileged):
+      if !isPrivileged && navigationAction.navigationType != .backForward {
+        return .cancel
+      } else {
+        return nil
+      }
+    case .none, .braveScheme:
+      return nil
+    }
+  }
+  
+  // TODO: Downgrade to 14.5 once api becomes available.
+  /// Special handling for iOS below versio 15+
+  func handleHTTPSUpgrades(for navigationAction: WKNavigationAction) {
+    guard let url = navigationAction.request.url else { return }
+    pendingRequests[url.absoluteString] = navigationAction.request
+    
+    if #unavailable(iOS 15.0) {
+      guard Preferences.Shields.httpsEverywhere.value,
+            url.scheme == "http",
+            let urlHost = url.normalizedHost() else {
+        return
+      }
+      
+      HttpsEverywhereStats.shared.shouldUpgrade(url) { shouldupgrade in
+        DispatchQueue.main.async {
+          if shouldupgrade {
+            self.pendingHTTPUpgrades[urlHost] = navigationAction.request
+          }
+        }
+      }
+    }
+  }
+  
+  /// Setup Adblock preferences on the tab
+  func setupAdBlock(for navigationAction: WKNavigationAction, on tab: Tab, preferences: WKWebpagePreferences) -> WKWebpagePreferences {
+    // Only use main document URL, not the request URL
+    //   If an iFrame is loaded, shields depending on the main frame, not the iFrame request
+    // Weird behavior here with `targetFram` and `sourceFrame`, on refreshing page `sourceFrame` is not nil (it is non-optional)
+    //   however, it is still an uninitialized object, making it an unreliable source to compare `isMainFrame` against.
+    //   Rather than using `sourceFrame.isMainFrame` or even comparing `sourceFrame == targetFrame`, a simple URL check is used.
+    // No adblocking logic is be used on session restore urls. It uses javascript to retrieve the
+    //   request then the page is reloaded with a proper url and adblocking rules are applied.
+    if let url = navigationAction.request.url,
+       let mainDocumentURL = navigationAction.request.mainDocumentURL,
+       mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
+       !(InternalURL(url)?.isSessionRestore ?? false),
+       navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
+      // Identify specific block lists that need to be applied to the requesting domain
+      let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: false)
+
+      // Force adblocking on
+      domainForShields.shield_allOff = 0
+      domainForShields.shield_adblockAndTp = true
+      
+      // Load block lists
+      let enabledRuleTypes = ContentBlockerManager.shared.compiledRuleTypes(for: domainForShields)
+      tab.contentBlocker.ruleListTypes = enabledRuleTypes
+
+      let isScriptsEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
+      preferences.allowsContentJavaScript = isScriptsEnabled
+    }
+    
+    return preferences
   }
 }
