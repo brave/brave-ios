@@ -42,9 +42,7 @@ public class BraveSkusManager {
     
     Logger.module.debug("Refreshing sku credential. Clearing old credential from persistence.")
     
-    Preferences.VPN.skusCredential.reset()
-    Preferences.VPN.skusCredentialDomain.reset()
-    Preferences.VPN.skusCredentialExpirationDate.reset()
+    BraveVPN.clearSkusCredentials()
     
     manager.credentialSummary(for: domain) { completion in
       Logger.module.debug("credentialSummary response")

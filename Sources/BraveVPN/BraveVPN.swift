@@ -307,6 +307,10 @@ public class BraveVPN {
     GRDKeychain.removeGuardianKeychainItems()
     GRDKeychain.removeSubscriberCredential(withRetries: 3)
     
+    clearSkusCredentials() 
+  }
+  
+  public static func clearSkusCredentials() {
     Preferences.VPN.skusCredential.reset()
     Preferences.VPN.skusCredentialDomain.reset()
     Preferences.VPN.skusCredentialExpirationDate.reset()
