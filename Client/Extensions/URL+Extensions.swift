@@ -24,11 +24,4 @@ extension URL {
     
     return host == "itunes.apple.com"
   }
-
-  /// This is the place where we decide what to do with a new navigation action. There are a number of special schemes
-  /// and http(s) urls that need to be handled in a different way. All the logic for that is inside this delegate
-  /// method.
-  var isUpholdOAuthAuthorization: Bool {
-    return scheme == "rewards" && host == "uphold"
-  }
 }
