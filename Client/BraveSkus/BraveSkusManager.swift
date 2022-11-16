@@ -15,7 +15,7 @@ public class BraveSkusManager {
   
   public init?(isPrivateMode: Bool) {
     guard let skusService = Skus.SkusServiceFactory.get(privateMode: isPrivateMode) else {
-      assertionFailure("Failed to create SkusService")
+      assert(isPrivateMode, "SkusServiceFactory failed to intialize in regular mode, something is wrong.")
       return nil
     }
     
@@ -36,7 +36,7 @@ public class BraveSkusManager {
     }
     
     guard let manager = BraveSkusManager(isPrivateMode: isPrivate) else {
-      assertionFailure()
+      assert(isPrivate, "SkusServiceFactory failed to intialize in regular mode, something is wrong.")
       return
     }
     

@@ -18,7 +18,7 @@ class BraveSkusScriptHandler: TabContentScript {
   
   required init?(tab: Tab) {
     guard let manager = BraveSkusManager(isPrivateMode: tab.isPrivate) else {
-      assertionFailure()
+      assert(tab.isPrivate, "BraveSkusManager failed to intialize in regular mode, something is wrong.")
       return nil
     }
     
