@@ -6,6 +6,7 @@
 @testable import Brave
 import UIKit
 import Shared
+import BraveCore
 
 import XCTest
 
@@ -24,6 +25,9 @@ class SearchTests: XCTestCase {
   }
 
   func testURIFixup() {
+    
+    assert(BraveCoreMain.initializeICUForTesting(), "ICU should load for test")
+    
     // Check valid URLs. We can load these after some fixup.
     checkValidURL("about:", afterFixup: "about:")
     checkValidURL("about:config", afterFixup: "about:config")
@@ -61,21 +65,20 @@ class SearchTests: XCTestCase {
     checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
     checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
   
-    // TODO: Need https://github.com/brave/brave-browser/issues/26707
-//    checkValidURL("https://日本語.jp", afterFixup: "https://xn--wgv71a119e.jp/")
-//    checkValidURL("http://anlaşırız.net", afterFixup: "http://xn--anlarz-s9ab52b.net/")
-//    checkValidURL("http://ö.de", afterFixup: "http://xn--nda.de/")
+    checkValidURL("https://日本語.jp", afterFixup: "https://xn--wgv71a119e.jp/")
+    checkValidURL("http://anlaşırız.net", afterFixup: "http://xn--anlarz-s9ab52b.net/")
+    checkValidURL("http://ö.de", afterFixup: "http://xn--nda.de/")
 
 
-//    // Check invalid URLs. These are passed along to the default search engine.
+    // Check invalid URLs. These are passed along to the default search engine.
     checkInvalidURL("foobar")
     checkInvalidURL("foo bar")
     checkInvalidURL("brave. org")
     checkInvalidURL("123")
     checkInvalidURL("a/b")
-//    checkInvalidURL("创业咖啡")
-//    checkInvalidURL("创业咖啡 中国")
-//    checkInvalidURL("创业咖啡. 中国")
+    checkInvalidURL("创业咖啡")
+    checkInvalidURL("创业咖啡 中国")
+    checkInvalidURL("创业咖啡. 中国")
     checkInvalidURL("data:text/html;base64,SGVsbG8gV29ybGQhCg==")
     checkInvalidURL("data://https://www.example.com,fake example.com")
     checkInvalidURL("1.2.3")
@@ -94,8 +97,8 @@ class SearchTests: XCTestCase {
     checkInvalidURL("foo@brave.com")
     checkInvalidURL("\"foo@brave.com")
     checkInvalidURL("\"foo@brave.com\"")
-//    checkInvalidURL(#""创业咖啡.中国"#)
-//    checkInvalidURL(#""创业咖啡.中国""#)
+    checkInvalidURL(#""创业咖啡.中国"#)
+    checkInvalidURL(#""创业咖啡.中国""#)
     checkInvalidURL("foo:5000")
     checkInvalidURL("http://::192.9.5.5")
     checkInvalidURL("http://::192.9.5.5:8080")
