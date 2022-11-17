@@ -8,6 +8,8 @@ import BraveUI
 
 protocol TabSyncHeaderViewDelegate {
   func toggleSection(_ header: TabSyncHeaderView, section: Int)
+  func hideForNow(_ header: TabSyncHeaderView, section: Int)
+  func openAll(_ header: TabSyncHeaderView, section: Int)
 }
 
 class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
@@ -90,6 +92,9 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     }
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapHeader(_:))))
+    
+    let toolBarInteraction = UIContextMenuInteraction(delegate: self)
+    self.contentView.addInteraction(toolBarInteraction)
   }
     
   required init?(coder aDecoder: NSCoder) {
@@ -129,6 +134,47 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     arrowIconView.layer.add(animation, forKey: nil)
     
     CATransaction.commit()
+  }
+}
+
+extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
+  public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+    return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+      var actionMenuChildren: [UIAction] = []
+
+      let allOpenAction = UIAction(
+        title: "Open all",
+        image: UIImage(systemName: "plus"),
+        handler: UIAction.deferredActionHandler { _ in
+          self.delegate?.openAll(self, section: self.section)
+
+        })
+
+      let hideForAction = UIAction(
+        title: "Hide for now",
+        image: UIImage(systemName: "eye.slash"),
+        attributes: .destructive,
+        handler: UIAction.deferredActionHandler { _ in
+          self.delegate?.hideForNow(self, section: self.section)
+
+        })
+
+      actionMenuChildren = [allOpenAction, hideForAction]
+
+      return UIMenu(title: "", identifier: nil, children: actionMenuChildren)
+    }
+  }
+  
+  func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configuration: UIContextMenuConfiguration, highlightPreviewForItemWithIdentifier identifier: NSCopying) -> UITargetedPreview? {
+    let parameters = UIPreviewParameters().then {
+      $0.backgroundColor = .clear
+    }
+  
+    return UITargetedPreview(view: self, parameters: parameters)
+  }
+  
+  func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configuration: UIContextMenuConfiguration, dismissalPreviewForItemWithIdentifier identifier: NSCopying) -> UITargetedPreview? {
+    self.contextMenuInteraction(interaction, configuration: configuration, highlightPreviewForItemWithIdentifier: identifier)
   }
 }
 
