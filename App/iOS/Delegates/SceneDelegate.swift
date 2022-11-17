@@ -113,6 +113,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     PrivacyReportsManager.consolidateData()
     PrivacyReportsManager.scheduleProcessingBlockedRequests()
     PrivacyReportsManager.scheduleVPNAlertsTask()
+    
+    // Start preparing ad-block right away so it's ready when we need it for our first tab
+    // But don't block anything just yet. This will be done on the WKNavigationDelegate
+    Task { @MainActor in
+      await LaunchHelper.shared.prepareAdBlockServices(
+        adBlockService: appDelegate.braveCore.adblockService
+      )
+    }
   }
   
   private func present(browserViewController: BrowserViewController, windowScene: UIWindowScene, connectionOptions: UIScene.ConnectionOptions) {

@@ -822,13 +822,7 @@ public class BrowserViewController: UIViewController {
       Preferences.Chromium.syncV2ObjectMigrationCount.value = 0
     }
     
-    Task { @MainActor in
-      await LaunchHelper.shared.prepareAdBlockServices(
-        adBlockService: self.braveCore.adblockService
-      )
-      
-      self.setupInteractions()
-    }
+    setupInteractions()
   }
   
   private func setupInteractions() {
