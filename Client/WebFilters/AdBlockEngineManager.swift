@@ -269,7 +269,7 @@ public actor AdBlockEngineManager: Sendable {
     await data.compileTask?.cancel()
     await data.set(compileTask: nil)
     
-    let task = Task.detached {
+    let task = Task.detached(priority: .high) {
       let resourcesWithVersion = await self.data.enabledResources.sorted(by: {
         $0.order < $1.order
       })
@@ -277,7 +277,7 @@ public actor AdBlockEngineManager: Sendable {
       var allCompileResults: [ResourceWithVersion: Result<Void, Error>] = [:]
       var allEngines: [CachedAdBlockEngine] = []
       
-      for (source, group) in await self.group(resources: resourcesWithVersion) {
+      try await self.group(resources: resourcesWithVersion).asyncConcurrentForEach { source, group in
         try Task.checkCancellation()
         
         // Combine all rule lists that need to be injected during initialization
@@ -392,10 +392,12 @@ public actor AdBlockEngineManager: Sendable {
           return
         }
         
-        if engine.deserialize(data: data) {
-          continuation.resume()
-        } else {
-          continuation.resume(throwing: CompileError.couldNotDeserializeDATFile)
+        DispatchQueue.main.async {
+          if engine.deserialize(data: data) {
+            continuation.resume()
+          } else {
+            continuation.resume(throwing: CompileError.couldNotDeserializeDATFile)
+          }
         }
       case .jsonResources:
         guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
@@ -408,9 +410,10 @@ public actor AdBlockEngineManager: Sendable {
             continuation.resume()
             return
           }
-          
-          engine.addResources(json)
-          continuation.resume()
+          DispatchQueue.main.async {
+            engine.addResources(json)
+            continuation.resume()
+          }
         } catch {
           continuation.resume(throwing: error)
         }
