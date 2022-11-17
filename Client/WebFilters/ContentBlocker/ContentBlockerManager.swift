@@ -279,7 +279,7 @@ final public class ContentBlockerManager: Sendable {
   public func loadCachedRuleLists() async {
     await withTaskGroup(of: Void.self) { group in
       for (identifier, resource) in await data.pendingResources {
-        group.addTask {
+        group.addTask { @MainActor in
           do {
             guard let ruleList = try await self.ruleStore.contentRuleList(forIdentifier: identifier) else {
               await self.data.movePendingResource(forIdentifier: identifier)
