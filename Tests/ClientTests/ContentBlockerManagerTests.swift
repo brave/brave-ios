@@ -25,7 +25,7 @@ class ContentBlockerManagerTests: XCTestCase {
     
     Task.detached {
       // When
-      await manager.loadBundledResources()
+      await manager.loadBundledResourcesIfNeeded()
       await manager.set(resource: ContentBlockerManager.Resource(
         url: resourceURL,
         sourceType: downloadedSourceType

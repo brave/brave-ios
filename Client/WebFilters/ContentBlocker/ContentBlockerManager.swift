@@ -207,13 +207,17 @@ final public class ContentBlockerManager: Sendable {
     }
   }
   
-  public func loadBundledResources() async {
+  public func loadBundledResourcesIfNeeded() async {
     await withTaskGroup(of: Void.self) { group in
       for type in GeneralBlocklistTypes.validLists {
-        group.addTask(operation: {
+        let ruleType = BlocklistRuleType.general(type)
+        group.addTask { @MainActor in
+          // Don't compile this unless we don't have something already loaded
+          // This will have speed improvments
+          guard self.cachedCompileResults[ruleType.identifier] == nil else { return }
           guard let resource = await self.getBundledResource(for: type) else { return }
-          await self.data.set(enabledResource: resource, for: .general(type))
-        })
+          await self.data.set(enabledResource: resource, for: ruleType)
+        }
       }
     }
   }

@@ -522,10 +522,10 @@ public class BrowserViewController: UIViewController {
     updateWidgetFavoritesData()
     
     Task { @MainActor in
-      self.setupTabs()
-      
-      await ContentBlockerManager.shared.loadBundledResources()
+      // We need to first load blocklists before we load tabs
       await ContentBlockerManager.shared.loadCachedCompileResults()
+      await ContentBlockerManager.shared.loadBundledResourcesIfNeeded()
+      self.setupTabs()
       
       // Load cached data
       // This is done first because compileResources and compilePendingResource need their results
