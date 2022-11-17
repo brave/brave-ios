@@ -30,21 +30,15 @@ public actor LaunchHelper {
     let task = Task { @MainActor in
       // Load cached data
       // This is done first because compileResources and loadCachedRuleLists need their results
-      print("bxx before loads: \(CFAbsoluteTimeGetCurrent() - startTime)")
       async let loadBundledResources: Void = await ContentBlockerManager.shared.loadBundledResources()
-      print("bxx after ContentBlockerManager.loadBundledResources: \(CFAbsoluteTimeGetCurrent() - startTime)")
       async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
-      print("bxx after FilterListResourceDownloader.loadCachedData: \(CFAbsoluteTimeGetCurrent() - startTime)")
       async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
       _ = await (loadBundledResources, filterListCache, adblockResourceCache)
-      print("bxx after AdblockResourceDownloader.loadCachedData: \(CFAbsoluteTimeGetCurrent() - startTime)")
 
       // Compile some engines and load cached rule lists
       async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
-      print("bxx after AdBlockEngineManager.compileResources: \(CFAbsoluteTimeGetCurrent() - startTime)")
       async let cachedRuleListLoad: Void = await ContentBlockerManager.shared.loadCachedRuleLists()
       _ = await (compiledResourcesCompile, cachedRuleListLoad)
-      print("bxx after ContentBlockerManager.loadCachedRuleLists: \(CFAbsoluteTimeGetCurrent() - startTime)")
       
       // This one is non-blocking
       await performPostLoadTasks(adBlockService: adBlockService)
@@ -56,7 +50,8 @@ public actor LaunchHelper {
     self.loadTask = task
     await task.value
     self.loadTask = nil
-    print("bxx time elapsed: \(CFAbsoluteTimeGetCurrent() - startTime)")
+    let diff = CFAbsoluteTimeGetCurrent() - startTime
+    print("bxx time elapsed: \(diff)")
   }
   
   private func markAdBlockReady() {
