@@ -22,9 +22,9 @@ window.__firefox__.execute(function($, $Object) {
         .then(
             (result) => {
               if (completion == undefined) {
-                resolve(result);
+                resolve($.deepFreeze(result));
               } else {
-                completion(result, resolve);
+                completion($.deepFreeze(result), resolve);
               }
             },
             (errorJSON) => {
@@ -48,20 +48,20 @@ window.__firefox__.execute(function($, $Object) {
       const serializedMessage = transaction.serializeMessage();
       const signatures = transaction.signatures;
       let convertSignaturePubkeyTuple = $(function(signaturePubkeyTuple) {
-        const obj = new Object();
+        const obj = $Object.create(null, undefined);
         obj.publicKey = signaturePubkeyTuple.publicKey.toBase58();
         obj.signature = signaturePubkeyTuple.signature;
-        return obj;
+        return $.deepFreeze(obj);
       })
       const signaturesMapped = signatures.map(convertSignaturePubkeyTuple);
-      const object = new Object();
+      const object = $Object.create(null, undefined);
       object.transaction = transaction;
       object.serializedMessage = serializedMessage;
       object.signatures = signaturesMapped;
-      return object;
+      return $.deepFreeze(object);
     })
     let createTransaction = $(function(serializedTx) {
-      return $<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx))
+      return $.deepFreeze($<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx)))
     })
     const provider = {
       value: {
@@ -74,9 +74,9 @@ window.__firefox__.execute(function($, $Object) {
         connect: $(function(payload) { /* -> {publicKey: solanaWeb3.PublicKey} */
           function completion(publicKey, resolve) {
             /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
-            const result = new Object();
+            const result = $Object.create(null, undefined);
             result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
-            resolve(result);
+            resolve($.deepFreeze(result));
           }
           return post('connect', payload, completion)
         }),
@@ -95,10 +95,10 @@ window.__firefox__.execute(function($, $Object) {
             const parsed = JSON.parse(result);
             const publicKey = parsed["publicKey"]; /* base58 encoded pubkey */
             const signature = parsed["signature"]; /* array of uint8 */
-            const obj = new Object();
+            const obj = $Object.create(null, undefined);
             obj.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
             obj.signature = new Uint8Array(signature);
-            resolve(obj);
+            resolve($.deepFreeze(obj));
           }
           return post('signMessage', payload, completion)
         }),
@@ -106,9 +106,9 @@ window.__firefox__.execute(function($, $Object) {
           if (args["method"] == 'connect') {
             function completion(publicKey, resolve) {
               /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
-              const result = new Object();
-              result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
-              resolve(result);
+              const result = $Object.create(null, undefined);
+              result.publicKey = $(new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey));
+              resolve($.deepFreeze(result));
             }
             return post('request', args, completion)
           }
@@ -120,7 +120,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(serializedTx, resolve) {
             /* Convert `<[UInt8]>` -> `solanaWeb3.Transaction` */
             const result = createTransaction(serializedTx);
-            resolve(result);
+            resolve($.deepFreeze(result));
           }
           return post('signTransaction', object, completion)
         }),
@@ -130,7 +130,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(serializedTxs, resolve) {
             /* Convert `<[[UInt8]]>` -> `[<solanaWeb3.Transaction>]` */
             const result = serializedTxs.map(createTransaction);
-            resolve(result);
+            resolve($.deepFreeze(result));
           }
           return post('signAllTransactions', objects, completion)
         }),

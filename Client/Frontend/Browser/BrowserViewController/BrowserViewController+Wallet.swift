@@ -507,7 +507,15 @@ extension Tab: BraveWalletSolanaEventsListener {
        let publicKey = await keyringService.selectedAccount(.sol),
        self.isSolanaAccountConnected(publicKey) {
       await webView.evaluateSafeJavaScript(
-        functionName: "if (\(UserScriptManager.walletSolanaNameSpace).solanaWeb3) { window.solana.publicKey = new \(UserScriptManager.walletSolanaNameSpace).solanaWeb3.PublicKey('\(publicKey.htmlEntityEncodedString)'); }",
+        functionName: """
+        if (\(UserScriptManager.walletSolanaNameSpace).solanaWeb3) {
+          window.__firefox__.execute(function($) {
+            window.solana.publicKey = $.deepFreeze(
+              new \(UserScriptManager.walletSolanaNameSpace).solanaWeb3.PublicKey('\(publicKey.htmlEntityEncodedString)')
+            );
+          });
+        }
+        """,
         contentWorld: .page,
         asFunction: false
       )
