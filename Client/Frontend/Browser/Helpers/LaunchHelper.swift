@@ -15,7 +15,6 @@ public actor LaunchHelper {
   /// This method prepares the ad-block services one time so that multiple scenes can benefit from its results
   /// This is particularly important since we use a shared instance for most of our ad-block services.
   public func prepareAdBlockServices(adBlockService: AdblockService) async {
-    let startTime = CFAbsoluteTimeGetCurrent()
     // Check if ad-block services are already ready.
     // If so, we don't have to do anything
     guard !areAdBlockServicesReady else { return }
@@ -43,15 +42,12 @@ public actor LaunchHelper {
       // This one is non-blocking
       await performPostLoadTasks(adBlockService: adBlockService)
       await markAdBlockReady()
-      
     }
     
     // Await the task and wait for the results
     self.loadTask = task
     await task.value
     self.loadTask = nil
-    let diff = CFAbsoluteTimeGetCurrent() - startTime
-    print("bxx time elapsed: \(diff)")
   }
   
   private func markAdBlockReady() {
