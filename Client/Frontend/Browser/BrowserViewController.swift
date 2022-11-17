@@ -40,7 +40,7 @@ private let KVOs: [KVOConstants] = [
 ]
 
 public class BrowserViewController: UIViewController {
-  private(set) lazy var webViewContainer = UIView()
+  let webViewContainer = UIView()
   private(set) lazy var screenshotHelper = ScreenshotHelper(tabManager: tabManager)
   
   private(set) lazy var topToolbar: TopToolbarView = {
@@ -65,19 +65,19 @@ public class BrowserViewController: UIViewController {
   let header = HeaderContainerView()
   private let headerHeightLayoutGuide = UILayoutGuide()
   
-  private(set) lazy var footer: UIView = {
+  let footer: UIView = {
     let footer = UIView()
     footer.translatesAutoresizingMaskIntoConstraints = false
     return footer
   }()
   
-  private lazy var topTouchArea: UIButton = {
+  private let topTouchArea: UIButton = {
     let topTouchArea = UIButton()
     topTouchArea.isAccessibilityElement = false
     return topTouchArea
   }()
   
-  private lazy var bottomTouchArea: UIButton = {
+  private let bottomTouchArea: UIButton = {
     let bottomTouchArea = UIButton()
     bottomTouchArea.isAccessibilityElement = false
     return bottomTouchArea
@@ -87,7 +87,7 @@ public class BrowserViewController: UIViewController {
   private var webViewContainerTopOffset: Constraint?
 
   /// Backdrop used for displaying greyed background for private tabs
-  private lazy var webViewContainerBackdrop: UIView = {
+  private let webViewContainerBackdrop: UIView = {
     let webViewContainerBackdrop = UIView()
     webViewContainerBackdrop.backgroundColor = .braveBackground
     webViewContainerBackdrop.alpha = 0
@@ -97,7 +97,7 @@ public class BrowserViewController: UIViewController {
   var readerModeBar: ReaderModeBarView?
   private(set) var readerModeCache: ReaderModeCache
   
-  private lazy var statusBarOverlay: UIView = {
+  private let statusBarOverlay: UIView = {
     // Temporary work around for covering the non-clipped web view content
     let statusBarOverlay = UIView()
     statusBarOverlay.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
@@ -110,7 +110,7 @@ public class BrowserViewController: UIViewController {
   var favoritesController: FavoritesViewController?
   
   /// All content that appears above the footer should be added to this view. (Find In Page/SnackBars)
-  private(set) lazy var alertStackView: UIStackView = {
+  let alertStackView: UIStackView = {
     let alertStackView = UIStackView()
     alertStackView.axis = .vertical
     alertStackView.alignment = .center
