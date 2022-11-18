@@ -107,12 +107,7 @@ public class BraveSkusManager {
         let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
         
         if credentialSummaryJson.isValid {
-          Preferences.VPN.expirationDate.value = credentialSummaryJson.expiresAt
-          
-          // The credential has not expired yet, we can proceed with preparing it.
-          if credentialSummaryJson.expiresAt > Date() {
-            self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
-          }
+          self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
         } else {
           if !credentialSummaryJson.active {
             Logger.module.debug("The credential summary is not active")
