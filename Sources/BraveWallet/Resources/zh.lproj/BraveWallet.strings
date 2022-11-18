@@ -554,13 +554,13 @@
 "wallet.enterPasswordForBiometricsTitle" = "输入您的钱包的密码以启用钱包的生物识别功能（只会要求您输入一次）";
 
 /* A placeholder for the text field that users will input the custom token Coingecko ID. */
-"wallet.enterTokenCoingeckoId" = "输入令牌 Coingecko ID";
+"wallet.enterTokenCoingeckoId" = "输入代币 Coingecko ID";
 
 /* A placeholder for the text field that users will input the custom token icon URL */
-"wallet.enterTokenIconURL" = "输入令牌图标网址";
+"wallet.enterTokenIconURL" = "输入代币图标网址";
 
 /* A placeholder for the text field that users will input the custom token's ID. */
-"wallet.enterTokenId" = "输入令牌 ID";
+"wallet.enterTokenId" = "输入代币 ID";
 
 /* A placeholder for the text field that users will input the custom token name */
 "wallet.enterTokenName" = "输入代币名称";
@@ -1241,7 +1241,7 @@
 "wallet.today" = "今天";
 
 /* A title that will be displayed on top of the text field for users to input the custom token address */
-"wallet.tokenAddress" = "令牌地址";
+"wallet.tokenAddress" = "代币地址";
 
 /* A title that will be displayed on top of the text field for users to input the custom token name */
 "wallet.tokenName" = "代币名称";
