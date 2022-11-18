@@ -62,13 +62,13 @@
 "wallet.addCustomTokenErrorTitle" = "无法添加自定义令牌";
 
 /* A title that will be displayed on top of the text field for users to input the custom token's icon URL. */
-"wallet.addCustomTokenIconURL" = "圖示 URL";
+"wallet.addCustomTokenIconURL" = "输入代币图标网址";
 
 /* A title that will be displayed on top of the text field for users to input the custom token's ID. */
-"wallet.addCustomTokenId" = "代幣 ID (僅適用於 ERC721)";
+"wallet.addCustomTokenId" = "代币 ID (仅限用于 ERC721)";
 
 /* A title of one segment on top of Add Custom Assets screen, which is default selected. Users would need to select this segment if they are willing to add a custom fungible token. */
-"wallet.addCustomTokenTitle" = "代幣";
+"wallet.addCustomTokenTitle" = "代币";
 
 /* The description of the view shown over a dapps website that describes what adding a new network will do. */
 "wallet.addNetworkDescription" = "这将允许在 Brave Wallet 中使用该网络。";
@@ -89,7 +89,7 @@
 "wallet.advancedSettingsTransaction" = "进阶设置";
 
 /* The title of the option to filter by all networks, displayed in a view to filter assets between 'All Networks' or a specific Crypto network. */
-"wallet.allNetworksTitle" = "所有網路";
+"wallet.allNetworksTitle" = "所有网络";
 
 /* A title displayed above two numbers (the amount and transaction fee) showing the user the breakdown of the amount transferred and transaction fee for any Solana transaction. The \"+\" is a literal plus as the label below will show such as \"0.004 SOL + 0.00064 SOL\" */
 "wallet.amountAndFee" = "金额 + 费用";
