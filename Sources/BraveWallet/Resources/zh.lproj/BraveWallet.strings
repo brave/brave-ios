@@ -50,7 +50,7 @@
 "wallet.addCustomNFTTitle" = "NFT";
 
 /* A title of an initally hidden section in Add custom asset screen for users to input icon url and coingecko id. */
-"wallet.addCustomTokenAdvanced" = "高级";
+"wallet.addCustomTokenAdvanced" = "进阶";
 
 /* A title that will be displayed on top of the text field for users to input the custom token's coingecko ID. */
 "wallet.addCustomTokenCoingeckoId" = "Coingecko ID";
@@ -68,7 +68,7 @@
 "wallet.addCustomTokenId" = "代幣 ID (僅適用於 ERC721)";
 
 /* A title of one segment on top of Add Custom Assets screen, which is default selected. Users would need to select this segment if they are willing to add a custom fungible token. */
-"wallet.addCustomTokenTitle" = "代碼";
+"wallet.addCustomTokenTitle" = "代幣";
 
 /* The description of the view shown over a dapps website that describes what adding a new network will do. */
 "wallet.addNetworkDescription" = "这将允许在 Brave Wallet 中使用该网络。";
