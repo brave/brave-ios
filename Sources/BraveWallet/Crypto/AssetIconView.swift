@@ -39,11 +39,8 @@ struct AssetIconView: View {
       }
     }
     
-    if network.isNativeAsset(token), let logo = network.nativeTokenLogo {
-      // check bundled images
-      if let uiImage = UIImage(named: logo, in: .module, with: nil) {
-        return Image(uiImage: uiImage)
-      }
+    if network.isNativeAsset(token), let uiImage = networkNativeTokenLogo {
+      return Image(uiImage: uiImage)
     }
     
     return nil
@@ -68,7 +65,23 @@ struct AssetIconView: View {
       }
     }
     .frame(width: length, height: length)
+    .overlay(tokenLogo, alignment: .bottomTrailing)
     .accessibilityHidden(true)
+  }
+  
+  private var networkNativeTokenLogo: UIImage? {
+    if let logo = network.nativeTokenLogo {
+      return UIImage(named: logo, in: .module, with: nil)
+    }
+    return nil
+  }
+  
+  @ViewBuilder private var tokenLogo: some View {
+    if !(token.isNft || token.isErc721), !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+      Image(uiImage: image)
+        .resizable()
+        .frame(width: 15, height: 15)
+    }
   }
 }
 

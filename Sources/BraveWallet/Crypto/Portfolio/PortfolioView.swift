@@ -21,6 +21,7 @@ struct PortfolioView: View {
   @State private var dismissedBackupBannerThisSession: Bool = false
   @State private var isPresentingBackup: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
+  @State private var isPresentingNetworkFilter: Bool = false
   
   @Environment(\.sizeCategory) private var sizeCategory
   /// Reference to the collection view used to back the `List` on iOS 16+
@@ -88,6 +89,27 @@ struct PortfolioView: View {
       }
     }
   }
+  
+  private var networkFilterButton: some View {
+    Button(action: {
+      self.isPresentingNetworkFilter = true
+    }) {
+      Label(portfolioStore.networkFilter.title, braveSystemImage: "brave.text.alignleft")
+        .font(.footnote.weight(.medium))
+        .foregroundColor(Color(.braveBlurpleTint))
+    }
+    .sheet(isPresented: $isPresentingNetworkFilter) {
+      NavigationView {
+        NetworkFilterView(
+          networkFilter: $portfolioStore.networkFilter,
+          networkStore: networkStore
+        )
+      }
+      .onDisappear {
+        networkStore.closeNetworkSelectionStore()
+      }
+    }
+  }
 
   var body: some View {
     List {
@@ -105,9 +127,10 @@ struct PortfolioView: View {
               selectedToken = asset.token
             }) {
               PortfolioAssetView(
-                image: AssetIconView(token: asset.token, network: networkStore.selectedChain),
+                image: AssetIconView(token: asset.token, network: asset.network),
                 title: asset.token.name,
                 symbol: asset.token.symbol,
+                networkName: asset.network.chainName,
                 amount: portfolioStore.currencyFormatter.string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
                 quantity: String(format: "%.04f", asset.decimalBalance)
               )
@@ -117,7 +140,12 @@ struct PortfolioView: View {
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }, header: {
-        WalletListHeaderView(title: Text(Strings.Wallet.assetsTitle))
+        HStack {
+          Text(Strings.Wallet.assetsTitle)
+          Spacer()
+          networkFilterButton
+        }
+        .textCase(nil)
       })
       
       if !portfolioStore.userVisibleNFTs.isEmpty {
@@ -135,6 +163,7 @@ struct PortfolioView: View {
                   ),
                   title: nftAsset.token.nftTokenTitle,
                   symbol: nftAsset.token.symbol,
+                  networkName: nftAsset.network.chainName,
                   quantity: "\(nftAsset.balance)"
                 )
               }
