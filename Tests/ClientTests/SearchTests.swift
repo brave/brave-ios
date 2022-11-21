@@ -34,7 +34,7 @@ class SearchTests: XCTestCase {
     checkValidURL("about: config", afterFixup: "about:%20config")
     
     checkValidURL("file:///f/o/o", afterFixup: "file:///f/o/o")
-    checkValidURL("ftp://ftp.mozilla.org", afterFixup: "ftp://ftp.mozilla.org")
+    checkValidURL("ftp://ftp.mozilla.org", afterFixup: "ftp://ftp.mozilla.org/")
     checkValidURL("foo.bar", afterFixup: "http://foo.bar/")
     checkValidURL(" foo.bar ", afterFixup: "http://foo.bar/")
     
@@ -48,29 +48,32 @@ class SearchTests: XCTestCase {
     checkValidURL("[::192.9.5.5]:80/png", afterFixup: "http://[::c009:505]/png")
     checkValidURL("192.168.2.1", afterFixup: "http://192.168.2.1/")
     
-    checkValidURL("http://www.brave.com", afterFixup: "http://www.brave.com")
-    checkValidURL("https://www.wikipedia.org", afterFixup: "https://www.wikipedia.org")
+    checkValidURL("http://www.brave.com", afterFixup: "http://www.brave.com/")
+    checkValidURL("https://www.wikipedia.org", afterFixup: "https://www.wikipedia.org/")
     checkValidURL("brave.io", afterFixup: "http://brave.io/")
     checkValidURL("brave.new.world", afterFixup: "http://brave.new.world/")
     checkValidURL("brave.new.world.test", afterFixup: "http://brave.new.world.test/")
     checkValidURL("brave.new.world.test.io", afterFixup: "http://brave.new.world.test.io/")
     checkValidURL("brave.new.world.test.whatever.io", afterFixup: "http://brave.new.world.test.whatever.io/")
     
-    checkValidURL("http://2130706433:8000/", afterFixup: "http://2130706433:8000/")
-    checkValidURL("http://127.0.0.1:8080", afterFixup: "http://127.0.0.1:8080")
-    checkValidURL("http://127.0.1", afterFixup: "http://127.0.1")
-    checkValidURL("http://127.1", afterFixup: "http://127.1")
-    checkValidURL("http://127.1:8000", afterFixup: "http://127.1:8000")
-    checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
-    checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
-    checkValidURL("http://1.1:80", afterFixup: "http://1.1:80")
+    checkValidURL("http://2130706433:8000/", afterFixup: "http://127.0.0.1:8000/")
+    checkValidURL("http://127.0.0.1:8080", afterFixup: "http://127.0.0.1:8080/")
+    checkValidURL("http://127.0.1", afterFixup: "http://127.0.0.1/")
+    checkValidURL("http://127.1", afterFixup: "http://127.0.0.1/")
+    checkValidURL("http://127.1:8000", afterFixup: "http://127.0.0.1:8000/")
+    checkValidURL("http://1.1:80", afterFixup: "http://1.0.0.1/")
+    checkValidURL("http://1.1:80", afterFixup: "http://1.0.0.1/")
+    checkValidURL("http://1.1:80", afterFixup: "http://1.0.0.1/")
   
     checkValidURL("https://日本語.jp", afterFixup: "https://xn--wgv71a119e.jp/")
     checkValidURL("http://anlaşırız.net", afterFixup: "http://xn--anlarz-s9ab52b.net/")
     checkValidURL("http://ö.de", afterFixup: "http://xn--nda.de/")
 
-
     // Check invalid URLs. These are passed along to the default search engine.
+    checkInvalidURL("user@domain.com")
+    checkInvalidURL("user@domain.com/whatever")
+    checkInvalidURL("user@domain.com?something=whatever")
+  
     checkInvalidURL("foobar")
     checkInvalidURL("foo bar")
     checkInvalidURL("brave. org")

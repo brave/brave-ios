@@ -63,7 +63,7 @@ public class URIFixup {
     
     // NSURL: idnString from brave core handles the puny code represantation of Hostnames
     // Using Punycode, host names containing Unicode characters are transcoded to a subset of ASCII
-    let entryURL = URL(string: trimmed) ?? NSURL(idnString: trimmed) as URL?
+    let entryURL = NSURL(idnString: trimmed) as URL?
     if let url = entryURL, InternalURL.isValid(url: url) {
       return url
     }
@@ -78,7 +78,7 @@ public class URIFixup {
     // the official URI scheme list, so that other such search phrases
     // like "filetype:" are recognised as searches rather than URLs.
     // Use `URL(string: entry)` so it doesn't double percent escape URLs.
-    if let url = entryURL ?? URL(string: escaped), url.schemeIsValid {
+    if let url = entryURL, url.schemeIsValid {
       return validateURL(url)
     }
 
@@ -87,10 +87,6 @@ public class URIFixup {
     // we'll allow single-word searches (e.g., "foo") at the expense
     // of breaking single-word hosts without a scheme (e.g., "localhost").
     if trimmed.range(of: ".") == nil && trimmed.range(of: ":") == nil {
-      return nil
-    }
-
-    if trimmed.range(of: " ") != nil {
       return nil
     }
 
@@ -122,15 +118,6 @@ public class URIFixup {
     //      without a path or query.
     if URL(string: trimmed)?.user != nil || URL(string: escaped)?.user != nil ||
         URL(string: "http://\(trimmed)")?.user != nil || URL(string: "http://\(escaped)")?.user != nil {
-      return nil
-    }
-
-    // If the user enters anything arithmetic
-    // Such as 125.5, do not construct a URL from it
-    // It is a mathematical expression
-    if let url = URL(string: trimmed),
-      url.scheme == nil,
-      Double(trimmed) != nil {
       return nil
     }
 
