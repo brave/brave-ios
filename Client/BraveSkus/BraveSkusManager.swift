@@ -25,7 +25,7 @@ public class BraveSkusManager {
   public static func refreshSKUCredential(isPrivate: Bool) {
     guard let _ = Preferences.VPN.skusCredential.value,
           let domain = Preferences.VPN.skusCredentialDomain.value,
-          let expirationDate = Preferences.VPN.skusCredentialExpirationDate.value else {
+          let expirationDate = Preferences.VPN.expirationDate.value else {
       Logger.module.debug("No skus credentials stored in the app.")
       return
     }
@@ -80,7 +80,7 @@ public class BraveSkusManager {
         if let vpnCredential = BraveSkusWebHelper.fetchVPNCredential(credential, domain: domain) {
           Preferences.VPN.skusCredential.value = credential
           Preferences.VPN.skusCredentialDomain.value = domain
-          Preferences.VPN.skusCredentialExpirationDate.value = vpnCredential.expirationDate
+          Preferences.VPN.expirationDate.value = vpnCredential.expirationDate
           
           BraveVPN.setCustomVPNCredential(vpnCredential)
         }

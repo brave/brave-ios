@@ -313,7 +313,7 @@ public class BraveVPN {
   public static func clearSkusCredentials() {
     Preferences.VPN.skusCredential.reset()
     Preferences.VPN.skusCredentialDomain.reset()
-    Preferences.VPN.skusCredentialExpirationDate.reset()
+    Preferences.VPN.expirationDate.reset()
   }
 
   // MARK: - Region selection
