@@ -37,6 +37,11 @@ struct BalanceTimePrice: DataPoint, Equatable {
   }
 }
 
+enum NetworkFilter: Equatable {
+  case allNetworks
+  case network(BraveWallet.NetworkInfo)
+}
+
 /// A store containing data around the users assets
 public class PortfolioStore: ObservableObject {
   /// The dollar amount of your portfolio
@@ -65,6 +70,7 @@ public class PortfolioStore: ObservableObject {
       update()
     }
   }
+  @Published var networkFilter: NetworkFilter = .allNetworks
 
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
     walletService: self.walletService,
