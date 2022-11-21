@@ -202,7 +202,7 @@ struct PrivacyReportAllTimeListsView: View {
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
         Button(Strings.done, action: onDismiss)
-          .foregroundColor(Color(.braveBlurple))
+          .foregroundColor(Color(.braveBlurpleTint))
       }
     }
     .onAppear {

@@ -182,7 +182,7 @@ private struct LanguagePicker: View {
             }
             Image(systemName: "checkmark")
               .font(.body.weight(.semibold))
-              .foregroundColor(Color(.braveBlurple))
+              .foregroundColor(Color(.braveBlurpleTint))
           }
         }
       } header: {

@@ -120,7 +120,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   fileprivate lazy var progressBar: GradientProgressBar = {
     let progressBar = GradientProgressBar()
     progressBar.clipsToBounds = false
-    progressBar.setGradientColors(startColor: .braveBlurple, endColor: .braveBlurple)
+    progressBar.setGradientColors(startColor: .braveBlurpleTint, endColor: .braveBlurpleTint)
     return progressBar
   }()
 

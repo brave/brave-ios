@@ -52,7 +52,7 @@ struct PortfolioView: View {
             )
           }
           .environment(\.modalPresentationMode, $isPresentingBackup)
-          .accentColor(Color(.braveBlurple))
+          .accentColor(Color(.braveBlurpleTint))
         }
       }
       BalanceHeaderView(

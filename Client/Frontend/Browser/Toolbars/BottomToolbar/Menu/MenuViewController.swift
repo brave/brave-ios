@@ -49,7 +49,7 @@ private struct MenuView<Content: View>: View {
       content
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity)
-        .accentColor(Color(.braveBlurple))
+        .accentColor(Color(.braveBlurpleTint))
     }
   }
 }

@@ -90,18 +90,18 @@ struct AccountDetailsView: View {
         ToolbarItemGroup(placement: .cancellationAction) {
           Button(action: { presentationMode.dismiss() }) {
             Text(Strings.cancelButtonTitle)
-              .foregroundColor(Color(.braveBlurple))
+              .foregroundColor(Color(.braveBlurpleTint))
           }
         }
         ToolbarItemGroup(placement: .confirmationAction) {
           Button(action: renameAccountAndDismiss) {
             Text(Strings.done)
-              .foregroundColor(Color(.braveBlurple))
+              .foregroundColor(Color(.braveBlurpleTint))
           }
         }
       }
     }
-    .accentColor(Color(.braveBlurple)) // needed for navigation bar back button(s)
+    .accentColor(Color(.braveBlurpleTint)) // needed for navigation bar back button(s)
     .onAppear {
       if name.isEmpty {
         // Wait until next runloop pass to fix bug where body isn't recomputed based on state change

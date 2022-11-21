@@ -50,7 +50,7 @@ class TabsButton: UIButton {
 
   override var isHighlighted: Bool {
     didSet {
-      let color: UIColor = isHighlighted ? .braveBlurple : .braveLabel
+      let color: UIColor = isHighlighted ? .braveBlurpleTint : .braveLabel
       countLabel.textColor = color
       borderView.layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
     }
@@ -63,7 +63,7 @@ class TabsButton: UIButton {
   
   private func updateForTraitCollection() {
     // CGColor's do not get automatic updates
-    borderView.layer.borderColor = isHighlighted ? UIColor.braveBlurple.cgColor : UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
+    borderView.layer.borderColor = isHighlighted ? UIColor.braveBlurpleTint.cgColor : UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
     
     let toolbarTraitCollection = UITraitCollection(preferredContentSizeCategory: traitCollection.toolbarButtonContentSizeCategory)
     let metrics = UIFontMetrics(forTextStyle: .body)

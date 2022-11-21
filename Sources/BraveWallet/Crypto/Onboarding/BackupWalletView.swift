@@ -136,7 +136,7 @@ struct BackupWalletView: View {
                 presentationMode.dismiss()
               }) {
                 Text(Strings.cancelButtonTitle)
-                  .foregroundColor(Color(.braveBlurple))
+                  .foregroundColor(Color(.braveBlurpleTint))
               }
             }
           }

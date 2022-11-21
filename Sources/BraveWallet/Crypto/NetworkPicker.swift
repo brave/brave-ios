@@ -101,7 +101,7 @@ struct NetworkPicker: View {
                 networkSelectionStore: networkSelectionStore
               )
             }
-            .accentColor(Color(.braveBlurple))
+            .accentColor(Color(.braveBlurpleTint))
             .navigationViewStyle(.stack)
           }
         }
