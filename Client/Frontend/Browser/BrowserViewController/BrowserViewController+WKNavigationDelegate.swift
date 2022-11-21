@@ -676,7 +676,7 @@ extension BrowserViewController: WKNavigationDelegate {
       return
     }
 
-    if checkIfWebContentProcessHasCrashed(webView, error: error as NSError) {
+    if checkIfWebContentProcessHasCrashed(webView, error: error) {
       return
     }
 
@@ -694,7 +694,7 @@ extension BrowserViewController: WKNavigationDelegate {
       // Reseting the progress bar in case there is an error is necessary
       topToolbar.hideProgressBar()
 
-      // If the local web server isn't working for some reason (Firefox cellular data is
+      // If the local web server isn't working for some reason (Brave cellular data is
       // disabled in settings, for example), we'll fail to load the session restore URL.
       // We rely on loading that page to get the restore callback to reset the restoring
       // flag, so if we fail to load that page, reset it here.

@@ -153,7 +153,7 @@ public class URIFixup {
 
     // If there is a "." or ":", prepend "http://" and try again. Since this
     // is strictly an "http://" URL, we also require a host.
-    if let url =  NSURL(idnString: "http://\(escaped)") as URL?, url.host != nil {
+    if let url = NSURL(idnString: "http://\(escaped)") as URL?, url.host != nil {
       return validateURL(url)
     }
 
