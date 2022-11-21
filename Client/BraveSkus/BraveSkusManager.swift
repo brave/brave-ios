@@ -107,7 +107,13 @@ public class BraveSkusManager {
         let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
         
         if credentialSummaryJson.isValid {
-          self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
+          
+          if Preferences.VPN.skusCredential.value == nil {
+            Logger.module.debug("The credential does NOT exists, calling prepareCredentialsPresentation")
+            self?.prepareCredentialsPresentation(for: domain, path: "*", resultCredential: nil)
+          } else {
+            Logger.module.debug("The credential exists, NOT calling prepareCredentialsPresentation")
+          }
         } else {
           if !credentialSummaryJson.active {
             Logger.module.debug("The credential summary is not active")
