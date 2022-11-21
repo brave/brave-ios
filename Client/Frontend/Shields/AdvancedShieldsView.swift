@@ -84,7 +84,7 @@ extension AdvancedShieldsView {
     }()
 
     let toggleSwitch = UISwitch().then {
-      $0.onTintColor = UIColor.braveOrange
+      $0.onTintColor = UIColor.braveBlurple
     }
     var valueToggled: ((Bool) -> Void)?
 

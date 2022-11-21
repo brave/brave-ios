@@ -85,7 +85,7 @@ struct CryptoPagesView: View {
         }) {
           Label(Strings.Wallet.searchTitle, systemImage: "magnifyingglass")
             .labelStyle(.iconOnly)
-            .foregroundColor(Color(.braveOrange))
+            .foregroundColor(Color(.braveBlurple))
         }
         Menu {
           Button(action: {
@@ -112,7 +112,7 @@ struct CryptoPagesView: View {
                   .imageScale(.large)
               }
             }
-            .foregroundColor(Color(.braveOrange))
+            .foregroundColor(Color(.braveBlurple))
         }
         .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
       }

@@ -242,7 +242,7 @@ struct AddCustomAssetView: View {
             presentationMode.dismiss()
           }) {
             Text(Strings.cancelButtonTitle)
-              .foregroundColor(Color(.braveOrange))
+              .foregroundColor(Color(.braveBlurple))
           }
         }
         ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -251,7 +251,7 @@ struct AddCustomAssetView: View {
             addCustomToken()
           }) {
             Text(Strings.Wallet.add)
-              .foregroundColor(Color(.braveOrange))
+              .foregroundColor(Color(.braveBlurple))
           }
           .disabled(addButtonDisabled)
         }
@@ -283,7 +283,7 @@ struct AddCustomAssetView: View {
                 networkSelectionStore: networkSelectionStore
               )
             }
-            .accentColor(Color(.braveOrange))
+            .accentColor(Color(.braveBlurple))
             .navigationViewStyle(.stack)
           }
       )

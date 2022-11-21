@@ -30,7 +30,7 @@ class ToolbarButton: UIButton {
     adjustsImageWhenHighlighted = false
     imageView?.contentMode = .scaleAspectFit
 
-    selectedTintColor = .braveOrange
+    selectedTintColor = .braveBlurple
     primaryTintColor = .braveLabel
     tintColor = primaryTintColor
     imageView?.tintColor = tintColor

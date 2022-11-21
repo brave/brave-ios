@@ -75,7 +75,7 @@ private struct BasicStringInputView: View {
           presentationMode.dismiss()
         } label: {
           Text("Save")
-            .foregroundColor(Color(.braveOrange))
+            .foregroundColor(Color(.braveBlurple))
         }
       }
     }
@@ -128,7 +128,7 @@ private struct BasicPickerInputView: View {
           presentationMode.dismiss()
         } label: {
           Text("Save")
-            .foregroundColor(Color(.braveOrange))
+            .foregroundColor(Color(.braveBlurple))
         }
       }
     }
