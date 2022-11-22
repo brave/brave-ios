@@ -21,7 +21,7 @@ struct PortfolioAssetView: View {
           .font(.footnote)
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
-        Text("\(symbol) on \(networkName)") // TODO: localize
+        Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, symbol, networkName))
           .font(.caption)
           .foregroundColor(Color(.braveLabel))
       }
@@ -73,7 +73,7 @@ struct PortfolioNFTAssetView: View {
           .font(.footnote)
           .fontWeight(.semibold)
           .foregroundColor(Color(.bravePrimary))
-        Text("\(symbol) on \(networkName)") // TODO: Localize
+        Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, symbol, networkName))
           .font(.caption)
           .foregroundColor(Color(.braveLabel))
       }
