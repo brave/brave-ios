@@ -5,6 +5,7 @@
 
 import UIKit
 import BraveUI
+import BraveShared
 
 protocol TabSyncHeaderViewDelegate {
   func toggleSection(_ header: TabSyncHeaderView, section: Int)
@@ -143,7 +144,7 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
       var actionMenuChildren: [UIAction] = []
 
       let allOpenAction = UIAction(
-        title: "Open all",
+        title: Strings.OpenTabs.openSessionOpenAllActionTitle,
         image: UIImage(systemName: "plus"),
         handler: UIAction.deferredActionHandler { _ in
           self.delegate?.openAll(self, section: self.section)
@@ -151,7 +152,7 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
         })
 
       let hideForAction = UIAction(
-        title: "Hide for now",
+        title: Strings.OpenTabs.openSessionHideAllActionTitle,
         image: UIImage(systemName: "eye.slash"),
         attributes: .destructive,
         handler: UIAction.deferredActionHandler { _ in
