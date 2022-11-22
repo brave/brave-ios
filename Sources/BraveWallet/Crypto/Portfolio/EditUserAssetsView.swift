@@ -37,7 +37,7 @@ private struct EditTokenView: View {
           Text(tokenName)
             .fontWeight(.semibold)
             .foregroundColor(Color(.bravePrimary))
-          Text(assetStore.token.symbol.uppercased())
+          Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, assetStore.token.symbol, assetStore.network.chainName))
             .foregroundColor(Color(.secondaryBraveLabel))
         }
         .font(.footnote)
@@ -71,10 +71,7 @@ struct EditUserAssetsView: View {
         $0.token.symbol.lowercased().contains(normalizedQuery) || $0.token.name.lowercased().contains(normalizedQuery)
       }
     }
-    return
-      stores
-      .sorted(by: { $0.token.symbol.caseInsensitiveCompare($1.token.symbol) == .orderedAscending })
-      .sorted(by: { $0.isVisible && !$1.isVisible })
+    return stores.sorted(by: { $0.isVisible && !$1.isVisible })
   }
 
   var body: some View {
