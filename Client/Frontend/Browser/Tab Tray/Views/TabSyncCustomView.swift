@@ -148,7 +148,6 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
         image: UIImage(systemName: "plus"),
         handler: UIAction.deferredActionHandler { _ in
           self.delegate?.openAll(self, section: self.section)
-
         })
 
       let hideForAction = UIAction(
@@ -157,7 +156,6 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
         attributes: .destructive,
         handler: UIAction.deferredActionHandler { _ in
           self.delegate?.hideForNow(self, section: self.section)
-
         })
 
       actionMenuChildren = [allOpenAction, hideForAction]
