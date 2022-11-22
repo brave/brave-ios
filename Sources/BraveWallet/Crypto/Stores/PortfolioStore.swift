@@ -153,33 +153,33 @@ public class PortfolioStore: ObservableObject {
       case let .network(network):
         networks = [network]
       }
-      struct AssetsForNetwork: Equatable {
+      struct NetworkAssets: Equatable {
         let network: BraveWallet.NetworkInfo
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
       let allVisibleUserAssets = await withTaskGroup(
-        of: [AssetsForNetwork].self,
-        body: { @MainActor group -> [AssetsForNetwork] in
+        of: [NetworkAssets].self,
+        body: { @MainActor group -> [NetworkAssets] in
           for (index, network) in networks.enumerated() {
             group.addTask { @MainActor in
               let userAssets = await self.walletService.userAssets(network.chainId, coin: network.coin).filter(\.visible)
-              return [AssetsForNetwork(network: network, tokens: userAssets, sortOrder: index)]
+              return [NetworkAssets(network: network, tokens: userAssets, sortOrder: index)]
             }
           }
-          return await group.reduce([AssetsForNetwork](), { $0 + $1 })
+          return await group.reduce([NetworkAssets](), { $0 + $1 })
             .sorted(by: { $0.sortOrder < $1.sortOrder }) // maintain sort order of networks
         }
       )
       let visibleUserAssetsForNetwork = allVisibleUserAssets.map {
-        AssetsForNetwork(
+        NetworkAssets(
           network: $0.network,
           tokens: $0.tokens.filter { !$0.isErc721 && !$0.isNft },
           sortOrder: $0.sortOrder
         )
       }
       let visibleNFTUserAssetsForNetwork = allVisibleUserAssets.map {
-        AssetsForNetwork(
+        NetworkAssets(
           network: $0.network,
           tokens: $0.tokens.filter { $0.isErc721 || $0.isNft },
           sortOrder: $0.sortOrder
