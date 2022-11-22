@@ -236,9 +236,13 @@ class UserScriptManager {
           \(UserScriptManager.walletSolanaNameSpace) = $({
             solanaWeb3: $(solanaWeb3)
           });
-
-          for (const [key, value] of $Object.entries(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3)) {
-            $.deepFreeze(value);
+        
+          for (const value of $Object.values(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3)) {
+            if (!value) {
+              continue;
+            }
+        
+            $.extensiveFreeze(value);
           }
         
           $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);

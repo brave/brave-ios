@@ -22,9 +22,9 @@ window.__firefox__.execute(function($, $Object) {
         .then(
             (result) => {
               if (completion == undefined) {
-                resolve($.deepFreeze(result));
+                resolve($.extensiveFreeze(result));
               } else {
-                completion($.deepFreeze(result), resolve);
+                completion($.extensiveFreeze(result), resolve);
               }
             },
             (errorJSON) => {
@@ -61,7 +61,7 @@ window.__firefox__.execute(function($, $Object) {
       return $.deepFreeze(object);
     })
     let createTransaction = $(function(serializedTx) {
-      return $.deepFreeze($<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx)))
+      return $.extensiveFreeze($<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx)))
     })
     const provider = {
       value: {
@@ -76,7 +76,7 @@ window.__firefox__.execute(function($, $Object) {
             /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
             const result = $Object.create(null, undefined);
             result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
-            resolve($.deepFreeze(result));
+            resolve($.extensiveFreeze(result));
           }
           return post('connect', payload, completion)
         }),
@@ -98,7 +98,7 @@ window.__firefox__.execute(function($, $Object) {
             const obj = $Object.create(null, undefined);
             obj.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
             obj.signature = new Uint8Array(signature);
-            resolve($.deepFreeze(obj));
+            resolve($.extensiveFreeze(obj));
           }
           return post('signMessage', payload, completion)
         }),
@@ -108,7 +108,7 @@ window.__firefox__.execute(function($, $Object) {
               /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
               const result = $Object.create(null, undefined);
               result.publicKey = $(new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey));
-              resolve($.deepFreeze(result));
+              resolve($.extensiveFreeze(result));
             }
             return post('request', args, completion)
           }
@@ -120,7 +120,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(serializedTx, resolve) {
             /* Convert `<[UInt8]>` -> `solanaWeb3.Transaction` */
             const result = createTransaction(serializedTx);
-            resolve($.deepFreeze(result));
+            resolve($.extensiveFreeze(result));
           }
           return post('signTransaction', object, completion)
         }),
@@ -130,7 +130,7 @@ window.__firefox__.execute(function($, $Object) {
           function completion(serializedTxs, resolve) {
             /* Convert `<[[UInt8]]>` -> `[<solanaWeb3.Transaction>]` */
             const result = serializedTxs.map(createTransaction);
-            resolve($.deepFreeze(result));
+            resolve($.extensiveFreeze(result));
           }
           return post('signAllTransactions', objects, completion)
         }),

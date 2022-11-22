@@ -95,36 +95,56 @@ if (!window.__firefox__) {
         }
       }
       
-      for (const [name, property] of $Object.entries(overrides)) {
-        if (($Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
-          toString[name] = property;
+      // Secure calls to `toString`
+      const secureToString = function(toString) {
+        for (const [name, property] of $Object.entries(overrides)) {
+          if (($Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
+            toString[name] = property;
+          }
+
+          if (($Object.getOwnPropertyDescriptor(toString, name) || {}).configurable) {
+            $Object.defineProperty(toString, name, {
+              enumerable: false,
+              configurable: false,
+              writable: false,
+              value: property
+            });
+          }
+
+          if (name !== 'toString') {
+            $.deepFreeze(toString[name]);
+          }
         }
 
-        $Object.defineProperty(toString, name, {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: property
-        });
-
-        if (name !== 'toString') {
-          $.deepFreeze(toString[name]);
-        }
-      }
-
-      $.deepFreeze(toString);
+        $.deepFreeze(toString);
+      };
+      
+      // Secure our custom `toString`
+      secureToString(toString);
 
       for (const [name, property] of $Object.entries(overrides)) {
+        if (name == 'toString') {
+          let descriptor = $Object.getOwnPropertyDescriptor(value, name);
+          if (descriptor && descriptor.value !== Object.prototype.toString) {
+            // Secure the existing custom toString function
+            secureToString(value[name]);
+            continue;
+          }
+        }
+        
+        // Override all of the functions in the overrides array
         if (($Object.getOwnPropertyDescriptor(value, name) || {}).writable) {
           value[name] = property;
         }
-
-        $Object.defineProperty(value, name, {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: property
-        });
+        
+        if (($Object.getOwnPropertyDescriptor(value, name) || {}).configurable) {
+          $Object.defineProperty(value, name, {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: property
+          });
+        }
 
         $.deepFreeze(value[name]);
       }
@@ -147,6 +167,101 @@ if (!window.__firefox__) {
     }
     return value;
   };
+  
+  /*
+   *  Freeze an object recursively
+   */
+  $.extensiveFreeze = function(obj) {
+    const primitiveTypes = $Array.of('number', 'string', 'boolean', 'null', 'undefined');
+    
+    // Do nothing to primitive types
+    if (primitiveTypes.includes(typeof obj)) {
+      return obj;
+    }
+    
+    if (!obj || (obj.constructor && obj.constructor.name == "Object")) {
+      return obj;
+    }
+
+    // Do nothing to these prototypes
+    if (obj == Object.prototype || obj == Function.prototype) {
+      return obj;
+    }
+    
+    // Do nothing for typed arrays as they only contains primitives
+    if (obj instanceof Object.getPrototypeOf(Uint8Array)) {
+      return obj;
+    }
+
+    if ($Array.isArray(obj) || obj instanceof Set) {
+      for (const value of obj) {
+        if (!value || primitiveTypes.includes(typeof value)) {
+          continue;
+        }
+
+        if (value instanceof Object.getPrototypeOf(Uint8Array)) {
+          continue;
+        }
+        
+        $.extensiveFreeze(value);
+        $Object.freeze($(value));
+      }
+
+      return $Object.freeze($(obj));
+    } else if (obj instanceof Map) {
+      for (const value of obj.values()) {
+        if (!value || primitiveTypes.includes(typeof value)) {
+          continue;
+        }
+        
+        if (value instanceof Object.getPrototypeOf(Uint8Array)) {
+          continue;
+        }
+
+        $.extensiveFreeze(value);
+        $Object.freeze($(value));
+      }
+
+      return $Object.freeze($(obj));
+    } else if (obj.constructor && (obj.constructor.name == "Function" || obj.constructor.name == "AsyncFunction")) {
+      return $Object.freeze($(obj));
+    } else {
+      let prototype = $Object.getPrototypeOf(obj);
+      if (prototype && prototype != Object.prototype && prototype != Function.prototype) {
+        $.extensiveFreeze(prototype);
+        $Object.freeze($(prototype));
+      }
+
+      for (const value of $Object.values(obj)) {
+        if (!value || primitiveTypes.includes(typeof value)) {
+          continue;
+        }
+        
+        if (value instanceof Object.getPrototypeOf(Uint8Array)) {
+          continue;
+        }
+
+        $.extensiveFreeze(value);
+        $Object.freeze($(value));
+      }
+
+      for (const name of $Object.getOwnPropertyNames(obj)) {
+        let value = obj[name];
+        if (!value || primitiveTypes.includes(typeof value)) {
+          continue;
+        }
+        
+        if (value instanceof Object.getPrototypeOf(Uint8Array)) {
+          continue;
+        }
+        
+        $.extensiveFreeze(value);
+        $Object.freeze($(value));
+      }
+
+      return $Object.freeze($(obj));
+    }
+  };
     
   $.postNativeMessage = function(messageHandlerName, message) {
     if (!window.webkit || !window.webkit.messageHandlers) {
@@ -161,14 +276,16 @@ if (!window.__firefox__) {
     let result = $MessageHandlers[messageHandlerName].postMessage(message);
     window.webkit = webkit;
     return result;
-  }
+  };
   
   // Start securing functions before any other code can use them
   $($.deepFreeze);
+  $($.extensiveFreeze);
   $($.postNativeMessage);
   $($);
 
   $.deepFreeze($.deepFreeze);
+  $.deepFreeze($.extensiveFreeze);
   $.deepFreeze($.postNativeMessage);
   $.deepFreeze($);
   
