@@ -36,7 +36,6 @@ public class BraveSkusManager {
     }
     
     guard let manager = BraveSkusManager(isPrivateMode: isPrivate) else {
-      assert(isPrivate, "SkusServiceFactory failed to intialize in regular mode, something is wrong.")
       return
     }
     
