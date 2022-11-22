@@ -94,9 +94,12 @@ struct PortfolioView: View {
     Button(action: {
       self.isPresentingNetworkFilter = true
     }) {
-      Label(portfolioStore.networkFilter.title, braveSystemImage: "brave.text.alignleft")
-        .font(.footnote.weight(.medium))
-        .foregroundColor(Color(.braveBlurpleTint))
+      HStack {
+        Text(portfolioStore.networkFilter.title)
+        Image(braveSystemName: "brave.text.alignleft")
+      }
+      .font(.footnote.weight(.medium))
+      .foregroundColor(Color(.braveBlurpleTint))
     }
     .sheet(isPresented: $isPresentingNetworkFilter) {
       NavigationView {
@@ -233,38 +236,19 @@ struct BalanceHeaderView: View {
 
   private var balanceOrDataPointView: some View {
     HStack {
-      Group {
-        if sizeCategory.isAccessibilityCategory {
-          VStack(alignment: .leading) {
-            NetworkPicker(
-              keyringStore: keyringStore,
-              networkStore: networkStore
-            )
-            Text(verbatim: balance)
-              .font(.largeTitle.bold())
-          }
-        } else {
-          HStack {
-            Text(verbatim: balance)
-              .font(.largeTitle.bold())
-            NetworkPicker(
-              keyringStore: keyringStore,
-              networkStore: networkStore
-            )
-            Spacer()
-          }
-        }
-      }
-      .opacity(selectedBalance == nil ? 1 : 0)
-      .overlay(
-        Group {
-          if let dataPoint = selectedBalance {
-            Text(dataPoint.formattedPrice)
-              .font(.largeTitle.bold())
-          }
-        },
-        alignment: .leading
-      )
+      Text(verbatim: balance)
+        .font(.largeTitle.bold())
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .opacity(selectedBalance == nil ? 1 : 0)
+        .overlay(
+          Group {
+            if let dataPoint = selectedBalance {
+              Text(dataPoint.formattedPrice)
+                .font(.largeTitle.bold())
+            }
+          },
+          alignment: .leading
+        )
       if horizontalSizeClass == .regular {
         Spacer()
         DateRangeView(selectedRange: $selectedDateRange)
