@@ -162,7 +162,7 @@ public class PortfolioStore: ObservableObject {
         of: [AssetsForNetwork].self,
         body: { @MainActor group -> [AssetsForNetwork] in
           for (index, network) in networks.enumerated() {
-            group.addTask {
+            group.addTask { @MainActor in
               let userAssets = await self.walletService.userAssets(network.chainId, coin: network.coin).filter(\.visible)
               return [AssetsForNetwork(network: network, tokens: userAssets, sortOrder: index)]
             }
@@ -222,9 +222,9 @@ public class PortfolioStore: ObservableObject {
           accounts: keyrings.first(where: { $0.coin == userVisibleNFT.token.coin })?.accountInfos ?? []
         )
       }
-      let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { group in
+      let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { @MainActor group in
         for tokenNetworkAccounts in allTokenNetworkAccounts {
-          group.addTask {
+          group.addTask { @MainActor in
             let totalBalance = await self.fetchTotalBalance(
               token: tokenNetworkAccounts.token,
               network: tokenNetworkAccounts.network,
@@ -315,9 +315,9 @@ public class PortfolioStore: ObservableObject {
     network: BraveWallet.NetworkInfo,
     accounts: [BraveWallet.AccountInfo]
   ) async -> Double {
-    let balancesForAsset = await withTaskGroup(of: [Double].self, body: { group in
+    let balancesForAsset = await withTaskGroup(of: [Double].self, body: { @MainActor group in
       for account in accounts {
-        group.addTask {
+        group.addTask { @MainActor in
           let balance = await self.rpcService.balance(
             for: token,
             in: account,
