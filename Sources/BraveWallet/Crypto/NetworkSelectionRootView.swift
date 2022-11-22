@@ -62,6 +62,7 @@ struct NetworkSelectionRootView: View {
               }
             )
           }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
       }
       Section(content: {
@@ -72,6 +73,7 @@ struct NetworkSelectionRootView: View {
               selectedNetwork: selectedNetwork
             )
           }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
       }, header: {
         WalletListHeaderView(title: Text(Strings.Wallet.networkSelectionSecondaryNetworks))
@@ -199,7 +201,6 @@ private struct NetworkRowView: View {
     .padding(.vertical, 4)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
-    .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
 }
 
@@ -256,6 +257,7 @@ private struct NetworkSelectionDetailView: View {
           )
           .contentShape(Rectangle())
         }
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
     }
     .listStyle(.insetGrouped)
