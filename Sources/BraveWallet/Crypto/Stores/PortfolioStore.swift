@@ -208,26 +208,39 @@ public class PortfolioStore: ObservableObject {
       }
       let keyrings = await self.keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       guard !Task.isCancelled else { return }
-      // fetch balance for every token
-      for userVisibleAsset in self.userVisibleAssets {
-        let accountsToFetchBalance = keyrings.first(where: { $0.coin == userVisibleAsset.token.coin })?.accountInfos ?? []
-        let totalBalance = await fetchTotalBalance(
+      typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
+      let allTokenNetworkAccounts: [TokenNetworkAccounts] = userVisibleAssets.map { userVisibleAsset in
+        TokenNetworkAccounts(
           token: userVisibleAsset.token,
           network: userVisibleAsset.network,
-          accounts: accountsToFetchBalance
+          accounts: keyrings.first(where: { $0.coin == userVisibleAsset.token.coin })?.accountInfos ?? []
         )
-        totalBalancesCache[userVisibleAsset.token.assetBalanceId] = totalBalance
-      }
-      guard !Task.isCancelled else { return }
-      for userVisibleNFT in self.userVisibleNFTs {
-        let accountsToFetchBalance = keyrings.first(where: { $0.coin == userVisibleNFT.token.coin })?.accountInfos ?? []
-        // fetch balance
-        let totalBalance = await fetchTotalBalance(
+      } + userVisibleNFTs.map { userVisibleNFT in
+        TokenNetworkAccounts(
           token: userVisibleNFT.token,
           network: userVisibleNFT.network,
-          accounts: accountsToFetchBalance
+          accounts: keyrings.first(where: { $0.coin == userVisibleNFT.token.coin })?.accountInfos ?? []
         )
-        totalBalancesCache[userVisibleNFT.token.assetBalanceId] = totalBalance
+      }
+      let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { group in
+        for tokenNetworkAccounts in allTokenNetworkAccounts {
+          group.addTask {
+            let totalBalance = await self.fetchTotalBalance(
+              token: tokenNetworkAccounts.token,
+              network: tokenNetworkAccounts.network,
+              accounts: tokenNetworkAccounts.accounts
+            )
+            return [tokenNetworkAccounts.token.assetBalanceId: totalBalance]
+          }
+        }
+        return await group.reduce(into: [String: Double](), { partialResult, new in
+          for key in new.keys {
+            partialResult[key] = new[key]
+          }
+        })
+      })
+      for (key, value) in totalBalances {
+        totalBalancesCache[key] = value
       }
 
       // fetch price for every token
