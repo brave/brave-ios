@@ -96,10 +96,11 @@ public class BraveSkusManager {
       do {
         Logger.module.debug("skus credentialSummary")
         
-        guard let data = completion.data(using: .utf8) else { return }
+        guard let data = completion.data(using: .utf8) else {
+          resultJSON(nil)
+          return
+        }
         let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        
-        resultJSON(json)
         
         let jsonDecoder = JSONDecoder()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -122,7 +123,10 @@ public class BraveSkusManager {
             Logger.module.debug("The credential summary does not have any remaining credentials")
           }
         }
+        
+        resultJSON(json)
       } catch {
+        resultJSON(nil)
         Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
       }
     }
