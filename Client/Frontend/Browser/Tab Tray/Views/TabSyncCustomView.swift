@@ -152,7 +152,7 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
 
       let hideForAction = UIAction(
         title: Strings.OpenTabs.openSessionHideAllActionTitle,
-        image: UIImage(systemName: "eye.slash"),
+        image: UIImage(braveSystemNamed: "brave.eye.slash"),
         attributes: .destructive,
         handler: UIAction.deferredActionHandler { _ in
           self.delegate?.hideForNow(self, section: self.section)
