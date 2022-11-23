@@ -11,6 +11,8 @@ struct NFTDetailView: View {
   @ObservedObject var nftDetailStore: NFTDetailStore
   @Binding var buySendSwapDestination: BuySendSwapDestination?
   
+  @Environment(\.openWalletURLAction) private var openWalletURL
+  
   @ViewBuilder private var nftImage: some View {
     if let erc721MetaData = nftDetailStore.erc721MetaData {
       WebImageReader(url: erc721MetaData.imageURL) { image, isFinished in
@@ -86,10 +88,26 @@ struct NFTDetailView: View {
               Text(Strings.Wallet.nftDetailTokenID)
                 .font(.headline.weight(.semibold))
               Spacer()
-              if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
-                Text(verbatim: "#\(tokenId)")
-              } else {
-                Text("\(nftDetailStore.nft.name) #\(nftDetailStore.nft.tokenId)")
+              Button(action: {
+                if let explorerURL = nftDetailStore.networkInfo.blockExplorerUrls.first {
+                  let baseURL = "\(explorerURL)/token/\(nftDetailStore.nft.contractAddress)"
+                  var nftURL = URL(string: baseURL)
+                  if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
+                    nftURL = URL(string: "\(baseURL)?a=\(tokenId)")
+                  }
+                  
+                  if let url = nftURL {
+                    openWalletURL?(url)
+                  }
+                }
+              }) {
+                if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
+                  Text(verbatim: "#\(tokenId)")
+                    .foregroundColor(Color(.braveBlurple))
+                } else {
+                  Text("\(nftDetailStore.nft.name) #\(nftDetailStore.nft.tokenId)")
+                    .foregroundColor(Color(.braveBlurple))
+                }
               }
             }
           }
