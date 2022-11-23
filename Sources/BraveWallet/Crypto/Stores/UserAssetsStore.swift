@@ -78,7 +78,11 @@ public class UserAssetsStore: ObservableObject {
     update()
   }
   
-  @Published var networkFilter: NetworkFilter = .allNetworks
+  @Published var networkFilter: NetworkFilter = .allNetworks {
+    didSet {
+      update()
+    }
+  }
   
   func update() {
     Task { @MainActor in
