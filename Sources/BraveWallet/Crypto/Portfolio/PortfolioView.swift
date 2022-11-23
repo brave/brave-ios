@@ -161,7 +161,7 @@ struct PortfolioView: View {
                 PortfolioNFTAssetView(
                   image: NFTIconView(
                     token: nftAsset.token,
-                    network: networkStore.selectedChain,
+                    network: nftAsset.network,
                     url: nftAsset.imageUrl
                   ),
                   title: nftAsset.token.nftTokenTitle,

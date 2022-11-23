@@ -77,7 +77,7 @@ struct AssetIconView: View {
   }
   
   @ViewBuilder private var tokenLogo: some View {
-    if !(token.isNft || token.isErc721), !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if !network.isNativeAsset(token), let image = networkNativeTokenLogo {
       Image(uiImage: image)
         .resizable()
         .frame(width: 15, height: 15)
