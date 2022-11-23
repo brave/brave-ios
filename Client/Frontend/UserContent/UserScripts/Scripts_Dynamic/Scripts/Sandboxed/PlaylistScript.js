@@ -305,12 +305,12 @@ window.__firefox__.includeOnce("Playlist", function($) {
           let audios = getAllAudioElements();
           
           if (videos.length == 0 && audios.length == 0) {
-            $(function() {
+            setTimeout(function() {
               $.postNativeMessage('$<message_handler>', {
                 "securityToken": SECURITY_TOKEN,
-                "state": document.readyState
+                "state": "cancel"
               });
-            })();
+            }, 10000);
             return;
           }
           
@@ -323,6 +323,13 @@ window.__firefox__.includeOnce("Playlist", function($) {
             observeNode(node);
             notifyNode(node, 'audio', true, ignoreSource);
           });
+          
+          $(function() {
+            $.postNativeMessage('$<message_handler>', {
+              "securityToken": SECURITY_TOKEN,
+              "state": document.readyState
+            });
+          })();
         });
         
         // Timeinterval is needed for DailyMotion as their DOM is bad
