@@ -20,13 +20,13 @@ struct NFTDetailView: View {
             .aspectRatio(contentMode: .fit)
             .cornerRadius(10)
         } else {
-          Text("Image is not available")
+          Text(Strings.Wallet.nftDetailImageNotAvailable)
             .foregroundColor(Color(.secondaryBraveLabel))
             .frame(maxWidth: .infinity, idealHeight: 200)
         }
       }
     } else {
-      Text("Image is not available")
+      Text(Strings.Wallet.nftDetailImageNotAvailable)
         .foregroundColor(Color(.secondaryBraveLabel))
         .frame(maxWidth: .infinity, idealHeight: 200)
     }
@@ -52,7 +52,7 @@ struct NFTDetailView: View {
               initialToken: nftDetailStore.nft
             )
           }) {
-            Text("Send NFT")
+            Text(Strings.Wallet.nftDetailSendNFTButtonTitle)
               .frame(maxWidth: .infinity)
           }
           .buttonStyle(BraveFilledButtonStyle(size: .large))
@@ -60,7 +60,7 @@ struct NFTDetailView: View {
         if let erc721MetaData = nftDetailStore.erc721MetaData {
           if let description = erc721MetaData.description {
             VStack(alignment: .leading, spacing: 8) {
-              Text("Description")
+              Text(Strings.Wallet.nftDetailDescription)
                 .font(.headline.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
               Text(description)
@@ -71,25 +71,25 @@ struct NFTDetailView: View {
         VStack(spacing: 16) {
           Group {
             HStack {
-              Text("Blockchain")
+              Text(Strings.Wallet.nftDetailBlockchain)
                 .font(.headline.weight(.semibold))
               Spacer()
               Text(nftDetailStore.networkInfo.chainName)
             }
             HStack {
-              Text("Token standard")
+              Text(Strings.Wallet.nftDetailTokenStandard)
                 .font(.headline.weight(.semibold))
               Spacer()
-              Text("ERC 721")
+              Text(Strings.Wallet.nftDetailERC721)
             }
             HStack {
-              Text("Token ID")
+              Text(Strings.Wallet.nftDetailTokenID)
                 .font(.headline.weight(.semibold))
               Spacer()
               if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
-                Text("#\(tokenId)")
+                Text(verbatim: "#\(tokenId)")
               } else {
-                Text("#\(nftDetailStore.nft.tokenId)")
+                Text("\(nftDetailStore.nft.name) #\(nftDetailStore.nft.tokenId)")
               }
             }
           }
@@ -101,6 +101,6 @@ struct NFTDetailView: View {
     .onAppear {
       nftDetailStore.fetchMetaData()
     }
-    .navigationBarTitle("NFT Detail")
+    .navigationBarTitle(Strings.Wallet.nftDetailTitle)
   }
 }
