@@ -171,8 +171,11 @@ if (!window.__firefox__) {
   /*
    *  Freeze an object recursively
    */
-  $.extensiveFreeze = function(obj) {
+  $.extensiveFreeze = function(obj, exceptions = []) {
     const primitiveTypes = $Array.of('number', 'string', 'boolean', 'null', 'undefined');
+    const isIgnoredClass = function(instance) {
+      return instance.constructor && exceptions.includes(instance.constructor.name);
+    };
     
     // Do nothing to primitive types
     if (primitiveTypes.includes(typeof obj)) {
@@ -203,11 +206,14 @@ if (!window.__firefox__) {
           continue;
         }
         
-        $.extensiveFreeze(value);
-        $Object.freeze($(value));
+        $.extensiveFreeze(value, exceptions);
+        
+        if (!isIgnoredClass(value)) {
+          $Object.freeze($(value));
+        }
       }
-
-      return $Object.freeze($(obj));
+      
+      return isIgnoredClass(obj) ? $(obj) : $Object.freeze($(obj));
     } else if (obj instanceof Map) {
       for (const value of obj.values()) {
         if (!value || primitiveTypes.includes(typeof value)) {
@@ -218,18 +224,24 @@ if (!window.__firefox__) {
           continue;
         }
 
-        $.extensiveFreeze(value);
-        $Object.freeze($(value));
+        $.extensiveFreeze(value, exceptions);
+        
+        if (!isIgnoredClass(value)) {
+          $Object.freeze($(value));
+        }
       }
 
-      return $Object.freeze($(obj));
+      return isIgnoredClass(obj) ? $(obj) : $Object.freeze($(obj));
     } else if (obj.constructor && (obj.constructor.name == "Function" || obj.constructor.name == "AsyncFunction")) {
       return $Object.freeze($(obj));
     } else {
       let prototype = $Object.getPrototypeOf(obj);
       if (prototype && prototype != Object.prototype && prototype != Function.prototype) {
-        $.extensiveFreeze(prototype);
-        $Object.freeze($(prototype));
+        $.extensiveFreeze(prototype, exceptions);
+        
+        if (!isIgnoredClass(prototype)) {
+          $Object.freeze($(prototype));
+        }
       }
 
       for (const value of $Object.values(obj)) {
@@ -241,11 +253,37 @@ if (!window.__firefox__) {
           continue;
         }
 
-        $.extensiveFreeze(value);
-        $Object.freeze($(value));
+        $.extensiveFreeze(value, exceptions);
+        
+        if (!isIgnoredClass(value)) {
+          $Object.freeze($(value));
+        }
       }
 
       for (const name of $Object.getOwnPropertyNames(obj)) {
+        // Special handling for getters and setters because accessing them will return the value,
+        // and not the function itself.
+        let descriptor = $Object.getOwnPropertyDescriptor(obj, name);
+        if (descriptor) {
+          let values = $Array.of(descriptor.get, descriptor.set, descriptor.value);
+          for (const value of values) {
+            if (!value || primitiveTypes.includes(typeof value) || value instanceof Object.getPrototypeOf(Uint8Array)) {
+              continue;
+            }
+            
+            $.extensiveFreeze(value, exceptions);
+            
+            if (!isIgnoredClass(value)) {
+              $Object.freeze($(value));
+            }
+          }
+          
+          descriptor.enumerable = false;
+          descriptor.writable = false;
+          descriptor.configurable = false;
+          continue;
+        }
+        
         let value = obj[name];
         if (!value || primitiveTypes.includes(typeof value)) {
           continue;
@@ -255,11 +293,14 @@ if (!window.__firefox__) {
           continue;
         }
         
-        $.extensiveFreeze(value);
-        $Object.freeze($(value));
+        $.extensiveFreeze(value, exceptions);
+        
+        if (!isIgnoredClass(value)) {
+          $Object.freeze($(value));
+        }
       }
 
-      return $Object.freeze($(obj));
+      return isIgnoredClass(obj) ? $(obj) : $Object.freeze($(obj));
     }
   };
     

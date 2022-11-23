@@ -242,7 +242,7 @@ class UserScriptManager {
               continue;
             }
         
-            $.extensiveFreeze(value);
+            $.extensiveFreeze(value, ["BN"]);
           }
         
           $.deepFreeze(\(UserScriptManager.walletSolanaNameSpace).solanaWeb3);
