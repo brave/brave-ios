@@ -87,7 +87,7 @@ struct NetworkSelectionRootView: View {
       ToolbarItemGroup(placement: .cancellationAction) {
         Button(action: { presentationMode.dismiss() }) {
           Text(Strings.cancelButtonTitle)
-            .foregroundColor(Color(.braveOrange))
+            .foregroundColor(Color(.braveBlurpleTint))
         }
       }
     }
@@ -145,7 +145,7 @@ private struct NetworkRowView: View {
   @ViewBuilder private var checkmark: some View {
     Image(systemName: "checkmark")
       .opacity(isSelected ? 1 : 0)
-      .foregroundColor(Color(.braveLabel))
+      .foregroundColor(Color(.braveBlurpleTint))
   }
   
   private var showShortChainName: Bool {
