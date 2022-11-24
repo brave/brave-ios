@@ -72,7 +72,6 @@ public class UserAssetsStore: ObservableObject {
     self.rpcService = rpcService
     self.keyringService = keyringService
     self.assetRatioService = assetRatioService
-    self.rpcService.add(self)
     self.keyringService.add(self)
   }
   
@@ -211,15 +210,6 @@ public class UserAssetsStore: ObservableObject {
   @MainActor func networkInfo(by chainId: String, coin: BraveWallet.CoinType) async -> BraveWallet.NetworkInfo? {
     let allNetworks = await rpcService.allNetworks(coin)
     return allNetworks.first { $0.chainId.caseInsensitiveCompare(chainId) == .orderedSame }
-  }
-}
-
-extension UserAssetsStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
-  }
-  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-  }
-  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
 
