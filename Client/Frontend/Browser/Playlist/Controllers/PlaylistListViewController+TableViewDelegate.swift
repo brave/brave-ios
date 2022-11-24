@@ -383,6 +383,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           PlaylistCarplayManager.shared.currentPlaylistItem = item
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
           self.delegate?.updateLastPlayedItem(item: item)
+          PlaylistManager.shared.autoDownload(item: item)
         case .cancelled:
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
           Logger.module.debug("User cancelled Playlist Playback")

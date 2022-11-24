@@ -681,6 +681,7 @@ extension PlaylistViewController: VideoViewDelegate {
             PlaylistCarplayManager.shared.currentPlaylistItem = item
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             self.updateLastPlayedItem(item: item)
+            PlaylistManager.shared.autoDownload(item: item)
           case .cancelled:
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             Logger.module.debug("User Cancelled Playlist Playback")
@@ -762,6 +763,7 @@ extension PlaylistViewController: VideoViewDelegate {
             PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
             PlaylistCarplayManager.shared.currentPlaylistItem = item
             self.updateLastPlayedItem(item: item)
+            PlaylistManager.shared.autoDownload(item: item)
           case .cancelled:
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             Logger.module.debug("User Cancelled Playlist Playback")
