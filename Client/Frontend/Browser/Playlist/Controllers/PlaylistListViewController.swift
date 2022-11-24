@@ -323,7 +323,7 @@ class PlaylistListViewController: UIViewController {
         return
       }
 
-      delegate.playItem(item: item) { [weak self] error in
+      delegate.playItem(item: item) { [weak self] item, error in
         PlaylistCarplayManager.shared.currentPlaylistItem = nil
 
         guard let self = self,
