@@ -18,6 +18,8 @@ import BraveCore
 struct AssetIconView: View {
   var token: BraveWallet.BlockchainToken
   var network: BraveWallet.NetworkInfo
+  /// If we should show the native token logo on non-native assets
+  var shouldShowNativeTokenIcon: Bool = false
   @ScaledMetric var length: CGFloat = 40
 
   private var fallbackMonogram: some View {
@@ -77,7 +79,7 @@ struct AssetIconView: View {
   }
   
   @ViewBuilder private var tokenLogo: some View {
-    if !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = networkNativeTokenLogo {
       Image(uiImage: image)
         .resizable()
         .frame(width: 15, height: 15)
@@ -125,6 +127,8 @@ struct NFTIconView: View {
   var network: BraveWallet.NetworkInfo
   /// NFT image url from metadata
   var url: URL?
+  /// If we should show the native token logo on non-native assets
+  var shouldShowNativeTokenIcon: Bool = false
   
   var body: some View {
     WebImageReader(url: url) { image, isFinished in
@@ -133,7 +137,7 @@ struct NFTIconView: View {
           .resizable()
           .aspectRatio(contentMode: .fit)
       } else {
-        AssetIconView(token: token, network: network)
+        AssetIconView(token: token, network: network, shouldShowNativeTokenIcon: shouldShowNativeTokenIcon)
       }
     }
   }

@@ -130,7 +130,11 @@ struct PortfolioView: View {
               selectedToken = asset.token
             }) {
               PortfolioAssetView(
-                image: AssetIconView(token: asset.token, network: asset.network),
+                image: AssetIconView(
+                  token: asset.token,
+                  network: asset.network,
+                  shouldShowNativeTokenIcon: true
+                ),
                 title: asset.token.name,
                 symbol: asset.token.symbol,
                 networkName: asset.network.chainName,
@@ -177,7 +181,8 @@ struct PortfolioView: View {
                   image: NFTIconView(
                     token: nftAsset.token,
                     network: nftAsset.network,
-                    url: nftAsset.imageUrl
+                    url: nftAsset.imageUrl,
+                    shouldShowNativeTokenIcon: true
                   ),
                   title: nftAsset.token.nftTokenTitle,
                   symbol: nftAsset.token.symbol,
