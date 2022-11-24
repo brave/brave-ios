@@ -32,7 +32,11 @@ private struct EditTokenView: View {
       }
     }) {
       HStack(spacing: 8) {
-        AssetIconView(token: assetStore.token, network: assetStore.network)
+        AssetIconView(
+          token: assetStore.token,
+          network: assetStore.network,
+          shouldShowNativeTokenIcon: true
+        )
         VStack(alignment: .leading) {
           Text(tokenName)
             .fontWeight(.semibold)
