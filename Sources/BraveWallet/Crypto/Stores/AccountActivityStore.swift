@@ -12,8 +12,8 @@ class AccountActivityStore: ObservableObject {
   /// selected account changes (ex. when removing an account).
   let observeAccountUpdates: Bool
   private(set) var account: BraveWallet.AccountInfo
-  @Published private(set) var assets: [AssetViewModel] = []
-  @Published private(set) var NFTAssets: [NFTAssetViewModel] = []
+  @Published private(set) var userVisibleAssets: [AssetViewModel] = []
+  @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
   @Published var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var allTokens: [BraveWallet.BlockchainToken] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
@@ -67,101 +67,166 @@ class AccountActivityStore: ObservableObject {
   func update() {
     Task { @MainActor in
       let coin = account.coin
-      let network = await rpcService.network(coin)
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
-      let allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
-      let allUserAssets: [BraveWallet.BlockchainToken] = await walletService.userAssets(network.chainId, coin: network.coin)
-      let userVisibleTokens = allUserAssets.filter(\.visible)
-      self.assets = await fetchAssets(userVisibleTokens: userVisibleTokens, network: network)
-      self.NFTAssets = await fetchNFTAssets(userVisibleTokens: userVisibleTokens, network: network)
-      let assetRatios = self.assets.reduce(into: [String: Double](), {
+      let networks = await rpcService.allNetworks(coin)
+        .filter { $0.chainId != BraveWallet.LocalhostChainId } // localhost not supported
+      
+      struct NetworkAssets: Equatable {
+        let network: BraveWallet.NetworkInfo
+        let tokens: [BraveWallet.BlockchainToken]
+        let sortOrder: Int
+      }
+      let allVisibleUserAssets = await withTaskGroup(of: [NetworkAssets].self, body: { @MainActor group in
+        for (index, network) in networks.enumerated() {
+          group.addTask { @MainActor in
+            let assets = await self.walletService.userAssets(network.chainId, coin: network.coin).filter(\.visible)
+            return [NetworkAssets(network: network, tokens: assets, sortOrder: index)]
+          }
+        }
+        return await group.reduce([NetworkAssets](), { $0 + $1 })
+          .sorted(by: { $0.sortOrder < $1.sortOrder })
+      })
+      let visibleUserAssetsForNetwork = allVisibleUserAssets.map {
+        NetworkAssets(
+          network: $0.network,
+          tokens: $0.tokens.filter { !$0.isErc721 && !$0.isNft },
+          sortOrder: $0.sortOrder
+        )
+      }
+      let visibleNFTUserAssetsForNetwork = allVisibleUserAssets.map {
+        NetworkAssets(
+          network: $0.network,
+          tokens: $0.tokens.filter { $0.isErc721 || $0.isNft },
+          sortOrder: $0.sortOrder
+        )
+      }
+      userVisibleAssets = visibleUserAssetsForNetwork.flatMap { assetsForNetwork in
+        assetsForNetwork.tokens.map { token in
+          AssetViewModel(
+            token: token,
+            network: assetsForNetwork.network,
+            decimalBalance: 0,
+            price: "",
+            history: []
+          )
+        }
+      }
+      userVisibleNFTs = visibleNFTUserAssetsForNetwork.flatMap { assetsForNetwork in
+        assetsForNetwork.tokens.map { token in
+          NFTAssetViewModel(
+            token: token,
+            network: assetsForNetwork.network,
+            balance: 0
+          )
+        }
+      }
+      
+      let keyringForAccount = await keyringService.keyringInfo(coin.keyringId)
+      typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
+      let allTokenNetworkAccounts: [TokenNetworkAccounts] = userVisibleAssets.map { userVisibleAsset in
+        TokenNetworkAccounts(
+          token: userVisibleAsset.token,
+          network: userVisibleAsset.network,
+          accounts: [account]
+        )
+      } + userVisibleNFTs.map { userVisibleNFT in
+        TokenNetworkAccounts(
+          token: userVisibleNFT.token,
+          network: userVisibleNFT.network,
+          accounts: [account]
+        )
+      }
+      let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { @MainActor group in
+        for tokenNetworkAccounts in allTokenNetworkAccounts {
+          group.addTask { @MainActor in
+            let totalBalance = await self.fetchTotalBalance(
+              token: tokenNetworkAccounts.token,
+              network: tokenNetworkAccounts.network,
+              accounts: tokenNetworkAccounts.accounts
+            )
+            return [tokenNetworkAccounts.token.assetBalanceId: totalBalance]
+          }
+        }
+        return await group.reduce(into: [String: Double](), { partialResult, new in
+          for key in new.keys {
+            partialResult[key] = new[key]
+          }
+        })
+      })
+      
+      // fetch price for every token
+      let allTokens = allVisibleUserAssets.flatMap(\.tokens)
+      let allAssetRatioIds = allTokens.map(\.assetRatioId)
+      let prices: [String: String] = await fetchPrices(for: allAssetRatioIds)
+      
+      guard !Task.isCancelled else { return }
+      // build our `userVisibleAssets` & `userVisibleNFTs`
+      userVisibleAssets = visibleUserAssetsForNetwork.flatMap { assetsForNetwork in
+        assetsForNetwork.tokens.map { token in
+          AssetViewModel(
+            token: token,
+            network: assetsForNetwork.network,
+            decimalBalance: totalBalances[token.assetBalanceId] ?? 0,
+            price: prices[token.assetRatioId.lowercased()] ?? "",
+            history: []
+          )
+        }
+      }
+      userVisibleNFTs = visibleNFTUserAssetsForNetwork.flatMap { assetsForNetwork in
+        assetsForNetwork.tokens.map { token in
+          NFTAssetViewModel(
+            token: token,
+            network: assetsForNetwork.network,
+            balance: Int(totalBalances[token.assetBalanceId] ?? 0)
+          )
+        }
+      }
+      
+      let selectedNetworkForAccountCoin = await rpcService.network(coin)
+      let assetRatios = self.userVisibleAssets.reduce(into: [String: Double](), {
         $0[$1.token.assetRatioId.lowercased()] = Double($1.price)
       })
       self.transactionSummaries = await fetchTransactionSummarys(
-        network: network,
-        accountInfos: keyring.accountInfos,
-        userVisibleTokens: allUserAssets,
+        network: selectedNetworkForAccountCoin,
+        accountInfos: keyringForAccount.accountInfos,
+        userVisibleTokens: userVisibleAssets.map(\.token).filter { $0.chainId == selectedNetworkForAccountCoin.chainId },
         allTokens: allTokens,
         assetRatios: assetRatios
       )
     }
   }
-
-  @MainActor private func fetchAssets(
-    userVisibleTokens: [BraveWallet.BlockchainToken],
-    network: BraveWallet.NetworkInfo
-  ) async -> [AssetViewModel] {
-    let visibleUserAssets = userVisibleTokens.filter { !$0.isErc721 && !$0.isNft }
-    var updatedAssets = visibleUserAssets.map {
-      AssetViewModel(token: $0, network: network, decimalBalance: 0, price: "", history: [])
-    }
-    // fetch price for each asset
+  
+  @MainActor private func fetchTotalBalance(
+    token: BraveWallet.BlockchainToken,
+    network: BraveWallet.NetworkInfo,
+    accounts: [BraveWallet.AccountInfo]
+  ) async -> Double {
+    let balancesForAsset = await withTaskGroup(of: [Double].self, body: { @MainActor group in
+      for account in accounts {
+        group.addTask { @MainActor in
+          let balance = await self.rpcService.balance(
+            for: token,
+            in: account,
+            network: network
+          )
+          return [balance ?? 0]
+        }
+      }
+      return await group.reduce([Double](), { $0 + $1 })
+    })
+    return balancesForAsset.reduce(0, +)
+  }
+  
+  /// Fetches the prices for a given list of `assetRatioId`, giving a dictionary with the price for each symbol
+  @MainActor func fetchPrices(
+    for priceIds: [String]
+  ) async -> [String: String] {
     let priceResult = await assetRatioService.priceWithIndividualRetry(
-      visibleUserAssets.map { $0.assetRatioId.lowercased() },
+      priceIds.map { $0.lowercased() },
       toAssets: [currencyFormatter.currencyCode],
       timeframe: .oneDay
     )
-    for price in priceResult.assetPrices {
-      if let index = updatedAssets.firstIndex(where: {
-        $0.token.assetRatioId.caseInsensitiveCompare(price.fromAsset) == .orderedSame
-      }) {
-        updatedAssets[index].price = price.price
-      }
-    }
-    // fetch balance for each asset
-    typealias TokenBalance = (token: BraveWallet.BlockchainToken, balance: Double?)
-    let tokenBalances = await withTaskGroup(of: [TokenBalance].self) { @MainActor group -> [TokenBalance] in
-      for token in visibleUserAssets {
-        group.addTask { @MainActor in
-          let balance = await self.rpcService.balance(for: token, in: self.account, network: network)
-          return [TokenBalance(token, balance)]
-        }
-      }
-      return await group.reduce([TokenBalance](), { $0 + $1 })
-    }
-    // update assets with balance
-    for tokenBalance in tokenBalances {
-      if let value = tokenBalance.balance, let index = updatedAssets.firstIndex(where: {
-        $0.token.assetBalanceId.caseInsensitiveCompare(tokenBalance.token.assetBalanceId) == .orderedSame
-      }) {
-        updatedAssets[index].decimalBalance = value
-      }
-    }
-    return updatedAssets
-  }
-  
-  @MainActor private func fetchNFTAssets(
-    userVisibleTokens: [BraveWallet.BlockchainToken],
-    network: BraveWallet.NetworkInfo
-  ) async -> [NFTAssetViewModel] {
-    let visibleNFTAssets = userVisibleTokens.filter { $0.isErc721 || $0.isNft }
-    var updatedNFTAssets = visibleNFTAssets.map { asset in
-      NFTAssetViewModel(
-        token: asset,
-        network: network,
-        balance: 0
-      )
-    }
-    // fetch balance for each asset
-    typealias TokenBalance = (token: BraveWallet.BlockchainToken, balance: Double?)
-    let tokenBalances = await withTaskGroup(of: [TokenBalance].self) { @MainActor group -> [TokenBalance] in
-      for token in visibleNFTAssets {
-        group.addTask { @MainActor in
-          let balance = await self.rpcService.balance(for: token, in: self.account, network: network)
-          return [TokenBalance(token, balance)]
-        }
-      }
-      return await group.reduce([TokenBalance](), { $0 + $1 })
-    }
-    // update assets with balance
-    for tokenBalance in tokenBalances {
-      if let value = tokenBalance.balance, let index = updatedNFTAssets.firstIndex(where: {
-        $0.token.assetBalanceId.caseInsensitiveCompare(tokenBalance.token.assetBalanceId) == .orderedSame
-      }) {
-        updatedNFTAssets[index].balance = Int(value)
-      }
-    }
-    return updatedNFTAssets
+    let prices = Dictionary(uniqueKeysWithValues: priceResult.assetPrices.map { ($0.fromAsset, $0.price) })
+    return prices
   }
   
   @MainActor private func fetchTransactionSummarys(
