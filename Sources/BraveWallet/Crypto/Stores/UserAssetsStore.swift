@@ -74,8 +74,6 @@ public class UserAssetsStore: ObservableObject {
     self.assetRatioService = assetRatioService
     self.rpcService.add(self)
     self.keyringService.add(self)
-
-    update()
   }
   
   @Published var networkFilter: NetworkFilter = .allNetworks {

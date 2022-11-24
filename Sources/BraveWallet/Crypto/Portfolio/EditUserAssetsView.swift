@@ -226,6 +226,9 @@ struct EditUserAssetsView: View {
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
+    .onAppear {
+      userAssetsStore.update()
+    }
   }
 
   private func removeCustomToken(_ token: BraveWallet.BlockchainToken) {
