@@ -22,8 +22,8 @@ struct NFTDetailView: View {
   
   @ViewBuilder private var nftImage: some View {
     if let erc721MetaData = nftDetailStore.erc721MetaData {
-      let test: String? = "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"
-      if let imageURL = test /*erc721MetaData.imageURL*/ {
+//      let test: String? = "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"
+      if let imageURL = erc721MetaData.imageURL {
         if imageURL.hasPrefix("data:image/") {
           WebImageReader(url: URL(string: imageURL)) { image, isFinished in
             if let image = image {
