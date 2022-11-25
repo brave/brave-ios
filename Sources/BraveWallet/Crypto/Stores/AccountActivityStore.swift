@@ -19,6 +19,7 @@ class AccountActivityStore: ObservableObject {
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
+      guard oldValue != currencyCode else { return }
       update()
     }
   }
