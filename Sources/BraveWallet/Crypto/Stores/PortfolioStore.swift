@@ -158,19 +158,7 @@ public class PortfolioStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = await withTaskGroup(
-        of: [NetworkAssets].self,
-        body: { @MainActor group -> [NetworkAssets] in
-          for (index, network) in networks.enumerated() {
-            group.addTask { @MainActor in
-              let userAssets = await self.walletService.userAssets(network.chainId, coin: network.coin).filter(\.visible)
-              return [NetworkAssets(network: network, tokens: userAssets, sortOrder: index)]
-            }
-          }
-          return await group.reduce([NetworkAssets](), { $0 + $1 })
-            .sorted(by: { $0.sortOrder < $1.sortOrder }) // maintain sort order of networks
-        }
-      )
+      let allVisibleUserAssets = await self.walletService.allVisibleUserAssets(in: networks)
       var updatedUserVisibleAssets: [AssetViewModel] = []
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
       for networkAssets in allVisibleUserAssets {

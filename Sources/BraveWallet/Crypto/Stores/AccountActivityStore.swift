@@ -15,7 +15,6 @@ class AccountActivityStore: ObservableObject {
   @Published private(set) var userVisibleAssets: [AssetViewModel] = []
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
   @Published var transactionSummaries: [TransactionSummary] = []
-  @Published private(set) var allTokens: [BraveWallet.BlockchainToken] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
@@ -76,16 +75,7 @@ class AccountActivityStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = await withTaskGroup(of: [NetworkAssets].self, body: { @MainActor group in
-        for (index, network) in networks.enumerated() {
-          group.addTask { @MainActor in
-            let assets = await self.walletService.userAssets(network.chainId, coin: network.coin).filter(\.visible)
-            return [NetworkAssets(network: network, tokens: assets, sortOrder: index)]
-          }
-        }
-        return await group.reduce([NetworkAssets](), { $0 + $1 })
-          .sorted(by: { $0.sortOrder < $1.sortOrder })
-      })
+      let allVisibleUserAssets = await walletService.allVisibleUserAssets(in: networks)
       let visibleUserAssetsForNetwork = allVisibleUserAssets.map {
         NetworkAssets(
           network: $0.network,
