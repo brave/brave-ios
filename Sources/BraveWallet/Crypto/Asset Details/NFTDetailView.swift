@@ -6,6 +6,7 @@
 import SwiftUI
 import BraveCore
 import DesignSystem
+import SDWebImageSwiftUI
 
 struct NFTDetailView: View {
   @ObservedObject var nftDetailStore: NFTDetailStore
@@ -13,24 +14,51 @@ struct NFTDetailView: View {
   
   @Environment(\.openWalletURLAction) private var openWalletURL
   
+  @ViewBuilder private var noImageView: some View {
+    Text(Strings.Wallet.nftDetailImageNotAvailable)
+      .foregroundColor(Color(.secondaryBraveLabel))
+      .frame(maxWidth: .infinity, idealHeight: 300)
+  }
+  
   @ViewBuilder private var nftImage: some View {
     if let erc721MetaData = nftDetailStore.erc721MetaData {
-      WebImageReader(url: erc721MetaData.imageURL) { image, isFinished in
-        if let image = image {
-          Image(uiImage: image)
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .cornerRadius(10)
+      let test: String? = "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"
+      if let imageURL = test /*erc721MetaData.imageURL*/ {
+        if imageURL.hasPrefix("data:image/") {
+          WebImageReader(url: URL(string: imageURL)) { image, isFinished in
+            if let image = image {
+              Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(10)
+            } else {
+              noImageView
+            }
+          }
         } else {
-          Text(Strings.Wallet.nftDetailImageNotAvailable)
-            .foregroundColor(Color(.secondaryBraveLabel))
-            .frame(maxWidth: .infinity, idealHeight: 200)
+          if imageURL.hasSuffix(".svg") {
+            WebSVGImageView(url: URL(string: imageURL))
+              .frame(maxWidth: .infinity, minHeight: 300)
+//            AnimatedImage(url: URL(string: imageURL))
+          } else {
+            WebImage(url: URL(string: erc721MetaData.imageURL ?? ""))
+              .resizable()
+              .placeholder {
+                Text(Strings.Wallet.nftDetailImageNotAvailable)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+                  .frame(maxWidth: .infinity, minHeight: 300)
+              }
+              .indicator(.activity)
+              .transition(.fade(duration: 0.5))
+              .aspectRatio(contentMode: .fit)
+              .cornerRadius(10)
+          }
         }
+      } else {
+        noImageView
       }
     } else {
-      Text(Strings.Wallet.nftDetailImageNotAvailable)
-        .foregroundColor(Color(.secondaryBraveLabel))
-        .frame(maxWidth: .infinity, idealHeight: 200)
+      noImageView
     }
   }
   var body: some View {
@@ -39,7 +67,7 @@ struct NFTDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
           if nftDetailStore.isLoading {
             ProgressView()
-              .frame(maxWidth: .infinity, idealHeight: 200)
+              .frame(maxWidth: .infinity, idealHeight: 300)
           } else {
             nftImage
           }

@@ -5,8 +5,15 @@
 
 import BraveCore
 
+private extension String {
+  var httpifyIpfsUrl: String {
+    let trimmedUrl = self.trim(" ")
+    return trimmedUrl.hasPrefix("ipfs://") ? trimmedUrl.replacingOccurrences(of: "ipfs://", with: "https://ipfs.io/ipfs/") : trimmedUrl
+  }
+}
+
 struct ERC721MetaData: Codable {
-  var imageURL: URL?
+  var imageURL: String?
   var name: String?
   var description: String?
   
@@ -18,8 +25,8 @@ struct ERC721MetaData: Codable {
   
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    if let imageURLString = try container.decodeIfPresent(String.self, forKey: .imageURL) {
-      self.imageURL = URL(string: imageURLString)
+    if let imageString = try container.decodeIfPresent(String.self, forKey: .imageURL) {
+      self.imageURL = imageString.hasPrefix("data:image") ? imageString : imageString.httpifyIpfsUrl
     }
     self.name = try container.decodeIfPresent(String.self, forKey: .name)
     self.description = try container.decodeIfPresent(String.self, forKey: .description)
