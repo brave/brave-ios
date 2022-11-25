@@ -215,7 +215,7 @@ public class PortfolioStore: ObservableObject {
       let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { @MainActor group in
         for tokenNetworkAccounts in allTokenNetworkAccounts {
           group.addTask { @MainActor in
-            let totalBalance = await self.fetchTotalBalance(
+            let totalBalance = await self.rpcService.fetchTotalBalance(
               token: tokenNetworkAccounts.token,
               network: tokenNetworkAccounts.network,
               accounts: tokenNetworkAccounts.accounts
@@ -236,7 +236,11 @@ public class PortfolioStore: ObservableObject {
       // fetch price for every token
       let allTokens = allVisibleUserAssets.flatMap(\.tokens)
       let allAssetRatioIds = allTokens.map(\.assetRatioId)
-      let prices: [String: String] = await fetchPrices(for: allAssetRatioIds)
+      let prices: [String: String] = await assetRatioService.fetchPrices(
+        for: allAssetRatioIds,
+        toAssets: [currencyFormatter.currencyCode],
+        timeframe: timeframe
+      )
       for (key, value) in prices { // update cached values
         self.pricesCache[key] = value
       }
@@ -304,40 +308,6 @@ public class PortfolioStore: ObservableObject {
       }
       isLoadingBalances = false
     }
-  }
-  
-  @MainActor private func fetchTotalBalance(
-    token: BraveWallet.BlockchainToken,
-    network: BraveWallet.NetworkInfo,
-    accounts: [BraveWallet.AccountInfo]
-  ) async -> Double {
-    let balancesForAsset = await withTaskGroup(of: [Double].self, body: { @MainActor group in
-      for account in accounts {
-        group.addTask { @MainActor in
-          let balance = await self.rpcService.balance(
-            for: token,
-            in: account,
-            network: network
-          )
-          return [balance ?? 0]
-        }
-      }
-      return await group.reduce([Double](), { $0 + $1 })
-    })
-    return balancesForAsset.reduce(0, +)
-  }
-  
-  /// Fetches the prices for a given list of `assetRatioId`, giving a dictionary with the price for each symbol
-  @MainActor func fetchPrices(
-    for priceIds: [String]
-  ) async -> [String: String] {
-    let priceResult = await assetRatioService.priceWithIndividualRetry(
-      priceIds.map { $0.lowercased() },
-      toAssets: [currencyFormatter.currencyCode],
-      timeframe: timeframe
-    )
-    let prices = Dictionary(uniqueKeysWithValues: priceResult.assetPrices.map { ($0.fromAsset, $0.price) })
-    return prices
   }
   
   /// Fetches the price history for the given `assetRatioId`, giving a dictionary with the price history for each symbol
