@@ -171,56 +171,46 @@ public class PortfolioStore: ObservableObject {
             .sorted(by: { $0.sortOrder < $1.sortOrder }) // maintain sort order of networks
         }
       )
-      let visibleUserAssetsForNetwork = allVisibleUserAssets.map {
-        NetworkAssets(
-          network: $0.network,
-          tokens: $0.tokens.filter { !$0.isErc721 && !$0.isNft },
-          sortOrder: $0.sortOrder
-        )
-      }
-      let visibleNFTUserAssetsForNetwork = allVisibleUserAssets.map {
-        NetworkAssets(
-          network: $0.network,
-          tokens: $0.tokens.filter { $0.isErc721 || $0.isNft },
-          sortOrder: $0.sortOrder
-        )
+      var updatedUserVisibleAssets: [AssetViewModel] = []
+      var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
+      for networkAssets in allVisibleUserAssets {
+        for token in networkAssets.tokens {
+          if token.isErc721 || token.isNft {
+            updatedUserVisibleNFTs.append(
+              NFTAssetViewModel(
+                token: token,
+                network: networkAssets.network,
+                balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0)
+              )
+            )
+          } else {
+            updatedUserVisibleAssets.append(
+              AssetViewModel(
+                token: token,
+                network: networkAssets.network,
+                decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
+                price: pricesCache[token.assetRatioId.lowercased()] ?? "",
+                history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
+              )
+            )
+          }
+        }
       }
       // update userVisibleAssets on display immediately with empty values. Issue #5567
-      userVisibleAssets = visibleUserAssetsForNetwork.flatMap { assetsForNetwork in
-        assetsForNetwork.tokens.map { token in
-          AssetViewModel(
-            token: token,
-            network: assetsForNetwork.network,
-            decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
-            price: pricesCache[token.assetRatioId.lowercased()] ?? "",
-            history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
-          )
-        }
-      }
-      userVisibleNFTs = visibleNFTUserAssetsForNetwork.flatMap { assetsForNetwork in
-        assetsForNetwork.tokens.map { token in
-          NFTAssetViewModel(
-            token: token,
-            network: assetsForNetwork.network,
-            balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0)
-          )
-        }
-      }
+      self.userVisibleAssets = updatedUserVisibleAssets
+      self.userVisibleNFTs = updatedUserVisibleNFTs
+      
       let keyrings = await self.keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       guard !Task.isCancelled else { return }
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
-      let allTokenNetworkAccounts: [TokenNetworkAccounts] = userVisibleAssets.map { userVisibleAsset in
-        TokenNetworkAccounts(
-          token: userVisibleAsset.token,
-          network: userVisibleAsset.network,
-          accounts: keyrings.first(where: { $0.coin == userVisibleAsset.token.coin })?.accountInfos ?? []
-        )
-      } + userVisibleNFTs.map { userVisibleNFT in
-        TokenNetworkAccounts(
-          token: userVisibleNFT.token,
-          network: userVisibleNFT.network,
-          accounts: keyrings.first(where: { $0.coin == userVisibleNFT.token.coin })?.accountInfos ?? []
-        )
+      let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
+        networkAssets.tokens.map { token in
+          TokenNetworkAccounts(
+            token: token,
+            network: networkAssets.network,
+            accounts: keyrings.first(where: { $0.coin == token.coin })?.accountInfos ?? []
+          )
+        }
       }
       let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { @MainActor group in
         for tokenNetworkAccounts in allTokenNetworkAccounts {
@@ -261,27 +251,33 @@ public class PortfolioStore: ObservableObject {
       }
       
       guard !Task.isCancelled else { return }
-      // build our userVisibleAssets
-      userVisibleAssets = visibleUserAssetsForNetwork.flatMap { assetsForNetwork in
-        assetsForNetwork.tokens.map { token in
-          AssetViewModel(
-            token: token,
-            network: assetsForNetwork.network,
-            decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
-            price: pricesCache[token.assetRatioId.lowercased()] ?? "",
-            history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
-          )
+      updatedUserVisibleAssets.removeAll()
+      updatedUserVisibleNFTs.removeAll()
+      for networkAssets in allVisibleUserAssets {
+        for token in networkAssets.tokens {
+          if token.isErc721 || token.isNft {
+            updatedUserVisibleNFTs.append(
+              NFTAssetViewModel(
+                token: token,
+                network: networkAssets.network,
+                balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0)
+              )
+            )
+          } else {
+            updatedUserVisibleAssets.append(
+              AssetViewModel(
+                token: token,
+                network: networkAssets.network,
+                decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
+                price: pricesCache[token.assetRatioId.lowercased()] ?? "",
+                history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
+              )
+            )
+          }
         }
       }
-      userVisibleNFTs = visibleNFTUserAssetsForNetwork.flatMap { assetsForNetwork in
-        assetsForNetwork.tokens.map { token in
-          NFTAssetViewModel(
-            token: token,
-            network: assetsForNetwork.network,
-            balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0)
-          )
-        }
-      }
+      self.userVisibleAssets = updatedUserVisibleAssets
+      self.userVisibleNFTs = updatedUserVisibleNFTs
       
       // Compute balance based on current prices
       let currentBalance = userVisibleAssets
