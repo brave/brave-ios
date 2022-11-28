@@ -283,7 +283,9 @@ public actor AdBlockEngineManager: Sendable {
         // Combine all rule lists that need to be injected during initialization
         let combinedRuleLists = await self.combineAllRuleLists(from: group)
         // Create an engine with the combined rule lists
-        let engine = AdblockEngine(rules: combinedRuleLists)
+        let engine = await MainActor.run {
+          return AdblockEngine(rules: combinedRuleLists)
+        }
         // Compile remaining resources
         let compileResults = await self.compile(resources: group, into: engine)
         
@@ -384,44 +386,33 @@ public actor AdBlockEngineManager: Sendable {
   
   /// Compile the given resource into the given engine
   private func compile(resource: ResourceWithVersion, into engine: AdblockEngine) async throws {
-    return try await withCheckedThrowingContinuation { continuation in
       switch resource.resource.type {
       case .dat:
         guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: CompileError.fileNotFound)
-          return
+          throw CompileError.fileNotFound
         }
         
-        DispatchQueue.main.async {
-          if engine.deserialize(data: data) {
-            continuation.resume()
-          } else {
-            continuation.resume(throwing: CompileError.couldNotDeserializeDATFile)
+        try await MainActor.run {
+          if !engine.deserialize(data: data) {
+            throw CompileError.couldNotDeserializeDATFile
           }
         }
       case .jsonResources:
         guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: CompileError.fileNotFound)
+          throw CompileError.fileNotFound
+        }
+        
+        guard let json = try self.validateJSON(data) else {
           return
         }
         
-        do {
-          guard let json = try self.validateJSON(data) else {
-            continuation.resume()
-            return
-          }
-          DispatchQueue.main.async {
-            engine.addResources(json)
-            continuation.resume()
-          }
-        } catch {
-          continuation.resume(throwing: error)
+        await MainActor.run {
+          engine.addResources(json)
         }
       case .ruleList:
         // This is added during engine initualization
-        continuation.resume()
+        break
       }
-    }
   }
   
   /// Return a `JSON` string if this data is valid
