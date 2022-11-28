@@ -54,15 +54,6 @@
       }
     },
     {
-      "identity" : "sdwebimagesvgcoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageSVGCoder.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "4e8e17925ed0c6f160c0d4c4ce58d5dfbcd26093"
-      }
-    },
-    {
       "identity" : "sdwebimagesvgnativecoder",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageSVGNativeCoder.git",

@@ -8,7 +8,6 @@ import AVFoundation
 import MessageUI
 import SDWebImage
 import SDWebImageSVGNativeCoder
-import SDWebImageSVGCoder
 import SwiftKeychainWrapper
 import LocalAuthentication
 import CoreSpotlight
@@ -183,7 +182,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     SDImageCodersManager.shared.addCoder(PrivateCDNImageCoder())
     SDImageCodersManager.shared.addCoder(SDImageSVGNativeCoder.shared)
-    SDImageCodersManager.shared.addCoder(SDImageSVGCoder.shared)
 
     // Setup Profile
     let profile = BrowserProfile(localName: "profile")

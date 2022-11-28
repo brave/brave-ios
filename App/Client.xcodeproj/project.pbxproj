@@ -42,7 +42,6 @@
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F926647A234D4EF400359492 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7DDAF2232930091600D955A2 /* SDWebImageSVGNativeCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 7DDAF2222930091600D955A2 /* SDWebImageSVGNativeCoder */; };
-		7DDAF226293009E100D955A2 /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 7DDAF225293009E100D955A2 /* SDWebImageSVGCoder */; };
 		7DDE6308292FEC9500B8B585 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 7DDE6307292FEC9500B8B585 /* SDWebImage */; };
 		CA0391B4271E1023000EB13C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA0391B3271E1023000EB13C /* WidgetKit.framework */; };
 		CA0391B6271E1023000EB13C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA0391B5271E1023000EB13C /* SwiftUI.framework */; };
@@ -272,7 +271,6 @@
 				270ECFC82838210F0089B8B7 /* Brave in Frameworks */,
 				279A9BCC2823370100F40FC6 /* SwiftKeychainWrapper in Frameworks */,
 				7DDE6308292FEC9500B8B585 /* SDWebImage in Frameworks */,
-				7DDAF226293009E100D955A2 /* SDWebImageSVGCoder in Frameworks */,
 				27FA218B2837FB0100FA2C45 /* Storage in Frameworks */,
 				27FA21832837FB0100FA2C45 /* Data in Frameworks */,
 				27FA21872837FB0100FA2C45 /* HTTPSE in Frameworks */,
@@ -625,7 +623,6 @@
 				27D972E528BD4D9900DDCF79 /* BraveNews */,
 				7DDE6307292FEC9500B8B585 /* SDWebImage */,
 				7DDAF2222930091600D955A2 /* SDWebImageSVGNativeCoder */,
-				7DDAF225293009E100D955A2 /* SDWebImageSVGCoder */,
 			);
 			productName = Client;
 			productReference = F84B21BE1A090F8100AAB793 /* Client.app */;
@@ -708,7 +705,6 @@
 				2775689A25ACF7B500C129AF /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				7DDE6306292FEC9500B8B585 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				7DDAF2212930091600D955A2 /* XCRemoteSwiftPackageReference "SDWebImageSVGNativeCoder" */,
-				7DDAF224293009E100D955A2 /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */,
 			);
 			productRefGroup = F84B21BF1A090F8100AAB793 /* Products */;
 			projectDirPath = "";
@@ -2366,14 +2362,6 @@
 				minimumVersion = 0.1.1;
 			};
 		};
-		7DDAF224293009E100D955A2 /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageSVGCoder.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		7DDE6306292FEC9500B8B585 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImage.git";
@@ -2458,11 +2446,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7DDAF2212930091600D955A2 /* XCRemoteSwiftPackageReference "SDWebImageSVGNativeCoder" */;
 			productName = SDWebImageSVGNativeCoder;
-		};
-		7DDAF225293009E100D955A2 /* SDWebImageSVGCoder */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7DDAF224293009E100D955A2 /* XCRemoteSwiftPackageReference "SDWebImageSVGCoder" */;
-			productName = SDWebImageSVGCoder;
 		};
 		7DDE6307292FEC9500B8B585 /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;
