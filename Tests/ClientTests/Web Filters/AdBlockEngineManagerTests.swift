@@ -78,7 +78,7 @@ class AdBlockEngineManagerTests: XCTestCase {
         )
       }
       
-      await engineManager.compileResources()
+      await engineManager.compileResources(priority: .userInitiated)
       
       Task { @MainActor in
         let url = URL(string:  "https://stackoverflow.com")!
