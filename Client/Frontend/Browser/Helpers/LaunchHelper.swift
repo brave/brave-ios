@@ -26,7 +26,7 @@ public actor LaunchHelper {
     }
     
     // Otherwise prepare the services and await the task
-    let task = Task {
+    let task = Task(priority: .userInitiated) {
       // Load cached data
       // This is done first because compileResources and loadCachedRuleLists need their results
       async let loadBundledResources: Void = ContentBlockerManager.shared.loadBundledResources()
@@ -35,7 +35,7 @@ public actor LaunchHelper {
       _ = await (loadBundledResources, filterListCache, adblockResourceCache)
 
       // Compile some engines and load cached rule lists
-      async let compiledResourcesCompile: Void = AdBlockEngineManager.shared.compileResources()
+      async let compiledResourcesCompile: Void = AdBlockEngineManager.shared.compileResources(priority: .userInitiated)
       async let cachedRuleListLoad: Void = ContentBlockerManager.shared.loadCachedRuleLists()
       _ = await (compiledResourcesCompile, cachedRuleListLoad)
       
