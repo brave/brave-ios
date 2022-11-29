@@ -69,12 +69,8 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
       guard let domainURLString = domain.url else { return }
       
-      AdBlockStats.shared.shouldBlock(
-        requestURL: requestURL,
-        sourceURL: sourceURL,
-        resourceType: dto.data.resourceType
-      ) { shouldBlock in
-        assertIsMainThread("Result should happen on the main thread")
+      Task { @MainActor in
+        let shouldBlock = await AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType)
         
         if shouldBlock, Preferences.PrivacyReports.captureShieldsData.value,
            let domainURL = URL(string: domainURLString),

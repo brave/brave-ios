@@ -24,6 +24,19 @@ public class HttpsEverywhereStats: LocalAdblockResourceProtocol {
       setData(data: data)
     }
   }
+  
+  func shouldUpgrade(_ url: URL?) async -> Bool {
+    guard let url = url else {
+      Logger.module.error("Httpse should block called with empty url")
+      return false
+    }
+
+    return await withUnsafeContinuation { continuation in
+      tryRedirectingUrl(url) { shouldUpgrade in
+        continuation.resume(returning: shouldUpgrade)
+      }
+    }
+  }
 
   func shouldUpgrade(_ url: URL?, _ completion: @escaping (Bool) -> Void) {
     guard let url = url else {
