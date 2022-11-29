@@ -100,8 +100,15 @@ class AssetDetailStore: ObservableObject {
       let allNetworks = await rpcService.allNetworks(coin)
       let selectedNetwork = await rpcService.network(coin)
       let network = allNetworks.first(where: { $0.chainId == token.chainId }) ?? selectedNetwork
-      let buyTokens = await blockchainRegistry.buyTokens(.wyre, chainId: network.chainId)
-      self.isBuySupported = buyTokens.first(where: { $0.symbol.lowercased() == token.symbol.lowercased() }) != nil
+      var wyreBuyTokens: [BraveWallet.BlockchainToken] = []
+      if WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(network.chainId) {
+        wyreBuyTokens = await blockchainRegistry.buyTokens(.wyre, chainId: network.chainId)
+      }
+      let rampBuyTokens = await blockchainRegistry.buyTokens(.ramp, chainId: network.chainId)
+      let sardineBuyTokens = await blockchainRegistry.buyTokens(.sardine, chainId: network.chainId)
+      let buyTokens = wyreBuyTokens + rampBuyTokens + sardineBuyTokens
+      self.isBuySupported = buyTokens.first(where: { $0.symbol.caseInsensitiveCompare(token.symbol) == .orderedSame }) != nil
+      
       // fetch accounts
       let keyring = await keyringService.keyringInfo(coin.keyringId)
       var updatedAccounts = keyring.accountInfos.map {

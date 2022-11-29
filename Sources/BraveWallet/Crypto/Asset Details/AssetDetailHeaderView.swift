@@ -49,13 +49,8 @@ struct AssetDetailHeaderView: View {
     (0..<300).map { _ in .init(date: Date(), price: "0.0") }
   }
   
-  private var isBuySupported: Bool {
-    assetDetailStore.isBuySupported
-    && WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(networkStore.selectedChainId)
-  }
-  
   @ViewBuilder private var actionButtonsContainer: some View {
-    if isBuySupported && networkStore.isSwapSupported {
+    if assetDetailStore.isBuySupported && networkStore.isSwapSupported {
       VStack {
         actionButtons
       }
@@ -75,7 +70,7 @@ struct AssetDetailHeaderView: View {
   
   @ViewBuilder var buySendSwapButtonsContainer: some View {
     HStack {
-      if isBuySupported {
+      if assetDetailStore.isBuySupported {
         Button(
           action: {
             buySendSwapDestination = BuySendSwapDestination(
