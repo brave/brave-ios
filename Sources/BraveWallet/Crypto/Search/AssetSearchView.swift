@@ -102,7 +102,7 @@ struct AssetSearchView: View {
                       network: assetViewModel.network,
                       shouldShowNativeTokenIcon: true
                     ),
-                    title: assetViewModel.token.name,
+                    title: title(for: assetViewModel.token),
                     symbol: assetViewModel.token.symbol,
                     networkName: assetViewModel.network.chainName
                   )
@@ -139,6 +139,14 @@ struct AssetSearchView: View {
       Task { @MainActor in
         self.allAssets = await userAssetsStore.allAssets()
       }
+    }
+  }
+  
+  private func title(for token: BraveWallet.BlockchainToken) -> String {
+    if (token.isErc721 || token.isNft), !token.tokenId.isEmpty {
+      return token.nftTokenTitle
+    } else {
+      return token.name
     }
   }
 }
