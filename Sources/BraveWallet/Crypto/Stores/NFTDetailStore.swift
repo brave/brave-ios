@@ -60,10 +60,9 @@ class NFTDetailStore: ObservableObject {
       let (metaData, _, _) = await rpcService.erc721Metadata(nft.contractAddress, tokenId: nft.tokenId, chainId: nft.chainId)
       
       isLoading = false
-      if let data = metaData.data(using: .utf8) {
-        if let result = try? JSONDecoder().decode(ERC721MetaData.self, from: data) {
-          erc721MetaData = result
-        }
+      if let data = metaData.data(using: .utf8),
+         let result = try? JSONDecoder().decode(ERC721MetaData.self, from: data) {
+        erc721MetaData = result
       }
     }
   }

@@ -79,10 +79,8 @@ public struct WebImageReader<Content: View>: View {
         if let urlString = url?.absoluteString {
           if urlString.hasPrefix("data:image/") {
             imageManager.load(base64Str: urlString)
-          } else {
-            if !imageManager.isFinished {
+          } else if !imageManager.isFinished {
               imageManager.load(url: url, options: options)
-            }
           }
         }
       }

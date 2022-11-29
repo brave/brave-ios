@@ -18,7 +18,7 @@ struct NFTDetailView: View {
   @ViewBuilder private var noImageView: some View {
     Text(Strings.Wallet.nftDetailImageNotAvailable)
       .foregroundColor(Color(.secondaryBraveLabel))
-      .frame(maxWidth: .infinity, idealHeight: 300)
+      .frame(maxWidth: .infinity, minHeight: 300)
   }
   
   @ViewBuilder private var nftImage: some View {
@@ -67,7 +67,7 @@ struct NFTDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
           if nftDetailStore.isLoading {
             ProgressView()
-              .frame(maxWidth: .infinity, idealHeight: 300)
+              .frame(maxWidth: .infinity, minHeight: 300)
           } else {
             nftImage
           }
@@ -87,15 +87,13 @@ struct NFTDetailView: View {
           }
           .buttonStyle(BraveFilledButtonStyle(size: .large))
         }
-        if let erc721MetaData = nftDetailStore.erc721MetaData {
-          if let description = erc721MetaData.description {
-            VStack(alignment: .leading, spacing: 8) {
-              Text(Strings.Wallet.nftDetailDescription)
-                .font(.headline.weight(.semibold))
-                .foregroundColor(Color(.braveLabel))
-              Text(description)
-                .foregroundColor(Color(.braveLabel))
-            }
+        if let erc721MetaData = nftDetailStore.erc721MetaData, let description = erc721MetaData.description {
+          VStack(alignment: .leading, spacing: 8) {
+            Text(Strings.Wallet.nftDetailDescription)
+              .font(.headline.weight(.semibold))
+              .foregroundColor(Color(.braveLabel))
+            Text(description)
+              .foregroundColor(Color(.braveLabel))
           }
         }
         VStack(spacing: 16) {
