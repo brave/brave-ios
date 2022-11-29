@@ -41,6 +41,9 @@ class AssetDetailStore: ObservableObject {
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
+      guard oldValue != currencyCode, // only if currency code changed
+            !isInitialState // only update if we're not in initial state
+      else { return }
       update()
     }
   }
