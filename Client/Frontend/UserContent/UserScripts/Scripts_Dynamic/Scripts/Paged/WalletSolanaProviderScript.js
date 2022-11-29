@@ -5,6 +5,24 @@
 
 window.__firefox__.execute(function($, $Object, $Function, $Array) {
   if (window.isSecureContext) {
+    // Failed to Inject SolanaWeb3
+    if (typeof $<walletSolanaNameSpace> === 'undefined') {
+      return;
+    }
+    
+    // Access solanaWeb3 from the hidden namespace
+    let solanaWeb3 = $($($<walletSolanaNameSpace>).solanaWeb3);
+    if (!solanaWeb3) {
+      return;
+    }
+    
+    // From this point on, do not access the namespace!
+    // If the code throws an exception, the namespace will not be in the stacktrace.
+    // SolanaWeb3 is the only variable declared above that should be accessed from this point forward.
+    
+    // ---- Wallet Code ---- //
+    
+    // List of classes that should not be Frozen completely.
     const freezeExceptions = $Array.of("BN");
     
     let post = $(function(method, payload, completion) {
@@ -63,7 +81,7 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
       return $.extensiveFreeze(object, freezeExceptions);
     })
     let createTransaction = $(function(serializedTx) {
-      return $.extensiveFreeze($<walletSolanaNameSpace>.solanaWeb3.Transaction.from(new Uint8Array(serializedTx)), freezeExceptions)
+      return $.extensiveFreeze(solanaWeb3.Transaction.from(new Uint8Array(serializedTx)), freezeExceptions)
     })
     const provider = {
       value: {
@@ -77,7 +95,7 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
           function completion(publicKey, resolve) {
             /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
             const result = $Object.create(null, undefined);
-            result.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
+            result.publicKey = new solanaWeb3.PublicKey(publicKey);
             resolve($.extensiveFreeze(result, freezeExceptions));
           }
           return post('connect', payload, completion)
@@ -98,7 +116,7 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
             const publicKey = parsed["publicKey"]; /* base58 encoded pubkey */
             const signature = parsed["signature"]; /* array of uint8 */
             const obj = $Object.create(null, undefined);
-            obj.publicKey = new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey);
+            obj.publicKey = new solanaWeb3.PublicKey(publicKey);
             obj.signature = new Uint8Array(signature);
             resolve($.extensiveFreeze(obj, freezeExceptions));
           }
@@ -109,7 +127,7 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
             function completion(publicKey, resolve) {
               /* convert `<base58 encoded string>` -> `{publicKey: <solanaWeb3.PublicKey>}` */
               const result = $Object.create(null, undefined);
-              result.publicKey = $(new $<walletSolanaNameSpace>.solanaWeb3.PublicKey(publicKey));
+              result.publicKey = $(new solanaWeb3.PublicKey(publicKey));
               resolve($.extensiveFreeze(result, freezeExceptions));
             }
             return post('request', args, completion)

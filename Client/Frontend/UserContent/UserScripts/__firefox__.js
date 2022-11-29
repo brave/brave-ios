@@ -148,10 +148,10 @@ if (!window.__firefox__) {
         let descriptor = $Object.getOwnPropertyDescriptor(value, name);
         if (!descriptor || descriptor.configurable) {
           $Object.defineProperty(value, name, {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: property
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: property
           });
         }
         
