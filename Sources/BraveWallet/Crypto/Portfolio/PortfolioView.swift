@@ -210,8 +210,7 @@ struct PortfolioView: View {
         destination: {
           if let token = selectedToken {
             if token.isErc721 {
-              NFTDetailView(nftDetailStore: cryptoStore.nftDetailStore(for: token), buySendSwapDestination: buySendSwapDestination
-              )
+              NFTDetailView(nftDetailStore: cryptoStore.nftDetailStore(for: token), buySendSwapDestination: buySendSwapDestination)
               .onDisappear {
                 cryptoStore.closeNFTDetailStore(for: token)
               }

@@ -6,6 +6,7 @@
 import SwiftUI
 import BraveCore
 import DesignSystem
+import BraveUI
 import SDWebImageSwiftUI
 
 struct NFTDetailView: View {
@@ -22,7 +23,6 @@ struct NFTDetailView: View {
   
   @ViewBuilder private var nftImage: some View {
     if let erc721MetaData = nftDetailStore.erc721MetaData {
-//      let test: String? = "https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/w3c.svg"
       if let imageURL = erc721MetaData.imageURL {
         if imageURL.hasPrefix("data:image/") {
           WebImageReader(url: URL(string: imageURL)) { image, isFinished in
@@ -39,7 +39,7 @@ struct NFTDetailView: View {
           if imageURL.hasSuffix(".svg") {
             WebSVGImageView(url: URL(string: imageURL))
               .frame(maxWidth: .infinity, minHeight: 300)
-//            AnimatedImage(url: URL(string: imageURL))
+              .cornerRadius(10)
           } else {
             WebImage(url: URL(string: erc721MetaData.imageURL ?? ""))
               .resizable()
@@ -62,7 +62,7 @@ struct NFTDetailView: View {
     }
   }
   var body: some View {
-    ScrollView() {
+    ScrollView {
       VStack(alignment: .leading, spacing: 24) {
         VStack(alignment: .leading, spacing: 8) {
           if nftDetailStore.isLoading {
@@ -147,6 +147,7 @@ struct NFTDetailView: View {
     .onAppear {
       nftDetailStore.fetchMetaData()
     }
+    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
   }
 }

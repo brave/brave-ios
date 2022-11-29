@@ -6,6 +6,7 @@
 import SwiftUI
 import SDWebImage
 import SDWebImageSVGNativeCoder
+import os.log
 
 private class WalletWebImageManager: ObservableObject {
   /// loaded image, note when progressive loading, this will published multiple times with different partial image
@@ -88,21 +89,21 @@ public struct WebImageReader<Content: View>: View {
   }
 }
 
-struct WebSVGImageView: UIViewRepresentable {
+public struct WebSVGImageView: UIViewRepresentable {
   let url: URL?
   
-  init(url: URL?) {
+  public init(url: URL?) {
     self.url = url
   }
   
-  func makeUIView(context: Context) -> UIImageView {
+  public func makeUIView(context: Context) -> UIImageView {
     return UIImageView()
   }
   
-  func updateUIView(_ uiView: UIImageView, context: Context) {
+  public func updateUIView(_ uiView: UIImageView, context: Context) {
     uiView.sd_setImage(with: url) { image, error, cacheType, url in
       guard image != nil else {
-        print("svg image failed to load")
+        Logger.module.debug("SVG image failed to load. Error: \(error.debugDescription)")
         return
       }
     }
