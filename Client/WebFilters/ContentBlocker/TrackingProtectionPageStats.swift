@@ -40,7 +40,6 @@ struct TPPageStats {
 
 class TPStatsBlocklistChecker {
   static let shared = TPStatsBlocklistChecker()
-  private let adblockSerialQueue = AdBlockStats.adblockSerialQueue
   
   enum BlockedType {
     case image
@@ -59,18 +58,24 @@ class TPStatsBlocklistChecker {
       callback(.image)
     }
 
-    adblockSerialQueue.async {
-      if (loadedRuleTypes.contains(.general(.blockAds)) || loadedRuleTypes.contains(.general(.blockTrackers)))
-          && AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) {
-        DispatchQueue.main.async {
+    Task { @MainActor in
+      if loadedRuleTypes.contains(.general(.blockAds)) || loadedRuleTypes.contains(.general(.blockTrackers)) {
+        if await AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) {
           callback(.ad)
+          return
         }
-        
-        return
       }
 
       // TODO: Downgrade to 14.5 once api becomes available.
       if #unavailable(iOS 15.0) {
+        let shouldUpgrade = await HttpsEverywhereStats.shared.shouldUpgrade(requestURL)
+        
+        if loadedRuleTypes.contains(.general(.upgradeHTTP)) && shouldUpgrade {
+          return
+        } else {
+          callback(nil)
+        }
+        
         HttpsEverywhereStats.shared.shouldUpgrade(requestURL) { shouldUpgrade in
           DispatchQueue.main.async {
             if loadedRuleTypes.contains(.general(.upgradeHTTP)) && shouldUpgrade {
@@ -81,9 +86,7 @@ class TPStatsBlocklistChecker {
           }
         }
       } else {
-        DispatchQueue.main.async {
-          callback(nil)
-        }
+        callback(nil)
       }
     }
   }

@@ -50,6 +50,34 @@ public class CachedAdBlockEngine {
   
   let engine: AdblockEngine
   let source: AdBlockEngineManager.Source
+  let serialQueue: DispatchQueue
+  
+  init(engine: AdblockEngine, source: AdBlockEngineManager.Source, serialQueue: DispatchQueue) {
+    self.engine = engine
+    self.source = source
+    self.serialQueue = serialQueue
+  }
+  
+  /// Checks the general and regional engines to see if the request should be blocked.
+  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, callback: @escaping (Bool) -> Void) {
+    serialQueue.async { [weak self] in
+      let shouldBlock = self?.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) == true
+      
+      DispatchQueue.main.async {
+        callback(shouldBlock)
+      }
+    }
+  }
+  
+  /// Checks the general and regional engines to see if the request should be blocked.
+  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) async -> Bool {
+    return await withUnsafeContinuation { continuation in
+      serialQueue.async { [weak self] in
+        let shouldBlock = self?.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) == true
+        continuation.resume(returning: shouldBlock)
+      }
+    }
+  }
   
   /// Returns all the models for this frame URL
   /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
@@ -79,7 +107,7 @@ public class CachedAdBlockEngine {
   }
   
   /// Checks the general and regional engines to see if the request should be blocked
-  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) -> Bool {
+  private func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) -> Bool {
     let key = [requestURL.absoluteString, sourceURL.absoluteString, resourceType.rawValue].joined(separator: "_")
     
     if let cachedResult = cachedShouldBlockResult.getElement(key) {
@@ -118,15 +146,11 @@ public class CachedAdBlockEngine {
     return userScriptTypes
   }
   
-  /// Clear the caches. Useful 
+  /// Clear the caches.
   func clearCaches() {
     cachedCosmeticFilterModels = FifoDict()
     cachedShouldBlockResult = FifoDict()
-  }
-  
-  init(engine: AdblockEngine, source: AdBlockEngineManager.Source) {
-    self.engine = engine
-    self.source = source
+    cachedFrameScriptTypes = FifoDict()
   }
   
   /// Returns a boolean indicating if the engine is enabled for the given domain.
@@ -144,6 +168,19 @@ public class CachedAdBlockEngine {
       return true
     }
   }
+  
+  /// Create an engine from the given resources
+  static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion], source: AdBlockEngineManager.Source) async -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
+    return await withUnsafeContinuation { continuation in
+      let serialQueue = DispatchQueue(label: "com.brave.WrappedAdBlockEngine.\(UUID().uuidString)")
+      
+      serialQueue.async {
+        let results = AdblockEngine.createEngine(from: resources)
+        let cachedEngine = CachedAdBlockEngine(engine: results.engine, source: source, serialQueue: serialQueue)
+        continuation.resume(returning: (cachedEngine, results.compileResults))
+      }
+    }
+  }
 }
 
 public class AdBlockStats {
@@ -155,38 +192,23 @@ public class AdBlockStats {
   init() {
     cachedEngines = []
   }
-
-  static let adblockSerialQueue = DispatchQueue(label: "com.brave.adblock-dispatch-queue")
   
   func clearCaches(clearEngineCaches: Bool = true) {
     guard clearEngineCaches else { return }
     cachedEngines.forEach({ $0.clearCaches() })
   }
   
-  /// Checks the general and regional engines to see if the request should be blocked.
-  ///
-  /// - Note: This method is should not be synced on `AdBlockStatus.adblockSerialQueue` and the result is synced on the main thread.
-  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, callback: @escaping (Bool) -> Void) {
-    Self.adblockSerialQueue.async { [weak self] in
-      let shouldBlock = self?.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) == true
-      
-      DispatchQueue.main.async {
-        callback(shouldBlock)
-      }
-    }
-  }
-  
   /// Checks the general and regional engines to see if the request should be blocked
   ///
   /// - Warning: This method needs to be synced on `AdBlockStatus.adblockSerialQueue`
-  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) -> Bool {
-    return cachedEngines.contains(where: { cachedEngine in
-      return cachedEngine.shouldBlock(
+  func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) async -> Bool {
+    return await cachedEngines.asyncConcurrentMap({ cachedEngine in
+      return await cachedEngine.shouldBlock(
         requestURL: requestURL,
         sourceURL: sourceURL,
         resourceType: resourceType
       )
-    })
+    }).contains(where: { $0 })
   }
   
   func set(engines: [CachedAdBlockEngine]) {
@@ -240,5 +262,143 @@ private extension AdblockEngine {
     let rules = cosmeticResourcesForURL(frameURL.absoluteString)
     guard let data = rules.data(using: .utf8) else { return nil }
     return try JSONDecoder().decode(CosmeticFilterModel.self, from: data)
+  }
+}
+
+extension AdblockEngine {
+  public enum CompileError: Error {
+    case invalidResourceJSON
+    case fileNotFound
+    case couldNotDeserializeDATFile
+  }
+  
+  static func createEngines(
+    from resources: [AdBlockEngineManager.ResourceWithVersion]
+  ) async -> (engines: [CachedAdBlockEngine], compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
+    let groupedResources = group(resources: resources)
+    
+    let enginesWithCompileResults = await groupedResources.asyncConcurrentMap { source, resources -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) in
+      let results = await CachedAdBlockEngine.createEngine(from: resources, source: source)
+      return (results.engine, results.compileResults)
+    }
+    
+    var allCompileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] = [:]
+    let engines = enginesWithCompileResults.map({ $0.engine })
+    
+    for result in enginesWithCompileResults {
+      for compileResult in result.1 {
+        allCompileResults[compileResult.key] = compileResult.value
+      }
+    }
+    
+    return (engines, allCompileResults)
+  }
+  
+  /// Create an engine from the given resources.
+  ///
+  /// - Warning: You should only have at max dat file in this list. Each dat file can only represent a single engine
+  public static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion]) -> (engine: AdblockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
+    let combinedRuleLists = Self.combineAllRuleLists(from: resources)
+    // Create an engine with the combined rule lists
+    let engine = AdblockEngine(rules: combinedRuleLists)
+    // Compile remaining resources
+    let compileResults = engine.compile(resources: resources)
+    // Return the compiled data
+    return (engine, compileResults)
+  }
+  
+  /// Combine all resources of type rule lists to one single string
+  private static func combineAllRuleLists(from resourcesWithVersion: [AdBlockEngineManager.ResourceWithVersion]) -> String {
+    // Combine all rule lists that need to be injected during initialization
+    let allResults = resourcesWithVersion.compactMap { resourceWithVersion -> String? in
+      switch resourceWithVersion.resource.type {
+      case .ruleList:
+        guard let data = FileManager.default.contents(atPath: resourceWithVersion.fileURL.path) else {
+          return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+      case .dat, .jsonResources:
+        return nil
+      }
+    }
+    
+    let combinedRules = allResults.joined(separator: "\n")
+    return combinedRules
+  }
+  
+  static func group(
+    resources: [AdBlockEngineManager.ResourceWithVersion]
+  ) -> [AdBlockEngineManager.Source: [AdBlockEngineManager.ResourceWithVersion]] {
+    var groups: [AdBlockEngineManager.Source: [AdBlockEngineManager.ResourceWithVersion]] = [:]
+    
+    for resourceWithVersion in resources {
+      var group = groups[resourceWithVersion.resource.source] ?? []
+      group.append(resourceWithVersion)
+      groups[resourceWithVersion.resource.source] = group
+    }
+    
+    return groups
+  }
+  
+  /// Compile all the resources on a detached task
+  func compile(resources: [AdBlockEngineManager.ResourceWithVersion]) -> [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] {
+    var compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] = [:]
+    
+    for resourceWithVersion in resources {
+      do {
+        try self.compile(resource: resourceWithVersion)
+        compileResults[resourceWithVersion] = .success(Void())
+      } catch {
+        compileResults[resourceWithVersion] = .failure(error)
+        //log.error("\(error.localizedDescription)")
+      }
+    }
+    
+    return compileResults
+  }
+  
+  /// Compile the given resource into the given engine
+  func compile(resource: AdBlockEngineManager.ResourceWithVersion) throws {
+    switch resource.resource.type {
+    case .dat:
+      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
+        return
+      }
+      
+      if !deserialize(data: data) {
+        throw CompileError.couldNotDeserializeDATFile
+      }
+    case .jsonResources:
+      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
+        throw CompileError.fileNotFound
+      }
+      
+      guard let json = try self.validateJSON(data) else {
+        return
+      }
+      
+      addResources(json)
+    case .ruleList:
+      // This is added during engine initialization
+      break
+    }
+  }
+  
+  /// Return a `JSON` string if this data is valid
+  private func validateJSON(_ data: Data) throws -> String? {
+    let value = try JSONSerialization.jsonObject(with: data, options: [])
+    
+    if let value = value as? NSArray {
+      guard value.count > 0 else { return nil }
+      return String(data: data, encoding: .utf8)
+    }
+    
+    guard let value = value as? NSDictionary else {
+      throw CompileError.invalidResourceJSON
+    }
+      
+    guard value.count > 0 else { return nil }
+    return String(data: data, encoding: .utf8)
   }
 }
