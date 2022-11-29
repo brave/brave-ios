@@ -145,7 +145,15 @@ struct NFTDetailView: View {
     .onAppear {
       nftDetailStore.fetchMetaData()
     }
-    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+    .osAvailabilityModifiers { content in
+      if #available(iOS 16.0, *) {
+        content
+          .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+      } else {
+        content
+          .background(Color(UIColor.braveGroupedBackground))
+      }
+    }
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
   }
 }
