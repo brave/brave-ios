@@ -151,7 +151,7 @@ struct NFTDetailView: View {
           .listBackgroundColor(Color(UIColor.braveGroupedBackground))
       } else {
         content
-          .background(Color(UIColor.braveGroupedBackground))
+          .background(Color(UIColor.braveGroupedBackground).ignoresSafeArea())
       }
     }
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
