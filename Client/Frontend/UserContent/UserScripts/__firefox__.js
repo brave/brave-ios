@@ -98,11 +98,8 @@ if (!window.__firefox__) {
       // Secure calls to `toString`
       const secureToString = function(toString) {
         for (const [name, property] of $Object.entries(overrides)) {
-          if (($Object.getOwnPropertyDescriptor(toString, name) || {}).writable) {
-            toString[name] = property;
-          }
-
-          if (($Object.getOwnPropertyDescriptor(toString, name) || {}).configurable) {
+          let descriptor = $Object.getOwnPropertyDescriptor(toString, name);
+          if (!descriptor || descriptor.configurable) {
             $Object.defineProperty(toString, name, {
               enumerable: false,
               configurable: false,
@@ -110,7 +107,12 @@ if (!window.__firefox__) {
               value: property
             });
           }
-
+          
+          descriptor = $Object.getOwnPropertyDescriptor(toString, name);
+          if (!descriptor || descriptor.writable) {
+            toString[name] = property;
+          }
+          
           if (name !== 'toString') {
             $.deepFreeze(toString[name]);
           }
@@ -124,8 +126,18 @@ if (!window.__firefox__) {
 
       for (const [name, property] of $Object.entries(overrides)) {
         if (name == 'toString') {
+          // Object.prototype.toString != Object.toString
+          // They are two different functions, so we should check for both before overriding them
+          if (value[name] && value[name] !== Object.prototype.toString && value[name] !== Object.toString) {
+            // Secure the existing custom toString function
+            secureToString(value[name]);
+            continue;
+          }
+          
+          // Object.prototype.toString != Object.toString
+          // They are two different functions, so we should check for both before overriding them
           let descriptor = $Object.getOwnPropertyDescriptor(value, name);
-          if (descriptor && descriptor.value !== Object.prototype.toString) {
+          if (descriptor && descriptor.value !== Object.prototype.toString && descriptor.value !== Object.toString) {
             // Secure the existing custom toString function
             secureToString(value[name]);
             continue;
@@ -133,20 +145,21 @@ if (!window.__firefox__) {
         }
         
         // Override all of the functions in the overrides array
-        if (($Object.getOwnPropertyDescriptor(value, name) || {}).writable) {
-          value[name] = property;
-        }
-        
-        if (($Object.getOwnPropertyDescriptor(value, name) || {}).configurable) {
+        let descriptor = $Object.getOwnPropertyDescriptor(value, name);
+        if (!descriptor || descriptor.configurable) {
           $Object.defineProperty(value, name, {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: property
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: property
           });
         }
-
-        $.deepFreeze(value[name]);
+        
+        descriptor = $Object.getOwnPropertyDescriptor(value, name);
+        if (!descriptor || descriptor.writable) {
+          value[name] = property;
+          $.deepFreeze(value[name]);
+        }
       }
     }
     return value;
