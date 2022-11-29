@@ -315,7 +315,7 @@ final public class ContentBlockerManager: Sendable {
   }
   
   /// Return the enabled rule types for this domain and the enabled settings
-  public func compiledRuleTypes(for domain: Domain) -> Set<RuleTypeWithSourceType> {
+  @MainActor public func compiledRuleTypes(for domain: Domain) -> Set<RuleTypeWithSourceType> {
     let filterLists = FilterListResourceDownloader.shared.filterLists
     
     if domain.shield_allOff == 1 {
