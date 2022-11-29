@@ -199,11 +199,9 @@ struct AssetDetailHeaderView: View {
               .foregroundColor(Color(.secondaryBraveLabel))
           }
           .redacted(reason: assetDetailStore.isInitialState ? .placeholder : [])
-          .shimmer(assetDetailStore.isLoadingPrice)
           let data = assetDetailStore.priceHistory.isEmpty ? emptyData : assetDetailStore.priceHistory
           LineChartView(data: data, numberOfColumns: data.count, selectedDataPoint: $selectedCandle) {
             Color(.walletGreen)
-              .shimmer(assetDetailStore.isLoadingChart)
           }
           .chartAccessibility(
             title: String.localizedStringWithFormat(
