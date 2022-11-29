@@ -159,10 +159,34 @@ public class SwapTokenStore: ObservableObject {
     self.txService = txService
     self.walletService = walletService
     self.ethTxManagerProxy = ethTxManagerProxy
-    self.selectedFromToken = prefilledToken
+    if let prefilledToken = prefilledToken {
+      validatePrefilledToken(prefilledToken)
+    }
 
     self.keyringService.add(self)
     self.rpcService.add(self)
+  }
+  
+  func validatePrefilledToken(_ prefilledToken: BraveWallet.BlockchainToken) {
+    Task { @MainActor in
+      let selectedCoin = await walletService.selectedCoin()
+      let selectedNetwork = await rpcService.network(selectedCoin)
+      if prefilledToken.coin == selectedCoin && prefilledToken.chainId == selectedNetwork.chainId {
+        // valid for current network
+        self.selectedFromToken = prefilledToken
+      } else {
+        // need to try and select correct network.
+        let allNetworksForTokenCoin = await rpcService.allNetworks(prefilledToken.coin)
+        guard let networkForToken = allNetworksForTokenCoin.first(where: { $0.chainId == prefilledToken.chainId }) else {
+          // don't set prefilled token if it belongs to a network we don't know
+          return
+        }
+        let success = await rpcService.setNetwork(networkForToken.chainId, coin: networkForToken.coin)
+        if success {
+          self.selectedFromToken = prefilledToken
+        }
+      }
+    }
   }
 
   private func fetchTokenBalance(
