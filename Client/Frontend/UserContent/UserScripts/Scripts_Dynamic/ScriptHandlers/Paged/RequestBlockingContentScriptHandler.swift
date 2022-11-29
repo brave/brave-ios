@@ -66,10 +66,10 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return }
       guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return }
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
-      let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
-      guard let domainURLString = domain.url else { return }
       
       Task { @MainActor in
+        let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
+        guard let domainURLString = domain.url else { return }
         let shouldBlock = await AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType)
         
         if shouldBlock, Preferences.PrivacyReports.captureShieldsData.value,
