@@ -50,7 +50,7 @@ struct AssetDetailHeaderView: View {
   }
   
   @ViewBuilder private var actionButtonsContainer: some View {
-    if assetDetailStore.isBuySupported && networkStore.isSwapSupported {
+    if assetDetailStore.isBuySupported && assetDetailStore.isSwapSupported {
       VStack {
         actionButtons
       }
@@ -92,7 +92,7 @@ struct AssetDetailHeaderView: View {
       ) {
         Text(Strings.Wallet.send)
       }
-      if networkStore.isSwapSupported && assetDetailStore.token.isFungibleToken {
+      if assetDetailStore.isSwapSupported && assetDetailStore.token.isFungibleToken {
         Button(
           action: {
             buySendSwapDestination = BuySendSwapDestination(
