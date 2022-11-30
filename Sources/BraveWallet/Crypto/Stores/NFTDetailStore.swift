@@ -12,7 +12,7 @@ private extension String {
   }
 }
 
-struct ERC721MetaData: Codable {
+struct ERC721Metadata: Codable {
   var imageURL: String?
   var name: String?
   var description: String?
@@ -37,18 +37,20 @@ class NFTDetailStore: ObservableObject {
   private let rpcService: BraveWalletJsonRpcService
   let nft: BraveWallet.BlockchainToken
   @Published var isLoading: Bool = false
-  @Published var erc721MetaData: ERC721MetaData?
+  @Published var erc721Metadata: ERC721Metadata?
   @Published var networkInfo: BraveWallet.NetworkInfo = .init()
   
   init(
     rpcService: BraveWalletJsonRpcService,
-    nft: BraveWallet.BlockchainToken
+    nft: BraveWallet.BlockchainToken,
+    erc721Metadata: ERC721Metadata?
   ) {
     self.rpcService = rpcService
     self.nft = nft
+    self.erc721Metadata = erc721Metadata
   }
   
-  func fetchMetaData() {
+  func fetchMetadata() {
     Task { @MainActor in
       isLoading = true
       
@@ -61,8 +63,8 @@ class NFTDetailStore: ObservableObject {
       
       isLoading = false
       if let data = metaData.data(using: .utf8),
-         let result = try? JSONDecoder().decode(ERC721MetaData.self, from: data) {
-        erc721MetaData = result
+         let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {
+        erc721Metadata = result
       }
     }
   }

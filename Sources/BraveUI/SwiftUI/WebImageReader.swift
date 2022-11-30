@@ -95,7 +95,10 @@ public struct WebSVGImageView: UIViewRepresentable {
   }
   
   public func makeUIView(context: Context) -> UIImageView {
-    return UIImageView()
+    let result = UIImageView()
+    result.contentMode = .scaleAspectFit
+    result.clipsToBounds = true
+    return result
   }
   
   public func updateUIView(_ uiView: UIImageView, context: Context) {

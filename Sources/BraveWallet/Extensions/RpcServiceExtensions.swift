@@ -275,4 +275,27 @@ extension BraveWalletJsonRpcService {
       }
     }
   }
+  
+  /// Returns a map of Token.id with it ERC721 metadata
+  @MainActor func fetchERC721Metadata(tokens: [BraveWallet.BlockchainToken]) async -> [String: ERC721Metadata] {
+    await withTaskGroup(of: [String: ERC721Metadata].self) {  @MainActor [weak self] group -> [String: ERC721Metadata] in
+      guard let self = self else { return [:] }
+      for token in tokens {
+        group.addTask { @MainActor in
+          let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
+          if result != .success {
+            print(errMsg)
+          }
+          if let data = metaData.data(using: .utf8),
+             let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {
+            return [token.id: result]
+          }
+          return [:]
+        }
+      }
+
+      return await group.reduce([:], { $0.merging($1, uniquingKeysWith: { key, _ in key })
+      })
+    }
+  }
 }

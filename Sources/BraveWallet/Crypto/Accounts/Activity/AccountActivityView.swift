@@ -45,6 +45,15 @@ struct AccountActivityView: View {
       .multilineTextAlignment(.center)
       .foregroundColor(Color(.secondaryBraveLabel))
   }
+  
+  private func imageURL(nftViewModel: NFTAssetViewModel) -> URL? {
+    var imageURL: URL? = nil
+    if let metaData = nftViewModel.erc721Metadata,
+       let urlString = metaData.imageURL, let url = URL(string: urlString) {
+      imageURL = url
+    }
+    return imageURL
+  }
 
   var body: some View {
     List {
@@ -90,7 +99,7 @@ struct AccountActivityView: View {
                 image: NFTIconView(
                   token: nftAsset.token,
                   network: nftAsset.network,
-                  url: nftAsset.imageUrl,
+                  url: imageURL(nftViewModel: nftAsset),
                   shouldShowNativeTokenIcon: true
                 ),
                 title: nftAsset.token.nftTokenTitle,

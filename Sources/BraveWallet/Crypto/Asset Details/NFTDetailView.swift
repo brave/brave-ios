@@ -22,38 +22,14 @@ struct NFTDetailView: View {
   }
   
   @ViewBuilder private var nftImage: some View {
-    if let erc721MetaData = nftDetailStore.erc721MetaData {
-      if let imageURL = erc721MetaData.imageURL {
-        if imageURL.hasPrefix("data:image/") {
-          WebImageReader(url: URL(string: imageURL)) { image, isFinished in
-            if let image = image {
-              Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .cornerRadius(10)
-            } else {
-              noImageView
-            }
-          }
-        } else {
-          if imageURL.hasSuffix(".svg") {
-            WebSVGImageView(url: URL(string: imageURL))
-              .frame(maxWidth: .infinity, minHeight: 300)
-              .cornerRadius(10)
-          } else {
-            WebImage(url: URL(string: erc721MetaData.imageURL ?? ""))
-              .resizable()
-              .placeholder {
-                Text(Strings.Wallet.nftDetailImageNotAvailable)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .frame(maxWidth: .infinity, minHeight: 300)
-              }
-              .indicator(.activity)
-              .transition(.fade(duration: 0.5))
-              .aspectRatio(contentMode: .fit)
-              .cornerRadius(10)
-          }
+    if let erc721Metadata = nftDetailStore.erc721Metadata {
+      let test: String? = "https://d4rgq65mqvxhk.cloudfront.net/public/gift_icons/officialGift%2378548ed1-9c95-4634-b355-ca8c2a53da4f.svg"
+      if let imageURL = erc721Metadata.imageURL {
+        NFTImageView(urlString: imageURL) {
+          noImageView
         }
+        .cornerRadius(10)
+//        .frame(maxWidth: .infinity, minHeight: 300)
       } else {
         noImageView
       }
@@ -62,7 +38,7 @@ struct NFTDetailView: View {
     }
   }
   var body: some View {
-    ScrollView {
+    ScrollView(.vertical) {
       VStack(alignment: .leading, spacing: 24) {
         VStack(alignment: .leading, spacing: 8) {
           if nftDetailStore.isLoading {
@@ -87,7 +63,7 @@ struct NFTDetailView: View {
           }
           .buttonStyle(BraveFilledButtonStyle(size: .large))
         }
-        if let erc721MetaData = nftDetailStore.erc721MetaData, let description = erc721MetaData.description {
+        if let erc721Metadata = nftDetailStore.erc721Metadata, let description = erc721Metadata.description {
           VStack(alignment: .leading, spacing: 8) {
             Text(Strings.Wallet.nftDetailDescription)
               .font(.headline.weight(.semibold))
@@ -143,7 +119,9 @@ struct NFTDetailView: View {
       .padding()
     }
     .onAppear {
-      nftDetailStore.fetchMetaData()
+      if nftDetailStore.erc721Metadata == nil {
+        nftDetailStore.fetchMetadata()
+      }
     }
     .background(Color(UIColor.braveGroupedBackground).ignoresSafeArea())
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
