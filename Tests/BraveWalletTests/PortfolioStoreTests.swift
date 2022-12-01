@@ -104,6 +104,9 @@ class PortfolioStoreTests: XCTestCase {
     rpcService._splTokenAccountBalance = {_, _, _, completion in
       completion("\(mockNFTBalance)", UInt8(0), "\(mockNFTBalance)", .success, "") // sol nft balance
     }
+    rpcService._erc721Metadata = { _, _, _, completion in
+      completion("", .internalError, "")
+    }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._userAssets = { _, coin, completion in
       switch coin {

@@ -38,6 +38,9 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._splTokenAccountBalance = {_, _, _, completion in
       completion(splTokenBalance, UInt8(6), "", .success, "")
     }
+    rpcService._erc721Metadata = { _, _, _, completion in
+      completion("", .internalError, "")
+    }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._selectedCoin = { $0(selectedCoin) }
     walletService._userAssets = { $2(userAssets) }
@@ -320,6 +323,9 @@ class SendTokenStoreTests: XCTestCase {
       completion(mockBalanceWei, .success, "")
     }
     rpcService._addObserver = { _ in }
+    rpcService._erc721Metadata = { _, _, _, completion in
+      completion("", .internalError, "")
+    }
 
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._userAssets = { $2([.previewToken]) }

@@ -116,15 +116,6 @@ struct PortfolioView: View {
       }
     }
   }
-  
-  private func imageURL(nftViewModel: NFTAssetViewModel) -> URL? {
-    var imageURL: URL? = nil
-    if let metaData = nftViewModel.erc721Metadata,
-       let urlString = metaData.imageURL, let url = URL(string: urlString) {
-      imageURL = url
-    }
-    return imageURL
-  }
 
   var body: some View {
     List {
@@ -193,7 +184,7 @@ struct PortfolioView: View {
                   image: NFTIconView(
                     token: nftAsset.token,
                     network: nftAsset.network,
-                    url: imageURL(nftViewModel: nftAsset),
+                    url: nftAsset.erc721Metadata?.imageURL,
                     shouldShowNativeTokenIcon: true
                   ),
                   title: nftAsset.token.nftTokenTitle,

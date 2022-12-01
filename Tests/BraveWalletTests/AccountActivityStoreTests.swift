@@ -76,6 +76,9 @@ class AccountActivityStoreTests: XCTestCase {
       // spd token, sol nft balance
       completion(mockSplTokenBalances[tokenMintAddress] ?? "", UInt8(0), mockSplTokenBalances[tokenMintAddress] ?? "", .success, "")
     }
+    rpcService._erc721Metadata = { _, _, _, completion in
+      completion("", .internalError, "")
+    }
     
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._addObserver = { _ in }

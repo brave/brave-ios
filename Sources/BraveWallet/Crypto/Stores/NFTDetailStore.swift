@@ -13,23 +13,28 @@ private extension String {
 }
 
 struct ERC721Metadata: Codable {
-  var imageURL: String?
+  var imageURLString: String?
   var name: String?
   var description: String?
   
   enum CodingKeys: String, CodingKey {
-    case imageURL = "image"
+    case imageURLString = "image"
     case name
     case description
   }
   
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    if let imageString = try container.decodeIfPresent(String.self, forKey: .imageURL) {
-      self.imageURL = imageString.hasPrefix("data:image") ? imageString : imageString.httpifyIpfsUrl
+    if let imageString = try container.decodeIfPresent(String.self, forKey: .imageURLString) {
+      self.imageURLString = imageString.hasPrefix("data:image") ? imageString : imageString.httpifyIpfsUrl
     }
     self.name = try container.decodeIfPresent(String.self, forKey: .name)
     self.description = try container.decodeIfPresent(String.self, forKey: .description)
+  }
+  
+  var imageURL: URL? {
+    guard let urlString = imageURLString else { return nil }
+    return URL(string: urlString)
   }
 }
 

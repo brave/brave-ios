@@ -24,8 +24,8 @@ struct NFTDetailView: View {
   @ViewBuilder private var nftImage: some View {
     if let erc721Metadata = nftDetailStore.erc721Metadata {
       let test: String? = "https://d4rgq65mqvxhk.cloudfront.net/public/gift_icons/officialGift%2378548ed1-9c95-4634-b355-ca8c2a53da4f.svg"
-      if let imageURL = erc721Metadata.imageURL {
-        NFTImageView(urlString: imageURL) {
+      if let urlString = erc721Metadata.imageURLString {
+        NFTImageView(urlString: urlString) {
           noImageView
         }
         .cornerRadius(10)

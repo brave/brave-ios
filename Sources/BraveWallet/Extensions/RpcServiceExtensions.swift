@@ -288,7 +288,8 @@ extension BraveWalletJsonRpcService {
           }
           if let data = metaData.data(using: .utf8),
              let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {
-            return [token.id: result]
+            let newId = token.id + token.chainId
+            return [newId: result]
           }
           return [:]
         }
@@ -297,5 +298,18 @@ extension BraveWalletJsonRpcService {
       return await group.reduce([:], { $0.merging($1, uniquingKeysWith: { key, _ in key })
       })
     }
+  }
+  
+  /// Returns a nullable ERC721 metadata
+  @MainActor func fetchERC721Metadata(for token: BraveWallet.BlockchainToken) async -> ERC721Metadata? {
+    let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
+    if result != .success {
+      print(errMsg)
+    }
+    if let data = metaData.data(using: .utf8),
+       let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {
+      return result
+    }
+    return nil
   }
 }
