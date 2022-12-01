@@ -493,8 +493,7 @@ extension Tab: BraveWalletSolanaEventsListener {
   }
 
   @MainActor func updateSolanaProperties() async {
-    guard WalletDebugFlags.isSolanaDappsEnabled,
-          Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
+    guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
           let webView = webView,
           let provider = walletSolProvider else {
       return

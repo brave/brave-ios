@@ -208,8 +208,7 @@ class UserScriptManager {
       }
       
       // Inject SolanaWeb3Script.js
-      if WalletDebugFlags.isSolanaDappsEnabled,
-         tab.isPrivate == false,
+      if tab.isPrivate == false,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave {
         let script = ScriptLoader.loadUserScript(named: "SolanaWeb3Script") ?? tab.walletSolProviderScripts[.solanaWeb3]
         
@@ -256,8 +255,7 @@ class UserScriptManager {
         }
       }
       
-      if WalletDebugFlags.isSolanaDappsEnabled,
-         tab.isPrivate == false,
+      if tab.isPrivate == false,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave,
          let script = self.dynamicScripts[.solanaProvider] {
 
