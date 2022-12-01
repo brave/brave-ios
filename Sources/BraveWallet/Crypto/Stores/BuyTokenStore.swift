@@ -31,6 +31,7 @@ public class BuyTokenStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private var selectedNetwork: BraveWallet.NetworkInfo = .init()
   private(set) var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
+  private var prefilledToken: BraveWallet.BlockchainToken?
   
   /// A map between chain id and gas token's symbol
   static let gasTokens: [String: [String]] = [
@@ -57,9 +58,7 @@ public class BuyTokenStore: ObservableObject {
     self.rpcService = rpcService
     self.walletService = walletService
     self.assetRatioService = assetRatioService
-    if let prefilledToken = prefilledToken {
-      validatePrefilledToken(prefilledToken)
-    }
+    self.prefilledToken = prefilledToken
     
     self.rpcService.add(self)
     
@@ -68,26 +67,27 @@ public class BuyTokenStore: ObservableObject {
     }
   }
   
-  func validatePrefilledToken(_ prefilledToken: BraveWallet.BlockchainToken) {
-    Task { @MainActor in
-      let selectedCoin = await walletService.selectedCoin()
-      let selectedNetwork = await rpcService.network(selectedCoin)
-      if prefilledToken.coin == selectedCoin && prefilledToken.chainId == selectedNetwork.chainId {
-        // valid for current network
+  @MainActor private func validatePrefilledToken(on network: BraveWallet.NetworkInfo) async {
+    guard let prefilledToken = self.prefilledToken else {
+      return
+    }
+    if prefilledToken.coin == network.coin && prefilledToken.chainId == network.chainId {
+      // valid for current network
+      self.selectedBuyToken = prefilledToken
+    } else {
+      // need to try and select correct network.
+      let allNetworksForTokenCoin = await rpcService.allNetworks(prefilledToken.coin)
+      guard let networkForToken = allNetworksForTokenCoin.first(where: { $0.chainId == prefilledToken.chainId }) else {
+        // don't set prefilled token if it belongs to a network we don't know
+        return
+      }
+      let success = await rpcService.setNetwork(networkForToken.chainId, coin: networkForToken.coin)
+      if success {
+        self.selectedNetwork = networkForToken
         self.selectedBuyToken = prefilledToken
-      } else {
-        // need to try and select correct network.
-        let allNetworksForTokenCoin = await rpcService.allNetworks(prefilledToken.coin)
-        guard let networkForToken = allNetworksForTokenCoin.first(where: { $0.chainId == prefilledToken.chainId }) else {
-          // don't set prefilled token if it belongs to a network we don't know
-          return
-        }
-        let success = await rpcService.setNetwork(networkForToken.chainId, coin: networkForToken.coin)
-        if success {
-          self.selectedBuyToken = prefilledToken
-        }
       }
     }
+    self.prefilledToken = nil
   }
 
   func fetchBuyUrl(
@@ -176,6 +176,7 @@ public class BuyTokenStore: ObservableObject {
     
     let coin = await walletService.selectedCoin()
     selectedNetwork = await rpcService.network(coin)
+    await validatePrefilledToken(on: selectedNetwork) // selectedNetwork may change
     await fetchBuyTokens(network: selectedNetwork)
   
     // exclude all buy options that its available buy tokens list does not include the
