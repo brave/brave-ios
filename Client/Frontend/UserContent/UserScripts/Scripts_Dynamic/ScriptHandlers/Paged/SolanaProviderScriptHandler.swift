@@ -153,8 +153,7 @@ class SolanaProviderScriptHandler: TabContentScript {
     if let args = args {
       param = MojoBase.Value(jsonString: args)?.dictionaryValue
     }
-    // need to inject Solana Web3 Library
-    await UserScriptManager.shared.injectSolanaWeb3Script(tab: tab, solanaWeb3Script: tab.walletSolProviderScripts[.solanaWeb3])
+
     let (status, errorMessage, publicKey) = await provider.connect(param)
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
@@ -235,8 +234,6 @@ class SolanaProviderScriptHandler: TabContentScript {
     }
     if method == Keys.connect.rawValue,
        let publicKey = result[Keys.publicKey.rawValue]?.stringValue {
-      // need to inject Solana Web3 Library before replying with success
-      await UserScriptManager.shared.injectSolanaWeb3Script(tab: tab, solanaWeb3Script: tab.walletSolProviderScripts[.solanaWeb3])
       await tab.updateSolanaProperties()
       return (publicKey, nil)
     } else {

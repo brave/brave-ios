@@ -283,24 +283,4 @@ class UserScriptManager {
       }
     }
   }
-  
-  @MainActor func injectSolanaWeb3Script(tab: Tab, solanaWeb3Script: String?) async {
-    guard let webView = tab.webView,
-          let solanaWeb3Script = solanaWeb3Script else {
-      return
-    }
-    
-    let (result, error) = await webView.evaluateSafeJavaScript(
-      functionName: """
-      console.log(\(UserScriptManager.walletSolanaNameSpace));
-      """,
-      args: [],
-      contentWorld: .page,
-      asFunction: false
-    )
-    
-    if let error = error {
-      Logger.module.error("Error Detecting SOLANA-WEB-3: \(error.localizedDescription)")
-    }
-  }
 }
