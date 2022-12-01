@@ -124,6 +124,20 @@ struct AssetDetailHeaderView: View {
     }
     .buttonStyle(BraveFilledButtonStyle(size: .normal))
   }
+  
+  @ViewBuilder private var tokenImageNameAndNetwork: some View {
+    AssetIconView(token: assetDetailStore.token, network: assetDetailStore.network ?? networkStore.selectedChain)
+    VStack(alignment: .leading) {
+      Text(assetDetailStore.token.name)
+        .fixedSize(horizontal: false, vertical: true)
+        .font(.title3.weight(.semibold))
+      if let chainName = assetDetailStore.network?.chainName {
+        Text(chainName)
+          .fixedSize(horizontal: false, vertical: true)
+          .font(.caption)
+      }
+    }
+  }
 
   var body: some View {
     VStack(alignment: assetDetailStore.token.isFungibleToken ? .center : .leading, spacing: 0) {
@@ -140,19 +154,13 @@ struct AssetDetailHeaderView: View {
                   )
               }
               HStack {
-                AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
-                Text(assetDetailStore.token.name)
-                  .fixedSize(horizontal: false, vertical: true)
-                  .font(.title3.weight(.semibold))
+                tokenImageNameAndNetwork
               }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
           } else {
             HStack {
-              AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
-              Text(assetDetailStore.token.name)
-                .fixedSize(horizontal: false, vertical: true)
-                .font(.title3.weight(.semibold))
+              tokenImageNameAndNetwork
               if horizontalSizeClass == .regular {
                 Spacer()
                 DateRangeView(selectedRange: $assetDetailStore.timeframe)

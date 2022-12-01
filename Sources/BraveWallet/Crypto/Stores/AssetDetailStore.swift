@@ -45,6 +45,7 @@ class AssetDetailStore: ObservableObject {
       update()
     }
   }
+  @Published private(set) var network: BraveWallet.NetworkInfo?
 
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
 
@@ -104,6 +105,7 @@ class AssetDetailStore: ObservableObject {
       let allNetworks = await rpcService.allNetworks(coin)
       let selectedNetwork = await rpcService.network(coin)
       let network = allNetworks.first(where: { $0.chainId == token.chainId }) ?? selectedNetwork
+      self.network = network
       var wyreBuyTokens: [BraveWallet.BlockchainToken] = []
       if WalletConstants.supportedBuyWithWyreNetworkChainIds.contains(network.chainId) {
         wyreBuyTokens = await blockchainRegistry.buyTokens(.wyre, chainId: network.chainId)
