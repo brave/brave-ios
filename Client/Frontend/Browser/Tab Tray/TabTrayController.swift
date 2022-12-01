@@ -5,6 +5,7 @@
 
 import UIKit
 import Shared
+import SwiftUI
 import BraveCore
 import BraveShared
 import Combine
@@ -265,6 +266,7 @@ class TabTrayController: LoadingViewController {
 
     doneButton.addTarget(self, action: #selector(doneAction), for: .touchUpInside)
     newTabButton.addTarget(self, action: #selector(newTabAction), for: .touchUpInside)
+    newTabButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(tappedButton(_:))))
     privateModeButton.addTarget(self, action: #selector(togglePrivateModeAction), for: .touchUpInside)
 
     navigationController?.isToolbarHidden = false
@@ -515,6 +517,16 @@ class TabTrayController: LoadingViewController {
     } else {
       tabManager.addTabAndSelect(isPrivate: privateMode)
     }
+  }
+  
+  @objc private func tappedButton(_ gestureRecognizer: UIGestureRecognizer) {
+    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+      return
+    }
+    
+    // TODO: Test Code change it with real view
+    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+    present(host, animated: true)
   }
 
   @objc func togglePrivateModeAction() {
