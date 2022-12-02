@@ -270,7 +270,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
     
     var duplicateTabMenuChildren: [UIAction] = []
-
+    
     if containsWebPage, let selectedTab = tabManager.selectedTab, let url = selectedTab.fetchedURL {
       let duplicateActiveTab = UIAction(
         title: Strings.duplicateActiveTab,
@@ -287,7 +287,26 @@ extension BrowserViewController: TabManagerDelegate {
 
       duplicateTabMenuChildren.append(duplicateActiveTab)
     }
+    
+    var recentlyClosedMenuChildren: [UIAction] = []
 
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      let recentlyClosedTab = UIAction(
+        title: "View Recently Closed Tabs",
+        image: UIImage(braveSystemNamed: "brave.recently.closed"),
+        handler: UIAction.deferredActionHandler { [weak self] _ in
+          if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            return
+          }
+          
+          // TODO: Test Code change it with real view
+          let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+          self?.present(host, animated: true)
+        })
+      
+      recentlyClosedMenuChildren.append(recentlyClosedTab)
+    }
+    
     var closeTabMenuChildren: [UIAction] = []
 
     let closeActiveTab = UIAction(
@@ -339,9 +358,10 @@ extension BrowserViewController: TabManagerDelegate {
     let addTabMenu = UIMenu(title: "", options: .displayInline, children: addTabMenuChildren)
     let bookmarkMenu = UIMenu(title: "", options: .displayInline, children: bookmarkMenuChildren)
     let duplicateTabMenu = UIMenu(title: "", options: .displayInline, children: duplicateTabMenuChildren)
+    let recentlyClosedMenu = UIMenu(title: "", options: .displayInline, children: recentlyClosedMenuChildren)
     let closeTabMenu = UIMenu(title: "", options: .displayInline, children: closeTabMenuChildren)
     
-    let tabButtonMenuActionList = [closeTabMenu, duplicateTabMenu, bookmarkMenu, newTabMenu]
+    let tabButtonMenuActionList = [closeTabMenu, recentlyClosedMenu, duplicateTabMenu, bookmarkMenu, newTabMenu]
     let addTabMenuActionList = [addTabMenu]
 
     toolbar?.tabsButton.menu = UIMenu(title: "", identifier: nil, children: tabButtonMenuActionList)
