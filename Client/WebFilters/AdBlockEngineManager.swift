@@ -277,7 +277,7 @@ public actor AdBlockEngineManager: Sendable {
       var allCompileResults: [ResourceWithVersion: Result<Void, Error>] = [:]
       var allEngines: [CachedAdBlockEngine] = []
       
-      try await self.group(resources: resourcesWithVersion).asyncConcurrentForEach { source, group in
+      try await self.group(resources: resourcesWithVersion).asyncForEach { source, group in
         try Task.checkCancellation()
         
         // Combine all rule lists that need to be injected during initialization
@@ -384,43 +384,32 @@ public actor AdBlockEngineManager: Sendable {
   
   /// Compile the given resource into the given engine
   private func compile(resource: ResourceWithVersion, into engine: AdblockEngine) async throws {
-    return try await withCheckedThrowingContinuation { continuation in
-      switch resource.resource.type {
-      case .dat:
-        guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: CompileError.fileNotFound)
-          return
-        }
-        
-        DispatchQueue.main.async {
-          if engine.deserialize(data: data) {
-            continuation.resume()
-          } else {
-            continuation.resume(throwing: CompileError.couldNotDeserializeDATFile)
-          }
-        }
-      case .jsonResources:
-        guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-          continuation.resume(throwing: CompileError.fileNotFound)
-          return
-        }
-        
-        do {
-          guard let json = try self.validateJSON(data) else {
-            continuation.resume()
-            return
-          }
-          DispatchQueue.main.async {
-            engine.addResources(json)
-            continuation.resume()
-          }
-        } catch {
-          continuation.resume(throwing: error)
-        }
-      case .ruleList:
-        // This is added during engine initualization
-        continuation.resume()
+    switch resource.resource.type {
+    case .dat:
+      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
+        throw CompileError.fileNotFound
       }
+      
+      try await MainActor.run {
+        if !engine.deserialize(data: data) {
+          throw CompileError.couldNotDeserializeDATFile
+        }
+      }
+    case .jsonResources:
+      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
+        throw CompileError.fileNotFound
+      }
+      
+      guard let json = try self.validateJSON(data) else {
+        return
+      }
+      
+      await MainActor.run {
+        engine.addResources(json)
+      }
+    case .ruleList:
+      // This is added during engine initualization
+      return
     }
   }
   

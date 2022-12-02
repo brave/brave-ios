@@ -50,6 +50,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // initialization. This is because Database container may change. See bugs #3416, #3377.
     DataController.shared.initializeOnce()
     Migration.postCoreDataInitMigrations()
+    
+    Task { @MainActor in
+      await LaunchHelper.shared.prepareAdBlockServices(
+        adBlockService: appDelegate.braveCore.adblockService
+      )
+    }
 
     Preferences.General.themeNormalMode.objectWillChange
       .receive(on: RunLoop.main)
