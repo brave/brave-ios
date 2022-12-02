@@ -32,7 +32,7 @@ guard let apiKey = ProcessInfo.processInfo.environment["PASSWORD"] else {
       "attributes": {
         "callback_url": null,
         "content_encoding": "text",
-        "file_type": "xliff",
+        "file_type": "default",
         "mode": "default",
         "pseudo": false
       },
