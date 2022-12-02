@@ -272,7 +272,7 @@ extension BrowserViewController: TabManagerDelegate {
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       let recentlyClosedTab = UIAction(
         title: "View Recently Closed Tabs",
-        image: UIImage(systemName: "plus.square.on.square"),
+        image: UIImage(braveSystemNamed: "brave.recently.closed"),
         handler: UIAction.deferredActionHandler { [weak self] _ in
           if PrivateBrowsingManager.shared.isPrivateBrowsing {
             return
@@ -358,9 +358,10 @@ extension BrowserViewController: TabManagerDelegate {
     let activityTabMenu = UIMenu(title: "", options: .displayInline, children: activityTabMenuChildren)
     let recentlyClosedMenu = UIMenu(title: "", options: .displayInline, children: recentlyClosedChildren)
     let closeTabMenu = UIMenu(title: "", options: .displayInline, children: closeTabMenuChildren)
-
-    toolbar?.tabsButton.menu = UIMenu(title: "", identifier: nil, children: [closeTabMenu, recentlyClosedMenu, activityTabMenu, bookmarkMenu, newTabMenu])
-    topToolbar.tabsButton.menu = UIMenu(title: "", identifier: nil, children: [closeTabMenu, recentlyClosedMenu, activityTabMenu, bookmarkMenu, newTabMenu])
+    let tabMenuItems = [closeTabMenu, recentlyClosedMenu, activityTabMenu, bookmarkMenu, newTabMenu]
+    
+    toolbar?.tabsButton.menu = UIMenu(title: "", identifier: nil, children: tabMenuItems)
+    topToolbar.tabsButton.menu = UIMenu(title: "", identifier: nil, children: tabMenuItems)
 
     // Update Actions for Add-Tab Button
     toolbar?.addTabButton.menu = UIMenu(title: "", identifier: nil, children: [addTabMenu])
