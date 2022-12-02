@@ -99,13 +99,15 @@ public extension WKWebView {
     asFunction: Bool = true
   ) async -> (Any?, Error?) {
     await withCheckedContinuation { continuation in
-      evaluateSafeJavaScript(
-        functionName: functionName,
-        args: args,
-        contentWorld: contentWorld,
-        escapeArgs: escapeArgs,
-        asFunction: asFunction) { value, error in
-          continuation.resume(returning: (value, error))
+      DispatchQueue.main.async {
+        self.evaluateSafeJavaScript(
+          functionName: functionName,
+          args: args,
+          contentWorld: contentWorld,
+          escapeArgs: escapeArgs,
+          asFunction: asFunction) { value, error in
+            continuation.resume(returning: (value, error))
+        }
       }
     }
   }
