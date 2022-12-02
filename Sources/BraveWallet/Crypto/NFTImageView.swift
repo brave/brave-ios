@@ -7,17 +7,16 @@ import SwiftUI
 import BraveUI
 import SDWebImageSwiftUI
 
-struct NFTImageView<Fallback: View>: View {
-  let urlString: String
-  
-  private var fallback: () -> Fallback
+struct NFTImageView<Placeholder: View>: View {
+  private let urlString: String
+  private var placeholder: () -> Placeholder
   
   init(
     urlString: String,
-    @ViewBuilder fallback: @escaping () -> Fallback
+    @ViewBuilder placeholder: @escaping () -> Placeholder
   ) {
     self.urlString = urlString
-    self.fallback = fallback
+    self.placeholder = placeholder
   }
   
   var body: some View {
@@ -28,16 +27,24 @@ struct NFTImageView<Fallback: View>: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
         } else {
-          fallback()
+          placeholder()
         }
       }
     } else {
       if urlString.hasSuffix(".svg") {
-        WebSVGImageView(url: URL(string: urlString))
+        WebImageReader(url: URL(string: urlString)) { image, isFinished in
+          if let image = image {
+            Image(uiImage: image)
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+          } else {
+            placeholder()
+          }
+        }
       } else {
         WebImage(url: URL(string: urlString))
           .resizable()
-          .placeholder { fallback() }
+          .placeholder { placeholder() }
           .indicator(.activity)
           .transition(.fade(duration: 0.5))
           .aspectRatio(contentMode: .fit)

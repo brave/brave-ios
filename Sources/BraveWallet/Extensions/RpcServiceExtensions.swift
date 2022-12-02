@@ -6,6 +6,7 @@
 import Foundation
 import BraveCore
 import BigNumber
+import os.log
 
 extension BraveWalletJsonRpcService {
   /// Obtain the decimal balance of an `BlockchainToken` for a given account
@@ -284,12 +285,13 @@ extension BraveWalletJsonRpcService {
         group.addTask { @MainActor in
           let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
           if result != .success {
-            print(errMsg)
+            if result != .success {
+              Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
+            }
           }
           if let data = metaData.data(using: .utf8),
              let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {
-            let newId = token.id + token.chainId
-            return [newId: result]
+            return [token.id: result]
           }
           return [:]
         }
@@ -304,7 +306,7 @@ extension BraveWalletJsonRpcService {
   @MainActor func fetchERC721Metadata(for token: BraveWallet.BlockchainToken) async -> ERC721Metadata? {
     let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
     if result != .success {
-      print(errMsg)
+      Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
     }
     if let data = metaData.data(using: .utf8),
        let result = try? JSONDecoder().decode(ERC721Metadata.self, from: data) {

@@ -152,8 +152,10 @@ struct NFTIconView: View {
     NFTImageView(urlString: url?.absoluteString ?? "") {
       AssetIconView(token: token, network: network, shouldShowNativeTokenIcon: shouldShowNativeTokenIcon)
     }
+    .cornerRadius(5)
     .frame(width: length, height: length)
     .overlay(tokenLogo, alignment: .bottomTrailing)
+    .allowsHitTesting(false)
     .accessibilityHidden(true)
   }
 }

@@ -77,7 +77,14 @@ class AccountActivityStoreTests: XCTestCase {
       completion(mockSplTokenBalances[tokenMintAddress] ?? "", UInt8(0), mockSplTokenBalances[tokenMintAddress] ?? "", .success, "")
     }
     rpcService._erc721Metadata = { _, _, _, completion in
-      completion("", .internalError, "")
+      completion(
+      """
+      {
+        "image": "mock.image.url",
+        "name": "mock nft name",
+        "description": "mock nft description"
+      }
+      """, .success, "")
     }
     
     let walletService = BraveWallet.TestBraveWalletService()
@@ -286,6 +293,65 @@ class AccountActivityStoreTests: XCTestCase {
     
     accountActivityStore.update()
 
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
+  }
+  
+  func testFetchERC721Metadata() {
+    let account: BraveWallet.AccountInfo = .mockEthAccount
+    let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+    let mockEthDecimalBalance: Double = 0.0896
+    let numEthDecimals = Int(BraveWallet.NetworkInfo.mockMainnet.nativeToken.decimals)
+    let mockEthBalanceWei = formatter.weiString(from: mockEthDecimalBalance, radix: .hex, decimals: numEthDecimals) ?? ""
+    let mockERC20DecimalBalance = 1.5
+    let mockERC20BalanceWei = formatter.weiString(from: mockERC20DecimalBalance, radix: .hex, decimals: Int(BraveWallet.BlockchainToken.mockUSDCToken.decimals)) ?? ""
+    let mockNFTBalance: Double = 1
+    let mockERC721BalanceWei = formatter.weiString(from: mockNFTBalance, radix: .hex, decimals: 0) ?? ""
+    
+    let mockERC721Metadata: ERC721Metadata = .init(imageURLString: "mock.image.url", name: "mock nft name", description: "mock nft description")
+    
+    let (keyringService, rpcService, walletService, blockchainRegistry, assetRatioService, txService, solTxManagerProxy) = setupServices(
+      mockEthBalanceWei: mockEthBalanceWei,
+      mockERC20BalanceWei: mockERC20BalanceWei,
+      mockERC721BalanceWei: mockERC721BalanceWei,
+      selectedNetwork: .mockMainnet
+    )
+    
+    let accountActivityStore = AccountActivityStore(
+      account: account,
+      observeAccountUpdates: false,
+      keyringService: keyringService,
+      walletService: walletService,
+      rpcService: rpcService,
+      assetRatioService: assetRatioService,
+      txService: txService,
+      blockchainRegistry: blockchainRegistry,
+      solTxManagerProxy: solTxManagerProxy
+    )
+    
+    let userVisibleNFTsMetadataException = expectation(description: "accountActivityStore-userVisibleNFTsMetadata")
+    XCTAssertTrue(accountActivityStore.userVisibleNFTs.isEmpty)  // Initial state
+    accountActivityStore.$userVisibleNFTs
+      .dropFirst()
+      .collect(2)
+      .sink { userVisibleNFTs in
+        defer { userVisibleNFTsMetadataException.fulfill() }
+        XCTAssertEqual(userVisibleNFTs.count, 2) // empty nfts, populated nfts
+        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+          XCTFail("Unexpected test result")
+          return
+        }
+        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 1)
+        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.token.symbol, BraveWallet.BlockchainToken.mockERC721NFTToken.symbol)
+        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.balance, Int(mockNFTBalance))
+        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.erc721Metadata?.imageURLString, mockERC721Metadata.imageURLString)
+        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.erc721Metadata?.name, mockERC721Metadata.name)
+        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.erc721Metadata?.description, mockERC721Metadata.description)
+      }.store(in: &cancellables)
+    
+    accountActivityStore.update()
+    
     waitForExpectations(timeout: 1) { error in
       XCTAssertNil(error)
     }

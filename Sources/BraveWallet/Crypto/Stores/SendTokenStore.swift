@@ -194,13 +194,12 @@ public class SendTokenStore: ObservableObject {
         decimalFormatStyle: .decimals(precision: Int(selectedSendToken.decimals))
       )
   
-      let metadataId = selectedSendToken.id + selectedSendToken.chainId
-      if selectedSendToken.isErc721, metadataCache[metadataId] == nil {
-        metadataCache[metadataId] = await rpcService.fetchERC721Metadata(for: selectedSendToken)
+      if selectedSendToken.isErc721, metadataCache[selectedSendToken.id] == nil {
+        metadataCache[selectedSendToken.id] = await rpcService.fetchERC721Metadata(for: selectedSendToken)
       }
       guard !Task.isCancelled else { return }
       self.selectedSendTokenBalance = balance
-      self.selectedSendTokenERC721Metadata = metadataCache[metadataId]
+      self.selectedSendTokenERC721Metadata = metadataCache[selectedSendToken.id]
       self.validateBalance()
     }
   }

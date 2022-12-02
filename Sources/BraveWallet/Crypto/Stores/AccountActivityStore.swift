@@ -156,7 +156,7 @@ class AccountActivityStore: ObservableObject {
                 token: token,
                 network: networkAssets.network,
                 balance: Int(totalBalances[token.assetBalanceId] ?? 0),
-                erc721Metadata: allErc721Metadata[token.id + token.chainId]
+                erc721Metadata: allErc721Metadata[token.id]
               )
             )
           } else {

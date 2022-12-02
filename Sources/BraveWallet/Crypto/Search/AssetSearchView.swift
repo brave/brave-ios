@@ -92,7 +92,7 @@ struct AssetSearchView: View {
                   destination: {
                     if assetViewModel.token.isErc721 {
                       NFTDetailView(
-                        nftDetailStore: cryptoStore.nftDetailStore(for: assetViewModel.token, erc721Metadata: allERC721Metadta[assetViewModel.token.id + assetViewModel.token.chainId]),
+                        nftDetailStore: cryptoStore.nftDetailStore(for: assetViewModel.token, erc721Metadata: allERC721Metadta[assetViewModel.token.id]),
                         buySendSwapDestination: .constant(nil)
                       )
                       .onDisappear {
@@ -119,7 +119,7 @@ struct AssetSearchView: View {
                       NFTIconView(
                         token: assetViewModel.token,
                         network: assetViewModel.network,
-                        url: allERC721Metadta[assetViewModel.token.id + assetViewModel.token.chainId]?.imageURL,
+                        url: allERC721Metadta[assetViewModel.token.id]?.imageURL,
                         shouldShowNativeTokenIcon: true
                       )
                     } else {

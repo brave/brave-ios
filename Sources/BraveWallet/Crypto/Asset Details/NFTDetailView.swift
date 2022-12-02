@@ -23,13 +23,11 @@ struct NFTDetailView: View {
   
   @ViewBuilder private var nftImage: some View {
     if let erc721Metadata = nftDetailStore.erc721Metadata {
-      let test: String? = "https://d4rgq65mqvxhk.cloudfront.net/public/gift_icons/officialGift%2378548ed1-9c95-4634-b355-ca8c2a53da4f.svg"
       if let urlString = erc721Metadata.imageURLString {
         NFTImageView(urlString: urlString) {
           noImageView
         }
         .cornerRadius(10)
-//        .frame(maxWidth: .infinity, minHeight: 300)
       } else {
         noImageView
       }
@@ -40,28 +38,30 @@ struct NFTDetailView: View {
   var body: some View {
     ScrollView(.vertical) {
       VStack(alignment: .leading, spacing: 24) {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(spacing: 8) {
           if nftDetailStore.isLoading {
             ProgressView()
               .frame(maxWidth: .infinity, minHeight: 300)
           } else {
             nftImage
           }
-          Text(nftDetailStore.nft.nftTokenTitle)
-            .font(.title3.weight(.semibold))
-            .foregroundColor(Color(.braveLabel))
-          Text(nftDetailStore.nft.name)
-            .foregroundColor(Color(.secondaryBraveLabel))
-          Button(action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .send,
-              initialToken: nftDetailStore.nft
-            )
-          }) {
-            Text(Strings.Wallet.nftDetailSendNFTButtonTitle)
-              .frame(maxWidth: .infinity)
+          VStack(alignment: .leading, spacing: 8) {
+            Text(nftDetailStore.nft.nftTokenTitle)
+              .font(.title3.weight(.semibold))
+              .foregroundColor(Color(.braveLabel))
+            Text(nftDetailStore.nft.name)
+              .foregroundColor(Color(.secondaryBraveLabel))
+            Button(action: {
+              buySendSwapDestination = BuySendSwapDestination(
+                kind: .send,
+                initialToken: nftDetailStore.nft
+              )
+            }) {
+              Text(Strings.Wallet.nftDetailSendNFTButtonTitle)
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(BraveFilledButtonStyle(size: .large))
           }
-          .buttonStyle(BraveFilledButtonStyle(size: .large))
         }
         if let erc721Metadata = nftDetailStore.erc721Metadata, let description = erc721Metadata.description {
           VStack(alignment: .leading, spacing: 8) {

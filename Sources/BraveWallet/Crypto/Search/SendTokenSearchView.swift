@@ -19,7 +19,7 @@ struct SendTokenSearchView: View {
   var body: some View {
     TokenList(tokens: sendTokenStore.userAssets) { token in
       Button(action: {
-        sendTokenStore.selectedSendTokenERC721Metadata = allERC721Metadata[token.id + token.chainId]
+        sendTokenStore.selectedSendTokenERC721Metadata = allERC721Metadata[token.id]
         sendTokenStore.selectedSendToken = token
         presentationMode.dismiss()
       }) {
@@ -31,7 +31,7 @@ struct SendTokenSearchView: View {
             NFTIconView(
               token: token,
               network: network,
-              url: allERC721Metadata[token.id + token.chainId]?.imageURL
+              url: allERC721Metadata[token.id]?.imageURL
             )
           } else {
             AssetIconView(

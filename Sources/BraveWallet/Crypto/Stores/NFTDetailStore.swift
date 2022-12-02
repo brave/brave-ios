@@ -32,6 +32,16 @@ struct ERC721Metadata: Codable {
     self.description = try container.decodeIfPresent(String.self, forKey: .description)
   }
   
+  init(
+    imageURLString: String?,
+    name: String?,
+    description: String?
+  ) {
+    self.imageURLString = imageURLString
+    self.name = name
+    self.description = description
+  }
+  
   var imageURL: URL? {
     guard let urlString = imageURLString else { return nil }
     return URL(string: urlString)

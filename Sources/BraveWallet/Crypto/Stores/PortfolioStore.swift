@@ -111,7 +111,7 @@ public class PortfolioStore: ObservableObject {
   private var pricesCache: [String: String] = [:]
   /// Cache of priceHistories. The key is the token's `assetRatioId`.
   private var priceHistoriesCache: [String: [BraveWallet.AssetTimePrice]] = [:]
-  /// Cache of metadata for erc721 token. The key is the token's `id` + token's `chainId`.
+  /// Cache of metadata for erc721 token. The key is the token's `id`.
   private var metadataCache: [String: ERC721Metadata] = [:]
 
   private let keyringService: BraveWalletKeyringService
@@ -175,7 +175,7 @@ public class PortfolioStore: ObservableObject {
                 token: token,
                 network: networkAssets.network,
                 balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0),
-                erc721Metadata: metadataCache[token.id + token.chainId]
+                erc721Metadata: metadataCache[token.id]
               )
             )
           } else {
@@ -264,7 +264,7 @@ public class PortfolioStore: ObservableObject {
                 token: token,
                 network: networkAssets.network,
                 balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0),
-                erc721Metadata: metadataCache[token.id + token.chainId]
+                erc721Metadata: metadataCache[token.id]
               )
             )
           } else {
