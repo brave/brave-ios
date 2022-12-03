@@ -150,7 +150,7 @@ struct NFTIconView: View {
   
   var body: some View {
     NFTImageView(urlString: url?.absoluteString ?? "") {
-      AssetIconView(token: token, network: network, shouldShowNativeTokenIcon: shouldShowNativeTokenIcon)
+      AssetIconView(token: token, network: network, shouldShowNativeTokenIcon: shouldShowNativeTokenIcon, length: length)
     }
     .cornerRadius(5)
     .frame(width: length, height: length)

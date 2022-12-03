@@ -83,12 +83,14 @@ struct SendTokenView: View {
                     url: sendTokenStore.selectedSendTokenERC721Metadata?.imageURL,
                     length: 26
                   )
+                  .background(Color(.secondaryBraveGroupedBackground)) // swiftui issue won't erase old view
                 } else {
                   AssetIconView(
                     token: token,
                     network: networkStore.selectedChain,
                     length: 26
                   )
+                  .background(Color(.secondaryBraveGroupedBackground)) // swiftui issue won't erase old view
                 }
               }
               Text(sendTokenStore.selectedSendToken?.symbol ?? "")
