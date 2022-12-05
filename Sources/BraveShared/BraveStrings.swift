@@ -130,6 +130,13 @@ extension Strings {
       bundle: .module,
       value: "Duplicate Active Tab",
       comment: "Action item title of long press for Opening the existing - active Tab url in a new Tab")
+  public static let viewRecentlyClosedTab =
+    NSLocalizedString(
+      "ViewRecentlyClosedTab",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "View Recently Closed Tab",
+      comment: "Action item title of long press for Opening recently closed tab view")
   public static let suppressAlertsActionTitle = NSLocalizedString("SuppressAlertsActionTitle", tableName: "BraveShared", bundle: .module, value: "Suppress Alerts", comment: "Title of alert that seeks permission from user to suppress future JS alerts")
   public static let suppressAlertsActionMessage = NSLocalizedString("SuppressAlertsActionMessage", tableName: "BraveShared", bundle: .module, value: "Prevent this page from creating additional alerts", comment: "Message body of alert that seeks permission from user to suppress future JS alerts")
   public static let openDownloadsFolderErrorDescription =
