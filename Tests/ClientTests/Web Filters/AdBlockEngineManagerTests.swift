@@ -107,4 +107,56 @@ class AdBlockEngineManagerTests: XCTestCase {
     
     waitForExpectations(timeout: 10)
   }
+  
+  func testPerformance() throws {
+    AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
+    // Given
+    // Ad block data and an engine manager
+    let sampleAdBlockDatURL = Bundle.module.url(forResource: "rs-ABPFilterParserData", withExtension: "dat")!
+    let sampleResourceURL = Bundle.module.url(forResource: "resources", withExtension: "json")!
+    let engineManager = AdBlockEngineManager(stats: AdBlockStats())
+    
+    // When
+    // Added number of resources to the engine manager
+    let numberOfEngines = 10
+    let setupExpectation = expectation(description: "Compiled engine resources")
+    
+    Task {
+      for _ in (0..<numberOfEngines) {
+        let uuid = UUID().uuidString
+        
+        await engineManager.add(
+          resource: .init(type: .dat, source: .filterList(uuid: uuid)),
+          fileURL: sampleAdBlockDatURL,
+          version: nil
+        )
+        
+        await engineManager.add(
+          resource: .init(type: .jsonResources, source: .filterList(uuid: uuid)),
+          fileURL: sampleResourceURL,
+          version: nil
+        )
+      }
+      
+      setupExpectation.fulfill()
+    }
+    
+    wait(for: [setupExpectation], timeout: 10)
+    
+    // Then
+    // Measure performance
+    let options = XCTMeasureOptions()
+    options.iterationCount = 10
+    
+    measure(metrics: [XCTClockMetric(), XCTCPUMetric(), XCTMemoryMetric()], options: options) {
+      let exp = expectation(description: "Finished")
+
+      Task {
+        await engineManager.compileResources(priority: .high)
+        exp.fulfill()
+      }
+      
+      wait(for: [exp], timeout: 20)
+    }
+  }
 }
