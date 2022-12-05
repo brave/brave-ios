@@ -44,7 +44,7 @@ struct SendTokenSearchView: View {
     }
     .onAppear {
       Task { @MainActor in
-        self.allERC721Metadata = await sendTokenStore.fetchERC721Metada(tokens: sendTokenStore.userAssets.filter { $0.isErc721 })
+        self.allERC721Metadata = await sendTokenStore.fetchERC721Metadata(tokens: sendTokenStore.userAssets.filter { $0.isErc721 })
       }
     }
     .navigationTitle(Strings.Wallet.searchTitle)

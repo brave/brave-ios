@@ -64,7 +64,7 @@ private struct EditTokenView: View {
     }
     .onAppear {
       Task { @MainActor in
-        self.erc721Metadata = await assetStore.fetchERC721Metada()
+        self.erc721Metadata = await assetStore.fetchERC721Metadata()
       }
     }
     .accessibilityAddTraits(assetStore.isVisible ? [.isSelected] : [])

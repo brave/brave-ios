@@ -50,7 +50,7 @@ public class AssetStore: ObservableObject, Equatable {
     lhs.token == rhs.token && lhs.isVisible == rhs.isVisible
   }
   
-  @MainActor func fetchERC721Metada() async -> ERC721Metadata? {
+  @MainActor func fetchERC721Metadata() async -> ERC721Metadata? {
     return await rpcService.fetchERC721Metadata(for: token)
   }
 }

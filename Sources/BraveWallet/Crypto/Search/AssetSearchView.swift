@@ -16,7 +16,7 @@ struct AssetSearchView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   @State private var allAssets: [AssetViewModel] = []
-  @State private var allERC721Metadta: [String: ERC721Metadata] = [:]
+  @State private var allERC721Metadata: [String: ERC721Metadata] = [:]
   @State private var query = ""
   @State private var networkFilter: NetworkFilter = .allNetworks
   @State private var isPresentingNetworkFilter = false
@@ -92,7 +92,7 @@ struct AssetSearchView: View {
                   destination: {
                     if assetViewModel.token.isErc721 {
                       NFTDetailView(
-                        nftDetailStore: cryptoStore.nftDetailStore(for: assetViewModel.token, erc721Metadata: allERC721Metadta[assetViewModel.token.id]),
+                        nftDetailStore: cryptoStore.nftDetailStore(for: assetViewModel.token, erc721Metadata: allERC721Metadata[assetViewModel.token.id]),
                         buySendSwapDestination: .constant(nil)
                       )
                       .onDisappear {
@@ -119,7 +119,7 @@ struct AssetSearchView: View {
                       NFTIconView(
                         token: assetViewModel.token,
                         network: assetViewModel.network,
-                        url: allERC721Metadta[assetViewModel.token.id]?.imageURL,
+                        url: allERC721Metadata[assetViewModel.token.id]?.imageURL,
                         shouldShowNativeTokenIcon: true
                       )
                     } else {
@@ -162,7 +162,7 @@ struct AssetSearchView: View {
     .onAppear {
       Task { @MainActor in
         self.allAssets = await userAssetsStore.allAssets()
-        self.allERC721Metadta = await userAssetsStore.allERC721Metadata()
+        self.allERC721Metadata = await userAssetsStore.allERC721Metadata()
       }
     }
   }

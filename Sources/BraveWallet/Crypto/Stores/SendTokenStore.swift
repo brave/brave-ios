@@ -419,7 +419,7 @@ public class SendTokenStore: ObservableObject {
     }
   }
   
-  @MainActor func fetchERC721Metada(tokens: [BraveWallet.BlockchainToken]) async -> [String: ERC721Metadata] {
+  @MainActor func fetchERC721Metadata(tokens: [BraveWallet.BlockchainToken]) async -> [String: ERC721Metadata] {
     return await rpcService.fetchERC721Metadata(tokens: tokens)
   }
 }
