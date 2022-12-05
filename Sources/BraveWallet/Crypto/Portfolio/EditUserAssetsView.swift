@@ -90,17 +90,6 @@ struct EditUserAssetsView: View {
       .font(.footnote.weight(.medium))
       .foregroundColor(Color(.braveBlurpleTint))
     }
-    .sheet(isPresented: $isPresentingNetworkFilter) {
-      NavigationView {
-        NetworkFilterView(
-          networkFilter: $userAssetsStore.networkFilter,
-          networkStore: networkStore
-        )
-      }
-      .onDisappear {
-        networkStore.closeNetworkSelectionStore()
-      }
-    }
   }
   
   private var addCustomAssetButton: some View {
@@ -108,17 +97,6 @@ struct EditUserAssetsView: View {
       isAddingCustomAsset = true
     }) {
       Image(systemName: "plus")
-    }
-    .sheet(isPresented: $isAddingCustomAsset) {
-      AddCustomAssetView(
-        networkStore: networkStore,
-        networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
-        keyringStore: keyringStore,
-        userAssetStore: userAssetsStore
-      )
-      .onDisappear {
-        networkStore.closeNetworkSelectionStore()
-      }
     }
   }
 
@@ -187,7 +165,11 @@ struct EditUserAssetsView: View {
       .animation(.default, value: tokenStores)
       .navigationTitle(Strings.Wallet.editVisibleAssetsButtonTitle)
       .navigationBarTitleDisplayMode(.inline)
+      .navigationViewStyle(StackNavigationViewStyle())
       .filterable(text: $query)
+      .onAppear {
+        userAssetsStore.update()
+      }
       .toolbar {
         ToolbarItemGroup(placement: .bottomBar) {
           networkFilterButton
@@ -203,36 +185,54 @@ struct EditUserAssetsView: View {
               .foregroundColor(Color(.braveBlurpleTint))
           }
         }
+      } // List
+    } // NavigationView
+    .background(Color.clear.sheet(
+      isPresented: Binding(
+        get: { tokenNeedsTokenId != nil },
+        set: { if !$0 { tokenNeedsTokenId = nil } }
+      )
+    ) {
+      AddCustomAssetView(
+        networkStore: networkStore,
+        networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
+        keyringStore: keyringStore,
+        userAssetStore: userAssetsStore,
+        tokenNeedsTokenId: tokenNeedsTokenId
+      )
+      .onDisappear {
+        networkStore.closeNetworkSelectionStore()
       }
-      .sheet(
-        isPresented: Binding(
-          get: { tokenNeedsTokenId != nil },
-          set: { if !$0 { tokenNeedsTokenId = nil } }
-        )
-      ) {
-        AddCustomAssetView(
-          networkStore: networkStore,
-          networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
-          keyringStore: keyringStore,
-          userAssetStore: userAssetsStore,
-          tokenNeedsTokenId: tokenNeedsTokenId
-        )
-        .onDisappear {
-          networkStore.closeNetworkSelectionStore()
-        }
-      }
-      .alert(isPresented: $isPresentingAssetRemovalError) {
-        Alert(
-          title: Text(Strings.Wallet.removeCustomTokenErrorTitle),
-          message: Text(Strings.Wallet.removeCustomTokenErrorMessage),
-          dismissButton: .default(Text(Strings.OKString))
+    })
+    .background(Color.clear.alert(isPresented: $isPresentingAssetRemovalError) {
+      Alert(
+        title: Text(Strings.Wallet.removeCustomTokenErrorTitle),
+        message: Text(Strings.Wallet.removeCustomTokenErrorMessage),
+        dismissButton: .default(Text(Strings.OKString))
+      )
+    })
+    .background(Color.clear.sheet(isPresented: $isPresentingNetworkFilter) {
+      NavigationView {
+        NetworkFilterView(
+          networkFilter: $userAssetsStore.networkFilter,
+          networkStore: networkStore
         )
       }
-    }
-    .navigationViewStyle(StackNavigationViewStyle())
-    .onAppear {
-      userAssetsStore.update()
-    }
+      .onDisappear {
+        networkStore.closeNetworkSelectionStore()
+      }
+    })
+    .background(Color.clear.sheet(isPresented: $isAddingCustomAsset) {
+      AddCustomAssetView(
+        networkStore: networkStore,
+        networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
+        keyringStore: keyringStore,
+        userAssetStore: userAssetsStore
+      )
+      .onDisappear {
+        networkStore.closeNetworkSelectionStore()
+      }
+    })
   }
 
   private func removeCustomToken(_ token: BraveWallet.BlockchainToken) {
