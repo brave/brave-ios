@@ -93,7 +93,7 @@ class SiteStateListenerScriptHandler: TabContentScript {
   }
   
   private func makeArgs(from models: [CosmeticFilterModel], frameURL: URL) async throws -> String {
-    return try await Task.detached(priority: .high) {
+    return try await Task(priority: .high) {
       let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
         return partialResult.union(model.hideSelectors)
       })
