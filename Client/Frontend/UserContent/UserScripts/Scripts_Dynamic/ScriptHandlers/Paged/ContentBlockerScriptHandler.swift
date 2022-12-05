@@ -82,10 +82,6 @@ extension ContentBlockerHelper: TabContentScript {
         guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return }
         guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return }
         guard let domainURLString = domain.url else { return }
-        
-        // Getting this domain and current tab urls before going into asynchronous closure
-        // to avoid threading problems(#1094, #1096)
-        assertIsMainThread("Getting enabled blocklists should happen on main thread")
         let loadedRuleTypes = Set(self.loadedRuleTypeWithSourceTypes.map({ $0.ruleType }))
         
         let blockedType = await TPStatsBlocklistChecker.shared.blockedTypes(
