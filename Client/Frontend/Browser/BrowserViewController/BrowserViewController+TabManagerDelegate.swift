@@ -271,15 +271,15 @@ extension BrowserViewController: TabManagerDelegate {
 
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       let recentlyClosedTab = UIAction(
-        title: "View Recently Closed Tabs",
-        image: UIImage(braveSystemNamed: "brave.recently.closed"),
+        title: Strings.viewRecentlyClosedTab,
+        image: UIImage(braveSystemNamed: "brave.arrow.counterclockwise.rectangle"),
         handler: UIAction.deferredActionHandler { [weak self] _ in
           if PrivateBrowsingManager.shared.isPrivateBrowsing {
             return
           }
           
           // TODO: Test Code change it with real view
-          let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+          let host = UIHostingController(rootView: RecentlyClosedTabsView())
           self?.present(host, animated: true)
         })
       
