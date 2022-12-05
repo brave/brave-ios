@@ -46,7 +46,6 @@ struct NFTImageView<Placeholder: View>: View {
           .resizable()
           .placeholder { placeholder() }
           .indicator(.activity)
-          .transition(.fade(duration: 0.5))
           .aspectRatio(contentMode: .fit)
       }
     }
