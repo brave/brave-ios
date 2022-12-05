@@ -525,7 +525,7 @@ class TabTrayController: LoadingViewController {
     }
     
     // TODO: Test Code change it with real view
-    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
+    let host = UIHostingController(rootView: RecentlyClosedTabsView())
     present(host, animated: true)
   }
 
