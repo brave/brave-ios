@@ -65,36 +65,9 @@ class SiteStateListenerScriptHandler: TabContentScript {
         Task { @MainActor in
           let domain = pageData.domain(persistent: !tab.isPrivate)
           let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
-          
-          let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
-            return partialResult.union(model.hideSelectors)
-          })
-          
-          var styleSelectors: [String: Set<String>] = [:]
-          
-          for model in models {
-            for (key, values) in model.styleSelectors {
-              styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
-            }
-          }
-          
-          let styleSelectorObjects = styleSelectors.map { selector, rules -> UserScriptType.SelectorsPollerSetup.StyleSelectorEntry in
-            UserScriptType.SelectorsPollerSetup.StyleSelectorEntry(
-              selector: selector, rules: rules
-            )
-          }
-          
-          let setup = UserScriptType.SelectorsPollerSetup(
-            frameURL: frameURL,
-            genericHide: models.contains { $0.genericHide },
-            hideSelectors: hideSelectors,
-            styleSelectors: Set(styleSelectorObjects)
-          )
-          
-          let encoder = JSONEncoder()
-          let data = try encoder.encode(setup)
-          let args = String(data: data, encoding: .utf8)!
+          let args = try await self.makeArgs(from: models, frameURL: frameURL)
           let source = try ScriptFactory.shared.makeScriptSource(of: .selectorsPoller).replacingOccurrences(of: "$<args>", with: args)
+          
           let secureSource = CosmeticFiltersScriptHandler.secureScript(
             handlerName: CosmeticFiltersScriptHandler.messageHandlerName,
             securityToken: CosmeticFiltersScriptHandler.scriptId,
@@ -117,5 +90,38 @@ class SiteStateListenerScriptHandler: TabContentScript {
       assertionFailure("Invalid type of message. Fix the `Site.js` script")
       Logger.module.error("\(error.localizedDescription)")
     }
+  }
+  
+  private func makeArgs(from models: [CosmeticFilterModel], frameURL: URL) async throws -> String {
+    return try await Task.detached(priority: .high) {
+      let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
+        return partialResult.union(model.hideSelectors)
+      })
+      
+      var styleSelectors: [String: Set<String>] = [:]
+      
+      for model in models {
+        for (key, values) in model.styleSelectors {
+          styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
+        }
+      }
+      
+      let styleSelectorObjects = styleSelectors.map { selector, rules -> UserScriptType.SelectorsPollerSetup.StyleSelectorEntry in
+        UserScriptType.SelectorsPollerSetup.StyleSelectorEntry(
+          selector: selector, rules: rules
+        )
+      }
+      
+      let setup = UserScriptType.SelectorsPollerSetup(
+        frameURL: frameURL,
+        genericHide: models.contains { $0.genericHide },
+        hideSelectors: hideSelectors,
+        styleSelectors: Set(styleSelectorObjects)
+      )
+      
+      let encoder = JSONEncoder()
+      let data = try encoder.encode(setup)
+      return String(data: data, encoding: .utf8)!
+    }.value
   }
 }
