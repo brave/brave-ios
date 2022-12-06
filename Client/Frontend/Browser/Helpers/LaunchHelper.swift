@@ -70,7 +70,13 @@ public actor LaunchHelper {
     
     // Await the task and wait for the results
     self.loadTask = task
-    await task.value
+    
+    await measuredTask(
+      label: "bxx LaunchHelper Total", callback: {
+        await task.value
+      }
+    )
+    
     self.loadTask = nil
   }
   
