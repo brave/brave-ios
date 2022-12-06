@@ -93,7 +93,7 @@ public actor AdBlockEngineManager: Sendable {
   /// The compile results
   var compileResults: [ResourceWithVersion: Result<Void, Error>]
   /// The current compile task. Ensures we don't try to compile while we're already compiling
-  var compileTask: Task<Void, Error>?
+  var compileTask: Task<Void, Never>?
   /// Cached engines
   var cachedEngines: [Source: AdblockEngine]
   
@@ -146,58 +146,38 @@ public actor AdBlockEngineManager: Sendable {
   public func startTimer() {
     guard endlessBuildTask == nil else { return }
     
-    self.endlessBuildTask = Task.detached(priority: .background) {
-      try await withTaskCancellationHandler(operation: {
+    self.endlessBuildTask = Task(priority: .background) {
+      do {
         while true {
           try await Task.sleep(seconds: Self.buildSleepTime)
-          guard await self.compileTask == nil else { continue }
-          guard await !self.isSynced else { continue }
-          await self.compileResources(priority: .background)
+          guard self.compileTask == nil else { continue }
+          guard !self.isSynced else { continue }
+          await self.compileResources()
         }
-      }, onCancel: {
-        Task { @MainActor in
-          await self.removeBuildTask()
-        }
-      })
+      } catch is CancellationError {
+        endlessBuildTask = nil
+      }
     }
   }
   
   /// Compile all resources
-  public func compileResources(priority: TaskPriority) async {
+  public func compileResources() async {
     compileTask?.cancel()
-    set(compileTask: nil)
+    compileTask = nil
     
     let resourcesWithVersion = self.enabledResources.sorted(by: {
       $0.order < $1.order
     })
     
-    let task = Task.detached(priority: priority) {
+    let task = Task {
       let results = await AdblockEngine.createEngines(from: resourcesWithVersion)
-      await self.set(compileResults: results.compileResults)
-      
-      try await MainActor.run {
-        try Task.checkCancellation()
-        self.stats.set(engines: results.engines)
-      }
-      
-      #if DEBUG
-      await self.debug(resources: resourcesWithVersion)
-      #endif
+      set(compileResults: results.compileResults)
+      await stats.set(engines: results.engines)
     }
     
-    set(compileTask: task)
-    
-    do {
-      try await task.value
-    } catch {
-      log.error("\(error.localizedDescription)")
-    }
-    
-    set(compileTask: nil)
-  }
-  
-  private func removeBuildTask() {
-    endlessBuildTask = nil
+    self.compileTask = task
+    await task.value
+    self.compileTask = nil
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
@@ -220,11 +200,6 @@ public actor AdBlockEngineManager: Sendable {
   /// Set the compile results so this manager can compute if its in sync or not
   private func add(engine: AdblockEngine, for source: Source) {
     self.cachedEngines[source] = engine
-  }
-  
-  /// Set the current compile task to avoid overlaping compilations
-  private func set(compileTask: Task<Void, Error>?) {
-    self.compileTask = compileTask
   }
 }
 

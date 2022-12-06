@@ -38,7 +38,7 @@ public class AdBlockStats {
     }).contains(where: { $0 })
   }
   
-  func set(engines: [CachedAdBlockEngine]) {
+  @MainActor func set(engines: [CachedAdBlockEngine]) {
     self.cachedEngines = engines
   }
   
