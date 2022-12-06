@@ -7,22 +7,24 @@ import SwiftUI
 import Shared
 import BraveShared
 import Data
+import CoreData
 import BraveUI
 
 struct RecentlyClosedTabsView: View {
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.sizeCategory) private var sizeCategory
   
-  @State private var websites: [PrivacyReportsWebsite] = []
+  @State private var websites: [RecentSearch] = []
+//  @State private var websites: [PrivacyReportsWebsite] = []
   @State private var websitesLoading = true
   
   @State private var showClearDataPrompt: Bool = false
+  
+  private let recentSearchesFRC = RecentSearch.frc()
 
   private var clearAllDataButton: some View {
-    Button(action: {
+    Button("Clear", action: {
       showClearDataPrompt = true
-    }, label: {
-      Image(uiImage: .init(braveSystemNamed: "brave.trash")!.template)
     })
     .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
     .foregroundColor(Color(.braveBlurpleTint))
@@ -45,19 +47,27 @@ struct RecentlyClosedTabsView: View {
   
   private var websitesList: some View {
     List {
+//      Section {
+//        ForEach(websites) { item in
+//          HStack {
+//            FaviconImage(url: item.faviconUrl)
+//            Text(item.domain)
+//            Spacer()
+//          }
+//        }
+//      }
       Section {
         ForEach(websites) { item in
           HStack {
-            FaviconImage(url: item.faviconUrl)
-            Text(item.domain)
+            FaviconImage(url: item.websiteUrl)
+            Text(item.text ?? "")
             Spacer()
-            Text("\(item.count)")
-              .font(.headline)
           }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
+    .environment(\.defaultMinListHeaderHeight, 0)
     .listStyle(.insetGrouped)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
   }
@@ -73,7 +83,8 @@ struct RecentlyClosedTabsView: View {
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
+        .background(Color(.braveGroupedBackground).ignoresSafeArea())
+        .navigationTitle("Recently Closed Tabs")
         .navigationBarTitleDisplayMode(.inline)
         .osAvailabilityModifiers { content in
           if #available(iOS 15.0, *) {
@@ -91,27 +102,27 @@ struct RecentlyClosedTabsView: View {
               .navigationBarItems(leading: clearAllDataButton, trailing: doneButton)
           }
         }
-        .background(Color(.braveGroupedBackground).ignoresSafeArea())
-        .onAppear {
-          BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
-            websites = riskyWebsites.map {
-              PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-            }
-
-            websitesLoading = false
-          }
-        }
     }
     .navigationViewStyle(.stack)
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
-      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
-        websites = riskyWebsites.map {
-          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-        }
-
-        websitesLoading = false
+      
+      do {
+        try recentSearchesFRC.performFetch()
+      } catch {
+        print("Recent Searches fetch error: \(error.localizedDescription))")
       }
+
+      websites = recentSearchesFRC.fetchedObjects ?? []
+
+      
+//      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
+//        websites = riskyWebsites.map {
+//          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
+//        }
+//
+//        websitesLoading = false
+//      }
     }
   }
   

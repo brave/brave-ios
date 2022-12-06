@@ -15,7 +15,7 @@ public enum RecentSearchType: Int32 {
 }
 
 @objc(RecentSearch)
-final public class RecentSearch: NSManagedObject, CRUD {
+final public class RecentSearch: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var searchType: Int32
   @NSManaged public var text: String?
   @NSManaged public var websiteUrl: String?
