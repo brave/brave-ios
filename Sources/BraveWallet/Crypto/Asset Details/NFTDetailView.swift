@@ -140,9 +140,3 @@ struct NFTDetailView: View {
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
   }
 }
-
-private extension String {
-  var isSVGImage: Bool {
-    hasPrefix("data:image/svg") || hasSuffix(".svg")
-  }
-}
