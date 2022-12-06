@@ -54,7 +54,7 @@ class CosmeticFiltersScriptHandler: TabContentScript {
       
       Task { @MainActor in
         let domain = Domain.getOrCreate(forUrl: frameURL, persistent: tab?.isPrivate == true ? false : true)
-        let cachedEngines = AdBlockStats.shared.cachedEngines(for: domain)
+        let cachedEngines = await AdBlockStats.shared.cachedEngines(for: domain)
         
         let selectorArrays = await cachedEngines.asyncConcurrentMap { cachedEngine -> [String] in
           do {

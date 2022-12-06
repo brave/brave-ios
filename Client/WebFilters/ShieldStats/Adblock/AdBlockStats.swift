@@ -10,7 +10,7 @@ import os.log
 
 /// This object holds on to our adblock engines and returns information needed for stats tracking as well as some conveniences
 /// for injected scripts needed during web navigation and cosmetic filters models needed by the `SelectorsPollerScript.js` script.
-public class AdBlockStats {
+public actor AdBlockStats {
   public static let shared = AdBlockStats()
 
   // Adblock engine for general adblock lists.
@@ -38,7 +38,7 @@ public class AdBlockStats {
     }).contains(where: { $0 })
   }
   
-  @MainActor func set(engines: [CachedAdBlockEngine]) {
+  func set(engines: [CachedAdBlockEngine]) {
     self.cachedEngines = engines
   }
   
@@ -62,9 +62,9 @@ public class AdBlockStats {
   }
   
   /// Returns all the models for this frame URL
-  @MainActor func cachedEngines(for domain: Domain) -> [CachedAdBlockEngine] {
-    return cachedEngines.filter({ cachedEngine in
-      return cachedEngine.isEnabled(for: domain)
+  func cachedEngines(for domain: Domain) async -> [CachedAdBlockEngine] {
+    return await cachedEngines.asyncCompactMap({ cachedEngine in
+      return await cachedEngine.isEnabled(for: domain) ? cachedEngine : nil
     })
   }
   
