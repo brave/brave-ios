@@ -78,12 +78,12 @@ class AdBlockEngineManagerTests: XCTestCase {
         )
       }
       
-      await engineManager.compileResources(priority: .userInitiated)
+      await engineManager.compileResources()
       
       Task { @MainActor in
         let url = URL(string:  "https://stackoverflow.com")!
         let domain = Domain.getOrCreate(forUrl: url, persistent: false)
-        let cachedEngines = stats.cachedEngines(for: domain)
+        let cachedEngines = await stats.cachedEngines(for: domain)
         XCTAssertEqual(cachedEngines.count, 3)
         
         let types = await stats.makeEngineScriptTypes(frameURL: url, isMainFrame: true, domain: domain)
@@ -152,7 +152,7 @@ class AdBlockEngineManagerTests: XCTestCase {
       let exp = expectation(description: "Finished")
 
       Task {
-        await engineManager.compileResources(priority: .high)
+        await engineManager.compileResources()
         exp.fulfill()
       }
       
