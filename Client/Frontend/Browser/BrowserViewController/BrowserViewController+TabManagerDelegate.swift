@@ -274,13 +274,15 @@ extension BrowserViewController: TabManagerDelegate {
         title: Strings.viewRecentlyClosedTab,
         image: UIImage(braveSystemNamed: "brave.arrow.counterclockwise.rectangle"),
         handler: UIAction.deferredActionHandler { [weak self] _ in
+          guard let self = self else { return }
+          
           if PrivateBrowsingManager.shared.isPrivateBrowsing {
             return
           }
           
           // TODO: Test Code change it with real view
           let host = UIHostingController(rootView: RecentlyClosedTabsView())
-          self?.present(host, animated: true)
+          self.present(host, animated: true)
         })
       
       recentlyClosedChildren.append(recentlyClosedTab)
