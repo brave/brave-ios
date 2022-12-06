@@ -93,35 +93,33 @@ class SiteStateListenerScriptHandler: TabContentScript {
   }
   
   private func makeArgs(from models: [CosmeticFilterModel], frameURL: URL) async throws -> String {
-    return try await Task(priority: .high) {
-      let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
-        return partialResult.union(model.hideSelectors)
-      })
-      
-      var styleSelectors: [String: Set<String>] = [:]
-      
-      for model in models {
-        for (key, values) in model.styleSelectors {
-          styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
-        }
+    let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
+      return partialResult.union(model.hideSelectors)
+    })
+    
+    var styleSelectors: [String: Set<String>] = [:]
+    
+    for model in models {
+      for (key, values) in model.styleSelectors {
+        styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
       }
-      
-      let styleSelectorObjects = styleSelectors.map { selector, rules -> UserScriptType.SelectorsPollerSetup.StyleSelectorEntry in
-        UserScriptType.SelectorsPollerSetup.StyleSelectorEntry(
-          selector: selector, rules: rules
-        )
-      }
-      
-      let setup = UserScriptType.SelectorsPollerSetup(
-        frameURL: frameURL,
-        genericHide: models.contains { $0.genericHide },
-        hideSelectors: hideSelectors,
-        styleSelectors: Set(styleSelectorObjects)
+    }
+    
+    let styleSelectorObjects = styleSelectors.map { selector, rules -> UserScriptType.SelectorsPollerSetup.StyleSelectorEntry in
+      UserScriptType.SelectorsPollerSetup.StyleSelectorEntry(
+        selector: selector, rules: rules
       )
-      
-      let encoder = JSONEncoder()
-      let data = try encoder.encode(setup)
-      return String(data: data, encoding: .utf8)!
-    }.value
+    }
+    
+    let setup = UserScriptType.SelectorsPollerSetup(
+      frameURL: frameURL,
+      genericHide: models.contains { $0.genericHide },
+      hideSelectors: hideSelectors,
+      styleSelectors: Set(styleSelectorObjects)
+    )
+    
+    let encoder = JSONEncoder()
+    let data = try encoder.encode(setup)
+    return String(data: data, encoding: .utf8)!
   }
 }
