@@ -301,7 +301,7 @@ extension BrowserViewController: WKNavigationDelegate {
       // Check if custom user scripts must be added to or removed from the web view.
       if let targetFrame = navigationAction.targetFrame {
         tab?.currentPageData?.addSubframeURL(forRequestURL: url, isForMainFrame: targetFrame.isMainFrame)
-        let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame) ?? []
+        let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame) ?? []
         tab?.setCustomUserScript(scripts: scriptTypes)
       }
     }
@@ -439,7 +439,7 @@ extension BrowserViewController: WKNavigationDelegate {
     if let responseURL = responseURL,
        let domain = tab?.currentPageData?.domain(persistent: !isPrivateBrowsing),
        tab?.currentPageData?.upgradeFrameURL(forResponseURL: responseURL, isForMainFrame: navigationResponse.isForMainFrame) == true {
-      let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domain) ?? []
+      let scriptTypes = tab?.currentPageData?.makeUserScriptTypes(domain: domain) ?? []
       tab?.setCustomUserScript(scripts: scriptTypes)
     }
 

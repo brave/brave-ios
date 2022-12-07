@@ -40,52 +40,31 @@ public class CachedAdBlockEngine {
   
   /// Returns all the models for this frame URL
   /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
-  func cosmeticFilterModel(forFrameURL frameURL: URL) async throws -> CosmeticFilterModel? {
-    return try await withUnsafeThrowingContinuation { continuation in
-      serialQueue.async {
-        if let model = self.cachedCosmeticFilterModels.getElement(frameURL) {
-          continuation.resume(returning: model)
-          return
-        }
-        
-        do {
-          let model = try self.engine.cosmeticFilterModel(forFrameURL: frameURL)
-          self.cachedCosmeticFilterModels.addElement(model, forKey: frameURL)
-          continuation.resume(returning: model)
-        } catch {
-          continuation.resume(throwing: error)
-        }
-      }
+  @MainActor func cosmeticFilterModel(forFrameURL frameURL: URL) throws -> CosmeticFilterModel? {
+    if let model = self.cachedCosmeticFilterModels.getElement(frameURL) {
+      return model
     }
+  
+    let model = try self.engine.cosmeticFilterModel(forFrameURL: frameURL)
+    self.cachedCosmeticFilterModels.addElement(model, forKey: frameURL)
+    return model
   }
   
   /// Return the selectors that need to be hidden given the frameURL, ids and classes
-  func selectorsForCosmeticRules(frameURL: URL, ids: [String], classes: [String]) async throws -> [String] {
-    let model = try await cosmeticFilterModel(forFrameURL: frameURL)
+  @MainActor func selectorsForCosmeticRules(frameURL: URL, ids: [String], classes: [String]) throws -> [String] {
+    let model = try cosmeticFilterModel(forFrameURL: frameURL)
+    let selectorsJSON = self.engine.stylesheetForCosmeticRulesIncluding(
+      classes: classes,
+      ids: ids,
+      exceptions: model?.exceptions ?? []
+    )
     
-    return try await withUnsafeThrowingContinuation { continuation in
-      serialQueue.async {
-        let selectorsJSON = self.engine.stylesheetForCosmeticRulesIncluding(
-          classes: classes,
-          ids: ids,
-          exceptions: model?.exceptions ?? []
-        )
-        
-        guard let data = selectorsJSON.data(using: .utf8) else {
-          continuation.resume(returning: [])
-          return
-        }
-        
-        let decoder = JSONDecoder()
-        
-        do {
-          let selectors = try decoder.decode([String].self, from: data)
-          continuation.resume(returning: selectors)
-        } catch {
-          continuation.resume(throwing: error)
-        }
-      }
+    guard let data = selectorsJSON.data(using: .utf8) else {
+      return []
     }
+    
+    let decoder = JSONDecoder()
+    return try decoder.decode([String].self, from: data)
   }
   
   /// Checks the general and regional engines to see if the request should be blocked
@@ -107,7 +86,7 @@ public class CachedAdBlockEngine {
   }
   
   /// This returns all the user script types for the given frame
-  func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, index: Int) async throws -> Set<UserScriptType> {
+  @MainActor func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, index: Int) throws -> Set<UserScriptType> {
     if let userScriptTypes = cachedFrameScriptTypes.getElement(frameURL) {
       return userScriptTypes
     }
@@ -115,7 +94,7 @@ public class CachedAdBlockEngine {
     // Add the selectors poller scripts for this frame
     var userScriptTypes: Set<UserScriptType> = []
     
-    if let source = try await cosmeticFilterModel(forFrameURL: frameURL)?.injectedScript, !source.isEmpty {
+    if let source = try cosmeticFilterModel(forFrameURL: frameURL)?.injectedScript, !source.isEmpty {
       let configuration = UserScriptType.EngineScriptConfiguration(
         frameURL: frameURL, isMainFrame: isMainFrame, source: source, order: index,
         isDeAMPEnabled: Preferences.Shields.autoRedirectAMPPages.value
