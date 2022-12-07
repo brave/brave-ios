@@ -261,7 +261,7 @@ final public class ContentBlockerManager: Sendable {
             let ruleList = try await self.compile(resource: resource, forIdentifier: identifier)
             self.cachedCompileResults[identifier] = (resource.sourceType, .success(ruleList))
           } catch {
-            Self.log.error("\(error.localizedDescription)")
+            Self.log.error("Failed to compile rule list `\(identifier)`: \(error)")
             self.cachedCompileResults[identifier] = (resource.sourceType, .failure(error))
           }
           await self.data.movePendingResource(forIdentifier: identifier)
