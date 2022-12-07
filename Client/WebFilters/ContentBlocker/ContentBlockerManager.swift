@@ -148,7 +148,6 @@ final public class ContentBlockerManager: Sendable {
     self.data = SyncData()
   }
   
-  
   public func cleanupDeadRuleLists() async {
     guard let identifiers = await ruleStore.availableIdentifiers() else { return }
     let enabledResources = await data.enabledResources

@@ -92,10 +92,6 @@ public actor AdBlockEngineManager: Sendable {
   var enabledResources: Set<ResourceWithVersion>
   /// The compile results
   var compileResults: [ResourceWithVersion: Result<Void, Error>]
-  /// The current compile task. Ensures we don't try to compile while we're already compiling
-  var compileTask: Task<Void, Never>?
-  /// Cached engines
-  var cachedEngines: [Source: AdblockEngine]
   
   /// The amount of time to wait before checking if new entries came in
   private static let buildSleepTime: TimeInterval = {
@@ -118,7 +114,6 @@ public actor AdBlockEngineManager: Sendable {
     self.stats = stats
     self.enabledResources = []
     self.compileResults = [:]
-    self.cachedEngines = [:]
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
@@ -150,7 +145,6 @@ public actor AdBlockEngineManager: Sendable {
       do {
         while true {
           try await Task.sleep(seconds: Self.buildSleepTime)
-          guard self.compileTask == nil else { continue }
           guard !self.isSynced else { continue }
           await self.compileResources()
         }
@@ -162,22 +156,16 @@ public actor AdBlockEngineManager: Sendable {
   
   /// Compile all resources
   public func compileResources() async {
-    compileTask?.cancel()
-    compileTask = nil
-    
     let resourcesWithVersion = self.enabledResources.sorted(by: {
       $0.order < $1.order
     })
     
-    let task = Task {
-      let results = await AdblockEngine.createEngines(from: resourcesWithVersion)
-      set(compileResults: results.compileResults)
-      await stats.set(engines: results.engines)
-    }
-    
-    self.compileTask = task
-    await task.value
-    self.compileTask = nil
+    let results = await AdblockEngine.createEngines(from: resourcesWithVersion)
+    self.compileResults = results.compileResults
+    await stats.set(engines: results.engines)
+    #if DEBUG
+    debug(compiledResults: results.compileResults)
+    #endif
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
@@ -191,62 +179,25 @@ public actor AdBlockEngineManager: Sendable {
     
     enabledResources.insert(resource)
   }
-  
-  /// Set the compile results so this manager can compute if its in sync or not
-  private func set(compileResults: [ResourceWithVersion: Result<Void, Error>]) {
-    self.compileResults = compileResults
-  }
-  
-  /// Set the compile results so this manager can compute if its in sync or not
-  private func add(engine: AdblockEngine, for source: Source) {
-    self.cachedEngines[source] = engine
-  }
 }
 
 #if DEBUG
 extension AdBlockEngineManager {
   /// A method that logs info on the given resources
-  fileprivate func debug(resources: [ResourceWithVersion]) {
-    let resourcesString = resources.sorted(by: { $0.order < $1.order })
-      .map { resourceWithVersion -> String in
-        let resource = resourceWithVersion.resource
-        let type: String
-        let sourceString: String
+  fileprivate func debug(compiledResults: [ResourceWithVersion: Result<Void, Error>]) {
+    let resourcesString = compiledResults.sorted(by: { $0.key.order < $1.key.order })
+      .map { (resourceWithVersion, compileResult) -> String in
         let resultString: String
         
-        switch resource.type {
-        case .dat:
-          type = "dat"
-        case .jsonResources:
-          type = "jsonResources"
-        case .ruleList:
-          type = "ruleList"
-        }
-        
-        switch resource.source {
-        case .filterList(let uuid):
-          sourceString = "filterList(\(uuid))"
-        case .adBlock:
-          sourceString = "adBlock"
-        case .cosmeticFilters:
-          sourceString = "cosmeticFilters"
-        }
-        
-        switch compileResults[resourceWithVersion] {
-        case .failure(let error):
-          resultString = error.localizedDescription
+        switch compileResult {
         case .success:
           resultString = "success"
-        case .none:
-          resultString = "not compiled"
+        case .failure(let error):
+          resultString = error.localizedDescription
         }
         
         let sourceDebugString = [
-          "order: \(resourceWithVersion.order)",
-          "fileName: \(resourceWithVersion.fileURL.lastPathComponent)",
-          "source: \(sourceString)",
-          "version: \(resourceWithVersion.version ?? "nil")",
-          "type: \(type)",
+          resourceWithVersion.debugDescription,
           "result: \(resultString)",
         ].joined(separator: ", ")
         
@@ -254,6 +205,38 @@ extension AdBlockEngineManager {
       }.joined(separator: ", ")
 
     log.debug("Loaded \(self.enabledResources.count, privacy: .public) (total) engine resources: \(resourcesString, privacy: .public)")
+  }
+}
+
+extension AdBlockEngineManager.ResourceWithVersion: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    return [
+      "order: \(order)",
+      "fileName: \(fileURL.lastPathComponent)",
+      "source: \(resource.source.debugDescription)",
+      "version: \(version ?? "nil")",
+      "type: \(resource.type.debugDescription)"
+    ].joined(separator: ", ")
+  }
+}
+
+extension AdBlockEngineManager.Source: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    switch self {
+    case .filterList(let uuid): return "filterList(\(uuid))"
+    case .adBlock: return "adBlock"
+    case .cosmeticFilters: return "cosmeticFilters"
+    }
+  }
+}
+
+extension AdBlockEngineManager.ResourceType: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    switch self {
+    case .dat: return "dat"
+    case .jsonResources: return "jsonResources"
+    case .ruleList: return "ruleList"
+    }
   }
 }
 #endif
