@@ -40,6 +40,34 @@ public class CachedAdBlockEngine {
   
   /// Returns all the models for this frame URL
   /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
+  func cosmeticFilterModelSync(forFrameURL frameURL: URL) throws -> CosmeticFilterModel? {
+    var result: CosmeticFilterModel?
+    var resultError: Error?
+    
+    serialQueue.sync {
+      if let model = self.cachedCosmeticFilterModels.getElement(frameURL) {
+        result = model
+        return
+      }
+      
+      do {
+        let model = try self.engine.cosmeticFilterModel(forFrameURL: frameURL)
+        self.cachedCosmeticFilterModels.addElement(model, forKey: frameURL)
+        result = model
+      } catch {
+        resultError = error
+      }
+    }
+    
+    if let error = resultError {
+      throw error
+    } else {
+      return result
+    }
+  }
+  
+  /// Returns all the models for this frame URL
+  /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
   func cosmeticFilterModel(forFrameURL frameURL: URL) async throws -> CosmeticFilterModel? {
     return try await withUnsafeThrowingContinuation { continuation in
       serialQueue.async {
@@ -107,7 +135,7 @@ public class CachedAdBlockEngine {
   }
   
   /// This returns all the user script types for the given frame
-  func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, index: Int) async throws -> Set<UserScriptType> {
+  func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, index: Int) throws -> Set<UserScriptType> {
     if let userScriptTypes = cachedFrameScriptTypes.getElement(frameURL) {
       return userScriptTypes
     }
@@ -115,7 +143,7 @@ public class CachedAdBlockEngine {
     // Add the selectors poller scripts for this frame
     var userScriptTypes: Set<UserScriptType> = []
     
-    if let source = try await cosmeticFilterModel(forFrameURL: frameURL)?.injectedScript, !source.isEmpty {
+    if let source = try cosmeticFilterModelSync(forFrameURL: frameURL)?.injectedScript, !source.isEmpty {
       let configuration = UserScriptType.EngineScriptConfiguration(
         frameURL: frameURL, isMainFrame: isMainFrame, source: source, order: index,
         isDeAMPEnabled: Preferences.Shields.autoRedirectAMPPages.value
