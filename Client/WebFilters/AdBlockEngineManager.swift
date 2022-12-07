@@ -91,7 +91,7 @@ public actor AdBlockEngineManager: Sendable {
   /// The current set resources which will be compiled and loaded
   var enabledResources: Set<ResourceWithVersion>
   /// The compile results
-  var compileResults: [ResourceWithVersion: Result<Void, Error>]
+  var compiledResources: Set<ResourceWithVersion>
   
   /// The amount of time to wait before checking if new entries came in
   private static let buildSleepTime: TimeInterval = {
@@ -105,15 +105,13 @@ public actor AdBlockEngineManager: Sendable {
   /// Tells us if all the enabled resources are synced
   /// (i.e. we didn't compile too little or too many resources and don't need to recompile them)
   private var isSynced: Bool {
-    return enabledResources.allSatisfy({ compileResults[$0] != nil }) && compileResults.allSatisfy({ key, _ in
-      enabledResources.contains(key)
-    })
+    return enabledResources == compiledResources
   }
   
   init(stats: AdBlockStats = AdBlockStats.shared) {
     self.stats = stats
     self.enabledResources = []
-    self.compileResults = [:]
+    self.compiledResources = []
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
@@ -161,7 +159,7 @@ public actor AdBlockEngineManager: Sendable {
     })
     
     let results = await AdblockEngine.createEngines(from: resourcesWithVersion)
-    self.compileResults = results.compileResults
+    self.compiledResources = Set(resourcesWithVersion)
     await stats.set(engines: results.engines)
     #if DEBUG
     debug(compiledResults: results.compileResults)
@@ -170,13 +168,13 @@ public actor AdBlockEngineManager: Sendable {
   
   /// Tells this manager to add this resource next time it compiles this engine
   private func add(resource: ResourceWithVersion) {
-    self.enabledResources = enabledResources.filter({ resourceWithVersion in
-      guard resourceWithVersion.resource == resource.resource else { return true }
-      // Remove these compile results so we have to compile again
-      compileResults.removeValue(forKey: resourceWithVersion)
-      return false
-    })
+    // Remove existing resources that have a new version order, file url, etc
+    if let existingResoure = enabledResources.first(where: { $0.resource == resource.resource }), existingResoure != resource {
+      enabledResources.remove(existingResoure)
+      compiledResources.remove(existingResoure)
+    }
     
+    // Add the new entry back in
     enabledResources.insert(resource)
   }
 }

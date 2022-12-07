@@ -103,7 +103,7 @@ extension AdblockEngine {
     switch resource.resource.type {
     case .dat:
       guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-        return
+        throw CompileError.fileNotFound
       }
       
       if !deserialize(data: data) {
