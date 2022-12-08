@@ -132,10 +132,7 @@ struct NFTDetailView: View {
       .padding()
     }
     .onAppear {
-      nftDetailStore.fetchNetworkInfo()
-      if nftDetailStore.erc721Metadata == nil {
-        nftDetailStore.fetchMetadata()
-      }
+      nftDetailStore.update()
     }
     .background(Color(UIColor.braveGroupedBackground).ignoresSafeArea())
     .navigationBarTitle(Strings.Wallet.nftDetailTitle)
