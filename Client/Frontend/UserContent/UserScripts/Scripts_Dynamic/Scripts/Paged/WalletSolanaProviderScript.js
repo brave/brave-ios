@@ -75,7 +75,6 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
       })
       const signaturesMapped = signatures.map(convertSignaturePubkeyTuple);
       const object = $Object.create(null, undefined);
-      object.transaction = transaction;
       object.serializedMessage = serializedMessage;
       object.signatures = signaturesMapped;
       return $.extensiveFreeze(object, freezeExceptions);
