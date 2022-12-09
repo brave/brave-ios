@@ -18,7 +18,7 @@ public class CachedAdBlockEngine {
   /// We cache the user scripts so that they load faster on refreshes and back and forth
   private var cachedFrameScriptTypes = FifoDict<URL, Set<UserScriptType>>()
   
-  private let engine: AdblockEngine
+  private var engine: AdblockEngine?
   private let source: AdBlockEngineManager.Source
   private let serialQueue: DispatchQueue
   
@@ -26,6 +26,10 @@ public class CachedAdBlockEngine {
     self.engine = engine
     self.source = source
     self.serialQueue = serialQueue
+  }
+  
+  deinit {
+    engine = nil
   }
   
   /// Checks the general and regional engines to see if the request should be blocked.
@@ -45,7 +49,7 @@ public class CachedAdBlockEngine {
       return model
     }
   
-    let model = try self.engine.cosmeticFilterModel(forFrameURL: frameURL)
+    let model = try self.engine?.cosmeticFilterModel(forFrameURL: frameURL)
     self.cachedCosmeticFilterModels.addElement(model, forKey: frameURL)
     return model
   }
@@ -53,13 +57,13 @@ public class CachedAdBlockEngine {
   /// Return the selectors that need to be hidden given the frameURL, ids and classes
   @MainActor func selectorsForCosmeticRules(frameURL: URL, ids: [String], classes: [String]) throws -> [String] {
     let model = try cosmeticFilterModel(forFrameURL: frameURL)
-    let selectorsJSON = self.engine.stylesheetForCosmeticRulesIncluding(
+    let selectorsJSON = self.engine?.stylesheetForCosmeticRulesIncluding(
       classes: classes,
       ids: ids,
       exceptions: model?.exceptions ?? []
     )
     
-    guard let data = selectorsJSON.data(using: .utf8) else {
+    guard let data = selectorsJSON?.data(using: .utf8) else {
       return []
     }
     
@@ -75,14 +79,14 @@ public class CachedAdBlockEngine {
         return cachedResult
     }
     
-    let shouldBlock = engine.shouldBlock(
+    let shouldBlock = engine?.shouldBlock(
       requestURL: requestURL,
       sourceURL: sourceURL,
       resourceType: resourceType
     )
     
     cachedShouldBlockResult.addElement(shouldBlock, forKey: key)
-    return shouldBlock
+    return shouldBlock ?? false
   }
   
   /// This returns all the user script types for the given frame
