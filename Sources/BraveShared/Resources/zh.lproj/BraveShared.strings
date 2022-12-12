@@ -1304,7 +1304,7 @@
 "opentabs.noSyncSessionPlaceHolderViewTitle" = "此空间显示在其他设备中打开的 Brave 选项卡";
 
 /* The title for the action to hide open session with all tabs */
-"opentabs.openSessionHideAllActionTitle" = "暫時隱藏";
+"opentabs.openSessionHideAllActionTitle" = "暂时隐藏";
 
 /* The title for the action to open all the tabs in a synced open session */
 "opentabs.openSessionOpenAllActionTitle" = "全部开启";
@@ -3215,10 +3215,10 @@
 "today.channelsButtonSubtitle" = "关注您感兴趣的主题";
 
 /* A button title that when tapped shows users a list of channels/topics that they can follow */
-"today.channelsButtonTitle" = "頻道";
+"today.channelsButtonTitle" = "频道";
 
 /* A header title shown over a list of channels (i.e. Cars, Business, Fashion, etc.) */
-"today.channelsHeaderTitle" = "頻道";
+"today.channelsHeaderTitle" = "频道";
 
 /* A title at the top of the screen that shows a list of topics the user can follow */
 "today.channelsTitle" = "頻道";
@@ -3257,10 +3257,10 @@
 "today.followingButtonSubtitle" = "管理您的摘要来源";
 
 /* A button title that when tapped shows users a list of sources & channels they are currently following */
-"today.followingButtonTitle" = "關注中";
+"today.followingButtonTitle" = "关注中";
 
 /* A title at the top of the screen that shows a list of the news content the user is following */
-"today.followingTitle" = "關注中";
+"today.followingTitle" = "关注中";
 
 /* A toggle title shown next to a source or channel that the user can follow. When tapped switches to 'Unfollow' */
 "today.followToggleTitle" = "跟隨";
@@ -3278,7 +3278,7 @@
 "today.introCardBody" = "通过单一摘要关注您喜爱的来源。只要在 Brave 中开启分页、向下滑动，一切搞定！\nBrave 新闻支援匿名投放私人广告。";
 
 /* Shown above a button that turns on the \"Brave News\" product in the app. */
-"today.introCardTitle" = "開啟 Brave 新聞，絕不錯過每一條消息";
+"today.introCardTitle" = "开启 Brave 新闻，绝不错过每一条消息";
 
 /* No comment provided by engineer. */
 "today.isEnabledToggleLabel" = "显示 Show Brave News";
