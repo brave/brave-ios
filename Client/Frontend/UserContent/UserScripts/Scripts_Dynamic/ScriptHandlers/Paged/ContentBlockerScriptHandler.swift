@@ -109,7 +109,7 @@ extension ContentBlockerHelper: TabContentScript {
         // so we check the source etld+1 agains the tab url etld+1
         // For subframes which may use different etld+1 than the main frame (example `reddit.com` and `redditmedia.com`)
         // We simply check the known subframeURLs on this page.
-        guard self.tab?.url?.baseDomain == sourceURL.baseDomain,
+        guard self.tab?.url?.baseDomain == sourceURL.baseDomain ||
               self.tab?.currentPageData?.allSubframeURLs.contains(sourceURL) == true else {
           return
         }
