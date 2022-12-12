@@ -29,38 +29,14 @@ public actor LaunchHelper {
     let task = Task {
       // Load cached data
       // This is done first because compileResources and loadCachedRuleLists need their results
-      async let loadBundledResources: Void = measuredTask(
-        label: "bxx ContentBlockerManager.shared.loadBundledResources()", callback: {
-          await ContentBlockerManager.shared.loadBundledResources()
-        }
-      )
-        
-      async let filterListCache: Void =  measuredTask(
-        label: "bxx FilterListResourceDownloader.shared.loadCachedData", callback: {
-          await FilterListResourceDownloader.shared.loadCachedData()
-        }
-      )
-      
-      async let adblockResourceCache: Void =  measuredTask(
-        label: "bxx AdblockResourceDownloader.shared.loadCachedData()", callback: {
-          await AdblockResourceDownloader.shared.loadCachedData()
-        }
-      )
-      
+      async let loadBundledResources: Void = await ContentBlockerManager.shared.loadBundledResources()
+      async let filterListCache: Void = await FilterListResourceDownloader.shared.loadCachedData()
+      async let adblockResourceCache: Void = await AdblockResourceDownloader.shared.loadCachedData()
       _ = await (loadBundledResources, filterListCache, adblockResourceCache)
-
-      // Compile some engines and load cached rule lists
-      async let compiledResourcesCompile: Void = measuredTask(
-        label: "bxx AdBlockEngineManager.shared.compileResources()", callback: {
-          await AdBlockEngineManager.shared.compileResources()
-        }
-      )
       
-      async let cachedRuleListLoad: Void = measuredTask(
-        label: "bxx ContentBlockerManager.shared.loadCachedRuleLists()", callback: {
-          await ContentBlockerManager.shared.loadCachedRuleLists()
-        }
-      )
+      // Compile some engines and load cached rule lists
+      async let compiledResourcesCompile: Void = await AdBlockEngineManager.shared.compileResources()
+      async let cachedRuleListLoad: Void = await ContentBlockerManager.shared.loadCachedRuleLists()
       _ = await (compiledResourcesCompile, cachedRuleListLoad)
       
       // This one is non-blocking
@@ -70,13 +46,7 @@ public actor LaunchHelper {
     
     // Await the task and wait for the results
     self.loadTask = task
-    
-    await measuredTask(
-      label: "bxx LaunchHelper Total", callback: {
-        await task.value
-      }
-    )
-    
+    await task.value
     self.loadTask = nil
   }
   
@@ -93,17 +63,5 @@ public actor LaunchHelper {
       ContentBlockerManager.shared.startTimer()
       await AdBlockEngineManager.shared.startTimer()
     }
-  }
-  
-  private func measuredTask(label: String, callback: () async -> Void) async {
-    #if DEBUG
-    let startTime = CFAbsoluteTimeGetCurrent()
-    #endif
-    
-    await callback()
-    
-    #if DEBUG
-    print([label, "\(CFAbsoluteTimeGetCurrent() - startTime)"].joined(separator: ": "))
-    #endif
   }
 }
