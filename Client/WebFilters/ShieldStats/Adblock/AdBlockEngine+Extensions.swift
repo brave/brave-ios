@@ -16,7 +16,7 @@ extension AdblockEngine {
   static func createEngines(
     from resources: [AdBlockEngineManager.ResourceWithVersion]
   ) async -> (engines: [CachedAdBlockEngine], compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
-    let groupedResources = group(resources: resources)
+    let groupedResources = Dictionary(grouping: resources, by: \.resource.source)
     
     let enginesWithCompileResults = await groupedResources.asyncConcurrentMap { source, resources -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) in
       let results = await CachedAdBlockEngine.createEngine(from: resources, source: source)
@@ -66,20 +66,6 @@ extension AdblockEngine {
     
     let combinedRules = allResults.joined(separator: "\n")
     return combinedRules
-  }
-  
-  static func group(
-    resources: [AdBlockEngineManager.ResourceWithVersion]
-  ) -> [AdBlockEngineManager.Source: [AdBlockEngineManager.ResourceWithVersion]] {
-    var groups: [AdBlockEngineManager.Source: [AdBlockEngineManager.ResourceWithVersion]] = [:]
-    
-    for resourceWithVersion in resources {
-      var group = groups[resourceWithVersion.resource.source] ?? []
-      group.append(resourceWithVersion)
-      groups[resourceWithVersion.resource.source] = group
-    }
-    
-    return groups
   }
   
   /// Compile all the resources on a detached task
