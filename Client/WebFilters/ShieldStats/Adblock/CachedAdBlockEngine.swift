@@ -18,7 +18,7 @@ public class CachedAdBlockEngine {
   /// We cache the user scripts so that they load faster on refreshes and back and forth
   private var cachedFrameScriptTypes = FifoDict<URL, Set<UserScriptType>>()
   
-  private var engine: AdblockEngine
+  private let engine: AdblockEngine
   private let source: AdBlockEngineManager.Source
   private let serialQueue: DispatchQueue
   
