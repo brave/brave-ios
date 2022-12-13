@@ -296,6 +296,24 @@ extension Strings {
         tableName: "BraveShared", bundle: .module,
         value: "Learn more about our Privacy Preserving Product Analytics (P3A).",
         comment: "Title for the link that navigates to a webpage showing information about p3a (Privacy Preserving Analytics)")
+    public static let bottomBarCalloutTitle =
+      NSLocalizedString(
+        "callout.bottomBarCalloutTitle",
+        tableName: "BraveShared", bundle: .module,
+        value: "Introducing Toolbar",
+        comment: "Title for Bottom Bar Callout View")
+    public static let bottomBarCalloutDescription =
+      NSLocalizedString(
+        "callout.bottomBarCalloutDescription",
+        tableName: "BraveShared", bundle: .module,
+        value: "Make playlists of your favorite audio and videos and play anytime, anywhere.",
+        comment: "Description for Bottom Bar Callout View")
+    public static let bottomBarCalloutButtonTitle =
+      NSLocalizedString(
+        "callout.bottomBarCalloutButtonTitle",
+        tableName: "BraveShared", bundle: .module,
+        value: "Switch to Toolbar",
+        comment: "Button title for Bottom Bar Callout View")
   }
 }
 
