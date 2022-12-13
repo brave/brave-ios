@@ -54,7 +54,8 @@ extension AdblockEngine {
     guard let string = String(data: json, encoding: .utf8) else {
       return false
     }
-    addResources(string)
+    // TODO: Resolve for v1.48 BraveCore bump
+//    addResources(string)
     return true
   }
 }
