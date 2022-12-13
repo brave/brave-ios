@@ -150,6 +150,7 @@ extension BrowserViewController {
 
   func authorizeUpholdWallet(from tab: Tab, queryItems items: [String: String]) {
     guard let ledger = rewards.ledger else { return }
+    /*
     ledger.authorizeExternalWallet(
       ofType: .uphold,
       queryItems: items
@@ -183,6 +184,7 @@ extension BrowserViewController {
         popup.showWithType(showType: .flyUp)
       }
     }
+     */
   }
 
   @objc func resetNTPNotification() {

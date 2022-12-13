@@ -43,6 +43,7 @@ class WalletTransferViewController: UIViewController {
     transferView.cameraView.scanCallback = { [weak self] paymentId in
       guard let self = self, !paymentId.isEmpty, !self.isTransferring else { return }
       self.isTransferring = true
+      /*
       self.legacyWallet.linkBraveWallet(paymentId: paymentId) { [weak self] result, drainID in
         guard let self = self else { return }
         if result != .ledgerOk {
@@ -62,6 +63,7 @@ class WalletTransferViewController: UIViewController {
           self.navigationController?.pushViewController(completedVC, animated: true)
         }
       }
+       */
     }
     transferView.learnMoreButton.addTarget(self, action: #selector(tappedLearnMoreButton), for: .touchUpInside)
   }
