@@ -5,17 +5,16 @@
 
 "use strict";
 
-window.__firefox__.execute("FarblingProtection", function($) {
+//window.__firefox__.execute("FarblingProtection", function($) {
   (function() {
     const args = $<farbling_protection_args>;
     const braveNacl = window.nacl
+    delete window.nacl
     
     // 1. Farble audio
     // Adds slight randization when reading data for audio files
     // Randomization is determined by the fudge factor
-    const farbleAudio = $((fudgeFactor) => {
-      delete window.nacl
-
+    const farbleAudio = (fudgeFactor) => {
       const farbleArrayData = (destination) => {
         // Let's fudge the data by our fudge factor.
         for (const index in destination) {
@@ -81,7 +80,7 @@ window.__firefox__.execute("FarblingProtection", function($) {
           farbleArrayData(arguments[0])
         }
       }
-    });
+    }
 
     // 2. Farble plugin data
     // Injects fake plugins with fake mime-types
@@ -241,6 +240,93 @@ window.__firefox__.execute("FarblingProtection", function($) {
         value: newRemaining + 2
       })
     }
+    
+    // 5. Farble screen APIs such as `window.screenX`, `window.screen.width` and `window.screen.availHeight`
+    // R = random number between 0 and 8, seeded by session + domain
+    const farbleScreenAPIs = (Rx, Ry) => {
+      // NOTE: On iOS we use window.outer{Width,Height} instead of top.inner{Width,Height}
+      // as top is not available on cross site frames.
+      const originalOuterWidth = Object.getOwnPropertyDescriptor(window, 'outerWidth').get
+      const originalOuterHeight = Object.getOwnPropertyDescriptor(window, 'outerHeight').get
+      const deltaX = () => { Reflect.apply(originalOuterWidth, window, []) + Rx }
+      const deltaY = () => { Reflect.apply(originalOuterHeight, window, []) + Ry }
+      
+      
+      const originalScreenWidth = window.screen.width
+      const originalScreenHeight = window.screen.height
+      const originalScreenAvailWidth = window.screen.availWidth
+      const originalScreenAvailHeight = window.screen.availHeight
+      
+      const printScreenSizes = () => {
+        console.log(`window.outerWidth: ${Reflect.apply(originalOuterWidth, window, [])} -> ${window.outerWidth}`)
+        console.log(`window.outerHeight: ${Reflect.apply(originalOuterHeight, window, [])} -> ${window.outerHeight}`)
+        console.log(`window.screen.width: ${originalScreenWidth} -> ${window.screen.width}`)
+        console.log(`window.screen.height: ${originalScreenHeight} -> ${window.screen.height}`)
+        console.log(`window.screen.availWidth: ${originalScreenAvailWidth} -> ${window.screen.availWidth}`)
+        console.log(`window.screen.availHeight: ${originalScreenAvailHeight} -> ${window.screen.availHeight}`)
+      }
+      
+      // 1. window.outer{Width,Height}, window.screen{X,Y},
+      // window.screen.{width,height,avail{Width,Height,Left,Top}}
+      // - window.screen{X,Y} -> R (no need to farble on iOS since this is always 0)
+      // - window.outer{Width,Height} -> top.inner{Width, Height} + R
+      // - window.screen.{width, height} -> top.inner{Width, Height} + R
+      // - window.screen.avail{Width, Height} -> top.inner{Width, Height} + R
+      // - window.screen.avail{Top, Left} -> R (no need to farble on iOS since this is always 0)
+      // - window.screen.isExtended -> false (not supported safari)
+      try {
+        Object.defineProperty(window, 'outerWidth', { get () { return Reflect.apply(originalOuterWidth, window, []) + Rx }})
+        Object.defineProperty(window, 'outerHeight', { get () { return Reflect.apply(originalOuterHeight, window, []) + Ry }})
+
+        // On iOS the screen width and height does not change depending on rotation.
+        // We assume apple will not create a "fat" device where the screen is wider than taller
+        // So we take the min/max values here
+        Object.defineProperty(window.screen, 'width', { get () { return Math.min(window.outerWidth, window.outerHeight) }})
+        Object.defineProperty(window.screen, 'height', { get () { return Math.max(window.outerWidth, window.outerHeight) }})
+        Object.defineProperty(window.screen, 'availWidth', { get () { return window.screen.width }})
+        Object.defineProperty(window.screen, 'availHeight', { get () { return window.screen.height }})
+      } catch(e) {
+        console.log(`Error: ${e}`)
+      }
+      
+      // 2. {mouse,drag,pointer,touch}Event.screen{X,Y}
+      // Rewrite Event screen coordinates such that
+      // - event.screen{X,Y} -> devicePixelRatio * event.client{X,Y} + R
+      // Since we don't farble screenX/Y (as it's always 0, 0) we don't need to "farble" this value
+      // If we ever do change this, this is what we want to do:
+      //Object.defineProperty(window.MouseEvent.prototype, 'screenX', { get () {
+      //  return (window.devicePixelRatio * this.clientX) + Rx
+      //}})
+
+      //Object.defineProperty(window.MouseEvent.prototype, 'screenY', { get () {
+      //  return (window.devicePixelRatio * this.clientY) + Ry
+      //}})
+      
+
+      // 3. device-{width,height} in media queries
+      // When farbling is enabled, media query for device-width
+      // matches the same value as window.screen.width (also farbled).
+      // Same for device-height.
+      // - media query for device-width -> top.screen.width (also farbled)
+      // - media query for device-height -> top.screen.height (also farbled)
+      // TODO: @JS
+      const originalMatchMedia = window.matchMedia
+      window.matchMedia = (query) => {
+        console.log(query)
+        return originalMatchMedia(query)
+      }
+      
+
+      // 4: make window.open play nice with spoofed screen coords
+      // When a web page opens a child window, the position of the child window
+      // should be relative to the spoofed screen coordinates, not relative
+      // to the real screen coordinates.
+      // - window.open coordinates -> relative to top.screen coordinates, regardless of whether opened from top-level document or an iframe
+      // TODO: @JS
+      
+      console.log(`Farbled: ${window.location.href}`)
+      printScreenSizes()
+    }
 
     // A value between 0.99 and 1 to fudge the audio data
     // A value between 0.99 to 1 means the values in the destination will
@@ -267,5 +353,10 @@ window.__firefox__.execute("FarblingProtection", function($) {
     // thus return 2 + 3 = 5 for hardware concurrency
     const randomHardwareIndexScale = args['randomHardwareIndexScale']
     farbleHardwareConcurrency(randomHardwareIndexScale)
+    
+    // This farbles certain screen size and position outputs
+    const screenPositionRandomNumberX = args['screenPositionRandomNumberX']
+    const screenPositionRandomNumberY = args['screenPositionRandomNumberY']
+    farbleScreenAPIs(screenPositionRandomNumberX, screenPositionRandomNumberY)
   })();
-});
+//});

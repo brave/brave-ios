@@ -45,6 +45,10 @@ class FarblingProtectionHelper {
     ///
     /// Must be a value between 0 and 1
     let randomHardwareIndexScale: Float
+    /// A random number between 0 and 8 used to farble screen position width/x values
+    let screenPositionRandomNumberX: Int
+    /// A random number between 0 and 8 used to farble screen position height/y values
+    let screenPositionRandomNumberY: Int
   }
 
   /// Variables representing the prefix of a randomly generated strings used as the plugin name
@@ -82,7 +86,9 @@ class FarblingProtectionHelper {
       fakeVoiceName: fakeVoiceNames.seededRandom() ?? "",
       fakePluginData: FarblingProtectionHelper.makeFakePluginData(),
       randomVoiceIndexScale: Float(drand48()),
-      randomHardwareIndexScale: Float(drand48())
+      randomHardwareIndexScale: Float(drand48()),
+      screenPositionRandomNumberX: Int.seededRandom(in: 0...8),
+      screenPositionRandomNumberY: Int.seededRandom(in: 0...8)
     )
 
     let encoder = JSONEncoder()
