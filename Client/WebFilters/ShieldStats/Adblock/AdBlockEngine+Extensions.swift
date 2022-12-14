@@ -104,8 +104,7 @@ extension AdblockEngine {
         return
       }
       
-      // TODO: Resolve for v1.48 BraveCore bump
-      //    addResources(string)
+      useResources(json)
     case .ruleList:
       // This is added during engine initialization
       break

@@ -507,8 +507,7 @@ private extension AdblockService {
         return
       }
       
-      // TODO: Resolve for v1.48 BraveCore bump. Verify `userLegacyComponent` property
-      registerFilterListComponent(filterList, useLegacyComponent: false) { folderPath in
+      registerFilterListComponent(filterList, useLegacyComponent: true) { folderPath in
         guard let folderPath = folderPath else {
           continuation.yield(nil)
           return
@@ -519,8 +518,7 @@ private extension AdblockService {
       }
       
       continuation.onTermination = { @Sendable _ in
-        // TODO: Resolve for v1.48 BraveCore bump. Verify `userLegacyComponent` property
-        self.unregisterFilterListComponent(filterList, useLegacyComponent: false)
+        self.unregisterFilterListComponent(filterList, useLegacyComponent: true)
       }
     }
   }
