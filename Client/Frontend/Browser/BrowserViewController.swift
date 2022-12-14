@@ -1147,8 +1147,8 @@ public class BrowserViewController: UIViewController {
     // Priority: P3A - VPN - Default Browser - Rewards
     // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      self.presentBottomBarCallout()
       self.presentP3AScreenCallout()
+      self.presentBottomBarCallout()
       self.presentVPNAlertCallout()
       self.presentDefaultBrowserScreenCallout()
       self.presentBraveRewardsScreenCallout()

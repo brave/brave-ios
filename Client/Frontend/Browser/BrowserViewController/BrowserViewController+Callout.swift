@@ -38,16 +38,19 @@ extension BrowserViewController {
       return
     }
 
-    let onboardingNotCompleted =
-      Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue
-
-    if onboardingNotCompleted || !Preferences.General.isUsingBottomBar.value {
+    // Onboarding should be completed to show callouts
+    if Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
+      return
+    }
+    
+    // Show if bottom bar is not enabled
+    if Preferences.General.isUsingBottomBar.value {
       return
     }
 
     var bottomBarView = OnboardingBottomBarView()
     bottomBarView.switchBottomBar = { [weak self] in
-      guard let self = self else { return }
+      guard let self else { return }
     
       self.dismiss(animated: false) {
         Preferences.General.isUsingBottomBar.value = true
