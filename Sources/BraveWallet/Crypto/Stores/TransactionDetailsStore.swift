@@ -116,8 +116,8 @@ class TransactionDetailsStore: ObservableObject {
         self.fiat = details.fromFiat
       case let .ethErc20Approve(details):
         self.title = Strings.Wallet.approveNetworkButtonTitle
-        self.value = String(format: "%@ %@", details.approvalAmount, details.token.symbol)
-        if let tokenPrice = assetRatios[details.token.assetRatioId.lowercased()] {
+        self.value = String(format: "%@ %@", details.approvalAmount, details.token?.symbol ?? "<Unknown>")
+        if let token = details.token, let tokenPrice = assetRatios[token.assetRatioId.lowercased()] {
           self.marketPrice = currencyFormatter.string(from: NSNumber(value: tokenPrice)) ?? "$0.00"
         }
       case let .erc721Transfer(details):

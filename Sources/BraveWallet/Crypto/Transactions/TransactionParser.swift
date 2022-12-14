@@ -229,16 +229,16 @@ enum TransactionParser {
     case .erc20Approve:
       guard let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to,
             let spenderAddress = transaction.txArgs[safe: 0],
-            let value = transaction.txArgs[safe: 1],
-            let token = token(for: contractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens) else {
+            let value = transaction.txArgs[safe: 1] else {
         return nil
       }
+      let token = token(for: contractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
       let isUnlimited = value.caseInsensitiveCompare(WalletConstants.MAX_UINT256) == .orderedSame
       let approvalAmount: String
       if isUnlimited {
         approvalAmount = Strings.Wallet.editPermissionsApproveUnlimited
       } else {
-        approvalAmount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals))?.trimmingTrailingZeros ?? ""
+        approvalAmount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token?.decimals ?? network.decimals))?.trimmingTrailingZeros ?? ""
       }
       /* Example:
        Approve DAI
@@ -664,7 +664,7 @@ struct ParsedTransaction: Equatable {
 
 struct EthErc20ApproveDetails: Equatable {
   /// Token being approved
-  let token: BraveWallet.BlockchainToken
+  let token: BraveWallet.BlockchainToken?
   /// Value being approved prior to formatting
   let approvalValue: String
   /// Value being approved formatted

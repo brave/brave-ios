@@ -249,8 +249,8 @@ public class TransactionConfirmationStore: ObservableObject {
     }
     
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
-    let (allowance, _, _) = await rpcService.erc20TokenAllowance(details.token.contractAddress(in: selectedChain), ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
-    let allowanceString = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(details.token.decimals)) ?? ""
+    let (allowance, _, _) = await rpcService.erc20TokenAllowance(details.token?.contractAddress(in: selectedChain) ?? "", ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
+    let allowanceString = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(details.token?.decimals ?? selectedChain.decimals)) ?? ""
     currentAllowanceCache[parsedTransaction.transaction.id] = allowanceString
     updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
   }
@@ -312,7 +312,7 @@ public class TransactionConfirmationStore: ObservableObject {
       
     case let .ethErc20Approve(details):
       value = details.approvalAmount
-      symbol = details.token.symbol
+      symbol = details.token?.symbol ?? "<Unknown>"
       proposedAllowance = details.approvalValue
       isUnlimitedApprovalRequested = details.isUnlimited
       
