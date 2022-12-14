@@ -139,15 +139,15 @@ public actor AdBlockEngineManager: Sendable {
   public func startTimer() {
     guard endlessBuildTask == nil else { return }
     
-    self.endlessBuildTask = Task(priority: .background) {
+    self.endlessBuildTask = Task.detached(priority: .background) {
       do {
         while true {
           try await Task.sleep(seconds: Self.buildSleepTime)
-          guard !self.isSynced else { continue }
+          guard await !self.isSynced else { continue }
           await self.compileResources()
         }
       } catch is CancellationError {
-        endlessBuildTask = nil
+        await self.clearBuildTask()
       }
     }
   }
@@ -164,6 +164,10 @@ public actor AdBlockEngineManager: Sendable {
     #if DEBUG
     debug(compiledResults: results.compileResults)
     #endif
+  }
+  
+  private func clearBuildTask() {
+    endlessBuildTask = nil
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
