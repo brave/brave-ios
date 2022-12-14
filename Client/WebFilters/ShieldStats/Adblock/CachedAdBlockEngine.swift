@@ -30,7 +30,7 @@ public class CachedAdBlockEngine {
   
   /// Checks the general and regional engines to see if the request should be blocked.
   func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType) async -> Bool {
-    return await withUnsafeContinuation { continuation in
+    return await withCheckedContinuation { continuation in
       serialQueue.async { [weak self] in
         let shouldBlock = self?.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) == true
         continuation.resume(returning: shouldBlock)
@@ -132,7 +132,7 @@ public class CachedAdBlockEngine {
   
   /// Create an engine from the given resources
   static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion], source: AdBlockEngineManager.Source) async -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
-    return await withUnsafeContinuation { continuation in
+    return await withCheckedContinuation { continuation in
       let serialQueue = DispatchQueue(label: "com.brave.WrappedAdBlockEngine.\(UUID().uuidString)")
       
       serialQueue.async {

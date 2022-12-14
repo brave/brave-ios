@@ -26,7 +26,7 @@ public class HttpsEverywhereStats: LocalAdblockResourceProtocol {
   }
   
   func shouldUpgrade(_ url: URL?) async -> Bool {
-    return await withUnsafeContinuation { continuation in
+    return await withCheckedContinuation { continuation in
       shouldUpgrade(url, { shouldUpgrade in
         continuation.resume(returning: shouldUpgrade)
       })
