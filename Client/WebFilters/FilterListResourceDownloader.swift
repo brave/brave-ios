@@ -63,14 +63,14 @@ public class FilterListResourceDownloader: ObservableObject {
     /// Otherwise it will create a new setting with the specified properties
     ///
     /// - Warning: Do not call this before we load core data
-    public func upsertSetting(uuid: String, isEnabled: Bool, componentId: String?) {
+    public func upsertSetting(uuid: String, isEnabled: Bool, componentId: String?, allowCreation: Bool) {
       if allFilterListSettings.contains(where: { $0.uuid == uuid }) {
         updateSetting(
           uuid: uuid,
           isEnabled: isEnabled,
           componentId: componentId
         )
-      } else {
+      } else if allowCreation {
         create(
           uuid: uuid,
           componentId: componentId,
@@ -135,6 +135,8 @@ public class FilterListResourceDownloader: ObservableObject {
   private var adBlockServiceTasks: [String: Task<Void, Error>]
   /// A marker that says if fetching has started
   private var startedFetching = false
+  /// A list of defaults that should be set to true in case we are loading the filter list for the first time
+  private var pendingDefaults: [String: Bool]
   /// The filter lists wrapped up so we can contain
   @Published var filterLists: [FilterList]
   
@@ -154,6 +156,7 @@ public class FilterListResourceDownloader: ObservableObject {
     self.fetchTasks = [:]
     self.adBlockServiceTasks = [:]
     self.adBlockService = nil
+    self.pendingDefaults = [:]
     self.recordP3ACookieListEnabled()
   }
   
@@ -234,9 +237,11 @@ public class FilterListResourceDownloader: ObservableObject {
     // Enable the setting
     defer { self.recordP3ACookieListEnabled() }
     if let index = filterLists.firstIndex(where: { $0.componentId == componentID }) {
+      guard filterLists[index].isEnabled != isEnabled else { return true }
       filterLists[index].isEnabled = isEnabled
       return true
     } else {
+      pendingDefaults[componentID] = isEnabled
       return false
     }
   }
@@ -287,10 +292,13 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// This method allows us to enable selected lists by default for new users.
   /// Make sure you use componentID to identify the filter list, as `uuid` will be deprecated in the future.
-  private func newFilterListEnabledOverride(for componentId: String) -> Bool? {
-    let componentIDsToOverride = [FilterList.mobileAnnoyancesComponentID]
+  private func newFilterListDefault(for componentId: String) -> Bool {
+    if let value = pendingDefaults[componentId] {
+      return value
+    }
     
-    return componentIDsToOverride.contains(componentId) ? true : nil
+    let componentIDsToOverride = [FilterList.mobileAnnoyancesComponentID]
+    return componentIDsToOverride.contains(componentId) ? true : false
   }
   
   /// Load filter lists from the ad block service
@@ -299,8 +307,7 @@ public class FilterListResourceDownloader: ObservableObject {
       let setting = filterListSettings.first(where: { $0.uuid == adBlockFilterList.uuid })
       return FilterList(from: adBlockFilterList,
                         isEnabled: setting?.isEnabled
-                        ?? newFilterListEnabledOverride(for: adBlockFilterList.componentId)
-                        ?? false)
+                        ?? newFilterListDefault(for: adBlockFilterList.componentId))
     }
   }
   
@@ -319,12 +326,21 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Ensures settings are saved for the given filter list and that our publisher is aware of the changes
   @MainActor private func handleUpdate(to filterList: FilterList) {
+    // Upsert (update or insert) the setting.
+    //
+    // However we create only when:
+    // a) The filter list is enabled
+    //    (this is because loading caches are based on created settings)
+    // b) The filter list is different than the default
+    //    (in order to respect the users preference if the default were to change in the future)
     settingsManager.upsertSetting(
       uuid: filterList.uuid,
       isEnabled: filterList.isEnabled,
-      componentId: filterList.componentId
+      componentId: filterList.componentId,
+      allowCreation: filterList.isEnabled || newFilterListDefault(for: filterList.componentId) != filterList.isEnabled
     )
     
+    // Register or unregister the filter list depending on its toggle state
     if filterList.isEnabled {
       register(filterList: filterList)
     } else {

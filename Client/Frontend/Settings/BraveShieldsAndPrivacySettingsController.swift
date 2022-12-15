@@ -71,24 +71,22 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       .sink { filterLists in
         let filterList = filterLists.first(where: { $0.componentId == FilterList.cookieConsentNoticesComponentID })
         let isEnabled = filterList?.isEnabled == true
+        guard isEnabled != self.currentCookieConsentNoticeBlockingState else { return }
+        self.currentCookieConsentNoticeBlockingState = isEnabled
         
-        if isEnabled != self.currentCookieConsentNoticeBlockingState {
-          self.currentCookieConsentNoticeBlockingState = isEnabled
-          
-          guard let sectionIndex = self.dataSource.sections.firstIndex(where: { $0.uuid == self.shieldsSection.uuid }) else {
-            assertionFailure("Should exist")
-            return
-          }
-          
-          guard let rowIndex = self.shieldsSection.rows.firstIndex(where: { $0.uuid == self.cookieConsentNoticesRowUUID.uuidString }) else {
-            assertionFailure("Should exist")
-            return
-          }
-          
-          // Reload the section
-          self.shieldsSection.rows[rowIndex] = self.makeCookieConsentBlockingRow()
-          self.dataSource.sections[sectionIndex] = self.shieldsSection
+        guard let sectionIndex = self.dataSource.sections.firstIndex(where: { $0.uuid == self.shieldsSection.uuid }) else {
+          assertionFailure("Should exist")
+          return
         }
+        
+        guard let rowIndex = self.shieldsSection.rows.firstIndex(where: { $0.uuid == self.cookieConsentNoticesRowUUID.uuidString }) else {
+          assertionFailure("Should exist")
+          return
+        }
+        
+        // Reload the section
+        self.shieldsSection.rows[rowIndex] = self.makeCookieConsentBlockingRow()
+        self.dataSource.sections[sectionIndex] = self.shieldsSection
       }
       .store(in: &cancellables)
     
@@ -361,6 +359,8 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         for: FilterList.cookieConsentNoticesComponentID
       ),
       valueChange: { isEnabled in
+        self.currentCookieConsentNoticeBlockingState = isEnabled
+        
         if !FilterListResourceDownloader.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: isEnabled) {
           assertionFailure("This filter list should exist or this UI is completely useless")
         }
