@@ -50,7 +50,7 @@ public class AppReviewManager: ObservableObject {
   
   public static var shared = AppReviewManager()
   
-  // MARK: Legacy Review Mrthods
+  // MARK: Legacy Review Methods
   
   public func legacyShouldRequestReview(date: Date = Date()) -> Bool {
      let launchCount = Preferences.Review.launchCount.value
