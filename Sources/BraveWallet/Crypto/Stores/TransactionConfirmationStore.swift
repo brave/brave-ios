@@ -56,6 +56,7 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
       currencyFormatter.currencyCode = currencyCode
+      guard currencyCode != oldValue else { return }
       updateTransaction(with: activeTransaction)
     }
   }
@@ -192,7 +193,7 @@ public class TransactionConfirmationStore: ObservableObject {
         network: network,
         accountInfos: keyring.accountInfos,
         visibleTokens: userVisibleTokens,
-        allTokens: allTokens,
+        allTokens: allTokens + tokenInfoCache.map(\.value),
         assetRatios: assetRatios,
         solEstimatedTxFee: solEstimatedTxFee,
         currencyFormatter: currencyFormatter
@@ -226,6 +227,10 @@ public class TransactionConfirmationStore: ObservableObject {
   private var assetRatios: [String: Double] = [:]
   private var currentAllowanceCache: [String: String] = [:]
   private var gasTokenBalanceCache: [String: Double] = [:]
+  /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
+  /// This could occur with a dapp creating an ERC20 approve transaction, so we fetch given the
+  /// contract address for the token being approved.
+  private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
   
   @MainActor private func fetchAssetRatios(for userVisibleTokens: [BraveWallet.BlockchainToken]) async {
     let priceResult = await assetRatioService.priceWithIndividualRetry(
@@ -264,6 +269,15 @@ public class TransactionConfirmationStore: ObservableObject {
       gasTokenBalanceCache["\(token.symbol)\(account.address)"] = gasTokenBalance
       updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
     }
+  }
+  
+  @MainActor func fetchTokenInfo(for contractAddress: String) async -> BraveWallet.BlockchainToken? {
+    guard tokenInfoCache[contractAddress] == nil,
+          let tokenInfo = await assetRatioService.tokenInfo(contractAddress) else {
+      return tokenInfoCache[contractAddress]
+    }
+    tokenInfoCache[contractAddress] = tokenInfo
+    return tokenInfo
   }
   
   @MainActor func fetchActiveTransactionDetails(
@@ -311,8 +325,13 @@ public class TransactionConfirmationStore: ObservableObject {
       totalFiat = totalFiat(value: value, tokenAssetRatioId: details.fromToken.assetRatioId, gasValue: gasValue, gasSymbol: gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
       
     case let .ethErc20Approve(details):
+      var token = details.token
+      if token == nil {
+        token = await fetchTokenInfo(for: details.tokenContractAddress)
+      }
+      
       value = details.approvalAmount
-      symbol = details.token?.symbol ?? "<Unknown>"
+      symbol = token?.symbol ?? ""
       proposedAllowance = details.approvalValue
       isUnlimitedApprovalRequested = details.isUnlimited
       

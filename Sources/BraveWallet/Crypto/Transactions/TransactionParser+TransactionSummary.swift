@@ -110,9 +110,9 @@ extension TransactionParser {
     case let .ethErc20Approve(details):
       let title: String
       if details.isUnlimited {
-        title = String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, Strings.Wallet.editPermissionsApproveUnlimited, details.token?.symbol ?? "<Unknown>")
+        title = String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, Strings.Wallet.editPermissionsApproveUnlimited, details.token?.symbol ?? "")
       } else {
-        title = String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, details.approvalAmount, details.token?.symbol ?? "<Unknown>")
+        title = String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, details.approvalAmount, details.token?.symbol ?? "")
       }
       return .init(
         txInfo: transaction,

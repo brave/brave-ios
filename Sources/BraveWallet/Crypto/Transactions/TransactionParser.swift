@@ -261,6 +261,7 @@ enum TransactionParser {
         details: .ethErc20Approve(
           .init(
             token: token,
+            tokenContractAddress: contractAddress,
             approvalValue: value,
             approvalAmount: approvalAmount,
             isUnlimited: isUnlimited,
@@ -665,6 +666,8 @@ struct ParsedTransaction: Equatable {
 struct EthErc20ApproveDetails: Equatable {
   /// Token being approved
   let token: BraveWallet.BlockchainToken?
+  /// The contract address of the token being approved
+  let tokenContractAddress: String
   /// Value being approved prior to formatting
   let approvalValue: String
   /// Value being approved formatted

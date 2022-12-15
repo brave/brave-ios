@@ -35,6 +35,10 @@ class TransactionDetailsStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
+  /// This could occur with a dapp creating an ERC20 approve transaction, so we fetch given the
+  /// contract address for the token being approved.
+  private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
   
   init(
     transaction: BraveWallet.TransactionInfo,
@@ -64,7 +68,7 @@ class TransactionDetailsStore: ObservableObject {
       let network = await rpcService.network(coin)
       self.network = network
       let keyring = await keyringService.keyringInfo(coin.keyringId)
-      let allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
+      let allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin) + tokenInfoCache.map(\.value)
       let userVisibleTokens: [BraveWallet.BlockchainToken] = await walletService.userAssets(network.chainId, coin: network.coin)
       let priceResult = await assetRatioService.priceWithIndividualRetry(
         userVisibleTokens.map { $0.assetRatioId.lowercased() },
@@ -115,9 +119,14 @@ class TransactionDetailsStore: ObservableObject {
         }
         self.fiat = details.fromFiat
       case let .ethErc20Approve(details):
+        var token = details.token
+        if token == nil {
+          token = await self.fetchTokenInfo(for: details.tokenContractAddress)
+        }
+        
         self.title = Strings.Wallet.approveNetworkButtonTitle
-        self.value = String(format: "%@ %@", details.approvalAmount, details.token?.symbol ?? "<Unknown>")
-        if let token = details.token, let tokenPrice = assetRatios[token.assetRatioId.lowercased()] {
+        self.value = String(format: "%@ %@", details.approvalAmount, token?.symbol ?? "")
+        if let token = token, let tokenPrice = assetRatios[token.assetRatioId.lowercased()] {
           self.marketPrice = currencyFormatter.string(from: NSNumber(value: tokenPrice)) ?? "$0.00"
         }
       case let .erc721Transfer(details):
@@ -140,5 +149,15 @@ class TransactionDetailsStore: ObservableObject {
         self.gasFee = String(format: "%@ %@\n%@", gasFee.fee, parsedTransaction.networkSymbol, gasFee.fiat)
       }
     }
+  }
+  
+  @MainActor private func fetchTokenInfo(for contractAddress: String) async -> BraveWallet.BlockchainToken? {
+    if let cachedToken = tokenInfoCache[contractAddress] {
+      return cachedToken
+    }
+    let tokenInfo = await assetRatioService.tokenInfo(contractAddress)
+    guard let tokenInfo = tokenInfo else { return nil }
+    self.tokenInfoCache[contractAddress] = tokenInfo
+    return tokenInfo
   }
 }
