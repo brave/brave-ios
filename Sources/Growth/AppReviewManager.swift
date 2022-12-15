@@ -41,9 +41,9 @@ public class AppReviewManager: ObservableObject {
   
   // MARK: Legacy properties - Added for swithing back to legacy logic easily
   private let legacyAppReviewLogicEnabled = true
-  private let legacyFirstThreshold = 14
-  private let legacySecondThreshold = 41
-  private let legacyLastThreshold = 121
+  let legacyFirstThreshold = 14
+  let legacySecondThreshold = 41
+  let legacyLastThreshold = 121
   private let legacyMinimumDaysBetweenReviewRequest = 60
   
   // MARK: Lifecycle
