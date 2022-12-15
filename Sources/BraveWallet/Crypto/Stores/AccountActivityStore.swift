@@ -201,6 +201,18 @@ class AccountActivityStore: ObservableObject {
     if account.coin == .sol {
       solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: transactions.map(\.id))
     }
+    let unknownERC20ApproveTokenContractAddresses = transactions
+      .filter { $0.txType == .erc20Approve }
+      .compactMap { $0.txDataUnion.ethTxData1559?.baseData.to }
+      .filter { contractAddress in
+        !userVisibleTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
+        && !allTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
+      }
+    // fetch unknown token contract addresses
+    var unknownTokens: [BraveWallet.BlockchainToken] = []
+    if !unknownERC20ApproveTokenContractAddresses.isEmpty {
+      unknownTokens = await assetRatioService.fetchTokens(for: unknownERC20ApproveTokenContractAddresses)
+    }
     return transactions
       .sorted(by: { $0.createdTime > $1.createdTime })
       .map { transaction in
@@ -209,7 +221,7 @@ class AccountActivityStore: ObservableObject {
           network: network,
           accountInfos: accountInfos,
           visibleTokens: userVisibleTokens,
-          allTokens: allTokens,
+          allTokens: allTokens + unknownTokens,
           assetRatios: assetRatios,
           solEstimatedTxFee: solEstimatedTxFees[transaction.id],
           currencyFormatter: currencyFormatter
