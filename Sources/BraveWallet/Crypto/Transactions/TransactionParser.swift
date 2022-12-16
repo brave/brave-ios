@@ -124,7 +124,7 @@ enum TransactionParser {
     case .erc20Transfer:
       guard let toAddress = transaction.txArgs[safe: 0],
             let fromValue = transaction.txArgs[safe: 1],
-            let tokenContractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to,
+            let tokenContractAddress = transaction.erc20TransferTokenContractAddress,
             let fromToken = token(for: tokenContractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens) else {
         return nil
       }
@@ -162,17 +162,11 @@ enum TransactionParser {
         )
       )
     case .ethSwap:
-      guard let fillPath = transaction.txArgs[safe: 0],
-            let sellAmountValue = transaction.txArgs[safe: 1],
+      guard let sellAmountValue = transaction.txArgs[safe: 1],
             let minBuyAmountValue = transaction.txArgs[safe: 2] else {
         return nil
       }
-      
-      let fillPathNoHexPrefix = fillPath.removingHexPrefix
-      let fillPathLength = fillPathNoHexPrefix.count / 2
-      let splitIndex = fillPathNoHexPrefix.index(fillPathNoHexPrefix.startIndex, offsetBy: fillPathLength)
-      let fromTokenAddress = String(fillPathNoHexPrefix[..<splitIndex]).addingHexPrefix
-      let toTokenAddress = String(fillPathNoHexPrefix[splitIndex...]).addingHexPrefix
+      let (fromTokenAddress, toTokenAddress) = transaction.ethSwapTokenContractAddresses ?? ("", "")
       
       let fromToken = token(for: fromTokenAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
       let fromTokenDecimals = Int(fromToken?.decimals ?? network.decimals)
@@ -227,7 +221,7 @@ enum TransactionParser {
         )
       )
     case .erc20Approve:
-      guard let contractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to,
+      guard let contractAddress = transaction.erc20ApproveTokenContractAddress,
             let spenderAddress = transaction.txArgs[safe: 0],
             let value = transaction.txArgs[safe: 1] else {
         return nil
@@ -279,7 +273,7 @@ enum TransactionParser {
       guard let owner = transaction.txArgs[safe: 0],
             let toAddress = transaction.txArgs[safe: 1],
             let tokenId = transaction.txArgs[safe: 2],
-            let tokenContractAddress = transaction.txDataUnion.ethTxData1559?.baseData.to,
+            let tokenContractAddress = transaction.erc721ContractAddress,
             let token = token(for: tokenContractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens) else {
         return nil
       }
@@ -488,6 +482,8 @@ enum TransactionParser {
       )
     case .erc1155SafeTransferFrom:
       return nil
+    case .solanaSwap:
+      return nil
     @unknown default:
       return nil
     }
@@ -682,7 +678,7 @@ struct EthErc20ApproveDetails: Equatable {
 
 struct SendDetails: Equatable {
   /// Token being swapped from
-  let fromToken: BraveWallet.BlockchainToken
+  let fromToken: BraveWallet.BlockchainToken?
   /// From value prior to formatting
   let fromValue: String
   /// From amount formatted
@@ -794,5 +790,70 @@ extension BraveWallet.TransactionInfo {
 extension ParsedTransaction {
   var coin: BraveWallet.CoinType {
     transaction.coin
+  }
+}
+
+extension BraveWallet.TransactionInfo {
+  /// Contract address for the ERC20 token being approved
+  var erc20ApproveTokenContractAddress: String? {
+    guard txType == .erc20Approve else { return nil }
+    return txDataUnion.ethTxData1559?.baseData.to
+  }
+  
+  /// Contract address for the ERC20 token being transferred
+  var erc20TransferTokenContractAddress: String? {
+    guard txType == .erc20Transfer else { return nil }
+    return txDataUnion.ethTxData1559?.baseData.to
+  }
+  
+  /// Contract address for the from and to token being swapped
+  var ethSwapTokenContractAddresses: (from: String, to: String)? {
+    guard txType == .ethSwap, let fillPath = txArgs[safe: 0] else { return nil }
+    let fillPathNoHexPrefix = fillPath.removingHexPrefix
+    let fillPathLength = fillPathNoHexPrefix.count / 2
+    let splitIndex = fillPathNoHexPrefix.index(fillPathNoHexPrefix.startIndex, offsetBy: fillPathLength)
+    let fromTokenAddress = String(fillPathNoHexPrefix[..<splitIndex]).addingHexPrefix
+    let toTokenAddress = String(fillPathNoHexPrefix[splitIndex...]).addingHexPrefix
+    return (fromTokenAddress, toTokenAddress)
+  }
+  
+  /// Contract address for the ERC721 token
+  var erc721ContractAddress: String? {
+    guard txType == .erc721TransferFrom || txType == .erc721SafeTransferFrom else { return nil }
+    return txDataUnion.ethTxData1559?.baseData.to
+  }
+  
+  /// The contract addresses of the tokens in the transaction
+  var tokenContractAddresses: [String] {
+    switch txType {
+    case .erc20Approve:
+      if let erc20ApproveTokenContractAddress {
+        return [erc20ApproveTokenContractAddress]
+      }
+    case .ethSwap:
+      if let (fromTokenContractAddress, toTokenContractAddress) = ethSwapTokenContractAddresses {
+        return [fromTokenContractAddress, toTokenContractAddress]
+      }
+    case .erc20Transfer:
+      if let erc20TransferTokenContractAddress {
+        return [erc20TransferTokenContractAddress]
+      }
+    case .erc721TransferFrom, .erc721SafeTransferFrom:
+      if let erc721ContractAddress {
+        return [erc721ContractAddress]
+      }
+    case .ethSend, .erc1155SafeTransferFrom, .other:
+      break
+    case .solanaSystemTransfer,
+        .solanaSplTokenTransfer,
+        .solanaSplTokenTransferWithAssociatedTokenAccountCreation,
+        .solanaDappSignTransaction,
+        .solanaDappSignAndSendTransaction,
+        .solanaSwap:
+      break
+    @unknown default:
+      break
+    }
+    return []
   }
 }

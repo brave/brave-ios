@@ -74,7 +74,7 @@ extension TransactionParser {
     }
     switch parsedTransaction.details {
     case let .ethSend(details):
-      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken.symbol, details.fromFiat ?? "")
+      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken?.symbol ?? "", details.fromFiat ?? "")
       return .init(
         txInfo: transaction,
         namedFromAddress: parsedTransaction.namedFromAddress,
@@ -84,7 +84,7 @@ extension TransactionParser {
         networkSymbol: parsedTransaction.networkSymbol
       )
     case let .erc20Transfer(details):
-      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken.symbol, details.fromFiat ?? "")
+      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken?.symbol ?? "", details.fromFiat ?? "")
       return .init(
         txInfo: transaction,
         namedFromAddress: parsedTransaction.namedFromAddress,
@@ -138,7 +138,7 @@ extension TransactionParser {
         networkSymbol: parsedTransaction.networkSymbol
       )
     case let .solSystemTransfer(details), let .solSplTokenTransfer(details):
-      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken.symbol, details.fromFiat ?? "").replacingOccurrences(of: "()", with: "") // if fiat is empty string, remove `()`
+      let title = String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, details.fromAmount, details.fromToken?.symbol ?? "", details.fromFiat ?? "").replacingOccurrences(of: "()", with: "") // if fiat is empty string, remove `()`
       return .init(
         txInfo: transaction,
         namedFromAddress: parsedTransaction.namedFromAddress,
