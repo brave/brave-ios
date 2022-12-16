@@ -164,6 +164,7 @@ public class TransactionConfirmationStore: ObservableObject {
       let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
       await fetchAssetRatios(for: userVisibleTokens)
     }
+    await fetchUnknownTokens(for: transactions)
   }
   
   func updateTransaction(
@@ -177,21 +178,8 @@ public class TransactionConfirmationStore: ObservableObject {
       let coin = transaction.coin
       let keyring = await keyringService.keyringInfo(coin.keyringId)
       let network = await rpcService.network(coin)
-      var allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin) + tokenInfoCache.map(\.value)
+      let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin) + tokenInfoCache.map(\.value)
       let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
-      let unknownTokenContractAddresses = transaction.tokenContractAddresses
-        .filter { contractAddress in
-          !userVisibleTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
-          && !allTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
-          && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
-        }
-      if !unknownTokenContractAddresses.isEmpty {
-        let unknownTokens = await assetRatioService.fetchTokens(for: unknownTokenContractAddresses)
-        for unknownToken in unknownTokens {
-          tokenInfoCache[unknownToken.contractAddress] = unknownToken
-        }
-        allTokens.append(contentsOf: unknownTokens)
-      }
       
       var solEstimatedTxFee: UInt64?
       if transaction.coin == .sol {
@@ -283,13 +271,25 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   }
   
-  @MainActor func fetchTokenInfo(for contractAddress: String) async -> BraveWallet.BlockchainToken? {
-    guard tokenInfoCache[contractAddress] == nil,
-          let tokenInfo = await assetRatioService.tokenInfo(contractAddress) else {
-      return tokenInfoCache[contractAddress]
+  @MainActor private func fetchUnknownTokens(
+    for transactions: [BraveWallet.TransactionInfo]
+  ) async {
+    let coin = await walletService.selectedCoin()
+    let network = await rpcService.network(coin)
+    let userVisibleTokens = await walletService.userAssets(network.chainId, coin: network.coin)
+    let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
+    let unknownTokenContractAddresses = transactions.flatMap(\.tokenContractAddresses)
+      .filter { contractAddress in
+        !userVisibleTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
+        && !allTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
+        && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
+      }
+    guard !unknownTokenContractAddresses.isEmpty else { return }
+    let unknownTokens = await assetRatioService.fetchTokens(for: unknownTokenContractAddresses)
+    for unknownToken in unknownTokens {
+      tokenInfoCache[unknownToken.contractAddress] = unknownToken
     }
-    tokenInfoCache[contractAddress] = tokenInfo
-    return tokenInfo
+    updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
   }
   
   @MainActor func fetchActiveTransactionDetails(
