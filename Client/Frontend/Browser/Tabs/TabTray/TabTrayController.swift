@@ -525,7 +525,7 @@ class TabTrayController: LoadingViewController {
     }
     
     // TODO: Test Code change it with real view
-    let host = UIHostingController(rootView: RecentlyClosedTabsView())
+    let host = UIHostingController(rootView: RecentlyClosedTabsView(tabManager: tabManager))
     present(host, animated: true)
   }
 

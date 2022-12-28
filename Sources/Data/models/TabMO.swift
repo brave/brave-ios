@@ -19,23 +19,25 @@ public struct SavedTab {
   public let history: [String]
   public let historyIndex: Int16
   public let isPrivate: Bool
+  public let isRecentlyClosed: Bool
 
   /// For the love of all developers everywhere, if you use this constructor, **PLEASE** use
   /// `SessionData.updateSessionURLs(urls)` **BEFORE** passing in the URLs for the `history` parameter!!!
   /// If you don't, you **WILL break session restore**.
   public init(
     id: String, title: String?, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?,
-    history: [String], historyIndex: Int16, isPrivate: Bool
-  ) {
-    self.id = id
-    self.title = title
-    self.url = url
-    self.isSelected = isSelected
-    self.order = order
-    self.screenshot = screenshot
-    self.history = history
-    self.historyIndex = historyIndex
-    self.isPrivate = isPrivate
+    history: [String], historyIndex: Int16, isPrivate: Bool, isRecentlyClosed: Bool) {
+      self.id = id
+      self.title = title
+      self.url = url
+      self.isSelected = isSelected
+      self.order = order
+      self.screenshot = screenshot
+      self.history = history
+      self.historyIndex = historyIndex
+      self.isPrivate = isPrivate
+      self.isRecentlyClosed = isRecentlyClosed
+      
   }
 }
 
@@ -54,15 +56,10 @@ public final class TabMO: NSManagedObject, CRUD {
   /// Last time this tab was updated. Required for 'purge unused tabs' feature.
   @NSManaged public var lastUpdate: Date?
   @NSManaged public var isPrivate: Bool
+  @NSManaged public var isRecentlyClosed: Bool
 
   public override func prepareForDeletion() {
     super.prepareForDeletion()
-
-    // BRAVE TODO: check, if we still need it for restoring website screenshots.
-    // Remove cached image
-    //        if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
-    //            ImageCache.shared.remove(url, type: .portrait)
-    //        }
   }
 
   // MARK: - Public interface
@@ -125,6 +122,7 @@ public final class TabMO: NSManagedObject, CRUD {
       tabToUpdate.isSelected = tabData.isSelected
       tabToUpdate.lastUpdate = Date()
       tabToUpdate.isPrivate = tabData.isPrivate
+      tabToUpdate.isRecentlyClosed = tabData.isRecentlyClosed
     }
   }
 
@@ -204,6 +202,20 @@ public final class TabMO: NSManagedObject, CRUD {
       NSPredicate(format: "\(lastUpdateKeyPath) != nil AND \(lastUpdateKeyPath) < %@", date)
 
     self.deleteAll(predicate: predicate)
+  }
+  
+  // MARK: Migration
+  
+  public static func migrateRecentlyClosed() {
+    DataController.perform { context in
+      guard let tabs = TabMO.all(context: context) else {
+        return
+      }
+      
+      for tab in tabs {
+        tab.isRecentlyClosed = false
+      }
+    }
   }
 }
 
