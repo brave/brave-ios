@@ -207,7 +207,7 @@ class TabManager: NSObject {
   private func tabs(withType type: TabType, query: String? = nil) -> [Tab] {
     assert(Thread.isMainThread)
 
-    let allTabs = allTabs.filter { $0.type == type }
+    let allTabs = allTabs.filter { $0.type == type && !$0.isRecentlyClosed }
 
     if let query = query, !query.isEmpty {
       // Display title is the only data that will be present on every situation
@@ -215,6 +215,12 @@ class TabManager: NSObject {
     } else {
       return allTabs
     }
+  }
+  
+  func recentlyClosedTabs() -> [Tab] {
+    let allTabs = allTabs.filter { $0.type == .regular }
+
+    return allTabs.filter { !$0.isRecentlyClosed }
   }
   
   /// Function for adding local tabs as synced sessions
@@ -279,25 +285,6 @@ class TabManager: NSObject {
     if let url = selectedTab?.url {
       selectedTab?.loadRequest(PrivilegedRequest(url: url) as URLRequest)
     }
-  }
-
-  func getTabFor(_ url: URL) -> Tab? {
-    assert(Thread.isMainThread)
-
-    for tab in allTabs {
-      if tab.webView?.url == url {
-        return tab
-      }
-
-      // Also look for tabs that haven't been restored yet.
-      if let sessionData = tab.sessionData,
-        0..<sessionData.urls.count ~= sessionData.currentPage,
-        sessionData.urls[sessionData.currentPage] == url {
-        return tab
-      }
-    }
-
-    return nil
   }
 
   func selectTab(_ tab: Tab?, previous: Tab? = nil) {
@@ -591,7 +578,7 @@ class TabManager: NSObject {
     }
   }
 
-  func savedTabData(tab: Tab) -> SavedTab? {
+  private func savedTabData(tab: Tab) -> SavedTab? {
 
     guard let webView = tab.webView, let order = indexOfWebView(webView) else { return nil }
 
@@ -628,7 +615,8 @@ class TabManager: NSObject {
         isSelected: isSelected, order: Int16(order),
         screenshot: nil, history: urls,
         historyIndex: Int16(currentPage),
-        isPrivate: tab.isPrivate)
+        isPrivate: tab.isPrivate,
+        isRecentlyClosed: tab.isRecentlyClosed)
       return data
     }
 
@@ -1011,7 +999,7 @@ class TabManager: NSObject {
     guard let savedTab = TabMO.get(fromId: tab.id) else { return }
 
     if let history = savedTab.urlHistorySnapshot as? [String], let tabUUID = savedTab.syncUUID, let url = savedTab.url {
-      let data = SavedTab(id: tabUUID, title: savedTab.title, url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex, isPrivate: tab.isPrivate)
+      let data = SavedTab(id: tabUUID, title: savedTab.title, url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex, isPrivate: tab.isPrivate, isRecentlyClosed: savedTab.isRecentlyClosed)
       if let webView = tab.webView {
         tab.navigationDelegate = navDelegate
         tab.restore(webView, restorationData: data)
