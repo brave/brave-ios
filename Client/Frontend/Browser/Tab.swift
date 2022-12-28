@@ -79,6 +79,8 @@ class Tab: NSObject {
     return type.isPrivate
   }
 
+  var isRecentlyClosed = false
+  
   var secureContentState: TabSecureContentState = .unknown
 
   var walletEthProvider: BraveWalletEthereumProvider?

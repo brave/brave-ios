@@ -281,7 +281,7 @@ extension BrowserViewController: TabManagerDelegate {
           }
           
           // TODO: Test Code change it with real view
-          let host = UIHostingController(rootView: RecentlyClosedTabsView())
+          let host = UIHostingController(rootView: RecentlyClosedTabsView(tabManager: tabManager))
           self.present(host, animated: true)
         })
       

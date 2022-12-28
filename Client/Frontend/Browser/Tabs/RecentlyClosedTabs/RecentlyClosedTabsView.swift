@@ -11,27 +11,26 @@ import CoreData
 import BraveUI
 
 struct RecentlyClosedTabsView: View {
-  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-  @Environment(\.sizeCategory) private var sizeCategory
-  
-  @State private var websites: [RecentSearch] = []
-//  @State private var websites: [PrivacyReportsWebsite] = []
-  @State private var websitesLoading = true
+  @Environment(\.presentationMode) @Binding private var presentationMode
+
+  @State private var recentlyClosedTabs: [Tab] = []
+  @State private var recentlyClosedLoading = true
   
   @State private var showClearDataPrompt: Bool = false
-  
-  private let recentSearchesFRC = RecentSearch.frc()
+  private(set) var onDismiss: (() -> Void)?
+
+  private let tabManager: TabManager
 
   private var clearAllDataButton: some View {
     Button("Clear", action: {
       showClearDataPrompt = true
     })
-    .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
+    .accessibility(label: Text("Clear All Recently Closed Tabs"))
     .foregroundColor(Color(.braveBlurpleTint))
     .actionSheet(isPresented: $showClearDataPrompt) {
-      .init(title: Text(Strings.PrivacyHub.clearAllDataPrompt),
+      .init(title: Text("Clear All Recently Closed Tabs?"),
             buttons: [
-              .destructive(Text(Strings.yes), action: {
+              .destructive(Text("Clear Recently Closed Tabs"), action: {
                 // TODO: ADD CLEAR CODE
                 dismissView()
               }),
@@ -47,22 +46,25 @@ struct RecentlyClosedTabsView: View {
   
   private var websitesList: some View {
     List {
-//      Section {
-//        ForEach(websites) { item in
-//          HStack {
-//            FaviconImage(url: item.faviconUrl)
-//            Text(item.domain)
-//            Spacer()
-//          }
-//        }
-//      }
       Section {
-        ForEach(websites) { item in
+        ForEach(recentlyClosedTabs, id: \.id) { tab in
           HStack {
-            FaviconImage(url: item.websiteUrl)
-            Text(item.text ?? "")
+            FaviconImage(url: tab.displayFavicon?.url)
+            VStack(alignment: .leading) {
+              Text(tab.displayTitle)
+                .font(.footnote)
+                .fontWeight(.semibold)
+                .foregroundColor(Color(.bravePrimary))
+              Text(fetchURL(for: tab) ?? "")
+                .font(.caption)
+                .foregroundColor(Color(.braveLabel))
+            }
             Spacer()
           }
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 6)
+          .accessibilityElement()
+          .accessibilityLabel("\(tab.displayTitle)")
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -72,10 +74,14 @@ struct RecentlyClosedTabsView: View {
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
   }
   
+  init(tabManager: TabManager) {
+      self.tabManager = tabManager
+  }
+  
   var body: some View {
     NavigationView {
         VStack(spacing: 0) {
-          if websitesLoading {
+          if recentlyClosedLoading {
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
           } else {
@@ -106,39 +112,33 @@ struct RecentlyClosedTabsView: View {
     .navigationViewStyle(.stack)
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
-      
-      do {
-        try recentSearchesFRC.performFetch()
-      } catch {
-        print("Recent Searches fetch error: \(error.localizedDescription))")
-      }
+    
+      recentlyClosedTabs = tabManager.recentlyClosedTabs()
 
-      websites = recentSearchesFRC.fetchedObjects ?? []
-
-      
-//      BlockedResource.allTimeMostRiskyWebsites { riskyWebsites in
-//        websites = riskyWebsites.map {
-//          PrivacyReportsWebsite(domain: $0.domain, faviconUrl: $0.faviconUrl, count: $0.count)
-//        }
-//
-//        websitesLoading = false
-//      }
+      recentlyClosedLoading = false
     }
   }
   
   private func dismissView() {
-    // TODO: Custom Dismissal
-  }
-}
-
-#if DEBUG
-struct RecentlyClosedTabsView_Previews: PreviewProvider {
-  static var previews: some View {
-    Group {
-      RecentlyClosedTabsView()
-      RecentlyClosedTabsView()
-        .preferredColorScheme(.dark)
+    // Dismiss on presentation mode does not work on iOS 14
+    // when using the UIHostingController is parent view.
+    // As a workaround a completion handler is used instead.
+    if #available(iOS 15, *) {
+      presentationMode.dismiss()
+    } else {
+      onDismiss?()
     }
   }
+  
+  private func fetchURL(for tab: Tab) -> String? {
+    if let tabID = tab.id {
+      let fetchedTab = TabMO.get(fromId: tabID)
+
+      if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
+          return urlString
+      }
+    }
+    
+    return nil
+  }
 }
-#endif

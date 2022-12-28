@@ -50,7 +50,7 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: object.syncUUID!, title: newTitle, url: newUrl, isSelected: true, order: 10,
-      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false)
+      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false, isRecentlyClosed: false)
 
     backgroundSaveAndWaitForExpectation {
       TabMO.update(tabData: tabData)
@@ -91,7 +91,7 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: wrongId, title: newTitle, url: newUrl, isSelected: true, order: 10,
-      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false)
+      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false, isRecentlyClosed: false)
 
     TabMO.update(tabData: tabData)
     // We can't wait for context save here, wrong id is being passed, let's fake it by waiting one second
@@ -157,7 +157,7 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: object.syncUUID!, title: "title\(order)", url: "url\(order)", isSelected: false, order: Int16(order),
-      screenshot: nil, history: [], historyIndex: 0, isPrivate: false)
+      screenshot: nil, history: [], historyIndex: 0, isPrivate: false, isRecentlyClosed: false)
     backgroundSaveAndWaitForExpectation {
       TabMO.update(tabData: tabData)
     }
