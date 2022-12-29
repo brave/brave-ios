@@ -532,6 +532,12 @@ class TabTrayController: LoadingViewController {
       self.dismiss(animated: false)
     }
     
+    recentlyClosedTabsView.onDismiss = { [weak self] cleared in
+      if cleared {
+        self?.dismiss(animated: false)
+      }
+    }
+    
     present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)
   }
 

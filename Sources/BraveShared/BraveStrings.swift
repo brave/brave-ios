@@ -130,13 +130,6 @@ extension Strings {
       bundle: .module,
       value: "Duplicate Active Tab",
       comment: "Action item title of long press for Opening the existing - active Tab url in a new Tab")
-  public static let viewRecentlyClosedTab =
-    NSLocalizedString(
-      "ViewRecentlyClosedTab",
-      tableName: "BraveShared",
-      bundle: .module,
-      value: "View Recently Closed Tab",
-      comment: "Action item title of long press for Opening recently closed tab view")
   public static let suppressAlertsActionTitle = NSLocalizedString("SuppressAlertsActionTitle", tableName: "BraveShared", bundle: .module, value: "Suppress Alerts", comment: "Title of alert that seeks permission from user to suppress future JS alerts")
   public static let suppressAlertsActionMessage = NSLocalizedString("SuppressAlertsActionMessage", tableName: "BraveShared", bundle: .module, value: "Prevent this page from creating additional alerts", comment: "Message body of alert that seeks permission from user to suppress future JS alerts")
   public static let openDownloadsFolderErrorDescription =
@@ -4307,6 +4300,42 @@ extension Strings {
       value: "When a website's Zoom-Level has changed, the website will show up on the list here. Currently, there are no websites zoomed in or out.",
       comment: "Description for the empty Web-Page zoom view"
     )
+  }
+}
+
+extension Strings {
+  public struct RecentlyClosed {
+    public static let viewRecentlyClosedTab =
+      NSLocalizedString(
+        "recently.closed.view.tab",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "View Recently Closed Tab",
+        comment: "Action item title of long press for Opening recently closed tab view")
+    
+    public static let recentlyClosedTabsScreenTitle =
+      NSLocalizedString(
+        "recently.closed.title",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Recently Closed Tabs",
+        comment: "Action item title of long press for Opening recently closed tab view")
+    
+    public static let recentlyClosedClearActionTitle =
+      NSLocalizedString(
+        "recently.closed.action.clear",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Clear",
+        comment: "Title for Clear Button inside Recently Closed Tabs")
+    
+    public static let recentlyClosedClearActionConfirmation =
+      NSLocalizedString(
+        "recently.closed.confirmation.clear.title",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Clear All Recently Closed Tabs?",
+        comment: "Confirmationb message for Clear Button action inside Recently Closed Tabs")
   }
 }
 

@@ -271,7 +271,7 @@ extension BrowserViewController: TabManagerDelegate {
 
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       let recentlyClosedTab = UIAction(
-        title: Strings.viewRecentlyClosedTab,
+        title: Strings.RecentlyClosed.viewRecentlyClosedTab,
         image: UIImage(braveSystemNamed: "brave.arrow.counterclockwise.rectangle"),
         handler: UIAction.deferredActionHandler { [weak self] _ in
           guard let self = self else { return }

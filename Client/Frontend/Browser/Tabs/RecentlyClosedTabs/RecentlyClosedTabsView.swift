@@ -17,32 +17,35 @@ struct RecentlyClosedTabsView: View {
   @State private var recentlyClosedLoading = true
   
   @State private var showClearDataPrompt: Bool = false
-  private(set) var onDismiss: (() -> Void)?
+  var onDismiss: ((Bool) -> Void)?
   var selectedNetworkHandler: ((Tab) -> Void)?
   
   private let tabManager: TabManager
 
   private var clearAllDataButton: some View {
-    Button("Clear", action: {
+    Button(Strings.RecentlyClosed.recentlyClosedClearActionTitle, action: {
       showClearDataPrompt = true
     })
-    .accessibility(label: Text("Clear All Recently Closed Tabs"))
+    .accessibility(label: Text(Strings.RecentlyClosed.recentlyClosedClearActionConfirmation))
     .foregroundColor(Color(.braveBlurpleTint))
     .actionSheet(isPresented: $showClearDataPrompt) {
-      .init(title: Text("Clear All Recently Closed Tabs?"),
-            buttons: [
-              .destructive(Text("Clear Recently Closed Tabs"), action: {
-                tabManager.removeAllRecenylClosedTabs()
-                dismissView()
-              }),
-              .cancel()
-            ])
+      .init(title: Text(Strings.RecentlyClosed.recentlyClosedClearActionConfirmation),
+        buttons: [
+          .destructive(Text(Strings.RecentlyClosed.recentlyClosedClearActionTitle), action: {
+            tabManager.removeAllRecenylClosedTabs()
+            dismissView(cleared: true)
+          }),
+          .cancel()
+        ]
+      )
     }
   }
   
   private var doneButton: some View {
-    Button(Strings.done, action: dismissView)
-      .foregroundColor(Color(.braveBlurpleTint))
+    Button(Strings.done, action: {
+      dismissView()
+    })
+    .foregroundColor(Color(.braveBlurpleTint))
   }
   
   private var websitesList: some View {
@@ -96,7 +99,7 @@ struct RecentlyClosedTabsView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.braveGroupedBackground).ignoresSafeArea())
-        .navigationTitle("Recently Closed Tabs")
+        .navigationTitle(Strings.RecentlyClosed.recentlyClosedTabsScreenTitle)
         .navigationBarTitleDisplayMode(.inline)
         .osAvailabilityModifiers { content in
           if #available(iOS 15.0, *) {
@@ -125,15 +128,9 @@ struct RecentlyClosedTabsView: View {
     }
   }
   
-  private func dismissView() {
-    // Dismiss on presentation mode does not work on iOS 14
-    // when using the UIHostingController is parent view.
-    // As a workaround a completion handler is used instead.
-    if #available(iOS 15, *) {
-      presentationMode.dismiss()
-    } else {
-      onDismiss?()
-    }
+  private func dismissView(cleared: Bool = false) {
+    presentationMode.dismiss()
+    onDismiss?(cleared)
   }
   
   private func fetchURL(for tab: Tab) -> String? {
