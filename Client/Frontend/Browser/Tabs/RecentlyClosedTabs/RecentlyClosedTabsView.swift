@@ -75,6 +75,14 @@ struct RecentlyClosedTabsView: View {
           .accessibilityElement()
           .accessibilityLabel("\(tab.displayTitle)")
         }
+        .onDelete { indexSet in
+          let tabsToRemove = indexSet.map { recentlyClosedTabs[$0] }
+          withAnimation(.default) {
+            for tab in tabsToRemove {
+              tabManager.removeTab(tab)
+            }
+          }
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
