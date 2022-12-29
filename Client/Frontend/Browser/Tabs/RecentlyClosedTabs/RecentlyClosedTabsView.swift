@@ -18,7 +18,8 @@ struct RecentlyClosedTabsView: View {
   
   @State private var showClearDataPrompt: Bool = false
   private(set) var onDismiss: (() -> Void)?
-
+  var selectedNetworkHandler: ((Tab) -> Void)?
+  
   private let tabManager: TabManager
 
   private var clearAllDataButton: some View {
@@ -31,7 +32,7 @@ struct RecentlyClosedTabsView: View {
       .init(title: Text("Clear All Recently Closed Tabs?"),
             buttons: [
               .destructive(Text("Clear Recently Closed Tabs"), action: {
-                // TODO: ADD CLEAR CODE
+                tabManager.removeAllRecenylClosedTabs()
                 dismissView()
               }),
               .cancel()
@@ -48,18 +49,23 @@ struct RecentlyClosedTabsView: View {
     List {
       Section {
         ForEach(recentlyClosedTabs, id: \.id) { tab in
-          HStack {
-            FaviconImage(url: tab.displayFavicon?.url)
-            VStack(alignment: .leading) {
-              Text(tab.displayTitle)
-                .font(.footnote)
-                .fontWeight(.semibold)
-                .foregroundColor(Color(.bravePrimary))
-              Text(fetchURL(for: tab) ?? "")
-                .font(.caption)
-                .foregroundColor(Color(.braveLabel))
+          Button(action: {
+            dismissView()
+            selectedNetworkHandler?(tab)
+          }) {
+            HStack {
+              FaviconImage(url: tab.displayFavicon?.url)
+              VStack(alignment: .leading) {
+                Text(tab.displayTitle)
+                  .font(.footnote)
+                  .fontWeight(.semibold)
+                  .foregroundColor(Color(.bravePrimary))
+                Text(fetchURL(for: tab) ?? "")
+                  .font(.caption)
+                  .foregroundColor(Color(.braveLabel))
+              }
+              Spacer()
             }
-            Spacer()
           }
           .frame(maxWidth: .infinity)
           .padding(.vertical, 6)
