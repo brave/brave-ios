@@ -148,6 +148,14 @@ public final class TabMO: NSManagedObject, CRUD {
       tabToUpdate.isSelected = true
     }
   }
+  
+  public class func activateRecentlyClosedTab(tabId: String) {
+    DataController.perform { context in
+      guard let tabToUpdate = getInternal(fromId: tabId, context: context) else { return }
+
+      tabToUpdate.isRecentlyClosed = false
+    }
+  }
 
   // Deletes the Tab History by removing items except the last one from historysnapshot and setting current index
   public class func removeHistory(with tabID: String) {

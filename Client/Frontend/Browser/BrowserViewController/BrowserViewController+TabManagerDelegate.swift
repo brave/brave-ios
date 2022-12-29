@@ -279,10 +279,13 @@ extension BrowserViewController: TabManagerDelegate {
           if PrivateBrowsingManager.shared.isPrivateBrowsing {
             return
           }
+                  
+          var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
+          recentlyClosedTabsView.selectedNetworkHandler = { [weak self] tab in
+            self?.tabManager.selectTab(tab, isRecentlyClosed: true)
+          }
           
-          // TODO: Test Code change it with real view
-          let host = UIHostingController(rootView: RecentlyClosedTabsView(tabManager: tabManager))
-          self.present(host, animated: true)
+          self.present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)
         })
       
       recentlyClosedChildren.append(recentlyClosedTab)

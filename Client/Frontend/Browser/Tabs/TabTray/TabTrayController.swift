@@ -524,9 +524,15 @@ class TabTrayController: LoadingViewController {
       return
     }
     
-    // TODO: Test Code change it with real view
-    let host = UIHostingController(rootView: RecentlyClosedTabsView(tabManager: tabManager))
-    present(host, animated: true)
+    var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
+    recentlyClosedTabsView.selectedNetworkHandler = { [weak self] tab in
+      guard let self else { return }
+      
+      self.tabManager.selectTab(tab, isRecentlyClosed: true)
+      self.dismiss(animated: false)
+    }
+    
+    present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)
   }
 
   @objc func togglePrivateModeAction() {

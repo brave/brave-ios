@@ -141,6 +141,12 @@ class TabManager: NSObject {
 
     return allTabs.count
   }
+  
+  var activeTabCount: Int {
+    assert(Thread.isMainThread)
+
+    return allTabs.filter { !$0.isRecentlyClosed }.count
+  }
 
   var selectedTab: Tab? {
     assert(Thread.isMainThread)
@@ -287,7 +293,7 @@ class TabManager: NSObject {
     }
   }
 
-  func selectTab(_ tab: Tab?, previous: Tab? = nil) {
+  func selectTab(_ tab: Tab?, previous: Tab? = nil, isRecentlyClosed: Bool = false) {
     assert(Thread.isMainThread)
     let previous = previous ?? selectedTab
 
@@ -321,8 +327,17 @@ class TabManager: NSObject {
       return
     }
 
-    if let tabId = tab?.id {
+    if let tab = tab, let tabId = tab.id {
       TabMO.selectTabAndDeselectOthers(selectedTabId: tabId)
+      
+      if isRecentlyClosed {
+        // Re-activate recently closed Tab
+        TabMO.activateRecentlyClosedTab(tabId: tabId)
+
+        // Move Tab to the end of the tab_list where count
+        // respresents all the tabs which are not recently closed
+        moveTab(tab, toIndex: activeTabCount - 1)
+      }
     }
 
     UIImpactFeedbackGenerator(style: .light).bzzt()
@@ -738,6 +753,17 @@ class TabManager: NSObject {
     BraveWebView.removeNonPersistentStore()
 
     allTabs = tabs(withType: .regular)
+  }
+  
+  /// Removes all recently closed tabs from tab list
+  /// Private tab status is uncessary since this action can not
+  /// be executed from private mode but it is there for safetry reference
+  func removeAllRecenylClosedTabs() {
+    for tab in allTabs {
+      if tab.isRecentlyClosed, !tab.isPrivate {
+        removeTab(tab)
+      }
+    }
   }
 
   func removeAllBrowsingDataForTab(_ tab: Tab, completionHandler: @escaping () -> Void = {}) {
