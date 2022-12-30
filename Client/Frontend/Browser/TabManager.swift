@@ -68,10 +68,10 @@ class TabManager: NSObject {
     }
   }
 
-  fileprivate(set) var allTabs = [Tab]()
-  fileprivate var _selectedIndex = -1
-  fileprivate let navDelegate: TabManagerNavDelegate
-  fileprivate(set) var isRestoring = false
+  private(set) var allTabs = [Tab]()
+  private var _selectedIndex = -1
+  private let navDelegate: TabManagerNavDelegate
+  private(set) var isRestoring = false
 
   // A WKWebViewConfiguration used for normal tabs
   lazy fileprivate var configuration: WKWebViewConfiguration = {
@@ -226,7 +226,7 @@ class TabManager: NSObject {
   func recentlyClosedTabs() -> [Tab] {
     let allTabs = allTabs.filter { $0.type == .regular }
 
-    return allTabs.filter { !$0.isRecentlyClosed }
+    return allTabs.filter { $0.isRecentlyClosed }
   }
   
   /// Function for adding local tabs as synced sessions
@@ -332,7 +332,7 @@ class TabManager: NSObject {
       
       if isRecentlyClosed {
         // Re-activate recently closed Tab
-        TabMO.activateRecentlyClosedTab(tabId: tabId)
+        TabMO.changeRecentlyClosedStatus(tabId: tabId, isRecentlyClosed: isRecentlyClosed)
 
         // Move Tab to the end of the tab_list where count
         // respresents all the tabs which are not recently closed
@@ -481,8 +481,8 @@ class TabManager: NSObject {
     let allTabIds = allTabs.compactMap { $0.id }
     TabMO.saveTabOrder(tabIds: allTabIds)
   }
-
-  func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, id: String? = nil, isPopup: Bool = false) {
+  
+  private func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, id: String? = nil, isPopup: Bool = false) {
     assert(Thread.isMainThread)
 
     let isPrivate = tab.type == .private
@@ -492,6 +492,10 @@ class TabManager: NSObject {
     } else {
       tab.id = id ?? TabMO.create()
     }
+    
+    //
+    let tabMO = TabMO.get(fromId: tab.id)
+    tab.isRecentlyClosed = tabMO?.isRecentlyClosed ?? false
 
     if let (provider, js) = makeWalletEthProvider?(tab) {
       let providerJS = """
@@ -637,7 +641,30 @@ class TabManager: NSObject {
 
     return nil
   }
+  
+  // TODO: TAB Closed
+  /// Function to set an active Tab as Recently-Closed when
+  /// the tab is removed by user interaction
+  /// - Parameter tab: Tab to be removed
+  func setTabAsRecentlyClosed(_ tab: Tab) {
+    tab.isRecentlyClosed = true
+    
+    if let tabId = tab.id {
+      TabMO.changeRecentlyClosedStatus(tabId: tabId, isRecentlyClosed: true)
+    }
+  }
+  
+  // TODO: TAB Closed
+  /// Function to set an all tab as Recently-Closed
+  func setAllTabsAsRecentlyClosed() {
+    for tab in allTabs {
+      tab.isRecentlyClosed = true
+    }
+    
+    TabMO.changeRecentlyClosedStatusAllTabs()
+  }
 
+  // TODO: TAB Closed 1 - 3 - 4
   func removeTab(_ tab: Tab) {
     assert(Thread.isMainThread)
 
@@ -849,6 +876,7 @@ class TabManager: NSObject {
     removeTabs(self.allTabs)
   }
   
+  // TODO: TAB Closed 2
   func removeAllForCurrentMode() {
     removeTabs(tabsForCurrentMode)
   }
