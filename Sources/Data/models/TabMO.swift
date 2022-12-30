@@ -149,11 +149,23 @@ public final class TabMO: NSManagedObject, CRUD {
     }
   }
   
-  public class func activateRecentlyClosedTab(tabId: String) {
+  public class func changeRecentlyClosedStatus(tabId: String, isRecentlyClosed: Bool) {
     DataController.perform { context in
       guard let tabToUpdate = getInternal(fromId: tabId, context: context) else { return }
 
-      tabToUpdate.isRecentlyClosed = false
+      tabToUpdate.isRecentlyClosed = isRecentlyClosed
+    }
+  }
+  
+  public class func changeRecentlyClosedStatusAllTabs() {
+    DataController.perform { context in
+      guard let tabs = TabMO.all(context: context) else {
+        return
+      }
+      
+      for tab in tabs {
+        tab.isRecentlyClosed = false
+      }
     }
   }
 

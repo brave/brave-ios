@@ -281,7 +281,7 @@ extension BrowserViewController: TabManagerDelegate {
           }
                   
           var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
-          recentlyClosedTabsView.selectedNetworkHandler = { [weak self] tab in
+          recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] tab in
             self?.tabManager.selectTab(tab, isRecentlyClosed: true)
           }
           
@@ -322,7 +322,12 @@ extension BrowserViewController: TabManagerDelegate {
             hideReaderModeBar(animated: false)
           }
           
-          tabManager.removeTab(tab)
+          // TODO: TAB Closed 1
+          if tab.isPrivate {
+            tabManager.removeTab(tab)
+          } else {
+            tabManager.setTabAsRecentlyClosed(tab)
+          }
         }
       })
 
@@ -339,7 +344,12 @@ extension BrowserViewController: TabManagerDelegate {
           let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel)
           let closedTabsTitle = String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count)
           let closeAllAction = UIAlertAction(title: closedTabsTitle, style: .destructive) { _ in
-            tabManager.removeAllForCurrentMode()
+            // TODO: TAB Closed 2
+            if PrivateBrowsingManager.shared.isPrivateBrowsing {
+              tabManager.removeAllForCurrentMode()
+            } else {
+              tabManager.setAllTabsAsRecentlyClosed()
+            }
           }
           alert.addAction(closeAllAction)
           alert.addAction(cancelAction)

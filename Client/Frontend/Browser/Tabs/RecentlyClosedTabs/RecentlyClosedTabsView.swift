@@ -18,7 +18,7 @@ struct RecentlyClosedTabsView: View {
   
   @State private var showClearDataPrompt: Bool = false
   var onDismiss: ((Bool) -> Void)?
-  var selectedNetworkHandler: ((Tab) -> Void)?
+  var onRecentlyClosedSelected: ((Tab) -> Void)?
   
   private let tabManager: TabManager
 
@@ -54,7 +54,7 @@ struct RecentlyClosedTabsView: View {
         ForEach(recentlyClosedTabs, id: \.id) { tab in
           Button(action: {
             dismissView()
-            selectedNetworkHandler?(tab)
+            onRecentlyClosedSelected?(tab)
           }) {
             HStack {
               FaviconImage(url: tab.displayFavicon?.url)
