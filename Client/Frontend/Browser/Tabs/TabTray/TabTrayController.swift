@@ -525,7 +525,7 @@ class TabTrayController: LoadingViewController {
     }
     
     var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
-    recentlyClosedTabsView.selectedNetworkHandler = { [weak self] tab in
+    recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] tab in
       guard let self else { return }
       
       self.tabManager.selectTab(tab, isRecentlyClosed: true)
@@ -577,7 +577,12 @@ class TabTrayController: LoadingViewController {
   }
 
   private func remove(tab: Tab) {
-    tabManager.removeTab(tab)
+    // TODO: TAB Closed 4
+    if tab.isPrivate {
+      tabManager.removeTab(tab)
+    } else {
+      tabManager.setTabAsRecentlyClosed(tab)
+    }
     
     let query = isTabTrayBeingSearched ? tabTraySearchQuery : nil
     applySnapshot(for: query)
