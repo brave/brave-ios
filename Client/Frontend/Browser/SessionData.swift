@@ -68,7 +68,7 @@ class SessionData: NSObject, NSSecureCoding {
     let isPrivate = jsonDictionary[SessionData.Keys.isPrivate] as? Bool ?? false
     let currentURL = urlStrings[(currentPage < 0 ? max(urlStrings.count - 1, 0) : currentPage)]
 
-    return SavedTab(id: "InvalidId", title: nil, url: currentURL, isSelected: false, order: -1, screenshot: nil, history: urlStrings, historyIndex: Int16(currentPage), isPrivate: isPrivate, isRecentlyClosed: false)
+    return SavedTab(id: "InvalidId", title: nil, url: currentURL, isSelected: false, order: -1, screenshot: nil, history: urlStrings, historyIndex: Int16(currentPage), isPrivate: isPrivate)
   }
 
   static var supportsSecureCoding: Bool {

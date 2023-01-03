@@ -78,8 +78,6 @@ class Tab: NSObject {
   var isPrivate: Bool {
     return type.isPrivate
   }
-
-  var isRecentlyClosed: Bool
   
   var secureContentState: TabSecureContentState = .unknown
 
@@ -273,11 +271,8 @@ class Tab: NSObject {
     }
   }
 
-  init(configuration: WKWebViewConfiguration, type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil, isRecentlyClosed: Bool = false) {
-
-//  init(configuration: WKWebViewConfiguration, type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil, isRecentlyClosed: Bool) {
+  init(configuration: WKWebViewConfiguration, type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil) {
     self.configuration = configuration
-    self.isRecentlyClosed = isRecentlyClosed
     rewardsId = UInt32.random(in: 1...UInt32.max)
     nightMode = Preferences.General.nightModeEnabled.value
     syncTab = tabGeneratorAPI?.createBraveSyncTab(isOffTheRecord: type == .private)

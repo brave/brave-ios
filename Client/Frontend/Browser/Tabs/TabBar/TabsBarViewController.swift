@@ -207,7 +207,6 @@ class TabsBarViewController: UIViewController {
     }
   }
 
-  // TODO: TAB Updated 1
   func updateData() {
     tabList = WeakList<Tab>()
 
@@ -385,14 +384,13 @@ extension TabsBarViewController: UICollectionViewDataSource {
       
       self.delegate?.tabsBarDidChangeReaderModeVisibility(true)
       
-      // TODO: TAB Closed 3
+      // TODO: Recently Closed
       if tab.isPrivate {
-        tabManager.removeTab(tab)
-      } else {
-        tabManager.setTabAsRecentlyClosed(tab)
+        // Add tab to recently closed
       }
       
-      // TODO: TAB Updated 1
+      tabManager.removeTab(tab)
+      
       self.updateData()
 
       let previousOrNext = max(0, previousIndex - 1)

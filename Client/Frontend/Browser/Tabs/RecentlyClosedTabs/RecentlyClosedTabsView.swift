@@ -32,7 +32,9 @@ struct RecentlyClosedTabsView: View {
       .init(title: Text(Strings.RecentlyClosed.recentlyClosedClearActionConfirmation),
         buttons: [
           .destructive(Text(Strings.RecentlyClosed.recentlyClosedClearActionTitle), action: {
-            tabManager.removeAllRecenylClosedTabs()
+            // TODO Recently Closed
+            
+            // Clear all recently closed
             dismissView(cleared: true)
           }),
           .cancel()
@@ -76,12 +78,17 @@ struct RecentlyClosedTabsView: View {
           .accessibilityLabel("\(tab.displayTitle)")
         }
         .onDelete { indexSet in
-          let tabsToRemove = indexSet.map { recentlyClosedTabs[$0] }
-          withAnimation(.default) {
-            for tab in tabsToRemove {
-              tabManager.removeTab(tab)
-            }
-          }
+          // TODO: Recently Closed
+          
+          // Delete an individual info from recently closed
+          
+//          let tabsToRemove = indexSet.map { recentlyClosedTabs[$0] }
+//          withAnimation(.default) {
+//            for tab in tabsToRemove {
+//              tabManager.removeTab(tab)
+//            }
+//          }
+          
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -130,7 +137,7 @@ struct RecentlyClosedTabsView: View {
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
     
-      recentlyClosedTabs = tabManager.recentlyClosedTabs()
+      recentlyClosedTabs = tabManager.allTabs
 
       recentlyClosedLoading = false
     }

@@ -524,11 +524,12 @@ class TabTrayController: LoadingViewController {
       return
     }
     
+    // TODO: Recently Closed
     var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
     recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] tab in
       guard let self else { return }
       
-      self.tabManager.selectTab(tab, isRecentlyClosed: true)
+      // Add tab to recently closed
       self.dismiss(animated: false)
     }
     
@@ -576,13 +577,13 @@ class TabTrayController: LoadingViewController {
 
   }
 
+  // TODO: Recently Closed
   private func remove(tab: Tab) {
-    // TODO: TAB Closed 4
-    if tab.isPrivate {
-      tabManager.removeTab(tab)
-    } else {
-      tabManager.setTabAsRecentlyClosed(tab)
+    if !tab.isPrivate {
+      // Add tab to recently closed
     }
+    
+    tabManager.removeTab(tab)
     
     let query = isTabTrayBeingSearched ? tabTraySearchQuery : nil
     applySnapshot(for: query)
