@@ -230,11 +230,6 @@ public class Migration {
       
       Preferences.Migration.coreDataCompleted.value = true
     }
-    
-    if !Preferences.Migration.recentlyClosedCompleted.value {
-      TabMO.migrateRecentlyClosed()
-      Preferences.Migration.recentlyClosedCompleted.value = true
-    }
   }
 }
 
@@ -270,7 +265,6 @@ fileprivate extension Preferences {
     // After migrating to Apples OSLog those files have to be removed.
     static let xcgloggerFilesRemovalCompleted =
           Option<Bool>(key: "migration.xcglogger-file-removal-completed", default: false)
-    static let recentlyClosedCompleted = Option<Bool>(key: "migration.recently-closed-completed", default: false)
   }
 
   /// Migrate a given key from `Prefs` into a specific option
