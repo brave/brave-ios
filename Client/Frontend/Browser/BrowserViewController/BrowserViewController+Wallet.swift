@@ -320,10 +320,7 @@ extension Tab: BraveWalletProviderDelegate {
     case .eth:
       return !Preferences.Wallet.allowEthProviderAccess.value
     case .sol:
-      if WalletDebugFlags.isSolanaDappsEnabled {
-        return !Preferences.Wallet.allowSolProviderAccess.value
-      }
-      return true
+      return !Preferences.Wallet.allowSolProviderAccess.value
     case .fil:
       return true
     @unknown default:
