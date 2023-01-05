@@ -54,16 +54,26 @@ extension BrowserViewController {
       return
     }
     
+    var alertDetails = String(format: Strings.openExternalAppURLMessage, url.relativeString)
+    
     // We do not want certain schemes to be opened externally when called from subframes.
-    if ["tel", "sms"].contains(url.scheme) && !isMainFrame {
-      return
+    // And tel / sms dialog should not be shown for non-active tabs #6687
+    if ["tel", "sms"].contains(url.scheme) {
+      if !isMainFrame || tab?.url?.host != topToolbar.currentURL?.host {
+        return
+      }
+      
+      if let displayHost = tab?.url?.withoutWWW.host {
+        alertDetails = String(format: Strings.openExternalAppURLHost, displayHost) + "\n\n" + alertDetails
+      }
     }
     
     self.view.endEditing(true)
+    
     let popup = AlertPopupView(
       imageView: nil,
       title: Strings.openExternalAppURLTitle,
-      message: String(format: Strings.openExternalAppURLMessage, url.relativeString),
+      message: alertDetails,
       titleWeight: .semibold,
       titleSize: 21
     )

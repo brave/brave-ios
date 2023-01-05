@@ -1092,6 +1092,7 @@ extension Strings {
   public static let shareWithMenuItem = NSLocalizedString("ShareWithMenuItem", tableName: "BraveShared", bundle: .module, value: "Share with...", comment: "Title for sharing url menu item")
   public static let openExternalAppURLTitle = NSLocalizedString("ExternalAppURLAlertTitle", tableName: "BraveShared", bundle: .module, value: "Allow link to switch apps?", comment: "Allow link to switch apps?")
   public static let openExternalAppURLMessage = NSLocalizedString("ExternalAppURLAlertMessage", tableName: "BraveShared", bundle: .module, value: "%@ will launch an external application", comment: "%@ will launch an external application")
+  public static let openExternalAppURLHost = NSLocalizedString("openExternalAppURLHost", tableName: "BraveShared", bundle: .module, value: "%@ says:", comment: "This will be used to indicate which website is calling the action. %s will replace the name of the website for instance: 'google.com says:'")
   public static let openExternalAppURLAllow = NSLocalizedString("ExternalAppURLAllow", tableName: "BraveShared", bundle: .module, value: "Allow", comment: "Allow Brave to open the external app URL")
   public static let openExternalAppURLDontAllow = NSLocalizedString("ExternalAppURLDontAllow", tableName: "BraveShared", bundle: .module, value: "Don't Allow", comment: "Don't allow Brave to open the external app URL")
   public static let downloadsMenuItem = NSLocalizedString("DownloadsMenuItem", tableName: "BraveShared", bundle: .module, value: "Downloads", comment: "Title for downloads menu item")
