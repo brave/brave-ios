@@ -65,6 +65,12 @@ class SyncAddDeviceViewController: SyncViewController {
     $0.alignment = .center
   }
   
+  // This view is created to create white frame around the QR code
+  // It is done to solve problems scanning QR code with Android devices
+  private let qrCodeContainerView = UIView().then {
+    $0.backgroundColor = .white
+  }
+  
   private let qrCodeView: SyncQRCodeView
   
   private lazy var codewordsView = UILabel().then {
@@ -160,7 +166,10 @@ class SyncAddDeviceViewController: SyncViewController {
   private func setTheme() {
     title = deviceType == .computer ? Strings.syncAddComputerTitle : Strings.syncAddTabletOrPhoneTitle
 
-    codewordsView.text = syncAPI.getTimeLimitedWords(fromWords: syncAPI.getSyncCode())
+    codewordsView.do {
+      $0.text = syncAPI.getTimeLimitedWords(fromWords: syncAPI.getSyncCode())
+      $0.isHidden = true
+    }
     
     modeControl.do {
       $0.isHidden = deviceType == .computer
@@ -196,19 +205,24 @@ class SyncAddDeviceViewController: SyncViewController {
     stackView.addArrangedSubview(titleDescriptionStackView)
 
     // Code Words View - QR Code
-    syncDetailsContainerView.addArrangedSubview(qrCodeView)
+    syncDetailsContainerView.addArrangedSubview(qrCodeContainerView)
     syncDetailsContainerView.addArrangedSubview(codewordsView)
     
+    qrCodeContainerView.snp.makeConstraints {
+      $0.leading.trailing.equalToSuperview().inset(12)
+      $0.width.equalTo(qrCodeContainerView.snp.height)
+    }
+    
+    qrCodeContainerView.addSubview(qrCodeView)
+    
     qrCodeView.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview().inset(24)
-      $0.width.equalTo(qrCodeView.snp.height)
+      $0.edges.equalToSuperview().inset(12)
     }
     
     codewordsView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
     
-    codewordsView.isHidden = true
     stackView.addArrangedSubview(syncDetailsContainerView)
 
     // Copy - Paste - Done Button
@@ -288,13 +302,9 @@ extension SyncAddDeviceViewController {
   @objc func changeMode() {
     let isFirstIndex = modeControl.selectedSegmentIndex == 0
 
-    qrCodeView.isHidden = !isFirstIndex
+    qrCodeContainerView.isHidden = !isFirstIndex
     codewordsView.isHidden = isFirstIndex
     copyPasteButton.isHidden = isFirstIndex
-
-    codewordsView.snp.remakeConstraints {
-      $0.edges.equalToSuperview()
-    }
     
     updateLabels()
   }
