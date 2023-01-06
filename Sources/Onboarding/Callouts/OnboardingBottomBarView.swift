@@ -27,7 +27,7 @@ public struct OnboardingBottomBarView: View {
       VStack(spacing: 24) {
         Image("bottom-bar-logo-bottom", bundle: .module)
           .aspectRatio(contentMode: .fit)
-        Text(Strings.Callout.bottomBarCalloutButtonTitle)
+        Text(Strings.Callout.bottomBarCalloutTitle)
           .font(.title2.weight(.semibold))
           .foregroundColor(Color(.bravePrimary))
           .multilineTextAlignment(.center)
@@ -54,7 +54,7 @@ public struct OnboardingBottomBarView: View {
       Button(action: {
         dismiss?()
       }) {
-        Text(Strings.DefaultBrowserCallout.introSkipButtonText)
+        Text(Strings.Callout.bottomBarCalloutDismissButtonTitle)
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .font(.title3.weight(.medium))
       }

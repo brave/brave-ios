@@ -300,20 +300,26 @@ extension Strings {
       NSLocalizedString(
         "callout.bottomBarCalloutTitle",
         tableName: "BraveShared", bundle: .module,
-        value: "Introducing Toolbar",
+        value: "Customize Brave Tabs Bar",
         comment: "Title for Bottom Bar Callout View")
     public static let bottomBarCalloutDescription =
       NSLocalizedString(
         "callout.bottomBarCalloutDescription",
         tableName: "BraveShared", bundle: .module,
-        value: "Make playlists of your favorite audio and videos and play anytime, anywhere.",
+        value: "Move the address bar, tabs, bookmarks, and other tools to the bottom of the browser.",
         comment: "Description for Bottom Bar Callout View")
     public static let bottomBarCalloutButtonTitle =
       NSLocalizedString(
         "callout.bottomBarCalloutButtonTitle",
         tableName: "BraveShared", bundle: .module,
-        value: "Switch to Toolbar",
+        value: "Move Tabs Bar",
         comment: "Button title for Bottom Bar Callout View")
+    public static let bottomBarCalloutDismissButtonTitle = NSLocalizedString(
+      "braveSearchPromotion.bottomBarCalloutDismissButtonTitle",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Maybe later",
+      comment: "Button title for Bottom Bar Callout View for action later")
   }
 }
 
