@@ -62,7 +62,7 @@ public class SendTokenStore: ObservableObject {
   /// The address returned from SNS / ENS
   @Published private(set) var resolvedAddress: String?
 
-  enum AddressError: LocalizedError {
+  enum AddressError: LocalizedError, Equatable {
     case sameAsFromAddress
     case contractAddress
     case notEthAddress
