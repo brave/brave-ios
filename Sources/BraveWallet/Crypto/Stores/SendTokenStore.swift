@@ -69,8 +69,7 @@ public class SendTokenStore: ObservableObject {
     case missingChecksum
     case invalidChecksum
     case notSolAddress
-    case ensError
-    case snsError
+    case snsError(domain: String)
 
     var errorDescription: String? {
       switch self {
@@ -86,10 +85,8 @@ public class SendTokenStore: ObservableObject {
         return Strings.Wallet.sendWarningAddressInvalidChecksum
       case .notSolAddress:
         return Strings.Wallet.sendWarningSolAddressNotValid
-      case .ensError:
-        return "Failed to resolve address via ENS."
-      case .snsError:
-        return "Failed to resolve address via SNS."
+      case .snsError(let domain):
+        return String.localizedStringWithFormat(Strings.Wallet.sendErrorDomainNotRegistered, domain)
       }
     }
   }
@@ -294,7 +291,7 @@ public class SendTokenStore: ObservableObject {
       let (address, status, _) = await rpcService.snsGetSolAddr(sendAddress)
       guard !Task.isCancelled else { return }
       if status != .success || address.isEmpty {
-        addressError = .snsError
+        addressError = .snsError(domain: sendAddress)
         return
       }
       // If found address is the same as the selectedAccounts Wallet Address
