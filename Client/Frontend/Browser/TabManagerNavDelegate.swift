@@ -79,6 +79,7 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     return .allow
   }
   
+  @MainActor
   func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
     var res = defaultAllowPolicy()
     var pref = preferences
@@ -103,6 +104,7 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     return (res, pref)
   }
   
+  @MainActor
   func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     var res = WKNavigationResponsePolicy.allow
     for delegate in delegates {
@@ -121,11 +123,8 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     }
 
     if res == .allow {
-      // TabManager.subscript.getter requires MAIN-THREAD!
-      await Task { @MainActor in
-        let tab = tabManager?[webView]
-        tab?.mimeType = navigationResponse.response.mimeType
-      }.value
+      let tab = tabManager?[webView]
+      tab?.mimeType = navigationResponse.response.mimeType
     }
     
     return res
