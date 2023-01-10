@@ -84,8 +84,13 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     var pref = preferences
     
     for delegate in delegates {
+      // Needed to resolve ambiguous delegate signatures: https://github.com/apple/swift/issues/45652#issuecomment-1149235081
       typealias WKNavigationActionSignature = (WKNavigationDelegate) -> ((WKWebView, WKNavigationAction, WKWebpagePreferences, @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) -> Void)?
+      
+      // Needed to detect if async implementations exist as we cannot detect them directly
       if delegate.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:preferences:decisionHandler:) as WKNavigationActionSignature)) {
+        // Do NOT change to `delegate.webView?(....)` the optional operator makes async-await calls crash the compiler atm!
+        // It must be force-unwrapped at the time of writing `January 10th, 2023`.
         let (policy, preferences) = await delegate.webView!(webView, decidePolicyFor: navigationAction, preferences: preferences)
         if policy == .cancel {
           res = policy
@@ -101,8 +106,13 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
   func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     var res = WKNavigationResponsePolicy.allow
     for delegate in delegates {
+      // Needed to resolve ambiguous delegate signatures: https://github.com/apple/swift/issues/45652#issuecomment-1149235081
       typealias WKNavigationResponseSignature = (WKNavigationDelegate) -> ((WKWebView, WKNavigationResponse, @escaping (WKNavigationResponsePolicy) -> Void) -> Void)?
+      
+      // Needed to detect if async implementations exist as we cannot detect them directly
       if delegate.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:) as WKNavigationResponseSignature)) {
+        // Do NOT change to `delegate.webView?(....)` the optional operator makes async-await calls crash the compiler atm!
+        // It must be force-unwrapped at the time of writing `January 10th, 2023`.
         let policy = await delegate.webView!(webView, decidePolicyFor: navigationResponse)
         if policy == .cancel {
           res = policy
@@ -111,8 +121,7 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     }
 
     if res == .allow {
-      // TabManager.subscript.getter required MAIN-THREAD!
-      
+      // TabManager.subscript.getter requires MAIN-THREAD!
       await Task { @MainActor in
         let tab = tabManager?[webView]
         tab?.mimeType = navigationResponse.response.mimeType
