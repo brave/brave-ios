@@ -331,23 +331,22 @@ extension BrowserViewController: WKNavigationDelegate {
 
       // We fetch cookies to determine if backup search was enabled on the website.
       let profile = self.profile
-      webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
-        tab?.braveSearchManager = BraveSearchManager(profile: profile, url: url, cookies: cookies)
-        if let braveSearchManager = tab?.braveSearchManager {
-          braveSearchManager.fallbackQueryResultsPending = true
-          braveSearchManager.shouldUseFallback { backupQuery in
-            guard let query = backupQuery else {
-              braveSearchManager.fallbackQueryResultsPending = false
-              return
-            }
+      let cookies = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
+      tab?.braveSearchManager = BraveSearchManager(profile: profile, url: url, cookies: cookies)
+      if let braveSearchManager = tab?.braveSearchManager {
+        braveSearchManager.fallbackQueryResultsPending = true
+        braveSearchManager.shouldUseFallback { backupQuery in
+          guard let query = backupQuery else {
+            braveSearchManager.fallbackQueryResultsPending = false
+            return
+          }
 
-            if query.found {
+          if query.found {
+            braveSearchManager.fallbackQueryResultsPending = false
+          } else {
+            braveSearchManager.backupSearch(with: query) { completion in
               braveSearchManager.fallbackQueryResultsPending = false
-            } else {
-              braveSearchManager.backupSearch(with: query) { completion in
-                braveSearchManager.fallbackQueryResultsPending = false
-                tab?.injectResults()
-              }
+              tab?.injectResults()
             }
           }
         }

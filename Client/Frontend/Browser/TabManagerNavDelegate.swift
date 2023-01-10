@@ -78,47 +78,47 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
     }
     return .allow
   }
-
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-
+  
+  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
     var res = defaultAllowPolicy()
     var pref = preferences
+    
     for delegate in delegates {
-      delegate.webView?(
-        webView, decidePolicyFor: navigationAction, preferences: preferences,
-        decisionHandler: { policy, preference in
-          if policy == .cancel {
-            res = policy
-          }
-
-          pref = preference
-        })
+      typealias WKNavigationActionSignature = (WKNavigationDelegate) -> ((WKWebView, WKNavigationAction, WKWebpagePreferences, @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) -> Void)?
+      if delegate.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:preferences:decisionHandler:) as WKNavigationActionSignature)) {
+        let (policy, preferences) = await delegate.webView!(webView, decidePolicyFor: navigationAction, preferences: preferences)
+        if policy == .cancel {
+          res = policy
+        }
+        
+        pref = preferences
+      }
     }
-
-    decisionHandler(res, pref)
+    
+    return (res, pref)
   }
-
-  func webView(
-    _ webView: WKWebView,
-    decidePolicyFor navigationResponse: WKNavigationResponse,
-    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
-  ) {
+  
+  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     var res = WKNavigationResponsePolicy.allow
     for delegate in delegates {
-      delegate.webView?(
-        webView, decidePolicyFor: navigationResponse,
-        decisionHandler: { policy in
-          if policy == .cancel {
-            res = policy
-          }
-        })
+      typealias WKNavigationResponseSignature = (WKNavigationDelegate) -> ((WKWebView, WKNavigationResponse, @escaping (WKNavigationResponsePolicy) -> Void) -> Void)?
+      if delegate.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:) as WKNavigationResponseSignature)) {
+        let policy = await delegate.webView!(webView, decidePolicyFor: navigationResponse)
+        if policy == .cancel {
+          res = policy
+        }
+      }
     }
 
     if res == .allow {
-      let tab = tabManager?[webView]
-      tab?.mimeType = navigationResponse.response.mimeType
+      // TabManager.subscript.getter required MAIN-THREAD!
+      
+      await Task { @MainActor in
+        let tab = tabManager?[webView]
+        tab?.mimeType = navigationResponse.response.mimeType
+      }.value
     }
-
-    decisionHandler(res)
+    
+    return res
   }
 }
