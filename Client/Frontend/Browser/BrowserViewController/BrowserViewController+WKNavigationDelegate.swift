@@ -147,6 +147,7 @@ extension BrowserViewController: WKNavigationDelegate {
     return url.scheme == "rewards" && url.host == "uphold"
   }
 
+  @MainActor
   public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
     guard let url = navigationAction.request.url else {
       return (.cancel, preferences)
@@ -329,23 +330,22 @@ extension BrowserViewController: WKNavigationDelegate {
 
       // We fetch cookies to determine if backup search was enabled on the website.
       let profile = self.profile
-      webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
-        tab?.braveSearchManager = BraveSearchManager(profile: profile, url: url, cookies: cookies)
-        if let braveSearchManager = tab?.braveSearchManager {
-          braveSearchManager.fallbackQueryResultsPending = true
-          braveSearchManager.shouldUseFallback { backupQuery in
-            guard let query = backupQuery else {
-              braveSearchManager.fallbackQueryResultsPending = false
-              return
-            }
+      let cookies = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
+      tab?.braveSearchManager = BraveSearchManager(profile: profile, url: url, cookies: cookies)
+      if let braveSearchManager = tab?.braveSearchManager {
+        braveSearchManager.fallbackQueryResultsPending = true
+        braveSearchManager.shouldUseFallback { backupQuery in
+          guard let query = backupQuery else {
+            braveSearchManager.fallbackQueryResultsPending = false
+            return
+          }
 
-            if query.found {
+          if query.found {
+            braveSearchManager.fallbackQueryResultsPending = false
+          } else {
+            braveSearchManager.backupSearch(with: query) { completion in
               braveSearchManager.fallbackQueryResultsPending = false
-            } else {
-              braveSearchManager.backupSearch(with: query) { completion in
-                braveSearchManager.fallbackQueryResultsPending = false
-                tab?.injectResults()
-              }
+              tab?.injectResults()
             }
           }
         }
@@ -437,7 +437,8 @@ extension BrowserViewController: WKNavigationDelegate {
     return (.cancel, preferences)
   }
 
-  public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  @MainActor
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     let response = navigationResponse.response
     let responseURL = response.url
@@ -488,8 +489,7 @@ extension BrowserViewController: WKNavigationDelegate {
     if let passbookHelper = OpenPassBookHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
       // Open our helper and cancel this response from the webview.
       passbookHelper.open()
-      decisionHandler(.cancel)
-      return
+      return .cancel
     }
 
     // Check if this response should be downloaded.
@@ -507,8 +507,8 @@ extension BrowserViewController: WKNavigationDelegate {
       if let downloadAlert = downloadHelper.downloadAlert(from: view, okAction: downloadAlertAction) {
         present(downloadAlert, animated: true, completion: nil)
       }
-      decisionHandler(.cancel)
-      return
+      
+      return .cancel
     }
 
     // If the content type is not HTML, create a temporary document so it can be downloaded and
@@ -522,22 +522,19 @@ extension BrowserViewController: WKNavigationDelegate {
 
       tab.mimeType = response.mimeType
     }
-
-    // If none of our helpers are responsible for handling this response,
-    // just let the webview handle it as normal.
-    decisionHandler(.allow)
-    
-    guard let url = responseURL, let tab = tab else {
-      return
-    }
     
     // Record the navigation visit type for the URL after navigation actions
     // this is done in decidePolicyFor to handle all the cases like redirects etc.
-    if !url.isReaderModeURL, !url.isFileURL, url.isWebPage(), !tab.isPrivate {
+    if let url = responseURL, let tab = tab, !url.isReaderModeURL, !url.isFileURL, url.isWebPage(), !tab.isPrivate {
       recordNavigationInTab(url, visitType: lastEnteredURLVisitType)
     }
+    
+    // If none of our helpers are responsible for handling this response,
+    // just let the webview handle it as normal.
+    return .allow
   }
 
+  // When this function is moved to Async-Await, do NOT forget to move the `TabManagerNavDelegate` to async-await!
   public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 
     // If this is a certificate challenge, see if the certificate has previously been
