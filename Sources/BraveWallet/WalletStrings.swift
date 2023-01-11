@@ -1766,7 +1766,7 @@ extension Strings {
       comment: "A warning that appears below the send crypto address text field, when the input `To` address is not a valid SOL address."
     )
     public static let sendErrorDomainNotRegistered = NSLocalizedString(
-      "wallet.sendWarningDomainNotRegistered",
+      "wallet.sendErrorDomainNotRegistered",
       tableName: "BraveWallet",
       bundle: .module,
       value: "%@ is not registered",
