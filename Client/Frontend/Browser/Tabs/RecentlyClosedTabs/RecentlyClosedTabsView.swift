@@ -33,7 +33,7 @@ struct RecentlyClosedTabsView: View {
       .init(title: Text(Strings.RecentlyClosed.recentlyClosedClearActionConfirmation),
         buttons: [
           .destructive(Text(Strings.RecentlyClosed.recentlyClosedClearActionTitle), action: {
-            RecentSearch.removeAll()
+            RecentlyClosed.removeAll()
             dismissView(cleared: true)
           }),
           .cancel()
@@ -64,6 +64,7 @@ struct RecentlyClosedTabsView: View {
                   .font(.footnote)
                   .fontWeight(.semibold)
                   .foregroundColor(Color(.bravePrimary))
+                  .lineLimit(1)
                 Text("\(URLFormatter.formatURL(recentlyClosed.url))")
                   .font(.caption)
                   .foregroundColor(Color(.braveLabel))
