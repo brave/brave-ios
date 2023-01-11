@@ -149,6 +149,14 @@ struct SendTokenView: View {
               .font(.footnote)
               .foregroundColor(Color(.braveErrorLabel))
               .padding(.bottom)
+            } else {
+              // SwiftUI will add/remove this Section footer when addressError
+              // optionality is changed. This can cause keyboard to dismiss.
+              // By using clear square, the footer remains and section is not
+              // redrawn, so the keyboard does not dismiss as user types.
+              Color.clear.frame(width: 1, height: 1)
+                .accessibility(hidden: true)
+                .transition(.identity)
             }
           }
         ) {
