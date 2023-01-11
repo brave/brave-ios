@@ -302,8 +302,9 @@ extension BrowserViewController: TabManagerDelegate {
           }
                   
           var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
-          recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] tab in
+          recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] recentlyClosed in
             // TODO: Recently Closed - Selected
+            self?.tabManager.addAndSelectRecentlyClosed(recentlyClosed)
           }
           
           self.present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)

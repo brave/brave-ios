@@ -36,7 +36,8 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
   }
 
   public class func all() -> [RecentlyClosed] {
-    all() ?? []
+    let sortDescriptors = [NSSortDescriptor(key: #keyPath(RecentlyClosed.dateAdded), ascending: false)] 
+    return all(sortDescriptors: sortDescriptors) ?? []
   }
 
   public class func remove(with url: String) {
