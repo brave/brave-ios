@@ -106,7 +106,16 @@ struct RecentlyClosedTabsView: View {
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
           } else {
-            websitesList
+            if recentlyClosedTabs.isEmpty {
+              Text(Strings.RecentlyClosed.recentlyClosedEmptyListTitle)
+                .font(.headline)
+                .fontWeight(.bold)
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color(.bravePrimary))
+                .padding(.horizontal, 20)
+            } else {
+              websitesList
+            }
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -133,9 +142,7 @@ struct RecentlyClosedTabsView: View {
     .navigationViewStyle(.stack)
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
-    
       recentlyClosedTabs = RecentlyClosed.all()
-
       recentlyClosedLoading = false
     }
   }
