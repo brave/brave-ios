@@ -30,6 +30,9 @@ extension BraveCoreSwitchKey {
     case .p3aUploadServerURL:
       return "Upload Server URL"
     default:
+      if rawValue == "enable-features" {
+        return "Enable Features"
+      }
       return ""
     }
   }
@@ -246,6 +249,11 @@ struct BraveCoreDebugSwitchesView: View {
             BasicStringInputView(coreSwitch: .vModule, hint: "Should match the format:\n\n{folder-expression}={level}\n\nDefaults to */brave/*=5")
           } label: {
             SwitchContainer(.vModule)
+          }
+          NavigationLink {
+            BasicStringInputView(coreSwitch: BraveCoreSwitchKey(rawValue: "enable-features"), hint: "Should match the format:\n\n{feature_name}")
+          } label: {
+            SwitchContainer(BraveCoreSwitchKey(rawValue: "enable-features"))
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
