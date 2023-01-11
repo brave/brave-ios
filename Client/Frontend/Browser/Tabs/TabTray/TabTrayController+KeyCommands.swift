@@ -35,14 +35,14 @@ extension TabTrayController {
     ] + arrowCommands
 
   }
-
+  
   @objc func didTogglePrivateModeKeyCommand() {
     togglePrivateModeAction()
   }
 
   @objc func didCloseTabKeyCommand() {
     if let tab = tabManager.selectedTab {
-      tabManager.removeTab(tab)
+      remove(tab: tab)
     }
   }
 

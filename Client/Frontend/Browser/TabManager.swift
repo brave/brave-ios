@@ -1046,6 +1046,85 @@ class TabManager: NSObject {
       value: count
     )
   }
+  
+  // MARK: - Recently Closed
+  
+  func addTabToRecentlyClosed(_ tab: Tab) {
+    if let savedItem = createSavedTabFromActiveTab(tab) {
+      RecentlyClosed.insert(savedItem)
+    }
+  }
+  
+  func addAllTabsToRecentlyClosed() {
+    var allRecentlyClosed: [SavedRecentlyClosed] = []
+    
+    tabs(withType: .regular).forEach {
+      if let savedItem = createSavedTabFromActiveTab($0) {
+        allRecentlyClosed.append(savedItem)
+      }
+    }
+        
+    RecentlyClosed.insertAll(allRecentlyClosed)
+  }
+  
+  func addAndSelectRecentlyClosed(_ recentlyClosed: RecentlyClosed) {
+    var historyURLs: [URL] = []
+    
+    if let historyList = recentlyClosed.historyList, let history = historyList as? [String] {
+      for urlString in history {
+        if let url = URL(string: urlString) {
+          historyURLs.append(url)
+        }
+      }
+    }
+    
+    let urls = SessionData.updateSessionURLs(urls: historyURLs).map({ $0.absoluteString })
+
+    guard let url = URL(string: recentlyClosed.url) else {
+      return
+    }
+    
+    let tab = addTab(URLRequest(url: url), isPrivate: false)
+    
+    let data = SavedRecentlyClosed(
+      url: recentlyClosed.url,
+      title: recentlyClosed.title,
+      historyList: urls as NSArray,
+      historyIndex: recentlyClosed.historyIndex)
+    
+    if let id = tab.id {
+      TabMO.insertRecentlyClosed(uuidString: id, data)
+    }
+    
+    selectTab(tab)
+  }
+  
+  private func createSavedTabFromActiveTab(_ tab: Tab) -> SavedRecentlyClosed? {
+    // Private Tabs can not be added to Recently Closed
+    if tab.isPrivate {
+      return nil
+    }
+    
+    guard let tabID = tab.id,
+          let fetchedTab = TabMO.get(fromId: tabID),
+          let urlString = fetchedTab.url else {
+      return nil
+    }
+    
+    let urlHistorySnapshot = fetchedTab.urlHistorySnapshot ?? []
+    
+    if let url = URL(string: urlString), InternalURL(url)?.isAboutHomeURL == true, urlHistorySnapshot.count > 1 {
+      return nil
+    }
+    
+    let savedItem = SavedRecentlyClosed(
+      url: urlString,
+      title: fetchedTab.title,
+      historyList: urlHistorySnapshot,
+      historyIndex: fetchedTab.urlHistoryCurrentIndex)
+    
+    return savedItem
+  }
 }
 
 extension TabManager: WKNavigationDelegate {

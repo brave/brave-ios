@@ -71,7 +71,12 @@ public final class TabMO: NSManagedObject, CRUD {
   
   class func createInternal(uuidString: String, lastUpdateDate: Date) {
     DataController.perform(task: { context in
-      let tab = TabMO(entity: entity(context), insertInto: context)
+      guard let entity = entity(context) else {
+        Logger.module.error("Error fetching the entity 'Tab' from Managed Object-Model")
+        return
+      }
+      
+      let tab = TabMO(entity: entity, insertInto: context)
       // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
       tab.syncUUID = uuidString
       tab.title = Strings.newTab
@@ -98,6 +103,22 @@ public final class TabMO: NSManagedObject, CRUD {
   
   public class func get(fromId id: String?) -> TabMO? {
     return getInternal(fromId: id)
+  }
+  
+  public class func insertRecentlyClosed(uuidString: String, _ saved: SavedRecentlyClosed) {
+    DataController.perform { context in
+      guard let entity = entity(context) else {
+        Logger.module.error("Error fetching the entity 'Tab' from Managed Object-Model")
+        return
+      }
+  
+      let tab = TabMO(entity: entity, insertInto: context)
+      tab.syncUUID = uuidString
+      tab.url = saved.url
+      tab.title = saved.title
+      tab.urlHistorySnapshot = saved.historyList
+      tab.urlHistoryCurrentIndex = saved.historyIndex
+    }
   }
   
   // MARK: Update
@@ -204,8 +225,8 @@ public final class TabMO: NSManagedObject, CRUD {
 // MARK: - Internal implementations
 extension TabMO {
   // Currently required, because not `syncable`
-  private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
+  private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription? {
+    return NSEntityDescription.entity(forEntityName: "TabMO", in: context)
   }
 
   private class func getInternal(

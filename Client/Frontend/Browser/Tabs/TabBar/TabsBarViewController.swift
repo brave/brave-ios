@@ -384,11 +384,9 @@ extension TabsBarViewController: UICollectionViewDataSource {
       
       self.delegate?.tabsBarDidChangeReaderModeVisibility(true)
       
-      // TODO: Recently Closed
-      if tab.isPrivate {
-        // Add tab to recently closed
-      }
-      
+      // Add the tab information to recently closed before removing
+      tabManager.addTabToRecentlyClosed(tab)
+
       tabManager.removeTab(tab)
       
       self.updateData()
