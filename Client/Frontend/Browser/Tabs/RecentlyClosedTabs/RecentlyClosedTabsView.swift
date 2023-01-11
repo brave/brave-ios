@@ -9,16 +9,17 @@ import BraveShared
 import Data
 import CoreData
 import BraveUI
+import BraveCore
 
 struct RecentlyClosedTabsView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
 
-  @State private var recentlyClosedTabs: [Tab] = []
+  @State var recentlyClosedTabs: [RecentlyClosed] = []
   @State private var recentlyClosedLoading = true
   
   @State private var showClearDataPrompt: Bool = false
   var onDismiss: ((Bool) -> Void)?
-  var onRecentlyClosedSelected: ((Tab) -> Void)?
+  var onRecentlyClosedSelected: ((RecentlyClosed) -> Void)?
   
   private let tabManager: TabManager
 
@@ -32,9 +33,7 @@ struct RecentlyClosedTabsView: View {
       .init(title: Text(Strings.RecentlyClosed.recentlyClosedClearActionConfirmation),
         buttons: [
           .destructive(Text(Strings.RecentlyClosed.recentlyClosedClearActionTitle), action: {
-            // TODO Recently Closed
-            
-            // Clear all recently closed
+            RecentSearch.removeAll()
             dismissView(cleared: true)
           }),
           .cancel()
@@ -53,21 +52,22 @@ struct RecentlyClosedTabsView: View {
   private var websitesList: some View {
     List {
       Section {
-        ForEach(recentlyClosedTabs, id: \.id) { tab in
+        ForEach(recentlyClosedTabs, id: \.url) { recentlyClosed in
           Button(action: {
             dismissView()
-            onRecentlyClosedSelected?(tab)
+            onRecentlyClosedSelected?(recentlyClosed)
           }) {
             HStack {
-              FaviconImage(url: tab.displayFavicon?.url)
+              FaviconImage(url: recentlyClosed.url)  
               VStack(alignment: .leading) {
-                Text(tab.displayTitle)
+                Text(recentlyClosed.title ?? "")
                   .font(.footnote)
                   .fontWeight(.semibold)
                   .foregroundColor(Color(.bravePrimary))
-                Text(fetchURL(for: tab) ?? "")
+                Text("\(URLFormatter.formatURL(recentlyClosed.url))")
                   .font(.caption)
                   .foregroundColor(Color(.braveLabel))
+                  .lineLimit(1)
               }
               Spacer()
             }
@@ -75,20 +75,16 @@ struct RecentlyClosedTabsView: View {
           .frame(maxWidth: .infinity)
           .padding(.vertical, 6)
           .accessibilityElement()
-          .accessibilityLabel("\(tab.displayTitle)")
+          .accessibilityLabel(recentlyClosed.title ?? "")
         }
         .onDelete { indexSet in
-          // TODO: Recently Closed
-          
           // Delete an individual info from recently closed
-          
-//          let tabsToRemove = indexSet.map { recentlyClosedTabs[$0] }
-//          withAnimation(.default) {
-//            for tab in tabsToRemove {
-//              tabManager.removeTab(tab)
-//            }
-//          }
-          
+          let tabsToRemove = indexSet.map { recentlyClosedTabs[$0] }
+          withAnimation(.default) {
+            for tab in tabsToRemove {
+              RecentlyClosed.remove(with: tab.url)
+            }
+          }
         }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -137,7 +133,7 @@ struct RecentlyClosedTabsView: View {
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
     
-      recentlyClosedTabs = tabManager.allTabs
+      recentlyClosedTabs = RecentlyClosed.all()
 
       recentlyClosedLoading = false
     }
@@ -146,17 +142,5 @@ struct RecentlyClosedTabsView: View {
   private func dismissView(cleared: Bool = false) {
     presentationMode.dismiss()
     onDismiss?(cleared)
-  }
-  
-  private func fetchURL(for tab: Tab) -> String? {
-    if let tabID = tab.id {
-      let fetchedTab = TabMO.get(fromId: tabID)
-
-      if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-          return urlString
-      }
-    }
-    
-    return nil
   }
 }

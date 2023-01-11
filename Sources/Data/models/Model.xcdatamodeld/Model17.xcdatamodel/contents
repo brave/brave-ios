@@ -163,6 +163,13 @@
         <attribute name="uuid" optional="YES" attributeType="String"/>
         <relationship name="playlistFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PlaylistFolder" inverseName="playlistItems" inverseEntity="PlaylistFolder"/>
     </entity>
+    <entity name="RecentlyClosed" representedClassName="Data.RecentlyClosed" syncable="YES">
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="historyIndex" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="historyList" optional="YES" attributeType="Transformable"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="url" attributeType="String"/>
+    </entity>
     <entity name="RecentSearch" representedClassName="Data.RecentSearch" syncable="YES">
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="searchType" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
