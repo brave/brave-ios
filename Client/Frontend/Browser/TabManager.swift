@@ -1068,55 +1068,20 @@ class TabManager: NSObject {
   }
   
   func addAndSelectRecentlyClosed(_ recentlyClosed: RecentlyClosed) {
-//    var historyURLs: [URL] = []
-//
-//    if let historyList = recentlyClosed.historyList, let history = historyList as? [String] {
-//      for urlString in history {
-//        if let url = URL(string: urlString) {
-//          historyURLs.append(url)
-//        }
-//      }
-//    }
-//
-//    let urls = SessionData.updateSessionURLs(urls: historyURLs).map({ $0.absoluteString })
 
     guard let url = URL(string: recentlyClosed.url) else {
       return
     }
     
     let tab = addTab(URLRequest(url: url), isPrivate: false)
-        
     guard let webView = tab.webView, let order = indexOfWebView(webView) else { return }
 
-    //
-    
-//    guard let savedTab = TabMO.get(fromId: tab.id) else { return }
-
     if let history = recentlyClosed.historyList as? [String], let tabUUID = tab.id {
-      
-      
       let data = SavedTab(id: tabUUID, title: recentlyClosed.title, url: recentlyClosed.url, isSelected: false, order: Int16(order), screenshot: nil, history: history, historyIndex: recentlyClosed.historyIndex, isPrivate: false)
       
       tab.navigationDelegate = navDelegate
       tab.restore(webView, restorationData: data)
-      
     }
-    
-    //
-    
-//    let savedTab = SavedTab(id: tab.id, title: recentlyClosed.title, url: recentlyClosed.url, history: recentlyClosed.historyList, historyIndex: <#T##Int16#>, isPrivate: <#T##Bool#>)
-//
-//    tab.restore(tab.webView, restorationData: <#T##SavedTab?#>)
-    
-//    let data = SavedRecentlyClosed(
-//      url: recentlyClosed.url,
-//      title: recentlyClosed.title,
-//      historyList: recentlyClosed.historyList,
-//      historyIndex: recentlyClosed.historyIndex)
-//
-//    if let id = tab.id {
-//      TabMO.insertRecentlyClosed(uuidString: id, data)
-//    }
     
     selectTab(tab)
   }
@@ -1133,7 +1098,12 @@ class TabManager: NSObject {
       return nil
     }
     
-    let urlHistorySnapshot = fetchedTab.urlHistorySnapshot ?? []
+    let urlHistorySnapshot = (fetchedTab.urlHistorySnapshot as? [String] ?? []).compactMap {
+      if let _url = URL(string: $0), let url = InternalURL(_url) {
+        return url.extractedUrlParam
+      }
+      return URL(string: $0)
+    }
     
     if let url = URL(string: urlString), InternalURL(url)?.isAboutHomeURL == true, urlHistorySnapshot.count > 1 {
       return nil
@@ -1142,7 +1112,7 @@ class TabManager: NSObject {
     let savedItem = SavedRecentlyClosed(
       url: urlString,
       title: fetchedTab.title,
-      historyList: urlHistorySnapshot,
+      historyList: urlHistorySnapshot.map({ $0.absoluteString }) as NSArray,
       historyIndex: fetchedTab.urlHistoryCurrentIndex)
     
     return savedItem
