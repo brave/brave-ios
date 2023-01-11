@@ -4323,7 +4323,15 @@ extension Strings {
         tableName: "BraveShared",
         bundle: .module,
         value: "Clear All Recently Closed Tabs?",
-        comment: "Confirmationb message for Clear Button action inside Recently Closed Tabs")
+        comment: "Confirmation message for Clear Button action inside Recently Closed Tabs")
+    
+    public static let recentlyClosedEmptyListTitle =
+      NSLocalizedString(
+        "recently.closed.empty.list.title",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "No Recently Closed Tabs.",
+        comment: "Title for empty screen Recently Closed Tabs")
   }
 }
 
