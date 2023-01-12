@@ -97,5 +97,4 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
 
     return first(where: predicate, context: context)
   }
-    
 }

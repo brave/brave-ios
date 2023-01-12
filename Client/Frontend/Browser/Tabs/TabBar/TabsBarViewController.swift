@@ -386,7 +386,6 @@ extension TabsBarViewController: UICollectionViewDataSource {
       
       // Add the tab information to recently closed before removing
       tabManager.addTabToRecentlyClosed(tab)
-
       tabManager.removeTab(tab)
       
       self.updateData()

@@ -216,20 +216,20 @@ public class Migration {
       Preferences.Migration.xcgloggerFilesRemovalCompleted.value = true
     }
 
-    if !Preferences.Migration.coreDataCompleted.value {
-      // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
-      //  - Cleared private data
-      //  - Exited Private Mode
-      //  - The app was terminated (bug)
-      // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
-      // we must dismiss any records that are private tabs during migration from Model7
-      TabMO.deleteAllPrivateTabs()
-      
-      Domain.migrateShieldOverrides()
-      LegacyBookmarksHelper.migrateBookmarkOrders()
-      
-      Preferences.Migration.coreDataCompleted.value = true
-    }
+    if Preferences.Migration.coreDataCompleted.value { return }
+
+    // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
+    //  - Cleared private data
+    //  - Exited Private Mode
+    //  - The app was terminated (bug)
+    // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
+    // we must dismiss any records that are private tabs during migration from Model7
+    TabMO.deleteAllPrivateTabs()
+  
+    Domain.migrateShieldOverrides()
+    LegacyBookmarksHelper.migrateBookmarkOrders()
+  
+    Preferences.Migration.coreDataCompleted.value = true
   }
 }
 
