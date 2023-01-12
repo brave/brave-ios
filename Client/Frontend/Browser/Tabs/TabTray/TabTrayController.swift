@@ -529,6 +529,9 @@ class TabTrayController: LoadingViewController {
       guard let self else { return }
       
       self.tabManager.addAndSelectRecentlyClosed(recentlyClosed)
+      // After opening the Recently Closed in a new tab delete it from list
+      RecentlyClosed.remove(with: recentlyClosed.url)
+      
       self.dismiss(animated: false)
     }
     
