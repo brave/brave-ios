@@ -477,16 +477,6 @@ public class SendTokenStore: ObservableObject {
   }
 }
 
-private extension String {
-  var endsWithSupportedENSExtension: Bool {
-    WalletConstants.supportedENSExtensions.contains(where: hasSuffix)
-  }
-  
-  var endsWithSupportedSNSExtension: Bool {
-    WalletConstants.supportedSNSExtensions.contains(where: hasSuffix)
-  }
-}
-
 extension SendTokenStore: BraveWalletKeyringServiceObserver {
   public func keyringReset() {
   }
