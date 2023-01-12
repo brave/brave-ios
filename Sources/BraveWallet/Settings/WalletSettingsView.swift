@@ -13,11 +13,15 @@ public struct WalletSettingsView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var displayDappsNotifications = Preferences.Wallet.displayWeb3Notifications
+  @ObservedObject var enableIPFS = Preferences.Wallet.enableIPFS
+  @ObservedObject var enableSNSDomainName = Preferences.Wallet.resolveSNSDomainNames
 
   @State private var isShowingResetWalletAlert = false
   @State private var isShowingResetTransactionAlert = false
   /// If we are showing the modal so the user can enter their password to enable unlock via biometrics.
   @State private var isShowingBiometricsPasswordEntry = false
+  
+  private var domainOptions: [Preferences.Wallet.Web3DomainOption] = [.ask, .enable, .disable]
 
   public init(
     settingsStore: SettingsStore,
@@ -82,9 +86,9 @@ public struct WalletSettingsView: View {
             isOn: Binding(get: { settingsStore.isBiometricsUnlockEnabled },
                           set: { toggledBiometricsUnlock($0) })
           )
-            .foregroundColor(Color(.braveLabel))
-            .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          .foregroundColor(Color(.braveLabel))
+          .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
       }
       Section(
@@ -138,12 +142,31 @@ public struct WalletSettingsView: View {
           Text(Strings.Wallet.settingsResetButtonTitle)
             .foregroundColor(.red)
         } // iOS 15: .role(.destructive)
+      }
+      Section(header: Text(Strings.Wallet.web3IPFSHeader)) {
+        Toggle(Strings.Wallet.web3IPFSTitle, isOn: .constant(false))
+          .foregroundColor(Color(.braveLabel))
+          .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      }
+      Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
+        Picker(selection: $enableSNSDomainName.value) {
+          ForEach(Preferences.Wallet.Web3DomainOption.allCases) { option in
+            Text(option.name)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .tag(option)
+          }
+        } label: {
+          Text(Strings.Wallet.web3DomainOptionsTitle)
+            .foregroundColor(Color(.braveLabel))
+            .padding(.vertical, 4)
+        }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
     }
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .navigationTitle(Strings.Wallet.braveWallet)
+    .navigationTitle(Strings.Wallet.web3)
     .navigationBarTitleDisplayMode(.inline)
     .background(
       Color.clear

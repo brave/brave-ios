@@ -63,5 +63,31 @@ extension Preferences {
         return
       }
     }
+    
+    /// The option to enable IPFS
+    public static let enableIPFS = Option<Bool>(key: "web3.enable-ipfs", default: false)
+    
+    public enum Web3DomainOption: Int, Identifiable, CaseIterable {
+      case ask
+      case enable
+      case disable
+      
+      public var id: Int {
+        rawValue
+      }
+      
+      public var name: String {
+        switch self {
+        case .ask:
+          return Strings.Wallet.web3DomainOptionAsk
+        case .enable:
+          return Strings.Wallet.web3DomainOptionEnabled
+        case .disable:
+          return Strings.Wallet.web3DomainOptionDisabled
+        }
+      }
+    }
+    
+    public static let resolveSNSDomainNames = Option<Int>(key: "web3.resolve-sns-domain-names", default: Web3DomainOption.ask.rawValue)
   }
 }
