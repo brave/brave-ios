@@ -304,6 +304,9 @@ extension BrowserViewController: TabManagerDelegate {
           var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
           recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] recentlyClosed in
             self?.tabManager.addAndSelectRecentlyClosed(recentlyClosed)
+            
+            // After opening the Recently Closed in a new tab delete it from list
+            RecentlyClosed.remove(with: recentlyClosed.url)
           }
           
           self.present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)
