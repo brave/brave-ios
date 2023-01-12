@@ -460,7 +460,7 @@ class TabManager: NSObject {
     let allTabIds = allTabs.compactMap { $0.id }
     TabMO.saveTabOrder(tabIds: allTabIds)
   }
-  
+
   func configureTab(_ tab: Tab, request: URLRequest?, afterTab parent: Tab? = nil, flushToDisk: Bool, zombie: Bool, id: String? = nil, isPopup: Bool = false) {
     assert(Thread.isMainThread)
 
@@ -732,7 +732,7 @@ class TabManager: NSObject {
 
     allTabs = tabs(withType: .regular)
   }
-  
+
   func removeAllBrowsingDataForTab(_ tab: Tab, completionHandler: @escaping () -> Void = {}) {
     let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
     tab.webView?.configuration.websiteDataStore.removeData(

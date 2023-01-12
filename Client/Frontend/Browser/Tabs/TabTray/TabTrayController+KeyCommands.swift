@@ -35,7 +35,7 @@ extension TabTrayController {
     ] + arrowCommands
 
   }
-  
+
   @objc func didTogglePrivateModeKeyCommand() {
     togglePrivateModeAction()
   }

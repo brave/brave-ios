@@ -78,7 +78,7 @@ class Tab: NSObject {
   var isPrivate: Bool {
     return type.isPrivate
   }
-  
+
   var secureContentState: TabSecureContentState = .unknown
 
   var walletEthProvider: BraveWalletEthereumProvider?
