@@ -524,13 +524,11 @@ class TabTrayController: LoadingViewController {
       return
     }
     
-    // TODO: Recently Closed - Selected
     var recentlyClosedTabsView = RecentlyClosedTabsView(tabManager: tabManager)
     recentlyClosedTabsView.onRecentlyClosedSelected = { [weak self] recentlyClosed in
       guard let self else { return }
       
       self.tabManager.addAndSelectRecentlyClosed(recentlyClosed)
-      // Recently Closed Selected
       self.dismiss(animated: false)
     }
     

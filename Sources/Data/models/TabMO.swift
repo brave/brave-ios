@@ -116,7 +116,7 @@ public final class TabMO: NSManagedObject, CRUD {
       tab.syncUUID = uuidString
       tab.url = saved.url
       tab.title = saved.title
-      tab.urlHistorySnapshot = saved.historyList
+      tab.urlHistorySnapshot = saved.historyList as NSArray
       tab.urlHistoryCurrentIndex = saved.historyIndex
     }
   }

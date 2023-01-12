@@ -12,10 +12,10 @@ public struct SavedRecentlyClosed {
   public let url: String
   public let title: String?
   public let dateAdded: Date?
-  public let historyList: NSArray
+  public let historyList: [String]
   public let historyIndex: Int16
 
-  public init(url: String, title: String?, dateAdded: Date? = Date(), historyList: NSArray, historyIndex: Int16) {
+  public init(url: String, title: String?, dateAdded: Date? = Date(), historyList: [String], historyIndex: Int16) {
     self.url = url
     self.title = title
     self.dateAdded = dateAdded
@@ -36,7 +36,7 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
   }
 
   public class func all() -> [RecentlyClosed] {
-    let sortDescriptors = [NSSortDescriptor(key: #keyPath(RecentlyClosed.dateAdded), ascending: false)] 
+    let sortDescriptors = [NSSortDescriptor(key: #keyPath(RecentlyClosed.dateAdded), ascending: false)]
     return all(sortDescriptors: sortDescriptors) ?? []
   }
 
@@ -64,7 +64,7 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
       source.url = saved.url
       source.title = saved.title
       source.dateAdded = saved.dateAdded
-      source.historyList = saved.historyList
+      source.historyList = saved.historyList as NSArray
       source.historyIndex = saved.historyIndex
     }
   }
@@ -73,6 +73,15 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
     savedList.forEach {
       RecentlyClosed.insert($0)
     }
+  }
+  
+  public class func deleteAll(olderThan timeInterval: TimeInterval) {
+    let addedKeyPath = #keyPath(RecentlyClosed.dateAdded)
+    let date = Date().advanced(by: -timeInterval) as NSDate
+    
+    let predicate = NSPredicate(format: "\(addedKeyPath) != nil AND \(addedKeyPath) < %@", date)
+    
+    self.deleteAll(predicate: predicate)
   }
 
   // MARK: Private

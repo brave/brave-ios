@@ -301,6 +301,9 @@ public class BrowserViewController: UIViewController {
     if Preferences.Chromium.syncOpenTabsEnabled.value {
       tabManager.addRegularTabsToSyncChain()
     }
+    
+    // Remove outdated Recently Closed tabs
+    tabManager.deleteOutdatedRecentlyClosed()
 
     // Setup ReaderMode Cache
     self.readerModeCache = ReaderModeScriptHandler.cache(for: tabManager.selectedTab)
