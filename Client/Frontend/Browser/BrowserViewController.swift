@@ -3192,7 +3192,7 @@ extension BrowserViewController: WKUIDelegate {
     }
 
     let linkPreview: UIContextMenuContentPreviewProvider? = { [unowned self] in
-      if let tab = tabManager.tabForWebView(webView) {
+      if let tab = tabManager.tabForWebView(webView), url.schemeIsValid, ["http", "https"].contains(url.scheme) {
         return LinkPreviewViewController(url: url, for: tab, browserController: self)
       }
       return nil
