@@ -21,7 +21,7 @@ struct RecentlyClosedTabsView: View {
   var onDismiss: ((Bool) -> Void)?
   var onRecentlyClosedSelected: ((RecentlyClosed) -> Void)?
   
-  private let tabManager: TabManager
+  private let tabManager: TabManager?
 
   private var clearAllDataButton: some View {
     Button(Strings.RecentlyClosed.recentlyClosedClearActionTitle, action: {
@@ -95,8 +95,8 @@ struct RecentlyClosedTabsView: View {
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
   }
   
-  init(tabManager: TabManager) {
-      self.tabManager = tabManager
+  init(tabManager: TabManager? = nil) {
+    self.tabManager = tabManager
   }
   
   var body: some View {
@@ -142,6 +142,7 @@ struct RecentlyClosedTabsView: View {
     .navigationViewStyle(.stack)
     .environment(\.managedObjectContext, DataController.swiftUIContext)
     .onAppear {
+      tabManager?.deleteOutdatedRecentlyClosed()
       recentlyClosedTabs = RecentlyClosed.all()
       recentlyClosedLoading = false
     }
