@@ -521,6 +521,9 @@ struct WalletPanelView: View {
             isConnectHidden = false
           }
         }))
+      } else if cryptoStore.pendingRequest != nil {
+        // race condition for when `pendingRequest` is assigned in CryptoStore before this view visible
+        presentWalletWithContext(.pendingRequests)
       } else {
         cryptoStore.prepare()
       }
