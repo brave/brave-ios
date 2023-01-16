@@ -112,11 +112,17 @@ struct NFTDetailView: View {
                   }
                 }) {
                   if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
-                    Text(verbatim: "#\(tokenId)")
-                      .foregroundColor(Color(.braveBlurple))
+                    HStack {
+                      Text(verbatim: "#\(tokenId)")
+                      Image(systemName: "arrow.up.forward.square")
+                    }
+                    .foregroundColor(Color(.braveBlurple))
                   } else {
-                    Text("\(nftDetailStore.nft.name) #\(nftDetailStore.nft.tokenId)")
-                      .foregroundColor(Color(.braveBlurple))
+                    HStack {
+                      Text("\(nftDetailStore.nft.name) #\(nftDetailStore.nft.tokenId)")
+                      Image(systemName: "arrow.up.forward.square")
+                    }
+                    .foregroundColor(Color(.braveBlurple))
                   }
                 }
               }
@@ -139,8 +145,11 @@ struct NFTDetailView: View {
                     }
                   }
                 }) {
-                  Text("\(nftDetailStore.nft.contractAddress.truncatedAddress)")
-                    .foregroundColor(Color(.braveBlurple))
+                  HStack {
+                    Text("\(nftDetailStore.nft.contractAddress.truncatedAddress)")
+                    Image(systemName: "arrow.up.forward.square")
+                  }
+                  .foregroundColor(Color(.braveBlurple))
                 }
               }
             }

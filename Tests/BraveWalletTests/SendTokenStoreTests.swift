@@ -612,7 +612,7 @@ class SendTokenStoreTests: XCTestCase {
       prefilledToken: nil
     )
     
-    let selectedSendNFTMetadataSolNFTException = expectation(description: "sendTokenStore-selectedSendTokenERC721MetadataException")
+    let selectedSendNFTMetadataSolNFTException = expectation(description: "sendTokenStore-selectedSendNFTMetadataSolNFTException")
     XCTAssertNil(store.selectedSendNFTMetadata)  // Initial state
     store.$selectedSendNFTMetadata
       .dropFirst()

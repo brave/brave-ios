@@ -283,17 +283,13 @@ extension BraveWalletJsonRpcService {
     if token.isErc721 {
       let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
       if result != .success {
-        if result != .success {
-          Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
-        }
+        Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
       }
       metaDataString = metaData
     } else {
       let (metaData, result, errMsg) = await self.solTokenMetadata(token.contractAddress)
       if result != .success {
-        if result != .success {
-          Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
-        }
+        Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
       }
       metaDataString = metaData
     }
@@ -314,17 +310,13 @@ extension BraveWalletJsonRpcService {
           if token.isErc721 {
             let (metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
             if result != .success {
-              if result != .success {
-                Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
-              }
+              Logger.module.debug("Failed to load ERC721 metadata: \(errMsg)")
             }
             metaDataString = metaData
           } else {
             let (metaData, result, errMsg) = await self.solTokenMetadata(token.contractAddress)
             if result != .success {
-              if result != .success {
-                Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
-              }
+              Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
             }
             metaDataString = metaData
           }
