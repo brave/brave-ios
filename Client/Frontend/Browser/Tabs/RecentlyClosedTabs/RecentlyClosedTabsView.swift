@@ -61,8 +61,7 @@ struct RecentlyClosedTabsView: View {
               FaviconImage(url: recentlyClosed.url)  
               VStack(alignment: .leading) {
                 Text(recentlyClosed.title ?? "")
-                  .font(.footnote)
-                  .fontWeight(.semibold)
+                  .font(.footnote.weight(.semibold))
                   .foregroundColor(Color(.bravePrimary))
                   .lineLimit(1)
                 Text("\(URLFormatter.formatURL(recentlyClosed.url))")
@@ -108,8 +107,7 @@ struct RecentlyClosedTabsView: View {
           } else {
             if recentlyClosedTabs.isEmpty {
               Text(Strings.RecentlyClosed.recentlyClosedEmptyListTitle)
-                .font(.headline)
-                .fontWeight(.bold)
+                .font(.headline.weight(.bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(.bravePrimary))
                 .padding(.horizontal, 20)
