@@ -73,8 +73,11 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .disconnected, "Error Message")
   }
   
-  func ensGetEthAddr(_ domain: String, options: BraveWallet.EnsOffchainLookupOptions?, completion: @escaping (String, Bool, BraveWallet.ProviderError, String) -> Void) {
-    completion("", false, .unknown, "Error Message")
+  func enableEnsOffchainLookup() {
+  }
+  
+  func ensGetEthAddr(_ domain: String, completion: @escaping (String, Bool, BraveWallet.ProviderError, String) -> Void) {
+    completion("", false, .internalError, "")
   }
   
   func unstoppableDomainsGetWalletAddr(_ domain: String, token: BraveWallet.BlockchainToken?, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
