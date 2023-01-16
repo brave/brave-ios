@@ -1104,7 +1104,7 @@ class TabManager: NSObject {
   /// Function used to auto delete outdated Recently Closed Tabs
   func deleteOutdatedRecentlyClosed() {
     // The time interval to remove Recently Closed 3 days
-    let autoRemoveInterval = 3.days
+    let autoRemoveInterval = AppConstants.buildChannel.isPublic ? 30.minutes : 3.days
     
     RecentlyClosed.deleteAll(olderThan: autoRemoveInterval)
   }
