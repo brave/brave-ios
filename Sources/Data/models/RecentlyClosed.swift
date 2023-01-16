@@ -70,8 +70,17 @@ public final class RecentlyClosed: NSManagedObject, CRUD {
   }
   
   public class func insertAll(_ savedList: [SavedRecentlyClosed]) {
-    savedList.forEach {
-      RecentlyClosed.insert($0)
+    DataController.perform { context in
+      savedList.forEach { saved in
+        if let entity = entity(in: context) {
+          let source = RecentlyClosed(entity: entity, insertInto: context)
+          source.url = saved.url
+          source.title = saved.title
+          source.dateAdded = saved.dateAdded
+          source.historyList = saved.historyList as NSArray
+          source.historyIndex = saved.historyIndex
+        }
+      }
     }
   }
   
