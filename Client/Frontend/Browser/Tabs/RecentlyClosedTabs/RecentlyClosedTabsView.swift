@@ -19,6 +19,7 @@ struct RecentlyClosedTabsView: View {
   
   @State private var showClearDataPrompt: Bool = false
   var onDismiss: ((Bool) -> Void)?
+  var onCleared: (() -> Void)?
   var onRecentlyClosedSelected: ((RecentlyClosed) -> Void)?
   
   private let tabManager: TabManager?
@@ -147,7 +148,13 @@ struct RecentlyClosedTabsView: View {
   }
   
   private func dismissView(cleared: Bool = false) {
-    presentationMode.dismiss()
+    // Dismiss on presentation mode does not work on iOS 14
+    // when using the UIHostingController is parent view.
+    // As a workaround a completion handler is used instead.
+    if #available(iOS 15, *) {
+      presentationMode.dismiss()
+    }
+      
     onDismiss?(cleared)
   }
 }
