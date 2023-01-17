@@ -536,8 +536,16 @@ class TabTrayController: LoadingViewController {
     }
     
     recentlyClosedTabsView.onDismiss = { [weak self] cleared in
+      guard let self else { return }
+      
+      // Dismiss on presentation mode does not work on iOS 14
+      if #unavailable(iOS 15) {
+        self.dismiss(animated: true)
+      }
+      
+      // Clear All should also dismiss Tab Tray
       if cleared {
-        self?.dismiss(animated: false)
+        self.dismiss(animated: false)
       }
     }
     
