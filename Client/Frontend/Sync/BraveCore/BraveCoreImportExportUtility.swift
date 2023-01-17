@@ -51,14 +51,14 @@ class BraveCoreImportExportUtility {
       }
       
       self.importer.import(fromFile: nativePath, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: true) { [weak self] state, bookmarks in
-        guard let self = self, state != .started else { return }
-        
         defer {
           // Each call to startAccessingSecurityScopedResource must be balanced with a call to stopAccessingSecurityScopedResource
           // (Note: this is not reference counted)
           path.stopAccessingSecurityScopedResource()
         }
         
+        guard let self = self, state != .started else { return }
+            
         do {
           try self.rethrow(state)
           self.state = .none
@@ -98,11 +98,11 @@ class BraveCoreImportExportUtility {
       }
       
       self.importer.import(fromFile: nativePath, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: false) { [weak self] state, bookmarks in
-        guard let self = self, state != .started else { return }
-
         defer {
           path.stopAccessingSecurityScopedResource()
         }
+        
+        guard let self = self, state != .started else { return }
         
         do {
           try self.rethrow(state)
@@ -213,7 +213,7 @@ extension BraveCoreImportExportUtility {
   func nativeURLPathFromURL(_ url: URL) -> String? {
     return url.withUnsafeFileSystemRepresentation { bytes -> String? in
       guard let bytes = bytes else { return nil }
-      return String(cString: bytes)//.replacingOccurrences(of: " ", with: "%20").replacingOccurrences(of: "file://", with: "")
+      return String(cString: bytes)
     }
   }
 }
