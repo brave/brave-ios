@@ -43,6 +43,9 @@ class BraveCoreImportExportUtility {
 
     state = .importing
     self.queue.async {
+      // While accessing document URL from UIDocumentPickerViewController to access the file
+      // startAccessingSecurityScopedResource should be called for that URL
+      // Reference: https://stackoverflow.com/a/73912499/2239348
       guard path.startAccessingSecurityScopedResource() else {
         return
       }
@@ -51,6 +54,8 @@ class BraveCoreImportExportUtility {
         guard let self = self, state != .started else { return }
         
         defer {
+          // Each call to startAccessingSecurityScopedResource must be balanced with a call to stopAccessingSecurityScopedResource
+          // (Note: this is not reference counted)
           path.stopAccessingSecurityScopedResource()
         }
         
@@ -86,6 +91,8 @@ class BraveCoreImportExportUtility {
 
     state = .importing
     self.queue.async {
+      // To access a document URL from UIDocumentPickerViewController
+      // startAccessingSecurityScopedResource should be called
       guard path.startAccessingSecurityScopedResource() else {
         return
       }
