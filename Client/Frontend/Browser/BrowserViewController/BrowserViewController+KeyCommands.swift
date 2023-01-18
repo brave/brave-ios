@@ -9,11 +9,6 @@ import UIKit
 // Naming functions: use the suffix 'KeyCommand' for an additional level of namespacing (bug 1415830)
 extension BrowserViewController {
 
-  enum TextSearchDirection: String {
-    case next = "findNext"
-    case previous = "findPrevious"
-  }
-
   @objc private func reloadTabKeyCommand() {
     if let tab = tabManager.selectedTab, favoritesController == nil {
       tab.reload()
@@ -167,6 +162,10 @@ extension BrowserViewController {
 
     searchController.handleKeyCommands(sender: sender)
   }
+  
+  @objc private func toggleBraveTalkMuteCommand() {
+    braveTalkJitsiCoordinator.toggleMute()
+  }
 
   override public var keyCommands: [UIKeyCommand]? {
     let isEditingText = tabManager.selectedTab?.isEditing ?? false
@@ -271,7 +270,11 @@ extension BrowserViewController {
       UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(moveURLCompletionKeyCommand(sender:))),
       UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(moveURLCompletionKeyCommand(sender:)))
     ]
-
+    
+    let braveTalkKeyCommands: [UIKeyCommand] = [
+      UIKeyCommand(input: "m", modifierFlags: [], action: #selector(toggleBraveTalkMuteCommand))
+    ]
+    
     // In iOS 15+, certain keys events are delivered to the text input or focus systems first, unless specified otherwise
     if #available(iOS 15, *) {
       searchLocationCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
