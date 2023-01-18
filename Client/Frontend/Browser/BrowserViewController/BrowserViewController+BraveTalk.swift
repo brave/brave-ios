@@ -30,14 +30,4 @@ extension BrowserViewController {
       }
     )
   }
-  
-  var braveTalkKeyCommands: [UIKeyCommand] {
-    [
-      .init(input: "m", modifierFlags: [], action: #selector(BrowserViewController.toggleBraveTalkMute))
-    ]
-  }
-  
-  @objc private func toggleBraveTalkMute() {
-    braveTalkJitsiCoordinator.toggleMute()
-  }
 }
