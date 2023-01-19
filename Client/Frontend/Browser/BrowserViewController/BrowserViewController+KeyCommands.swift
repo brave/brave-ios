@@ -5,10 +5,12 @@
 import Shared
 import Foundation
 import UIKit
+import Data
 
-// Naming functions: use the suffix 'KeyCommand' for an additional level of namespacing (bug 1415830)
 extension BrowserViewController {
-
+  
+  // MARK: Actions
+  
   @objc private func reloadTabKeyCommand() {
     if let tab = tabManager.selectedTab, favoritesController == nil {
       tab.reload()
@@ -166,7 +168,18 @@ extension BrowserViewController {
   @objc private func toggleBraveTalkMuteCommand() {
     braveTalkJitsiCoordinator.toggleMute()
   }
-
+  
+  @objc private func reopenRecentlyClosedTabCommand() {
+    guard let recentlyClosed = RecentlyClosed.all().first else {
+      return
+    }
+    
+    tabManager.addAndSelectRecentlyClosed(recentlyClosed)
+    RecentlyClosed.remove(with: recentlyClosed.url)
+  }
+  
+  // MARK: KeyCommands
+  
   override public var keyCommands: [UIKeyCommand]? {
     let isEditingText = tabManager.selectedTab?.isEditing ?? false
       

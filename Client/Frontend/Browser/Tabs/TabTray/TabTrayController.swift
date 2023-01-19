@@ -287,11 +287,17 @@ class TabTrayController: LoadingViewController {
       })
   
     reloadOpenTabsSession()
+    
+    becomeFirstResponder()
   }
   
   override func loadView() {
     createTypeSelectorItems()
     layoutTabTray()
+  }
+  
+  override var canBecomeFirstResponder: Bool {
+    return true
   }
   
   private func layoutTabTray() {
@@ -390,6 +396,29 @@ class TabTrayController: LoadingViewController {
     
     searchBarView?.setNeedsLayout()
     searchBarView?.layoutIfNeeded()
+  }
+  
+  override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+    guard let recentlyClosedTab = RecentlyClosed.all().first else {
+      return
+    }
+    
+    if motion == .motionShake {
+      let alert = UIAlertController(
+        title: "Re-open Closed Tab",
+        message: "Do you want to open the latest closed tab?", preferredStyle: .alert)
+      
+      alert.addAction(
+        UIAlertAction(
+          title: "Open", style: .default,
+          handler: { [weak self] _ in
+            self?.tabManager.addAndSelectRecentlyClosed(recentlyClosedTab)
+            RecentlyClosed.remove(with: recentlyClosedTab.url)
+          }))
+      alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
+      
+      self.present(alert, animated: true, completion: nil)
+    }
   }
 
   // MARK: Snapshot handling
