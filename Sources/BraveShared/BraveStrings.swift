@@ -4017,6 +4017,20 @@ extension Strings {
     public static let walletShortcutTitle = NSLocalizedString("widgets.walletShortcutTitle", tableName: "BraveShared", bundle: .module,
                                                               value: "Brave Wallet",
                                                               comment: "Description for the Brave Wallet option on the 'shortcuts' widget.")
+    public static let newsClusteringWidgetTitle = NSLocalizedString(
+      "widgets.newsClusteringWidgetTitle",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Top News",
+      comment: "Title for Brave News widgets that display the top news"
+    )
+    public static let newsClusteringWidgetDescription = NSLocalizedString(
+      "widgets.newsClusteringWidgetDescription",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Get the latest news",
+      comment: "Description for Brave News widgets that display the top news"
+    )
   }
 }
 
