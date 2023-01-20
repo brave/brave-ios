@@ -65,7 +65,7 @@ struct RecentlyClosedTabsView: View {
                   .font(.footnote.weight(.semibold))
                   .foregroundColor(Color(.bravePrimary))
                   .lineLimit(1)
-                Text("\(URLFormatter.formatURL(recentlyClosed.url))")
+                Text("\(URLFormatter.formatURL(recentlyClosed.url, formatTypes: [], unescapeOptions: []))")
                   .font(.caption)
                   .foregroundColor(Color(.braveLabel))
                   .lineLimit(1)
