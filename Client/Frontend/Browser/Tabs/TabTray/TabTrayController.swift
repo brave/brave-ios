@@ -405,12 +405,12 @@ class TabTrayController: LoadingViewController {
     
     if motion == .motionShake {
       let alert = UIAlertController(
-        title: "Re-open Closed Tab",
-        message: "Do you want to open the latest closed tab?", preferredStyle: .alert)
+        title: Strings.Hotkey.recentlyClosedTabTitle,
+        message: Strings.RecentlyClosed.recentlyClosedShakeActionDescription, preferredStyle: .alert)
       
       alert.addAction(
         UIAlertAction(
-          title: "Open", style: .default,
+          title: Strings.RecentlyClosed.recentlyClosedOpenActionTitle, style: .default,
           handler: { [weak self] _ in
             self?.tabManager.addAndSelectRecentlyClosed(recentlyClosedTab)
             RecentlyClosed.remove(with: recentlyClosedTab.url)

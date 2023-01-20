@@ -4332,6 +4332,23 @@ extension Strings {
         bundle: .module,
         value: "No Recently Closed Tabs.",
         comment: "Title for empty screen Recently Closed Tabs")
+    
+    public static let recentlyClosedShakeActionDescription =
+      NSLocalizedString(
+        "recently.closed.shake.description",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Do you want to open the latest closed tab?",
+        comment: "Description for alert to ask user for opening last closed tab in list")
+    
+    public static let recentlyClosedOpenActionTitle =
+      NSLocalizedString(
+        "recently.closed.open",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Open",
+        comment: "Open Tab action title")
+
   }
 }
 
