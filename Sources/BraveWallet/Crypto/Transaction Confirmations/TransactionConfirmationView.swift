@@ -32,6 +32,8 @@ struct TransactionConfirmationView: View {
   }
 
   @State private var viewMode: ViewMode = .transaction
+  @State private var isShowingGas: Bool = false
+  @State private var isShowingAdvancedSettings: Bool = false
 
   private var transactionType: String {
     if confirmationStore.activeParsedTransaction.transaction.txType == .erc20Approve {
@@ -245,10 +247,10 @@ struct TransactionConfirmationView: View {
             parsedTransaction: confirmationStore.activeParsedTransaction,
             network: confirmationStore.network ?? .init(),
             editGasFeeTapped: {
-              
+              isShowingGas = true
             },
             advancedSettingsTapped: {
-              
+              isShowingAdvancedSettings = true
             }
           )
         } else {
@@ -309,6 +311,40 @@ struct TransactionConfirmationView: View {
         await confirmationStore.prepare()
       }
     }
+    .background(
+      NavigationLink(
+        isActive: $isShowingGas,
+        destination: {
+          Group {
+            if let gasEstimation = confirmationStore.eip1559GasEstimation {
+              EditPriorityFeeView(
+                transaction: confirmationStore.activeParsedTransaction.transaction,
+                gasEstimation: gasEstimation,
+                confirmationStore: confirmationStore
+              )
+            } else {
+              EditGasFeeView(
+                transaction: confirmationStore.activeParsedTransaction.transaction,
+                confirmationStore: confirmationStore
+              )
+            }
+          }
+        },
+        label: { EmptyView() }
+      )
+    )
+    .background(
+      NavigationLink(
+        isActive: $isShowingAdvancedSettings,
+        destination: {
+          EditNonceView(
+            confirmationStore: confirmationStore,
+            transaction: confirmationStore.activeParsedTransaction.transaction
+          )
+        },
+        label: { EmptyView() }
+      )
+    )
   }
   
   private var currentTransactionView: some View {
