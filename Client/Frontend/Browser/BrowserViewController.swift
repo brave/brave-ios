@@ -837,6 +837,9 @@ public class BrowserViewController: UIViewController {
       Preferences.Chromium.syncV2ObjectMigrationCount.value = 0
     }
     
+    // Adding Screenshot Service Delegate to browser to fetch full screen webview screenshots
+    currentScene?.screenshotService?.delegate = self
+    
     self.setupInteractions()
   }
   
@@ -3582,6 +3585,37 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
       openPrivacyReport()
     }
     completionHandler()
+  }
+}
+
+// MARK: UIScreenshotServiceDelegate
+
+extension BrowserViewController: UIScreenshotServiceDelegate {
+  public func screenshotService(_ screenshotService: UIScreenshotService, generatePDFRepresentationWithCompletion completionHandler: @escaping (Data?, Int, CGRect) -> Void) {
+      
+    guard screenshotService.windowScene != nil,
+          presentedViewController == nil,
+          let webView = tabManager.selectedTab?.webView,
+          let url = webView.url,
+          url.isWebPage() else {
+      completionHandler(nil, 0, .zero)
+      return
+    }
+
+    var rect = webView.scrollView.frame
+    rect.origin.x = webView.scrollView.contentOffset.x
+    rect.origin.y = webView.scrollView.contentSize.height - rect.height - webView.scrollView.contentOffset.y
+    
+    webView.createPDF { result in
+      dispatchPrecondition(condition: .onQueue(.main))
+      
+      switch result {
+      case .success(let data):
+        completionHandler(data, 0, rect)
+      case .failure:
+        completionHandler(nil, 0, .zero)
+      }
+    }
   }
 }
 
