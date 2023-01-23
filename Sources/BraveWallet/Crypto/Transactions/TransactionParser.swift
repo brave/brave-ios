@@ -273,10 +273,11 @@ enum TransactionParser {
       guard let owner = transaction.txArgs[safe: 0],
             let toAddress = transaction.txArgs[safe: 1],
             let tokenId = transaction.txArgs[safe: 2],
-            let tokenContractAddress = transaction.erc721ContractAddress,
-            let token = token(for: tokenContractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens) else {
+            let tokenContractAddress = transaction.erc721ContractAddress else {
         return nil
       }
+      let token = token(for: tokenContractAddress, network: network, visibleTokens: visibleTokens, allTokens: allTokens)
+      
       return .init(
         transaction: transaction,
         namedFromAddress: NamedAddresses.name(for: transaction.fromAddress, accounts: accountInfos),
