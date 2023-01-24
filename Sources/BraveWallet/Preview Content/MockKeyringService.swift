@@ -204,7 +204,6 @@ class MockKeyringService: BraveWalletKeyringService {
     completion(false, "")
   }
 
-  // TODO: Check 1.49.x Method Changes
   func encodePrivateKey(forExport address: String, password: String, coin: BraveWallet.CoinType, completion: @escaping (String) -> Void) {
     completion("807df4db569fab37cdf475a4bda779897f0f3dd9c5d90a2cb953c88ef762fd96")
   }
