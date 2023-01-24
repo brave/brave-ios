@@ -1,4 +1,4 @@
-// Copyright 2021 The Brave Authors. All rights reserved.
+// Copyright 2023 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -78,7 +78,8 @@ struct SwapTransactionConfirmationView: View {
   
   @ViewBuilder private var tokenValueComparison: some View {
     if let minBuyAmount = Double(parsedTransaction?.ethSwap?.minBuyAmount ?? ""),
-       let sellAmount = Double( parsedTransaction?.ethSwap?.fromAmount ?? "") {
+       let sellAmount = Double( parsedTransaction?.ethSwap?.fromAmount ?? ""),
+       minBuyAmount != 0, sellAmount != 0 {
       let calculated = minBuyAmount / sellAmount
       let display = String(format: "1 \(parsedTransaction?.ethSwap?.fromToken?.symbol ?? "") = %.6f \(parsedTransaction?.ethSwap?.toToken?.symbol ?? "")", calculated)
       Text(display)
