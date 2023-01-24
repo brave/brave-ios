@@ -2428,6 +2428,8 @@ extension BrowserViewController: TabDelegate {
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
+      
+      WebStorePrivateAPIScriptHandler(tab: tab),
     ]
     
     if let braveSkusHandler = BraveSkusScriptHandler(tab: tab) {
