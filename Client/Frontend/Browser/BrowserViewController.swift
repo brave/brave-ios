@@ -3591,29 +3591,32 @@ extension BrowserViewController: UNUserNotificationCenterDelegate {
 // MARK: UIScreenshotServiceDelegate
 
 extension BrowserViewController: UIScreenshotServiceDelegate {
-  public func screenshotService(_ screenshotService: UIScreenshotService, generatePDFRepresentationWithCompletion completionHandler: @escaping (Data?, Int, CGRect) -> Void) {
+  
+  @MainActor
+  public func screenshotServiceGeneratePDFRepresentation(_ screenshotService: UIScreenshotService) async -> (Data?, Int, CGRect) {
+    await withCheckedContinuation { continuation in
+      guard screenshotService.windowScene != nil,
+            presentedViewController == nil,
+            let webView = tabManager.selectedTab?.webView,
+            let url = webView.url,
+            url.isWebPage()
+      else {
+        continuation.resume(returning: (nil, 0, .zero))
+        return
+      }
       
-    guard screenshotService.windowScene != nil,
-          presentedViewController == nil,
-          let webView = tabManager.selectedTab?.webView,
-          let url = webView.url,
-          url.isWebPage() else {
-      completionHandler(nil, 0, .zero)
-      return
-    }
-
-    var rect = webView.scrollView.frame
-    rect.origin.x = webView.scrollView.contentOffset.x
-    rect.origin.y = webView.scrollView.contentSize.height - rect.height - webView.scrollView.contentOffset.y
-    
-    webView.createPDF { result in
-      dispatchPrecondition(condition: .onQueue(.main))
+      var rect = webView.scrollView.frame
+      rect.origin.x = webView.scrollView.contentOffset.x
+      rect.origin.y = webView.scrollView.contentSize.height - rect.height - webView.scrollView.contentOffset.y
       
-      switch result {
-      case .success(let data):
-        completionHandler(data, 0, rect)
-      case .failure:
-        completionHandler(nil, 0, .zero)
+      webView.createPDF { result in
+  
+        switch result {
+        case .success(let data):
+          continuation.resume(returning: (data, 0, rect))
+        case .failure:
+          continuation.resume(returning: (nil, 0, .zero))
+        }
       }
     }
   }
