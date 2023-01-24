@@ -150,7 +150,6 @@ extension BrowserViewController {
     guard shouldShowCallout(calloutType: .defaultBrowser) else {
       return
     }
-    
 
     let onboardingController = WelcomeViewController(
       state: WelcomeViewCalloutState.defaultBrowserCallout(
