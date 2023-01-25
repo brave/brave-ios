@@ -68,7 +68,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     // Listen to changes on filter lists so we know we need to reload the section
     FilterListResourceDownloader.shared.$filterLists
       .sink { filterLists in
-        let filterList = filterLists.first(where: { $0.componentId == FilterList.cookieConsentNoticesComponentID })
+        let filterList = filterLists.first(where: { $0.entry.componentId == FilterList.cookieConsentNoticesComponentID })
         
         Task { @MainActor in
           let isEnabled = FilterListResourceDownloader.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID)

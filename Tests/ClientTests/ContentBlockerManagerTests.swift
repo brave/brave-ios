@@ -5,7 +5,6 @@
 
 import XCTest
 import WebKit
-import Data
 @testable import Brave
 
 class ContentBlockerManagerTests: XCTestCase {
@@ -15,64 +14,64 @@ class ContentBlockerManagerTests: XCTestCase {
     return WKContentRuleListStore(url: bundleURL)!
   }()
   
-  func testCompilePendingResources() throws {
+  func testContentBlockerManager() throws {
     // Given
     let bundle = Bundle.module
     let resourceURL = bundle.url(forResource: "content-blocking", withExtension: "json")!
-    let downloadedRuleType = ContentBlockerManager.BlocklistRuleType.general(.blockAds)
-    let downloadedSourceType = ContentBlockerManager.BlocklistSourceType.downloaded(version: "123")
+    let encodedContentRuleList = try String(contentsOf: resourceURL, encoding: .utf8)
     let expectation = XCTestExpectation(description: "Test loading resources")
     let manager = ContentBlockerManager(ruleStore: ruleStore)
-    let domain = Domain.getOrCreate(forUrl: URL(string: "https://example.com")!, persistent: false)
+    let filterListUUID = UUID().uuidString
+    let filterListCustomUUID = UUID().uuidString
     
-    Task.detached {
+    Task { @MainActor in
       // When
-      await manager.loadBundledResources()
-      await manager.set(resource: ContentBlockerManager.Resource(
-        url: resourceURL,
-        sourceType: downloadedSourceType
-      ), for: downloadedRuleType)
-      
-      await manager.compilePendingResources()
-      let returnedCachedRuleLists = await manager.ruleLists(for: domain)
-      
-      await MainActor.run {
-        // Then
-        // Check for the correct source and cached rule list
-        for generalType in ContentBlockerManager.GeneralBlocklistTypes.allCases {
-          let returnedSourceType = manager.sourceType(for: .general(generalType))
-          
-          switch generalType {
-          case .blockAds:
-            // Check for downloaded rule type
-            XCTAssertEqual(returnedSourceType, downloadedSourceType)
-            XCTAssertTrue(returnedCachedRuleLists.contains(where: {
-              $0.identifier == ContentBlockerManager.BlocklistRuleType.general(generalType).identifier
-            }))
-          case .blockCookies, .blockTrackers:
-            // Check for bundled rule type
-            XCTAssertEqual(returnedSourceType, .bundled)
-            XCTAssertNotNil(returnedSourceType)
-          }
+      for generalType in ContentBlockerManager.GenericBlocklistType.allCases {
+        do {
+          try await manager.compileBundledRuleList(for: generalType)
+        } catch {
+          XCTFail(error.localizedDescription)
         }
       }
       
-      // Check we go back to the bundled rule type if we remove the downloaded one
-      await manager.removeResource(for: downloadedRuleType)
-      await manager.compilePendingResources()
-      
-      Task { @MainActor in
-        XCTAssertEqual(
-          manager.sourceType(for: downloadedRuleType), .bundled
-        )
-        
-        let returnedCachedRuleLists = manager.ruleLists(for: domain)
-        XCTAssertTrue(returnedCachedRuleLists.contains(where: {
-          $0.identifier == downloadedRuleType.identifier
-        }))
-        
-        expectation.fulfill()
+      do {
+        try await manager.compile(encodedContentRuleList: encodedContentRuleList, for: .filterList(uuid: filterListUUID))
+        try await manager.compile(encodedContentRuleList: encodedContentRuleList, for: .customFilterList(uuid: filterListCustomUUID))
+      } catch {
+        XCTFail(error.localizedDescription)
       }
+      
+      // Then
+      // Check for loading the cached results
+      for generalType in ContentBlockerManager.GenericBlocklistType.allCases {
+        do {
+          let cachedType = try await manager.ruleList(for: .generic(generalType))
+          XCTAssertNotNil(cachedType)
+        } catch {
+          XCTFail(error.localizedDescription)
+        }
+      }
+      
+      // Then
+      // Check for loading the uncached result from the rule store
+      for generalType in ContentBlockerManager.GenericBlocklistType.allCases {
+        do {
+          let cachedType = try await manager.loadRuleList(for: .generic(generalType))
+          XCTAssertNotNil(cachedType)
+        } catch {
+          XCTFail(error.localizedDescription)
+        }
+      }
+      
+      // Check removing the filter lists
+      do {
+        try await manager.removeRuleList(for: .filterList(uuid: filterListUUID))
+        try await manager.removeRuleList(for: .customFilterList(uuid: filterListCustomUUID))
+      } catch {
+        XCTFail(error.localizedDescription)
+      }
+      
+      expectation.fulfill()
     }
     
     wait(for: [expectation], timeout: 10)

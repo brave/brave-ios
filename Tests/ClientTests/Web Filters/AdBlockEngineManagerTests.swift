@@ -54,27 +54,30 @@ class AdBlockEngineManagerTests: XCTestCase {
     AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
     
     Task.detached {
-      for (source, url) in filterListURLs {
+      for (index, (source, url)) in filterListURLs.enumerated() {
         await engineManager.add(
           resource: .init(type: .ruleList, source: source),
           fileURL: url,
-          version: nil
+          version: "1.0",
+          relativeOrder: index
         )
       }
       
-      for (source, url) in filterListDATURLs {
+      for (index, (source, url)) in filterListDATURLs.enumerated() {
         await engineManager.add(
           resource: .init(type: .dat, source: source),
           fileURL: url,
-          version: nil
+          version: "1.0",
+          relativeOrder: index + filterListURLs.count
         )
       }
       
-      for (source, url) in resourceURLs {
+      for (index, (source, url)) in resourceURLs.enumerated() {
         await engineManager.add(
           resource: .init(type: .jsonResources, source: source),
           fileURL: url,
-          version: nil
+          version: "1.0",
+          relativeOrder: index + filterListURLs.count + filterListDATURLs.count
         )
       }
       
@@ -122,19 +125,21 @@ class AdBlockEngineManagerTests: XCTestCase {
     let setupExpectation = expectation(description: "Compiled engine resources")
     
     Task {
-      for _ in (0..<numberOfEngines) {
+      for index in (0..<numberOfEngines) {
         let uuid = UUID().uuidString
         
         await engineManager.add(
           resource: .init(type: .dat, source: .filterList(uuid: uuid)),
           fileURL: sampleAdBlockDatURL,
-          version: nil
+          version: "1.0",
+          relativeOrder: index
         )
         
         await engineManager.add(
           resource: .init(type: .jsonResources, source: .filterList(uuid: uuid)),
           fileURL: sampleResourceURL,
-          version: nil
+          version: "1.0",
+          relativeOrder: index
         )
       }
       

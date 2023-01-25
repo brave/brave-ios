@@ -26,6 +26,8 @@ actor ResourceDownloader: Sendable {
     case filterListContentBlockingBehaviors(uuid: String, componentId: String)
     /// General external file
     case dataFile(URL, cacheFolderName: String, cacheFileName: String)
+    /// Custom filter list URL
+    case customFilterListURL(uuid: String, externalURL: URL)
     
     /// The folder name under which this data should be saved under
     var cacheFolderName: String {
@@ -40,6 +42,8 @@ actor ResourceDownloader: Sendable {
         return "cmf-data"
       case .dataFile(_, let cacheFolderName, _):
         return cacheFolderName
+      case .customFilterListURL(let uuid, _):
+        return ["custom-filter-lists", uuid].joined(separator: "/")
       }
     }
     
@@ -67,6 +71,8 @@ actor ResourceDownloader: Sendable {
         return "scriptlet-resources.json"
       case .dataFile(_, _, let cacheFileName):
         return cacheFileName
+      case .customFilterListURL(_, let externalURL):
+        return externalURL.lastPathComponent
       }
     }
     
@@ -97,7 +103,7 @@ actor ResourceDownloader: Sendable {
         return Self.baseResourceURL.appendingPathComponent("/ios/ios-cosmetic-filters.dat")
       case .generalScriptletResources:
         return Self.baseResourceURL.appendingPathComponent("/ios/scriptlet-resources.json")
-      case .dataFile(let url, _, _):
+      case .dataFile(let url, _, _), .customFilterListURL(_, let url):
         return url
       }
     }
