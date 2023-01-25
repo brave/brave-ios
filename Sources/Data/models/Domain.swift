@@ -36,6 +36,10 @@ public final class Domain: NSManagedObject, CRUD {
     return URLComponents(string: url ?? "")
   }
   
+  @MainActor public var areAllSheildsOff: Bool {
+    return shield_allOff == 1
+  }
+  
   private static let containsEthereumPermissionsPredicate = NSPredicate(format: "wallet_permittedAccounts != nil && wallet_permittedAccounts != ''")
   private static let containsSolanaPermissionsPredicate = NSPredicate(format: "wallet_solanaPermittedAcccounts != nil && wallet_solanaPermittedAcccounts != ''")
   
