@@ -105,7 +105,7 @@ struct WebExtensionManifest: Codable {
 struct WebExtensionDetails: Codable {
   let id: String
   let manifest: WebExtensionManifest
-  let iconUrl: String  // Optional
+  let iconUrl: String?  // Optional
   let localizedName: String  // Optional
   let locale: String?  // Optional
   let appInstallBubble: Bool  // Optional
@@ -120,6 +120,60 @@ struct WebExtensionDetails: Codable {
 
     id = try container.decode(String.self, forKey: .id)
     manifest = try JSONDecoder().decode(WebExtensionManifest.self, from: manifestString.data(using: .utf8)!)
+    iconUrl = try container.decodeIfPresent(String.self, forKey: .iconUrl) ?? ""
+    localizedName = try container.decodeIfPresent(String.self, forKey: .localizedName) ?? ""
+    locale = try container.decodeIfPresent(String.self, forKey: .locale)
+    appInstallBubble = try container.decodeIfPresent(Bool.self, forKey: .appInstallBubble) ?? false
+    enableLauncher = try container.decodeIfPresent(Bool.self, forKey: .enableLauncher) ?? false
+    authUser = try container.decodeIfPresent(String.self, forKey: .authUser)
+    esbAllowlist = try container.decodeIfPresent(Bool.self, forKey: .esbAllowlist) ?? false
+    additionalProperties = try container.decodeAnyIfPresent([String: Any].self, forKey: .additionalProperties)
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(manifest, forKey: .manifest)
+    try container.encode(iconUrl, forKey: .iconUrl)
+    try container.encode(localizedName, forKey: .localizedName)
+    try container.encode(locale, forKey: .locale)
+    try container.encode(appInstallBubble, forKey: .appInstallBubble)
+    try container.encode(enableLauncher, forKey: .enableLauncher)
+    try container.encode(authUser, forKey: .authUser)
+    try container.encode(esbAllowlist, forKey: .esbAllowlist)
+    try? container.encodeAnyIfPresent(additionalProperties, forKey: .additionalProperties)
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case id
+    case manifest
+    case iconUrl
+    case localizedName
+    case locale
+    case appInstallBubble
+    case enableLauncher
+    case authUser = "authuser"
+    case esbAllowlist
+    case additionalProperties
+  }
+}
+
+struct WebExtensionInfo: Codable {
+  let id: String
+  let manifest: String
+  let iconUrl: String?  // Optional
+  let localizedName: String  // Optional
+  let locale: String?  // Optional
+  let appInstallBubble: Bool  // Optional
+  let enableLauncher: Bool  // Optional
+  let authUser: String?  // Optional
+  let esbAllowlist: Bool  // Optional
+  let additionalProperties: [String: Any]?  // Arbitrary properties
+  
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    id = try container.decode(String.self, forKey: .id)
+    manifest = try container.decode(String.self, forKey: .manifest)
     iconUrl = try container.decodeIfPresent(String.self, forKey: .iconUrl) ?? ""
     localizedName = try container.decodeIfPresent(String.self, forKey: .localizedName) ?? ""
     locale = try container.decodeIfPresent(String.self, forKey: .locale)

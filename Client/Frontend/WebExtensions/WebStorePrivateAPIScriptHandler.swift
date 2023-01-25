@@ -107,7 +107,7 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
     
     switch messageName {
     case "beginInstallWithManifest3": beginInstallWithManifest3(data: messageData, replyHandler: replyHandler)
-    case "getExtensionStatus": replyHandler("installable", nil)
+    case "getExtensionStatus": replyHandler(ExtensionRegistry.shared.isInstalled(extensionId: messageData["extension_id"] as? String ?? "") ? "already_installed" : "installable", nil)
     default:
       assertionFailure("Unhandled WebStore Message: \(messageName)")
       replyHandler(nil, "Unhandled Message")
@@ -115,44 +115,39 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
   }
   
   private func beginInstallWithManifest3(data: [String: AnyHashable], replyHandler: @escaping (Any?, String?) -> Void) {
-    do {
-      Task { @MainActor in
-        let json = try JSONSerialization.data(withJSONObject: data, options: [.fragmentsAllowed])
-        let model = try JSONDecoder().decode(WebExtensionDetails.self, from: json)
+    Task { @MainActor in
+      let json = try JSONSerialization.data(withJSONObject: data, options: [.fragmentsAllowed])
+      let model = try JSONDecoder().decode(WebExtensionInfo.self, from: json)
+      
+      let (result, icon, manifest) = await webStoreHandler.beginIntallWithManifest3(details: model)
+      if result == .userGestureRequired, let icon = icon, let manifest = manifest {
+        let browserController = tab?.webView?.window?.windowScene?.browserViewController
         
-        let result = await webStoreHandler.beginIntallWithManifest3(details: model)
-        if result == .userGestureRequired {
-          let browserController = tab?.webView?.window?.windowScene?.browserViewController
-          
-          var installView = WebStoreInstallUI(title: model.localizedName,
-                                              author: model.manifest.author?["name"] as? String ?? model.manifest.author?["email"] as? String ?? "N/A",
-                                              iconURL: model.iconUrl,
-                                              permissions: model.manifest.permissions ?? []
-          )
-          
-          installView.onCancel = { [replyHandler] in
-            replyHandler(nil, "user_cancelled")
-            browserController?.dismiss(animated: true, completion: nil)
-          }
-          
-          installView.onInstall = {
-            replyHandler(nil, nil)
-            browserController?.dismiss(animated: true, completion: nil)
-          }
-          
-          let controller = PopupViewController(rootView: installView).then {
-            $0.isModalInPresentation = true
-            $0.modalPresentationStyle = .overFullScreen
-          }
-          
-          browserController?.present(controller, animated: true)
-        } else {
-          replyHandler(nil, "Invalid Manifest")
+        var installView = WebStoreInstallUI(title: model.localizedName,
+                                            author: manifest.author?["name"] as? String ?? "N/A",
+                                            iconURL: model.iconUrl ?? "",
+                                            permissions: manifest.permissions ?? []
+        )
+        
+        installView.onCancel = { [replyHandler] in
+          replyHandler(nil, "user_cancelled")
+          browserController?.dismiss(animated: true, completion: nil)
         }
+        
+        installView.onInstall = {
+          replyHandler(nil, nil)
+          browserController?.dismiss(animated: true, completion: nil)
+        }
+        
+        let controller = PopupViewController(rootView: installView).then {
+          $0.isModalInPresentation = true
+          $0.modalPresentationStyle = .overFullScreen
+        }
+        
+        browserController?.present(controller, animated: true)
+      } else {
+        replyHandler(nil, "Invalid Manifest")
       }
-    } catch {
-      print(error)
-      replyHandler(nil, "Invalid Manifest")
     }
   }
 }
