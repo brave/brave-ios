@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BlockedResource" representedClassName="Data.BlockedResource" syncable="YES">
         <attribute name="domain" optional="YES" attributeType="String"/>
         <attribute name="faviconUrl" optional="YES" attributeType="String"/>
@@ -59,6 +59,11 @@
                 <constraint value="host"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
+    </entity>
+    <entity name="CustomFilterListSetting" representedClassName="Data.CustomFilterListSetting" syncable="YES">
+        <attribute name="externalURL" optional="YES" attributeType="URI"/>
+        <attribute name="isEnabled" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="uuid" optional="YES" attributeType="String"/>
     </entity>
     <entity name="DataSaved" representedClassName="Data.DataSaved" syncable="YES">
         <attribute name="amount" optional="YES" attributeType="String"/>
@@ -120,6 +125,7 @@
         <attribute name="componentId" optional="YES" attributeType="String"/>
         <attribute name="folderPath" optional="YES" attributeType="String"/>
         <attribute name="isEnabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="order" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="uuid" attributeType="String"/>
     </entity>
     <entity name="History" representedClassName="Data.History" syncable="YES">

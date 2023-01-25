@@ -44,7 +44,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
         text: "Recompile Content Blockers",
         selection: {
           Task { @MainActor in
-            await ContentBlockerManager.shared.compilePendingResources()
+            await AdblockResourceDownloader.shared.loadCachedData()
             self.showCompiledBlockListAlert()
           }
         }, cellClass: ButtonCell.self)
@@ -173,9 +173,13 @@ class AdblockDebugMenuTableViewController: TableViewController {
       return Row(text: fileURL.lastPathComponent, detailText: detailText, cellClass: MultilineSubtitleCell.self)
     }
     
-    var resources = FilterListResourceDownloader.shared.filterLists.flatMap { filterList -> [ResourceDownloader.Resource] in
-      return filterList.resources
+    var resources = FilterListResourceDownloader.shared.filterLists.map { filterList -> ResourceDownloader.Resource in
+      return filterList.makeResource(componentId: filterList.entry.componentId)
     }
+    
+    resources.append(contentsOf: CustomFilterListStorage.shared.filterListsURLs.map({ customURL in
+      return .customFilterListURL(uuid: customURL.setting.uuid, externalURL: customURL.setting.externalURL)
+    }))
     
     resources.append(contentsOf: [
       .debounceRules, .genericContentBlockingBehaviors, .genericFilterRules, .generalCosmeticFilters, .generalScriptletResources
