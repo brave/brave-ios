@@ -4298,7 +4298,7 @@ extension Strings {
         "recently.closed.view.tab",
         tableName: "BraveShared",
         bundle: .module,
-        value: "View Recently Closed Tab",
+        value: "View Recently Closed Tabs",
         comment: "Action item title of long press for Opening recently closed tab view")
     
     public static let recentlyClosedTabsScreenTitle =
