@@ -784,8 +784,7 @@
 /* %@ will launch an external application */
 "ExternalAppURLAlertMessage" = "%@ 随即会启动一个外部应用。";
 
-/* Allow link to switch apps?
-   This will be used to indicate which website is calling the action. %@ will replace the name of the website for instance: 'Allow google.com to switch apps?' */
+/* Allow link to switch apps? */
 "ExternalAppURLAlertTitle" = "允许连接以切换应用吗？";
 
 /* Allow Brave to open the external app URL */

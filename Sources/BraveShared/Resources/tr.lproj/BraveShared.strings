@@ -278,7 +278,7 @@
 "callout.bottomBarCalloutButtonTitle" = "Sekme Çubuğunu Taşı";
 
 /* Description for Bottom Bar Callout View */
-"callout.bottomBarCalloutDescription" = "Adres çubuğu, sekmeleri, yer işaretleri ve diğer araçları tarayıcının altına taşıyın.";
+"callout.bottomBarCalloutDescription" = "Adres çubuğunu, sekmeleri, yer işaretleri ve diğer araçları tarayıcının altına taşıyın.";
 
 /* Title for Bottom Bar Callout View */
 "callout.bottomBarCalloutTitle" = "Brave Sekmeleri Çubuğunu Özelleştir";
@@ -784,8 +784,7 @@
 /* %@ will launch an external application */
 "ExternalAppURLAlertMessage" = "%@ harici bir uygulama başlatacak";
 
-/* Allow link to switch apps?
-   This will be used to indicate which website is calling the action. %@ will replace the name of the website for instance: 'Allow google.com to switch apps?' */
+/* Allow link to switch apps? */
 "ExternalAppURLAlertTitle" = "Bağlantının uygulamaları değiştirmesine izin verilsin mi?";
 
 /* Allow Brave to open the external app URL */
