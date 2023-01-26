@@ -96,7 +96,11 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
 
   func add(_ observer: BraveWalletBraveWalletServiceObserver) {
   }
-
+  
+  // TODO: Check Wallet changes
+  func add(_ observer: BraveWalletBraveWalletServiceTokenObserver) {
+  }
+  
   func setDefaultWallet(_ defaultEthWallet: BraveWallet.DefaultWallet) {
   }
 
@@ -210,6 +214,11 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   }
   
   func discoverAssetsOnAllSupportedChains() {
+  }
+  
+  // TODO: Check Wallet changes
+  func allUserAssets(_ completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
+    completion(assets[BraveWallet.MainnetChainId] ?? [])
   }
 }
 #endif

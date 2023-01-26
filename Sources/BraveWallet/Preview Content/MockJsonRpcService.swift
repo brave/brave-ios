@@ -143,8 +143,13 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .internalError, "")
   }
   
-  func erc1155Metadata(_ contract: String, tokenId: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
-    completion("", .internalError, "")
+  // TODO: Check Wallet changes
+  func erc721Metadata(_ contract: String, tokenId: String, chainId: String, completion: @escaping (String, String, BraveWallet.ProviderError, String) -> Void) {
+    completion("", "", .internalError, "")
+  }
+  
+  func erc1155Metadata(_ contract: String, tokenId: String, chainId: String, completion: @escaping (String, String, BraveWallet.ProviderError, String) -> Void) {
+    completion("", "", .internalError, "")
   }
   
   func hiddenNetworks(_ coin: BraveWallet.CoinType, completion: @escaping ([String]) -> Void) {

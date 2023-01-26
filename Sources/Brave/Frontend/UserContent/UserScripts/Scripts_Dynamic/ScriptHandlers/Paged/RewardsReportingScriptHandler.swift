@@ -71,10 +71,11 @@ class RewardsReportingScriptHandler: TabContentScript {
         let refURL = URL(string: content.referrerUrl ?? "")
 
         if content.method.lowercased() == "post" {
+          // TODO: Check Ledger Change - No Media URL / No Repost Data
           if let postData = content.data?.removingPercentEncoding, let data = postData.data(using: .utf8) {
-            if BraveLedger.isMediaURL(url, firstPartyURL: tabURL, referrerURL: refURL) {
-              rewards.reportPostData(data, url: url, tabId: Int(tab.rewardsId), firstPartyURL: tabURL, referrerURL: refURL)
-            }
+//            if BraveLedger.isMediaURL(url, firstPartyURL: tabURL, referrerURL: refURL) {
+//              rewards.reportPostData(data, url: url, tabId: Int(tab.rewardsId), firstPartyURL: tabURL, referrerURL: refURL)
+//            }
           }
         } else {
           rewards.reportXHRLoad(url: url, tabId: Int(tab.rewardsId), firstPartyURL: tabURL, referrerURL: refURL)
