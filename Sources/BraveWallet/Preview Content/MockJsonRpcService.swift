@@ -162,6 +162,10 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func snsGetSolAddr(_ domain: String, completion: @escaping (String, BraveWallet.SolanaProviderError, String) -> Void) {
     completion("", .internalError, "Error Message")
   }
+  
+  func snsResolveHost(_ domain: String, completion: @escaping (URL?, BraveWallet.SolanaProviderError, String) -> Void) {
+    completion(nil, .internalError, "Error Message")
+  }
 }
 
 extension BraveWallet.NetworkInfo {
