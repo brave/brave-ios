@@ -64,9 +64,6 @@ extension Preferences {
       }
     }
     
-    /// The option to enable IPFS
-    public static let enableIPFS = Option<Bool>(key: "web3.enable-ipfs", default: false)
-    
     public enum Web3DomainOption: Int, Identifiable, CaseIterable {
       case ask
       case enable

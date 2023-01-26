@@ -13,7 +13,6 @@ public struct WalletSettingsView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var displayDappsNotifications = Preferences.Wallet.displayWeb3Notifications
-  @ObservedObject var enableIPFS = Preferences.Wallet.enableIPFS
   @ObservedObject var enableSNSDomainName = Preferences.Wallet.resolveSNSDomainNames
 
   @State private var isShowingResetWalletAlert = false
@@ -142,12 +141,6 @@ public struct WalletSettingsView: View {
           Text(Strings.Wallet.settingsResetButtonTitle)
             .foregroundColor(.red)
         } // iOS 15: .role(.destructive)
-      }
-      Section(header: Text(Strings.Wallet.web3IPFSHeader)) {
-        Toggle(Strings.Wallet.web3IPFSTitle, isOn: .constant(false))
-          .foregroundColor(Color(.braveLabel))
-          .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
         Picker(selection: $enableSNSDomainName.value) {

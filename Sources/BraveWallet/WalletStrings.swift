@@ -3494,19 +3494,5 @@ extension Strings {
       value: "Web3 Domains",
       comment: "The header for the options to resolve Solana Name service domain names."
     )
-    public static let web3IPFSTitle = NSLocalizedString(
-      "wallet.web3IPFSTitle",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enable IPFS",
-      comment: "The title for the options to enable IPFS."
-    )
-    public static let web3IPFSHeader = NSLocalizedString(
-      "wallet.web3IPFSTitle",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enable IPFS",
-      comment: "The title for the options to enable IPFS."
-    )
   }
 }
