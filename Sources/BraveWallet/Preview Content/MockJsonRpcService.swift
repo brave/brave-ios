@@ -143,7 +143,6 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .internalError, "")
   }
   
-  // TODO: Check Wallet changes
   func erc721Metadata(_ contract: String, tokenId: String, chainId: String, completion: @escaping (String, String, BraveWallet.ProviderError, String) -> Void) {
     completion("", "", .internalError, "")
   }

@@ -281,7 +281,6 @@ extension BraveWalletJsonRpcService {
   @MainActor func fetchNFTMetadata(for token: BraveWallet.BlockchainToken) async -> NFTMetadata? {
     var metaDataString = ""
     if token.isErc721 {
-      // TODO: Check Wallet changes
       let (_, metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
       
       if result != .success {
@@ -310,7 +309,6 @@ extension BraveWalletJsonRpcService {
         group.addTask { @MainActor in
           var metaDataString = ""
           if token.isErc721 {
-            // TODO: Check Wallet changes
             let (_, metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
 
             if result != .success {

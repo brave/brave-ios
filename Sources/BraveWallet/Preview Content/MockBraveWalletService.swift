@@ -22,6 +22,11 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   func userAssets(_ chainId: String, coin: BraveWallet.CoinType, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(assets[chainId] ?? [])
   }
+  
+  func allUserAssets(_ completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
+    let allAssets = assets.values.flatMap { $0 }
+    completion(Array(allAssets))
+  }
 
   func addUserAsset(_ token: BraveWallet.BlockchainToken, completion: @escaping (Bool) -> Void) {
     assets[token.chainId]?.append(token)
@@ -97,7 +102,6 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   func add(_ observer: BraveWalletBraveWalletServiceObserver) {
   }
   
-  // TODO: Check Wallet changes
   func add(_ observer: BraveWalletBraveWalletServiceTokenObserver) {
   }
   
@@ -214,11 +218,6 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   }
   
   func discoverAssetsOnAllSupportedChains() {
-  }
-  
-  // TODO: Check Wallet changes
-  func allUserAssets(_ completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
-    completion(assets[BraveWallet.MainnetChainId] ?? [])
   }
 }
 #endif
