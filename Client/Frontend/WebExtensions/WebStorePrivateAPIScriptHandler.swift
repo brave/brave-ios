@@ -10,60 +10,6 @@ import Shared
 import SwiftUI
 import BraveUI
 
-private struct Manifest: Codable {
-  // Required
-  let manifestVersion: Double
-  let name: String
-  let version: String
-  let updateUrl: String
-
-  // Recommended
-  let action: Action?
-  let defaultLocale: String?
-  let description: String?
-  let icons: Icons?
-
-  // Optional
-  let author: String?
-  let automation: String?
-  let background: Background?
-
-  let permissions: [String]?
-
-  struct Action: Codable {
-
-  }
-
-  struct Icons: Codable {
-
-  }
-
-  struct Background: Codable {
-    // Required
-    let serviceWorker: String?
-
-    // Optional
-    let type: String?
-  }
-
-  private enum CodingKeys: String, CodingKey {
-    case manifestVersion = "manifest_version"
-    case name
-    case version
-    case updateUrl = "update_url"
-
-    case action
-    case defaultLocale = "default_locale"
-    case description
-    case icons
-
-    case author
-    case automation
-    case background
-    case permissions
-  }
-}
-
 class WebStorePrivateAPIScriptHandler: TabContentScript {
   private weak var tab: Tab?
   private let webStoreHandler = WebStorePrivateAPI()
@@ -72,7 +18,7 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
     self.tab = tab
   }
 
-  static let scriptName = "WebStorePrivateAPI"
+  static let scriptName = "WebStorePrivateAPIScript"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
   static let scriptSandbox: WKContentWorld = .page
@@ -107,7 +53,37 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
     
     switch messageName {
     case "beginInstallWithManifest3": beginInstallWithManifest3(data: messageData, replyHandler: replyHandler)
-    case "getExtensionStatus": replyHandler(ExtensionRegistry.shared.isInstalled(extensionId: messageData["extension_id"] as? String ?? "") ? "already_installed" : "installable", nil)
+    case "getExtensionStatus": replyHandler(ExtensionRegistry.shared.isInstalled(extensionId: messageData["extension_id"] as? String ?? "") ? "enabled" : "installable", nil)
+    case "getAll":
+      do {
+        let jsonData = try JSONEncoder().encode(ExtensionRegistry.shared.getAll(kind: .all))
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData)
+        replyHandler(jsonObject, nil)
+      } catch {
+        replyHandler([], "ERROR!: \(error)")
+      }
+    case "completeInstall":
+      do {
+        let jsonData = try JSONEncoder().encode(ExtensionRegistry.shared.getExtension(id: messageData["expected_id"] as? String ?? "", kind: .all))
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData)
+        replyHandler(jsonObject, nil)
+      } catch {
+        replyHandler(nil, "ERROR!: \(error)")
+      }
+    case "uninstall":
+      do {
+        let jsonData = try JSONEncoder().encode(ExtensionRegistry.shared.getExtension(id: messageData["extension_id"] as? String ?? "", kind: .all))
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData)
+        
+        if (messageData["options"] as? [String: AnyHashable])?["showConfirmDialog"] as? Bool == true {
+          // TODO: Show confirm dialog for uninstalling an extension
+        }
+        
+        ExtensionRegistry.shared.removeExtension(id: messageData["extension_id"] as? String ?? "")
+        replyHandler(jsonObject, nil)
+      } catch {
+        replyHandler(nil, "ERROR!: \(error)")
+      }
     default:
       assertionFailure("Unhandled WebStore Message: \(messageName)")
       replyHandler(nil, "Unhandled Message")
@@ -135,7 +111,7 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
         }
         
         installView.onInstall = {
-          replyHandler(nil, nil)
+          replyHandler("", nil)  //success
           browserController?.dismiss(animated: true, completion: nil)
         }
         
@@ -145,6 +121,8 @@ class WebStorePrivateAPIScriptHandler: TabContentScript {
         }
         
         browserController?.present(controller, animated: true)
+      } else if result == .alreadyInstalled {
+        replyHandler("", nil)  // already_installed
       } else {
         replyHandler(nil, "Invalid Manifest")
       }

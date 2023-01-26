@@ -95,7 +95,7 @@ class WebStorePrivateAPI {
     
     do {
       let (icon, manifest) = try await installHelper.start()
-      ExtensionRegistry.shared.setInstalled(extensionId: details.id)
+      ExtensionRegistry.shared.add(info: details, manifest: manifest)
       return (.userGestureRequired, icon, manifest)
     } catch {
       guard let error = error as? WebStoreInstallHelper.InstallHelperResultCode else {

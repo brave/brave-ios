@@ -7,19 +7,27 @@ import Foundation
 
 class ExtensionRegistry {
   static let shared = ExtensionRegistry()
-  private var installedExtensions = [String: Any]()
+  private var installedExtensions = [String: WebExtensionInstallInfo]()
 
   func isInstalled(extensionId: String) -> Bool {
     // TODO: Check if Private-Browsing allows the extension, etc..
     return installedExtensions[extensionId] != nil
   }
   
-  func setInstalled(extensionId: String) {
-    installedExtensions[extensionId] = true
+  func add(info: WebExtensionInfo, manifest: WebExtensionManifest) {
+    installedExtensions[info.id] = WebExtensionInstallInfo(info: info, manifest: manifest)
   }
   
-  func getExtension(id: String, kind: IncludeFlag) {
-    
+  func removeExtension(id: String) {
+    installedExtensions.removeValue(forKey: id)
+  }
+  
+  func getExtension(id: String, kind: IncludeFlag) -> WebExtensionInstallInfo? {
+    return installedExtensions[id]
+  }
+  
+  func getAll(kind: IncludeFlag) -> [WebExtensionInstallInfo] {
+    return installedExtensions.values.map { $0 }
   }
   
   struct IncludeFlag: OptionSet {

@@ -211,3 +211,48 @@ struct WebExtensionInfo: Codable {
     case additionalProperties
   }
 }
+
+struct WebExtensionInstallInfo: Codable {
+  let description: String
+  let enabled: Bool
+  let homepageUrl: String
+  let hostPermissions: [String]
+  let icons: [Icon]
+  let id: String
+  let installType: String
+  let isApp: Bool
+  let mayDisable: Bool
+  let name: String
+  let offlineEnabled: Bool
+  let optionsUrl: String
+  let permissions: [String]
+  let shortName: String
+  let type: String
+  let updateUrl: String
+  let version: String
+  
+  struct Icon: Codable {
+    let size: Int
+    let url: String
+  }
+  
+  init(info: WebExtensionInfo, manifest: WebExtensionManifest) {
+    description = manifest.description ?? ""
+    enabled = true
+    homepageUrl = ""
+    hostPermissions = (manifest.permissions ?? []) + ["chrome://favicon/*"]
+    icons = [Icon(size: 16, url: ""), Icon(size: 48, url: ""), Icon(size: 128, url: "")]
+    id = info.id
+    installType = "normal"
+    isApp = false
+    mayDisable = true
+    name = info.localizedName
+    offlineEnabled = false
+    optionsUrl = ""
+    permissions = manifest.permissions ?? []
+    shortName = manifest.name
+    type = "extension"
+    updateUrl = manifest.updateUrl
+    version = manifest.version
+  }
+}

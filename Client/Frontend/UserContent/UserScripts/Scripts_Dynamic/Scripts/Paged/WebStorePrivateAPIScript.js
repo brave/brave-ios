@@ -5,8 +5,6 @@
 
 window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
   let postMessage = $(function(name, data) {
-    console.log("POST MESSAGE CALLED!\n");
-    
     return $.postNativeMessage('$<message_handler>', {
       "securityToken": SECURITY_TOKEN,
       "name": name,
@@ -28,19 +26,19 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
     }
 
     removeListener(callback) {
-      const index = this['callbacks'].indexOf(callback);
+      const index = this.callbacks.indexOf(callback);
       if (index > -1) {
         array.splice(index, 1);
       }
     }
 
     hasListener(listener) {
-      return this['callbacks'].indexOf(listener) != -1;
+      return this.callbacks.indexOf(listener) != -1;
     }
 
     dispatch(event) {
-      if (callbacks) {
-        callbacks.forEach(callback => callback());
+      if (this.callbacks) {
+        this.callbacks.forEach(callback => callback(event));
       }
     }
   };
@@ -123,6 +121,7 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
       // string, callback() [optional]
       install: function(expected_id, callback) {
         console.log("INSTALL: ", expected_id);
+        callback();
       },
 
       // dictionary { id: "...",
@@ -149,46 +148,63 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
         }
 
         postMessage('beginInstallWithManifest3', details).then(e => {
-          callback(WebStoreResult.SUCCESS);
+          callback(e);  // WebStoreResult.SUCCESS
         })
         .catch(e => {
-          callback(WebStoreResult.USER_CANCELLED);
+          callback(e);  // WebStoreResult.USER_CANCELLED
         });
       },
 
       // string, callback() [optional]
       completeInstall: function(expected_id, callback) {
-        console.log("COMPLETE INSTALL: ", expected_id);
+        console.log("COMPLETE INSTALL");
+        
+        postMessage('completeInstall', {"expected_id": expected_id}).then(e => {  /* ExtensionInfo */
+          window.chrome.management.onEnabled.dispatch(e);
+          window.chrome.management.onInstalled.dispatch(e);
+          callback();
+        })
+        .catch(e => {
+          window.chrome.management.onEnabled.dispatch(e);
+          window.chrome.management.onInstalled.dispatch(e);
+          callback();
+        });
       },
 
       // callback() [optional]
       enableAppLauncher: function(callback) {
         console.log("ENABLE APP LAUNCHER");
+        callback();
       },
 
       // callback(info: Dictionary {"login": "...."})
       getBrowserLogin: function(callback) {
         console.log("GET BROWSER LOGIN");
+        callback({});
       },
 
       // callback(info: Dictionary {"login: "....")
       getStoreLogin: function(callback) {
         console.log("GET STORE LOGIN");
+        callback({});
       },
 
       // string, callback() [optional]
       setStoreLogin: function(login, callback) {
         console.log("SET STORE LOGIN: ", login);
+        callback();
       },
 
       // callback(webgl_status: WebGlStatus)
       getWebGLStatus: function(callback) {
         console.log("GET WEBGL STATUS");
+        callback(WebGlStatus.webgl_blocked);
       },
 
       // callback(is_enabled: Bool)
       getIsLauncherEnabled: function(callback) {
         console.log("IS LAUNCHER ENABLED");
+        callback(false);
       },
 
       // callback(is_incognito_mode: Bool)
@@ -206,6 +222,7 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
       // string, callback(Result) [optional]
       launchEphemeralApp: function(id, callback) {
         console.log("LAUNCH EPHEMERAL APPS");
+        callback("user_cancelled");
       },
 
       // string, callback(is_pending_approval: Bool)
@@ -237,6 +254,7 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
       // string, callback(status: ExtensionInstalledStatus) [optional]
       requestExtension: function(id, callback) {
         console.log("REQUEST EXTENSION");
+        callback("already_installed");
       }
     }
   });
@@ -327,7 +345,7 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
     configurable: false,
     writable: false,
     value: {
-//        lastError: { },
+      lastError: { },
       inIncognitoContext: false,
       ViewType: { "TAB": "tab", "POPUP": "popup" },
     }
@@ -381,13 +399,19 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
       // callback(result: [ExtensionInfo])
       getAll: function(callback) {
         console.log("GET ALL");
-        callback([]);
-        //setTimeout(callback([]), 2000);
+        
+        postMessage('getAll', {}).then(e => {
+          //callback([ExtensionInfo]);
+          callback(e);
+        })
+        .catch(e => {
+          callback([]);
+        });
       },
 
       // string, callback(result: [ExtensionInfo])
       get: function(id, callback) {
-        console.log("GET");
+        console.log("GET: ", id);
         callback([])
       },
 
@@ -397,7 +421,7 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
 //      },
 
       getPermissionWarningsById: function(id, callback) {
-        console.log("GET PERMISSION WARNINGS BY ID");
+        console.log("GET PERMISSION WARNINGS BY ID: ", id);
       },
 
 //      getPermissionWarningsByManifest: function(manifestStr, callback) {
@@ -405,11 +429,30 @@ window.__firefox__.includeOnce("WebStoreAPI", function($, $Object) {
 //      },
 
       setEnabled: function(id, enabled, callback) {
-        console.log("SET ENABELD");
+        console.log("SET ENABELD: ", id);
+        callback();
       },
 
+      // id: string, options: UninstallOptions
       uninstall: function(id, options, callback) {
         console.log("UNINSTALL");
+        
+        postMessage('uninstall', {"extension_id": id, "options": options}).then(e => {
+          window.chrome.management.onDisabled.dispatch(e);
+          window.chrome.management.onUninstalled.dispatch(id);
+          
+          if (callback) {
+            callback();
+          }
+        })
+        .catch(e => {
+          window.chrome.management.onDisabled.dispatch(e);
+          window.chrome.management.onUninstalled.dispatch(id);
+          
+          if (callback) {
+            callback();
+          }
+        });
       },
 
 //      uninstallSelf: function(options, callback) {
