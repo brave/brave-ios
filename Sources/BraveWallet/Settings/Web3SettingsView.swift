@@ -21,7 +21,7 @@ public struct Web3SettingsView: View {
   /// If we are showing the modal so the user can enter their password to enable unlock via biometrics.
   @State private var isShowingBiometricsPasswordEntry = false
   
-  private var domainOptions: [Preferences.Wallet.Web3DomainOption] = [.ask, .enable, .disable]
+  private var domainOptions: [Preferences.Wallet.Web3DomainOption] = Preferences.Wallet.Web3DomainOption.allCases
   
   public init(
     settingsStore: SettingsStore? = nil,
@@ -45,19 +45,21 @@ public struct Web3SettingsView: View {
           isShowingBiometricsPasswordEntry: $isShowingBiometricsPasswordEntry
         )
       }
-      Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
-        Picker(selection: $enableSNSDomainName.value) {
-          ForEach(Preferences.Wallet.Web3DomainOption.allCases) { option in
-            Text(option.name)
-              .foregroundColor(Color(.secondaryBraveLabel))
-              .tag(option)
+      if WalletFeatureFlags.SNSDomainResolverEnabled {
+        Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
+          Picker(selection: $enableSNSDomainName.value) {
+            ForEach(Preferences.Wallet.Web3DomainOption.allCases) { option in
+              Text(option.name)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tag(option)
+            }
+          } label: {
+            Text(Strings.Wallet.web3DomainOptionsTitle)
+              .foregroundColor(Color(.braveLabel))
+              .padding(.vertical, 4)
           }
-        } label: {
-          Text(Strings.Wallet.web3DomainOptionsTitle)
-            .foregroundColor(Color(.braveLabel))
-            .padding(.vertical, 4)
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
     }
     .listStyle(InsetGroupedListStyle())
@@ -105,7 +107,7 @@ public struct Web3SettingsView: View {
   }
 }
 
-struct WalletSettingsView: View {
+private struct WalletSettingsView: View {
   @ObservedObject var settingsStore: SettingsStore
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var keyringStore: KeyringStore
