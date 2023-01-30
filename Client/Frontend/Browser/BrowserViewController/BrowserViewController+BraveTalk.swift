@@ -32,10 +32,4 @@ extension BrowserViewController {
     )
 #endif
   }
-  
-  @objc private func toggleBraveTalkMute() {
-#if canImport(BraveTalk)
-    braveTalkJitsiCoordinator.toggleMute()
-#endif
-  }
 }

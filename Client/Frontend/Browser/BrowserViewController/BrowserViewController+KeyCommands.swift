@@ -165,10 +165,12 @@ extension BrowserViewController {
     searchController.handleKeyCommands(sender: sender)
   }
   
+#if canImport(BraveTalk)
   @objc private func toggleBraveTalkMuteCommand() {
     braveTalkJitsiCoordinator.toggleMute()
   }
-  
+#endif
+
   @objc private func reopenRecentlyClosedTabCommand() {
     guard let recentlyClosed = RecentlyClosed.all().first else {
       return
@@ -285,10 +287,12 @@ extension BrowserViewController {
       UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(moveURLCompletionKeyCommand(sender:)))
     ]
     
+#if canImport(BraveTalk)
     let braveTalkKeyCommands: [UIKeyCommand] = [
       UIKeyCommand(input: "m", modifierFlags: [], action: #selector(toggleBraveTalkMuteCommand))
     ]
-    
+#endif
+
     // In iOS 15+, certain keys events are delivered to the text input or focus systems first, unless specified otherwise
     if #available(iOS 15, *) {
       searchLocationCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
