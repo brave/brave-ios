@@ -17,7 +17,7 @@ enum OnboardingColor: String {
 
 extension BraveGradient {
   
-  public static var backgroundGradient: BraveGradient {
+  static var backgroundGradient: BraveGradient {
     .init(
       stops: [
         .init(color: OnboardingColor.background_gradient_step0.color, position: 0.17),
