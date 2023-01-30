@@ -399,7 +399,7 @@ class TabTrayController: LoadingViewController {
   }
   
   override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
-    guard let recentlyClosedTab = RecentlyClosed.all().first else {
+    guard !PrivateBrowsingManager.shared.isPrivateBrowsing, let recentlyClosedTab = RecentlyClosed.all().first else {
       return
     }
     

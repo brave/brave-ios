@@ -96,7 +96,7 @@ extension TabTrayController {
       }
     }
 
-    return [
+    var navigationCommands = [
       UIKeyCommand(title: toggleText, action: #selector(didTogglePrivateModeKeyCommand), input: "`", modifierFlags: .command),
       UIKeyCommand(input: "w", modifierFlags: .command, action: #selector(didCloseTabKeyCommand)),
       UIKeyCommand(title: Strings.Hotkey.closeTabFromTabTrayKeyCodeTitle, action: #selector(didCloseTabKeyCommand), input: "\u{8}", modifierFlags: []),
@@ -104,9 +104,15 @@ extension TabTrayController {
       UIKeyCommand(title: Strings.Hotkey.openSelectedTabFromTabTrayKeyCodeTitle, action: #selector(didEnterTabKeyCommand), input: "\r", modifierFlags: []),
       UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(didEnterTabKeyCommand)),
       UIKeyCommand(input: "\t", modifierFlags: [.command, .alternate], action: #selector(didEnterTabKeyCommand)),
-      UIKeyCommand(title: Strings.Hotkey.openNewTabFromTabTrayKeyCodeTitle, action: #selector(didOpenNewTabKeyCommand), input: "t", modifierFlags: .command),
-      UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift]),
-    ] + arrowCommands
-
+      UIKeyCommand(title: Strings.Hotkey.openNewTabFromTabTrayKeyCodeTitle, action: #selector(didOpenNewTabKeyCommand), input: "t", modifierFlags: .command)
+    ]
+    
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      navigationCommands += [
+        UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift])
+      ]
+    }
+    
+    return navigationCommands + arrowCommands
   }
 }

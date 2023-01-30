@@ -184,12 +184,12 @@ extension BrowserViewController {
   
   override public var keyCommands: [UIKeyCommand]? {
     let isEditingText = tabManager.selectedTab?.isEditing ?? false
-      
+    
     var navigationCommands = [
       // Web Page Key Commands
       UIKeyCommand(title: Strings.Hotkey.reloadPageTitle, action: #selector(reloadTabKeyCommand), input: "r", modifierFlags: .command),
     ]
-
+    
     let tabMovementCommands = [
       UIKeyCommand(title: Strings.Hotkey.backTitle, action: #selector(goBackKeyCommand), input: UIKeyCommand.inputLeftArrow, modifierFlags: .command),
       UIKeyCommand(title: Strings.Hotkey.forwardTitle, action: #selector(goForwardKeyCommand), input: UIKeyCommand.inputRightArrow, modifierFlags: .command)
@@ -203,16 +203,25 @@ extension BrowserViewController {
       UIKeyCommand(input: "[", modifierFlags: .command, action: #selector(goBackKeyCommand)),
       UIKeyCommand(input: "]", modifierFlags: .command, action: #selector(goForwardKeyCommand)),
     ]
-      
+    
+    // URL Bar - Tab Key Commands
     navigationCommands += [
-      // URL Bar - Tab Key Commands
       UIKeyCommand(title: Strings.Hotkey.selectLocationBarTitle, action: #selector(selectLocationBarKeyCommand), input: "l", modifierFlags: .command),
       UIKeyCommand(title: Strings.Hotkey.newTabTitle, action: #selector(newTabKeyCommand), input: "t", modifierFlags: .command),
       UIKeyCommand(title: Strings.Hotkey.newPrivateTabTitle, action: #selector(newPrivateTabKeyCommand), input: "n", modifierFlags: [.command, .shift]),
-      UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift]),
+    ]
+    
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      navigationCommands += [
+        UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift])
+      ]
+    }
+    
+    navigationCommands += [
       UIKeyCommand(title: Strings.Hotkey.closeTabTitle, action: #selector(closeTabKeyCommand), input: "w", modifierFlags: .command),
       UIKeyCommand(title: Strings.Hotkey.closeAllTabsFromTabTrayKeyCodeTitle, action: #selector(closeAllTabsKeyCommand), input: "w", modifierFlags: [.command, .alternate])
     ]
+    
     
     let tabNavigationKeyCommands = [
       // Tab Navigation Key Commands
