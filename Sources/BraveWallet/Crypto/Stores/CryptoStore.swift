@@ -422,7 +422,6 @@ extension CryptoStore: BraveWalletTxServiceObserver {
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     prepare()
   }
-  // TODO: Check Wallet changes
   public func onTxServiceReset() {
     prepare()
   }
