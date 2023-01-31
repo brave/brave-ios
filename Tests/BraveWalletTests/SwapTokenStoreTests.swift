@@ -238,114 +238,144 @@ class SwapStoreTests: XCTestCase {
     }
   }
 
-  func testSwapERC20EIP1559Transaction() {
+  private func setupServices(
+    network: BraveWallet.NetworkInfo = .mockMainnet,
+    coin: BraveWallet.CoinType = .eth
+  ) -> (BraveWallet.TestKeyringService, BraveWallet.TestBlockchainRegistry, BraveWallet.TestJsonRpcService, BraveWallet.TestSwapService, BraveWallet.TestTxService, BraveWallet.TestBraveWalletService, BraveWallet.TestEthTxManagerProxy) {
+    let keyringService = BraveWallet.TestKeyringService()
+    keyringService._addObserver = { _ in }
+    let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
+    let rpcService = BraveWallet.TestJsonRpcService()
+    rpcService._addObserver = { _ in }
+    rpcService._network = { $1(network) }
+    rpcService._balance = { _, _, _, completion in
+      // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
+      completion("0x13e25e19dc20ba7", .success, "")
+    }
+    let swapService = BraveWallet.TestSwapService()
+    swapService._priceQuote = { $1(.init(), nil, "") }
+    swapService._transactionPayload = { $1(.init(), nil, "") }
+    let txService = BraveWallet.TestTxService()
+    txService._addUnapprovedTransaction = { $4(true, "tx-meta-id", "") }
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._selectedCoin = { $0(coin) }
+    let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
+    ethTxManagerProxy._makeErc20ApproveData = { $2(true, []) }
+    ethTxManagerProxy._gasEstimation1559 = { $0(.init()) }
+    return (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy)
+  }
+
+  /// Test creating ERC20 approve transaction on EIP1559 network
+  @MainActor func testSwapERC20EIP1559Transaction() async {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices()
+    var submittedTxData: BraveWallet.TxDataUnion?
+    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+      submittedTxData = txData
+      completion(true, "tx-meta-id", "")
+    }
     let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
-      rpcService: MockJsonRpcService(),
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
       prefilledToken: nil
     )
-    let ex = expectation(description: "make-erc20-eip1559-swap-transaction")
     store.setUpTest()
     store.state = .lowAllowance("test-spender-address")
-    store.prepareSwap { _ in }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      if case .swap = store.state {
-        ex.fulfill()
-      }
-    }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
+    let success = await store.createSwapTransaction()
+    XCTAssertTrue(success, "Expected to successfully create transaction")
+    XCTAssertFalse(store.isMakingTx)
+    XCTAssertNotNil(submittedTxData?.ethTxData1559)
+    XCTAssertNil(submittedTxData?.ethTxData)
   }
 
-  func testSwapERC20Transaction() {
-    let rpcService = MockJsonRpcService()
+  /// Test creating ERC20 approve transaction on non-EIP1559 network
+  @MainActor func testSwapERC20Transaction() async {
+    // Celo Mainnet / `.mockCelo` is not EIP1559
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices(network: .mockCelo)
+    var submittedTxData: BraveWallet.TxDataUnion?
+    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+      submittedTxData = txData
+      completion(true, "tx-meta-id", "")
+    }
     let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
       rpcService: rpcService,
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
       prefilledToken: nil
     )
-    let ex = expectation(description: "make-erc20-swap-transaction")
     store.setUpTest()
     store.state = .lowAllowance("test-spender-address")
-
-    rpcService.setNetwork(BraveWallet.GoerliChainId, coin: .eth) { success in
-      XCTAssertTrue(success)
-      store.prepareSwap { _ in }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        if case .swap = store.state {
-          ex.fulfill()
-        }
-      }
-    }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
+    
+    let success = await store.createSwapTransaction()
+    XCTAssertTrue(success, "Expected to successfully create transaction")
+    XCTAssertFalse(store.isMakingTx)
+    XCTAssertNotNil(submittedTxData?.ethTxData)
+    XCTAssertNil(submittedTxData?.ethTxData1559)
   }
 
-  func testSwapETHSwapEIP1559Transaction() {
-    let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
-      rpcService: MockJsonRpcService(),
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
-      prefilledToken: nil
-    )
-    let ex = expectation(description: "make-eth-swap-eip1559-transaction")
-    store.setUpTest()
-    store.state = .swap
-    store.prepareSwap { _ in }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      if case .swap = store.state {
-        ex.fulfill()
-      }
+  /// Test creating a eth swap transaction on EIP1559 network
+  @MainActor func testSwapETHSwapEIP1559Transaction() async {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices()
+    var submittedTxData: BraveWallet.TxDataUnion?
+    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+      submittedTxData = txData
+      completion(true, "tx-meta-id", "")
     }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
-  }
-
-  func testSwapETHSwapTransaction() {
-    let rpcService = MockJsonRpcService()
     let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
       rpcService: rpcService,
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
       prefilledToken: nil
     )
-    let ex = expectation(description: "make-eth-swap-eip1559-transaction")
     store.setUpTest()
     store.state = .swap
+    
+    let success = await store.createSwapTransaction()
+    XCTAssertTrue(success, "Expected to successfully create transaction")
+    XCTAssertFalse(store.isMakingTx)
+    XCTAssertNotNil(submittedTxData?.ethTxData1559)
+    XCTAssertNil(submittedTxData?.ethTxData)
+  }
 
-    rpcService.setNetwork(BraveWallet.GoerliChainId, coin: .eth) { success in
-      XCTAssertTrue(success)
-      store.prepareSwap { _ in }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        if case .swap = store.state {
-          ex.fulfill()
-        }
-      }
+  /// Test creating a eth swap transaction on non-EIP1559 network
+  @MainActor func testSwapETHSwapTransaction() async {
+    // Celo Mainnet / `.mockCelo` is not EIP1559
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices(network: .mockCelo)
+    var submittedTxData: BraveWallet.TxDataUnion?
+    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+      submittedTxData = txData
+      completion(true, "tx-meta-id", "")
     }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      prefilledToken: nil
+    )
+    store.setUpTest()
+    store.state = .swap
+    
+    let success = await store.createSwapTransaction()
+    XCTAssertTrue(success, "Expected to successfully create transaction")
+    XCTAssertFalse(store.isMakingTx)
+    XCTAssertNotNil(submittedTxData?.ethTxData)
+    XCTAssertNil(submittedTxData?.ethTxData1559)
   }
   
   func testSwapFullBalanceNoRounding() {
