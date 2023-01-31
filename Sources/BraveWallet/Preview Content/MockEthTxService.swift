@@ -43,7 +43,11 @@ class MockTxService: BraveWalletTxService {
   func retryTransaction(_ coinType: BraveWallet.CoinType, txMetaId: String, completion: @escaping (Bool, String, String) -> Void) {
     completion(false, "", "Error Message")
   }
-
+  // TODO: Check Wallet changes
+  func pendingTransactionsCount(_ completion: @escaping (UInt32) -> Void) {
+    completion(0)
+  }
+  
   func reset() {
   }
 
