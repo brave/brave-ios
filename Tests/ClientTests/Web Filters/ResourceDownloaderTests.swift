@@ -10,11 +10,11 @@ class ResourceDownloaderTests: XCTestCase {
   func testSuccessfulResourceDownload() throws {
     // Given
     let expectation = XCTestExpectation(description: "Test downloading resources")
-    let resource = ResourceDownloader.Resource.debounceRules
-    let firstDownloader = ResourceDownloader(networkManager: NetworkManager.makeNetworkManager(
+    let resource = BraveS3Resource.debounceRules
+    let firstDownloader = ResourceDownloader<BraveS3Resource>(networkManager: NetworkManager.makeNetworkManager(
       for: [resource], statusCode: 200, etag: "123"
     ))
-    let secondDownloader = ResourceDownloader(networkManager: NetworkManager.makeNetworkManager(
+    let secondDownloader = ResourceDownloader<BraveS3Resource>(networkManager: NetworkManager.makeNetworkManager(
       for: [resource], statusCode: 304, etag: "123"
     ))
     
@@ -62,8 +62,8 @@ class ResourceDownloaderTests: XCTestCase {
   func testFailedResourceDownload() throws {
     // Given
     let expectation = XCTestExpectation(description: "Test downloading resource")
-    let resource = ResourceDownloader.Resource.debounceRules
-    let downloader = ResourceDownloader(networkManager: NetworkManager.makeNetworkManager(
+    let resource = BraveS3Resource.debounceRules
+    let downloader = ResourceDownloader<BraveS3Resource>(networkManager: NetworkManager.makeNetworkManager(
       for: [resource], statusCode: 404
     ))
     

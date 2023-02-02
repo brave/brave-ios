@@ -18,6 +18,11 @@ public actor AdblockResourceDownloader: Sendable {
     .blockTrackers, .blockCookies
   ]
   
+  /// All the different resources this downloader handles
+  static let handledResources: [BraveS3Resource] = [
+    .genericContentBlockingBehaviors, .generalCosmeticFilters, .debounceRules
+  ]
+  
   /// A formatter that is used to format a version number
   private let fileVersionDateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
@@ -28,9 +33,9 @@ public actor AdblockResourceDownloader: Sendable {
   }()
   
   /// The resource downloader that will be used to download all our resoruces
-  private let resourceDownloader: ResourceDownloader
+  private let resourceDownloader: ResourceDownloader<BraveS3Resource>
   /// All the resources that this downloader handles
-  private let handledResources: [ResourceDownloader.Resource] = [.genericContentBlockingBehaviors, .generalCosmeticFilters]
+  
 
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
@@ -50,7 +55,7 @@ public actor AdblockResourceDownloader: Sendable {
     }
     
     // Here we load downloaded resources if we need to
-    await handledResources.asyncConcurrentForEach { resource in
+    await Self.handledResources.asyncConcurrentForEach { resource in
       await self.loadCachedData(for: resource)
     }
   }
@@ -59,13 +64,13 @@ public actor AdblockResourceDownloader: Sendable {
   public func startFetching() {
     let fetchInterval = AppConstants.buildChannel.isPublic ? 6.hours : 10.minutes
     
-    for resource in handledResources {
+    for resource in Self.handledResources {
       startFetching(resource: resource, every: fetchInterval)
     }
   }
   
   /// Start fetching the given resource at regular intervals
-  private func startFetching(resource: ResourceDownloader.Resource, every fetchInterval: TimeInterval) {
+  private func startFetching(resource: BraveS3Resource, every fetchInterval: TimeInterval) {
     Task { @MainActor in
       for try await result in await self.resourceDownloader.downloadStream(for: resource, every: fetchInterval) {
         switch result {
@@ -79,7 +84,7 @@ public actor AdblockResourceDownloader: Sendable {
   }
   
   /// Load cached data for the given resource. Ensures this is done on the MainActor
-  private func loadCachedData(for resource: ResourceDownloader.Resource) async {
+  private func loadCachedData(for resource: BraveS3Resource) async {
     do {
       if let downloadResult = try ResourceDownloaderStream.downloadResult(for: resource) {
         await handle(downloadResult: downloadResult, for: resource)
@@ -99,7 +104,7 @@ public actor AdblockResourceDownloader: Sendable {
           // But ensure that this is only triggered for handled resource
           // We should have never triggered this method for resources that are outside
           // of the handled resources list
-          assert(handledResources.contains(resource))
+          assert(Self.handledResources.contains(resource))
         }
       }
     } catch {
@@ -108,17 +113,10 @@ public actor AdblockResourceDownloader: Sendable {
   }
   
   /// Handle the downloaded file url for the given resource
-  private func handle(downloadResult: ResourceDownloaderStream.DownloadResult, for resource: ResourceDownloader.Resource) async {
+  private func handle(downloadResult: ResourceDownloaderStream<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource) async {
     let version = fileVersionDateFormatter.string(from: downloadResult.date)
     
     switch resource {
-    case .genericFilterRules:
-      await AdBlockEngineManager.shared.add(
-        resource: AdBlockEngineManager.Resource(type: .ruleList, source: .adBlock),
-        fileURL: downloadResult.fileURL,
-        version: version
-      )
-      
     case .generalCosmeticFilters:
       await AdBlockEngineManager.shared.add(
         resource: AdBlockEngineManager.Resource(type: .dat, source: .cosmeticFilters),
@@ -149,6 +147,23 @@ public actor AdblockResourceDownloader: Sendable {
         )
       } catch {
         ContentBlockerManager.log.error("Failed to compile downloaded content blocker resource: \(error.localizedDescription)")
+      }
+      
+    case .debounceRules:
+      // We don't want to setup the debounce rules more than once for the same cached file
+      guard downloadResult.isModified || DebouncingResourceDownloader.shared.matcher == nil else {
+        return
+      }
+      
+      do {
+        guard let data = try ResourceDownloader<BraveS3Resource>.data(for: resource) else {
+          assertionFailure("We just downloaded this file, how can it not be there?")
+          return
+        }
+        
+        try DebouncingResourceDownloader.shared.setup(withRulesJSON: data)
+      } catch {
+        ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
       }
       
     default:

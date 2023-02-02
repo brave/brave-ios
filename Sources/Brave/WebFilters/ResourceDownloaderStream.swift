@@ -6,7 +6,7 @@
 import Foundation
 
 /// An endless sequence iterator for the given resource
-struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol {
+struct ResourceDownloaderStream<Resource: DownloadResourceInterface>: Sendable, AsyncSequence, AsyncIteratorProtocol {
   /// An object representing the download
   struct DownloadResult: Equatable {
     let date: Date
@@ -15,12 +15,12 @@ struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol 
   }
   
   typealias Element = Result<DownloadResult, Error>
-  private let resource: ResourceDownloader.Resource
-  private let resourceDownloader: ResourceDownloader
+  private let resource: Resource
+  private let resourceDownloader: ResourceDownloader<Resource>
   private let fetchInterval: TimeInterval
   private var firstLoad = true
   
-  init(resource: ResourceDownloader.Resource, resourceDownloader: ResourceDownloader, fetchInterval: TimeInterval) {
+  init(resource: Resource, resourceDownloader: ResourceDownloader<Resource>, fetchInterval: TimeInterval) {
     self.resource = resource
     self.resourceDownloader = resourceDownloader
     self.fetchInterval = fetchInterval
@@ -75,7 +75,7 @@ struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol 
     return self
   }
   
-  static func downloadResult(for resource: ResourceDownloader.Resource) throws -> DownloadResult? {
+  static func downloadResult(for resource: Resource) throws -> DownloadResult? {
     guard let fileURL = ResourceDownloader.downloadedFileURL(for: resource) else { return nil }
     guard let creationDate = try ResourceDownloader.creationDate(for: resource) else { return nil }
     return DownloadResult(date: creationDate, fileURL: fileURL, isModified: false)
