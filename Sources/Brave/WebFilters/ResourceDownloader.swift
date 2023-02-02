@@ -7,108 +7,16 @@ import Foundation
 import Shared
 import BraveCore
 
+public protocol DownloadResourceInterface: Sendable {
+  /// The folder name under which this data should be saved under
+  var cacheFolderName: String { get }
+  var cacheFileName: String { get }
+  var externalURL: URL { get }
+  var headers: [String: String] { get }
+}
+
 /// A ganeric resource downloader class that is responsible for fetching resources
-actor ResourceDownloader: Sendable {
-  enum Resource: Hashable {
-    /// Rules for debouncing links
-    case debounceRules
-    /// Generic filter rules for any locale
-    case genericFilterRules
-    /// Generic iOS only content blocking behaviours used for the iOS content blocker
-    case genericContentBlockingBehaviors
-    /// Cosmetic filter rules
-    case generalCosmeticFilters
-    /// Resources for cosmetic filters
-    case generalScriptletResources
-    /// Adblock rules for a filter list
-    case filterListAdBlockRules(uuid: String, componentId: String)
-    /// iOS only content blocking behaviours used for the iOS content blocker for a given filter list
-    case filterListContentBlockingBehaviors(uuid: String, componentId: String)
-    /// General external file
-    case dataFile(URL, cacheFolderName: String, cacheFileName: String)
-    /// Custom filter list URL
-    case customFilterListURL(uuid: String, externalURL: URL)
-    
-    /// The folder name under which this data should be saved under
-    var cacheFolderName: String {
-      switch self {
-      case .debounceRules:
-        return "debounce-data"
-      case .filterListContentBlockingBehaviors(_, let componentId), .filterListAdBlockRules(_, let componentId):
-        return ["filter-lists", componentId].joined(separator: "/")
-      case .genericFilterRules, .genericContentBlockingBehaviors:
-        return "abp-data"
-      case .generalCosmeticFilters, .generalScriptletResources:
-        return "cmf-data"
-      case .dataFile(_, let cacheFolderName, _):
-        return cacheFolderName
-      case .customFilterListURL(let uuid, _):
-        return ["custom-filter-lists", uuid].joined(separator: "/")
-      }
-    }
-    
-    /// The name of the etag save into the cache folder
-    fileprivate var etagFileName: String {
-      return [cacheFileName, "etag"].joined(separator: ".")
-    }
-    
-    /// Get the file name that is stored on the device
-    var cacheFileName: String {
-      switch self {
-      case .debounceRules:
-        return "ios-debouce.json"
-      case .filterListAdBlockRules(let uuid, _):
-        return "\(uuid)-latest.txt"
-      case .filterListContentBlockingBehaviors(let uuid, _):
-        return "\(uuid)-latest.json"
-      case .genericFilterRules:
-        return "latest.txt"
-      case .genericContentBlockingBehaviors:
-        return "latest.json"
-      case .generalCosmeticFilters:
-        return "ios-cosmetic-filters.dat"
-      case .generalScriptletResources:
-        return "scriptlet-resources.json"
-      case .dataFile(_, _, let cacheFileName):
-        return cacheFileName
-      case .customFilterListURL(_, let externalURL):
-        return externalURL.lastPathComponent
-      }
-    }
-    
-    /// The base s3 environment url that hosts the debouncing (and other) files.
-    /// Cannot be used as-is and must be combined with a path
-    private static var baseResourceURL: URL = {
-      if AppConstants.buildChannel.isPublic {
-        return URL(string: "https://adblock-data.s3.brave.com")!
-      } else {
-        return URL(string: "https://adblock-data-staging.s3.bravesoftware.com")!
-      }
-    }()
-    
-    /// Get the external path for the given filter list and this resource type
-    var externalURL: URL {
-      switch self {
-      case .debounceRules:
-        return Self.baseResourceURL.appendingPathComponent("/ios/debounce.json")
-      case .filterListContentBlockingBehaviors(let uuid, _):
-        return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.json")
-      case .filterListAdBlockRules(let uuid, _):
-        return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.txt")
-      case .genericFilterRules:
-        return Self.baseResourceURL.appendingPathComponent("/ios/latest.txt")
-      case .genericContentBlockingBehaviors:
-        return Self.baseResourceURL.appendingPathComponent("/ios/latest.json")
-      case .generalCosmeticFilters:
-        return Self.baseResourceURL.appendingPathComponent("/ios/ios-cosmetic-filters.dat")
-      case .generalScriptletResources:
-        return Self.baseResourceURL.appendingPathComponent("/ios/scriptlet-resources.json")
-      case .dataFile(let url, _, _), .customFilterListURL(_, let url):
-        return url
-      }
-    }
-  }
-  
+actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
   /// An object representing errors with the resource downloader
   enum ResourceDownloaderError: Error {
     case failedToCreateCacheFolder
@@ -134,10 +42,6 @@ actor ResourceDownloader: Sendable {
     return AppConstants.buildChannel.isPublic ? 6.hours : 10.minutes
   }
   
-  /// The name of the info plist key that contains the service key
-  private static let servicesKeyName = "SERVICES_KEY"
-  /// The name of the header value that contains the service key
-  private static let servicesKeyHeaderValue = "BraveServiceKey"
   /// The netowrk manager performing the requests
   private let networkManager: NetworkManager
   
@@ -146,7 +50,7 @@ actor ResourceDownloader: Sendable {
     self.networkManager = networkManager
   }
   
-  func downloadStream(for resource: Resource, every fetchInterval: TimeInterval = defaultFetchInterval) -> ResourceDownloaderStream {
+  func downloadStream(for resource: Resource, every fetchInterval: TimeInterval = defaultFetchInterval) -> ResourceDownloaderStream<Resource> {
     return ResourceDownloaderStream(resource: resource, resourceDownloader: self, fetchInterval: fetchInterval)
   }
   
@@ -181,12 +85,6 @@ actor ResourceDownloader: Sendable {
   }
   
   private func downloadInternal(resource: Resource) async throws -> DownloadResult<CachedNetworkResource> {
-    var headers = [String: String]()
-    
-    if let servicesKeyValue = Bundle.main.getPlistString(for: Self.servicesKeyName) {
-      headers[Self.servicesKeyHeaderValue] = servicesKeyValue
-    }
-    
     let etag = try? Self.etag(for: resource)
     
     do {
@@ -194,7 +92,7 @@ actor ResourceDownloader: Sendable {
         with: resource.externalURL,
         resourceType: .cached(etag: etag),
         checkLastServerSideModification: !AppConstants.buildChannel.isPublic,
-        customHeaders: headers)
+        customHeaders: resource.headers)
       
       guard !networkResource.data.isEmpty else {
         throw DownloadResultError.noData
@@ -332,7 +230,7 @@ actor ResourceDownloader: Sendable {
   #if DEBUG
   /// Convenience method for tests
   public static func getMockResponse(
-    for resource: ResourceDownloader.Resource,
+    for resource: Resource,
     statusCode code: Int = 200,
     headerFields: [String: String]? = nil
   ) -> HTTPURLResponse {
@@ -341,4 +239,11 @@ actor ResourceDownloader: Sendable {
       httpVersion: "HTTP/1.1", headerFields: headerFields)!
   }
   #endif
+}
+
+private extension DownloadResourceInterface {
+  /// The name of the etag save into the cache folder
+  var etagFileName: String {
+    return [cacheFileName, "etag"].joined(separator: ".")
+  }
 }

@@ -339,7 +339,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       UrpLog.log("Failed to initialize user referral program")
     }
 
-    DebouncingResourceDownloader.shared.startLoading()
 #if canImport(BraveTalk)
     BraveTalkJitsiCoordinator.sendAppLifetimeEvent(
       .didFinishLaunching(options: launchOptions ?? [:])

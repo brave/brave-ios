@@ -9,6 +9,23 @@ import Combine
 import BraveCore
 
 actor FilterListCustomURLDownloader: ObservableObject {
+  struct DownloadResource: Hashable, DownloadResourceInterface {
+    let uuid: String
+    let externalURL: URL
+    
+    var cacheFolderName: String {
+      return ["custom-filter-lists", uuid].joined(separator: "/")
+    }
+    
+    var cacheFileName: String {
+      return externalURL.lastPathComponent
+    }
+    
+    var headers: [String: String] {
+      return [:]
+    }
+  }
+  
   /// A formatter that is used to format a version number
   private let fileVersionDateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
@@ -21,9 +38,9 @@ actor FilterListCustomURLDownloader: ObservableObject {
   static let shared = FilterListCustomURLDownloader()
   
   /// The resource downloader that downloads our resources
-  private let resourceDownloader: ResourceDownloader
+  private let resourceDownloader: ResourceDownloader<DownloadResource>
   /// Fetch content blocking tasks per filter list
-  private var fetchTasks: [ResourceDownloader.Resource: Task<Void, Error>]
+  private var fetchTasks: [DownloadResource: Task<Void, Error>]
   
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
@@ -41,7 +58,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
   }
   
-  private func handle(downloadResult: ResourceDownloaderStream.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
+  private func handle(downloadResult: ResourceDownloaderStream<DownloadResource>.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
     let uuid = await filterListCustomURL.setting.uuid
     let hasCache = await ContentBlockerManager.shared.hasCache(for: .customFilterList(uuid: uuid))
     
@@ -158,7 +175,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
 }
 
 extension CustomFilterListSetting {
-  @MainActor var resource: ResourceDownloader.Resource {
-    return .customFilterListURL(uuid: uuid, externalURL: externalURL)
+  @MainActor var resource: FilterListCustomURLDownloader.DownloadResource {
+    return FilterListCustomURLDownloader.DownloadResource(uuid: uuid, externalURL: externalURL)
   }
 }
