@@ -288,7 +288,7 @@ extension Strings {
       NSLocalizedString(
         "callout.p3aCalloutToggleTitle",
         tableName: "BraveShared", bundle: .module,
-        value: "Share anonymous, private product insights. ",
+        value: "Share Completely Private and Anonymous Product Insights.",
         comment: "Title for toggle for enabling p3a (Privacy Preserving Analytics) Full Screen Callout")
     public static let p3aCalloutLinkTitle =
       NSLocalizedString(
