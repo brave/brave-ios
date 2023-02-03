@@ -6,6 +6,7 @@
 import Foundation
 import WebKit
 import Shared
+import BraveShared
 
 enum InternalPageSchemeHandlerError: Error {
   case badURL
@@ -80,11 +81,20 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       urlSchemeTask.didFailWithError(InternalPageSchemeHandlerError.badURL)
       return
     }
-
-    while url.pathComponents.count > 2 {
-      url = url.deletingLastPathComponent()
+    
+    // Home URL contains "/" - "about" - "home"
+    // None of the path components should be removed
+    var isAboutHomeUrl = false
+    if let internalURL = InternalURL(url) {
+      isAboutHomeUrl = internalURL.isAboutHomeURL
     }
     
+    if !isAboutHomeUrl {
+      while url.pathComponents.count > 2 {
+        url = url.deletingLastPathComponent()
+      }
+    }
+      
     let path = url.path.starts(with: "/") ? String(url.path.dropFirst()) : url.path
 
     // For non-main doc URL, try load it as a resource
