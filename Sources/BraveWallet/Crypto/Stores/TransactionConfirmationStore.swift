@@ -470,7 +470,7 @@ public class TransactionConfirmationStore: ObservableObject {
         
         totalFiat = totalFiat(value: value, tokenAssetRatioId: details.fromToken?.assetRatioId ?? "", gasValue: gasValue, gasSymbol: gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
       }
-    case let .solDappTransaction(details):
+    case let .solDappTransaction(details), let .solSwapTransaction(details):
       symbol = details.symbol ?? ""
       value = details.fromAmount
       transactionDetails = details.instructions
