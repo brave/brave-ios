@@ -302,7 +302,7 @@ public class SwapTokenStore: ObservableObject {
   }
 
   /// Update price market and sell/buy amount fields based on `SwapParamsBase`
-  private func handlePriceQuoteResponse(_ response: BraveWallet.SwapResponse, base: SwapParamsBase) {
+  @MainActor private func handlePriceQuoteResponse(_ response: BraveWallet.SwapResponse, base: SwapParamsBase) async {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     switch base {
     case .perSellAsset:
@@ -326,12 +326,18 @@ public class SwapTokenStore: ObservableObject {
     }
 
     if let bv = BDouble(response.price) {
-      // will need to invert price if price quote is based on buyAmount
-      let price = base == .perSellAsset ? bv : 1 / bv
-      selectedFromTokenPrice = price.decimalDescription
+      switch base {
+      case .perSellAsset:
+        selectedFromTokenPrice = bv.decimalDescription
+      case .perBuyAsset:
+        // will need to invert price if price quote is based on buyAmount
+        if bv != 0 {
+          selectedFromTokenPrice = (1 / bv).decimalDescription
+        }
+      }
     }
 
-    checkBalanceShowError(swapResponse: response)
+    await checkBalanceShowError(swapResponse: response)
   }
 
   @MainActor private func createERC20ApprovalTransaction(
@@ -427,7 +433,7 @@ public class SwapTokenStore: ObservableObject {
     return bumpedValue.rounded().asString(radix: 16)
   }
 
-  private func checkBalanceShowError(swapResponse: BraveWallet.SwapResponse) {
+  @MainActor private func checkBalanceShowError(swapResponse: BraveWallet.SwapResponse) async {
     guard
       let accountInfo = accountInfo,
       let sellAmountValue = BDouble(sellAmount.normalizedDecimals),
@@ -444,65 +450,56 @@ public class SwapTokenStore: ObservableObject {
     }
 
     // Get ETH balance for this account because gas can only be paid in ETH
-    walletService.selectedCoin { [weak self] coinType in
-      guard let self = self else { return }
-      self.rpcService.network(coinType) { network in
-        self.rpcService.balance(accountInfo.address, coin: network.coin, chainId: network.chainId) { balance, status, _ in
-          if status == BraveWallet.ProviderError.success {
-            let fee = gasLimit * gasPrice
-            let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
-            let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
-            if fromToken.symbol == network.symbol {
-              if currentBalance < fee + sellAmountValue {
-                self.state = .error(Strings.Wallet.insufficientFundsForGas)
-                return
-              }
-            } else {
-              if currentBalance < fee {
-                self.state = .error(Strings.Wallet.insufficientFundsForGas)
-                return
-              }
-            }
-            self.state = .swap
-            // check for ERC20 token allowance
-            if fromToken.isErc20 {
-              self.checkAllowance(
-                ownerAddress: accountInfo.address,
-                spenderAddress: swapResponse.allowanceTarget,
-                amountToSend: sellAmountValue,
-                fromToken: fromToken
-              )
-            }
-          } else {
-            self.state = .error(Strings.Wallet.unknownError)
-            self.clearAllAmount()
-          }
+    let coin = await walletService.selectedCoin()
+    let network = await rpcService.network(coin)
+    let (balance, status, _) = await rpcService.balance(accountInfo.address, coin: network.coin, chainId: network.chainId)
+    if status == BraveWallet.ProviderError.success {
+      let fee = gasLimit * gasPrice
+      let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
+      let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
+      if fromToken.symbol == network.symbol {
+        if currentBalance < fee + sellAmountValue {
+          self.state = .error(Strings.Wallet.insufficientFundsForGas)
+          return
+        }
+      } else {
+        if currentBalance < fee {
+          self.state = .error(Strings.Wallet.insufficientFundsForGas)
+          return
         }
       }
+      self.state = .swap
+      // check for ERC20 token allowance
+      if fromToken.isErc20 {
+        await self.checkAllowance(
+          network: network,
+          ownerAddress: accountInfo.address,
+          spenderAddress: swapResponse.allowanceTarget,
+          amountToSend: sellAmountValue,
+          fromToken: fromToken
+        )
+      }
+    } else {
+      self.state = .error(Strings.Wallet.unknownError)
+      self.clearAllAmount()
     }
   }
 
-  private func checkAllowance(
+  @MainActor private func checkAllowance(
+    network: BraveWallet.NetworkInfo,
     ownerAddress: String,
     spenderAddress: String,
     amountToSend: BDouble,
     fromToken: BraveWallet.BlockchainToken
-  ) {
-    walletService.selectedCoin { [weak self] coinType in
-      guard let self = self else { return }
-      self.rpcService.network(coinType) { network in
-        self.rpcService.erc20TokenAllowance(
-          fromToken.contractAddress(in: network),
-          ownerAddress: ownerAddress,
-          spenderAddress: spenderAddress
-        ) { allowance, status, _ in
-          let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(fromToken.decimals)))
-          let allowanceValue = BDouble(weiFormatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(fromToken.decimals)) ?? "") ?? 0
-          guard status == .success, amountToSend > allowanceValue else { return }  // no problem with its allowance
-          self.state = .lowAllowance(spenderAddress)
-        }
-      }
-    }
+  ) async {
+    let (allowance, status, _) = await rpcService.erc20TokenAllowance(
+      fromToken.contractAddress(in: network),
+      ownerAddress: ownerAddress,
+      spenderAddress: spenderAddress)
+    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: Int(fromToken.decimals)))
+    let allowanceValue = BDouble(weiFormatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(fromToken.decimals)) ?? "") ?? 0
+    guard status == .success, amountToSend > allowanceValue else { return }  // no problem with its allowance
+    self.state = .lowAllowance(spenderAddress)
   }
 
   // MARK: Public
@@ -533,38 +530,47 @@ public class SwapTokenStore: ObservableObject {
   }
 
   func fetchPriceQuote(base: SwapParamsBase) {
-    walletService.selectedCoin { [weak self] coinType in
-      guard let self = self else { return }
-      self.rpcService.network(coinType) { network in
-        guard let swapParams = self.swapParameters(for: base, in: network)
-        else {
-          self.state = .idle
-          return
-        }
-        
-        self.updatingPriceQuote = true
-        self.swapService.priceQuote(swapParams) { swapResponse, swapErrorResponse, error in
-          defer { self.updatingPriceQuote = false }
-          if let swapResponse = swapResponse {
-            self.handlePriceQuoteResponse(swapResponse, base: base)
-          } else if let swapErrorResponse = swapErrorResponse {
-            // check balance first because error can cause by insufficient balance
-            if let sellTokenBalance = self.selectedFromTokenBalance,
-               let sellAmountValue = BDouble(self.sellAmount.normalizedDecimals),
-               sellTokenBalance < sellAmountValue {
-              self.state = .error(Strings.Wallet.insufficientBalance)
-              return
-            }
-            // check if priceQuote fails due to insufficient liquidity
-            if swapErrorResponse.isInsufficientLiquidity {
-              self.state = .error(Strings.Wallet.insufficientLiquidity)
-              return
-            }
-            self.state = .error(Strings.Wallet.unknownError)
-            self.clearAllAmount()
-          }
-        }
+    Task { @MainActor in
+      let coin = await walletService.selectedCoin()
+      let network = await rpcService.network(coin)
+      guard let swapParams = self.swapParameters(for: base, in: network) else {
+        self.state = .idle
+        return
       }
+      switch coin {
+      case .eth:
+        await fetchEthPriceQuote(base: base, swapParams: swapParams, network: network)
+      default:
+        break
+      }
+    }
+  }
+  
+  @MainActor private func fetchEthPriceQuote(
+    base: SwapParamsBase,
+    swapParams: BraveWallet.SwapParams,
+    network: BraveWallet.NetworkInfo
+  ) async {
+    self.updatingPriceQuote = true
+    defer { self.updatingPriceQuote = false }
+    let (swapResponse, swapErrorResponse, _) = await swapService.priceQuote(swapParams)
+    if let swapResponse = swapResponse {
+      await self.handlePriceQuoteResponse(swapResponse, base: base)
+    } else if let swapErrorResponse = swapErrorResponse {
+      // check balance first because error can cause by insufficient balance
+      if let sellTokenBalance = self.selectedFromTokenBalance,
+         let sellAmountValue = BDouble(self.sellAmount.normalizedDecimals),
+         sellTokenBalance < sellAmountValue {
+        self.state = .error(Strings.Wallet.insufficientBalance)
+        return
+      }
+      // check if priceQuote fails due to insufficient liquidity
+      if swapErrorResponse.isInsufficientLiquidity {
+        self.state = .error(Strings.Wallet.insufficientLiquidity)
+        return
+      }
+      self.state = .error(Strings.Wallet.unknownError)
+      self.clearAllAmount()
     }
   }
 
@@ -677,11 +683,11 @@ public class SwapTokenStore: ObservableObject {
   }
 
   #if DEBUG
-  func setUpTest() {
+  func setUpTest(sellAmount: String = "0.01") {
     accountInfo = .init()
     selectedFromToken = .previewToken
-    selectedToToken = .previewToken
-    sellAmount = "0.01"
+    selectedToToken = .previewDaiToken
+    self.sellAmount = sellAmount
     selectedFromTokenBalance = 0.02
   }
   

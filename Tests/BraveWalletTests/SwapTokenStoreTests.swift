@@ -215,29 +215,6 @@ class SwapStoreTests: XCTestCase {
     }
   }
 
-  func testFetchPriceQuote() {
-    let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
-      rpcService: MockJsonRpcService(),
-      swapService: MockSwapService(),
-      txService: MockTxService(),
-      walletService: MockBraveWalletService(),
-      ethTxManagerProxy: MockEthTxManagerProxy(),
-      prefilledToken: nil
-    )
-    let ex = expectation(description: "fetch-price-quote")
-    store.setUpTest()
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      if case .swap = store.state {
-        ex.fulfill()
-      }
-    }
-    waitForExpectations(timeout: 3) { error in
-      XCTAssertNil(error)
-    }
-  }
-
   private func setupServices(
     network: BraveWallet.NetworkInfo = .mockMainnet,
     coin: BraveWallet.CoinType = .eth
@@ -245,10 +222,15 @@ class SwapStoreTests: XCTestCase {
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._addObserver = { _ in }
     let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
+    blockchainRegistry._allTokens = { $2([.previewToken, .previewDaiToken]) }
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._addObserver = { _ in }
     rpcService._network = { $1(network) }
     rpcService._balance = { _, _, _, completion in
+      // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
+      completion("0x13e25e19dc20ba7", .success, "")
+    }
+    rpcService._erc20TokenBalance = { _, _, _, completion in
       // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
       completion("0x13e25e19dc20ba7", .success, "")
     }
@@ -259,10 +241,88 @@ class SwapStoreTests: XCTestCase {
     txService._addUnapprovedTransaction = { $4(true, "tx-meta-id", "") }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._selectedCoin = { $0(coin) }
+    walletService._userAssets = { $2([.previewToken, .previewDaiToken]) }
     let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
     ethTxManagerProxy._makeErc20ApproveData = { $2(true, []) }
     ethTxManagerProxy._gasEstimation1559 = { $0(.init()) }
     return (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy)
+  }
+  
+  /// Test change to `sellAmount` (from value) will fetch price quote and assign to `buyAmount`
+  func testFetchPriceQuoteSell() {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices()
+    swapService._priceQuote = { _, completion in
+      let swapResponse: BraveWallet.SwapResponse = .init()
+      swapResponse.buyAmount = "2000000000000000000"
+      completion(swapResponse, nil, "")
+    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      prefilledToken: nil
+    )
+    
+    let buyAmountExpectation = expectation(description: "buyAmountExpectation")
+    store.$buyAmount
+      .dropFirst()
+      .first()
+      .sink { buyAmount in
+        defer { buyAmountExpectation.fulfill() }
+        XCTAssertFalse(buyAmount.isEmpty)
+        XCTAssertEqual(buyAmount, "2.0000")
+      }
+      .store(in: &cancellables)
+
+    XCTAssertTrue(store.buyAmount.isEmpty)
+    // non-empty assignment to `sellAmount` calls fetchPriceQuote
+    store.setUpTest(sellAmount: "0.01")
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
+  }
+  
+  /// Test change to `buyAmount` (to value) will fetch price quote and assign to `buyAmount`
+  func testFetchPriceQuoteBuy() {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy) = setupServices()
+    swapService._priceQuote = { _, completion in
+      let swapResponse: BraveWallet.SwapResponse = .init()
+      swapResponse.sellAmount = "3000000000000000000"
+      completion(swapResponse, nil, "")
+    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      prefilledToken: nil
+    )
+    store.setUpTest(sellAmount: "")
+    
+    let sellAmountExpectation = expectation(description: "sellAmountExpectation")
+    store.$sellAmount
+      .dropFirst()
+      .first()
+      .sink { sellAmount in
+        defer { sellAmountExpectation.fulfill() }
+        XCTAssertFalse(sellAmount.isEmpty)
+        XCTAssertEqual(sellAmount, "3.0000")
+      }
+      .store(in: &cancellables)
+
+    XCTAssertTrue(store.sellAmount.isEmpty)
+    // calls fetchPriceQuote
+    store.buyAmount = "0.01"
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
   }
 
   /// Test creating ERC20 approve transaction on EIP1559 network
