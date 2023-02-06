@@ -255,6 +255,7 @@ private struct WalletSettingsView: View {
           .foregroundColor(.red)
       } // iOS 15: .role(.destructive)
     }
+    .listRowBackground(Color(.secondaryBraveGroupedBackground))
   }
   
   private func toggledBiometricsUnlock(_ enabled: Bool) {
