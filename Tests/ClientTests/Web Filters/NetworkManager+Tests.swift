@@ -39,13 +39,13 @@ extension NetworkManager {
         let resourceURL = bundle.url(forResource: "debouncing", withExtension: "json")
         let data = try Data(contentsOf: resourceURL!)
         return data
-      case .genericContentBlockingBehaviors, .filterListContentBlockingBehaviors:
+      case .genericContentBlockingBehaviors:
         let bundle = Bundle.module
         let resourceURL = bundle.url(forResource: "content-blocking", withExtension: "json")
         let data = try Data(contentsOf: resourceURL!)
         return data
         
-      default:
+      case .generalCosmeticFilters:
         // Because of the retry timeout we don't throw any errors but return some empty data
         return Data()
       }

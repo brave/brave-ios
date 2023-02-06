@@ -17,7 +17,7 @@ public actor AdBlockEngineManager: Sendable {
   enum Source: Hashable {
     case adBlock
     case cosmeticFilters
-    case filterList(uuid: String)
+    case filterList(componentId: String)
     case filterListURL(uuid: String)
     
     /// The order of this source relative to other sources.
@@ -36,7 +36,6 @@ public actor AdBlockEngineManager: Sendable {
   /// The type of resource so we know how to compile it and add it into the engine
   public enum ResourceType: CaseIterable {
     case dat
-    case jsonResources
     case ruleList
     
     /// The order of this resource type relative to other resource types.
@@ -46,7 +45,6 @@ public actor AdBlockEngineManager: Sendable {
       switch self {
       case .ruleList: return 0
       case .dat: return 1
-      case .jsonResources: return 2
       }
     }
   }
@@ -94,6 +92,8 @@ public actor AdBlockEngineManager: Sendable {
   var enabledResources: Set<ResourceWithVersion>
   /// The compile results
   var compiledResources: Set<ResourceWithVersion>
+  /// The path to the ad-block scriplet resources to be added to all engines
+  private var scripletResourcesURL: URL?
   
   /// The amount of time to wait before checking if new entries came in
   private static let buildSleepTime: TimeInterval = {
@@ -114,6 +114,15 @@ public actor AdBlockEngineManager: Sendable {
     self.stats = stats
     self.enabledResources = []
     self.compiledResources = []
+  }
+  
+  func set(scripletResourcesURL: URL) {
+    guard scripletResourcesURL != self.scripletResourcesURL else { return }
+    
+    #if DEBUG
+    ContentBlockerManager.log.debug("Set scriplet resources: \(scripletResourcesURL.lastPathComponent)")
+    #endif
+    self.scripletResourcesURL = scripletResourcesURL
   }
   
   /// Tells this manager to add this resource next time it compiles this engine
@@ -160,7 +169,7 @@ public actor AdBlockEngineManager: Sendable {
       $0.order < $1.order
     })
     
-    let results = await AdblockEngine.createEngines(from: resourcesWithVersion)
+    let results = await AdblockEngine.createEngines(from: resourcesWithVersion, scripletResourcesURL: scripletResourcesURL)
     self.compiledResources = Set(resourcesWithVersion)
     await stats.set(engines: results.engines)
     #if DEBUG
@@ -237,7 +246,6 @@ extension AdBlockEngineManager.ResourceType: CustomDebugStringConvertible {
   public var debugDescription: String {
     switch self {
     case .dat: return "dat"
-    case .jsonResources: return "jsonResources"
     case .ruleList: return "ruleList"
     }
   }

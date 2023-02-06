@@ -84,7 +84,7 @@ public actor LaunchHelper {
     return FilterListStorage.shared.filterLists
       // All filter lists blocklist types
       .reduce(Set<ContentBlockerManager.BlocklistType>()) { partialResult, filterList in
-        return partialResult.union([.filterList(uuid: filterList.uuid)])
+        return partialResult.union([.filterList(componentId: filterList.entry.componentId)])
       }
       // All generic types
       .union(

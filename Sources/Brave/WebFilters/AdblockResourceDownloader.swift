@@ -177,9 +177,6 @@ public actor AdblockResourceDownloader: Sendable {
       } catch {
         ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
       }
-      
-    default:
-      assertionFailure("Should not be handling this resource type")
     }
   }
 }
