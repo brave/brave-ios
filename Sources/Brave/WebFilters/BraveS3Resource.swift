@@ -11,9 +11,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
   case debounceRules
   /// Generic iOS only content blocking behaviours used for the iOS content blocker
   case genericContentBlockingBehaviors
-  /// Adblock rules for a filter list
-  /// iOS only content blocking behaviours used for the iOS content blocker for a given filter list
-  case filterListContentBlockingBehaviors(uuid: String, componentId: String)
   
   /// Cosmetic filter rules
   /// - Warning: Do not use this. This is here solely so we can delete the files
@@ -38,8 +35,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
     switch self {
     case .debounceRules:
       return "debounce-data"
-    case .filterListContentBlockingBehaviors(_, let componentId):
-      return ["filter-lists", componentId].joined(separator: "/")
     case .genericContentBlockingBehaviors:
       return "abp-data"
     case .deprecatedGeneralCosmeticFilters:
@@ -52,8 +47,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
     switch self {
     case .debounceRules:
       return "ios-debouce.json"
-    case .filterListContentBlockingBehaviors(let uuid, _):
-      return "\(uuid)-latest.json"
     case .genericContentBlockingBehaviors:
       return "latest.json"
     case .deprecatedGeneralCosmeticFilters:
@@ -66,8 +59,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
     switch self {
     case .debounceRules:
       return Self.baseResourceURL.appendingPathComponent("/ios/debounce.json")
-    case .filterListContentBlockingBehaviors(let uuid, _):
-      return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.json")
     case .genericContentBlockingBehaviors:
       return Self.baseResourceURL.appendingPathComponent("/ios/latest.json")
     case .deprecatedGeneralCosmeticFilters:

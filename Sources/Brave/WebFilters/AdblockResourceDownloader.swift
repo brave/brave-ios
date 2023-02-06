@@ -20,15 +20,6 @@ public actor AdblockResourceDownloader: Sendable {
   /// A list of old resources that need to be deleted so as not to take up the user's disk space
   private static let deprecatedResources: [BraveS3Resource] = [.deprecatedGeneralCosmeticFilters]
   
-  /// A formatter that is used to format a version number
-  private let fileVersionDateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-    dateFormatter.dateFormat = "yyyy.MM.dd.HH.mm.ss"
-    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-    return dateFormatter
-  }()
-  
   /// The resource downloader that will be used to download all our resoruces
   private let resourceDownloader: ResourceDownloader<BraveS3Resource>
 
@@ -128,8 +119,6 @@ public actor AdblockResourceDownloader: Sendable {
   
   /// Handle the downloaded file url for the given resource
   private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource, allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
-    let version = fileVersionDateFormatter.string(from: downloadResult.date)
-    
     switch resource {
     case .genericContentBlockingBehaviors:
       let blocklistType = ContentBlockerManager.BlocklistType.generic(.blockAds)
@@ -183,7 +172,7 @@ public actor AdblockResourceDownloader: Sendable {
         ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
       }
       
-    default:
+    case .deprecatedGeneralCosmeticFilters:
       assertionFailure("Should not be handling this resource type")
     }
   }
