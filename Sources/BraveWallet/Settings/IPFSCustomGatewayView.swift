@@ -22,7 +22,7 @@ struct IPFSCustomGatewayView: View {
   private let ipfsAPI: IpfsAPI
   @State private var url: String = "https://"
   @State private var setButtonStatus: SetButtonStatus = .disabled
-  @State private var presentWrongGatewayAlert: Bool = false
+  @State private var isPresentingWrongGatewayAlert: Bool = false
   
   init(ipfsAPI: IpfsAPI) {
     self.ipfsAPI = ipfsAPI
@@ -31,7 +31,7 @@ struct IPFSCustomGatewayView: View {
   var body: some View {
     List {
       Section(footer: Text(Strings.Wallet.nftGatewayLongDescription)) {
-        TextField(ipfsAPI.nftIpfsGateway?.absoluteString ?? "", text: $url)
+        TextField(ipfsAPI.nftIpfsGateway?.absoluteString ?? "https://", text: $url)
           .font(.body)
           .keyboardType(.URL)
           .autocapitalization(.none)
@@ -77,7 +77,7 @@ struct IPFSCustomGatewayView: View {
         .buttonStyle(BraveFilledButtonStyle(size: .small))
         .disabled(setButtonStatus != .enabled)
     )
-    .alert(isPresented: $presentWrongGatewayAlert) {
+    .alert(isPresented: $isPresentingWrongGatewayAlert) {
       Alert(
         title: Text(Strings.Wallet.wrongGatewayAlertTitle),
         message: Text(Strings.Wallet.wrongGatewayAlertDescription),
@@ -92,33 +92,31 @@ struct IPFSCustomGatewayView: View {
   }
   
   private func validateURLAndSet() {
-    guard let enteredURL = URL(string: url), enteredURL.isSecureWebPage() else {
-      presentWrongGatewayAlert = true
-      return
-    }
-    var testURL = enteredURL
-    testURL.append(pathComponents: IPFSCustomGatewayView.ipfsTestPath, IPFSCustomGatewayView.ipfsTestCID)
-    
-    setButtonStatus = .loading
-    resignFirstResponder()
-    
-    URLSession.shared.dataTask(with: testURL) { data, response, error in
-      guard let data = data, error == nil else {
-        presentWrongGatewayAlert = true
+    Task { @MainActor in
+      guard let enteredURL = URL(string: url), enteredURL.isSecureWebPage() else {
+        isPresentingWrongGatewayAlert = true
         return
       }
-      if String(data: data, encoding: .utf8) == IPFSCustomGatewayView.ipfsTestContent {
-        DispatchQueue.main.async {
+      var testURL = enteredURL
+      testURL.append(pathComponents: IPFSCustomGatewayView.ipfsTestPath, IPFSCustomGatewayView.ipfsTestCID)
+
+      setButtonStatus = .loading
+      resignFirstResponder()
+
+      do {
+        let (data, _) = try await URLSession.shared.data(from: testURL)
+        if String(data: data, encoding: .utf8) == IPFSCustomGatewayView.ipfsTestContent {
           ipfsAPI.nftIpfsGateway = enteredURL
           setButtonStatus = .disabled
-        }
-      } else {
-        DispatchQueue.main.async {
-          presentWrongGatewayAlert = true
+        } else {
+          isPresentingWrongGatewayAlert = true
           setButtonStatus = .enabled
         }
+      } catch {
+        isPresentingWrongGatewayAlert = true
+        setButtonStatus = .enabled
       }
-    }.resume()
+    }
   }
   
   private func resignFirstResponder() {
