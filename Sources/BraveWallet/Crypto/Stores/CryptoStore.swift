@@ -67,6 +67,15 @@ public class CryptoStore: ObservableObject {
     didSet {
       if pendingRequest == nil {
         isPresentingPendingRequest = false
+        return
+      }
+      // Verify a new request is available
+      guard pendingRequest != oldValue, pendingRequest != nil else { return }
+      // If we set these before the send or swap screens disappear for some reason it may crash
+      // within the SwiftUI runtime or fail to dismiss. Delaying it to give time for the
+      // animation to complete fixes it.
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        self.isPresentingPendingRequest = true
       }
     }
   }
@@ -303,13 +312,7 @@ public class CryptoStore: ObservableObject {
         // Dismiss any buy send swap open to show the newPendingRequest
         self.buySendSwapDestination = nil
       }
-      // If we set these before the send or swap screens disappear for some reason it may crash
-      // within the SwiftUI runtime or fail to dismiss. Delaying it to give time for the
-      // animation to complete fixes it.
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-        self.pendingRequest = newPendingRequest
-        self.isPresentingPendingRequest = self.pendingRequest != nil
-      }
+      self.pendingRequest = newPendingRequest
     }
   }
 
