@@ -497,6 +497,17 @@ extension Strings {
   public static let readerModeErrorConvertDisplayText = NSLocalizedString("ReaderModeErrorConvertDisplayText", tableName: "BraveShared", bundle: .module, value: "There was an error converting the page", comment: "Error displayed when reader mode cannot be enabled")
 }
 
+// MARK:- SNSDomainHandler.swift
+extension Strings {
+  public static let snsDomainInterstitialPageTitle = NSLocalizedString("SnsDomainInterstitialPageTitle", tableName: "BraveShared", bundle: .module, value: "Enable support of Solana Name Service (SNS) in Brave?", comment: "Title displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one.")
+  public static let snsDomainInterstitialPageDescription = NSLocalizedString("SnsDomainInterstitialPageDescription", tableName: "BraveShared", bundle: .module, value: " Brave will be using Syndica to resolve .sol domain names. Brave hides your IP address. If you enable this, Syndica will see that someone is trying to visit these .sol domains but nothing else. See Syndica's", comment: "Description displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one.")
+  public static let snsDomainInterstitialPageTAndU = NSLocalizedString("SnsDomainInterstitialPageTAndC", tableName: "BraveShared", bundle: .module, value: "terms of use", comment: "Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the 'terms of use' webpage of the server that Brave uses to resolve SNS domain.")
+  public static let snsDomainInterstitialPagePrivacyPolicy = NSLocalizedString("SnsDomainInterstitialPagePrivacyPolicy", tableName: "BraveShared", bundle: .module, value: "privacy policy", comment: "Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the privay policy webpage of the server that Brave uses to resolve SNS domain.")
+  public static let snsDomainInterstitialPageAnd = NSLocalizedString("SnsDomainInterstitialPageAnd", tableName: "BraveShared", bundle: .module, value: "and", comment: "Used to connect 'snsDomainInterstitialPageTAndU' and 'snsDomainInterstitialPagePrivacyPolicy'. ")
+  public static let snsDomainInterstitialPageButtonDisable = NSLocalizedString("SnsDomainInterstitialPageButtonDisable", tableName: "BraveShared", bundle: .module, value: "Disable", comment: "Title on the button that users can click to disable Brave to resolve the SNS domain they entered.")
+  public static let snsDomainInterstitialPageButtonProceed = NSLocalizedString("SnsDomainInterstitialPageButtonProceed", tableName: "BraveShared", bundle: .module, value: "Proceed using Syndica server", comment: "Title on the button that users can click to enable Brave to resolve the SNS domain they entered.")
+}
+
 // MARK:-  ReaderModeStyleViewController.swift
 extension Strings {
   public static let readerModeBrightSliderAccessibilityLabel = NSLocalizedString("ReaderModeBrightSliderAccessibilityLabel", tableName: "BraveShared", bundle: .module, value: "Brightness", comment: "Accessibility label for brightness adjustment slider in Reader Mode display settings")

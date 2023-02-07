@@ -93,6 +93,6 @@ struct WalletConstants {
   static let signTransactionRiskLink: URL = URL(string: "https://support.brave.com/hc/en-us/articles/4409513799693")!
 }
 
-struct WalletFeatureFlags {
-  static let SNSDomainResolverEnabled: Bool = false
+public struct WalletFeatureFlags {
+  public static let SNSDomainResolverEnabled: Bool = false
 }

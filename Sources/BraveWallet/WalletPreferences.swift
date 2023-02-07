@@ -66,8 +66,8 @@ extension Preferences {
     
     public enum Web3DomainOption: Int, Identifiable, CaseIterable {
       case ask
-      case enable
-      case disable
+      case enabled
+      case disabled
       
       public var id: Int {
         rawValue
@@ -77,9 +77,9 @@ extension Preferences {
         switch self {
         case .ask:
           return Strings.Wallet.web3DomainOptionAsk
-        case .enable:
+        case .enabled:
           return Strings.Wallet.web3DomainOptionEnabled
-        case .disable:
+        case .disabled:
           return Strings.Wallet.web3DomainOptionDisabled
         }
       }
