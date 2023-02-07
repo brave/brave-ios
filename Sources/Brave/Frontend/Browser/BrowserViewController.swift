@@ -1594,6 +1594,21 @@ public class BrowserViewController: UIViewController {
     }
   }
 
+  func showSNSDomainInterstitialPage(originalURL: URL, visitType: VisitType?) {
+    topToolbar.leaveOverlayMode()
+    
+    guard let tab = tabManager.selectedTab, let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(SNSDomainHandler.path)") else {
+      return
+    }
+    let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler
+    scriptHandler?.originalURL = originalURL
+    if let visitType {
+      scriptHandler?.visitType = visitType
+    }
+    
+    tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
+  }
+  
   override public func accessibilityPerformEscape() -> Bool {
     if topToolbar.inOverlayMode {
       topToolbar.didClickCancel()
@@ -2471,6 +2486,7 @@ extension BrowserViewController: TabDelegate {
       SiteStateListenerScriptHandler(tab: tab),
       CosmeticFiltersScriptHandler(tab: tab),
       FaviconScriptHandler(tab: tab),
+      Web3NameServiceScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
@@ -2508,6 +2524,7 @@ extension BrowserViewController: TabDelegate {
     (tab.getContentScript(name: FindInPageScriptHandler.scriptName) as? FindInPageScriptHandler)?.delegate = self
     (tab.getContentScript(name: PlaylistScriptHandler.scriptName) as? PlaylistScriptHandler)?.delegate = self
     (tab.getContentScript(name: PlaylistFolderSharingScriptHandler.scriptName) as? PlaylistFolderSharingScriptHandler)?.delegate = self
+    (tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler)?.delegate = self
   }
 
   func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
@@ -2739,6 +2756,27 @@ extension BrowserViewController: SessionRestoreScriptHandlerDelegate {
 
     if let tab = tabManager.selectedTab {
       updateUIForReaderHomeStateForTab(tab)
+    }
+  }
+}
+
+extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
+  func web3NameServiceDecisionHandler(_ proceed: Bool, originalURL: URL, visitType: VisitType) {
+    if proceed {
+      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.enabled.rawValue
+      Task { @MainActor in
+        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+        if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode), let host = originalURL.host {
+          let (url, status, _) = await rpcService.snsResolveHost(host)
+          if let url = url, status == .success {
+            // resolved url
+            finishEditingAndSubmit(url, visitType: visitType)
+          }
+        }
+      }
+    } else {
+      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.disabled.rawValue
+      finishEditingAndSubmit(originalURL, visitType: visitType)
     }
   }
 }
