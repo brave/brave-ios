@@ -77,22 +77,9 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
   }
 
   public func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-    guard var url = urlSchemeTask.request.url else {
+    guard let url = urlSchemeTask.request.url else {
       urlSchemeTask.didFailWithError(InternalPageSchemeHandlerError.badURL)
       return
-    }
-    
-    // Home URL contains "/" - "about" - "home"
-    // None of the path components should be removed
-    var isAboutHomeUrl = false
-    if let internalURL = InternalURL(url) {
-      isAboutHomeUrl = internalURL.isAboutHomeURL
-    }
-    
-    if !isAboutHomeUrl {
-      while url.pathComponents.count > 2 {
-        url = url.deletingLastPathComponent()
-      }
     }
       
     let path = url.path.starts(with: "/") ? String(url.path.dropFirst()) : url.path
