@@ -121,6 +121,7 @@ extension BrowserViewController: TopToolbarDelegate {
             let (resolvedUrl, status, _) = await rpcService.snsResolveHost(url.absoluteString)
             if let resolvedUrl = resolvedUrl, status == .success {
               tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedUrl))
+              return
             }
           }
           tabManager.selectedTab?.loadRequest(URLRequest(url: url))

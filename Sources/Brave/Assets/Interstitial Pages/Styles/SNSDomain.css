@@ -9,10 +9,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-body {
-  background-color: rgb(255, 252, 240) !important;
-}
-
 .navigationButtons {
   display: block;
 }
