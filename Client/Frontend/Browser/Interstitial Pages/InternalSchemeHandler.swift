@@ -36,6 +36,7 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       "/interstitial-style/InterstitialStyles.css": "text/css",
       "/interstitial-style/NetworkError.css": "text/css",
       "/interstitial-style/CertificateError.css": "text/css",
+      "/interstitial-style/SNSDomain.css": "text/css",
       "/interstitial-icon/Generic.svg": "image/svg+xml",
       "/interstitial-icon/Cloud.svg": "image/svg+xml",
       "/interstitial-icon/Clock.svg": "image/svg+xml",
@@ -80,9 +81,16 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       urlSchemeTask.didFailWithError(InternalPageSchemeHandlerError.badURL)
       return
     }
+    
+    var isWeb3Url = false
+    if let internalURL = InternalURL(url) {
+      isWeb3Url = internalURL.isWeb3URL
+    }
 
-    while url.pathComponents.count > 2 {
-      url = url.deletingLastPathComponent()
+    if !isWeb3Url {
+      while url.pathComponents.count > 2 {
+        url = url.deletingLastPathComponent()
+      }
     }
     
     let path = url.path.starts(with: "/") ? String(url.path.dropFirst()) : url.path

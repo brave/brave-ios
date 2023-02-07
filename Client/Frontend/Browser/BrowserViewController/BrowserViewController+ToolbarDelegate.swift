@@ -12,6 +12,7 @@ import Data
 import SwiftUI
 import BraveNews
 import os.log
+import BraveWallet
 
 // MARK: - TopToolbarDelegate
 
@@ -108,7 +109,28 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
-    tabManager.selectedTab?.reload()
+    if WalletFeatureFlags.SNSDomainResolverEnabled, let url = topToolbar.currentURL, url.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
+      switch currentStatus {
+      case .ask:
+        // show name service interstitial page
+        showSNSDomainInterstitialPage(originalURL: url, visitType: nil)
+      case .enabled:
+        Task { @MainActor in
+          let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+          if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+            let (resolvedUrl, status, _) = await rpcService.snsResolveHost(url.absoluteString)
+            if let resolvedUrl = resolvedUrl, status == .success {
+              tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedUrl))
+            }
+          }
+          tabManager.selectedTab?.loadRequest(URLRequest(url: url))
+        }
+      case .disabled:
+        tabManager.selectedTab?.reload()
+      }
+    } else {
+      tabManager.selectedTab?.reload()
+    }
   }
 
   func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
@@ -224,7 +246,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     // We couldn't build a URL, so pass it on to the search engine.
     submitSearchText(text, isBraveSearchPromotion: isBraveSearchPromotion)
-
+    
     if !PrivateBrowsingManager.shared.isPrivateBrowsing {
       RecentSearch.addItem(type: .text, text: text, websiteUrl: nil)
     }
@@ -235,6 +257,35 @@ extension BrowserViewController: TopToolbarDelegate {
       // Do not allow users to enter URLs with the following schemes.
       // Instead, submit them to the search engine like Chrome-iOS does.
       if !["file"].contains(fixupURL.scheme) {
+        // check text is SNS domain
+        if WalletFeatureFlags.SNSDomainResolverEnabled, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
+          switch currentStatus {
+          case .ask:
+            // show name service interstitial page
+            showSNSDomainInterstitialPage(originalURL: fixupURL, visitType: visitType)
+            return true
+          case .enabled:
+            Task { @MainActor in
+              let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+              if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+                let (url, status, _) = await rpcService.snsResolveHost(text)
+                if let url = url, status == .success {
+                  // resolved url
+                  finishEditingAndSubmit(url, visitType: visitType)
+                  return true
+                }
+              }
+              // user entered url
+              finishEditingAndSubmit(fixupURL, visitType: visitType)
+              return true
+            }
+          case .disabled:
+            // user entered url
+            finishEditingAndSubmit(fixupURL, visitType: visitType)
+            return true
+          }
+        }
+        
         // The user entered a URL, so use it.
         finishEditingAndSubmit(fixupURL, visitType: visitType)
         return true

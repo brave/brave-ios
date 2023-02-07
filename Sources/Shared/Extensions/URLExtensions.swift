@@ -615,4 +615,21 @@ public struct InternalURL {
     }
     return nil
   }
+  
+  public var isWeb3URL: Bool {
+    return web3Component != nil
+  }
+  
+  /// Return the path after "web3t/" in the URI.
+  public var web3Component: String? {
+    let web3Path = "/web3/"
+    guard let url = URL(string: stripAuthorization) else {
+      return nil
+    }
+    
+    if url.path.hasPrefix(web3Path) {
+      return String(url.path.dropFirst(web3Path.count))
+    }
+    return nil
+  }
 }
