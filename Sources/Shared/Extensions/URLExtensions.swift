@@ -159,7 +159,7 @@ extension URL {
       return internalUrl.originalURLFromErrorPage?.displayURL
     }
     
-    if let internalUrl = InternalURL(self), internalUrl.isSessionRestore {
+    if let internalUrl = InternalURL(self), internalUrl.isSessionRestore || internalUrl.isWeb3URL {
       return internalUrl.extractedUrlParam?.displayURL
     }
 
