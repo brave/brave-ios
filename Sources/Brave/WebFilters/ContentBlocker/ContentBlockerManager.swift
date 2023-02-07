@@ -388,45 +388,44 @@ final public class ContentBlockerManager: Sendable {
   #if DEBUG
   /// A method that logs info on the given resources
   private func debug(resources: [String: Resource]) {
-    let resourcesString = resources
+    Self.log.debug("Compiled \(resources.count, privacy: .public) block list resources:")
+    
+    resources
       .sorted(by: { lhs, rhs in
         lhs.value.url.absoluteString < rhs.value.url.absoluteString
       })
-      .map { identifier, compiledResource -> String in
-        let sourceString: String
-        let versionString: String
+      .forEach { identifier, compiledResource in
         let resultString: String
-        
-        switch compiledResource.sourceType {
-        case .bundled:
-          sourceString = "bundled"
-          versionString = "nil"
-        case .downloaded(let version):
-          sourceString = "downloaded"
-          versionString = version ?? "nil"
-        }
         
         switch self.cachedCompileResults[identifier]?.result {
         case .failure(let error):
           resultString = error.localizedDescription
         case .success:
-          resultString = "success"
+          resultString = "✔︎"
         case .none:
-          resultString = "nil"
+          resultString = "?"
         }
         
         let resourcesDebugString = [
-          "identifier: \(identifier)",
-          "fileName: \(compiledResource.url.lastPathComponent)",
-          "source: \(sourceString)",
-          "version: \(versionString)",
-          "result: \(resultString)"
-        ].joined(separator: ", ")
+          identifier, compiledResource.sourceType.debugDescription,
+          resultString
+        ].joined(separator: " ")
         
-        return ["{", resourcesDebugString, "}"].joined()
-      }.joined(separator: ", ")
-
-    Self.log.debug("Compiled \(resources.count, privacy: .public) additional block list resources: \(resourcesString, privacy: .public))")
+        Self.log.debug(" \(resourcesDebugString)")
+      }
   }
   #endif
 }
+
+#if DEBUG
+extension ContentBlockerManager.BlocklistSourceType: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    switch self {
+    case .bundled:
+      return "bundled"
+    case .downloaded(let version):
+      return version ?? "nil"
+    }
+  }
+}
+#endif

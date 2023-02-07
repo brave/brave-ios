@@ -129,6 +129,10 @@ extension BrowserViewController: WKNavigationDelegate {
     guard let url = navigationAction.request.url else {
       return (.cancel, preferences)
     }
+    
+    #if DEBUG
+    ContentBlockerManager.log.debug("Nav: \(url.absoluteString)")
+    #endif
 
     if InternalURL.isValid(url: url) {
       if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged {
