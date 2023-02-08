@@ -38,9 +38,7 @@ window.__firefox__.execute(function($) {
     const url = new URL(urlString, window.location.href)
     return sendMessage(url).then(blocked => {
       if (blocked) {
-        return new Promise(function (resolve, reject) {
-          reject(new TypeError('Load failed'))
-        })
+        return Promise.reject(new TypeError('Load failed'))
       } else {
         return originalFetch.apply(this, arguments)
       }

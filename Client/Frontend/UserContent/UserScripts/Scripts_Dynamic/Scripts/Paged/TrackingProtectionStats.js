@@ -37,40 +37,16 @@ window.__firefox__.execute(function($) {
     });
   });
 
-  let originalOpen = null;
-  let originalSend = null;
-  let originalImageSrc = null;
   let mutationObserver = null;
-
-  let injectStatsTracking = $(function(enabled) {
-    // This enable/disable section is a change from the original Focus iOS version.
-    if (enabled) {
-      if (originalOpen) {
-        return;
-      }
-      window.addEventListener("load", onLoadNativeCallback, false);
-    } else {
-      window.removeEventListener("load", onLoadNativeCallback, false);
-
-      if (originalOpen) { // if one is set, then all the enable code has run
-        XMLHttpRequest.prototype.open = originalOpen;
-        XMLHttpRequest.prototype.send = originalSend;
-        Image.prototype.src = originalImageSrc;
-        mutationObserver.disconnect();
-
-        originalOpen = originalSend = originalImageSrc = mutationObserver = null;
-      }
-      return;
-    }
+  let injectStatsTracking = $(function() {
+    window.addEventListener("load", onLoadNativeCallback, false);
 
     // -------------------------------------------------
     // Send ajax requests URLs to the host application
     // -------------------------------------------------
-    var xhrProto = XMLHttpRequest.prototype;
-    if (!originalOpen) {
-      originalOpen = xhrProto.open;
-      originalSend = xhrProto.send;
-    }
+    let xhrProto = XMLHttpRequest.prototype;
+    const originalOpen = xhrProto.open;
+    const originalSend = xhrProto.send;
 
     xhrProto.open = $(function(method, url) {
       // Blocked async XMLHttpRequest are handled via RequestBlocking.js
@@ -87,41 +63,46 @@ window.__firefox__.execute(function($) {
 
       // Only attach the `error` event listener once for this
       // `XMLHttpRequest` instance.
-      if (!this._tpErrorHandler) {
-        // If this `XMLHttpRequest` instance fails to load, we
-        // can assume it has been blocked.
-        this._tpErrorHandler = $(function() {
-          sendMessage(this._url, "xmlhttprequest");
-        });
-        this.addEventListener("error", this._tpErrorHandler);
+      if (this._tpErrorHandler) {
+        return originalSend.apply(this, arguments);
       }
+      
+      // If this `XMLHttpRequest` instance fails to load, we
+      // can assume it has been blocked.
+      this._tpErrorHandler = $(function() {
+        sendMessage(this._url, "xmlhttprequest");
+      });
+      
+      this.addEventListener("error", this._tpErrorHandler);
       return originalSend.apply(this, arguments);
     }
 
     // -------------------------------------------------
     // Detect when new sources get set on Image and send them to the host application
     // -------------------------------------------------
-    if (!originalImageSrc) {
-      originalImageSrc = Object.getOwnPropertyDescriptor(Image.prototype, "src");
-    }
+    const originalImageSrc = Object.getOwnPropertyDescriptor(Image.prototype, "src");
     delete Image.prototype.src;
+    
     Object.defineProperty(Image.prototype, "src", {
       get: $(function() {
         return originalImageSrc.get.call(this);
       }),
       set: $(function(value) {
+        originalImageSrc.set.call(this, value);
+        
         // Only attach the `error` event listener once for this
         // Image instance.
-        if (!this._tpErrorHandler) {
-          // If this `Image` instance fails to load, we can assume
-          // it has been blocked.
-          this._tpErrorHandler = $(function() {
-            sendMessage(this.src, "image");
-          });
-          this.addEventListener("error", this._tpErrorHandler);
+        if (this._tpErrorHandler) {
+          return
         }
-
-        originalImageSrc.set.call(this, value);
+        
+        // If this `Image` instance fails to load, we can assume
+        // it has been blocked.
+        this._tpErrorHandler = $(function() {
+          sendMessage(this.src, "image");
+        });
+        
+        this.addEventListener("error", this._tpErrorHandler);
       }),
       enumerable: true,
       configurable: true
@@ -135,10 +116,12 @@ window.__firefox__.execute(function($) {
       mutations.forEach($(function(mutation) {
         mutation.addedNodes.forEach($(function(node) {
           // Only consider `<script src="*">` elements.
-          if (node.tagName === "SCRIPT" && node.src) {
-            // Send all scripts that are added, we won't add it to the stats unless script blocking is enabled anyways
-            sendMessage(node.src, "script");
+          if (node.tagName !== "SCRIPT" || !node.src) {
+            return
           }
+          
+          // Send all scripts that are added, we won't add it to the stats unless script blocking is enabled anyways
+          sendMessage(node.src, "script");
         }));
       }));
     }));
@@ -149,5 +132,5 @@ window.__firefox__.execute(function($) {
     });
   });
 
-  injectStatsTracking(true);
+  injectStatsTracking();
 });
