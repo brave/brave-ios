@@ -63,7 +63,7 @@ window.__firefox__.execute(function($) {
   });
 
   const originalSend = XMLHttpRequest.prototype.send
-  XMLHttpRequest.prototype.send = $(function () {
+  XMLHttpRequest.prototype.send = function () {
     if (this._url === undefined) {
       return originalSend.apply(this, arguments)
     }
@@ -92,5 +92,5 @@ window.__firefox__.execute(function($) {
         originalSend.apply(this, arguments)
       }
     })
-  });
+  }
 });

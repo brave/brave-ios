@@ -80,11 +80,11 @@ window.__firefox__.execute(function($) {
       return originalOpen.apply(this, arguments);
     });
 
-    xhrProto.send = $(function(body) {
+    xhrProto.send = function(body) {
       if (this._url === undefined || !this._shouldTrack) {
         return originalSend.apply(this, arguments);
       }
-      
+
       // Only attach the `error` event listener once for this
       // `XMLHttpRequest` instance.
       if (!this._tpErrorHandler) {
@@ -96,7 +96,7 @@ window.__firefox__.execute(function($) {
         this.addEventListener("error", this._tpErrorHandler);
       }
       return originalSend.apply(this, arguments);
-    });
+    }
 
     // -------------------------------------------------
     // Detect when new sources get set on Image and send them to the host application
