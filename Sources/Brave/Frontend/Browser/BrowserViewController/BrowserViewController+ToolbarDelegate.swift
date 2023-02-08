@@ -109,7 +109,7 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
-    if WalletFeatureFlags.SNSDomainResolverEnabled, let url = topToolbar.currentURL, url.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
+    if WalletFeatureFlags.SNSDomainResolverEnabled, let url = topToolbar.currentURL, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
       switch currentStatus {
       case .ask:
         // show name service interstitial page
