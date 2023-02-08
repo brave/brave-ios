@@ -136,7 +136,11 @@ if (!window.__firefox__) {
             // on custom objects we don't own. We secure it,
             // but not freeze it.
             // The object may want to change it or override it, etc.
-            secureToString(value[name]);
+            // Do not secure our already secured toString override,
+            // if the custom override happens to be the same
+            if (value[name] !== toString) {
+              secureToString(value[name]);
+            }
             continue;
           }
           
@@ -149,13 +153,23 @@ if (!window.__firefox__) {
             // on custom objects we don't own. We secure it,
             // but not freeze it.
             // The object may want to change it or override it, etc.
-            secureToString(value[name]);
+            // Do not secure our already secured toString override,
+            // if the custom override happens to be the same
+            if (descriptor.value !== toString) {
+              secureToString(descriptor.value);
+            }
             continue;
           }
         }
         
         // Override all of the functions in the overrides array
         let descriptor = $Object.getOwnPropertyDescriptor(value, name);
+        
+        // Do not secure our already secured property override
+        if (descriptor && descriptor.value === property) {
+          continue;
+        }
+        
         if (!descriptor || descriptor.configurable) {
           $Object.defineProperty(value, name, {
             enumerable: false,
