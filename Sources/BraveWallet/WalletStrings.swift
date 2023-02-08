@@ -1692,15 +1692,15 @@ extension Strings {
       "wallet.swapDexAggrigatorNote",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Brave uses 0x as a DEX aggregator.",
-      comment: "A disclaimer note shown on the Swap screen. '0x' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange)"
+      value: "Brave uses %@ as a DEX aggregator.",
+      comment: "A disclaimer note shown on the Swap screen. '%@' will be replaced by a company name, ex. '0x' / 'Jupiter'. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange)"
     )
     public static let swapDexAggrigatorDisclaimer = NSLocalizedString(
       "wallet.swapDexAggrigatorDisclaimer",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "0x will process the Ethereum address and IP address to fulfill a transaction (including getting quotes). 0x will ONLY use this data for the purposes of processing transactions.",
-      comment: "A longer disclaimer about the DEX aggrigator used by Brave for swap transactions. '0x' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange). 'ONLY' is emphasized to show importance of 0x's data usage."
+      value: "%@ will process the %@ address and IP address to fulfill a transaction (including getting quotes). %@ will ONLY use this data for the purposes of processing transactions.",
+      comment: "A longer disclaimer about the DEX aggrigator used by Brave for swap transactions. The first '%@' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange). 'ONLY' is emphasized to show importance of the company's data usage."
     )
     public static let chartAxisDateLabel = NSLocalizedString(
       "wallet.chartAxisDateLabel",
