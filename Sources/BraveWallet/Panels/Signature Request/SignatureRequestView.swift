@@ -37,6 +37,43 @@ struct SignatureRequestView: View {
     keyringStore.allAccounts.first(where: { $0.address == currentRequest.address }) ?? keyringStore.selectedAccount
   }
   
+  private var requestDisplayText: String {
+    if currentRequest.domain.isEmpty {
+      return requestMessage
+    }
+    return """
+    \(Strings.Wallet.signatureRequestDomainTitle):
+    \(requestDomain)
+    
+    \(Strings.Wallet.signatureRequestMessageTitle):
+    \(requestMessage)
+    """
+  }
+  
+  private var requestDomain: String {
+    if showOrignalMessage[requestIndex] == true {
+      return currentRequest.domain
+    } else {
+      let uuid = UUID()
+      var result = currentRequest.domain
+      if needPilcrowFormatted[requestIndex] == true {
+        var copy = currentRequest.domain
+        while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
+          if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
+            let newlines = String(copy[range])
+            result.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
+            copy.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
+          }
+        }
+      }
+      if currentRequest.domain.hasUnknownUnicode {
+        result = result.printableWithUnknownUnicode
+      }
+      
+      return result.replacingOccurrences(of: uuid.uuidString, with: "\u{00B6}")
+    }
+  }
+  
   private var requestMessage: String {
     if showOrignalMessage[requestIndex] == true {
       return currentRequest.message
@@ -148,7 +185,7 @@ struct SignatureRequestView: View {
           }
         }
         .padding(.vertical, 32)
-        StaticTextView(text: requestMessage, isMonospaced: false)
+        StaticTextView(text: requestDisplayText, isMonospaced: false)
           .frame(maxWidth: .infinity)
           .frame(height: staticTextViewHeight)
           .background(Color(.tertiaryBraveGroupedBackground))
@@ -196,7 +233,8 @@ struct SignatureRequestView: View {
     .introspectTextView { textView in
       // A flash to show users message is overflowing the text view (related to issue https://github.com/brave/brave-ios/issues/6277)
       if showOrignalMessage[requestIndex] == true {
-        if textView.contentSize.height > staticTextViewHeight && currentRequest.message.hasConsecutiveNewLines {
+        let currentRequestHasConsecutiveNewLines = currentRequest.domain.hasConsecutiveNewLines || currentRequest.message.hasConsecutiveNewLines
+        if textView.contentSize.height > staticTextViewHeight && currentRequestHasConsecutiveNewLines {
           needPilcrowFormatted[requestIndex] = true
           textView.flashScrollIndicators()
         } else {
