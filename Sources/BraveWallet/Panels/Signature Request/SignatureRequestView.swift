@@ -37,6 +37,7 @@ struct SignatureRequestView: View {
     keyringStore.allAccounts.first(where: { $0.address == currentRequest.address }) ?? keyringStore.selectedAccount
   }
   
+  /// Request display text, used as fallback.
   private var requestDisplayText: String {
     if currentRequest.domain.isEmpty {
       return requestMessage
@@ -48,6 +49,29 @@ struct SignatureRequestView: View {
     \(Strings.Wallet.signatureRequestMessageTitle):
     \(requestMessage)
     """
+  }
+  
+  /// Formatted request display text. Will display with bold `Domain` / `Message` headers if domain is non-empty.
+  private var requestDisplayAttributedText: NSAttributedString? {
+    let metrics = UIFontMetrics(forTextStyle: .body)
+    let desc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
+    let regularFont = metrics.scaledFont(for: UIFont.systemFont(ofSize: desc.pointSize, weight: .regular))
+    if currentRequest.domain.isEmpty {
+      // if we don't show domain, we don't need the full title
+      return NSAttributedString(string: requestMessage, attributes: [.font: regularFont])
+    }
+    let boldFont = metrics.scaledFont(for: UIFont.systemFont(ofSize: desc.pointSize, weight: .bold))
+    
+    let domainTitle = NSAttributedString(string: "\(Strings.Wallet.signatureRequestDomainTitle):\n", attributes: [.font: boldFont])
+    let domain = NSAttributedString(string: requestDomain, attributes: [.font: regularFont])
+    let messageTitle = NSAttributedString(string: "\n\(Strings.Wallet.signatureRequestMessageTitle):\n", attributes: [.font: boldFont])
+    let message = NSAttributedString(string: requestMessage, attributes: [.font: regularFont])
+    
+    let attrString = NSMutableAttributedString(attributedString: domainTitle)
+    attrString.append(domain)
+    attrString.append(messageTitle)
+    attrString.append(message)
+    return attrString
   }
   
   private var requestDomain: String {
@@ -185,7 +209,7 @@ struct SignatureRequestView: View {
           }
         }
         .padding(.vertical, 32)
-        StaticTextView(text: requestDisplayText, isMonospaced: false)
+        StaticTextView(text: requestDisplayText, attributedText: requestDisplayAttributedText, isMonospaced: false)
           .frame(maxWidth: .infinity)
           .frame(height: staticTextViewHeight)
           .background(Color(.tertiaryBraveGroupedBackground))
