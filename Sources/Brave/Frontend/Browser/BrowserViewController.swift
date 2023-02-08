@@ -1597,7 +1597,7 @@ public class BrowserViewController: UIViewController {
   func showSNSDomainInterstitialPage(originalURL: URL, visitType: VisitType?) {
     topToolbar.leaveOverlayMode()
     
-    guard let tab = tabManager.selectedTab, let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(SNSDomainHandler.path)?url=\(originalURL.absoluteString)") else {
+    guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(SNSDomainHandler.path)?url=\(encodedURL)") else {
       return
     }
     let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler
