@@ -164,12 +164,6 @@ if (!window.__firefox__) {
         
         // Override all of the functions in the overrides array
         let descriptor = $Object.getOwnPropertyDescriptor(value, name);
-        
-        // Do not secure our already secured property override
-        if (descriptor && descriptor.value === property) {
-          continue;
-        }
-        
         if (!descriptor || descriptor.configurable) {
           $Object.defineProperty(value, name, {
             enumerable: false,
