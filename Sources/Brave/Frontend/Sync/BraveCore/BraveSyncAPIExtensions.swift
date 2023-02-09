@@ -47,7 +47,7 @@ extension BraveSyncAPI {
   
   @discardableResult
   func joinSyncGroup(codeWords: String, syncProfileService: BraveSyncProfileServiceIOS) -> Bool {
-    if self.setSyncCode(codeWords) {
+    if setSyncCode(codeWords) {
       Preferences.Chromium.syncEnabled.value = true
       enableSyncTypes(syncProfileService: syncProfileService)
 

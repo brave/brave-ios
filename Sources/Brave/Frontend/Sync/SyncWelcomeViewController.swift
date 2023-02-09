@@ -277,15 +277,19 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
 
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
+    
     syncDeviceInfoObserver = syncAPI.addDeviceStateObserver { [weak self] in
       guard let self = self else { return }
       self.syncServiceObserver = nil
       self.syncDeviceInfoObserver = nil
+      
       controller.disableNavigationPrevention()
       self.pushSettings()
     }
 
+
     syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
+    
     syncAPI.requestSync()
     syncAPI.setSetupComplete()
   }

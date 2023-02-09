@@ -171,18 +171,6 @@ class SyncPairWordsViewController: SyncViewController {
   private func checkCodes() {
     Logger.module.debug("check codes")
 
-    func alert(title: String? = nil, message: String? = nil) {
-      if syncAPI.isInSyncGroup {
-        // No alert
-        return
-      }
-      let title = title ?? Strings.unableToConnectTitle
-      let message = message ?? Strings.unableToConnectDescription
-      let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
-      self.present(alert, animated: true, completion: nil)
-    }
-
     let codes = self.codewordsView.codeWords().joined(separator: " ")
     let syncCodeValidation = syncAPI.getWordsValidationResult(codes)
     if syncCodeValidation == .wrongWordsNumber {
@@ -190,16 +178,8 @@ class SyncPairWordsViewController: SyncViewController {
       return
     }
 
-    self.view.endEditing(true)
+    view.endEditing(true)
     enableNavigationPrevention()
-
-    // forced timeout
-    DispatchQueue.main.asyncAfter(
-      deadline: DispatchTime.now() + Double(Int64(25.0) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC),
-      execute: {
-        self.disableNavigationPrevention()
-        alert()
-      })
 
     if syncCodeValidation == .valid {
       let words = syncAPI.getWordsFromTimeLimitedWords(codes)
@@ -208,9 +188,30 @@ class SyncPairWordsViewController: SyncViewController {
       alert(message: syncCodeValidation.errorDescription)
       disableNavigationPrevention()
     }
-
+  }
+  
+  private func timeoutSyncSetup() {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 25.0) {
+      self.disableNavigationPrevention()
+      self.alert()
+    }
+  }
+  
+  private func alert(title: String? = nil, message: String? = nil) {
+    if syncAPI.isInSyncGroup {
+      return
+    }
+    
+    let title = title ?? Strings.unableToConnectTitle
+    let message = message ?? Strings.unableToConnectDescription
+    
+    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+    present(alert, animated: true, completion: nil)
   }
 }
+
+// MARK: NavigationPrevention
 
 extension SyncPairWordsViewController: NavigationPrevention {
   func enableNavigationPrevention() {
