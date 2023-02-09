@@ -52,7 +52,7 @@ struct AppStorageDebugComposer {
             
             let formattedSize = formatter.string(fromByteCount: Int64(directorySize))
             
-            let indentation = String(repeating: "·", count: (enumerator.level - 1) * 2)
+            let indentation = String(repeating: "\t", count: enumerator.level - 1)
             result += indentation + file.lastPathComponent + "(\(formattedSize))\n"
           } catch {
             Logger.module.error("AppStorageDebug error: \(error)")
