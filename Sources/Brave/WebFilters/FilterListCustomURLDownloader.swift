@@ -22,7 +22,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
     
     var headers: [String: String] {
-      return [:]
+      return ["Accept": "text/plain"]
     }
   }
   
