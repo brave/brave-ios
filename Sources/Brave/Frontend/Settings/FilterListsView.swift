@@ -69,12 +69,32 @@ struct FilterListsView: View {
           
           Task {
             await removedURLs.asyncConcurrentForEach { removedURL in
-              // For some reason if we remove the rule list,
+              // 1. Disable the filter list.
+              // It would be better to delete it but for some reason if we remove the rule list,
               // it will not allow us to remove it from the tab
               // So we don't remove it, only flag it as disabled and it will be removed on the next launch
               // during the `cleaupInvalidRuleLists` step on `LaunchHelper`
-              await FilterListCustomURLDownloader.shared.handleUpdate(to: removedURL, isEnabled: false)
-              await FilterListCustomURLDownloader.shared.stopFetching(filterListCustomURL: removedURL)
+              await FilterListCustomURLDownloader.shared.handleUpdate(
+                to: removedURL, isEnabled: false
+              )
+              
+              // 2. Stop downloading the file
+              await FilterListCustomURLDownloader.shared.stopFetching(
+                filterListCustomURL: removedURL
+              )
+              
+              // 3. Remove the files
+              do {
+                try ResourceDownloader.removeCacheFolder(for: removedURL.setting.resource)
+              } catch {
+                ContentBlockerManager.log.error(
+                  "Failed to remove file for resource \(removedURL.setting.uuid)"
+                )
+              }
+              
+              // 4. Remove the setting.
+              // This should always happen in the end
+              // because we need to access properties on the setting until then
               removedURL.setting.delete(inMemory: !customFilterListStorage.persistChanges)
             }
           }

@@ -217,7 +217,7 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
   }
   
   /// Removes all the data for the given `Resource`
-  private static func removeCacheFolder(for resource: Resource) throws {
+  static func removeCacheFolder(for resource: Resource) throws {
     guard
       let folderURL = self.createdCacheFolderURL(for: resource)
     else {
