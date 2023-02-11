@@ -98,10 +98,12 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
         throw DownloadResultError.noData
       }
       
-      return .downloaded(networkResource, Date())
+      let date = try Self.creationDate(for: resource)
+      return .downloaded(networkResource, date ?? Date())
     } catch let error as NetworkManagerError {
       if error == .fileNotModified, let fileURL = Self.downloadedFileURL(for: resource) {
-        return .notModified(fileURL, Date())
+        let date = try Self.creationDate(for: resource)
+        return .notModified(fileURL, date ?? Date())
       } else {
         throw error
       }
