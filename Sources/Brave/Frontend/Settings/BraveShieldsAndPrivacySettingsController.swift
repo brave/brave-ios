@@ -385,9 +385,6 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     let clearAction = UIAlertAction(title: Strings.clearPrivateDataAlertYesAction, style: .destructive) { [weak self] _ in
       guard let self = self else { return }
       Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
-      // Naive solution, we do not check what toggles are enabled.
-      // This is for debug purposes only and we trust in users good faith when following our directions.
-      AppStorageDebugComposer.clearedDataThisSession = true
       let spinner = SpinnerView().then {
         $0.present(on: self.view)
       }

@@ -596,7 +596,8 @@ class SettingsViewController: TableViewController {
             }
             
             let copyAppInfoAction = UIAlertAction(title: Strings.copyAppSizeInfoToClipboard, style: .default) { _ in
-              UIPasteboard.general.strings = [AppStorageDebugComposer.compose()]
+              UIPasteboard.general.setSecureString(AppStorageDebugComposer.compose(),
+                                                   expirationDate: Date().addingTimeInterval(2.minutes))
             }
 
             actionSheet.addAction(copyDebugInfoAction)

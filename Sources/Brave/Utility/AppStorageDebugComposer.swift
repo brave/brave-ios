@@ -8,10 +8,6 @@ import UIKit
 import os.log
 
 struct AppStorageDebugComposer {
-  /// This toggle tells us whether the user attempted to clear browsing data.
-  /// This way we can ask the user to clear the data first
-  /// so the debug info shared with us will clearly show any outstanding big sized folders.
-  static var clearedDataThisSession = false
   
   /// This function prepares data to help us identify any app storage problems users may have.
   static func compose() -> String {
@@ -63,13 +59,9 @@ struct AppStorageDebugComposer {
         return result
       }
     
-    // This data is for us, no need to translate the body.
-    let clearedDataCheck = "Cleared Data: \(Self.clearedDataThisSession ? "Yes" : "No")"
-    
     let result =
     """
     \(printDeviceInfo)
-    \(clearedDataCheck)
     \(printFolderTreeStructure)
     """
     
