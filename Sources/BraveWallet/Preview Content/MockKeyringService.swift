@@ -361,7 +361,7 @@ extension BraveWallet.AccountInfo {
     isImported: false,
     hardware: nil,
     coin: .eth,
-    keyringId: ""
+    keyringId: BraveWallet.DefaultKeyringId
   )
   
   static let mockSolAccount: BraveWallet.AccountInfo = .init(
@@ -370,7 +370,7 @@ extension BraveWallet.AccountInfo {
     isImported: false,
     hardware: nil,
     coin: .sol,
-    keyringId: ""
+    keyringId: BraveWallet.SolanaKeyringId
   )
   
   static let mockFilAccount: BraveWallet.AccountInfo = .init(
@@ -379,7 +379,7 @@ extension BraveWallet.AccountInfo {
     isImported: false,
     hardware: nil,
     coin: .fil,
-    keyringId: ""
+    keyringId: BraveWallet.FilecoinKeyringId
   )
 }
 
