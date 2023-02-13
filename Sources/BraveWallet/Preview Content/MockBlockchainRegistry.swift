@@ -43,6 +43,10 @@ class MockBlockchainRegistry: BraveWalletBlockchainRegistry {
   func buyTokens(_ provider: BraveWallet.OnRampProvider, chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(Self.testTokens)
   }
+  
+  func providersBuyTokens(_ providers: [NSNumber], chainId: String, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
+    completion(Self.testTokens)
+  }
 
   func buyUrl(_ provider: BraveWallet.OnRampProvider, chainId: String, address: String, symbol: String, amount: String, completion: @escaping (String, String?) -> Void) {
     completion("", nil)
