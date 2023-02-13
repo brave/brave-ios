@@ -113,16 +113,12 @@ extension BrowserViewController: TopToolbarDelegate {
       switch currentStatus {
       case .ask:
         // show name service interstitial page
-        showSNSDomainInterstitialPage(originalURL: url, visitType: nil)
+        showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
       case .enabled:
         Task { @MainActor in
-          let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-          if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-            let (resolvedUrl, status, _) = await rpcService.snsResolveHost(url.absoluteString)
-            if let resolvedUrl = resolvedUrl, status == .success {
-              tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedUrl))
-              return
-            }
+          if let resolvedURL = await resolveSNSHost(url.absoluteString) {
+            tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
+            return
           }
           tabManager.selectedTab?.loadRequest(URLRequest(url: url))
         }
@@ -253,6 +249,16 @@ extension BrowserViewController: TopToolbarDelegate {
     }
   }
   
+  @MainActor func resolveSNSHost(_ host: String) async -> URL? {
+    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+    if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+      let (url, status, _) = await rpcService.snsResolveHost(host)
+      guard let url = url, status == .success else { return nil }
+      return url
+    }
+    return nil
+  }
+  
   func submitValidURL(_ text: String, visitType: VisitType) -> Bool {
     if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
@@ -267,23 +273,17 @@ extension BrowserViewController: TopToolbarDelegate {
             return true
           case .enabled:
             Task { @MainActor in
-              let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-              if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-                let (url, status, _) = await rpcService.snsResolveHost(text)
-                if let url = url, status == .success {
-                  // resolved url
-                  finishEditingAndSubmit(url, visitType: visitType)
-                  return true
-                }
+              if let resolvedURL = await resolveSNSHost(text) {
+                // resolved url
+                finishEditingAndSubmit(resolvedURL, visitType: visitType)
+                return true
               }
               // user entered url
               finishEditingAndSubmit(fixupURL, visitType: visitType)
               return true
             }
           case .disabled:
-            // user entered url
-            finishEditingAndSubmit(fixupURL, visitType: visitType)
-            return true
+            break
           }
         }
         

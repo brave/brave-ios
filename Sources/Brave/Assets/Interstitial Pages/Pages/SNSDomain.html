@@ -36,9 +36,7 @@ You can obtain one at https://mozilla.org/MPL/2.0/.
       disableButton.addEventListener('click', function(e) {
         e.preventDefault();
         webkit.messageHandlers["%message_handler%"].postMessage({
-          "securityToken": "%security_token%",
           "type": "SNSDisable",
-          "input": "%user_input%",
         });
       });
       var proceedButton = document.getElementById("proceedSNSButton")

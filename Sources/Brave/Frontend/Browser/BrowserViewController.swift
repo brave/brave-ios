@@ -1594,7 +1594,7 @@ public class BrowserViewController: UIViewController {
     }
   }
 
-  func showSNSDomainInterstitialPage(originalURL: URL, visitType: VisitType?) {
+  func showSNSDomainInterstitialPage(originalURL: URL, visitType: VisitType) {
     topToolbar.leaveOverlayMode()
     
     guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(SNSDomainHandler.path)?url=\(encodedURL)") else {
@@ -1602,9 +1602,7 @@ public class BrowserViewController: UIViewController {
     }
     let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler
     scriptHandler?.originalURL = originalURL
-    if let visitType {
-      scriptHandler?.visitType = visitType
-    }
+    scriptHandler?.visitType = visitType
     
     tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
   }
@@ -2756,27 +2754,6 @@ extension BrowserViewController: SessionRestoreScriptHandlerDelegate {
 
     if let tab = tabManager.selectedTab {
       updateUIForReaderHomeStateForTab(tab)
-    }
-  }
-}
-
-extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
-  func web3NameServiceDecisionHandler(_ proceed: Bool, originalURL: URL, visitType: VisitType) {
-    if proceed {
-      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.enabled.rawValue
-      Task { @MainActor in
-        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode), let host = originalURL.host {
-          let (url, status, _) = await rpcService.snsResolveHost(host)
-          if let url = url, status == .success {
-            // resolved url
-            finishEditingAndSubmit(url, visitType: visitType)
-          }
-        }
-      }
-    } else {
-      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.disabled.rawValue
-      finishEditingAndSubmit(originalURL, visitType: visitType)
     }
   }
 }

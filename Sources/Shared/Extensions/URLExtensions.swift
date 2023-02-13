@@ -620,10 +620,10 @@ public struct InternalURL {
     return web3Component != nil
   }
   
-  /// Return the path after "web3t/" in the URI.
+  /// Return the path after "web3/" in the URI.
   public var web3Component: String? {
     let web3Path = "/web3/"
-    guard let url = URL(string: stripAuthorization) else {
+    guard let url = NSURL(idnString: stripAuthorization) as? URL else {
       return nil
     }
     
