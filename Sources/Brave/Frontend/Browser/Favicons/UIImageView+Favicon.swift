@@ -31,9 +31,14 @@ extension UIImageView {
   func loadFavicon(for siteURL: URL, monogramFallbackCharacter: Character? = nil, completion: ((UIImage?) -> Void)? = nil) {
     cancelFaviconLoad()
     faviconTask = Task { @MainActor in
-      let favicon = try? await FaviconFetcher.loadIcon(url: siteURL, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
-      self.image = favicon?.image
-      completion?(self.image)
+      do {
+        let favicon = try await FaviconFetcher.loadIcon(url: siteURL, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+        self.image = favicon.image
+        completion?(favicon.image)
+      } catch {
+        self.image = try? await FaviconFetcher.monogramIcon(url: siteURL).image ?? Favicon.defaultImage
+        completion?(nil)
+      }
     }
   }
 
