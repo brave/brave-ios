@@ -168,7 +168,8 @@ public class BraveSkusManager {
   }
   
   // MARK: - Session Expired state
-  public static var keepShowingSessionExpiredState = true
+  /// An in-memory flag that will show a "session expired" prompt to the user in the current browsing session.
+  public static var keepShowingSessionExpiredState = false
   
   public static func sessionExpiredStateAlert(loginCallback: @escaping (UIAlertAction) -> Void) -> UIAlertController {
     let alert = UIAlertController(title: Strings.VPN.sessionExpiredTitle, message: Strings.VPN.sessionExpiredDescription, preferredStyle: .alert)
