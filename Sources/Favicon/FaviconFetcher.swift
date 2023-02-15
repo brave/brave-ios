@@ -62,7 +62,7 @@ public class FaviconFetcher {
   }
   
   @MainActor
-  public static func monogramIcon(url: URL) async throws -> Favicon {
+  public static func monogramIcon(url: URL, monogramString: Character? = nil) async throws -> Favicon {
     // Render the Monogram on a UIImage
     guard let attributes = BraveCore.FaviconAttributes.withDefaultImage() else {
       throw FaviconError.noImagesFound
@@ -70,7 +70,12 @@ public class FaviconFetcher {
     
     let textColor = !attributes.isDefaultBackgroundColor ? attributes.textColor : nil
     let backColor = !attributes.isDefaultBackgroundColor ? attributes.backgroundColor : nil
-    let favicon = await UIImage.renderMonogram(url, textColor: textColor, backgroundColor: backColor, monogramString: attributes.monogramString)
+    var monogramText = attributes.monogramString
+    if let monogramString = monogramString {
+      monogramText = String(monogramString)
+    }
+    
+    let favicon = await UIImage.renderMonogram(url, textColor: textColor, backgroundColor: backColor, monogramString: monogramText)
     try Task.checkCancellation()
     return favicon
   }
