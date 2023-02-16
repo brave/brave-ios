@@ -106,7 +106,7 @@ extension UIImage {
       
       var padding = hasTransparentEdges ? 4.0 : 0.0
       var idealSize = image.size
-      if shouldScale && max(idealSize.width, idealSize.height) < 64.0 {
+      if shouldScale && max(idealSize.width, idealSize.height) < 64.0 && min(idealSize.width, idealSize.height) > 0 {
         let ratio = 64.0 / min(idealSize.width, idealSize.height)
         idealSize.width *= ratio
         idealSize.height *= ratio
