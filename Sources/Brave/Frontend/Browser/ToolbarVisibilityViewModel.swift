@@ -274,7 +274,9 @@ import SwiftUI
     scrollView.panGestureRecognizer.addTarget(self, action: #selector(pannedScrollView(_:)))
     scrollViewObservation = scrollView.observe(\.contentSize, options: [.old, .new], changeHandler: { [weak self] scrollView, change in
       guard change.oldValue != change.newValue else { return }
-      self?.send(action: .contentSizeChanged(snapshot: Self.snapshotData(from: scrollView)))
+      DispatchQueue.main.async { [self] in
+        self?.send(action: .contentSizeChanged(snapshot: Self.snapshotData(from: scrollView)))
+      }
     })
     scrollView.delegate = coordinator
   }
