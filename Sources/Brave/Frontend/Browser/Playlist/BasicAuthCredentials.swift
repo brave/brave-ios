@@ -28,9 +28,9 @@ class BasicAuthCredentialsManager: NSObject, URLSessionDataDelegate {
       let logins = cursor.asArray()
       
       if logins.count > 1 {
-        return (logins.find { login in
+        return (logins.first(where: { login in
           (login.protectionSpace.protocol == challenge.protectionSpace.protocol) && !login.hasMalformedHostname
-        })?.credentials
+        }))?.credentials
       } else if logins.count == 1, logins.first?.protectionSpace.protocol != challenge.protectionSpace.protocol {
         return logins.first?.credentials
       }

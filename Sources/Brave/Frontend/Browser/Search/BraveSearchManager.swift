@@ -269,9 +269,9 @@ extension BraveSearchManager: URLSessionDataDelegate {
         
         if logins.count > 1 {
           credentials =
-          (logins.find { login in
+          (logins.first(where: { login in
             (login.protectionSpace.`protocol` == challenge.protectionSpace.`protocol`) && !login.hasMalformedHostname
-          })?.credentials
+          }))?.credentials
         } else if logins.count == 1, logins.first?.protectionSpace.`protocol` != challenge.protectionSpace.`protocol` {
           credentials = logins.first?.credentials
         } else {
