@@ -50,7 +50,8 @@ struct TransactionStatusView: View {
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       Button {
         if let baseURL = networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-           let url = baseURL?.appendingPathComponent("tx/\(confirmationStore.activeParsedTransaction.transaction.txHash)") {
+           let tx = confirmationStore.allTxs.first(where: { $0.id == confirmationStore.activeTransactionId }),
+           let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
           openWalletURL?(url)
         }
       } label: {
