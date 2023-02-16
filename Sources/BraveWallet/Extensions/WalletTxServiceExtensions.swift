@@ -30,4 +30,27 @@ extension BraveWalletTxService {
       }
     )
   }
+  
+  // Fetches all transactions for all given keyrings
+  func allTransactions(
+    for keyrings: [BraveWallet.KeyringInfo]
+  ) async -> [BraveWallet.TransactionInfo] {
+    return await withTaskGroup(
+      of: [BraveWallet.TransactionInfo].self,
+      body: { @MainActor group in
+        for keyring in keyrings {
+          for info in keyring.accountInfos {
+            group.addTask { @MainActor in
+              await self.allTransactionInfo(info.coin, from: info.address)
+            }
+          }
+        }
+        var allTx: [BraveWallet.TransactionInfo] = []
+        for await transactions in group {
+          allTx.append(contentsOf: transactions)
+        }
+        return allTx
+      }
+    )
+  }
 }
