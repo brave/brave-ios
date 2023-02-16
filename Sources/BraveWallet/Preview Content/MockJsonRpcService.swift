@@ -44,6 +44,11 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("10", .success, "")
   }
   
+  // TODO: Check Wallet changes
+  func erc20TokenBalances(_ contracts: [String], address: String, chainId: String, completion: @escaping ([BraveWallet.ERC20BalanceResult], BraveWallet.ProviderError, String) -> Void) {
+    completion([.init(contractAddress: "", balance: "10")], .success, "")
+  }
+  
   func request(_ jsonPayload: String, autoRetryOnNetworkChange: Bool, id: MojoBase.Value, coin: BraveWallet.CoinType, completion: @escaping (MojoBase.Value, MojoBase.Value, Bool, String, Bool) -> Void) {
     completion(.init(), .init(), true, "", false)
   }

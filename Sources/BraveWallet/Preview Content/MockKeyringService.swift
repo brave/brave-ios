@@ -339,7 +339,9 @@ class MockKeyringService: BraveWalletKeyringService {
     completion(true)
   }
 
-  func removeHardwareAccount(_ address: String, password: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
+  // TODO: Check Wallet changes
+  func removeHardwareAccount(_ address: String, coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
+    completion(true)
   }
 
   func notifyUserInteraction() {
