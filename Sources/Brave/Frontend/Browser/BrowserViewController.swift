@@ -2369,7 +2369,7 @@ public class BrowserViewController: UIViewController {
   }
 }
 
-extension BrowserViewController: QRCodeViewControllerDelegate {
+extension BrowserViewController {
   func didScanQRCodeWithURL(_ url: URL) {
     popToBVC()
     finishEditingAndSubmit(url, visitType: .typed)
