@@ -278,18 +278,36 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
     
-    syncDeviceInfoObserver = syncAPI.addDeviceStateObserver { [weak self] in
-      guard let self = self else { return }
-      self.syncServiceObserver = nil
-      self.syncDeviceInfoObserver = nil
-      
-      controller.disableNavigationPrevention()
-      self.pushSettings()
+    syncAPI.setJoinSyncChain { [weak self] result in
+      guard let self else { return }
+
+      if result {
+        self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
+          guard let self else { return }
+          self.syncServiceObserver = nil
+          self.syncDeviceInfoObserver = nil
+          
+          controller.disableNavigationPrevention()
+          self.pushSettings()
+        }
+      } else {
+        let alert = UIAlertController(
+          title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
+          message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
+          preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+          self.syncAPI.leaveSyncGroup()
+
+          controller.disableNavigationPrevention()
+          self.navigationController?.popViewController(animated: true)
+        })
+        
+        self.present(alert, animated: true, completion: nil)
+      }
     }
-
-
-    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
     
+    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
     syncAPI.requestSync()
     syncAPI.setSetupComplete()
   }

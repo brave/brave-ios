@@ -174,7 +174,15 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
         }
       case .syncChainDeleted:
         // Call Sync Account Delete
-        self.navigationController?.popToRootViewController(animated: true)
+        
+        self.syncAPI.permanentlyDeleteAccount { [weak self] status in
+          guard let self else { return }
+          self.syncAPI.leaveSyncGroup()
+
+          print("Test \(status)")
+          self.navigationController?.popToRootViewController(animated: true)
+        }
+        
       }
       return .flyDown
     }
