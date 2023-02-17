@@ -3596,28 +3596,28 @@ extension Strings {
       "wallet.signedTransactionTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Transaction signed",
+      value: "Transaction Signed",
       comment: "A title of transaction signed status view indicating this transaction has been signed."
     )
     public static let submittedTransactionTitle = NSLocalizedString(
       "wallet.submittedTransactionTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Transaction submitted",
+      value: "Transaction Submitted",
       comment: "A title of transaction signed status view indicating this transaction has been submitted to the network."
     )
     public static let confirmedTransactionTitle = NSLocalizedString(
       "wallet.confirmedTransactionTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Transaction completed",
+      value: "Transaction Completed",
       comment: "A title of transaction confirmed status view indicating this transaction has been included in a block."
     )
     public static let failedTransactionTitle = NSLocalizedString(
       "wallet.failedTransactionTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Transaction failed",
+      value: "Transaction Failed",
       comment: "A title of transaction failed status view indicating this transaction has not been included in a block."
     )
     public static let signedTransactionDescription = NSLocalizedString(
@@ -3673,7 +3673,7 @@ extension Strings {
       "wallet.failedTransactionErrorViewTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Error message",
+      value: "Error Message",
       comment: "A title of the view that will display the error message."
     )
     public static let failedTransactionErrorViewDescription = NSLocalizedString(
