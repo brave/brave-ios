@@ -67,6 +67,10 @@ public class CryptoStore: ObservableObject {
   @Published private(set) var pendingRequest: PendingRequest? {
     didSet {
       if pendingRequest == nil {
+        if let confirmationStore = self.confirmationStore, !confirmationStore.isReadyToBeDismissed {
+          pendingRequest = .transactions([])
+          return
+        }
         isPresentingPendingRequest = false
         return
       }

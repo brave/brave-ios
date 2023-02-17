@@ -313,6 +313,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
               toolbarDismissContent: toolbarDismissContent,
               onDismiss: {
                 cryptoStore.isPresentingPendingRequest = false
+                cryptoStore.prepare()
               }
             )
           }
