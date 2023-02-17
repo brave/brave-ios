@@ -3007,7 +3007,16 @@ extension Strings {
         "sync.syncChainAlreadyDeletedAlertDescription", tableName: "BraveShared", bundle: .module,
         value: "Could not join this chain. Account was deleted.",
         comment: "Alert description for the occasion when an user is trying to join a already deleted account")
-
+    public static let syncChainAccountDeletionErrorTitle =
+      NSLocalizedString(
+        "sync.syncChainAccountDeletionErrorTitle", tableName: "BraveShared", bundle: .module,
+        value: "Sync Device",
+        comment: "Alert title for error while deleting sync chain")
+    public static let syncChainAccountDeletionErrorDescription =
+      NSLocalizedString(
+        "sync.syncChainAccountDeletionErrorDescription", tableName: "BraveShared", bundle: .module,
+        value: "Sync Device",
+        comment: "Alert description for error while deleting sync chain")
   }
 }
 

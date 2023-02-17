@@ -36,7 +36,11 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
   }
 
   private enum AlertActionType {
-    case lastDeviceLeft, currentDeviceLeft, otherDeviceLeft, syncChainDeleted
+    case lastDeviceLeft
+    case currentDeviceLeft
+    case otherDeviceLeft
+    case syncChainDeleteConfirmation
+    case syncChainDeleteError
   }
   
   // MARK: Private
@@ -151,10 +155,14 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
       title = String(format: Strings.syncRemoveOtherDeviceTitle, deviceName)
       message = Strings.syncRemoveOtherDeviceMessage
       removeButtonName = Strings.removeDevice
-    case .syncChainDeleted:
+    case .syncChainDeleteConfirmation:
       title = Strings.Sync.syncDeleteAccountAlertTitle
       message = "\(Strings.Sync.syncDeleteAccountAlertDescriptionPart1).\n\n\(Strings.Sync.syncDeleteAccountAlertDescriptionPart2)"
       removeButtonName = Strings.delete
+    case .syncChainDeleteError:
+      title = Strings.Sync.syncChainAccountDeletionErrorTitle
+      message = Strings.Sync.syncChainAccountDeletionErrorDescription
+      removeButtonName = Strings.OKString
     }
 
     guard let popupTitle = title, let popupMessage = message, let popupButtonName = removeButtonName else { fatalError() }
@@ -171,7 +179,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
         if let guid = device?.guid {
           self.syncAPI.removeDeviceFromSyncGroup(deviceGuid: guid)
         }
-      case .syncChainDeleted:
+      case .syncChainDeleteConfirmation:
         self.doIfConnected {
           // Observers have to be removed before permanentlyDeleteAccount is called
           // to prevent glicthes in settings screen
@@ -182,7 +190,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
             
             switch status {
             case .throttled, .partialFailure, .transientError:
-              break
+              self.presentAlertPopup(for: .syncChainDeleteError)
             default:
               self.syncAPI.leaveSyncGroup(includeObservers: false)
             }
@@ -190,6 +198,8 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
             self.navigationController?.popToRootViewController(animated: true)
           }
         }
+      default:
+        break
       }
       return .flyDown
     }
@@ -275,7 +285,7 @@ extension SyncSettingsTableViewController {
     // Delete Sync Chain
     
     if section == .chainRemoval {
-      presentAlertPopup(for: .syncChainDeleted)
+      presentAlertPopup(for: .syncChainDeleteConfirmation)
       return
     }
 
