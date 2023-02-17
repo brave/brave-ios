@@ -3681,7 +3681,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .module,
       value: "Please save the error message for future reference.",
-      comment: "A title of the view that will display the error message."
+      comment: "A description of the view that will display the error message."
     )
   }
 }
