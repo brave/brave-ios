@@ -3690,5 +3690,26 @@ extension Strings {
       value: "Please save the error message for future reference.",
       comment: "A description of the view that will display the error message."
     )
+    public static let ensOffchainGatewayTitle = NSLocalizedString(
+      "wallet.ensOffchainGatewayTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Brave supports using offchain gateways to resolve .eth domains.",
+      comment: "Title shown send address / ENS domain when requesting to do an ENS off chain lookup."
+    )
+    public static let ensOffchainGatewayDesc = NSLocalizedString(
+      "wallet.ensOffchainGatewayDesc",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "It looks like you've entered an ENS address. We'll need to use a third-party resolver to resolve this request. This helps ensure your .eth domain isn't leaked, and that your transaction is secure.",
+      comment: "Description shown send address / ENS domain when requesting to do an ENS off chain lookup."
+    )
+    public static let ensOffchainGatewayButton = NSLocalizedString(
+      "wallet.ensOffchainGatewayDesc",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Use ENS Domain",
+      comment: "Button title when requesting to do an ENS off chain lookup."
+    )
   }
 }
