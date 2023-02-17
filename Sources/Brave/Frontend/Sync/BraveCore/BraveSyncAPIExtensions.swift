@@ -60,10 +60,12 @@ extension BraveSyncAPI {
     deleteDevice(deviceGuid)
   }
 
-  func leaveSyncGroup() {
-    // Remove all observers before leaving the sync chain
-    removeAllObservers()
-
+  func leaveSyncGroup(includeObservers: Bool = true) {
+    if includeObservers {
+      // Remove all observers before leaving the sync chain
+      removeAllObservers()
+    }
+    
     resetSyncChain()
     Preferences.Chromium.syncEnabled.value = false
   }

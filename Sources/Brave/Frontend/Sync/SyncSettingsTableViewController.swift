@@ -9,7 +9,7 @@ import BraveCore
 import BraveUI
 import os.log
 
-class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, UITableViewDataSource {
   
   private enum Sections: Int, CaseIterable {
     case deviceList, deviceActions, syncTypes, chainRemoval
@@ -159,11 +159,10 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
 
     guard let popupTitle = title, let popupMessage = message, let popupButtonName = removeButtonName else { fatalError() }
 
-    let popup = AlertPopupView(imageView: nil, title: popupTitle, message: popupMessage)
-    let fontSize: CGFloat = 15
+    let popup = AlertPopupView(title: popupTitle, message: popupMessage)
 
-    popup.addButton(title: Strings.cancelButtonTitle, fontSize: fontSize) { return .flyDown }
-    popup.addButton(title: popupButtonName, type: .destructive, fontSize: fontSize) {
+    popup.addButton(title: Strings.cancelButtonTitle) { return .flyDown }
+    popup.addButton(title: popupButtonName, type: .destructive) {
       switch type {
       case .lastDeviceLeft, .currentDeviceLeft:
         self.syncAPI.leaveSyncGroup()
@@ -173,16 +172,24 @@ class SyncSettingsTableViewController: UIViewController, UITableViewDelegate, UI
           self.syncAPI.removeDeviceFromSyncGroup(deviceGuid: guid)
         }
       case .syncChainDeleted:
-        // Call Sync Account Delete
-        
-        self.syncAPI.permanentlyDeleteAccount { [weak self] status in
-          guard let self else { return }
-          self.syncAPI.leaveSyncGroup()
-
-          print("Test \(status)")
-          self.navigationController?.popToRootViewController(animated: true)
+        self.doIfConnected {
+          // Observers have to be removed before permanentlyDeleteAccount is called
+          // to prevent glicthes in settings screen
+          self.syncAPI.removeAllObservers()
+          
+          self.syncAPI.permanentlyDeleteAccount { [weak self] status in
+            guard let self else { return }
+            
+            switch status {
+            case .throttled, .partialFailure, .transientError:
+              break
+            default:
+              self.syncAPI.leaveSyncGroup(includeObservers: false)
+            }
+            
+            self.navigationController?.popToRootViewController(animated: true)
+          }
         }
-        
       }
       return .flyDown
     }
