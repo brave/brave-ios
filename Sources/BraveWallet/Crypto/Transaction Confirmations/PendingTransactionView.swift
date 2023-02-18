@@ -16,7 +16,7 @@ struct PendingTransactionView: View {
   @Binding var isShowingGas: Bool
   @Binding var isShowingAdvancedSettings: Bool
   
-  var onClose: () -> Void
+  var onDismiss: () -> Void
   
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.openWalletURLAction) private var openWalletURL
@@ -61,8 +61,6 @@ struct PendingTransactionView: View {
             .foregroundColor(Color(.braveBlurpleTint))
         }
       }
-    } else {
-      EmptyView()
     }
   }
   
@@ -431,7 +429,7 @@ struct PendingTransactionView: View {
           Button(action: {
             confirmationStore.rejectAllTransactions { success in
               if success {
-                onClose()
+                onDismiss()
               }
             }
           }) {
@@ -474,43 +472,6 @@ struct PendingTransactionView: View {
   }
 }
 
-/// We needed a `TextEditor` that couldn't be edited and had a clear background color
-/// so we have to fallback to UIKit for this
-struct StaticTextView: UIViewRepresentable {
-  var text: String
-  var attributedText: NSAttributedString?
-  var isMonospaced: Bool = true
-  
-  func makeUIView(context: Context) -> UITextView {
-    let textView = UITextView()
-    if let attributedText {
-      textView.attributedText = attributedText
-    } else {
-      textView.text = text
-    }
-    textView.isEditable = false
-    textView.backgroundColor = .tertiaryBraveGroupedBackground
-    textView.font = {
-      let metrics = UIFontMetrics(forTextStyle: .body)
-      let desc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
-      let font = isMonospaced ?
-      UIFont.monospacedSystemFont(ofSize: desc.pointSize, weight: .regular) :
-      UIFont.systemFont(ofSize: desc.pointSize, weight: .regular)
-      return metrics.scaledFont(for: font)
-    }()
-    textView.adjustsFontForContentSizeCategory = true
-    textView.textContainerInset = .init(top: 12, left: 8, bottom: 12, right: 8)
-    return textView
-  }
-  func updateUIView(_ uiView: UITextView, context: Context) {
-    if let attributedText {
-      uiView.attributedText = attributedText
-    } else {
-      uiView.text = text
-    }
-  }
-}
-
 #if DEBUG
 struct PendingTransactionView_Previews: PreviewProvider {
   static var previews: some View {
@@ -520,7 +481,7 @@ struct PendingTransactionView_Previews: PreviewProvider {
       keyringStore: .previewStore,
       isShowingGas: .constant(false),
       isShowingAdvancedSettings: .constant(false),
-      onClose: { }
+      onDismiss: { }
     )
   }
 }

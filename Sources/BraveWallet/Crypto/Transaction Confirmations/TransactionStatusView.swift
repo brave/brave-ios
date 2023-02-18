@@ -17,7 +17,7 @@ struct TransactionStatusView: View {
   @Binding var isShowingAdvancedSettings: Bool
   @Binding var transactionDetails: TransactionDetailsStore?
  
-  let onClose: () -> Void
+  let onDismiss: () -> Void
   
   @Environment(\.openWalletURLAction) private var openWalletURL
   
@@ -29,75 +29,100 @@ struct TransactionStatusView: View {
   }
   
   @ViewBuilder private var signedOrSubmittedTxView: some View {
-    VStack(spacing: 10) {
-      Image("tx-submitted", bundle: .module)
-      Text(confirmationStore.activeTxStatus == .signed ? Strings.Wallet.signedTransactionTitle : Strings.Wallet.submittedTransactionTitle)
-        .font(.title3.bold())
-        .foregroundColor(Color(.braveLabel))
-        .multilineTextAlignment(.center)
-        .padding(.top, 10)
-      Text(confirmationStore.activeTxStatus == .signed ? Strings.Wallet.signedTransactionDescription : Strings.Wallet.submittedTransactionDescription)
-        .font(.subheadline)
-        .foregroundColor(Color(.secondaryBraveLabel))
-        .multilineTextAlignment(.center)
-      Button {
-        onClose()
-      } label: {
-        Text(Strings.OKString)
-          .padding(.horizontal, 8)
-      }
-      .padding(.top, 40)
-      .buttonStyle(BraveFilledButtonStyle(size: .large))
-      Button {
-        if let baseURL = networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-           let tx = confirmationStore.allTxs.first(where: { $0.id == confirmationStore.activeTransactionId }),
-           let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
-          openWalletURL?(url)
+    GeometryReader { geometry in
+      ScrollView(.vertical) {
+        VStack(spacing: 10) {
+          Image("tx-submitted", bundle: .module)
+          Text(confirmationStore.activeTxStatus == .signed ? Strings.Wallet.signedTransactionTitle : Strings.Wallet.submittedTransactionTitle)
+            .font(.title3.bold())
+            .foregroundColor(Color(.braveLabel))
+            .multilineTextAlignment(.center)
+            .padding(.top, 10)
+          Text(confirmationStore.activeTxStatus == .signed ? Strings.Wallet.signedTransactionDescription : Strings.Wallet.submittedTransactionDescription)
+            .font(.subheadline)
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .multilineTextAlignment(.center)
+          Button {
+            onDismiss()
+          } label: {
+            Text(Strings.OKString)
+              .padding(.horizontal, 8)
+          }
+          .padding(.top, 40)
+          .buttonStyle(BraveFilledButtonStyle(size: .large))
+          Button {
+            if let baseURL = networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+               let tx = confirmationStore.allTxs.first(where: { $0.id == confirmationStore.activeTransactionId }),
+               let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
+              openWalletURL?(url)
+            }
+          } label: {
+            HStack {
+              Text(Strings.Wallet.viewOnBlockExplorer)
+              Image(systemName: "arrow.up.forward.square")
+            }
+            .foregroundColor(Color(.braveBlurpleTint))
+            .font(.subheadline.bold())
+          }
+          .padding(.top, 10)
         }
-      } label: {
-        HStack {
-          Text(Strings.Wallet.viewOnBlockExplorer)
-          Image(systemName: "arrow.up.forward.square")
-        }
-        .foregroundColor(Color(.braveBlurpleTint))
-        .font(.subheadline.bold())
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: geometry.size.height)
+        .padding()
       }
-      .padding(.top, 10)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .padding()
   }
   
-  @ViewBuilder private var confirmedTxView: some View {
-    VStack(spacing: 10) {
-      Image("tx-confirmed", bundle: .module)
-      Text(Strings.Wallet.confirmedTransactionTitle)
-        .font(.title3.bold())
-        .foregroundColor(Color(.braveLabel))
-        .multilineTextAlignment(.center)
-        .padding(.top, 10)
-      Text(Strings.Wallet.confirmedTransactionDescription)
-        .font(.subheadline)
-        .foregroundColor(Color(.secondaryBraveLabel))
-        .multilineTextAlignment(.center)
-      HStack {
-        Button {
-          transactionDetails = confirmationStore.activeTxDetailsStore()
-        } label: {
-          Text(Strings.Wallet.confirmedTransactionReceiptButtonTitle)
+  @ViewBuilder private var confirmedOrFailedTxView: some View {
+    GeometryReader { geometry in
+      ScrollView(.vertical) {
+        VStack(spacing: 10) {
+          Image(confirmationStore.activeTxStatus == .confirmed ? "tx-confirmed" : "tx-failed", bundle: .module)
+          Text(confirmationStore.activeTxStatus == .confirmed ? Strings.Wallet.confirmedTransactionTitle : Strings.Wallet.failedTransactionTitle)
+            .font(.title3.bold())
+            .foregroundColor(confirmationStore.activeTxStatus == .confirmed ? Color(.braveLabel) : Color(.braveErrorLabel))
+            .multilineTextAlignment(.center)
+            .padding(.top, 10)
+          Text(confirmationStore.activeTxStatus == .confirmed ? Strings.Wallet.confirmedTransactionDescription : Strings.Wallet.failedTransactionDescription)
+            .font(.subheadline)
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .multilineTextAlignment(.center)
+          if confirmationStore.activeTxStatus == .error, let txProviderError = confirmationStore.transactionProviderErrorRegistry[confirmationStore.activeTransactionId] {
+            StaticTextView(text: "\(txProviderError.code): \(txProviderError.message)")
+              .frame(maxWidth: .infinity)
+              .frame(height: 100)
+              .background(Color(.tertiaryBraveGroupedBackground))
+              .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+              .padding()
+              .background(
+                Color(.secondaryBraveGroupedBackground)
+              )
+              .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+              .padding(.top, 10)
+          }
+          HStack {
+            if confirmationStore.activeTxStatus == .confirmed {
+              Button {
+                transactionDetails = confirmationStore.activeTxDetailsStore()
+              } label: {
+                Text(Strings.Wallet.confirmedTransactionReceiptButtonTitle)
+              }
+              .buttonStyle(BraveOutlineButtonStyle(size: .large))
+            }
+            Button {
+              onDismiss()
+            } label: {
+              Text(Strings.Wallet.confirmedTransactionCloseButtonTitle)
+            }
+            .buttonStyle(BraveFilledButtonStyle(size: .large))
+          }
+          .padding(.top, 40)
         }
-        .buttonStyle(BraveOutlineButtonStyle(size: .large))
-        Button {
-          onClose()
-        } label: {
-          Text(Strings.Wallet.confirmedTransactionCloseButtonTitle)
-        }
-        .buttonStyle(BraveFilledButtonStyle(size: .large))
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: geometry.size.height)
+        .padding()
       }
-      .padding(.top, 40)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .padding()
   }
   
   var body: some View {
@@ -107,8 +132,8 @@ struct TransactionStatusView: View {
       switch confirmationStore.activeTxStatus {
       case .signed, .submitted:
         signedOrSubmittedTxView
-      case .confirmed:
-        confirmedTxView
+      case .confirmed, .error:
+        confirmedOrFailedTxView
       default:
         PendingTransactionView(
           confirmationStore: confirmationStore,
@@ -116,7 +141,7 @@ struct TransactionStatusView: View {
           keyringStore: keyringStore,
           isShowingGas: $isShowingGas,
           isShowingAdvancedSettings: $isShowingAdvancedSettings,
-          onClose: onClose
+          onDismiss: onDismiss
         )
       }
     }
@@ -146,7 +171,7 @@ struct TransactionStatusView_Previews: PreviewProvider {
       isShowingGas: .constant(false),
       isShowingAdvancedSettings: .constant(false),
       transactionDetails: .constant(nil),
-      onClose: { }
+      onDismiss: { }
     )
   }
 }

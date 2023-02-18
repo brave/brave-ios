@@ -36,7 +36,7 @@ struct TransactionConfirmationView: View {
   }
   
   private var navigationTitle: String {
-    if confirmationStore.isTxSubmitting || confirmationStore.activeTxStatus == .signed || confirmationStore.activeTxStatus == .submitted || confirmationStore.activeTxStatus == .confirmed {
+    if confirmationStore.isTxSubmitting || confirmationStore.activeTxStatus == .signed || confirmationStore.activeTxStatus == .submitted || confirmationStore.activeTxStatus == .confirmed || confirmationStore.activeTxStatus == .error {
       return "\(transactionType) \(confirmationStore.value) \(confirmationStore.symbol)"
     } else {
       if confirmationStore.activeParsedTransaction.transaction.txType == .ethSwap {

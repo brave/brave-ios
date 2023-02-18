@@ -85,6 +85,8 @@ public class TransactionConfirmationStore: ObservableObject {
   var isReadyToBeDismissed: Bool {
     return unapprovedTxs.count == 0 && activeTransactionId == ""
   }
+  /// This is a map between transaction id and its error happened during transaction submitting
+  var transactionProviderErrorRegistry: [String: TransactionProviderError] = [:]
 
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
     .then {
@@ -523,7 +525,14 @@ public class TransactionConfirmationStore: ObservableObject {
   }
 
   func confirm(transaction: BraveWallet.TransactionInfo, completion: @escaping (_ error: String?) -> Void) {
-    txService.approveTransaction(transaction.coin, txMetaId: transaction.id) { success, error, message in
+    txService.approveTransaction(transaction.coin, txMetaId: transaction.id) { [weak self] success, error, message in
+      // As desktop, we only care about eth provider error or solana
+      // provider error (plus we haven't start supporting filecoin)
+      if error.tag == .providerError {
+        self?.transactionProviderErrorRegistry[transaction.id] = TransactionProviderError(code: error.providerError.rawValue, message: message)
+      } else if error.tag == .solanaProviderError {
+        self?.transactionProviderErrorRegistry[transaction.id] = TransactionProviderError(code: error.solanaProviderError.rawValue, message: message)
+      }
       completion(success ? nil : message)
     }
   }
@@ -613,6 +622,11 @@ public class TransactionConfirmationStore: ObservableObject {
   }
 }
 
+struct TransactionProviderError {
+  let code: Int
+  let message: String
+}
+
 extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
   public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
     // won't have any new unapproved tx being added if you on tx confirmation panel
@@ -628,7 +642,7 @@ extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
       
       // only update the `activeTransactionId` if the current active transaction status
       // becomes `.rejected`/`.error`/`.dropped`
-      if activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .error || txInfo.txStatus == .dropped {
+      if activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .dropped {
         let indexOfChangedTx = unapprovedTxs.firstIndex(where: { $0.id == txInfo.id }) ?? 0
         let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
         activeTransactionId = unapprovedTxs[safe: newIndex]?.id ?? unapprovedTxs.first?.id ?? ""
@@ -691,3 +705,29 @@ extension TransactionConfirmationStore: BraveWalletBraveWalletServiceObserver {
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
   }
 }
+
+private extension BraveWalletTxService {
+  // Fetches all transactions for all given keyrings
+  func allTransactions(
+    for keyrings: [BraveWallet.KeyringInfo]
+  ) async -> [BraveWallet.TransactionInfo] {
+    return await withTaskGroup(
+      of: [BraveWallet.TransactionInfo].self,
+      body: { @MainActor group in
+        for keyring in keyrings {
+          for info in keyring.accountInfos {
+            group.addTask { @MainActor in
+              await self.allTransactionInfo(info.coin, from: info.address)
+            }
+          }
+        }
+        var allTx: [BraveWallet.TransactionInfo] = []
+        for await transactions in group {
+          allTx.append(contentsOf: transactions)
+        }
+        return allTx
+      }
+    )
+  }
+}
+
