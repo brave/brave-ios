@@ -67,6 +67,18 @@ public class CryptoStore: ObservableObject {
   @Published private(set) var pendingRequest: PendingRequest? {
     didSet {
       if pendingRequest == nil {
+        /*
+         We need to check if Tx Confirmation modal is ready
+         to be dismissed. It could be not ready as there is no pending tx
+         but an active tx is being shown its different state like
+         loading, submitted, completed or failed.
+         As such we need to continue displaying Tx Confirmation until the
+         user taps Ok/Close on the status overlay.
+         */
+        if let confirmationStore = self.confirmationStore, !confirmationStore.isReadyToBeDismissed {
+          pendingRequest = .transactions([])
+          return
+        }
         isPresentingPendingRequest = false
         return
       }
@@ -298,12 +310,20 @@ public class CryptoStore: ObservableObject {
       if isInitialOpen {
         portfolioStore.discoverAssetsOnAllSupportedChains()
       }
+      
       let pendingTransactions = await fetchPendingTransactions()
       var newPendingRequest: PendingRequest?
       if !pendingTransactions.isEmpty {
         newPendingRequest = .transactions(pendingTransactions)
-      } else { // no pending transactions, check for webpage requests
-        newPendingRequest = await fetchPendingWebpageRequest()
+      } else {
+        // no pending transactions, but need to check if
+        // `TransactionConfirmationView` is ready to be dismissed
+        if let store = confirmationStore, !store.isReadyToBeDismissed {
+          newPendingRequest = nil
+        } else {
+          // check for webpage requests
+          newPendingRequest = await fetchPendingWebpageRequest()
+        }
       }
       // Verify this new `newPendingRequest` isn't the same as the current
       // `pendingRequest` because re-assigning the same request could cause
@@ -421,10 +441,7 @@ extension CryptoStore: BraveWalletTxServiceObserver {
     prepare()
   }
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
-    // we are not going to call `prepare()` in here to update `pendingRequest` since for pending transactions,
-    // we have different status UI need to show.
-    // We will force to update `pendingRequest` once
-    // `RequestContainerView` is dismissed
+    prepare()
   }
   public func onTxServiceReset() {
     prepare()

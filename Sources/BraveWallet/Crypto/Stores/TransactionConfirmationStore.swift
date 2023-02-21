@@ -81,6 +81,9 @@ public class TransactionConfirmationStore: ObservableObject {
   var unapprovedTxs: [BraveWallet.TransactionInfo] {
     return allTxs.filter { $0.txStatus == .unapproved }
   }
+  var isReadyToBeDismissed: Bool {
+    return unapprovedTxs.isEmpty && activeTransactionId.isEmpty
+  }
   /// This is a map between transaction id and its error happened during transaction submitting
   var transactionProviderErrorRegistry: [String: TransactionProviderError] = [:]
 
@@ -637,7 +640,7 @@ extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
       }
       
       // only update the `activeTransactionId` if the current active transaction status
-      // becomes `.rejected`/`.error`/`.dropped`
+      // becomes `.rejected`/`.dropped`
       if activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .dropped {
         let indexOfChangedTx = unapprovedTxs.firstIndex(where: { $0.id == txInfo.id }) ?? 0
         let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
@@ -701,29 +704,3 @@ extension TransactionConfirmationStore: BraveWalletBraveWalletServiceObserver {
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
   }
 }
-
-private extension BraveWalletTxService {
-  // Fetches all transactions for all given keyrings
-  func allTransactions(
-    for keyrings: [BraveWallet.KeyringInfo]
-  ) async -> [BraveWallet.TransactionInfo] {
-    return await withTaskGroup(
-      of: [BraveWallet.TransactionInfo].self,
-      body: { @MainActor group in
-        for keyring in keyrings {
-          for info in keyring.accountInfos {
-            group.addTask { @MainActor in
-              await self.allTransactionInfo(info.coin, from: info.address)
-            }
-          }
-        }
-        var allTx: [BraveWallet.TransactionInfo] = []
-        for await transactions in group {
-          allTx.append(contentsOf: transactions)
-        }
-        return allTx
-      }
-    )
-  }
-}
-

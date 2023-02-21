@@ -63,16 +63,26 @@ struct TransactionConfirmationView: View {
     )
     .overlay(
       Group {
-        TransactionStatusView(
-          confirmationStore: confirmationStore,
-          networkStore: networkStore,
-          transactionDetails: $transactionDetails) {
-            if confirmationStore.unapprovedTxs.count == 0 {
-              onDismiss()
-            }
-            // update activeTransactionId
-            confirmationStore.updateActiveTxIdAfterSignedClosed()
+        if confirmationStore.isTxSubmitting {
+          ZStack {
+            Rectangle()
+              .fill(Color(.braveGroupedBackground))
+              .edgesIgnoringSafeArea(.all)
+            ProgressView()
+              .progressViewStyle(.braveCircular(size: .large, tint: .braveBlurpleTint))
           }
+        } else {
+          TransactionStatusView(
+            confirmationStore: confirmationStore,
+            networkStore: networkStore,
+            transactionDetails: $transactionDetails) {
+              if confirmationStore.unapprovedTxs.count == 0 {
+                onDismiss()
+              }
+              // update activeTransactionId
+              confirmationStore.updateActiveTxIdAfterSignedClosed()
+            }
+        }
       }
     )
   }

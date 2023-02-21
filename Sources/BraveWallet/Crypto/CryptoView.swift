@@ -87,12 +87,12 @@ public struct CryptoView: View {
                 toolbarDismissContent: dismissButtonToolbarContents,
                 onDismiss: {
                   dismissAction?()
-                  store.prepare()
                 }
               )
               .onDisappear {
                 // onDisappear allows us to catch all cases (swipe, cancel, confirm/approve/sign)
                 store.isPresentingPendingRequest = false
+                store.prepare()
               }
             case .requestPermissions(let request, let onPermittedAccountsUpdated):
               NewSiteConnectionView(
@@ -314,9 +314,11 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
               toolbarDismissContent: toolbarDismissContent,
               onDismiss: {
                 cryptoStore.isPresentingPendingRequest = false
-                cryptoStore.prepare()
               }
             )
+            .onDisappear {
+              cryptoStore.prepare()
+            }
           }
         }
     )

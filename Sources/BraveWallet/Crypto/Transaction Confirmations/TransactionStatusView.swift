@@ -18,17 +18,6 @@ struct TransactionStatusView: View {
   
   @Environment(\.openWalletURLAction) private var openWalletURL
   
-  @ViewBuilder private var loadingTxView: some View {
-    VStack {
-      TxProgressView()
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(
-      Color(.braveGroupedBackground)
-        .edgesIgnoringSafeArea(.all)
-    )
-  }
-  
   @ViewBuilder private var signedOrSubmittedTxView: some View {
     GeometryReader { geometry in
       ScrollView(.vertical) {
@@ -67,8 +56,7 @@ struct TransactionStatusView: View {
           }
           .padding(.top, 10)
         }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: geometry.size.height)
+        .frame(maxWidth: .infinity, minHeight: geometry.size.height)
         .padding()
       }
       .background(
@@ -123,8 +111,7 @@ struct TransactionStatusView: View {
           }
           .padding(.top, 40)
         }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: geometry.size.height)
+        .frame(maxWidth: .infinity, minHeight: geometry.size.height)
         .padding()
       }
       .background(
@@ -135,35 +122,18 @@ struct TransactionStatusView: View {
   }
   
   var body: some View {
-    if confirmationStore.isTxSubmitting {
-      loadingTxView
-    } else {
-      switch confirmationStore.activeTxStatus {
-      case .signed, .submitted:
-        signedOrSubmittedTxView
-      case .confirmed, .error:
-        if confirmationStore.activeTxStatus == .error, confirmationStore.activeTransactionId == "" {
-          EmptyView()
-        } else {
-          confirmedOrFailedTxView
-        }
-      default:
+    switch confirmationStore.activeTxStatus {
+    case .signed, .submitted:
+      signedOrSubmittedTxView
+    case .confirmed, .error:
+      if confirmationStore.activeTxStatus == .error, confirmationStore.activeTransactionId.isEmpty {
         EmptyView()
+      } else {
+        confirmedOrFailedTxView
       }
+    default:
+      EmptyView()
     }
-  }
-}
-
-/// A custom loader needed during the process of submitting a transaction
-private struct TxProgressView: View {
-  @State private var isAnimating = false
-  
-  var body: some View {
-    Image("tx-loading", bundle: .module)
-      .rotationEffect(.degrees(isAnimating ? 360 : 0))
-      .animation(isAnimating ? .linear(duration: 1.0).repeatForever(autoreverses: false) : .default)
-      .onAppear { isAnimating = true }
-      .onDisappear { isAnimating = false }
   }
 }
 
