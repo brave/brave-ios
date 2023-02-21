@@ -240,6 +240,12 @@ class SwapStoreTests: XCTestCase {
       // return fake sufficient ETH balance `0x13e25e19dc20ba7` is about 0.0896 ETH
       completion("0x13e25e19dc20ba7", .success, "")
     }
+    rpcService._solanaBalance = { _, _, completion in
+      completion(0, .internalError, "")
+    }
+    rpcService._splTokenAccountBalance = { _, _, _, completion in
+      completion("", 0, "", .internalError, "")
+    }
     let swapService = BraveWallet.TestSwapService()
     swapService._priceQuote = { $1(.init(), nil, "") }
     swapService._transactionPayload = { $1(.init(), nil, "") }
@@ -329,6 +335,105 @@ class SwapStoreTests: XCTestCase {
     XCTAssertTrue(store.sellAmount.isEmpty)
     // calls fetchPriceQuote
     store.buyAmount = "0.01"
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
+  }
+  
+  /// Test change to `sellAmount` (from value) will fetch price quote and assign to `buyAmount` on Solana Mainnet
+  func testSolanaFetchPriceQuoteSell() {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      network: .mockSolana,
+      coin: .sol
+    )
+    swapService._jupiterQuote = { _, completion in
+      let route: BraveWallet.JupiterRoute = .init(
+        inAmount: 10000000, // 0.01 SOL (9 decimals)
+        outAmount: 2500000, // 2.5 SPD (6 decimals)
+        amount: 2500000, // 2.5 SPD (6 decimals)
+        otherAmountThreshold: 2500000, // 2.5 SPD (6 decimals)
+        swapMode: "",
+        priceImpactPct: 0,
+        marketInfos: [])
+      completion(.init(routes: [route]), nil, "")
+    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: nil
+    )
+
+    let buyAmountExpectation = expectation(description: "buyAmountExpectation")
+    store.$buyAmount
+      .dropFirst()
+      .sink { buyAmount in
+        defer { buyAmountExpectation.fulfill() }
+        XCTAssertFalse(buyAmount.isEmpty)
+        XCTAssertEqual(buyAmount, "2.5000")
+      }
+      .store(in: &cancellables)
+
+    XCTAssertTrue(store.buyAmount.isEmpty)
+    // non-empty assignment to `sellAmount` calls fetchPriceQuote
+    store.setUpTest(
+      selectedFromToken: .mockSolToken,
+      selectedToToken: .mockSpdToken,
+      sellAmount: "0.01"
+    )
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
+  }
+  
+  /// Test change to `sellAmount` (from value) will fetch price quote and display insufficient liquidity (when returned by Jupiter price quote)
+  func testSolanaFetchPriceQuoteInsufficientLiquidity() {
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      network: .mockSolana,
+      coin: .sol
+    )
+    swapService._jupiterQuote = { _, completion in
+      let errorResponse: BraveWallet.JupiterErrorResponse = .init(
+        statusCode: "",
+        error: "",
+        message: "",
+        isInsufficientLiquidity: true
+      )
+      completion(nil, errorResponse, "")
+    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: nil
+    )
+    
+    let stateExpectation = expectation(description: "stateExpectation")
+    store.$state
+      .dropFirst()
+      .sink { state in
+        defer { stateExpectation.fulfill() }
+        XCTAssertEqual(state, .error(Strings.Wallet.insufficientLiquidity))
+      }
+      .store(in: &cancellables)
+    
+    XCTAssertNotEqual(store.state, .error(Strings.Wallet.insufficientLiquidity))
+    // non-empty assignment to `sellAmount` calls fetchPriceQuote
+    store.setUpTest(
+      selectedFromToken: .mockSolToken,
+      selectedToToken: .mockSpdToken,
+      sellAmount: "0.01"
+    )
     waitForExpectations(timeout: 1) { error in
       XCTAssertNil(error)
     }
@@ -449,6 +554,58 @@ class SwapStoreTests: XCTestCase {
     XCTAssertFalse(store.isMakingTx)
     XCTAssertNotNil(submittedTxData?.ethTxData)
     XCTAssertNil(submittedTxData?.ethTxData1559)
+  }
+
+  /// Test creating a sol swap transaction
+  @MainActor func testSwapSolSwapTransaction() async {
+    let route: BraveWallet.JupiterRoute = .init(
+      inAmount: 3000000000,
+      outAmount: 2500000, // 2.5 SPD (6 decimals)
+      amount: 2500000, // 2.5 SPD (6 decimals)
+      otherAmountThreshold: 2500000, // 2.5 SPD (6 decimals)
+      swapMode: "",
+      priceImpactPct: 0,
+      marketInfos: [])
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      network: .mockSolana,
+      coin: .sol
+    )
+    swapService._jupiterSwapTransactions = { _, completion in
+      let swapTransactions: BraveWallet.JupiterSwapTransactions = .init(
+        setupTransaction: "", swapTransaction: "1", cleanupTransaction: "")
+      completion(swapTransactions, nil, "")
+    }
+    solTxManagerProxy._makeTxDataFromBase64EncodedTransaction = { _, _, _, completion in
+      completion(.init(), .success, "")
+    }
+    var submittedTxData: BraveWallet.TxDataUnion?
+    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+      submittedTxData = txData
+      completion(true, "tx-meta-id", "")
+    }
+    let store = SwapTokenStore(
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
+      rpcService: rpcService,
+      swapService: swapService,
+      txService: txService,
+      walletService: walletService,
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: nil
+    )
+    store.setUpTest(
+      selectedFromToken: .mockSolToken,
+      selectedToToken: .mockSpdToken,
+      sellAmount: "0.01",
+      jupiterQuote: .init(routes: [route])
+    )
+    store.state = .swap
+    
+    let success = await store.createSwapTransaction()
+    XCTAssertTrue(success, "Expected to successfully create transaction")
+    XCTAssertFalse(store.isMakingTx)
+    XCTAssertNotNil(submittedTxData?.solanaTxData)
   }
   
   func testSwapFullBalanceNoRounding() {

@@ -853,11 +853,25 @@ public class SwapTokenStore: ObservableObject {
   }
 
   #if DEBUG
-  func setUpTest(sellAmount: String = "0.01") {
+  func setUpTest(
+    selectedFromToken: BraveWallet.BlockchainToken = .previewToken,
+    selectedToToken: BraveWallet.BlockchainToken = .previewDaiToken,
+    sellAmount: String? = "0.01",
+    buyAmount: String? = nil,
+    jupiterQuote: BraveWallet.JupiterQuote? = nil
+  ) {
     accountInfo = .init()
-    selectedFromToken = .previewToken
-    selectedToToken = .previewDaiToken
-    self.sellAmount = sellAmount
+    self.selectedFromToken = selectedFromToken
+    self.selectedToToken = selectedToToken
+    if let sellAmount {
+      self.sellAmount = sellAmount
+    }
+    if let buyAmount {
+      self.buyAmount = buyAmount
+    }
+    if let jupiterQuote {
+      self.jupiterQuote = jupiterQuote
+    }
     selectedFromTokenBalance = 0.02
   }
   
