@@ -754,14 +754,18 @@ public class SwapTokenStore: ObservableObject {
         if network.chainId == BraveWallet.MainnetChainId {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == batSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != batSymbol.uppercased() })
-          } else {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == batSymbol.uppercased() })
+          } else if let batToken = allTokens.first(where: { $0.symbol.uppercased() == batSymbol.uppercased() }) {
+            selectedToToken = batToken
+          } else { // if BAT is unavailable
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != selectedFromToken?.symbol.uppercased() })
           }
         } else if network.chainId == BraveWallet.SolanaMainnet {
           if let fromToken = selectedFromToken, fromToken.symbol.uppercased() == USDCSymbol.uppercased() {
             selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != USDCSymbol.uppercased() })
-          } else {
-            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() == USDCSymbol.uppercased() })
+          } else if let usdcToken = allTokens.first(where: { $0.symbol.uppercased() == USDCSymbol.uppercased() }) {
+            selectedToToken = usdcToken
+          } else { // if USDC is unavailable
+            selectedToToken = allTokens.first(where: { $0.symbol.uppercased() != selectedFromToken?.symbol.uppercased() })
           }
         } else {
           if let fromToken = selectedFromToken {

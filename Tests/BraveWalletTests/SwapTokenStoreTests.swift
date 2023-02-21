@@ -82,16 +82,13 @@ class SwapStoreTests: XCTestCase {
   func testPrefilledTokenSwitchNetwork() {
     let prefilledToken: BraveWallet.BlockchainToken = .mockSolToken
     
+    let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices()
     var selectedCoin: BraveWallet.CoinType = .eth
     var selectedNetwork: BraveWallet.NetworkInfo = .mockMainnet
-    let walletService = BraveWallet.TestBraveWalletService()
-    walletService._addObserver = { _ in }
     walletService._selectedCoin = { $0(selectedCoin) }
     walletService._userAssets = { _, coin, completion in
-      completion(coin == .eth ? [.previewToken] : [.mockSolToken])
+      completion(coin == .eth ? [.previewToken, .previewDaiToken] : [.mockSolToken, .mockSpdToken])
     }
-    let rpcService = BraveWallet.TestJsonRpcService()
-    rpcService._addObserver = { _ in }
     rpcService._network = { coin, completion in
       completion(selectedNetwork)
     }
@@ -111,16 +108,15 @@ class SwapStoreTests: XCTestCase {
       selectedNetwork = coin == .eth ? .mockMainnet : .mockSolana
       completion(true)
     }
-    let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let store = SwapTokenStore(
-      keyringService: MockKeyringService(),
-      blockchainRegistry: MockBlockchainRegistry(),
+      keyringService: keyringService,
+      blockchainRegistry: blockchainRegistry,
       rpcService: rpcService,
-      swapService: MockSwapService(),
-      txService: MockTxService(),
+      swapService: swapService,
+      txService: txService,
       walletService: walletService,
-      ethTxManagerProxy: MockEthTxManagerProxy(),
+      ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: prefilledToken
     )
@@ -142,7 +138,7 @@ class SwapStoreTests: XCTestCase {
       defer { ex.fulfill() }
       XCTAssertEqual(store.selectedFromToken?.symbol.lowercased(), prefilledToken.symbol.lowercased())
       XCTAssertNotNil(store.selectedToToken)
-      XCTAssertNotEqual(store.selectedToToken!.symbol.lowercased(), prefilledToken.symbol.lowercased())
+      XCTAssertNotEqual(store.selectedToToken?.symbol.lowercased(), prefilledToken.symbol.lowercased())
     }
     waitForExpectations(timeout: 3) { error in
       XCTAssertNil(error)
