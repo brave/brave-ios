@@ -81,10 +81,6 @@ public class TransactionConfirmationStore: ObservableObject {
   var unapprovedTxs: [BraveWallet.TransactionInfo] {
     return allTxs.filter { $0.txStatus == .unapproved }
   }
-  /// This is used inside `CryptoStore` to determine if we are ready to dimiss `TransactionConfirmationView`
-  var isReadyToBeDismissed: Bool {
-    return unapprovedTxs.count == 0 && activeTransactionId == ""
-  }
   /// This is a map between transaction id and its error happened during transaction submitting
   var transactionProviderErrorRegistry: [String: TransactionProviderError] = [:]
 

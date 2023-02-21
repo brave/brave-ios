@@ -12,9 +12,6 @@ import DesignSystem
 struct TransactionStatusView: View {
   @ObservedObject var confirmationStore: TransactionConfirmationStore
   let networkStore: NetworkStore
-  let keyringStore: KeyringStore
-  @Binding var isShowingGas: Bool
-  @Binding var isShowingAdvancedSettings: Bool
   @Binding var transactionDetails: TransactionDetailsStore?
  
   let onDismiss: () -> Void
@@ -26,6 +23,10 @@ struct TransactionStatusView: View {
       TxProgressView()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+      Color(.braveGroupedBackground)
+        .edgesIgnoringSafeArea(.all)
+    )
   }
   
   @ViewBuilder private var signedOrSubmittedTxView: some View {
@@ -70,6 +71,10 @@ struct TransactionStatusView: View {
         .frame(minHeight: geometry.size.height)
         .padding()
       }
+      .background(
+        Color(.braveGroupedBackground)
+          .edgesIgnoringSafeArea(.all)
+      )
     }
   }
   
@@ -122,6 +127,10 @@ struct TransactionStatusView: View {
         .frame(minHeight: geometry.size.height)
         .padding()
       }
+      .background(
+        Color(.braveGroupedBackground)
+          .edgesIgnoringSafeArea(.all)
+      )
     }
   }
   
@@ -133,16 +142,13 @@ struct TransactionStatusView: View {
       case .signed, .submitted:
         signedOrSubmittedTxView
       case .confirmed, .error:
-        confirmedOrFailedTxView
+        if confirmationStore.activeTxStatus == .error, confirmationStore.activeTransactionId == "" {
+          EmptyView()
+        } else {
+          confirmedOrFailedTxView
+        }
       default:
-        PendingTransactionView(
-          confirmationStore: confirmationStore,
-          networkStore: networkStore,
-          keyringStore: keyringStore,
-          isShowingGas: $isShowingGas,
-          isShowingAdvancedSettings: $isShowingAdvancedSettings,
-          onDismiss: onDismiss
-        )
+        EmptyView()
       }
     }
   }
@@ -167,9 +173,6 @@ struct TransactionStatusView_Previews: PreviewProvider {
     TransactionStatusView(
       confirmationStore: .previewStore,
       networkStore: .previewStore,
-      keyringStore: .previewStore,
-      isShowingGas: .constant(false),
-      isShowingAdvancedSettings: .constant(false),
       transactionDetails: .constant(nil),
       onDismiss: { }
     )

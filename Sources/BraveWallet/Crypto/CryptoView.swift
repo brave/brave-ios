@@ -87,6 +87,7 @@ public struct CryptoView: View {
                 toolbarDismissContent: dismissButtonToolbarContents,
                 onDismiss: {
                   dismissAction?()
+                  store.prepare()
                 }
               )
               .onDisappear {

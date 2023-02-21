@@ -47,19 +47,34 @@ struct TransactionConfirmationView: View {
   }
   
   @ViewBuilder private var containerView: some View {
-    TransactionStatusView(
+    PendingTransactionView(
       confirmationStore: confirmationStore,
       networkStore: networkStore,
       keyringStore: keyringStore,
       isShowingGas: $isShowingGas,
       isShowingAdvancedSettings: $isShowingAdvancedSettings,
-      transactionDetails: $transactionDetails) {
+      onDismiss: {
         if confirmationStore.unapprovedTxs.count == 0 {
           onDismiss()
         }
         // update activeTransactionId
         confirmationStore.updateActiveTxIdAfterSignedClosed()
       }
+    )
+    .overlay(
+      Group {
+        TransactionStatusView(
+          confirmationStore: confirmationStore,
+          networkStore: networkStore,
+          transactionDetails: $transactionDetails) {
+            if confirmationStore.unapprovedTxs.count == 0 {
+              onDismiss()
+            }
+            // update activeTransactionId
+            confirmationStore.updateActiveTxIdAfterSignedClosed()
+          }
+      }
+    )
   }
 
   var body: some View {
