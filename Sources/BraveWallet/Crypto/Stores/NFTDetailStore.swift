@@ -5,18 +5,11 @@
 
 import BraveCore
 
-private extension String {
-  var httpifyIpfsUrl: String {
-    let trimmedUrl = self.trim(" ")
-    return trimmedUrl.hasPrefix("ipfs://") ? trimmedUrl.replacingOccurrences(of: "ipfs://", with: "https://ipfs.io/ipfs/") : trimmedUrl
-  }
-}
-
 struct NFTMetadata: Codable, Equatable {
   var imageURLString: String?
   var name: String?
   var description: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case imageURLString = "image"
     case name
@@ -25,9 +18,7 @@ struct NFTMetadata: Codable, Equatable {
   
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    if let imageString = try container.decodeIfPresent(String.self, forKey: .imageURLString) {
-      self.imageURLString = imageString.hasPrefix("data:image") ? imageString : imageString.httpifyIpfsUrl
-    }
+    self.imageURLString = try container.decodeIfPresent(String.self, forKey: .imageURLString)
     self.name = try container.decodeIfPresent(String.self, forKey: .name)
     self.description = try container.decodeIfPresent(String.self, forKey: .description)
   }
@@ -40,6 +31,17 @@ struct NFTMetadata: Codable, Equatable {
     self.imageURLString = imageURLString
     self.name = name
     self.description = description
+  }
+
+  func httpfyIpfsUrl(ipfsApi: IpfsAPI?) -> NFTMetadata {
+    if ipfsApi != nil {
+      if self.imageURLString != nil && self.imageURLString!.hasPrefix("ipfs://") {
+        if let url = URL(string: self.imageURLString!) {
+          return NFTMetadata(imageURLString: ipfsApi?.resolveGatewayUrl(for: url)?.absoluteString, name: self.name, description: self.description)
+        }
+      }
+    }
+    return NFTMetadata(imageURLString: self.imageURLString, name: self.name, description: self.description)
   }
   
   var imageURL: URL? {
@@ -54,15 +56,18 @@ class NFTDetailStore: ObservableObject {
   @Published var isLoading: Bool = false
   @Published var nftMetadata: NFTMetadata?
   @Published var networkInfo: BraveWallet.NetworkInfo = .init()
+  var ipfsApi: IpfsAPI?
   
   init(
     rpcService: BraveWalletJsonRpcService,
+    ipfsApi: IpfsAPI?,
     nft: BraveWallet.BlockchainToken,
     nftMetadata: NFTMetadata?
   ) {
     self.rpcService = rpcService
     self.nft = nft
-    self.nftMetadata = nftMetadata
+    self.nftMetadata = nftMetadata?.httpfyIpfsUrl(ipfsApi: ipfsApi)
+    self.ipfsApi = ipfsApi
   }
   
   func update() {
@@ -74,7 +79,9 @@ class NFTDetailStore: ObservableObject {
       
       if nftMetadata == nil {
         isLoading = true
-        nftMetadata = await rpcService.fetchNFTMetadata(for: nft)
+        if let newNftMetadata = await rpcService.fetchNFTMetadata(for: nft, ipfsApi: self.ipfsApi) {
+          nftMetadata = newNftMetadata
+        }
         isLoading = false
       }
     }
