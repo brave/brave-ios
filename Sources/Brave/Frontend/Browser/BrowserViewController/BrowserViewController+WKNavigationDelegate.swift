@@ -208,6 +208,19 @@ extension BrowserViewController: WKNavigationDelegate {
       adBlockService: self.braveCore.adblockService
     )
     
+    // Attempt to upgrade the request to https
+    if let mainFrameURL = navigationAction.request.mainDocumentURL, let targetFrame = navigationAction.targetFrame {
+      let domainManager = await tabManager.httpsUpgradeManager.storageManager(forMainFrameURL: mainFrameURL)
+      domainManager?.clearDataIfNeeded(for: navigationAction.request, isForMainFrame: targetFrame.isMainFrame)
+      
+      if let upgradedURL = domainManager?.upgradedURL(for: navigationAction.request, isForMainFrame: targetFrame.isMainFrame) {
+        var upgradedRequest = URLRequest(url: upgradedURL)
+        upgradedRequest.allHTTPHeaderFields = navigationAction.request.allHTTPHeaderFields
+        tab?.loadRequest(upgradedRequest)
+        return (.cancel, preferences)
+      }
+    }
+    
     if let mainDocumentURL = navigationAction.request.mainDocumentURL {
       if mainDocumentURL != tab?.currentPageData?.mainFrameURL {
         // Clear the current page data if the page changes.
@@ -331,8 +344,6 @@ extension BrowserViewController: WKNavigationDelegate {
         tab?.updateUserAgent(webView, newURL: url)
       }
 
-      pendingRequests[url.absoluteString] = navigationAction.request
-
       // Adblock logic,
       // Only use main document URL, not the request URL
       // If an iFrame is loaded, shields depending on the main frame, not the iFrame request
@@ -398,6 +409,31 @@ extension BrowserViewController: WKNavigationDelegate {
     let responseURL = response.url
     let tab = tab(for: webView)
     
+    // Check if we need to roll-back the https upgrade
+    if let url = navigationResponse.response.url,
+       let domainManager = await tabManager.httpsUpgradeManager.storageManager(forMainFrameURL: url) {
+      // We first need to see if we upgraded this request.
+      if domainManager.didUpgrade(response: response) {
+        if navigationResponse.isForMainFrame,
+           let httpResponse = navigationResponse.response as? HTTPURLResponse,
+           httpResponse.statusCode < 200 || httpResponse.statusCode >= 400,
+           let originalRequest = domainManager.originalRequest(for: response) {
+          // So we don't have a circular redirect, we need to add this failed url
+          domainManager.addFailedURL(url: url)
+          // We then have to make sure this upgrade was successful. If it wasn't we roll back and we don't count anything
+          tab?.loadRequest(originalRequest)
+          return .cancel
+        } else {
+          // If we didn't revert this upgrade, we count the upgrade in shields
+          BraveGlobalShieldStats.shared.httpse += 1
+          
+          if let stats = tab?.contentBlocker.stats {
+            tab?.contentBlocker.stats = stats.adding(httpsCount: 1)
+          }
+        }
+      }
+    }
+    
     // Check if we upgraded to https and if so we need to update the url of frame evaluations
     if let responseURL = responseURL,
        let domain = tab?.currentPageData?.domain(persistent: !isPrivateBrowsing),
@@ -421,16 +457,6 @@ extension BrowserViewController: WKNavigationDelegate {
     // download via the context menu.
     let canShowInWebView = navigationResponse.canShowMIMEType && (webView != pendingDownloadWebView)
     let forceDownload = webView == pendingDownloadWebView
-
-    if let url = responseURL, let urlHost = responseURL?.normalizedHost() {
-      // If an upgraded https load happens with a host which was upgraded, increase the stats
-      if url.scheme == "https", let _ = pendingHTTPUpgrades.removeValue(forKey: urlHost) {
-        BraveGlobalShieldStats.shared.httpse += 1
-        if let stats = tab?.contentBlocker.stats {
-          tab?.contentBlocker.stats = stats.adding(httpsCount: 1)
-        }
-      }
-    }
 
     // Check if this response should be handed off to Passbook.
     if let passbookHelper = OpenPassBookHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
@@ -482,7 +508,6 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   nonisolated public func webView(_ webView: WKWebView, respondTo challenge: URLAuthenticationChallenge) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
-
     // If this is a certificate challenge, see if the certificate has previously been
     // accepted by the user.
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"

@@ -20,6 +20,9 @@ struct PageData {
   /// A list of all currently available subframes for this current page
   /// These are loaded dyncamically as the user scrolls through the page
   private(set) var allSubframeURLs: Set<URL> = []
+  /// A list of all currently available subframes for this current page
+  /// These are loaded dyncamically as the user scrolls through the page
+  private(set) var upgradedFrameURLs: Set<URL> = []
   /// The stats class to get the engine data from
   private var adBlockStats: AdBlockStats
   
@@ -34,6 +37,21 @@ struct PageData {
       // We need to add any non-main frame urls to our site data
       // We will need this to construct all non-main frame scripts
       allSubframeURLs.insert(requestURL)
+    }
+  }
+  
+  /// A new list of scripts is returned only if a change is detected in the response (for example an HTTPs upgrade).
+  /// In some cases (like during an https upgrade) the scripts may change on the response. So we need to update the user scripts
+  @MainActor mutating func upgradeFrameURL(forRequestURL responseURL: URL, isForMainFrame: Bool) {
+    // first try to remove the old unwanted `http` frame URL
+    if var components = URLComponents(url: responseURL, resolvingAgainstBaseURL: false), components.scheme == "https" {
+      components.scheme = "http"
+      if let downgradedURL = components.url {
+        if isForMainFrame {
+        } else {
+          allSubframeURLs.remove(downgradedURL)
+        }
+      }
     }
   }
   

@@ -49,6 +49,7 @@ class TabManager: NSObject {
   fileprivate var delegates = [WeakTabManagerDelegate]()
   fileprivate let tabEventHandlers: [TabEventHandler]
   weak var stateDelegate: TabManagerStateDelegate?
+  let httpsUpgradeManager = HTTPSUpgradeManager()
   
   /// Internal url to access the new tab page.
   private let ntpInteralURL = URL(string: "\(InternalURL.baseUrl)/\(AboutHomeHandler.path)#panel=0")!
