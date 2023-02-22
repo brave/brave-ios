@@ -67,18 +67,6 @@ public class CryptoStore: ObservableObject {
   @Published private(set) var pendingRequest: PendingRequest? {
     didSet {
       if pendingRequest == nil {
-        /*
-         We need to check if Tx Confirmation modal is ready
-         to be dismissed. It could be not ready as there is no pending tx
-         but an active tx is being shown its different state like
-         loading, submitted, completed or failed.
-         As such we need to continue displaying Tx Confirmation until the
-         user taps Ok/Close on the status overlay.
-         */
-        if let confirmationStore = self.confirmationStore, !confirmationStore.isReadyToBeDismissed {
-          pendingRequest = .transactions([])
-          return
-        }
         isPresentingPendingRequest = false
         return
       }
@@ -319,7 +307,15 @@ public class CryptoStore: ObservableObject {
         // no pending transactions, but need to check if
         // `TransactionConfirmationView` is ready to be dismissed
         if let store = confirmationStore, !store.isReadyToBeDismissed {
-          newPendingRequest = nil
+          /*
+           We need to check if Tx Confirmation modal is ready
+           to be dismissed. It could be not ready as there is no pending tx
+           but an active tx is being shown its different state like
+           loading, submitted, completed or failed.
+           As such we need to continue displaying Tx Confirmation until the
+           user taps Ok/Close on the status overlay.
+           */
+          newPendingRequest = .transactions([])
         } else {
           // check for webpage requests
           newPendingRequest = await fetchPendingWebpageRequest()
@@ -372,6 +368,11 @@ public class CryptoStore: ObservableObject {
   public func isPendingRequestAvailable() async -> Bool {
     let pendingTransactions = await fetchPendingTransactions()
     if !pendingTransactions.isEmpty {
+      return true
+    } else if let store = confirmationStore, !store.isReadyToBeDismissed {
+      // Even though pendingTransaction is empty, however we still need
+      // to check if TransactionConfirmationView is still displaying
+      // an transaction in a different status.
       return true
     }
     let pendingRequest = await fetchPendingWebpageRequest()
