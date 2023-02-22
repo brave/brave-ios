@@ -64,13 +64,10 @@ struct TransactionConfirmationView: View {
     .overlay(
       Group {
         if confirmationStore.isTxSubmitting {
-          ZStack {
-            Rectangle()
-              .fill(Color(.braveGroupedBackground))
-              .edgesIgnoringSafeArea(.all)
-            ProgressView()
-              .progressViewStyle(.braveCircular(size: .large, tint: .braveBlurpleTint))
-          }
+          ProgressView()
+            .progressViewStyle(.braveCircular(size: .large, tint: .braveBlurpleTint))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.braveGroupedBackground).ignoresSafeArea())
         } else {
           TransactionStatusView(
             confirmationStore: confirmationStore,

@@ -32,9 +32,7 @@ struct TransactionStatusView: View {
             .font(.subheadline)
             .foregroundColor(Color(.secondaryBraveLabel))
             .multilineTextAlignment(.center)
-          Button {
-            onDismiss()
-          } label: {
+          Button(action: onDismiss) {
             Text(Strings.OKString)
               .padding(.horizontal, 8)
           }
@@ -102,9 +100,7 @@ struct TransactionStatusView: View {
               }
               .buttonStyle(BraveOutlineButtonStyle(size: .large))
             }
-            Button {
-              onDismiss()
-            } label: {
+            Button(action: onDismiss) {
               Text(Strings.Wallet.confirmedTransactionCloseButtonTitle)
             }
             .buttonStyle(BraveFilledButtonStyle(size: .large))
