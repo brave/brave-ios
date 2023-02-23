@@ -27,6 +27,10 @@ class ShareExtensionHelper {
     var activityItems: [Any] = [
       printInfo, selectedURL,
     ]
+    
+    if let webView = selectedTab?.webView, let url = webView.url, url.isWebPage(includeDataURIs: false) {
+      activityItems.append(webView)
+    }
 
     if let tab = selectedTab {
       // Adds the ability to "Print" or "Markup" the page using this custom renderer
