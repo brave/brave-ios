@@ -595,8 +595,7 @@ public class SwapTokenStore: ObservableObject {
           let selectedToToken else {
       return false
     }
-    let coin = await walletService.selectedCoin()
-    let network = await rpcService.network(coin)
+    let network = await rpcService.network(.sol)
     let jupiterSwapParams: BraveWallet.JupiterSwapParams = .init(
       route: route,
       userPublicKey: accountInfo.address,

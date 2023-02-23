@@ -757,9 +757,10 @@ struct SolanaTxDetails: Equatable {
     
     var toString: String {
       let detailsString = details.map { keyValue in
-        "\(keyValue.key):\n  \(keyValue.value)"
-      }.joined(separator: "\n")
-      return "\(name)\n\(detailsString)"
+        let valueIndentedNewLines = keyValue.value.replacingOccurrences(of: "\n", with: "\n")
+        return "\(keyValue.key):\n\(valueIndentedNewLines)"
+      }.joined(separator: "\n--\n")
+      return "\(name)\n--\n\(detailsString)"
     }
   }
   /// From value prior to formatting

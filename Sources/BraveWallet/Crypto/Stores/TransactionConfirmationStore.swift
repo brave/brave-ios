@@ -475,7 +475,7 @@ public class TransactionConfirmationStore: ObservableObject {
       value = details.fromAmount
       transactionDetails = details.instructions
         .map(\.toString)
-        .joined(separator: "\n\n") // separator between each instruction
+        .joined(separator: "\n\n====\n\n") // separator between each instruction
       
       if let gasFee = details.gasFee {
         gasValue = gasFee.fee

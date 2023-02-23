@@ -3054,7 +3054,7 @@ extension Strings {
       comment: "The title displayed above the value of a Solana dapp transaction in transaction confirmation view, transaction details view and transaction summary rows."
     )
     public static let solanaSwapTransactionTitle = NSLocalizedString(
-      "wallet.solanaDappTransactionTitle",
+      "wallet.solanaSwapTransactionTitle",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Swap Transaction",
