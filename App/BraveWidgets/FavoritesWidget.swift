@@ -99,11 +99,8 @@ private struct FavoritesGridView: View {
       return 8
     case .systemLarge:
       return 16
-    case .systemSmall, .systemExtraLarge, .accessoryCircular,
-        .accessoryRectangular, .accessoryInline:
+    default:
       assertionFailure("widget family isn't supported")
-      return 0
-    @unknown default:
       return 0
     }
   }
