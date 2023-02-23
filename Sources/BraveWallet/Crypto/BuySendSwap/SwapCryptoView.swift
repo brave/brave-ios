@@ -201,8 +201,8 @@ struct SwapCryptoView: View {
     var swapDexAggrigatorDisclaimer: String {
       let network: String
       switch self {
-      case .zeroX: network = "Ethereum"
-      case .jupiter: network = "Solana"
+      case .zeroX: network = Strings.Wallet.coinTypeEthereum
+      case .jupiter: network = Strings.Wallet.coinTypeSolana
       }
       return String.localizedStringWithFormat(
         Strings.Wallet.swapDexAggrigatorDisclaimer, displayName, network, displayName)
