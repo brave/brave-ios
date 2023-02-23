@@ -204,7 +204,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   }
   
   func code(_ address: String, coin: BraveWallet.CoinType, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
-    completion("", .internalError, "")
+    completion("", .internalError, "Error Message")
   }
 }
 
