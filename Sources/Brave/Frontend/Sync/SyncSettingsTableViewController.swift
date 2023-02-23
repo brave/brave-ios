@@ -50,6 +50,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
   private let tabManager: TabManager
 
   private var syncDeviceObserver: AnyObject?
+  private var syncServiceObserver: AnyObject?
   private var devices = [BraveSyncDevice]()
 
   /// After synchronization is completed, user needs to tap on `Done` to go back.
@@ -97,11 +98,36 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
     syncDeviceObserver = syncAPI.addDeviceStateObserver { [weak self] in
       self?.updateDeviceList()
     }
+    
+    syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
+          guard let self = self else { return }
 
-    let codeWords = syncAPI.getSyncCode()
-    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileService)
-    syncAPI.requestSync()
-    syncAPI.setSetupComplete()
+          print("================")
+          print("Sync State in group \(self.syncAPI.isInSyncGroup)")
+          print("Sync State is active \(self.syncAPI.isSyncFeatureActive)")
+          print("Sync State setup complete \(self.syncAPI.isFirstSetupComplete)")
+          print("Sync State delete notice pending \(self.syncAPI.isSyncAccountDeletedNoticePending)")
+          print("================")
+      
+          if (self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete) || (self.syncAPI.isInSyncGroup && self.syncAPI.isSyncAccountDeletedNoticePending) {
+            self.syncAPI.leaveSyncGroup()
+            self.navigationController?.popToRootViewController(animated: true)
+          }
+        } onServiceShutdown: { [weak self] in
+          guard let self = self else { return }
+          print("================")
+          print("Sync Service in group \(self.syncAPI.isInSyncGroup)")
+          print("Sync Service is active \(self.syncAPI.isSyncFeatureActive)")
+          print("Sync Service setup complete \(self.syncAPI.isFirstSetupComplete)")
+          print("Sync Service delete notice pending \(self.syncAPI.isSyncAccountDeletedNoticePending)")
+          print("================")
+
+        }
+    
+    if (self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete) || (self.syncAPI.isInSyncGroup && self.syncAPI.isSyncAccountDeletedNoticePending) {
+      self.syncAPI.leaveSyncGroup()
+      self.navigationController?.popToRootViewController(animated: true)
+    }
 
     updateDeviceList()
 

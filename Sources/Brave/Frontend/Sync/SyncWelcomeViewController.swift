@@ -195,6 +195,8 @@ class SyncWelcomeViewController: SyncViewController {
           bvc?.present(SyncAlerts.initializationError, animated: true)
         }
       }
+    } onServiceShutdown: {
+      
     }
   }
 
@@ -278,7 +280,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
     
-    syncAPI.setJoinSyncChain { [weak self] result in
+    syncAPI.setDidJoinSyncChain { [weak self] result in
       guard let self else { return }
 
       if result {

@@ -98,11 +98,11 @@ extension BraveSyncAPI {
     }
   }
 
-  func addServiceStateObserver(_ observer: @escaping () -> Void) -> AnyObject {
+  func addServiceStateObserver(_ onStateChanged: @escaping () -> Void, onServiceShutdown: @escaping () -> Void) -> AnyObject {
     let serviceStateListener = BraveSyncServiceListener(onRemoved: { [weak self] observer in
       self?.serviceObservers.remove(observer)
     })
-    serviceStateListener.observer = createSyncServiceObserver(observer, onSyncServiceShutdown: {})
+    serviceStateListener.observer = createSyncServiceObserver(onStateChanged, onSyncServiceShutdown: onServiceShutdown)
 
     serviceObservers.add(serviceStateListener)
     return serviceStateListener
