@@ -278,7 +278,6 @@ class UserScriptManager {
         }
       }
       
-      // TODO: Check Wallet changes
       if let walletStandardScript = tab.walletSolProviderScripts[.walletStandard] {
         let script = """
         window.__firefox__.execute(function($, $Object) {
