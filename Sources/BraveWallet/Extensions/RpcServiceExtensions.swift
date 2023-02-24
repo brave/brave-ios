@@ -296,8 +296,7 @@ extension BraveWalletJsonRpcService {
     }
     if let data = metaDataString.data(using: .utf8),
        let result = try? JSONDecoder().decode(NFTMetadata.self, from: data) {
-      let r =  result.httpfyIpfsUrl(ipfsApi: ipfsApi)
-      return r
+      return result.httpfyIpfsUrl(ipfsApi: ipfsApi)
     }
     return nil
   }

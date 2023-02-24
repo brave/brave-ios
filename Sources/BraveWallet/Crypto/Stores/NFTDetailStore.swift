@@ -34,14 +34,13 @@ struct NFTMetadata: Codable, Equatable {
   }
 
   func httpfyIpfsUrl(ipfsApi: IpfsAPI?) -> NFTMetadata {
-    if ipfsApi != nil {
-      if self.imageURLString != nil && self.imageURLString!.hasPrefix("ipfs://") {
-        if let url = URL(string: self.imageURLString!) {
-          return NFTMetadata(imageURLString: ipfsApi?.resolveGatewayUrl(for: url)?.absoluteString, name: self.name, description: self.description)
-        }
-      }
+    guard let ipfsApi,
+          let imageURLString,
+          imageURLString.hasPrefix("ipfs://"),
+          let url = URL(string: imageURLString) else {
+      return NFTMetadata(imageURLString: self.imageURLString, name: self.name, description: self.description)
     }
-    return NFTMetadata(imageURLString: self.imageURLString, name: self.name, description: self.description)
+    return NFTMetadata(imageURLString: ipfsApi.resolveGatewayUrl(for: url)?.absoluteString, name: self.name, description: self.description)
   }
   
   var imageURL: URL? {
@@ -52,12 +51,12 @@ struct NFTMetadata: Codable, Equatable {
 
 class NFTDetailStore: ObservableObject {
   private let rpcService: BraveWalletJsonRpcService
+  private let ipfsApi: IpfsAPI?
   let nft: BraveWallet.BlockchainToken
   @Published var isLoading: Bool = false
   @Published var nftMetadata: NFTMetadata?
   @Published var networkInfo: BraveWallet.NetworkInfo = .init()
-  var ipfsApi: IpfsAPI?
-  
+
   init(
     rpcService: BraveWalletJsonRpcService,
     ipfsApi: IpfsAPI?,
@@ -65,9 +64,9 @@ class NFTDetailStore: ObservableObject {
     nftMetadata: NFTMetadata?
   ) {
     self.rpcService = rpcService
+    self.ipfsApi = ipfsApi
     self.nft = nft
     self.nftMetadata = nftMetadata?.httpfyIpfsUrl(ipfsApi: ipfsApi)
-    self.ipfsApi = ipfsApi
   }
   
   func update() {
@@ -79,9 +78,7 @@ class NFTDetailStore: ObservableObject {
       
       if nftMetadata == nil {
         isLoading = true
-        if let newNftMetadata = await rpcService.fetchNFTMetadata(for: nft, ipfsApi: self.ipfsApi) {
-          nftMetadata = newNftMetadata
-        }
+        nftMetadata = await rpcService.fetchNFTMetadata(for: nft, ipfsApi: self.ipfsApi)
         isLoading = false
       }
     }
