@@ -235,17 +235,17 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func processAddressBar(text: String, visitType: VisitType, isBraveSearchPromotion: Bool = false) {
-    if !isBraveSearchPromotion {
-      if submitValidURL(text, visitType: visitType) {
+    Task { @MainActor in
+      if !isBraveSearchPromotion, await submitValidURL(text, visitType: visitType) {
         return
+      } else {
+        // We couldn't build a URL, so pass it on to the search engine.
+        submitSearchText(text, isBraveSearchPromotion: isBraveSearchPromotion)
+        
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+          RecentSearch.addItem(type: .text, text: text, websiteUrl: nil)
+        }
       }
-    }
-    
-    // We couldn't build a URL, so pass it on to the search engine.
-    submitSearchText(text, isBraveSearchPromotion: isBraveSearchPromotion)
-
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-      RecentSearch.addItem(type: .text, text: text, websiteUrl: nil)
     }
   }
   
@@ -259,27 +259,22 @@ extension BrowserViewController: TopToolbarDelegate {
     return nil
   }
   
-  func submitValidURL(_ text: String, visitType: VisitType) -> Bool {
+  @MainActor func submitValidURL(_ text: String, visitType: VisitType) async -> Bool {
     if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
       // Instead, submit them to the search engine like Chrome-iOS does.
       if !["file"].contains(fixupURL.scheme) {
         // check text is SNS domain
-        if WalletFeatureFlags.SNSDomainResolverEnabled, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
+        if !PrivateBrowsingManager.shared.isPrivateBrowsing, WalletFeatureFlags.SNSDomainResolverEnabled, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
           switch currentStatus {
           case .ask:
             // show name service interstitial page
             showSNSDomainInterstitialPage(originalURL: fixupURL, visitType: visitType)
             return true
           case .enabled:
-            Task { @MainActor in
-              if let resolvedURL = await resolveSNSHost(text) {
-                // resolved url
-                finishEditingAndSubmit(resolvedURL, visitType: visitType)
-                return true
-              }
-              // user entered url
-              finishEditingAndSubmit(fixupURL, visitType: visitType)
+            if let resolvedURL = await resolveSNSHost(text) {
+              // resolved url
+              finishEditingAndSubmit(resolvedURL, visitType: visitType)
               return true
             }
           case .disabled:
