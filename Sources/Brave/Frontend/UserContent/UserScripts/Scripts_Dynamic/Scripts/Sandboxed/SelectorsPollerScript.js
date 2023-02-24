@@ -21,7 +21,7 @@ window.__firefox__.execute(function($) {
   // Start looking for things to unhide before at most this long after
   // the backend script is up and connected (eg backgroundReady = true),
   // or sooner if the thread is idle.
-  const maxTimeMSBeforeStart = 0
+  const maxTimeMSBeforeStart = 1000
   // The cutoff for text ads.  If something has only text in it, it needs to have
   // this many, or more, characters.  Similarly, require it to have a non-trivial
   // number of words in it, to look like an actual text ad.
@@ -154,7 +154,6 @@ window.__firefox__.execute(function($) {
   const makeStyleSheet = () => {
     const style = document.createElement('style')
     style.setAttribute('type', 'text/css')
-    document.head.appendChild(style)
     return style
   }
   
@@ -162,34 +161,28 @@ window.__firefox__.execute(function($) {
   /// We do this in iOS here because we can't initialize a style sheet
   const ensureStyleSheet = () => {
     if (CC.cosmeticStyleSheet === undefined) {
-      const style = makeStyleSheet()
-      CC.cosmeticStyleSheet = style
-    }
-  }
-  
-  const insertRule = (rule) => {
-    let nextIndex = CC.cosmeticStyleSheet.sheet.cssRules.length
-    
-    try {
-      CC.cosmeticStyleSheet.sheet.insertRule(rule, nextIndex)
-      
-      if (!CC.hide1pContent) {
-        CC.allSelectorsToRules.set(selector, nextIndex)
-        CC.firstRunQueue.add(selector)
-      }
-    } catch (error) {
-      console.error(`Inserting rule: ${rule} failed: ${error}`)
+      const styleElm = makeStyleSheet()
+      document.body.appendChild(styleElm)
+      CC.cosmeticStyleSheet = styleElm
     }
   }
   
   /// Takes selectors and adds them to the style sheet
   const processSelectors = (selectors) => {
     ensureStyleSheet()
-    
+    let nextIndex = CC.cosmeticStyleSheet.sheet.cssRules.length
+
     selectors.forEach(selector => {
       if ((typeof selector === 'string') && (CC.hide1pContent || !CC.allSelectorsToRules.has(selector))) {
         const rule = selector + '{display:none !important;}'
-        insertRule(rule)
+        CC.cosmeticStyleSheet.sheet.insertRule(rule, nextIndex)
+        
+        if (!CC.hide1pContent) {
+          CC.allSelectorsToRules.set(selector, nextIndex)
+          CC.firstRunQueue.add(selector)
+        }
+        
+        nextIndex++
       }
     })
   }
@@ -197,11 +190,19 @@ window.__firefox__.execute(function($) {
   /// Takes selectors and adds them to the style sheet
   const processStyleSelectors = (styleSelectors) => {
     ensureStyleSheet()
+    let nextIndex = CC.cosmeticStyleSheet.sheet.cssRules.length
 
     styleSelectors.forEach(entry => {
       if (CC.hide1pContent || !CC.allSelectorsToRules.has(entry.selector)) {
         let rule = entry.selector + '{' + entry.rules.join(';') + ';}'
-        insertRule(rule)
+        CC.cosmeticStyleSheet.sheet.insertRule(rule, nextIndex)
+        
+        if (!CC.hide1pContent) {
+          CC.allSelectorsToRules.set(selector, nextIndex)
+          CC.firstRunQueue.add(selector)
+        }
+        
+        nextIndex++
       }
     })
   }
@@ -502,7 +503,7 @@ window.__firefox__.execute(function($) {
       const ruleIdx = rulesToRemove1[_i]
       // Safe to asset ruleIdx is a number because we've already filtered out
       // any `undefined` instances with the filter call above.
-      CC.cosmeticStyleSheet.deleteRule(ruleIdx)
+      CC.cosmeticStyleSheet.sheet.deleteRule(ruleIdx)
     }
     
     // Re-sync the indexes
@@ -705,12 +706,11 @@ window.__firefox__.execute(function($) {
       scheduleQueuePump(false, false)
     }
   }
-
-  CC.tryScheduleQueuePump = CC.tryScheduleQueuePump || tryScheduleQueuePump
-  tryScheduleQueuePump()
   
   // Wait until document head is ready. We just need to wait a moment
   window.setTimeout(function () {
+    ensureStyleSheet()
+    
     // Third, load some static hide rules if they are defined
     if (args.hideSelectors) {
       processSelectors(args.hideSelectors)
@@ -720,5 +720,28 @@ window.__firefox__.execute(function($) {
     if (args.styleSelectors) {
       processStyleSelectors(args.styleSelectors)
     }
+    
+    tryScheduleQueuePump()
+
+    const timerId = setInterval(() => {
+      const styleElm = CC.cosmeticStyleSheet
+      const targetElm = document.body
+
+      // If we're already the last element in the body, then nothing to do
+      if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
+        return
+      }
+
+      // Move the stylesheet to the end of the head
+      let rules = styleElm.sheet.cssRules
+      styleElm.parentElement.removeChild(styleElm)
+      targetElm.appendChild(styleElm)
+      
+      // For some reason moving the stylesheet removed all the rules
+      // that were added using `insertRule`. They need to be added back.
+      for (let nextIndex = 0; nextIndex < rules.length; nextIndex++) {
+        styleElm.sheet.insertRule(rules[nextIndex].cssText, nextIndex)
+      }
+    }, 1000)
   }, 0)
 });
