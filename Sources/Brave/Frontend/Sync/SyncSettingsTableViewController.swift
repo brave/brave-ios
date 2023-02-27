@@ -58,6 +58,13 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
   private var showDoneButton = false
   
   private var tableView = UITableView(frame: .zero, style: .grouped)
+  private let loadingView = UIView().then {
+    $0.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
+    $0.isHidden = true
+  }
+  private let loadingSpinner = UIActivityIndicatorView(style: .large).then {
+    $0.startAnimating()
+  }
 
   private lazy var emptyStateOverlayView = EmptyStateOverlayView(
     overlayDetails: EmptyOverlayStateDetails(
@@ -87,14 +94,11 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
     tableView.do {
       $0.dataSource = self
       $0.delegate = self
+      $0.tableHeaderView = makeInformationTextView(with: Strings.syncSettingsHeader)
     }
     
-    view.addSubview(tableView)
+    doLayout()
 
-    tableView.snp.makeConstraints {
-      $0.edges.equalTo(view)
-    }
-    
     syncDeviceObserver = syncAPI.addDeviceStateObserver { [weak self] in
       self?.updateDeviceList()
     }
@@ -131,7 +135,6 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
 
     updateDeviceList()
 
-    tableView.tableHeaderView = makeInformationTextView(with: Strings.syncSettingsHeader)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -160,6 +163,24 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
 
     let newSize = headerView.systemLayoutSizeFitting(CGSize(width: self.view.bounds.width, height: 0))
     headerView.frame.size.height = newSize.height
+  }
+  
+  private func doLayout() {
+    view.addSubview(tableView)
+    loadingView.addSubview(loadingSpinner)
+    view.addSubview(loadingView)
+
+    tableView.snp.makeConstraints {
+      $0.edges.equalTo(view)
+    }
+    
+    loadingView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
+
+    loadingSpinner.snp.makeConstraints {
+      $0.center.equalTo(loadingView)
+    }
   }
 
   private func presentAlertPopup(for type: AlertActionType, device: BraveSyncDevice? = nil) {
@@ -211,6 +232,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
           // to prevent glicthes in settings screen
           self.syncAPI.removeAllObservers()
           
+          self.enableNavigationPrevention()
           self.syncAPI.permanentlyDeleteAccount { [weak self] status in
             guard let self else { return }
             
@@ -221,6 +243,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
               self.syncAPI.leaveSyncGroup(includeObservers: false)
             }
             
+            self.disableNavigationPrevention()
             self.navigationController?.popToRootViewController(animated: true)
           }
         }
@@ -302,21 +325,18 @@ extension SyncSettingsTableViewController {
     }
 
     // Device Actions - Add New Device
-    
     if section == .deviceActions {
       addAnotherDevice()
       return
     }
     
     // Delete Sync Chain
-    
     if section == .chainRemoval {
       presentAlertPopup(for: .syncChainDeleteConfirmation)
       return
     }
 
     // Device List
-    
     guard section == .deviceList,
           !devices.isEmpty,
           let device = devices[safe: indexPath.row] else {
@@ -547,5 +567,22 @@ extension SyncSettingsTableViewController {
       self.navigationController?.pushViewController(view, animated: true)
     }
     navigationController?.pushViewController(view, animated: true)
+  }
+}
+
+// MARK: NavigationPrevention
+
+extension SyncSettingsTableViewController: NavigationPrevention {
+  func enableNavigationPrevention() {
+    loadingView.isHidden = false
+    navigationItem.rightBarButtonItem?.isEnabled = false
+    navigationItem.hidesBackButton = true
+  }
+
+  func disableNavigationPrevention() {
+    loadingView.isHidden = true
+    navigationItem.rightBarButtonItem?.isEnabled = true
+    navigationItem.hidesBackButton = false
+
   }
 }
