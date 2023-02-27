@@ -722,6 +722,20 @@ window.__firefox__.execute(function($) {
     }
     
     tryScheduleQueuePump()
+    
+    const moveStyle = (timestamp) => {
+      // Move the stylesheet to the end of the head
+      const styleElm = CC.cosmeticStyleSheet
+      let rules = styleElm.sheet.cssRules
+      styleElm.parentElement.removeChild(styleElm)
+      targetElm.appendChild(styleElm)
+      
+      // For some reason moving the stylesheet removed all the rules
+      // that were added using `insertRule`. They need to be added back.
+      for (let nextIndex = 0; nextIndex < rules.length; nextIndex++) {
+        styleElm.sheet.insertRule(rules[nextIndex].cssText, nextIndex)
+      }
+    }
 
     const timerId = setInterval(() => {
       const styleElm = CC.cosmeticStyleSheet
@@ -732,16 +746,7 @@ window.__firefox__.execute(function($) {
         return
       }
 
-      // Move the stylesheet to the end of the head
-      let rules = styleElm.sheet.cssRules
-      styleElm.parentElement.removeChild(styleElm)
-      targetElm.appendChild(styleElm)
-      
-      // For some reason moving the stylesheet removed all the rules
-      // that were added using `insertRule`. They need to be added back.
-      for (let nextIndex = 0; nextIndex < rules.length; nextIndex++) {
-        styleElm.sheet.insertRule(rules[nextIndex].cssText, nextIndex)
-      }
+      window.requestAnimationFrame(moveStyle)
     }, 1000)
   }, 0)
 });
