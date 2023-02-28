@@ -1797,8 +1797,8 @@ extension Strings {
       "wallet.sendErrorDomainNotRegistered",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "%@ is not registered",
-      comment: "An error that appears below the send crypto address text field, when the input `To` domain/url that we cannot resolve to a wallet address. Ex. `Stephen.sol`"
+      value: "Domain doesn\'t have a linked %@ address",
+      comment: "An error that appears below the send crypto address text field, when the input `To` domain/url that we cannot resolve to a wallet address. The '%@' will be replaced with the coin type Ex. `Domain doesn\'t have a linked ETH address`"
     )
     public static let customNetworkChainIdTitle = NSLocalizedString(
       "wallet.customNetworkChainIdTitle",

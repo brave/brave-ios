@@ -90,8 +90,10 @@ public class SendTokenStore: ObservableObject {
         return Strings.Wallet.sendWarningAddressInvalidChecksum
       case .notSolAddress:
         return Strings.Wallet.sendWarningSolAddressNotValid
-      case let .snsError(domain), .ensError(let domain):
-        return String.localizedStringWithFormat(Strings.Wallet.sendErrorDomainNotRegistered, domain)
+      case .snsError:
+        return String.localizedStringWithFormat(Strings.Wallet.sendErrorDomainNotRegistered, BraveWallet.CoinType.sol.localizedTitle)
+      case .ensError:
+        return String.localizedStringWithFormat(Strings.Wallet.sendErrorDomainNotRegistered, BraveWallet.CoinType.eth.localizedTitle)
       }
     }
   }
