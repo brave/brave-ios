@@ -60,6 +60,9 @@ extension BraveSyncAPI {
     deleteDevice(deviceGuid)
   }
 
+  /// Method for leaving sync chain
+  /// Removing Observers, clearing local preferences and calling reset chain on brave-core side
+  /// - Parameter includeObservers: Parameter that decides if observers should be removed
   func leaveSyncGroup(includeObservers: Bool = true) {
     if includeObservers {
       // Remove all observers before leaving the sync chain
@@ -98,6 +101,13 @@ extension BraveSyncAPI {
     }
   }
 
+  /// Method to add observer for SyncService for onStateChanged and onSyncShutdown
+  /// OnStateChanged can be called in various situations like successful initialization - services unavaiable
+  /// sync shutdown - sync errors - sync chain deleted
+  /// - Parameters:
+  ///   - onStateChanged: Callback for sync service state changes
+  ///   - onServiceShutdown: Callback for sync service shutdown
+  /// - Returns: Listener for service
   func addServiceStateObserver(_ onStateChanged: @escaping () -> Void, onServiceShutdown: @escaping () -> Void) -> AnyObject {
     let serviceStateListener = BraveSyncServiceListener(onRemoved: { [weak self] observer in
       self?.serviceObservers.remove(observer)
