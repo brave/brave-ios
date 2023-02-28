@@ -77,6 +77,8 @@ class SyncPairWordsViewController: SyncViewController {
 
     title = Strings.syncAddDeviceWordsTitle
 
+    doLayout()
+
     codewordsView.wordCountChangeCallback = { [weak self] count in
       self?.wordCountLabel.text = String(format: Strings.wordCount, count)
     }
