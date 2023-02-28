@@ -195,9 +195,7 @@ class SyncWelcomeViewController: SyncViewController {
           bvc?.present(SyncAlerts.initializationError, animated: true)
         }
       }
-    } onServiceShutdown: {
-      
-    }
+    } onServiceShutdown: {}
   }
 
   @objc
@@ -280,10 +278,14 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
     
+    // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
+    // returning an error accordingly - only error is Deleted Sync Chain atm
     syncAPI.setDidJoinSyncChain { [weak self] result in
       guard let self else { return }
 
       if result {
+        // If chain is not deleted start listening for device state observer
+        // to validate devices are added to chain and show settings
         self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
           guard let self else { return }
           self.syncServiceObserver = nil
@@ -293,12 +295,15 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
           self.pushSettings()
         }
       } else {
+        // Show an alert if the sync hain is deleted
         let alert = UIAlertController(
           title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
           message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
           preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+          // Leave sync chain should be called if there is deleted chain alert
+          // to reset sync and local preferences with observer
           self.syncAPI.leaveSyncGroup()
 
           controller.disableNavigationPrevention()
@@ -308,7 +313,9 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
         self.present(alert, animated: true, completion: nil)
       }
     }
-    
+
+    // In parallel set code words - request sync and setup complete
+    // should be called on brave-core side
     syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
     syncAPI.requestSync()
     syncAPI.setSetupComplete()
