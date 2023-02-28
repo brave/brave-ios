@@ -281,8 +281,29 @@ private struct Web3DomainSettingsView: View {
     Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
       Group {
         snsResolveMethodPreference
+        ensOffchainResolveMethodPreference
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    }
+  }
+  
+  @ViewBuilder private var ensOffchainResolveMethodPreference: some View {
+    Picker(selection: $settingsStore.ensOffchainResolveMethod) {
+      ForEach(BraveWallet.ResolveMethod.allCases) { option in
+        Text(option.name)
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .tag(option)
+      }
+    } label: {
+      Text(Strings.Wallet.ensOffchainResolveMethodTitle)
+        .foregroundColor(Color(.braveLabel))
+        .padding(.vertical, 4)
+    }
+
+    Button(action: { openWalletURL?(WalletConstants.braveWalletENSOffchainURL) }) {
+      Text(Strings.Wallet.ensOffchainResolveMethodDescription)
+        .font(.footnote)
+        .padding(.vertical, 4)
     }
   }
   
