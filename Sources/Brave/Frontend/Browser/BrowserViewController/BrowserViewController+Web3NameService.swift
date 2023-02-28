@@ -6,19 +6,25 @@
 import Foundation
 import BraveWallet
 import BraveShared
+import BraveCore
 
 extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
   func web3NameServiceDecisionHandler(_ proceed: Bool, originalURL: URL, visitType: VisitType) {
+    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+    guard let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) else {
+      finishEditingAndSubmit(originalURL, visitType: visitType)
+      return
+    }
     if proceed {
-      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.enabled.rawValue
       Task { @MainActor in
-        if let host = originalURL.host, let resolvedUrl = await resolveSNSHost(host) {
+        rpcService.setSnsResolveMethod(.enabled)
+        if let host = originalURL.host, let resolvedUrl = await resolveSNSHost(host, rpcService: rpcService) {
           // resolved url
           finishEditingAndSubmit(resolvedUrl, visitType: visitType)
         }
       }
     } else {
-      Preferences.Wallet.resolveSNSDomainNames.value = Preferences.Wallet.Web3DomainOption.disabled.rawValue
+      rpcService.setSnsResolveMethod(.disabled)
       finishEditingAndSubmit(originalURL, visitType: visitType)
     }
   }

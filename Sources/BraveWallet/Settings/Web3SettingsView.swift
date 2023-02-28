@@ -278,13 +278,11 @@ private struct Web3DomainSettingsView: View {
   @Environment(\.openWalletURLAction) private var openWalletURL
 
   var body: some View {
-    if WalletFeatureFlags.SNSDomainResolverEnabled {
-      Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
-        Group {
-          snsResolveMethodPreference
-        }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    Section(header: Text(Strings.Wallet.web3DomainOptionsHeader)) {
+      Group {
+        snsResolveMethodPreference
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
   }
   

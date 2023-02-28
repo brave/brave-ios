@@ -109,21 +109,25 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
-    if WalletFeatureFlags.SNSDomainResolverEnabled, let url = topToolbar.currentURL, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
-      switch currentStatus {
-      case .ask:
-        // show name service interstitial page
-        showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
-      case .enabled:
-        Task { @MainActor in
-          if let resolvedURL = await resolveSNSHost(url.absoluteString) {
+    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+    if !isPrivateMode, let url = topToolbar.currentURL, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+      Task { @MainActor in
+        let currentStatus = await rpcService.snsResolveMethod()
+        switch currentStatus {
+        case .ask:
+          // show name service interstitial page
+          showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
+        case .enabled:
+          if let resolvedURL = await resolveSNSHost(url.schemelessAbsoluteDisplayString, rpcService: rpcService) {
             tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
             return
           }
           tabManager.selectedTab?.loadRequest(URLRequest(url: url))
+        case .disabled:
+          tabManager.selectedTab?.reload()
+        @unknown default:
+          tabManager.selectedTab?.reload()
         }
-      case .disabled:
-        tabManager.selectedTab?.reload()
       }
     } else {
       tabManager.selectedTab?.reload()
@@ -249,14 +253,10 @@ extension BrowserViewController: TopToolbarDelegate {
     }
   }
   
-  @MainActor func resolveSNSHost(_ host: String) async -> URL? {
-    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    if let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-      let (url, status, _) = await rpcService.snsResolveHost(host)
-      guard let url = url, status == .success else { return nil }
-      return url
-    }
-    return nil
+  @MainActor func resolveSNSHost(_ host: String, rpcService: BraveWalletJsonRpcService) async -> URL? {
+    let (url, status, _) = await rpcService.snsResolveHost(host)
+    guard let url = url, status == .success else { return nil }
+    return url
   }
   
   @MainActor func submitValidURL(_ text: String, visitType: VisitType) async -> Bool {
@@ -265,19 +265,23 @@ extension BrowserViewController: TopToolbarDelegate {
       // Instead, submit them to the search engine like Chrome-iOS does.
       if !["file"].contains(fixupURL.scheme) {
         // check text is SNS domain
-        if !PrivateBrowsingManager.shared.isPrivateBrowsing, WalletFeatureFlags.SNSDomainResolverEnabled, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let currentStatus = Preferences.Wallet.Web3DomainOption(rawValue: Preferences.Wallet.resolveSNSDomainNames.value) {
+        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+        if !isPrivateMode, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+          let currentStatus = await rpcService.snsResolveMethod()
           switch currentStatus {
           case .ask:
             // show name service interstitial page
             showSNSDomainInterstitialPage(originalURL: fixupURL, visitType: visitType)
             return true
           case .enabled:
-            if let resolvedURL = await resolveSNSHost(text) {
+            if let resolvedURL = await resolveSNSHost(text, rpcService: rpcService) {
               // resolved url
               finishEditingAndSubmit(resolvedURL, visitType: visitType)
               return true
             }
           case .disabled:
+            break
+          @unknown default:
             break
           }
         }
