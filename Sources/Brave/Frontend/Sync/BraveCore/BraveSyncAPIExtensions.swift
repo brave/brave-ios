@@ -30,6 +30,10 @@ extension BraveSyncAPI {
   var isInSyncGroup: Bool {
     return Preferences.Chromium.syncEnabled.value
   }
+  
+  var shouldLeaveSyncGroup: Bool {
+    return (isInSyncGroup && !isSyncFeatureActive && !isFirstSetupComplete) || (isInSyncGroup && isSyncAccountDeletedNoticePending)
+  }
 
   var isSendTabToSelfVisible: Bool {
     guard let json = getDeviceListJSON(), let data = json.data(using: .utf8) else {

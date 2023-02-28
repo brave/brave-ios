@@ -99,42 +99,18 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
     
     doLayout()
 
+    syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
+      // Observe Sync State in order to determine if the sync chain is deleted
+      // from another device - Clean local sync chain
+      self?.restartSyncSetupIfNecessary()
+    } onServiceShutdown: {}
+    
     syncDeviceObserver = syncAPI.addDeviceStateObserver { [weak self] in
       self?.updateDeviceList()
     }
     
-    syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
-          guard let self = self else { return }
-
-          print("================")
-          print("Sync State in group \(self.syncAPI.isInSyncGroup)")
-          print("Sync State is active \(self.syncAPI.isSyncFeatureActive)")
-          print("Sync State setup complete \(self.syncAPI.isFirstSetupComplete)")
-          print("Sync State delete notice pending \(self.syncAPI.isSyncAccountDeletedNoticePending)")
-          print("================")
-      
-          if (self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete) || (self.syncAPI.isInSyncGroup && self.syncAPI.isSyncAccountDeletedNoticePending) {
-            self.syncAPI.leaveSyncGroup()
-            self.navigationController?.popToRootViewController(animated: true)
-          }
-        } onServiceShutdown: { [weak self] in
-          guard let self = self else { return }
-          print("================")
-          print("Sync Service in group \(self.syncAPI.isInSyncGroup)")
-          print("Sync Service is active \(self.syncAPI.isSyncFeatureActive)")
-          print("Sync Service setup complete \(self.syncAPI.isFirstSetupComplete)")
-          print("Sync Service delete notice pending \(self.syncAPI.isSyncAccountDeletedNoticePending)")
-          print("================")
-
-        }
-    
-    if (self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete) || (self.syncAPI.isInSyncGroup && self.syncAPI.isSyncAccountDeletedNoticePending) {
-      self.syncAPI.leaveSyncGroup()
-      self.navigationController?.popToRootViewController(animated: true)
-    }
-
+    restartSyncSetupIfNecessary()
     updateDeviceList()
-
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -163,6 +139,13 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
 
     let newSize = headerView.systemLayoutSizeFitting(CGSize(width: self.view.bounds.width, height: 0))
     headerView.frame.size.height = newSize.height
+  }
+  
+  private func restartSyncSetupIfNecessary() {
+    if syncAPI.shouldLeaveSyncGroup {
+      syncAPI.leaveSyncGroup()
+      navigationController?.popToRootViewController(animated: true)
+    }
   }
   
   private func doLayout() {
@@ -229,10 +212,12 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
       case .syncChainDeleteConfirmation:
         self.doIfConnected {
           // Observers have to be removed before permanentlyDeleteAccount is called
-          // to prevent glicthes in settings screen
+          // to prevent glitch in settings screen
           self.syncAPI.removeAllObservers()
-          
+          // Start  loading and diable navigation while delete action is happening
           self.enableNavigationPrevention()
+          
+          // Permanently Delete action is called on brave-core side
           self.syncAPI.permanentlyDeleteAccount { [weak self] status in
             guard let self else { return }
             
@@ -240,6 +225,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
             case .throttled, .partialFailure, .transientError:
               self.presentAlertPopup(for: .syncChainDeleteError)
             default:
+              // Clearing local preferences and calling reset chain on brave-core side
               self.syncAPI.leaveSyncGroup(includeObservers: false)
             }
             
