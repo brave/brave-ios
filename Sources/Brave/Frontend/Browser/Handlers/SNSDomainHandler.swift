@@ -30,7 +30,7 @@ public class SNSDomainHandler: InternalSchemeResponse {
     }
     
     let variables = [
-      "page_title": request.url?.normalizedHost(stripWWWSubdomainOnly: true) ?? "",
+      "page_title": request.url?.displayURL?.absoluteDisplayString ?? "",
       "error_title": Strings.snsDomainInterstitialPageTitle,
       "error_description": String.localizedStringWithFormat(Strings.snsDomainInterstitialPageDescription, snsThirdPartyTermsofUseLink.absoluteString, Strings.snsDomainInterstitialPageTAndU, snsThirdPartyPrivacyPolicyLink.absoluteString, Strings.snsDomainInterstitialPagePrivacyPolicy),
       "button_disable": Strings.snsDomainInterstitialPageButtonDisable,
