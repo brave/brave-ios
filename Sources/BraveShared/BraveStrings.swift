@@ -2995,7 +2995,7 @@ extension Strings {
     public static let syncDeleteAccountAlertDescriptionPart2 =
       NSLocalizedString(
         "sync.syncDeleteAccountAlertDescriptionPart2", tableName: "BraveShared", bundle: .module,
-        value: "Deleting your account will remove your encrypted data from Brave servers and disable Sync on all of your connected devices. It will not however delete the data that is stored locally on those devices.",
+        value: "This deletion is permanent and there is no way to recover the data. Should you decide to start using Sync again, you will need to create a new account and re-add each device one by one.",
         comment: "Part 2 Description for Alert used action Delete Sync Account.")
     public static let syncChainAlreadyDeletedAlertTitle =
       NSLocalizedString(

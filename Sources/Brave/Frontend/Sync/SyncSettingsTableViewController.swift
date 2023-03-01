@@ -233,7 +233,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
             self.navigationController?.popToRootViewController(animated: true)
           }
         }
-      default:
+      case .syncChainDeleteError:
         break
       }
       return .flyDown
