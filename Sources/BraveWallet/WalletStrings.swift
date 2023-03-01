@@ -3726,7 +3726,7 @@ extension Strings {
       comment: "Description shown send address / ENS domain when requesting to do an ENS off chain lookup."
     )
     public static let ensOffchainGatewayButton = NSLocalizedString(
-      "wallet.ensOffchainGatewayDesc",
+      "wallet.ensOffchainGatewayButton",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Use ENS Domain",
