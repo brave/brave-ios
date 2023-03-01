@@ -47,7 +47,8 @@ window.__firefox__.execute(function($) {
   let notYetQueriedIds = []
   
   const CC = {}
-  CC.allSelectorsToRules = CC.allSelectorsToRules || new Map()
+  CC.allHideSelectorsToRules = CC.allHideSelectorsToRules || new Map()
+  CC.allRules = []
   CC.observingHasStarted = CC.observingHasStarted || false
   // All new selectors go in `firstRunQueue`
   CC.firstRunQueue = CC.firstRunQueue || new Set()
@@ -168,43 +169,42 @@ window.__firefox__.execute(function($) {
   }
   
   /// Takes selectors and adds them to the style sheet
-  const processSelectors = (selectors) => {
-    ensureStyleSheet()
-    let nextIndex = CC.cosmeticStyleSheet.sheet.cssRules.length
-
+  const processHideSelectors = (selectors) => {
     selectors.forEach(selector => {
-      if ((typeof selector === 'string') && (CC.hide1pContent || !CC.allSelectorsToRules.has(selector))) {
+      if ((typeof selector === 'string') && (CC.hide1pContent || !CC.allHideSelectorsToRules.has(selector))) {
         const rule = selector + '{display:none !important;}'
-        CC.cosmeticStyleSheet.sheet.insertRule(rule, nextIndex)
+        CC.allRules.push(rule)
         
         if (!CC.hide1pContent) {
-          CC.allSelectorsToRules.set(selector, nextIndex)
+          CC.allHideSelectorsToRules.set(selector, CC.allRules.count - 1)
           CC.firstRunQueue.add(selector)
         }
-        
-        nextIndex++
       }
     })
   }
   
   /// Takes selectors and adds them to the style sheet
   const processStyleSelectors = (styleSelectors) => {
-    ensureStyleSheet()
-    let nextIndex = CC.cosmeticStyleSheet.sheet.cssRules.length
-
     styleSelectors.forEach(entry => {
-      if (CC.hide1pContent || !CC.allSelectorsToRules.has(entry.selector)) {
-        let rule = entry.selector + '{' + entry.rules.join(';') + ';}'
-        CC.cosmeticStyleSheet.sheet.insertRule(rule, nextIndex)
-        
-        if (!CC.hide1pContent) {
-          CC.allSelectorsToRules.set(selector, nextIndex)
-          CC.firstRunQueue.add(selector)
-        }
-        
-        nextIndex++
-      }
+      let rule = entry.selector + '{' + entry.rules.join(';') + ';}'
+      CC.allRules.push(rule)
     })
+  }
+  
+  /// Moves the stylesheet to the bottom of the page
+  const moveStyle = () => {
+    const styleElm = CC.cosmeticStyleSheet
+    const targetElm = document.body
+    styleElm.parentElement.removeChild(styleElm)
+    targetElm.appendChild(styleElm)
+  }
+  
+  const setRulesOnStylesheet = () => {
+    ensureStyleSheet()
+    const ruleText = CC.allRules.filter(rule => {
+      return rule !== undefined && !rule.startsWith(':')
+    }).join('')
+    CC.cosmeticStyleSheet.innerText = ruleText
   }
 
   const fetchNewClassIdRules = () => {
@@ -215,7 +215,8 @@ window.__firefox__.execute(function($) {
     
     sendMessage(notYetQueriedIds, notYetQueriedClasses).then(selectors => {
       if (!selectors) { return }
-      processSelectors(selectors)
+      processHideSelectors(selectors)
+      setRulesOnStylesheet()
     })
     
     notYetQueriedClasses = []
@@ -490,25 +491,25 @@ window.__firefox__.execute(function($) {
     }
     // Find selectors we have a rule index for
     const rulesToRemove = Array.from(selectors)
-      .map(function (selector) { return CC.allSelectorsToRules.get(selector) })
+      .map(function (selector) { return CC.allHideSelectorsToRules.get(selector) })
       .filter(function (i) { return i !== undefined })
       .sort()
       .reverse()
 
     // Delete the rules
-    const lastIdx = CC.allSelectorsToRules.size - 1
+    const lastIdx = CC.allHideSelectorsToRules.size - 1
     // to deal with removing rules
     
     for (let _i = 0, rulesToRemove1 = rulesToRemove; _i < rulesToRemove1.length; _i++) {
       const ruleIdx = rulesToRemove1[_i]
       // Safe to asset ruleIdx is a number because we've already filtered out
       // any `undefined` instances with the filter call above.
-      CC.cosmeticStyleSheet.sheet.deleteRule(ruleIdx)
+      delete myArray[ruleIdx]
     }
     
     // Re-sync the indexes
     // TODO: Sync is hard, just re-build by iterating through the StyleSheet rules.
-    const ruleLookup = Array.from(CC.allSelectorsToRules.entries())
+    const ruleLookup = Array.from(CC.allHideSelectorsToRules.entries())
     let countAtLastHighest = rulesToRemove.length
     for (let i = lastIdx; i > 0; i--) {
       const _a = ruleLookup[i]
@@ -516,7 +517,7 @@ window.__firefox__.execute(function($) {
       const oldIdx = _a[1]
       // Is this one we removed?
       if (rulesToRemove.includes(i)) {
-        CC.allSelectorsToRules.delete(selector)
+        CC.allHideSelectorsToRules.delete(selector)
         countAtLastHighest--
         if (countAtLastHighest === 0) {
           break
@@ -527,7 +528,7 @@ window.__firefox__.execute(function($) {
         // Probably out of sync
         console.error('Cosmetic Filters: old index did not match lookup index', { selector: selector, oldIdx: oldIdx, i: i })
       }
-      CC.allSelectorsToRules.set(selector, oldIdx - countAtLastHighest)
+      CC.allHideSelectorsToRules.set(selector, oldIdx - countAtLastHighest)
     }
   }
 
@@ -709,11 +710,9 @@ window.__firefox__.execute(function($) {
   
   // Wait until document head is ready. We just need to wait a moment
   window.setTimeout(function () {
-    ensureStyleSheet()
-    
     // Third, load some static hide rules if they are defined
     if (args.hideSelectors) {
-      processSelectors(args.hideSelectors)
+      processHideSelectors(args.hideSelectors)
     }
     
     // Fourth, load some static style selectors if they are defined
@@ -721,32 +720,16 @@ window.__firefox__.execute(function($) {
       processStyleSelectors(args.styleSelectors)
     }
     
+    setRulesOnStylesheet()
     tryScheduleQueuePump()
-    
-    const moveStyle = (timestamp) => {
-      // Move the stylesheet to the end of the head
-      const styleElm = CC.cosmeticStyleSheet
-      let rules = styleElm.sheet.cssRules
-      styleElm.parentElement.removeChild(styleElm)
-      targetElm.appendChild(styleElm)
-      
-      // For some reason moving the stylesheet removed all the rules
-      // that were added using `insertRule`. They need to be added back.
-      for (let nextIndex = 0; nextIndex < rules.length; nextIndex++) {
-        styleElm.sheet.insertRule(rules[nextIndex].cssText, nextIndex)
-      }
-    }
 
     const timerId = setInterval(() => {
       const styleElm = CC.cosmeticStyleSheet
       const targetElm = document.body
-
-      // If we're already the last element in the body, then nothing to do
       if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
         return
       }
-
-      window.requestAnimationFrame(moveStyle)
+      moveStyle()
     }, 1000)
   }, 0)
 });
