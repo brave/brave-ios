@@ -258,6 +258,20 @@ struct SuggestedNetworkView: View {
             )
           })
     )
+    .onAppear {
+      // this can occur when Add Network is dismissed while still loading...
+      // we need to show loading state again, and handle success/failure response
+      if case let .addNetwork(network) = mode,
+         let pendingCompletion = cryptoStore.addNetworkWebpageRequestCompletion,
+         pendingCompletion.chainId == network.chainId {
+        self.isLoading = true
+        // overwrite the completion closure with a new one for this new view instance
+        cryptoStore.addNetworkWebpageRequestCompletion = .init(
+          chainId: network.chainId,
+          completion: handleAddNetworkCompletion
+        )
+      }
+    }
   }
   
   private var actionButtonTitle: String {
@@ -313,14 +327,7 @@ struct SuggestedNetworkView: View {
     case let .addNetwork(networkInfo):
       cryptoStore.handleWebpageRequestResponse(
         .addNetwork(approved: approved, chainId: networkInfo.chainId),
-        completion: { error in
-          isLoading = false
-          if let error, !error.isEmpty {
-            customNetworkError = .failed(errorMessage: error)
-            return
-          }
-          onDismiss()
-        }
+        completion: handleAddNetworkCompletion
       )
     case .switchNetworks:
       cryptoStore.handleWebpageRequestResponse(
@@ -331,6 +338,15 @@ struct SuggestedNetworkView: View {
         }
       )
     }
+  }
+  
+  private func handleAddNetworkCompletion(_ error: String?) {
+    isLoading = false
+    if let error, !error.isEmpty {
+      customNetworkError = .failed(errorMessage: error)
+      return
+    }
+    onDismiss()
   }
 }
 

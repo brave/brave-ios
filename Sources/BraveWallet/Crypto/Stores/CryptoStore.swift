@@ -386,14 +386,14 @@ public class CryptoStore: ObservableObject {
     return pendingRequest != nil
   }
 
-  private struct AddNetworkCompletion {
+  struct AddNetworkCompletion {
     let chainId: String
     let completion: (_ error: String?) -> Void
   }
   // Helper to store the completion block of an Add Network request.
   // The completion closure is handled in `onAddEthereumChainRequestCompleted`
   // when we determine if the chain was added successfully or not.
-  private var addNetworkWebpageRequestCompletion: AddNetworkCompletion?
+  var addNetworkWebpageRequestCompletion: AddNetworkCompletion?
   
   func handleWebpageRequestResponse(
     _ response: WebpageRequestResponse,
@@ -517,7 +517,6 @@ extension CryptoStore: BraveWalletJsonRpcServiceObserver {
     if let addNetworkWebpageRequestCompletion {
       addNetworkWebpageRequestCompletion.completion(error.isEmpty ? nil : error)
       self.addNetworkWebpageRequestCompletion = nil
-      prepare()
     }
   }
   
