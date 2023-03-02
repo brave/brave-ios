@@ -103,7 +103,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
       // Observe Sync State in order to determine if the sync chain is deleted
       // from another device - Clean local sync chain
       self?.restartSyncSetupIfNecessary()
-    } onServiceShutdown: {}
+    }
     
     syncDeviceObserver = syncAPI.addDeviceStateObserver { [weak self] in
       self?.updateDeviceList()
@@ -218,15 +218,14 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
           self.enableNavigationPrevention()
           
           // Permanently Delete action is called on brave-core side
-          self.syncAPI.permanentlyDeleteAccount { [weak self] status in
-            guard let self else { return }
+          self.syncAPI.permanentlyDeleteAccount { status in
             
             switch status {
             case .throttled, .partialFailure, .transientError:
               self.presentAlertPopup(for: .syncChainDeleteError)
             default:
               // Clearing local preferences and calling reset chain on brave-core side
-              self.syncAPI.leaveSyncGroup(includeObservers: false)
+              self.syncAPI.leaveSyncGroup(preservingObservers: true)
             }
             
             self.disableNavigationPrevention()
@@ -569,6 +568,5 @@ extension SyncSettingsTableViewController: NavigationPrevention {
     loadingView.isHidden = true
     navigationItem.rightBarButtonItem?.isEnabled = true
     navigationItem.hidesBackButton = false
-
   }
 }

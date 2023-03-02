@@ -211,7 +211,7 @@ class TabTrayController: LoadingViewController {
           $0.updateSyncStatusPanel(for: self.emptyPanelState)
         }
       }
-    } onServiceShutdown: {}
+    }
   }
 
   @available(*, unavailable)

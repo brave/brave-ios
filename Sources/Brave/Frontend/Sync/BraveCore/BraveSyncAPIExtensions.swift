@@ -32,7 +32,11 @@ extension BraveSyncAPI {
   }
   
   var shouldLeaveSyncGroup: Bool {
-    return (isInSyncGroup && !isSyncFeatureActive && !isFirstSetupComplete) || (isInSyncGroup && isSyncAccountDeletedNoticePending)
+    guard isInSyncGroup else {
+      return false
+    }
+    
+    return !(isSyncFeatureActive && isFirstSetupComplete) || isSyncAccountDeletedNoticePending
   }
 
   var isSendTabToSelfVisible: Bool {
@@ -68,9 +72,9 @@ extension BraveSyncAPI {
 
   /// Method for leaving sync chain
   /// Removing Observers, clearing local preferences and calling reset chain on brave-core side
-  /// - Parameter includeObservers: Parameter that decides if observers should be removed
-  func leaveSyncGroup(includeObservers: Bool = true) {
-    if includeObservers {
+  /// - Parameter preservingObservers: Parameter that decides if observers should be preserved or removed
+  func leaveSyncGroup(preservingObservers: Bool = false) {
+    if !preservingObservers {
       // Remove all observers before leaving the sync chain
       removeAllObservers()
     }
@@ -114,7 +118,7 @@ extension BraveSyncAPI {
   ///   - onStateChanged: Callback for sync service state changes
   ///   - onServiceShutdown: Callback for sync service shutdown
   /// - Returns: Listener for service
-  func addServiceStateObserver(_ onStateChanged: @escaping () -> Void, onServiceShutdown: @escaping () -> Void) -> AnyObject {
+  func addServiceStateObserver(_ onStateChanged: @escaping () -> Void, onServiceShutdown: @escaping () -> Void = {}) -> AnyObject {
     let serviceStateListener = BraveSyncServiceListener(onRemoved: { [weak self] observer in
       self?.serviceObservers.remove(observer)
     })

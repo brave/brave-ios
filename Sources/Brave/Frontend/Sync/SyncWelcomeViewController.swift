@@ -195,7 +195,7 @@ class SyncWelcomeViewController: SyncViewController {
           bvc?.present(SyncAlerts.initializationError, animated: true)
         }
       }
-    } onServiceShutdown: {}
+    }
   }
 
   @objc
@@ -277,9 +277,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     
     // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
     // returning an error accordingly - only error is Deleted Sync Chain atm
-    syncAPI.setDidJoinSyncChain { [weak self] result in
-      guard let self else { return }
-
+    syncAPI.setDidJoinSyncChain { result in
       if result {
         // If chain is not deleted start listening for device state observer
         // to validate devices are added to chain and show settings
