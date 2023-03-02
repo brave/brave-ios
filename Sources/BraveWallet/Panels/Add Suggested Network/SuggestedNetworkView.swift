@@ -24,6 +24,7 @@ struct SuggestedNetworkView: View {
   
   @State private var isPresentingNetworkDetails: CustomNetworkModel?
   @State private var customNetworkError: CustomNetworkError?
+  @State private var isLoading: Bool = false
   
   @ScaledMetric private var blockieSize = 24
   private let maxBlockieSize: CGFloat = 72
@@ -253,7 +254,7 @@ struct SuggestedNetworkView: View {
             Alert(
               title: Text(error.errorTitle),
               message: Text(error.errorDescription),
-              dismissButton: .default(Text(Strings.OKString))
+              dismissButton: .default(Text(Strings.OKString), action: onDismiss)
             )
           })
     )
@@ -288,30 +289,48 @@ struct SuggestedNetworkView: View {
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: { // approve
-      handleAction(approved: true)
-    }) {
-      HStack {
-        Image(braveSystemName: "brave.checkmark.circle.fill")
-        Text(actionButtonTitle)
-          .multilineTextAlignment(.center)
+    .disabled(isLoading)
+    WalletLoadingButton(
+      isLoading: isLoading,
+      action: {  // approve
+        handleAction(approved: true)
+      },
+      label: {
+        HStack {
+          Image(braveSystemName: "brave.checkmark.circle.fill")
+          Text(actionButtonTitle)
+            .multilineTextAlignment(.center)
+        }
       }
-    }
+    )
     .buttonStyle(BraveFilledButtonStyle(size: .large))
+    .disabled(isLoading)
   }
   
   private func handleAction(approved: Bool) {
+    isLoading = true
     switch mode {
     case let .addNetwork(networkInfo):
       cryptoStore.handleWebpageRequestResponse(
-        .addNetwork(approved: approved, chainId: networkInfo.chainId)
+        .addNetwork(approved: approved, chainId: networkInfo.chainId),
+        completion: { error in
+          isLoading = false
+          if let error, !error.isEmpty {
+            customNetworkError = .failed(errorMessage: error)
+            return
+          }
+          onDismiss()
+        }
       )
     case .switchNetworks:
       cryptoStore.handleWebpageRequestResponse(
-        .switchChain(approved: approved, originInfo: originInfo)
+        .switchChain(approved: approved, originInfo: originInfo),
+        completion: { _ in
+          isLoading = false
+          onDismiss()
+        }
       )
     }
-    onDismiss()
   }
 }
 
