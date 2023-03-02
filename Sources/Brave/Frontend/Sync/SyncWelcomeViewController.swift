@@ -189,7 +189,7 @@ class SyncWelcomeViewController: SyncViewController {
     syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
       guard let self = self else { return }
 
-      if !self.syncAPI.isInSyncGroup {
+      if !self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete {
         let bvc = self.currentScene?.browserViewController
         self.dismiss(animated: true) {
           bvc?.present(SyncAlerts.initializationError, animated: true)
@@ -208,7 +208,6 @@ class SyncWelcomeViewController: SyncViewController {
   }
 
   @objc func newToSyncAction() {
-    handleSyncSetupFailure()
     let addDevice = SyncSelectDeviceTypeViewController()
     addDevice.syncInitHandler = { [weak self] (title, type) in
       guard let self = self else { return }
@@ -241,15 +240,13 @@ class SyncWelcomeViewController: SyncViewController {
       }
 
       self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices)
-      self.syncAPI.requestSync()
-      self.syncAPI.setSetupComplete()
+      self.handleSyncSetupFailure()
     }
 
     self.navigationController?.pushViewController(addDevice, animated: true)
   }
 
   @objc func existingUserAction() {
-    handleSyncSetupFailure()
     let pairCamera = SyncPairCameraViewController(syncAPI: syncAPI)
     pairCamera.delegate = self
     self.navigationController?.pushViewController(pairCamera, animated: true)
@@ -317,7 +314,6 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     // In parallel set code words - request sync and setup complete
     // should be called on brave-core side
     syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
-    syncAPI.requestSync()
-    syncAPI.setSetupComplete()
+    handleSyncSetupFailure()
   }
 }
