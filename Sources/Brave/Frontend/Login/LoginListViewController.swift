@@ -30,6 +30,7 @@ class LoginListViewController: LoginAuthViewController {
   enum Section: Int, CaseIterable {
     case options
     case savedLogins
+    case neverSaved
   }
 
   weak var settingsDelegate: SettingsDelegate?
@@ -40,6 +41,7 @@ class LoginListViewController: LoginAuthViewController {
   private let windowProtection: WindowProtection?
 
   private var credentialList = [PasswordForm]()
+  private var blockedList = [PasswordForm]()
   private var passwordStoreListener: PasswordStoreListener?
   private var isCredentialsRefreshing = false
 
@@ -153,6 +155,12 @@ class LoginListViewController: LoginAuthViewController {
   private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
     if let query = query, !query.isEmpty {
       credentialList = passwordForms.filter { form in
+        // Check If the website is blocked by user with Never Save functionality
+        if form.isBlockedByUser {
+          blockedList.append(form)
+          return false
+        }
+        
         if let origin = form.url.origin.url?.absoluteString.lowercased(), origin.contains(query) {
           return true
         }
@@ -164,7 +172,14 @@ class LoginListViewController: LoginAuthViewController {
         return false
       }
     } else {
-      credentialList = passwordForms
+      credentialList = passwordForms.filter { form in
+        if form.isBlockedByUser {
+          blockedList.append(form)
+          return false
+        }
+        
+        return true
+      }
     }
 
     DispatchQueue.main.async {
@@ -180,16 +195,31 @@ class LoginListViewController: LoginAuthViewController {
 extension LoginListViewController {
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    tableView.backgroundView = credentialList.isEmpty ? emptyStateOverlayView : nil
+    tableView.backgroundView = (credentialList.isEmpty && blockedList.isEmpty) ? emptyStateOverlayView : nil
 
-    return Section.allCases.count
+    var sectionCount = Section.allCases.count
+    
+    if blockedList.isEmpty {
+      sectionCount -= 1
+    }
+    
+    if credentialList.isEmpty {
+      sectionCount -= 1
+    }
+    
+    return sectionCount
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if section == Section.options.rawValue {
+    switch section {
+    case Section.options.rawValue:
       return 1
-    } else {
+    case Section.savedLogins.rawValue:
       return credentialList.count
+    case Section.neverSaved.rawValue:
+      return blockedList.count
+    default:
+      return 0
     }
   }
 
@@ -201,11 +231,16 @@ extension LoginListViewController {
   }
 
   override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    if section == Section.savedLogins.rawValue {
+    switch section {
+    case Section.options.rawValue:
+      return .zero
+    case Section.savedLogins.rawValue:
       return credentialList.isEmpty ? .zero : UX.headerHeight
+    case Section.neverSaved.rawValue:
+      return blockedList.isEmpty ? .zero : UX.headerHeight
+    default:
+      return .zero
     }
-
-    return .zero
   }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -260,20 +295,40 @@ extension LoginListViewController {
 
   override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-    headerView.titleLabel.text = Strings.Login.loginListSavedLoginsHeaderTitle.uppercased()
-
+    
+    switch section {
+    case Section.savedLogins.rawValue:
+      headerView.titleLabel.text = Strings.Login.loginListSavedLoginsHeaderTitle.uppercased()
+    case Section.neverSaved.rawValue:
+      headerView.titleLabel.text = "NEVER SAVED".uppercased()
+    default:
+      headerView.titleLabel.text = ""
+    }
+    
     return headerView
   }
 
   override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-    if indexPath.section == Section.savedLogins.rawValue, let credentials = credentialList[safe: indexPath.row], !tableView.isEditing {
+    func showInformationController(for form: PasswordForm) {
       let loginDetailsViewController = LoginInfoViewController(
         passwordAPI: passwordAPI,
-        credentials: credentials,
+        credentials: form,
         windowProtection: windowProtection)
       loginDetailsViewController.settingsDelegate = settingsDelegate
       navigationController?.pushViewController(loginDetailsViewController, animated: true)
-
+    }
+    
+    if tableView.isEditing {
+      return nil
+    }
+    
+    if indexPath.section == Section.savedLogins.rawValue, let form = credentialList[safe: indexPath.row] {
+      showInformationController(for: form)
+      return indexPath
+    }
+    
+    if indexPath.section == Section.neverSaved.rawValue, let form = blockedList[safe: indexPath.row] {
+      showInformationController(for: form)
       return indexPath
     }
 
@@ -281,7 +336,7 @@ extension LoginListViewController {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.section == Section.savedLogins.rawValue {
+    if indexPath.section != Section.options.rawValue {
       searchController.isActive = false
       
       tableView.isEditing = false
@@ -293,7 +348,7 @@ extension LoginListViewController {
 
   // Determine whether to show delete button in edit mode
   override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-    guard indexPath.section == Section.savedLogins.rawValue else {
+    if indexPath.section == Section.options.rawValue {
       return .none
     }
 
@@ -302,19 +357,28 @@ extension LoginListViewController {
 
   // Determine whether to indent while in edit mode for deletion
   override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section == Section.savedLogins.rawValue
+    return indexPath.section != Section.options.rawValue
   }
 
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      guard let credential = credentialList[safe: indexPath.row] else { return }
-
-      showDeleteLoginWarning(with: credential)
+      switch indexPath.section {
+      case Section.savedLogins.rawValue:
+        if let passwordForm = credentialList[safe: indexPath.row] {
+          showDeleteLoginWarning(with: passwordForm)
+        }
+      case Section.neverSaved.rawValue:
+        if let passwordForm = blockedList[safe: indexPath.row] {
+          showDeleteLoginWarning(with: passwordForm)
+        }
+      default:
+        break
+      }
     }
   }
 
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section == Section.savedLogins.rawValue
+    return indexPath.section != Section.options.rawValue
   }
 
   private func showDeleteLoginWarning(with credential: PasswordForm) {
