@@ -184,9 +184,9 @@ public actor AdBlockEngineManager: Sendable {
 }
 
 #if DEBUG
-extension AdBlockEngineManager {
+private extension AdBlockEngineManager {
   /// A method that logs info on the given resources
-  fileprivate func debug(compiledResults: [ResourceWithVersion: Result<Void, Error>]) {
+  func debug(compiledResults: [ResourceWithVersion: Result<Void, Error>]) {
     log.debug("Loaded \(compiledResults.count, privacy: .public) (total) engine resources:")
     
     compiledResults.sorted(by: { $0.key.order < $1.key.order })

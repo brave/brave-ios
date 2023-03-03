@@ -49,10 +49,10 @@ class ContentBlockerManagerTests: XCTestCase {
             XCTAssertTrue(returnedCachedRuleLists.contains(where: {
               $0.identifier == ContentBlockerManager.BlocklistRuleType.general(generalType).identifier
             }))
-          case .blockCookies:
+          case .blockCookies, .blockTrackers:
             // Check for bundled rule type
             XCTAssertEqual(returnedSourceType, .bundled)
-            XCTAssertNotNil(returnedCachedRuleList)
+            XCTAssertNotNil(returnedSourceType)
           }
         }
       }
@@ -66,7 +66,7 @@ class ContentBlockerManagerTests: XCTestCase {
           manager.sourceType(for: downloadedRuleType), .bundled
         )
         
-        let returnedCachedRuleLists = await manager.ruleLists(for: domain)
+        let returnedCachedRuleLists = manager.ruleLists(for: domain)
         XCTAssertTrue(returnedCachedRuleLists.contains(where: {
           $0.identifier == downloadedRuleType.identifier
         }))
