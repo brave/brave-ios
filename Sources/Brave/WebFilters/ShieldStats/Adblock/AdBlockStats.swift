@@ -43,10 +43,10 @@ public class AdBlockStats {
   }
   
   /// This returns all the user script types for the given frame
-  @MainActor func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain) async -> Set<UserScriptType> {
+  func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain) async -> Set<UserScriptType> {
     // Add any engine scripts for this frame
     return await cachedEngines.enumerated().asyncMap({ (index, cachedEngine) -> Set<UserScriptType> in
-      guard cachedEngine.isEnabled(for: domain) else { return [] }
+      guard await cachedEngine.isEnabled(for: domain) else { return [] }
       
       do {
         return try await cachedEngine.makeEngineScriptTypes(

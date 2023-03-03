@@ -337,10 +337,10 @@ final public class ContentBlockerManager: Sendable {
   }
   
   /// Return the enabled rule types for this domain and the enabled settings
-  @MainActor public func ruleLists(for domain: Domain) async -> Set<WKContentRuleList> {
+  @MainActor public func ruleLists(for domain: Domain) -> Set<WKContentRuleList> {
     let ruleTypes = enabledRuleTypes(for: domain)
     
-    return await Set(ruleTypes.asyncConcurrentCompactMap { ruleType in
+    return Set(ruleTypes.compactMap { ruleType in
       return self.cachedRuleList(for: ruleType)
     })
   }
