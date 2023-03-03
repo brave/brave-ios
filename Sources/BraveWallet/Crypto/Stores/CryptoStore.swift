@@ -386,14 +386,11 @@ public class CryptoStore: ObservableObject {
     return pendingRequest != nil
   }
 
-  struct AddNetworkCompletion {
-    let chainId: String
-    let completion: (_ error: String?) -> Void
-  }
-  // Helper to store the completion block of an Add Network request.
-  // The completion closure is handled in `onAddEthereumChainRequestCompleted`
+  // Helper to store the completion block of an Add Network dapp request.
+  typealias AddNetworkCompletion = (_ error: String?) -> Void
+  // The completion closure(s) are handled in `onAddEthereumChainRequestCompleted`
   // when we determine if the chain was added successfully or not.
-  var addNetworkWebpageRequestCompletion: AddNetworkCompletion?
+  var addNetworkDappRequestCompletion: [String: AddNetworkCompletion] = [:]
   
   func handleWebpageRequestResponse(
     _ response: WebpageRequestResponse,
@@ -407,7 +404,7 @@ public class CryptoStore: ObservableObject {
       // wait for `onAddEthereumChainRequestCompleted` to know success/failure
       if approved, let completion {
         // store `completion` closure until notified of `onAddEthereumChainRequestCompleted` event
-        addNetworkWebpageRequestCompletion = .init(chainId: chainId, completion: completion)
+        addNetworkDappRequestCompletion[chainId] = completion
         rpcService.addEthereumChainRequestCompleted(chainId, approved: approved)
       } else { // not approved, or no completion closure provided.
         completion?(nil)
@@ -514,9 +511,9 @@ extension CryptoStore: BraveWalletJsonRpcServiceObserver {
   }
   
   public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-    if let addNetworkWebpageRequestCompletion {
-      addNetworkWebpageRequestCompletion.completion(error.isEmpty ? nil : error)
-      self.addNetworkWebpageRequestCompletion = nil
+    if let addNetworkDappRequestCompletion = addNetworkDappRequestCompletion[chainId] {
+      addNetworkDappRequestCompletion(error.isEmpty ? nil : error)
+      self.addNetworkDappRequestCompletion[chainId] = nil
     }
   }
   

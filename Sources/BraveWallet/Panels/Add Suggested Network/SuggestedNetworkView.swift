@@ -262,14 +262,10 @@ struct SuggestedNetworkView: View {
       // this can occur when Add Network is dismissed while still loading...
       // we need to show loading state again, and handle success/failure response
       if case let .addNetwork(network) = mode,
-         let pendingCompletion = cryptoStore.addNetworkWebpageRequestCompletion,
-         pendingCompletion.chainId == network.chainId {
+         cryptoStore.addNetworkDappRequestCompletion[network.chainId] != nil {
         self.isLoading = true
         // overwrite the completion closure with a new one for this new view instance
-        cryptoStore.addNetworkWebpageRequestCompletion = .init(
-          chainId: network.chainId,
-          completion: handleAddNetworkCompletion
-        )
+        cryptoStore.addNetworkDappRequestCompletion[network.chainId] = handleAddNetworkCompletion
       }
     }
   }
