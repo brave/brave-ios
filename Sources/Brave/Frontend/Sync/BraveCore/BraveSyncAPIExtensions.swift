@@ -31,6 +31,7 @@ extension BraveSyncAPI {
     return Preferences.Chromium.syncEnabled.value
   }
   
+  /// Property that determines if the local sync chain should be resetted
   var shouldLeaveSyncGroup: Bool {
     guard isInSyncGroup else {
       return false
