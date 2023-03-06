@@ -7,6 +7,7 @@ import Foundation
 import Shared
 import WebKit
 import os.log
+import JavaScriptCore
 
 struct ReadyState: Codable {
   let state: State
@@ -47,6 +48,7 @@ struct ReadyState: Codable {
 class ReadyStateScriptHandler: TabContentScript {
   private weak var tab: Tab?
   private var debounceTimer: Timer?
+  private let ctx = JSContext.plus
 
   required init(tab: Tab) {
     self.tab = tab
@@ -67,7 +69,10 @@ class ReadyStateScriptHandler: TabContentScript {
                                forMainFrameOnly: true,
                                in: scriptSandbox)
   }()
-
+  
+  var ranOnce = false
+  var value: JSValue?
+  
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     
     defer { replyHandler(nil, nil) }
@@ -83,5 +88,77 @@ class ReadyStateScriptHandler: TabContentScript {
     }
     
     tab?.onPageReadyStateChanged?(readyState.state)
+    
+    func loadUserScript(named: String) -> String? {
+      guard let path = Bundle.module.path(forResource: named, ofType: "js"),
+            let source: String = try? String(contentsOfFile: path) else {
+        Logger.module.error("Failed to load script: \(named).js")
+        assertionFailure("Failed to Load Script: \(named).js")
+        return nil
+      }
+      return source
+    }
+    
+    guard !ranOnce else { return }
+    ranOnce = true
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+      guard let script = loadUserScript(named: "ytdl") else {
+        return
+      }
+        
+      guard let ctx = self.ctx else {
+        return
+      }
+        
+      ctx.evaluateScript(script)
+      
+      let fn = """
+      Exported.ytdl.getInfo('https://www.youtube.com/watch?v=aqz-KE-bpKQ', { "lang": "en"})
+      .then(function(e) {
+        debugger;
+        console.log(e);
+      })
+      .catch(function(e) {
+        debugger;
+        console.log(e);
+      });
+      """
+      
+      self.value = ctx.evaluateScript(fn)
+      print(self.value)
+    }
+
+    
+//    let success: @convention(c) (JSContextRef?, JSObjectRef?, JSObjectRef?, Int, UnsafePointer<JSValueRef?>?, UnsafeMutablePointer<JSValueRef?>?) -> JSValueRef? = { (context, function, thisObject, argumentCount, arguments, exception) -> JSValueRef? in
+//      guard let context = JSContext(jsGlobalContextRef: context) else { return nil }
+//      
+//      if argumentCount > 0, let arguments = arguments {
+//        let buffer = UnsafeBufferPointer(start: arguments, count: argumentCount)
+//        let args = Array(buffer)
+//        
+//        print(args)
+//      }
+//      return nil
+//    }
+//    
+//    let failure: @convention(c) (JSContextRef?, JSObjectRef?, JSObjectRef?, Int, UnsafePointer<JSValueRef?>?, UnsafeMutablePointer<JSValueRef?>?) -> JSValueRef? = { (context, function, thisObject, argumentCount, arguments, exception) -> JSValueRef? in
+//      guard let context = JSContext(jsGlobalContextRef: context) else { return nil }
+//      
+//      if argumentCount > 0, let arguments = arguments {
+//        let buffer = UnsafeBufferPointer(start: arguments, count: argumentCount)
+//        let args = Array(buffer)
+//        
+//        print(args)
+//      }
+//      return nil
+//    }
+//    
+//    
+//    
+//    value?.invokeMethod("then", withArguments: [
+//      JSContext.bind(ctx: ctx, thisObject: nil, name: "resolve", callback: success),
+//      JSContext.bind(ctx: ctx, thisObject: nil, name: "reject", callback: failure)
+//    ])
   }
 }
