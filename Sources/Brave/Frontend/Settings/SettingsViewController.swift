@@ -746,14 +746,13 @@ class SettingsViewController: TableViewController {
                 networkStore: cryptoStore?.networkStore,
                 keyringStore: keyringStore,
                 ipfsAPI: ipfsAPI
-              ).environment(
-                \.openWalletURLAction,
-                .init(action: { [weak self] url in
-                  guard let self = self else { return }
-                  (self.presentingViewController ?? self).dismiss(animated: true) { [self] in
-                    self.settingsDelegate?.settingsOpenURLInNewTab(url)
-                  }
-                }))
+              ).environment(\.openURL, .init(handler: { [weak self] url in
+                guard let self = self else { return .discarded }
+                (self.presentingViewController ?? self).dismiss(animated: true) { [self] in
+                  self.settingsDelegate?.settingsOpenURLInNewTab(url)
+                }
+                return .handled
+              }))
               let vc = UIHostingController(rootView: web3SettingsView)
               self.navigationController?.pushViewController(vc, animated: true)
             },

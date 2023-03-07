@@ -295,15 +295,15 @@ private struct Web3DomainSettingsView: View {
           .tag(option)
       }
     } label: {
-      Text(Strings.Wallet.ensOffchainResolveMethodTitle)
-        .foregroundColor(Color(.braveLabel))
-        .padding(.vertical, 4)
-    }
-
-    Button(action: { openWalletURL?(WalletConstants.braveWalletENSOffchainURL) }) {
-      Text(Strings.Wallet.ensOffchainResolveMethodDescription)
-        .font(.footnote)
-        .padding(.vertical, 4)
+      VStack(alignment: .leading, spacing: 6) {
+        Text(Strings.Wallet.ensOffchainResolveMethodTitle)
+          .foregroundColor(Color(.braveLabel))
+        Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ensOffchainResolveMethodDescription, WalletConstants.braveWalletENSOffchainURL.absoluteDisplayString)))
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .tint(Color(.braveBlurpleTint))
+          .font(.footnote)
+      }
+      .padding(.vertical, 4)
     }
   }
   

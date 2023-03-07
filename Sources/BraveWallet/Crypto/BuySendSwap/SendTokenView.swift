@@ -19,7 +19,7 @@ struct SendTokenView: View {
   @ScaledMetric private var length: CGFloat = 16.0
   
   @Environment(\.appRatingRequestAction) private var appRatingRequest
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openURL
   
   var completion: ((_ success: Bool) -> Void)?
   var onDismiss: () -> Void
@@ -211,7 +211,7 @@ struct SendTokenView: View {
                     .foregroundColor(Color(.secondaryBraveLabel))
                     .fixedSize(horizontal: false, vertical: true)
                   Button(action: {
-                    openWalletURL?(WalletConstants.braveWalletENSOffchainURL)
+                    openURL(WalletConstants.braveWalletENSOffchainURL)
                   }) {
                     Text(Strings.Wallet.learnMoreButton)
                       .foregroundColor(Color(.braveBlurpleTint))

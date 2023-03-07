@@ -3554,7 +3554,7 @@ extension Strings {
       "wallet.ensOffchainResolveMethodTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Learn More about ENS offchain lookup privacy considerations.",
+      value: "[Learn More](%@) about ENS offchain lookup privacy considerations.",
       comment: "The description for the options to allow Ethereum Name service domain names offchain."
     )
     public static let snsResolveMethodTitle = NSLocalizedString(
