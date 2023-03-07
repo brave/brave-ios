@@ -176,7 +176,7 @@ window.__firefox__.execute(function($) {
         CC.allRules.push(rule)
         
         if (!CC.hide1pContent) {
-          CC.allHideSelectorsToRules.set(selector, CC.allRules.count - 1)
+          CC.allHideSelectorsToRules.set(selector, CC.allRules.length - 1)
           CC.firstRunQueue.add(selector)
         }
       }
