@@ -524,6 +524,10 @@ extension JSContext {
           
           document.evaluateCode(res, code);
         }
+    
+        const Exported = {
+          ytdl: null
+        };
     """)
     
     return ctx

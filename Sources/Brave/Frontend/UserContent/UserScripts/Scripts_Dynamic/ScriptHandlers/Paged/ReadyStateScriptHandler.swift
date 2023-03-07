@@ -102,7 +102,7 @@ class ReadyStateScriptHandler: TabContentScript {
     guard !ranOnce else { return }
     ranOnce = true
     
-    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+    DispatchQueue.main.asyncAfter(deadline: .now()) {
       guard let script = loadUserScript(named: "ytdl") else {
         return
       }
@@ -114,13 +114,11 @@ class ReadyStateScriptHandler: TabContentScript {
       ctx.evaluateScript(script)
       
       let fn = """
-      Exported.ytdl.getInfo('https://www.youtube.com/watch?v=aqz-KE-bpKQ', { "lang": "en"})
-      .then(function(e) {
-        debugger;
+      var info = Exported.ytdl.getInfo('https://www.youtube.com/watch?v=aqz-KE-bpKQ', { "lang": "en" });
+      info.then((e) => {
         console.log(e);
       })
-      .catch(function(e) {
-        debugger;
+      .catch((e) => {
         console.log(e);
       });
       """
