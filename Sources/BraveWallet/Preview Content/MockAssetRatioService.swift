@@ -43,10 +43,6 @@ class MockAssetRatioService: BraveWalletAssetRatioService {
   func coinMarkets(_ vsAsset: String, limit: UInt8, completion: @escaping (Bool, [BraveWallet.CoinMarket]) -> Void) {
     completion(false, [])
   }
-  
-  func sellUrl(_ provider: BraveWallet.OffRampProvider, chainId: String, address: String, symbol: String, amount: String, currencyCode: String, completion: @escaping (String, String?) -> Void) {
-    completion("", nil)
-  }
 }
 
 #endif
