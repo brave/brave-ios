@@ -591,6 +591,8 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         preferences.allowsContentJavaScript = isScriptsEnabled
       }
 
+      // Cookie Blocking code below
+      tab.setScript(script: .cookieBlocking, enabled: Preferences.Privacy.blockAllCookies.value)
       return (.allow, preferences)
     }
 

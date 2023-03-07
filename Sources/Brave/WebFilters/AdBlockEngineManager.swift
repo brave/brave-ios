@@ -205,7 +205,7 @@ private extension AdBlockEngineManager {
           "\(resultString)",
         ].joined(separator: " ")
         
-        log.debug("\(sourceDebugString, privacy: .public)")
+        log.debug("\(sourceDebugString, privacy: .private)")
       }
   }
 }
