@@ -44,6 +44,12 @@ private class MediaRequest: NSObject, MediaRequestProcessor {
   private let queue = DispatchQueue(label: "com.ranged.media-request", qos: .utility)
   private var loadingRequest: AVAssetResourceLoadingRequest
   private var response: URLResponse?
+  private let dateFormatter = {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+    return dateFormatter
+  }()
   
   private lazy var session: URLSession = {
     return URLSession(configuration: .ephemeral, delegate: self, delegateQueue: OperationQueue().then {
@@ -69,6 +75,8 @@ private class MediaRequest: NSObject, MediaRequestProcessor {
     let offset = loadingRequest.dataRequest?.requestedOffset ?? 0
     let length = Int64(loadingRequest.dataRequest?.requestedLength ?? 1)
     var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60)
+//    var request = loadingRequest.request
+//    request.url = url
     request.setValue("bytes=\(offset)-\(offset + length - 1)", forHTTPHeaderField: "Range")
     loadingRequest.request.allHTTPHeaderFields?.forEach({
       request.setValue($0.value, forHTTPHeaderField: $0.key)
@@ -85,11 +93,19 @@ private class MediaRequest: NSObject, MediaRequestProcessor {
   func cancel() {
     session.invalidateAndCancel()
   }
+  
+  func format(date: String) -> Date? {
+    return dateFormatter.date(from: date)
+  }
+  
+  func isSame(as request: AVAssetResourceLoadingRequest) -> Bool {
+    return loadingRequest === request
+  }
 }
 
 extension MediaRequest: URLSessionTaskDelegate {
   func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-    queue.async { [weak self] in
+    queue.sync { [weak self] in
       guard let self = self else { return }
       if self.loadingRequest.isFinished || self.loadingRequest.isCancelled {
         self.session.invalidateAndCancel()
@@ -109,7 +125,7 @@ extension MediaRequest: URLSessionTaskDelegate {
 
 extension MediaRequest: URLSessionDataDelegate {
   func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-    queue.async { [weak self] in
+    queue.sync { [weak self] in
       guard let self = self else { return }
       self.data = data
       self.processRequest(response: self.response, data: self.data, loadingRequest: self.loadingRequest)
@@ -117,7 +133,7 @@ extension MediaRequest: URLSessionDataDelegate {
   }
   
   func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-    queue.async { [weak self] in
+    queue.sync { [weak self] in
       guard let self = self else { return }
       
       self.response = response
@@ -130,9 +146,15 @@ extension MediaRequest: URLSessionDataDelegate {
 private class InfoRequest: MediaRequest {
   override func processRequest(response: URLResponse?, data: Data, loadingRequest: AVAssetResourceLoadingRequest) {
     guard !loadingRequest.isFinished && !loadingRequest.isCancelled && data.count > 0 else { return }
+    
     if let infoRequest = loadingRequest.contentInformationRequest, let response = response {
       loadingRequest.response = response
-      infoRequest.isByteRangeAccessSupported = true
+      infoRequest.isByteRangeAccessSupported = false
+      infoRequest.contentLength = response.expectedContentLength
+      
+      if #available(iOS 16.0, *) {
+        infoRequest.isEntireLengthAvailableOnDemand = false
+      }
 
       if let mimeType = response.mimeType {
         infoRequest.contentType = UTType(mimeType: mimeType)?.identifier
@@ -140,30 +162,38 @@ private class InfoRequest: MediaRequest {
         infoRequest.contentType = response.mimeType ?? "video/mp4"
       }
 
-      infoRequest.contentLength = response.expectedContentLength
-      if let contentRange = ((response as? HTTPURLResponse)?.allHeaderFields["Content-Range"] as? String)?.suffix(while: { return $0 != "/" }) {
-        infoRequest.contentLength = Int64(contentRange) ?? response.expectedContentLength
+      if let response = response as? HTTPURLResponse {
+        if let contentRange = response.value(forHTTPHeaderField: "Content-Range")?.suffix(while: { $0 != "/" }),
+           let contentLength = Int64(contentRange) {
+          infoRequest.contentLength = contentLength
+        }
+        
+        if let expires = response.value(forHTTPHeaderField: "Expires") {
+          infoRequest.renewalDate = format(date: expires)
+        }
+        
+        if let acceptRanges = response.value(forHTTPHeaderField: "Accept-Ranges") {
+          infoRequest.isByteRangeAccessSupported = acceptRanges == "bytes"
+        }
       }
 
-      loadingRequest.dataRequest?.respond(with: data)
-      loadingRequest.finishLoading()
+      if let dataRequest = loadingRequest.dataRequest {
+        dataRequest.respond(with: data)
+      }
     }
   }
 }
 
 private class DataRequest: MediaRequest {
-  private var totalData = 0
-  
   override func processRequest(response: URLResponse?, data: Data, loadingRequest: AVAssetResourceLoadingRequest) {
     guard !loadingRequest.isFinished && !loadingRequest.isCancelled else { return }
     if let dataRequest = loadingRequest.dataRequest {
-      totalData += data.count
-      
-      if totalData > 0 {
+
+      if data.count > 0 {
         dataRequest.respond(with: data)
       }
-      
-      if totalData >= dataRequest.requestedLength {
+
+      if data.count >= dataRequest.requestedLength {
         loadingRequest.finishLoading()
       }
     }
@@ -174,10 +204,9 @@ class RangedResourceLoaderDelegate: NSObject {
   private static let scheme = "chunked"
   private let url: URL
   public let streamURL: URL
-  private var request: MediaRequest?
+  private var requests = [MediaRequest]()
   
   let queue = DispatchQueue(label: "com.ranged.resource-delegate", qos: .utility)
-  private var requests = [MediaRequest]()
 
   init(url: URL) {
     self.url = url
@@ -193,7 +222,7 @@ extension RangedResourceLoaderDelegate: AVAssetResourceLoaderDelegate {
     
     if url.isFileURL {
       if loadingRequest.contentInformationRequest != nil {
-        self.request = InfoRequest(request: loadingRequest)
+        requests.append(InfoRequest(request: loadingRequest))
       } else {
         guard let dataRequest = loadingRequest.dataRequest else { return false }
         
@@ -229,7 +258,7 @@ extension RangedResourceLoaderDelegate: AVAssetResourceLoaderDelegate {
     }
 
     if loadingRequest.contentInformationRequest != nil {
-      self.request = InfoRequest(request: loadingRequest)
+      requests.append(InfoRequest(request: loadingRequest))
     } else {
       requests.append(DataRequest(request: loadingRequest))
     }
@@ -237,8 +266,14 @@ extension RangedResourceLoaderDelegate: AVAssetResourceLoaderDelegate {
     return true
   }
   
+  func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
+    return false
+  }
+  
   func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
-    self.request?.cancel()
-    self.request = nil
+    if let index = requests.firstIndex(where: { $0.isSame(as: loadingRequest) }) {
+      let request = requests.remove(at: index)
+      request.cancel()
+    }
   }
 }
