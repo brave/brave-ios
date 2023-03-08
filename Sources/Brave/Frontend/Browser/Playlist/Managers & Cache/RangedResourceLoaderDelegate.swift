@@ -89,18 +89,21 @@ private class MediaRequest: NSObject, MediaRequestProcessor {
 
 extension MediaRequest: URLSessionTaskDelegate {
   func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-    if loadingRequest.isFinished || loadingRequest.isCancelled {
-      session.invalidateAndCancel()
-      return
+    queue.async { [weak self] in
+      guard let self = self else { return }
+      if self.loadingRequest.isFinished || self.loadingRequest.isCancelled {
+        self.session.invalidateAndCancel()
+        return
+      }
+      
+      if let error = error {
+        self.loadingRequest.finishLoading(with: error)
+      } else {
+        self.loadingRequest.finishLoading()
+      }
+      
+      self.session.finishTasksAndInvalidate()
     }
-    
-    if let error = error {
-      loadingRequest.finishLoading(with: error)
-    } else {
-      loadingRequest.finishLoading()
-    }
-    
-    session.finishTasksAndInvalidate()
   }
 }
 
@@ -119,14 +122,14 @@ extension MediaRequest: URLSessionDataDelegate {
       
       self.response = response
       self.processRequest(response: self.response, data: self.data, loadingRequest: self.loadingRequest)
+      completionHandler(.allow)
     }
-    completionHandler(.allow)
   }
 }
 
 private class InfoRequest: MediaRequest {
   override func processRequest(response: URLResponse?, data: Data, loadingRequest: AVAssetResourceLoadingRequest) {
-    guard !loadingRequest.isFinished && !loadingRequest.isCancelled else { return }
+    guard !loadingRequest.isFinished && !loadingRequest.isCancelled && data.count > 0 else { return }
     if let infoRequest = loadingRequest.contentInformationRequest, let response = response {
       loadingRequest.response = response
       infoRequest.isByteRangeAccessSupported = true
@@ -159,6 +162,10 @@ private class DataRequest: MediaRequest {
       if totalData > 0 {
         dataRequest.respond(with: data)
       }
+      
+      if totalData >= dataRequest.requestedLength {
+        loadingRequest.finishLoading()
+      }
     }
   }
 }
@@ -170,7 +177,7 @@ class RangedResourceLoaderDelegate: NSObject {
   private var request: MediaRequest?
   
   let queue = DispatchQueue(label: "com.ranged.resource-delegate", qos: .utility)
-  private var requests = [AVAssetResourceLoadingRequest]()
+  private var requests = [MediaRequest]()
 
   init(url: URL) {
     self.url = url
@@ -224,7 +231,7 @@ extension RangedResourceLoaderDelegate: AVAssetResourceLoaderDelegate {
     if loadingRequest.contentInformationRequest != nil {
       self.request = InfoRequest(request: loadingRequest)
     } else {
-      self.request = DataRequest(request: loadingRequest)
+      requests.append(DataRequest(request: loadingRequest))
     }
     
     return true
