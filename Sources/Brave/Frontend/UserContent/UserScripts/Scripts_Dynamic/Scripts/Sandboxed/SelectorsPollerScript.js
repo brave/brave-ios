@@ -504,7 +504,7 @@ window.__firefox__.execute(function($) {
       const ruleIdx = rulesToRemove1[_i]
       // Safe to asset ruleIdx is a number because we've already filtered out
       // any `undefined` instances with the filter call above.
-      delete myArray[ruleIdx]
+      delete allRules[ruleIdx]
     }
     
     // Re-sync the indexes
