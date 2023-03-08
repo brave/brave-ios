@@ -313,3 +313,11 @@ public extension String {
     WalletConstants.supportedSNSExtensions.contains(where: hasSuffix)
   }
 }
+
+public extension URL {
+  /// Returns true if url's scheme is supported to be resolved using IPFS public gateway
+  var isIPFSScheme: Bool {
+    guard let scheme = self.scheme else { return false }
+    return WalletConstants.supportedIPFSSchemes.contains(scheme)
+  }
+}

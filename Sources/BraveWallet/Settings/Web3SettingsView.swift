@@ -16,6 +16,8 @@ public struct Web3SettingsView: View {
   
   private let ipfsAPI: IpfsAPI?
   
+  @ObservedObject var enableIPFSResourcesResolver = Preferences.Wallet.resolveIPFSResources
+
   @State private var isShowingResetWalletAlert = false
   @State private var isShowingResetTransactionAlert = false
   /// If we are showing the modal so the user can enter their password to enable unlock via biometrics.
@@ -48,12 +50,34 @@ public struct Web3SettingsView: View {
       }
       if let ipfsAPI { // means users come from the browser not the wallet
         Section(
-          header: Text(Strings.Wallet.ipfsSettingsHeader),
-          footer: Text(Strings.Wallet.ipfsSettingsFooter)
+          header: Text(Strings.Wallet.ipfsSettingsHeader)
         ) {
+          Picker(selection: $enableIPFSResourcesResolver.value) {
+            ForEach(Preferences.Wallet.Web3IPFSOption.allCases) { option in
+              Text(option.name)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tag(option)
+            }
+          } label: {
+            Text(Strings.Wallet.ipfsResourcesOptionsTitle)
+              .foregroundColor(Color(.braveLabel))
+              .padding(.vertical, 5)
+          }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
           NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
+            VStack(alignment: .leading, spacing: 5) {
+              Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
+                .foregroundColor(Color(.braveLabel))
+              Text(ipfsNFTGatewayURL)
+                .font(.footnote)
+                .foregroundColor(Color(.secondaryBraveLabel))
+            }
+            .padding(.vertical, 5)
+          }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
             VStack(alignment: .leading, spacing: 4) {
-              Text(Strings.Wallet.nftGatewayTitle)
+              Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
                 .foregroundColor(Color(.braveLabel))
               Text(ipfsNFTGatewayURL)
                 .font(.footnote)

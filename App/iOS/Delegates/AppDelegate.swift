@@ -423,7 +423,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       (SessionRestoreHandler.path, SessionRestoreHandler()),
       (ErrorPageHandler.path, ErrorPageHandler()),
       (ReaderModeHandler.path, ReaderModeHandler(profile: profile)),
-      (SNSDomainHandler.path, SNSDomainHandler())
+      (SNSDomainHandler.path, SNSDomainHandler()),
+      (IPFSSchemeHandler.path, IPFSSchemeHandler())
     ]
     
     responders.forEach { (path, responder) in

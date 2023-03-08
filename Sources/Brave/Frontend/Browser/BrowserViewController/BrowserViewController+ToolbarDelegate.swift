@@ -257,8 +257,32 @@ extension BrowserViewController: TopToolbarDelegate {
     return url
   }
   
+  @discardableResult
+  func handleIPFSSchmeURL(_ url: URL, visitType: VisitType) -> Bool {
+    guard !PrivateBrowsingManager.shared.isPrivateBrowsing, let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
+      return false
+    }
+    
+    switch ipfsPref {
+    case .ask:
+      showIPFSInterstitialPage(originalURL: url, visitType: visitType)
+      return true
+    case .enabled:
+      if let resolvedUrl = braveCore.ipfsAPI.resolveGatewayUrl(for: url) {
+        finishEditingAndSubmit(resolvedUrl, visitType: visitType)
+        return true
+      }
+    case .disabled:
+      break
+    }
+    
+    return false
+  }
+  
   @MainActor func submitValidURL(_ text: String, visitType: VisitType) async -> Bool {
-    if let fixupURL = URIFixup.getURL(text) {
+    if let url = URL(string: text), url.isIPFSScheme {
+      return handleIPFSSchmeURL(url, visitType: visitType)
+    } else if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
       // Instead, submit them to the search engine like Chrome-iOS does.
       if !["file"].contains(fixupURL.scheme) {
