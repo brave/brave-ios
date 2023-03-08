@@ -9,6 +9,32 @@ import Foundation
 import AVFoundation
 import MobileCoreServices
 
+private extension URL {
+  var withMediaScheme: URL {
+    guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+      return self
+    }
+    
+    if let scheme = components.scheme {
+      components.scheme = "\(scheme)-chunked"
+    }
+    
+    return components.url ?? self
+  }
+  
+  var removingMediaScheme: URL {
+    guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+      return self
+    }
+    
+    if let scheme = components.scheme {
+      components.scheme = scheme.replacingOccurrences(of: "-chunked$", with: "", options: .regularExpression)
+    }
+    
+    return components.url ?? self
+  }
+}
+
 private protocol MediaRequestProcessor {
   func processRequest(response: URLResponse?, data: Data, loadingRequest: AVAssetResourceLoadingRequest)
 }
@@ -35,14 +61,7 @@ private class MediaRequest: NSObject, MediaRequestProcessor {
   
   init(request: AVAssetResourceLoadingRequest) {
     self.loadingRequest = request
-    guard let requestURL = loadingRequest.request.url,
-          var components = URLComponents(url: requestURL, resolvingAgainstBaseURL: false) else {
-      super.init()
-      return
-    }
-    
-    components.scheme = String("\(components.scheme ?? "")".prefix(while: { $0 != "-" }))
-    guard let url = components.url else {
+    guard let url = self.loadingRequest.request.url?.removingMediaScheme else {
       super.init()
       return
     }
@@ -155,54 +174,57 @@ class RangedResourceLoaderDelegate: NSObject {
 
   init(url: URL) {
     self.url = url
-
-    guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-      self.streamURL = url
-      super.init()
-      return
-    }
-
-    components.scheme = "\(components.scheme ?? "")-\(Self.scheme)"
-    guard let streamURL = components.url else {
-      self.streamURL = url
-      super.init()
-      return
-    }
-
-    self.streamURL = streamURL
+    self.streamURL = url.withMediaScheme
     super.init()
   }
 }
 
 extension RangedResourceLoaderDelegate: AVAssetResourceLoaderDelegate {
-  private static var data = Data()
-  
   func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
     guard resourceLoader.delegate === self else { return false }
+    guard let url = loadingRequest.request.url?.removingMediaScheme else { return false }
+    
+    if url.isFileURL {
+      if loadingRequest.contentInformationRequest != nil {
+        self.request = InfoRequest(request: loadingRequest)
+      } else {
+        guard let dataRequest = loadingRequest.dataRequest else { return false }
+        
+        let requestedOffset = dataRequest.requestedOffset
+        let requestedLength = dataRequest.requestedLength
+        
+        let chunkSize = 1024 * 1024 * 1024
+        let chunks = requestedLength / chunkSize
+        let lastChunk = requestedLength % chunkSize
+        
+        do {
+          let fileHandle = try FileHandle(forReadingFrom: url)
+          try fileHandle.seek(toOffset: UInt64(requestedOffset))
+
+          for _ in 0..<chunks {
+            let data = try fileHandle.read(upToCount: chunkSize)
+            dataRequest.respond(with: data!)
+          }
+
+          if lastChunk > 0 {
+            let data = try fileHandle.read(upToCount: lastChunk)
+            dataRequest.respond(with: data!)
+          }
+          
+          try fileHandle.close()
+          loadingRequest.finishLoading()
+        } catch {
+          loadingRequest.finishLoading(with: error)
+          return false
+        }
+      }
+      return true
+    }
 
     if loadingRequest.contentInformationRequest != nil {
       self.request = InfoRequest(request: loadingRequest)
-      
-//      self.queue.async {
-//        Self.data = (try? Data(contentsOf: self.url, options: .mappedIfSafe)) ?? Data()
-//        loadingRequest.response = URLResponse(url: self.url, mimeType: "video/mp4", expectedContentLength: Self.data.count, textEncodingName: nil)
-//        loadingRequest.contentInformationRequest?.isByteRangeAccessSupported = false
-//
-//        loadingRequest.contentInformationRequest?.contentType = UTType(mimeType: "video/mp4")?.identifier
-//        loadingRequest.contentInformationRequest?.contentLength = Int64(Self.data.count)
-//
-//        loadingRequest.dataRequest?.respond(with: Self.data.subdata(in: 0..<2))
-//        loadingRequest.finishLoading()
-//      }
     } else {
       self.request = DataRequest(request: loadingRequest)
-      
-//      if let dataRequest = loadingRequest.dataRequest {
-//        let offset = Int(dataRequest.requestedOffset)
-//        let length = dataRequest.requestedLength
-//        dataRequest.respond(with: Self.data.subdata(in: offset..<offset+length))
-//        loadingRequest.finishLoading()
-//      }
     }
     
     return true
