@@ -3585,19 +3585,54 @@ extension Strings {
       value: "IPFS",
       comment: "The header of the section under Web3 settings for IPFS NFT gateway setting."
     )
-    public static let nftGatewayTitle = NSLocalizedString(
-      "wallet.nftGatewayTitle",
+    public static let ipfsResourcesOptionsTitle = NSLocalizedString(
+      "wallet.ipfsResourcesOptionsTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Customize NFT Gateway",
+      value: "Resolve IPFS Resources",
+      comment: "The title of the section under Web3 settings for users to pick an option to resolve IPFS Resources."
+    )
+    public static let web3IPFSPreferenceAsk = NSLocalizedString(
+      "wallet.web3IPFSPreferenceAsk",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Ask",
+      comment: "One of the options for Brave to handle IPFS scheme urls. 'Ask' means Brave will ask user first before enable or disable resolving the IPFS scheme url."
+    )
+    public static let web3IPFSPreferenceEnabled = NSLocalizedString(
+      "wallet.web3IPFSPreferenceEnabled",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enabled",
+      comment: "One of the options for Brave to handle IPFS scheme urls. 'Enabled' means Brave will enable resolving the IPFS scheme url."
+    )
+    public static let web3IPFSPreferenceDisabled = NSLocalizedString(
+      "wallet.web3IPFSPreferenceDisabled",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Disabled",
+      comment: "One of the options for Brave to handle Solana Name Service domain name. 'Disabled' means Brave will disable resolving SNS domain name."
+    )
+    public static let ipfsPublicGatewayAddressTitle = NSLocalizedString(
+      "wallet.ipfsPublicGatewayAddressTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "IPFS Public Gateway Address",
+      comment: "The navigation title of the screen for users to customize IPFS public gateway."
+    )
+    public static let ipfsPublicGatewayAddressNFTTitle = NSLocalizedString(
+      "wallet.ipfsPublicGatewayAddressNFTTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "IPFS Public Gateway Address for NFT",
       comment: "The navigation title of the screen for users to customize NFT gateway."
     )
-    public static let ipfsSettingsFooter = NSLocalizedString(
-      "wallet.ipfsSettingsFooter",
+    public static let customizeIPFSPublicGatewayNavTitle = NSLocalizedString(
+      "wallet.customizeIPFSPublicGatewayNavTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Gateway is used to resolve NFT content in the wallet",
-      comment: "The footer of the section for IPFS NFT gateway setting."
+      value: "Customize IPFS Gateway",
+      comment: "The navigation title of the screen for users to customize ipfs public gateway address."
     )
     public static let nftGatewayLongDescription = NSLocalizedString(
       "wallet.nftGatewayLongDescription",
@@ -3738,6 +3773,48 @@ extension Strings {
       bundle: .module,
       value: "Use ENS Domain",
       comment: "Button title when requesting to do an ENS off chain lookup."
+    )
+    public static let web3IPFSInterstitialDisableButton = NSLocalizedString(
+      "wallet.web3IPFSInterstitialDisableButton",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Disable",
+      comment: "The title of the button that user will click to disable Brave to resolve IPFS shceme url."
+    )
+    public static let web3IPFSInterstitialProceedButton = NSLocalizedString(
+      "wallet.web3IPFSInterstitialProceedButton",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Use a Public Gateway",
+      comment: "The title of the button that user will click to let Brave to resolve IPFS shceme url."
+    )
+    public static let web3IPFSInterstitialIPFSTitle = NSLocalizedString(
+      "wallet.web3IPFSInterstitialIPFSTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Set your IPFS preference",
+      comment: "The title of the IPFS interstitial page for user to set the preference of IPFS scheme url handling."
+    )
+    public static let web3IPFSInterstitialIPFSPrivacy = NSLocalizedString(
+      "wallet.web3IPFSInterstitialIPFSPrivacy",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "IPFS (InterPlanetary File System) is the public network for peer-to-peer data storage and delivery. This protocol has different privacy considerations from HTTP(S). <a href=%@>%@</a>",
+      comment: "A brief explaination of IPFS on privacy. The first '%@' will be replaced with a link to a Brave article that explains how does IPFS impact users' privacy in details. The second '%@' will be replaced with 'web3IPFSInterstitialIPFSPrivacyLearnMore'."
+    )
+    public static let web3IPFSInterstitialIPFSPrivacyLearnMore = NSLocalizedString(
+      "wallet.web3IPFSInterstitialIPFSPrivacy",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Learn more",
+      comment: "A hyper link that users can click on which will redirect them to a Brave article that explains how does IPFS impact users' privacy in details."
+    )
+    public static let web3IPFSInterstitialIPFSPublicGateway = NSLocalizedString(
+      "wallet.web3IPFSInterstitialIPFSPublicGateway",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Protects your IP address and content you’re requesting from potential third-party observers, but not from the public gateway operator.  The gateway operator is responsible for ensuring that the content served to you over a gateway is the content you requested. Also, your computer does not contribute to the public IPFS network.",
+      comment: "A brief explaination of resolving IPFS scheme url using a public gateway."
     )
   }
 }

@@ -20,12 +20,14 @@ struct IPFSCustomGatewayView: View {
   }
   
   private let ipfsAPI: IpfsAPI
+  private let isForNFT: Bool
   @State private var url: String = "https://"
   @State private var setButtonStatus: SetButtonStatus = .disabled
   @State private var isPresentingWrongGatewayAlert: Bool = false
   
-  init(ipfsAPI: IpfsAPI) {
+  init(ipfsAPI: IpfsAPI, isForNFT: Bool = false) {
     self.ipfsAPI = ipfsAPI
+    self.isForNFT = isForNFT
   }
   
   var body: some View {
@@ -62,7 +64,7 @@ struct IPFSCustomGatewayView: View {
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(Strings.Wallet.nftGatewayTitle)
+    .navigationTitle(Strings.Wallet.customizeIPFSPublicGatewayNavTitle)
     .navigationBarItems(
       // Have to use this instead of toolbar placement to have a custom button style
       trailing: Button(action: {
@@ -75,7 +77,7 @@ struct IPFSCustomGatewayView: View {
         }
       }
         .buttonStyle(BraveFilledButtonStyle(size: .small))
-        .disabled(setButtonStatus != .enabled)
+        .disabled(setButtonStatus != .enabled && !isForNFT) // waiting for another set ipfs public gatway address api from core
     )
     .alert(isPresented: $isPresentingWrongGatewayAlert) {
       Alert(

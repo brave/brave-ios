@@ -64,6 +64,9 @@ struct WalletConstants {
   /// The supported Unstoppable Domain (UD) extensions
   static let supportedUDExtensions = [".crypto", ".x", ".nft", ".dao", ".wallet", ".888", ".blockchain", ".bitcoin"]
   
+  /// The supported IPFS schemes
+  static let supportedIPFSSchemes = ["ipfs", "ipns"]
+  
   /// The link for users to learn more about Solana SPL token account creation in transaction confirmation screen
   static let splTokenAccountCreationLink = URL(string: "https://support.brave.com/hc/en-us/articles/5546517853325")!
   
