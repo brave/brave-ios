@@ -47,30 +47,27 @@ window.__firefox__.execute(function($) {
   let notYetQueriedIds = []
   
   const CC = {}
-  CC.allHideSelectorsToRules = CC.allHideSelectorsToRules || new Map()
+  CC.allHideSelectorsToRules = new Map()
   CC.allRules = []
-  CC.observingHasStarted = CC.observingHasStarted || false
+  CC.observingHasStarted = false
   // All new selectors go in `firstRunQueue`
-  CC.firstRunQueue = CC.firstRunQueue || new Set()
+  CC.firstRunQueue = new Set()
   // Third party matches go in the second and third queues.
-  CC.secondRunQueue = CC.secondRunQueue || new Set()
+  CC.secondRunQueue = new Set()
   // Once a selector gets in to this queue, it's only evaluated for 1p content one
   // more time.
-  CC.finalRunQueue = CC.finalRunQueue || new Set()
-  CC.allQueues = CC.allQueues || [
+  CC.finalRunQueue = new Set()
+  CC.allQueues = [
     CC.firstRunQueue, CC.secondRunQueue, CC.finalRunQueue
   ]
-  CC.numQueues = CC.numQueues || CC.allQueues.length
-  CC.alreadyUnhiddenSelectors = CC.alreadyUnhiddenSelectors || new Set()
-  CC.alreadyKnownFirstPartySubtrees =
-    CC.alreadyKnownFirstPartySubtrees || new WeakSet()
-  CC._hasDelayOcurred = CC._hasDelayOcurred || false
-  CC._startCheckingId = CC._startCheckingId || undefined
-  CC.firstSelectorsPollingDelayMs = CC.firstSelectorsPollingDelayMs || undefined
-  CC.switchToSelectorsPollingThreshold =
-    CC.switchToSelectorsPollingThreshold || undefined
-  CC.fetchNewClassIdRulesThrottlingMs =
-    CC.fetchNewClassIdRulesThrottlingMs || undefined
+  CC.numQueues = CC.allQueues.length
+  CC.alreadyUnhiddenSelectors = new Set()
+  CC.alreadyKnownFirstPartySubtrees = new WeakSet()
+  CC._hasDelayOcurred = false
+  CC._startCheckingId = undefined
+  CC.firstSelectorsPollingDelayMs = undefined
+  CC.switchToSelectorsPollingThreshold = undefined
+  CC.fetchNewClassIdRulesThrottlingMs = undefined
   
   // The passed configuration to this script
   CC.hide1pContent = args.hideFirstPartyContent
@@ -152,17 +149,12 @@ window.__firefox__.execute(function($) {
     return false
   }
   
-  const makeStyleSheet = () => {
-    const style = document.createElement('style')
-    style.setAttribute('type', 'text/css')
-    return style
-  }
-  
   /// Create the style sheet if it isn't already created
   /// We do this in iOS here because we can't initialize a style sheet
   const ensureStyleSheet = () => {
     if (CC.cosmeticStyleSheet === undefined) {
-      const styleElm = makeStyleSheet()
+      const styleElm = document.createElement('style')
+      styleElm.setAttribute('type', 'text/css')
       document.body.appendChild(styleElm)
       CC.cosmeticStyleSheet = styleElm
     }
@@ -335,7 +327,7 @@ window.__firefox__.execute(function($) {
     }
   }
 
-  const isFirstPartyUrl = function (url) {
+  const isFirstPartyUrl = (url) => {
     if (isRelativeUrl(url)) {
       return true
     }
@@ -347,7 +339,7 @@ window.__firefox__.execute(function($) {
     return false
   }
 
-  const stripChildTagsFromText = function (elm, tagName, text) {
+  const stripChildTagsFromText = (elm, tagName, text) => {
     const childElms = Array.from(elm.getElementsByTagName(tagName))
     let localText = text
     for (let _i = 0, childElms1 = childElms; _i < childElms1.length; _i++) {
@@ -367,7 +359,7 @@ window.__firefox__.execute(function($) {
    *
    * @see https://github.com/brave/brave-browser/issues/9955
    */
-  const showsSignificantText = function (elm) {
+  const showsSignificantText = (elm) => {
     if (!isHTMLElement(elm)) {
       return false
     }
@@ -411,7 +403,7 @@ window.__firefox__.execute(function($) {
    *
    * Finally, special case some ids we know are used only for third party ads.
    */
-  const isSubTreeFirstParty = function (elm, possibleQueryResult) {
+  const isSubTreeFirstParty = (elm, possibleQueryResult) => {
     let queryResult
     let isTopLevel
     if (possibleQueryResult) {
@@ -485,51 +477,19 @@ window.__firefox__.execute(function($) {
     return true
   }
 
-  const unhideSelectors = function (selectors) {
+  const unhideSelectors = (selectors) => {
     if (selectors.size === 0) {
       return
     }
-    // Find selectors we have a rule index for
-    const rulesToRemove = Array.from(selectors)
-      .map(function (selector) { return CC.allHideSelectorsToRules.get(selector) })
-      .filter(function (i) { return i !== undefined })
-      .sort()
-      .reverse()
-
-    // Delete the rules
-    const lastIdx = CC.allHideSelectorsToRules.size - 1
-    // to deal with removing rules
     
-    for (let _i = 0, rulesToRemove1 = rulesToRemove; _i < rulesToRemove1.length; _i++) {
-      const ruleIdx = rulesToRemove1[_i]
-      // Safe to asset ruleIdx is a number because we've already filtered out
-      // any `undefined` instances with the filter call above.
-      delete allRules[ruleIdx]
-    }
-    
-    // Re-sync the indexes
-    // TODO: Sync is hard, just re-build by iterating through the StyleSheet rules.
-    const ruleLookup = Array.from(CC.allHideSelectorsToRules.entries())
-    let countAtLastHighest = rulesToRemove.length
-    for (let i = lastIdx; i > 0; i--) {
-      const _a = ruleLookup[i]
-      const selector = _a[0]
-      const oldIdx = _a[1]
-      // Is this one we removed?
-      if (rulesToRemove.includes(i)) {
+    Array.from(selectors).forEach((selector) => {
+      const index = CC.allHideSelectorsToRules[selector]
+      
+      if (index !== undefined) {
         CC.allHideSelectorsToRules.delete(selector)
-        countAtLastHighest--
-        if (countAtLastHighest === 0) {
-          break
-        }
-        continue
+        delete CC.allRules[index]
       }
-      if (oldIdx !== i) {
-        // Probably out of sync
-        console.error('Cosmetic Filters: old index did not match lookup index', { selector: selector, oldIdx: oldIdx, i: i })
-      }
-      CC.allHideSelectorsToRules.set(selector, oldIdx - countAtLastHighest)
-    }
+    })
   }
 
   const pumpIntervalMinMs = 40
@@ -545,7 +505,7 @@ window.__firefox__.execute(function($) {
    *   - If any are 1st party, remove 'hide' rule and never check selector again.
    * 3. If we're looking at the 3rd queue, don't requeue any selectors.
    */
-  const pumpCosmeticFilterQueues = function () {
+  const pumpCosmeticFilterQueues = () => {
     if (queueIsSleeping) { return }
     let didPumpAnything = false
     // For each "pump", walk through each queue until we find selectors
@@ -621,7 +581,7 @@ window.__firefox__.execute(function($) {
     }
     if (didPumpAnything) {
       queueIsSleeping = true
-      window.setTimeout(function () {
+      window.setTimeout(() => {
         // Set this to false now even though there's a gap in time between now and
         // idle since all other calls to `pumpCosmeticFilterQueuesOnIdle` that occur during this time
         // will be ignored (and nothing else should be calling `pumpCosmeticFilterQueues` straight).
@@ -660,7 +620,7 @@ window.__firefox__.execute(function($) {
     }
   }
 
-  const startObserving = function () {
+  const startObserving = () => {
     // First queue up any classes and ids that exist before the mutation observer
     // starts running.
     queryAttrsFromDocument()
@@ -669,7 +629,7 @@ window.__firefox__.execute(function($) {
     useMutationObserver()
   }
 
-  const scheduleQueuePump = function (hide1pContent, genericHide) {
+  const scheduleQueuePump = (hide1pContent, genericHide) => {
     // Three states possible here.  First, the delay has already occurred.  If so,
     // pass through to pumpCosmeticFilterQueues immediately.
     if (CC._hasDelayOcurred) {
@@ -699,7 +659,7 @@ window.__firefox__.execute(function($) {
     }, maxTimeMSBeforeStart)
   }
 
-  const tryScheduleQueuePump = function () {
+  const tryScheduleQueuePump = () => {
     if (!CC.observingHasStarted) {
       CC.observingHasStarted = true
       scheduleQueuePump(CC.hide1pContent, CC.generichide)
@@ -708,28 +668,25 @@ window.__firefox__.execute(function($) {
     }
   }
   
-  // Wait until document head is ready. We just need to wait a moment
-  window.setTimeout(function () {
-    // Third, load some static hide rules if they are defined
-    if (args.hideSelectors) {
-      processHideSelectors(args.hideSelectors)
-    }
-    
-    // Fourth, load some static style selectors if they are defined
-    if (args.styleSelectors) {
-      processStyleSelectors(args.styleSelectors)
-    }
-    
-    setRulesOnStylesheet()
-    tryScheduleQueuePump()
+  // Third, load some static hide rules if they are defined
+  if (args.hideSelectors) {
+    processHideSelectors(args.hideSelectors)
+  }
+  
+  // Fourth, load some static style selectors if they are defined
+  if (args.styleSelectors) {
+    processStyleSelectors(args.styleSelectors)
+  }
+  
+  setRulesOnStylesheet()
+  tryScheduleQueuePump()
 
-    const timerId = setInterval(() => {
-      const styleElm = CC.cosmeticStyleSheet
-      const targetElm = document.body
-      if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
-        return
-      }
-      moveStyle()
-    }, 1000)
-  }, 0)
+  const timerId = setInterval(() => {
+    const styleElm = CC.cosmeticStyleSheet
+    const targetElm = document.body
+    if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
+      return
+    }
+    moveStyle()
+  }, 1000)
 });
