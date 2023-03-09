@@ -206,6 +206,10 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func code(_ address: String, coin: BraveWallet.CoinType, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     completion("", .internalError, "Error Message")
   }
+  
+  func ensGetContentHash(_ domain: String, completion: @escaping ([NSNumber], Bool, BraveWallet.ProviderError, String) -> Void) {
+    completion([], false, .internalError, "Error Message")
+  }
 }
 
 extension BraveWallet.NetworkInfo {
