@@ -114,13 +114,15 @@ extension BrowserViewController: TopToolbarDelegate {
         if !handleIPFSSchemeURL(url, visitType: .unknown) {
           tabManager.selectedTab?.reload()
         }
-      } else if !isPrivateMode, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+      } else if !isPrivateMode,
+                url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension,
+                let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
         Task { @MainActor in
           let currentStatus = await rpcService.snsResolveMethod()
           switch currentStatus {
           case .ask:
             // show name service interstitial page
-            showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
+            showWeb3ServiceInterstitialPage(service: .solana, originalURL: url, visitType: .unknown)
           case .enabled:
             if let resolvedURL = await resolveSNSHost(url.schemelessAbsoluteDisplayString, rpcService: rpcService) {
               tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
@@ -135,6 +137,33 @@ extension BrowserViewController: TopToolbarDelegate {
         }
       } else {
         tabManager.selectedTab?.reload()
+      }
+    } else if !isPrivateMode,
+              let url = topToolbar.currentURL,
+              url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedENSExtension,
+              let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+      Task { @MainActor in
+        let ensResolveMethod = await rpcService.ensResolveMethod()
+        switch ensResolveMethod {
+        case .ask:
+          showWeb3ServiceInterstitialPage(service: .ethereum, originalURL: url, visitType: .unknown)
+        case .enabled:
+          let (contentHash, isOffchainConsentRequired, status, _) = await rpcService.ensGetContentHash(url.schemelessAbsoluteDisplayString)
+          if isOffchainConsentRequired {
+            showWeb3ServiceInterstitialPage(service: .ethereumOffchain, originalURL: url, visitType: .unknown)
+            return
+          }
+          if status == .success,
+             !contentHash.isEmpty,
+             let ipfsUrl = braveCore.ipfsAPI.contentHashToCIDv1URL(for: contentHash) {
+            handleIPFSSchemeURL(ipfsUrl, visitType: .unknown)
+            return
+          }
+        case .disabled:
+          tabManager.selectedTab?.reload()
+        @unknown default:
+          tabManager.selectedTab?.reload()
+        }
       }
     } else {
       tabManager.selectedTab?.reload()
@@ -309,18 +338,44 @@ extension BrowserViewController: TopToolbarDelegate {
       if !["file"].contains(fixupURL.scheme) {
         // check text is SNS domain
         let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        if !isPrivateMode, fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+        if !isPrivateMode,
+           fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension,
+           let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
           let currentStatus = await rpcService.snsResolveMethod()
           switch currentStatus {
           case .ask:
             // show name service interstitial page
-            showSNSDomainInterstitialPage(originalURL: fixupURL, visitType: visitType)
+            showWeb3ServiceInterstitialPage(service: .solana, originalURL: fixupURL, visitType: visitType)
             return true
           case .enabled:
             if let resolvedURL = await resolveSNSHost(text, rpcService: rpcService) {
               // resolved url
               finishEditingAndSubmit(resolvedURL, visitType: visitType)
               return true
+            }
+          case .disabled:
+            break
+          @unknown default:
+            break
+          }
+        } else if !isPrivateMode,
+                  fixupURL.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedENSExtension,
+                  let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+          let ensResolveMethod = await rpcService.ensResolveMethod()
+          switch ensResolveMethod {
+          case .ask:
+            showWeb3ServiceInterstitialPage(service: .ethereum, originalURL: fixupURL, visitType: visitType)
+            return true
+          case .enabled:
+            let (contentHash, isOffchainConsentRequired, status, _) = await rpcService.ensGetContentHash(text)
+            if isOffchainConsentRequired {
+              showWeb3ServiceInterstitialPage(service: .ethereumOffchain, originalURL: fixupURL, visitType: visitType)
+              return true
+            }
+            if status == .success,
+               !contentHash.isEmpty,
+               let ipfsUrl = braveCore.ipfsAPI.contentHashToCIDv1URL(for: contentHash) {
+              return handleIPFSSchemeURL(ipfsUrl, visitType: visitType)
             }
           case .disabled:
             break

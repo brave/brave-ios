@@ -8,7 +8,7 @@ import WebKit
 import os.log
 
 protocol Web3NameServiceScriptHandlerDelegate: AnyObject {
-  func web3NameServiceDecisionHandler(_ proceed: Bool, originalURL: URL, visitType: VisitType)
+  func web3NameServiceDecisionHandler(_ proceed: Bool, web3Service: Web3Service, originalURL: URL, visitType: VisitType)
 }
 
 class Web3NameServiceScriptHandler: TabContentScript {
@@ -34,10 +34,14 @@ class Web3NameServiceScriptHandler: TabContentScript {
       return
     }
     
-    if params["type"] == "SNSDisable" {
-      delegate?.web3NameServiceDecisionHandler(false, originalURL: originalURL, visitType: visitType)
-    } else if params["type"] == "SNSProceed" {
-      delegate?.web3NameServiceDecisionHandler(true, originalURL: originalURL, visitType: visitType)
+    if params["type"] == "Disable",
+       let serviceId = params["service_id"],
+       let service = Web3Service(rawValue: serviceId) {
+      delegate?.web3NameServiceDecisionHandler(false, web3Service: service, originalURL: originalURL, visitType: visitType)
+    } else if params["type"] == "Proceed",
+              let serviceId = params["service_id"],
+              let service = Web3Service(rawValue: serviceId) {
+      delegate?.web3NameServiceDecisionHandler(true, web3Service: service, originalURL: originalURL, visitType: visitType)
     } else {
       assertionFailure("Invalid message: \(message.body)")
     }

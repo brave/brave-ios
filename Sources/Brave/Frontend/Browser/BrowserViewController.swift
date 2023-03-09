@@ -1607,10 +1607,10 @@ public class BrowserViewController: UIViewController {
     tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
   }
 
-  func showSNSDomainInterstitialPage(originalURL: URL, visitType: VisitType) {
+  func showWeb3ServiceInterstitialPage(service: Web3Service, originalURL: URL, visitType: VisitType) {
     topToolbar.leaveOverlayMode()
-    
-    guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(SNSDomainHandler.path)?url=\(encodedURL)") else {
+
+    guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(Web3DomainHandler.path(for: service))?url=\(encodedURL)") else {
       return
     }
     let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler

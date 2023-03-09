@@ -27,6 +27,7 @@ import BraveTalk
 #endif
 import Onboarding
 import os
+import BraveWallet
 
 extension AppDelegate {
   // A model that is passed used in every scene
@@ -418,10 +419,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       (SessionRestoreHandler.path, SessionRestoreHandler()),
       (ErrorPageHandler.path, ErrorPageHandler()),
       (ReaderModeHandler.path, ReaderModeHandler(profile: profile)),
-      (SNSDomainHandler.path, SNSDomainHandler()),
       (IPFSSchemeHandler.path, IPFSSchemeHandler())
-    ]
-    
+    ] + Web3Service.allCases.map {
+      (Web3DomainHandler.path(for: $0), Web3DomainHandler(for: $0))
+    }
+
     responders.forEach { (path, responder) in
       InternalSchemeHandler.responders[path] = responder
     }
