@@ -317,18 +317,18 @@ extension LoginListViewController {
     
     if isCredentialsBeingSearched {
       switch section {
-      case 1:
+      case 0:
         headerView.titleLabel.text = savedLoginHeaderText
-      case 2:
+      case 1:
         headerView.titleLabel.text = neverSavedHeaderText
       default:
         headerView.titleLabel.text = ""
       }
     } else {
       switch section {
-      case 0:
-        headerView.titleLabel.text = savedLoginHeaderText
       case 1:
+        headerView.titleLabel.text = savedLoginHeaderText
+      case 2:
         headerView.titleLabel.text = neverSavedHeaderText
       default:
         headerView.titleLabel.text = ""
