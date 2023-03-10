@@ -149,17 +149,6 @@ window.__firefox__.execute(function($) {
     return false
   }
   
-  /// Create the style sheet if it isn't already created
-  /// We do this in iOS here because we can't initialize a style sheet
-  const ensureStyleSheet = () => {
-    if (CC.cosmeticStyleSheet === undefined) {
-      const styleElm = document.createElement('style')
-      styleElm.setAttribute('type', 'text/css')
-      document.body.appendChild(styleElm)
-      CC.cosmeticStyleSheet = styleElm
-    }
-  }
-  
   /// Takes selectors and adds them to the style sheet
   const processHideSelectors = (selectors) => {
     selectors.forEach(selector => {
@@ -192,7 +181,6 @@ window.__firefox__.execute(function($) {
   }
   
   const setRulesOnStylesheet = () => {
-    ensureStyleSheet()
     const ruleText = CC.allRules.filter(rule => {
       return rule !== undefined && !rule.startsWith(':')
     }).join('')
@@ -668,25 +656,41 @@ window.__firefox__.execute(function($) {
     }
   }
   
-  // Third, load some static hide rules if they are defined
+  // Load some static hide rules if they are defined
   if (args.hideSelectors) {
     processHideSelectors(args.hideSelectors)
   }
   
-  // Fourth, load some static style selectors if they are defined
+  // Load some static style selectors if they are defined
   if (args.styleSelectors) {
     processStyleSelectors(args.styleSelectors)
   }
   
-  setRulesOnStylesheet()
-  tryScheduleQueuePump()
-
-  const timerId = setInterval(() => {
-    const styleElm = CC.cosmeticStyleSheet
-    const targetElm = document.body
-    if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
+  // Wait until document body is ready
+  const timerId = window.setInterval(() => {
+    if (!document.body) {
+      // we need to wait longer.
       return
     }
-    moveStyle()
-  }, 1000)
+    
+    // Body is ready, kill this interval and create the stylesheet
+    window.clearInterval(timerId)
+    const targetElm = document.body
+    const styleElm = document.createElement('style')
+    styleElm.setAttribute('type', 'text/css')
+    targetElm.appendChild(styleElm)
+    CC.cosmeticStyleSheet = styleElm
+    setRulesOnStylesheet()
+    
+    // Start listening to new selectors
+    tryScheduleQueuePump()
+    
+    // Start a timer that moves the stylesheet down
+    setInterval(() => {
+      if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
+        return
+      }
+      moveStyle()
+    }, 1000)
+  }, 500)
 });
