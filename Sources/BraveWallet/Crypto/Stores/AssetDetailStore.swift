@@ -226,7 +226,14 @@ class AssetDetailStore: ObservableObject {
             return false
           }
           return tokenContractAddress.caseInsensitiveCompare(self.token.contractAddress) == .orderedSame
-        case .erc1155SafeTransferFrom, .solanaDappSignTransaction, .solanaDappSignAndSendTransaction, .solanaSwap:
+        case .solanaSwap, .solanaDappSignTransaction, .solanaDappSignAndSendTransaction:
+          guard network.isNativeAsset(token) else {
+            // Currently we can only detect SOL token by checking for System program instruction
+            // So are unable to know which SPL tokens a transaction might use
+            return false
+          }
+          return tx.txDataUnion.solanaTxData?.instructions.contains(where: { $0.isSystemProgram }) == true
+        case .erc1155SafeTransferFrom:
           return false
         @unknown default:
           return false
