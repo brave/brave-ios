@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BlockedResource" representedClassName="Data.BlockedResource" syncable="YES">
         <attribute name="domain" optional="YES" attributeType="String"/>
         <attribute name="faviconUrl" optional="YES" attributeType="String"/>
@@ -26,9 +26,7 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="url" optional="YES" attributeType="String"/>
         <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Bookmark" inverseName="parentFolder" inverseEntity="Bookmark"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="bookmarks" inverseEntity="Domain"/>
-        <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="children" inverseEntity="Bookmark"/>
         <fetchIndex name="byLastVisitedIndex">
             <fetchIndexElement property="lastVisited" type="Binary" order="ascending"/>
         </fetchIndex>
@@ -93,7 +91,6 @@
         <attribute name="wallet_solanaPermittedAcccounts" optional="YES" attributeType="String"/>
         <attribute name="zoom_level" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
         <relationship name="bookmarks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="domain" inverseEntity="Bookmark"/>
-        <relationship name="historyItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="History" inverseName="domain" inverseEntity="History"/>
         <fetchIndex name="byBlockedFromTopSitesIndex">
             <fetchIndexElement property="blockedFromTopSites" type="Binary" order="ascending"/>
         </fetchIndex>
@@ -121,14 +118,6 @@
         <attribute name="folderPath" optional="YES" attributeType="String"/>
         <attribute name="isEnabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="uuid" attributeType="String"/>
-    </entity>
-    <entity name="History" representedClassName="Data.History" syncable="YES">
-        <attribute name="sectionIdentifier" optional="YES" transient="YES" attributeType="String"/>
-        <attribute name="syncUUID" optional="YES" attributeType="Transformable"/>
-        <attribute name="title" optional="YES" attributeType="String"/>
-        <attribute name="url" optional="YES" attributeType="String"/>
-        <attribute name="visitedOn" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="historyItems" inverseEntity="Domain"/>
     </entity>
     <entity name="PlaylistFolder" representedClassName="Data.PlaylistFolder" syncable="YES">
         <attribute name="creatorLink" optional="YES" attributeType="String"/>
