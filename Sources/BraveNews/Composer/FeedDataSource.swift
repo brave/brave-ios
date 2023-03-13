@@ -105,16 +105,14 @@ public class FeedDataSource: ObservableObject {
 
   /// An ads object to handle inserting Inline Content Ads within the Brave News sequence
   public var ads: BraveAds?
+  public var historyAPI: BraveHistoryAPI?
 
   private let todayQueue = DispatchQueue(label: "com.brave.today")
   private let reloadQueue = DispatchQueue(label: "com.brave.today.reload")
-  private weak var historyAPI: BraveHistoryAPI?
 
   // MARK: - Initialization
 
-  public init(historyAPI: BraveHistoryAPI? = nil) {
-    self.historyAPI = historyAPI
-    
+  public init() {
     selectedLocale = Preferences.BraveNews.selectedLocale.value ?? "en_US"
     restoreCachedSources()
     
@@ -780,29 +778,30 @@ public class FeedDataSource: ObservableObject {
     dispatchPrecondition(condition: .onQueue(.main))
     
     var lastVisitedDomains: [String] = []
-    
+
     historyAPI?.search(withQuery: "", maxCount: 200) { historyNodeList in
       lastVisitedDomains = historyNodeList.compactMap { $0.url.baseDomain }
-    }
-    
-    let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
-    todayQueue.async {
-      let items: [FeedItem] = feeds.compactMap { content in
-        var score = content.baseScore ?? Double.greatestFiniteMagnitude
-        if let feedBaseDomain = content.url?.baseDomain,
-          lastVisitedDomains.contains(feedBaseDomain) {
-          score -= 5
+      
+      let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
+      self.todayQueue.async {
+        let items: [FeedItem] = feeds.compactMap { content in
+          var score = content.baseScore ?? Double.greatestFiniteMagnitude
+          if let feedBaseDomain = content.url?.baseDomain,
+             lastVisitedDomains.contains(feedBaseDomain) {
+            score -= 5
+          }
+          guard let source = sources.first(where: { $0.id == content.publisherID }) else {
+            return nil
+          }
+          if followedSources.contains(where: { $0 == source.id }) {
+            score -= 5
+          }
+          return FeedItem(score: score, content: content, source: source)
         }
-        guard let source = sources.first(where: { $0.id == content.publisherID }) else {
-          return nil
+        
+        DispatchQueue.main.async {
+          completion(items)
         }
-        if followedSources.contains(where: { $0 == source.id }) {
-          score -= 5
-        }
-        return FeedItem(score: score, content: content, source: source)
-      }
-      DispatchQueue.main.async {
-        completion(items)
       }
     }
   }

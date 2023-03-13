@@ -129,7 +129,7 @@ public class BrowserViewController: UIViewController {
 
   // Single data source used for all favorites vcs
   public let backgroundDataSource = NTPDataSource()
-  var feedDataSource: FeedDataSource
+  let feedDataSource = FeedDataSource()
 
   private var postSetupTasks: [() -> Void] = []
   private var setupTasksCompleted: Bool = false
@@ -272,7 +272,7 @@ public class BrowserViewController: UIViewController {
     self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
     self.migration = migration
     self.crashedLastSession = crashedLastSession
-    feedDataSource = FeedDataSource(historyAPI: braveCore.historyAPI)
+    feedDataSource.historyAPI = braveCore.historyAPI
     
     let configuration: BraveRewards.Configuration = .current()
 
