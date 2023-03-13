@@ -15,13 +15,13 @@ class LoginListViewController: LoginAuthViewController {
 
   // MARK: UX
 
-  struct UX {
+  private struct UX {
     static let headerHeight: CGFloat = 44
   }
 
   // MARK: Constants
 
-  struct Constants {
+  private struct Constants {
     static let saveLoginsRowIdentifier = "saveLoginsRowIdentifier"
   }
 
@@ -30,15 +30,11 @@ class LoginListViewController: LoginAuthViewController {
   // MARK: Private
 
   private let passwordAPI: BravePasswordAPI
+  private let dataSource: LoginListDataSource
   private let windowProtection: WindowProtection?
 
-  private var credentialList = [PasswordForm]()
-  private var blockedList = [PasswordForm]()
   private var passwordStoreListener: PasswordStoreListener?
-  private var isCredentialsRefreshing = false
-
   private var searchLoginTimer: Timer?
-  private var isCredentialsBeingSearched = false
   private let searchController = UISearchController(searchResultsController: nil)
   private let emptyStateOverlayView = EmptyStateOverlayView(
     overlayDetails: EmptyOverlayStateDetails(title: Strings.Login.loginListEmptyScreenTitle))
@@ -48,13 +44,16 @@ class LoginListViewController: LoginAuthViewController {
   init(passwordAPI: BravePasswordAPI, windowProtection: WindowProtection?) {
     self.windowProtection = windowProtection
     self.passwordAPI = passwordAPI
-
+    dataSource = LoginListDataSource(with: passwordAPI)
+    
     super.init(windowProtection: windowProtection, requiresAuthentication: true)
 
     // Adding the Password store observer in constructor to watch credentials changes
     passwordStoreListener = passwordAPI.add(
       PasswordStoreStateObserver { [weak self] _ in
-        guard let self = self, !self.isCredentialsBeingSearched else { return }
+        guard let self = self, !self.dataSource.isCredentialsBeingSearched else {
+          return
+        }
 
         DispatchQueue.main.async {
           self.fetchLoginInfo()
@@ -80,15 +79,18 @@ class LoginListViewController: LoginAuthViewController {
 
     // Insert Done button if being presented outside of the Settings Navigation stack
     if navigationController?.viewControllers.first === self {
-      navigationItem.leftBarButtonItem =
-        UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
+      navigationItem.leftBarButtonItem = UIBarButtonItem(
+        title: Strings.settingsSearchDoneButton,
+        style: .done,
+        target: self,
+        action: #selector(dismissAnimated))
     }
 
     navigationItem.do {
       $0.searchController = searchController
       $0.hidesSearchBarWhenScrolling = false
       $0.rightBarButtonItem = editButtonItem
-      $0.rightBarButtonItem?.isEnabled = !self.credentialList.isEmpty
+      $0.rightBarButtonItem?.isEnabled = !self.dataSource.credentialList.isEmpty
     }
     definesPresentationContext = true
 
@@ -133,56 +135,6 @@ class LoginListViewController: LoginAuthViewController {
 
     navigationController?.view.backgroundColor = .secondaryBraveBackground
   }
-
-  private func fetchLoginInfo(_ searchQuery: String? = nil) {
-    if !isCredentialsRefreshing {
-      isCredentialsRefreshing = true
-
-      passwordAPI.getSavedLogins { credentials in
-        self.reloadEntries(with: searchQuery, passwordForms: credentials)
-      }
-    }
-  }
-
-  private func reloadEntries(with query: String? = nil, passwordForms: [PasswordForm]) {
-    // Clear the blocklist before new items append
-    blockedList.removeAll()
-    
-    if let query = query, !query.isEmpty {
-      credentialList = passwordForms.filter { form in
-        if let origin = form.url.origin.url?.absoluteString.lowercased(), origin.contains(query) {
-          if form.isBlockedByUser {
-            blockedList.append(form)
-          }
-          return !form.isBlockedByUser
-        }
-
-        if let username = form.usernameValue?.lowercased(), username.contains(query) {
-          if form.isBlockedByUser {
-            blockedList.append(form)
-          }
-          return !form.isBlockedByUser
-        }
-
-        return false
-      }
-    } else {
-      credentialList = passwordForms.filter { form in
-        // Check If the website is blocked by user with Never Save functionality
-        if form.isBlockedByUser {
-          blockedList.append(form)
-        }
-        
-        return !form.isBlockedByUser
-      }
-    }
-
-    DispatchQueue.main.async {
-      self.tableView.reloadData()
-      self.isCredentialsRefreshing = false
-      self.navigationItem.rightBarButtonItem?.isEnabled = !self.credentialList.isEmpty
-    }
-  }
 }
 
 // MARK: TableViewDataSource - TableViewDelegate
@@ -190,41 +142,12 @@ class LoginListViewController: LoginAuthViewController {
 extension LoginListViewController {
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    tableView.backgroundView = (credentialList.isEmpty && blockedList.isEmpty) ? emptyStateOverlayView : nil
-
-    // Option - Saved Logins - Never Saved
-    var sectionCount = 3
-    
-    if blockedList.isEmpty {
-      sectionCount -= 1
-    }
-    
-    if credentialList.isEmpty {
-      sectionCount -= 1
-    }
-        
-    return isCredentialsBeingSearched ? sectionCount - 1 : sectionCount
+    tableView.backgroundView = dataSource.isDataSourceEmpty ? emptyStateOverlayView : nil
+    return dataSource.fetchNumberOfSections()
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    switch section {
-    case 0:
-      if !isCredentialsBeingSearched {
-        return 1
-      }
-      
-      return credentialList.isEmpty ? blockedList.count : credentialList.count
-    case 1:
-      if !isCredentialsBeingSearched {
-        return credentialList.isEmpty ? blockedList.count : credentialList.count
-      }
-      
-      return blockedList.count
-    case 2:
-      return isCredentialsBeingSearched ? 0 : blockedList.count
-    default:
-      return 0
-    }
+    return dataSource.fetchNumberOfRowsInSection(section: section)
   }
 
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -232,7 +155,8 @@ extension LoginListViewController {
   }
 
   override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    if section == 0, !isCredentialsBeingSearched {
+    // Save Login Toggle
+    if section == 0, !dataSource.isCredentialsBeingSearched {
       return 0
     }
     
@@ -290,11 +214,11 @@ extension LoginListViewController {
       return cell
     }
     
-    if let form = fetchPasswordFormFor(indexPath: indexPath) {
+    if let form = dataSource.fetchPasswordFormFor(indexPath: indexPath) {
       return createCredentialFormCell(passwordForm: form)
     }
     
-    if !isCredentialsBeingSearched, indexPath.section == 0 {
+    if !dataSource.isCredentialsBeingSearched, indexPath.section == 0 {
       return createSaveToggleCell()
     }
     
@@ -309,21 +233,21 @@ extension LoginListViewController {
     
     var titleHeaderText = ""
     
-    if isCredentialsBeingSearched {
+    if dataSource.isCredentialsBeingSearched {
       switch section {
       case 0:
-        titleHeaderText = credentialList.isEmpty ? neverSavedHeaderText : savedLoginHeaderText
+        titleHeaderText = dataSource.credentialList.isEmpty ? neverSavedHeaderText : savedLoginHeaderText
       case 1:
-        titleHeaderText = blockedList.isEmpty ? "" : neverSavedHeaderText
+        titleHeaderText = dataSource.blockedList.isEmpty ? "" : neverSavedHeaderText
       default:
         titleHeaderText = ""
       }
     } else {
       switch section {
       case 1:
-        titleHeaderText = credentialList.isEmpty ? neverSavedHeaderText : savedLoginHeaderText
+        titleHeaderText = dataSource.credentialList.isEmpty ? neverSavedHeaderText : savedLoginHeaderText
       case 2:
-        titleHeaderText = blockedList.isEmpty ? "" : neverSavedHeaderText
+        titleHeaderText = dataSource.blockedList.isEmpty ? "" : neverSavedHeaderText
       default:
         titleHeaderText = ""
       }
@@ -348,7 +272,7 @@ extension LoginListViewController {
       return nil
     }
     
-    if let form = fetchPasswordFormFor(indexPath: indexPath) {
+    if let form = dataSource.fetchPasswordFormFor(indexPath: indexPath) {
       showInformationController(for: form)
       return indexPath
     }
@@ -357,7 +281,7 @@ extension LoginListViewController {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.section == 0, !isCredentialsBeingSearched {
+    if indexPath.section == 0, !dataSource.isCredentialsBeingSearched {
      return
     }
     
@@ -371,7 +295,7 @@ extension LoginListViewController {
 
   // Determine whether to show delete button in edit mode
   override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-    if indexPath.section == 0, !isCredentialsBeingSearched {
+    if indexPath.section == 0, !dataSource.isCredentialsBeingSearched {
       return .none
     }
 
@@ -380,19 +304,19 @@ extension LoginListViewController {
 
   // Determine whether to indent while in edit mode for deletion
   override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-    return !(indexPath.section == 0 && !isCredentialsBeingSearched)
+    return !(indexPath.section == 0 && !dataSource.isCredentialsBeingSearched)
   }
 
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      if let form = fetchPasswordFormFor(indexPath: indexPath) {
+      if let form = dataSource.fetchPasswordFormFor(indexPath: indexPath) {
         showDeleteLoginWarning(with: form)
       }
     }
   }
 
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return !(indexPath.section == 0 && !isCredentialsBeingSearched)
+    return !(indexPath.section == 0 && !dataSource.isCredentialsBeingSearched)
   }
 
   private func showDeleteLoginWarning(with credential: PasswordForm) {
@@ -417,25 +341,10 @@ extension LoginListViewController {
     present(alert, animated: true, completion: nil)
   }
   
-  private func fetchPasswordFormFor(indexPath: IndexPath) -> PasswordForm? {
-    if isCredentialsBeingSearched {
-      switch indexPath.section {
-      case 0:
-        return credentialList.isEmpty ? blockedList[safe: indexPath.item] : credentialList[safe: indexPath.item]
-      case 1:
-        return blockedList[safe: indexPath.item]
-      default:
-        return nil
-      }
-    } else {
-      switch indexPath.section {
-      case 1:
-        return credentialList.isEmpty ? blockedList[safe: indexPath.item] : credentialList[safe: indexPath.item]
-      case 2:
-        return blockedList[safe: indexPath.item]
-      default:
-        return nil
-      }
+  private func fetchLoginInfo(_ searchQuery: String? = nil) {
+    dataSource.fetchLoginInfo(searchQuery) { [weak self] editEnabled in
+      self?.tableView.reloadData()
+      self?.navigationItem.rightBarButtonItem?.isEnabled = editEnabled
     }
   }
 }
@@ -483,14 +392,14 @@ extension LoginListViewController: UISearchResultsUpdating {
 extension LoginListViewController: UISearchControllerDelegate {
 
   func willPresentSearchController(_ searchController: UISearchController) {
-    isCredentialsBeingSearched = true
+    dataSource.isCredentialsBeingSearched = true
 
     tableView.setEditing(false, animated: true)
     tableView.reloadData()
   }
 
   func willDismissSearchController(_ searchController: UISearchController) {
-    isCredentialsBeingSearched = false
+    dataSource.isCredentialsBeingSearched = false
 
     tableView.reloadData()
   }
