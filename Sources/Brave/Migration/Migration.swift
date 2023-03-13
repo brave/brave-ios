@@ -13,15 +13,10 @@ import os.log
 
 public class Migration {
 
-  private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
   private let braveCore: BraveCoreMain
 
   public init(braveCore: BraveCoreMain) {
     self.braveCore = braveCore
-  }
-
-  public static var isChromiumMigrationCompleted: Bool {
-    return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value && Preferences.Chromium.syncV2HistoryMigrationCompleted.value && Preferences.Chromium.syncV2PasswordMigrationCompleted.value
   }
 
   public func launchMigrations(keyPrefix: String, profile: Profile) {
@@ -32,11 +27,6 @@ public class Migration {
     if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
       documentsDirectoryCleanup()
       Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
-    }
-
-    // `.migrate` is called in `BrowserViewController.viewDidLoad()`
-    if !Migration.isChromiumMigrationCompleted {
-      braveCoreSyncObjectsMigrator = BraveCoreMigrator(braveCore: braveCore, profile: profile)
     }
 
     if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
@@ -223,7 +213,6 @@ public class Migration {
     TabMO.deleteAllPrivateTabs()
   
     Domain.migrateShieldOverrides()
-    LegacyBookmarksHelper.migrateBookmarkOrders()
   
     Preferences.Migration.coreDataCompleted.value = true
   }

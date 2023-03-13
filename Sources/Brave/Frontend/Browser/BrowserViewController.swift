@@ -129,7 +129,7 @@ public class BrowserViewController: UIViewController {
 
   // Single data source used for all favorites vcs
   public let backgroundDataSource = NTPDataSource()
-  let feedDataSource = FeedDataSource()
+  var feedDataSource: FeedDataSource
 
   private var postSetupTasks: [() -> Void] = []
   private var setupTasksCompleted: Bool = false
@@ -272,7 +272,8 @@ public class BrowserViewController: UIViewController {
     self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
     self.migration = migration
     self.crashedLastSession = crashedLastSession
-
+    feedDataSource = FeedDataSource(historyAPI: braveCore.historyAPI)
+    
     let configuration: BraveRewards.Configuration = .current()
 
     let buildChannel = Ads.BuildChannelInfo().then {
@@ -852,17 +853,6 @@ public class BrowserViewController: UIViewController {
       }
     }
     
-    // Do some migratins
-    LegacyBookmarksHelper.restore_1_12_Bookmarks() {
-      Logger.module.info("Bookmarks from old database were successfully restored")
-    }
-    
-    // Perform migration to brave-core sync objects
-    if !Migration.isChromiumMigrationCompleted,
-      !Preferences.Chromium.syncV2PasswordMigrationStarted.value {
-      Preferences.Chromium.syncV2ObjectMigrationCount.value = 0
-    }
-    
     // Adding Screenshot Service Delegate to browser to fetch full screen webview screenshots
     currentScene?.screenshotService?.delegate = self
     
@@ -932,8 +922,6 @@ public class BrowserViewController: UIViewController {
         BraveVPN.initialize(customCredential: nil)
       }
     }
-
-    doSyncMigration()
 
     if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
       scheduleDefaultBrowserNotification()

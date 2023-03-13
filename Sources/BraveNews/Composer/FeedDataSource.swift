@@ -108,10 +108,13 @@ public class FeedDataSource: ObservableObject {
 
   private let todayQueue = DispatchQueue(label: "com.brave.today")
   private let reloadQueue = DispatchQueue(label: "com.brave.today.reload")
+  private weak var historyAPI: BraveHistoryAPI?
 
   // MARK: - Initialization
 
-  public init() {
+  public init(historyAPI: BraveHistoryAPI? = nil) {
+    self.historyAPI = historyAPI
+    
     selectedLocale = Preferences.BraveNews.selectedLocale.value ?? "en_US"
     restoreCachedSources()
     
@@ -775,11 +778,13 @@ public class FeedDataSource: ObservableObject {
   ) {
     // Ensure main thread since we're querying from CoreData
     dispatchPrecondition(condition: .onQueue(.main))
-    let lastVisitedDomains =
-      (try? History.suffix(200)
-        .lazy
-        .compactMap(\.url)
-        .compactMap { URL(string: $0)?.baseDomain }) ?? []
+    
+    var lastVisitedDomains: [String] = []
+    
+    historyAPI?.search(withQuery: "", maxCount: 200) { historyNodeList in
+      lastVisitedDomains = historyNodeList.compactMap { $0.url.baseDomain }
+    }
+    
     let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
     todayQueue.async {
       let items: [FeedItem] = feeds.compactMap { content in
