@@ -388,7 +388,7 @@ final public class ContentBlockerManager: Sendable {
   #if DEBUG
   /// A method that logs info on the given resources
   private func debug(resources: [String: Resource]) {
-    Self.log.debug("Compiled \(resources.count, privacy: .public) block list resources:")
+    Self.log.debug("Compiled \(resources.count) block list resources:")
     
     resources
       .sorted(by: { lhs, rhs in
