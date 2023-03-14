@@ -531,11 +531,16 @@ public class BrowserViewController: UIViewController {
     // Used in App Rating criteria
     AppReviewManager.shared.processMainCriteria(for: .daysInUse)
     
+    // P3A Record
     maybeRecordInitialShieldsP3A()
     recordVPNUsageP3A(vpnEnabled: BraveVPN.isConnected)
     
     // Revised Review Handling
     AppReviewManager.shared.handleAppReview(for: .revisedCrossPlatform, using: self)
+    recordAccessibilityDisplayZoomEnabledP3A()
+    recordAccessibilityPhysicalKeyboardUsageP3A()
+    recordAccessibilityPhysicalMouseUsageP3A()
+    recordAccessibilityDocumentsDirectorySizeP3A()
   }
 
   private func setupAdsNotificationHandler() {
