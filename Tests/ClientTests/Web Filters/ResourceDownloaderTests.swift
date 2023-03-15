@@ -26,8 +26,8 @@ class ResourceDownloaderTests: XCTestCase {
         
         // Then
         // We get a download result
-        XCTAssertNotNil(try resource.data())
-        XCTAssertNotNil(try resource.etag())
+        XCTAssertNotNil(try resource.downloadedData())
+        XCTAssertNotNil(try resource.createdEtag())
         XCTAssertTrue(result.isModified)
         
         // When
@@ -36,8 +36,8 @@ class ResourceDownloaderTests: XCTestCase {
         
         // Then
         // We get a non modified result
-        XCTAssertNotNil(try resource.data())
-        XCTAssertNotNil(try resource.etag())
+        XCTAssertNotNil(try resource.downloadedData())
+        XCTAssertNotNil(try resource.createdEtag())
         XCTAssertFalse(result2.isModified)
         // Same download date
         XCTAssertEqual(result2.date, result.date)

@@ -157,7 +157,7 @@ class AdblockDebugMenuTableViewController: TableViewController {
     
     func getEtag(from resource: Resource) -> String? {
       do {
-        return try resource.etag()
+        return try resource.createdEtag()
       } catch {
         return nil
       }

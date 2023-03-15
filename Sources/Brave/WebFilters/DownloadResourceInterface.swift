@@ -104,7 +104,7 @@ extension DownloadResourceInterface {
   /// Get an existing etag for this resource..
   ///
   /// - Note: If no etag is created (i.e. the file is not downloaded) a nil is returned.
-  func etag() throws -> String? {
+  func createdEtag() throws -> String? {
     guard let fileURL = createdEtagURL else { return nil }
     guard let data = FileManager.default.contents(atPath: fileURL.path) else { return nil }
     return String(data: data, encoding: .utf8)

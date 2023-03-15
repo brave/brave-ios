@@ -80,7 +80,7 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
   }
   
   private func downloadInternal(resource: Resource) async throws -> DownloadResultStatus {
-    let etag = try? resource.etag()
+    let etag = try? resource.createdEtag()
     
     do {
       let networkResource = try await self.networkManager.downloadResource(
