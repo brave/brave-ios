@@ -24,7 +24,12 @@ class CustomFilterListStorage: ObservableObject {
     self.filterListsURLs = settings.map { setting in
       let resource = setting.resource
       let date = try? ResourceDownloader.creationDate(for: resource)
-      return FilterListCustomURL(setting: setting, downloadStatus: date != nil ? .downloaded(date!) : .pending)
+      
+      if let date = date {
+        return FilterListCustomURL(setting: setting, downloadStatus: .downloaded(date))
+      } else {
+        return FilterListCustomURL(setting: setting, downloadStatus: .pending)
+      }
     }
   }
 
