@@ -7,8 +7,6 @@ import Foundation
 import Shared
 
 enum BraveS3Resource: Hashable, DownloadResourceInterface {
-  /// Rules for debouncing links
-  case debounceRules
   /// Generic iOS only content blocking behaviours used for the iOS content blocker
   case genericContentBlockingBehaviors
   /// Cosmetic filter rules
@@ -34,8 +32,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
   /// The folder name under which this data should be saved under
   var cacheFolderName: String {
     switch self {
-    case .debounceRules:
-      return "debounce-data"
     case .filterListContentBlockingBehaviors(_, let componentId):
       return ["filter-lists", componentId].joined(separator: "/")
     case .genericContentBlockingBehaviors:
@@ -48,8 +44,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
   /// Get the file name that is stored on the device
   var cacheFileName: String {
     switch self {
-    case .debounceRules:
-      return "ios-debouce.json"
     case .filterListContentBlockingBehaviors(let uuid, _):
       return "\(uuid)-latest.json"
     case .genericContentBlockingBehaviors:
@@ -62,8 +56,6 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
   /// Get the external path for the given filter list and this resource type
   var externalURL: URL {
     switch self {
-    case .debounceRules:
-      return Self.baseResourceURL.appendingPathComponent("/ios/debounce.json")
     case .filterListContentBlockingBehaviors(let uuid, _):
       return Self.baseResourceURL.appendingPathComponent("/ios/\(uuid)-latest.json")
     case .genericContentBlockingBehaviors:
