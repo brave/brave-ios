@@ -266,6 +266,10 @@ public class BraveVPN {
     // 1. Existing user, check if credentials and connection are available.
     if GRDVPNHelper.activeConnectionPossible() {
       // just configure & connect, no need for 'first user' setup
+      
+      // VPN Transport Protocol should be set WireGuard since the dfault is iKEv2
+      Self.assignPreferredTransportProtocol(.wireGuard)
+      
       helper.configureAndConnectVPN { error, status in
         if let error = error {
           logAndStoreError("configureAndConnectVPN: \(error)")
@@ -285,6 +289,35 @@ public class BraveVPN {
         completion?(success)
       }
     }
+  }
+  
+  public enum VPNTransportProtocol: Int, CaseIterable {
+    case unknown = 0
+    case iKEv2
+    case wireGuard
+    
+    var title: String {
+      switch self {
+      case .wireGuard:
+        return GRDTransportProtocol.prettyTransportProtocolString(for: .wireGuard)
+      default:
+        return GRDTransportProtocol.prettyTransportProtocolString(for: .ikEv2)
+      }
+      
+    }
+  }
+  
+  public static func assignPreferredTransportProtocol(_ vpnProtocol: VPNTransportProtocol) {
+    switch vpnProtocol {
+    case .wireGuard:
+      GRDTransportProtocol.setUserPreferred(.wireGuard)
+    default:
+      GRDTransportProtocol.setUserPreferred(.ikEv2)
+    }
+  }
+  
+  public static func fetchassignPreferredTransportProtocol() -> VPNTransportProtocol {
+    return VPNTransportProtocol(rawValue: Int(GRDTransportProtocol.getUserPreferredTransportProtocol().rawValue)) ?? .unknown
   }
   
   /// Attempts to reconfigure the vpn by migrating to a new server.
