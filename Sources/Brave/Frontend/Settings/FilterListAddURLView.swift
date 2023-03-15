@@ -18,6 +18,7 @@ struct FilterListAddURLView: View {
       .keyboardType(.URL)
       .textContentType(.URL)
       .autocapitalization(.none)
+      .autocorrectionDisabled()
   }
   
   var body: some View {
