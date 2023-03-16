@@ -23,6 +23,7 @@ public struct Web3SettingsView: View {
   /// If we are showing the modal so the user can enter their password to enable unlock via biometrics.
   @State private var isShowingBiometricsPasswordEntry = false
   @State private var ipfsNFTGatewayURL: String = ""
+  @State private var ipfsGatewayURL: String = ""
   
   public init(
     settingsStore: SettingsStore? = nil,
@@ -69,7 +70,7 @@ public struct Web3SettingsView: View {
               VStack(alignment: .leading, spacing: 5) {
                 Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
                   .foregroundColor(Color(.braveLabel))
-                Text(ipfsNFTGatewayURL)
+                Text(ipfsGatewayURL)
                   .font(.footnote)
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
@@ -86,7 +87,6 @@ public struct Web3SettingsView: View {
               }
               .padding(.vertical, 4)
             }
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
         }
       }
@@ -139,6 +139,9 @@ public struct Web3SettingsView: View {
     .onAppear {
       if let urlString = settingsStore?.ipfsApi.nftIpfsGateway?.absoluteString, urlString != ipfsNFTGatewayURL {
         ipfsNFTGatewayURL = urlString
+      }
+      if let urlString = ipfsAPI?.ipfsGateway?.absoluteString, urlString != ipfsGatewayURL {
+        ipfsGatewayURL = urlString
       }
       settingsStore?.setup()
     }

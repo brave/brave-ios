@@ -19,10 +19,11 @@ extension BrowserViewController: Web3IPFSScriptHandlerDelegate {
       }
       Preferences.Wallet.resolveIPFSResources.value = Preferences.Wallet.Web3IPFSOption.enabled.rawValue
     } else {
-      submitSearchText(originalURL.absoluteString, isBraveSearchPromotion: false)
-      
-      RecentSearch.addItem(type: .text, text: originalURL.absoluteString, websiteUrl: nil)
-      
+      let errorPageHelper = ErrorPageHelper(certStore: nil)
+      if let webView =  tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.disabledError, forUrl: originalURL, inWebView: webView)
+      }
+
       Preferences.Wallet.resolveIPFSResources.value = Preferences.Wallet.Web3IPFSOption.disabled.rawValue
     }
   }
