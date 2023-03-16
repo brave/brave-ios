@@ -77,7 +77,7 @@ struct IPFSCustomGatewayView: View {
         }
       }
         .buttonStyle(BraveFilledButtonStyle(size: .small))
-        .disabled(setButtonStatus != .enabled && !isForNFT) // waiting for another set ipfs public gatway address api from core
+        .disabled(setButtonStatus != .enabled)
     )
     .alert(isPresented: $isPresentingWrongGatewayAlert) {
       Alert(
@@ -90,7 +90,7 @@ struct IPFSCustomGatewayView: View {
       // SwiftUI bug, has to wait a bit (#7044: bug only exists
       // in iOS 15. Will revisit once iOS 15 support is removed)
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        if let url = ipfsAPI.nftIpfsGateway?.absoluteString {
+        if let url = isForNFT ? ipfsAPI.nftIpfsGateway?.absoluteString : ipfsAPI.ipfsGateway?.absoluteString {
           self.url = url
         }
       }
@@ -112,7 +112,11 @@ struct IPFSCustomGatewayView: View {
       do {
         let (data, _) = try await URLSession.shared.data(from: testURL)
         if String(data: data, encoding: .utf8) == IPFSCustomGatewayView.ipfsTestContent {
-          ipfsAPI.nftIpfsGateway = enteredURL
+          if isForNFT {
+            ipfsAPI.nftIpfsGateway = enteredURL
+          } else {
+            ipfsAPI.ipfsGateway = enteredURL
+          }
           setButtonStatus = .disabled
         } else {
           isPresentingWrongGatewayAlert = true
