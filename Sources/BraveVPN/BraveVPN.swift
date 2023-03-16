@@ -65,6 +65,9 @@ public class BraveVPN {
 
     helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
     helper.tunnelLocalizedDescription = connectionName
+    helper.grdTunnelProviderManagerLocalizedDescription = "Brave VPN WireGuard Configuration"
+    helper.tunnelProviderBundleIdentifier = "Tunnel Bundle ID"
+    helper.appGroupIdentifier = AppInfo.sharedContainerIdentifier
 
     if case .notPurchased = vpnState {
       // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
@@ -267,9 +270,6 @@ public class BraveVPN {
     if GRDVPNHelper.activeConnectionPossible() {
       // just configure & connect, no need for 'first user' setup
       
-      // VPN Transport Protocol should be set WireGuard since the dfault is iKEv2
-      Self.assignPreferredTransportProtocol(.wireGuard)
-      
       helper.configureAndConnectVPN { error, status in
         if let error = error {
           logAndStoreError("configureAndConnectVPN: \(error)")
@@ -280,7 +280,7 @@ public class BraveVPN {
       }
     } else {
       // New user or no credentials and have to remake them.
-      helper.configureFirstTimeUserPostCredential(nil) { success, error in
+      helper.configureFirstTimeUser(for: .wireGuard, postCredential: nil) { success, error in
         if let error = error {
           logAndStoreError("configureFirstTimeUserPostCredential \(error)")
         }
@@ -289,35 +289,6 @@ public class BraveVPN {
         completion?(success)
       }
     }
-  }
-  
-  public enum VPNTransportProtocol: Int, CaseIterable {
-    case unknown = 0
-    case iKEv2
-    case wireGuard
-    
-    var title: String {
-      switch self {
-      case .wireGuard:
-        return GRDTransportProtocol.prettyTransportProtocolString(for: .wireGuard)
-      default:
-        return GRDTransportProtocol.prettyTransportProtocolString(for: .ikEv2)
-      }
-      
-    }
-  }
-  
-  public static func assignPreferredTransportProtocol(_ vpnProtocol: VPNTransportProtocol) {
-    switch vpnProtocol {
-    case .wireGuard:
-      GRDTransportProtocol.setUserPreferred(.wireGuard)
-    default:
-      GRDTransportProtocol.setUserPreferred(.ikEv2)
-    }
-  }
-  
-  public static func fetchassignPreferredTransportProtocol() -> VPNTransportProtocol {
-    return VPNTransportProtocol(rawValue: Int(GRDTransportProtocol.getUserPreferredTransportProtocol().rawValue)) ?? .unknown
   }
   
   /// Attempts to reconfigure the vpn by migrating to a new server.
@@ -381,9 +352,40 @@ public class BraveVPN {
   }
   
   public static func populateRegionDataIfNecessary () {
-    serverManager.getRegionsWithCompletion { regions in
-      self.regions = regions
+    serverManager.regions { regions, _ in
+      self.regions = regions ?? []
     }
+  }
+  
+  // MARK: - VPN Transport Protocol Functionality
+  
+  public enum VPNTransportProtocol: Int, CaseIterable {
+    case unknown = 0
+    case iKEv2
+    case wireGuard
+    
+    var title: String {
+      switch self {
+      case .wireGuard:
+        return GRDTransportProtocol.prettyTransportProtocolString(for: .wireGuard)
+      default:
+        return GRDTransportProtocol.prettyTransportProtocolString(for: .ikEv2)
+      }
+      
+    }
+  }
+  
+  public static func assignPreferredTransportProtocol(_ vpnProtocol: VPNTransportProtocol) {
+    switch vpnProtocol {
+    case .wireGuard:
+      GRDTransportProtocol.setUserPreferred(.wireGuard)
+    default:
+      GRDTransportProtocol.setUserPreferred(.ikEv2)
+    }
+  }
+  
+  public static func fetchPreferredTransportProtocol() -> VPNTransportProtocol {
+    return VPNTransportProtocol(rawValue: Int(GRDTransportProtocol.getUserPreferredTransportProtocol().rawValue)) ?? .unknown
   }
   
   // MARK: - VPN Alerts and notifications
