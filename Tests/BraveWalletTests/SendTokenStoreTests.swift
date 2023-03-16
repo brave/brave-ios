@@ -1091,4 +1091,93 @@ class SendTokenStoreTests: XCTestCase {
       XCTAssertNil(error)
     }
   }
+  
+  /// Test `resolvedAddress` will be assigned the address returned from `unstoppableDomainsGetWalletAddr`, then if the `selectedSendToken` changes will call `unstoppableDomainsGetWalletAddr` and assign the new `resolvedAddress`.
+  func testUDAddressResolutionTokenChange() {
+    let domain = "brave.crypto"
+    let expectedAddress = "0xxxxxxxxxxxyyyyyyyyyyzzzzzzzzzz0000000000"
+    let expectedAddressUSDC = "0x1111111111222222222233333333330000000000"
+
+    let (keyringService, rpcService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      selectedCoin: .eth
+    )
+    rpcService._unstoppableDomainsGetWalletAddr = { domain, token, completion in
+      if token == .mockUSDCToken { // simulate special address for USDC
+        completion(expectedAddressUSDC, .success, "")
+      } else {
+        completion(expectedAddress, .success, "")
+      }
+    }
+
+    let store = SendTokenStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: .previewToken,
+      ipfsApi: nil
+    )
+    
+    let waitForPrefilledTokenExpectation = expectation(description: "waitForPrefilledToken")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { waitForPrefilledTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, .previewToken)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for store to be setup with given `prefilledToken`
+    wait(for: [waitForPrefilledTokenExpectation], timeout: 1)
+    // release above sink on `selectedSendToken`
+    // to avoid repeated calls to expectation
+    cancellables.removeAll()
+
+    // Wait for `resolvedAddress` to be populated with address for the `prefilledToken`
+    let resolvedAddressExpectation = expectation(description: "sendTokenStore-resolvedAddress")
+    XCTAssertNil(store.resolvedAddress)  // Initial state
+    store.$resolvedAddress
+      .collect(6) // Initial value, reset to nil in `sendAddress` didSet, reset to nil in `resolveUnstoppableDomain`, assigned address in `resolveUnstoppableDomain`, reset to nil in `resolveUnstoppableDomain`, assigned address in `resolveUnstoppableDomain`
+      .sink { resolvedAddresses in
+        guard let resolvedAddress = resolvedAddresses.last else {
+          XCTFail("Expected >0 resolved address assignments")
+          return
+        }
+        XCTAssertEqual(store.selectedSendToken, .previewToken)
+        XCTAssertEqual(resolvedAddress, expectedAddress)
+        resolvedAddressExpectation.fulfill()
+      }.store(in: &cancellables)
+
+    store.sendAddress = domain
+    wait(for: [resolvedAddressExpectation], timeout: 1)
+    // release above sink on `selectedSendToken`
+    // to avoid repeated calls to expectation
+    cancellables.removeAll()
+
+    // Verify change from the resolved address for `previewToken`
+    // will change to the resolved address for `.mockUSDCToken`
+    let resolvedUSDCAddressExpectation = expectation(description: "sendTokenStore-resolvedUSDCAddress")
+    store.$resolvedAddress
+      .collect(3)
+      .sink { resolvedAddresses in
+        // initial value of sink
+        XCTAssertEqual(resolvedAddresses[safe: 0], expectedAddress)
+        // reset in `resolveUnstoppableDomain`
+        XCTAssertEqual(resolvedAddresses[safe: 1], Optional<String>.none)
+        // new value assigned after resolving for new token
+        XCTAssertEqual(resolvedAddresses[safe: 2], expectedAddressUSDC)
+        XCTAssertEqual(store.selectedSendToken, .mockUSDCToken)
+        resolvedUSDCAddressExpectation.fulfill()
+      }.store(in: &cancellables)
+    
+    // change token from `.previewToken` to `.mockUSDCToken`
+    store.selectedSendToken = .mockUSDCToken
+
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
+  }
 }
