@@ -3809,5 +3809,12 @@ extension Strings {
       value: "Protects your IP address and content you’re requesting from potential third-party observers, but not from the public gateway operator.  The gateway operator is responsible for ensuring that the content served to you over a gateway is the content you requested. Also, your computer does not contribute to the public IPFS network.",
       comment: "A brief explaination of resolving IPFS scheme url using a public gateway."
     )
+    public static let ipfsErrorTitle = NSLocalizedString(
+      "wallet.ipfsErrorTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "This site can't be reached",
+      comment: "A title will displayed in the IPFS error page when IPFS is disabled."
+    )
   }
 }
