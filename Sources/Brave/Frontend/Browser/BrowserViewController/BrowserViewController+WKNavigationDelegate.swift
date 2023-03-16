@@ -194,6 +194,12 @@ extension BrowserViewController: WKNavigationDelegate {
       handleExternalURL(url, tab: tab, navigationAction: navigationAction)
       return (.cancel, preferences)
     }
+    
+    // handles IPFS URL schemes
+    if url.isIPFSScheme {
+      handleIPFSSchemeURL(url, visitType: .link)
+      return (.cancel, preferences)
+    }
 
     let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
     
