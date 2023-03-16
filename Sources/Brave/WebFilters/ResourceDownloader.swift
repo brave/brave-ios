@@ -7,6 +7,8 @@ import Foundation
 import Shared
 import BraveCore
 
+/// An object providing the interface of a download resource which can be used with the `ResourceDownloader`.
+/// This provides a generic multi-purpose way of downloading any files.
 public protocol DownloadResourceInterface: Sendable {
   /// The folder name under which this data should be saved under
   var cacheFolderName: String { get }
@@ -38,6 +40,7 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
     return FileManager.SearchPathDirectory.applicationSupportDirectory
   }
   
+  /// The default fetch interval used by this resource downloaded. In production its 6 hours, whereas in debug it's every 10 minutes.
   private static var defaultFetchInterval: TimeInterval {
     return AppConstants.buildChannel.isPublic ? 6.hours : 10.minutes
   }
@@ -50,6 +53,7 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
     self.networkManager = networkManager
   }
   
+  /// Return a download stream for the given resource. The download stream will fetch data every interval given by the provided `fetchInterval`.
   func downloadStream(for resource: Resource, every fetchInterval: TimeInterval = defaultFetchInterval) -> ResourceDownloaderStream<Resource> {
     return ResourceDownloaderStream(resource: resource, resourceDownloader: self, fetchInterval: fetchInterval)
   }
@@ -171,14 +175,15 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
     }
   }
   
-  /// Get an existing etag for the given `Resource`
+  /// Get a creation date for the file downloaded for the given `Resource`.
+  /// If the file is not downloaded a nil is returned.
   static func creationDate(for resource: Resource) throws -> Date? {
     guard let fileURL = downloadedFileURL(for: resource) else { return nil }
     let fileAttributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
     return fileAttributes[.creationDate] as? Date
   }
   
-  /// Get an existing etag for the given `Resource`
+  /// Get an existing etag for the given `Resource`. If no etag is created (i.e. the file is not downloaded) a nil is returned.
   static func etag(for resource: Resource) throws -> String? {
     guard let fileURL = etagURL(for: resource) else { return nil }
     guard let data = FileManager.default.contents(atPath: fileURL.path) else { return nil }
@@ -199,7 +204,7 @@ actor ResourceDownloader<Resource: DownloadResourceInterface>: Sendable {
     }
   }
   
-  /// Removes all the data for the given `Resource`
+  /// Removes file for the given `Resource`. The containing folder is not removed.
   static func removeFile(for resource: Resource) throws {
     guard
       let fileURL = self.downloadedFileURL(for: resource)

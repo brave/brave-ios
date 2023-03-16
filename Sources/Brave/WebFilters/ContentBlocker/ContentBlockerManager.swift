@@ -12,6 +12,10 @@ import os.log
 
 /// A class that aids in the managment of rule lists on the rule store.
 actor ContentBlockerManager {
+  // TODO: Use a proper logger system once implemented and adblock files are moved to their own module(#5928).
+  /// Logger to use for debugging.
+  static let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "adblock")
+  
   struct CompileOptions: OptionSet {
     let rawValue: Int
     
@@ -20,9 +24,6 @@ actor ContentBlockerManager {
     static let `default`: CompileOptions = []
     static let all: CompileOptions = [.stripContentBlockers, .punycodeDomains]
   }
-  // TODO: Use a proper logger system once implemented and adblock files are moved to their own module(#5928).
-  /// Logger to use for debugging.
-  static let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "adblock")
   
   enum CompileError: Error {
     case noRuleListReturned(identifier: String)
@@ -233,12 +234,14 @@ actor ContentBlockerManager {
     }))
   }
   
-  /// Remove the rule list for the
+  /// Remove the rule list for the given identifier. This will remove them from this local cache and from the rule store.
   private func removeRuleList(forIdentifier identifier: String) async throws {
     self.cachedRuleLists.removeValue(forKey: identifier)
     try await ruleStore.removeContentRuleList(forIdentifier: identifier)
   }
   
+  /// This will remove cosmetic filters from the provided encoded rule list. These are any rules that have a `selector` in the `action` field.
+  /// We do this because our cosmetic filtering is handled via the `SelectorsPoller.js` file and these selectors come from the engine directly.
   private func stripCosmeticFilters(encodedContentRuleList: String) async throws -> String? {
     guard let blocklistData = encodedContentRuleList.data(using: .utf8) else {
       assertionFailure()
@@ -271,6 +274,9 @@ actor ContentBlockerManager {
     return String(bytes: modifiedData, encoding: .ascii)
   }
   
+  /// Convert all domain in the `if-domain` and `unless-domain` fields.
+  ///
+  /// Sometimes we get non-punycoded domans in our JSON and apple does not allow non-punycoded domains to be passed to the rule store.
   private func punycodeConversion(encodedContentRuleList: String) async throws -> String? {
     guard let blocklistData = encodedContentRuleList.data(using: .utf8) else {
       assertionFailure()
@@ -301,6 +307,8 @@ actor ContentBlockerManager {
     return String(bytes: modifiedData, encoding: .ascii)
   }
   
+  /// Punycode an array of `domains` and return the punycoded results.
+  /// The array size shoud be unchanged but this is not guarantted.
   private func punycodeConversion(domains: [String]) -> [String] {
     return domains.compactMap { domain -> String? in
       guard domain.allSatisfy({ $0.isASCII }) else {

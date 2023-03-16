@@ -8,7 +8,9 @@ import Data
 import Combine
 import BraveCore
 
+/// An actor that handles the downloading of custom filter lists which are sourced via a URL
 actor FilterListCustomURLDownloader: ObservableObject {
+  /// An object representing a downloadable custom filter list.
   struct DownloadResource: Hashable, DownloadResourceInterface {
     let uuid: String
     let externalURL: URL
@@ -47,6 +49,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     self.fetchTasks = [:]
   }
   
+  /// Load any custom filter lists from cache so they are ready to use and start fetching updates.
   func loadCachedFilterLists() async {
     await CustomFilterListStorage.shared.loadCachedFilterLists()
     
@@ -58,6 +61,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
   }
   
+  /// Handle the download results of a custom filter list. This will process the download by compiling iOS rule lists and adding the rule list to the `AdblockEngineManager`.
   private func handle(downloadResult: ResourceDownloaderStream<DownloadResource>.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
     let uuid = await filterListCustomURL.setting.uuid
     let hasCache = await ContentBlockerManager.shared.hasCache(for: .customFilterList(uuid: uuid))
@@ -95,6 +99,8 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
   }
   
+  /// Handle the update to a filter list enabled status which will will add or remove it from the engine.
+  /// This will not compile anything to iOS rule lists as we always do this on the download regardless of its enabled status.
   @MainActor func handleUpdate(to filterListCustomURL: FilterListCustomURL, isEnabled: Bool) async {
     if isEnabled {
       let resource = filterListCustomURL.setting.resource
@@ -115,7 +121,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
   }
   
-  /// Start fetching the resource for the given filter list
+  /// Start fetching the resource for the given filter list. Once a new version is downloaded, the file will be processed using the `handle` method
   func startFetching(filterListCustomURL: FilterListCustomURL) async {
     let resource = await filterListCustomURL.setting.resource
     
@@ -175,6 +181,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
 }
 
 extension CustomFilterListSetting {
+  /// Return a download resource representing the given setting
   @MainActor var resource: FilterListCustomURLDownloader.DownloadResource {
     return FilterListCustomURLDownloader.DownloadResource(uuid: uuid, externalURL: externalURL)
   }

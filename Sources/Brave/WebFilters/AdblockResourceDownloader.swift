@@ -36,7 +36,6 @@ public actor AdblockResourceDownloader: Sendable {
   private let resourceDownloader: ResourceDownloader<BraveS3Resource>
   /// All the resources that this downloader handles
   
-
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
   }
