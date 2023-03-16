@@ -14,6 +14,8 @@ public struct Web3SettingsView: View {
   var networkStore: NetworkStore?
   var keyringStore: KeyringStore?
   
+  private let ipfsAPI: IpfsAPI?
+  
   @ObservedObject var enableIPFSResourcesResolver = Preferences.Wallet.resolveIPFSResources
 
   @State private var isShowingResetWalletAlert = false
@@ -25,11 +27,13 @@ public struct Web3SettingsView: View {
   public init(
     settingsStore: SettingsStore? = nil,
     networkStore: NetworkStore? = nil,
-    keyringStore: KeyringStore? = nil
+    keyringStore: KeyringStore? = nil,
+    ipfsAPI: IpfsAPI? = nil
   ) {
     self.settingsStore = settingsStore
     self.networkStore = networkStore
     self.keyringStore = keyringStore
+    self.ipfsAPI = ipfsAPI
   }
   
   public var body: some View {
@@ -45,43 +49,45 @@ public struct Web3SettingsView: View {
             isShowingBiometricsPasswordEntry: $isShowingBiometricsPasswordEntry
           )
         }
-        Section(
-          header: Text(Strings.Wallet.ipfsSettingsHeader)
-        ) {
-          Picker(selection: $enableIPFSResourcesResolver.value) {
-            ForEach(Preferences.Wallet.Web3IPFSOption.allCases) { option in
-              Text(option.name)
-                .foregroundColor(Color(.secondaryBraveLabel))
-                .tag(option)
+        if let ipfsAPI { // means users come from the browser not the wallet
+          Section(
+            header: Text(Strings.Wallet.ipfsSettingsHeader)
+          ) {
+            Picker(selection: $enableIPFSResourcesResolver.value) {
+              ForEach(Preferences.Wallet.Web3IPFSOption.allCases) { option in
+                Text(option.name)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+                  .tag(option)
+              }
+            } label: {
+              Text(Strings.Wallet.ipfsResourcesOptionsTitle)
+                .foregroundColor(Color(.braveLabel))
+                .padding(.vertical, 5)
             }
-          } label: {
-            Text(Strings.Wallet.ipfsResourcesOptionsTitle)
-              .foregroundColor(Color(.braveLabel))
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
+            NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
+              VStack(alignment: .leading, spacing: 5) {
+                Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
+                  .foregroundColor(Color(.braveLabel))
+                Text(ipfsNFTGatewayURL)
+                  .font(.footnote)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+              }
               .padding(.vertical, 5)
-          }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-          NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
-            VStack(alignment: .leading, spacing: 5) {
-              Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
-                .foregroundColor(Color(.braveLabel))
-              Text(ipfsNFTGatewayURL)
-                .font(.footnote)
-                .foregroundColor(Color(.secondaryBraveLabel))
             }
-            .padding(.vertical, 5)
-          }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-          NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
-            VStack(alignment: .leading, spacing: 4) {
-              Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
-                .foregroundColor(Color(.braveLabel))
-              Text(ipfsNFTGatewayURL)
-                .font(.footnote)
-                .foregroundColor(Color(.secondaryBraveLabel))
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
+            NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
+              VStack(alignment: .leading, spacing: 4) {
+                Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
+                  .foregroundColor(Color(.braveLabel))
+                Text(ipfsNFTGatewayURL)
+                  .font(.footnote)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+              }
+              .padding(.vertical, 4)
             }
-            .padding(.vertical, 4)
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
       }
       if let settingsStore {

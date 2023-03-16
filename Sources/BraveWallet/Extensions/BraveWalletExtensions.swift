@@ -327,7 +327,7 @@ public extension String {
 public extension URL {
   /// Returns true if url's scheme is supported to be resolved using IPFS public gateway
   var isIPFSScheme: Bool {
-    guard let scheme = self.scheme else { return false }
+    guard let scheme = self.scheme?.lowercased() else { return false }
     return WalletConstants.supportedIPFSSchemes.contains(scheme)
   }
 }

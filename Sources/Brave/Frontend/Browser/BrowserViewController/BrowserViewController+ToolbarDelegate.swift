@@ -108,24 +108,32 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
     let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    if !isPrivateMode, let url = topToolbar.currentURL, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-      Task { @MainActor in
-        let currentStatus = await rpcService.snsResolveMethod()
-        switch currentStatus {
-        case .ask:
-          // show name service interstitial page
-          showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
-        case .enabled:
-          if let resolvedURL = await resolveSNSHost(url.schemelessAbsoluteDisplayString, rpcService: rpcService) {
-            tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
-            return
-          }
-          tabManager.selectedTab?.loadRequest(URLRequest(url: url))
-        case .disabled:
-          tabManager.selectedTab?.reload()
-        @unknown default:
+    if !isPrivateMode, let url = topToolbar.currentURL {
+      if url.isIPFSScheme {
+        if !handleIPFSSchemeURL(url, visitType: .unknown) {
           tabManager.selectedTab?.reload()
         }
+      } else if url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+        Task { @MainActor in
+          let currentStatus = await rpcService.snsResolveMethod()
+          switch currentStatus {
+          case .ask:
+            // show name service interstitial page
+            showSNSDomainInterstitialPage(originalURL: url, visitType: .unknown)
+          case .enabled:
+            if let resolvedURL = await resolveSNSHost(url.schemelessAbsoluteDisplayString, rpcService: rpcService) {
+              tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
+              return
+            }
+            tabManager.selectedTab?.loadRequest(URLRequest(url: url))
+          case .disabled:
+            tabManager.selectedTab?.reload()
+          @unknown default:
+            tabManager.selectedTab?.reload()
+          }
+        }
+      } else {
+        tabManager.selectedTab?.reload()
       }
     } else {
       tabManager.selectedTab?.reload()
@@ -258,7 +266,7 @@ extension BrowserViewController: TopToolbarDelegate {
   }
   
   @discardableResult
-  func handleIPFSSchmeURL(_ url: URL, visitType: VisitType) -> Bool {
+  func handleIPFSSchemeURL(_ url: URL, visitType: VisitType) -> Bool {
     guard !PrivateBrowsingManager.shared.isPrivateBrowsing, let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
       return false
     }
@@ -273,7 +281,12 @@ extension BrowserViewController: TopToolbarDelegate {
         return true
       }
     case .disabled:
-      break
+      topToolbar.leaveOverlayMode()
+      let errorPageHelper = ErrorPageHelper(certStore: nil)
+      if let webView =  tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.disabledError, forUrl: url, inWebView: webView)
+      }
+      return true
     }
     
     return false
@@ -281,7 +294,7 @@ extension BrowserViewController: TopToolbarDelegate {
   
   @MainActor func submitValidURL(_ text: String, visitType: VisitType) async -> Bool {
     if let url = URL(string: text), url.isIPFSScheme {
-      return handleIPFSSchmeURL(url, visitType: visitType)
+      return handleIPFSSchemeURL(url, visitType: visitType)
     } else if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
       // Instead, submit them to the search engine like Chrome-iOS does.
