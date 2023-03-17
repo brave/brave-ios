@@ -329,6 +329,11 @@ public class SendTokenStore: ObservableObject {
   }
   
   @MainActor private func resolveUnstoppableDomain(_ domain: String) async {
+    guard selectedSendToken != nil else {
+      // token is required for `unstoppableDomainsGetWalletAddr`
+      // else it returns `invalidParams` error immediately
+      return
+    }
     self.resolvedAddress = nil
     self.isResolvingAddress = true
     defer { self.isResolvingAddress = false }

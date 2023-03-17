@@ -986,9 +986,24 @@ class SendTokenStoreTests: XCTestCase {
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
-      prefilledToken: nil,
+      prefilledToken: .previewToken,
       ipfsApi: nil
     )
+    
+    let waitForPrefilledTokenExpectation = expectation(description: "waitForPrefilledToken")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { waitForPrefilledTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, .previewToken)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for store to be setup with given `prefilledToken`
+    wait(for: [waitForPrefilledTokenExpectation], timeout: 1)
+    // release above sink on `selectedSendToken`
+    // to avoid repeated calls to expectation
+    cancellables.removeAll()
     
     let resolvedAddressExpectation = expectation(description: "sendTokenStore-resolvedAddress")
     XCTAssertNil(store.resolvedAddress)  // Initial state
@@ -1024,9 +1039,24 @@ class SendTokenStoreTests: XCTestCase {
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
-      prefilledToken: nil,
+      prefilledToken: .previewToken,
       ipfsApi: nil
     )
+    
+    let waitForPrefilledTokenExpectation = expectation(description: "waitForPrefilledToken")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { waitForPrefilledTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, .previewToken)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for store to be setup with given `prefilledToken`
+    wait(for: [waitForPrefilledTokenExpectation], timeout: 1)
+    // release above sink on `selectedSendToken`
+    // to avoid repeated calls to expectation
+    cancellables.removeAll()
     
     let resolvedAddressExpectation = expectation(description: "sendTokenStore-resolvedAddress")
     XCTAssertNil(store.resolvedAddress)  // Initial state
@@ -1072,9 +1102,24 @@ class SendTokenStoreTests: XCTestCase {
       blockchainRegistry: MockBlockchainRegistry(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
-      prefilledToken: nil,
+      prefilledToken: .mockSolToken,
       ipfsApi: nil
     )
+    
+    let waitForPrefilledTokenExpectation = expectation(description: "waitForPrefilledToken")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { waitForPrefilledTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, .mockSolToken)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for store to be setup with given `prefilledToken`
+    wait(for: [waitForPrefilledTokenExpectation], timeout: 1)
+    // release above sink on `selectedSendToken`
+    // to avoid repeated calls to expectation
+    cancellables.removeAll()
     
     let resolvedAddressExpectation = expectation(description: "sendTokenStore-resolvedAddress")
     XCTAssertNil(store.resolvedAddress)  // Initial state
