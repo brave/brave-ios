@@ -66,8 +66,8 @@ public class BraveVPN {
     helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
     helper.tunnelLocalizedDescription = connectionName
     helper.grdTunnelProviderManagerLocalizedDescription = "Brave VPN WireGuard Configuration"
-    helper.tunnelProviderBundleIdentifier = AppInfo.sharedContainerIdentifier
-    helper.appGroupIdentifier = "group.brave.soneryuksel.local.id"
+    helper.tunnelProviderBundleIdentifier = AppInfo.baseBundleIdentifier + ".BraveWireGuard"
+    helper.appGroupIdentifier = AppInfo.sharedContainerIdentifier
 
     if case .notPurchased = vpnState {
       // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
