@@ -42,10 +42,12 @@
 		27FA21A42838019000FA2C45 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27FA21902838018E00FA2C45 /* InfoPlist.strings */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2F93A97729C8C09600C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
+		2F93A97829C8C17500C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
+		2F93A97929C8C17600C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2FD860C229C3D677005AADD1 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */; };
 		2FD860C529C3D686005AADD1 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */; };
 		2FD860CA29C3D686005AADD1 /* BraveWireGuard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2FD860D529C3D796005AADD1 /* GRDWireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2FD860D429C3D796005AADD1 /* GRDWireGuardKit */; };
 		441A6360272445F9001492C3 /* StatDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A635F272444DE001492C3 /* StatDataModel.swift */; };
 		5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8CD8E023D5E3D100548FC0 /* libarchive.2.tbd */; };
 		5EE5918123A290E000E8E8DE /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F926647A234D4EF400359492 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -103,6 +105,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2F93A97A29C8C17700C7C158 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2F93A97929C8C17600C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F84B22531A0920C600AAB793 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -214,10 +227,15 @@
 		2F69320C260D03B000ECEB38 /* BrowserIntentsRelease (AppStore).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "BrowserIntentsRelease (AppStore).entitlements"; sourceTree = "<group>"; };
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
+		2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GRDWireGuardKit.xcframework; sourceTree = "<group>"; };
+		2F93A97B29C8CD6C00C7C158 /* BraveWireGuardBeta.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardBeta.entitlements; sourceTree = "<group>"; };
+		2F93A97C29C8CDB200C7C158 /* BraveWireGuardDebug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardDebug.entitlements; sourceTree = "<group>"; };
+		2F93A97D29C8CDE600C7C158 /* BraveWireGuardEnterprise.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardEnterprise.entitlements; sourceTree = "<group>"; };
+		2F93A97E29C8CF1300C7C158 /* BraveWireGuardDev.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardDev.entitlements; sourceTree = "<group>"; };
+		2F93A98029C8CFAF00C7C158 /* BraveWireGuardRelease.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardRelease.entitlements; sourceTree = "<group>"; };
 		2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BraveWireGuard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
 		2FD860C629C3D686005AADD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2FD860C729C3D686005AADD1 /* BraveWireGuard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BraveWireGuard.entitlements; sourceTree = "<group>"; };
 		441A635F272444DE001492C3 /* StatDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatDataModel.swift; sourceTree = "<group>"; };
 		445ABC0527319C000089710D /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/BraveWidgets.strings; sourceTree = "<group>"; };
 		445ABC0727319C030089710D /* zh-TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-TW"; path = "zh-TW.lproj/BraveWidgets.strings"; sourceTree = "<group>"; };
@@ -309,6 +327,7 @@
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,
 				27D972E628BD4D9900DDCF79 /* BraveNews in Frameworks */,
+				2F93A97829C8C17500C7C158 /* GRDWireGuardKit.xcframework in Frameworks */,
 				27FA217F2837FB0100FA2C45 /* BraveShared in Frameworks */,
 				7DDAF2232930091600D955A2 /* SDWebImageSVGNativeCoder in Frameworks */,
 				27FA21812837FB0100FA2C45 /* BraveWallet in Frameworks */,
@@ -331,8 +350,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2FD860D529C3D796005AADD1 /* GRDWireGuardKit in Frameworks */,
 				2FD860C229C3D677005AADD1 /* NetworkExtension.framework in Frameworks */,
+				2F93A97729C8C09600C7C158 /* GRDWireGuardKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,12 +485,25 @@
 			path = BrowserIntents;
 			sourceTree = "<group>";
 		};
+		2F93A98129C8D0FD00C7C158 /* Entitlements */ = {
+			isa = PBXGroup;
+			children = (
+				2F93A97B29C8CD6C00C7C158 /* BraveWireGuardBeta.entitlements */,
+				2F93A97C29C8CDB200C7C158 /* BraveWireGuardDebug.entitlements */,
+				2F93A97E29C8CF1300C7C158 /* BraveWireGuardDev.entitlements */,
+				2F93A97D29C8CDE600C7C158 /* BraveWireGuardEnterprise.entitlements */,
+				2F93A98029C8CFAF00C7C158 /* BraveWireGuardRelease.entitlements */,
+			);
+			path = Entitlements;
+			sourceTree = "<group>";
+		};
 		2FD860C329C3D686005AADD1 /* BraveWireGuard */ = {
 			isa = PBXGroup;
 			children = (
+				2F93A98129C8D0FD00C7C158 /* Entitlements */,
 				2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */,
 				2FD860C629C3D686005AADD1 /* Info.plist */,
-				2FD860C729C3D686005AADD1 /* BraveWireGuard.entitlements */,
+				2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */,
 			);
 			path = BraveWireGuard;
 			sourceTree = "<group>";
@@ -658,7 +690,6 @@
 			);
 			name = BraveWireGuard;
 			packageProductDependencies = (
-				2FD860D429C3D796005AADD1 /* GRDWireGuardKit */,
 			);
 			productName = BraveWireGuard;
 			productReference = 2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */;
@@ -702,6 +733,7 @@
 				28CE83DE1A1D1E7C00576538 /* Frameworks */,
 				F84B22531A0920C600AAB793 /* Embed App Extensions */,
 				272FC6BF25DC19A0000F2EFC /* Fix Embedded Frameworks Signing */,
+				2F93A97A29C8C17700C7C158 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2083,11 +2115,12 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardDebug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = KL8N8XSYF4;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
@@ -2120,7 +2153,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardRelease.entitlements";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
@@ -2141,6 +2174,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Brave iOS - Development WireGuard Extension";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2157,7 +2191,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardDev.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
@@ -2192,12 +2226,13 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardEnterprise.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: BRAVE SOFTWARE, INC.";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L6556KQ6XT;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
@@ -2228,8 +2263,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardRelease.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Distribution: Brave Software, Inc.";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
@@ -2247,6 +2282,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Brave iOS WireGuard Extension";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2264,7 +2300,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardRelease.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
@@ -2300,7 +2336,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BraveWireGuard/BraveWireGuard.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/BraveWireGuard/Entitlements/BraveWireGuardBeta.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
@@ -3087,11 +3123,6 @@
 		27FA218A2837FB0100FA2C45 /* Storage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Storage;
-		};
-		2FD860D429C3D796005AADD1 /* GRDWireGuardKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2FD860D329C3D796005AADD1 /* XCRemoteSwiftPackageReference "GuardianWireGuard" */;
-			productName = GRDWireGuardKit;
 		};
 		7DDAF2222930091600D955A2 /* SDWebImageSVGNativeCoder */ = {
 			isa = XCSwiftPackageProductDependency;
