@@ -86,6 +86,7 @@ extension BrowserViewController {
       self.openURLInNewTab(BraveUX.braveVPNLinkReceiptProd, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isPrivileged: false)
     }
     let popup = PopupViewController(rootView: linkReceiptView, isDismissable: true)
+    isOnboardingOrFullScreenCalloutPresented = true
     present(popup, animated: false)
   }
   
