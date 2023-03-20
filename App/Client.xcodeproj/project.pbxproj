@@ -43,7 +43,8 @@
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2F93A98229C8DDA700C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
-		2F93A98329C8DDA700C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2F93A98529C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
+		2F93A98629C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2FD860C229C3D677005AADD1 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */; };
 		2FD860C529C3D686005AADD1 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */; };
 		2FD860CA29C3D686005AADD1 /* BraveWireGuard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -104,13 +105,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		2F93A98429C8DDA700C7C158 /* Embed Frameworks */ = {
+		2F93A98729C8EB3300C7C158 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				2F93A98329C8DDA700C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */,
+				2F93A98629C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -326,6 +327,7 @@
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,
 				27D972E628BD4D9900DDCF79 /* BraveNews in Frameworks */,
+				2F93A98529C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Frameworks */,
 				27FA217F2837FB0100FA2C45 /* BraveShared in Frameworks */,
 				7DDAF2232930091600D955A2 /* SDWebImageSVGNativeCoder in Frameworks */,
 				27FA21812837FB0100FA2C45 /* BraveWallet in Frameworks */,
@@ -681,7 +683,6 @@
 				2FD860BD29C3D676005AADD1 /* Sources */,
 				2FD860BE29C3D676005AADD1 /* Frameworks */,
 				2FD860BF29C3D676005AADD1 /* Resources */,
-				2F93A98429C8DDA700C7C158 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -732,6 +733,7 @@
 				28CE83DE1A1D1E7C00576538 /* Frameworks */,
 				F84B22531A0920C600AAB793 /* Embed App Extensions */,
 				272FC6BF25DC19A0000F2EFC /* Fix Embedded Frameworks Signing */,
+				2F93A98729C8EB3300C7C158 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2122,7 +2124,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2160,7 +2162,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2197,7 +2199,7 @@
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2235,7 +2237,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = L6556KQ6XT;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2272,7 +2274,7 @@
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2310,7 +2312,7 @@
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -2346,7 +2348,7 @@
 				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BraveWireGuard/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BraveWireGuard;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
