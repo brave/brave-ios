@@ -108,12 +108,13 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
     let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    if !isPrivateMode, let url = topToolbar.currentURL {
+    
+    if let url = topToolbar.currentURL {
       if url.isIPFSScheme {
         if !handleIPFSSchemeURL(url, visitType: .unknown) {
           tabManager.selectedTab?.reload()
         }
-      } else if url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+      } else if !isPrivateMode, url.domainURL.schemelessAbsoluteDisplayString.endsWithSupportedSNSExtension, let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
         Task { @MainActor in
           let currentStatus = await rpcService.snsResolveMethod()
           switch currentStatus {
@@ -267,7 +268,16 @@ extension BrowserViewController: TopToolbarDelegate {
   
   @discardableResult
   func handleIPFSSchemeURL(_ url: URL, visitType: VisitType) -> Bool {
-    guard !PrivateBrowsingManager.shared.isPrivateBrowsing, let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
+    guard !PrivateBrowsingManager.shared.isPrivateBrowsing else {
+      topToolbar.leaveOverlayMode()
+      let errorPageHelper = ErrorPageHelper(certStore: nil)
+      if let webView =  tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
+      }
+      return true
+    }
+    
+    guard let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
       return false
     }
     

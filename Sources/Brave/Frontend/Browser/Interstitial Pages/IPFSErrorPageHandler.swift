@@ -13,8 +13,12 @@ class IPFSErrorPageHandler: InterstitialPageHandler {
     NSError(domain: "ERR_IPFS_DISABLED", code: 4000)
   }
   
+  static var privateModeError: NSError {
+    NSError(domain: "ERR_INCOGNITO_IPFS_NOT_ALLOWED", code: 5000)
+  }
+  
   func canHandle(error: NSError) -> Bool {
-    error.code == IPFSErrorPageHandler.disabledError.code && error.domain == IPFSErrorPageHandler.disabledError.domain
+    (error.code == IPFSErrorPageHandler.disabledError.code && error.domain == IPFSErrorPageHandler.disabledError.domain) || (error.code == IPFSErrorPageHandler.privateModeError.code && error.domain == IPFSErrorPageHandler.privateModeError.domain)
   }
 
   func response(for model: ErrorPageModel) -> (URLResponse, Data)? {
