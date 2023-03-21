@@ -14,7 +14,7 @@ class IPFSErrorPageHandler: InterstitialPageHandler {
   }
   
   func canHandle(error: NSError) -> Bool {
-    error.code == IPFSErrorPageHandler.disabledError.code
+    error.code == IPFSErrorPageHandler.disabledError.code && error.domain == IPFSErrorPageHandler.disabledError.domain
   }
 
   func response(for model: ErrorPageModel) -> (URLResponse, Data)? {

@@ -3803,7 +3803,7 @@ extension Strings {
       comment: "A brief explaination of IPFS on privacy. The first '%@' will be replaced with a link to a Brave article that explains how does IPFS impact users' privacy in details. The second '%@' will be replaced with 'web3IPFSInterstitialIPFSPrivacyLearnMore'."
     )
     public static let web3IPFSInterstitialIPFSPrivacyLearnMore = NSLocalizedString(
-      "wallet.web3IPFSInterstitialIPFSPrivacy",
+      "wallet.web3IPFSInterstitialIPFSPrivacyLearnMore",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Learn more",
