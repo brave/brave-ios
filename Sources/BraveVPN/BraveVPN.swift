@@ -268,15 +268,25 @@ public class BraveVPN {
 
     // 1. Existing user, check if credentials and connection are available.
     if GRDVPNHelper.activeConnectionPossible() {
-      // just configure & connect, no need for 'first user' setup
       
-      helper.configureAndConnectVPN { error, status in
-        if let error = error {
-          logAndStoreError("configureAndConnectVPN: \(error)")
+      // Checking if user has to be migrated to wireguard
+      if !Preferences.VPN.wireGuardProtocolMigrated.value {
+        BraveVPN.reconfigureVPNForProtocolChange() { success in
+          reconnectPending = false
+          Preferences.VPN.wireGuardProtocolMigrated.value = success
+          
+          completion?(success)
         }
-        
-        reconnectPending = false
-        completion?(status == .success)
+      } else {
+        // just configure & connect, no need for 'first user' setup
+        helper.configureAndConnectVPN { error, status in
+          if let error = error {
+            logAndStoreError("configureAndConnectVPN: \(error)")
+          }
+          
+          reconnectPending = false
+          completion?(status == .success)
+        }
       }
     } else {
       // New user or no credentials and have to remake them.
@@ -302,6 +312,23 @@ public class BraveVPN {
 
     connectToVPN() { status in
       completion?(status)
+    }
+  }
+  
+  /// Attempts to reconfigure the vpn fpr protocol change
+  /// Called to migrate users from iKEv2 protocol to WireGuard
+  /// This method disconnects from the vpn before reconfiguration is happening
+  /// and reconnects automatically after reconfiguration is done.
+  private static func reconfigureVPNForProtocolChange(completion: ((Bool) -> Void)? = nil) {
+    helper.forceDisconnectVPNIfNecessary()
+    GRDVPNHelper.clearVpnConfiguration()
+    
+    helper.configureFirstTimeUser(for: .wireGuard, postCredential: nil) { success, error in
+      if let error = error {
+        logAndStoreError("configureFirstTimeUserPostCredential \(error)")
+      }
+      
+      completion?(success)
     }
   }
 
