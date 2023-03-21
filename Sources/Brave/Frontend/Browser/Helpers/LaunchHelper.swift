@@ -28,20 +28,17 @@ public actor LaunchHelper {
     // Otherwise prepare the services and await the task
     let task = Task {
       // Load cached data
-      // This is done first because compileResources and loadCachedRuleLists need their results
-      async let loadBundledResources: Void = ContentBlockerManager.shared.loadBundledResources()
+      // This is done first because compileResources need their results
       async let filterListCache: Void = FilterListResourceDownloader.shared.loadCachedData()
-      async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedData()
-      _ = await (loadBundledResources, filterListCache, adblockResourceCache)
+      async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded()
+      _ = await (filterListCache, adblockResourceCache)
       
-      // Compile some engines and load cached rule lists
-      async let compiledResourcesCompile: Void = AdBlockEngineManager.shared.compileResources()
-      async let cachedRuleListLoad: Void = ContentBlockerManager.shared.loadCachedRuleLists()
-      _ = await (compiledResourcesCompile, cachedRuleListLoad)
+      // Compile some engines
+      await AdBlockEngineManager.shared.compileResources()
       
       // This one is non-blocking
       performPostLoadTasks(adBlockService: adBlockService)
-      markAdBlockReady()
+      areAdBlockServicesReady = true
     }
     
     // Await the task and wait for the results
@@ -50,18 +47,31 @@ public actor LaunchHelper {
     self.loadTask = nil
   }
   
-  private func markAdBlockReady() {
-    areAdBlockServicesReady = true
+  /// Perform tasks that don't need to block the initial load (things that can happen happily in the background after the first page loads
+  private func performPostLoadTasks(adBlockService: AdblockService) {
+    Task.detached(priority: .low) {
+      await FilterListResourceDownloader.shared.start(with: adBlockService)
+      await AdblockResourceDownloader.shared.reloadBundledOnlyData()
+      await AdblockResourceDownloader.shared.startFetching()
+      await AdBlockEngineManager.shared.startTimer()
+      
+      /// Cleanup rule lists so we don't have dead rule lists
+      let validBlocklistTypes = await self.getAllValidBlocklistTypes()
+      await ContentBlockerManager.shared.cleaupInvalidRuleLists(validTypes: validBlocklistTypes)
+    }
   }
   
-  private func performPostLoadTasks(adBlockService: AdblockService) {
-    Task { @MainActor in
-      await ContentBlockerManager.shared.cleanupDeadRuleLists()
-      await ContentBlockerManager.shared.compilePendingResources()
-      FilterListResourceDownloader.shared.start(with: adBlockService)
-      await AdblockResourceDownloader.shared.startFetching()
-      ContentBlockerManager.shared.startTimer()
-      await AdBlockEngineManager.shared.startTimer()
-    }
+  /// Get all possible types of blocklist types available in this app, this includes actual and potential types
+  /// This is used to delete old filter lists so that we clean up old stuff
+  @MainActor private func getAllValidBlocklistTypes() -> Set<ContentBlockerManager.BlocklistType> {
+    return FilterListResourceDownloader.shared.filterLists
+      // All filter lists blocklist types
+      .reduce(Set<ContentBlockerManager.BlocklistType>()) { partialResult, filterList in
+        return partialResult.union([.filterList(uuid: filterList.uuid)])
+      }
+      // All generic types
+      .union(
+        ContentBlockerManager.GenericBlocklistType.allCases.map { .generic($0) }
+      )
   }
 }

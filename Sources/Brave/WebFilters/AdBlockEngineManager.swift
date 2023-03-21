@@ -61,7 +61,7 @@ public actor AdBlockEngineManager: Sendable {
     }
   }
   
-  /// An aboject containing the resource and version.
+  /// An object containing the resource and version.
   ///
   /// Stored in this way so we can replace resources with an older version
   public struct ResourceWithVersion: Hashable {
