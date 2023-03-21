@@ -414,8 +414,15 @@ extension TabsBarViewController: UICollectionViewDataSource {
     updateData()
 
     guard let selectedTab = tabList[destinationIndexPath.row] else { return }
-    // The line below selects tab without deselecting others
-    // manager.selectTab(selectedTab)
+    
+    // Deselects all tabBarCells before selecting a new one
+    for i in 0...tabs.count - 1 {
+        if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? TabBarCell {
+          cell.isSelected = false
+          cell.configure()
+        }
+    }
+    manager.selectTab(selectedTab)
   }
 }
 
