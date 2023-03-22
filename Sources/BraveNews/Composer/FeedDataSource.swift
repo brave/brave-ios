@@ -754,9 +754,7 @@ public class FeedDataSource: ObservableObject {
       group.enter()
       DispatchQueue.main.async {
         // Score must be called from main queue
-        guard let historyAPI = self?.historyAPI else { return }
-        
-        self?.score(feeds: items, sources: sources, historyAPI: historyAPI) { [weak self] feedItems in
+        self?.score(feeds: items, sources: sources) { [weak self] feedItems in
           self?.generateCards(from: feedItems) { [weak self] cards in
             defer { group.leave() }
             self?.state = .success(cards)
@@ -774,13 +772,12 @@ public class FeedDataSource: ObservableObject {
   private func score(
     feeds: [FeedItem.Content],
     sources: [FeedItem.Source],
-    historyAPI: BraveHistoryAPI,
     completion: @escaping ([FeedItem]) -> Void
   ) {
     // Ensure main thread since we're querying from CoreData
     dispatchPrecondition(condition: .onQueue(.main))
     
-    historyAPI.search(withQuery: "", maxCount: 200) { historyNodeList in
+    fetchHistory {historyNodeList in
       let lastVisitedDomains = historyNodeList.compactMap { $0.url.baseDomain }
       
       let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
@@ -804,6 +801,16 @@ public class FeedDataSource: ObservableObject {
           completion(items)
         }
       }
+    }
+  }
+  
+  private func fetchHistory(completion: @escaping ([HistoryNode]) -> Void) {
+    if let historyAPI {
+      historyAPI.search(withQuery: "", maxCount: 200) { historyNodeList in
+        completion(historyNodeList)
+      }
+    } else {
+      completion([])
     }
   }
 
