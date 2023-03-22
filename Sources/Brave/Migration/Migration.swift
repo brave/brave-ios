@@ -92,53 +92,7 @@ public class Migration {
       destinationLocation: .applicationSupportDirectory)
   }
 
-  private static func movePlaylistV2Items() {
-    // Migrate all items not belonging to a folder
-    func migrateItemsToSavedFolder(folderUUID: String) {
-      let items = PlaylistItem.getItems(parentFolder: nil)
-      if !items.isEmpty {
-        PlaylistItem.moveItems(items: items.map({ $0.objectID }), to: folderUUID)
-      }
-
-      Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value = true
-    }
-
-    if PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID) != nil {
-      migrateItemsToSavedFolder(folderUUID: PlaylistFolder.savedFolderUUID)
-    } else {
-      PlaylistFolder.addFolder(title: Strings.PlaylistFolders.playlistSavedFolderTitle, uuid: PlaylistFolder.savedFolderUUID) { uuid in
-        if PlaylistFolder.getFolder(uuid: uuid) != nil {
-          migrateItemsToSavedFolder(folderUUID: uuid)
-        } else {
-          Logger.module.error("Failed Moving Playlist items to Saved Folder - Unknown Error")
-        }
-      }
-    }
-  }
-  
-  private static func playlistFolderSharingIdentifierV2Migration() {
-    let itemIDs = PlaylistItem.all().map({ $0.objectID })
-    DataController.performOnMainContext(save: true) { context in
-      let items = itemIDs.compactMap({ context.object(with: $0) as? PlaylistItem })
-      items.forEach({
-        if $0.uuid == nil {
-          $0.uuid = UUID().uuidString
-        }
-      })
-      
-      Preferences.Migration.playlistV2SharedFoldersInitialMigrationCompleted.value = true
-    }
-  }
-
   public static func postCoreDataInitMigrations() {
-    if !Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value {
-      movePlaylistV2Items()
-    }
-    
-    if !Preferences.Migration.playlistV2SharedFoldersInitialMigrationCompleted.value {
-      playlistFolderSharingIdentifierV2Migration()
-    }
-
     if !Preferences.Migration.xcgloggerFilesRemovalCompleted.value {
       LegacyLogsMigration.run()
       
@@ -164,10 +118,6 @@ fileprivate extension Preferences {
     /// for user downloaded files.
     static let documentsDirectoryCleanupCompleted =
       Option<Bool>(key: "migration.documents-dir-completed", default: false)
-    static let playlistV2FoldersInitialMigrationCompleted =
-      Option<Bool>(key: "migration.playlistv2-folders-initial-migration-2-completed", default: false)
-    static let playlistV2SharedFoldersInitialMigrationCompleted =
-      Option<Bool>(key: "migration.playlistv2-sharedfolders-initial-migration-2-completed", default: false)
     // This is new preference introduced in iOS 1.32.3, tracks whether we should perform database migration.
     // It should be called only for users who have not completed the migration beforehand.
     // The reason for second migration flag is to first do file system migrations like moving database files,
