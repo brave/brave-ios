@@ -377,7 +377,7 @@ public class FilterListResourceDownloader: ObservableObject {
               downloadResult: downloadResult, for: filterList
             )
           case .failure(let error):
-            Logger.module.error("\(error.localizedDescription)")
+            ContentBlockerManager.log.error("Failed to download resource \(resource.cacheFolderName): \(error)")
           }
         }
       }, onCancel: {
