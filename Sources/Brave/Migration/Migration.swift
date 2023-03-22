@@ -93,12 +93,6 @@ public class Migration {
   }
 
   public static func postCoreDataInitMigrations() {
-    if !Preferences.Migration.xcgloggerFilesRemovalCompleted.value {
-      LegacyLogsMigration.run()
-      
-      Preferences.Migration.xcgloggerFilesRemovalCompleted.value = true
-    }
-
     if Preferences.Migration.coreDataCompleted.value { return }
 
     TabMO.deleteAllPrivateTabs()
@@ -128,11 +122,6 @@ fileprivate extension Preferences {
     /// A new preference key will be introduced in 1.44.x, indicates if Wallet Preferences migration has completed
     static let walletProviderAccountRequestCompleted =
     Option<Bool>(key: "migration.wallet-provider-account-request-completed", default: false)
-    
-    // See #5928. We used XCGLogger to handle logs, which used a custom rolling files in the system.
-    // After migrating to Apples OSLog those files have to be removed.
-    static let xcgloggerFilesRemovalCompleted =
-          Option<Bool>(key: "migration.xcglogger-file-removal-completed", default: false)
   }
 
   /// Migrate a given key from `Prefs` into a specific option
