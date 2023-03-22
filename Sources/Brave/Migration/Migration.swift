@@ -28,10 +28,6 @@ public class Migration {
       documentsDirectoryCleanup()
       Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
     }
-
-    if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
-      movePlaylistV1Items()
-    }
     
     if Preferences.General.isFirstLaunch.value {
       if UIDevice.current.userInterfaceIdiom == .phone {
@@ -96,59 +92,6 @@ public class Migration {
       destinationLocation: .applicationSupportDirectory)
   }
 
-  private func movePlaylistV1Items() {
-    // If moving the file fails, we'll never bother trying again.
-    // It doesn't hurt and the user can easily delete it themselves.
-    defer {
-      Preferences.Migration.playlistV1FileSettingsLocationCompleted.value = true
-    }
-
-    guard let libraryPath = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first,
-      let playlistDirectory = PlaylistDownloadManager.playlistDirectory
-    else {
-      return
-    }
-
-    let errorPath = "PlaylistV1FileSettingsLocationCompletion"
-    do {
-      let urls = try FileManager.default.contentsOfDirectory(
-        at: libraryPath,
-        includingPropertiesForKeys: nil,
-        options: [.skipsHiddenFiles])
-      for url in urls where url.absoluteString.contains("com.apple.UserManagedAssets") {
-        do {
-          let assets = try FileManager.default.contentsOfDirectory(
-            at: url,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles])
-          assets.forEach({
-            if let item = PlaylistItem.cachedItem(cacheURL: $0),
-              let itemId = item.uuid {
-              let destination = playlistDirectory.appendingPathComponent($0.lastPathComponent)
-
-              do {
-                try FileManager.default.moveItem(at: $0, to: destination)
-                try PlaylistItem.updateCache(uuid: itemId, cachedData: destination.bookmarkData())
-              } catch {
-                Logger.module.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-              }
-            }
-          })
-        } catch {
-          Logger.module.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-        }
-
-        do {
-          try FileManager.default.removeItem(at: url)
-        } catch {
-          Logger.module.error("Deleting Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-        }
-      }
-    } catch {
-      Logger.module.error("Moving Playlist Files for \(errorPath) failed: \(error.localizedDescription)")
-    }
-  }
-
   private static func movePlaylistV2Items() {
     // Migrate all items not belonging to a folder
     func migrateItemsToSavedFolder(folderUUID: String) {
@@ -204,12 +147,6 @@ public class Migration {
 
     if Preferences.Migration.coreDataCompleted.value { return }
 
-    // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
-    //  - Cleared private data
-    //  - Exited Private Mode
-    //  - The app was terminated (bug)
-    // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
-    // we must dismiss any records that are private tabs during migration from Model7
     TabMO.deleteAllPrivateTabs()
   
     Domain.migrateShieldOverrides()
@@ -227,8 +164,6 @@ fileprivate extension Preferences {
     /// for user downloaded files.
     static let documentsDirectoryCleanupCompleted =
       Option<Bool>(key: "migration.documents-dir-completed", default: false)
-    static let playlistV1FileSettingsLocationCompleted =
-      Option<Bool>(key: "migration.playlistv1-file-settings-location-completed", default: false)
     static let playlistV2FoldersInitialMigrationCompleted =
       Option<Bool>(key: "migration.playlistv2-folders-initial-migration-2-completed", default: false)
     static let playlistV2SharedFoldersInitialMigrationCompleted =
