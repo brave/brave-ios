@@ -13,7 +13,7 @@ public actor AdblockResourceDownloader: Sendable {
   public static let shared = AdblockResourceDownloader()
   
   /// All the different resources this downloader handles
-  static let handledResources: [ResourceDownloader.Resource] = [
+  static let handledResources: [BraveS3Resource] = [
     .genericContentBlockingBehaviors, .generalCosmeticFilters
   ]
   
@@ -27,7 +27,7 @@ public actor AdblockResourceDownloader: Sendable {
   }()
   
   /// The resource downloader that will be used to download all our resoruces
-  private let resourceDownloader: ResourceDownloader
+  private let resourceDownloader: ResourceDownloader<BraveS3Resource>
 
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
@@ -92,7 +92,7 @@ public actor AdblockResourceDownloader: Sendable {
   }
   
   /// Start fetching the given resource at regular intervals
-  private func startFetching(resource: ResourceDownloader.Resource, every fetchInterval: TimeInterval) {
+  private func startFetching(resource: BraveS3Resource, every fetchInterval: TimeInterval) {
     Task { @MainActor in
       for try await result in await self.resourceDownloader.downloadStream(for: resource, every: fetchInterval) {
         switch result {
@@ -106,10 +106,10 @@ public actor AdblockResourceDownloader: Sendable {
   }
   
   /// Load cached data for the given resource. Ensures this is done on the MainActor
-  private func loadCachedOrBundledData(for resource: ResourceDownloader.Resource) async {
+  private func loadCachedOrBundledData(for resource: BraveS3Resource) async {
     do {
       // Check if we have cached results for the given resource
-      if let cachedResult = try ResourceDownloaderStream.cachedResult(for: resource) {
+      if let cachedResult = try resource.cachedResult() {
         await handle(downloadResult: cachedResult, for: resource)
       }
     } catch {
@@ -120,7 +120,7 @@ public actor AdblockResourceDownloader: Sendable {
   }
   
   /// Handle the downloaded file url for the given resource
-  private func handle(downloadResult: ResourceDownloaderStream.DownloadResult, for resource: ResourceDownloader.Resource) async {
+  private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource) async {
     let version = fileVersionDateFormatter.string(from: downloadResult.date)
     
     switch resource {
@@ -137,7 +137,7 @@ public actor AdblockResourceDownloader: Sendable {
       if !downloadResult.isModified {
         // If the file is not modified first we need to see if we already have a cached value loaded
         // We don't what to bother recompiling this file if we already loaded it
-        guard await !(ContentBlockerManager.shared.hasRuleList(for: blocklistType)) else {
+        guard await !ContentBlockerManager.shared.hasRuleList(for: blocklistType) else {
           // We don't want to recompile something that we alrady have loaded
           ContentBlockerManager.log.debug("Cached rule list exists for `\(blocklistType.identifier)`")
           return
@@ -145,7 +145,7 @@ public actor AdblockResourceDownloader: Sendable {
       }
       
       do {
-        guard let encodedContentRuleList = try ResourceDownloader.string(for: resource) else {
+        guard let encodedContentRuleList = try resource.downloadedString() else {
           assertionFailure("This file was downloaded successfully so it should not be nil")
           return
         }
