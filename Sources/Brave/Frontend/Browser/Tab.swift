@@ -594,23 +594,6 @@ class Tab: NSObject {
         if url.isSecureWebPage(), !isPrivate {
           ActivityShortcutManager.shared.donateCustomIntent(for: .openWebsite, with: url.absoluteString)
         }
-
-        Task { @MainActor in
-          if let favicon = FaviconFetcher.getIconFromCache(for: url) {
-            self.favicon = favicon
-          } else if url.scheme == "http" {  // Attempt to upgrade http to https favicons if the original doesn't exist due to a redirect
-            var components = URLComponents(string: url.absoluteString)
-            components?.scheme = "https"
-
-            if let url = components?.url, let favicon = FaviconFetcher.getIconFromCache(for: url) {
-              self.favicon = favicon
-            } else {
-              self.favicon = Favicon.default
-            }
-          } else {
-            self.favicon = Favicon.default
-          }
-        }
       }
 
       return webView.load(request)

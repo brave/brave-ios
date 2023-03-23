@@ -40,6 +40,7 @@ public class FaviconFetcher {
   /// 1. Fetch from Cache
   /// 2. Fetch from Brave-Core
   /// 3. Fetch from Bundled Icons
+  /// 4. Fetch Monogram Icons
   /// Notes: Does NOT make a request to fetch icons from the page.
   ///      Requests are only made in FaviconScriptHandler, when the user visits the page.
   @MainActor
@@ -51,7 +52,8 @@ public class FaviconFetcher {
     }
 
     // Fetch the Brave-Core icons
-    if let favicon = try? await FaviconRenderer.loadIcon(for: url, persistent: persistent), !favicon.isMonogramImage {
+    let favicon = try? await FaviconRenderer.loadIcon(for: url, persistent: persistent)
+    if let favicon = favicon, !favicon.isMonogramImage {
       storeInCache(favicon, for: url, persistent: persistent)
       try Task.checkCancellation()
       return favicon
@@ -64,7 +66,14 @@ public class FaviconFetcher {
       try Task.checkCancellation()
       return favicon
     }
-
+    
+    // Cache and return Monogram icons
+    if let favicon = favicon {
+      storeInCache(favicon, for: url, persistent: persistent)
+      return favicon
+    }
+    
+    // No icons were found
     throw FaviconError.noImagesFound
   }
   
@@ -126,7 +135,7 @@ public class FaviconFetcher {
     return nil
   }
   
-  /// Stores a Favicon in the cache if not persistent, and not a monogram image.
+  /// Updates the Favicon in the cache with the specified icon if any, otherwise removes the favicon from the cache.
   public static func updateCache(_ favicon: Favicon?, for url: URL, persistent: Bool) {
     guard let favicon else {
       let cachedURL = cacheURL(for: url)

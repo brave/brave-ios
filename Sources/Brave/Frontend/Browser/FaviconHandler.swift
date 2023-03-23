@@ -38,10 +38,10 @@ extension FaviconHandler: TabEventHandler {
     if let currentURL = tab.url {
       if let favicon = FaviconFetcher.getIconFromCache(for: currentURL) {
         tab.favicon = favicon
-        return
+      } else {
+        tab.favicon = Favicon.default
       }
       
-      tab.favicon = Favicon.default
       Task { @MainActor in
         let favicon = try await loadFaviconURL(currentURL, forTab: tab)
         TabEvent.post(.didLoadFavicon(favicon), for: tab)

@@ -45,7 +45,7 @@ class LargeFaviconView: UIView {
           self.backgroundView.isHidden = !favicon.hasTransparentBackground && !favicon.isMonogramImage
         }
       } catch {
-        self.imageView.image = try? await FaviconFetcher.monogramIcon(url: siteURL, persistent: isPersistent).image ?? Favicon.defaultImage
+        self.imageView.image = Favicon.defaultImage
         self.backgroundColor = nil
         self.imageView.contentMode = .scaleAspectFit
         self.backgroundView.isHidden = false
