@@ -72,7 +72,13 @@ public class FaviconFetcher {
   /// 1. If `monogramString` is not null, it is used to render the Favicon image.
   /// 2. If `monogramString` is null, the first character of the URL's domain is used to render the Favicon image.
   @MainActor
-  public static func monogramIcon(url: URL, monogramString: Character? = nil) async throws -> Favicon {
+  public static func monogramIcon(url: URL, monogramString: Character? = nil, persistent: Bool) async throws -> Favicon {
+    try Task.checkCancellation()
+    
+    if let favicon = getFromCache(for: url) {
+      return favicon
+    }
+    
     // Render the Monogram on a UIImage
     guard let attributes = BraveCore.FaviconAttributes.withDefaultImage() else {
       throw FaviconError.noImagesFound
@@ -81,23 +87,48 @@ public class FaviconFetcher {
     let textColor = !attributes.isDefaultBackgroundColor ? attributes.textColor : nil
     let backColor = !attributes.isDefaultBackgroundColor ? attributes.backgroundColor : nil
     var monogramText = attributes.monogramString
-    if let monogramString = monogramString {
+    if let monogramString = monogramString ?? url.baseDomain?.first {
       monogramText = String(monogramString)
     }
     
     let favicon = await UIImage.renderMonogram(url, textColor: textColor, backgroundColor: backColor, monogramString: monogramText)
+    storeInCache(favicon, for: url, persistent: persistent)
     try Task.checkCancellation()
     return favicon
   }
   
   /// Retrieves a Favicon from the cache
   public static func getIconFromCache(for url: URL) -> Favicon? {
-    getFromCache(for: url)
+    // Handle internal URLs
+    var url = url
+    if let internalURL = InternalURL(url), let realUrl = internalURL.originalURLFromErrorPage ?? internalURL.extractedUrlParam {
+      url = realUrl
+    }
+    
+    // Fetch from cache
+    if let favicon = getFromCache(for: url) {
+      return favicon
+    }
+    
+    // When we search for a domain in the URL bar,
+    // it automatically makes the scheme `http`
+    // Even if the website loads/redirects as `https`
+    // Attempt to use `https` favicons if they exist
+    if url.scheme == "http", var components = URLComponents(string: url.absoluteString) {
+      components.scheme = "https"
+
+      // Fetch from cache
+      if let url = components.url, let favicon = FaviconFetcher.getIconFromCache(for: url) {
+        return favicon
+      }
+    }
+    
+    return nil
   }
   
   /// Stores a Favicon in the cache if not persistent, and not a monogram image.
   public static func updateCache(_ favicon: Favicon?, for url: URL, persistent: Bool) {
-    guard let favicon, !favicon.isMonogramImage else {
+    guard let favicon else {
       let cachedURL = cacheURL(for: url)
       SDImageCache.shared.memoryCache.removeObject(forKey: cachedURL.absoluteString)
       SDImageCache.shared.diskCache.removeData(forKey: cachedURL.absoluteString)
@@ -116,13 +147,21 @@ public class FaviconFetcher {
   }
 
   private static func storeInCache(_ favicon: Favicon, for url: URL, persistent: Bool) {
-    // Do not cache non-persistent icons
+    // Do not cache non-persistent icons to disk
     if persistent {
       do {
         let data = try JSONEncoder().encode(favicon)
         let cachedURL = cacheURL(for: url)
         SDImageCache.shared.memoryCache.setObject(data, forKey: cachedURL.absoluteString, cost: UInt(data.count))
         SDImageCache.shared.diskCache.setData(data, forKey: cachedURL.absoluteString)
+      } catch {
+        Logger.module.error("Error Caching Favicon: \(error)")
+      }
+    } else {
+      // Cache non-persistent icons to memory only
+      do {
+        let data = try JSONEncoder().encode(favicon)
+        SDImageCache.shared.memoryCache.setObject(data, forKey: cacheURL(for: url).absoluteString, cost: UInt(data.count))
       } catch {
         Logger.module.error("Error Caching Favicon: \(error)")
       }

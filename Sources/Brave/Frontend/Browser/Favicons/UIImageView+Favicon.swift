@@ -26,10 +26,11 @@ extension UIImageView {
   }
   
   private func fetchIcon(for siteURL: URL, monogramFallbackCharacter: Character? = nil) async -> Favicon? {
+    let isPersistent = !PrivateBrowsingManager.shared.isPrivateBrowsing
     do {
-      return try await FaviconFetcher.loadIcon(url: siteURL, persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+      return try await FaviconFetcher.loadIcon(url: siteURL, persistent: isPersistent)
     } catch {
-      return try? await FaviconFetcher.monogramIcon(url: siteURL, monogramString: monogramFallbackCharacter)
+      return try? await FaviconFetcher.monogramIcon(url: siteURL, monogramString: monogramFallbackCharacter, persistent: isPersistent)
     }
   }
 
@@ -38,6 +39,13 @@ extension UIImageView {
   /// based on the site URL.
   func loadFavicon(for siteURL: URL, monogramFallbackCharacter: Character? = nil, completion: ((Favicon?) -> Void)? = nil) {
     cancelFaviconLoad()
+    
+    if let icon = FaviconFetcher.getIconFromCache(for: siteURL) {
+      self.image = icon.image ?? Favicon.defaultImage
+      return
+    }
+    
+    self.image = Favicon.defaultImage
     faviconTask = Task { @MainActor in
       let favicon = await fetchIcon(for: siteURL, monogramFallbackCharacter: monogramFallbackCharacter)
       self.image = favicon?.image ?? Favicon.defaultImage
