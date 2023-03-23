@@ -285,7 +285,9 @@ public class BraveVPN {
         } else {
           // Handles the case user create a new profile with WireGuard
           // And old iKEv2 profile should be removed from Settings
-          helper.ikev2VPNManager.removeFromPreferences()
+          if helper.ikev2VPNManager.connection.status != .invalid {
+            helper.ikev2VPNManager.removeFromPreferences()
+          }
         }
         
         reconnectPending = false
