@@ -282,6 +282,10 @@ public class BraveVPN {
       helper.configureFirstTimeUser(for: .wireGuard, postCredential: nil) { success, error in
         if let error = error {
           logAndStoreError("configureFirstTimeUserPostCredential \(error)")
+        } else {
+          // Handles the case user create a new profile with WireGuard
+          // And old iKEv2 profile should be removed from Settings
+          helper.ikev2VPNManager.removeFromPreferences()
         }
         
         reconnectPending = false
