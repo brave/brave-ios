@@ -777,7 +777,7 @@ public class FeedDataSource: ObservableObject {
     // Ensure main thread since we're querying from CoreData
     dispatchPrecondition(condition: .onQueue(.main))
     
-    fetchHistory {historyNodeList in
+    fetchHistory { historyNodeList in
       let lastVisitedDomains = historyNodeList.compactMap { $0.url.baseDomain }
       
       let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
