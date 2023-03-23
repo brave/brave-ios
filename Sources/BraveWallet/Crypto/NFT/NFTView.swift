@@ -1,0 +1,165 @@
+// Copyright 2023 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import SwiftUI
+
+struct NFTView: View {
+  var cryptoStore: CryptoStore
+  @ObservedObject var keyringStore: KeyringStore
+  @ObservedObject var networkStore: NetworkStore
+  @ObservedObject var nftStore: NFTStore
+  
+  @State private var isPresentingEditUserAssets: Bool = false
+  @State private var selectedNFTViewModel: NFTAssetViewModel?
+  
+  @Environment(\.buySendSwapDestination)
+  private var buySendSwapDestination: Binding<BuySendSwapDestination?>
+  
+  private var emptyView: some View {
+    VStack(spacing: 10) {
+      Text("No NFTs here yet.")
+        .font(.headline.weight(.semibold))
+        .foregroundColor(Color(.braveLabel))
+      Text("Ready to add some? Just click the button below to import.")
+        .font(.subheadline.weight(.semibold))
+        .foregroundColor(Color(.secondaryLabel))
+      Text("Note that Brave Wallet currently only supports ERC721 token standard.")
+        .font(.footnote)
+        .foregroundColor(Color(.secondaryBraveLabel))
+    }
+    .multilineTextAlignment(.center)
+  }
+  
+  private var editUserAssetsButton: some View {
+    Button(action: { isPresentingEditUserAssets = true }) {
+      Text(Strings.Wallet.editVisibleAssetsButtonTitle)
+        .multilineTextAlignment(.center)
+        .font(.footnote.weight(.semibold))
+        .foregroundColor(Color(.braveBlurple))
+        .frame(maxWidth: .infinity)
+    }
+    .sheet(isPresented: $isPresentingEditUserAssets) {
+      EditUserAssetsView(
+        networkStore: networkStore,
+        keyringStore: keyringStore,
+        userAssetsStore: nftStore.userAssetsStore
+      ) {
+        nftStore.update()
+      }
+    }
+  }
+  
+  private let nftGrids = [GridItem(.adaptive(minimum: 120), spacing: 16, alignment: .top)]
+  
+  private func networkNativeTokenLogo(_ nftViewModel: NFTAssetViewModel) -> UIImage? {
+    if let logo = nftViewModel.network.nativeTokenLogo {
+      return UIImage(named: logo, in: .module, with: nil)
+    }
+    return nil
+  }
+  
+  @ViewBuilder private func nftLogo(_ nftViewModel: NFTAssetViewModel) -> some View {
+    if let image = networkNativeTokenLogo(nftViewModel) {
+      Image(uiImage: image)
+        .resizable()
+        .frame(width: 20, height: 20)
+        .padding(4)
+    }
+  }
+  
+  @ViewBuilder private func nftImage(_ nftViewModel: NFTAssetViewModel) -> some View {
+    Group {
+      if let urlString = nftViewModel.nftMetadata?.imageURLString {
+        NFTImageView(urlString: urlString) {
+          noImageView(nftViewModel)
+        }
+      } else {
+        noImageView(nftViewModel)
+      }
+    }
+    .overlay(nftLogo(nftViewModel), alignment: .bottomTrailing)
+    .cornerRadius(4)
+  }
+  
+  @ViewBuilder private func noImageView(_ nftViewModel: NFTAssetViewModel) -> some View {
+    NFTIconView(
+      token: nftViewModel.token,
+      network: nftViewModel.network,
+      blockieShape: .rectangle,
+      length: 160,
+      tokenLogoLength: 20
+    )
+  }
+  
+  var body: some View {
+    ScrollView {
+      VStack {
+        if nftStore.userVisibleNFTs.isEmpty {
+          emptyView
+            .padding(.horizontal, 36)
+            .padding(.vertical, 68)
+        } else {
+          LazyVGrid(columns: nftGrids) {
+            ForEach(nftStore.userVisibleNFTs) { nft in
+              Button(action: {
+                selectedNFTViewModel = nft
+              }) {
+                VStack(alignment: .leading, spacing: 12) {
+                  nftImage(nft)
+                  Text(nft.nftMetadata?.name ?? nft.token.name)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(Color(.braveLabel))
+                    .multilineTextAlignment(.leading)
+                }
+              }
+            }
+          }
+          .padding(24)
+        }
+        Divider()
+          .padding(.horizontal, 16)
+          .padding(.bottom, 12)
+        editUserAssetsButton
+      }
+    }
+    .background(
+      NavigationLink(
+        isActive: Binding(
+          get: { selectedNFTViewModel != nil },
+          set: { if !$0 { selectedNFTViewModel = nil } }
+        ),
+        destination: {
+          if let nftViewModel = selectedNFTViewModel {
+            NFTDetailView(
+              nftDetailStore: cryptoStore.nftDetailStore(for: nftViewModel.token, nftMetadata: nftViewModel.nftMetadata),
+              buySendSwapDestination: buySendSwapDestination
+            ) { nftMetadata in
+              nftStore.updateNFTMetadataCache(for: nftViewModel.token, metadata: nftMetadata)
+            }
+            .onDisappear {
+              cryptoStore.closeNFTDetailStore(for: nftViewModel.token)
+            }
+          }
+        },
+        label: {
+          EmptyView()
+        })
+    )
+    .background(Color(UIColor.braveGroupedBackground))
+  }
+}
+
+#if DEBUG
+struct NFTView_Previews: PreviewProvider {
+  static var previews: some View {
+    NFTView(
+      cryptoStore: .previewStore,
+      keyringStore: .previewStore,
+      networkStore: .previewStore,
+      nftStore: CryptoStore.previewStore.nftStore
+    )
+  }
+}
+#endif

@@ -3939,5 +3939,12 @@ extension Strings {
       value: "After your first transaction you will be able to view it here.",
       comment: "The description when showing no transactions inside Activity tab."
     )
+    public static let nftPageTitle = NSLocalizedString(
+      "wallet.nftPageTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "NFT",
+      comment: "The title of the tab that will display user's visible NFT assets."
+    )
   }
 }
