@@ -18,6 +18,8 @@
 		272FC5B62979F3F30027C53D /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 272FC5B52979F3F30027C53D /* SDWebImageSwiftUI */; };
 		27466BB1288EDB9C00584C90 /* RuntimeWarnings in Frameworks */ = {isa = PBXBuildFile; productRef = 27466BB0288EDB9C00584C90 /* RuntimeWarnings */; };
 		278BB9FF297B0A1E00690BE3 /* TopNewsListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278BB9FE297B0A1E00690BE3 /* TopNewsListWidget.swift */; };
+		2759468D29CCB62F0094BDDE /* GRDWireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2759468C29CCB62F0094BDDE /* GRDWireGuardKit */; };
+		2759468F29CCB6350094BDDE /* GRDWireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2759468E29CCB6350094BDDE /* GRDWireGuardKit */; };
 		279A828E28FEF01E00F55A5E /* BraveWidgets.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */; settings = {ATTRIBUTES = (no_codegen, ); }; };
 		279A829228FEF0BF00F55A5E /* BraveShared in Frameworks */ = {isa = PBXBuildFile; productRef = 279A829128FEF0BF00F55A5E /* BraveShared */; };
 		279A9BCC2823370100F40FC6 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 279A9BCB2823370100F40FC6 /* SwiftKeychainWrapper */; };
@@ -42,9 +44,6 @@
 		27FA21A42838019000FA2C45 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 27FA21902838018E00FA2C45 /* InfoPlist.strings */; };
 		2F6931B7260CFB3700ECEB38 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */; };
 		2F6931BB260CFB3700ECEB38 /* BrowserIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2F6931B4260CFB3700ECEB38 /* BrowserIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2F93A98229C8DDA700C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
-		2F93A98529C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; };
-		2F93A98629C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2FD860C229C3D677005AADD1 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1DF485244A2ECB00541FE4 /* NetworkExtension.framework */; };
 		2FD860C529C3D686005AADD1 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */; };
 		2FD860CA29C3D686005AADD1 /* BraveWireGuard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -111,7 +110,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				2F93A98629C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -227,7 +225,6 @@
 		2F69320C260D03B000ECEB38 /* BrowserIntentsRelease (AppStore).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "BrowserIntentsRelease (AppStore).entitlements"; sourceTree = "<group>"; };
 		2F69320D260D048400ECEB38 /* BrowserIntentsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsRelease.entitlements; sourceTree = "<group>"; };
 		2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserIntentsBeta.entitlements; sourceTree = "<group>"; };
-		2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GRDWireGuardKit.xcframework; sourceTree = "<group>"; };
 		2F93A97B29C8CD6C00C7C158 /* BraveWireGuardBeta.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardBeta.entitlements; sourceTree = "<group>"; };
 		2F93A97C29C8CDB200C7C158 /* BraveWireGuardDebug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardDebug.entitlements; sourceTree = "<group>"; };
 		2F93A97D29C8CDE600C7C158 /* BraveWireGuardEnterprise.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BraveWireGuardEnterprise.entitlements; sourceTree = "<group>"; };
@@ -326,8 +323,8 @@
 				5E8CD8E123D5E3DA00548FC0 /* libarchive.2.tbd in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,
+				2759468F29CCB6350094BDDE /* GRDWireGuardKit in Frameworks */,
 				27D972E628BD4D9900DDCF79 /* BraveNews in Frameworks */,
-				2F93A98529C8EB3200C7C158 /* GRDWireGuardKit.xcframework in Frameworks */,
 				27FA217F2837FB0100FA2C45 /* BraveShared in Frameworks */,
 				7DDAF2232930091600D955A2 /* SDWebImageSVGNativeCoder in Frameworks */,
 				27FA21812837FB0100FA2C45 /* BraveWallet in Frameworks */,
@@ -350,8 +347,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2759468D29CCB62F0094BDDE /* GRDWireGuardKit in Frameworks */,
 				2FD860C229C3D677005AADD1 /* NetworkExtension.framework in Frameworks */,
-				2F93A98229C8DDA700C7C158 /* GRDWireGuardKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,7 +500,6 @@
 				2F93A98129C8D0FD00C7C158 /* Entitlements */,
 				2FD860C429C3D686005AADD1 /* PacketTunnelProvider.swift */,
 				2FD860C629C3D686005AADD1 /* Info.plist */,
-				2F93A97629C8C09600C7C158 /* GRDWireGuardKit.xcframework */,
 			);
 			path = BraveWireGuard;
 			sourceTree = "<group>";
@@ -690,6 +686,7 @@
 			);
 			name = BraveWireGuard;
 			packageProductDependencies = (
+				2759468C29CCB62F0094BDDE /* GRDWireGuardKit */,
 			);
 			productName = BraveWireGuard;
 			productReference = 2FD860C129C3D677005AADD1 /* BraveWireGuard.appex */;
@@ -756,6 +753,7 @@
 				27D972E528BD4D9900DDCF79 /* BraveNews */,
 				7DDE6307292FEC9500B8B585 /* SDWebImage */,
 				7DDAF2222930091600D955A2 /* SDWebImageSVGNativeCoder */,
+				2759468E29CCB6350094BDDE /* GRDWireGuardKit */,
 			);
 			productName = Client;
 			productReference = F84B21BE1A090F8100AAB793 /* Client.app */;
@@ -3076,6 +3074,14 @@
 		27466BB0288EDB9C00584C90 /* RuntimeWarnings */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RuntimeWarnings;
+		};
+		2759468C29CCB62F0094BDDE /* GRDWireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GRDWireGuardKit;
+		};
+		2759468E29CCB6350094BDDE /* GRDWireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GRDWireGuardKit;
 		};
 		279A829128FEF0BF00F55A5E /* BraveShared */ = {
 			isa = XCSwiftPackageProductDependency;
