@@ -2679,6 +2679,10 @@ extension BrowserViewController: TabDelegate {
       topToolbar.updateWalletButtonState(.inactive)
     }
   }
+  
+  func reloadIPFSSchemeUrl(_ url: URL) {
+    handleIPFSSchemeURL(url, visitType: .unknown)
+  }
 
   @MainActor
   private func isPendingRequestAvailable() async -> Bool {

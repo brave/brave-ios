@@ -31,10 +31,10 @@ public class SNSDomainHandler: InternalSchemeResponse {
     
     let variables = [
       "page_title": request.url?.displayURL?.absoluteDisplayString ?? "",
-      "error_title": Strings.snsDomainInterstitialPageTitle,
-      "error_description": String.localizedStringWithFormat(Strings.snsDomainInterstitialPageDescription, snsThirdPartyTermsofUseLink.absoluteString, Strings.snsDomainInterstitialPageTAndU, snsThirdPartyPrivacyPolicyLink.absoluteString, Strings.snsDomainInterstitialPagePrivacyPolicy),
-      "button_disable": Strings.snsDomainInterstitialPageButtonDisable,
-      "button_procced": Strings.snsDomainInterstitialPageButtonProceed,
+      "error_title": Strings.Wallet.snsDomainInterstitialPageTitle,
+      "error_description": String.localizedStringWithFormat(Strings.Wallet.snsDomainInterstitialPageDescription, snsThirdPartyTermsofUseLink.absoluteString, Strings.Wallet.snsDomainInterstitialPageTAndU, snsThirdPartyPrivacyPolicyLink.absoluteString, Strings.Wallet.snsDomainInterstitialPagePrivacyPolicy),
+      "button_disable": Strings.Wallet.snsDomainInterstitialPageButtonDisable,
+      "button_procced": Strings.Wallet.snsDomainInterstitialPageButtonProceed,
       "message_handler": Web3NameServiceScriptHandler.messageHandlerName,
     ]
     

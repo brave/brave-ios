@@ -3527,21 +3527,21 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .module,
       value: "Ask",
-      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name. 'Ask' means Brave will ask user first before enable or disable resolving ENS/SNS domain name."
+      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Ask' means Brave will ask user first before enable or disable resolving ENS/SNS domain name and IPFS scheme url."
     )
     public static let web3DomainOptionEnabled = NSLocalizedString(
       "wallet.web3DomainOptionEnabled",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Enabled",
-      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name. 'Enabled' means Brave will enable resolving ENS/SNS domain name."
+      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Enabled' means Brave will enable resolving ENS/SNS domain name and IPFS scheme url."
     )
     public static let web3DomainOptionDisabled = NSLocalizedString(
       "wallet.web3DomainOptionDisabled",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Disabled",
-      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name. 'Disabled' means Brave will disable resolving ENS/SNS domain name."
+      comment: "One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Disabled' means Brave will disable resolving ENS/SNS domain name and IPFS scheme url."
     )
     public static let ensResolveMethodTitle = NSLocalizedString(
       "wallet.ensResolveMethodTitle",
@@ -3591,27 +3591,6 @@ extension Strings {
       bundle: .module,
       value: "Resolve IPFS Resources",
       comment: "The title of the section under Web3 settings for users to pick an option to resolve IPFS Resources."
-    )
-    public static let web3IPFSPreferenceAsk = NSLocalizedString(
-      "wallet.web3IPFSPreferenceAsk",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Ask",
-      comment: "One of the options for Brave to handle IPFS scheme urls. 'Ask' means Brave will ask user first before enable or disable resolving the IPFS scheme url."
-    )
-    public static let web3IPFSPreferenceEnabled = NSLocalizedString(
-      "wallet.web3IPFSPreferenceEnabled",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Enabled",
-      comment: "One of the options for Brave to handle IPFS scheme urls. 'Enabled' means Brave will enable resolving the IPFS scheme url."
-    )
-    public static let web3IPFSPreferenceDisabled = NSLocalizedString(
-      "wallet.web3IPFSPreferenceDisabled",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Disabled",
-      comment: "One of the options for Brave to handle Solana Name Service domain name. 'Disabled' means Brave will disable resolving SNS domain name."
     )
     public static let ipfsPublicGatewayAddressTitle = NSLocalizedString(
       "wallet.ipfsPublicGatewayAddressTitle",
@@ -3774,13 +3753,6 @@ extension Strings {
       value: "Use ENS Domain",
       comment: "Button title when requesting to do an ENS off chain lookup."
     )
-    public static let web3IPFSInterstitialDisableButton = NSLocalizedString(
-      "wallet.web3IPFSInterstitialDisableButton",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Disable",
-      comment: "The title of the button that user will click to disable Brave to resolve IPFS shceme url."
-    )
     public static let web3IPFSInterstitialProceedButton = NSLocalizedString(
       "wallet.web3IPFSInterstitialProceedButton",
       tableName: "BraveWallet",
@@ -3802,18 +3774,11 @@ extension Strings {
       value: "IPFS (InterPlanetary File System) is the public network for peer-to-peer data storage and delivery. This protocol has different privacy considerations from HTTP(S). <a href=%@>%@</a>",
       comment: "A brief explaination of IPFS on privacy. The first '%@' will be replaced with a link to a Brave article that explains how does IPFS impact users' privacy in details. The second '%@' will be replaced with 'web3IPFSInterstitialIPFSPrivacyLearnMore'."
     )
-    public static let web3IPFSInterstitialIPFSPrivacyLearnMore = NSLocalizedString(
-      "wallet.web3IPFSInterstitialIPFSPrivacyLearnMore",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Learn more",
-      comment: "A hyper link that users can click on which will redirect them to a Brave article that explains how does IPFS impact users' privacy in details."
-    )
     public static let web3IPFSInterstitialIPFSPublicGateway = NSLocalizedString(
       "wallet.web3IPFSInterstitialIPFSPublicGateway",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Protects your IP address and content you’re requesting from potential third-party observers, but not from the public gateway operator.  The gateway operator is responsible for ensuring that the content served to you over a gateway is the content you requested. Also, your computer does not contribute to the public IPFS network.",
+      value: "Protects your IP address and content you’re requesting from potential third-party observers, but not from the public gateway operator.  The gateway operator is responsible for ensuring that the content served to you over a gateway is the content you requested. Also, your device does not contribute to the public IPFS network.",
       comment: "A brief explaination of resolving IPFS scheme url using a public gateway."
     )
     public static let ipfsErrorTitle = NSLocalizedString(
@@ -3822,6 +3787,55 @@ extension Strings {
       bundle: .module,
       value: "This site can't be reached",
       comment: "A title will displayed in the IPFS error page when IPFS is disabled."
+    )
+    public static let ipfsResolveMethodDescription = NSLocalizedString(
+      "wallet.ipfsResolveMethodDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "[Learn more](%@) about IPFS gateway privacy considerations.",
+      comment: "The description for the options to allow to resolve IPFS scheme urls. '%@' will be replaced with a url to explain more about IPFS gateway privacy."
+    )
+    public static let snsDomainInterstitialPageTitle = NSLocalizedString(
+      "SnsDomainInterstitialPageTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enable support of Solana Name Service (SNS) in Brave?",
+      comment: "Title displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one."
+    )
+    public static let snsDomainInterstitialPageDescription = NSLocalizedString(
+      "SnsDomainInterstitialPageDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Brave will be using Syndica to resolve .sol domain names. Brave hides your IP address. If you enable this, Syndica will see that someone is trying to visit these .sol domains but nothing else. See Syndica's <a href=%@>%@</a> and <a href=%@>%@</a>.",
+      comment: "Description displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one. The first '%@' will be replaced with a link to Syndica's terms of use page. The second '%@' will be replaced with the value of 'snsDomainInterstitialPageTAndU'. The third '%@' will be replaced with a link to Syndica's privacy policy page. The last '%@' will be replaced with the value of 'snsDomainInterstitialPagePrivacyPolicy'."
+    )
+    public static let snsDomainInterstitialPageTAndU = NSLocalizedString(
+      "SnsDomainInterstitialPageTAndU",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "terms of use",
+      comment: "Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the 'terms of use' webpage of the server that Brave uses to resolve SNS domain."
+    )
+    public static let snsDomainInterstitialPagePrivacyPolicy = NSLocalizedString(
+      "SnsDomainInterstitialPagePrivacyPolicy",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "privacy policy",
+      comment: "Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the privay policy webpage of the server that Brave uses to resolve SNS domain."
+    )
+    public static let snsDomainInterstitialPageButtonDisable = NSLocalizedString(
+      "SnsDomainInterstitialPageButtonDisable",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Disable",
+      comment: "Title on the button that users can click to disable Brave to resolve the SNS domain or IPFS scheme url they entered."
+    )
+    public static let snsDomainInterstitialPageButtonProceed = NSLocalizedString(
+      "SnsDomainInterstitialPageButtonProceed",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Proceed using Syndica server",
+      comment: "Title on the button that users can click to enable Brave to resolve the SNS domain they entered."
     )
   }
 }

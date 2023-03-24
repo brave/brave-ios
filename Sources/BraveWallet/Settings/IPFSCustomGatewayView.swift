@@ -51,7 +51,8 @@ struct IPFSCustomGatewayView: View {
               let textEntered = newValue.withSecureUrlScheme
               self.url = textEntered
               
-              if let enteredURL = URL(string: textEntered), enteredURL != ipfsAPI.nftIpfsGateway {
+              let oldValue = isForNFT ? ipfsAPI.nftIpfsGateway : ipfsAPI.ipfsGateway
+              if let enteredURL = URL(string: textEntered), enteredURL != oldValue {
                 setButtonStatus = .enabled
               } else {
                 setButtonStatus = .disabled

@@ -76,11 +76,11 @@ extension Preferences {
       public var name: String {
         switch self {
         case .ask:
-          return Strings.Wallet.web3IPFSPreferenceAsk
+          return Strings.Wallet.web3DomainOptionAsk
         case .enabled:
-          return Strings.Wallet.web3IPFSPreferenceEnabled
+          return Strings.Wallet.web3DomainOptionEnabled
         case .disabled:
-          return Strings.Wallet.web3IPFSPreferenceDisabled
+          return Strings.Wallet.web3DomainOptionDisabled
         }
       }
     }

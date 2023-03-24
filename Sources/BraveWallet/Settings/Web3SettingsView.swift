@@ -61,9 +61,15 @@ public struct Web3SettingsView: View {
                   .tag(option)
               }
             } label: {
-              Text(Strings.Wallet.ipfsResourcesOptionsTitle)
-                .foregroundColor(Color(.braveLabel))
-                .padding(.vertical, 5)
+              VStack(alignment: .leading, spacing: 6) {
+                Text(Strings.Wallet.ipfsResourcesOptionsTitle)
+                  .foregroundColor(Color(.braveLabel))
+                  .padding(.vertical, 5)
+                Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ipfsResolveMethodDescription, WalletConstants.ipfsLearnMoreLink.absoluteString)))
+                  .foregroundColor(Color(.secondaryBraveLabel))
+                  .tint(Color(.braveBlurpleTint))
+                  .font(.footnote)
+              }
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
             NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
@@ -87,6 +93,7 @@ public struct Web3SettingsView: View {
               }
               .padding(.vertical, 4)
             }
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
         }
       }
