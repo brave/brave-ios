@@ -19,8 +19,7 @@ extension BrowserViewController: Web3IPFSScriptHandlerDelegate {
       }
       Preferences.Wallet.resolveIPFSResources.value = Preferences.Wallet.Web3IPFSOption.enabled.rawValue
     } else {
-      let errorPageHelper = ErrorPageHelper(certStore: nil)
-      if let webView =  tabManager.selectedTab?.webView {
+      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
         errorPageHelper.loadPage(IPFSErrorPageHandler.disabledError, forUrl: originalURL, inWebView: webView)
       }
 

@@ -64,7 +64,6 @@ public struct Web3SettingsView: View {
               VStack(alignment: .leading, spacing: 6) {
                 Text(Strings.Wallet.ipfsResourcesOptionsTitle)
                   .foregroundColor(Color(.braveLabel))
-                  .padding(.vertical, 4)
                 Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ipfsResolveMethodDescription, WalletConstants.ipfsLearnMoreLink.absoluteString)))
                   .foregroundColor(Color(.secondaryBraveLabel))
                   .tint(Color(.braveBlurpleTint))
@@ -73,7 +72,7 @@ public struct Web3SettingsView: View {
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
             NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
-              VStack(alignment: .leading, spacing: 5) {
+              VStack(alignment: .leading, spacing: 6) {
                 Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
                   .foregroundColor(Color(.braveLabel))
                 Text(ipfsGatewayURL)
@@ -84,7 +83,7 @@ public struct Web3SettingsView: View {
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
             NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
-              VStack(alignment: .leading, spacing: 4) {
+              VStack(alignment: .leading, spacing: 6) {
                 Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
                   .foregroundColor(Color(.braveLabel))
                 Text(ipfsNFTGatewayURL)

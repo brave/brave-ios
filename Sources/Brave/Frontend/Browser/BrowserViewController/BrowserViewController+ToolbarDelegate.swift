@@ -270,8 +270,7 @@ extension BrowserViewController: TopToolbarDelegate {
   func handleIPFSSchemeURL(_ url: URL, visitType: VisitType) -> Bool {
     guard !PrivateBrowsingManager.shared.isPrivateBrowsing else {
       topToolbar.leaveOverlayMode()
-      let errorPageHelper = ErrorPageHelper(certStore: nil)
-      if let webView =  tabManager.selectedTab?.webView {
+      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
         errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
       }
       return true
@@ -292,9 +291,8 @@ extension BrowserViewController: TopToolbarDelegate {
       }
     case .disabled:
       topToolbar.leaveOverlayMode()
-      let errorPageHelper = ErrorPageHelper(certStore: nil)
-      if let webView =  tabManager.selectedTab?.webView {
-        errorPageHelper.loadPage(IPFSErrorPageHandler.disabledError, forUrl: url, inWebView: webView)
+      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
       }
       return true
     }
