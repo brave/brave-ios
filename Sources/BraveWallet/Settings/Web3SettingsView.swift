@@ -64,7 +64,7 @@ public struct Web3SettingsView: View {
               VStack(alignment: .leading, spacing: 6) {
                 Text(Strings.Wallet.ipfsResourcesOptionsTitle)
                   .foregroundColor(Color(.braveLabel))
-                  .padding(.vertical, 5)
+                  .padding(.vertical, 4)
                 Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ipfsResolveMethodDescription, WalletConstants.ipfsLearnMoreLink.absoluteString)))
                   .foregroundColor(Color(.secondaryBraveLabel))
                   .tint(Color(.braveBlurpleTint))
@@ -80,7 +80,7 @@ public struct Web3SettingsView: View {
                   .font(.footnote)
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
-              .padding(.vertical, 5)
+              .padding(.vertical, 4)
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
             NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
