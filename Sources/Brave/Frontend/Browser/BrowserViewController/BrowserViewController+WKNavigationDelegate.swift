@@ -543,6 +543,8 @@ extension BrowserViewController: WKNavigationDelegate {
         return (.cancelAuthenticationChallenge, nil)
       }
     }
+    
+    // TODO: Basic Auth Check
 
     // URLAuthenticationChallenge isn't Sendable atm
     let protectionSpace = challenge.protectionSpace
@@ -559,20 +561,7 @@ extension BrowserViewController: WKNavigationDelegate {
       
       // The challenge may come from a background tab, so ensure it's the one visible.
       tabManager.selectTab(tab)
-      
-      let loginsHelper = tab.getContentScript(name: LoginsScriptHandler.scriptName) as? LoginsScriptHandler
-      do {
-        let credentials = try await Authenticator.handleAuthRequest(
-          self,
-          credential: credential,
-          protectionSpace: protectionSpace,
-          previousFailureCount: previousFailureCount,
-          loginsHelper: loginsHelper
-        )
-        return (.useCredential, credentials.credentials)
-      } catch {
-        return (.rejectProtectionSpace, nil)
-      }
+      return (.rejectProtectionSpace, nil)
     }.value
   }
 
