@@ -27,7 +27,7 @@ public enum Web3Service: String, CaseIterable {
     self.ipfsApi = ipfsApi
   }
   
-  public enum DNSLookupResult {
+  public enum DNSLookupResult: Equatable {
     case none
     case loadInterstitial(Web3Service)
     case load(URL)
