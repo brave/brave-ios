@@ -259,6 +259,9 @@ public class BrowserViewController: UIViewController {
   weak var walletStore: WalletStore?
   
   var lastEnteredURLVisitType: VisitType = .unknown
+  
+  var processAddressBarTask: Task<(), Never>?
+  var topToolbarDidPressReloadTask: Task<(), Never>?
 
   public init(
     profile: Profile,

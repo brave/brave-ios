@@ -118,9 +118,13 @@ extension BrowserViewController: TopToolbarDelegate {
                 let url = topToolbar.currentURL,
                 DecentralizedDNSHelper.isSupported(domain: url.domainURL.schemelessAbsoluteDisplayString),
                 let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-        Task { @MainActor in
+        topToolbarDidPressReloadTask?.cancel()
+        topToolbarDidPressReloadTask = Task { @MainActor in
           let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
+          topToolbar.locationView.loading = true
           let result = await decentralizedDNSHelper.lookup(domain: url.schemelessAbsoluteDisplayString)
+          topToolbar.locationView.loading = tabManager.selectedTab?.loading ?? false
+          guard !Task.isCancelled else { return } // user pressed stop, or typed new url
           switch result {
           case let .loadInterstitial(service):
             showWeb3ServiceInterstitialPage(service: service, originalURL: url, visitType: .unknown)
@@ -144,6 +148,9 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidPressStop(_ topToolbar: TopToolbarView) {
     tabManager.selectedTab?.stop()
+    processAddressBarTask?.cancel()
+    topToolbarDidPressReloadTask?.cancel()
+    topToolbar.locationView.loading = tabManager.selectedTab?.loading ?? false
   }
 
   func topToolbarDidLongPressReloadButton(_ topToolbar: TopToolbarView, from button: UIButton) {
@@ -247,7 +254,8 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func processAddressBar(text: String, visitType: VisitType, isBraveSearchPromotion: Bool = false) {
-    Task { @MainActor in
+    processAddressBarTask?.cancel()
+    processAddressBarTask = Task { @MainActor in
       if !isBraveSearchPromotion, await submitValidURL(text, visitType: visitType) {
         return
       } else {
@@ -307,7 +315,12 @@ extension BrowserViewController: TopToolbarDelegate {
         if DecentralizedDNSHelper.isSupported(domain: fixupURL.domainURL.schemelessAbsoluteDisplayString),
            let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
           let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
+          topToolbar.leaveOverlayMode()
+          updateToolbarCurrentURL(fixupURL)
+          topToolbar.locationView.loading = true
           let result = await decentralizedDNSHelper.lookup(domain: fixupURL.schemelessAbsoluteDisplayString)
+          topToolbar.locationView.loading = tabManager.selectedTab?.loading ?? false
+          guard !Task.isCancelled else { return true } // user pressed stop, or typed new url
           switch result {
           case let .loadInterstitial(service):
             showWeb3ServiceInterstitialPage(service: service, originalURL: fixupURL, visitType: visitType)
