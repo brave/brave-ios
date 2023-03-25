@@ -307,7 +307,7 @@ extension BrowserViewController: TopToolbarDelegate {
         if DecentralizedDNSHelper.isSupported(domain: fixupURL.domainURL.schemelessAbsoluteDisplayString),
            let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
           let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
-          let result = await decentralizedDNSHelper.lookup(domain: text)
+          let result = await decentralizedDNSHelper.lookup(domain: fixupURL.schemelessAbsoluteDisplayString)
           switch result {
           case let .loadInterstitial(service):
             showWeb3ServiceInterstitialPage(service: service, originalURL: fixupURL, visitType: visitType)
