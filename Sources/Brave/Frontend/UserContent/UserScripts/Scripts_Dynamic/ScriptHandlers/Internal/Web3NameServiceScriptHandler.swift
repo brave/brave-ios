@@ -6,6 +6,7 @@ import Foundation
 import Shared
 import WebKit
 import os.log
+import BraveWallet
 
 protocol Web3NameServiceScriptHandlerDelegate: AnyObject {
   func web3NameServiceDecisionHandler(_ proceed: Bool, web3Service: Web3Service, originalURL: URL, visitType: VisitType)

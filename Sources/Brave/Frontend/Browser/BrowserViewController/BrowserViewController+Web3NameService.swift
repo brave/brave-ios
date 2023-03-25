@@ -15,62 +15,29 @@ extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
       finishEditingAndSubmit(originalURL, visitType: visitType)
       return
     }
-    switch web3Service {
-    case .solana:
-      if proceed {
-        Task { @MainActor in
-          rpcService.setSnsResolveMethod(.enabled)
-          if let host = originalURL.host, let resolvedUrl = await resolveSNSHost(host, rpcService: rpcService) {
-            // resolved url
-            finishEditingAndSubmit(resolvedUrl, visitType: visitType)
-          }
-        }
-      } else {
-        rpcService.setSnsResolveMethod(.disabled)
-        finishEditingAndSubmit(originalURL, visitType: visitType)
+    Task { @MainActor in
+      switch web3Service {
+      case .solana:
+        rpcService.setSnsResolveMethod(proceed ? .enabled : .disabled)
+      case .ethereum:
+        rpcService.setEnsResolveMethod(proceed ? .enabled : .disabled)
+      case .ethereumOffchain:
+        rpcService.setEnsOffchainLookupResolveMethod(proceed ? .enabled : .disabled)
       }
-    case .ethereum:
-      if proceed {
-        Task { @MainActor in
-          rpcService.setEnsResolveMethod(.enabled)
-          if let host = originalURL.host {
-            let (contentHash, isOffchainConsentRequired, status, _) = await rpcService.ensGetContentHash(host)
-            if isOffchainConsentRequired {
-              showWeb3ServiceInterstitialPage(service: .ethereumOffchain, originalURL: originalURL, visitType: .unknown)
-              return
-            }
-            if status == .success,
-               !contentHash.isEmpty,
-               let ipfsUrl = braveCore.ipfsAPI.contentHashToCIDv1URL(for: contentHash) {
-              handleIPFSSchemeURL(ipfsUrl, visitType: .unknown)
-              return
-            }
-          }
+      let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
+      let result = await decentralizedDNSHelper.lookup(domain: originalURL.host ?? originalURL.absoluteString)
+      switch result {
+      case let .load(resolvedURL):
+        if resolvedURL.isIPFSScheme {
+          handleIPFSSchemeURL(resolvedURL, visitType: visitType)
+        } else {
+          finishEditingAndSubmit(resolvedURL, visitType: visitType)
         }
-      } else {
-        rpcService.setEnsResolveMethod(.disabled)
-        finishEditingAndSubmit(originalURL, visitType: visitType)
-      }
-    case .ethereumOffchain:
-      if proceed {
-        Task { @MainActor in
-          rpcService.setEnsOffchainLookupResolveMethod(.enabled)
-          if let host = originalURL.host {
-            let (contentHash, isOffchainConsentRequired, status, _) = await rpcService.ensGetContentHash(host)
-            if isOffchainConsentRequired { // TODO: is this here possible?
-              showWeb3ServiceInterstitialPage(service: .ethereumOffchain, originalURL: originalURL, visitType: .unknown)
-              return
-            }
-            if status == .success,
-               !contentHash.isEmpty,
-               let ipfsUrl = braveCore.ipfsAPI.contentHashToCIDv1URL(for: contentHash) {
-              handleIPFSSchemeURL(ipfsUrl, visitType: .unknown)
-              return
-            }
-          }
-        }
-      } else {
-        rpcService.setEnsOffchainLookupResolveMethod(.disabled)
+      case let .loadInterstitial(service):
+        // ENS interstitial -> ENS Offchain interstitial possible
+        showWeb3ServiceInterstitialPage(service: service, originalURL: originalURL, visitType: visitType)
+      case .none:
+        // failed to resolve domain or disabled
         finishEditingAndSubmit(originalURL, visitType: visitType)
       }
     }

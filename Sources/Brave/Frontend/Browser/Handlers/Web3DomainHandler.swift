@@ -8,14 +8,6 @@ import WebKit
 import Shared
 import BraveWallet
 
-public enum Web3Service: String, CaseIterable {
-  case solana
-  case ethereum
-  case ethereumOffchain
-  
-  public var id: String { rawValue }
-}
-
 extension Web3Service {
   
   var errorTitle: String {
