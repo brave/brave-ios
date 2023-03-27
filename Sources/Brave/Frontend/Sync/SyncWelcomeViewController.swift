@@ -228,15 +228,30 @@ class SyncWelcomeViewController: SyncViewController {
         self.navigationController?.pushViewController(view, animated: true)
       }
 
+      self.syncAPI.leaveSyncGroup()
+      
       if self.syncAPI.isInSyncGroup {
         pushAddDeviceVC()
         return
       }
 
       addDevice.enableNavigationPrevention()
-      self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver {
-        self.syncDeviceInfoObserver = nil
-        pushAddDeviceVC()
+
+      // DidJoinSyncChain result should be also checked when creating a new chain
+      self.syncAPI.setDidJoinSyncChain { result in
+        if result {
+          self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
+            guard let self else { return }
+            self.syncServiceObserver = nil
+            self.syncDeviceInfoObserver = nil
+            
+            pushAddDeviceVC()
+          }
+        } else {
+          self.syncAPI.leaveSyncGroup()
+          addDevice.disableNavigationPrevention()
+          self.navigationController?.popViewController(animated: true)
+        }
       }
 
       self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices)
