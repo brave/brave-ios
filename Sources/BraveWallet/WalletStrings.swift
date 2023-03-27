@@ -3613,6 +3613,13 @@ extension Strings {
       value: "Customize IPFS Gateway",
       comment: "The navigation title of the screen for users to customize ipfs public gateway address."
     )
+    public static let customizeIPFSNFTPublicGatewayNavTitle = NSLocalizedString(
+      "wallet.customizeIPFSNFTPublicGatewayNavTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Customize IPFS Gateway for NFT",
+      comment: "The navigation title of the screen for users to customize ipfs public gateway address for NFT."
+    )
     public static let nftGatewayLongDescription = NSLocalizedString(
       "wallet.nftGatewayLongDescription",
       tableName: "BraveWallet",

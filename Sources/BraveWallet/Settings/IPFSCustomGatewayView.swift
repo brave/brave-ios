@@ -65,7 +65,7 @@ struct IPFSCustomGatewayView: View {
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(Strings.Wallet.customizeIPFSPublicGatewayNavTitle)
+    .navigationTitle(isForNFT ? Strings.Wallet.customizeIPFSNFTPublicGatewayNavTitle : Strings.Wallet.customizeIPFSPublicGatewayNavTitle)
     .navigationBarItems(
       // Have to use this instead of toolbar placement to have a custom button style
       trailing: Button(action: {
