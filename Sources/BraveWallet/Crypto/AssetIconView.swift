@@ -135,6 +135,7 @@ struct NFTIconView: View {
   var url: URL?
   /// If we should show the native token logo on non-native assets
   var shouldShowNativeTokenIcon: Bool = false
+  /// Display the blockie/monogram icon in a specific shape
   var blockieShape: Blockie.Shape = .circle
   @ScaledMetric var length: CGFloat = 40
   @ScaledMetric var tokenLogoLength: CGFloat = 15
