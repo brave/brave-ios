@@ -227,8 +227,6 @@ class SyncWelcomeViewController: SyncViewController {
         view.navigationItem.hidesBackButton = true
         self.navigationController?.pushViewController(view, animated: true)
       }
-
-      self.syncAPI.leaveSyncGroup()
       
       if self.syncAPI.isInSyncGroup {
         pushAddDeviceVC()
