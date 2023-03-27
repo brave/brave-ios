@@ -2957,7 +2957,7 @@
 "sync.syncChainAccountDeletionErrorTitle" = "Cihazı Senkronize Et";
 
 /* Alert description for the occasion when an user is trying to join a already deleted account */
-"sync.syncChainAlreadyDeletedAlertDescription" = "Bu zincire katılınamadı. Hesap silindi.";
+"sync.syncChainAlreadyDeletedAlertDescription" = "Bu zincire katılınamadı. Hesap önceden silinmiş.";
 
 /* Alert title for the occasion when an user is trying to join a already deleted account */
 "sync.syncChainAlreadyDeletedAlertTitle" = "Cihazı Senkronize Et";
