@@ -117,10 +117,14 @@ extension BrowserViewController: TopToolbarDelegate {
       } else if !isPrivateMode,
                 let url = topToolbar.currentURL,
                 DecentralizedDNSHelper.isSupported(domain: url.domainURL.schemelessAbsoluteDisplayString),
-                let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
+                let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode),
+                let decentralizedDNSHelper = DecentralizedDNSHelper(
+                  rpcService: rpcService,
+                  ipfsApi: braveCore.ipfsAPI,
+                  isPrivateMode: isPrivateMode
+                ) {
         topToolbarDidPressReloadTask?.cancel()
         topToolbarDidPressReloadTask = Task { @MainActor in
-          let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
           topToolbar.locationView.loading = true
           let result = await decentralizedDNSHelper.lookup(domain: url.schemelessAbsoluteDisplayString)
           topToolbar.locationView.loading = tabManager.selectedTab?.loading ?? false
@@ -313,8 +317,12 @@ extension BrowserViewController: TopToolbarDelegate {
         // check text is decentralized DNS supported domain
         let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
         if DecentralizedDNSHelper.isSupported(domain: fixupURL.domainURL.schemelessAbsoluteDisplayString),
-           let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) {
-          let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
+           let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode),
+           let decentralizedDNSHelper = DecentralizedDNSHelper(
+            rpcService: rpcService,
+            ipfsApi: braveCore.ipfsAPI,
+            isPrivateMode: isPrivateMode
+           ) {
           topToolbar.leaveOverlayMode()
           updateToolbarCurrentURL(fixupURL)
           topToolbar.locationView.loading = true
@@ -327,11 +335,11 @@ extension BrowserViewController: TopToolbarDelegate {
             return true
           case let .load(resolvedURL):
             if resolvedURL.isIPFSScheme {
-              handleIPFSSchemeURL(resolvedURL, visitType: visitType)
+              return handleIPFSSchemeURL(resolvedURL, visitType: visitType)
             } else {
               finishEditingAndSubmit(resolvedURL, visitType: visitType)
+              return true
             }
-            return true
           case .none:
             break
           }

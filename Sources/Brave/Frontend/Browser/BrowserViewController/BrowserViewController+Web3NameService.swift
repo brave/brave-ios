@@ -11,7 +11,12 @@ import BraveCore
 extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
   func web3NameServiceDecisionHandler(_ proceed: Bool, web3Service: Web3Service, originalURL: URL, visitType: VisitType) {
     let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    guard let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode) else {
+    guard let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode),
+          let decentralizedDNSHelper = DecentralizedDNSHelper(
+            rpcService: rpcService,
+            ipfsApi: braveCore.ipfsAPI,
+            isPrivateMode: isPrivateMode
+          ) else {
       finishEditingAndSubmit(originalURL, visitType: visitType)
       return
     }
@@ -24,7 +29,6 @@ extension BrowserViewController: Web3NameServiceScriptHandlerDelegate {
       case .ethereumOffchain:
         rpcService.setEnsOffchainLookupResolveMethod(proceed ? .enabled : .disabled)
       }
-      let decentralizedDNSHelper = DecentralizedDNSHelper(rpcService: rpcService, ipfsApi: braveCore.ipfsAPI)
       let result = await decentralizedDNSHelper.lookup(domain: originalURL.host ?? originalURL.absoluteString)
       switch result {
       case let .load(resolvedURL):

@@ -19,10 +19,12 @@ public enum Web3Service: String, CaseIterable {
   private let rpcService: BraveWalletJsonRpcService
   private let ipfsApi: IpfsAPI?
   
-  public init(
+  public init?(
     rpcService: BraveWalletJsonRpcService,
-    ipfsApi: IpfsAPI?
+    ipfsApi: IpfsAPI?,
+    isPrivateMode: Bool
   ) {
+    guard !isPrivateMode else { return nil }
     self.rpcService = rpcService
     self.ipfsApi = ipfsApi
   }

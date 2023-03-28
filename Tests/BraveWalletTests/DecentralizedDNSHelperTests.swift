@@ -11,6 +11,12 @@ import BraveCore
 
 @MainActor class DecentralizedDNSHelperTests: XCTestCase {
   
+  /// Test `.init(rpcService:ipfsApi:isPrivateMode:)` will return nil when `isPrivateMode` is true.
+  func testInitFailsInPrivateMode() {
+    XCTAssertNil(DecentralizedDNSHelper(rpcService: MockJsonRpcService(), ipfsApi: nil, isPrivateMode: true))
+    XCTAssertNil(DecentralizedDNSHelper(rpcService: MockJsonRpcService(), ipfsApi: TestIpfsApi(), isPrivateMode: true))
+  }
+  
   /// Test `lookup(domain:)` provided an `.eth` domain will return `.loadInterstitial(.ethereum)` when ENS Resolve Method is `.ask`.
   func testLookupWithENSDomainAsk() async {
     let domain = "braveexample.eth"
@@ -21,10 +27,14 @@ import BraveCore
       completion([], false, .success, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .loadInterstitial(service) = result else {
@@ -51,10 +61,14 @@ import BraveCore
       resolvedURL
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: ipfsApi
-    )
+      ipfsApi: ipfsApi,
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .load(url) = result else {
@@ -74,10 +88,14 @@ import BraveCore
       completion([], false, .success, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     XCTAssertEqual(result, .none)
@@ -94,10 +112,14 @@ import BraveCore
       completion([], true, .success, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .loadInterstitial(service) = result else {
@@ -126,10 +148,14 @@ import BraveCore
       resolvedURL
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: ipfsApi
-    )
+      ipfsApi: ipfsApi,
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .load(url) = result else {
@@ -150,10 +176,14 @@ import BraveCore
       completion([], false, .internalError, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     XCTAssertEqual(result, .none)
@@ -169,10 +199,14 @@ import BraveCore
       completion(nil, .internalError, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .loadInterstitial(service) = result else {
@@ -193,10 +227,14 @@ import BraveCore
       completion(resolvedURL, .success, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     guard case let .load(url) = result else {
@@ -216,10 +254,14 @@ import BraveCore
       completion(nil, .internalError, "")
     }
     
-    let sut = DecentralizedDNSHelper(
+    guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi()
-    )
+      ipfsApi: TestIpfsApi(),
+      isPrivateMode: false
+    ) else {
+      XCTFail("Unexpected test setup")
+      return
+    }
     
     let result = await sut.lookup(domain: domain)
     XCTAssertEqual(result, .none)
@@ -230,7 +272,7 @@ import BraveCore
     XCTAssertTrue(DecentralizedDNSHelper.isSupported(domain: ensDomain))
     let nonSupportedENSDomain = "ethereumeth"
     XCTAssertFalse(DecentralizedDNSHelper.isSupported(domain: nonSupportedENSDomain))
-        
+    
     let snsDomain = "braveexample.sol"
     XCTAssertTrue(DecentralizedDNSHelper.isSupported(domain: snsDomain))
     let nonSupportedSNSDomain = "braveexamplesol"
