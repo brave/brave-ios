@@ -40,7 +40,7 @@ public final class Domain: NSManagedObject, CRUD {
   private static let containsSolanaPermissionsPredicate = NSPredicate(format: "wallet_solanaPermittedAcccounts != nil && wallet_solanaPermittedAcccounts != ''")
   
   @MainActor public var areAllShieldsOff: Bool {
-    return shield_allOff == 1
+    return shield_allOff?.boolValue ?? false
   }
 
   /// A domain can be created in many places,

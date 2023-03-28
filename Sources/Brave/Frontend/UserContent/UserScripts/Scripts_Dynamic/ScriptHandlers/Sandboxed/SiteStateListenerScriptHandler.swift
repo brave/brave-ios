@@ -65,7 +65,7 @@ class SiteStateListenerScriptHandler: TabContentScript {
         Task { @MainActor in
           let domain = pageData.domain(persistent: !tab.isPrivate)
           
-          guard domain.shield_allOff?.boolValue != true else {
+          guard !domain.areAllShieldsOff else {
             return
           }
           

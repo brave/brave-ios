@@ -66,7 +66,7 @@ extension ContentBlockerHelper: TabContentScript {
       Task { @MainActor in
         let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
         let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
-        if let shieldsAllOff = domain.shield_allOff, Bool(truncating: shieldsAllOff) {
+        guard !domain.areAllShieldsOff else {
           // if domain is "all_off", can just skip
           return
         }
