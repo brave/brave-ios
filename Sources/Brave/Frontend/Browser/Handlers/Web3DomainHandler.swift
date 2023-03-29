@@ -94,7 +94,7 @@ public class Web3DomainHandler: InternalSchemeResponse {
       "button_disable": service.disableButtonTitle,
       "button_procced": service.proceedButtonTitle,
       "message_handler": Web3NameServiceScriptHandler.messageHandlerName,
-      "service_id": service.id
+      Web3NameServiceScriptHandler.ParamKey.serviceId.rawValue: service.id
     ]
     
     variables.forEach { (arg, value) in

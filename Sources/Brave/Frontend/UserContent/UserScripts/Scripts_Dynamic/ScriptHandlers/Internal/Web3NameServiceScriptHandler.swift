@@ -13,6 +13,17 @@ protocol Web3NameServiceScriptHandlerDelegate: AnyObject {
 }
 
 class Web3NameServiceScriptHandler: TabContentScript {
+  
+  // The `rawValue`s MUST match `Web3Domain.html`
+  enum ParamKey: String {
+    case buttonType = "button_type"
+    case serviceId = "service_id"
+  }
+  enum ParamValue: String {
+    case proceed
+    case disable
+  }
+  
   weak var delegate: Web3NameServiceScriptHandlerDelegate?
   var originalURL: URL?
   var visitType: VisitType = .unknown
@@ -35,12 +46,12 @@ class Web3NameServiceScriptHandler: TabContentScript {
       return
     }
     
-    if params["type"] == "Disable",
-       let serviceId = params["service_id"],
+    if params[ParamKey.buttonType.rawValue] == ParamValue.disable.rawValue,
+       let serviceId = params[ParamKey.serviceId.rawValue],
        let service = Web3Service(rawValue: serviceId) {
       delegate?.web3NameServiceDecisionHandler(false, web3Service: service, originalURL: originalURL, visitType: visitType)
-    } else if params["type"] == "Proceed",
-              let serviceId = params["service_id"],
+    } else if params[ParamKey.buttonType.rawValue] == ParamValue.proceed.rawValue,
+              let serviceId = params[ParamKey.serviceId.rawValue],
               let service = Web3Service(rawValue: serviceId) {
       delegate?.web3NameServiceDecisionHandler(true, web3Service: service, originalURL: originalURL, visitType: visitType)
     } else {

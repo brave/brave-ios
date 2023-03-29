@@ -1610,7 +1610,7 @@ public class BrowserViewController: UIViewController {
     tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
   }
 
-  func showWeb3ServiceInterstitialPage(service: Web3Service, originalURL: URL, visitType: VisitType) {
+  func showWeb3ServiceInterstitialPage(service: Web3Service, originalURL: URL, visitType: VisitType = .unknown) {
     topToolbar.leaveOverlayMode()
 
     guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(Web3DomainHandler.path(for: service))?url=\(encodedURL)") else {

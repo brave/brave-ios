@@ -107,22 +107,12 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
-    let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    
     if let url = topToolbar.currentURL {
       if url.isIPFSScheme {
         if !handleIPFSSchemeURL(url, visitType: .unknown) {
           tabManager.selectedTab?.reload()
         }
-      } else if !isPrivateMode,
-                let url = topToolbar.currentURL,
-                DecentralizedDNSHelper.isSupported(domain: url.domainURL.schemelessAbsoluteDisplayString),
-                let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode),
-                let decentralizedDNSHelper = DecentralizedDNSHelper(
-                  rpcService: rpcService,
-                  ipfsApi: braveCore.ipfsAPI,
-                  isPrivateMode: isPrivateMode
-                ) {
+      } else if let decentralizedDNSHelper = decentralizedDNSHelperFor(url: topToolbar.currentURL) {
         topToolbarDidPressReloadTask?.cancel()
         topToolbarDidPressReloadTask = Task { @MainActor in
           topToolbar.locationView.loading = true
@@ -131,7 +121,7 @@ extension BrowserViewController: TopToolbarDelegate {
           guard !Task.isCancelled else { return } // user pressed stop, or typed new url
           switch result {
           case let .loadInterstitial(service):
-            showWeb3ServiceInterstitialPage(service: service, originalURL: url, visitType: .unknown)
+            showWeb3ServiceInterstitialPage(service: service, originalURL: url)
           case let .load(resolvedURL):
             if resolvedURL.isIPFSScheme {
               handleIPFSSchemeURL(resolvedURL, visitType: .unknown)
@@ -315,14 +305,7 @@ extension BrowserViewController: TopToolbarDelegate {
       // Instead, submit them to the search engine like Chrome-iOS does.
       if !["file"].contains(fixupURL.scheme) {
         // check text is decentralized DNS supported domain
-        let isPrivateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-        if DecentralizedDNSHelper.isSupported(domain: fixupURL.domainURL.schemelessAbsoluteDisplayString),
-           let rpcService = BraveWallet.JsonRpcServiceFactory.get(privateMode: isPrivateMode),
-           let decentralizedDNSHelper = DecentralizedDNSHelper(
-            rpcService: rpcService,
-            ipfsApi: braveCore.ipfsAPI,
-            isPrivateMode: isPrivateMode
-           ) {
+        if let decentralizedDNSHelper = self.decentralizedDNSHelperFor(url: fixupURL) {
           topToolbar.leaveOverlayMode()
           updateToolbarCurrentURL(fixupURL)
           topToolbar.locationView.loading = true

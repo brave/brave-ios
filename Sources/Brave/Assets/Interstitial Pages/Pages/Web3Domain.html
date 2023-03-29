@@ -37,7 +37,7 @@ You can obtain one at https://mozilla.org/MPL/2.0/.
       disableButton.addEventListener('click', function(e) {
         e.preventDefault();
         webkit.messageHandlers["%message_handler%"].postMessage({
-          "type": "Disable",
+          "button_type": "disable",
           "service_id": "%service_id%"
         });
       });
@@ -45,7 +45,7 @@ You can obtain one at https://mozilla.org/MPL/2.0/.
       proceedButton.addEventListener('click', function(e) {
         e.preventDefault();
         webkit.messageHandlers["%message_handler%"].postMessage({
-          "type": "Proceed",
+          "button_type": "proceed",
           "service_id": "%service_id%"
         });
       });
