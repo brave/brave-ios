@@ -40,8 +40,8 @@ class BasicAuthCredentialsManager: NSObject, URLSessionDataDelegate {
       return (.useCredential, proposedCredential)
     }
 
-    // TODO: Basic Auth Check
-    
+
+    // No proposed credential - reject challenge
     return (.rejectProtectionSpace, nil)
   }
 

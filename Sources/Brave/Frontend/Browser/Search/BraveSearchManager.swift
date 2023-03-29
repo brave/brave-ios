@@ -47,7 +47,6 @@ class BraveSearchManager: NSObject {
   }
 
   private var cancellables: Set<AnyCancellable> = []
-  private static var cachedCredentials: URLCredential?
     
   static let validDomains = ["search.brave.com", "search.brave.software",
                              "search.bravesoftware.com", "safesearch.brave.com",
@@ -275,18 +274,13 @@ extension BraveSearchManager: URLSessionDataDelegate {
       return (.rejectProtectionSpace, nil)
     }
 
-    if let credentials = BraveSearchManager.cachedCredentials {
-      return (.useCredential, credentials)
-    }
-
     if let proposedCredential = challenge.proposedCredential,
       !(proposedCredential.user?.isEmpty ?? true),
       challenge.previousFailureCount == 0 {
       return (.useCredential, proposedCredential)
     }
 
-    // TODO: Basic Auth Check
-
+    // No proposed credential - reject challenge
     return (.rejectProtectionSpace, nil)
   }
 

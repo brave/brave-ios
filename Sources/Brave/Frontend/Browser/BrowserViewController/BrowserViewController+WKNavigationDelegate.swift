@@ -561,7 +561,18 @@ extension BrowserViewController: WKNavigationDelegate {
       
       // The challenge may come from a background tab, so ensure it's the one visible.
       tabManager.selectTab(tab)
-      return (.rejectProtectionSpace, nil)
+
+      do {
+        let credentials = try await Authenticator.handleAuthRequest(
+          self,
+          credential: credential,
+          protectionSpace: protectionSpace,
+          previousFailureCount: previousFailureCount
+        )
+        return (.useCredential, credentials.credentials)
+      } catch {
+        return (.rejectProtectionSpace, nil)
+      }
     }.value
   }
 
