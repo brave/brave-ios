@@ -5,10 +5,13 @@
 
 import Foundation
 import BraveCore
+import os
 
 /// This class helps to prepare the browser during launch by ensuring the state of managers, resources and downloaders before performing additional tasks.
 public actor LaunchHelper {
   public static let shared = LaunchHelper()
+  static let signpost = OSSignposter(logger: ContentBlockerManager.log)
+  
   private var loadTask: Task<(), Never>?
   private var areAdBlockServicesReady = false
   
@@ -27,26 +30,24 @@ public actor LaunchHelper {
     
     // Otherwise prepare the services and await the task
     let task = Task {
-      #if DEBUG
-      let startTime = CFAbsoluteTimeGetCurrent()
-      #endif
+      let signpostID = Self.signpost.makeSignpostID()
+      let state = Self.signpost.beginInterval("blockingLaunchTask", id: signpostID)
       
       // Load cached data
       // This is done first because compileResources need their results
       async let filterListCache: Void = FilterListResourceDownloader.shared.loadCachedData()
       async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded()
       _ = await (filterListCache, adblockResourceCache)
+      Self.signpost.emitEvent("loadedCachedData", id: signpostID, "Loaded cached data")
       
       // Compile some engines
       await AdBlockEngineManager.shared.compileResources()
+      Self.signpost.emitEvent("compileResources", id: signpostID, "Compiled engine resources")
       
-      #if DEBUG
-      let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-      ContentBlockerManager.log.debug("Adblock loaded: \(timeElapsed)s")
-      #endif
       // This one is non-blocking
       performPostLoadTasks(adBlockService: adBlockService)
       areAdBlockServicesReady = true
+      Self.signpost.endInterval("blockingLaunchTask", state)
     }
     
     // Await the task and wait for the results
@@ -58,14 +59,21 @@ public actor LaunchHelper {
   /// Perform tasks that don't need to block the initial load (things that can happen happily in the background after the first page loads
   private func performPostLoadTasks(adBlockService: AdblockService) {
     Task.detached(priority: .low) {
+      let signpostID = Self.signpost.makeSignpostID()
+      let state = Self.signpost.beginInterval("nonBlockingLaunchTask", id: signpostID)
       await FilterListResourceDownloader.shared.start(with: adBlockService)
+      Self.signpost.emitEvent("FilterListResourceDownloader.shared.start", id: signpostID, "Started filter list downloader")
       await AdblockResourceDownloader.shared.reloadBundledOnlyData()
+      Self.signpost.emitEvent("reloadBundledOnlyData", id: signpostID, "Reloaded bundled only data")
       await AdblockResourceDownloader.shared.startFetching()
+      Self.signpost.emitEvent("startFetching", id: signpostID, "Started fetching ad-block data")
       await AdBlockEngineManager.shared.startTimer()
+      Self.signpost.emitEvent("startTimer", id: signpostID, "Started engine timer")
       
       /// Cleanup rule lists so we don't have dead rule lists
       let validBlocklistTypes = await self.getAllValidBlocklistTypes()
       await ContentBlockerManager.shared.cleaupInvalidRuleLists(validTypes: validBlocklistTypes)
+      Self.signpost.endInterval("nonBlockingLaunchTask", state)
     }
   }
   
