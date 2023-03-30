@@ -20,10 +20,10 @@ struct NFTView: View {
   
   private var emptyView: some View {
     VStack(alignment: .center, spacing: 10) {
-      Text("No NFTs here yet.")
+      Text(Strings.Wallet.nftPageEmptyTitle)
         .font(.headline.weight(.semibold))
         .foregroundColor(Color(.braveLabel))
-      Text("Ready to add some? Just click the button below to import.")
+      Text(Strings.Wallet.nftPageEmptyDescription)
         .font(.subheadline.weight(.semibold))
         .foregroundColor(Color(.secondaryLabel))
     }
@@ -47,7 +47,7 @@ struct NFTView: View {
         keyringStore: keyringStore,
         userAssetsStore: nftStore.userAssetsStore
       ) {
-        nftStore.update()
+        cryptoStore.updateAssets()
       }
     }
   }

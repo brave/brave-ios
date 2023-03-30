@@ -24,7 +24,7 @@ struct NFTAssetViewModel: Identifiable, Equatable {
 public class NFTStore: ObservableObject {
   /// The users visible NFTs
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
-  /// 
+  /// The network filter in NFT tab
   @Published var networkFilter: NetworkFilter = .allNetworks {
     didSet {
       update()

@@ -322,6 +322,13 @@ public class CryptoStore: ObservableObject {
     }
   }
   
+  // This will be called when users exit from edit visible asset screen
+  // so that Portfolio and NFT tabs will update assets
+  func updateAssets() {
+    portfolioStore.update()
+    nftStore.update()
+  }
+  
   func prepare(isInitialOpen: Bool = false) {
     Task { @MainActor in
       if isInitialOpen {

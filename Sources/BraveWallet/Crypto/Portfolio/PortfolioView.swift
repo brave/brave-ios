@@ -88,7 +88,7 @@ struct PortfolioView: View {
         keyringStore: keyringStore,
         userAssetsStore: portfolioStore.userAssetsStore
       ) {
-        portfolioStore.update()
+        cryptoStore.updateAssets()
       }
     }
   }
