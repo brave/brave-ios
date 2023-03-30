@@ -61,7 +61,7 @@ struct AddAccountView: View {
   }
 
   private var isJSONImported: Bool {
-    guard let data = privateKey.data(using: .utf8) else {
+    guard selectedCoin == .eth, let data = privateKey.data(using: .utf8) else {
       return false
     }
     do {
