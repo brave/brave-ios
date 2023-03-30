@@ -11,6 +11,7 @@ struct NFTView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var nftStore: NFTStore
   
+  @State private var isPresentingNetworkFilter: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
   @State private var selectedNFTViewModel: NFTAssetViewModel?
   
@@ -18,18 +19,18 @@ struct NFTView: View {
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
   
   private var emptyView: some View {
-    VStack(spacing: 10) {
+    VStack(alignment: .center, spacing: 10) {
       Text("No NFTs here yet.")
         .font(.headline.weight(.semibold))
         .foregroundColor(Color(.braveLabel))
       Text("Ready to add some? Just click the button below to import.")
         .font(.subheadline.weight(.semibold))
         .foregroundColor(Color(.secondaryLabel))
-      Text("Note that Brave Wallet currently only supports ERC721 token standard.")
-        .font(.footnote)
-        .foregroundColor(Color(.secondaryBraveLabel))
     }
     .multilineTextAlignment(.center)
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 60)
+    .padding(.horizontal, 32)
   }
   
   private var editUserAssetsButton: some View {
@@ -84,45 +85,89 @@ struct NFTView: View {
   }
   
   @ViewBuilder private func noImageView(_ nftViewModel: NFTAssetViewModel) -> some View {
-    NFTIconView(
-      token: nftViewModel.token,
-      network: nftViewModel.network,
-      blockieShape: .rectangle,
-      length: 160,
-      tokenLogoLength: 20
-    )
+    Blockie(address: nftViewModel.token.contractAddress, shape: .rectangle)
+      .overlay(
+        Text(nftViewModel.token.symbol.first?.uppercased() ?? "")
+          .font(.system(size: 80, weight: .bold, design: .rounded))
+          .foregroundColor(.white)
+          .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+      )
+      .aspectRatio(1.0, contentMode: .fit)
+  }
+  
+  private var networkFilterButton: some View {
+    Button(action: {
+      self.isPresentingNetworkFilter = true
+    }) {
+      HStack {
+        Text(nftStore.networkFilter.title)
+        Image(braveSystemName: "brave.text.alignleft")
+      }
+      .font(.footnote.weight(.medium))
+      .foregroundColor(Color(.braveBlurpleTint))
+    }
+    .sheet(isPresented: $isPresentingNetworkFilter) {
+      NavigationView {
+        NetworkFilterView(
+          networkFilter: $nftStore.networkFilter,
+          networkStore: networkStore
+        )
+      }
+      .onDisappear {
+        networkStore.closeNetworkSelectionStore()
+      }
+    }
+  }
+  
+  private var nftHeaderView: some View {
+    HStack {
+      Text(Strings.Wallet.assetsTitle)
+        .font(.caption)
+        .foregroundColor(Color(.secondaryBraveLabel))
+      Spacer()
+      networkFilterButton
+    }
+    .textCase(nil)
+    .padding(.horizontal, 10)
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
   
   var body: some View {
     ScrollView {
       VStack {
+        nftHeaderView
         if nftStore.userVisibleNFTs.isEmpty {
           emptyView
-            .padding(.horizontal, 36)
-            .padding(.vertical, 68)
+            .listRowBackground(Color(.clear))
         } else {
           LazyVGrid(columns: nftGrids) {
             ForEach(nftStore.userVisibleNFTs) { nft in
               Button(action: {
                 selectedNFTViewModel = nft
               }) {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
                   nftImage(nft)
-                  Text(nft.nftMetadata?.name ?? nft.token.name)
-                    .font(.subheadline.weight(.semibold))
+                    .padding(.bottom, 8)
+                  Text(nft.token.nftTokenTitle)
+                    .font(.callout.weight(.medium))
                     .foregroundColor(Color(.braveLabel))
+                    .multilineTextAlignment(.leading)
+                  Text(nft.token.name)
+                    .font(.caption)
+                    .foregroundColor(Color(.secondaryBraveLabel))
                     .multilineTextAlignment(.leading)
                 }
               }
             }
           }
-          .padding(24)
         }
-        Divider()
-          .padding(.horizontal, 16)
-          .padding(.bottom, 12)
-        editUserAssetsButton
+        VStack(spacing: 16) {
+          Divider()
+          editUserAssetsButton
+        }
+        .padding(.top, 20)
       }
+      .padding(24)
     }
     .background(
       NavigationLink(

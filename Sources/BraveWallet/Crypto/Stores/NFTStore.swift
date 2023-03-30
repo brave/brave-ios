@@ -24,6 +24,12 @@ struct NFTAssetViewModel: Identifiable, Equatable {
 public class NFTStore: ObservableObject {
   /// The users visible NFTs
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
+  /// 
+  @Published var networkFilter: NetworkFilter = .allNetworks {
+    didSet {
+      update()
+    }
+  }
   
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
     walletService: self.walletService,
@@ -43,8 +49,6 @@ public class NFTStore: ObservableObject {
   
   /// Cancellable for the last running `update()` Task.
   private var updateTask: Task<(), Never>?
-  /// Cache of total balances. The key is the token's `assetBalanceId`.
-  private var totalBalancesCache: [String: Double] = [:]
   /// Cache of metadata for NFTs. The key is the token's `id`.
   private var metadataCache: [String: NFTMetadata] = [:]
   
@@ -76,8 +80,14 @@ public class NFTStore: ObservableObject {
   func update() {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
-      let networks = await self.rpcService.allNetworksForSupportedCoins()
-        .filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
+      let networks: [BraveWallet.NetworkInfo]
+      switch networkFilter {
+      case .allNetworks:
+        networks = await self.rpcService.allNetworksForSupportedCoins()
+          .filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
+      case let .network(network):
+        networks = [network]
+      }
       let allVisibleUserAssets = await self.walletService.allVisibleUserAssets(in: networks)
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
       for networkAssets in allVisibleUserAssets {
@@ -87,7 +97,7 @@ public class NFTStore: ObservableObject {
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
-                balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0),
+                balance: 0, // no balance shown in NFT tab
                 nftMetadata: metadataCache[token.id]
               )
             )
@@ -95,39 +105,6 @@ public class NFTStore: ObservableObject {
         }
       }
       self.userVisibleNFTs = updatedUserVisibleNFTs
-      
-      let keyrings = await self.keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
-      guard !Task.isCancelled else { return }
-      typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
-      let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
-        networkAssets.tokens.map { token in
-          TokenNetworkAccounts(
-            token: token,
-            network: networkAssets.network,
-            accounts: keyrings.first(where: { $0.coin == token.coin })?.accountInfos ?? []
-          )
-        }
-      }
-      let totalBalances: [String: Double] = await withTaskGroup(of: [String: Double].self, body: { @MainActor group in
-        for tokenNetworkAccounts in allTokenNetworkAccounts {
-          group.addTask { @MainActor in
-            let totalBalance = await self.rpcService.fetchTotalBalance(
-              token: tokenNetworkAccounts.token,
-              network: tokenNetworkAccounts.network,
-              accounts: tokenNetworkAccounts.accounts
-            )
-            return [tokenNetworkAccounts.token.assetBalanceId: totalBalance]
-          }
-        }
-        return await group.reduce(into: [String: Double](), { partialResult, new in
-          for key in new.keys {
-            partialResult[key] = new[key]
-          }
-        })
-      })
-      for (key, value) in totalBalances {
-        totalBalancesCache[key] = value
-      }
       
       // fetch nft metadata for all NFTs
       // fetch price for every token
@@ -147,7 +124,7 @@ public class NFTStore: ObservableObject {
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
-                balance: Int(totalBalancesCache[token.assetBalanceId] ?? 0),
+                balance: 0, // no balance shown in NFT tab
                 nftMetadata: metadataCache[token.id]
               )
             )
