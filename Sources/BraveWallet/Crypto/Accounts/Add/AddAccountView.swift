@@ -125,6 +125,11 @@ struct AddAccountView: View {
             tag: coin,
             selection: $selectedCoin) {
               addAccountView
+                .onDisappear {
+                  name = ""
+                  originPassword = ""
+                  privateKey = ""
+                }
             } label: {
               HStack(spacing: 10) {
                 Image(coin.iconName, bundle: .module)
