@@ -45,7 +45,7 @@ struct AssetIconView: View {
       }
     }
     
-    if network.isNativeAsset(token), let uiImage = networkNativeTokenLogo {
+    if network.isNativeAsset(token), let uiImage = network.nativeTokenLogoImage {
       return Image(uiImage: uiImage)
     }
     
@@ -75,15 +75,8 @@ struct AssetIconView: View {
     .accessibilityHidden(true)
   }
   
-  private var networkNativeTokenLogo: UIImage? {
-    if let logo = network.nativeTokenLogo {
-      return UIImage(named: logo, in: .module, with: nil)
-    }
-    return nil
-  }
-  
   @ViewBuilder private var tokenLogo: some View {
-    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = network.nativeTokenLogoImage {
       Image(uiImage: image)
         .resizable()
         .frame(width: min(networkSymbolLength, maxNetworkSymbolLength ?? networkSymbolLength), height: min(networkSymbolLength, maxNetworkSymbolLength ?? networkSymbolLength))
@@ -138,15 +131,8 @@ struct NFTIconView: View {
   @ScaledMetric var length: CGFloat = 40
   @ScaledMetric var tokenLogoLength: CGFloat = 15
   
-  private var networkNativeTokenLogo: UIImage? {
-    if let logo = network.nativeTokenLogo {
-      return UIImage(named: logo, in: .module, with: nil)
-    }
-    return nil
-  }
-  
   @ViewBuilder private var tokenLogo: some View {
-    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = network.nativeTokenLogoImage {
       Image(uiImage: image)
         .resizable()
         .frame(width: 15, height: 15)

@@ -3957,7 +3957,7 @@ extension Strings {
       "wallet.nftPageEmptyDescription",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Ready to add some? Just click the button below to import.",
+      value: "Ready to add some? Just tap the button below to import.",
       comment: "The description of the empty state inside NFT tab."
     )
   }

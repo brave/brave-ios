@@ -54,15 +54,8 @@ struct NFTView: View {
   
   private let nftGrids = [GridItem(.adaptive(minimum: 120), spacing: 16, alignment: .top)]
   
-  private func networkNativeTokenLogo(_ nftViewModel: NFTAssetViewModel) -> UIImage? {
-    if let logo = nftViewModel.network.nativeTokenLogo {
-      return UIImage(named: logo, in: .module, with: nil)
-    }
-    return nil
-  }
-  
   @ViewBuilder private func nftLogo(_ nftViewModel: NFTAssetViewModel) -> some View {
-    if let image = networkNativeTokenLogo(nftViewModel) {
+    if let image = nftViewModel.network.nativeTokenLogoImage {
       Image(uiImage: image)
         .resizable()
         .frame(width: 20, height: 20)
@@ -152,10 +145,12 @@ struct NFTView: View {
                     .font(.callout.weight(.medium))
                     .foregroundColor(Color(.braveLabel))
                     .multilineTextAlignment(.leading)
-                  Text(nft.token.name)
-                    .font(.caption)
-                    .foregroundColor(Color(.secondaryBraveLabel))
-                    .multilineTextAlignment(.leading)
+                  if !nft.token.symbol.isEmpty {
+                    Text(nft.token.symbol)
+                      .font(.caption)
+                      .foregroundColor(Color(.secondaryBraveLabel))
+                      .multilineTextAlignment(.leading)
+                  }
                 }
               }
             }
