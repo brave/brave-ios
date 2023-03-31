@@ -32,8 +32,18 @@ window.__firefox__.includeOnce("BraveTalkScript", function($) {
   if (document.location.host === "talk.brave.com") {
     const postRoom = $((event) => {
       if (event.target.tagName !== undefined && event.target.tagName.toLowerCase() == "iframe") {
-        launchNativeBraveTalk(event.target.src);
-        window.removeEventListener("DOMNodeInserted", postRoom)
+        const srcObserver = new MutationObserver((mutationsList) => {
+          mutationsList.forEach((mutation) => {
+            if (mutation.type === 'attributes') {
+              launchNativeBraveTalk(event.target.src);
+              srcObserver.disconnect();
+              return;
+            }
+          });
+        });
+
+        srcObserver.observe(event.target, { attributes: true, attributeFilter: ['src'] });
+        window.removeEventListener("DOMNodeInserted", postRoom);
       }
     });
     window.addEventListener("DOMNodeInserted", postRoom);
