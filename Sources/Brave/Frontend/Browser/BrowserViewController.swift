@@ -1613,7 +1613,9 @@ public class BrowserViewController: UIViewController {
   func showWeb3ServiceInterstitialPage(service: Web3Service, originalURL: URL, visitType: VisitType = .unknown) {
     topToolbar.leaveOverlayMode()
 
-    guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(Web3DomainHandler.path(for: service))?url=\(encodedURL)") else {
+    guard let tab = tabManager.selectedTab,
+          let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+          let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(Web3DomainHandler.path)?\(Web3NameServiceScriptHandler.ParamKey.serviceId.rawValue)=\(service.rawValue)&url=\(encodedURL)") else {
       return
     }
     let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler

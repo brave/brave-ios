@@ -68,17 +68,16 @@ extension Web3Service {
 
 public class Web3DomainHandler: InternalSchemeResponse {
   
-  let service: Web3Service
-  
-  public init(for service: Web3Service) {
-    self.service = service
-  }
+  public static let path = "web3/ddns"
+
+  public init() {}
   
   public func response(forRequest request: URLRequest) -> (URLResponse, Data)? {
     guard let url = request.url else { return nil }
     let response = InternalSchemeHandler.response(forUrl: url)
-    guard let path = Bundle.module.path(forResource: "Web3Domain", ofType: "html")
-    else {
+    guard let path = Bundle.module.path(forResource: "Web3Domain", ofType: "html"),
+          let serviceId = request.url?.getQuery()[Web3NameServiceScriptHandler.ParamKey.serviceId.rawValue],
+          let service = Web3Service(rawValue: serviceId) else {
       return nil
     }
     
@@ -106,16 +105,5 @@ public class Web3DomainHandler: InternalSchemeResponse {
     }
     
     return (response, data)
-  }
-  
-  public static func path(for service: Web3Service) -> String {
-    switch service {
-    case .solana:
-      return "web3/sns"
-    case .ethereum:
-      return "web3/ens"
-    case .ethereumOffchain:
-      return "web3/ensOffchain"
-    }
   }
 }

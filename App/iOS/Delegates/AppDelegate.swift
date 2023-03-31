@@ -419,10 +419,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       (SessionRestoreHandler.path, SessionRestoreHandler()),
       (ErrorPageHandler.path, ErrorPageHandler()),
       (ReaderModeHandler.path, ReaderModeHandler(profile: profile)),
-      (IPFSSchemeHandler.path, IPFSSchemeHandler())
-    ] + Web3Service.allCases.map {
-      (Web3DomainHandler.path(for: $0), Web3DomainHandler(for: $0))
-    }
+      (IPFSSchemeHandler.path, IPFSSchemeHandler()),
+      (Web3DomainHandler.path, Web3DomainHandler())
+    ]
 
     responders.forEach { (path, responder) in
       InternalSchemeHandler.responders[path] = responder
