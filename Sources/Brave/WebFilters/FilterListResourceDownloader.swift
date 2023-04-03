@@ -154,7 +154,7 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Tells us if the filter list is enabled for the given `UUID`
   @MainActor public func isEnabled(filterListUUID uuid: String) -> Bool {
-    return settingsManager.isEnabled(forUUID: uuid)
+    return filterLists.first(where: { $0.uuid == uuid })?.isEnabled ?? settingsManager.isEnabled(forUUID: uuid)
   }
   
   private func loadCachedFilterLists() async {
