@@ -28,6 +28,7 @@ public class AppReviewManager: ObservableObject {
     static let dappConnectionPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
     static let daysInUseMaxPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
     static let daysInUseRequiredPeriod = 4
+    static let revisedMinimumDaysBetweenReviewRequest = 30
   }
   
   /// A enumeration for which type of App Review Logic will be used
@@ -44,7 +45,7 @@ public class AppReviewManager: ObservableObject {
       case .revised:
         return [.threshold]
       case .revisedCrossPlatform:
-        return []
+        return [.launchCount, .daysInUse, .sessionCrash, .daysInBetweenReview]
       }
     }
     
@@ -56,7 +57,7 @@ public class AppReviewManager: ObservableObject {
       case .revised:
         return []
       case .revisedCrossPlatform:
-        return []
+        return [.numberOfBookmarks, .paidVPNSubscription]
       }
     }
   }
@@ -67,6 +68,7 @@ public class AppReviewManager: ObservableObject {
     case launchCount
     case daysInUse
     case sessionCrash
+    case daysInBetweenReview
   }
   
   /// A sub-criteria that should be satisfied if all main criterias are valid
@@ -79,7 +81,7 @@ public class AppReviewManager: ObservableObject {
   }
     
   @Published public var isRevisedReviewRequired = false
-  private var activeAppReviewLogicType: AppReviewLogicType = .legacy
+  private var activeAppReviewLogicType: AppReviewLogicType = .revisedCrossPlatform
   
   // MARK: Lifecycle
   
@@ -111,6 +113,7 @@ public class AppReviewManager: ObservableObject {
       }
     }
   }
+  
   // MARK: Review Request Inquiry
 
   public func shouldRequestReview(for logicType: AppReviewLogicType, date: Date = Date()) -> Bool {
@@ -173,10 +176,10 @@ public class AppReviewManager: ObservableObject {
     switch type {
     case .threshold:
       let launchCount = Preferences.Review.launchCount.value
-      let threshold = Preferences.LegacyReview.threshold.value
+      let threshold = Preferences.Review.threshold.value
 
       var daysSinceLastRequest = 0
-      if let previousRequest = Preferences.LegacyReview.lastReviewDate.value {
+      if let previousRequest = Preferences.Review.lastReviewDate.value {
         daysSinceLastRequest = Calendar.current.dateComponents([.day], from: previousRequest, to: date).day ?? 0
       } else {
         daysSinceLastRequest = Constants.minimumDaysBetweenReviewRequest
@@ -186,13 +189,13 @@ public class AppReviewManager: ObservableObject {
         return false
       }
 
-      Preferences.LegacyReview.lastReviewDate.value = date
+      Preferences.Review.lastReviewDate.value = date
 
       switch threshold {
       case Constants.firstThreshold:
-        Preferences.LegacyReview.threshold.value = Constants.secondThreshold
+        Preferences.Review.threshold.value = Constants.secondThreshold
       case Constants.secondThreshold:
-        Preferences.LegacyReview.threshold.value = Constants.lastThreshold
+        Preferences.Review.threshold.value = Constants.lastThreshold
       default:
         break
       }
@@ -204,6 +207,21 @@ public class AppReviewManager: ObservableObject {
       return Preferences.Review.daysInUse.value.count >= Constants.daysInUseRequiredPeriod
     case .sessionCrash:
       return !(!Preferences.AppState.backgroundedCleanly.value && AppConstants.buildChannel != .debug)
+    case .daysInBetweenReview:
+      var daysSinceLastRequest = 0
+      if let previousRequest = Preferences.Review.lastReviewDate.value {
+        daysSinceLastRequest = Calendar.current.dateComponents([.day], from: previousRequest, to: date).day ?? 0
+      } else {
+        Preferences.Review.lastReviewDate.value = date
+        return true
+      }
+
+      if daysSinceLastRequest < Constants.revisedMinimumDaysBetweenReviewRequest {
+        return false
+      }
+
+      Preferences.Review.lastReviewDate.value = date
+      return true
     }
   }
   

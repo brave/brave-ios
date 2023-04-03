@@ -607,6 +607,9 @@ public class BrowserViewController: UIViewController {
     
     maybeRecordInitialShieldsP3A()
     recordVPNUsageP3A(vpnEnabled: BraveVPN.isConnected)
+    
+    // Revised Review Handling
+    AppReviewManager.shared.handleAppReview(for: .revisedCrossPlatform, using: self)
   }
 
   private func setupAdsNotificationHandler() {
