@@ -573,6 +573,15 @@ class TabManager: NSObject {
         }
       }
     }
+    
+    tab.onWebViewScrolled = { tab, _ in
+      tab.webViewScrollDebounceTimer?.invalidate()
+      tab.webViewScrollDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self, weak tab] _ in
+        guard let self = self, let tab = tab else { return }
+        tab.webViewScrollDebounceTimer?.invalidate()
+        self.saveTab(tab)
+      }
+    }
   }
 
   func indexOfWebView(_ webView: WKWebView) -> UInt? {
@@ -917,11 +926,19 @@ class TabManager: NSObject {
     for savedTab in savedTabs {
       let tabURL = savedTab.url
       // Provide an empty request to prevent a new tab from loading the home screen
-      let tab = addTab(URLRequest(url: tabURL), flushToDisk: false, zombie: true, id: savedTab.tabId, isPrivate: false)
+      let tab = addTab(URLRequest(url: tabURL),
+                       flushToDisk: false,
+                       zombie: true,
+                       id: savedTab.tabId,
+                       isPrivate: false)
       // tab.sessionData = (savedTab.title, savedTab.interactionState)
       
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+      
+      tab.lastTitle = savedTab.title
       tab.favicon = FaviconFetcher.getIconFromCache(for: tabURL) ?? Favicon.default
+      tab.setScreenshot(savedTab.screenshot)
+      
       Task { @MainActor in
         tab.favicon = try await FaviconFetcher.loadIcon(url: tabURL, kind: .smallIcon, persistent: !isPrivateBrowsing)
         tab.setScreenshot(savedTab.screenshot)
@@ -930,8 +947,6 @@ class TabManager: NSObject {
       if savedTab.isSelected {
         tabToSelect = tab
       }
-
-      tab.lastTitle = savedTab.title
     }
 
     if let tabToSelect = tabToSelect ?? tabsForCurrentMode.last {
@@ -1040,9 +1055,9 @@ class TabManager: NSObject {
     let tab = addTab(URLRequest(url: url), isPrivate: false)
     guard let webView = tab.webView else { return }
 
-    if !recentlyClosed.interactionState.isEmpty {
+    if let interactionState = recentlyClosed.interactionState, !interactionState.isEmpty {
       tab.navigationDelegate = navDelegate
-      tab.restore(webView, restorationData: (recentlyClosed.title, recentlyClosed.interactionState))
+      tab.restore(webView, restorationData: (recentlyClosed.title ?? "", interactionState))
     }
     
     selectTab(tab)
@@ -1071,8 +1086,20 @@ class TabManager: NSObject {
       return nil
     }
     
+    // NTP should not be passed as Recently Closed item
+    if InternalURL(fetchedTab.url)?.isAboutHomeURL == true {
+      return nil
+    }
+    
+    // Convert any internal URLs to their real URL for the Recently Closed item
+    var fetchedTabURL = fetchedTab.url
+    if let url = InternalURL(fetchedTabURL),
+       let actualURL = url.extractedUrlParam ?? url.originalURLFromErrorPage {
+      fetchedTabURL = actualURL
+    }
+    
     return SavedRecentlyClosed(
-      url: fetchedTab.url,
+      url: fetchedTabURL,
       title: fetchedTab.title,
       interactionState: fetchedTab.interactionState,
       order: fetchedTab.index)

@@ -2276,9 +2276,9 @@ public class BrowserViewController: UIViewController {
           if let visitType = typedNavigation.first(where: {
             $0.key.typedDisplayString == url.typedDisplayString
           })?.value, visitType == .typed {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
+            braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date())
           } else {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+            braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date(), isURLTyped: false)
           }
           
           // Saving Tab. Private Mode - not supported yet.

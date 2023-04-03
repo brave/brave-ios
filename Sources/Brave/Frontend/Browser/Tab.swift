@@ -235,6 +235,10 @@ class Tab: NSObject {
   
   var webStateDebounceTimer: Timer?
   var onPageReadyStateChanged: ((ReadyState.State) -> Void)?
+  
+  private var webViewScrollViewObserver: NSObjectProtocol?
+  var webViewScrollDebounceTimer: Timer?
+  var onWebViewScrolled: ((_ tab: Tab, _ contentOffset: CGPoint) -> Void)?
 
   // If this tab has been opened from another, its parent will point to the tab from which it was opened
   var parent: Tab?
@@ -331,6 +335,11 @@ class Tab: NSObject {
 
       self.webView = webView
       self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
+      self.webViewScrollViewObserver = webView.scrollView.observe(\.contentOffset, options: [.new]) { [weak self] _, change in
+        guard let self = self, let value = change.newValue else { return }
+        self.onWebViewScrolled?(self, value)
+      }
+      
       tabDelegate?.tab(self, didCreateWebView: webView)
       
       let scriptPreferences: [UserScriptManager.ScriptType: Bool] = [
