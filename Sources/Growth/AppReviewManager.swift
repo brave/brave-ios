@@ -14,7 +14,7 @@ import BraveVPN
 /// Singleton Manager handles App Review Criteria
 public class AppReviewManager: ObservableObject {
   
-  private struct Constants {
+  struct Constants {
     // Legacy Review Constants
     static let firstThreshold = 14
     static let secondThreshold = 41
@@ -41,9 +41,9 @@ public class AppReviewManager: ObservableObject {
     var mainCriteria: [AppReviewMainCriteriaType] {
       switch self {
       case .legacy:
-        return [.launchCount, .daysInUse, .sessionCrash]
-      case .revised:
         return [.threshold]
+      case .revised:
+        return [.launchCount, .daysInUse, .sessionCrash]
       case .revisedCrossPlatform:
         return [.launchCount, .daysInUse, .sessionCrash, .daysInBetweenReview]
       }
@@ -52,10 +52,10 @@ public class AppReviewManager: ObservableObject {
     var subCriteria: [AppReviewSubCriteriaType] {
       switch self {
       case .legacy:
-        return [.numberOfBookmarks, .paidVPNSubscription, .walletConnectedDapp,
-          .numberOfPlaylistItems, .syncEnabledWithTabSync]
-      case .revised:
         return []
+      case .revised:
+        return [.numberOfBookmarks, .paidVPNSubscription, .walletConnectedDapp,
+                .numberOfPlaylistItems, .syncEnabledWithTabSync]
       case .revisedCrossPlatform:
         return [.numberOfBookmarks, .paidVPNSubscription]
       }
