@@ -59,8 +59,9 @@ public enum Web3Service: String, CaseIterable {
         return .loadInterstitial(.ethereumOffchain)
       }
       guard status == .success,
-         !contentHash.isEmpty,
-         let ipfsUrl = ipfsApi?.contentHashToCIDv1URL(for: contentHash) else {
+            !contentHash.isEmpty,
+            let ipfsUrl = ipfsApi?.contentHashToCIDv1URL(for: contentHash),
+            !ipfsUrl.isBookmarklet else {
         return .none
       }
       return .load(ipfsUrl)
@@ -79,7 +80,9 @@ public enum Web3Service: String, CaseIterable {
       return .loadInterstitial(.solana)
     case .enabled:
       let (url, status, _) = await rpcService.snsResolveHost(domain)
-      guard status == .success, let url else {
+      guard status == .success,
+            let url,
+            !url.isBookmarklet else {
         return .none
       }
       return .load(url)
