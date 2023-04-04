@@ -4031,6 +4031,13 @@ extension Strings {
       value: "Get the latest news",
       comment: "Description for Brave News widgets that display the top news"
     )
+    public static let newsClusteringErrorLabel = NSLocalizedString(
+      "widgets.newsClusteringErrorLabel",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Try again later",
+      comment: "Displayed on a news widget that has failed to load"
+    )
   }
 }
 

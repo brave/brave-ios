@@ -68,29 +68,33 @@ private struct TopNewsListView: View {
   @Environment(\.widgetFamily) var widgetFamily
   var entry: TopNewsListEntry
   
+  private var headerView: some View {
+    HStack {
+      HStack(spacing: 4) {
+        Image(braveSystemName: "brave.logo")
+          .font(.system(size: 12))
+          .imageScale(.large)
+          .foregroundColor(Color(.braveOrange))
+        Text("Brave News")
+          .foregroundColor(Color(.braveLabel))
+          .font(.system(size: 14, weight: .bold, design: .rounded))
+      }
+      Spacer()
+      Link(destination: URL(string: "\(BraveUX.appURLScheme)://shortcut?path=\(WidgetShortcut.braveNews.rawValue)")!) {
+        Text("Read More")
+          .foregroundColor(Color(.braveBlurpleTint))
+          .font(.system(size: 13, weight: .semibold, design: .rounded))
+      }
+    }
+    .padding(.horizontal)
+    .padding(.vertical, widgetFamily == .systemLarge ? 12 : 8)
+  }
+  
   var body: some View {
     if let topics = entry.topics, !topics.isEmpty {
       VStack(alignment: .leading, spacing: widgetFamily == .systemLarge ? 12 : 8) {
-        HStack {
-          HStack(spacing: 4) {
-            Image(braveSystemName: "brave.logo")
-              .font(.system(size: 12))
-              .imageScale(.large)
-              .foregroundColor(Color(.braveOrange))
-            Text("Brave News")
-              .foregroundColor(Color(.braveLabel))
-              .font(.system(size: 14, weight: .bold, design: .rounded))
-          }
-          Spacer()
-          Link(destination: URL(string: "\(BraveUX.appURLScheme)://shortcut?path=\(WidgetShortcut.braveNews.rawValue)")!) {
-            Text("Read More")
-              .foregroundColor(Color(.braveBlurpleTint))
-              .font(.system(size: 13, weight: .semibold, design: .rounded))
-          }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, widgetFamily == .systemLarge ? 12 : 8)
-        .background(Color(.braveGroupedBackground))
+        headerView
+          .background(Color(.braveGroupedBackground))
         VStack(alignment: .leading, spacing: 8) {
           ForEach(topics.prefix(widgetFamily == .systemLarge ? 5 : 2)) { topic in
             HStack {
@@ -127,7 +131,33 @@ private struct TopNewsListView: View {
       }
       .padding(.bottom)
     } else {
-      EmptyView()
+      ZStack(alignment: .top) {
+        Text(Strings.Widgets.newsClusteringErrorLabel)
+          .font(.system(size: widgetFamily == .systemLarge ? 26 : 18, weight: .semibold, design: .rounded))
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+          LinearGradient(braveGradient: .darkGradient01)
+          .mask {
+            Image("brave-today-error")
+              .renderingMode(.template)
+              .resizable(resizingMode: .tile)
+              .opacity(0.1)
+              .rotationEffect(.degrees(-45))
+              .scaleEffect(x: 2.1, y: 2.1)
+          }
+        }
+        headerView
+          .background {
+            LinearGradient(
+              colors: [Color(.braveBackground), Color(.braveBackground).opacity(0.0)],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+      .background(Color(.braveBackground))
     }
   }
 }

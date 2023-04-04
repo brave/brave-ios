@@ -145,7 +145,24 @@ private struct LockScreenTopNewsView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
       .widgetURL(topic.url)
     } else {
-      Text("")
+      VStack(spacing: 4) {
+        Image("brave-today-error")
+          .resizable()
+          .renderingMode(.template)
+          .aspectRatio(contentMode: .fit)
+          .frame(height: 32)
+          .foregroundColor(.black)
+        HStack(spacing: 3) {
+          Text(Strings.Widgets.newsClusteringErrorLabel)
+            .lineLimit(1)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundColor(.secondary)
+            .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity)
+      }
+      .allowsTightening(true)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
   }
 }
@@ -200,7 +217,31 @@ private struct WidgetTopNewsView: View {
       )
       .widgetURL(topic.url)
     } else {
-      Text("Failed to load")
+      VStack(alignment: .leading) {
+        Image(braveSystemName: "brave.logo")
+          .font(.footnote)
+          .imageScale(.large)
+          .foregroundColor(Color(.braveOrange))
+          .padding(4)
+          .background(Color(.white).clipShape(Circle()).shadow(color: .black.opacity(0.2), radius: 2, y: 1))
+        Spacer()
+        Text(Strings.Widgets.newsClusteringErrorLabel)
+          .font(.system(size: 14, weight: .medium, design: .rounded))
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+      .padding()
+      .background {
+        LinearGradient(braveGradient: .darkGradient01)
+          .mask {
+            Image("brave-today-error")
+              .renderingMode(.template)
+              .resizable(resizingMode: .tile)
+              .opacity(0.1)
+              .rotationEffect(.degrees(-45))
+              .scaleEffect(x: 1.5, y: 1.5)
+          }
+      }
+      .background(Color(.braveBackground))
     }
   }
 }
@@ -235,7 +276,11 @@ struct TopNewsView_PreviewProvider: PreviewProvider {
     if #available(iOS 16.0, *) {
       TopNewsView(entry: entry)
         .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
+      TopNewsView(entry: .init(topic: nil))
+        .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
     }
+    TopNewsView(entry: .init(topic: nil))
+      .previewContext(WidgetPreviewContext(family: .systemSmall))
   }
 }
 #endif
