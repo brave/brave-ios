@@ -32,7 +32,6 @@ class RewardsInternalsViewController: TableViewController {
 
   private let legacyLedger: BraveLedger?
   private var legacyInternalsInfo: Ledger.RewardsInternalsInfo?
-  private var hasTransferrableBalance = false
 
   init(ledger: BraveLedger, legacyLedger: BraveLedger?) {
     self.ledger = ledger
@@ -48,11 +47,6 @@ class RewardsInternalsViewController: TableViewController {
       group.enter()
       legacyLedger.rewardsInternalInfo { [weak self] info in
         self?.legacyInternalsInfo = info
-        group.leave()
-      }
-      group.enter()
-      legacyLedger.transferrableAmount { [weak self] amount in
-        self?.hasTransferrableBalance = amount > 0
         group.leave()
       }
     }
@@ -136,8 +130,7 @@ class RewardsInternalsViewController: TableViewController {
                   cell.showMenu()
                 }
               }, cellClass: PaymentIDCell.self),
-            Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(internals.bootStamp)))),
-            Row(text: Strings.RewardsInternals.legacyWalletHasTransferrableBalance, detailText: hasTransferrableBalance ? Strings.yes : Strings.no),
+            Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(internals.bootStamp))))
           ]
         )
       )
