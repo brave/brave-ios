@@ -57,8 +57,6 @@ struct WalletPromptView<Content, Footer>: UIViewControllerRepresentable where Co
   var action: (Bool, UINavigationController?) -> Bool
   var content: () -> Content
   var footer: () -> Footer
-  @Environment(\.buySendSwapDestination)
-  private var buySendSwapDestination: Binding<BuySendSwapDestination?>
   
   func makeUIViewController(context: Context) -> UIViewController {
     .init()
@@ -86,8 +84,7 @@ struct WalletPromptView<Content, Footer>: UIViewControllerRepresentable where Co
       context.coordinator.presentedViewController = .init(controller)
       uiViewController.present(controller, animated: true)
     } else {
-      if buySendSwapDestination.wrappedValue == nil,
-         let presentedViewController = context.coordinator.presentedViewController?.value,
+      if let presentedViewController = context.coordinator.presentedViewController?.value,
          presentedViewController == uiViewController.presentedViewController {
         uiViewController.presentedViewController?.dismiss(animated: true)
       }
