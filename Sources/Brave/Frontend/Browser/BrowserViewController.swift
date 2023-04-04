@@ -287,7 +287,7 @@ public class BrowserViewController: UIViewController {
     legacyWallet = Self.legacyWallet(for: configuration)
     if let wallet = legacyWallet {
       // Legacy ledger is disabled by default
-      wallet.isAutoContributeEnabled = false
+      wallet.setAutoContributeEnabled(false)
       // Ensure we remove any pending contributions or recurring tips from the legacy wallet
       wallet.removeAllPendingContributions { _ in }
       wallet.listRecurringTips { publishers in

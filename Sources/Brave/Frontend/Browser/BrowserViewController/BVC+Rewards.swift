@@ -167,10 +167,10 @@ extension BrowserViewController {
   func setupLedger() {
     guard let ledger = rewards.ledger else { return }
     // Update defaults
-    ledger.minimumVisitDuration = 8
-    ledger.minimumNumberOfVisits = 1
-    ledger.allowUnverifiedPublishers = false
-    ledger.contributionAmount = Double.greatestFiniteMagnitude
+    ledger.setMinimumVisitDuration(8)
+    ledger.setMinimumNumberOfVisits(1)
+    ledger.setAllowUnverifiedPublishers(false)
+    ledger.setContributionAmount(Double.greatestFiniteMagnitude)
 
     // Create ledger observer
     let rewardsObserver = LedgerObserver(ledger: ledger)
