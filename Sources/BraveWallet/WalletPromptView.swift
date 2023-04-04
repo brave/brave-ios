@@ -6,6 +6,7 @@
 import SwiftUI
 import BraveUI
 import DesignSystem
+import Shared
 
 struct WalletPromptContentView<Content, Footer>: View where Content: View, Footer: View {
   let content: () -> Content
@@ -82,12 +83,23 @@ struct WalletPromptView<Content, Footer>: UIViewControllerRepresentable where Co
           footer: footer
         )
       )
+      context.coordinator.presentedViewController = .init(controller)
       uiViewController.present(controller, animated: true)
     } else {
-      if buySendSwapDestination.wrappedValue == nil {
+      if buySendSwapDestination.wrappedValue == nil,
+         let presentedViewController = context.coordinator.presentedViewController?.value,
+         presentedViewController == uiViewController.presentedViewController {
         uiViewController.presentedViewController?.dismiss(animated: true)
       }
     }
+  }
+  
+  class Coordinator {
+    var presentedViewController: WeakRef<UIViewController>?
+  }
+  
+  func makeCoordinator() -> Coordinator {
+    Coordinator()
   }
 }
 
