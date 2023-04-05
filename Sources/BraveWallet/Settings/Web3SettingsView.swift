@@ -14,8 +14,6 @@ public struct Web3SettingsView: View {
   var networkStore: NetworkStore?
   var keyringStore: KeyringStore?
   
-  private let ipfsAPI: IpfsAPI?
-  
   @ObservedObject var enableIPFSResourcesResolver = Preferences.Wallet.resolveIPFSResources
 
   @State private var isShowingResetWalletAlert = false
@@ -28,13 +26,11 @@ public struct Web3SettingsView: View {
   public init(
     settingsStore: SettingsStore? = nil,
     networkStore: NetworkStore? = nil,
-    keyringStore: KeyringStore? = nil,
-    ipfsAPI: IpfsAPI? = nil
+    keyringStore: KeyringStore? = nil
   ) {
     self.settingsStore = settingsStore
     self.networkStore = networkStore
     self.keyringStore = keyringStore
-    self.ipfsAPI = ipfsAPI
   }
   
   public var body: some View {
@@ -50,51 +46,51 @@ public struct Web3SettingsView: View {
             isShowingBiometricsPasswordEntry: $isShowingBiometricsPasswordEntry
           )
         }
-        if let ipfsAPI { // means users come from the browser not the wallet
-          Section(
-            header: Text(Strings.Wallet.ipfsSettingsHeader)
-          ) {
-            Picker(selection: $enableIPFSResourcesResolver.value) {
-              ForEach(Preferences.Wallet.Web3IPFSOption.allCases) { option in
-                Text(option.name)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .tag(option)
-              }
-            } label: {
-              VStack(alignment: .leading, spacing: 6) {
-                Text(Strings.Wallet.ipfsResourcesOptionsTitle)
-                  .foregroundColor(Color(.braveLabel))
-                Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ipfsResolveMethodDescription, WalletConstants.ipfsLearnMoreLink.absoluteString)))
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .tint(Color(.braveBlurpleTint))
-                  .font(.footnote)
-              }
+        // means users come from the browser not the wallet
+        Section(
+          header: Text(Strings.Wallet.ipfsSettingsHeader)
+        ) {
+          Picker(selection: $enableIPFSResourcesResolver.value) {
+            ForEach(Preferences.Wallet.Web3IPFSOption.allCases) { option in
+              Text(option.name)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tag(option)
             }
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
-            NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI)) {
-              VStack(alignment: .leading, spacing: 6) {
-                Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
-                  .foregroundColor(Color(.braveLabel))
-                Text(ipfsGatewayURL)
-                  .font(.footnote)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-              }
-              .padding(.vertical, 4)
+          } label: {
+            VStack(alignment: .leading, spacing: 6) {
+              Text(Strings.Wallet.ipfsResourcesOptionsTitle)
+                .foregroundColor(Color(.braveLabel))
+              Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.ipfsResolveMethodDescription, WalletConstants.ipfsLearnMoreLink.absoluteString)))
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tint(Color(.braveBlurpleTint))
+                .font(.footnote)
             }
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
-            NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: ipfsAPI, isForNFT: true)) {
-              VStack(alignment: .leading, spacing: 6) {
-                Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
-                  .foregroundColor(Color(.braveLabel))
-                Text(ipfsNFTGatewayURL)
-                  .font(.footnote)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-              }
-              .padding(.vertical, 4)
-            }
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: settingsStore.ipfsApi)) {
+            VStack(alignment: .leading, spacing: 6) {
+              Text(Strings.Wallet.ipfsPublicGatewayAddressTitle)
+                .foregroundColor(Color(.braveLabel))
+              Text(ipfsGatewayURL)
+                .font(.footnote)
+                .foregroundColor(Color(.secondaryBraveLabel))
+            }
+            .padding(.vertical, 4)
+          }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          NavigationLink(destination: IPFSCustomGatewayView(ipfsAPI: settingsStore.ipfsApi, isForNFT: true)) {
+            VStack(alignment: .leading, spacing: 6) {
+              Text(Strings.Wallet.ipfsPublicGatewayAddressNFTTitle)
+                .foregroundColor(Color(.braveLabel))
+              Text(ipfsNFTGatewayURL)
+                .font(.footnote)
+                .foregroundColor(Color(.secondaryBraveLabel))
+            }
+            .padding(.vertical, 4)
+          }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
+        
       }
       if let settingsStore {
         Web3DomainSettingsView(settingsStore: settingsStore)
@@ -146,7 +142,7 @@ public struct Web3SettingsView: View {
       if let urlString = settingsStore?.ipfsApi.nftIpfsGateway?.absoluteString, urlString != ipfsNFTGatewayURL {
         ipfsNFTGatewayURL = urlString
       }
-      if let urlString = ipfsAPI?.ipfsGateway?.absoluteString, urlString != ipfsGatewayURL {
+      if let urlString = settingsStore?.ipfsApi.ipfsGateway?.absoluteString, urlString != ipfsGatewayURL {
         ipfsGatewayURL = urlString
       }
       settingsStore?.setup()
