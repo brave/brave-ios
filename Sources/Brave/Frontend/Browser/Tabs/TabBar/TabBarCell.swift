@@ -14,7 +14,7 @@ class TabBarCell: UICollectionViewCell {
     return label
   }()
 
-  private lazy var closeButton: UIButton = {
+  lazy var closeButton: UIButton = {
     let button = UIButton()
     button.addTarget(self, action: #selector(closeTab), for: .touchUpInside)
     button.setImage(UIImage(named: "close_tab_bar", in: .module, compatibleWith: nil)!.template, for: .normal)
@@ -44,7 +44,7 @@ class TabBarCell: UICollectionViewCell {
   var closeTabCallback: ((Tab) -> Void)?
   private var cancellables: Set<AnyCancellable> = []
 
-  private let deselectedOverlayView = UIView().then {
+  let deselectedOverlayView = UIView().then {
     $0.backgroundColor = UIColor {
       if $0.userInterfaceStyle == .dark {
         return UIColor.black.withAlphaComponent(0.25)
