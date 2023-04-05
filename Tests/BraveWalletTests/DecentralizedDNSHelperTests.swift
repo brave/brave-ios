@@ -14,7 +14,7 @@ import BraveCore
   /// Test `.init(rpcService:ipfsApi:isPrivateMode:)` will return nil when `isPrivateMode` is true.
   func testInitFailsInPrivateMode() {
     XCTAssertNil(DecentralizedDNSHelper(rpcService: MockJsonRpcService(), ipfsApi: nil, isPrivateMode: true))
-    XCTAssertNil(DecentralizedDNSHelper(rpcService: MockJsonRpcService(), ipfsApi: TestIpfsApi(), isPrivateMode: true))
+    XCTAssertNil(DecentralizedDNSHelper(rpcService: MockJsonRpcService(), ipfsApi: TestIpfsAPI(), isPrivateMode: true))
   }
   
   /// Test `lookup(domain:)` provided an `.eth` domain will return `.loadInterstitial(.ethereum)` when ENS Resolve Method is `.ask`.
@@ -29,7 +29,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -56,7 +56,7 @@ import BraveCore
       completion(contentHash, false, .success, "")
     }
     
-    let ipfsApi = TestIpfsApi()
+    let ipfsApi = TestIpfsAPI()
     ipfsApi._contentHashToCIDv1URL = { _ in
       resolvedURL
     }
@@ -90,7 +90,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -114,7 +114,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -143,7 +143,7 @@ import BraveCore
       completion(contentHash, false, .success, "")
     }
     
-    let ipfsApi = TestIpfsApi()
+    let ipfsApi = TestIpfsAPI()
     ipfsApi._contentHashToCIDv1URL = { _ in
       resolvedURL
     }
@@ -178,7 +178,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -201,7 +201,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -229,7 +229,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -256,7 +256,7 @@ import BraveCore
     
     guard let sut = DecentralizedDNSHelper(
       rpcService: rpcService,
-      ipfsApi: TestIpfsApi(),
+      ipfsApi: TestIpfsAPI(),
       isPrivateMode: false
     ) else {
       XCTFail("Unexpected test setup")
@@ -277,25 +277,5 @@ import BraveCore
     XCTAssertTrue(DecentralizedDNSHelper.isSupported(domain: snsDomain))
     let nonSupportedSNSDomain = "braveexamplesol"
     XCTAssertFalse(DecentralizedDNSHelper.isSupported(domain: nonSupportedSNSDomain))
-  }
-}
-
-class TestIpfsApi: IpfsAPI {
-  var ipfsGateway: URL?
-  var nftIpfsGateway: URL?
-  
-  var _resolveGatewayUrl: ((_ input: URL) -> URL?)?
-  func resolveGatewayUrl(for input: URL) -> URL? {
-    _resolveGatewayUrl?(input)
-  }
-  
-  var _resolveGatewayUrlForNft: ((_ input: URL) -> URL?)?
-  func resolveGatewayUrl(forNft input: URL) -> URL? {
-    _resolveGatewayUrlForNft?(input)
-  }
-  
-  var _contentHashToCIDv1URL: ((_ contentHash: [NSNumber]) -> URL?)?
-  func contentHashToCIDv1URL(for contentHash: [NSNumber]) -> URL? {
-    _contentHashToCIDv1URL?(contentHash)
   }
 }
