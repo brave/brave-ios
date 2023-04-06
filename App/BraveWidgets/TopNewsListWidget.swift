@@ -75,13 +75,13 @@ private struct TopNewsListView: View {
           .font(.system(size: 12))
           .imageScale(.large)
           .foregroundColor(Color(.braveOrange))
-        Text("Brave News")
+        Text(Strings.BraveNews.braveNews)
           .foregroundColor(Color(.braveLabel))
           .font(.system(size: 14, weight: .bold, design: .rounded))
       }
       Spacer()
       Link(destination: URL(string: "\(BraveUX.appURLScheme)://shortcut?path=\(WidgetShortcut.braveNews.rawValue)")!) {
-        Text("Read More")
+        Text(Strings.Widgets.newsClusteringReadMoreButtonTitle)
           .foregroundColor(Color(.braveBlurpleTint))
           .font(.system(size: 13, weight: .semibold, design: .rounded))
       }

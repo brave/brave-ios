@@ -4038,6 +4038,13 @@ extension Strings {
       value: "Try again later",
       comment: "Displayed on a news widget that has failed to load"
     )
+    public static let newsClusteringReadMoreButtonTitle = NSLocalizedString(
+      "widgets.newsClusteringReadMoreButtonTitle",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Read More",
+      comment: "Displayed on a news widget that links into the app to read more Brave News content"
+    )
   }
 }
 
