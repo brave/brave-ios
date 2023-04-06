@@ -69,9 +69,8 @@ struct FilterListsView: View {
           showingAddSheet = true
         } label: {
           Text(Strings.addCustomFilterList)
-            .foregroundColor(Color(.braveBlurple))
+            .foregroundColor(Color(.braveBlurpleTint))
         }
-          .buttonStyle(PlainButtonStyle())
           .disabled(editMode?.wrappedValue.isEditing == true)
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
           .popover(isPresented: $showingAddSheet, content: {
@@ -117,6 +116,10 @@ struct FilterListsView: View {
   private func onDeleteHandling(offsets: IndexSet) {
     let removedURLs = offsets.map { customFilterListStorage.filterListsURLs[$0] }
     customFilterListStorage.filterListsURLs.remove(atOffsets: offsets)
+    
+    if customFilterListStorage.filterListsURLs.isEmpty {
+      editMode?.wrappedValue = .inactive
+    }
     
     Task {
       await removedURLs.asyncConcurrentForEach { removedURL in

@@ -9,10 +9,15 @@ import DesignSystem
 import BraveUI
 
 struct FilterListAddURLView: View {
+  enum FocusField: Hashable {
+    case urlInput
+  }
+  
   @ObservedObject private var customFilterListStorage = CustomFilterListStorage.shared
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var newURLInput: String = ""
   @State private var errorMessage: String?
+  @FocusState private var focusField: FocusField?
   
   private var textField: some View {
     TextField(Strings.filterListsEnterFilterListURL, text: $newURLInput)
@@ -23,6 +28,10 @@ struct FilterListAddURLView: View {
       .textContentType(.URL)
       .autocapitalization(.none)
       .autocorrectionDisabled()
+      .focused($focusField, equals: .urlInput)
+      .onSubmit {
+        handleOnSubmit()
+      }
   }
   
   var body: some View {
@@ -32,23 +41,24 @@ struct FilterListAddURLView: View {
           VStack(alignment: .leading) {
             textField
               .submitLabel(SubmitLabel.done)
-            
+          }.listRowBackground(Color(.secondaryBraveGroupedBackground))
+        }, header: {
+          Text(Strings.customFilterListURL)
+        }, footer: {
+          VStack(alignment: .leading, spacing: 8) {
             if let errorMessage = errorMessage {
               Text(errorMessage)
                 .font(.caption)
                 .foregroundColor(.red)
             }
-          }
-        }, header: {
-          Text(Strings.customFilterListURL)
-        }, footer: {
-          VStack(alignment: .leading, spacing: 8) {
+            
             Text(Strings.addCustomFilterListDescription)
             Text(LocalizedStringKey(Strings.addCustomFilterListWarning))
           }.padding(.top, 8)
         })
       }
       .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+      .listStyle(.insetGrouped)
       .navigationTitle(Strings.customFilterList)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -65,6 +75,9 @@ struct FilterListAddURLView: View {
         }
       }
     }.frame(idealWidth: 400, idealHeight: 400)
+      .onAppear {
+        focusField = .urlInput
+      }
   }
   
   private func handleOnSubmit() {
