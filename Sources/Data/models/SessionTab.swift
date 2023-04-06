@@ -191,6 +191,32 @@ extension SessionTab {
       }
     }
   }
+  
+  public static func createIfNeeded(tabId: UUID, title: String, tabURL: URL) {
+    if !SessionTab.exists(tabId: tabId) {
+      DataController.performOnMainContext { context in
+        guard let window = SessionWindow.getActiveWindow(context: context) else { return }
+        _ = SessionTab(context: context,
+                       sessionWindow: window,
+                       sessionTabGroup: nil,
+                       index: Int32(window.sessionTabs.count),
+                       interactionState: Data(),
+                       isPrivate: false,
+                       isSelected: false,
+                       lastUpdated: .now,
+                       screenshotData: Data(),
+                       title: title,
+                       url: tabURL,
+                       tabId: tabId)
+        
+        do {
+          try context.save()
+        } catch {
+          Logger.module.error("performTask save error: \(error.localizedDescription, privacy: .public)")
+        }
+      }
+    }
+  }
 }
 
 // MARK: - Private

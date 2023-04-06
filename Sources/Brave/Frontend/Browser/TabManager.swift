@@ -473,31 +473,9 @@ class TabManager: NSObject {
 
     let isPrivate = tab.type == .private
     if !isPrivate {
-      let tabUrl = TabManager.ntpInteralURL
-      
-      if !SessionTab.exists(tabId: tab.id) {
-        DataController.performOnMainContext { context in
-          guard let window = SessionWindow.getActiveWindow(context: context) else { return }
-          _ = SessionTab(context: context,
-                         sessionWindow: window,
-                         sessionTabGroup: nil,
-                         index: Int32(window.sessionTabs.count),
-                         interactionState: Data(),
-                         isPrivate: false,
-                         isSelected: false,
-                         lastUpdated: .now,
-                         screenshotData: Data(),
-                         title: Strings.newTab,
-                         url: tabUrl,
-                         tabId: tab.id)
-          
-          do {
-            try context.save()
-          } catch {
-            Logger.module.error("performTask save error: \(error.localizedDescription, privacy: .public)")
-          }
-        }
-      }
+      SessionTab.createIfNeeded(tabId: tab.id,
+                                title: Strings.newTab,
+                                tabURL: TabManager.ntpInteralURL)
       
       if let (provider, js) = makeWalletEthProvider?(tab) {
         let providerJS = """
@@ -515,6 +493,7 @@ class TabManager: NSObject {
                                                    forMainFrameOnly: true,
                                                    in: EthereumProviderScriptHandler.scriptSandbox)
       }
+      
       if let (provider, jsScripts) = makeWalletSolProvider?(tab) {
         tab.walletSolProvider = provider
         tab.walletSolProvider?.`init`(tab)
@@ -571,15 +550,6 @@ class TabManager: NSObject {
             self.saveTab(tab)
           }
         }
-      }
-    }
-    
-    tab.onWebViewScrolled = { tab, _ in
-      tab.webViewScrollDebounceTimer?.invalidate()
-      tab.webViewScrollDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self, weak tab] _ in
-        guard let self = self, let tab = tab else { return }
-        tab.webViewScrollDebounceTimer?.invalidate()
-        self.saveTab(tab)
       }
     }
   }
@@ -931,7 +901,6 @@ class TabManager: NSObject {
                        zombie: true,
                        id: savedTab.tabId,
                        isPrivate: false)
-      // tab.sessionData = (savedTab.title, savedTab.interactionState)
       
       let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
       
