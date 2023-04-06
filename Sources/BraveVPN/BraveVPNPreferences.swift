@@ -28,6 +28,5 @@ extension Preferences {
       static let vpnHostDisplayName = Option<String?>(key: "vpn.host-location", default: nil)
       public static let skusCredential = Option<String?>(key: "skus.credential", default: nil)
       public static let skusCredentialDomain = Option<String?>(key: "skus.credential-domain", default: nil)
-      static let wireGuardProtocolMigrated = Option<Bool>(key: "vpn.migrate.protocol-wireguard", default: false)
     }
 }
