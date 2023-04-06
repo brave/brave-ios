@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "guardianwireguard",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/GuardianFirewall/GuardianWireGuard",
-      "state" : {
-        "revision" : "9246363c89fefd48d95e805d6465273c1a843c2c",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-ios",
