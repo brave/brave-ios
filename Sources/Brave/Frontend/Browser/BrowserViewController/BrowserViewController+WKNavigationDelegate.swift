@@ -544,8 +544,6 @@ extension BrowserViewController: WKNavigationDelegate {
       }
     }
     
-    // TODO: Basic Auth Check
-
     // URLAuthenticationChallenge isn't Sendable atm
     let protectionSpace = challenge.protectionSpace
     let credential = challenge.proposedCredential
