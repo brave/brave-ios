@@ -61,7 +61,7 @@ class WalletConnectionView: UIControl {
   }
   
   private func setup() {
-    let contentInset = 24.0
+    let contentInset = 32.0
     addSubview(scrollView)
     scrollView.snp.makeConstraints {
       $0.edges.equalToSuperview()
