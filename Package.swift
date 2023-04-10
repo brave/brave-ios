@@ -32,6 +32,7 @@ var package = Package(
     .library(name: "RuntimeWarnings", targets: ["RuntimeWarnings"]),
     .library(name: "CodableHelpers", targets: ["CodableHelpers"]),
     .library(name: "GRDWireGuardKit", targets: ["GRDWireGuardKit"]),
+    .library(name: "ContentBlocker", targets: ["ContentBlocker"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
     .plugin(name: "LoggerPlugin", targets: ["LoggerPlugin"])
   ],
@@ -68,6 +69,14 @@ var package = Package(
         "SwiftyJSON",
       ],
       plugins: ["LoggerPlugin"]
+    ),
+    .target(
+      name: "ContentBlocker",
+      dependencies: ["BraveCore"]
+    ),
+    .testTarget(
+      name: "ContentBlockerTests",
+      dependencies: ["ContentBlocker"]
     ),
     .target(
       name: "BraveShared",
