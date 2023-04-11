@@ -33,9 +33,22 @@ public class AppReviewManager: ObservableObject {
   
   /// A enumeration for which type of App Review Logic will be used
   /// Helper for quick changes between different types of logic
+  /// Active request review type can be changed using activeAppReviewLogicType
   public enum AppReviewLogicType: CaseIterable {
+    // Legacy Review Logic used as baseline
+    // Only checking Launch Count and Days in Between reviews
+    // Performing Rating Request in App Launch
     case legacy
+    // Revised Review Logic used to test
+    // various success scenarios for review request
+    // Checking various main criteria and sub criteria
+    // Performing Rating Request as a result of some actions
+    // This logic is reverted to legacy logic later
+    // Context: https://github.com/brave/brave-ios/pull/6210
     case revised
+    // Revised Review Logic which aligns with Android platform
+    // Checking various main criteria and sub criteria
+    // Performing Rating Request in App Launch
     case revisedCrossPlatform
     
     var mainCriteria: [AppReviewMainCriteriaType] {
