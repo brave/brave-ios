@@ -6,7 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
-import BraveShared
+import Preferences
 import Data
 import CoreData
 import BraveCore
@@ -482,7 +482,7 @@ class TabManager: NSObject {
       // Creating random tab id for private mode, as we don't want to save to database.
       tab.id = UUID().uuidString
     } else {
-      tab.id = id ?? TabMO.create()
+      tab.id = id ?? TabMO.create(title: Strings.newTab)
       
       if let (provider, js) = makeWalletEthProvider?(tab) {
         let providerJS = """
