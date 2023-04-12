@@ -469,7 +469,7 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
-		2F6931B5260CFB3700ECEB38 /* BrowserIntents */ = {
+		2F4A572629E73D1C003454F8 /* Entitlements */ = {
 			isa = PBXGroup;
 			children = (
 				2F69320E260D056100ECEB38 /* BrowserIntentsBeta.entitlements */,
@@ -478,6 +478,14 @@
 				2F69320B260D032700ECEB38 /* BrowserIntentsEnterprise.entitlements */,
 				2F69320A260D021D00ECEB38 /* BrowserIntentsDebug.entitlements */,
 				2F6931CD260CFB5300ECEB38 /* BrowserIntents.entitlements */,
+			);
+			path = Entitlements;
+			sourceTree = "<group>";
+		};
+		2F6931B5260CFB3700ECEB38 /* BrowserIntents */ = {
+			isa = PBXGroup;
+			children = (
+				2F4A572629E73D1C003454F8 /* Entitlements */,
 				2F6931B6260CFB3700ECEB38 /* IntentHandler.swift */,
 				2F6931B8260CFB3700ECEB38 /* Info.plist */,
 			);
@@ -1434,7 +1442,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntentsDebug.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntentsDebug.entitlements;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
@@ -1914,7 +1922,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntentsDebug.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntentsDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
@@ -1949,7 +1957,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntents.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntents.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
@@ -1982,7 +1990,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntentsEnterprise.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntentsEnterprise.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
@@ -2016,7 +2024,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "BrowserIntents/BrowserIntentsRelease (AppStore).entitlements";
+				CODE_SIGN_ENTITLEMENTS = "BrowserIntents/Entitlements/BrowserIntentsRelease (AppStore).entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
@@ -2050,7 +2058,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntentsRelease.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntentsRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
@@ -2084,7 +2092,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BrowserIntents/BrowserIntentsBeta.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BrowserIntents/Entitlements/BrowserIntentsBeta.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
