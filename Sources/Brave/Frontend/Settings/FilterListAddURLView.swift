@@ -41,18 +41,19 @@ struct FilterListAddURLView: View {
         }, header: {
           Text(Strings.customFilterListURL)
         }, footer: {
-          VStack(alignment: .leading, spacing: 8) {
-            if let errorMessage = errorMessage {
-              Text(errorMessage)
-                .font(.caption)
-                .foregroundColor(.red)
-            }
+          VStack(alignment: .leading, spacing: 0) {
+            SectionFooterErrorView(errorMessage: errorMessage)
             
-            Text(Strings.addCustomFilterListDescription)
-            Text(LocalizedStringKey(Strings.addCustomFilterListWarning))
-          }.padding(.top, 8)
+            VStack(alignment: .leading, spacing: 8) {
+              Text(Strings.addCustomFilterListDescription)
+                .fixedSize(horizontal: false, vertical: true)
+              Text(LocalizedStringKey(Strings.addCustomFilterListWarning))
+                .fixedSize(horizontal: false, vertical: true)
+            }.padding(.top)
+          }
         })
       }
+      .animation(.easeInOut, value: errorMessage)
       .listBackgroundColor(Color(UIColor.braveGroupedBackground))
       .listStyle(.insetGrouped)
       .navigationTitle(Strings.customFilterList)
