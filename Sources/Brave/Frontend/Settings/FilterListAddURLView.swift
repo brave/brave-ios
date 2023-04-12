@@ -9,15 +9,11 @@ import DesignSystem
 import BraveUI
 
 struct FilterListAddURLView: View {
-  enum FocusField: Hashable {
-    case urlInput
-  }
-  
   @ObservedObject private var customFilterListStorage = CustomFilterListStorage.shared
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var newURLInput: String = ""
   @State private var errorMessage: String?
-  @FocusState private var focusField: FocusField?
+  @FocusState private var isURLFieldFocused: Bool
   
   private var textField: some View {
     TextField(Strings.filterListsEnterFilterListURL, text: $newURLInput)
@@ -28,7 +24,7 @@ struct FilterListAddURLView: View {
       .textContentType(.URL)
       .autocapitalization(.none)
       .autocorrectionDisabled()
-      .focused($focusField, equals: .urlInput)
+      .focused($isURLFieldFocused, equals: true)
       .onSubmit {
         handleOnSubmit()
       }
@@ -76,7 +72,7 @@ struct FilterListAddURLView: View {
       }
     }.frame(idealWidth: 400, idealHeight: 400)
       .onAppear {
-        focusField = .urlInput
+        isURLFieldFocused = true
       }
   }
   
