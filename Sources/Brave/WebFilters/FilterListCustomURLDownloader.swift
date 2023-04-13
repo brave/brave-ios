@@ -20,7 +20,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
     
     var cacheFileName: String {
-      return externalURL.lastPathComponent
+      return [uuid, "json"].joined(separator: ".")
     }
     
     var headers: [String: String] {
