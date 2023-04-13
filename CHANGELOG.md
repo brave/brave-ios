@@ -38,7 +38,6 @@ General UI
 - Fixed an issue where scrolling/swiping stops on [www.theblock.co](http://www.theblock.co/) after loading links using ‘Open in New Tab’ option ([#6518](https://github.com/brave/brave-ios/issues/6518))
 - Fixed an issue in the shields panel where one of the toggles was shifted in German locale ([#6171](https://github.com/brave/brave-ios/issues/6171))
 
-
 ## [1.45.1](https://github.com/brave/brave-ios/releases/tag/v1.45.1)
 
  - Implemented Brave Shields to be loaded before the first tab loads. ([#6261](https://github.com/brave/brave-ios/issues/6261)) 
