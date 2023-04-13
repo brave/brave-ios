@@ -97,19 +97,34 @@ class TransactionsActivityStoreTests: XCTestCase {
     let transactionsExpectation = expectation(description: "transactionsExpectation")
     store.$transactionSummaries
       .dropFirst()
-      .sink { transactionSummaries in
+      .collect(2) // without asset prices, with asset prices
+      .sink { transactionSummariesUpdates in
         defer { transactionsExpectation.fulfill() }
+        guard let transactionSummariesWithoutPrices = transactionSummariesUpdates.first,
+              let transactionSummariesWithPrices = transactionSummariesUpdates[safe: 1] else {
+          XCTFail("Expected 2 updates to transactionSummaries")
+          return
+        }
         let expectedTransactions = self.transactions.values.flatMap { $0 }
         // verify all transactions from supported coin types are shown
-        XCTAssertEqual(transactionSummaries.count, expectedTransactions.count)
+        XCTAssertEqual(transactionSummariesWithoutPrices.count, expectedTransactions.count)
+        XCTAssertEqual(transactionSummariesWithPrices.count, expectedTransactions.count)
         // verify sorted by `createdTime`
         let expectedSortedOrder = expectedTransactions.sorted(by: { $0.createdTime > $1.createdTime })
-        XCTAssertEqual(transactionSummaries.map(\.txInfo.txHash), expectedSortedOrder.map(\.txHash))
-        // summaries are tested in `TransactionParserTests`, just verify they are populated with correct tx
-        XCTAssertEqual(transactionSummaries.count, 3)
-        XCTAssertEqual(transactionSummaries[safe: 0]?.txInfo, self.transactions[.sol]?[safe: 0] ?? .init())
-        XCTAssertEqual(transactionSummaries[safe: 1]?.txInfo, self.transactions[.eth]?[safe: 0] ?? .init())
-        XCTAssertEqual(transactionSummaries[safe: 2]?.txInfo, self.transactions[.eth]?[safe: 1] ?? .init())
+        XCTAssertEqual(transactionSummariesWithoutPrices.map(\.txInfo.txHash), expectedSortedOrder.map(\.txHash))
+        XCTAssertEqual(transactionSummariesWithPrices.map(\.txInfo.txHash), expectedSortedOrder.map(\.txHash))
+        // verify they are populated with correct tx (summaries are tested in `TransactionParserTests`)
+        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 0]?.txInfo, self.transactions[.sol]?[safe: 0] ?? .init())
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 0]?.txInfo, self.transactions[.sol]?[safe: 0] ?? .init())
+        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 1]?.txInfo, self.transactions[.eth]?[safe: 0] ?? .init())
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 0]?.txInfo, self.transactions[.sol]?[safe: 0] ?? .init())
+        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 2]?.txInfo, self.transactions[.eth]?[safe: 1] ?? .init())
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 2]?.txInfo, self.transactions[.eth]?[safe: 1] ?? .init())
+        
+        // verify gas fee fiat
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 0]?.gasFee?.fiat, "$0.000000002")
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 1]?.gasFee?.fiat, "$10.41008598")
+        XCTAssertEqual(transactionSummariesWithPrices[safe: 2]?.gasFee?.fiat, "$255.03792654")
       }
       .store(in: &cancellables)
     

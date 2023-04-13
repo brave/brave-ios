@@ -19,6 +19,9 @@ class TransactionsActivityStore: ObservableObject {
   
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
+  private var assetPricesCache: [String: Double] = [:]
+  private var lastUpdatedAssetPrices: Date?
+  
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
@@ -76,6 +79,17 @@ class TransactionsActivityStore: ObservableObject {
         in: Array(selectedNetworkForCoin.values)
       ).flatMap(\.tokens)
       guard !Task.isCancelled else { return }
+      // display transactions prior to network request to fetch
+      // estimated solana tx fees & asset prices
+      self.transactionSummaries = self.transactionSummaries(
+        transactions: allTransactions,
+        selectedNetworkForCoin: selectedNetworkForCoin,
+        accountInfos: allAccountInfos,
+        userVisibleTokens: userVisibleTokens,
+        allTokens: allTokens,
+        assetRatios: assetPricesCache,
+        solEstimatedTxFees: [:]
+      )
       
       var solEstimatedTxFees: [String: UInt64] = [:]
       if allTransactions.contains(where: { $0.coin == .sol }) {
@@ -83,20 +97,16 @@ class TransactionsActivityStore: ObservableObject {
         solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: solTransactionIds)
       }
       
-      // fetch price for every visible token
       let allVisibleTokenAssetRatioIds = userVisibleTokens.map(\.assetRatioId)
-      let prices = await assetRatioService.fetchPrices(
-        for: allVisibleTokenAssetRatioIds,
-        toAssets: [currencyFormatter.currencyCode],
-        timeframe: .oneDay
-      ).compactMapValues { Double($0) }
+      await updateAssetPricesCacheIfNeeded(assetRatioIds: allVisibleTokenAssetRatioIds)
+      guard !Task.isCancelled else { return }
       self.transactionSummaries = self.transactionSummaries(
         transactions: allTransactions,
         selectedNetworkForCoin: selectedNetworkForCoin,
         accountInfos: allAccountInfos,
         userVisibleTokens: userVisibleTokens,
         allTokens: allTokens,
-        assetRatios: prices,
+        assetRatios: assetPricesCache,
         solEstimatedTxFees: solEstimatedTxFees
       )
     }
@@ -126,6 +136,33 @@ class TransactionsActivityStore: ObservableObject {
         currencyFormatter: currencyFormatter
       )
     }.sorted(by: { $0.createdTime > $1.createdTime })
+  }
+  
+  // Helper so we only update the asset prices at most once every 2 minutes, unless new asset ratios are found
+  private func shouldUpdateAssetPrices(assetRatioIds: [String]) -> Bool {
+    guard let lastUpdatedAssetPrices,
+          assetRatioIds.isEmpty else {
+      return true // no prices are currently cached
+    }
+    // check if we have new assetRatioId(s) to fetch
+    if !assetRatioIds.allSatisfy({ self.assetPricesCache.keys.contains($0.lowercased()) }) {
+      return true
+    }
+    // otherwise only update if 2 minutes surpassed since last fetch
+    return lastUpdatedAssetPrices.timeIntervalSinceNow < -2.minutes
+  }
+  
+  @MainActor private func updateAssetPricesCacheIfNeeded(assetRatioIds: [String]) async {
+    guard shouldUpdateAssetPrices(assetRatioIds: assetRatioIds) else { return }
+    let prices = await assetRatioService.fetchPrices(
+      for: assetRatioIds,
+      toAssets: [currencyFormatter.currencyCode],
+      timeframe: .oneDay
+    ).compactMapValues { Double($0) }
+    for (key, value) in prices { // update cached values
+      self.assetPricesCache[key] = value
+    }
+    self.lastUpdatedAssetPrices = Date()
   }
   
   func transactionDetailsStore(
