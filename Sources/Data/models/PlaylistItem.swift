@@ -20,7 +20,7 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
   @NSManaged public var order: Int32
   @NSManaged public var pageSrc: String
   @NSManaged public var pageTitle: String?
-  @NSManaged public var uuid: String
+  @NSManaged public var uuid: String?
   @NSManaged public var playlistFolder: PlaylistFolder?
   
   @available(*, unavailable)
