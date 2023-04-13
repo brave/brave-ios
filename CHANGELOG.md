@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.49](https://github.com/brave/brave-ios/milestone/106)
+
+Web3
+
+- Added Solana Swap integration into existing swap UI using Jupiter as the DEX aggregator ([#6847](https://github.com/brave/brave-ios/issues/6847))
+- Added message for Submitted/Completed state change after a transaction is submitted. ([#6960](https://github.com/brave/brave-ios/issues/6960))
+- Added UI to display ‘signed’ status for Ethereum transactions ([#6606](https://github.com/brave/brave-ios/issues/6606))
+- Added support for sending to ENS wallet address ([#5787](https://github.com/brave/brave-ios/issues/5787) )
+- Added auto-complete when entering token address for custom Solana assets  ([#6990](https://github.com/brave/brave-ios/issues/6990))
+- Fixed wallet issue where the Original Password field was shown when adding Solana Account ([#7175](https://github.com/brave/brave-ios/issues/7175))
+- Fixed reporting Brave wallet usage stats ([#7143](https://github.com/brave/brave-ios/issues/7143))
+- Fixed issue adding a custom network via panel prompt ([#6965](https://github.com/brave/brave-ios/issues/6965))
+- Fixed issue with ERC721 NFTs with different token identifiers showing incorrect balance ([#6954](https://github.com/brave/brave-ios/issues/6954))
+- Added support for Solana Name Service (SNS) navigation in app ([#6706](https://github.com/brave/brave-ios/issues/6706))
+
+General UI
+
+- Dropped support for iOS 14 devices ([#6695](https://github.com/brave/brave-ios/issues/6695))
+- Added an enhancement where only HTTP/HTTPS URLs are loaded when using QR scanner in the URL box. ([#6997](https://github.com/brave/brave-ios/issues/6997))
+- Added capability to permanently delete sync accounts ([#6820](https://github.com/brave/brave-ios/issues/6829))
+- Added a promotional callout for VPN subscribers for linking their receipt on brave.com which will enable use of cross-platform VPN ([#6164](https://github.com/brave/brave-ios/issues/6164))
+- Added support for selecting full page view when taking screenshots in Brave ([#2806](https://github.com/brave/brave-ios/issues/2806))
+- Fixed crash related to loading URLs when selecting one of the on-ramp purchase options ([#6993](https://github.com/brave/brave-ios/issues/6993) )
+- Fixed website favicons flickering when searching history ([#7116](https://github.com/brave/brave-ios/issues/7116))
+- Fixed issue where some playlist folders were not shown when using CarPlay ([#7105](https://github.com/brave/brave-ios/issues/7105))
+- Fixed Brave News feed not showing when following only individual sources and no channels ([#7093](https://github.com/brave/brave-ios/issues/7093))
+- Fixed Brave News feed being updated every time NTP is viewed with RSS-only sources enabled ([#7059](https://github.com/brave/brave-ios/issues/7059))
+- Fixed suppressing ‘open in app’ dialog on google maps website ([#7024](https://github.com/brave/brave-ios/issues/7024))
+- Fixed an issue with cross platform VPN configuration not being refreshed after credentials expire ([#7014](https://github.com/brave/brave-ios/issues/7014))
+- Fixed issue where full URL is shown under the shields panel ([#7042](https://github.com/brave/brave-ios/issues/7042))
+- Fixed capability to reorder Playlist folders ([#6961](https://github.com/brave/brave-ios/issues/6961))
+- Fixed ‘Blocking Switch to App Notices’ switch from being in disabled state causing ‘open in app’ dialogs to not be suppressed on webpages ([#6953](https://github.com/brave/brave-ios/issues/6953))
+- Fixed favorites not showing in the widget. ([#6859](https://github.com/brave/brave-ios/issues/6859))
+- Fixed issue with animation not working in the opt-in card for Brave News on NTP ([#6786](https://github.com/brave/brave-ios/issues/6786))
+- Fixed opening ad notifications that use items-appss:// where new tab is opened but isn’t resolved ([#6782](https://github.com/brave/brave-ios/issues/6782))
+- Fixed an issue where scrolling/swiping stops on [www.theblock.co](http://www.theblock.co/) after loading links using ‘Open in New Tab’ option ([#6518](https://github.com/brave/brave-ios/issues/6518))
+- Fixed an issue in the shields panel where one of the toggles was shifted in German locale ([#6171](https://github.com/brave/brave-ios/issues/6171))
+
+
 ## [1.45.1](https://github.com/brave/brave-ios/releases/tag/v1.45.1)
 
  - Implemented Brave Shields to be loaded before the first tab loads. ([#6261](https://github.com/brave/brave-ios/issues/6261)) 
