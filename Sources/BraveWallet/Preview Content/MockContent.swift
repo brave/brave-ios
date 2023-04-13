@@ -265,6 +265,10 @@ extension BraveWallet.TransactionInfo {
           amount: UInt64(0),
           txType: .solanaSystemTransfer,
           instructions: [.init()],
+          version: .legacy,
+          messageHeader: .init(),
+          staticAccountKeys: [],
+          addressTableLookups: [],
           send: nil,
           signTransactionParam: nil
         )
@@ -298,6 +302,10 @@ extension BraveWallet.TransactionInfo {
           amount: UInt64(100000000),
           txType: .solanaSplTokenTransfer,
           instructions: [.init()],
+          version: .legacy,
+          messageHeader: .init(),
+          staticAccountKeys: [],
+          addressTableLookups: [],
           send: nil,
           signTransactionParam: nil
         )
