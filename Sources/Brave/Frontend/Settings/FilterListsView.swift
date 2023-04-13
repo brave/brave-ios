@@ -25,7 +25,7 @@ struct FilterListsView: View {
           VStack(alignment: .leading, spacing: 4) {
             Toggle(isOn: $filterListURL.setting.isEnabled) {
               VStack(alignment: .leading, spacing: 4) {
-                Text(filterListURL.title ?? filterListURL.setting.externalURL.origin.url?.absoluteString ?? filterListURL.setting.externalURL.absoluteString)
+                Text(filterListURL.title)
                   .foregroundColor(Color(.bravePrimary))
                   .truncationMode(.middle)
                   .lineLimit(1)
@@ -102,6 +102,7 @@ struct FilterListsView: View {
         }
       }
     }
+    .animation(.default, value: customFilterListStorage.filterListsURLs)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
     .navigationTitle(Strings.filterLists)

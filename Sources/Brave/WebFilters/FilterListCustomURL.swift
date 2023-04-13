@@ -5,9 +5,10 @@
 
 import Foundation
 import Data
+import BraveCore
 
-struct FilterListCustomURL: Identifiable {
-  enum DownloadStatus {
+struct FilterListCustomURL: Identifiable, Equatable {
+  enum DownloadStatus: Equatable {
     case pending
     case failure
     case downloaded(Date)
@@ -20,9 +21,13 @@ struct FilterListCustomURL: Identifiable {
   var setting: CustomFilterListSetting
   var downloadStatus: DownloadStatus = .pending
   
-  @MainActor var title: String? {
+  @MainActor var title: String {
     let lastPathComponent = setting.externalURL.lastPathComponent
-    guard !lastPathComponent.isEmpty else { return nil }
+    guard !lastPathComponent.isEmpty else {
+      return URLFormatter.formatURLOrigin(
+        forDisplayOmitSchemePathAndTrivialSubdomains: setting.externalURL.absoluteDisplayString
+      )
+    }
     return lastPathComponent
   }
   
