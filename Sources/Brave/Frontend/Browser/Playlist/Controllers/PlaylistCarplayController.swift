@@ -207,8 +207,14 @@ class PlaylistCarplayController: NSObject {
     }.store(in: &playerStateObservers)
 
     player.publisher(for: .finishedPlaying).sink { [weak self] event in
+      guard let self = self else { return }
+      
       event.mediaPlayer.pause()
       event.mediaPlayer.seek(to: .zero)
+      
+      if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
+        self.updateLastPlayedItem(item: item)
+      }
 
       var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo
       nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = 0.0
@@ -216,7 +222,7 @@ class PlaylistCarplayController: NSObject {
       nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
       MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
 
-      self?.onNextTrack(isUserInitiated: false)
+      self.onNextTrack(isUserInitiated: false)
     }.store(in: &playerStateObservers)
   }
 

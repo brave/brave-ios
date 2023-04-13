@@ -431,6 +431,10 @@ class PlaylistViewController: UIViewController {
 
         self.playerView.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
         event.mediaPlayer.seek(to: .zero)
+        
+        if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
+          self.updateLastPlayedItem(item: item)
+        }
 
         self.playerView.controlsView.playPauseButton.isEnabled = true
         self.playerView.controlsView.playPauseButton.setImage(UIImage(named: "playlist_play", in: .module, compatibleWith: nil)!, for: .normal)
