@@ -5,7 +5,7 @@
 Web3
 
 - Added Solana Swap integration into existing Swap UI using Jupiter as the DEX aggregator. ([#6847](https://github.com/brave/brave-ios/issues/6847))
-- Added transaction submitted and transaction completed state in wallet panel. ([#6881](https://github.com/brave/brave-ios/issues/6861)
+- Added transaction submitted and transaction completed state in wallet panel. ([#6881](https://github.com/brave/brave-ios/issues/6861))
 - Added UI to display "signed" status for Ethereum transactions. ([#6606](https://github.com/brave/brave-ios/issues/6606))
 - Added support for sending to ENS wallet address. ([#5787](https://github.com/brave/brave-ios/issues/5787))
 - Added auto-complete when entering token address for custom Solana assets. ([#6982](https://github.com/brave/brave-ios/issues/6982))
