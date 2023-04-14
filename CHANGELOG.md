@@ -27,7 +27,7 @@
 - Fixed issue where some playlist folders were not shown when using CarPlay. ([#7105](https://github.com/brave/brave-ios/issues/7105))
 - Fixed Brave News feed not showing when following only individual sources and no channels. ([#7093](https://github.com/brave/brave-ios/issues/7093))
 - Fixed Brave News feed being updated every time NTP is viewed with RSS-only sources enabled. ([#7059](https://github.com/brave/brave-ios/issues/7059))
-- Fixed suppressing "open in app" dialog on google maps website. ([#7024](https://github.com/brave/brave-ios/issues/7024))
+- Fixed suppressing "open in app" dialog on Google Maps website. ([#7024](https://github.com/brave/brave-ios/issues/7024))
 - Fixed an issue with cross-platform VPN configuration not being refreshed after credentials expire. ([#7014](https://github.com/brave/brave-ios/issues/7014))
 - Fixed issue where full URL is shown under the shields panel. ([#6964](https://github.com/brave/brave-ios/issues/6964))
 - Fixed Playlist folder reordering feature. ([#6961](https://github.com/brave/brave-ios/issues/6961))
