@@ -418,3 +418,20 @@ private extension BraveWallet.BlockchainToken {
     coin: .eth
   )
 }
+
+extension XCTestCase {
+  @MainActor func fulfillment(of expectations: [XCTestExpectation], timeout: TimeInterval) async {
+    #if compiler(>=5.8)
+    await fulfillment(of: expectations, timeout: timeout, enforceOrder: false)
+    #else
+    await withCheckedContinuation { continuation in
+      waitForExpectations(timeout: timeout) { error in
+        // `fulfillment(of:timeout:enforceOrder:) timeout will fail on the function
+        // Verify we did not timeout here
+        XCTAssertNil(error)
+        continuation.resume()
+      }
+    }
+    #endif
+  }
+}
