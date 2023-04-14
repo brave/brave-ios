@@ -1,8 +1,8 @@
 # Changelog
 
-## [1.49](https://github.com/brave/brave-ios/milestone/106)
+## [1.49](https://github.com/brave/brave-ios/releases/tag/v1.49)
 
-Web3
+### Web3
 
 - Added Solana Swap integration into existing Swap UI using Jupiter as the DEX aggregator. ([#6847](https://github.com/brave/brave-ios/issues/6847))
 - Added transaction submitted and transaction completed state in wallet panel. ([#6881](https://github.com/brave/brave-ios/issues/6861))
@@ -10,17 +10,17 @@ Web3
 - Added support for sending to ENS wallet address. ([#5787](https://github.com/brave/brave-ios/issues/5787))
 - Added auto-complete when entering token address for custom Solana assets. ([#6982](https://github.com/brave/brave-ios/issues/6982))
 - Added support for Solana Name Service (SNS) navigation in app. ([#6706](https://github.com/brave/brave-ios/issues/6706))
-- Fixed wallet issue where the Origin Password field was shown when adding Solana Account. ([#7175](https://github.com/brave/brave-ios/issues/7175))
-- Fixed reporting Brave wallet usage stats. ([#7143](https://github.com/brave/brave-ios/issues/7143))
+- Fixed wallet issue where the Origin Password field was shown when adding Solana account. ([#7175](https://github.com/brave/brave-ios/issues/7175))
+- Fixed reporting Brave Wallet usage stats. ([#7143](https://github.com/brave/brave-ios/issues/7143))
 - Fixed issue adding a custom network via panel. ([#6965](https://github.com/brave/brave-ios/issues/6965))
 - Fixed issue with ERC721 NFTs with different token identifiers showing incorrect balance. ([#6954](https://github.com/brave/brave-ios/issues/6954))
 - Fixed crash related to loading URLs when selecting one of the on-ramp purchase options. ([#6993](https://github.com/brave/brave-ios/issues/6993))
 
-General UI
+### General
 
 - Added support for only loading HTTP/HTTPS URLs when scanning a QR code from the URL bar. ([#6997](https://github.com/brave/brave-ios/issues/6997))
 - Added capability to permanently delete sync accounts. ([#6820](https://github.com/brave/brave-ios/issues/6829))
-- Added promotional callout for VPN cross-platform linking on account.brave.com. ([#6164](https://github.com/brave/brave-ios/issues/6164))
+- Added promotional callout for VPN cross-platform linking on https://account.brave.com. ([#6164](https://github.com/brave/brave-ios/issues/6164))
 - Added support for selecting full page view when taking screenshots in Brave. ([#2806](https://github.com/brave/brave-ios/issues/2806))
 - Dropped support for iOS 14 devices. ([#6695](https://github.com/brave/brave-ios/issues/6695))
 - Fixed website favicons flickering when searching history. ([#7116](https://github.com/brave/brave-ios/issues/7116))
@@ -34,8 +34,8 @@ General UI
 - Fixed "Blocking Switch to App Notices" switch from being in disabled state causing "open in app" dialogs to not be suppressed on webpages. ([#6953](https://github.com/brave/brave-ios/issues/6953))
 - Fixed favorites not showing in the widget. ([#6859](https://github.com/brave/brave-ios/issues/6859))
 - Fixed opening ad notifications that use items-appss:// where new tab is opened but isn’t resolved. ([#6782](https://github.com/brave/brave-ios/issues/6782))
-- Fixed an issue where scrolling/swiping stops on "www.theblock.co" after loading links using "Open in New Tab" option. ([#6518](https://github.com/brave/brave-ios/issues/6518))
-- Fixed Shields panel toggle alignment for localized German string. ([#6171](https://github.com/brave/brave-ios/issues/6171))
+- Fixed an issue where scrolling/swiping stops on https://www.theblock.co after loading links using "Open in New Tab" option. ([#6518](https://github.com/brave/brave-ios/issues/6518))
+- Fixed shields panel toggle alignment for localized German string. ([#6171](https://github.com/brave/brave-ios/issues/6171))
 
 ## [1.45.1](https://github.com/brave/brave-ios/releases/tag/v1.45.1)
 
