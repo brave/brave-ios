@@ -70,13 +70,19 @@ struct UnlockWalletView: View {
     }
     return nil
   }
+  
+  @State private var viewSize: CGSize = .zero
+  
+  private var isSmallScreen: Bool {
+    viewSize.height <= 667
+  }
 
   var body: some View {
     ScrollView(.vertical) {
-      VStack(spacing: 42) {
+      VStack(spacing: isSmallScreen ? 38 : 42) {
         Image("graphic-lock", bundle: .module)
           .accessibilityHidden(true)
-          .padding(.top, 20)
+          .padding(.top, isSmallScreen ? 0 : 20)
         Text(Strings.Wallet.unlockWalletTitle)
           .font(.headline)
           .multilineTextAlignment(.center)
@@ -88,7 +94,7 @@ struct UnlockWalletView: View {
           .textFieldStyle(BraveValidatedTextFieldStyle(error: unlockError))
           .onSubmit(unlock)
           .padding(.horizontal, 48)
-        VStack(spacing: 30) {
+        VStack(spacing: isSmallScreen ? 20 : 30) {
           Button(action: unlock) {
             Text(Strings.Wallet.unlockWalletButtonTitle)
           }
@@ -100,7 +106,7 @@ struct UnlockWalletView: View {
           }
           .foregroundColor(Color(.braveLabel))
         }
-        .padding(.top, 10)
+        .padding(.top, isSmallScreen ? 5 : 10)
         
         if keyringStore.isKeychainPasswordStored, let icon = biometricsIcon {
           Button(action: fillPasswordFromKeychain) {
@@ -111,13 +117,16 @@ struct UnlockWalletView: View {
               .font(.headline)
               .frame(width: 26, height: 26)
           }
-          .padding(.top, 18)
+          .padding(.top, isSmallScreen ? 12 : 18)
         }
       }
       .frame(maxHeight: .infinity, alignment: .top)
       .padding()
       .padding(.vertical)
     }
+    .readSize(onChange: { size in
+      self.viewSize = size
+    })
     .navigationTitle(Strings.Wallet.cryptoTitle)
     .navigationBarTitleDisplayMode(.inline)
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
@@ -147,3 +156,22 @@ struct CryptoUnlockView_Previews: PreviewProvider {
   }
 }
 #endif
+
+private struct SizePreferenceKey: PreferenceKey {
+  static var defaultValue: CGSize = .zero
+  static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
+}
+
+private extension View {
+  /// Determines the size of the view and calls the `onChange` when the size changes with the new size.
+  /// https://www.fivestars.blog/articles/swiftui-share-layout-information/
+  func readSize(onChange: @escaping (CGSize) -> Void) -> some View {
+    background(
+      GeometryReader { geometryProxy in
+        Color.clear
+          .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+      }
+    )
+    .onPreferenceChange(SizePreferenceKey.self, perform: onChange)
+  }
+}
