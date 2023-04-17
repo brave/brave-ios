@@ -1012,14 +1012,12 @@ extension PlaylistCarplayController {
   }
 
   func updateLastPlayedItem(item: PlaylistInfo) {
-    Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
-
-    if let playTime = player.currentItem?.currentTime(),
-      Preferences.Playlist.playbackLeftOff.value {
-      Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
-    } else {
-      Preferences.Playlist.lastPlayedItemTime.value = 0.0
+    guard let playTime = player.currentItem?.currentTime() else {
+      return
     }
+    
+    let lastPlayedTime = Preferences.Playlist.playbackLeftOff.value ? playTime.seconds : 0.0
+    PlaylistItem.updateLastPlayed(itemId: item.tagId, pageSrc: item.pageSrc, lastPlayedOffset: lastPlayedTime)
   }
 
   func displayExpiredResourceError(item: PlaylistInfo?) {
