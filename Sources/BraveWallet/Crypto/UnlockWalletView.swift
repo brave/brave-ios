@@ -12,6 +12,7 @@ struct UnlockWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
 
   @State private var password: String = ""
+  @State private var isPasswordRevealed: Bool = false
   @State private var unlockError: UnlockError?
   @State private var attemptedBiometricsUnlock: Bool = false
 
@@ -45,6 +46,8 @@ struct UnlockWalletView: View {
 
   private func fillPasswordFromKeychain() {
     if let password = keyringStore.retrievePasswordFromKeychain() {
+      // hide password (if revealed) before populating field with stored password
+      isPasswordRevealed = false
       self.password = password
       unlock()
     }
@@ -80,13 +83,14 @@ struct UnlockWalletView: View {
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
           HStack {
-            SecureField(Strings.Wallet.passwordPlaceholder, text: $password, onCommit: unlock)
+            RevealableSecureField(Strings.Wallet.passwordPlaceholder, text: $password, isRevealed: $isPasswordRevealed)
               .textContentType(.password)
               .font(.subheadline)
               .introspectTextField(customize: { tf in
                 tf.becomeFirstResponder()
               })
               .textFieldStyle(BraveValidatedTextFieldStyle(error: unlockError))
+              .onSubmit(unlock)
             if keyringStore.isKeychainPasswordStored, let icon = biometricsIcon {
               Button(action: fillPasswordFromKeychain) {
                 icon

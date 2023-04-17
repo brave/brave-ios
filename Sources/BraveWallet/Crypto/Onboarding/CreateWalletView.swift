@@ -47,6 +47,7 @@ private struct CreateWalletView: View {
 
   @State private var password: String = ""
   @State private var repeatedPassword: String = ""
+  @State private var isPasswordRevealed: Bool = false
   @State private var validationError: ValidationError?
   @State private var isShowingBiometricsPrompt: Bool = false
   @State private var isSkippingBiometricsPrompt: Bool = false
@@ -111,12 +112,22 @@ private struct CreateWalletView: View {
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
           VStack {
-            SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
-              .textContentType(.newPassword)
-              .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .requirementsNotMet))
-            SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
-              .textContentType(.newPassword)
-              .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .inputsDontMatch))
+            RevealableSecureField(
+              Strings.Wallet.passwordPlaceholder,
+              text: $password,
+              isRevealed: $isPasswordRevealed
+            )
+            .textContentType(.newPassword)
+            .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .requirementsNotMet))
+            RevealableSecureField(
+              Strings.Wallet.repeatedPasswordPlaceholder,
+              showsRevealButton: false,
+              text: $repeatedPassword,
+              isRevealed: $isPasswordRevealed
+            )
+            .textContentType(.newPassword)
+            .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .inputsDontMatch))
+            .onSubmit(createWallet)
           }
           .font(.subheadline)
           .padding(.horizontal, 48)
