@@ -35,7 +35,7 @@ extension URL {
       case .errorPage:
         return internalURL.originalURLFromErrorPage
       case .web3Page, .sessionRestorePage, .readerModePage, .aboutHomePage:
-        return internalURL.extractedUrlParam?.displayURL
+        return internalURL.extractedUrlParam
       default:
         return nil
       }
