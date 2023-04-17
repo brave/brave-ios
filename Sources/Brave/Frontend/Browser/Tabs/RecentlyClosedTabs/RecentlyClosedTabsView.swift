@@ -59,7 +59,7 @@ struct RecentlyClosedTabsView: View {
             HStack {
               FaviconImage(url: recentlyClosed.url)  
               VStack(alignment: .leading) {
-                Text(recentlyClosed.title ?? "")
+                Text(recentlyClosed.title)
                   .font(.footnote.weight(.semibold))
                   .foregroundColor(Color(.bravePrimary))
                   .lineLimit(1)
@@ -74,7 +74,7 @@ struct RecentlyClosedTabsView: View {
           .frame(maxWidth: .infinity)
           .padding(.vertical, 6)
           .accessibilityElement()
-          .accessibilityLabel(recentlyClosed.title ?? "")
+          .accessibilityLabel(recentlyClosed.title)
         }
         .onDelete { indexSet in
           // Delete an individual info from recently closed
