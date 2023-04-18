@@ -28,7 +28,7 @@ extension BrowserViewController {
     presentLinkReceiptCallout(skipSafeGuards: false)
   }
 
-  private func presentPassCodeMigration() {
+  func presentPassCodeMigration() {
     if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
       let controller = PasscodeMigrationViewController()
       controller.rootView.dismiss = { [unowned controller] enableBrowserLock in
@@ -264,6 +264,38 @@ extension BrowserViewController {
       present(controller, animated: true)
       isOnboardingOrFullScreenCalloutPresented = true
     }
+  }
+  
+  private func presentCookieNotificationBlockingCalloutIfNeeded() {
+    // Check the blockCookieConsentNotices callout can be shown
+    guard shouldShowCallout(calloutType: .blockCookieConsentNotices) else {
+      return
+    }
+    
+    // Don't show this if we already enabled the setting
+    guard !FilterListResourceDownloader.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID) else { return }
+    // Don't show this if we are presenting another popup already
+    guard !isOnboardingOrFullScreenCalloutPresented else { return }
+    // We only show the popup on second launch
+    guard !Preferences.General.isFirstLaunch.value else { return }
+    // Ensure we successfully shown basic onboarding first
+    guard Preferences.FullScreenCallout.omniboxCalloutCompleted.value else { return }
+
+    let popover = PopoverController(
+      contentController: CookieNotificationBlockingConsentViewController().then {
+        $0.rootView.onYesButtonPressed = {
+          Task { @MainActor in
+            FilterListResourceDownloader.shared.enableFilterList(
+              for: FilterList.cookieConsentNoticesComponentID, isEnabled: true
+            )
+            
+            try await Task.sleep(seconds: 3.5)
+          }
+        }
+      },
+      contentSizeBehavior: .preferredContentSize)
+    popover.addsConvenientDismissalMargins = false
+    popover.present(from: topToolbar.locationView.shieldsButton, on: self)
   }
   
   func presentTabReceivedCallout(url: URL) {
