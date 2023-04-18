@@ -19,8 +19,8 @@ class TransactionsActivityStore: ObservableObject {
   
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
+  private var solEstimatedTxFeesCache: [String: UInt64] = [:]
   private var assetPricesCache: [String: Double] = [:]
-  private var lastUpdatedAssetPrices: Date?
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -88,17 +88,18 @@ class TransactionsActivityStore: ObservableObject {
         userVisibleTokens: userVisibleTokens,
         allTokens: allTokens,
         assetRatios: assetPricesCache,
-        solEstimatedTxFees: [:]
+        solEstimatedTxFees: solEstimatedTxFeesCache
       )
+      guard !self.transactionSummaries.isEmpty else { return }
       
-      var solEstimatedTxFees: [String: UInt64] = [:]
       if allTransactions.contains(where: { $0.coin == .sol }) {
         let solTransactionIds = allTransactions.filter { $0.coin == .sol }.map(\.id)
-        solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: solTransactionIds)
+        await updateSolEstimatedTxFeesCache(solTransactionIds: solTransactionIds)
       }
       
       let allVisibleTokenAssetRatioIds = userVisibleTokens.map(\.assetRatioId)
-      await updateAssetPricesCacheIfNeeded(assetRatioIds: allVisibleTokenAssetRatioIds)
+      await updateAssetPricesCache(assetRatioIds: allVisibleTokenAssetRatioIds)
+      
       guard !Task.isCancelled else { return }
       self.transactionSummaries = self.transactionSummaries(
         transactions: allTransactions,
@@ -107,7 +108,7 @@ class TransactionsActivityStore: ObservableObject {
         userVisibleTokens: userVisibleTokens,
         allTokens: allTokens,
         assetRatios: assetPricesCache,
-        solEstimatedTxFees: solEstimatedTxFees
+        solEstimatedTxFees: solEstimatedTxFeesCache
       )
     }
   }
@@ -138,22 +139,14 @@ class TransactionsActivityStore: ObservableObject {
     }.sorted(by: { $0.createdTime > $1.createdTime })
   }
   
-  // Helper so we only update the asset prices at most once every 2 minutes, unless new asset ratios are found
-  private func shouldUpdateAssetPrices(assetRatioIds: [String]) -> Bool {
-    guard let lastUpdatedAssetPrices,
-          assetRatioIds.isEmpty else {
-      return true // no prices are currently cached
+  @MainActor private func updateSolEstimatedTxFeesCache(solTransactionIds: [String]) async {
+    let fees = await solTxManagerProxy.estimatedTxFees(for: solTransactionIds)
+    for (key, value) in fees { // update cached values
+      self.solEstimatedTxFeesCache[key] = value
     }
-    // check if we have new assetRatioId(s) to fetch
-    if !assetRatioIds.allSatisfy({ self.assetPricesCache.keys.contains($0.lowercased()) }) {
-      return true
-    }
-    // otherwise only update if 2 minutes surpassed since last fetch
-    return lastUpdatedAssetPrices.timeIntervalSinceNow < -2.minutes
   }
   
-  @MainActor private func updateAssetPricesCacheIfNeeded(assetRatioIds: [String]) async {
-    guard shouldUpdateAssetPrices(assetRatioIds: assetRatioIds) else { return }
+  @MainActor private func updateAssetPricesCache(assetRatioIds: [String]) async {
     let prices = await assetRatioService.fetchPrices(
       for: assetRatioIds,
       toAssets: [currencyFormatter.currencyCode],
@@ -162,7 +155,6 @@ class TransactionsActivityStore: ObservableObject {
     for (key, value) in prices { // update cached values
       self.assetPricesCache[key] = value
     }
-    self.lastUpdatedAssetPrices = Date()
   }
   
   func transactionDetailsStore(
