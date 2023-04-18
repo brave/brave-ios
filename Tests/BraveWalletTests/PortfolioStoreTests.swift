@@ -29,8 +29,8 @@ class PortfolioStoreTests: XCTestCase {
     let mockSolAccountInfos: [BraveWallet.AccountInfo] = [.mockSolAccount]
     let solNetwork: BraveWallet.NetworkInfo = .mockSolana
     let mockSolUserAssets: [BraveWallet.BlockchainToken] = [
-      BraveWallet.NetworkInfo.mockSolana.nativeToken.then { $0.visible = true },
-      .mockSpdToken.then { $0.visible = false }, // Verify non-visible assets not displayed #6386
+      BraveWallet.NetworkInfo.mockSolana.nativeToken.copy(asVisibleAsset: true),
+      .mockSpdToken, // Verify non-visible assets not displayed #6386
       .mockSolanaNFTToken
     ]
     let mockNFTBalance: Double = 1
@@ -45,9 +45,9 @@ class PortfolioStoreTests: XCTestCase {
     let mockEthAccountInfos: [BraveWallet.AccountInfo] = [.mockEthAccount]
     let ethNetwork: BraveWallet.NetworkInfo = .mockMainnet
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
-      .previewToken.then { $0.visible = true },
-      .previewDaiToken.then { $0.visible = false }, // Verify non-visible assets not displayed #6386
-      .mockUSDCToken.then { $0.visible = true },
+      .previewToken.copy(asVisibleAsset: true),
+      .previewDaiToken, // Verify non-visible assets not displayed #6386
+      .mockUSDCToken.copy(asVisibleAsset: true),
       .mockERC721NFTToken
     ]
     let ethBalanceWei = formatter.weiString(
@@ -262,6 +262,15 @@ class PortfolioStoreTests: XCTestCase {
     store.update()
     waitForExpectations(timeout: 1) { error in
       XCTAssertNil(error)
+    }
+  }
+}
+
+extension BraveWallet.BlockchainToken {
+  /// Returns a copy of the `BlockchainToken` with the given `visible` flag.
+  func copy(asVisibleAsset isVisible: Bool) -> Self {
+    (self.copy() as! Self).then {
+      $0.visible = isVisible
     }
   }
 }
