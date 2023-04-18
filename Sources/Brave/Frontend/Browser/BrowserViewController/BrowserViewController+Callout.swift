@@ -19,7 +19,7 @@ extension BrowserViewController {
 
   func presentPassCodeMigration() {
     if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
-      let controller = UIHostingController(rootView: PasscodeMigrationContainerView())
+      let controller = PasscodeMigrationViewController()
       controller.rootView.dismiss = { [unowned controller] enableBrowserLock in
         KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(nil)
         Preferences.Privacy.lockWithPasscode.value = enableBrowserLock
