@@ -18,6 +18,22 @@ public struct AssetViewModel: Identifiable, Equatable {
   public var id: String {
     token.id + network.chainId
   }
+  
+  /// Sort by the fiat/value of the asset (price x balance), otherwise by balance when price is unavailable.
+  static func sortedByValue(lhs: AssetViewModel, rhs: AssetViewModel) -> Bool {
+    if let lhsPrice = Double(lhs.price),
+       let rhsPrice = Double(rhs.price) {
+      return (lhsPrice * lhs.decimalBalance) > (rhsPrice * rhs.decimalBalance)
+    } else if let lhsPrice = Double(lhs.price), (lhsPrice * lhs.decimalBalance) > 0 {
+      // lhs has a non-zero value
+      return true
+    } else if let rhsPrice = Double(rhs.price), (rhsPrice * rhs.decimalBalance) > 0 {
+      // rhs has a non-zero value
+      return false
+    }
+    // price unavailable, sort by balance
+    return lhs.decimalBalance > rhs.decimalBalance
+  }
 }
 
 struct BalanceTimePrice: DataPoint, Equatable {
@@ -175,7 +191,7 @@ public class PortfolioStore: ObservableObject {
       }
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
-      
+        .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
       let keyrings = await self.keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       guard !Task.isCancelled else { return }
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
@@ -248,6 +264,7 @@ public class PortfolioStore: ObservableObject {
         }
       }
       self.userVisibleAssets = updatedUserVisibleAssets
+        .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
       
       // Compute balance based on current prices
       let currentBalance = userVisibleAssets
