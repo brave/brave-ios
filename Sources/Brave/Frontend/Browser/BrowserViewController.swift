@@ -1182,16 +1182,8 @@ public class BrowserViewController: UIViewController {
     presentOnboardingIntro()
 
     // Full Screen Callout Presentation
-    // Priority: P3A - VPN - Default Browser - Rewards
-    // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      self.presentP3AScreenCallout()
-      self.presentBottomBarCallout()
-      self.presentVPNAlertCallout()
-      self.presentDefaultBrowserScreenCallout()
-      self.presentBraveRewardsScreenCallout()
-      self.presentCookieNotificationBlockingCalloutIfNeeded()
-      self.presentLinkReceiptCallout(skipSafeGuards: false)
+      self.presentFullScreenCallouts()
     }
 
     screenshotHelper.viewIsVisible = true

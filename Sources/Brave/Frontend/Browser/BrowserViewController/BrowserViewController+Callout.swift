@@ -16,8 +16,19 @@ import SafariServices
 // MARK: - Callouts
 
 extension BrowserViewController {
+  
+  // Priority: P3A - Bottom Bar - VPN - Default Browser - Rewards - Cookie Notification - Link Receipt
+  func presentFullScreenCallouts() {
+    presentP3AScreenCallout()
+    presentBottomBarCallout()
+    presentVPNAlertCallout()
+    presentDefaultBrowserScreenCallout()
+    presentBraveRewardsScreenCallout()
+    presentCookieNotificationBlockingCalloutIfNeeded()
+    presentLinkReceiptCallout(skipSafeGuards: false)
+  }
 
-  func presentPassCodeMigration() {
+  private func presentPassCodeMigration() {
     if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
       let controller = PasscodeMigrationViewController()
       controller.rootView.dismiss = { [unowned controller] enableBrowserLock in
@@ -31,7 +42,7 @@ extension BrowserViewController {
     }
   }
   
-  func presentBottomBarCallout() {
+  private func presentBottomBarCallout() {
     guard traitCollection.userInterfaceIdiom == .phone else { return }
     
     // Check the blockCookieConsentNotices callout can be shown
@@ -96,7 +107,7 @@ extension BrowserViewController {
     }
   }
   
-  func presentLinkReceiptCallout(skipSafeGuards: Bool) {
+  private func presentLinkReceiptCallout(skipSafeGuards: Bool) {
     if !skipSafeGuards {
       // Show this onboarding only if the VPN has been purchased
       guard case .purchased = BraveVPN.vpnState else { return }
@@ -163,7 +174,7 @@ extension BrowserViewController {
     }
   }
 
-  func presentVPNAlertCallout() {
+  private func presentVPNAlertCallout() {
     // Check the blockCookieConsentNotices callout can be shown
     guard shouldShowCallout(calloutType: .vpn) else {
       return
@@ -197,7 +208,7 @@ extension BrowserViewController {
     present(popup, animated: false)
   }
 
-  func presentDefaultBrowserScreenCallout() {
+  private func presentDefaultBrowserScreenCallout() {
     // Check the blockCookieConsentNotices callout can be shown
     guard shouldShowCallout(calloutType: .defaultBrowser) else {
       return
@@ -235,7 +246,7 @@ extension BrowserViewController {
     }
   }
 
-  func presentBraveRewardsScreenCallout() {
+  private func presentBraveRewardsScreenCallout() {
     // Check the blockCookieConsentNotices callout can be shown
     guard shouldShowCallout(calloutType: .rewards) else {
       return
