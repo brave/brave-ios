@@ -47,13 +47,26 @@ public class FilterListResourceDownloader {
     self.adBlockService = nil
   }
   
-  public func loadCachedData() async {
+  /// This loads the filter list settings from core data.
+  /// It uses these settings and other stored properties to load the enabled general shields and filter lists.
+  ///
+  /// - Warning: This method loads filter list settings.
+  /// You need to wait for `DataController.shared.initializeOnce()` to be called first before invoking this method
+  public func loadFilterListSettingsAndCachedData() async {
     async let cachedFilterLists: Void = self.addEngineResourcesFromCachedFilterLists()
-    async let cachedDefaultFilterList: Void = self.loadCachedDefaultFilterList()
-    _ = await (cachedFilterLists, cachedDefaultFilterList)
+    async let cachedGeneralFilterList: Void = self.addEngineResourcesFromCachedGeneralFilterList()
+    _ = await (cachedFilterLists, cachedGeneralFilterList)
   }
   
-  /// This function adds engine resources to `AdBlockManager` for the cached filter lists
+  /// This function adds engine resources to `AdBlockManager` from cached data representing the enabled filter lists.
+  ///
+  /// The filter lists are additional blocking content that can be added to the`AdBlockEngine` and as iOS content blockers.
+  /// It represents the items found in the "Filter lists" section of the "Shields" menu.
+  ///
+  /// - Note: The content blockers for these filter lists are not loaded at this point. They are cached by iOS and there is no need to reload them.
+  ///
+  /// - Warning: This method loads filter list settings.
+  /// You need to wait for `DataController.shared.initializeOnce()` to be called first before invoking this method
   private func addEngineResourcesFromCachedFilterLists() async {
     await FilterListStorage.shared.loadFilterListSettings()
     let filterListSettings = await FilterListStorage.shared.allFilterListSettings
@@ -71,31 +84,33 @@ public class FilterListResourceDownloader {
     }
   }
   
-  private func loadCachedDefaultFilterList() async {
-    guard let folderURL = FilterListSetting.makeFolderURL(
+  /// This function adds engine resources to `AdBlockManager` from the "general" filter list.
+  ///
+  /// The "general" filter list is a built in filter list that is added to the`AdBlockEngine` and as content blockers.
+  /// It represents the "Block cross site trackers" toggle in the "Shields" menu.
+  ///
+  /// - Note: The content blockers for this "general" filter list are handled using the `AdBlockResourceDownloader` and are not loaded here at this point.
+  private func addEngineResourcesFromCachedGeneralFilterList() async {
+    guard let folderURL = await FilterListSetting.makeFolderURL(
       forFilterListFolderPath: Preferences.AppState.lastDefaultFilterListFolderPath.value
     ), FileManager.default.fileExists(atPath: folderURL.path) else {
       return
     }
     
-    await loadShields(fromDefaultFilterListFolderURL: folderURL)
+    await addEngineResources(fromGeneralFilterListFolderURL: folderURL)
   }
   
-  /// Start the resource subscriber.
-  ///
-  /// - Warning: You need to wait for `DataController.shared.initializeOnce()` to be called before invoking this method
+  /// Start the adblock service to get updates to the `shieldsInstallPath`
   @MainActor public func start(with adBlockService: AdblockService) {
     self.adBlockService = adBlockService
     
-    if let folderPath = adBlockService.shieldsInstallPath {
-      didUpdateShieldComponent(folderPath: folderPath, adBlockFilterLists: adBlockService.regionalFilterLists ?? [])
-    }
-    
-    adBlockService.shieldsComponentReady = { folderPath in
-      guard let folderPath = folderPath else { return }
-      
-      Task { @MainActor in
-        self.didUpdateShieldComponent(folderPath: folderPath, adBlockFilterLists: adBlockService.regionalFilterLists ?? [])
+    // Start listening to changes to the install url
+    Task {
+      for await folderURL in adBlockService.shieldsInstallURL {
+        self.didUpdateShieldComponent(
+          folderURL: folderURL,
+          adBlockFilterLists: adBlockService.regionalFilterLists ?? []
+        )
       }
     }
   }
@@ -103,8 +118,10 @@ public class FilterListResourceDownloader {
   /// Invoked when shield components are loaded
   ///
   /// This function will start fetching data and subscribe publishers once if it hasn't already done so.
-  @MainActor private func didUpdateShieldComponent(folderPath: String, adBlockFilterLists: [AdblockFilterListCatalogEntry]) {
+  @MainActor private func didUpdateShieldComponent(folderURL: URL, adBlockFilterLists: [AdblockFilterListCatalogEntry]) {
     if !startedFetching && !adBlockFilterLists.isEmpty {
+      // This is the first time we load ad-block filters.
+      // We need to perform some initial setup (but only do this once)
       startedFetching = true
       FilterListStorage.shared.loadFilterLists(from: adBlockFilterLists)
       
@@ -114,17 +131,16 @@ public class FilterListResourceDownloader {
     
     // Store the folder path so we can load it from cache next time we launch quicker
     // than waiting for the component updater to respond, which may take a few seconds
-    let folderURL = URL(fileURLWithPath: folderPath)
     let folderSubPath = FilterListSetting.extractFolderPath(fromFilterListFolderURL: folderURL)
     Preferences.AppState.lastDefaultFilterListFolderPath.value = folderSubPath
     
     Task {
-      await self.loadShields(fromDefaultFilterListFolderURL: folderURL)
+      await self.addEngineResources(fromGeneralFilterListFolderURL: folderURL)
     }
   }
   
   /// Load shields with the given `AdblockService` folder `URL`
-  private func loadShields(fromDefaultFilterListFolderURL folderURL: URL) async {
+  private func addEngineResources(fromGeneralFilterListFolderURL folderURL: URL) async {
     let version = folderURL.lastPathComponent
     
     // Lets add these new resources
@@ -182,7 +198,7 @@ public class FilterListResourceDownloader {
     startFetchingGenericContentBlockingBehaviors(for: filterList)
 
     adBlockServiceTasks[filterList.uuid] = Task { @MainActor in
-      for await folderURL in await adBlockService.register(filterList: filterList) {
+      for await folderURL in adBlockService.register(filterList: filterList) {
         guard let folderURL = folderURL else { continue }
         guard FilterListStorage.shared.isEnabled(for: filterList.entry.componentId) else { return }
         
@@ -295,10 +311,40 @@ public class FilterListResourceDownloader {
 
 /// Helpful extension to the AdblockService
 private extension AdblockService {
+  /// Stream the URL updates to the `shieldsInstallPath`
+  ///
+  /// - Warning: You should never do this more than once. Only one callback can be registered to the `shieldsComponentReady` callback.
+  @MainActor var shieldsInstallURL: AsyncStream<URL> {
+    return AsyncStream { continuation in
+      if let folderPath = shieldsInstallPath {
+        let folderURL = URL(fileURLWithPath: folderPath)
+        continuation.yield(folderURL)
+      }
+      
+      guard shieldsComponentReady == nil else {
+        assertionFailure("You have already set the `shieldsComponentReady` callback. Setting this more than once replaces the previous callback.")
+        return
+      }
+      
+      shieldsComponentReady = { folderPath in
+        guard let folderPath = folderPath else {
+          return
+        }
+        
+        let folderURL = URL(fileURLWithPath: folderPath)
+        continuation.yield(folderURL)
+      }
+      
+      continuation.onTermination = { @Sendable _ in
+        self.shieldsComponentReady = nil
+      }
+    }
+  }
+  
   /// Register the filter list given by the uuid and streams its updates
   ///
   /// - Note: Cancelling this task will unregister this filter list from recieving any further updates
-  @MainActor func register(filterList: FilterList) async -> AsyncStream<URL?> {
+  @MainActor func register(filterList: FilterList) -> AsyncStream<URL?> {
     return AsyncStream { continuation in
       registerFilterListComponent(filterList.entry, useLegacyComponent: true) { folderPath in
         guard let folderPath = folderPath else {

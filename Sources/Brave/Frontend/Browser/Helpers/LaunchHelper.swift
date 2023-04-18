@@ -35,7 +35,7 @@ public actor LaunchHelper {
       
       // Load cached data
       // This is done first because compileResources need their results
-      async let filterListCache: Void = FilterListResourceDownloader.shared.loadCachedData()
+      async let filterListCache: Void = FilterListResourceDownloader.shared.loadFilterListSettingsAndCachedData()
       async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded()
       async let filterListURLCache: Void = FilterListCustomURLDownloader.shared.loadCachedFilterLists()
       _ = await (filterListCache, adblockResourceCache, filterListURLCache)
