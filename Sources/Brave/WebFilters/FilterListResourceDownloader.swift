@@ -12,95 +12,7 @@ import BraveShared
 import os.log
 
 /// An object responsible for fetching filer lists resources from multiple sources
-public class FilterListResourceDownloader: ObservableObject {
-  private class FilterListSettingsManager {
-    /// Wether or not these settings are stored in memory or persisted
-    private let inMemory: Bool
-    
-    /// A list of defaults that should be set once we load the filter lists.
-    /// This is here in case the filter lists are not loaded but the user is already changing settings
-    @MainActor var pendingDefaults: [String: Bool] = [:]
-    
-    /// This is a list of all available settings.
-    ///
-    /// - Warning: Do not call this before we load core data
-    @MainActor public lazy var allFilterListSettings: [FilterListSetting] = {
-      return FilterListSetting.loadAllSettings(fromMemory: inMemory)
-    }()
-    
-    init(inMemory: Bool) {
-      self.inMemory = inMemory
-    }
-    
-    /// - Warning: Do not call this before we load core data
-    @MainActor public func isEnabled(for componentID: String) -> Bool {
-      guard let setting = allFilterListSettings.first(where: { $0.componentId == componentID }) else {
-        return pendingDefaults[componentID] ?? FilterList.defaultOnComponentIds.contains(componentID)
-      }
-      
-      return setting.isEnabled
-    }
-    
-    /// Set the enabled status and componentId of a filter list setting if the setting exists.
-    /// Otherwise it will create a new setting with the specified properties
-    ///
-    /// - Warning: Do not call this before we load core data
-    @MainActor public func upsertSetting(uuid: String, componentId: String?, isEnabled: Bool, order: Int, allowCreation: Bool) {
-      if allFilterListSettings.contains(where: { $0.uuid == uuid }) {
-        updateSetting(
-          uuid: uuid,
-          componentId: componentId,
-          isEnabled: isEnabled,
-          order: order
-        )
-      } else if allowCreation {
-        create(
-          uuid: uuid,
-          componentId: componentId,
-          isEnabled: isEnabled,
-          order: order
-        )
-      }
-    }
-    
-    /// Set the enabled status of a filter list setting
-    ///
-    /// - Warning: Do not call this before we load core data
-    @MainActor public func set(folderURL: URL, forUUID uuid: String) {
-      guard let index = allFilterListSettings.firstIndex(where: { $0.uuid == uuid }) else {
-        return
-      }
-      
-      guard allFilterListSettings[index].folderURL != folderURL else { return }
-      allFilterListSettings[index].folderURL = folderURL
-      FilterListSetting.save(inMemory: inMemory)
-    }
-    
-    @MainActor private func updateSetting(uuid: String, componentId: String?, isEnabled: Bool, order: Int) {
-      guard let index = allFilterListSettings.firstIndex(where: { $0.uuid == uuid }) else {
-        return
-      }
-      
-      guard allFilterListSettings[index].isEnabled != isEnabled || allFilterListSettings[index].componentId != componentId || allFilterListSettings[index].order?.intValue != order else {
-        // Ensure we stop if this is already in sync in order to avoid an event loop
-        // And things hanging for too long.
-        // This happens because we care about UI changes but not when our downloads finish
-        return
-      }
-        
-      allFilterListSettings[index].isEnabled = isEnabled
-      allFilterListSettings[index].componentId = componentId
-      allFilterListSettings[index].order = NSNumber(value: order)
-      FilterListSetting.save(inMemory: inMemory)
-    }
-    
-    /// Create a filter list setting for the given UUID and enabled status
-    @MainActor private func create(uuid: String, componentId: String?, isEnabled: Bool, order: Int) {
-      let setting = FilterListSetting.create(uuid: uuid, componentId: componentId, isEnabled: isEnabled, order: order, inMemory: inMemory)
-      allFilterListSettings.append(setting)
-    }
-  }
-  
+public class FilterListResourceDownloader {
   /// A shared instance of this class
   ///
   /// - Warning: You need to wait for `DataController.shared.initializeOnce()` to be called before using this instance
@@ -108,8 +20,6 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Object responsible for getting component updates
   private var adBlockService: AdblockService?
-  /// Manager that handles updates to filter list settings in core data
-  private let settingsManager: FilterListSettingsManager
   /// The resource downloader that downloads our resources
   private let resourceDownloader: ResourceDownloader<BraveS3Resource>
   /// The filter list subscription
@@ -120,8 +30,6 @@ public class FilterListResourceDownloader: ObservableObject {
   private var adBlockServiceTasks: [String: Task<Void, Error>]
   /// A marker that says if fetching has started
   private var startedFetching = false
-  /// The filter lists wrapped up so we can contain
-  @Published var filterLists: [FilterList]
   
   /// A formatter that is used to format a version number
   private lazy var fileVersionDateFormatter: DateFormatter = {
@@ -134,12 +42,9 @@ public class FilterListResourceDownloader: ObservableObject {
   
   init(networkManager: NetworkManager = NetworkManager(), persistChanges: Bool = true) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
-    self.settingsManager = FilterListSettingsManager(inMemory: !persistChanges)
-    self.filterLists = []
     self.fetchTasks = [:]
     self.adBlockServiceTasks = [:]
     self.adBlockService = nil
-    self.recordP3ACookieListEnabled()
   }
   
   public func loadCachedData() async {
@@ -149,14 +54,15 @@ public class FilterListResourceDownloader: ObservableObject {
   }
   
   /// This function adds engine resources to `AdBlockManager` for the cached filter lists
-  @MainActor private func addEngineResourcesFromCachedFilterLists() async {
-    let filterListSettings = settingsManager.allFilterListSettings
+  private func addEngineResourcesFromCachedFilterLists() async {
+    await FilterListStorage.shared.loadFilterListSettings()
+    let filterListSettings = await FilterListStorage.shared.allFilterListSettings
       
     await filterListSettings.asyncConcurrentForEach { setting in
-      guard setting.isEnabled == true else { return }
+      guard await setting.isEnabled == true else { return }
       
       // Try to load the filter list folder. We always have to compile this at start
-      if let folderURL = setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) {
+      if let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) {
         await self.addEngineResources(
           forFilterListUUID: setting.uuid, downloadedFolderURL: folderURL,
           relativeOrder: setting.order?.intValue ?? 0
@@ -194,46 +100,14 @@ public class FilterListResourceDownloader: ObservableObject {
     }
   }
   
-  /// Enables a filter list for the given component ID. Returns true if the filter list exists or not.
-  @MainActor public func enableFilterList(for componentID: String, isEnabled: Bool) {
-    // Enable the setting
-    defer { self.recordP3ACookieListEnabled() }
-    
-    if let index = filterLists.firstIndex(where: { $0.entry.componentId == componentID }) {
-      // Only update the value if it has changed
-      guard filterLists[index].isEnabled != isEnabled else { return }
-      filterLists[index].isEnabled = isEnabled
-    } else if let uuid = FilterList.componentToUUID[componentID] {
-      let defaultToggle = FilterList.defaultOnComponentIds.contains(componentID)
-      
-      settingsManager.upsertSetting(
-        uuid: uuid, componentId: componentID, isEnabled: isEnabled,
-        order: 0,
-        allowCreation: defaultToggle != isEnabled
-      )
-    } else {
-      assertionFailure(
-        "How can this be changed if we don't have a filter list or special shields toggle for this?"
-      )
-      
-      // We haven't loaded the filter lists yet. Add it to the pending list.
-      settingsManager.pendingDefaults[componentID] = isEnabled
-    }
-  }
-  
-  /// Tells us if the filter list is enabled for the given `componentID`
-  @MainActor public func isEnabled(for componentID: String) -> Bool {
-    return settingsManager.isEnabled(for: componentID)
-  }
-  
   /// Invoked when shield components are loaded
   ///
   /// This function will start fetching data and subscribe publishers once if it hasn't already done so.
   @MainActor private func didUpdateShieldComponent(folderPath: String, adBlockFilterLists: [AdblockFilterListCatalogEntry]) {
     if !startedFetching && !adBlockFilterLists.isEmpty {
       startedFetching = true
-      let filterLists = loadFilterLists(from: adBlockFilterLists, filterListSettings: settingsManager.allFilterListSettings)
-      self.filterLists = filterLists
+      FilterListStorage.shared.loadFilterLists(from: adBlockFilterLists)
+      
       self.subscribeToFilterListChanges()
       self.registerAllEnabledFilterLists()
     }
@@ -267,21 +141,10 @@ public class FilterListResourceDownloader: ObservableObject {
     )
   }
   
-  /// Load filter lists from the ad block service
-  @MainActor private func loadFilterLists(from regionalFilterLists: [AdblockFilterListCatalogEntry], filterListSettings: [FilterListSetting]) -> [FilterList] {
-    return regionalFilterLists.map { adBlockFilterList in
-      let setting = filterListSettings.first(where: { $0.uuid == adBlockFilterList.uuid })
-      return FilterList(
-        from: adBlockFilterList,
-        isEnabled: setting?.isEnabled ?? adBlockFilterList.defaultToggle
-      )
-    }
-  }
-  
   /// Subscribe to the UI changes on the `filterLists` so that we can save settings and register or unregister the filter lists
-  private func subscribeToFilterListChanges() {
+  @MainActor private func subscribeToFilterListChanges() {
     // Subscribe to changes on the filter list states
-    filterListSubscription = $filterLists
+    filterListSubscription = FilterListStorage.shared.$filterLists
       .sink { filterLists in
         DispatchQueue.main.async { [weak self] in
           for filterList in filterLists {
@@ -293,20 +156,7 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Ensures settings are saved for the given filter list and that our publisher is aware of the changes
   @MainActor private func handleUpdate(to filterList: FilterList) {
-    // Upsert (update or insert) the setting.
-    //
-    // However we create only when:
-    // a) The filter list is enabled
-    //    (this is because loading caches are based on created settings)
-    // b) The filter list is different than the default
-    //    (in order to respect the users preference if the default were to change in the future)
-    settingsManager.upsertSetting(
-      uuid: filterList.uuid,
-      componentId: filterList.entry.componentId,
-      isEnabled: filterList.isEnabled,
-      order: filterLists.firstIndex(where: { $0.id == filterList.id }) ?? 0,
-      allowCreation: filterList.entry.defaultToggle != filterList.isEnabled || filterList.isEnabled
-    )
+    FilterListStorage.shared.handleUpdate(to: filterList)
     
     // Register or unregister the filter list depending on its toggle state
     if filterList.isEnabled {
@@ -318,7 +168,7 @@ public class FilterListResourceDownloader: ObservableObject {
   
   /// Register all enabled filter lists
   @MainActor private func registerAllEnabledFilterLists() {
-    for filterList in filterLists {
+    for filterList in FilterListStorage.shared.filterLists {
       guard filterList.isEnabled else { continue }
       register(filterList: filterList)
     }
@@ -328,19 +178,20 @@ public class FilterListResourceDownloader: ObservableObject {
   @MainActor private func register(filterList: FilterList) {
     guard adBlockServiceTasks[filterList.uuid] == nil else { return }
     guard let adBlockService = adBlockService else { return }
-    guard let index = filterLists.firstIndex(where: { $0.id == filterList.id }) else { return }
+    guard let index = FilterListStorage.shared.filterLists.firstIndex(where: { $0.id == filterList.id }) else { return }
     startFetchingGenericContentBlockingBehaviors(for: filterList)
 
     adBlockServiceTasks[filterList.uuid] = Task { @MainActor in
       for await folderURL in await adBlockService.register(filterList: filterList) {
         guard let folderURL = folderURL else { continue }
-        guard self.isEnabled(for: filterList.entry.componentId) else { return }
+        guard FilterListStorage.shared.isEnabled(for: filterList.entry.componentId) else { return }
+        
         await self.addEngineResources(
           forFilterListUUID: filterList.uuid, downloadedFolderURL: folderURL, relativeOrder: index
         )
         
         // Save the downloaded folder for later (caching) purposes
-        self.settingsManager.set(folderURL: folderURL, forUUID: filterList.uuid)
+        FilterListStorage.shared.set(folderURL: folderURL, forUUID: filterList.uuid)
       }
     }
   }
@@ -440,18 +291,6 @@ public class FilterListResourceDownloader: ObservableObject {
       relativeOrder: relativeOrder
     )
   }
-  
-  // MARK: - P3A
-  
-  private func recordP3ACookieListEnabled() {
-    // Q69 Do you have cookie consent notice blocking enabled?
-    Task { @MainActor in
-      UmaHistogramBoolean(
-        "Brave.Shields.CookieListEnabled",
-        isEnabled(for: FilterList.cookieConsentNoticesComponentID)
-      )
-    }
-  }
 }
 
 /// Helpful extension to the AdblockService
@@ -474,40 +313,6 @@ private extension AdblockService {
       continuation.onTermination = { @Sendable _ in
         self.unregisterFilterListComponent(filterList.entry, useLegacyComponent: true)
       }
-    }
-  }
-}
-
-// MARK: - FilterListLanguageProvider - A way to share `defaultToggle` logic between multiple structs/classes
-
-private extension AdblockFilterListCatalogEntry {
-  @available(iOS 16, *)
-  /// A list of regions that this filter list focuses on.
-  /// An empty set means this filter list doesn't focus on any specific region.
-  var supportedLanguageCodes: Set<Locale.LanguageCode> {
-    return Set(languages.map({ Locale.LanguageCode($0) }))
-  }
-  
-  /// This method returns the default value for this filter list if the user does not manually toggle it.
-  /// - Warning: Make sure you use `componentID` to identify the filter list, as `uuid` will be deprecated in the future.
-  var defaultToggle: Bool {
-    // First check if this is a statically set component
-    if FilterList.defaultOnComponentIds.contains(componentId) {
-      return true
-    }
-    
-    // For compatibility reasons, we only enable certian regional filter lists
-    // These are the ones that are known to be well maintained.
-    guard FilterList.maintainedRegionalComponentIDs.contains(componentId) else {
-      return false
-    }
-    
-    if #available(iOS 16, *), let languageCode = Locale.current.language.languageCode {
-      return supportedLanguageCodes.contains(languageCode)
-    } else if let languageCode = Locale.current.languageCode {
-      return languages.contains(languageCode)
-    } else {
-      return false
     }
   }
 }
