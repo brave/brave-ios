@@ -31,6 +31,15 @@
 /* The title of the button at the bottom of Swap Screen, when the sell token is erc20 and it has not been activated its allowance. %@ will be replaced with the sell token's symbol such as 'DAI' or 'USDC' */
 "wallet.activateToken" = "토큰 %@ 활성화";
 
+/* The description when showing no transactions inside Activity tab. */
+"wallet.activityPageEmptyDescription" = "첫 트랜잭션 이후 여기서 볼 수 있습니다.";
+
+/* The title when showing no transactions inside Activity tab. */
+"wallet.activityPageEmptyTitle" = "아직 트랜잭션 없음";
+
+/* The title of the tab that will display user's transaction activity for all accounts. */
+"wallet.activityPageTitle" = "활동";
+
 /* The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree. */
 "wallet.addAccountAddButton" = "추가";
 
@@ -1533,6 +1542,12 @@
 
 /* The short name of one of the on ramp provider. */
 "wallet.transakProviderShortName" = "Transak";
+
+/* Description displayed when users chose Brave to ask them if they want the Unstoppable Domains to be resolved every time they enter one. The first '%@' will be replaced with a list of supported TLDs like '.x' or '.bitcoin'. The second '%@' be replaced with a link to Infura's terms of use page. The third '%@' will be replaced with the value of 'Web3DomainInterstitialPageTAndU'. The fourth '%@' will be replaced with a link to Infura's privacy policy page. The last '%@' will be replaced with the value of 'Web3DomainInterstitialPagePrivacyPolicy'. */
+"wallet.udDomainInterstitialPageDescription" = "Brave는 Unstoppable Domains상에서 .crypto(및 %1$@) 도메인 이름을 해석하는 데 Infura를 사용합니다. Brave는 귀하의 IP 주소를 숨깁니다. 이를 활성화하면 누군가 이러한 도메인을 방문하려고 한다는 사실 외에는 Infura가 확인할 수 없습니다. Infura의 <a href=%2$@>%3$@</a> 및 <a href=%4$@>%5$@</a>을 참조하세요.";
+
+/* Title displayed when users chose Brave to ask them if they want the Unstoppable Domains domain to be resolved every time they enter one. */
+"wallet.udDomainInterstitialPageTitle" = "Brave에서 Unstoppable Domains 지원을 활성화할까요?";
 
 /* The description for the options to allow Unstoppable Domain domain names. '%@' will be replaced with a url to explain more about Unstoppable Domains. */
 "wallet.udResolveMethodDescription" = "Unstoppable Domains 프라이버시 고려 사항에 대해 [자세히 알아보세요](%@).";
