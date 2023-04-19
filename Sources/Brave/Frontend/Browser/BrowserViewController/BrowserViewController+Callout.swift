@@ -24,7 +24,7 @@ extension BrowserViewController {
     }
   }
   
-  func presentScreenCallout(for type: FullScreenCalloutType) {
+  private func presentScreenCallout(for type: FullScreenCalloutType) {
     switch type {
     case .p3a:
       presentP3AScreenCallout()
