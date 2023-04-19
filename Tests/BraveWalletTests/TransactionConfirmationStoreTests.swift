@@ -31,17 +31,17 @@ import BraveCore
       completion(true, [mockEthAssetPrice, mockSolAssetPrice])
     }
     let rpcService = BraveWallet.TestJsonRpcService()
-    rpcService._chainId = { $1(network.chainId) }
-    rpcService._network = { $1(network) }
+    rpcService._chainIdForOrigin = { $2(network.chainId) }
+    rpcService._network = { $2(network) }
     rpcService._balance = { _, _, _, completion in
       completion(mockBalanceWei, .success, "")
     }
-    rpcService._erc20TokenAllowance = { _, _, _, completion in
+    rpcService._erc20TokenAllowance = { _, _, _, _, completion in
       completion("16345785d8a0000", .success, "") // 0.1000
     }
     let txService = BraveWallet.TestTxService()
     txService._addObserver = { _ in }
-    txService._allTransactionInfo = { _, _, completion in
+    txService._allTransactionInfo = { _, _, _, completion in
       completion(transactions)
     }
     let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
@@ -56,13 +56,13 @@ import BraveCore
     walletService._addObserver = { _ in }
     walletService._selectedCoin = { $0(BraveWallet.CoinType.eth) }
     let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
-    ethTxManagerProxy._gasEstimation1559 = { completion in
+    ethTxManagerProxy._gasEstimation1559 = { _, completion in
       completion(gasEstimation)
     }
     ethTxManagerProxy._makeErc20ApproveData = { _, _, completion in
       completion(makeErc20ApproveDataSuccess, [])
     }
-    ethTxManagerProxy._setDataForUnapprovedTransaction = { _, _, completion in
+    ethTxManagerProxy._setDataForUnapprovedTransaction = { _, _, _, completion in
       completion(setDataForUnapprovedTransactionSuccess)
     }
     let keyringService = BraveWallet.TestKeyringService()
@@ -77,7 +77,7 @@ import BraveCore
     }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._estimatedTxFee = { $1(0, .success, "") }
+    solTxManagerProxy._estimatedTxFee = { $2(0, .success, "") }
     
     return TransactionConfirmationStore(
       assetRatioService: assetRatioService,
@@ -301,7 +301,7 @@ import BraveCore
     
     let editExpectation = expectation(description: "edit allowance")
     store.editAllowance(
-      txMetaId: mockTransaction.id,
+      transaction: mockTransaction,
       spenderAddress: mockTransaction.txArgs[safe: 0] ?? "",
       amount: "0x0",
       completion: { success in
@@ -343,7 +343,7 @@ import BraveCore
     
     let editExpectation = expectation(description: "edit allowance")
     store.editAllowance(
-      txMetaId: mockTransaction.id,
+      transaction: mockTransaction,
       spenderAddress: mockTransaction.txArgs[safe: 0] ?? "",
       amount: "0x0",
       completion: { success in
@@ -385,7 +385,7 @@ import BraveCore
     
     let editExpectation = expectation(description: "edit allowance")
     store.editAllowance(
-      txMetaId: mockTransaction.id,
+      transaction: mockTransaction,
       spenderAddress: mockTransaction.txArgs[safe: 0] ?? "",
       amount: "0x0",
       completion: { success in

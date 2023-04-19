@@ -225,5 +225,11 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   
   func setNftDiscoveryEnabled(_ enabled: Bool) {
   }
+  
+  func chainId(forActiveOrigin coin: BraveWallet.CoinType, completion: @escaping (String) -> Void) {
+  }
+  
+  func setChainIdForActiveOrigin(_ coin: BraveWallet.CoinType, chainId: String, completion: @escaping (Bool) -> Void) {
+  }
 }
 #endif

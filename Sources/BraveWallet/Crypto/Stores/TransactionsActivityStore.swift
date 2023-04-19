@@ -67,7 +67,7 @@ class TransactionsActivityStore: ObservableObject {
       // for each coin type are returned
       var selectedNetworkForCoin: [BraveWallet.CoinType: BraveWallet.NetworkInfo] = [:]
       for coin in WalletConstants.supportedCoinTypes {
-        selectedNetworkForCoin[coin] = await rpcService.network(coin)
+        selectedNetworkForCoin[coin] = await rpcService.network(coin, origin: nil)
       }
       let allTransactions = await txService.allTransactions(
         for: allKeyrings
@@ -92,9 +92,10 @@ class TransactionsActivityStore: ObservableObject {
       )
       guard !self.transactionSummaries.isEmpty else { return }
       
-      if allTransactions.contains(where: { $0.coin == .sol }) {
+      if allTransactions.contains(where: { $0.coin == .sol }),
+         let selectedSolNetwork = selectedNetworkForCoin[.sol] {
         let solTransactionIds = allTransactions.filter { $0.coin == .sol }.map(\.id)
-        await updateSolEstimatedTxFeesCache(solTransactionIds: solTransactionIds)
+        await updateSolEstimatedTxFeesCache(chainId: selectedSolNetwork.chainId, solTransactionIds: solTransactionIds)
       }
       
       let allVisibleTokenAssetRatioIds = userVisibleTokens.map(\.assetRatioId)
@@ -139,8 +140,8 @@ class TransactionsActivityStore: ObservableObject {
     }.sorted(by: { $0.createdTime > $1.createdTime })
   }
   
-  @MainActor private func updateSolEstimatedTxFeesCache(solTransactionIds: [String]) async {
-    let fees = await solTxManagerProxy.estimatedTxFees(for: solTransactionIds)
+  @MainActor private func updateSolEstimatedTxFeesCache(chainId: String, solTransactionIds: [String]) async {
+    let fees = await solTxManagerProxy.estimatedTxFees(chainId: chainId, for: solTransactionIds)
     for (key, value) in fees { // update cached values
       self.solEstimatedTxFeesCache[key] = value
     }

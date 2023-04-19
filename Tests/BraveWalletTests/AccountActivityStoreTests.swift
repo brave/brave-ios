@@ -54,7 +54,7 @@ class AccountActivityStoreTests: XCTestCase {
 
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._addObserver = { _ in }
-    rpcService._network = { coin, completion in
+    rpcService._network = { coin, _, completion in
       completion(selectedNetwork)
     }
     rpcService._allNetworks = { coin, completion in
@@ -116,12 +116,12 @@ class AccountActivityStoreTests: XCTestCase {
     
     let txService = BraveWallet.TestTxService()
     txService._addObserver = { _ in }
-    txService._allTransactionInfo = { coin, _, completion in
+    txService._allTransactionInfo = { coin, _, _, completion in
       completion(self.transactions[coin] ?? [])
     }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
-    solTxManagerProxy._estimatedTxFee = { $1(0, .success, "") }
+    solTxManagerProxy._estimatedTxFee = { $2(0, .success, "") }
     
     let ipfsApi = TestIpfsAPI()
 
