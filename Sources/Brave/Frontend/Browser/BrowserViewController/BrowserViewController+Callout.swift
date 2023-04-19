@@ -226,7 +226,7 @@ extension BrowserViewController {
     }
     
     // Don't show this if we already enabled the setting
-    guard !FilterListResourceDownloader.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID) else { return }
+    guard !FilterListStorage.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID) else { return }
     // Don't show this if we are presenting another popup already
     guard !isOnboardingOrFullScreenCalloutPresented else { return }
     // We only show the popup on second launch
@@ -235,17 +235,7 @@ extension BrowserViewController {
     guard Preferences.FullScreenCallout.omniboxCalloutCompleted.value else { return }
 
     let popover = PopoverController(
-      contentController: CookieNotificationBlockingConsentViewController().then {
-        $0.rootView.onYesButtonPressed = {
-          Task { @MainActor in
-            FilterListResourceDownloader.shared.enableFilterList(
-              for: FilterList.cookieConsentNoticesComponentID, isEnabled: true
-            )
-            
-            try await Task.sleep(seconds: 3.5)
-          }
-        }
-      },
+      contentController: CookieNotificationBlockingConsentViewController(),
       contentSizeBehavior: .preferredContentSize)
     popover.addsConvenientDismissalMargins = false
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
