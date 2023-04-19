@@ -38,7 +38,7 @@
 "wallet.activityPageEmptyTitle" = "暂无交易";
 
 /* The title of the tab that will display user's transaction activity for all accounts. */
-"wallet.activityPageTitle" = "活動";
+"wallet.activityPageTitle" = "活动";
 
 /* The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree. */
 "wallet.addAccountAddButton" = "添加";
@@ -569,22 +569,22 @@
 "wallet.editVisibleAssetsButtonTitle" = "编辑可见资产";
 
 /* Title on the button that users can click to enable Brave to resolve the ENS domain they entered. */
-"wallet.ensDomainInterstitialPageButtonProceed" = "使用 Infura 伺服器繼續操作";
+"wallet.ensDomainInterstitialPageButtonProceed" = "使用 Infura 服务器继续操作";
 
 /* Description displayed when users chose Brave to ask them if they want the ENS to be resolved every time they enter one. The first '%@' will be replaced with a link to Infura's terms of use page. The second '%@' will be replaced with the value of 'Web3DomainInterstitialPageTAndU'. The third '%@' will be replaced with a link to Infura's privacy policy page. The last '%@' will be replaced with the value of 'Web3DomainInterstitialPagePrivacyPolicy'. */
 "wallet.ensDomainInterstitialPageDescription" = "Brave 将使用 Infura 来解决以太坊名称服务（ENS）的 .eth 域名。Brave 将隐藏你的 IP 地址。如果你启用这个功能，Infura 将看到有人试图访问这些 .eth 域名，但没有其他内容。查看 Infura 的 <a href=%1$@>%2$@</a> 和 <a href=%3$@>%4$@</a>。";
 
 /* Title displayed when users chose Brave to ask them if they want the ENS domain to be resolved every time they enter one. */
-"wallet.ensDomainInterstitialPageTitle" = "在 Brave 中啟用支援以太坊域名服務 (ENS)？";
+"wallet.ensDomainInterstitialPageTitle" = "在 Brave 中启用支援以太坊域名服务 (ENS)？";
 
 /* Title on the button that users can click to enable Brave to resolve the ENS offchain lookup for the domain they entered. */
-"wallet.ensOffchainDomainInterstitialPageButtonProceed" = "繼續鏈下查找";
+"wallet.ensOffchainDomainInterstitialPageButtonProceed" = "继续链外查找";
 
 /* Description displayed when users chose Brave to ask them if they want the ENS to be resolved every time they enter one. The first '%@' will be replaced with a link to Brave Wallet's offchain lookup privacy considerations. The second '%@' will be replaced with the value of 'ensOffchainDomainInterstitialLearnMore'. */
 "wallet.ensOffchainDomainInterstitialPageDescription" = "这个 .eth 域名被存储在链外，将由第三方网关解析。如果你启用 ENS 链外查询，第三方网关将看到你正试图访问 .eth 域名。<a href=%1$@>%2$@</a>。";
 
 /* Title displayed when users chose Brave to ask them if they want the ENS Offchain domain to be resolved every time they enter one. */
-"wallet.ensOffchainDomainInterstitialPageTitle" = "在 Brave 中啟用以太坊域名服務 (ENS) 鏈下查找支援？";
+"wallet.ensOffchainDomainInterstitialPageTitle" = "在 Brave 中启用以太坊域名服务 (ENS) 链外查找支援？";
 
 /* Button title when requesting to do an ENS off chain lookup. */
 "wallet.ensOffchainGatewayButton" = "使用 ENS 域";
@@ -1628,7 +1628,7 @@
 "wallet.web3DomainInterstitialPageTAndU" = "使用条款";
 
 /* One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Ask' means Brave will ask user first before enable or disable resolving ENS/SNS domain name and IPFS scheme url. */
-"wallet.web3DomainOptionAsk" = "詢問";
+"wallet.web3DomainOptionAsk" = "询问";
 
 /* One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Disabled' means Brave will disable resolving ENS/SNS domain name and IPFS scheme url. */
 "wallet.web3DomainOptionDisabled" = "已阻止";
@@ -1649,7 +1649,7 @@
 "wallet.web3IPFSInterstitialIPFSPublicGateway" = "保护你的 IP 地址和你所请求的内容不被潜在的第三方观察者发现，但不受公共网关运营商的影响。 网关运营商负责确保通过网关提供给你的内容是你请求的内容。另外，你的设备不参与公共 IPFS 网络。";
 
 /* The title of the IPFS interstitial page for user to set the preference of IPFS scheme url handling. */
-"wallet.web3IPFSInterstitialIPFSTitle" = "設定您的 IPFS 喜好設定";
+"wallet.web3IPFSInterstitialIPFSTitle" = "设定您的 IPFS 喜好设定";
 
 /* The title of the button that user will click to let Brave to resolve IPFS shceme url. */
 "wallet.web3IPFSInterstitialProceedButton" = "使用公共网关";

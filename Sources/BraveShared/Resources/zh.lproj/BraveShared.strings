@@ -23,7 +23,7 @@
 "AddCustomFilterList" = "新增自定义筛选器列表";
 
 /* A description of a section in a list that allows you to add custom filter lists found in the footer of the add custom url screen */
-"AddCustomFilterListDescription" = "新增由您信任的社群所建立及維護的額外清單。";
+"AddCustomFilterListDescription" = "新增由您信任的社群所建立维护的额外清单。";
 
 /* Warning text found in the footer of the add custom filter list url screen. */
 "AddCustomFilterListWarning" = "**仅订阅来自您信任的实体的列表**。您的浏览器将定期检查您输入的网址的列表更新。";
@@ -854,7 +854,7 @@
 "FilterListsEdit" = "编辑";
 
 /* This is a placeholder for an input field that takes a custom filter list URL. */
-"FilterListsEnterFilterListURL" = "輸入過濾器清單 URL";
+"FilterListsEnterFilterListURL" = "输入过滤器清单 URL";
 
 /* A label that shows when the filter list was last updated. Do not translate the '%@' placeholder. The %@ will be replaced with a relative date. For example, '5 minutes ago' or '1 hour ago'. So the full string will read something like 'Last updated 5 minutes ago'. */
 "FilterListsLastUpdatedLabel" = "上次更新时间 %@";
