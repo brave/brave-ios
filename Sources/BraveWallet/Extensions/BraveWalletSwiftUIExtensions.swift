@@ -83,7 +83,8 @@ extension BraveWallet.SignMessageRequest {
       domainHash: "",
       primaryHash: "",
       messageBytes: [],
-      coin: .eth
+      coin: .eth,
+      chainId: BraveWallet.MainnetChainId
     )
   }
 }

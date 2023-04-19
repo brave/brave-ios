@@ -106,7 +106,7 @@ class AssetDetailStore: ObservableObject {
       self.isLoadingChart = true
       let coin = token.coin
       let allNetworks = await rpcService.allNetworks(coin)
-      let selectedNetwork = await rpcService.network(coin)
+      let selectedNetwork = await rpcService.network(coin, origin: nil)
       let network = allNetworks.first(where: { $0.chainId == token.chainId }) ?? selectedNetwork
       self.network = network
       let rampBuyTokens = await blockchainRegistry.buyTokens(.ramp, chainId: network.chainId)
@@ -195,7 +195,11 @@ class AssetDetailStore: ObservableObject {
     let allTransactions = await withTaskGroup(of: [BraveWallet.TransactionInfo].self) { @MainActor group -> [BraveWallet.TransactionInfo] in
       for account in keyring.accountInfos {
         group.addTask { @MainActor in
-          await self.txService.allTransactionInfo(network.coin, from: account.address)
+          await self.txService.allTransactionInfo(
+            network.coin,
+            chainId: network.chainId,
+            from: account.address
+          )
         }
       }
       return await group.reduce([BraveWallet.TransactionInfo](), { partialResult, prior in
@@ -204,7 +208,10 @@ class AssetDetailStore: ObservableObject {
     }
     var solEstimatedTxFees: [String: UInt64] = [:]
     if token.coin == .sol {
-      solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: allTransactions.map(\.id))
+      solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(
+        chainId: network.chainId,
+        for: allTransactions.map(\.id)
+      )
     }
     return allTransactions
       .filter { tx in
