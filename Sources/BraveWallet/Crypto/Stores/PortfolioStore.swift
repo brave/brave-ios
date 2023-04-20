@@ -173,22 +173,7 @@ public class PortfolioStore: ObservableObject {
         let sortOrder: Int
       }
       let allVisibleUserAssets = await self.walletService.allVisibleUserAssets(in: networks)
-      var updatedUserVisibleAssets: [AssetViewModel] = []
-      for networkAssets in allVisibleUserAssets {
-        for token in networkAssets.tokens {
-          if !token.isErc721 && !token.isNft {
-            updatedUserVisibleAssets.append(
-              AssetViewModel(
-                token: token,
-                network: networkAssets.network,
-                decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
-                price: pricesCache[token.assetRatioId.lowercased()] ?? "",
-                history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
-              )
-            )
-          }
-        }
-      }
+      var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
         .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
@@ -247,22 +232,7 @@ public class PortfolioStore: ObservableObject {
       }
       
       guard !Task.isCancelled else { return }
-      updatedUserVisibleAssets.removeAll()
-      for networkAssets in allVisibleUserAssets {
-        for token in networkAssets.tokens {
-          if !token.isErc721 && !token.isNft {
-            updatedUserVisibleAssets.append(
-              AssetViewModel(
-                token: token,
-                network: networkAssets.network,
-                decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
-                price: pricesCache[token.assetRatioId.lowercased()] ?? "",
-                history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
-              )
-            )
-          }
-        }
-      }
+      updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       self.userVisibleAssets = updatedUserVisibleAssets
         .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
       
@@ -290,6 +260,23 @@ public class PortfolioStore: ObservableObject {
         )
       }
       isLoadingBalances = false
+    }
+  }
+  
+  /// Builds the `AssetViewModel`s and `NFTAssetViewModel`s using the balances, price and metadata stored in their respective caches.
+  private func buildAssetViewModels(
+    allVisibleUserAssets: [NetworkAssets]
+  ) -> [AssetViewModel] {
+    allVisibleUserAssets.flatMap { networkAssets in
+      networkAssets.tokens.filter { (!$0.isErc721 && !$0.isNft) }.map { token in
+        AssetViewModel(
+          token: token,
+          network: networkAssets.network,
+          decimalBalance: totalBalancesCache[token.assetBalanceId] ?? 0,
+          price: pricesCache[token.assetRatioId.lowercased()] ?? "",
+          history: priceHistoriesCache[token.assetRatioId.lowercased()] ?? []
+        )
+      }
     }
   }
   
