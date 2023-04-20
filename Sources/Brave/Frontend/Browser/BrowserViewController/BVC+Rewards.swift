@@ -194,8 +194,10 @@ extension BrowserViewController {
       self?.claimPendingPromotions()
     }
     rewardsObserver.fetchedPanelPublisher = { [weak self] publisher, tabId in
-      guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab, tab.rewardsId == tabId else { return }
-      self.publisher = publisher
+      DispatchQueue.main.async {
+        guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab, tab.rewardsId == tabId else { return }
+        self.publisher = publisher
+      }
     }
 
     promotionFetchTimer = Timer.scheduledTimer(
