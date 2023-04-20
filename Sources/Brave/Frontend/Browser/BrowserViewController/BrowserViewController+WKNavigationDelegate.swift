@@ -134,7 +134,8 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     if InternalURL.isValid(url: url) {
-      if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged {
+      if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged,
+          (navigationAction.sourceFrame != nil || navigationAction.targetFrame?.isMainFrame == false || navigationAction.request.cachePolicy == .useProtocolCachePolicy) {
         Logger.module.warning("Denying unprivileged request: \(navigationAction.request)")
         return (.cancel, preferences)
       }

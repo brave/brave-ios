@@ -1,8 +1,14 @@
-/* Description for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetDescription" = "Accede rápidamente a tus sitios web favoritos.";
+/* Displayed on a news widget that has failed to load */
+"widgets.newsClusteringErrorLabel" = "Inténtalo de nuevo más tarde";
 
-/* Title for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetTitle" = "Favoritos";
+/* Displayed on a news widget that links into the app to read more Brave News content */
+"widgets.newsClusteringReadMoreButtonTitle" = "Leer más";
+
+/* Description for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetDescription" = "Obtén las últimas noticias";
+
+/* Title for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetTitle" = "Noticias destacadas";
 
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Abre Brave para ver tus favoritos aquí";
@@ -45,3 +51,4 @@
 
 /* Description for the Brave Wallet option on the 'shortcuts' widget. */
 "widgets.walletShortcutTitle" = "Cartera de Brave";
+

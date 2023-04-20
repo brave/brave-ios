@@ -306,7 +306,6 @@ public class BrowserViewController: UIViewController {
     // Initialize TabManager
     self.tabManager = TabManager(
       prefs: profile.prefs,
-      imageStore: diskImageStore,
       rewards: rewards,
       tabGeneratorAPI: braveCore.tabGeneratorAPI)
     
@@ -365,7 +364,7 @@ public class BrowserViewController: UIViewController {
         if case .sendTabToSelfEntriesAddedRemotely(let newEntries) = stateChange {
           // Fetching the last URL that has been sent from synced sessions
           if let requestedURL = newEntries.last?.url {
-            self?.presentTabReceivedCallout(url: requestedURL)
+            self?.presentTabReceivedToast(url: requestedURL)
           }
         }
       })
@@ -748,6 +747,10 @@ public class BrowserViewController: UIViewController {
     }
   }
   
+  @objc func appWillTerminateNotification() {
+    tabManager.saveAllTabs()
+  }
+  
   @objc private func tappedCollapsedURLBar() {
     if keyboardState != nil && isUsingBottomBar && !topToolbar.inOverlayMode {
       view.endEditing(true)
@@ -761,6 +764,8 @@ public class BrowserViewController: UIViewController {
   }
 
   @objc func appWillResignActiveNotification() {
+    tabManager.saveAllTabs()
+    
     // Dismiss any popovers that might be visible
     displayedPopoverController?.dismiss(animated: false) {
       self.updateDisplayedPopoverProperties = nil
@@ -877,6 +882,9 @@ public class BrowserViewController: UIViewController {
       $0.addObserver(
         self, selector: #selector(appDidEnterBackgroundNotification),
         name: UIApplication.didEnterBackgroundNotification, object: nil)
+      $0.addObserver(
+        self, selector: #selector(appWillTerminateNotification),
+        name: UIApplication.willTerminateNotification, object: nil)
       $0.addObserver(
         self, selector: #selector(resetNTPNotification),
         name: .adsOrRewardsToggledInSettings, object: nil)
@@ -1157,7 +1165,7 @@ public class BrowserViewController: UIViewController {
         self.setupTabs()
       },
       noCallback: { _ in
-        TabMO.deleteAll()
+        SessionTab.deleteAll()
         self.tabManager.addTabAndSelect(isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
       }
     )
@@ -1166,7 +1174,7 @@ public class BrowserViewController: UIViewController {
 
   fileprivate func canRestoreTabs() -> Bool {
     // Make sure there's at least one real tab open
-    return !TabMO.getAll().compactMap({ $0.url }).isEmpty
+    return !SessionTab.all().compactMap({ $0.url }).isEmpty
   }
 
   override public func viewDidAppear(_ animated: Bool) {
@@ -1177,16 +1185,8 @@ public class BrowserViewController: UIViewController {
     presentOnboardingIntro()
 
     // Full Screen Callout Presentation
-    // Priority: P3A - VPN - Default Browser - Rewards
-    // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      self.presentP3AScreenCallout()
-      self.presentBottomBarCallout()
-      self.presentVPNAlertCallout()
-      self.presentDefaultBrowserScreenCallout()
-      self.presentBraveRewardsScreenCallout()
-      self.presentCookieNotificationBlockingCalloutIfNeeded()
-      self.presentLinkReceiptCallout(skipSafeGuards: false)
+      self.presentFullScreenCallouts()
     }
 
     screenshotHelper.viewIsVisible = true
@@ -1874,7 +1874,7 @@ public class BrowserViewController: UIViewController {
     }
   }
   
-  func switchToTabOrOpen(id: String?, url: URL) {
+  func switchToTabOrOpen(id: UUID?, url: URL) {
     popToBVC()
     
     if let tabID = id, let tab = tabManager.getTabForID(tabID) {
@@ -2271,9 +2271,9 @@ public class BrowserViewController: UIViewController {
           if let visitType = typedNavigation.first(where: {
             $0.key.typedDisplayString == url.typedDisplayString
           })?.value, visitType == .typed {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
+            braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date())
           } else {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+            braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date(), isURLTyped: false)
           }
           
           // Saving Tab. Private Mode - not supported yet.
@@ -2740,7 +2740,7 @@ extension BrowserViewController: SearchViewControllerDelegate {
     finishEditingAndSubmit(url, visitType: .typed)
   }
 
-  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: String?, url: URL)) {
+  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: UUID?, url: URL)) {
     switchToTabOrOpen(id: tabInfo.id, url: tabInfo.url)
   }
   
@@ -3094,6 +3094,27 @@ extension BrowserViewController {
   public func handleNavigationPath(path: NavigationPath) {
     executeAfterSetup {
       NavigationPath.handle(nav: path, with: self)
+    }
+  }
+}
+
+extension BrowserViewController {
+  func presentTabReceivedToast(url: URL) {
+    // 'Tab Received' indicator will only be shown in normal browsing
+    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      let toast = ButtonToast(
+        labelText: Strings.Callout.tabReceivedCalloutTitle,
+        image: UIImage(braveSystemNamed: "brave.tablet.and.phone"),
+        buttonText: Strings.goButtonTittle,
+        completion: { [weak self] buttonPressed in
+          guard let self = self else { return }
+          
+          if buttonPressed {
+            self.tabManager.addTabAndSelect(URLRequest(url: url), isPrivate: false)
+          }
+      })
+      
+      show(toast: toast, duration: ButtonToastUX.toastDismissAfter)
     }
   }
 }

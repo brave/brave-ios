@@ -1,8 +1,14 @@
-/* Description for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetDescription" = "즐겨찾는 웹사이트에 빠르게 액세스할 수 있습니다.";
+/* Displayed on a news widget that has failed to load */
+"widgets.newsClusteringErrorLabel" = "나중에 다시 시도";
 
-/* Title for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetTitle" = "즐겨찾기";
+/* Displayed on a news widget that links into the app to read more Brave News content */
+"widgets.newsClusteringReadMoreButtonTitle" = "자세히 읽어보기";
+
+/* Description for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetDescription" = "최신 뉴스 받기";
+
+/* Title for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetTitle" = "인기 뉴스";
 
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "여기서 즐겨찾기를 보려면 Brave를 여세요.";

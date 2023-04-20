@@ -1,8 +1,14 @@
-/* Description for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetDescription" = "Mengakses situs web favorit Anda dengan cepat.";
+/* Displayed on a news widget that has failed to load */
+"widgets.newsClusteringErrorLabel" = "Coba lagi nanti";
 
-/* Title for favorites widget on 'add widget' screen. */
-"widgets.favoritesWidgetTitle" = "Favorit";
+/* Displayed on a news widget that links into the app to read more Brave News content */
+"widgets.newsClusteringReadMoreButtonTitle" = "Baca Lebih Lanjut";
+
+/* Description for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetDescription" = "Dapatkan berita terkini";
+
+/* Title for Brave News widgets that display the top news */
+"widgets.newsClusteringWidgetTitle" = "Berita Terpopuler";
 
 /* This shows when you add a widget but have no favorites added in your app */
 "widgets.noFavoritesFound" = "Silakan buka Brave untuk melihat favorit Anda di sini";

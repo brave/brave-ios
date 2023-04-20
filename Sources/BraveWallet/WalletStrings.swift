@@ -3906,17 +3906,38 @@ extension Strings {
     // Unstoppable Domains
     public static let udDomainInterstitialPageTitle = NSLocalizedString(
       "wallet.udDomainInterstitialPageTitle",
-      tableName: "BraveShared",
+      tableName: "BraveWallet",
       bundle: .module,
       value: "Enable support of Unstoppable Domains in Brave?",
       comment: "Title displayed when users chose Brave to ask them if they want the Unstoppable Domains domain to be resolved every time they enter one."
     )
     public static let udDomainInterstitialPageDescription = NSLocalizedString(
       "wallet.udDomainInterstitialPageDescription",
-      tableName: "BraveShared",
+      tableName: "BraveWallet",
       bundle: .module,
       value: "Brave will be using Infura to resolve .crypto (and also %@) domain names that are on Unstoppable Domains. Brave hides your IP address. If you enable this, Infura will see that someone is trying to visit these domains but nothing else. See Infura's <a href=%@>%@</a> and <a href=%@>%@</a>.",
       comment: "Description displayed when users chose Brave to ask them if they want the Unstoppable Domains to be resolved every time they enter one. The first '%@' will be replaced with a list of supported TLDs like '.x' or '.bitcoin'. The second '%@' be replaced with a link to Infura's terms of use page. The third '%@' will be replaced with the value of 'Web3DomainInterstitialPageTAndU'. The fourth '%@' will be replaced with a link to Infura's privacy policy page. The last '%@' will be replaced with the value of 'Web3DomainInterstitialPagePrivacyPolicy'."
+    )
+    public static let activityPageTitle = NSLocalizedString(
+      "wallet.activityPageTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Activity",
+      comment: "The title of the tab that will display user's transaction activity for all accounts."
+    )
+    public static let activityPageEmptyTitle = NSLocalizedString(
+      "wallet.activityPageEmptyTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "No transactions yet",
+      comment: "The title when showing no transactions inside Activity tab."
+    )
+    public static let activityPageEmptyDescription = NSLocalizedString(
+      "wallet.activityPageEmptyDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "After your first transaction you will be able to view it here.",
+      comment: "The description when showing no transactions inside Activity tab."
     )
   }
 }
