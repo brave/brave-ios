@@ -282,10 +282,6 @@ public class BrowserViewController: UIViewController {
     
     let configuration: BraveRewards.Configuration = .current()
 
-    let buildChannel = BraveAds.BuildChannelInfo().then {
-      $0.name = AppConstants.buildChannel.rawValue
-      $0.isRelease = AppConstants.buildChannel == .release
-    }
     Self.migrateAdsConfirmations(for: configuration)
     legacyWallet = Self.legacyWallet(for: configuration)
     if let wallet = legacyWallet {
@@ -301,7 +297,7 @@ public class BrowserViewController: UIViewController {
     }
 
     // Initialize Rewards
-    self.rewards = BraveRewards(configuration: configuration, buildChannel: buildChannel)
+    self.rewards = BraveRewards(configuration: configuration)
 
     // Initialize TabManager
     self.tabManager = TabManager(

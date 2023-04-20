@@ -28,12 +28,8 @@ public class BraveRewards: NSObject {
 
   private let configuration: Configuration
 
-  init(configuration: Configuration, buildChannel: BraveAds.BuildChannelInfo?) {
+  init(configuration: Configuration) {
     self.configuration = configuration
-
-    if let channel = buildChannel {
-      BraveAds.buildChannelInfo = channel
-    }
 
     ads = BraveAds(stateStoragePath: configuration.storageURL.appendingPathComponent("ads").path)
 
