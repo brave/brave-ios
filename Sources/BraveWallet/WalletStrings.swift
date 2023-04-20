@@ -3967,13 +3967,6 @@ extension Strings {
       value: "Market",
       comment: "The page title that will display the top 250 tokens from the market via CoinGecko"
     )
-    public static let assetDetailNoSupported = NSLocalizedString(
-      "wallet.assetDetailNoSupported",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "This asset is not supported by Brave Wallet",
-      comment: "A label that will be displayed instead of account balances and transactions when the token is not supported by Brave Wallet."
-    )
     public static let coinMarketInformation = NSLocalizedString(
       "wallet.coinMarketInformation",
       tableName: "BraveWallet",

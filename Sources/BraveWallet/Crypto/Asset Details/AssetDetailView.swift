@@ -137,16 +137,7 @@ struct AssetDetailView: View {
       case .blockchainToken(_):
         accountsBalanceView
         transactionsView
-      case .coinMarket(let coinMarket, let isSupported):
-        if isSupported {
-          accountsBalanceView
-          transactionsView
-        } else {
-          Text(Strings.Wallet.assetDetailNoSupported)
-            .font(.footnote)
-            .foregroundColor(Color(.braveLabel))
-            .listRowBackground(Color.clear)
-        }
+      case .coinMarket(let coinMarket):
         Section {
           HStack {
             VStack(spacing: 10) {

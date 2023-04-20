@@ -20,13 +20,13 @@ struct AccountAssetViewModel: Identifiable {
 
 enum AssetDetailType: Identifiable {
   case blockchainToken(BraveWallet.BlockchainToken)
-  case coinMarket(BraveWallet.CoinMarket, Bool)
+  case coinMarket(BraveWallet.CoinMarket)
   
   var id: String {
     switch self {
     case .blockchainToken(let token):
       return token.tokenId
-    case .coinMarket(let coinMarket, _):
+    case .coinMarket(let coinMarket):
       return coinMarket.id
     }
   }
@@ -86,7 +86,7 @@ class AssetDetailStore: ObservableObject {
     switch assetDetailType {
     case .blockchainToken(let token):
       return token
-    case .coinMarket(let coinMarket, _):
+    case .coinMarket(let coinMarket):
       return .init().then {
         for tokens in allBuyTokensAllOptions.values {
           if let matchedToken = tokens.first(where: { token in  token.symbol.caseInsensitiveCompare(coinMarket.symbol) == .orderedSame }) {
@@ -209,7 +209,7 @@ class AssetDetailStore: ObservableObject {
         self.accounts = await fetchAccountBalances(updatedAccounts, keyring: keyring, network: network)
         let assetRatios = [token.assetRatioId.lowercased(): assetPriceValue]
         self.transactionSummaries = await fetchTransactionSummarys(keyring: keyring, network: network, assetRatios: assetRatios)
-      case .coinMarket(let coinMarket, _):
+      case .coinMarket(let coinMarket):
         // comes from Market tab
         self.price = self.currencyFormatter.string(from: NSNumber(value: coinMarket.currentPrice)) ?? ""
         self.priceDelta = self.percentFormatter.string(from: NSNumber(value: coinMarket.priceChangePercentage24h / 100.0)) ?? ""

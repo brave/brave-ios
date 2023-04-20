@@ -29,11 +29,6 @@ struct MarketView: View {
     self.marketStore = cryptoStore.marketStore
   }
   
-  private var isSelectedCoinMarketSupported: Bool {
-    guard let coinMarket = selectedCoinMarket else { return false }
-    return marketStore.allCoingeckoTokens.contains(where: { $0.coingeckoId.caseInsensitiveCompare(coinMarket.id) == .orderedSame })
-  }
-  
   private var emptyState: some View {
     VStack(alignment: .center, spacing: 10) {
       Text(Strings.Wallet.coinMarketEmptyMsg)
@@ -176,12 +171,12 @@ struct MarketView: View {
         destination: {
           if let coinMarket = selectedCoinMarket {
             AssetDetailView(
-              assetDetailStore: cryptoStore.assetDetailStore(for: .coinMarket(coinMarket, isSelectedCoinMarketSupported)),
+              assetDetailStore: cryptoStore.assetDetailStore(for: .coinMarket(coinMarket)),
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore
             )
             .onDisappear {
-              cryptoStore.closeAssetDetailStore(for: .coinMarket(coinMarket, isSelectedCoinMarketSupported))
+              cryptoStore.closeAssetDetailStore(for: .coinMarket(coinMarket))
             }
           }
         },
