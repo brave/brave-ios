@@ -3981,12 +3981,12 @@ extension Strings {
       value: "Rank",
       comment: "The title of the rank of this coin from market."
     )
-    public static let coinMarket24HVolumn = NSLocalizedString(
-      "wallet.coinMarket24HVolumn",
+    public static let coinMarket24HVolume = NSLocalizedString(
+      "wallet.coinMarket24HVolume",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "24h Volumn",
-      comment: "The title of the 24h volumn of this coin from market."
+      value: "24h Volume",
+      comment: "The title of the 24h volume of this coin from market."
     )
     public static let coinMarketMarketCap = NSLocalizedString(
       "wallet.coinMarketMarketCap",

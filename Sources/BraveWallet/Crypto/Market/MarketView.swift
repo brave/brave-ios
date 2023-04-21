@@ -91,7 +91,7 @@ struct MarketView: View {
     ForEach(0...10, id: \.self) { _ in
       HStack {
         if sizeCategory.isAccessibilityCategory {
-          VStack(spacing: 8) {
+          VStack(alignment: .leading, spacing: 8) {
             loadingTokenPlaceholder
           }
         } else {
@@ -116,7 +116,7 @@ struct MarketView: View {
     List {
       Section {
         Group {
-          if marketStore.isLoading {
+          if marketStore.isLoading && marketStore.coins.isEmpty {
             loadingView
           } else if marketStore.coins.isEmpty {
             emptyState

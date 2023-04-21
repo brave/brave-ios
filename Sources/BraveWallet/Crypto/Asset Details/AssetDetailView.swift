@@ -151,7 +151,7 @@ struct AssetDetailView: View {
               let computed = assetDetailStore.currencyFormatter.string(from: NSNumber(value: BraveWallet.CoinMarket.abbreviateToBillion(input: coinMarket.totalVolume))) ?? ""
               Text("\(computed)B")
                 .font(.title3.weight(.semibold))
-              Text(Strings.Wallet.coinMarket24HVolumn)
+              Text(Strings.Wallet.coinMarket24HVolume)
                 .font(.footnote)
             }
             Spacer()
