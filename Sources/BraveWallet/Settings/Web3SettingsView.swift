@@ -171,13 +171,13 @@ private struct WalletSettingsView: View {
   }
 
   var body: some View {
-    if !keyringStore.isDefaultKeyringCreated {
+    if keyringStore.isDefaultKeyringCreated {
+      sections
+    } else {
       // `KeyringStore` is optional in `Web3SettingsView`, but observed here.
       // When wallet is reset, we need SwiftUI to be notified `isDefaultKeyringCreated`
       // changed so we can hide Wallet specific sections
       EmptyView()
-    } else {
-      sections
     }
   }
   
