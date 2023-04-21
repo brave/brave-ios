@@ -2587,18 +2587,18 @@ extension Strings {
     public static let settingsServerLocation =
       NSLocalizedString("vpn.settingsServerLocation", tableName: "BraveShared", bundle: .module,
         value: "Location",
-        comment: "Table cell title for vpn's server location")
+        comment: "Table cell title for vpn's server location and which open opens location select")
 
     public static let settingsResetConfiguration =
       NSLocalizedString("vpn.settingsResetConfiguration", tableName: "BraveShared", bundle: .module,
         value: "Reset Configuration",
         comment: "Button to reset VPN configuration")
 
-    public static let settingsChangeLocation =
-      NSLocalizedString("vpn.settingsChangeLocation", tableName: "BraveShared", bundle: .module,
-        value: "Change Location",
-        comment: "Button to change VPN server location")
-
+    public static let settingsTransportProtocol =
+      NSLocalizedString("vpn.settingsTransportProtocol", tableName: "BraveShared", bundle: .module,
+        value: "Transport Protocol",
+        comment: "Table cell title for vpn's transport protocol and which open opens protocol select")
+    
     public static let settingsContactSupport =
       NSLocalizedString("vpn.settingsContactSupport", tableName: "BraveShared", bundle: .module,
         value: "Contact Technical Support",
