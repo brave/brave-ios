@@ -29,6 +29,15 @@ else
   npm install
 fi
 
+echo "${COLOR_ORANGE}Fetching Leo SF Symbol assets…${COLOR_NONE}"
+if [[ -d "node_modules/leo-sf-symbols" ]]; then
+  rm -rf "node_modules/leo-sf-symbols"
+fi
+git clone https://github.com/brave/leo-sf-symbols node_modules/leo-sf-symbols
+pushd node_modules/leo-sf-symbols > /dev/null
+git reset --hard 71bd5ca
+popd > /dev/null
+
 # Delete Chromium Assets from BraveCore.framework since they aren't used.
 # TODO: Get this removed in the brave-core builds if possible
 echo "${COLOR_ORANGE}Cleaning up BraveCore framework assets…${COLOR_NONE}"
