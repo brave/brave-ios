@@ -9,6 +9,7 @@ import Shared
 import BraveShared
 import WebKit
 import os.log
+import Preferences
 
 // A helper class to handle Brave Search fallback needs.
 class BraveSearchManager: NSObject {
@@ -74,7 +75,19 @@ class BraveSearchManager: NSObject {
     self.url = url
     self.query = queryItem
     self.domainCookies = cookies.filter { $0.domain == url.host }
-    if domainCookies.first(where: { $0.name == "fallback" })?.value != "1" {
+    
+    // The fallback mixing can be set from two places:
+    // 1. Brave Search website settings
+    // 2. Brave iOS app search settings
+    // If the in-app setting is enabled it will override the website setting.
+    //
+    // States:
+    // App: ON  site: OFF -> ON
+    // App: OFF site: ON  -> ON
+    // App: OFF site: OFF -> OFF
+    // App: ON site: ON -> ON
+    if domainCookies.first(where: { $0.name == "fallback" })?.value != "1"
+        && !Preferences.General.forceBraveSearchFallbackMixing.value {
       return nil
     }
 

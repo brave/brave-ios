@@ -840,6 +840,24 @@ extension Strings {
         bundle: .module,
         value: "After One Month",
         comment: "Settings option to close old tabs after 1 month")
+    public static let braveSearchSection =
+      NSLocalizedString(
+        "settings.braveSearchSection", tableName: "BraveShared",
+        bundle: .module,
+        value: "Brave Search",
+        comment: "A table section where you can update your Brave Search settings")
+    public static let braveSearchFallbackMixingOption =
+      NSLocalizedString(
+        "settings.braveSearchFallbackMixingOption", tableName: "BraveShared",
+        bundle: .module,
+        value: "Google Fallback Mixing",
+        comment: "Setting that allows users to turn Google fallback mixing when making queries with Brave Search")
+    public static let braveSearchFallbackMixingFooter =
+      NSLocalizedString(
+        "settings.braveSearchFallbackMixingFooter", tableName: "BraveShared",
+        bundle: .module,
+        value: "For queries where Brave Search is not yet refined, your browser will anonymously check Google for the same query, mix the results for you and send the query data back to us so we can improve Brave Search for everyone. This setting will take preference over what was set on the Brave Search website",
+        comment: "This footer text explains the Google fallback mixing feature.")
   }
 }
 

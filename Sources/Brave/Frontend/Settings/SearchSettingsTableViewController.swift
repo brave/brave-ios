@@ -4,6 +4,7 @@
 
 import UIKit
 import Shared
+import Preferences
 import os.log
 
 // MARK: - SearchEnginePickerDelegate
@@ -33,8 +34,7 @@ class SearchSettingsTableViewController: UITableViewController {
   struct Constants {
     static let addCustomEngineRowIdentifier = "addCustomEngineRowIdentifier"
     static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
-    static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
-    static let showRecentSearchesRowIdentifier = "showRecentSearchRowIdentifier"
+    static let switchCell = "switchCell"
     static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
     static let customSearchEngineRowIdentifier = "customSearchEngineRowIdentifier"
   }
@@ -44,6 +44,7 @@ class SearchSettingsTableViewController: UITableViewController {
   enum Section: Int, CaseIterable {
     case current
     case customSearch
+    case braveSearch
   }
 
   // MARK: CurrentEngineType
@@ -69,13 +70,13 @@ class SearchSettingsTableViewController: UITableViewController {
 
     if isPrivate {
       orderedEngines =
-        orderedEngines
+      orderedEngines
         .filter { !$0.isCustomEngine || $0.engineID == OpenSearchEngine.migratedYahooEngineID }
     }
 
     if let priorityEngine = InitialSearchEngines().priorityEngine?.rawValue {
       orderedEngines =
-        orderedEngines
+      orderedEngines
         .sorted { engine, _ in
           engine.engineID == priorityEngine
         }
@@ -110,17 +111,16 @@ class SearchSettingsTableViewController: UITableViewController {
       $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.addCustomEngineRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
-      $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showSearchSuggestionsRowIdentifier)
-      $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showRecentSearchesRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.customSearchEngineRowIdentifier)
+      $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.switchCell)
       $0.sectionHeaderTopPadding = 5
     }
 
     // Insert Done button if being presented outside of the Settings Nav stack
     if navigationController?.viewControllers.first === self {
       navigationItem.leftBarButtonItem =
-        UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
+      UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
     }
 
     let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
@@ -188,11 +188,18 @@ class SearchSettingsTableViewController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if section == Section.current.rawValue {
+    guard let section = Section(rawValue: section) else {
+      assertionFailure()
+      return 0
+    }
+
+    switch section {
+    case .current:
       return CurrentEngineType.allCases.count
-    } else {
-      // Adding an extra row for Add Search Engine Entry
+    case .customSearch:
       return customSearchEngines.count + 1
+    case .braveSearch:
+      return 1
     }
   }
 
@@ -202,98 +209,185 @@ class SearchSettingsTableViewController: UITableViewController {
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     var cell: UITableViewCell?
-    var engine: OpenSearchEngine?
-
-    if indexPath.section == Section.current.rawValue {
-      switch indexPath.item {
-      case CurrentEngineType.standard.rawValue:
-        engine = searchEngines.defaultEngine(forType: .standard)
-        cell = configureSearchEngineCell(type: .standard, engineName: engine?.displayName)
-      case CurrentEngineType.private.rawValue:
-        engine = searchEngines.defaultEngine(forType: .privateMode)
-        cell = configureSearchEngineCell(type: .privateMode, engineName: engine?.displayName)
-      case CurrentEngineType.quick.rawValue:
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickSearchEngineRowIdentifier, for: indexPath).then {
-          $0.textLabel?.text = Strings.quickSearchEngines
-          $0.accessoryType = .disclosureIndicator
-          $0.editingAccessoryType = .disclosureIndicator
-        }
-      case CurrentEngineType.suggestions.rawValue:
-        let toggle = UISwitch().then {
-          $0.addTarget(self, action: #selector(didToggleSearchSuggestions), for: .valueChanged)
-          $0.isOn = searchEngines.shouldShowSearchSuggestions
-        }
-
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.showSearchSuggestionsRowIdentifier, for: indexPath).then {
-          $0.textLabel?.text = Strings.searchSettingSuggestionCellTitle
-          $0.accessoryView = toggle
-          $0.selectionStyle = .none
-        }
-      case CurrentEngineType.recentSearches.rawValue:
-        let toggle = UISwitch().then {
-          $0.addTarget(self, action: #selector(didToggleRecentSearches), for: .valueChanged)
-          $0.isOn = searchEngines.shouldShowRecentSearches
-        }
-
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.showRecentSearchesRowIdentifier, for: indexPath).then {
-          $0.textLabel?.text = Strings.searchSettingRecentSearchesCellTitle
-          $0.accessoryView = toggle
-          $0.selectionStyle = .none
-        }
-      default:
-        // Should not happen.
-        break
-      }
-    } else {
-      // Add custom engine
-      if indexPath.item == customSearchEngines.count {
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.addCustomEngineRowIdentifier, for: indexPath).then {
-          $0.textLabel?.text = Strings.searchSettingAddCustomEngineCellTitle
-          $0.accessoryType = .disclosureIndicator
-          $0.editingAccessoryType = .disclosureIndicator
-        }
-      } else {
-        engine = customSearchEngines[indexPath.item]
-
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.customSearchEngineRowIdentifier, for: indexPath).then {
-          $0.textLabel?.text = engine?.displayName
-          $0.textLabel?.adjustsFontSizeToFitWidth = true
-          $0.textLabel?.minimumScaleFactor = 0.5
-          $0.imageView?.image = engine?.image.createScaled(UX.iconSize)
-          $0.imageView?.layer.cornerRadius = 4
-          $0.imageView?.layer.cornerCurve = .continuous
-          $0.imageView?.layer.masksToBounds = true
-          $0.selectionStyle = .none
-        }
-      }
+    guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
+    
+    switch section {
+    case .current:
+      cell = configureCurrentSectionCell(indexPath: indexPath)
+    case .customSearch:
+      cell = configureCustomSectionCell(indexPath: indexPath)
+    case .braveSearch:
+      cell = configureBraveSearchSection(indexPath: indexPath)
     }
-
-    guard let tableViewCell = cell else { return UITableViewCell() }
-    tableViewCell.separatorInset = .zero
-
-    return tableViewCell
+    
+    cell?.separatorInset = .zero
+    
+    return cell ?? UITableViewCell()
   }
-
+  
+  private func configureCurrentSectionCell(indexPath: IndexPath) -> UITableViewCell {
+    var cell: UITableViewCell?
+    
+    switch indexPath.item {
+    case CurrentEngineType.standard.rawValue:
+      let engine = searchEngines.defaultEngine(forType: .standard)
+      cell = configureSearchEngineCell(type: .standard, engineName: engine.displayName)
+    case CurrentEngineType.private.rawValue:
+      let engine = searchEngines.defaultEngine(forType: .privateMode)
+      cell = configureSearchEngineCell(type: .privateMode, engineName: engine.displayName)
+    case CurrentEngineType.quick.rawValue:
+      cell = configureQuickSearchEngineCell(indexPath: indexPath)
+    case CurrentEngineType.suggestions.rawValue:
+      cell = configureSearchSuggestionsCell(indexPath: indexPath)
+    case CurrentEngineType.recentSearches.rawValue:
+      cell = configureRecentSearchesCell(indexPath: indexPath)
+    default:
+      assertionFailure()
+    }
+    
+    return cell ?? UITableViewCell()
+  }
+  
+  private func configureCustomSectionCell(indexPath: IndexPath) -> UITableViewCell {
+    if indexPath.item == customSearchEngines.count {
+      let cell = tableView.dequeueReusableCell(withIdentifier: Constants.addCustomEngineRowIdentifier, for: indexPath).then {
+        $0.textLabel?.text = Strings.searchSettingAddCustomEngineCellTitle
+        $0.accessoryType = .disclosureIndicator
+        $0.editingAccessoryType = .disclosureIndicator
+      }
+      return cell
+    } else {
+      let engine = customSearchEngines[indexPath.item]
+      let cell = tableView.dequeueReusableCell(withIdentifier: Constants.customSearchEngineRowIdentifier, for: indexPath).then {
+        $0.textLabel?.text = engine.displayName
+        $0.textLabel?.adjustsFontSizeToFitWidth = true
+        $0.textLabel?.minimumScaleFactor = 0.5
+        $0.imageView?.image = engine.image.createScaled(UX.iconSize)
+        $0.imageView?.layer.cornerRadius = 4
+        $0.imageView?.layer.cornerCurve = .continuous
+        $0.imageView?.layer.masksToBounds = true
+        $0.selectionStyle = .none
+      }
+      return cell
+    }
+  }
+  
+  private func configureQuickSearchEngineCell(indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: Constants.quickSearchEngineRowIdentifier, for: indexPath).then {
+      $0.textLabel?.text = Strings.quickSearchEngines
+      $0.accessoryType = .disclosureIndicator
+      $0.editingAccessoryType = .disclosureIndicator
+    }
+    
+    return cell
+  }
+  
+  private func configureSearchSuggestionsCell(indexPath: IndexPath) -> UITableViewCell {
+    let toggle = UISwitch().then {
+      $0.addTarget(self, action: #selector(didToggleSearchSuggestions), for: .valueChanged)
+      $0.isOn = searchEngines.shouldShowSearchSuggestions
+    }
+    
+    let cell = tableView.dequeueReusableCell(withIdentifier: Constants.switchCell, for: indexPath).then {
+      $0.textLabel?.text = Strings.searchSettingSuggestionCellTitle
+      $0.accessoryView = toggle
+      $0.selectionStyle = .none
+    }
+    
+    return cell
+  }
+  
+  private func configureRecentSearchesCell(indexPath: IndexPath) -> UITableViewCell {
+    let toggle = UISwitch().then {
+      $0.addTarget(self, action: #selector(didToggleRecentSearches), for: .valueChanged)
+      $0.isOn = searchEngines.shouldShowRecentSearches
+    }
+    
+    let cell = tableView.dequeueReusableCell(withIdentifier: Constants.switchCell, for: indexPath).then {
+      $0.textLabel?.text = Strings.searchSettingRecentSearchesCellTitle
+      $0.accessoryView = toggle
+      $0.selectionStyle = .none
+    }
+    
+    return cell
+  }
+  
+  private func configureBraveSearchSection(indexPath: IndexPath) -> UITableViewCell {
+    let toggle = UISwitch().then {
+      $0.addTarget(self, action: #selector(didToggleFallbackMixing), for: .valueChanged)
+      $0.isOn = Preferences.General.forceBraveSearchFallbackMixing.value
+    }
+    
+    let cell = tableView.dequeueReusableCell(withIdentifier: Constants.switchCell, for: indexPath).then {
+      $0.textLabel?.text = Strings.Settings.braveSearchFallbackMixingOption
+      $0.accessoryView = toggle
+      $0.selectionStyle = .none
+    }
+    
+    return cell
+  }
+  
   override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    guard let section = Section(rawValue: section) else {
+      assertionFailure()
+      return nil
+    }
     let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
-
-    let sectionTitle = section == Section.current.rawValue ? Strings.currentlyUsedSearchEngines : Strings.customSearchEngines
-
-    headerView.titleLabel.text = sectionTitle
+    
+    let label = headerView.titleLabel
+    var text: String?
+    
+    switch section {
+    case .current:
+      text = Strings.currentlyUsedSearchEngines
+    case .customSearch:
+      text = Strings.customSearchEngines
+    case .braveSearch:
+      text = Strings.Settings.braveSearchSection
+    }
+    
+    label.text = text?.uppercased()
+    
     return headerView
   }
-
+  
+  override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    guard section == Section.braveSearch.rawValue else { return nil }
+    let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
+    headerView.titleLabel.text = Strings.Settings.braveSearchFallbackMixingFooter
+    return headerView
+  }
+  
+  override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    guard let section = Section(rawValue: section) else {
+      return 0
+    }
+    
+    switch section {
+    case .braveSearch:
+      return UITableView.automaticDimension
+    case .current, .customSearch:
+      return 0
+    }
+  }
+  
   override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-    if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.standard.rawValue {
-      navigationController?.pushViewController(configureSearchEnginePicker(.standard), animated: true)
-    } else if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.private.rawValue {
-      navigationController?.pushViewController(configureSearchEnginePicker(.privateMode), animated: true)
-    } else if indexPath.section == Section.current.rawValue && indexPath.item == CurrentEngineType.quick.rawValue {
+    guard let section = Section(rawValue: indexPath.section), let nav = navigationController else { return nil }
+    let item = indexPath.item
+    
+    switch (section, item) {
+    case (.current, CurrentEngineType.standard.rawValue):
+      nav.pushViewController(configureSearchEnginePicker(.standard), animated: true)
+    case (.current, CurrentEngineType.private.rawValue):
+      nav.pushViewController(configureSearchEnginePicker(.privateMode), animated: true)
+    case (.current, CurrentEngineType.quick.rawValue):
       let quickSearchEnginesViewController = SearchQuickEnginesViewController(profile: profile)
-      navigationController?.pushViewController(quickSearchEnginesViewController, animated: true)
-    } else if indexPath.section == Section.customSearch.rawValue && indexPath.item == customSearchEngines.count {
+      nav.pushViewController(quickSearchEnginesViewController, animated: true)
+    case (.customSearch, let item) where item == customSearchEngines.count:
       let customEngineViewController = SearchCustomEngineViewController(profile: profile)
-      navigationController?.pushViewController(customEngineViewController, animated: true)
+      nav.pushViewController(customEngineViewController, animated: true)
+    default:
+      break
     }
 
     return nil
@@ -374,7 +468,11 @@ extension SearchSettingsTableViewController {
     searchEngines.shouldShowRecentSearches = toggle.isOn
     searchEngines.shouldShowRecentSearchesOptIn = false
   }
-
+  
+  @objc func didToggleFallbackMixing(_ toggle: UISwitch) {
+    Preferences.General.forceBraveSearchFallbackMixing.value = toggle.isOn
+  }
+  
   @objc func dismissAnimated() {
     self.dismiss(animated: true, completion: nil)
   }

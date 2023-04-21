@@ -82,6 +82,8 @@ extension Preferences {
     static var defaultPageZoomLevel = Option<Double>(key: "general.default-page-zoom-level", default: 1.0)
     
     static let isUsingBottomBar = Option<Bool>(key: "general.bottom-bar", default: false)
+    
+    static let forceBraveSearchFallbackMixing = Option<Bool>(key: "general.fallback-mixing", default: false)
   }
 
   final public class Search {
