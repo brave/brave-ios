@@ -144,7 +144,6 @@ public class BraveVPNSettingsViewController: TableViewController {
                     self.selectServerTapped()
                  },
                  accessory: .disclosureIndicator,
-                 cellClass: ButtonCellValue1.self,
                  uuid: locationCellId),
              Row(text: Strings.VPN.settingsTransportProtocol,
                  detailText: transportProtocol,
@@ -152,7 +151,6 @@ public class BraveVPNSettingsViewController: TableViewController {
                     self.selectProtocolTapped()
                  },
                  accessory: .disclosureIndicator,
-                 cellClass: ButtonCellValue1.self,
                  uuid: protocolCellId),
              Row(text: Strings.VPN.settingsResetConfiguration,
                  selection: { [unowned self] in
@@ -166,15 +164,13 @@ public class BraveVPNSettingsViewController: TableViewController {
                  selection: { [unowned self] in
                    self.sendContactSupportEmail()
                  },
-                 accessory: .disclosureIndicator,
-                 cellClass: ButtonCell.self)])
+                 accessory: .disclosureIndicator)])
     
     let termsSection = Section(
       rows: [Row(text: Strings.VPN.settingsFAQ,
                  selection: { [unowned self] in
                    self.openURL?(.brave.braveVPNFaq)
                  },
-                 accessory: .disclosureIndicator,
                  cellClass: ButtonCell.self)])
     
     dataSource.sections = [vpnStatusSection,
@@ -306,20 +302,4 @@ public class BraveVPNSettingsViewController: TableViewController {
   @objc func vpnConfigChanged() {
     vpnConnectionStatusSwitch?.isOn = BraveVPN.isConnected
   }
-}
-
-private class ButtonCellValue1: UITableViewCell, Cell {
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-      super.init(style: .value1, reuseIdentifier: reuseIdentifier)
-      tintColorDidChange()
-    }
-  
-    required init?(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
-    }
-  
-    override func tintColorDidChange() {
-      super.tintColorDidChange()
-      textLabel?.textColor = tintColor
-    }
 }
