@@ -63,15 +63,15 @@ class NFTStoreTests: XCTestCase {
       """
       completion("", metadata, .success, "")
     }
-    rpcService._solTokenMetadata = { _, completion in
-      completion(
-      """
+    rpcService._solTokenMetadata = { _, _, completion in
+      let metadata = """
       {
         "image": "sol.mock.image.url",
         "name": "sol mock nft name",
         "description": "sol mock nft description"
       }
-      """, .success, "")
+      """
+      completion("", metadata, .success, "")
     }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._userAssets = { _, coin, completion in
@@ -98,7 +98,7 @@ class NFTStoreTests: XCTestCase {
       walletService: walletService,
       assetRatioService: assetRatioService,
       blockchainRegistry: BraveWallet.TestBlockchainRegistry(),
-      ipfsApi: nil
+      ipfsApi: TestIpfsAPI()
     )
     
     // test that `update()` will assign new value to `userVisibleNFTs` publisher
@@ -182,15 +182,15 @@ class NFTStoreTests: XCTestCase {
       """
       completion("", metadata, .success, "")
     }
-    rpcService._solTokenMetadata = { _, completion in
-      completion(
-      """
+    rpcService._solTokenMetadata = { _, _, completion in
+      let metadata = """
       {
         "image": "sol.mock.image.url",
         "name": "sol mock nft name",
         "description": "sol mock nft description"
       }
-      """, .success, "")
+      """
+      completion("", metadata, .success, "")
     }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._userAssets = { _, coin, completion in
@@ -217,7 +217,7 @@ class NFTStoreTests: XCTestCase {
       walletService: walletService,
       assetRatioService: assetRatioService,
       blockchainRegistry: BraveWallet.TestBlockchainRegistry(),
-      ipfsApi: nil
+      ipfsApi: TestIpfsAPI()
     )
     
     // test that `update()` will assign new value to `userVisibleNFTs` publisher
