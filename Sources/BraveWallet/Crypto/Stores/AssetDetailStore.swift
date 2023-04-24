@@ -77,7 +77,6 @@ class AssetDetailStore: ObservableObject {
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
   private let swapService: BraveWalletSwapService
-//  private var selectedNetwork: BraveWallet.NetworkInfo = .init()
   /// A list of tokens that are supported with the current selected network for all supported
   /// on-ramp providers.
   private var allBuyTokensAllOptions: [BraveWallet.OnRampProvider: [BraveWallet.BlockchainToken]] = [:]
@@ -200,6 +199,7 @@ class AssetDetailStore: ObservableObject {
         self.isInitialState = false
         self.isLoadingChart = false
         
+        // selected network used because we don't have `chainId` on CoinMarket
         let selectedCoin = await self.walletService.selectedCoin()
         let selectedNetwork = await self.rpcService.network(selectedCoin)
         self.isBuySupported = await self.isBuyButtonSupported(in: selectedNetwork, for: coinMarket.symbol)
