@@ -33,7 +33,7 @@ struct AssetDetailView: View {
 
   @Environment(\.openURL) private var openWalletURL
 
-  @ViewBuilder var accountsBalanceView: some View {
+  @ViewBuilder private var accountsBalanceView: some View {
     Section(
       header: WalletListHeaderView(title: Text(Strings.Wallet.accountsPageTitle)),
       footer: Button(action: {
@@ -85,7 +85,7 @@ struct AssetDetailView: View {
     }
   }
   
-  @ViewBuilder var transactionsView: some View {
+  @ViewBuilder private var transactionsView: some View {
     Section(
       header: WalletListHeaderView(title: Text(Strings.Wallet.transactionsTitle))
     ) {
@@ -119,6 +119,39 @@ struct AssetDetailView: View {
     }
   }
   
+  private func coinMarketInfoView(_ coinMarket: BraveWallet.CoinMarket) -> some View {
+    Section {
+      HStack {
+        VStack(spacing: 10) {
+          Text("\(coinMarket.marketCapRank)")
+            .font(.title3.weight(.semibold))
+          Text(Strings.Wallet.coinMarketRank)
+            .font(.footnote)
+        }
+        Spacer()
+        VStack(spacing: 10) {
+          let computed = assetDetailStore.currencyFormatter.string(from: NSNumber(value: BraveWallet.CoinMarket.abbreviateToBillion(input: coinMarket.totalVolume))) ?? ""
+          Text("\(computed)B")
+            .font(.title3.weight(.semibold))
+          Text(Strings.Wallet.coinMarket24HVolume)
+            .font(.footnote)
+        }
+        Spacer()
+        VStack(spacing: 10) {
+          let computed = assetDetailStore.currencyFormatter.string(from: NSNumber(value: BraveWallet.CoinMarket.abbreviateToBillion(input: coinMarket.marketCap))) ?? ""
+          Text("\(computed)B")
+            .font(.title3.weight(.semibold))
+          Text(Strings.Wallet.coinMarketMarketCap)
+            .font(.footnote)
+        }
+      }
+      .foregroundColor(Color(.braveLabel))
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+    } header: {
+      Text(Strings.Wallet.coinMarketInformation)
+    }
+  }
+  
   var body: some View {
     List {
       Section(
@@ -138,36 +171,7 @@ struct AssetDetailView: View {
         accountsBalanceView
         transactionsView
       case .coinMarket(let coinMarket):
-        Section {
-          HStack {
-            VStack(spacing: 10) {
-              Text("\(coinMarket.marketCapRank)")
-                .font(.title3.weight(.semibold))
-              Text(Strings.Wallet.coinMarketRank)
-                .font(.footnote)
-            }
-            Spacer()
-            VStack(spacing: 10) {
-              let computed = assetDetailStore.currencyFormatter.string(from: NSNumber(value: BraveWallet.CoinMarket.abbreviateToBillion(input: coinMarket.totalVolume))) ?? ""
-              Text("\(computed)B")
-                .font(.title3.weight(.semibold))
-              Text(Strings.Wallet.coinMarket24HVolume)
-                .font(.footnote)
-            }
-            Spacer()
-            VStack(spacing: 10) {
-              let computed = assetDetailStore.currencyFormatter.string(from: NSNumber(value: BraveWallet.CoinMarket.abbreviateToBillion(input: coinMarket.marketCap))) ?? ""
-              Text("\(computed)B")
-                .font(.title3.weight(.semibold))
-              Text(Strings.Wallet.coinMarketMarketCap)
-                .font(.footnote)
-            }
-          }
-          .foregroundColor(Color(.braveLabel))
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        } header: {
-          Text(Strings.Wallet.coinMarketInformation)
-        }
+        coinMarketInfoView(coinMarket)
       }
       if !assetDetailStore.assetDetailToken.isNft && !assetDetailStore.assetDetailToken.isErc721 {
         Section {
