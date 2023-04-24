@@ -233,6 +233,10 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func networkUrl(_ coin: BraveWallet.CoinType, origin: URLOrigin?, completion: @escaping (String) -> Void) {
     completion("")
   }
+  
+  func isSolanaBlockhashValid(_ chainId: String, blockhash: String, commitment: String?, completion: @escaping (Bool, BraveWallet.SolanaProviderError, String) -> Void) {
+    completion(true, .success, "")
+  }
 }
 
 extension BraveWallet.NetworkInfo {
