@@ -2412,7 +2412,11 @@ public class BrowserViewController: UIViewController {
 extension BrowserViewController {
   func didScanQRCodeWithURL(_ url: URL) {
     popToBVC()
-    finishEditingAndSubmit(url, visitType: .typed)
+    let overlayText = URLFormatter.formatURL(url.absoluteString, formatTypes: [], unescapeOptions: [])
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+      self.topToolbar.enterOverlayMode(overlayText, pasted: false, search: false)
+    }
 
     if !url.isBookmarklet && !PrivateBrowsingManager.shared.isPrivateBrowsing {
       RecentSearch.addItem(type: .qrCode, text: nil, websiteUrl: url.absoluteString)
