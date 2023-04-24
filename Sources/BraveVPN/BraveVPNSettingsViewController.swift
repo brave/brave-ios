@@ -285,7 +285,7 @@ public class BraveVPNSettingsViewController: TableViewController {
   }
   
   private func selectProtocolTapped() {
-    let vc = BraveVPNRegionPickerViewController()
+    let vc = BraveVPNProtocolPickerViewController()
     navigationController?.pushViewController(vc, animated: true)
   }
 
