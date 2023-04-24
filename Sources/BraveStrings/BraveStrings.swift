@@ -856,7 +856,7 @@ extension Strings {
       NSLocalizedString(
         "settings.braveSearchFallbackMixingFooter", tableName: "BraveShared",
         bundle: .module,
-        value: "For queries where Brave Search is not yet refined, your browser will anonymously check Google for the same query, mix the results for you and send the query data back to us so we can improve Brave Search for everyone. This setting will take preference over what was set on the Brave Search website",
+        value: "For queries where Brave Search is not yet refined, your browser will anonymously check Google for the same query, mix the results for you and send the query data back to us so we can improve Brave Search for everyone. This setting will take precedence over what was set on the Brave Search website",
         comment: "This footer text explains the Google fallback mixing feature.")
   }
 }
