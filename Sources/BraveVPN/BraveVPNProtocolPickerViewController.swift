@@ -12,15 +12,14 @@ import GuardianConnect
 
 class BraveVPNProtocolPickerViewController: BraveVPNPickerViewController {
   
-  private let regionList: [GRDRegion]
+  private let tunnelProtocolList: [TransportProtocol]
 
   /// This group monitors vpn connection status.
   private var dispatchGroup: DispatchGroup?
   private var vpnRegionChangeSuccess = false
 
   override init() {
-    self.regionList = BraveVPN.regions
-      .sorted { $0.displayName < $1.displayName }
+    self.tunnelProtocolList = [.wireGuard, .ikEv2]
 
     super.init()
   }
@@ -35,6 +34,8 @@ class BraveVPNProtocolPickerViewController: BraveVPNPickerViewController {
     tableView.dataSource = self
     
     super.viewDidLoad()
+    
+    print("Transport Protocol \(GRDTransportProtocol.getUserPreferredTransportProtocol())")
   }
   
   override func vpnConfigChanged(notification: NSNotification) {
@@ -52,12 +53,8 @@ class BraveVPNProtocolPickerViewController: BraveVPNPickerViewController {
 
 extension BraveVPNProtocolPickerViewController: UITableViewDelegate, UITableViewDataSource {
   
-  func numberOfSections(in tableView: UITableView) -> Int {
-    1
-  }
-
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    regionList.count
+    tunnelProtocolList.count
   }
 
   func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
@@ -68,10 +65,12 @@ extension BraveVPNProtocolPickerViewController: UITableViewDelegate, UITableView
     let cell = tableView.dequeueReusableCell(for: indexPath) as VPNRegionCell
     cell.accessoryType = .none
 
-    guard let server = regionList[safe: indexPath.row] else { return cell }
-    cell.textLabel?.text = server.displayName
+    guard let tunnelProtocol = tunnelProtocolList[safe: indexPath.row] else { return cell }
+    cell.textLabel?.text = GRDTransportProtocol.prettyTransportProtocolString(for: tunnelProtocol)
+    
+    let activeProtocolOption = GRDTransportProtocol.getUserPreferredTransportProtocol()
 
-    if server.displayName == BraveVPN.selectedRegion?.displayName {
+    if activeProtocolOption == tunnelProtocol {
       cell.accessoryType = .checkmark
     }
 
@@ -80,6 +79,32 @@ extension BraveVPNProtocolPickerViewController: UITableViewDelegate, UITableView
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
+
+    guard let tunnelProtocol = tunnelProtocolList[safe: indexPath.row] else { return }
+    
+    let activeProtocolOption = GRDTransportProtocol.getUserPreferredTransportProtocol()
+
+    // Same option is selected do nothing
+    if activeProtocolOption == tunnelProtocol {
+      return
+    }
+      
+    isLoading = true
+    
+    BraveVPN.changePreferredTransportProtocol(with: tunnelProtocol) { [weak self] success in
+      guard let self else { return }
+
+      isLoading = false
+
+      if success {
+        self.dismiss(animated: true) {
+          self.showSuccessAlert()
+        }
+      } else {
+        self.showErrorAlert(title: "Error",
+                            message: "Failed to change transport protocol.")
+      }
+    }
 
   }
 }

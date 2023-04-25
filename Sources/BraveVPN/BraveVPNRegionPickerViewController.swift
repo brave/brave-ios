@@ -121,10 +121,8 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
       guard let self = self else { return }
 
       if !success {
-        DispatchQueue.main.async {
-          self.showErrorAlert(title: Strings.VPN.regionPickerErrorTitle,
-                         message: Strings.VPN.regionPickerErrorMessage)
-        }
+        self.showErrorAlert(title: Strings.VPN.regionPickerErrorTitle,
+                            message: Strings.VPN.regionPickerErrorMessage)
       }
 
       // Changing vpn server settings takes lot of time,
@@ -147,10 +145,8 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
             self.showSuccessAlert()
           }
         } else {
-          DispatchQueue.main.async {
-            self.showErrorAlert(title: Strings.VPN.regionPickerErrorTitle,
-                           message: Strings.VPN.regionPickerErrorMessage)
-          }
+          self.showErrorAlert(title: Strings.VPN.regionPickerErrorTitle,
+                              message: Strings.VPN.regionPickerErrorMessage)
         }
       }
     }

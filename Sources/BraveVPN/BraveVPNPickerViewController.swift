@@ -73,8 +73,7 @@ class BraveVPNPickerViewController: UIViewController {
     tableView.reloadData()
   }
   
-  @objc func vpnConfigChanged(notification: NSNotification) {
-  }
+  @objc func vpnConfigChanged(notification: NSNotification) { }
 
   func showSuccessAlert() {
     let animation = AnimationView(name: "vpncheckmark", bundle: .module).then {
@@ -92,15 +91,17 @@ class BraveVPNPickerViewController: UIViewController {
   }
   
   func showErrorAlert(title: String, message: String?) {
-    let alert = AlertController(title: Strings.VPN.regionPickerErrorTitle,
-                                message: Strings.VPN.regionPickerErrorMessage,
-                                preferredStyle: .alert)
-    let okAction = UIAlertAction(title: Strings.OKString, style: .default) { _ in
-      self.dismiss(animated: true)
+    DispatchQueue.main.async {
+      let alert = AlertController(title: Strings.VPN.regionPickerErrorTitle,
+                                  message: Strings.VPN.regionPickerErrorMessage,
+                                  preferredStyle: .alert)
+      let okAction = UIAlertAction(title: Strings.OKString, style: .default) { _ in
+        self.dismiss(animated: true)
+      }
+      alert.addAction(okAction)
+      
+      self.present(alert, animated: true)
     }
-    alert.addAction(okAction)
-
-    present(alert, animated: true)
   }
 }
 
