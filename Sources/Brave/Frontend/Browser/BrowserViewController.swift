@@ -1968,11 +1968,11 @@ public class BrowserViewController: UIViewController {
     present(settingsNavigationController, animated: true)
   }
 
-  func popToBVC() {
+  func popToBVC(completion: (() -> Void)? = nil) {
     guard let currentViewController = navigationController?.topViewController else {
       return
     }
-    currentViewController.dismiss(animated: true, completion: nil)
+    currentViewController.dismiss(animated: true, completion: completion)
 
     if currentViewController != self {
       _ = self.navigationController?.popViewController(animated: true)
@@ -2411,10 +2411,9 @@ public class BrowserViewController: UIViewController {
 
 extension BrowserViewController {
   func didScanQRCodeWithURL(_ url: URL) {
-    popToBVC()
     let overlayText = URLFormatter.formatURL(url.absoluteString, formatTypes: [], unescapeOptions: [])
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+    popToBVC() {
       self.topToolbar.enterOverlayMode(overlayText, pasted: false, search: false)
     }
 
