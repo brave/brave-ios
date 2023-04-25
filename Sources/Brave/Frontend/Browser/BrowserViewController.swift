@@ -2516,6 +2516,7 @@ extension BrowserViewController: TabDelegate {
       DeAmpScriptHandler(tab: tab),
       SiteStateListenerScriptHandler(tab: tab),
       CosmeticFiltersScriptHandler(tab: tab),
+      URLPartinessScriptHandler(tab: tab),
       FaviconScriptHandler(tab: tab),
       Web3NameServiceScriptHandler(tab: tab),
       Web3IPFSScriptHandler(tab: tab),

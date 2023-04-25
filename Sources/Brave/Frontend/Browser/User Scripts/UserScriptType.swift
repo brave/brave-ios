@@ -23,7 +23,7 @@ enum UserScriptType: Hashable {
     /// Determines if we hide first party content or not
     ///
     /// - Note: For now this is always true as to be more aggressive. Later we may make this more configurable
-    let hideFirstPartyContent = true
+    let hideFirstPartyContent = false
     /// This value come from the engine. In most cases this is false.
     let genericHide: Bool
     /// The delay on which to start polling on.

@@ -6,8 +6,9 @@
 window.__firefox__.execute(function($) {
   const args = $<args>
   const messageHandler = '$<message_handler>';
+  const partinessMessageHandler = '$<partiness_message_handler>';
   
-  const sendMessage = $((ids, classes) => {
+  const sendSelectors = $((ids, classes) => {
     return $.postNativeMessage(messageHandler, {
       "securityToken": SECURITY_TOKEN,
       "data": {
@@ -15,13 +16,23 @@ window.__firefox__.execute(function($) {
         ids: ids,
         classes: classes
       }
-    });
-  });
+    })
+  })
   
+  const getPartiness = $((urls) => {
+    return $.postNativeMessage(partinessMessageHandler, {
+      "securityToken": SECURITY_TOKEN,
+      "data": {
+        sourceURL: window.location.href,
+        urls: urls,
+      }
+    })
+  })
+
   // Start looking for things to unhide before at most this long after
   // the backend script is up and connected (eg backgroundReady = true),
   // or sooner if the thread is idle.
-  const maxTimeMSBeforeStart = 1000
+  const maxTimeMSBeforeStart = 0
   // The cutoff for text ads.  If something has only text in it, it needs to have
   // this many, or more, characters.  Similarly, require it to have a non-trivial
   // number of words in it, to look like an actual text ad.
@@ -45,46 +56,26 @@ window.__firefox__.execute(function($) {
   // Each of these get setup once the mutation observer starts running.
   let notYetQueriedClasses = []
   let notYetQueriedIds = []
-  
-  const CC = {}
-  CC.allHideSelectorsToRules = new Map()
-  CC.allRules = []
-  CC.observingHasStarted = false
-  // All new selectors go in `firstRunQueue`
-  CC.firstRunQueue = new Set()
-  // Third party matches go in the second and third queues.
-  CC.secondRunQueue = new Set()
-  // Once a selector gets in to this queue, it's only evaluated for 1p content one
-  // more time.
-  CC.finalRunQueue = new Set()
-  CC.allQueues = [
-    CC.firstRunQueue, CC.secondRunQueue, CC.finalRunQueue
-  ]
-  CC.numQueues = CC.allQueues.length
-  CC.alreadyUnhiddenSelectors = new Set()
-  CC.alreadyKnownFirstPartySubtrees = new WeakSet()
-  CC._hasDelayOcurred = false
-  CC._startCheckingId = undefined
-  CC.firstSelectorsPollingDelayMs = undefined
-  CC.switchToSelectorsPollingThreshold = undefined
-  CC.fetchNewClassIdRulesThrottlingMs = undefined
-  
-  // The passed configuration to this script
-  CC.hide1pContent = args.hideFirstPartyContent
-  CC.generichide = args.genericHide
-  
-  if (args.firstSelectorsPollingDelayMs) {
-    CC.firstSelectorsPollingDelayMs = args.firstSelectorsPollingDelayMs
+
+  const CC = {
+    hiddenSelectors: new Set(),
+    allStyleRules: [],
+    alreadyUnhiddenSelectors: new Set(),
+    alreadyKnownFirstPartySubtrees: new WeakSet(),
+    runQueues: [
+      // All new selectors go in this first run queue
+      new Set(),
+      // Third party matches go in the second and third queues.
+      new Set(),
+      // This is the final run queue.
+      // It's only evaluated for 1p content one more time.
+      new Set()
+    ],
+    pendingURLS: new Set(),
+    sendingURLS: new Set(),
+    urlFirstParty: new Map()
   }
-  
-  if (args.switchToSelectorsPollingThreshold) {
-    CC.switchToSelectorsPollingThreshold = args.switchToSelectorsPollingThreshold
-  }
-  
-  if (args.fetchNewClassIdRulesThrottlingMs) {
-    CC.fetchNewClassIdRulesThrottlingMs = args.fetchNewClassIdRulesThrottlingMs
-  }
-  
+
   /**
    * Provides a new function which can only be scheduled once at a time.
    *
@@ -93,7 +84,7 @@ window.__firefox__.execute(function($) {
    */
   const idleize = (onIdle, timeout) => {
     let idleId
-    return function WillRunOnIdle () {
+    return function willRunOnIdle () {
       if (idleId !== undefined) {
         return
       }
@@ -126,8 +117,8 @@ window.__firefox__.execute(function($) {
   // Under the hood it makes a lot of work: call to C++ => IPC to the browser
   // process => request to the rust CS engine and back.
   // So limit the number of calls to one per fetchNewClassIdRulesThrottlingMs.
-  const ShouldThrottleFetchNewClassIdsRules = () => {
-    if (CC.fetchNewClassIdRulesThrottlingMs === undefined) {
+  const shouldThrottleFetchNewClassIdsRules = () => {
+    if (args.fetchNewClassIdRulesThrottlingMs === undefined) {
       return false // the feature is disabled.
     }
     if (fetchNewClassIdRulesTimeoutId) {
@@ -145,45 +136,54 @@ window.__firefox__.execute(function($) {
       return true
     }
     nextFetchNewClassIdRulesCall =
-      now + CC.fetchNewClassIdRulesThrottlingMs
+      now + args.fetchNewClassIdRulesThrottlingMs
     return false
   }
-  
+
   /// Takes selectors and adds them to the style sheet
   const processHideSelectors = (selectors) => {
     selectors.forEach(selector => {
-      if ((typeof selector === 'string') && (CC.hide1pContent || !CC.allHideSelectorsToRules.has(selector))) {
-        const rule = selector + '{display:none !important;}'
-        CC.allRules.push(rule)
-        
-        if (!CC.hide1pContent) {
-          CC.allHideSelectorsToRules.set(selector, CC.allRules.length - 1)
-          CC.firstRunQueue.add(selector)
+      if ((typeof selector === 'string') && !CC.hiddenSelectors.has(selector) && !CC.alreadyUnhiddenSelectors.has(selector)) {
+        CC.hiddenSelectors.add(selector)
+
+        if (!args.hideFirstPartyContent) {
+          CC.runQueues[0].add(selector)
         }
       }
     })
   }
-  
+
   /// Takes selectors and adds them to the style sheet
   const processStyleSelectors = (styleSelectors) => {
     styleSelectors.forEach(entry => {
-      let rule = entry.selector + '{' + entry.rules.join(';') + ';}'
-      CC.allRules.push(rule)
+      const rule = entry.selector + '{' + entry.rules.join(';') + ';}'
+      CC.allStyleRules.push(rule)
     })
   }
-  
+
   /// Moves the stylesheet to the bottom of the page
-  const moveStyle = () => {
+  const moveStyleIfNeeded = () => {
     const styleElm = CC.cosmeticStyleSheet
+
+    if (styleElm.nextElementSibling === null || styleElm.parentElement === styleElm) {
+      return
+    }
+
     const targetElm = document.body
     styleElm.parentElement.removeChild(styleElm)
     targetElm.appendChild(styleElm)
   }
-  
+
   const setRulesOnStylesheet = () => {
-    const ruleText = CC.allRules.filter(rule => {
+    const allHideRules = Array.from(CC.hiddenSelectors).map(selector => {
+      return selector + '{display:none !important;}'
+    })
+
+    const allRules = allHideRules.concat(CC.allStyleRules)
+    const ruleText = allRules.filter(rule => {
       return rule !== undefined && !rule.startsWith(':')
     }).join('')
+
     CC.cosmeticStyleSheet.innerText = ruleText
   }
 
@@ -192,13 +192,17 @@ window.__firefox__.execute(function($) {
       (!notYetQueriedIds || notYetQueriedIds.length === 0)) {
       return
     }
-    
-    sendMessage(notYetQueriedIds, notYetQueriedClasses).then(selectors => {
+
+    sendSelectors(notYetQueriedIds, notYetQueriedClasses).then(selectors => {
       if (!selectors) { return }
       processHideSelectors(selectors)
-      setRulesOnStylesheet()
+      if (!args.hideFirstPartyContent) {
+        pumpCosmeticFilterQueuesOnIdle()
+      } else {
+        setRulesOnStylesheet()
+      }
     })
-    
+
     notYetQueriedClasses = []
     notYetQueriedIds = []
   }
@@ -208,15 +212,15 @@ window.__firefox__.execute(function($) {
       clearInterval(selectorsPollingIntervalId)
       selectorsPollingIntervalId = undefined
     }
-    
+
     const observer = new MutationObserver(onMutations)
-    
+
     const observerConfig = {
       subtree: true,
       childList: true,
       attributeFilter: ['id', 'class']
     }
-    
+
     observer.observe(document.documentElement, observerConfig)
   }
 
@@ -224,22 +228,21 @@ window.__firefox__.execute(function($) {
     if (observer) {
       const mutations = observer.takeRecords()
       observer.disconnect()
-      
+
       if (mutations) {
         queueAttrsFromMutations(mutations)
       }
     }
-    
+
     const futureTimeMs = window.Date.now() + returnToMutationObserverIntervalMs
     const queryAttrsFromDocumentBound = queryAttrsFromDocument.bind(undefined, futureTimeMs)
-    selectorsPollingIntervalId = window.setInterval(queryAttrsFromDocumentBound,
-                                                       selectorsPollingIntervalMs)
+    selectorsPollingIntervalId = window.setInterval(queryAttrsFromDocumentBound, selectorsPollingIntervalMs)
   }
 
   const queueAttrsFromMutations = (mutations) => {
     let mutationScore = 0
-    for (let _i = 0, mutations1 = mutations; _i < mutations1.length; _i++) {
-      const aMutation = mutations1[_i]
+    for (let mutationIndex = 0; mutationIndex < mutations.length; mutationIndex++) {
+      const aMutation = mutations[mutationIndex]
       if (aMutation.type === 'attributes') {
         // Since we're filtering for attribute modifications, we can be certain
         // that the targets are always HTMLElements, and never TextNode.
@@ -264,8 +267,8 @@ window.__firefox__.execute(function($) {
             break
         }
       } else if (aMutation.addedNodes.length > 0) {
-        for (let _d = 0, _e = aMutation.addedNodes; _d < _e.length; _d++) {
-          const node = _e[_d]
+        for (let index = 0, nodes = aMutation.addedNodes; index < nodes.length; index++) {
+          const node = nodes[index]
           const element = asElement(node)
           if (!element) {
             continue
@@ -290,15 +293,15 @@ window.__firefox__.execute(function($) {
         }
       }
     }
-    
+
     return mutationScore
   }
-  
+
   const onMutations = (mutations, observer) => {
     const mutationScore = queueAttrsFromMutations(mutations)
     // Check the conditions to switch to the alternative strategy
     // to get selectors.
-    if (CC.switchToSelectorsPollingThreshold !== undefined) {
+    if (args.switchToSelectorsPollingThreshold !== undefined) {
       const now = performance.now()
       if (now > currentMutationStartTime + scoreCalcIntervalMs) {
         // Start the next time frame.
@@ -306,25 +309,13 @@ window.__firefox__.execute(function($) {
         currentMutationScore = 0
       }
       currentMutationScore += mutationScore
-      if (currentMutationScore > CC.switchToSelectorsPollingThreshold) {
+      if (currentMutationScore > args.switchToSelectorsPollingThreshold) {
         usePolling(observer)
       }
     }
-    if (!ShouldThrottleFetchNewClassIdsRules()) {
+    if (!shouldThrottleFetchNewClassIdsRules()) {
       fetchNewClassIdRules()
     }
-  }
-
-  const isFirstPartyUrl = (url) => {
-    if (isRelativeUrl(url)) {
-      return true
-    }
-    
-    // TODO: @JS Handle first party for more control over cosmetic filtering agressivness
-    // For now we return false. The original source code was getting this from C++ but we cannot
-    // Do this easily in iOS so we will have to get creative here if we ever implement this.
-    // Perhaps we can do a close enough js implementation.
-    return false
   }
 
   const stripChildTagsFromText = (elm, tagName, text) => {
@@ -373,6 +364,31 @@ window.__firefox__.execute(function($) {
     return wordCount >= minAdTextWords
   }
 
+  const pumpIntervalMinMs = 40
+  const pumpIntervalMaxMs = 1000
+  const maxWorkSize = 60
+  let queueIsSleeping = false
+
+  const isFirstPartyUrl = (urlString) => {
+    if (isRelativeUrl(urlString)) {
+      return true
+    }
+
+    try {
+      const url = new URL(urlString, window.location.url)
+      const isFirstParty = CC.urlFirstParty[url.origin]
+
+      if (isFirstParty === undefined && !CC.sendingURLS.has(url.origin)) {
+        CC.pendingURLS.add(url.origin)
+      }
+
+      return isFirstParty
+    } catch (error) {
+      console.error(error)
+      return true
+    }
+  }
+
   /**
    * Determine whether a subtree should be considered as "first party" content.
    *
@@ -393,17 +409,15 @@ window.__firefox__.execute(function($) {
    */
   const isSubTreeFirstParty = (elm, possibleQueryResult) => {
     let queryResult
-    let isTopLevel
     if (possibleQueryResult) {
       queryResult = possibleQueryResult
-      isTopLevel = false
     } else {
       queryResult = {
         foundFirstPartyResource: false,
         foundThirdPartyResource: false,
-        foundKnownThirdPartyAd: false
+        foundKnownThirdPartyAd: false,
+        pendingURLChecks: false
       }
-      isTopLevel = true
     }
     if (elm.getAttribute) {
       if (elm.hasAttribute('id')) {
@@ -418,11 +432,19 @@ window.__firefox__.execute(function($) {
       if (elm.hasAttribute('src')) {
         const elmSrc = elm.getAttribute('src')
         const elmSrcIsFirstParty = isFirstPartyUrl(elmSrc)
-        if (elmSrcIsFirstParty) {
-          queryResult.foundFirstPartyResource = true
-          return true
+
+        if (elmSrcIsFirstParty === undefined) {
+          // queryResult.awaiting1stPartyCheck = true
+          // We don't have enough
+          queryResult.pendingURLChecks = true
+        } else {
+          if (elmSrcIsFirstParty) {
+            queryResult.foundFirstPartyResource = true
+            return true
+          } else {
+            queryResult.foundThirdPartyResource = true
+          }
         }
-        queryResult.foundThirdPartyResource = true
       }
       if (elm.hasAttribute('style')) {
         const elmStyle = elm.getAttribute('style')
@@ -438,52 +460,31 @@ window.__firefox__.execute(function($) {
         }
       }
     }
+
+    const subElms = []
     if (elm.firstChild) {
-      isSubTreeFirstParty(elm.firstChild, queryResult)
-      if (queryResult.foundKnownThirdPartyAd) {
-        return false
-      }
-      if (queryResult.foundFirstPartyResource) {
-        return true
-      }
+      subElms.push(elm.firstChild)
     }
     if (elm.nextSibling) {
-      isSubTreeFirstParty(elm.nextSibling, queryResult)
+      subElms.push(elm.nextSibling)
+    }
+
+    for (const subElm of subElms) {
+      isSubTreeFirstParty(subElm, queryResult)
       if (queryResult.foundKnownThirdPartyAd) {
         return false
       }
-      if (queryResult.foundFirstPartyResource) {
+      if (queryResult.foundFirstPartyResource && !queryResult.pendingURLChecks) {
         return true
       }
     }
-    if (!isTopLevel) {
-      return (!queryResult.foundThirdPartyResource)
-    }
-    if (queryResult.foundThirdPartyResource) {
-      return false
-    }
-    return true
-  }
 
-  const unhideSelectors = (selectors) => {
-    if (selectors.size === 0) {
-      return
+    if (queryResult.pendingURLChecks) {
+      return undefined
+    } else {
+      return !queryResult.foundThirdPartyResource
     }
-    
-    Array.from(selectors).forEach((selector) => {
-      const index = CC.allHideSelectorsToRules[selector]
-      
-      if (index !== undefined) {
-        CC.allHideSelectorsToRules.delete(selector)
-        delete CC.allRules[index]
-      }
-    })
   }
-
-  const pumpIntervalMinMs = 40
-  const pumpIntervalMaxMs = 1000
-  const maxWorkSize = 60
-  let queueIsSleeping = false
 
   /**
    * Go through each of the 3 queues, only take 50 items from each one
@@ -493,81 +494,121 @@ window.__firefox__.execute(function($) {
    *   - If any are 1st party, remove 'hide' rule and never check selector again.
    * 3. If we're looking at the 3rd queue, don't requeue any selectors.
    */
-  const pumpCosmeticFilterQueues = () => {
+  const pumpCosmeticFilterQueuesOnIdle = idleize(() => {
     if (queueIsSleeping) { return }
     let didPumpAnything = false
     // For each "pump", walk through each queue until we find selectors
     // to evaluate. This means that nothing in queue N+1 will be evaluated
     // until queue N is completely empty.
-    for (let queueIndex = 0; queueIndex < CC.numQueues; queueIndex += 1) {
-      const currentQueue = CC.allQueues[queueIndex]
-      const nextQueue = CC.allQueues[queueIndex + 1]
+    for (let queueIndex = 0, runQueues = CC.runQueues; queueIndex < runQueues.length; queueIndex++) {
+      const currentQueue = runQueues[queueIndex]
       if (currentQueue.size === 0) {
         continue
       }
+
       const currentWorkLoad = Array.from(currentQueue.values()).slice(0, maxWorkSize)
       const comboSelector = currentWorkLoad.join(',')
       const matchingElms = document.querySelectorAll(comboSelector)
+
       // Will hold selectors identified by _this_ queue pumping, that were
-      // newly identified to be matching 1p content.  Will be sent to
-      // the background script to do the un-hiding.
+      // newly identified to be matching 1p content.
+      // Will be sent to the background script to do the un-hiding.
       const newlyIdentifiedFirstPartySelectors = new Set()
-      for (let _i = 0, matchingElms1 = matchingElms; _i < matchingElms1.length; _i++) {
-        const aMatchingElm = matchingElms1[_i]
+      const awaiting1stPartyChecks = new Set()
+      for (let elementIndex = 0; elementIndex < matchingElms.length; elementIndex++) {
+        const aMatchingElm = matchingElms[elementIndex]
+        let pendingURLChecks = false
         // Don't recheck elements / subtrees we already know are first party.
         // Once we know something is third party, we never need to evaluate it
         // again.
         if (CC.alreadyKnownFirstPartySubtrees.has(aMatchingElm)) {
           continue
         }
-        const elmSubtreeIsFirstParty = isSubTreeFirstParty(aMatchingElm)
-        // If we find that a subtree is third party, then no need to change
-        // anything, leave the selector as "hiding" and move on.
-        // This element will likely be checked again on the next 'pump'
-        // as long as another element from the selector does not match 1st party.
-        if (!elmSubtreeIsFirstParty) {
-          continue
-        }
+
         // If the subtree doesn't have a significant amount of text (e.g., it
         // just says "Advertisement"), then no need to change anything; it should
         // stay hidden.
         if (!showsSignificantText(aMatchingElm)) {
           continue
         }
+
+        // If we find that a subtree is third party, then no need to change
+        // anything, leave the selector as "hiding" and move on.
+        // This element will likely be checked again on the next 'pump'
+        // as long as another element from the selector does not match 1st party.
+        const elmSubtreeIsFirstParty = isSubTreeFirstParty(aMatchingElm)
+        if (elmSubtreeIsFirstParty === undefined) {
+          pendingURLChecks = true
+        } else if (!elmSubtreeIsFirstParty) {
+          continue
+        }
+
+        // If we know this is first party, we don't need to check again
+        if (!pendingURLChecks) {
+          CC.alreadyKnownFirstPartySubtrees.add(aMatchingElm)
+        }
+
         // Otherwise, we know that the given subtree was evaluated to be
-        // first party, so we need to figure out which selector from the combo
-        // selector did the matching.
-        for (let _a = 0, currentWorkLoad1 = currentWorkLoad; _a < currentWorkLoad1.length; _a++) {
-          const selector = currentWorkLoad1[_a]
+        // first party or is still undknown, so we need to figure out which selector from the combo
+        // selector did the matching and handle it accordingly.
+        for (let workloadIndex = 0; workloadIndex < currentWorkLoad.length; workloadIndex++) {
+          const selector = currentWorkLoad[workloadIndex]
           if (!aMatchingElm.matches(selector)) {
             continue
           }
+
           // Similarly, if we already know a selector matches 1p content,
           // there is no need to notify the background script again, so
           // we don't need to consider further.
           if (CC.alreadyUnhiddenSelectors.has(selector)) {
             continue
           }
-          newlyIdentifiedFirstPartySelectors.add(selector)
+
+          if (pendingURLChecks) {
+            awaiting1stPartyChecks.add(selector)
+          } else {
+            newlyIdentifiedFirstPartySelectors.add(selector)
+          }
+        }
+      }
+
+      const nextQueue = runQueues[queueIndex + 1]
+      for (let workloadIndex = 0; workloadIndex < currentWorkLoad.length; workloadIndex++) {
+        const selector = currentWorkLoad[workloadIndex]
+
+        // Check if we are still looking for partyness of the selector
+        if (awaiting1stPartyChecks.has(selector)) {
+          // We are still awaiting results for this selector. In which case, we don't do anything.
+          continue
+        }
+
+        currentQueue.delete(selector)
+        if (newlyIdentifiedFirstPartySelectors.has(selector)) {
+          // Don't requeue selectors we know identify first party content.
           CC.alreadyUnhiddenSelectors.add(selector)
-        }
-        CC.alreadyKnownFirstPartySubtrees.add(aMatchingElm)
-      }
-      unhideSelectors(newlyIdentifiedFirstPartySelectors)
-      for (let _b = 0, currentWorkLoad2 = currentWorkLoad; _b < currentWorkLoad2.length; _b++) {
-        const aUsedSelector = currentWorkLoad2[_b]
-        currentQueue.delete(aUsedSelector)
-        // Don't requeue selectors we know identify first party content.
-        const selectorMatchedFirstParty = newlyIdentifiedFirstPartySelectors.has(aUsedSelector)
-        if (nextQueue && !selectorMatchedFirstParty) {
-          nextQueue.add(aUsedSelector)
+          CC.hiddenSelectors.delete(selector)
+        } else {
+          CC.hiddenSelectors.add(selector)
+
+          if (nextQueue) {
+            nextQueue.add(selector)
+          }
         }
       }
+
       didPumpAnything = true
-      // If we did something,  process the next queue, save it for next time.
-      break
+      sendURLsIfNeeded()
+
+      if (currentQueue.size !== awaiting1stPartyChecks.size) {
+        // We go to the next queue if the only remaining values in this queue
+        // are the ones that need a first party check. We will leave those for later
+        // For now let's process what we know we have in the next queue.
+        break
+      }
     }
+
     if (didPumpAnything) {
+      setRulesOnStylesheet()
       queueIsSleeping = true
       window.setTimeout(() => {
         // Set this to false now even though there's a gap in time between now and
@@ -577,9 +618,7 @@ window.__firefox__.execute(function($) {
         pumpCosmeticFilterQueuesOnIdle()
       }, pumpIntervalMinMs)
     }
-  }
-
-  const pumpCosmeticFilterQueuesOnIdle = idleize(pumpCosmeticFilterQueues, pumpIntervalMaxMs)
+  }, pumpIntervalMaxMs)
 
   const queryAttrsFromDocument = (switchToMutationObserverAtTime) => {
     const elmWithClassOrId = document.querySelectorAll('[class],[id]')
@@ -601,10 +640,10 @@ window.__firefox__.execute(function($) {
       }
     }
     fetchNewClassIdRules()
-    
-    if (switchToMutationObserverAtTime !== undefined
-        && window.Date.now() >= switchToMutationObserverAtTime) {
-     useMutationObserver()
+
+    if (switchToMutationObserverAtTime !== undefined &&
+      window.Date.now() >= switchToMutationObserverAtTime) {
+      useMutationObserver()
     }
   }
 
@@ -617,80 +656,155 @@ window.__firefox__.execute(function($) {
     useMutationObserver()
   }
 
-  const scheduleQueuePump = (hide1pContent, genericHide) => {
-    // Three states possible here.  First, the delay has already occurred.  If so,
-    // pass through to pumpCosmeticFilterQueues immediately.
-    if (CC._hasDelayOcurred) {
+  /// Start the queue pump, which gives us a delay before we start taking selectors
+  /// This should be called only once
+  const startQueuePumpTimeout = (hide1pContent, genericHide) => {
+    if (!genericHide) {
+      if (args.firstSelectorsPollingDelayMs) {
+        // We want to start observing but only after a timeout
+        window.setTimeout(startObserving, args.firstSelectorsPollingDelayMs)
+      } else {
+        // Undefined means we want to start observing right away
+        startObserving()
+      }
+    }
+    if (!hide1pContent) {
       pumpCosmeticFilterQueuesOnIdle()
-      return
+    }
+  }
+
+  const sendURLsIfNeeded = () => {
+    if (CC.pendingURLS.size === 0) {
+      return Promise.resolve()
     }
 
-    // Second possibility is that we're already waiting for the delay to pass /
-    // occur.  In this case, do nothing.
-    if (CC._startCheckingId !== undefined) {
-      return
-    }
-    // Third / final possibility, this is this the first time this has been
-    // called, in which case set up a timer and quit
-    CC._startCheckingId = setTimeout(_ => {
-      CC._hasDelayOcurred = true
-      if (!genericHide) {
-        if (CC.firstSelectorsPollingDelayMs === undefined) {
-          startObserving()
-        } else {
-          window.setTimeout(startObserving, CC.firstSelectorsPollingDelayMs)
+    CC.sendingURLS = CC.pendingURLS
+    const urls = Array.from(CC.sendingURLS)
+    CC.pendingURLS = new Set()
+
+    return getPartiness(urls).then((results) => {
+      for (const url of urls) {
+        const result = results[url]
+
+        if (result === undefined) {
+          console.error(`Missing result for ${url}`)
+          CC.urlFirstParty[url] = false
+          continue
         }
+
+        CC.urlFirstParty[url] = result
+        CC.sendingURLS.delete(url)
       }
-      if (!hide1pContent) {
-        pumpCosmeticFilterQueuesOnIdle()
-      }
-    }, maxTimeMSBeforeStart)
+    })
   }
 
-  const tryScheduleQueuePump = () => {
-    if (!CC.observingHasStarted) {
-      CC.observingHasStarted = true
-      scheduleQueuePump(CC.hide1pContent, CC.generichide)
-    } else {
-      scheduleQueuePump(false, false)
+  const extractURL = (element) => {
+    if (element.hasAttribute === undefined || !element.hasAttribute('src')) {
+      return
+    }
+
+    const src = element.getAttribute('src')
+    isFirstPartyUrl(src)
+  }
+
+  const extractURLsRecursively = (element) => {
+    extractURL(element)
+    for (const child of element.childNodes) {
+      extractURLsRecursively(child)
     }
   }
-  
+
+  const onURLMutations = (mutations, observer) => {
+    let addedNodes = false
+    mutations.forEach((mutation) => {
+      const changedElm = mutation.target
+
+      switch (mutation.type) {
+        case 'childList':
+          if (mutation.addedNodes.length > 0) {
+            addedNodes = true
+
+            for (const node of mutation.addedNodes) {
+              extractURL(node)
+            }
+          }
+
+          break
+
+        case 'attributes':
+          extractURL(changedElm)
+          break
+      }
+    })
+
+    if (addedNodes) {
+      moveStyleIfNeeded()
+    }
+
+    sendURLsIfNeeded().then((changed) => {
+      if (!changed) { return }
+      pumpCosmeticFilterQueuesOnIdle()
+    })
+  }
+
+  const startURLMutationObserver = () => {
+    const observer = new MutationObserver(onURLMutations)
+
+    const observerConfig = {
+      subtree: true,
+      childList: true,
+      attributeFilter: ['src']
+    }
+
+    observer.observe(document.documentElement, observerConfig)
+  }
+
   // Load some static hide rules if they are defined
   if (args.hideSelectors) {
     processHideSelectors(args.hideSelectors)
   }
-  
+
   // Load some static style selectors if they are defined
   if (args.styleSelectors) {
     processStyleSelectors(args.styleSelectors)
   }
-  
-  // Wait until document body is ready
-  const timerId = window.setInterval(() => {
-    if (!document.body) {
-      // we need to wait longer.
-      return
-    }
-    
-    // Body is ready, kill this interval and create the stylesheet
-    window.clearInterval(timerId)
+
+  const createStylesheet = () => {
     const targetElm = document.body
     const styleElm = document.createElement('style')
     styleElm.setAttribute('type', 'text/css')
     targetElm.appendChild(styleElm)
     CC.cosmeticStyleSheet = styleElm
+  }
+
+  const start = () => {
+    createStylesheet()
     setRulesOnStylesheet()
-    
-    // Start listening to new selectors
-    tryScheduleQueuePump()
-    
-    // Start a timer that moves the stylesheet down
-    setInterval(() => {
-      if (styleElm.nextElementSibling === null && styleElm.parentElement === targetElm) {
+    extractURLsRecursively(document.body)
+
+    sendURLsIfNeeded().then(() => {
+      // Start the queue pump for the first time
+      startQueuePumpTimeout(args.hideFirstPartyContent, args.genericHide)
+      startURLMutationObserver()
+    })
+  }
+
+  window.setTimeout(() => {
+    if (document.body) {
+      start()
+      return
+    }
+
+    // Wait until document body is ready
+    const timerId = window.setInterval(() => {
+      if (!document.body) {
+        // we need to wait longer.
         return
       }
-      moveStyle()
-    }, 1000)
-  }, 500)
+
+      // Body is ready, kill this interval and create the stylesheet
+      window.clearInterval(timerId)
+      start()
+    }, 500)
+  }, maxTimeMSBeforeStart)
 });

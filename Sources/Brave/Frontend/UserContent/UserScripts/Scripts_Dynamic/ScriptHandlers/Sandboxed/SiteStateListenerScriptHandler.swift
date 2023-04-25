@@ -71,7 +71,10 @@ class SiteStateListenerScriptHandler: TabContentScript {
           let source = try ScriptFactory.shared.makeScriptSource(of: .selectorsPoller).replacingOccurrences(of: "$<args>", with: args)
           
           let secureSource = CosmeticFiltersScriptHandler.secureScript(
-            handlerName: CosmeticFiltersScriptHandler.messageHandlerName,
+            handlerNamesMap: [
+              "$<message_handler>": CosmeticFiltersScriptHandler.messageHandlerName,
+              "$<partiness_message_handler>": URLPartinessScriptHandler.messageHandlerName
+            ],
             securityToken: CosmeticFiltersScriptHandler.scriptId,
             script: source
           )
