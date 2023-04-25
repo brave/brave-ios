@@ -28,14 +28,12 @@ class BraveVPNProtocolPickerViewController: BraveVPNPickerViewController {
   required init?(coder: NSCoder) { fatalError() }
 
   override func viewDidLoad() {
-    title = "Transport Protocol"
+    title = Strings.VPN.protocolPickerTitle
 
     tableView.delegate = self
     tableView.dataSource = self
     
     super.viewDidLoad()
-    
-    print("Transport Protocol \(GRDTransportProtocol.getUserPreferredTransportProtocol())")
   }
   
   override func vpnConfigChanged(notification: NSNotification) {
@@ -58,7 +56,7 @@ extension BraveVPNProtocolPickerViewController: UITableViewDelegate, UITableView
   }
 
   func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-    return "Please select your preferred transport protocol. Once switched your existing VPN credentials will be cleared and you will be reconnected if a VPN connection is currently established"
+    return Strings.VPN.protocolPickerDescription
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -94,15 +92,15 @@ extension BraveVPNProtocolPickerViewController: UITableViewDelegate, UITableView
     BraveVPN.changePreferredTransportProtocol(with: tunnelProtocol) { [weak self] success in
       guard let self else { return }
 
-      isLoading = false
+      self.isLoading = false
 
       if success {
         self.dismiss(animated: true) {
-          self.showSuccessAlert()
+          self.showSuccessAlert(text: Strings.VPN.protocolSwitchSuccessPopupText)
         }
       } else {
-        self.showErrorAlert(title: "Error",
-                            message: "Failed to change transport protocol.")
+        self.showErrorAlert(title: Strings.VPN.protocolPickerErrorTitle,
+                            message: Strings.VPN.protocolPickerErrorMessage)
       }
     }
 

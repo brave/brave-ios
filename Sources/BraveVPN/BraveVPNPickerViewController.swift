@@ -75,7 +75,7 @@ class BraveVPNPickerViewController: UIViewController {
   
   @objc func vpnConfigChanged(notification: NSNotification) { }
 
-  func showSuccessAlert() {
+  func showSuccessAlert(text: String) {
     let animation = AnimationView(name: "vpncheckmark", bundle: .module).then {
       $0.bounds = CGRect(x: 0, y: 0, width: 300, height: 200)
       $0.contentMode = .scaleAspectFill
@@ -83,7 +83,7 @@ class BraveVPNPickerViewController: UIViewController {
     }
     
     let popup = AlertPopupView(imageView: animation,
-                               title: Strings.VPN.regionSwitchSuccessPopupText, message: "",
+                               title: text, message: "",
                                titleWeight: .semibold, titleSize: 18,
                                dismissHandler: { true })
     

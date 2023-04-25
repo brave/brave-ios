@@ -2869,10 +2869,35 @@ extension Strings {
         value: "Failed to switch servers, please try again later.",
         comment: "Message for error when we fail to switch vpn server for the user")
 
+    public static let protocolPickerTitle =
+      NSLocalizedString("vpn.protocolPickerTitle", tableName: "BraveShared", bundle: .module,
+        value: "Transport Protocol",
+        comment: "Title for vpn tunnel protocol screen")
+
+    public static let protocolPickerDescription =
+      NSLocalizedString("vpn.protocolPickerDescription", tableName: "BraveShared", bundle: .module,
+        value: "Please select your preferred transport protocol. Once switched your existing VPN credentials will be cleared and you will be reconnected if a VPN connection is currently established.",
+        comment: "Description of vpn tunnel protocol")
+
     public static let regionSwitchSuccessPopupText =
       NSLocalizedString("vpn.regionSwitchSuccessPopupText", tableName: "BraveShared", bundle: .module,
         value: "VPN region changed.",
         comment: "Message that we show after successfully changing vpn region.")
+    
+    public static let protocolPickerErrorTitle =
+      NSLocalizedString("vpn.protocolPickerErrorTitle", tableName: "BraveShared", bundle: .module,
+        value: "Server Error",
+        comment: "Title for error when we fail to switch tunnel protocol for the user")
+
+    public static let protocolPickerErrorMessage =
+      NSLocalizedString("vpn.protocolPickerErrorMessage", tableName: "BraveShared", bundle: .module,
+        value: "Failed to switch tunnel protocol, please try again later.",
+        comment: "Message for error when we fail to switch tunnel protocol for the user")
+
+    public static let protocolSwitchSuccessPopupText =
+      NSLocalizedString("vpn.protocolSwitchSuccessPopupText", tableName: "BraveShared", bundle: .module,
+        value: "VPN Tunnel Protocol changed.",
+        comment: "Message that we show after successfully changing tunnel protocol.")
 
     public static let settingsFailedToFetchServerList =
       NSLocalizedString("vpn.settingsFailedToFetchServerList", tableName: "BraveShared", bundle: .module,

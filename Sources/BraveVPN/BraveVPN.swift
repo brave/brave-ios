@@ -282,7 +282,7 @@ public class BraveVPN {
       // Setting User preferred Transport Protocol to WireGuard
       // In order to easily fetch and change in settings later
       GRDTransportProtocol.setUserPreferred(.wireGuard)
-            
+      
       // New user or no credentials and have to remake them.
       helper.configureFirstTimeUser(
         for: GRDTransportProtocol.getUserPreferredTransportProtocol(),
