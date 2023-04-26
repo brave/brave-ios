@@ -24,7 +24,6 @@ class SolanaProviderScriptHandler: TabContentScript {
     case method
     case params
     case code
-    case data
   }
   
   static let scriptName = "WalletSolanaProviderScript"
@@ -301,13 +300,13 @@ class SolanaProviderScriptHandler: TabContentScript {
   /// Helper function to build `SolanaSignTransactionParam` given the serializedMessage and signatures from the `solanaWeb3.Transaction`.
   private func createSignTransactionParam(serializedMessage: MojoBase.Value, signatures: MojoBase.Value) -> BraveWallet.SolanaSignTransactionParam {
     // get the serialized message
-    let serializedMessageValues = serializedMessage.bufferToList?.map { UInt8($0.intValue) } ?? []
+    let serializedMessageValues = serializedMessage.listValue?.map { UInt8($0.intValue) } ?? []
     let encodedSerializedMsg = (Data(serializedMessageValues) as NSData).base58EncodedString()
     // get the signatures array
     let signaturesValues = (signatures.listValue ?? []).compactMap { $0.dictionaryValue }
     let signatures: [BraveWallet.SignaturePubkeyPair] = signaturesValues.map {
       BraveWallet.SignaturePubkeyPair(
-        signature: $0[Keys.signature.rawValue]?.bufferToList?.map { NSNumber(value: $0.intValue) },
+        signature: $0[Keys.signature.rawValue]?.numberArray,
         publicKey: $0[Keys.publicKey.rawValue]?.stringValue ?? ""
       )
     }
@@ -327,12 +326,6 @@ class SolanaProviderScriptHandler: TabContentScript {
 }
 
 private extension MojoBase.Value {
-  /// Returns the array of numbers given a Buffer as MojoBase.Value.
-  /// `Buffer` comes as ["data": [UInt8], "type": "Buffer"].
-  var bufferToList: [MojoBase.Value]? {
-    dictionaryValue?[SolanaProviderScriptHandler.Keys.data.rawValue]?.listValue
-  }
-  
   var numberArray: [NSNumber]? {
     listValue?.map { NSNumber(value: $0.intValue) }
   }
