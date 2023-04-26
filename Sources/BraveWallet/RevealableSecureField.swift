@@ -31,7 +31,7 @@ struct RevealableSecureField: View {
   }
 
   var body: some View {
-    HStack(alignment: .firstTextBaseline) {
+    HStack(alignment: .firstTextBaseline, spacing: 4) {
       Group {
         if isRevealed {
           TextField(placeholder, text: $text)
@@ -62,6 +62,8 @@ struct RevealableSecureField: View {
           self.isRevealed.toggle()
         }) {
           Image(braveSystemName: isRevealed ? "leo.eye.off" : "leo.eye.on")
+            .padding(.vertical, 6)
+            .padding(.horizontal, 4)
             .contentShape(Rectangle())
             .transition(.identity)
             .animation(nil, value: isRevealed)
