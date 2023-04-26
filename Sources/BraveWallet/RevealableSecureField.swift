@@ -61,7 +61,7 @@ struct RevealableSecureField: View {
           }
           self.isRevealed.toggle()
         }) {
-          Image(braveSystemName: isRevealed ? "brave.eye.slash" : "brave.eye")
+          Image(braveSystemName: isRevealed ? "leo.eye.off" : "leo.eye.on")
             .contentShape(Rectangle())
             .transition(.identity)
             .animation(nil, value: isRevealed)
