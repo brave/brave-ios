@@ -145,6 +145,7 @@ private struct RestoreWalletView: View {
           }
         }
         .textFieldStyle(BraveValidatedTextFieldStyle(error: restoreError, when: .invalidPhrase))
+        .textInputAutocapitalization(.never)
         if isShowingLegacyWalletToggle {
           HStack {
             Toggle(Strings.Wallet.restoreWalletImportFromLegacyBraveWallet, isOn: $isBraveLegacyWallet)
