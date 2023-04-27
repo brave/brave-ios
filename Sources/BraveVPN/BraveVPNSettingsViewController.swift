@@ -10,6 +10,7 @@ import Preferences
 import BraveUI
 import os.log
 import BraveShared
+import GuardianConnect
 
 public class BraveVPNSettingsViewController: TableViewController {
 
@@ -133,8 +134,10 @@ public class BraveVPNSettingsViewController: TableViewController {
             footer: .title(Strings.VPN.settingsLinkReceiptFooter))
     
     let location = BraveVPN.serverLocation ?? "-"
-    let transportProtocol = "WireGuard"
     
+    let userPreferredTunnelProtocol = GRDTransportProtocol.getUserPreferredTransportProtocol()
+    let transportProtocol = GRDTransportProtocol.prettyTransportProtocolString(for: userPreferredTunnelProtocol)
+
     let serverSection = Section(
       header: .title(Strings.VPN.settingsServerSection),
       rows: [Row(text: Strings.VPN.settingsServerHost, detailText: hostname, uuid: hostCellId),
