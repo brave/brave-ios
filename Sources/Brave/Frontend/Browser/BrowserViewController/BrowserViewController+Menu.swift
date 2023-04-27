@@ -44,28 +44,32 @@ extension BrowserViewController {
         .padding(.horizontal, 14)
         .padding(.bottom, 5)
 
-      VPNMenuButton(
-        vpnProductInfo: self.vpnProductInfo,
-        description: Strings.OptionsMenu.braveVPNItemDescription,
-        displayVPNDestination: { [unowned self] vc in
-          (self.presentedViewController as? MenuViewController)?
-            .pushInnerMenu(vc)
-        },
-        enableInstalledVPN: { [unowned menuController] in
-          // Donate Enable VPN Activity for suggestions
-          let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
-          menuController.userActivity = enableVPNActivity
-          enableVPNActivity.becomeCurrent()
-        }, displayAlert: { [unowned self] alert in
-          self.popToBVC()
-          self.present(alert, animated: true)
-        }, openURL: { [unowned self] url in
-          self.openURLInNewTab(url,
-                               isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
-                               isPrivileged: false)
-        }
-      )
-
+//      VPNMenuButton(
+//        vpnProductInfo: self.vpnProductInfo,
+//        description: Strings.OptionsMenu.braveVPNItemDescription,
+//        displayVPNDestination: { [unowned self] vc in
+//          (self.presentedViewController as? MenuViewController)?
+//            .pushInnerMenu(vc)
+//        },
+//        enableInstalledVPN: { [unowned menuController] in
+//          // Donate Enable VPN Activity for suggestions
+//          let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
+//          menuController.userActivity = enableVPNActivity
+//          enableVPNActivity.becomeCurrent()
+//        }, displayAlert: { [unowned self] alert in
+//          self.popToBVC()
+//          self.present(alert, animated: true)
+//        }, openURL: { [unowned self] url in
+//          self.openURLInNewTab(url,
+//                               isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
+//                               isPrivileged: false)
+//        }
+//      )
+      
+      RegionMenuButton(vpnRegionInfo: vpnProductInfo, currentSettingsTitle: "VPN Region", regionSelectAction: {
+        
+      })
+      
       MenuItemFactory.button(for: .playlist(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription)) { [weak self] in
         guard let self = self else { return }
         self.presentPlaylistController()
