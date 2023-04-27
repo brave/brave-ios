@@ -281,7 +281,7 @@ class AssetDetailStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
       swapService: swapService,
-      assetDetailType: .coinMarket(.previewCoinMarketBitcoin)
+      assetDetailType: .coinMarket(.mockCoinMarketBitcoin)
     )
     
     let assetDetailBitcoinException = expectation(description: "update-coinMarket-bitcoin")
@@ -397,7 +397,7 @@ class AssetDetailStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
       swapService: swapService,
-      assetDetailType: .coinMarket(.previewCoinMarketEth)
+      assetDetailType: .coinMarket(.mockCoinMarketEth)
     )
     let assetDetailNonBitcoinException = expectation(description: "update-coinMarket-non-bitcoin")
     assetDetailNonBitcoinException.expectedFulfillmentCount = 11

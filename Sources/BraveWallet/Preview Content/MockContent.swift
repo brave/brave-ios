@@ -341,7 +341,7 @@ extension TransactionSummary {
 }
 
 extension BraveWallet.CoinMarket {
-  static var previewCoinMarketBitcoin: BraveWallet.CoinMarket {
+  static var mockCoinMarketBitcoin: BraveWallet.CoinMarket {
     .init(
       id: "bitcoin",
       symbol: "btc",
@@ -355,7 +355,7 @@ extension BraveWallet.CoinMarket {
       totalVolume: 30825602847
     )
   }
-  static var previewCoinMarketEth: BraveWallet.CoinMarket {
+  static var mockCoinMarketEth: BraveWallet.CoinMarket {
     .init(
       id: "ethereum",
       symbol: "eth",
