@@ -65,6 +65,8 @@ extension BrowserViewController {
                                isPrivileged: false)
         }
       )
+      
+      Divider()
 
       MenuItemFactory.button(for: .playlist(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription)) { [weak self] in
         guard let self = self else { return }
