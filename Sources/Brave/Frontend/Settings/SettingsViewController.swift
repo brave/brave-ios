@@ -217,18 +217,38 @@ class SettingsViewController: TableViewController {
         Row(
           text: Strings.braveShieldsAndPrivacy,
           selection: { [unowned self] in
-            let controller = BraveShieldsAndPrivacySettingsController(
+            let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
               profile: self.profile,
               tabManager: self.tabManager,
               feedDataSource: self.feedDataSource,
               historyAPI: self.historyAPI,
               p3aUtilities: self.p3aUtilities
-            )
+            ))
+            
             self.navigationController?.pushViewController(controller, animated: true)
-          }, image: UIImage(braveSystemNamed: "leo.shield.done"), accessory: .disclosureIndicator)
+          },
+          image: UIImage(braveSystemNamed: "leo.shield.done"),
+          accessory: .disclosureIndicator
+        )
       ],
       uuid: featureSectionUUID.uuidString
     )
+    
+    #if DEBUG
+    section.rows.append(Row(
+      text: "\(Strings.braveShieldsAndPrivacy) ORIG",
+      selection: { [unowned self] in
+        let controller = BraveShieldsAndPrivacySettingsController(
+          profile: self.profile,
+          tabManager: self.tabManager,
+          feedDataSource: self.feedDataSource,
+          historyAPI: self.historyAPI,
+          p3aUtilities: self.p3aUtilities
+        )
+        self.navigationController?.pushViewController(controller, animated: true)
+      }, image: UIImage(braveSystemNamed: "leo.shield.done"), accessory: .disclosureIndicator
+    ))
+    #endif
 
     if BraveRewards.isAvailable, let rewards = rewards {
       section.rows += [

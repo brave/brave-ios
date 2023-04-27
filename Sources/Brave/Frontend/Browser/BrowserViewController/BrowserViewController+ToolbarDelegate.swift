@@ -461,18 +461,19 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     shields.showGlobalShieldsSettings = { [unowned self] vc in
       vc.dismiss(animated: true) {
-        let shieldsAndPrivacy = BraveShieldsAndPrivacySettingsController(
+        let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
           profile: self.profile,
           tabManager: self.tabManager,
           feedDataSource: self.feedDataSource,
           historyAPI: self.braveCore.historyAPI,
           p3aUtilities: self.braveCore.p3aUtils
-        )
-        let container = SettingsNavigationController(rootViewController: shieldsAndPrivacy)
+        ))
+        
+        let container = SettingsNavigationController(rootViewController: controller)
         container.isModalInPresentation = true
         container.modalPresentationStyle =
           UIDevice.current.userInterfaceIdiom == .phone ? .pageSheet : .formSheet
-        shieldsAndPrivacy.navigationItem.rightBarButtonItem = .init(
+        controller.navigationItem.rightBarButtonItem = .init(
           barButtonSystemItem: .done,
           target: container,
           action: #selector(SettingsNavigationController.done)
