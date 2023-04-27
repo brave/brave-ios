@@ -179,9 +179,15 @@ class AssetDetailStoreTests: XCTestCase {
       .store(in: &cancellables)
     store.$isLoadingPrice
       .dropFirst()
-      .sink {
+      .collect(2)
+      .sink { values in
         defer { assetDetailException.fulfill() }
-        XCTAssertFalse($0)
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingPrice")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     store.$isInitialState
@@ -193,16 +199,20 @@ class AssetDetailStoreTests: XCTestCase {
       .store(in: &cancellables)
     store.$isLoadingChart
       .dropFirst()
-      .sink {
+      .collect(2)
+      .sink { values in
         defer { assetDetailException.fulfill() }
-        XCTAssertFalse($0)
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingChart")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     
     store.update()
-    waitForExpectations(timeout: 1) { error in
-      XCTAssertNil(error)
-    }
+    wait(for: [assetDetailException], timeout: 1)
   }
   
   func testUpdateWithCoinMarket() {
@@ -274,40 +284,40 @@ class AssetDetailStoreTests: XCTestCase {
       assetDetailType: .coinMarket(.previewCoinMarketBitcoin)
     )
     
-    let assetDetailException = expectation(description: "update-coinMarket-bitcoin")
-    assetDetailException.expectedFulfillmentCount = 11
+    let assetDetailBitcoinException = expectation(description: "update-coinMarket-bitcoin")
+    assetDetailBitcoinException.expectedFulfillmentCount = 11
     store.$isBuySupported
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertFalse($0)
       }
       .store(in: &cancellables)
     store.$isSendSupported
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertFalse($0)
       }
       .store(in: &cancellables)
     store.$isSwapSupported
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertFalse($0)
       }
       .store(in: &cancellables)
     store.$btcRatio
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertEqual($0, "1 BTC")
       }
       .store(in: &cancellables)
     store.$priceHistory
       .dropFirst()
       .sink { priceHistory in
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertEqual(priceHistory.count, 1)
         XCTAssertEqual(priceHistory[0].price, "0.99")
       }
@@ -315,54 +325,66 @@ class AssetDetailStoreTests: XCTestCase {
     store.$price
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertEqual($0, "$28,324.00")
       }
       .store(in: &cancellables)
     store.$priceIsDown
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertFalse($0)
       }
       .store(in: &cancellables)
     store.$priceDelta
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertEqual($0, "0.58%")
       }
       .store(in: &cancellables)
     store.$isLoadingPrice
       .dropFirst()
-      .sink {
-        defer { assetDetailException.fulfill() }
-        XCTAssertFalse($0)
+      .collect(2)
+      .sink { values in
+        defer { assetDetailBitcoinException.fulfill() }
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingPrice")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     store.$isInitialState
       .dropFirst()
       .sink {
-        defer { assetDetailException.fulfill() }
+        defer { assetDetailBitcoinException.fulfill() }
         XCTAssertFalse($0)
       }
       .store(in: &cancellables)
     store.$isLoadingChart
       .dropFirst()
-      .sink {
+      .collect(2)
+      .sink { values in
         defer {
           XCTAssertNil(store.network)
           XCTAssertTrue(store.accounts.isEmpty)
           XCTAssertTrue(store.transactionSummaries.isEmpty)
-          
-          assetDetailException.fulfill()
+
+          assetDetailBitcoinException.fulfill()
         }
-        XCTAssertFalse($0)
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingChart")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     
     store.update()
-    wait(for: [assetDetailException], timeout: 1)
+    wait(for: [assetDetailBitcoinException], timeout: 1)
     cancellables.removeAll()
     
     // setup store
@@ -444,9 +466,15 @@ class AssetDetailStoreTests: XCTestCase {
       .store(in: &cancellables)
     store.$isLoadingPrice
       .dropFirst()
-      .sink {
+      .collect(2)
+      .sink { values in
         defer { assetDetailNonBitcoinException.fulfill() }
-        XCTAssertFalse($0)
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingPrice")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     store.$isInitialState
@@ -458,7 +486,8 @@ class AssetDetailStoreTests: XCTestCase {
       .store(in: &cancellables)
     store.$isLoadingChart
       .dropFirst()
-      .sink {
+      .collect(2)
+      .sink { values in
         defer {
           XCTAssertNil(store.network)
           XCTAssertTrue(store.accounts.isEmpty)
@@ -466,7 +495,12 @@ class AssetDetailStoreTests: XCTestCase {
           
           assetDetailNonBitcoinException.fulfill()
         }
-        XCTAssertFalse($0)
+        guard let value = values.last
+        else {
+          XCTFail("Unexpected isLoadingChart")
+          return
+        }
+        XCTAssertFalse(value)
       }
       .store(in: &cancellables)
     
