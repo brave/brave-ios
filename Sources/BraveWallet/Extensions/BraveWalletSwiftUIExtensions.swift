@@ -65,6 +65,10 @@ extension BraveWallet.NetworkInfo: Identifiable {
       return "avax"
     } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
       return "fantom"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
+      return "aurora"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
+      return "optimism"
     } else {
       return iconUrls.first
     }
@@ -72,6 +76,37 @@ extension BraveWallet.NetworkInfo: Identifiable {
   
   public var nativeTokenLogoImage: UIImage? {
     guard let logo = nativeTokenLogo else { return nil }
+    return UIImage(named: logo, in: .module, with: nil)
+  }
+  
+  public var networkLogo: String? {
+    if chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
+      return "eth-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame {
+      return "sol-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame {
+      return "filecoin-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
+      return "matic"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
+      return "bnb-asset-icon"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
+      return "celo"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
+      return "avax"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
+      return "fantom"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
+      return "aurora"
+    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
+      return "optimism"
+    } else {
+      return iconUrls.first
+    }
+  }
+  
+  public var networkLogoImage: UIImage? {
+    guard let logo = networkLogo else { return nil }
     return UIImage(named: logo, in: .module, with: nil)
   }
 }

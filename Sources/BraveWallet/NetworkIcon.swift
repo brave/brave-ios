@@ -80,7 +80,15 @@ struct NetworkIcon: View {
     case BraveWallet.AuroraMainnetChainId:
       return ("aurora", false)
     default:
-      return nil
+      if network.symbol.caseInsensitiveCompare("ETH") == .orderedSame {
+        return ("eth-asset-icon", false)
+      } else if network.symbol.caseInsensitiveCompare("SOL") == .orderedSame {
+        return ("sol-asset-icon", false)
+      } else if network.symbol.caseInsensitiveCompare("FIL") == .orderedSame {
+        return ("filecoin-asset-icon", false)
+      } else {
+        return nil
+      }
     }
   }
 }
