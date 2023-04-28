@@ -430,8 +430,12 @@ extension AssetDetailStore: BraveWalletBraveWalletServiceObserver {
   func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
   }
   
+  func onDiscoverAssetsStarted() {
+  }
+  
   func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
   }
+
   func onResetWallet() {
   }
 }

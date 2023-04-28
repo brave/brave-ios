@@ -378,6 +378,10 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
   public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
   }
   
+  public func onDiscoverAssetsStarted() {
+    isLoadingDiscoverAssets = true
+  }
+  
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
     isLoadingDiscoverAssets = false
     if !discoveredAssets.isEmpty {

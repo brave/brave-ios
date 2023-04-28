@@ -15,7 +15,7 @@ import DeviceCheck
 class RewardsInternalsDebugViewController: TableViewController {
 
   private let ledger: BraveLedger
-  private var internalsInfo: Ledger.RewardsInternalsInfo?
+  private var internalsInfo: BraveCore.BraveRewards.RewardsInternalsInfo?
   private var transferrableTokens: Double = 0.0
 
   init(ledger: BraveLedger) {

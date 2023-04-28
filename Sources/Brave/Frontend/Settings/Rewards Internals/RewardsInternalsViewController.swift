@@ -28,10 +28,10 @@ private class WarningCell: MultilineSubtitleCell {
 class RewardsInternalsViewController: TableViewController {
 
   private let ledger: BraveLedger
-  private var internalsInfo: Ledger.RewardsInternalsInfo?
+  private var internalsInfo: BraveCore.BraveRewards.RewardsInternalsInfo?
 
   private let legacyLedger: BraveLedger?
-  private var legacyInternalsInfo: Ledger.RewardsInternalsInfo?
+  private var legacyInternalsInfo: BraveCore.BraveRewards.RewardsInternalsInfo?
 
   init(ledger: BraveLedger, legacyLedger: BraveLedger?) {
     self.ledger = ledger
@@ -145,7 +145,7 @@ class RewardsInternalsViewController: TableViewController {
 struct RewardsInternalsBasicInfoGenerator: RewardsInternalsFileGenerator {
   func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
     // Only 1 file to make here
-    var internals: Ledger.RewardsInternalsInfo?
+    var internals: BraveCore.BraveRewards.RewardsInternalsInfo?
     builder.ledger.rewardsInternalInfo { info in
       internals = info
     }

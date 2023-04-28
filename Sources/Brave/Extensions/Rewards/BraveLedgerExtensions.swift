@@ -29,14 +29,14 @@ extension BraveLedger {
     return now >= deadlineDate
   }
 
-  public func listAutoContributePublishers(_ completion: @escaping (_ publishers: [Ledger.PublisherInfo]) -> Void) {
+  public func listAutoContributePublishers(_ completion: @escaping (_ publishers: [BraveCore.BraveRewards.PublisherInfo]) -> Void) {
     fetchAutoContributeProperties { autoContributeProperties in
-      let filter: Ledger.ActivityInfoFilter = {
-        let sort = Ledger.ActivityInfoFilterOrderPair().then {
+      let filter: BraveCore.BraveRewards.ActivityInfoFilter = {
+        let sort = BraveCore.BraveRewards.ActivityInfoFilterOrderPair().then {
           $0.propertyName = "percent"
           $0.ascending = false
         }
-        let filter = Ledger.ActivityInfoFilter().then {
+        let filter = BraveCore.BraveRewards.ActivityInfoFilter().then {
           $0.id = ""
           $0.excluded = .filterAllExceptExcluded
           $0.percent = 1  // exclude 0% sites.
@@ -129,7 +129,7 @@ extension BraveLedger {
     }
   }
 
-  @MainActor public func claimPromotion(_ promotion: Ledger.Promotion) async -> Bool {
+  @MainActor public func claimPromotion(_ promotion: BraveCore.BraveRewards.Promotion) async -> Bool {
     guard let paymentId = await fetchPaymentId() else {
       return false
     }
