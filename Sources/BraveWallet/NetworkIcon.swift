@@ -79,16 +79,12 @@ struct NetworkIcon: View {
       return ("optimism", false)
     case BraveWallet.AuroraMainnetChainId:
       return ("aurora", false)
+    case BraveWallet.FilecoinEthereumMainnetChainId:
+      return ("filecoin-asset-icon", false)
+    case BraveWallet.FilecoinEthereumTestnetChainId:
+      return ("filecoin-asset-icon", true)
     default:
-      if network.symbol.caseInsensitiveCompare("ETH") == .orderedSame {
-        return ("eth-asset-icon", false)
-      } else if network.symbol.caseInsensitiveCompare("SOL") == .orderedSame {
-        return ("sol-asset-icon", false)
-      } else if network.symbol.caseInsensitiveCompare("FIL") == .orderedSame {
-        return ("filecoin-asset-icon", false)
-      } else {
-        return nil
-      }
+      return nil
     }
   }
 }
