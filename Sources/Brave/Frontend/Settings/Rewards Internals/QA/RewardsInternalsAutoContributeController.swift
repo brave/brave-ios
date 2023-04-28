@@ -10,8 +10,8 @@ import BraveUI
 class RewardsInternalsAutoContributeController: UITableViewController {
 
   let ledger: BraveLedger
-  private var publishers: [Ledger.PublisherInfo] = []
-  private var autocontributeProperties: Ledger.AutoContributeProperties?
+  private var publishers: [BraveCore.BraveRewards.PublisherInfo] = []
+  private var autocontributeProperties: BraveCore.BraveRewards.AutoContributeProperties?
   private let percentFormatter = NumberFormatter().then {
     $0.numberStyle = .percent
   }

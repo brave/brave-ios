@@ -214,7 +214,7 @@ public class BrowserViewController: UIViewController {
   var promotionFetchTimer: Timer?
   private var notificationsHandler: AdsNotificationHandler?
   let notificationsPresenter = BraveNotificationsPresenter()
-  var publisher: Ledger.PublisherInfo?
+  var publisher: BraveCore.BraveRewards.PublisherInfo?
 
   let vpnProductInfo = VPNProductInfo()
 
