@@ -6,11 +6,12 @@
 import Foundation
 import BraveCore
 import Shared
+import UIKit
 
 extension BraveAds {
   public func initialize(_ completion: @escaping (Bool) -> Void) {
     self.initialize(
-      with: .init(),
+      with: .init(deviceId: UIDevice.current.identifierForVendor?.uuidString ?? ""),
       buildChannelInfo: .init(
         isRelease: AppConstants.buildChannel == .release,
         name: AppConstants.buildChannel.rawValue
