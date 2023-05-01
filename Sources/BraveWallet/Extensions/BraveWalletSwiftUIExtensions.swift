@@ -86,38 +86,27 @@ extension BraveWallet.NetworkInfo: Identifiable {
   }
   
   private func assetIconNameByChainId(_ chainId: String) -> String? {
-    switch chainId.uppercased() {
-    case
-      BraveWallet.MainnetChainId.uppercased(),
-      BraveWallet.GoerliChainId.uppercased(),
-      BraveWallet.SepoliaChainId.uppercased():
+    if chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.GoerliChainId) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.SepoliaChainId) == .orderedSame {
       return AssetImageName.ethereum.rawValue
-    case
-      BraveWallet.SolanaMainnet.uppercased(),
-      BraveWallet.SolanaDevnet.uppercased(),
-      BraveWallet.SolanaTestnet.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.SolanaDevnet) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.SolanaTestnet) == .orderedSame {
       return AssetImageName.solana.rawValue
-    case
-      BraveWallet.FilecoinMainnet.uppercased(),
-      BraveWallet.FilecoinTestnet.uppercased(),
-      BraveWallet.FilecoinEthereumMainnetChainId.uppercased(),
-      BraveWallet.FilecoinEthereumTestnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.FilecoinTestnet) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.FilecoinEthereumMainnetChainId) == .orderedSame || chainId.caseInsensitiveCompare(BraveWallet.FilecoinEthereumTestnetChainId) == .orderedSame {
       return AssetImageName.filecoin.rawValue
-    case BraveWallet.PolygonMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
       return AssetImageName.polygon.rawValue
-    case BraveWallet.BinanceSmartChainMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
       return AssetImageName.binance.rawValue
-    case BraveWallet.CeloMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
       return AssetImageName.celo.rawValue
-    case BraveWallet.AvalancheMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
       return AssetImageName.avalanche.rawValue
-    case BraveWallet.FantomMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
       return AssetImageName.fantom.rawValue
-    case BraveWallet.AuroraMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
       return AssetImageName.aurora.rawValue
-    case BraveWallet.OptimismMainnetChainId.uppercased():
+    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
       return AssetImageName.optimism.rawValue
-    default:
+    } else {
       return nil
     }
   }
