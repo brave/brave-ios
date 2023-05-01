@@ -52,40 +52,9 @@ struct NetworkIcon: View {
   private typealias NetworkImageInfo = (iconName: String, grayscale: Bool)
   private var networkImageInfo: NetworkImageInfo? {
     let isGrayscale = WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
-    switch network.chainId {
-    case BraveWallet.MainnetChainId:
-      return (AssetImageName.ethereum.rawValue, isGrayscale)
-    case BraveWallet.GoerliChainId,
-      BraveWallet.SepoliaChainId:
-      return (AssetImageName.ethereum.rawValue, isGrayscale)
-    case BraveWallet.SolanaMainnet:
-      return (AssetImageName.solana.rawValue, isGrayscale)
-    case BraveWallet.SolanaTestnet, BraveWallet.SolanaDevnet:
-      return (AssetImageName.solana.rawValue, isGrayscale)
-    case BraveWallet.FilecoinMainnet:
-      return (AssetImageName.filecoin.rawValue, isGrayscale)
-    case BraveWallet.FilecoinTestnet:
-      return (AssetImageName.filecoin.rawValue, isGrayscale)
-    case BraveWallet.PolygonMainnetChainId:
-      return (AssetImageName.polygon.rawValue, isGrayscale)
-    case BraveWallet.BinanceSmartChainMainnetChainId:
-      return (AssetImageName.binance.rawValue, isGrayscale)
-    case BraveWallet.CeloMainnetChainId:
-      return (AssetImageName.celo.rawValue, isGrayscale)
-    case BraveWallet.AvalancheMainnetChainId:
-      return (AssetImageName.avalanche.rawValue, isGrayscale)
-    case BraveWallet.FantomMainnetChainId:
-      return (AssetImageName.fantom.rawValue, isGrayscale)
-    case BraveWallet.OptimismMainnetChainId:
-      return (AssetImageName.optimism.rawValue, isGrayscale)
-    case BraveWallet.AuroraMainnetChainId:
-      return (AssetImageName.aurora.rawValue, isGrayscale)
-    case BraveWallet.FilecoinEthereumMainnetChainId:
-      return (AssetImageName.filecoin.rawValue, isGrayscale)
-    case BraveWallet.FilecoinEthereumTestnetChainId:
-      return (AssetImageName.filecoin.rawValue, isGrayscale)
-    default:
-      return nil
+    if let imageName = network.networkLogoName {
+      return (imageName, isGrayscale)
     }
+    return nil
   }
 }

@@ -77,7 +77,7 @@ struct AssetIconView: View {
   
   @ViewBuilder private var tokenLogo: some View {
     if shouldShowNetworkIcon,  // explicitly show/not show network logo
-       (!network.isNativeAsset(token) || network.nativeTokenLogo != network.networkLogo), // non-native asset OR if the network is not the official Ethereum network, but uses ETH as gas
+       (!network.isNativeAsset(token) || network.nativeTokenLogoName != network.networkLogoName), // non-native asset OR if the network is not the official Ethereum network, but uses ETH as gas
        let image = network.networkLogoImage {
       Image(uiImage: image)
         .resizable()

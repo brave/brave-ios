@@ -46,7 +46,7 @@ extension BraveWallet.NetworkInfo: Identifiable {
     .init(
       contractAddress: "",
       name: symbolName,
-      logo: nativeTokenLogo ?? "",
+      logo: nativeTokenLogoName ?? "",
       isErc20: false,
       isErc721: false,
       isErc1155: false,
@@ -61,66 +61,76 @@ extension BraveWallet.NetworkInfo: Identifiable {
     )
   }
   
-  public var nativeTokenLogo: String? {
-    if symbol.caseInsensitiveCompare("ETH") == .orderedSame {
-      return AssetImageName.ethereum.rawValue
-    } else if symbol.caseInsensitiveCompare("SOL") == .orderedSame {
-      return AssetImageName.solana.rawValue
-    } else if symbol.caseInsensitiveCompare("FIL") == .orderedSame {
-      return AssetImageName.filecoin.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
-      return AssetImageName.polygon.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
-      return AssetImageName.binance.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
-      return AssetImageName.celo.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
-      return AssetImageName.avalanche.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
-      return AssetImageName.fantom.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
-      return AssetImageName.aurora.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
-      return AssetImageName.optimism.rawValue
+  public var nativeTokenLogoName: String? {
+    if let logoBySymbol = assetIconNameBySymbol(symbol) {
+      return logoBySymbol
+    } else if let logoByChainId = assetIconNameByChainId(chainId) {
+      return logoByChainId
     } else {
       return iconUrls.first
     }
   }
   
   public var nativeTokenLogoImage: UIImage? {
-    guard let logo = nativeTokenLogo else { return nil }
+    guard let logo = nativeTokenLogoName else { return nil }
     return UIImage(named: logo, in: .module, with: nil)
   }
   
-  public var networkLogo: String? {
-    if chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
-      return AssetImageName.ethereum.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame {
-      return AssetImageName.solana.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame {
-      return AssetImageName.filecoin.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
-      return AssetImageName.polygon.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
-      return AssetImageName.binance.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
-      return AssetImageName.celo.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
-      return AssetImageName.avalanche.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
-      return AssetImageName.fantom.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
-      return AssetImageName.aurora.rawValue
-    } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
-      return AssetImageName.optimism.rawValue
-    } else {
-      return iconUrls.first
-    }
+  public var networkLogoName: String? {
+    return assetIconNameByChainId(chainId) ?? iconUrls.first
   }
   
   public var networkLogoImage: UIImage? {
-    guard let logo = networkLogo else { return nil }
+    guard let logo = networkLogoName else { return nil }
     return UIImage(named: logo, in: .module, with: nil)
+  }
+  
+  private func assetIconNameByChainId(_ chainId: String) -> String? {
+    switch chainId.uppercased() {
+    case
+      BraveWallet.MainnetChainId.uppercased(),
+      BraveWallet.GoerliChainId.uppercased(),
+      BraveWallet.SepoliaChainId.uppercased():
+      return AssetImageName.ethereum.rawValue
+    case
+      BraveWallet.SolanaMainnet.uppercased(),
+      BraveWallet.SolanaDevnet.uppercased(),
+      BraveWallet.SolanaTestnet.uppercased():
+      return AssetImageName.solana.rawValue
+    case
+      BraveWallet.FilecoinMainnet.uppercased(),
+      BraveWallet.FilecoinTestnet.uppercased(),
+      BraveWallet.FilecoinEthereumMainnetChainId.uppercased(),
+      BraveWallet.FilecoinEthereumTestnetChainId.uppercased():
+      return AssetImageName.filecoin.rawValue
+    case BraveWallet.PolygonMainnetChainId.uppercased():
+      return AssetImageName.polygon.rawValue
+    case BraveWallet.BinanceSmartChainMainnetChainId.uppercased():
+      return AssetImageName.binance.rawValue
+    case BraveWallet.CeloMainnetChainId.uppercased():
+      return AssetImageName.celo.rawValue
+    case BraveWallet.AvalancheMainnetChainId.uppercased():
+      return AssetImageName.avalanche.rawValue
+    case BraveWallet.FantomMainnetChainId.uppercased():
+      return AssetImageName.fantom.rawValue
+    case BraveWallet.AuroraMainnetChainId.uppercased():
+      return AssetImageName.aurora.rawValue
+    case BraveWallet.OptimismMainnetChainId.uppercased():
+      return AssetImageName.optimism.rawValue
+    default:
+      return nil
+    }
+  }
+  
+  private func assetIconNameBySymbol(_ symbol: String) -> String? {
+    if symbol.caseInsensitiveCompare("ETH") == .orderedSame {
+      return AssetImageName.ethereum.rawValue
+    } else if symbol.caseInsensitiveCompare("SOL") == .orderedSame {
+      return AssetImageName.solana.rawValue
+    } else if symbol.caseInsensitiveCompare("FIL") == .orderedSame {
+      return AssetImageName.filecoin.rawValue
+    }
+    return nil
   }
 }
 
