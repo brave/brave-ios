@@ -479,10 +479,10 @@ enum TransactionParser {
         instructions: parsedInstructions
       )
       let details: ParsedTransaction.Details
-      if transaction.txType == .solanaDappSignTransaction, transaction.txType == .solanaDappSignAndSendTransaction {
-        details = .solDappTransaction(solanaTxDetails)
-      } else {
+      if transaction.txType == .solanaSwap {
         details = .solSwapTransaction(solanaTxDetails)
+      } else { // .solanaDappSignTransaction, .solanaDappSignAndSendTransaction
+        details = .solDappTransaction(solanaTxDetails)
       }
       return .init(
         transaction: transaction,
