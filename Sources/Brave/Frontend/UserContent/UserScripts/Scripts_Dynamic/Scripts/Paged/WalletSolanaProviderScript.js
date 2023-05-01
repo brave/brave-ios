@@ -35,7 +35,7 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
           "securityToken": SECURITY_TOKEN,
           "method": method,
           "args": JSON.stringify(payload, (key, value) => {
-            /* JSON.stringify will convert Uint8Array to a dictionary, f we convert to an array we get a list. */
+            /* JSON.stringify will convert Uint8Array to a dictionary, if we convert to an array we get a list. */
             return value instanceof Uint8Array ? Array.from(value) : value;
           })
         })
@@ -61,36 +61,61 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
       }))
     })
     /*
-     solanaWeb3.Transaction
+     solanaWeb3.Transaction | solanaWeb3.VersionedTransaction
      ->
      [UInt8]
      */
     let serializedMessageFromTx = $(function(transaction) {
-      const serializeMessageBuffer = transaction.serializeMessage();
-      const serializedMessage = [...serializeMessageBuffer]; // Buffer to Array
-      return serializedMessage;
+      if (transaction.message) { // VersionedTransaction (v0)
+        const serializeMessageBuffer = transaction.message.serialize();
+        const serializedMessage = [...serializeMessageBuffer]; // Buffer to Array
+        return serializedMessage;
+      } else { // Transaction (legacy)
+        const serializeMessageBuffer = transaction.serializeMessage();
+        const serializedMessage = [...serializeMessageBuffer]; // Buffer to Array
+        return serializedMessage;
+      }
     })
     /*
-     solanaWeb3.Transaction
+     solanaWeb3.Transaction | solanaWeb3.VersionedTransaction
      ->
      [{publicKey: <base58 encoded string>, signature: [UInt8]}]
      */
     let signaturesPubKeyPairsFromTx = $(function(transaction) {
-      let convertSignaturePubkeyTuple = $(function(signaturePubkeyTuple) {
-        const obj = $Object.create(null, undefined);
-        obj.publicKey = signaturePubkeyTuple.publicKey.toBase58();
-        const signatureBuffer = signaturePubkeyTuple.signature
-        if (signatureBuffer) {
-          obj.signature = [...signatureBuffer]; // Buffer to Array
-        } else {
-          obj.signature = [];
+      if (transaction.message) { // VersionedTransaction (v0)
+        const signatures = transaction.signatures;
+        const versionedMessage = transaction.message;
+        const staticAccountKeys = versionedMessage.staticAccountKeys;
+
+        const signaturePubkeyObjects = [];
+        for (let i = 0; i < signatures.length; i++) {
+          const signature = signatures[i];
+          const publicKey = staticAccountKeys[i];
+
+          const obj = $Object.create(null, undefined);
+          obj.publicKey = publicKey.toBase58();
+          obj.signature = signature;
+          signaturePubkeyObjects[i] = $.extensiveFreeze(obj, freezeExceptions);
         }
-        return $.extensiveFreeze(obj, freezeExceptions);
-      })
-      return transaction.signatures.map(convertSignaturePubkeyTuple);
+
+        return signaturePubkeyObjects;
+      } else { // Transaction (legacy)
+        let convertSignaturePubkeyTuple = $(function(signaturePubkeyTuple) {
+          const obj = $Object.create(null, undefined);
+          obj.publicKey = signaturePubkeyTuple.publicKey.toBase58();
+          const signatureBuffer = signaturePubkeyTuple.signature
+          if (signatureBuffer) {
+            obj.signature = [...signatureBuffer]; // Buffer to Array
+          } else {
+            obj.signature = [];
+          }
+          return $.extensiveFreeze(obj, freezeExceptions);
+        })
+        return transaction.signatures.map(convertSignaturePubkeyTuple);
+      }
     })
     /*
-     solanaWeb3.Transaction
+     solanaWeb3.Transaction | solanaWeb3.VersionedTransaction
      ->
      {
       serializedMessage: [UInt8],
@@ -105,8 +130,15 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
       object.signatures = signatures;
       return object;
     })
-    let createTransaction = $(function(serializedTx) {
-      return $.extensiveFreeze(solanaWeb3.Transaction.from(new Uint8Array(serializedTx)), freezeExceptions)
+    let createTransaction = $(function(serializedTxDict) {
+      const version = serializedTxDict["version"];
+      const serializedTx = serializedTxDict["serializedTx"];
+      
+      if (version == 0) { // Transaction (legacy)
+        return $.extensiveFreeze(solanaWeb3.Transaction.from(new Uint8Array(serializedTx)), freezeExceptions)
+      } else if (version == 1) { // VersionedTransaction (v0)
+        return $.extensiveFreeze(solanaWeb3.VersionedTransaction.deserialize(new Uint8Array(serializedTx)), freezeExceptions)
+      }
     })
     const provider = {
       value: {

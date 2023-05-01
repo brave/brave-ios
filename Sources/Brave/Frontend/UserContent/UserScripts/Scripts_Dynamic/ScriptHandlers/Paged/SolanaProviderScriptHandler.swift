@@ -24,6 +24,8 @@ class SolanaProviderScriptHandler: TabContentScript {
     case method
     case params
     case code
+    case serializedTx
+    case version
   }
   
   static let scriptName = "WalletSolanaProviderScript"
@@ -249,16 +251,18 @@ class SolanaProviderScriptHandler: TabContentScript {
       return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
     }
     let param = createSignTransactionParam(serializedMessage: serializedMessage, signatures: signatures)
-    // TODO: Wallet #7211 - `version` needs returned to DApp.
     let (status, errorMessage, serializedTx, version) = await provider.signTransaction(param)
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
     }
-    let listMojoInt = serializedTx.map { MojoBase.Value(intValue: $0.int32Value) }
-    guard let encodedSerializedTx = MojoBase.Value(listValue: listMojoInt).jsonObject else {
+    let transactionDict = self.buildSerializedTxJson(
+      serializedTx: serializedTx,
+      version: version
+    )
+    guard let transactionDict = transactionDict.jsonObject else {
       return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
     }
-    return (encodedSerializedTx, nil)
+    return (transactionDict, nil)
   }
   
   /// Given args `[{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}]`,
@@ -280,21 +284,19 @@ class SolanaProviderScriptHandler: TabContentScript {
     guard !params.isEmpty else {
       return (nil, buildErrorJson(status: .invalidParams, errorMessage: "Invalid args"))
     }
-    // TODO: Wallet #7211 - `versions` needs returned to DApp.
     let (status, errorMessage, serializedTxs, versions) = await provider.signAllTransactions(params)
     guard status == .success else {
       return (nil, buildErrorJson(status: status, errorMessage: errorMessage))
     }
-    let encodedSerializedTxs = serializedTxs.compactMap {
-      let listMojoInt = $0.map { number in
-        MojoBase.Value(intValue: number.int32Value)
-      }
-      return MojoBase.Value(listValue: listMojoInt).jsonObject
+    let serializedTransactionDicts: [MojoBase.Value] = zip(serializedTxs, versions).compactMap { serializedTx, versionInt in
+      guard let version = BraveWallet.SolanaMessageVersion(rawValue: versionInt.intValue) else { return nil }
+      return buildSerializedTxJson(serializedTx: serializedTx, version: version)
     }
-    guard !encodedSerializedTxs.isEmpty else {
+    guard serializedTransactionDicts.count == serializedTxs.count,
+          let encodedSerializedTxDicts = MojoBase.Value(listValue: serializedTransactionDicts).jsonObject else {
       return (nil, buildErrorJson(status: .internalError, errorMessage: "Internal error"))
     }
-    return (encodedSerializedTxs, nil)
+    return (encodedSerializedTxDicts, nil)
   }
   
   /// Helper function to build `SolanaSignTransactionParam` given the serializedMessage and signatures from the `solanaWeb3.Transaction`.
@@ -313,8 +315,30 @@ class SolanaProviderScriptHandler: TabContentScript {
     return .init(encodedSerializedMsg: encodedSerializedMsg, signatures: signatures)
   }
   
-  private func buildErrorJson(status: BraveWallet.SolanaProviderError, errorMessage: String) -> String? {
-    JSONSerialization.jsObject(withNative: [Keys.code.rawValue: status.rawValue, Keys.message.rawValue: errorMessage] as [String: Any])
+  private func buildSerializedTxJson(
+    serializedTx: [NSNumber],
+    version: BraveWallet.SolanaMessageVersion
+  ) -> MojoBase.Value {
+    let encodedSerializedTxMojoInts = serializedTx.map { MojoBase.Value(intValue: $0.int32Value) }
+    let encodedSerializedTx = MojoBase.Value(listValue: encodedSerializedTxMojoInts)
+    let versionMojoInt = MojoBase.Value(intValue: Int32(version.rawValue))
+    let dict = MojoBase.Value(dictionaryValue: [
+      Keys.serializedTx.rawValue: encodedSerializedTx,
+      Keys.version.rawValue: versionMojoInt
+    ])
+    return dict
+  }
+  
+  private func buildErrorJson(
+    status: BraveWallet.SolanaProviderError,
+    errorMessage: String
+  ) -> String? {
+    JSONSerialization.jsObject(
+      withNative: [
+        Keys.code.rawValue: status.rawValue,
+        Keys.message.rawValue: errorMessage
+      ] as [String: Any]
+    )
   }
   
   @MainActor private func emitConnectEvent(publicKey: String) async {
