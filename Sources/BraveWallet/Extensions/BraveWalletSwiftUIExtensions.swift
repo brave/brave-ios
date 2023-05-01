@@ -20,6 +20,19 @@ extension BraveWallet.TransactionInfo: Identifiable {
   // Already has `id` property
 }
 
+public enum AssetImageName: String {
+  case ethereum = "eth-asset-icon"
+  case solana = "sol-asset-icon"
+  case filecoin = "filecoin-asset-icon"
+  case polygon = "matic"
+  case binance = "bnb-asset-icon"
+  case celo = "celo"
+  case avalanche = "avax"
+  case fantom = "fantom"
+  case aurora = "aurora"
+  case optimism = "optimism"
+}
+
 extension BraveWallet.NetworkInfo: Identifiable {
   public var id: String {
     chainId
@@ -50,25 +63,25 @@ extension BraveWallet.NetworkInfo: Identifiable {
   
   public var nativeTokenLogo: String? {
     if symbol.caseInsensitiveCompare("ETH") == .orderedSame {
-      return "eth-asset-icon"
+      return AssetImageName.ethereum.rawValue
     } else if symbol.caseInsensitiveCompare("SOL") == .orderedSame {
-      return "sol-asset-icon"
+      return AssetImageName.solana.rawValue
     } else if symbol.caseInsensitiveCompare("FIL") == .orderedSame {
-      return "filecoin-asset-icon"
+      return AssetImageName.filecoin.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
-      return "matic"
+      return AssetImageName.polygon.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
-      return "bnb-asset-icon"
+      return AssetImageName.binance.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
-      return "celo"
+      return AssetImageName.celo.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
-      return "avax"
+      return AssetImageName.avalanche.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
-      return "fantom"
+      return AssetImageName.fantom.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
-      return "aurora"
+      return AssetImageName.aurora.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
-      return "optimism"
+      return AssetImageName.optimism.rawValue
     } else {
       return iconUrls.first
     }
@@ -81,25 +94,25 @@ extension BraveWallet.NetworkInfo: Identifiable {
   
   public var networkLogo: String? {
     if chainId.caseInsensitiveCompare(BraveWallet.MainnetChainId) == .orderedSame {
-      return "eth-asset-icon"
+      return AssetImageName.ethereum.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.SolanaMainnet) == .orderedSame {
-      return "sol-asset-icon"
+      return AssetImageName.solana.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.FilecoinMainnet) == .orderedSame {
-      return "filecoin-asset-icon"
+      return AssetImageName.filecoin.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.PolygonMainnetChainId) == .orderedSame {
-      return "matic"
+      return AssetImageName.polygon.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.BinanceSmartChainMainnetChainId) == .orderedSame {
-      return "bnb-asset-icon"
+      return AssetImageName.binance.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.CeloMainnetChainId) == .orderedSame {
-      return "celo"
+      return AssetImageName.celo.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.AvalancheMainnetChainId) == .orderedSame {
-      return "avax"
+      return AssetImageName.avalanche.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.FantomMainnetChainId) == .orderedSame {
-      return "fantom"
+      return AssetImageName.fantom.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.AuroraMainnetChainId) == .orderedSame {
-      return "aurora"
+      return AssetImageName.aurora.rawValue
     } else if chainId.caseInsensitiveCompare(BraveWallet.OptimismMainnetChainId) == .orderedSame {
-      return "optimism"
+      return AssetImageName.optimism.rawValue
     } else {
       return iconUrls.first
     }

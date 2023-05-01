@@ -51,38 +51,39 @@ struct NetworkIcon: View {
   
   private typealias NetworkImageInfo = (iconName: String, grayscale: Bool)
   private var networkImageInfo: NetworkImageInfo? {
+    let isGrayscale = WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
     switch network.chainId {
     case BraveWallet.MainnetChainId:
-      return ("eth-asset-icon", false)
+      return (AssetImageName.ethereum.rawValue, isGrayscale)
     case BraveWallet.GoerliChainId,
       BraveWallet.SepoliaChainId:
-      return ("eth-asset-icon", true)
+      return (AssetImageName.ethereum.rawValue, isGrayscale)
     case BraveWallet.SolanaMainnet:
-      return ("sol-asset-icon", false)
+      return (AssetImageName.solana.rawValue, isGrayscale)
     case BraveWallet.SolanaTestnet, BraveWallet.SolanaDevnet:
-      return ("sol-asset-icon", true)
+      return (AssetImageName.solana.rawValue, isGrayscale)
     case BraveWallet.FilecoinMainnet:
-      return ("filecoin-asset-icon", false)
+      return (AssetImageName.filecoin.rawValue, isGrayscale)
     case BraveWallet.FilecoinTestnet:
-      return ("filecoin-asset-icon", true)
+      return (AssetImageName.filecoin.rawValue, isGrayscale)
     case BraveWallet.PolygonMainnetChainId:
-      return ("matic", false)
+      return (AssetImageName.polygon.rawValue, isGrayscale)
     case BraveWallet.BinanceSmartChainMainnetChainId:
-      return ("bnb-asset-icon", false)
+      return (AssetImageName.binance.rawValue, isGrayscale)
     case BraveWallet.CeloMainnetChainId:
-      return ("celo", false)
+      return (AssetImageName.celo.rawValue, isGrayscale)
     case BraveWallet.AvalancheMainnetChainId:
-      return ("avax", false)
+      return (AssetImageName.avalanche.rawValue, isGrayscale)
     case BraveWallet.FantomMainnetChainId:
-      return ("fantom", false)
+      return (AssetImageName.fantom.rawValue, isGrayscale)
     case BraveWallet.OptimismMainnetChainId:
-      return ("optimism", false)
+      return (AssetImageName.optimism.rawValue, isGrayscale)
     case BraveWallet.AuroraMainnetChainId:
-      return ("aurora", false)
+      return (AssetImageName.aurora.rawValue, isGrayscale)
     case BraveWallet.FilecoinEthereumMainnetChainId:
-      return ("filecoin-asset-icon", false)
+      return (AssetImageName.filecoin.rawValue, isGrayscale)
     case BraveWallet.FilecoinEthereumTestnetChainId:
-      return ("filecoin-asset-icon", true)
+      return (AssetImageName.filecoin.rawValue, isGrayscale)
     default:
       return nil
     }
