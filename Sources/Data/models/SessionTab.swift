@@ -209,15 +209,13 @@ extension SessionTab {
   
   public static func createIfNeeded(tabId: UUID, title: String, tabURL: URL) {
     DataController.perform { context in
-      guard !SessionTab.exists(tabId: tabId, in: context) else {
-        return
-      }
+      guard !SessionTab.exists(tabId: tabId, in: context),
+            let window = SessionWindow.getActiveWindow(context: context) else { return }
       
-      guard let window = SessionWindow.getActiveWindow(context: context) else { return }
       _ = SessionTab(context: context,
                      sessionWindow: window,
                      sessionTabGroup: nil,
-                     index: Int32(window.sessionTabs.count),
+                     index: Int32(window.sessionTabs?.count ?? 0),
                      interactionState: Data(),
                      isPrivate: false,
                      isSelected: false,
