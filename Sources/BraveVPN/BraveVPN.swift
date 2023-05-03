@@ -24,6 +24,8 @@ public class BraveVPN {
   /// This list is not static and should be refetched every now and then.
   static var regions: [GRDRegion] = []
   
+  static var lastKnownRegion: GRDRegion?
+  
   // Non translatable
   private static let connectionName = "Brave Firewall + VPN"
 
@@ -366,6 +368,10 @@ public class BraveVPN {
     helper.selectedRegion
   }
   
+  public static var activatedRegion: GRDRegion? {
+    helper.selectedRegion ?? lastKnownRegion
+  }
+  
   /// Switched to use an automatic region, region closest to user location.
   public static func useAutomaticRegion() {
     helper.select(nil)
@@ -493,6 +499,21 @@ public class BraveVPN {
           }
         }
       }
+    }
+  }
+  
+  public static func fetchLastUsedRegionDetail(_ completion: ((GRDRegion?, Bool) -> Void)? = nil) {
+    housekeepingApi.requestTimeZonesForRegions { timeZones, success, responseStatusCode in
+      guard success, let timeZones = timeZones else {
+        logAndStoreError("Failed to get timezones while fetching region: \(responseStatusCode)", printToConsole: true)
+        completion?(nil, false)
+        
+        return
+      }
+     
+      let region = GRDServerManager.localRegion(fromTimezones: timeZones)
+      completion?(region, true)
+      BraveVPN.lastKnownRegion = region
     }
   }
   

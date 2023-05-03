@@ -143,6 +143,7 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
 
           self.dismiss(animated: true) {
             self.showSuccessAlert(text: Strings.VPN.regionSwitchSuccessPopupText)
+            BraveVPN.fetchLastUsedRegionDetail()
           }
         } else {
           self.showErrorAlert(title: Strings.VPN.regionPickerErrorTitle,

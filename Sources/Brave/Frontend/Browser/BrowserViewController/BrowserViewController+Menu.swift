@@ -12,6 +12,7 @@ import Data
 import BraveWallet
 import BraveCore
 import os.log
+import BraveVPN
 
 extension BrowserViewController {
   func featuresMenuSection(_ menuController: MenuViewController) -> some View {
@@ -63,6 +64,11 @@ extension BrowserViewController {
           self.openURLInNewTab(url,
                                isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
                                isPrivileged: false)
+        }
+      )
+      
+      RegionMenuButton(vpnRegionInfo: BraveVPN.activatedRegion, regionSelectAction: {
+        
         }
       )
       

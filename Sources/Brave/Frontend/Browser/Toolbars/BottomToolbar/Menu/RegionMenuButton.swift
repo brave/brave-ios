@@ -9,13 +9,12 @@ import BraveShared
 import SwiftUI
 import BraveUI
 import BraveVPN
+import GuardianConnect
 
 /// A menu button that provides a shortcut to changing Brave VPN region
 struct RegionMenuButton: View {
   /// The region information
-  var vpnRegionInfo: VPNProductInfo
-  /// The current setting which shows which server is selected
-  var currentSettingsTitle: String
+  var vpnRegionInfo: GRDRegion?
   /// A closure executed when the region select is clicked
   var regionSelectAction: () -> Void
   
@@ -26,14 +25,13 @@ struct RegionMenuButton: View {
   var body: some View {
     HStack {
       MenuItemHeaderView(
-        icon: Image(braveSystemName: "leo.product.vpn"),
+        icon: vpnRegionInfo?.regionFlag ?? Image(braveSystemName: "leo.globe"),
         title: "VPN Region",
-        subtitle: currentSettingsTitle)
+        subtitle: vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic")
       Spacer()
       if isVPNStatusChanging {
         ActivityIndicatorView(isAnimating: true)
       }
-      NavigationLink<<#Label: View#>, <#Destination: View#>>.empty
     }
     .padding(.horizontal, 14)
     .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)

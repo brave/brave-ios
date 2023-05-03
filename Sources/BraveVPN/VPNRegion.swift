@@ -4,15 +4,34 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import GuardianConnect
+import BraveUI
+import SwiftUI
 
-struct VPNRegion: Codable {
-  let continent: String
-  let name: String
-  let namePretty: String
-
-  private enum CodingKeys: String, CodingKey {
-    case continent
-    case name
-    case namePretty = "name-pretty"
+extension GRDRegion {
+  
+  public var settingTitle: String {
+    var title = "Current Setting: "
+    
+    if BraveVPN.isAutomaticRegion {
+      title.append("Automatic")
+    } else {
+      title.append(displayName)
+    }
+    
+    return title
+  }
+  
+  public var regionFlag: Image? {
+    let rootIndex: UInt32 = 127397
+    var unicodeScalarView = ""
+    
+    for scalar in countryISOCode.unicodeScalars {
+      if let appendedScalar = UnicodeScalar(rootIndex + scalar.value) {
+        unicodeScalarView.unicodeScalars.append(appendedScalar)
+      }
+    }
+    
+    return Image(uiImage: unicodeScalarView.image())
   }
 }

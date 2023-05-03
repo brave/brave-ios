@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import UIKit
 
 extension String {
   /// The first URL found within this String, or nil if no URL is found
@@ -38,4 +39,24 @@ extension String {
   public var preferredSearchSuggestionText: String {
     return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
   }
+}
+
+extension String {
+  
+  /// <#Description#>
+  /// - Parameter fontSize: <#fontSize description#>
+  /// - Returns: <#description#>
+  public func image(fontSize: CGFloat = 32.0) -> UIImage {
+    let font = UIFont.systemFont(ofSize: fontSize)
+    let size = self.size(withAttributes: [.font: font])
+    
+    return UIGraphicsImageRenderer(size: size).image { context in
+      context.cgContext.setFillColor(UIColor.white.cgColor)
+      context.cgContext.setStrokeColor(UIColor.white.cgColor)
+      context.fill(CGRect(origin: .zero, size: size))
+      
+      (self as AnyObject).draw(in: CGRect(origin: .zero, size: size), withAttributes: [.font: font])
+    }
+  }
+  
 }
