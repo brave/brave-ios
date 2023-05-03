@@ -66,15 +66,9 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
      [UInt8]
      */
     let serializedMessageFromTx = $(function(transaction) {
-      if (transaction.message) { // VersionedTransaction (v0)
-        const serializeMessageBuffer = transaction.message.serialize();
-        const serializedMessage = [...serializeMessageBuffer]; // Buffer to Array
-        return serializedMessage;
-      } else { // Transaction (legacy)
-        const serializeMessageBuffer = transaction.serializeMessage();
-        const serializedMessage = [...serializeMessageBuffer]; // Buffer to Array
-        return serializedMessage;
-      }
+      // VersionedTransaction (v0) : Transaction (legacy)
+      let serializeMessageBuffer = transaction.message ? transaction.message.serialize() : transaction.serializeMessage();
+      return [...serializeMessageBuffer]; // Buffer to Array
     })
     /*
      solanaWeb3.Transaction | solanaWeb3.VersionedTransaction
