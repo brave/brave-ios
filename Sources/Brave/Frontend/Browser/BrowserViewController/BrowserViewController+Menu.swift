@@ -68,9 +68,10 @@ extension BrowserViewController {
       )
       
       RegionMenuButton(vpnRegionInfo: BraveVPN.activatedRegion, regionSelectAction: {
-        
-        }
-      )
+        let vc = BraveVPNRegionPickerViewController()
+        (self.presentedViewController as? MenuViewController)?
+          .pushInnerMenu(vc)
+      })
       
       Divider()
 

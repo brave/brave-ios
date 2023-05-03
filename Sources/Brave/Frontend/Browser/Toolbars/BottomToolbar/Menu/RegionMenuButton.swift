@@ -30,7 +30,7 @@ struct RegionMenuButton: View {
         subtitle: vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic")
       Spacer()
       if isVPNStatusChanging {
-        ActivityIndicatorView(isAnimating: true)
+        hidden()
       }
     }
     .padding(.horizontal, 14)

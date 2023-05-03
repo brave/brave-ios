@@ -46,13 +46,13 @@ extension String {
   /// <#Description#>
   /// - Parameter fontSize: <#fontSize description#>
   /// - Returns: <#description#>
-  public func image(fontSize: CGFloat = 32.0) -> UIImage {
+  public func image(fontSize: CGFloat = 28.0) -> UIImage {
     let font = UIFont.systemFont(ofSize: fontSize)
     let size = self.size(withAttributes: [.font: font])
     
     return UIGraphicsImageRenderer(size: size).image { context in
-      context.cgContext.setFillColor(UIColor.white.cgColor)
-      context.cgContext.setStrokeColor(UIColor.white.cgColor)
+      context.cgContext.setFillColor(UIColor.clear.cgColor)
+      context.cgContext.setStrokeColor(UIColor.clear.cgColor)
       context.fill(CGRect(origin: .zero, size: size))
       
       (self as AnyObject).draw(in: CGRect(origin: .zero, size: size), withAttributes: [.font: font])
