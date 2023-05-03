@@ -13,8 +13,11 @@ import BraveCore
   private var cancellables: Set<AnyCancellable> = .init()
   
   private func setupStore(
-    network: BraveWallet.NetworkInfo = .mockGoerli,
-    accountInfos: [BraveWallet.AccountInfo] = [],
+    selectedNetworkForCoinType: [BraveWallet.CoinType: BraveWallet.NetworkInfo] = [
+      .eth : BraveWallet.NetworkInfo.mockMainnet,
+      .sol : BraveWallet.NetworkInfo.mockSolana
+    ],
+    accountInfos: [BraveWallet.AccountInfo] = [.mockEthAccount, .mockSolAccount],
     allTokens: [BraveWallet.BlockchainToken] = [],
     transactions: [BraveWallet.TransactionInfo] = [],
     gasEstimation: BraveWallet.GasEstimation1559 = .init(),
@@ -31,8 +34,12 @@ import BraveCore
       completion(true, [mockEthAssetPrice, mockSolAssetPrice])
     }
     let rpcService = BraveWallet.TestJsonRpcService()
-    rpcService._chainIdForOrigin = { $2(network.chainId) }
-    rpcService._network = { $2(network) }
+    rpcService._chainIdForOrigin = { coin, origin, completion in
+      completion(selectedNetworkForCoinType[coin]?.chainId ?? BraveWallet.MainnetChainId)
+    }
+    rpcService._network = { coin, origin, completion in
+      completion(selectedNetworkForCoinType[coin] ?? .mockMainnet)
+    }
     rpcService._balance = { _, _, _, completion in
       completion(mockBalanceWei, .success, "")
     }
@@ -66,9 +73,9 @@ import BraveCore
       completion(setDataForUnapprovedTransactionSuccess)
     }
     let keyringService = BraveWallet.TestKeyringService()
-    keyringService._keyringInfo = { _, completion in
+    keyringService._keyringInfo = { id, completion in
       let keyring: BraveWallet.KeyringInfo = .init(
-        id: BraveWallet.DefaultKeyringId,
+        id: id,
         isKeyringCreated: true,
         isLocked: false,
         isBackedUp: true,
@@ -101,7 +108,6 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      network: .mockSolana,
       accountInfos: [.mockSolAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
@@ -161,7 +167,6 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      network: .mockSolana,
       accountInfos: [.mockSolAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
@@ -221,7 +226,7 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      accountInfos: [.previewAccount],
+      accountInfos: [.mockEthAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
       gasEstimation: mockGasEstimation
@@ -282,7 +287,7 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      accountInfos: [.previewAccount],
+      accountInfos: [.mockEthAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
       gasEstimation: mockGasEstimation,
@@ -323,7 +328,7 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      accountInfos: [.previewAccount],
+      accountInfos: [.mockEthAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
       gasEstimation: mockGasEstimation,
@@ -365,7 +370,7 @@ import BraveCore
     }
     let mockGasEstimation: BraveWallet.GasEstimation1559 = .init()
     let store = setupStore(
-      accountInfos: [.previewAccount],
+      accountInfos: [.mockEthAccount],
       allTokens: mockAllTokens,
       transactions: mockTransactions,
       gasEstimation: mockGasEstimation,

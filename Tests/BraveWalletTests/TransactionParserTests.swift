@@ -37,11 +37,13 @@ class TransactionParserTests: XCTestCase {
   private let tokens: [BraveWallet.BlockchainToken] = [
     .previewToken, .previewDaiToken, .mockUSDCToken, .mockSolToken, .mockSpdToken, .mockSolanaNFTToken
   ]
-  let assetRatios: [String: Double] = ["eth": 1,
-                                       "dai": 2,
-                                       "usdc": 3,
-                                       "sol": 20,
-                                       "spd": 15]
+  let assetRatios: [String: Double] = [
+    "eth": 1,
+    BraveWallet.BlockchainToken.previewDaiToken.assetRatioId.lowercased(): 2,
+    BraveWallet.BlockchainToken.mockUSDCToken.assetRatioId.lowercased(): 3,
+    "sol": 20,
+    BraveWallet.BlockchainToken.mockSpdToken.assetRatioId.lowercased(): 15
+  ]
   
   func testEthSendTransaction() {
     let network: BraveWallet.NetworkInfo = .mockMainnet

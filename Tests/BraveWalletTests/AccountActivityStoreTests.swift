@@ -29,9 +29,11 @@ class AccountActivityStoreTests: XCTestCase {
   let tokenRegistry: [BraveWallet.CoinType: [BraveWallet.BlockchainToken]] = [:]
   let mockAssetPrices: [BraveWallet.AssetPrice] = [
     .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23"),
-    .init(fromAsset: "usdc", toAsset: "usd", price: "1.00", assetTimeframeChange: "-57.23"),
+    .init(fromAsset: BraveWallet.BlockchainToken.mockUSDCToken.assetRatioId,
+          toAsset: "usd", price: "1.00", assetTimeframeChange: "-57.23"),
     .init(fromAsset: "sol", toAsset: "usd", price: "2.00", assetTimeframeChange: "-57.23"),
-    .init(fromAsset: "spd", toAsset: "usd", price: "0.50", assetTimeframeChange: "-57.23")
+    .init(fromAsset: BraveWallet.BlockchainToken.mockSpdToken.assetRatioId.lowercased(),
+          toAsset: "usd", price: "0.50", assetTimeframeChange: "-57.23")
   ]
   let transactions: [BraveWallet.CoinType: [BraveWallet.TransactionInfo]] = [
     .eth: [.previewConfirmedSend, .previewConfirmedSwap],

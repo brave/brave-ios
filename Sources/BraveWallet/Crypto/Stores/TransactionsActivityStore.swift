@@ -70,6 +70,7 @@ class TransactionsActivityStore: ObservableObject {
         selectedNetworkForCoin[coin] = await rpcService.network(coin, origin: nil)
       }
       let allTransactions = await txService.allTransactions(
+        chainIdsForCoin: selectedNetworkForCoin.mapValues { [$0.chainId] },
         for: allKeyrings
       ).filter { $0.txStatus != .rejected }
       let userVisibleTokens = await walletService.allVisibleUserAssets(
@@ -91,16 +92,16 @@ class TransactionsActivityStore: ObservableObject {
         solEstimatedTxFees: solEstimatedTxFeesCache
       )
       guard !self.transactionSummaries.isEmpty else { return }
-      
+
       if allTransactions.contains(where: { $0.coin == .sol }),
          let selectedSolNetwork = selectedNetworkForCoin[.sol] {
         let solTransactionIds = allTransactions.filter { $0.coin == .sol }.map(\.id)
         await updateSolEstimatedTxFeesCache(chainId: selectedSolNetwork.chainId, solTransactionIds: solTransactionIds)
       }
-      
+
       let allVisibleTokenAssetRatioIds = userVisibleTokens.map(\.assetRatioId)
       await updateAssetPricesCache(assetRatioIds: allVisibleTokenAssetRatioIds)
-      
+
       guard !Task.isCancelled else { return }
       self.transactionSummaries = self.transactionSummaries(
         transactions: allTransactions,
