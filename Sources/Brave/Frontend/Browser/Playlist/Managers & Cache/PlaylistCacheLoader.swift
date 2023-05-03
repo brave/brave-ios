@@ -563,7 +563,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         tab.setCustomUserScript(scripts: scriptTypes)
       }
       
-      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = domainForMainFrame.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true)
+      webView.configuration.preferences.isFraudulentWebsiteWarningEnabled = Preferences.Shields.googleSafeBrowsing.value
     }
 
     if ["http", "https", "data", "blob", "file"].contains(url.scheme) {
