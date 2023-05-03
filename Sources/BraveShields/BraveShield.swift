@@ -20,7 +20,7 @@ public enum BraveShield {
     case .AdblockAndTp:
       return Preferences.Shields.blockAdsAndTracking.value
     case .SafeBrowsing:
-      return Preferences.Shields.blockPhishingAndMalware.value
+      return Preferences.Shields.googleSafeBrowsing.value
     case .FpProtection:
       return Preferences.Shields.fingerprintingProtection.value
     case .NoScript:

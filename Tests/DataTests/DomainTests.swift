@@ -201,7 +201,7 @@ class DomainTests: CoreDataTestCase {
   }
   
   @MainActor func testSafeBrowsing() {
-    Preferences.Shields.blockPhishingAndMalware.reset()
+    Preferences.Shields.googleSafeBrowsing.reset()
     DataController.shared = DataController()
     DataController.shared.initializeOnce()
     
@@ -217,7 +217,7 @@ class DomainTests: CoreDataTestCase {
       XCTAssertTrue(domain.isShieldExpected(.SafeBrowsing, considerAllShieldsOption: true))
     }
     
-    Preferences.Shields.blockPhishingAndMalware.value = false
+    Preferences.Shields.googleSafeBrowsing.value = false
     
     for url in urls {
       let domain = Domain.getOrCreate(forUrl: url, persistent: false)

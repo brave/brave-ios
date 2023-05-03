@@ -111,7 +111,7 @@ public final class Domain: NSManagedObject, CRUD {
       case .AdblockAndTp:
         return self.shield_adblockAndTp?.boolValue ?? Preferences.Shields.blockAdsAndTracking.value
       case .SafeBrowsing:
-        return self.shield_safeBrowsing?.boolValue ?? Preferences.Shields.blockPhishingAndMalware.value
+        return self.shield_safeBrowsing?.boolValue ?? Preferences.Shields.googleSafeBrowsing.value
       case .FpProtection:
         return self.shield_fpProtection?.boolValue ?? Preferences.Shields.fingerprintingProtection.value
       case .NoScript:
