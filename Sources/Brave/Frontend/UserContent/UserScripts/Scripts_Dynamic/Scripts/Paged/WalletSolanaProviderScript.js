@@ -105,7 +105,8 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
           }
           return $.extensiveFreeze(obj, freezeExceptions);
         })
-        return transaction.signatures.map(convertSignaturePubkeyTuple);
+        const txSignatures = $Array.of(...transaction.signatures);
+        return txSignatures.map(convertSignaturePubkeyTuple);
       }
     })
     /*
@@ -200,12 +201,12 @@ window.__firefox__.execute(function($, $Object, $Function, $Array) {
         }),
         /* Deprecated */
         signAllTransactions: $(function(transactions) { /* -> Promise<[solanaWeb3.Transaction]> */
-          const objects = transactions.map(convertTransaction);
+          const objects = $Array.of(...transactions).map(convertTransaction);
           $.extensiveFreeze(objects, freezeExceptions);
           
           function completion(serializedTxs, resolve) {
             /* Convert `[[UInt8]]` -> `[solanaWeb3.Transaction]` */
-            const result = serializedTxs.map(createTransaction);
+            const result = $Array.of(...serializedTxs).map(createTransaction);
             resolve($.extensiveFreeze(result, freezeExceptions));
           }
           return post('signAllTransactions', objects, completion)
