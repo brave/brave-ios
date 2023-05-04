@@ -133,11 +133,15 @@ extension BrowserViewController {
     ]
     
     if let documentsSize = fetchDocumentsAndDataSize() {
-      UmaHistogramRecordValueToBucket("Brave.Accessibility.DocumentDirectorySize", buckets: buckets, value: documentsSize)
+      UmaHistogramRecordValueToBucket("Brave.Core.DocumentsDirectorySizeMB", buckets: buckets, value: documentsSize)
     }
   }
 
   func recordGeneralBottomBarLocationP3A() {
+    if UIDevice.isIpad {
+      return
+    }
+      
     enum Answer: Int, CaseIterable {
       case top = 0
       case bottom = 1
@@ -154,7 +158,7 @@ extension BrowserViewController {
       storage.add(value: 1, to: Date())
     }
     UmaHistogramRecordValueToBucket(
-      "Brave.TimeBased.NumberReaderModeActivated",
+      "Brave.ReaderMode.NumberReaderModeActivated",
       buckets: [
         0,
         .r(1...5),

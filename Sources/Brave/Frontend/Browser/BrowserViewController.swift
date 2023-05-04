@@ -534,11 +534,12 @@ public class BrowserViewController: UIViewController {
     // P3A Record
     maybeRecordInitialShieldsP3A()
     recordVPNUsageP3A(vpnEnabled: BraveVPN.isConnected)
+    recordAccessibilityDisplayZoomEnabledP3A()
+    recordAccessibilityDocumentsDirectorySizeP3A()
+    recordTimeBasedNumberReaderModeUsedP3A(activated: false)
     
     // Revised Review Handling
     AppReviewManager.shared.handleAppReview(for: .revisedCrossPlatform, using: self)
-    recordAccessibilityDisplayZoomEnabledP3A()
-    recordAccessibilityDocumentsDirectorySizeP3A()
   }
 
   private func setupAdsNotificationHandler() {
