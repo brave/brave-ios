@@ -640,7 +640,7 @@ public class TransactionConfirmationStore: ObservableObject {
       self.ethTxManagerProxy.setDataForUnapprovedTransaction(
         transaction.chainId,
         txMetaId: transaction.id,
-        data: []
+        data: data
       ) { success in
         // not going to refresh unapproved transactions since the tx observer will be
         // notified `onTransactionStatusChanged` and `onUnapprovedTxUpdated`
