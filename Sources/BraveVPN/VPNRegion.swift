@@ -7,20 +7,19 @@ import Foundation
 import GuardianConnect
 import BraveUI
 import SwiftUI
+import Shared
 
 extension GRDRegion {
   
   /// The title used in menu while chaging region
   public var settingTitle: String {
-    var title = "Current Setting: "
+    var settingSelection = displayName
     
     if BraveVPN.isAutomaticRegion {
-      title.append("Automatic")
-    } else {
-      title.append(displayName)
+      settingSelection = Strings.VPN.regionPickerAutomaticModeCellText
     }
     
-    return title
+    return  String(format: Strings.VPN.vpnRegionSelectorButtonSubTitle, settingSelection)
   }
   
   /// Flag of the region as an image

@@ -25,8 +25,9 @@ struct RegionMenuButton: View {
       return nil
     }
     
-    
-    return vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic"
+    return vpnRegionInfo?.settingTitle ?? String(
+      format: Strings.VPN.vpnRegionSelectorButtonSubTitle,
+      Strings.VPN.regionPickerAutomaticModeCellText)
   }
   
   @State private var isVPNEnabled = BraveVPN.isConnected
@@ -37,7 +38,7 @@ struct RegionMenuButton: View {
         HStack {
           MenuItemHeaderView(
             icon: vpnRegionInfo?.regionFlag ?? Image(braveSystemName: "leo.globe"),
-            title: "VPN Region",
+            title: Strings.VPN.vpnRegionSelectorButtonTitle,
             subtitle: subTitle)
           Spacer()
           Image(braveSystemName: "leo.arrow.small-right")
@@ -51,11 +52,11 @@ struct RegionMenuButton: View {
           }) {
             Color.clear
           }
-            .buttonStyle(TableCellButtonStyle())
+          .buttonStyle(TableCellButtonStyle())
         )
         .accessibilityElement()
         .accessibility(addTraits: .isButton)
-        .accessibility(label: Text("VPN Region"))
+        .accessibility(label: Text(Strings.VPN.vpnRegionSelectorButtonTitle))
       }
     }
     .onReceive(NotificationCenter.default.publisher(for: .NEVPNStatusDidChange)) { _ in
