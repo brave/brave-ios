@@ -171,7 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // This is a light operation, can be called at every launch without troubles.
     BraveVPN.migrateV1Credentials()
 
-    //
+    // Fetching details of GRDRegion for Automatic Region selection
     BraveVPN.fetchLastUsedRegionDetail()
     
     // Start the keyboard helper to monitor and cache keyboard state.

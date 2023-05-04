@@ -15,15 +15,16 @@ import GuardianConnect
 struct RegionMenuButton: View {
   /// The region information
   var vpnRegionInfo: GRDRegion?
-  ///
+  /// Boolean determining if current setting subtitle is going to be shown
   var settingTitleEnabled = true
   /// A closure executed when the region select is clicked
   var regionSelectAction: () -> Void
-  
+  /// Subtitle generation according to menu selection
   var subTitle: String? {
     guard settingTitleEnabled else {
       return nil
     }
+    
     
     return vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic"
   }

@@ -43,9 +43,9 @@ extension String {
 
 extension String {
   
-  /// <#Description#>
-  /// - Parameter fontSize: <#fontSize description#>
-  /// - Returns: <#description#>
+  /// Image generation from String with changing font size
+  /// - Parameter fontSize: Desired Font Size
+  /// - Returns: Image generated from the String
   public func image(fontSize: CGFloat = 28.0) -> UIImage {
     let font = UIFont.systemFont(ofSize: fontSize)
     let size = self.size(withAttributes: [.font: font])

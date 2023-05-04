@@ -10,6 +10,7 @@ import SwiftUI
 
 extension GRDRegion {
   
+  /// The title used in menu while chaging region
   public var settingTitle: String {
     var title = "Current Setting: "
     
@@ -22,12 +23,16 @@ extension GRDRegion {
     return title
   }
   
+  /// Flag of the region as an image
   public var regionFlag: Image? {
+    // Root Unicode flags index
     let rootIndex: UInt32 = 127397
     var unicodeScalarView = ""
     
     for scalar in countryISOCode.unicodeScalars {
+      // Shift the letter index to the flags index
       if let appendedScalar = UnicodeScalar(rootIndex + scalar.value) {
+        // Append symbol to the Unicode string
         unicodeScalarView.unicodeScalars.append(appendedScalar)
       }
     }
