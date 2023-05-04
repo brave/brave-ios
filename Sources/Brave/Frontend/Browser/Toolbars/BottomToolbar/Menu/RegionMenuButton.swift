@@ -15,41 +15,50 @@ import GuardianConnect
 struct RegionMenuButton: View {
   /// The region information
   var vpnRegionInfo: GRDRegion?
+  ///
+  var settingTitleEnabled = true
   /// A closure executed when the region select is clicked
   var regionSelectAction: () -> Void
+  
+  var subTitle: String? {
+    guard settingTitleEnabled else {
+      return nil
+    }
+    
+    return vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic"
+  }
   
   @State private var isVPNEnabled = BraveVPN.isConnected
   
   var body: some View {
-      HStack {
-        if isVPNEnabled {
-          HStack {
-            MenuItemHeaderView(
-              icon: vpnRegionInfo?.regionFlag ?? Image(braveSystemName: "leo.globe"),
-              title: "VPN Region",
-              subtitle: vpnRegionInfo?.settingTitle ?? "Current Setting: Automatic")
-            Spacer()
-            Image(braveSystemName: "leo.arrow.small-right")
-              .foregroundColor(Color(.secondaryBraveLabel))
-          }
-          .padding(.horizontal, 14)
-          .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
-          .background(
-            Button(action: {
-              regionSelectAction()
-            }) {
-              Color.clear
-            }
-              .buttonStyle(TableCellButtonStyle())
-          )
-          .accessibilityElement()
-          .accessibility(addTraits: .isButton)
-          .accessibility(label: Text("VPN Region"))
+    HStack {
+      if isVPNEnabled {
+        HStack {
+          MenuItemHeaderView(
+            icon: vpnRegionInfo?.regionFlag ?? Image(braveSystemName: "leo.globe"),
+            title: "VPN Region",
+            subtitle: subTitle)
+          Spacer()
+          Image(braveSystemName: "leo.arrow.small-right")
+            .foregroundColor(Color(.secondaryBraveLabel))
         }
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, minHeight: 48.0, alignment: .leading)
+        .background(
+          Button(action: {
+            regionSelectAction()
+          }) {
+            Color.clear
+          }
+            .buttonStyle(TableCellButtonStyle())
+        )
+        .accessibilityElement()
+        .accessibility(addTraits: .isButton)
+        .accessibility(label: Text("VPN Region"))
       }
-      .onReceive(NotificationCenter.default.publisher(for: .NEVPNStatusDidChange)) { _ in
-        isVPNEnabled = BraveVPN.isConnected
-      }
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .NEVPNStatusDidChange)) { _ in
+      isVPNEnabled = BraveVPN.isConnected
+    }
   }
-  
 }
