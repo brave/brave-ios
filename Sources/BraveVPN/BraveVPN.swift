@@ -296,9 +296,15 @@ public class BraveVPN {
         } else {
           helper.ikev2VPNManager.removeFromPreferences()
         }
-        
-        reconnectPending = false
-        completion?(success)
+         
+        // First time user will connect automatic region - detail is pulled
+        fetchLastUsedRegionDetail() { _, _ in
+          reconnectPending = false
+          DispatchQueue.main.async {  
+            completion?(success)
+          }
+        }
+      
       }
     }
   }
