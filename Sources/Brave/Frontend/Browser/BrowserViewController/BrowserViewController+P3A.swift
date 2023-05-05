@@ -10,6 +10,7 @@ import Data
 import BraveShields
 import BraveCore
 import Shared
+import os.log
 
 extension BrowserViewController {
   
@@ -109,19 +110,31 @@ extension BrowserViewController {
     func fetchDocumentsAndDataSize() -> Int? {
       let fileManager = FileManager.default
       
-      guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-        return nil
-      }
-
-      do {
-        if let documentsDirectorySize = try fileManager.directorySize(at: documentsDirectory){
-          return Int(documentsDirectorySize / 1024 / 1024)
-        } else {
+      var directorySize = 0
+      
+      if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+        do {
+          if let documentsDirectorySize = try fileManager.directorySize(at: documentsDirectory){
+            directorySize += Int(documentsDirectorySize / 1024 / 1024)
+          }
+        } catch {
+          Logger.module.error("Cant fetch document directory size")
           return nil
         }
+      }
+      
+      let temporaryDirectory = FileManager.default.temporaryDirectory
+      
+      do {
+        if let temporaryDirectorySize = try fileManager.directorySize(at: temporaryDirectory){
+          directorySize += Int(temporaryDirectorySize / 1024 / 1024)
+        }
       } catch {
+        Logger.module.error("Cant fetch temporary directory size")
         return nil
       }
+      
+      return directorySize
     }
     
     let buckets: [Bucket] = [
