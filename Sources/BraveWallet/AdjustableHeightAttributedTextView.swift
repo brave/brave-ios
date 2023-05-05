@@ -40,6 +40,7 @@ struct AttributedTextView: UIViewRepresentable {
   
   func makeUIView(context: Context) -> UITextView {
     let textView = UITextView().then {
+      $0.backgroundColor = .clear
       $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       $0.isEditable = false
       $0.isSelectable = true
