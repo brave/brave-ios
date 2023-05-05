@@ -25,7 +25,7 @@ public class BraveVPN {
   static var regions: [GRDRegion] = []
   
   /// Record last used region
-  /// It is used to hold details of the region when automatic slection is used
+  /// It is used to hold details of the region when automatic selection is used
   static var lastKnownRegion: GRDRegion?
   
   // Non translatable
@@ -515,7 +515,7 @@ public class BraveVPN {
   /// The function that fetched the last used region details from timezones
   /// It used to get details of Region when Automatic Region is used
   /// Otherwise the region detail items will be empty
-  /// - Parameter completion: comnpletion block that returns region with details or error
+  /// - Parameter completion: completion block that returns region with details or error
   public static func fetchLastUsedRegionDetail(_ completion: ((GRDRegion?, Bool) -> Void)? = nil) {
     switch vpnState {
     case .expired, .notPurchased:
