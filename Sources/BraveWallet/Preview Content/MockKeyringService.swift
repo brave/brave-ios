@@ -318,12 +318,16 @@ class MockKeyringService: BraveWalletKeyringService {
   func notifyUserInteraction() {
   }
   
-  func addFilecoinAccount(_ accountName: String, fileCoinNetwork: String, completion: @escaping (Bool) -> Void) {
+  func addFilecoinAccount(_ accountName: String, filecoinNetwork fileCoinNetwork: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
   
   func filecoinSelectedAccount(_ network: String, completion: @escaping (String?) -> Void) {
     completion("")
+  }
+  
+  func addBitcoinAccount(_ accountName: String, networkId: String, keyringId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
   }
 }
 
