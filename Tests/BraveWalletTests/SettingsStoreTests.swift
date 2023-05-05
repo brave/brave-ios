@@ -64,6 +64,7 @@ class SettingsStoreTests: XCTestCase {
     let (keyringService, walletService, rpcService, txService, ipfsApi) = setupServices()
     keyringService._autoLockMinutes = { $0(1) }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.cad.code) }
+    walletService._nftDiscoveryEnabled = { _ in }
     rpcService._ensResolveMethod = { $0(.disabled) }
     rpcService._ensOffchainLookupResolveMethod = { $0(.disabled) }
     rpcService._snsResolveMethod = { $0(.disabled) }
