@@ -17,6 +17,7 @@ struct AdvancedShieldsSettingsView: View {
   
   @State private var showManageWebsiteData = false
   @State private var showPrivateBrowsingConfirmation = false
+  @State private var showLoading = false
   
   init(profile: Profile, tabManager: TabManager, feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI, p3aUtilities: BraveP3AUtils) {
     self.settings = AdvancedShieldsSettings(
@@ -32,7 +33,7 @@ struct AdvancedShieldsSettingsView: View {
   var body: some View {
     List {
       DefaultShieldsViewView(settings: settings)
-      ClearDataSectionView(settings: settings)
+      ClearDataSectionView(settings: settings, clearingData: $showLoading)
       
       Section {
         Button {
@@ -46,11 +47,10 @@ struct AdvancedShieldsSettingsView: View {
             )
           })
         }
-          .buttonStyle(.plain)
-          .listRowBackground(Color(.secondaryBraveGroupedBackground))
-          .sheet(isPresented: $showManageWebsiteData) {
-            ManageWebsiteDataView()
-          }
+        .buttonStyle(.plain)
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+        .sheet(isPresented: $showManageWebsiteData) {
+          ManageWebsiteDataView()
         
         NavigationLink {
           PrivacyReportSettingsView()
@@ -80,6 +80,7 @@ struct AdvancedShieldsSettingsView: View {
             primaryButton: .default(Text(Strings.OKString), action: {
               Task { @MainActor in
                 try await Task.sleep(nanoseconds: NSEC_PER_MSEC * 100)
+                self.showLoading = true
                 await settings.clearPrivateData([CookiesAndCacheClearable()])
                 
                 // First remove all tabs so that only a blank tab exists.
@@ -90,6 +91,7 @@ struct AdvancedShieldsSettingsView: View {
                 
                 // Restore all existing tabs by removing the blank tabs and recreating new ones..
                 self.tabManager.removeAll()
+                self.showLoading = false
               }
             }),
             secondaryButton: .cancel(Text(Strings.cancelButtonTitle), action: {
@@ -124,6 +126,96 @@ struct AdvancedShieldsSettingsView: View {
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
+    .loadingView(message: Strings.clearingData, isShowing: $showLoading)
     .navigationTitle(Strings.braveShieldsAndPrivacy)
+  }
+}
+
+struct ProgressIndicatorView: UIViewRepresentable {
+  private let size: LoaderView.Size
+  @Environment(\.font) var font
+  @Binding var isAnimating: Bool
+  
+  init(size: LoaderView.Size) {
+    self.size = size
+    _isAnimating = .constant(true)
+  }
+  
+  func makeUIView(context: Context) -> BraveUI.LoaderView {
+    let loaderView = LoaderView(size: size)
+    loaderView.tintColor = .white
+    return loaderView
+  }
+  
+  func updateUIView(_ loaderView: BraveUI.LoaderView, context: Context) {
+    if isAnimating {
+      loaderView.start()
+      
+    } else {
+      loaderView.stop()
+    }
+  }
+}
+
+struct LoadingView: ViewModifier {
+  enum Size {
+    case small, normal, large
+    var loadingViewSize: LoaderView.Size {
+      switch self {
+      case .large: return .large
+      case .normal: return .normal
+      case .small: return .small
+      }
+    }
+  }
+  
+  @Environment(\.colorScheme) private var colorScheme
+  let size: Size
+  let message: String
+  @Binding var isShowing: Bool
+  
+  private var overlayColor: Color {
+    switch colorScheme {
+    case .dark: return .black
+    case .light: return .white
+    @unknown default: return .white
+    }
+  }
+  
+  func body(content: Content) -> some View {
+    GeometryReader { geometry in
+      content
+        .disabled(self.isShowing)
+        .blur(radius: self.isShowing ? 1 : 0)
+        .animation(.default, value: isShowing)
+        .overlay {
+          overlayColor.opacity(0.25)
+            .overlay(alignment: .center) {
+              VStack {
+                ProgressIndicatorView(size: size.loadingViewSize)
+                  .frame(width: size.loadingViewSize.width, height: size.loadingViewSize.height)
+                Text(message)
+                  .font(.callout)
+                  .foregroundColor(.white)
+                  .fontWeight(.bold)
+              }
+                .frame(
+                  width: geometry.size.width / 2,
+                  height: geometry.size.height / 5
+                )
+                .background(Color.black.opacity(0.6))
+                .cornerRadius(20)
+            }
+            .opacity(self.isShowing ? 1 : 0)
+            .animation(.default, value: isShowing)
+            .ignoresSafeArea()
+        }
+    }
+  }
+}
+
+extension View {
+  func loadingView(size: LoadingView.Size = .large, message: String, isShowing: Binding<Bool>) -> some View {
+    self.modifier(LoadingView(size: size, message: message, isShowing: isShowing))
   }
 }

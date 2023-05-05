@@ -10,13 +10,9 @@ import Strings
 import Preferences
 
 struct ClearDataSectionView: View {
-  @ObservedObject private var settings: AdvancedShieldsSettings
-  @State private var clearingData = false
   @State private var showClearablesAlert = false
-  
-  init(settings: AdvancedShieldsSettings) {
-    self.settings = settings
-  }
+  @ObservedObject var settings: AdvancedShieldsSettings
+  @Binding var clearingData: Bool
   
   var body: some View {
     Section {
@@ -31,17 +27,9 @@ struct ClearDataSectionView: View {
       Button {
         showClearablesAlert = true
       } label: {
-        ZStack(alignment: .center) {
-          VStack(alignment: .center) {
-            Text(Strings.clearDataNow)
-              .foregroundColor(Color(.braveBlurpleTint))
-          }
-          
-          if clearingData {
-            VStack(alignment: .trailing) {
-              ActivityIndicatorView(isAnimating: true)
-            }
-          }
+        VStack(alignment: .center) {
+          Text(Strings.clearDataNow)
+            .foregroundColor(Color(.braveBlurpleTint))
         }
       }
         .frame(maxWidth: .infinity)
