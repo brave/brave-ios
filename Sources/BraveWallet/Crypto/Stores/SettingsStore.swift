@@ -67,10 +67,10 @@ public class SettingsStore: ObservableObject {
   }
   
   /// The current preference for enabling NFT discovery (Enabled / Disabled)
-  @Published var nftDiscovery: Bool = false {
+  @Published var isNFTDiscoveryEnabled: Bool = false {
     didSet {
-      guard oldValue != nftDiscovery else { return }
-      walletService.setNftDiscoveryEnabled(nftDiscovery)
+      guard oldValue != isNFTDiscoveryEnabled else { return }
+      walletService.setNftDiscoveryEnabled(isNFTDiscoveryEnabled)
     }
   }
 
@@ -113,7 +113,7 @@ public class SettingsStore: ObservableObject {
       self.ensOffchainResolveMethod = await rpcService.ensOffchainLookupResolveMethod()
       self.udResolveMethod = await rpcService.unstoppableDomainsResolveMethod()
       
-      self.nftDiscovery = await walletService.nftDiscoveryEnabled()
+      self.isNFTDiscoveryEnabled = await walletService.nftDiscoveryEnabled()
     }
   }
 

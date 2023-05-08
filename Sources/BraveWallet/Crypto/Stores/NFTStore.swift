@@ -144,7 +144,7 @@ public class NFTStore: ObservableObject {
     }
   }
   
-  @MainActor func checkNFTDiscovery() async -> Bool {
+  @MainActor func isNFTDiscoveryEnabled() async -> Bool {
     await walletService.nftDiscoveryEnabled()
   }
   

@@ -233,7 +233,7 @@ private struct WalletSettingsView: View {
         .foregroundColor(Color(.secondaryBraveLabel))
         .tint(Color(.braveBlurpleTint))
     ) {
-      Toggle(Strings.Wallet.web3SettingsEnableNFTDiscovery, isOn: $settingsStore.nftDiscovery)
+      Toggle(Strings.Wallet.web3SettingsEnableNFTDiscovery, isOn: $settingsStore.isNFTDiscoveryEnabled)
         .foregroundColor(Color(.braveLabel))
         .toggleStyle(SwitchToggleStyle(tint: Color(.braveBlurpleTint)))
         .listRowBackground(Color(.secondaryBraveGroupedBackground))

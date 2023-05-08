@@ -272,7 +272,7 @@ struct NFTView: View {
     }
     .onAppear {
       Task {
-        let isNFTDiscoveryEnabled = await nftStore.checkNFTDiscovery()
+        let isNFTDiscoveryEnabled = await nftStore.isNFTDiscoveryEnabled()
         if !isNFTDiscoveryEnabled && Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value {
           self.isShowingNFTDiscoveryAlert = true
         }
