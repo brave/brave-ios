@@ -551,6 +551,7 @@ public class TransactionConfirmationStore: ObservableObject {
   @MainActor private func fetchAllTransactions() async -> [BraveWallet.TransactionInfo] {
     let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
     return await txService.pendingTransactions(for: allKeyrings)
+      .sorted(by: { $0.createdTime < $1.createdTime })
   }
 
   func confirm(transaction: BraveWallet.TransactionInfo, completion: @escaping (_ error: String?) -> Void) {
