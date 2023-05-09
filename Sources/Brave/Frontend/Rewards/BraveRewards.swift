@@ -187,7 +187,9 @@ public class BraveRewards: NSObject {
       ledger?.selectedTabId = UInt32(tabId)
       tabRetrieved(tabId, url: url, html: nil)
     }
-    ads.reportTabUpdated(tabId, url: url, redirectedFrom: tab.redirectURLs, isSelected: isSelected, isPrivate: isPrivate)
+    if isAdsInitialized {
+      ads.reportTabUpdated(tabId, url: url, redirectedFrom: tab.redirectURLs, isSelected: isSelected, isPrivate: isPrivate)
+    }
   }
 
   /// Report that a page has loaded in the current browser tab, and the HTML is available for analysis
@@ -202,7 +204,7 @@ public class BraveRewards: NSObject {
     adsInnerText: String?
   ) {
     tabRetrieved(tabId, url: url, html: html)
-    if let innerText = adsInnerText {
+    if let innerText = adsInnerText, isAdsInitialized {
       ads.reportLoadedPage(
         with: url,
         redirectedFrom: redirectionURLs ?? [],
@@ -226,11 +228,13 @@ public class BraveRewards: NSObject {
 
   /// Report that media has started on a tab with a given id
   func reportMediaStarted(tabId: Int) {
+    if !isAdsInitialized { return }
     ads.reportMediaStarted(tabId: tabId)
   }
 
   /// Report that media has stopped on a tab with a given id
   func reportMediaStopped(tabId: Int) {
+    if !isAdsInitialized { return }
     ads.reportMediaStopped(tabId: tabId)
   }
 
@@ -241,7 +245,9 @@ public class BraveRewards: NSObject {
 
   /// Report that a tab with a given id was closed by the user
   func reportTabClosed(tabId: Int) {
-    ads.reportTabClosed(tabId: tabId)
+    if isAdsInitialized {
+      ads.reportTabClosed(tabId: tabId)
+    }
     ledger?.reportTabNavigationOrClosed(tabId: UInt32(tabId))
   }
 
