@@ -21,13 +21,13 @@
 - Improved load time for adblock filter lists. ([#7147](https://github.com/brave/brave-ios/issues/7147))
 - Improved storage management when re-launching the browser. ([#7114](https://github.com/brave/brave-ios/issues/7114))
 - Fixed crash with adblock engine/cosmetic filters. ([#6254](https://github.com/brave/brave-ios/issues/6254))
-- Fixed crash for Playlist when entering PIP mode. ([#7347](https://github.com/brave/brave-ios/issues/7347))
+- Fixed crash for Playlist when entering picture-in-picture mode. ([#7347](https://github.com/brave/brave-ios/issues/7347))
 - Fixed issue causing Playlist to play a short chime instead of the actual video that was added. ([#7345](https://github.com/brave/brave-ios/issues/7345))
 - Fixed flickering or low resolution favicon in Playlist and on New Tab page. ([#7271](https://github.com/brave/brave-ios/issues/7271))
 - Fixed images/thumbnails not displaying on sites such as Mastodon and Airbnb with Shields up. ([#7215](https://github.com/brave/brave-ios/issues/7215))
-- Fixed/Adjusted padding for items under "Saved Logins" section in Password Manager when syncing. ([#7197](https://github.com/brave/brave-ios/issues/7197))
+- Fixed padding for items under "Saved Logins" section in Password Manager when syncing. ([#7197](https://github.com/brave/brave-ios/issues/7197))
 - Fixed white gradient appearing on the URL bar in private mode. ([#7132](https://github.com/brave/brave-ios/issues/7132))
-- Fixed favicons displaying very small on lock screen widget. ([#7124](https://github.com/brave/brave-ios/issues/7124))
+- Fixed favicon size on lock screen widget. ([#7124](https://github.com/brave/brave-ios/issues/7124))
 
 ## [1.49.1](https://github.com/brave/brave-ios/releases/tag/v1.49.1)
 
