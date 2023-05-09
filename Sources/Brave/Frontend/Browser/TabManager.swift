@@ -416,12 +416,24 @@ class TabManager: NSObject {
     }
     // When bulk adding tabs don't notify delegates until we are done
     self.isRestoring = true
-    var tab: Tab!
-    for url in urls {
-      tab = self.addTab(URLRequest(url: url), flushToDisk: false, zombie: zombie, isPrivate: isPrivate)
+    let tabs = urls.map {
+      self.addTab(URLRequest(url: $0), flushToDisk: false, zombie: true, isPrivate: isPrivate)
     }
+    
+    // Load at most X of the most recent tabs
+    // IE: Load the last X tabs, lazy load all the rest
+    let amountOfTabsToRestoreImmediately = 5
+    
+    let urls = Array(urls.suffix(amountOfTabsToRestoreImmediately))
+    tabs.suffix(amountOfTabsToRestoreImmediately).enumerated().forEach { index, tab in
+      let url = urls[index]
+      tab.createWebview()
+      tab.loadRequest(URLRequest(url: url))
+      tab.url = url
+    }
+    
     // Select the most recent.
-    self.selectTab(tab)
+    self.selectTab(tabs.last)
     self.isRestoring = false
     // Okay now notify that we bulk-loaded so we can adjust counts and animate changes.
     delegates.forEach { $0.get()?.tabManagerDidAddTabs(self) }
@@ -625,9 +637,7 @@ class TabManager: NSObject {
     let prevCount = count
     allTabs.remove(at: removalIndex)
 
-    if let tab = SessionTab.from(tabId: tab.id) {
-      tab.delete()
-    }
+    SessionTab.delete(tabId: tab.id)
 
     currentTabs = tabs(withType: tab.type)
 
@@ -943,15 +953,20 @@ class TabManager: NSObject {
   }
 
   func restoreTab(_ tab: Tab) {
-    // Tab was created with no active webview or session data. Restore tab data from CD and configure.
-    guard let sessionTab = SessionTab.from(tabId: tab.id) else { return }
-
-    if !sessionTab.interactionState.isEmpty {
-      if let webView = tab.webView {
-        tab.navigationDelegate = navDelegate
-        tab.restore(webView, restorationData: (sessionTab.title, sessionTab.interactionState))
-      }
+    guard let webView = tab.webView else { return }
+    guard let sessionTab = SessionTab.from(tabId: tab.id) else {
+      // Restore Tab with its Last-Request
+      tab.navigationDelegate = navDelegate
+      tab.restore(webView, restorationData: nil)
+      return
     }
+
+    // Tab was created with no active webview or session data.
+    // Restore tab data from CoreData if possible, and configure it.
+    tab.navigationDelegate = navDelegate
+    tab.restore(webView,
+                restorationData: sessionTab.interactionState.isEmpty ? nil :
+                  (sessionTab.title, sessionTab.interactionState))
   }
 
   /// Restores all tabs.
@@ -1059,19 +1074,17 @@ class TabManager: NSObject {
     if tab.isPrivate {
       return nil
     }
-    
-    // Fetching the Managed Object using the tab id
-    guard let fetchedTab = SessionTab.from(tabId: tab.id) else {
-      return nil
-    }
-    
+
     // NTP should not be passed as Recently Closed item
-    if InternalURL(fetchedTab.url)?.isAboutHomeURL == true {
+    guard let tabUrl = tab.url,
+          let interactionState = tab.webView?.sessionData else { return nil }
+      
+    if InternalURL(tabUrl)?.isAboutHomeURL == true {
       return nil
     }
     
     // Convert any internal URLs to their real URL for the Recently Closed item
-    var fetchedTabURL = fetchedTab.url
+    var fetchedTabURL = tabUrl
     if let url = InternalURL(fetchedTabURL),
        let actualURL = url.extractedUrlParam ?? url.originalURLFromErrorPage {
       fetchedTabURL = actualURL
@@ -1079,9 +1092,9 @@ class TabManager: NSObject {
     
     return SavedRecentlyClosed(
       url: fetchedTabURL,
-      title: fetchedTab.title,
-      interactionState: fetchedTab.interactionState,
-      order: fetchedTab.index)
+      title: tab.displayTitle,
+      interactionState: interactionState,
+      order: -1)
   }
 }
 
