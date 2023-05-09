@@ -18,6 +18,7 @@ struct NFTView: View {
   @State private var selectedNFTViewModel: NFTAssetViewModel?
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
+  @State private var isNFTDiscoveryEnabled: Bool = false
   
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -127,7 +128,7 @@ struct NFTView: View {
       Text(Strings.Wallet.assetsTitle)
         .font(.footnote)
         .foregroundColor(Color(.secondaryBraveLabel))
-      if nftStore.isLoadingDiscoverAssets {
+      if nftStore.isLoadingDiscoverAssets && isNFTDiscoveryEnabled {
         ProgressView()
           .padding(.leading, 5)
       }
@@ -224,6 +225,7 @@ struct NFTView: View {
         primaryButton: .init(
           title: Strings.Wallet.nftDiscoveryCalloutEnable,
           action: { _ in
+            isNFTDiscoveryEnabled = true
             nftStore.enableNFTDiscovery()
             Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value = false
             isShowingNFTDiscoveryAlert = false
@@ -232,6 +234,7 @@ struct NFTView: View {
         secondaryButton: .init(
           title: Strings.Wallet.nftDiscoveryCalloutDisable,
           action: { _ in
+            isNFTDiscoveryEnabled = false
             Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value = false
             // don't need to setDiscovery(false) since the default value is false
             // and when nftDiscoveryEnabled() is true, this WalletPromptView won't
@@ -272,8 +275,8 @@ struct NFTView: View {
     }
     .onAppear {
       Task {
-        let isNFTDiscoveryEnabled = await nftStore.isNFTDiscoveryEnabled()
-        if !isNFTDiscoveryEnabled && Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value {
+        isNFTDiscoveryEnabled = await nftStore.isNFTDiscoveryEnabled()
+        if /*!isNFTDiscoveryEnabled && Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value*/ true {
           self.isShowingNFTDiscoveryAlert = true
         }
       }

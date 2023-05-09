@@ -44,7 +44,7 @@ struct WalletPromptContentView<Content, Footer>: View where Content: View, Foote
             Button(primaryButton.title, action: { primaryButton.action(nil) })
               .buttonStyle(BraveFilledButtonStyle(size: .large))
             Button(secondaryButton.title, action: { secondaryButton.action(nil) })
-              .buttonStyle(BraveOutlineButtonStyle(size: .large))
+              .foregroundColor(Color(.braveLabel))
           }
         } else {
           HStack {
