@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Skjuler ikonet for Brave Rewards når Brave Rewards ikke er tilgjengelig";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Logg";
+"HistoryMenuItem" = "Logg";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Slett logg";

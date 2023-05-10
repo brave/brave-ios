@@ -905,7 +905,7 @@
 "HideRewardsIconSubtitle" = "Brave Rewards가 활성화되지 않았을 때 Brave Rewards 아이콘 숨김";
 
 /* Title for history menu item */
-"HistortMenuItem" = "기록";
+"HistoryMenuItem" = "기록";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "기록 지우기";

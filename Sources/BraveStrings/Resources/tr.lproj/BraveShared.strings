@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Brave Ödülleri etkinleştirilmediğinde Brave Ödülleri simgesini gizler";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Geçmiş";
+"HistoryMenuItem" = "Geçmiş";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Geçmişi Temizle";

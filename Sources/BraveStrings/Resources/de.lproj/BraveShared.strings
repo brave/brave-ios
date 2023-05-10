@@ -914,7 +914,7 @@
 "HideRewardsIconSubtitle" = "Versteckt das Brave Rewards-Symbol, wenn Brave Rewards nicht aktiviert ist.";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Verlauf";
+"HistoryMenuItem" = "Verlauf";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Verlauf löschen";

@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Oculta o ícone do Brave Rewards quando o Brave Rewards não está ativado";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Histórico";
+"HistoryMenuItem" = "Histórico";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Limpar histórico";

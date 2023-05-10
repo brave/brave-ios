@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Позначка Brave Rewards не відображатиметься, коли Brave Rewards не ввімкнено";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Історія";
+"HistoryMenuItem" = "Історія";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Очистити журнал";

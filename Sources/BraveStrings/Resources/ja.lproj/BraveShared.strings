@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Brave Rewardsに参加していないページではBrave Rewardsのアイコンを非表示にする";
 
 /* Title for history menu item */
-"HistortMenuItem" = "履歴";
+"HistoryMenuItem" = "履歴";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "履歴を消去する";

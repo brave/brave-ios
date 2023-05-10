@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Sembunyikan ikon Brave Rewards apabila Brave Rewards tidak didayakan";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Sejarah";
+"HistoryMenuItem" = "Sejarah";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Kosongkan Sejarah";

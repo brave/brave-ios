@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "Döljer Brave Rewards-ikonen när Brave Rewards inte är aktiverat";
 
 /* Title for history menu item */
-"HistortMenuItem" = "Historik";
+"HistoryMenuItem" = "Historik";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "Rensa historik";

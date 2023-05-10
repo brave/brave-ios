@@ -917,7 +917,7 @@
 "HideRewardsIconSubtitle" = "未启用“Brave Rewards”时隐藏“Brave Rewards”图标";
 
 /* Title for history menu item */
-"HistortMenuItem" = "历史记录";
+"HistoryMenuItem" = "历史记录";
 
 /* Title for History Clear All Action */
 "history.historyClearActionTitle" = "清除历史记录";
