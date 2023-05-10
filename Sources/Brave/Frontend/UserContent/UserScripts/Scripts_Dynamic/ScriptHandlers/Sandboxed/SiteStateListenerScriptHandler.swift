@@ -126,7 +126,7 @@ class SiteStateListenerScriptHandler: TabContentScript {
     // (i.e. we don't hide first party content on standard mode)
     let setup = UserScriptType.SelectorsPollerSetup(
       frameURL: frameURL,
-      hideFirstPartyContent: true,
+      hideFirstPartyContent: false,
       genericHide: modelTuples.contains { $0.model.genericHide },
       firstSelectorsPollingDelayMs: nil,
       switchToSelectorsPollingThreshold: 1000,
