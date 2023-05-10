@@ -550,7 +550,12 @@ public class TransactionConfirmationStore: ObservableObject {
   
   @MainActor private func fetchAllTransactions() async -> [BraveWallet.TransactionInfo] {
     let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
-    return await txService.pendingTransactions(for: allKeyrings)
+    var allChainIdsForCoin: [BraveWallet.CoinType: [String]] = [:]
+    for coin in WalletConstants.supportedCoinTypes {
+      let allNetworks = await rpcService.allNetworks(coin)
+      allChainIdsForCoin[coin] = allNetworks.map(\.chainId)
+    }
+    return await txService.pendingTransactions(chainIdsForCoin: allChainIdsForCoin, for: allKeyrings)
       .sorted(by: { $0.createdTime < $1.createdTime })
   }
 

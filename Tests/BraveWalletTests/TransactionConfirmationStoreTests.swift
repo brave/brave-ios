@@ -56,8 +56,14 @@ import BraveCore
     let txService = BraveWallet.TestTxService()
     txService._addObserver = { _ in }
     txService._allTransactionInfo = { coin, chainId, address, completion in
-      let transactionsForCoin = transactions.filter { $0.coin == coin }
-      completion(transactionsForCoin)
+      let filteredTransactions = transactions.filter {
+        if let chainId = chainId {
+          return $0.coin == coin && $0.chainId == chainId
+        } else {
+          return $0.coin == coin
+        }
+      }
+      completion(filteredTransactions)
     }
     let blockchainRegistry = BraveWallet.TestBlockchainRegistry()
     blockchainRegistry._allTokens = { _, _, completion in
