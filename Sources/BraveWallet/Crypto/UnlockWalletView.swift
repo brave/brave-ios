@@ -126,8 +126,6 @@ struct UnlockWalletView: View {
           attemptedBiometricsUnlock = true
           fillPasswordFromKeychain()
         }
-        // only focus field if user did not manually lock
-        isPasswordFieldFocused = !keyringStore.lockedManually
       }
     }
   }
