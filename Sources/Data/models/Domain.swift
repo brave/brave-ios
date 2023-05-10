@@ -40,11 +40,11 @@ public final class Domain: NSManagedObject, CRUD {
   private static let containsEthereumPermissionsPredicate = NSPredicate(format: "wallet_permittedAccounts != nil && wallet_permittedAccounts != ''")
   private static let containsSolanaPermissionsPredicate = NSPredicate(format: "wallet_solanaPermittedAcccounts != nil && wallet_solanaPermittedAcccounts != ''")
   
-  @MainActor public var adBlockAndTPShieldLevel: Preferences.Shields.ShieldLevel {
+  @MainActor public var adBlockAndTPShieldLevel: ShieldLevel {
     get {
       guard let shield_adblockAndTp = shield_adblockAndTp else {
         // If this value is nil, revert to global preferences
-        return Preferences.Shields.blockAdsAndTrackingLevel
+        return ShieldPreferences.blockAdsAndTrackingLevel
       }
       
       if !shield_adblockAndTp.boolValue {
@@ -129,7 +129,7 @@ public final class Domain: NSManagedObject, CRUD {
     )
   }
   
-  @MainActor public class func setAdAndTP(shieldLevel: Preferences.Shields.ShieldLevel, for url: URL, isPrivateBrowsing: Bool) {
+  @MainActor public class func setAdAndTP(shieldLevel: ShieldLevel, for url: URL, isPrivateBrowsing: Bool) {
     setAdAndTPInternal(
       shieldLevel: shieldLevel,
       for: url,
@@ -195,7 +195,7 @@ public final class Domain: NSManagedObject, CRUD {
   }
   
   public class func totalDomainsWithAdblockShieldsLoweredFromGlobal() -> Int {
-    guard Preferences.Shields.blockAdsAndTrackingLevel.isEnabled,
+    guard ShieldPreferences.blockAdsAndTrackingLevel.isEnabled,
           let domains = Domain.all(where: NSPredicate(format: "shield_adblockAndTp != nil")) else {
       return 0 // Can't be lower than off
     }
@@ -203,7 +203,7 @@ public final class Domain: NSManagedObject, CRUD {
   }
   
   public class func totalDomainsWithAdblockShieldsIncreasedFromGlobal() -> Int {
-    guard !Preferences.Shields.blockAdsAndTrackingLevel.isEnabled,
+    guard !ShieldPreferences.blockAdsAndTrackingLevel.isEnabled,
           let domains = Domain.all(where: NSPredicate(format: "shield_adblockAndTp != nil")) else {
       return 0 // Can't be higher than on
     }
@@ -430,7 +430,7 @@ extension Domain {
     }
   }
   
-  @MainActor class func setAdAndTPInternal(shieldLevel: Preferences.Shields.ShieldLevel, for url: URL, context: WriteContext) {
+  @MainActor class func setAdAndTPInternal(shieldLevel: ShieldLevel, for url: URL, context: WriteContext) {
     DataController.perform(context: context) { context in
       // Not saving here, save happens in `perform` method.
       let domain = Domain.getOrCreateInternal(
@@ -441,7 +441,7 @@ extension Domain {
   }
   
   @MainActor private func setAdAndTP(
-    shieldLevel: Preferences.Shields.ShieldLevel
+    shieldLevel: ShieldLevel
   ) {
     shield_adblockAndTp = shieldLevel.isEnabled as NSNumber
     shield_adblockAndTpAggressive = shieldLevel.isAggressive as NSNumber

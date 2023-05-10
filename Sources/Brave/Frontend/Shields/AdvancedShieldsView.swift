@@ -7,6 +7,7 @@ import Shared
 import BraveShared
 import BraveUI
 import Preferences
+import BraveShields
 
 class AdvancedShieldsView: UIStackView {
   let siteTitle = HeaderTitleView()
@@ -17,20 +18,22 @@ class AdvancedShieldsView: UIStackView {
     $0.titleLabel.text = Strings.Shields.globalControls.uppercased()
   }
   let globalControlsButton = ChangeGlobalDefaultsView()
-  var adsTrackerValueChange: ((Preferences.Shields.ShieldLevel) -> Void)?
+  var adsTrackerValueChange: ((ShieldLevel) -> Void)?
   
   lazy var adsTrackersControl: PickerView = {
     return PickerView(
       title: Strings.trackersAndAdsBlocking,
-      options: Preferences.Shields.ShieldLevel.allCases,
-      selectedValue: Preferences.Shields.blockAdsAndTrackingLevel) { [weak self] value in
-        guard let shieldLevel = Preferences.Shields.ShieldLevel(rawValue: value.id) else {
+      options: ShieldLevel.allCases,
+      selectedValue: ShieldPreferences.blockAdsAndTrackingLevel,
+      valueChange: { [weak self] value in
+        guard let shieldLevel = ShieldLevel(rawValue: value.id) else {
           assertionFailure()
           return
         }
         
         self?.adsTrackerValueChange?(shieldLevel)
       }
+    )
   }()
 
   override init(frame: CGRect) {

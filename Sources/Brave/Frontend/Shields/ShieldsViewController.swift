@@ -66,13 +66,8 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
       domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
     }
 
-    if let domain = domain {
-      shieldsUpSwitch.isOn = !domain.isShieldExpected(.AllOff, considerAllShieldsOption: false)
-      shieldsView.advancedShieldView.adsTrackersControl.pickerView.selectedValue = domain.adBlockAndTPShieldLevel
-    } else {
-      shieldsUpSwitch.isOn = true
-      shieldsView.advancedShieldView.adsTrackersControl.pickerView.selectedValue = Preferences.Shields.blockAdsAndTrackingLevel
-    }
+    shieldsUpSwitch.isOn = domain?.isShieldExpected(.AllOff, considerAllShieldsOption: false) == false
+    shieldsView.advancedShieldView.adsTrackersControl.pickerView.selectedValue = domain?.adBlockAndTPShieldLevel ?? ShieldPreferences.blockAdsAndTrackingLevel
 
     shieldControlMapping.forEach { shield, view, option in
       // Updating based on global settings

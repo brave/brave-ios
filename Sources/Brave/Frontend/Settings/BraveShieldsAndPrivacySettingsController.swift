@@ -16,6 +16,7 @@ import os.log
 import Data
 import Combine
 import Growth
+import BraveShields
 
 class BraveShieldsAndPrivacySettingsController: TableViewController {
   let profile: Profile
@@ -89,7 +90,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       }
       .store(in: &cancellables)
     
-    Preferences.Shields.blockAdsAndTracking.$value
+    ShieldPreferences.blockAdsAndTrackingLevelRaw.$value
       .sink { [weak self] _ in
         self?.recordGlobalAdBlockShieldsP3A()
       }
@@ -105,7 +106,22 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   // MARK: - P3A
   
   private func recordGlobalAdBlockShieldsP3A() {
-    UmaHistogramEnumeration("Brave.Shields.AdBlockSetting", sample: Preferences.Shields.blockAdsAndTrackingLevel.p3AAnswer)
+    // Q46 What is the global ad blocking shields setting?
+    enum Answer: Int, CaseIterable {
+      case disabled = 0
+      case standard = 1
+      case aggressive = 2
+    }
+    
+    let answer = { () -> Answer in
+      switch ShieldPreferences.blockAdsAndTrackingLevel {
+      case .disabled: return .disabled
+      case .standard: return .standard
+      case .aggressive: return .aggressive
+      }
+    }()
+    
+    UmaHistogramEnumeration("Brave.Shields.AdBlockSetting", sample: answer)
   }
   
   private func recordGlobalFingerprintingShieldsP3A() {
@@ -128,15 +144,15 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         .pickerRow(
           title: Strings.trackersAndAdsBlocking,
           detailText: Strings.trackersAndAdsBlockingDescription,
-          options: Preferences.Shields.ShieldLevel.allCases,
-          selectedValue: Preferences.Shields.blockAdsAndTrackingLevel,
+          options: ShieldLevel.allCases,
+          selectedValue: ShieldPreferences.blockAdsAndTrackingLevel,
           valueChange: { value in
-            guard let shieldLevel = Preferences.Shields.ShieldLevel(rawValue: value.id) else {
+            guard let shieldLevel = ShieldLevel(rawValue: value.id) else {
               assertionFailure()
               return
             }
             
-            Preferences.Shields.blockAdsAndTrackingLevel = shieldLevel
+            ShieldPreferences.blockAdsAndTrackingLevel = shieldLevel
           }
         ),
         .boolRow(title: Strings.HTTPSEverywhere, detailText: Strings.HTTPSEverywhereDescription, option: Preferences.Shields.httpsEverywhere),
@@ -530,7 +546,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   }
 }
 
-extension Preferences.Shields.ShieldLevel: PickerAccessoryViewValue {
+extension ShieldLevel: PickerAccessoryViewValue {
   public var id: String {
     return rawValue
   }
@@ -543,3 +559,4 @@ extension Preferences.Shields.ShieldLevel: PickerAccessoryViewValue {
     }
   }
 }
+
