@@ -195,7 +195,7 @@ extension BraveWallet.TransactionInfo {
             signOnly: false,
             signedTransaction: nil
           ),
-          chainId: "0x3",
+          chainId: BraveWallet.GoerliChainId,
           maxPriorityFeePerGas: "0x77359400",
           maxFeePerGas: "0x39bdf3b000",
           gasEstimation: nil
