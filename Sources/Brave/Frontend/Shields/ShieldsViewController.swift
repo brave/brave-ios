@@ -68,8 +68,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
 
     if let domain = domain {
       shieldsUpSwitch.isOn = !domain.isShieldExpected(.AllOff, considerAllShieldsOption: false)
+      shieldsView.advancedShieldView.adsTrackersControl.pickerView.selectedValue = domain.adBlockAndTPShieldLevel
     } else {
       shieldsUpSwitch.isOn = true
+      shieldsView.advancedShieldView.adsTrackersControl.pickerView.selectedValue = Preferences.Shields.blockAdsAndTrackingLevel
     }
 
     shieldControlMapping.forEach { shield, view, option in
@@ -85,6 +87,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
         view.toggleSwitch.isOn = domain.isShieldExpected(shield, considerAllShieldsOption: false)
       }
     }
+    
     updateGlobalShieldState(shieldsUpSwitch.isOn)
   }
 
@@ -212,7 +215,6 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
 
   /// Groups the shield types with their control and global preference
   private lazy var shieldControlMapping: [(BraveShield, AdvancedShieldsView.ToggleView, Preferences.Option<Bool>?)] = [
-    (.AdblockAndTp, shieldsView.advancedShieldView.adsTrackersControl, Preferences.Shields.blockAdsAndTracking),
     (.NoScript, shieldsView.advancedShieldView.blockScriptsControl, Preferences.Shields.blockScripts),
     (.FpProtection, shieldsView.advancedShieldView.fingerprintingControl, Preferences.Shields.fingerprintingProtection),
   ]
@@ -262,6 +264,22 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
       shieldsView.advancedShieldView.isHidden = false
       shieldsView.advancedControlsBar.isShowingAdvancedControls = true
       updatePreferredContentSize()
+    }
+    
+    shieldsView.advancedShieldView.adsTrackerValueChange = { [weak self] shieldLevel in
+      guard let self = self, let url = self.url else { return }
+      
+      Domain.setAdAndTP(
+        shieldLevel: shieldLevel,
+        for: url,
+        isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing
+      )
+      
+      // Wait a fraction of a second to allow DB write to complete otherwise it will not use the
+      // updated shield settings when reloading the page
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        self.shieldsSettingsChanged?(self, .AdblockAndTp)
+      }
     }
 
     shieldControlMapping.forEach { shield, toggle, option in

@@ -6,6 +6,9 @@ import Foundation
 import Static
 import Preferences
 import UIKit
+import DesignSystem
+import SnapKit
+import Strings
 
 /// The same style switch accessory view as in Static framework, except will not be recreated each time the Cell
 /// is configured, since it will be stored as is in `Row.Accessory.view`
@@ -27,6 +30,74 @@ public class SwitchAccessoryView: UISwitch {
 
   @objc func valueChanged() {
     valueChange?(self.isOn)
+  }
+}
+
+public protocol PickerAccessoryViewValue {
+  var id: String { get }
+  var localizedTitle: String { get }
+}
+
+public class PickerAccessoryView: UIButton {
+  public typealias ValueChange = (PickerAccessoryViewValue) -> Void
+  private let textColor = UIColor.secondaryBraveLabel
+  
+  private let options: [PickerAccessoryViewValue]
+  private let valueChange: ValueChange
+
+  /// The current selected id for the options above
+  /// Needs to be one of the values available in options
+  public var selectedValue: PickerAccessoryViewValue {
+    didSet {
+      guard oldValue.id != selectedValue.id else { return }
+      setTitle(selectedValue.localizedTitle, for: .normal)
+      setMenu()
+    }
+  }
+  
+  public override var accessibilityValue: String? {
+    get { return title(for: .normal) }
+    set { assertionFailure() } // swiftlint:disable:this unused_setter_value
+  }
+
+  public init(options: [PickerAccessoryViewValue], selectedValue: PickerAccessoryViewValue, valueChange: @escaping ValueChange) {
+    self.selectedValue = selectedValue
+    self.options = options
+    self.valueChange = valueChange
+    super.init(frame: CGRect(width: 105, height: 40))
+    
+    var configuration = UIButton.Configuration.plain()
+    configuration.image = UIImage(systemName: "chevron.up.chevron.down")
+    configuration.imagePlacement = .trailing
+    configuration.titleAlignment = .trailing
+    configuration.contentInsets = .zero
+    configuration.imagePadding = 4
+    configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 10)
+    configuration.baseForegroundColor = .secondaryBraveLabel
+    configuration.title = selectedValue.localizedTitle
+    self.configuration = configuration
+    showsMenuAsPrimaryAction = true
+    setMenu()
+  }
+  
+  private func setMenu() {
+    menu = UIMenu(
+      title: "",
+      options: [.displayInline, .singleSelection],
+      
+      children: options.map { value in
+        let state: UIMenuElement.State = value.id == selectedValue.id ? .on : .off
+        
+        return UIAction(title: value.localizedTitle, state: state, handler: { [weak self] _ in
+          self?.selectedValue = value
+          self?.valueChange(value)
+        })
+      }
+    )
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 }
 
@@ -52,6 +123,35 @@ extension Row {
       cellClass: MultilineSubtitleCell.self,
       uuid: uuid.uuidString,
       reuseIdentifier: cellReuseId
+    )
+  }
+  
+  /// Creates a switch toggle `Row` which holds local value and no preference update
+  public static func pickerRow(uuid: UUID = UUID(), title: String, detailText: String?, options: [PickerAccessoryViewValue], selectedValue: PickerAccessoryViewValue, valueChange: @escaping PickerAccessoryView.ValueChange) -> Row {
+    let pickerView = PickerAccessoryView(
+      options: options, selectedValue: selectedValue, valueChange: valueChange
+    )
+    
+    // Get the largest possible size
+    var frame: CGRect = pickerView.frame
+    for option in options {
+      pickerView.selectedValue = option
+      pickerView.sizeToFit()
+      
+      if frame.width < pickerView.frame.width {
+        frame = pickerView.frame
+      }
+    }
+    pickerView.selectedValue = selectedValue
+    pickerView.frame = frame
+    
+    return Row(
+      text: title,
+      detailText: detailText,
+      accessory: .view(pickerView),
+      cellClass: MultilineSubtitleCell.self,
+      uuid: uuid.uuidString,
+      reuseIdentifier: "picker_row"
     )
   }
 }

@@ -34,10 +34,82 @@ extension Preferences {
   }
   
   public final class Shields {
+    /// A 3 part option for shield levels varying in strength of blocking content
+    public enum ShieldLevel: String, CaseIterable {
+      // Q46 What is the global ad blocking shields setting?
+      public enum P3AAnswer: Int, CaseIterable {
+        case disabled = 0
+        case standard = 1
+        case aggressive = 2
+      }
+      
+      /// Mode blocks all content
+      case aggressive
+      /// Mode indicating that 1st party content is not blocked for default and regional lists
+      case standard
+      /// Mode indicating this setting is disabled
+      case disabled
+      
+      /// Wether this setting indicates that the shields are enabled or not
+      public var isEnabled: Bool {
+        switch self {
+        case .aggressive, .standard: return true
+        case .disabled: return false
+        }
+      }
+      
+      /// Wether this setting indicates that the shields are enabled or not
+      public var isAggressive: Bool {
+        switch self {
+        case .aggressive: return true
+        case .disabled, .standard: return false
+        }
+      }
+      
+      /// Return the P3A answer associated with this enum
+      public var p3AAnswer: P3AAnswer {
+        switch self {
+        case .disabled: return .disabled
+        case .standard: return .standard
+        case .aggressive: return .aggressive
+        }
+      }
+    }
+    
     public static let allShields = [blockAdsAndTracking, httpsEverywhere, googleSafeBrowsing, blockScripts, fingerprintingProtection, blockImages]
     
     /// Shields will block ads and tracking if enabled
     public static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
+    /// Shields will block ads and tracking aggressive mode is enabled
+    public static let blockAdsAndTrackingAggressive = Option<Bool>(key: "shields.block-ads-and-tracking-aggressive", default: false)
+    
+    /// Get the level of the adblock and tracking protection
+    public static var blockAdsAndTrackingLevel: ShieldLevel {
+      get {
+        if !blockAdsAndTracking.value {
+          return .disabled
+        } else if blockAdsAndTrackingAggressive.value {
+          return .aggressive
+        } else {
+          return .standard
+        }
+      }
+      
+      set {
+        switch newValue {
+        case .aggressive:
+          blockAdsAndTrackingAggressive.value = true
+          blockAdsAndTracking.value = true
+        case .disabled:
+          blockAdsAndTrackingAggressive.value = false
+          blockAdsAndTracking.value = false
+        case .standard:
+          blockAdsAndTrackingAggressive.value = false
+          blockAdsAndTracking.value = true
+        }
+      }
+    }
+    
     /// Websites will be upgraded to HTTPS if a loaded page attempts to use HTTP
     public static let httpsEverywhere = Option<Bool>(key: "shields.https-everywhere", default: true)
     /// Enable Google Safe Browsing

@@ -105,14 +105,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   // MARK: - P3A
   
   private func recordGlobalAdBlockShieldsP3A() {
-    // Q46 What is the global ad blocking shields setting?
-    enum Answer: Int, CaseIterable {
-      case disabled = 0
-      case standard = 1
-      case aggressive = 2
-    }
-    let answer: Answer = Preferences.Shields.blockAdsAndTracking.value ? .standard : .disabled
-    UmaHistogramEnumeration("Brave.Shields.AdBlockSetting", sample: answer)
+    UmaHistogramEnumeration("Brave.Shields.AdBlockSetting", sample: Preferences.Shields.blockAdsAndTrackingLevel.p3AAnswer)
   }
   
   private func recordGlobalFingerprintingShieldsP3A() {
@@ -132,7 +125,20 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     var shields = Section(
       header: .title(Strings.shieldsDefaults),
       rows: [
-        .boolRow(title: Strings.blockAdsAndTracking, detailText: Strings.blockAdsAndTrackingDescription, option: Preferences.Shields.blockAdsAndTracking),
+        .pickerRow(
+          title: Strings.trackersAndAdsBlocking,
+          detailText: Strings.trackersAndAdsBlockingDescription,
+          options: Preferences.Shields.ShieldLevel.allCases,
+          selectedValue: Preferences.Shields.blockAdsAndTrackingLevel,
+          valueChange: { value in
+            guard let shieldLevel = Preferences.Shields.ShieldLevel(rawValue: value.id) else {
+              assertionFailure()
+              return
+            }
+            
+            Preferences.Shields.blockAdsAndTrackingLevel = shieldLevel
+          }
+        ),
         .boolRow(title: Strings.HTTPSEverywhere, detailText: Strings.HTTPSEverywhereDescription, option: Preferences.Shields.httpsEverywhere),
         .boolRow(title: Strings.autoRedirectAMPPages, detailText: Strings.autoRedirectAMPPagesDescription, option: Preferences.Shields.autoRedirectAMPPages),
         .boolRow(title: Strings.autoRedirectTrackingURLs, detailText: Strings.autoRedirectTrackingURLsDescription, option: Preferences.Shields.autoRedirectTrackingURLs),
@@ -521,5 +527,19 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     }
     
     _toggleFolderAccessForBlockCookies(locked: true)
+  }
+}
+
+extension Preferences.Shields.ShieldLevel: PickerAccessoryViewValue {
+  public var id: String {
+    return rawValue
+  }
+  
+  public var localizedTitle: String {
+    switch self {
+    case .aggressive: return Strings.trackersAndAdsBlockingAggressive
+    case .disabled: return Strings.trackersAndAdsBlockingDisabled
+    case .standard: return Strings.trackersAndAdsBlockingStandard
+    }
   }
 }

@@ -6,10 +6,10 @@ import UIKit
 import Shared
 import BraveShared
 import BraveUI
+import Preferences
 
 class AdvancedShieldsView: UIStackView {
   let siteTitle = HeaderTitleView()
-  let adsTrackersControl = ToggleView(title: Strings.blockAdsAndTracking)
   let blockMalwareControl = ToggleView(title: Strings.blockPhishing)
   let blockScriptsControl = ToggleView(title: Strings.blockScripts)
   let fingerprintingControl = ToggleView(title: Strings.fingerprintingProtection)
@@ -17,6 +17,21 @@ class AdvancedShieldsView: UIStackView {
     $0.titleLabel.text = Strings.Shields.globalControls.uppercased()
   }
   let globalControlsButton = ChangeGlobalDefaultsView()
+  var adsTrackerValueChange: ((Preferences.Shields.ShieldLevel) -> Void)?
+  
+  lazy var adsTrackersControl: PickerView = {
+    return PickerView(
+      title: Strings.trackersAndAdsBlocking,
+      options: Preferences.Shields.ShieldLevel.allCases,
+      selectedValue: Preferences.Shields.blockAdsAndTrackingLevel) { [weak self] value in
+        guard let shieldLevel = Preferences.Shields.ShieldLevel(rawValue: value.id) else {
+          assertionFailure()
+          return
+        }
+        
+        self?.adsTrackerValueChange?(shieldLevel)
+      }
+  }()
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -143,6 +158,64 @@ extension AdvancedShieldsView {
 
     @objc private func switchValueChanged() {
       valueToggled?(toggleSwitch.isOn)
+    }
+  }
+  
+  /// A container displaying a toggle for the user
+  class PickerView: UIView {
+    private let titleLabel: UILabel = {
+      let label = UILabel()
+      label.font = .systemFont(ofSize: 15.0)
+      label.numberOfLines = 0
+      label.textColor = .braveLabel
+      return label
+    }()
+
+    let pickerView: PickerAccessoryView
+    var selectedValue: PickerAccessoryView.ValueChange?
+    
+    override var accessibilityLabel: String? {
+      get { titleLabel.accessibilityLabel }
+      set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+    }
+
+    override var accessibilityValue: String? {
+      get { pickerView.accessibilityValue }
+      set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+    }
+
+    init(title: String, options: [PickerAccessoryViewValue], selectedValue: PickerAccessoryViewValue, valueChange: @escaping PickerAccessoryView.ValueChange) {
+      self.pickerView = PickerAccessoryView(
+        options: options,
+        selectedValue: selectedValue,
+        valueChange: valueChange
+      )
+      
+      super.init(frame: .zero)
+
+      let stackView = UIStackView(arrangedSubviews: [titleLabel, pickerView])
+      stackView.spacing = 12.0
+      stackView.alignment = .center
+      stackView.distribution = .equalSpacing
+      addSubview(stackView)
+      
+      snp.makeConstraints {
+        $0.height.greaterThanOrEqualTo(44)
+      }
+      
+      stackView.snp.makeConstraints {
+        $0.horizontalEdges.equalToSuperview().inset(16)
+        $0.verticalEdges.equalToSuperview()
+      }
+
+      titleLabel.text = title
+      isAccessibilityElement = true
+      accessibilityTraits.insert(.button)
+    }
+
+    @available(*, unavailable)
+    required init?(coder aDecoder: NSCoder) {
+      fatalError()
     }
   }
 

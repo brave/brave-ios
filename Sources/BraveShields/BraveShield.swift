@@ -17,7 +17,7 @@ public enum BraveShield {
     case .AllOff:
       return false
     case .AdblockAndTp:
-      return Preferences.Shields.blockAdsAndTracking.value
+      return Preferences.Shields.blockAdsAndTrackingLevel.isEnabled
     case .FpProtection:
       return Preferences.Shields.fingerprintingProtection.value
     case .NoScript:

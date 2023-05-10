@@ -17,7 +17,8 @@ public final class Domain: NSManagedObject, CRUD {
   @NSManaged public var blockedFromTopSites: Bool  // don't show ever on top sites
 
   @NSManaged public var shield_allOff: NSNumber?
-  @NSManaged public var shield_adblockAndTp: NSNumber?
+  @NSManaged private var shield_adblockAndTp: NSNumber?
+  @NSManaged private var shield_adblockAndTpAggressive: NSNumber
 
   @available(*, deprecated, message: "Per domain HTTPSE shield is currently unused.")
   @NSManaged public var shield_httpse: NSNumber?
@@ -38,6 +39,28 @@ public final class Domain: NSManagedObject, CRUD {
   
   private static let containsEthereumPermissionsPredicate = NSPredicate(format: "wallet_permittedAccounts != nil && wallet_permittedAccounts != ''")
   private static let containsSolanaPermissionsPredicate = NSPredicate(format: "wallet_solanaPermittedAcccounts != nil && wallet_solanaPermittedAcccounts != ''")
+  
+  @MainActor public var adBlockAndTPShieldLevel: Preferences.Shields.ShieldLevel {
+    get {
+      guard let shield_adblockAndTp = shield_adblockAndTp else {
+        // If this value is nil, revert to global preferences
+        return Preferences.Shields.blockAdsAndTrackingLevel
+      }
+      
+      if !shield_adblockAndTp.boolValue {
+        return .disabled
+      } else if shield_adblockAndTpAggressive == true {
+        return .aggressive
+      } else {
+        return .standard
+      }
+    }
+    
+    set {
+      shield_adblockAndTp = newValue.isEnabled as NSNumber
+      shield_adblockAndTpAggressive = newValue.isAggressive as NSNumber
+    }
+  }
   
   @MainActor public var areAllShieldsOff: Bool {
     return shield_allOff?.boolValue ?? false
@@ -98,8 +121,24 @@ public final class Domain: NSManagedObject, CRUD {
     forUrl url: URL, shield: BraveShield,
     isOn: Bool?, isPrivateBrowsing: Bool
   ) {
-    let _context: WriteContext = isPrivateBrowsing ? .new(inMemory: true) : .new(inMemory: false)
-    setBraveShieldInternal(forUrl: url, shield: shield, isOn: isOn, context: _context)
+    setBraveShieldInternal(
+      forUrl: url,
+      shield: shield,
+      isOn: isOn,
+      context: writeContext(isPrivateBrowsing: isPrivateBrowsing)
+    )
+  }
+  
+  @MainActor public class func setAdAndTP(shieldLevel: Preferences.Shields.ShieldLevel, for url: URL, isPrivateBrowsing: Bool) {
+    setAdAndTPInternal(
+      shieldLevel: shieldLevel,
+      for: url,
+      context: writeContext(isPrivateBrowsing: isPrivateBrowsing)
+    )
+  }
+  
+  private class func writeContext(isPrivateBrowsing: Bool) -> WriteContext {
+    return isPrivateBrowsing ? .new(inMemory: true) : .new(inMemory: false)
   }
 
   /// Whether or not a given shield should be enabled based on domain exceptions and the users global preference
@@ -109,7 +148,7 @@ public final class Domain: NSManagedObject, CRUD {
       case .AllOff:
         return self.shield_allOff?.boolValue ?? false
       case .AdblockAndTp:
-        return self.shield_adblockAndTp?.boolValue ?? Preferences.Shields.blockAdsAndTracking.value
+        return adBlockAndTPShieldLevel.isEnabled
       case .FpProtection:
         return self.shield_fpProtection?.boolValue ?? Preferences.Shields.fingerprintingProtection.value
       case .NoScript:
@@ -156,7 +195,7 @@ public final class Domain: NSManagedObject, CRUD {
   }
   
   public class func totalDomainsWithAdblockShieldsLoweredFromGlobal() -> Int {
-    guard Preferences.Shields.blockAdsAndTracking.value,
+    guard Preferences.Shields.blockAdsAndTrackingLevel.isEnabled,
           let domains = Domain.all(where: NSPredicate(format: "shield_adblockAndTp != nil")) else {
       return 0 // Can't be lower than off
     }
@@ -164,7 +203,7 @@ public final class Domain: NSManagedObject, CRUD {
   }
   
   public class func totalDomainsWithAdblockShieldsIncreasedFromGlobal() -> Int {
-    guard !Preferences.Shields.blockAdsAndTracking.value,
+    guard !Preferences.Shields.blockAdsAndTrackingLevel.isEnabled,
           let domains = Domain.all(where: NSPredicate(format: "shield_adblockAndTp != nil")) else {
       return 0 // Can't be higher than on
     }
@@ -387,35 +426,36 @@ extension Domain {
       let domain = Domain.getOrCreateInternal(
         url, context: context,
         saveStrategy: .delayedPersistentStore)
-      domain.setBraveShield(shield: shield, isOn: isOn, context: context)
+      domain.setBraveShield(shield: shield, isOn: isOn)
     }
+  }
+  
+  @MainActor class func setAdAndTPInternal(shieldLevel: Preferences.Shields.ShieldLevel, for url: URL, context: WriteContext) {
+    DataController.perform(context: context) { context in
+      // Not saving here, save happens in `perform` method.
+      let domain = Domain.getOrCreateInternal(
+        url, context: context,
+        saveStrategy: .delayedPersistentStore)
+      domain.setAdAndTP(shieldLevel: shieldLevel)
+    }
+  }
+  
+  @MainActor private func setAdAndTP(
+    shieldLevel: Preferences.Shields.ShieldLevel
+  ) {
+    shield_adblockAndTp = shieldLevel.isEnabled as NSNumber
+    shield_adblockAndTpAggressive = shieldLevel.isAggressive as NSNumber
   }
 
   private func setBraveShield(
-    shield: BraveShield, isOn: Bool?,
-    context: NSManagedObjectContext
+    shield: BraveShield, isOn: Bool?
   ) {
-
     let setting = (isOn == shield.globalPreference ? nil : isOn) as NSNumber?
     switch shield {
     case .AllOff: shield_allOff = setting
     case .AdblockAndTp: shield_adblockAndTp = setting
     case .FpProtection: shield_fpProtection = setting
     case .NoScript: shield_noScript = setting
-    }
-  }
-
-  /// Get whether or not a shield override is set for a given shield.
-  private func getBraveShield(_ shield: BraveShield) -> Bool? {
-    switch shield {
-    case .AllOff:
-      return self.shield_allOff?.boolValue
-    case .AdblockAndTp:
-      return self.shield_adblockAndTp?.boolValue
-    case .FpProtection:
-      return self.shield_fpProtection?.boolValue
-    case .NoScript:
-      return self.shield_noScript?.boolValue
     }
   }
 
