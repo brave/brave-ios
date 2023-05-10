@@ -161,7 +161,7 @@ window.__firefox__.execute(function($) {
 
     return sendPendingSelectorsPromise
   }
-  
+
   /**
    * Extract any new id selector from the element
    * @param {object} element The element to extract from
@@ -374,18 +374,8 @@ window.__firefox__.execute(function($) {
    * @returns Origin string if found otherwise undefined
    */
   const extractOriginFromURLString = (urlString) => {
-    if (urlString.startsWith('//')) {
-      try {
-        const newURLString = [window.location.protocol, urlString].join('')
-        const url = new URL(newURLString)
-        return url.origin
-      } catch (error) {
-        return
-      }
-    }
-
     try {
-      const url = new URL(urlString, window.location.url)
+      const url = new URL(urlString, window.location.toString())
       return url.origin
     } catch (error) {
       console.error(error)
@@ -1020,14 +1010,14 @@ window.__firefox__.execute(function($) {
       // 3. Unhide any elements (or their parents) we know have urls
       unhideSelectorsMatchingElementsAndTheirParents(nodesWithExtractedURLs)
     }
-    
+
     // 4. Set the rules on the stylesheet. So far we don't have any rules set
     // We could do this earlier but it causes elements to hide and unhide
     // It's best to wait to this period so we have
     setRulesOnStylesheet()
     // 5. Start our queue pump if we need to
     scheduleQueuePump(args.hideFirstPartyContent, args.genericHide)
-    
+
     if (!args.hideFirstPartyContent) {
       // 6. Start listening to new urls
       startURLMutationObserver()
