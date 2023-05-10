@@ -41,17 +41,32 @@ import os
       p3aUtilities.isP3AEnabled = isP3AEnabled
     }
   }
+  @Published var isClearingData: Bool {
+    didSet {
+      loadingCallback(isClearingData)
+    }
+  }
   
+  typealias LoadingCallback = @MainActor (Bool) -> Void
   @Published var clearableSettings: [ClearableSetting]
   
   private var subscriptions: [AnyCancellable] = []
   private let p3aUtilities: BraveP3AUtils
-  private let tabManager: TabManager
+  private let loadingCallback: LoadingCallback
+  let tabManager: TabManager
   
-  init(profile: Profile, tabManager: TabManager, feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI, p3aUtilities: BraveP3AUtils) {
+  init(
+    profile: Profile, tabManager: TabManager,
+    feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI,
+    p3aUtilities: BraveP3AUtils,
+    loadingCallback: @escaping LoadingCallback
+  ) {
     self.p3aUtilities = p3aUtilities
     self.tabManager = tabManager
     self.isP3AEnabled = p3aUtilities.isP3AEnabled
+    self.loadingCallback = loadingCallback
+    self.isClearingData = false
+      
     cookieConsentBlocking = FilterListStorage.shared.isEnabled(
       for: FilterList.cookieConsentNoticesComponentID
     )

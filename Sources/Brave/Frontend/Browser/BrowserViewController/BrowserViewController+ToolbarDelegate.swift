@@ -459,14 +459,30 @@ extension BrowserViewController: TopToolbarDelegate {
       // In 1.6 we "reload" the whole web view state, dumping caches, etc. (reload():BraveWebView.swift:495)
       // BRAVE TODO: Port over proper tab reloading with Shields
     }
+    
     shields.showGlobalShieldsSettings = { [unowned self] vc in
       vc.dismiss(animated: true) {
+        weak var spinner: SpinnerView?
         let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
           profile: self.profile,
           tabManager: self.tabManager,
           feedDataSource: self.feedDataSource,
           historyAPI: self.braveCore.historyAPI,
-          p3aUtilities: self.braveCore.p3aUtils
+          p3aUtilities: self.braveCore.p3aUtils,
+          loadingCallback: { [weak self] isLoading in
+            guard let view = self?.navigationController?.view, view.window != nil else {
+              assertionFailure()
+              return
+            }
+            
+            if isLoading, spinner == nil {
+              let newSpinner = SpinnerView()
+              newSpinner.present(on: view)
+              spinner = newSpinner
+            } else {
+              spinner?.dismiss()
+            }
+          }
         ))
         
         let container = SettingsNavigationController(rootViewController: controller)

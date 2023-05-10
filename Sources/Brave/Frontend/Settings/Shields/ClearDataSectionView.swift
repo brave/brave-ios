@@ -12,7 +12,6 @@ import Preferences
 struct ClearDataSectionView: View {
   @State private var showClearablesAlert = false
   @ObservedObject var settings: AdvancedShieldsSettings
-  @Binding var clearingData: Bool
   
   var body: some View {
     Section {
@@ -38,7 +37,7 @@ struct ClearDataSectionView: View {
             title: Text(Strings.clearPrivateDataAlertTitle),
             message: Text(Strings.clearPrivateDataAlertMessage),
             primaryButton: .destructive(Text(Strings.clearPrivateDataAlertYesAction), action: {
-              clearingData = true
+              settings.isClearingData = true
               Preferences.Privacy.clearPrivateDataToggles.value = settings.clearableSettings.map({ $0.isEnabled })
               
               Task { @MainActor in
@@ -47,13 +46,13 @@ struct ClearDataSectionView: View {
                   return $0.clearable
                 }))
                 
-                self.clearingData = false
+                settings.isClearingData = false
               }
             }),
             secondaryButton: .cancel(Text(Strings.cancelButtonTitle))
           )
         })
-        .disabled(clearingData || settings.clearableSettings.allSatisfy({ !$0.isEnabled }))
+        .disabled(settings.isClearingData || settings.clearableSettings.allSatisfy({ !$0.isEnabled }))
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
     } header: {
       Text(Strings.clearPrivateData)
