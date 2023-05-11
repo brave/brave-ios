@@ -30,7 +30,7 @@ struct OtherPrivacySettingsSectionView: View {
           primaryButton: .default(Text(Strings.OKString), action: {
             Task { @MainActor in
               try await Task.sleep(nanoseconds: NSEC_PER_MSEC * 100)
-              settings.isClearingData = true
+              
               await settings.clearPrivateData([CookiesAndCacheClearable()])
               
               // First remove all tabs so that only a blank tab exists.
@@ -41,7 +41,6 @@ struct OtherPrivacySettingsSectionView: View {
               
               // Restore all existing tabs by removing the blank tabs and recreating new ones..
               settings.tabManager.removeAll()
-              settings.isClearingData = false
             }
           }),
           secondaryButton: .cancel(Text(Strings.cancelButtonTitle), action: {

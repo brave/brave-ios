@@ -17,7 +17,7 @@ struct AdvancedShieldsSettingsView: View {
   init(
     profile: Profile, tabManager: TabManager,
     feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI, p3aUtilities: BraveP3AUtils,
-    loadingCallback: @escaping AdvancedShieldsSettings.LoadingCallback
+    clearDataCallback: @escaping AdvancedShieldsSettings.ClearDataCallback
   ) {
     self.settings = AdvancedShieldsSettings(
       profile: profile,
@@ -25,7 +25,7 @@ struct AdvancedShieldsSettingsView: View {
       feedDataSource: feedDataSource,
       historyAPI: historyAPI,
       p3aUtilities: p3aUtilities,
-      loadingCallback: loadingCallback
+      clearDataCallback: clearDataCallback
     )
   }
 

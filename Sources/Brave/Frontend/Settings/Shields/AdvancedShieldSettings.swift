@@ -42,32 +42,26 @@ import os
       p3aUtilities.isP3AEnabled = isP3AEnabled
     }
   }
-  @Published var isClearingData: Bool {
-    didSet {
-      loadingCallback(isClearingData)
-    }
-  }
   
-  typealias LoadingCallback = @MainActor (Bool) -> Void
+  typealias ClearDataCallback = @MainActor (Bool) -> Void
   @Published var clearableSettings: [ClearableSetting]
   
   private var subscriptions: [AnyCancellable] = []
   private let p3aUtilities: BraveP3AUtils
-  private let loadingCallback: LoadingCallback
+  private let clearDataCallback: ClearDataCallback
   let tabManager: TabManager
   
   init(
     profile: Profile, tabManager: TabManager,
     feedDataSource: FeedDataSource, historyAPI: BraveHistoryAPI,
     p3aUtilities: BraveP3AUtils,
-    loadingCallback: @escaping LoadingCallback
+    clearDataCallback: @escaping ClearDataCallback
   ) {
     self.p3aUtilities = p3aUtilities
     self.tabManager = tabManager
     self.isP3AEnabled = p3aUtilities.isP3AEnabled
-    self.loadingCallback = loadingCallback
-    self.isClearingData = false
-      
+    self.clearDataCallback = clearDataCallback
+    
     cookieConsentBlocking = FilterListStorage.shared.isEnabled(
       for: FilterList.cookieConsentNoticesComponentID
     )
@@ -101,7 +95,13 @@ import os
     registerSubscriptions()
   }
   
-  @MainActor func clearPrivateData(_ clearables: [Clearable]) async {
+  func clearPrivateData(_ clearables: [Clearable]) async {
+    clearDataCallback(true)
+    await clearPrivateDataInternal(clearables)
+    clearDataCallback(false)
+  }
+  
+  private func clearPrivateDataInternal(_ clearables: [Clearable]) async {
     @Sendable func _clear(_ clearables: [Clearable], secondAttempt: Bool = false) async {
       await withThrowingTaskGroup(of: Void.self) { group in
         for clearable in clearables {
@@ -163,12 +163,6 @@ import os
       
       // Clearing Tab History should clear Recently Closed
       RecentlyClosed.removeAll()
-      
-      // Donate Clear Browser History for suggestions
-      let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
-      // TODO: @JS How do I handle this?
-      // self.userActivity = clearBrowserHistoryActivity
-      clearBrowserHistoryActivity.becomeCurrent()
     }
     
     _toggleFolderAccessForBlockCookies(locked: true)

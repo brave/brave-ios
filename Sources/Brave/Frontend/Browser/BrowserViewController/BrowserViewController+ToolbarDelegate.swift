@@ -469,7 +469,7 @@ extension BrowserViewController: TopToolbarDelegate {
           feedDataSource: self.feedDataSource,
           historyAPI: self.braveCore.historyAPI,
           p3aUtilities: self.braveCore.p3aUtils,
-          loadingCallback: { [weak self] isLoading in
+          clearDataCallback: { [weak self] isLoading in
             guard let view = self?.navigationController?.view, view.window != nil else {
               assertionFailure()
               return

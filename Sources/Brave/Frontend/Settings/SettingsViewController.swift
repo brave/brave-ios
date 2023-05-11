@@ -225,7 +225,7 @@ class SettingsViewController: TableViewController {
               feedDataSource: self.feedDataSource,
               historyAPI: self.historyAPI,
               p3aUtilities: self.p3aUtilities,
-              loadingCallback: { [weak self] isLoading in
+              clearDataCallback: { [weak self] isLoading in
                 guard let view = self?.navigationController?.view, view.window != nil else {
                   assertionFailure()
                   return

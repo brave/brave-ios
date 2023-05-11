@@ -23,39 +23,44 @@ struct ClearDataSectionView: View {
         )
       }
       
-      Button {
-        showClearablesAlert = true
-      } label: {
-        VStack(alignment: .center) {
-          Text(Strings.clearDataNow)
-            .foregroundColor(Color(.braveBlurpleTint))
-        }
-      }
-        .frame(maxWidth: .infinity)
-        .alert(isPresented: $showClearablesAlert, content: {
-          Alert(
-            title: Text(Strings.clearPrivateDataAlertTitle),
-            message: Text(Strings.clearPrivateDataAlertMessage),
-            primaryButton: .destructive(Text(Strings.clearPrivateDataAlertYesAction), action: {
-              settings.isClearingData = true
-              Preferences.Privacy.clearPrivateDataToggles.value = settings.clearableSettings.map({ $0.isEnabled })
-              
-              Task { @MainActor in
-                await settings.clearPrivateData(settings.clearableSettings.compactMap({
-                  guard $0.isEnabled else { return nil }
-                  return $0.clearable
-                }))
-                
-                settings.isClearingData = false
-              }
-            }),
-            secondaryButton: .cancel(Text(Strings.cancelButtonTitle))
-          )
-        })
-        .disabled(settings.isClearingData || settings.clearableSettings.allSatisfy({ !$0.isEnabled }))
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      clearPrivateDataButton
     } header: {
       Text(Strings.clearPrivateData)
+    }
+  }
+  
+  private var clearPrivateDataButton: some View {
+    Button {
+      showClearablesAlert = true
+    } label: {
+      VStack(alignment: .center) {
+        Text(Strings.clearDataNow)
+          .foregroundColor(Color(.braveBlurpleTint))
+      }
+    }
+      .frame(maxWidth: .infinity)
+      .alert(isPresented: $showClearablesAlert, content: {
+        Alert(
+          title: Text(Strings.clearPrivateDataAlertTitle),
+          message: Text(Strings.clearPrivateDataAlertMessage),
+          primaryButton: .destructive(Text(Strings.clearPrivateDataAlertYesAction), action: {
+            clearPrivateData()
+          }),
+          secondaryButton: .cancel(Text(Strings.cancelButtonTitle))
+        )
+      })
+      .disabled(settings.clearableSettings.allSatisfy({ !$0.isEnabled }))
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+  }
+  
+  private func clearPrivateData() {
+    Preferences.Privacy.clearPrivateDataToggles.value = settings.clearableSettings.map({ $0.isEnabled })
+    
+    Task { @MainActor in
+      await settings.clearPrivateData(settings.clearableSettings.compactMap({
+        guard $0.isEnabled else { return nil }
+        return $0.clearable
+      }))
     }
   }
 }
