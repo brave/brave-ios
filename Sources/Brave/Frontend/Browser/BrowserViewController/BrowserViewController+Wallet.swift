@@ -93,8 +93,10 @@ extension BrowserViewController {
     return walletStore
   }
   
+  /// Presents the Wallet panel for a given origin
   func presentWalletPanel(from origin: URLOrigin, with tabDappStore: TabDappStore) {
     guard let walletStore = self.walletStore ?? newWalletStore() else { return }
+    walletStore.origin = origin
     let controller = WalletPanelHostingController(
       walletStore: walletStore,
       tabDappStore: tabDappStore,
@@ -168,6 +170,14 @@ extension Tab: BraveWalletProviderDelegate {
 
   func getOrigin() -> URLOrigin {
     guard let origin = url?.origin else {
+      // A nil url is possible if multiple tabs are restored but one or more
+      // of the tabs is not opened yet (loaded the url). When a new chain is
+      // assigned for a specific origin, the provider(s) will check origin
+      // of all open Tab's to see if that provider needs(s) updated too.
+      // We can get the url from the SessionTab, and return it's origin.
+      if let sessionTabOrigin = SessionTab.from(tabId: id)?.url.origin {
+        return sessionTabOrigin
+      }
       assert(false, "We should have a valid origin to get to this point")
       return .init()
     }

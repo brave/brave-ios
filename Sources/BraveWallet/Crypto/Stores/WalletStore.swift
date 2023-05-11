@@ -12,6 +12,12 @@ public class WalletStore {
 
   public let keyringStore: KeyringStore
   public var cryptoStore: CryptoStore?
+  public var origin: URLOrigin? {
+    didSet {
+      cryptoStore?.origin = origin
+      keyringStore.origin = origin
+    }
+  }
   
   public let onPendingRequestUpdated = PassthroughSubject<Void, Never>()
 
@@ -77,7 +83,8 @@ public class WalletStore {
             txService: txService,
             ethTxManagerProxy: ethTxManagerProxy,
             solTxManagerProxy: solTxManagerProxy,
-            ipfsApi: ipfsApi
+            ipfsApi: ipfsApi,
+            origin: self.origin
           )
           self.onPendingRequestCancellable = self.cryptoStore?.$pendingRequest
             .removeDuplicates()

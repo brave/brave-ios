@@ -86,6 +86,27 @@ class NetworkStoreTests: XCTestCase {
     XCTAssertEqual(error, .chainAlreadySelected, "Expected chain already selected error")
   }
   
+  /// Test `setSelectedChain` will call `setNetwork` with the store's `origin: URLOrigin?` value.
+  func testSetSelectedNetworkWithOrigin() async {
+    let origin: URLOrigin = .init(url: URL(string: "https://brave.com")!)
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    rpcService._setNetwork = { chainId, coin, origin, completion in
+      XCTAssertEqual(origin, origin)
+      completion(true)
+    }
+    
+    let store = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService,
+      origin: origin
+    )
+    
+    let error = await store.setSelectedChain(.mockGoerli)
+    XCTAssertNil(error, "Expected success")
+  }
+  
   func testSetSelectedNetworkNoAccounts() async {
     let (keyringService, rpcService, walletService, swapService) = setupServices()
     
