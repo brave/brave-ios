@@ -9,6 +9,7 @@ import BraveCore
 import BraveNews
 import Preferences
 import Data
+import Growth
 import os
 
 @MainActor class AdvancedShieldsSettings: ObservableObject {
@@ -97,26 +98,7 @@ import os
     }
     
     self.clearableSettings = clearableSettings
-    
-    FilterListStorage.shared.$filterLists
-      .receive(on: DispatchQueue.main)
-      .sink { filterLists in
-        for filterList in filterLists {
-          switch filterList.entry.componentId {
-          case FilterList.cookieConsentNoticesComponentID:
-            if filterList.isEnabled != self.cookieConsentBlocking {
-              self.cookieConsentBlocking = filterList.isEnabled
-            }
-          case FilterList.mobileAnnoyancesComponentID:
-            if filterList.isEnabled != self.blockMobileAnnoyances {
-              self.blockMobileAnnoyances = filterList.isEnabled
-            }
-          default:
-            continue
-          }
-        }
-      }
-      .store(in: &subscriptions)
+    registerSubscriptions()
   }
   
   @MainActor func clearPrivateData(_ clearables: [Clearable]) async {
@@ -185,10 +167,68 @@ import os
       // Donate Clear Browser History for suggestions
       let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
       // TODO: @JS How do I handle this?
-      //self.userActivity = clearBrowserHistoryActivity
+      // self.userActivity = clearBrowserHistoryActivity
       clearBrowserHistoryActivity.becomeCurrent()
     }
     
     _toggleFolderAccessForBlockCookies(locked: true)
+  }
+  
+  private func registerSubscriptions() {
+    FilterListStorage.shared.$filterLists
+      .receive(on: DispatchQueue.main)
+      .sink { filterLists in
+        for filterList in filterLists {
+          switch filterList.entry.componentId {
+          case FilterList.cookieConsentNoticesComponentID:
+            if filterList.isEnabled != self.cookieConsentBlocking {
+              self.cookieConsentBlocking = filterList.isEnabled
+            }
+          case FilterList.mobileAnnoyancesComponentID:
+            if filterList.isEnabled != self.blockMobileAnnoyances {
+              self.blockMobileAnnoyances = filterList.isEnabled
+            }
+          default:
+            continue
+          }
+        }
+      }
+      .store(in: &subscriptions)
+    
+    Preferences.Shields.blockAdsAndTracking.$value
+      .sink { [weak self] _ in
+        self?.recordGlobalAdBlockShieldsP3A()
+      }
+      .store(in: &subscriptions)
+    
+    Preferences.Shields.fingerprintingProtection.$value
+      .sink { [weak self] _ in
+        self?.recordGlobalFingerprintingShieldsP3A()
+      }
+      .store(in: &subscriptions)
+  }
+  
+  // MARK: - P3A
+  
+  private func recordGlobalAdBlockShieldsP3A() {
+    // Q46 What is the global ad blocking shields setting?
+    enum Answer: Int, CaseIterable {
+      case disabled = 0
+      case standard = 1
+      case aggressive = 2
+    }
+    let answer: Answer = Preferences.Shields.blockAdsAndTracking.value ? .standard : .disabled
+    UmaHistogramEnumeration("Brave.Shields.AdBlockSetting", sample: answer)
+  }
+  
+  private func recordGlobalFingerprintingShieldsP3A() {
+    // Q47 What is the global fingerprinting shields setting?
+    enum Answer: Int, CaseIterable {
+      case disabled = 0
+      case standard = 1
+      case aggressive = 2
+    }
+    let answer: Answer = Preferences.Shields.fingerprintingProtection.value ? .standard : .disabled
+    UmaHistogramEnumeration("Brave.Shields.FingerprintBlockSetting", sample: answer)
   }
 }
