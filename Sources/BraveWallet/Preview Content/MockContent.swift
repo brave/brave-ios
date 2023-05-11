@@ -107,7 +107,7 @@ extension BraveWallet.BlockchainToken {
     visible: true,
     tokenId: "30934",
     coingeckoId: "",
-    chainId: "0x1",
+    chainId: BraveWallet.MainnetChainId,
     coin: .eth
   )
   
@@ -124,7 +124,7 @@ extension BraveWallet.BlockchainToken {
     visible: true,
     tokenId: "",
     coingeckoId: "",
-    chainId: "0x65",
+    chainId: BraveWallet.SolanaMainnet,
     coin: .sol
   )
 }
