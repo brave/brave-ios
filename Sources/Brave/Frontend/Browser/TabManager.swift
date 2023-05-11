@@ -417,28 +417,35 @@ class TabManager: NSObject {
     // When bulk adding tabs don't notify delegates until we are done
     self.isRestoring = true
     
-    // Load at most X of the most recent tabs
-    // IE: Load the last X tabs, lazy load all the rest
-    let amountOfTabsToRestoreImmediately = 5
-    
-    var tab: Tab!
-    for (index, url) in urls.enumerated() {
-      tab = self.addTab(URLRequest(url: url),
+    var tabs = [Tab]()
+    for url in urls {
+      let request = InternalURL.isValid(url: url) ?
+                      PrivilegedRequest(url: url) as URLRequest :
+                      URLRequest(url: url)
+      let tab = self.addTab(request,
                             flushToDisk: false,
                             zombie: true,
                             isPrivate: isPrivate)
       tab.lastTitle = url.absoluteDisplayString
       tab.url = url
       tab.favicon = FaviconFetcher.getIconFromCache(for: url) ?? Favicon.default
+      tabs.append(tab)
+    }
       
-      if index >= urls.count - amountOfTabsToRestoreImmediately {
-        tab.createWebview()
-        tab.loadRequest(URLRequest(url: url))
-      }
+    // Load at most X of the most recent tabs
+    // IE: Load the last X tabs, lazy load all the rest
+    let amountOfTabsToRestoreImmediately = 5
+    Array(tabs.suffix(amountOfTabsToRestoreImmediately)).reversed().forEach {
+      guard let url = $0.url else { return }
+      let request = InternalURL.isValid(url: url) ?
+                      PrivilegedRequest(url: url) as URLRequest :
+                      URLRequest(url: url)
+      $0.createWebview()
+      $0.loadRequest(URLRequest(url: url))
     }
     
     // Select the most recent.
-    self.selectTab(tab)
+    self.selectTab(tabs.last)
     self.isRestoring = false
     // Okay now notify that we bulk-loaded so we can adjust counts and animate changes.
     delegates.forEach { $0.get()?.tabManagerDidAddTabs(self) }
