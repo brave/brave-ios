@@ -330,8 +330,9 @@ class PlaylistWebLoader: UIView {
     self.removeFromSuperview()
   }
 
+  @MainActor
   func load(url: URL) async -> PlaylistInfo? {
-    return await withCheckedContinuation { @MainActor continuation in
+    return await withCheckedContinuation { continuation in
       self.handler = { [weak self] in
         // Handler cannot be called more than once!
         self?.handler = nil

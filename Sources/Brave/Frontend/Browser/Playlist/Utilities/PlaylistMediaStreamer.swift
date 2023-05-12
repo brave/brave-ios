@@ -126,15 +126,17 @@ class PlaylistMediaStreamer {
                                      tagId: item.tagId,  // Keep the same tagId
                                      order: item.order) // Keep the same order
       
-      return try await withCheckedThrowingContinuation { continuation in
+      let item = try await withCheckedThrowingContinuation { continuation in
         PlaylistItem.updateItem(updatedItem) {
           continuation.resume(returning: updatedItem)
-          
-          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            PlaylistManager.shared.autoDownload(item: updatedItem)
-          }
         }
       }
+        
+      Task {
+        try await Task.sleep(seconds: 1)
+        PlaylistManager.shared.autoDownload(item: updatedItem)
+      }
+      return item
     } onCancel: {
       Task { @MainActor in
         webLoader?.stop()
