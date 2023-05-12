@@ -134,7 +134,7 @@ class SettingsViewController: TableViewController {
   }
 
   // Do not use `sections` directly to access sections/rows. Use DataSource.sections instead.
-  @MainActor private func makeSections() -> [Static.Section] {
+  private func makeSections() -> [Static.Section] {
     var list = [
       defaultBrowserSection,
       makeFeaturesSection(),
@@ -210,7 +210,7 @@ class SettingsViewController: TableViewController {
     return section
   }()
 
-  @MainActor private func makeFeaturesSection() -> Static.Section {
+  private func makeFeaturesSection() -> Static.Section {
     weak var spinner: SpinnerView?
     
     var section = Static.Section(
@@ -237,6 +237,7 @@ class SettingsViewController: TableViewController {
                   spinner = newSpinner
                 } else {
                   spinner?.dismiss()
+                  spinner = nil
                 }
               }
             ))

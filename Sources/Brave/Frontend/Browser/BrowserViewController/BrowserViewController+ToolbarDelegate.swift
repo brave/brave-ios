@@ -481,6 +481,7 @@ extension BrowserViewController: TopToolbarDelegate {
               spinner = newSpinner
             } else {
               spinner?.dismiss()
+              spinner = nil
             }
           }
         ))
