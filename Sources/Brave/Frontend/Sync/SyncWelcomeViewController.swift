@@ -139,7 +139,7 @@ class SyncWelcomeViewController: SyncViewController {
     self.syncProfileServices = syncProfileServices
     self.tabManager = tabManager
     
-    super.init(nibName: nil, bundle: nil)
+    super.init()
   }
 
   @available(*, unavailable)
