@@ -7,7 +7,7 @@ import Data
 
 class SyncViewController: UIViewController {
 
-  private let windowProtection: WindowProtection?
+  let windowProtection: WindowProtection?
   private let requiresAuthentication: Bool
 
   // MARK: Lifecycle
