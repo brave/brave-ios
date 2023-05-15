@@ -68,7 +68,7 @@ class NetworkStoreTests: XCTestCase {
       swapService: swapService
     )
     
-    let error = await store.setSelectedChain(.mockGoerli)
+    let error = await store.setSelectedChain(.mockGoerli, isForOrigin: false)
     XCTAssertNil(error, "Expected success, accounts exist for ethereum")
   }
   
@@ -82,7 +82,7 @@ class NetworkStoreTests: XCTestCase {
       swapService: swapService
     )
     
-    let error = await store.setSelectedChain(.mockMainnet)
+    let error = await store.setSelectedChain(.mockMainnet, isForOrigin: false)
     XCTAssertEqual(error, .chainAlreadySelected, "Expected chain already selected error")
   }
   
@@ -103,7 +103,7 @@ class NetworkStoreTests: XCTestCase {
       origin: origin
     )
     
-    let error = await store.setSelectedChain(.mockGoerli)
+    let error = await store.setSelectedChain(.mockGoerli, isForOrigin: true)
     XCTAssertNil(error, "Expected success")
   }
   
@@ -117,7 +117,7 @@ class NetworkStoreTests: XCTestCase {
       swapService: swapService
     )
     
-    let error = await store.setSelectedChain(.mockSolana)
+    let error = await store.setSelectedChain(.mockSolana, isForOrigin: false)
     XCTAssertEqual(error, .selectedChainHasNoAccounts, "Expected chain has no accounts error")
   }
   

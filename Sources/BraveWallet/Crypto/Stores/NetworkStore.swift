@@ -39,11 +39,18 @@ public class NetworkStore: ObservableObject {
       }
   }
 
-  @Published private(set) var selectedChainId: String = BraveWallet.MainnetChainId
-  var selectedChain: BraveWallet.NetworkInfo {
-    allChains.first(where: { $0.chainId == self.selectedChainId }) ?? .init()
+  @Published private(set) var defaultSelectedChainId: String = BraveWallet.MainnetChainId
+  var defaultSelectedChain: BraveWallet.NetworkInfo {
+    allChains.first(where: { $0.chainId == self.defaultSelectedChainId }) ?? .init()
   }
   
+  /// Selected chain id for the current `origin`. If `origin` is nil, this will be the default chain id.
+  @Published private(set) var selectedChainIdForOrigin: String = BraveWallet.MainnetChainId
+  var selectedChainForOrigin: BraveWallet.NetworkInfo {
+    allChains.first(where: { $0.chainId == self.selectedChainIdForOrigin }) ?? .init()
+  }
+  
+  /// If Swap is supported for the current `defaultSelectedChain`.
   @Published private(set) var isSwapSupported: Bool = true
   
   public var origin: URLOrigin? {
@@ -83,10 +90,12 @@ public class NetworkStore: ObservableObject {
   private func updateSelectedChain() {
     Task { @MainActor in // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
-      let chain = await rpcService.network(selectedCoin, origin: origin)
+      let chain = await rpcService.network(selectedCoin, origin: nil)
       // since we are fetch network from JsonRpcService,
       // we don't need to call `setNetwork` on JsonRpcService
-      self.selectedChainId = chain.chainId
+      self.defaultSelectedChainId = chain.chainId
+      let chainForOrigin = await rpcService.network(selectedCoin, origin: origin)
+      self.selectedChainIdForOrigin = chainForOrigin.chainId
       // update `isSwapSupported` for Buy/Send/Swap panel
       self.isSwapSupported = await swapService.isSwapSupported(chain.chainId)
     }
@@ -105,7 +114,10 @@ public class NetworkStore: ObservableObject {
     customChains.contains(where: { $0.coin == network.coin && $0.chainId == network.chainId })
   }
   
-  @MainActor @discardableResult func setSelectedChain(_ network: BraveWallet.NetworkInfo) async -> SetSelectedChainError? {
+  @MainActor @discardableResult func setSelectedChain(
+    _ network: BraveWallet.NetworkInfo,
+    isForOrigin: Bool
+  ) async -> SetSelectedChainError? {
     let keyringId = network.coin.keyringId
     let keyringInfo = await keyringService.keyringInfo(keyringId)
     if keyringInfo.accountInfos.isEmpty {
@@ -113,19 +125,27 @@ public class NetworkStore: ObservableObject {
       return .selectedChainHasNoAccounts
     } else {
       let selectedCoin = await walletService.selectedCoin()
-      if self.selectedChainId != network.chainId {
-        self.selectedChainId = network.chainId
+      if isForOrigin {
+        if self.selectedChainIdForOrigin != network.chainId {
+          self.selectedChainIdForOrigin = network.chainId
+        }
+      } else {
+        if self.defaultSelectedChainId != network.chainId {
+          self.defaultSelectedChainId = network.chainId
+        }
       }
       if selectedCoin != network.coin {
-        let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: origin)
+        let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: isForOrigin ? origin : nil)
         return success ? nil : .unknown
       } else {
-        let rpcServiceNetwork = await rpcService.network(network.coin, origin: origin)
+        let rpcServiceNetwork = await rpcService.network(network.coin, origin: isForOrigin ? origin : nil)
         guard rpcServiceNetwork.chainId != network.chainId else {
-          self.isSwapSupported = await swapService.isSwapSupported(network.chainId)
+          if !isForOrigin { // `isSwapSupported` is for the `defaultSelectedChain`
+            self.isSwapSupported = await swapService.isSwapSupported(network.chainId)
+          }
           return .chainAlreadySelected
         }
-        let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: origin)
+        let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: isForOrigin ? origin : nil)
         return success ? nil : .unknown
       }
     }
@@ -148,7 +168,9 @@ public class NetworkStore: ObservableObject {
     }
   }
   
-  func openNetworkSelectionStore(mode: NetworkSelectionStore.Mode = .select) -> NetworkSelectionStore {
+  func openNetworkSelectionStore(
+    mode: NetworkSelectionStore.Mode = .select(isForOrigin: false)
+  ) -> NetworkSelectionStore {
     if let store = networkSelectionStore {
       if store.mode == mode {
         return store
@@ -231,7 +253,7 @@ public class NetworkStore: ObservableObject {
     rpcService.removeChain(network.chainId, coin: network.coin) { [self] success in
       if success {
         // check if its the current network, set mainnet the active net
-        if network.id.lowercased() == selectedChainId.lowercased() {
+        if network.id.lowercased() == defaultSelectedChainId.lowercased() {
           rpcService.setNetwork(BraveWallet.MainnetChainId, coin: .eth, origin: nil, completion: { _ in })
         }
         // Update `ethereumChains` by api calling
@@ -257,9 +279,14 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
       walletService.setSelectedCoin(coin)
       // since JsonRpcService notify us of change,
       // we don't need to call `setNetwork` on JsonRpcService
-      selectedChainId = chainId
-      
-      isSwapSupported = await swapService.isSwapSupported(chainId)
+      if let origin {
+        if origin == origin {
+          selectedChainIdForOrigin = chainId
+        }
+      } else {
+        defaultSelectedChainId = chainId
+        isSwapSupported = await swapService.isSwapSupported(chainId)
+      }
     }
   }
 }
@@ -268,8 +295,12 @@ extension NetworkStore: BraveWalletKeyringServiceObserver {
   public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
     Task { @MainActor in
       // coin type of selected account might have changed
-      let chain = await rpcService.network(coin, origin: origin)
-      await setSelectedChain(chain)
+      let chain = await rpcService.network(coin, origin: nil)
+      await setSelectedChain(chain, isForOrigin: false)
+      if let origin {
+        let chainForOrigin = await rpcService.network(coin, origin: origin)
+        await setSelectedChain(chainForOrigin, isForOrigin: true)
+      }
     }
   }
   

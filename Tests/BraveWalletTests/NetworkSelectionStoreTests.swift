@@ -153,6 +153,31 @@ import Preferences
     XCTAssertTrue(success, "Expected success for selecting Goerli because we have ethereum accounts.")
   }
   
+  /// Test `setSelectedChain` will call `setNetwork` with the `Mode.select(isForOrigin: true)`.
+  func testSetSelectedNetworkPanel() async {
+    let origin: URLOrigin = .init(url: URL(string: "https://brave.com")!)
+    let (keyringService, rpcService, walletService, swapService) = setupServices()
+    rpcService._setNetwork = { chainId, coin, origin, completion in
+      XCTAssertEqual(origin, origin)
+      completion(true)
+    }
+    
+    let networkStore = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService,
+      origin: origin
+    )
+    
+    let store = NetworkSelectionStore(
+      mode: .select(isForOrigin: true),
+      networkStore: networkStore
+    )
+    let success = await store.selectNetwork(.network(.mockGoerli))
+    XCTAssertTrue(success, "Expected success for selecting Goerli because we have ethereum accounts.")
+  }
+  
   func testSetSelectedNetworkNoAccounts() async {
     let (keyringService, rpcService, walletService, swapService) = setupServices()
     

@@ -331,7 +331,7 @@ extension Tab: BraveWalletProviderDelegate {
       return !Preferences.Wallet.allowEthProviderAccess.value
     case .sol:
       return !Preferences.Wallet.allowSolProviderAccess.value
-    case .fil:
+    case .fil, .btc:
       return true
     @unknown default:
       return true
@@ -416,6 +416,13 @@ extension Tab: BraveWalletEventsListener {
     guard !isPrivate else { return }
     
     Task { @MainActor in
+      // chain change might not apply to this origin when assigning
+      // new default network / nil origin: brave-browser #30344
+      guard let provider = walletEthProvider,
+            case let providerChainId = await provider.chainId(),
+            providerChainId == chainId
+      else { return }
+      
       // Temporary fix for #5404
       // Ethereum properties have been updated correctly, however, dapp is not updated unless there is a reload
       // We keep the same as Metamask, that, we will reload tab on chain changes.
@@ -444,7 +451,6 @@ extension Tab: BraveWalletEventsListener {
   func updateEthereumProperties() async {
     guard !isPrivate,
           let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
-          let walletService = BraveWallet.ServiceFactory.get(privateMode: false),
           Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
       return
     }
