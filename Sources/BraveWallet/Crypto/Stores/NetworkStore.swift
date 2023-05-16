@@ -294,6 +294,14 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
       } else {
         defaultSelectedChainId = chainId
         isSwapSupported = await swapService.isSwapSupported(chainId)
+        if self.origin != nil {
+          // The default network may be used for this origin if no
+          // other network was assigned for this origin. If so, we
+          // need to make sure the `selectedChainIdForOrigin` is updated
+          // to reflect the correct network.
+          let network = await rpcService.network(coin, origin: origin)
+          selectedChainIdForOrigin = network.chainId
+        }
       }
     }
   }
