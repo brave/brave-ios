@@ -235,8 +235,15 @@ extension BrowserViewController {
     // Ensure we successfully shown basic onboarding first
     guard Preferences.FullScreenCallout.omniboxCalloutCompleted.value else { return }
 
+    let contentController = CookieNotificationBlockingConsentViewController()
+    contentController.rootView.onYesButtonPressed = {
+      FilterListStorage.shared.enableFilterList(
+        for: FilterList.cookieConsentNoticesComponentID, isEnabled: true
+      )
+    }
+    
     let popover = PopoverController(
-      contentController: CookieNotificationBlockingConsentViewController(),
+      contentController: contentController,
       contentSizeBehavior: .preferredContentSize)
     popover.addsConvenientDismissalMargins = false
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)

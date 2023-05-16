@@ -36,6 +36,7 @@ public struct CookieNotificationBlockingConsentView: View {
         Task { @MainActor in
           recordCookieListPromptP3A(answer: .tappedYes)
           onYesButtonPressed?()
+          try await Task.sleep(seconds: 3.5)
           self.dismiss()
         }
       }
