@@ -33,10 +33,10 @@ public struct CookieNotificationBlockingConsentView: View {
         }
       
         Task { @MainActor in
-          try await Task.sleep(seconds: 3.5)
           recordCookieListPromptP3A(answer: .tappedYes)
           onYesButtonPressed()
           // Allow the animation to play before dismissing
+          try await Task.sleep(seconds: 3.5)
           self.dismiss()
         }
       }
