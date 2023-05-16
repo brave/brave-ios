@@ -56,7 +56,9 @@ public class NetworkStore: ObservableObject {
   public var origin: URLOrigin? {
     didSet {
       guard origin != oldValue else { return }
-      updateSelectedChain()
+      Task {
+        await updateSelectedChain()
+      }
     }
   }
 
@@ -81,14 +83,16 @@ public class NetworkStore: ObservableObject {
     self.origin = origin
     rpcService.add(self)
     keyringService.add(self)
-    
-    updateChainList()
-    updateSelectedChain()
+  }
+  
+  @MainActor func setup() async {
+    await updateChainList()
+    await updateSelectedChain()
   }
   
   /// Updates the `selectedChainId` and `isSwapSupported` for the network for the current `origin`.
-  private func updateSelectedChain() {
-    Task { @MainActor in // fetch current selected network
+  @MainActor private func updateSelectedChain() async {
+    // fetch current selected network
       let selectedCoin = await walletService.selectedCoin()
       let chain = await rpcService.network(selectedCoin, origin: nil)
       // since we are fetch network from JsonRpcService,
@@ -98,16 +102,14 @@ public class NetworkStore: ObservableObject {
       self.selectedChainIdForOrigin = chainForOrigin.chainId
       // update `isSwapSupported` for Buy/Send/Swap panel
       self.isSwapSupported = await swapService.isSwapSupported(chain.chainId)
-    }
   }
 
-  private func updateChainList() {
-    Task { @MainActor in // fetch all networks for all coin types
+  @MainActor private func updateChainList() async {
+    // fetch all networks for all coin types
       self.allChains = await rpcService.allNetworksForSupportedCoins()
       
       let customChainIds = await rpcService.customNetworks(.eth) // only support Ethereum custom chains
       self.customChains = allChains.filter { customChainIds.contains($0.id) }
-    }
   }
   
   func isCustomChain(_ network: BraveWallet.NetworkInfo) -> Bool {
@@ -198,7 +200,9 @@ public class NetworkStore: ObservableObject {
       rpcService.addChain(network) { [self] chainId, status, message in
         if status == .success {
           // Update `ethereumChains` by api calling
-          updateChainList()
+          Task {
+            await updateChainList()
+          }
           isAddingNewNetwork = false
           completion(true, "")
         } else {
@@ -206,8 +210,9 @@ public class NetworkStore: ObservableObject {
           // Also add the the old network back on rpc service
           if let oldNetwork = allChains.filter({ $0.coin == .eth }).first(where: { $0.id.lowercased() == network.id.lowercased() }) {
             rpcService.addChain(oldNetwork) { _, _, _ in
-              // Update `ethereumChains` by api calling
-              self.updateChainList()
+              Task {
+                await self.updateChainList()
+              }
               self.isAddingNewNetwork = false
               completion(false, message)
             }
@@ -256,8 +261,9 @@ public class NetworkStore: ObservableObject {
         if network.id.lowercased() == defaultSelectedChainId.lowercased() {
           rpcService.setNetwork(BraveWallet.MainnetChainId, coin: .eth, origin: nil, completion: { _ in })
         }
-        // Update `ethereumChains` by api calling
-        updateChainList()
+        Task {
+          await updateChainList()
+        }
       }
       completion(success)
     }
@@ -272,7 +278,9 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
   public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-    updateChainList()
+    Task {
+      await updateChainList()
+    }
   }
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
     Task { @MainActor in

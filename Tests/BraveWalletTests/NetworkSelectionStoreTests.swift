@@ -60,7 +60,7 @@ import Preferences
     return (keyringService, rpcService, walletService, swapService)
   }
   
-  func testUpdateSelectMode() {
+  func testUpdateSelectMode() async {
     Preferences.Wallet.showTestNetworks.value = false
 
     let (keyringService, rpcService, walletService, swapService) = setupServices()
@@ -71,16 +71,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
-    
-    // wait for all chains to populate in `NetworkStore`
-    let allChainsException = expectation(description: "networkStore-allChains")
-    networkStore.$allChains
-      .dropFirst()
-      .sink { allChains in
-        allChainsException.fulfill()
-      }
-      .store(in: &cancellables)
-    wait(for: [allChainsException], timeout: 1)
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
@@ -99,7 +90,7 @@ import Preferences
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
   }
   
-  func testUpdateTestNetworksEnabledSelectMode() {
+  func testUpdateTestNetworksEnabledSelectMode() async {
     Preferences.Wallet.showTestNetworks.value = true
     
     let (keyringService, rpcService, walletService, swapService) = setupServices()
@@ -110,16 +101,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
-    
-    // wait for all chains to populate in `NetworkStore`
-    let allChainsException = expectation(description: "networkStore-allChains")
-    networkStore.$allChains
-      .dropFirst()
-      .sink { allChains in
-        allChainsException.fulfill()
-      }
-      .store(in: &cancellables)
-    wait(for: [allChainsException], timeout: 1)
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
@@ -147,6 +129,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     let success = await store.selectNetwork(.network(.mockGoerli))
@@ -169,6 +152,7 @@ import Preferences
       swapService: swapService,
       origin: origin
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(
       mode: .select(isForOrigin: true),
@@ -187,6 +171,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     let success = await store.selectNetwork(.network(.mockSolana))
@@ -203,6 +188,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(mode: .formSelection, networkStore: networkStore)
     let success = await store.selectNetwork(.network(.mockGoerli))
@@ -210,7 +196,7 @@ import Preferences
     XCTAssertEqual(store.networkSelectionInForm, .mockGoerli)
   }
   
-  func testAlertResponseCreateAccount() {
+  func testAlertResponseCreateAccount() async {
     let (keyringService, rpcService, walletService, swapService) = setupServices()
     
     let networkStore = NetworkStore(
@@ -219,6 +205,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     
@@ -228,7 +215,7 @@ import Preferences
     XCTAssertTrue(store.isPresentingAddAccount, "Expected to set isPresentingAddAccount to true to present add network")
   }
   
-  func testAlertResponseDontCreateAccount() {
+  func testAlertResponseDontCreateAccount() async {
     let (keyringService, rpcService, walletService, swapService) = setupServices()
     
     let networkStore = NetworkStore(
@@ -237,6 +224,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     store.isPresentingNextNetworkAlert = true
@@ -256,6 +244,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     
@@ -301,6 +290,7 @@ import Preferences
       walletService: walletService,
       swapService: swapService
     )
+    await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     
