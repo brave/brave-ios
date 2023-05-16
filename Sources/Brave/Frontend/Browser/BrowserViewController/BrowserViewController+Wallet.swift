@@ -309,7 +309,7 @@ extension Tab: BraveWalletProviderDelegate {
     )
   }
   
-  func isAccountAllowed(_ type: BraveWallet.CoinType, account: String) async -> Bool {
+  @MainActor func isAccountAllowed(_ type: BraveWallet.CoinType, account: String) async -> Bool {
     return await allowedAccounts(type, accounts: [account]).1.contains(account)
   }
   

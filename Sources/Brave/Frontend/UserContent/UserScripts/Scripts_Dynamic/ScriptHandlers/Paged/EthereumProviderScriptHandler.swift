@@ -99,7 +99,7 @@ class EthereumProviderScriptHandler: TabContentScript {
       firstAllowedAccount: String,
       updateJSProperties: Bool
     ) {
-      Task {
+      Task { @MainActor in
         if updateJSProperties {
           await tab.updateEthereumProperties()
         }
