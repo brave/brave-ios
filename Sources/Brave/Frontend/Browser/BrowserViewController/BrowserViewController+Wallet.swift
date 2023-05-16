@@ -387,8 +387,8 @@ extension Tab: BraveWalletProviderDelegate {
   
   func clearSolanaConnectedAccounts() {
     Task { @MainActor in
-        tabDappStore.solConnectedAddresses = .init()
-        await updateSolanaProperties()
+      tabDappStore.solConnectedAddresses = .init()
+      await updateSolanaProperties()
     }
   }
 }
@@ -490,6 +490,14 @@ extension Tab: BraveWalletEventsListener {
   }
   
   func messageEvent(_ subscriptionId: String, result: MojoBase.Value) {
+    let eventArgs = MojoBase.Value(dictionaryValue: [
+      "type": MojoBase.Value(stringValue: "eth_subscription"),
+      "data": MojoBase.Value(dictionaryValue: [
+        "subscription": MojoBase.Value(stringValue: subscriptionId),
+        "result": result
+      ])
+    ])
+    emitEthereumEvent(.init("message", arguments: eventArgs.jsonObject))
   }
 }
 
@@ -560,21 +568,6 @@ extension Tab: BraveWalletSolanaEventsListener {
   }
 }
 
-extension BraveWallet.CoinType {
-  var keyringId: String {
-    switch self {
-    case .eth:
-      return BraveWallet.DefaultKeyringId
-    case .sol:
-      return BraveWallet.SolanaKeyringId
-    case .fil:
-      return BraveWallet.FilecoinKeyringId
-    @unknown default:
-      return ""
-    }
-  }
-}
-
 extension Tab: BraveWalletKeyringServiceObserver {
   func keyringCreated(_ keyringId: String) {
   }
@@ -588,6 +581,10 @@ extension Tab: BraveWalletKeyringServiceObserver {
   }
   
   func locked() {
+    Task {
+      await updateEthereumProperties()
+      await updateSolanaProperties()
+    }
   }
   
   func unlocked() {
