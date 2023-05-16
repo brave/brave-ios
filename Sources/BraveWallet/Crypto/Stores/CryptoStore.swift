@@ -167,9 +167,6 @@ public class CryptoStore: ObservableObject {
     self.keyringService.add(self)
     self.txService.add(self)
     self.rpcService.add(self)
-    Task {
-      await networkStore.setup()
-    }
   }
   
   private var buyTokenStore: BuyTokenStore?

@@ -86,11 +86,17 @@ public class WalletStore {
             ipfsApi: ipfsApi,
             origin: self.origin
           )
-          self.onPendingRequestCancellable = self.cryptoStore?.$pendingRequest
-            .removeDuplicates()
-            .sink { [weak self] _ in
-              self?.onPendingRequestUpdated.send()
+          if let cryptoStore = self.cryptoStore {
+            Task {
+              // if called in `CryptoStore.init` we may crash
+              await cryptoStore.networkStore.setup()
             }
+            self.onPendingRequestCancellable = cryptoStore.$pendingRequest
+              .removeDuplicates()
+              .sink { [weak self] _ in
+                self?.onPendingRequestUpdated.send()
+              }
+          }
         }
       }
   }

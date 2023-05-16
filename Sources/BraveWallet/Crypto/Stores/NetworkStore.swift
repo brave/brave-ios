@@ -93,23 +93,23 @@ public class NetworkStore: ObservableObject {
   /// Updates the `selectedChainId` and `isSwapSupported` for the network for the current `origin`.
   @MainActor private func updateSelectedChain() async {
     // fetch current selected network
-      let selectedCoin = await walletService.selectedCoin()
-      let chain = await rpcService.network(selectedCoin, origin: nil)
-      // since we are fetch network from JsonRpcService,
-      // we don't need to call `setNetwork` on JsonRpcService
-      self.defaultSelectedChainId = chain.chainId
-      let chainForOrigin = await rpcService.network(selectedCoin, origin: origin)
-      self.selectedChainIdForOrigin = chainForOrigin.chainId
-      // update `isSwapSupported` for Buy/Send/Swap panel
-      self.isSwapSupported = await swapService.isSwapSupported(chain.chainId)
+    let selectedCoin = await walletService.selectedCoin()
+    let chain = await rpcService.network(selectedCoin, origin: nil)
+    // since we are fetch network from JsonRpcService,
+    // we don't need to call `setNetwork` on JsonRpcService
+    self.defaultSelectedChainId = chain.chainId
+    let chainForOrigin = await rpcService.network(selectedCoin, origin: origin)
+    self.selectedChainIdForOrigin = chainForOrigin.chainId
+    // update `isSwapSupported` for Buy/Send/Swap panel
+    self.isSwapSupported = await swapService.isSwapSupported(chain.chainId)
   }
 
   @MainActor private func updateChainList() async {
     // fetch all networks for all coin types
-      self.allChains = await rpcService.allNetworksForSupportedCoins()
-      
-      let customChainIds = await rpcService.customNetworks(.eth) // only support Ethereum custom chains
-      self.customChains = allChains.filter { customChainIds.contains($0.id) }
+    self.allChains = await rpcService.allNetworksForSupportedCoins()
+    
+    let customChainIds = await rpcService.customNetworks(.eth) // only support Ethereum custom chains
+    self.customChains = allChains.filter { customChainIds.contains($0.id) }
   }
   
   func isCustomChain(_ network: BraveWallet.NetworkInfo) -> Bool {
@@ -288,7 +288,7 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
       // since JsonRpcService notify us of change,
       // we don't need to call `setNetwork` on JsonRpcService
       if let origin {
-        if origin == origin {
+        if origin == self.origin {
           selectedChainIdForOrigin = chainId
         }
       } else {
