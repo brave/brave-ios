@@ -154,7 +154,7 @@ class TabLocationView: UIView {
     return urlTextField
   }()
 
-  private(set) lazy var lockImageView = ToolbarButton(top: true).then {
+  private(set) lazy var lockImageView = ToolbarButton().then {
     $0.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil), for: .normal)
     $0.isHidden = true
     $0.tintColor = .braveLabel
@@ -168,7 +168,7 @@ class TabLocationView: UIView {
 
   private(set) lazy var readerModeButton: ReaderModeButton = {
     let readerModeButton = ReaderModeButton(frame: .zero)
-    readerModeButton.addTarget(self, action: #selector(didTapPlaylistButton), for: .touchUpInside)
+    readerModeButton.addTarget(self, action: #selector(didTapReaderModeButton), for: .touchUpInside)
     readerModeButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPressReaderModeButton)))
     readerModeButton.isAccessibilityElement = true
     readerModeButton.isHidden = true
@@ -196,7 +196,7 @@ class TabLocationView: UIView {
     $0.addTarget(self, action: #selector(didTapWalletButton), for: .touchUpInside)
   }
   
-  lazy var reloadButton = ToolbarButton(top: true).then {
+  lazy var reloadButton = ToolbarButton().then {
     $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
     $0.isAccessibilityElement = true
     $0.accessibilityLabel = Strings.tabToolbarReloadButtonAccessibilityLabel
@@ -207,7 +207,7 @@ class TabLocationView: UIView {
     $0.addTarget(self, action: #selector(didTapStopReloadButton), for: .touchUpInside)
   }
   
-  private lazy var voiceSearchButton = ToolbarButton(top: true).then {
+  private lazy var voiceSearchButton = ToolbarButton().then {
     $0.accessibilityIdentifier = "TabToolbar.voiceSearchButton"
     $0.isAccessibilityElement = true
     $0.accessibilityLabel = Strings.tabToolbarVoiceSearchButtonAccessibilityLabel
@@ -217,7 +217,7 @@ class TabLocationView: UIView {
   }
 
   lazy var shieldsButton: ToolbarButton = {
-    let button = ToolbarButton(top: true)
+    let button = ToolbarButton()
     button.setImage(UIImage(sharedNamed: "brave.logo"), for: .normal)
     button.addTarget(self, action: #selector(didTapBraveShieldsButton), for: .touchUpInside)
     button.imageView?.contentMode = .scaleAspectFit
