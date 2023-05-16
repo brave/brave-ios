@@ -435,11 +435,6 @@ extension Tab: BraveWalletEventsListener {
   func accountsChangedEvent(_ accounts: [String]) {
     guard !isPrivate else { return }
     
-    // Temporary fix for #5402.
-    // If we emit from one account directly to another we're not seeing dapp sites
-    // update our selected account. If we emit an undefined/empty string before
-    // emitting the new account, we're seeing correct account change behaviour
-    emitEthereumEvent(.ethereumAccountsChanged(accounts: []))
     emitEthereumEvent(.ethereumAccountsChanged(accounts: accounts))
     
     Task {
