@@ -559,6 +559,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
         self.locationTextField?.selectAll(nil)
       }
     }
+    
+    setNeedsUpdateConstraints()
   }
 
   func leaveOverlayMode(didCancel cancel: Bool = false) {
@@ -611,11 +613,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
   private func updateLocationBarRightView(showQrCodeButton: Bool) {
     if RecentSearchQRCodeScannerController.hasCameraSupport {
-//      locationTextField?.clearButtonMode = showQrCodeButton ? .never : .whileEditing
-//      locationTextField?.rightViewMode = showQrCodeButton ? .always : .never
+      qrCodeButton.isHidden = !showQrCodeButton
     } else {
-//      locationTextField?.rightViewMode = .always
-//      locationTextField?.clearButtonMode = .whileEditing
+      qrCodeButton.isHidden = true
     }
   }
 
