@@ -248,24 +248,6 @@ extension Strings {
         tableName: "BraveShared", bundle: .module,
         value: "Sync now",
         comment: "Title for button in Default Browser Full Screen Callout")
-    public static let playlistOnboardingViewTitle =
-      NSLocalizedString(
-        "callout.playlistOnboardingViewTitle",
-        tableName: "BraveShared", bundle: .module,
-        value: "Add video to Playlist…",
-        comment: "Title for Playlist Onboarding View")
-    public static let playlistOnboardingViewDescription =
-      NSLocalizedString(
-        "callout.playlistOnboardingViewDescription",
-        tableName: "BraveShared", bundle: .module,
-        value: "…play anywhere, anytime. In the background, picture-in-picture, or even offline. And, of course, ad-free.",
-        comment: "Description for Playlist Onboarding View")
-    public static let playlistOnboardingViewButtonTitle =
-      NSLocalizedString(
-        "callout.playlistOnboardingViewButtonTitle",
-        tableName: "BraveShared", bundle: .module,
-        value: "Watch the video",
-        comment: "Button title for Playlist Onboarding View")
     public static let tabReceivedCalloutTitle =
       NSLocalizedString(
         "callout.tabReceivedCalloutTitle",

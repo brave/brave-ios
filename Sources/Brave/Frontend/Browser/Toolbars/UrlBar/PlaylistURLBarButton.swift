@@ -153,6 +153,7 @@ class PlaylistURLBarButton: UIButton {
       imageView?.snp.remakeConstraints {
         $0.width.equalTo(size.width * scale)
         $0.height.equalTo(size.height * scale)
+        $0.center.equalToSuperview()
       }
     }
   }
