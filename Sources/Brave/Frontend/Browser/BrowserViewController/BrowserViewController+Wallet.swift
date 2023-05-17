@@ -270,7 +270,20 @@ extension Tab: BraveWalletProviderDelegate {
       self.tabDelegate?.showWalletNotification(self, origin: origin)
     }
   }
+  
+  /// Returns the selected account if present in `accounts`, otherwise returns `accounts`
+  private func filterAccounts(
+    _ accounts: [String],
+    selectedAccount: String?
+  ) -> [String] {
+    if let selectedAccount = selectedAccount, accounts.contains(selectedAccount) {
+      return [selectedAccount]
+    }
+    return accounts
+  }
 
+  /// Helper to fetch the allowed accounts for the current coin. Unlike `allowedAccounts(_:accounts:)`
+  /// this will filter the selected account to the front of the array if it is an allowed/permitted account
   @MainActor func allowedAccountsForCurrentCoin() async -> (Bool, [String]) {
     guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
           let walletService = BraveWallet.ServiceFactory.get(privateMode: false) else {
@@ -278,39 +291,31 @@ extension Tab: BraveWalletProviderDelegate {
     }
     let coin = await walletService.selectedCoin()
     let accounts = await keyringService.keyringInfo(coin.keyringId).accountInfos.map(\.address)
-    return await allowedAccounts(coin, accounts: accounts)
+    let (success, allowedAccounts) = await allowedAccounts(coin, accounts: accounts)
+    guard success else {
+      return (false, [])
+    }
+    let selectedAccounts = await keyringService.selectedAccount(coin)
+    return (true, filterAccounts(allowedAccounts, selectedAccount: selectedAccounts))
   }
   
+  /// Fetches all allowed accounts for the current origin.
   @MainActor func allowedAccounts(_ type: BraveWallet.CoinType, accounts: [String]) async -> (Bool, [String]) {
-    func filterAccounts(
-      _ accounts: [String],
-      selectedAccount: String?
-    ) -> [String] {
-      if let selectedAccount = selectedAccount, accounts.contains(selectedAccount) {
-        return [selectedAccount]
-      }
-      return accounts
-    }
-    // This method is called immediately upon creation of the wallet provider, which happens at tab
-    // configuration, which means it may not be selected or ready yet.
-    guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: false),
+    guard !isPermissionDenied(type),
           let originURL = url?.origin.url else {
       return (false, [])
     }
-    let isLocked = await keyringService.isLocked()
-    if isLocked {
-      return (false, [])
-    }
-    let selectedAccount = await keyringService.selectedAccount(type)
-    let permissions = Domain.walletPermissions(forUrl: originURL, coin: type)
-    return (
-      true,
-      filterAccounts(permissions ?? [], selectedAccount: selectedAccount)
-    )
+    let permissions = Domain.walletPermissions(forUrl: originURL, coin: type) ?? []
+    // keyring locked status is checked in `EthereumProviderImpl::GetAllowedAccounts`
+    return (true, permissions)
   }
   
   @MainActor func isAccountAllowed(_ type: BraveWallet.CoinType, account: String) async -> Bool {
-    return await allowedAccounts(type, accounts: [account]).1.contains(account)
+    let (success, allowedAccounts) = await allowedAccounts(type, accounts: [account])
+    guard success else {
+      return false
+    }
+    return allowedAccounts.contains(account)
   }
   
   func walletInteractionDetected() {
@@ -395,16 +400,16 @@ extension Tab: BraveWalletProviderDelegate {
 
 extension Tab: BraveWalletEventsListener {
   func emitEthereumEvent(_ event: Web3ProviderEvent) {
-    guard !isPrivate else { return }
-    
-    guard Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue else {
+    guard !isPrivate,
+          Preferences.Wallet.defaultEthWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
+          let webView = self.webView else {
       return
     }
     var arguments: [Any] = [event.name]
     if let eventArgs = event.arguments {
       arguments.append(eventArgs)
     }
-    webView?.evaluateSafeJavaScript(
+    webView.evaluateSafeJavaScript(
       functionName: "window.ethereum.emit",
       args: arguments,
       contentWorld: EthereumProviderScriptHandler.scriptSandbox,
@@ -481,12 +486,29 @@ extension Tab: BraveWalletEventsListener {
     )
     
     let coin: BraveWallet.CoinType = .eth
-    let accounts = await keyringService.keyringInfo(coin.keyringId).accountInfos.map(\.address)
-    let selectedAccount = valueOrUndefined(await self.allowedAccounts(coin, accounts: accounts).1.first)
+    let keyring = await keyringService.keyringInfo(coin.keyringId)
+    let selectedAccount: String
+    if keyring.isLocked {
+      // Check for locked status before assigning account address.
+      // `allowedAccounts` does not check locked status.
+      selectedAccount = valueOrUndefined(Optional<String>.none)
+    } else {
+      let allAccounts = keyring.accountInfos.map(\.address)
+      let (success, allowedAccounts) = await allowedAccounts(coin, accounts: allAccounts)
+      if success {
+        // Assign the selected account if it's permitted / allowed
+        let selectedAccountForCoin = await keyringService.selectedAccount(coin)
+        let filteredAllowedAccounts = filterAccounts(allowedAccounts, selectedAccount: selectedAccountForCoin)
+        selectedAccount = valueOrUndefined(filteredAllowedAccounts.first)
+      } else {
+        selectedAccount = valueOrUndefined(Optional<String>.none)
+      }
+    }
     await webView.evaluateSafeJavaScript(
       functionName: "window.ethereum.selectedAddress = \(selectedAccount)",
       contentWorld: EthereumProviderScriptHandler.scriptSandbox,
-      asFunction: false)
+      asFunction: false
+    )
   }
   
   func messageEvent(_ subscriptionId: String, result: MojoBase.Value) {
