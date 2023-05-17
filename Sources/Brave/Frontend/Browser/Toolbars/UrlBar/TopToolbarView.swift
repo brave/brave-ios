@@ -617,6 +617,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
     } else {
       qrCodeButton.isHidden = true
     }
+    
+    locationBarOptionsStackView.isHidden = !showQrCodeButton
   }
 
   /// Update the shields icon based on whether or not shields are enabled for this site
