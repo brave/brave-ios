@@ -7,7 +7,8 @@ import SwiftUI
 
 struct ShieldLabelView: View {
   let title: String
-  let subtitle: String?
+  var subtitle: String?
+  var markdownSubtitle: LocalizedStringKey?
   
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
@@ -15,6 +16,10 @@ struct ShieldLabelView: View {
         .foregroundColor(Color(.bravePrimary))
       if let subtitle = subtitle {
         Text(subtitle)
+          .foregroundColor(Color(.braveLabel))
+          .font(.caption)
+      } else if let markdownSubtitle {
+        Text(markdownSubtitle)
           .foregroundColor(Color(.braveLabel))
           .font(.caption)
       }
