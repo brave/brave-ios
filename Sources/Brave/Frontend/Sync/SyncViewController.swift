@@ -66,8 +66,8 @@ class SyncViewController: UIViewController {
   /// - Parameter completion: block after Ok button is pressed
   private func showSetPasscodeError(completion: @escaping (() -> Void)) {
     let alert = UIAlertController(
-      title: "Set a Passcode",
-      message: "To setup sync hain or see settings, you must first set a passcode on your device.",
+      title: Strings.Sync.syncSetPasscodeAlertTitle,
+      message: Strings.Sync.syncSetPasscodeAlertDescription,
       preferredStyle: .alert)
 
     alert.addAction(
