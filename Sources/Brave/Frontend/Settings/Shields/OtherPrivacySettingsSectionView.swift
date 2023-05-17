@@ -64,8 +64,7 @@ struct OtherPrivacySettingsSectionView: View {
       )
       OptionToggleView(
         title: Strings.googleSafeBrowsing,
-        subtitle: nil,
-        markdownSubtitle: LocalizedStringKey(String.localizedStringWithFormat(Strings.googleSafeBrowsingUsingWebKitDescription, URL.brave.safeBrowsingHelp.absoluteString)),
+        subtitle: String.localizedStringWithFormat(Strings.googleSafeBrowsingUsingWebKitDescription, URL.brave.safeBrowsingHelp.absoluteString),
         option: Preferences.Shields.googleSafeBrowsing
       )
       ShieldToggleView(

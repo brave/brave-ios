@@ -10,21 +10,19 @@ struct ShieldToggleView: View {
   typealias OnChangeCallback = (Bool) -> Void
   let title: String
   var subtitle: String?
-  var markdownSubtitle: LocalizedStringKey?
   @Binding var toggle: Bool
   let onChange: OnChangeCallback?
   
-  init(title: String, subtitle: String?, markdownSubtitle: LocalizedStringKey? = nil, toggle: Binding<Bool>, onChange: OnChangeCallback? = nil) {
+  init(title: String, subtitle: String?, toggle: Binding<Bool>, onChange: OnChangeCallback? = nil) {
     self.title = title
     self.subtitle = subtitle
     _toggle = toggle
     self.onChange = onChange
-    self.markdownSubtitle = markdownSubtitle
   }
   
   var body: some View {
     Toggle(isOn: $toggle) {
-      ShieldLabelView(title: title, subtitle: subtitle, markdownSubtitle: markdownSubtitle)
+      ShieldLabelView(title: title, subtitle: subtitle)
     }
     .listRowBackground(Color(.secondaryBraveGroupedBackground))
       .toggleStyle(SwitchToggleStyle(tint: .accentColor))
