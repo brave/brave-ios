@@ -419,22 +419,22 @@ public class BrowserViewController: UIViewController {
     updateApplicationShortcuts()
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
-    tabManager.makeWalletEthProvider = { [weak self] tab in
-      guard let self = self,
-            let provider = self.braveCore.braveWalletAPI.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate),
-            let js = self.braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] else {
-        return nil
-      }
-      return (provider, js: js)
+    if let ethJS = braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] {
+      let providerJS = """
+      window.__firefox__.execute(function($, $Object) {
+        if (window.isSecureContext) {
+          \(ethJS)
+        }
+      });
+      """
+      UserScriptManager.shared.walletEthProviderScript = WKUserScript(
+        source: providerJS,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: true,
+        in: EthereumProviderScriptHandler.scriptSandbox
+      )
     }
-    tabManager.makeWalletSolProvider = { [weak self] tab in
-      guard let self = self,
-            let provider = self.braveCore.braveWalletAPI.solanaProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
-        return nil
-      }
-      let scripts = self.braveCore.braveWalletAPI.providerScripts(for: .sol)
-      return (provider, jsScripts: scripts)
-    }
+    UserScriptManager.shared.walletSolProviderScripts = braveCore.braveWalletAPI.providerScripts(for: .sol)
     downloadQueue.delegate = self
 
     // Observe some user preferences

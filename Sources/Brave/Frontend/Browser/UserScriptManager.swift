@@ -82,6 +82,9 @@ class UserScriptManager {
     }
   }()
   
+  var walletEthProviderScript: WKUserScript?
+  var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
+  
   enum ScriptType: String, CaseIterable {
     case faviconFetcher
     case cookieBlocking
@@ -178,9 +181,7 @@ class UserScriptManager {
   func loadCustomScripts(
     into tab: Tab,
     userScripts: Set<ScriptType>,
-    customScripts: Set<UserScriptType>,
-    walletEthProviderScript: WKUserScript?,
-    walletSolProviderScripts: [BraveWalletProviderScriptKey: String]
+    customScripts: Set<UserScriptType>
   ) {
     guard let webView = tab.webView else {
       assertionFailure("Injecting Scripts into a Tab that has no WebView")
@@ -203,7 +204,7 @@ class UserScriptManager {
       // TODO: Somehow refactor wallet and get rid of this
       // Inject WALLET specific scripts
       
-      if tab.isPrivate == false,
+      if !tab.isPrivate,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultEthWallet.value) == .brave,
          let script = self.dynamicScripts[.ethereumProvider] {
         
@@ -216,9 +217,9 @@ class UserScriptManager {
       }
       
       // Inject SolanaWeb3Script.js
-      if tab.isPrivate == false,
+      if !tab.isPrivate,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave,
-         let solanaWeb3Script = tab.walletSolProviderScripts[.solanaWeb3] {
+         let solanaWeb3Script = self.walletSolProviderScripts[.solanaWeb3] {
         
         let script = """
           // Define a global variable with a random name
@@ -261,7 +262,7 @@ class UserScriptManager {
         scriptController.addUserScript(wkScript)
       }
       
-      if tab.isPrivate == false,
+      if !tab.isPrivate,
          Preferences.Wallet.WalletType(rawValue: Preferences.Wallet.defaultSolWallet.value) == .brave,
          let script = self.dynamicScripts[.solanaProvider] {
 
@@ -283,7 +284,8 @@ class UserScriptManager {
         }
       }
       
-      if let walletStandardScript = tab.walletSolProviderScripts[.walletStandard] {
+      if !tab.isPrivate,
+         let walletStandardScript = self.walletSolProviderScripts[.walletStandard] {
         let script = """
         window.__firefox__.execute(function($, $Object) {
            \(walletStandardScript)
