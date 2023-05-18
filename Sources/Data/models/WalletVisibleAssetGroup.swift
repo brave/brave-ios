@@ -10,18 +10,27 @@ import os.log
 
 public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
   @NSManaged public var groupId: String
-  @NSManaged public var visibleAssets: Set<WalletVisibleAsset>?
+  @NSManaged public var walletVisibleAssets: Set<WalletVisibleAsset>?
   
-  public static func addGroup(_ groupId: String, completion: ((_ group: NSManagedObjectID) -> Void)? = nil) {
-    DataController.perform(context: .new(inMemory: false)) { context in
-      let group = WalletVisibleAssetGroup(context: context)
-      group.groupId = groupId
-      
-      let groupObjectId = group.objectID
-      DispatchQueue.main.async {
-        completion?(groupObjectId)
-      }
-    }
+  @available(*, unavailable)
+  public init() {
+    fatalError("No Such Initializer: init()")
+  }
+  
+  @available(*, unavailable)
+  public init(context: NSManagedObjectContext) {
+    fatalError("No Such Initializer: init(context:)")
+  }
+  
+  @objc
+  private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
+    super.init(entity: entity, insertInto: context)
+  }
+  
+  public init(context: NSManagedObjectContext, groupId: String) {
+    let entity = Self.entity(context)
+    super.init(entity: entity, insertInto: context)
+    self.groupId = groupId
   }
   
   public static func getGroup(groupId: String, context: NSManagedObjectContext? = nil) -> WalletVisibleAssetGroup? {
@@ -45,6 +54,13 @@ public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
       includesPropertyValues: false,
       completion: completion
     )
+  }
+  
+  public static func groupExists(groupId: String) -> Bool {
+    if let count = WalletVisibleAssetGroup.count(predicate: NSPredicate(format: "groupId == %@", groupId)), count > 0 {
+      return true
+    }
+    return false
   }
 }
 

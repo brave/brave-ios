@@ -170,11 +170,6 @@ public class CryptoStore: ObservableObject {
     self.keyringService.add(self)
     self.txService.add(self)
     self.rpcService.add(self)
-    
-    // Check if we need to migrate visible assets
-    if !Preferences.Wallet.migrateCoreToWalletVisibleAssetCompleted.value {
-      migrateVisibleAssets()
-    }
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -509,24 +504,6 @@ public class CryptoStore: ObservableObject {
       let pendingDecryptRequests = await walletService.pendingDecryptRequests()
       pendingDecryptRequests.forEach {
         handleWebpageRequestResponse(.decrypt(approved: false, originInfo: $0.originInfo))
-      }
-    }
-  }
-  
-  private func migrateVisibleAssets() {
-    Task { @MainActor in
-      WalletVisibleAssetGroup.removeAllGroup()
-      var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]
-      let networks = await self.rpcService.allNetworksForSupportedCoins()
-        .filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
-      for network in networks {
-        let assets = await walletService.userAssets(network.chainId, coin: network.coin)
-        fetchedUserAssets["\(network.coin.rawValue).\(network.chainId)"] = assets
-      }
-      WalletVisibleAsset.migrateVisibleAssets(fetchedUserAssets) {
-        let allGroups = WalletVisibleAssetGroup.getAllGroups()
-        print("After migration, groups count: \(allGroups?.count ?? 0)")
-        WalletVisibleAssetGroup.removeAllGroup()
       }
     }
   }

@@ -6,6 +6,8 @@
 import Foundation
 import BraveCore
 import Combine
+import Data
+import Preferences
 
 /// The main wallet store
 public class WalletStore {
@@ -74,6 +76,12 @@ public class WalletStore {
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {
+          if !Preferences.Wallet.migrateCoreToWalletVisibleAssetCompleted.value {
+            self.migrateVisibleAssets(
+              rpcService: rpcService,
+              walletService: walletService
+            )
+          }
           self.cryptoStore = CryptoStore(
             keyringService: keyringService,
             rpcService: rpcService,
@@ -100,5 +108,39 @@ public class WalletStore {
           }
         }
       }
+  }
+  
+  private func migrateVisibleAssets(
+    rpcService: BraveWalletJsonRpcService,
+    walletService: BraveWalletBraveWalletService
+  ) {
+    Task { @MainActor in
+      WalletVisibleAssetGroup.removeAllGroup()
+      var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]
+      let networks = await rpcService.allNetworksForSupportedCoins()
+        .filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
+      for network in networks {
+        let assets = await walletService.userAssets(network.chainId, coin: network.coin)
+        fetchedUserAssets["\(network.coin.rawValue).\(network.chainId)"] = assets
+      }
+      WalletVisibleAsset.migrateVisibleAssets(fetchedUserAssets) {
+        let allGroups = WalletVisibleAssetGroup.getAllGroups()
+        print("*****After migration, groups count: \(allGroups?.count ?? 0)")
+        if let groups = allGroups {
+          for group in groups {
+            print("GroupId: \(group.groupId)")
+            if let assets = group.walletVisibleAssets {
+              print("Assets: \(assets.count)")
+            }
+          }
+        }
+        if let assets = WalletVisibleAsset.getAllVisibleAssets() {
+          for asset in assets {
+            print("Asset name: \(asset.name) coin: \(BraveWallet.CoinType(rawValue: Int(asset.coin))) chainId: \(asset.chainId)")
+          }
+        }
+        Preferences.Wallet.migrateCoreToWalletVisibleAssetCompleted.value = true
+      }
+    }
   }
 }
