@@ -433,9 +433,7 @@ class TabLocationView: UIView {
   }
   
   @objc func didTapVoiceSearchButton() {
-    if loading {
-      delegate?.tabLocationViewDidTapVoiceSearch(self)
-    }
+    delegate?.tabLocationViewDidTapVoiceSearch(self)
   }
 
   @objc func didTapLocationBar(_ recognizer: UITapGestureRecognizer) {

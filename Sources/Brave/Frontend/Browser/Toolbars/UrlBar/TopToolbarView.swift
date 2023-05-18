@@ -671,7 +671,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   @objc func topToolbarDidPressVoiceSearchButton() {
     leaveOverlayMode(didCancel: true)
-    // TODO: Search StartVoice
+    delegate?.topToolbarDidPressVoiceSearchButton(self)
   }
   
   @objc private func swipedLocationView() {

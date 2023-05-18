@@ -157,10 +157,6 @@ extension BrowserViewController: TopToolbarDelegate {
     topToolbarDidPressReloadTask?.cancel()
     topToolbar.locationView.loading = tabManager.selectedTab?.loading ?? false
   }
-  
-  func topToolbarDidPressVoiceSearchButton(_ urlBar: TopToolbarView) {
-    // TODO: Search Start Voice
-  }
 
   func topToolbarDidLongPressReloadButton(_ topToolbar: TopToolbarView, from button: UIButton) {
     guard let tab = tabManager.selectedTab, let url = tab.url, !url.isLocal, !url.isReaderModeURL else { return }
@@ -534,6 +530,11 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidPressQrCodeButton(_ urlBar: TopToolbarView) {
     scanQRCode()
+  }
+  
+  func topToolbarDidPressVoiceSearchButton(_ urlBar: TopToolbarView) {
+    let voiceSearchViewController = UIHostingController(rootView: VoiceSearchInputView())
+    present(voiceSearchViewController, animated: true)
   }
 
   func topToolbarDidTapWalletButton(_ urlBar: TopToolbarView) {
