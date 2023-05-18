@@ -77,6 +77,8 @@
 	<string>This allows use of your microphone when using Brave.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This lets you save photos.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This allows use of your private speech recognition when using Brave Voice Search.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>LockScreenFavoriteConfigurationIntent</string>
