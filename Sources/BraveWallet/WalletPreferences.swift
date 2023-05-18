@@ -89,6 +89,9 @@ extension Preferences {
     
     /// Used to track whether to prompt user to enable NFT discovery
     public static let shouldShowNFTDiscoveryPermissionCallout = Option<Bool>(key: "wallet.show-nft-discovery-permission-callout", default: true)
+   
+    /// Used to track whether to migrate visible assets stored in BraveCore to CoreData
+    static let migrateCoreToWalletVisibleAssetCompleted = Option<Bool>(key: "wallet.core-to-wallet-visible-asset", default: false)
   }
 }
 
