@@ -12,16 +12,14 @@ public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
   @NSManaged public var groupId: String
   @NSManaged public var visibleAssets: Set<WalletVisibleAsset>?
   
-  public static func addGroup(_ groupId: String, completion: ((_ group: WalletVisibleAssetGroup) -> Void)? = nil) {
-    DataController.perform(context: .existing(DataController.viewContext), save: false) { context in
-      context.perform {
-        let group = WalletVisibleAssetGroup(context: context)
-        group.groupId = groupId
-        WalletVisibleAssetGroup.saveContext(context)
-        
-        DispatchQueue.main.async {
-          completion?(group)
-        }
+  public static func addGroup(_ groupId: String, completion: ((_ group: NSManagedObjectID) -> Void)? = nil) {
+    DataController.perform(context: .new(inMemory: false)) { context in
+      let group = WalletVisibleAssetGroup(context: context)
+      group.groupId = groupId
+      
+      let groupObjectId = group.objectID
+      DispatchQueue.main.async {
+        completion?(groupObjectId)
       }
     }
   }

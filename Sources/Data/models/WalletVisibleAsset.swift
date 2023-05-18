@@ -24,7 +24,7 @@ public final class WalletVisibleAsset: NSManagedObject, CRUD {
   @NSManaged public var coingeckoId: String
   @NSManaged public var chainId: String
   @NSManaged public var coin: Int16
-  @NSManaged public var visibleAssetGroup: WalletVisibleAssetGroup?
+  @NSManaged public var walletVisibleAssetGroup: WalletVisibleAssetGroup?
   
   @available(*, unavailable)
   public init() {
@@ -74,18 +74,22 @@ public final class WalletVisibleAsset: NSManagedObject, CRUD {
   public static func migrateVisibleAssets(_ assets: [String: [BraveWallet.BlockchainToken]], completion: (() -> Void)? = nil) {
     for groupId in assets.keys {
       guard let assetsInOneGroup = assets[groupId] else { return }
-      WalletVisibleAssetGroup.addGroup(groupId) { group in
-        DataController.perform(context: .existing(DataController.viewContext), save: false) { context in
-          context.perform {
-            for asset in assetsInOneGroup {
-              let visibleAsset = WalletVisibleAsset(context: context, asset: asset)
-              visibleAsset.visibleAssetGroup = group
-            }
-            WalletVisibleAsset.saveContext(context)
-            
+      WalletVisibleAssetGroup.addGroup(groupId) { groupObjectId in
+        DataController.perform(context: .new(inMemory: false)) { context in
+          guard let group = context.object(with: groupObjectId) as? WalletVisibleAssetGroup else {
             DispatchQueue.main.async {
               completion?()
             }
+            return
+          }
+          
+          for asset in assetsInOneGroup {
+            let visibleAsset = WalletVisibleAsset(context: context, asset: asset)
+            visibleAsset.walletVisibleAssetGroup = group
+          }
+          
+          DispatchQueue.main.async {
+            completion?()
           }
         }
       }
