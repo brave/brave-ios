@@ -60,6 +60,13 @@ struct NetworkPicker: View {
     }
   }
   
+  private var chainName: String {
+    if isForOrigin {
+      return networkStore.selectedChainForOrigin.chainName
+    }
+    return networkStore.defaultSelectedChain.chainName
+  }
+  
   var body: some View {
     Button(action: {
       networkSelectionStore = .init(
@@ -68,13 +75,8 @@ struct NetworkPicker: View {
       )
     }) {
       HStack {
-        if isForOrigin {
-          Text(networkStore.selectedChainForOrigin.chainName)
-            .fontWeight(.bold)
-        } else {
-          Text(networkStore.defaultSelectedChain.chainName)
-            .fontWeight(.bold)
-        }
+        Text(chainName)
+          .fontWeight(.bold)
         Image(systemName: "chevron.down.circle")
       }
       .foregroundColor(Color(style.textColor))

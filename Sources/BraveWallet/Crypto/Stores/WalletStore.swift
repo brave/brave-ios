@@ -12,6 +12,7 @@ public class WalletStore {
 
   public let keyringStore: KeyringStore
   public var cryptoStore: CryptoStore?
+  /// The origin of the active tab (if applicable). Used for fetching/selecting network for the DApp origin.
   public var origin: URLOrigin? {
     didSet {
       cryptoStore?.origin = origin

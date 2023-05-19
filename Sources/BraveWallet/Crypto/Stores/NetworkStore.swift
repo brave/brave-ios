@@ -53,6 +53,7 @@ public class NetworkStore: ObservableObject {
   /// If Swap is supported for the current `defaultSelectedChain`.
   @Published private(set) var isSwapSupported: Bool = true
   
+  /// The origin of the active tab (if applicable). Used for fetching/selecting network for the DApp origin.
   public var origin: URLOrigin? {
     didSet {
       guard origin != oldValue else { return }
@@ -135,6 +136,11 @@ public class NetworkStore: ObservableObject {
         if self.defaultSelectedChainId != network.chainId {
           self.defaultSelectedChainId = network.chainId
         }
+      }
+      if isForOrigin && selectedChainIdForOrigin != network.chainId {
+        self.selectedChainIdForOrigin = network.chainId
+      } else if defaultSelectedChainId != network.chainId {
+        self.defaultSelectedChainId = network.chainId
       }
       if selectedCoin != network.coin {
         let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: isForOrigin ? origin : nil)

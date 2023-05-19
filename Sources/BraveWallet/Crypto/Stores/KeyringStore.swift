@@ -104,6 +104,7 @@ public class KeyringStore: ObservableObject {
   /// A list of default account with all support coin types
   @Published var defaultAccounts: [BraveWallet.AccountInfo] = []
   
+  /// The origin of the active tab (if applicable). Used for fetching/selecting network for the DApp origin.
   public var origin: URLOrigin?
 
   private let keyringService: BraveWalletKeyringService
