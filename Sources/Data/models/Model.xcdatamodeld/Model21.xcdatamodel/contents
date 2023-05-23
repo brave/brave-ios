@@ -207,7 +207,7 @@
         <attribute name="urlHistoryCurrentIndex" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="urlHistorySnapshot" optional="YES" attributeType="Transformable"/>
     </entity>
-    <entity name="WalletVisibleAsset" representedClassName="Data.WalletVisibleAsset" syncable="YES">
+    <entity name="WalletUserAsset" representedClassName="Data.WalletUserAsset" syncable="YES">
         <attribute name="chainId" optional="YES" attributeType="String"/>
         <attribute name="coin" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="coingeckoId" optional="YES" attributeType="String"/>
@@ -222,10 +222,10 @@
         <attribute name="symbol" optional="YES" attributeType="String"/>
         <attribute name="tokenId" optional="YES" attributeType="String"/>
         <attribute name="visible" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <relationship name="walletVisibleAssetGroup" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WalletVisibleAssetGroup" inverseName="walletVisibleAssets" inverseEntity="WalletVisibleAssetGroup"/>
+        <relationship name="walletUserAssetGroup" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WalletUserAssetGroup" inverseName="walletUserAssets" inverseEntity="WalletUserAssetGroup"/>
     </entity>
-    <entity name="WalletVisibleAssetGroup" representedClassName="Data.WalletVisibleAssetGroup" syncable="YES">
+    <entity name="WalletUserAssetGroup" representedClassName="Data.WalletUserAssetGroup" syncable="YES">
         <attribute name="groupId" optional="YES" attributeType="String"/>
-        <relationship name="walletVisibleAssets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WalletVisibleAsset" inverseName="walletVisibleAssetGroup" inverseEntity="WalletVisibleAsset"/>
+        <relationship name="walletUserAssets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WalletUserAsset" inverseName="walletUserAssetGroup" inverseEntity="WalletUserAsset"/>
     </entity>
 </model>

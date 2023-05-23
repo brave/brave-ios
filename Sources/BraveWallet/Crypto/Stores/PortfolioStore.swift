@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import SwiftUI
 import Combine
+import Data
 
 public struct AssetViewModel: Identifiable, Equatable {
   var token: BraveWallet.BlockchainToken
@@ -167,7 +168,7 @@ public class PortfolioStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = await self.walletService.allVisibleUserAssets(in: networks)
+      let allVisibleUserAssets = getAllVisibleAssetsInNetworkAssets(networks: networks)
       var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
@@ -258,10 +259,24 @@ public class PortfolioStore: ObservableObject {
     }
   }
   
+  private func getAllVisibleAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
+    var allVisibleUserAssets: [NetworkAssets] = []
+    for (index, network) in networks.enumerated() {
+      let groupId = "\(network.coin.rawValue).\(network.chainId)"
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets {
+        let networkAsset = NetworkAssets(
+          network: network,
+          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          sortOrder: index
+        )
+        allVisibleUserAssets.append(networkAsset)
+      }
+    }
+    return allVisibleUserAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
+  }
+  
   /// Builds the `AssetViewModel`s and `NFTAssetViewModel`s using the balances, price and metadata stored in their respective caches.
-  private func buildAssetViewModels(
-    allVisibleUserAssets: [NetworkAssets]
-  ) -> [AssetViewModel] {
+  private func buildAssetViewModels(allVisibleUserAssets: [NetworkAssets]) -> [AssetViewModel] {
     allVisibleUserAssets.flatMap { networkAssets in
       networkAssets.tokens.filter { (!$0.isErc721 && !$0.isNft) }.map { token in
         AssetViewModel(

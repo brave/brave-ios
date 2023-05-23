@@ -8,9 +8,9 @@ import CoreData
 import Shared
 import os.log
 
-public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
+public final class WalletUserAssetGroup: NSManagedObject, CRUD {
   @NSManaged public var groupId: String
-  @NSManaged public var walletVisibleAssets: Set<WalletVisibleAsset>?
+  @NSManaged public var walletUserAssets: Set<WalletUserAsset>?
   
   @available(*, unavailable)
   public init() {
@@ -33,16 +33,16 @@ public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
     self.groupId = groupId
   }
   
-  public static func getGroup(groupId: String, context: NSManagedObjectContext? = nil) -> WalletVisibleAssetGroup? {
-    WalletVisibleAssetGroup.first(where: NSPredicate(format: "groupId == %@", groupId), context: context ?? DataController.viewContext)
+  public static func getGroup(groupId: String, context: NSManagedObjectContext? = nil) -> WalletUserAssetGroup? {
+    WalletUserAssetGroup.first(where: NSPredicate(format: "groupId == %@", groupId), context: context ?? DataController.viewContext)
   }
   
-  public static func getAllGroups(context: NSManagedObjectContext? = nil) -> [WalletVisibleAssetGroup]? {
-    WalletVisibleAssetGroup.all(context: context ?? DataController.viewContext)
+  public static func getAllGroups(context: NSManagedObjectContext? = nil) -> [WalletUserAssetGroup]? {
+    WalletUserAssetGroup.all(context: context ?? DataController.viewContext)
   }
   
   public static func removeGroup(_ groupId: String, completion: (() -> Void)? = nil) {
-    WalletVisibleAssetGroup.deleteAll(
+    WalletUserAssetGroup.deleteAll(
       predicate: NSPredicate(format: "groupId == %@", groupId),
       includesPropertyValues: false,
       completion: completion
@@ -50,23 +50,23 @@ public final class WalletVisibleAssetGroup: NSManagedObject, CRUD {
   }
   
   public static func removeAllGroup(completion: (() -> Void)? = nil) {
-    WalletVisibleAssetGroup.deleteAll(
+    WalletUserAssetGroup.deleteAll(
       includesPropertyValues: false,
       completion: completion
     )
   }
   
   public static func groupExists(groupId: String) -> Bool {
-    if let count = WalletVisibleAssetGroup.count(predicate: NSPredicate(format: "groupId == %@", groupId)), count > 0 {
+    if let count = WalletUserAssetGroup.count(predicate: NSPredicate(format: "groupId == %@", groupId)), count > 0 {
       return true
     }
     return false
   }
 }
 
-extension WalletVisibleAssetGroup {
+extension WalletUserAssetGroup {
   private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    NSEntityDescription.entity(forEntityName: "WalletVisibleAssetGroup", in: context)!
+    NSEntityDescription.entity(forEntityName: "WalletUserAssetGroup", in: context)!
   }
   
   private static func saveContext(_ context: NSManagedObjectContext) {

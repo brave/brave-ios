@@ -9,7 +9,7 @@ import Shared
 import BraveCore
 import os.log
 
-public final class WalletVisibleAsset: NSManagedObject, CRUD {
+public final class WalletUserAsset: NSManagedObject, CRUD {
   @NSManaged public var contractAddress: String
   @NSManaged public var name: String
   @NSManaged public var logo: String
@@ -24,7 +24,26 @@ public final class WalletVisibleAsset: NSManagedObject, CRUD {
   @NSManaged public var coingeckoId: String
   @NSManaged public var chainId: String
   @NSManaged public var coin: Int16
-  @NSManaged public var walletVisibleAssetGroup: WalletVisibleAssetGroup?
+  @NSManaged public var walletUserAssetGroup: WalletUserAssetGroup?
+  
+  public var blockchainToken: BraveWallet.BlockchainToken {
+    .init(
+      contractAddress: self.contractAddress,
+      name: self.name,
+      logo: self.logo,
+      isErc20: self.isERC20,
+      isErc721: self.isERC721,
+      isErc1155: self.isERC1155,
+      isNft: self.isNFT,
+      symbol: self.symbol,
+      decimals: self.decimals,
+      visible: self.visible,
+      tokenId: self.tokenId,
+      coingeckoId: self.coingeckoId,
+      chainId: self.chainId,
+      coin: BraveWallet.CoinType(rawValue: Int(self.coin))!
+    )
+  }
   
   @available(*, unavailable)
   public init() {
@@ -56,36 +75,29 @@ public final class WalletVisibleAsset: NSManagedObject, CRUD {
     self.visible = asset.visible
     self.tokenId = asset.tokenId
     self.coingeckoId = asset.coingeckoId
+    self.chainId = asset.chainId
     self.coin = Int16(asset.coin.rawValue)
   }
   
-//  public static func addVisibleAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)? = nil) {
-//    DataController.perform(context: .new(inMemory: false), save: false) { context in
-//      let walletVisibleAsset = WalletVisibleAsset(context: context, asset: asset)
-////      walletVisibleAsset.visibleAssetGroup = WalletVisibleAssetGroup.getVisibleAssetGroup(groupId: "\(asset.coin).\(asset.chainId)")
-//      WalletVisibleAsset.saveContext(context)
-//      
-//      DispatchQueue.main.async {
-//        completion?()
-//      }
-//    }
-//  }
+  public static func getAllUserAssets(context: NSManagedObjectContext? = nil) -> [WalletUserAsset]? {
+    WalletUserAsset.all(context: context ?? DataController.viewContext)
+  }
   
-  public static func getAllVisibleAssets(context: NSManagedObjectContext? = nil) -> [WalletVisibleAsset]? {
-    WalletVisibleAsset.all(context: context ?? DataController.viewContext)
+  public static func getAllVisibleUserAssets(context: NSManagedObjectContext? = nil) -> [WalletUserAsset]? {
+    WalletUserAsset.all(where: NSPredicate(format: "visible = true"), context: context ?? DataController.viewContext)
   }
   
   public static func migrateVisibleAssets(_ assets: [String: [BraveWallet.BlockchainToken]], completion: (() -> Void)? = nil) {
     for groupId in assets.keys {
       guard let assetsInOneGroup = assets[groupId] else { return }
       DataController.perform(context: .new(inMemory: false), save: false) { context in
-        let group = WalletVisibleAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletVisibleAssetGroup(context: context, groupId: groupId)
+        let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
         for asset in assetsInOneGroup {
-          let visibleAsset = WalletVisibleAsset(context: context, asset: asset)
-          visibleAsset.walletVisibleAssetGroup = group
+          let visibleAsset = WalletUserAsset(context: context, asset: asset)
+          visibleAsset.walletUserAssetGroup = group
         }
         
-        WalletVisibleAsset.saveContext(context)
+        WalletUserAsset.saveContext(context)
         
         DispatchQueue.main.async {
           completion?()
@@ -95,7 +107,7 @@ public final class WalletVisibleAsset: NSManagedObject, CRUD {
   }
   
   private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    NSEntityDescription.entity(forEntityName: "WalletVisibleAsset", in: context)!
+    NSEntityDescription.entity(forEntityName: "WalletUserAsset", in: context)!
   }
   
   private static func saveContext(_ context: NSManagedObjectContext) {
