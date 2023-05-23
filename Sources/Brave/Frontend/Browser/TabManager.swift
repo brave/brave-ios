@@ -87,8 +87,6 @@ class TabManager: NSObject {
   var tempTabs: [Tab]?
   private weak var rewards: BraveRewards?
   private weak var tabGeneratorAPI: BraveTabGeneratorAPI?
-//  var makeWalletEthJS: (() -> String?)?
-//  var makeWalletSolJSScripts: (() -> [BraveWalletProviderScriptKey: String]?)?
   private var domainFrc = Domain.frc()
   private let syncedTabsQueue = DispatchQueue(label: "synced-tabs-queue")
   private var syncTabsTask: DispatchWorkItem?

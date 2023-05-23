@@ -271,15 +271,15 @@ extension Tab: BraveWalletProviderDelegate {
     }
   }
   
-  /// Returns the selected account if present in `accounts`, otherwise returns `accounts`
-  private func filterAccounts(
-    _ accounts: [String],
+  /// Returns the selected account if present in `allowedAccounts`, otherwise returns `allowedAccounts`
+  private func filterAllowedAccounts(
+    _ allowedAccounts: [String],
     selectedAccount: String?
   ) -> [String] {
-    if let selectedAccount = selectedAccount, accounts.contains(selectedAccount) {
+    if let selectedAccount = selectedAccount, allowedAccounts.contains(selectedAccount) {
       return [selectedAccount]
     }
-    return accounts
+    return allowedAccounts
   }
 
   /// Helper to fetch the allowed accounts for the current coin. Unlike `allowedAccounts(_:accounts:)`
@@ -296,7 +296,7 @@ extension Tab: BraveWalletProviderDelegate {
       return (false, [])
     }
     let selectedAccounts = await keyringService.selectedAccount(coin)
-    return (true, filterAccounts(allowedAccounts, selectedAccount: selectedAccounts))
+    return (true, filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccounts))
   }
   
   /// Fetches all allowed accounts for the current origin.
@@ -498,7 +498,7 @@ extension Tab: BraveWalletEventsListener {
       if success {
         // Assign the selected account if it's permitted / allowed
         let selectedAccountForCoin = await keyringService.selectedAccount(coin)
-        let filteredAllowedAccounts = filterAccounts(allowedAccounts, selectedAccount: selectedAccountForCoin)
+        let filteredAllowedAccounts = filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccountForCoin)
         selectedAccount = valueOrUndefined(filteredAllowedAccounts.first)
       } else {
         selectedAccount = valueOrUndefined(Optional<String>.none)
