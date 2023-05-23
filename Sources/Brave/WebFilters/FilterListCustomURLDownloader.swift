@@ -69,7 +69,8 @@ actor FilterListCustomURLDownloader: ObservableObject {
     if downloadResult.isModified {
       do {
         let filterSet = try String(contentsOf: downloadResult.fileURL, encoding: .utf8)
-        let jsonRules = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
+        let truncated = UnsafeMutablePointer<Bool>.allocate(capacity: 1) // TODO: @cuba Adblock related change
+        let jsonRules = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet, truncated: truncated)
         
         try await ContentBlockerManager.shared.compile(
           encodedContentRuleList: jsonRules,
