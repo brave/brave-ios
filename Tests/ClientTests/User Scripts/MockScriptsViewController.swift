@@ -109,6 +109,14 @@ class MockScriptsViewController: UIViewController {
       )
     }
   }
+  
+  func attachScriptHandler(contentWorld: WKContentWorld, name: String, messageHandler: MockMessageHandler) {
+    webView.configuration.userContentController.addScriptMessageHandler(
+      messageHandler,
+      contentWorld: contentWorld,
+      name: name
+    )
+  }
 }
 
 // MARK: - WKNavigationDelegate

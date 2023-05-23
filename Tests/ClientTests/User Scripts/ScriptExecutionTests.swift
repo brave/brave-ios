@@ -17,6 +17,11 @@ final class ScriptExecutionTests: XCTestCase {
     let hardwareConcurrency: Int
   }
   
+  struct RequestBlockingTestDTO: Decodable {
+    let blockedFetch: Bool
+    let blockedXHR: Bool
+  }
+  
   @MainActor func testSiteStateListenerScript() async throws {
     // Given
     let viewController = MockScriptsViewController()
@@ -137,5 +142,59 @@ final class ScriptExecutionTests: XCTestCase {
     XCTAssertNotEqual(farblingResult?.voiceNames, controlResult?.voiceNames)
     XCTAssertNotEqual(farblingResult?.pluginNames, controlResult?.pluginNames)
     XCTAssertNotEqual(farblingResult?.hardwareConcurrency, controlResult?.hardwareConcurrency)
+  }
+  
+  @MainActor func testRequestBlockingScript() async throws {
+    // Given
+    let viewController = MockScriptsViewController()
+    
+    // When
+    let blockingResultStream = viewController.attachScriptHandler(
+      contentWorld: RequestBlockingContentScriptHandler.scriptSandbox,
+      name: "SendTestRequestResult"
+    )
+    
+    viewController.attachScriptHandler(
+      contentWorld: RequestBlockingContentScriptHandler.scriptSandbox,
+      name: RequestBlockingContentScriptHandler.messageHandlerName,
+      messageHandler: MockMessageHandler(callback: { message in
+        // Block the request
+        return true
+      })
+    )
+    
+    // Load the view and add scripts
+    viewController.loadViewIfNeeded()
+    viewController.add(userScript: RequestBlockingContentScriptHandler.userScript!)
+    
+    let testURL = Bundle.module.url(forResource: "request-blocking-tests", withExtension: "js")!
+    let source = try String(contentsOf: testURL)
+    let testScript = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: RequestBlockingContentScriptHandler.scriptSandbox)
+    viewController.add(userScript: testScript)
+    
+    // Load the sample htmls page and await the first page load result
+    let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html")!
+    let htmlString = try! String(contentsOf: htmlURL, encoding: .utf8)
+    try await viewController.loadHTMLString(htmlString)
+    
+    // Then
+    // Await the script handler and checks it's contents
+    var foundMessage: RequestBlockingTestDTO?
+    for await message in blockingResultStream {
+      do {
+        let data = try JSONSerialization.data(withJSONObject: message.body)
+        foundMessage = try JSONDecoder().decode(RequestBlockingTestDTO.self, from: data)
+      } catch {
+        XCTFail(String(describing: error))
+      }
+      
+      // We only care about the first script handler result
+      break
+    }
+    
+    // Ensure we got a result
+    XCTAssertNotNil(foundMessage)
+    XCTAssertEqual(foundMessage?.blockedFetch, true)
+    XCTAssertEqual(foundMessage?.blockedXHR, true)
   }
 }

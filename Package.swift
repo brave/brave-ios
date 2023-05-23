@@ -320,6 +320,7 @@ var package = Package(
         .copy("Resources/filter-rules/rs-AC023D22-AE88-4060-A978-4FEEEC4221693.dat"),
         .copy("Resources/html/index.html"),
         .copy("Resources/scripts/farbling-tests.js"),
+        .copy("Resources/scripts/request-blocking-tests.js"),
         .copy("blocking-summary-test.json"),
       ]
     ),
