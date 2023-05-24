@@ -141,6 +141,10 @@ public class BrowserViewController: UIViewController {
   private var privateModeCancellable: AnyCancellable?
   private var appReviewCancelable: AnyCancellable?
   var onPendingRequestUpdatedCancellable: AnyCancellable?
+  
+  /// Voice Search
+  var voiceSearchViewController: UIHostingController<VoiceSearchInputView>?
+  var voiceSearchCancelable: AnyCancellable?
 
   /// Custom Search Engine
   var openSearchEngine: OpenSearchReference?

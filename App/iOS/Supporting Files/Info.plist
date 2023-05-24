@@ -78,7 +78,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This lets you save photos.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>This allows use of your private speech recognition when using Brave Voice Search.</string>
+	<string>This permission is used to enable Apple Advanced Speech Recognition. If not allowed `on device` recognition will be used and searches will be totally private. Brave will never store your searches or share it with any entity.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>LockScreenFavoriteConfigurationIntent</string>

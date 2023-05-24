@@ -11,6 +11,7 @@ import Data
 
 struct VoiceSearchInputView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @ObservedObject var speechModel: SpeechRecognizer
 
   var onEnterSearchKeyword: (() -> Void)?
   @State private var animationScale: CGFloat = 0.75
@@ -26,9 +27,9 @@ struct VoiceSearchInputView: View {
         microphoneView
       }
       .onAppear {
-        
+        speechModel.startTranscribing()
       }.onDisappear {
-        
+        speechModel.stopTranscribing()
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .padding()
@@ -42,13 +43,12 @@ struct VoiceSearchInputView: View {
       .background(Color(.secondaryBraveBackground).ignoresSafeArea())
     }
     .navigationViewStyle(.stack)
-    .environment(\.managedObjectContext, DataController.swiftUIContext)
   }
     
   private var microphoneView: some View {
     VStack {
       Spacer()
-        Text("Test Voice Search")
+      Text(speechModel.transcript)
           .multilineTextAlignment(.center)
           .padding(.horizontal, 25)
         ZStack {
@@ -77,7 +77,7 @@ struct VoiceSearchInputView: View {
         .padding(.bottom, 45)
         .padding(.top, 45)
         Spacer()
-        Text("Important information about how voice search is nice and secure")
+        Text("Brave will never store your searches or share it with any entity.")
           .font(.footnote)
           .multilineTextAlignment(.center)
           .foregroundColor(Color(.secondaryBraveLabel))
@@ -91,17 +91,3 @@ struct VoiceSearchInputView: View {
       .foregroundColor(Color(.braveBlurpleTint))
   }
 }
-
-#if DEBUG
-struct VoiceSearchInput_Previews: PreviewProvider {
-  static var previews: some View {
-    
-    Group {
-      VoiceSearchInputView()
-      
-      VoiceSearchInputView()
-        .preferredColorScheme(.dark)
-    }
-  }
-}
-#endif

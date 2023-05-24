@@ -533,8 +533,49 @@ extension BrowserViewController: TopToolbarDelegate {
   }
   
   func topToolbarDidPressVoiceSearchButton(_ urlBar: TopToolbarView) {
-    let voiceSearchViewController = UIHostingController(rootView: VoiceSearchInputView())
-    present(voiceSearchViewController, animated: true)
+    Task { @MainActor in
+      let speechRecognizer = SpeechRecognizer()
+
+      onPendingRequestUpdatedCancellable = await speechRecognizer.$finalizedRecognition.sink { [weak self] finalizedRecognition in
+        guard let self else { return }
+        
+        if finalizedRecognition.status {
+          self.voiceSearchViewController?.dismiss(animated: true) {
+            self.submitSearchText(finalizedRecognition.searchQuery)
+          }
+        }
+      }
+      
+      var permissionStatus: (succeed: Bool, error: SpeechRecognizer.RecognizerError?)
+      
+      do {
+        permissionStatus = try await speechRecognizer.askForUserPermission()
+        
+        if permissionStatus.succeed {
+          openVoiceSearch(speechRecognizer: speechRecognizer)
+        }
+      } catch {
+        if let error = error as? SpeechRecognizer.RecognizerError {
+          switch error {
+          case .notPermittedToRecord:
+            print("Not permitted to record")
+          case .notAuthorizedToRecognize:
+            print("Not authorized to recognize")
+          default:
+            break
+          }
+        } else {
+          Logger.module.error("Unrecognized Problem \(error.localizedDescription)")
+        }
+      }
+    }
+    
+    func openVoiceSearch(speechRecognizer: SpeechRecognizer) {
+      voiceSearchViewController = UIHostingController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
+      if let voiceSearchController = voiceSearchViewController {
+        present(voiceSearchController, animated: true)
+      }
+    }
   }
 
   func topToolbarDidTapWalletButton(_ urlBar: TopToolbarView) {

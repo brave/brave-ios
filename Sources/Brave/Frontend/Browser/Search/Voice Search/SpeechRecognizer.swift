@@ -9,20 +9,27 @@ import Speech
 import SwiftUI
 import os.log
 
+protocol SpeechRecognizerDelegate: AnyObject {
+    func speechRecognizerDidFinishQuery(query: String)
+}
+
 actor SpeechRecognizer: ObservableObject {
   
   private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "voiceRecognizer")
   
-  enum SpeechRecorderError: Error {
+  enum RecognizerError: Error {
     case failedSetup
     case notAuthorizedToRecognize
     case notPermittedToRecord
     case recognizerIsUnavailable
   }
   
-  /// Formatted transcript from speech recognizer
-  @MainActor var transcript: String = ""
+  weak var delegate: SpeechRecognizerDelegate?
   
+  /// Formatted transcript from speech recognizer
+  @MainActor @Published var transcript: String = ""
+  @MainActor @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
+
   var isVoiceSearchAvailable: Bool {
     if let recognizer, recognizer.isAvailable {
       return true
@@ -42,27 +49,33 @@ actor SpeechRecognizer: ObservableObject {
     recognizer = SFSpeechRecognizer()
     
     guard recognizer != nil else {
-      log.debug("Voice Search Setup failed \(SpeechRecorderError.failedSetup.localizedDescription)")
+      log.debug("Voice Search Setup failed \(RecognizerError.failedSetup.localizedDescription)")
       return
     }
-      
-    Task {
-      do {
-        // Ask for Speech Recognizer Authorization if not authorized throw error
-        guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
-          throw SpeechRecorderError.notAuthorizedToRecognize
-        }
-        
-        // Ask for Record Permission if not permitted throw error
-        guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
-          throw SpeechRecorderError.notPermittedToRecord
-        }
-      } catch {
-        log.debug("Voice Search Authorization Fault \(error.localizedDescription)")
+  }
+  
+  @MainActor
+  func askForUserPermission() async throws -> (Bool, RecognizerError?) {
+    do {
+      // Ask for Record Permission if not permitted throw error
+      guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
+        throw RecognizerError.notPermittedToRecord
       }
+      
+//      // Ask for Speech Recognizer Authorization if not authorized throw error
+//      // Data will be sent to Apple server for improved accuracy
+//      guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
+//        throw RecognizerError.notAuthorizedToRecognize
+//      }
+      
+      return (true, nil)
+    } catch {
+      log.debug("Voice Search Authorization Fault \(error.localizedDescription)")
+
+      return (false, error as? RecognizerError)
     }
   }
-    
+  
   @MainActor
   func startTranscribing() {
     Task {
@@ -76,12 +89,12 @@ actor SpeechRecognizer: ObservableObject {
       await reset()
     }
   }
-    
+  
   /// Creates a `SFSpeechRecognitionTask` that transcribes speech to text until you call `stopTranscribing()`.
   /// The resulting transcription is continuously written to the published `transcript` property.
   private func transcribe() {
     guard let recognizer, recognizer.isAvailable else {
-      log.debug("Voice Search Unavailable \(SpeechRecorderError.recognizerIsUnavailable.localizedDescription)")
+      log.debug("Voice Search Unavailable \(RecognizerError.recognizerIsUnavailable.localizedDescription)")
       return
     }
     
@@ -92,16 +105,28 @@ actor SpeechRecognizer: ObservableObject {
       self.request = request
       
       task = recognizer.recognitionTask(with: request, resultHandler: { [weak self] result, error in
-        let textInputStopped = result?.isFinal ?? false || error != nil
+        guard let self = self else {
+          return
+        }
+        
+        var isFinal = false
+        
+        if let result {
+          // SpeechRecognitionMetadata is the key to detect speaking finalized
+          isFinal = result.isFinal || result.speechRecognitionMetadata != nil
+          self.transcribe(result.bestTranscription.formattedString)
+        }
         
         // Check voice input final
-        if textInputStopped {
-          audioEngine.stop()
+        if isFinal {
+          // Remove audio buffer input
           audioEngine.inputNode.removeTap(onBus: 0)
-        }
+          // Reset Speech Recognizer
+          Task {
+            await self.reset()
+          }
           
-        if let result {
-          self?.transcribe(result.bestTranscription.formattedString)
+          finalize(searchQuery: result?.bestTranscription.formattedString ?? "")
         }
       })
     } catch {
@@ -112,6 +137,7 @@ actor SpeechRecognizer: ObservableObject {
     
   /// Reset the speech recognizer.
   private func reset() {
+    try? AVAudioSession.sharedInstance().setActive(false)
     task?.cancel()
     audioEngine?.stop()
     
@@ -125,7 +151,8 @@ actor SpeechRecognizer: ObservableObject {
     
     let request = SFSpeechAudioBufferRecognitionRequest()
     request.shouldReportPartialResults = true
-    
+    request.requiresOnDeviceRecognition = true
+
     let audioSession = AVAudioSession.sharedInstance()
     try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
     try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
@@ -133,7 +160,7 @@ actor SpeechRecognizer: ObservableObject {
     
     let recordingFormat = inputNode.outputFormat(forBus: 0)
     inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, when in
-        request.append(buffer)
+      request.append(buffer)
     }
     
     audioEngine.prepare()
@@ -145,6 +172,20 @@ actor SpeechRecognizer: ObservableObject {
   nonisolated private func transcribe(_ message: String) {
     Task { @MainActor in
       transcript = message
+    }
+  }
+  
+  nonisolated private func finalize(searchQuery: String) {
+    Task { @MainActor in
+      if !finalizedRecognition.status {
+        finalizedRecognition = (true, searchQuery)
+      }
+    }
+  }
+  
+  nonisolated private func clearSearch() {
+    Task { @MainActor in
+      finalizedRecognition = (false, "")
     }
   }
 }
