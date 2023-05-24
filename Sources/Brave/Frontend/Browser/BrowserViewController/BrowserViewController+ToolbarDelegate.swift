@@ -546,27 +546,18 @@ extension BrowserViewController: TopToolbarDelegate {
         }
       }
       
-      var permissionStatus: (succeed: Bool, error: SpeechRecognizer.RecognizerError?)
+      var permissionStatus: Bool
       
       do {
         permissionStatus = try await speechRecognizer.askForUserPermission()
         
-        if permissionStatus.succeed {
+        if permissionStatus {
           openVoiceSearch(speechRecognizer: speechRecognizer)
+        } else {
+          showNoMicrophoneWarning()
         }
       } catch {
-        if let error = error as? SpeechRecognizer.RecognizerError {
-          switch error {
-          case .notPermittedToRecord:
-            print("Not permitted to record")
-          case .notAuthorizedToRecognize:
-            print("Not authorized to recognize")
-          default:
-            break
-          }
-        } else {
-          Logger.module.error("Unrecognized Problem \(error.localizedDescription)")
-        }
+        Logger.module.debug("Access Microphone Required _ \(error.localizedDescription)")
       }
     }
     
@@ -575,6 +566,27 @@ extension BrowserViewController: TopToolbarDelegate {
       if let voiceSearchController = voiceSearchViewController {
         present(voiceSearchController, animated: true)
       }
+    }
+    
+    func showNoMicrophoneWarning() {
+      let alertController = UIAlertController(
+        title: "Microphone Access Required",
+        message: "Please allow Microphone Access in iOS System Settings for Brave to use anonymous voice search.",
+        preferredStyle: .alert)
+      
+      let settingsAction = UIAlertAction(
+        title: "Settings",
+        style: .default) { _ in
+          let url = URL(string: UIApplication.openSettingsURLString)!
+          UIApplication.shared.open(url, options: [:], completionHandler: nil)
+      }
+      
+      let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+
+      alertController.addAction(settingsAction)
+      alertController.addAction(cancelAction)
+      
+      present(alertController, animated: true)
     }
   }
 

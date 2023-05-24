@@ -19,8 +19,7 @@ actor SpeechRecognizer: ObservableObject {
   
   enum RecognizerError: Error {
     case failedSetup
-    case notAuthorizedToRecognize
-    case notPermittedToRecord
+    case microphoneAccessDenied
     case recognizerIsUnavailable
   }
   
@@ -55,25 +54,19 @@ actor SpeechRecognizer: ObservableObject {
   }
   
   @MainActor
-  func askForUserPermission() async throws -> (Bool, RecognizerError?) {
+  func askForUserPermission() async throws -> Bool {
     do {
       // Ask for Record Permission if not permitted throw error
       guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
-        throw RecognizerError.notPermittedToRecord
+        throw RecognizerError.microphoneAccessDenied
       }
       
-//      // Ask for Speech Recognizer Authorization if not authorized throw error
-//      // Data will be sent to Apple server for improved accuracy
-//      guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
-//        throw RecognizerError.notAuthorizedToRecognize
-//      }
-      
-      return (true, nil)
+      return true
     } catch {
       log.debug("Voice Search Authorization Fault \(error.localizedDescription)")
-
-      return (false, error as? RecognizerError)
     }
+    
+    return false
   }
   
   @MainActor
@@ -190,6 +183,19 @@ actor SpeechRecognizer: ObservableObject {
   }
 }
 
+extension AVAudioSession {
+  /// Ask for recording permission
+  ///  this is used for access microphone
+  /// - Returns: Authorization state
+  func hasPermissionToRecord() async -> Bool {
+    await withCheckedContinuation { continuation in
+      requestRecordPermission { authorized in
+        continuation.resume(returning: authorized)
+      }
+    }
+  }
+}
+
 extension SFSpeechRecognizer {
   /// Ask for Speech recognization authorization
   /// - Returns: Authorization state
@@ -197,18 +203,6 @@ extension SFSpeechRecognizer {
     await withCheckedContinuation { continuation in
       requestAuthorization { status in
         continuation.resume(returning: status == .authorized)
-      }
-    }
-  }
-}
-
-extension AVAudioSession {
-  /// Ask for recording permission
-  /// - Returns: Authorization state
-  func hasPermissionToRecord() async -> Bool {
-    await withCheckedContinuation { continuation in
-      requestRecordPermission { authorized in
-        continuation.resume(returning: authorized)
       }
     }
   }
