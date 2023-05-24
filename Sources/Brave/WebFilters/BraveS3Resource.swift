@@ -12,6 +12,7 @@ enum BraveS3Resource: Hashable, DownloadResourceInterface {
   /// Generic iOS only content blocking behaviours used for the iOS content blocker
   case genericContentBlockingBehaviors
   /// Cosmetic filter rules
+  /// - Warning: Do not use this. This is here solely so we can delete the files
   case generalCosmeticFilters
   /// Adblock rules for a filter list
   /// iOS only content blocking behaviours used for the iOS content blocker for a given filter list
