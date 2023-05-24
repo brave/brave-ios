@@ -321,6 +321,7 @@ var package = Package(
         .copy("Resources/html/index.html"),
         .copy("Resources/scripts/farbling-tests.js"),
         .copy("Resources/scripts/request-blocking-tests.js"),
+        .copy("Resources/scripts/cosmetic-filter-tests.js"),
         .copy("blocking-summary-test.json"),
       ]
     ),

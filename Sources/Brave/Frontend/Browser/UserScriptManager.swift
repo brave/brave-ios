@@ -329,6 +329,8 @@ extension UserScriptType: CustomDebugStringConvertible {
       return "nacl"
     case .siteStateListener:
       return "siteStateListener"
+    case .selectorsPoller:
+      return "selectorsPoller"
     }
   }
 }
