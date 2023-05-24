@@ -419,22 +419,7 @@ public class BrowserViewController: UIViewController {
     updateApplicationShortcuts()
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
-    if let ethJS = braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] {
-      let providerJS = """
-      window.__firefox__.execute(function($, $Object) {
-        if (window.isSecureContext) {
-          \(ethJS)
-        }
-      });
-      """
-      UserScriptManager.shared.walletEthProviderScript = WKUserScript(
-        source: providerJS,
-        injectionTime: .atDocumentStart,
-        forMainFrameOnly: true,
-        in: EthereumProviderScriptHandler.scriptSandbox
-      )
-    }
-    UserScriptManager.shared.walletSolProviderScripts = braveCore.braveWalletAPI.providerScripts(for: .sol)
+    UserScriptManager.shared.fetchWalletScripts(from: braveCore.braveWalletAPI)
     downloadQueue.delegate = self
 
     // Observe some user preferences
