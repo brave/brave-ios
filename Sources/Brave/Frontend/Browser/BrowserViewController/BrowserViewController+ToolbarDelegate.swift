@@ -536,7 +536,7 @@ extension BrowserViewController: TopToolbarDelegate {
     Task { @MainActor in
       let speechRecognizer = SpeechRecognizer()
 
-      onPendingRequestUpdatedCancellable = await speechRecognizer.$finalizedRecognition.sink { [weak self] finalizedRecognition in
+      onPendingRequestUpdatedCancellable = speechRecognizer.$finalizedRecognition.sink { [weak self] finalizedRecognition in
         guard let self else { return }
         
         if finalizedRecognition.status {

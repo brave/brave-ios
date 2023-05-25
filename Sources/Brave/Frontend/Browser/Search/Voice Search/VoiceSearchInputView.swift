@@ -14,7 +14,6 @@ struct VoiceSearchInputView: View {
   @ObservedObject var speechModel: SpeechRecognizer
 
   var onEnterSearchKeyword: (() -> Void)?
-  @State private var animationScale: CGFloat = 0.75
 
   private func dismissView() {
     presentationMode.dismiss()
@@ -28,6 +27,7 @@ struct VoiceSearchInputView: View {
       }
       .onAppear {
         speechModel.startTranscribing()
+        speechModel.startSilenceAnimation()
       }.onDisappear {
         speechModel.stopTranscribing()
       }
@@ -55,11 +55,8 @@ struct VoiceSearchInputView: View {
           Circle()
             .foregroundColor(Color(.braveDarkerBlurple).opacity(0.25))
             .frame(width: 150, height: 150, alignment: .center)
-            .scaleEffect(animationScale)
-            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: animationScale)
-            .onAppear {
-              self.animationScale = 1
-            }
+            .scaleEffect(outerCircleScale)
+            .animation(outerCircleAnimation, value: outerCircleScale)
           Button {
             onEnterSearchKeyword?()
             dismissView()
@@ -89,5 +86,26 @@ struct VoiceSearchInputView: View {
   private var doneButton: some View {
     Button(Strings.done, action: dismissView)
       .foregroundColor(Color(.braveBlurpleTint))
+  }
+}
+
+extension VoiceSearchInputView {
+    
+  private var outerCircleScale: CGFloat {
+    switch speechModel.animationType {
+    case .pulse(let scale):
+        return scale
+    case .speech(let volume):
+        return volume
+    }
+  }
+  
+  private var outerCircleAnimation: Animation {
+    switch speechModel.animationType {
+    case .pulse:
+      return .easeInOut(duration: 1.5).repeatForever()
+    case .speech:
+      return .linear(duration: 0.1)
+    }
   }
 }

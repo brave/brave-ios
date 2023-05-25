@@ -13,7 +13,7 @@ protocol SpeechRecognizerDelegate: AnyObject {
     func speechRecognizerDidFinishQuery(query: String)
 }
 
-actor SpeechRecognizer: ObservableObject {
+class SpeechRecognizer: ObservableObject {
   
   private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "voiceRecognizer")
   
@@ -23,11 +23,23 @@ actor SpeechRecognizer: ObservableObject {
     case recognizerIsUnavailable
   }
   
+  enum AnimationType {
+    case speech(volume: CGFloat)
+    case pulse(scale: CGFloat)
+  }
+  
+  private struct AnimationScale {
+    static let max: CGFloat = 1.50
+    static let pulse: CGFloat = 0.75
+  }
+  
   weak var delegate: SpeechRecognizerDelegate?
   
   /// Formatted transcript from speech recognizer
   @MainActor @Published var transcript: String = ""
   @MainActor @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
+
+  @Published private(set) var animationType: AnimationType = .pulse(scale: 1)
 
   var isVoiceSearchAvailable: Bool {
     if let recognizer, recognizer.isAvailable {
@@ -36,6 +48,8 @@ actor SpeechRecognizer: ObservableObject {
     
     return false
   }
+  
+  private var isSilent = true
     
   private var audioEngine: AVAudioEngine?
   private var request: SFSpeechAudioBufferRecognitionRequest?
@@ -71,16 +85,12 @@ actor SpeechRecognizer: ObservableObject {
   
   @MainActor
   func startTranscribing() {
-    Task {
-      await transcribe()
-    }
+    transcribe()
   }
     
   @MainActor
   func stopTranscribing() {
-    Task {
-      await reset()
-    }
+    reset()
   }
   
   /// Creates a `SFSpeechRecognitionTask` that transcribes speech to text until you call `stopTranscribing()`.
@@ -115,9 +125,7 @@ actor SpeechRecognizer: ObservableObject {
           // Remove audio buffer input
           audioEngine.inputNode.removeTap(onBus: 0)
           // Reset Speech Recognizer
-          Task {
-            await self.reset()
-          }
+          self.reset()
           
           finalize(searchQuery: result?.bestTranscription.formattedString ?? "")
         }
@@ -152,14 +160,42 @@ actor SpeechRecognizer: ObservableObject {
     let inputNode = audioEngine.inputNode
     
     let recordingFormat = inputNode.outputFormat(forBus: 0)
-    inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, when in
+    inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, when in
+      guard let self else { return }
+      
       request.append(buffer)
+      
+      guard let channelData = buffer.floatChannelData?[0] else {
+          return
+      }
+      
+      let volume = self.getVolumeLevel(from: channelData)
+      
+      Task { @MainActor in
+        self.setupAnimationWithVolume(volume)
+      }
     }
     
     audioEngine.prepare()
     try audioEngine.start()
     
     return (audioEngine, request)
+  }
+  
+  func getVolumeLevel(from channelData: UnsafeMutablePointer<Float>) -> Float {
+      let channelDataArray = Array(UnsafeBufferPointer(start: channelData, count: 1024))
+      guard channelDataArray.count != 0 else { return 0 }
+      
+      let silenceThreshold: Float = 0.0030
+      let loudThreshold: Float = 0.07
+      
+      let sumChannelData = channelDataArray.reduce(0) { $0 + abs($1) }
+      var channelAverage = sumChannelData / Float(channelDataArray.count)
+      channelAverage = min(channelAverage, loudThreshold)
+      channelAverage = max(channelAverage, silenceThreshold)
+
+      let normalized = (channelAverage - silenceThreshold) / (loudThreshold - silenceThreshold)
+      return normalized
   }
 
   nonisolated private func transcribe(_ message: String) {
@@ -180,6 +216,31 @@ actor SpeechRecognizer: ObservableObject {
     Task { @MainActor in
       finalizedRecognition = (false, "")
     }
+  }
+  
+  func startSilenceAnimation() {
+    animationType = .pulse(scale: AnimationScale.pulse)
+  }
+
+  func startSpeechAnimation(_ scale: CGFloat) {
+    animationType = .speech(volume: scale)
+  }
+  
+  private func setupAnimationWithVolume(_ volume: Float) {
+    let isCurrentlySilent = volume <= 0
+    // We want to make sure that every detected sound makes the outer circle bigger
+    let minScale: CGFloat = 1.25
+    
+    if !isCurrentlySilent {
+        let scaleValue = min(CGFloat(volume) + minScale, AnimationScale.max)
+        self.startSpeechAnimation(scaleValue)
+    }
+    
+    if !self.isSilent && isCurrentlySilent {
+        self.startSilenceAnimation()
+    }
+    
+    self.isSilent = isCurrentlySilent
   }
 }
 
