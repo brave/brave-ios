@@ -8,11 +8,13 @@ import Shared
 import Lottie
 import BraveUI
 
-class InstallVPNViewController: UIViewController {
+class InstallVPNViewController: VPNSetupLoadingController {
 
   private var installVPNView: View {
     return view as! View  // swiftlint:disable:this force_cast
   }
+  
+  private var installVPNProfileRetryCount = 0
 
   override func loadView() {
     view = View()
@@ -48,32 +50,43 @@ class InstallVPNViewController: UIViewController {
   }
 
   @objc func installVPNAction() {
-    installVPNView.installVPNButton.isLoading = true
+    isLoading = true
     
-    BraveVPN.connectToVPN() { [weak self] status in
-      guard let self = self else { return }
+    installProfileAndConnectVPNFirstTime { [weak self] status in
+      guard let self else { return }
       
-      DispatchQueue.main.async {
-        self.installVPNView.installVPNButton.isLoading = false
-      }
-
       if status {
         self.dismiss(animated: true) {
           self.showSuccessAlert()
         }
-      } else {
-        let okAction = UIAlertAction(title: Strings.OKString, style: .default)
-        
-        let message = Strings.VPN.vpnConfigGenericErrorBody
-        let alert = UIAlertController(title: Strings.VPN.vpnConfigGenericErrorTitle,
-                                      message: message,
-                                      preferredStyle: .alert)
-        alert.addAction(okAction)
-        
-        DispatchQueue.main.async {
-          self.present(alert, animated: true)
-        }
+      } else if self.installVPNProfileRetryCount < 2 {
+        // Retry installing profile if it fails first time
+        presentErrorVPNInstallProfile()
       }
+    }
+ 
+    func presentErrorVPNInstallProfile() {
+      let alert = UIAlertController(title: Strings.VPN.vpnConfigGenericErrorTitle,
+                                    message: Strings.VPN.vpnConfigGenericErrorBody,
+                                    preferredStyle: .alert)
+      
+      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default))
+      
+      DispatchQueue.main.async {
+        self.present(alert, animated: true)
+      }
+    }
+  }
+  
+  private func installProfileAndConnectVPNFirstTime(completion: @escaping (Bool) -> Void) {
+    installVPNProfileRetryCount += 1
+    
+    BraveVPN.connectToVPN() { [weak self] status in
+      DispatchQueue.main.async {
+        self?.isLoading = true
+      }
+
+      completion(status)
     }
   }
 
