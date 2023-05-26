@@ -59,9 +59,14 @@ class InstallVPNViewController: VPNSetupLoadingController {
         self.dismiss(animated: true) {
           self.showSuccessAlert()
         }
-      } else if self.installVPNProfileRetryCount < 2 {
-        // Retry installing profile if it fails first time
-        presentErrorVPNInstallProfile()
+      } else {
+        // Retry installing profile twice if it fails
+        // Error generated is WireGuard capabilities are not yet enabled on this node
+        if self.installVPNProfileRetryCount < 2 {
+          installVPNAction()
+        } else {
+          presentErrorVPNInstallProfile()
+        }
       }
     }
  
@@ -83,7 +88,7 @@ class InstallVPNViewController: VPNSetupLoadingController {
     
     BraveVPN.connectToVPN() { [weak self] status in
       DispatchQueue.main.async {
-        self?.isLoading = true
+        self?.isLoading = false
       }
 
       completion(status)
