@@ -38,44 +38,49 @@ public actor AdblockResourceDownloader: Sendable {
   
   /// Load the cached data and await the results
   public func loadCachedAndBundledDataIfNeeded() async {
-    // Compile bundled blocklists but only if we don't have anything already loaded.
-    await ContentBlockerManager.GenericBlocklistType.allCases.asyncConcurrentForEach { genericType in
-      let type = ContentBlockerManager.BlocklistType.generic(genericType)
-      
-      // Only compile these rules it if it is not already set
-      guard await !ContentBlockerManager.shared.hasRuleList(for: type) else {
-        ContentBlockerManager.log.debug("Rule list already loaded for `\(type.identifier)`")
-        return
-      }
-      
+    // Here we load downloaded resources if we need to
+    await Self.handledResources.asyncConcurrentForEach { resource in
       do {
-        try await ContentBlockerManager.shared.compileBundledRuleList(for: genericType)
+        // Check if we have cached results for the given resource
+        if let cachedResult = try resource.cachedResult() {
+          await self.handle(downloadResult: cachedResult, for: resource)
+        }
       } catch {
-        assertionFailure("A bundled file should not fail to compile")
+        ContentBlockerManager.log.error(
+          "Failed to load cached data for resource \(resource.cacheFileName): \(error)"
+        )
       }
     }
     
-    // Here we load downloaded resources if we need to
-    await Self.handledResources.asyncConcurrentForEach { resource in
-      await self.loadCachedOrBundledData(for: resource)
+    // Compile bundled blocklists but only if we don't have anything already loaded.
+    await ContentBlockerManager.GenericBlocklistType.allCases.asyncConcurrentForEach { genericType in
+      let blocklistType = ContentBlockerManager.BlocklistType.generic(genericType)
+      let modes = await blocklistType.allowedModes.asyncFilter { mode in
+        if await ContentBlockerManager.shared.hasRuleList(for: blocklistType, mode: mode) {
+          ContentBlockerManager.log.debug("Rule list already compiled for `\(blocklistType.makeIdentifier(for: mode))`")
+          return false
+        } else {
+          return true
+        }
+      }
+      
+      do {
+        try await ContentBlockerManager.shared.compileBundledRuleList(for: genericType, modes: modes)
+      } catch {
+        assertionFailure("A bundled file should not fail to compile")
+      }
     }
   }
   
   /// This reloads bundled data. This is needed in case the bundled data changed since last app update.
   /// This is done on the background to speed up launch time. We don't recompile downloadable resources.
   public func reloadBundledOnlyData() async {
-    // Compile bundled blocklists for non-downloadable types
+    // Compile bundled blocklists for non-downloadable types in case they changed since
+    // the last version
     await ContentBlockerManager.GenericBlocklistType.allCases.asyncConcurrentForEach { genericType in
-      let type = ContentBlockerManager.BlocklistType.generic(genericType)
-      
-      if genericType == .blockAds {
-        // This type of rule list may be replaced by a downloaded version.
-        // Only compile it if it is not already set.
-        // All other ones we always re-compile since the bundled versions might have been updated.
-        guard await !ContentBlockerManager.shared.hasRuleList(for: type) else {
-          return
-        }
-      }
+      // This type of rule list is replaced by a downloaded version
+      // We can't just recompile this type.
+      guard genericType != .blockAds else { return }
        
       do {
         try await ContentBlockerManager.shared.compileBundledRuleList(for: genericType)
@@ -120,20 +125,6 @@ public actor AdblockResourceDownloader: Sendable {
     }
   }
   
-  /// Load cached data for the given resource. Ensures this is done on the MainActor
-  private func loadCachedOrBundledData(for resource: BraveS3Resource) async {
-    do {
-      // Check if we have cached results for the given resource
-      if let cachedResult = try resource.cachedResult() {
-        await handle(downloadResult: cachedResult, for: resource)
-      }
-    } catch {
-      ContentBlockerManager.log.error(
-        "Failed to load cached data for resource \(resource.cacheFileName): \(error)"
-      )
-    }
-  }
-  
   /// Handle the downloaded file url for the given resource
   private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource) async {
     let version = fileVersionDateFormatter.string(from: downloadResult.date)
@@ -141,18 +132,19 @@ public actor AdblockResourceDownloader: Sendable {
     switch resource {
     case .genericContentBlockingBehaviors:
       let blocklistType = ContentBlockerManager.BlocklistType.generic(.blockAds)
-      
-      if !downloadResult.isModified {
-        // If the file is not modified first we need to see if we already have a cached value loaded
-        // We don't what to bother recompiling this file if we already loaded it
-        guard await !ContentBlockerManager.shared.hasRuleList(for: blocklistType) else {
-          // We don't want to recompile something that we alrady have loaded
-          ContentBlockerManager.log.debug("Cached rule list exists for `\(blocklistType.identifier)`")
-          return
+      let modes = await blocklistType.allowedModes.asyncFilter { mode in
+        if downloadResult.isModified { return true }
+          
+        if await ContentBlockerManager.shared.hasRuleList(for: blocklistType, mode: mode) {
+          ContentBlockerManager.log.debug("Rule list already compiled for `\(blocklistType.makeIdentifier(for: mode))`")
+          return false
+        } else {
+          return true
         }
       }
       
       do {
+        guard !modes.isEmpty else { return }
         guard let encodedContentRuleList = try resource.downloadedString() else {
           assertionFailure("This file was downloaded successfully so it should not be nil")
           return
@@ -161,7 +153,8 @@ public actor AdblockResourceDownloader: Sendable {
         // try to compile
         try await ContentBlockerManager.shared.compile(
           encodedContentRuleList: encodedContentRuleList,
-          for: .generic(.blockAds)
+          for: .generic(.blockAds),
+          modes: modes
         )
       } catch {
         ContentBlockerManager.log.error(

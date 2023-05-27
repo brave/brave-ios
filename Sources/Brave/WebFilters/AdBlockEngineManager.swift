@@ -53,7 +53,7 @@ public actor AdBlockEngineManager: Sendable {
           return false
         }
         
-        return filterList.entry.languages.isEmpty
+        return filterList.isAlwaysAggressive
       }
     }
   }

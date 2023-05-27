@@ -9,6 +9,7 @@ import Data
 import BraveCore
 import Shared
 import Preferences
+import BraveShields
 import os.log
 
 /// An object responsible for fetching filer lists resources from multiple sources
@@ -218,8 +219,8 @@ public class FilterListResourceDownloader {
     stopFetching(resource: .filterListContentBlockingBehaviors(uuid: filterList.uuid, componentId: filterList.entry.componentId))
     
     Task {
-      async let removeContentBlockerResource: Void = ContentBlockerManager.shared.removeRuleList(
-        for: .filterList(uuid: filterList.uuid)
+      async let removeContentBlockerResource: Void = ContentBlockerManager.shared.removeRuleLists(
+        for: .filterList(uuid: filterList.uuid, isAlwaysAggressive: filterList.isAlwaysAggressive)
       )
       async let removeAdBlockEngineResource: Void = AdBlockEngineManager.shared.removeResources(
         for: .filterList(uuid: filterList.uuid)
@@ -245,9 +246,7 @@ public class FilterListResourceDownloader {
         for try await result in await self.resourceDownloader.downloadStream(for: resource) {
           switch result {
           case .success(let downloadResult):
-            await handle(
-              downloadResult: downloadResult, for: filterList
-            )
+            await handle(downloadResult: downloadResult, for: filterList)
           case .failure(let error):
             ContentBlockerManager.log.error("Failed to download resource \(resource.cacheFolderName): \(error)")
           }
@@ -264,12 +263,17 @@ public class FilterListResourceDownloader {
     fetchTasks.removeValue(forKey: resource)
   }
   
-  private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for filterList: FilterListInterface) async {
-    if !downloadResult.isModified {
-      // if the file is not modified first we need to see if we already have a cached value loaded
-      guard await !ContentBlockerManager.shared.hasRuleList(for: .filterList(uuid: filterList.uuid)) else {
-        // We don't want to recompile something that we alrady have loaded
-        return
+  @MainActor private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for filterList: FilterList) async {
+    let blocklistType = ContentBlockerManager.BlocklistType.filterList(uuid: filterList.uuid, isAlwaysAggressive: filterList.isAlwaysAggressive)
+    
+    let modes = await blocklistType.allowedModes.asyncFilter { mode in
+      if downloadResult.isModified { return true }
+        
+      if await ContentBlockerManager.shared.hasRuleList(for: blocklistType, mode: mode) {
+        ContentBlockerManager.log.debug("Rule list already compiled for `\(blocklistType.makeIdentifier(for: mode))`")
+        return false
+      } else {
+        return true
       }
     }
     
@@ -279,13 +283,13 @@ public class FilterListResourceDownloader {
       // We only want to compile cached values if they are not already loaded
       try await ContentBlockerManager.shared.compile(
         encodedContentRuleList: encodedContentRuleList,
-        for: .filterList(uuid: filterList.uuid),
-        options: .all
+        for: blocklistType,
+        options: .all,
+        modes: modes
       )
     } catch {
-      let debugTitle = await filterList.debugTitle
       ContentBlockerManager.log.error(
-        "Failed to compile rule list for \(debugTitle) (`\(downloadResult.fileURL.absoluteString)`): \(error)"
+        "Failed to compile rule list for \(String(describing: blocklistType)): \(error)"
       )
     }
   }
