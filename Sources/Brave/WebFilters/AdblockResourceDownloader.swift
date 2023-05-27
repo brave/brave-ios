@@ -18,7 +18,7 @@ public actor AdblockResourceDownloader: Sendable {
   ]
   
   /// A list of old resources that need to be deleted so as not to take up the user's disk space
-  private static let deprecatedResources: [BraveS3Resource] = [.generalCosmeticFilters]
+  private static let deprecatedResources: [BraveS3Resource] = [.deprecatedGeneralCosmeticFilters]
   
   /// A formatter that is used to format a version number
   private let fileVersionDateFormatter: DateFormatter = {
