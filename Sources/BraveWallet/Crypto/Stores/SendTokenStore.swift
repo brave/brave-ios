@@ -195,7 +195,7 @@ public class SendTokenStore: ObservableObject {
       
       let selectedAccount = await self.keyringService.selectedAccount(selectedCoin)
       if selectedAccount != account.address {
-        _ = await self.keyringService.setSelectedAccount(account.coin, keyringId: account.keyringId, address: account.address)
+        _ = await self.keyringService.setSelectedAccount(account.accountId)
       }
       
       let selectedChain = await rpcService.network(selectedCoin, origin: nil)

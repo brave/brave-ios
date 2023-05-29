@@ -15,12 +15,15 @@ private extension BraveWallet.AccountInfo {
     coin: BraveWallet.CoinType = .eth
   ) {
     self.init(
+      accountId: .init(
+        coin: coin,
+        keyringId: coin.keyringId,
+        kind: .derived,
+        address: address
+      ),
       address: address,
       name: name,
-      isImported: false,
-      hardware: nil,
-      coin: .eth,
-      keyringId: BraveWallet.DefaultKeyringId
+      hardware: nil
     )
   }
 }
