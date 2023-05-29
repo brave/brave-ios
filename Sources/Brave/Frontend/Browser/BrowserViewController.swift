@@ -2464,6 +2464,7 @@ extension BrowserViewController: TabDelegate {
       FaviconScriptHandler(tab: tab),
       Web3NameServiceScriptHandler(tab: tab),
       Web3IPFSScriptHandler(tab: tab),
+      YoutubeQualityScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
