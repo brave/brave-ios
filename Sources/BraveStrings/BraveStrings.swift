@@ -2441,10 +2441,15 @@ extension Strings {
         value: "Powered by",
         comment: "It is used in context: 'Powered by BRAND_NAME'")
 
-    public static let freeTrial =
-      NSLocalizedString("vpn.freeTrial", tableName: "BraveShared", bundle: .module,
-        value: "All plans include a free 7-day trial!",
-        comment: "")
+    public static let freeTrialDetail =
+      NSLocalizedString("vpn.freeTrialDetail", tableName: "BraveShared", bundle: .module,
+        value: "All plans include a %@!",
+        comment: "Used in context: All plans include a 'free 7-day trial'! where variable part will be indicating what kind of trial it will include")
+    
+    public static let freeTrialPeriod =
+      NSLocalizedString("vpn.freeTrialDisclaimer", tableName: "BraveShared", bundle: .module,
+        value: "free 7-day trial",
+        comment: "Used in context: All plans include a 'free 7-day trial'! - this will be the disclamier for the trial showing it is free and 7 days long")
 
     public static let restorePurchases =
       NSLocalizedString("vpn.restorePurchases", tableName: "BraveShared", bundle: .module,

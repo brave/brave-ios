@@ -73,7 +73,26 @@ extension BuyVPNViewController {
         BraveVPNCommonUI.Views.poweredByView(textColor: .white, fontSize: 15, imageColor: .white)
 
       let title = BraveVPNCommonUI.Views.ShrinkableLabel().then {
-        $0.text = Strings.VPN.freeTrial
+        let boldedFont = $0.font.with(traits: .traitBold)
+
+        let normalFontAttribute: [NSAttributedString.Key: Any] = [
+          .font: $0.font.with(traits: nil)
+        ]
+        
+        let boldedUnderlineFontAttribute: [NSAttributedString.Key: Any] = [
+          .font: boldedFont,
+          .underlineStyle: NSUnderlineStyle.single.rawValue
+        ]
+        
+        let textToSet = String(format: Strings.VPN.freeTrialDetail, "\(Strings.VPN.freeTrialPeriod)")
+        let rangeOfUnderLinedBold = (textToSet as NSString).range(of: Strings.VPN.freeTrialPeriod)
+        let rangeOfNormalText = (textToSet as NSString).range(of: Strings.VPN.freeTrialDetail)
+        
+        let attributedText = NSMutableAttributedString(string: textToSet)
+        attributedText.addAttributes(boldedUnderlineFontAttribute, range: rangeOfUnderLinedBold)
+        attributedText.addAttributes(normalFontAttribute, range: rangeOfNormalText)
+
+        $0.attributedText = attributedText
         $0.textAlignment = .center
         $0.textColor = .white
         $0.isHidden = Preferences.VPN.freeTrialUsed.value
