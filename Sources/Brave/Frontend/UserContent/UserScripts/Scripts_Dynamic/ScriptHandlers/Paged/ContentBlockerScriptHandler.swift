@@ -89,7 +89,8 @@ extension ContentBlockerHelper: TabContentScript {
           requestURL: requestURL,
           sourceURL: sourceURL,
           enabledRuleTypes: genericTypes,
-          resourceType: dto.data.resourceType
+          resourceType: dto.data.resourceType,
+          isAggressiveMode: ShieldPreferences.blockAdsAndTrackingLevel.isAggressive
         )
         
         guard let blockedType = blockedType else { return }

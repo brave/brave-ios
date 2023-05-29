@@ -79,7 +79,8 @@ public class FilterListResourceDownloader {
       if let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) {
         await self.addEngineResources(
           forFilterListUUID: setting.uuid, downloadedFolderURL: folderURL,
-          relativeOrder: setting.order?.intValue ?? 0
+          relativeOrder: setting.order?.intValue ?? 0,
+          isAlwaysAggressive: setting.isAlwaysAggressive
         )
       }
     }
@@ -203,7 +204,8 @@ public class FilterListResourceDownloader {
         guard FilterListStorage.shared.isEnabled(for: filterList.entry.componentId) else { return }
         
         await self.addEngineResources(
-          forFilterListUUID: filterList.uuid, downloadedFolderURL: folderURL, relativeOrder: filterList.order
+          forFilterListUUID: filterList.uuid, downloadedFolderURL: folderURL, relativeOrder: filterList.order,
+          isAlwaysAggressive: filterList.isAlwaysAggressive
         )
         
         // Save the downloaded folder for later (caching) purposes
@@ -223,7 +225,7 @@ public class FilterListResourceDownloader {
         for: .filterList(uuid: filterList.uuid, isAlwaysAggressive: filterList.isAlwaysAggressive)
       )
       async let removeAdBlockEngineResource: Void = AdBlockEngineManager.shared.removeResources(
-        for: .filterList(uuid: filterList.uuid)
+        for: .filterList(uuid: filterList.uuid, isAlwaysAggressive: filterList.isAlwaysAggressive)
       )
       _ = try await (removeContentBlockerResource, removeAdBlockEngineResource)
     }
@@ -296,15 +298,15 @@ public class FilterListResourceDownloader {
   
   /// Handle the downloaded folder url for the given filter list. The folder URL should point to a `AdblockFilterList` resource
   /// This will also start fetching any additional resources for the given filter list given it is still enabled.
-  private func addEngineResources(forFilterListUUID uuid: String, downloadedFolderURL: URL, relativeOrder: Int) async {
+  private func addEngineResources(forFilterListUUID uuid: String, downloadedFolderURL: URL, relativeOrder: Int, isAlwaysAggressive: Bool) async {
     // Let's add the new ones in
     await AdBlockEngineManager.shared.add(
-      resource: AdBlockEngineManager.Resource(type: .dat, source: .filterList(uuid: uuid)),
+      resource: AdBlockEngineManager.Resource(type: .dat, source: .filterList(uuid: uuid, isAlwaysAggressive: isAlwaysAggressive)),
       fileURL: downloadedFolderURL.appendingPathComponent("rs-\(uuid).dat"),
       version: downloadedFolderURL.lastPathComponent, relativeOrder: relativeOrder
     )
     await AdBlockEngineManager.shared.add(
-      resource: AdBlockEngineManager.Resource(type: .jsonResources, source: .filterList(uuid: uuid)),
+      resource: AdBlockEngineManager.Resource(type: .jsonResources, source: .filterList(uuid: uuid, isAlwaysAggressive: isAlwaysAggressive)),
       fileURL: downloadedFolderURL.appendingPathComponent("resources.json"),
       version: downloadedFolderURL.lastPathComponent,
       relativeOrder: relativeOrder

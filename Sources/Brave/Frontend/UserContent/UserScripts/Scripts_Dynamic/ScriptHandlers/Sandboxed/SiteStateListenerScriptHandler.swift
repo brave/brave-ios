@@ -95,7 +95,7 @@ class SiteStateListenerScriptHandler: TabContentScript {
         styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
       }
       
-      if modelTuple.source.isAlwaysAgressive(given: FilterListStorage.shared.filterLists) {
+      if modelTuple.source.isAlwaysAggressive {
         aggressiveSelectors = aggressiveSelectors.union(modelTuple.model.hideSelectors)
       } else {
         standardSelectors = standardSelectors.union(modelTuple.model.hideSelectors)

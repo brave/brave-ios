@@ -14,7 +14,7 @@ extension AdblockEngine {
   /// Check the rust engine if the request should be blocked given the `sourceURL` and `resourceType`.
   ///
   /// - Warning: You must provide a absolute URL (i.e. containing a host) fo r `requestURL` and `sourceURL`
-  public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType) -> Bool {
+  public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType, isAggressive: Bool) -> Bool {
     // Compare the etld+1 of requestURL and sourceURL.
     // Note: `baseDomain` returns etld+1
     let isThirdParty = requestURL.baseDomain != sourceURL.baseDomain
