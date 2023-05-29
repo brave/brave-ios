@@ -155,7 +155,7 @@ actor ContentBlockerManager {
       guard prefixes.contains(where: { identifier.hasPrefix($0) }) else { return }
       
       do {
-        try await self.removeRuleList(forIdentifier: identifier)
+        try await self.removeRuleList(forIdentifier: identifier, force: true)
       } catch {
         assertionFailure()
       }
@@ -261,9 +261,9 @@ actor ContentBlockerManager {
   }
   
   /// Remove the rule list for the blocklist type
-  func removeRuleLists(for type: BlocklistType) async throws {
+  func removeRuleLists(for type: BlocklistType, force: Bool = false) async throws {
     for mode in type.allowedModes {
-      try await removeRuleList(forIdentifier: type.makeIdentifier(for: mode))
+      try await removeRuleList(forIdentifier: type.makeIdentifier(for: mode), force: force)
     }
   }
   
@@ -377,13 +377,15 @@ actor ContentBlockerManager {
       do {
         return try await self.ruleList(for: blocklistType, mode: mode)
       } catch {
+        Self.log.error("Missing rule list for `\(blocklistType.makeIdentifier(for: mode))`")
         return nil
       }
     }))
   }
   
   /// Remove the rule list for the given identifier. This will remove them from this local cache and from the rule store.
-  private func removeRuleList(forIdentifier identifier: String) async throws {
+  private func removeRuleList(forIdentifier identifier: String, force: Bool) async throws {
+    guard force || self.cachedRuleLists[identifier] != nil else { return }
     self.cachedRuleLists.removeValue(forKey: identifier)
     try await ruleStore.removeContentRuleList(forIdentifier: identifier)
     Self.log.debug("Removed rule list for `\(identifier)`")
