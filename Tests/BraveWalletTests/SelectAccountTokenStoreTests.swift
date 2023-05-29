@@ -52,12 +52,15 @@ import BraveCore
   ]
   
   private let mockEthAccount2: BraveWallet.AccountInfo = .init(
+    accountId: .init(
+      coin: .eth,
+      keyringId: BraveWallet.DefaultKeyringId,
+      kind: .derived,
+      address: "mock_eth_id_2"
+    ),
     address: "mock_eth_id_2",
     name: "Ethereum Account 2",
-    isImported: false,
-    hardware: nil,
-    coin: .eth,
-    keyringId: BraveWallet.DefaultKeyringId
+    hardware: nil
   )
   
   private let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
