@@ -6,23 +6,13 @@
 import Foundation
 import BraveCore
 import Combine
+import Data
 
 public class AssetStore: ObservableObject, Equatable {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
-      if isCustomToken {
-        walletService.setUserAssetVisible(
-          token,
-          visible: isVisible
-        ) { _ in }
-      } else {
-        if isVisible {
-          walletService.addUserAsset(token) { _ in }
-        } else {
-          walletService.removeUserAsset(token) { _ in }
-        }
-      }
+      WalletUserAsset.updateUserAsset(for: token, visible: isVisible)
     }
   }
   var network: BraveWallet.NetworkInfo
@@ -104,7 +94,7 @@ public class UserAssetsStore: ObservableObject {
       case let .network(network):
         networks = [network]
       }
-      let allUserAssets = await self.walletService.allUserAssets(in: networks)
+      let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: networks)
       var allTokens = await self.blockchainRegistry.allTokens(in: networks)
       // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
       let allUserTokens = allUserAssets.flatMap(\.tokens)
@@ -150,20 +140,20 @@ public class UserAssetsStore: ObservableObject {
     _ asset: BraveWallet.BlockchainToken,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    walletService.addUserAsset(asset) { [weak self] success in
-      if success {
+    if WalletUserAsset.getUserAsset(asset: asset) != nil {
+      completion(false)
+    } else {
+      WalletUserAsset.addUserAsset(asset: asset) { [weak self] in
         self?.update()
+        completion(true)
       }
-      completion(success)
     }
   }
 
   func removeUserAsset(token: BraveWallet.BlockchainToken, completion: @escaping (_ success: Bool) -> Void) {
-    walletService.removeUserAsset(token) { [weak self] success in
-      if success {
-        self?.update()
-      }
-      completion(success)
+    WalletUserAsset.removeUserAsset(asset: token) { [weak self] in
+      self?.update()
+      completion(true)
     }
   }
 
@@ -200,7 +190,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allAssets() async -> [AssetViewModel] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = await walletService.allUserAssets(in: allNetworks)
+    let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: allNetworks)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     let allBlockchainTokens = await blockchainRegistry.allTokens(in: allNetworks)
@@ -228,7 +218,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allNFTMetadata() async -> [String: NFTMetadata] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = await walletService.allUserAssets(in: allNetworks)
+    let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: allNetworks)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     

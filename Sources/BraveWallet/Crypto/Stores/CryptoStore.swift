@@ -170,6 +170,11 @@ public class CryptoStore: ObservableObject {
     self.keyringService.add(self)
     self.txService.add(self)
     self.rpcService.add(self)
+    self.walletService.add(self)
+    
+    if !Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value {
+      migrateUserAssets()
+    }
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -507,6 +512,76 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
+  
+  /// return all user assets with given networks in `NetworkAssets` form from database.
+  static func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
+    var allVisibleUserAssets: [NetworkAssets] = []
+    for (index, network) in networks.enumerated() {
+      let groupId = "\(network.coin.rawValue).\(network.chainId)"
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets {
+        let networkAsset = NetworkAssets(
+          network: network,
+          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          sortOrder: index
+        )
+        allVisibleUserAssets.append(networkAsset)
+      }
+    }
+    return allVisibleUserAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
+  }
+  
+  /// return all user assets with given networks in `NetworkAssets` form from database.
+  static func getAllVisibleAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
+    var allVisibleUserAssets: [NetworkAssets] = []
+    for (index, network) in networks.enumerated() {
+      let groupId = "\(network.coin.rawValue).\(network.chainId)"
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter(\.visible) {
+        let networkAsset = NetworkAssets(
+          network: network,
+          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          sortOrder: index
+        )
+        allVisibleUserAssets.append(networkAsset)
+      }
+    }
+    return allVisibleUserAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
+  }
+  
+  func migrateUserAssets(for coin: BraveWallet.CoinType? = nil) {
+    Task { @MainActor in
+      var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]
+      var networks: [BraveWallet.NetworkInfo] = []
+      if let coin = coin {
+        networks = await rpcService.allNetworks(coin)
+      } else {
+        networks = await rpcService.allNetworksForSupportedCoins()
+      }
+      networks = networks.filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
+      let networkAssets = await walletService.allUserAssets(in: networks)
+      for networkAsset in networkAssets {
+        fetchedUserAssets["\(networkAsset.network.coin.rawValue).\(networkAsset.network.chainId)"] = networkAsset.tokens
+      }
+      WalletUserAsset.migrateVisibleAssets(fetchedUserAssets) { [weak self] in
+        let allGroups = WalletUserAssetGroup.getAllGroups()
+        print("*****After migration, groups count: \(allGroups?.count ?? 0)")
+        if let groups = allGroups {
+          for group in groups {
+            print("GroupId: \(group.groupId)")
+            if let assets = group.walletUserAssets {
+              print("Assets: \(assets.count)")
+            }
+          }
+        }
+        if let assets = WalletUserAsset.getAllUserAssets() {
+          for asset in assets {
+            print("Asset name: \(asset.name) coin: \(BraveWallet.CoinType(rawValue: Int(asset.coin))) chainId: \(asset.chainId)")
+          }
+        }
+        Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value = true
+        self?.updateAssets()
+      }
+    }
+  }
 }
 
 extension CryptoStore: BraveWalletTxServiceObserver {
@@ -531,8 +606,23 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
     rejectAllPendingWebpageRequests()
   }
   public func keyringCreated(_ keyringId: String) {
+    Task { @MainActor in
+      var coin: BraveWallet.CoinType?
+      for supportedCoin in WalletConstants.supportedCoinTypes where supportedCoin.keyringId == keyringId {
+        coin = supportedCoin
+        break
+      }
+      if let newCoin = coin {
+        migrateUserAssets(for: newCoin)
+      }
+    }
   }
   public func keyringRestored(_ keyringId: String) {
+    // if a keyring is restored, we want to reset user assets local storage
+    // and migrate with for new keyring
+    WalletUserAssetGroup.removeAllGroup() { [weak self] in
+      self?.migrateUserAssets()
+    }
   }
   public func locked() {
     isPresentingPendingRequest = false
@@ -569,5 +659,40 @@ extension CryptoStore: BraveWalletJsonRpcServiceObserver {
   }
   
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
+  }
+}
+
+extension CryptoStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
+  }
+  
+  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+  
+  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
+  }
+  
+  public func onDefaultBaseCurrencyChanged(_ currency: String) {
+  }
+  
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
+  }
+  
+  public func onNetworkListChanged() {
+  }
+  
+  public func onDiscoverAssetsStarted() {
+  }
+  
+  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
+    for asset in discoveredAssets where WalletUserAsset.getUserAsset(asset: asset) == nil {
+      WalletUserAsset.addUserAsset(asset: asset)
+    }
+    if !discoveredAssets.isEmpty {
+      updateAssets()
+    }
+  }
+  
+  public func onResetWallet() {
   }
 }

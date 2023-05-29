@@ -6,7 +6,6 @@
 import Foundation
 import BraveCore
 import Combine
-import Data
 import Preferences
 
 /// The main wallet store
@@ -76,12 +75,6 @@ public class WalletStore {
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {
-          if !Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value {
-            self.migrateUserAssets(
-              rpcService: rpcService,
-              walletService: walletService
-            )
-          }
           self.cryptoStore = CryptoStore(
             keyringService: keyringService,
             rpcService: rpcService,
@@ -108,38 +101,5 @@ public class WalletStore {
           }
         }
       }
-  }
-  
-  private func migrateUserAssets(
-    rpcService: BraveWalletJsonRpcService,
-    walletService: BraveWalletBraveWalletService
-  ) {
-    Task { @MainActor in
-      var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]
-      let networks = await rpcService.allNetworksForSupportedCoins()
-        .filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
-      for network in networks {
-        let assets = await walletService.userAssets(network.chainId, coin: network.coin)
-        fetchedUserAssets["\(network.coin.rawValue).\(network.chainId)"] = assets
-      }
-      WalletUserAsset.migrateVisibleAssets(fetchedUserAssets) {
-        let allGroups = WalletUserAssetGroup.getAllGroups()
-        print("*****After migration, groups count: \(allGroups?.count ?? 0)")
-        if let groups = allGroups {
-          for group in groups {
-            print("GroupId: \(group.groupId)")
-            if let assets = group.walletUserAssets {
-              print("Assets: \(assets.count)")
-            }
-          }
-        }
-        if let assets = WalletUserAsset.getAllUserAssets() {
-          for asset in assets {
-            print("Asset name: \(asset.name) coin: \(BraveWallet.CoinType(rawValue: Int(asset.coin))) chainId: \(asset.chainId)")
-          }
-        }
-        Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value = true
-      }
-    }
   }
 }

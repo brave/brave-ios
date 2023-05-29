@@ -81,7 +81,7 @@ class AccountActivityStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = await walletService.allVisibleUserAssets(in: networksForAccountCoin)
+      let allVisibleUserAssets = CryptoStore.getAllVisibleAssetsInNetworkAssets(networks: networksForAccountCoin)
       let allTokens = await blockchainRegistry.allTokens(in: networksForAccountCoin).flatMap(\.tokens)
       var updatedUserVisibleAssets: [AssetViewModel] = []
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []

@@ -44,14 +44,12 @@ public final class WalletUserAssetGroup: NSManagedObject, CRUD {
   public static func removeGroup(_ groupId: String, completion: (() -> Void)? = nil) {
     WalletUserAssetGroup.deleteAll(
       predicate: NSPredicate(format: "groupId == %@", groupId),
-      includesPropertyValues: false,
       completion: completion
     )
   }
   
   public static func removeAllGroup(completion: (() -> Void)? = nil) {
     WalletUserAssetGroup.deleteAll(
-      includesPropertyValues: false,
       completion: completion
     )
   }

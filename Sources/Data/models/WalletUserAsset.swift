@@ -79,6 +79,10 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
     self.coin = Int16(asset.coin.rawValue)
   }
   
+  public static func getUserAsset(asset: BraveWallet.BlockchainToken, context: NSManagedObjectContext? = nil) -> WalletUserAsset? {
+    WalletUserAsset.first(where: NSPredicate(format: "contractAddress == %@ AND chainId == %@ AND symbol == %@ AND tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId), context: context ?? DataController.viewContext)
+  }
+  
   public static func getAllUserAssets(context: NSManagedObjectContext? = nil) -> [WalletUserAsset]? {
     WalletUserAsset.all(context: context ?? DataController.viewContext)
   }
@@ -92,7 +96,7 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
       guard let assetsInOneGroup = assets[groupId] else { return }
       DataController.perform(context: .new(inMemory: false), save: false) { context in
         let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
-        for asset in assetsInOneGroup {
+        for asset in assetsInOneGroup where WalletUserAsset.getUserAsset(asset: asset, context: context) == nil {
           let visibleAsset = WalletUserAsset(context: context, asset: asset)
           visibleAsset.walletUserAssetGroup = group
         }
@@ -106,6 +110,51 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
     }
   }
   
+  public static func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, completion: (() -> Void)? = nil) {
+    DataController.perform(context: .new(inMemory: false), save: false) { context in
+      if let asset = WalletUserAsset.first(where: NSPredicate(format: "contractAddress == %@ AND chainId == %@ AND symbol == %@ AND tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId), context: context) {
+        asset.visible = visible
+      } else {
+        let groupId = "\(asset.coin.rawValue).\(asset.chainId)"
+        let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
+        let visibleAsset = WalletUserAsset(context: context, asset: asset)
+        visibleAsset.visible = visible
+        visibleAsset.walletUserAssetGroup = group
+      }
+      
+      WalletUserAsset.saveContext(context)
+      
+      DispatchQueue.main.async {
+        completion?()
+      }
+    }
+  }
+  
+  public static func addUserAsset(asset: BraveWallet.BlockchainToken, completion: (() -> Void)? = nil) {
+    DataController.perform(context: .new(inMemory: false), save: false) { context in
+      let groupId = "\(asset.coin.rawValue).\(asset.chainId)"
+      let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
+      let visibleAsset = WalletUserAsset(context: context, asset: asset)
+      visibleAsset.visible = true
+      visibleAsset.walletUserAssetGroup = group
+      
+      WalletUserAsset.saveContext(context)
+      
+      DispatchQueue.main.async {
+        completion?()
+      }
+    }
+  }
+  
+  public static func removeUserAsset(asset: BraveWallet.BlockchainToken, completion: (() -> Void)? = nil) {
+    WalletUserAsset.deleteAll(
+      predicate: NSPredicate(format: "contractAddress == %@ AND chainId == %@ AND symbol == %@ AND tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId),
+      completion: completion
+    )
+  }
+}
+
+extension WalletUserAsset {
   private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
     NSEntityDescription.entity(forEntityName: "WalletUserAsset", in: context)!
   }

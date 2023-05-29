@@ -90,7 +90,7 @@ public class NFTStore: ObservableObject {
       case let .network(network):
         networks = [network]
       }
-      let allVisibleUserAssets = await self.walletService.allVisibleUserAssets(in: networks)
+      let allVisibleUserAssets = CryptoStore.getAllVisibleAssetsInNetworkAssets(networks: networks)
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
       for networkAssets in allVisibleUserAssets {
         for token in networkAssets.tokens {
@@ -230,9 +230,7 @@ extension NFTStore: BraveWalletBraveWalletServiceObserver {
   
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
     isLoadingDiscoverAssets = false
-    if !discoveredAssets.isEmpty {
-      update()
-    }
+    // assets update will be called via `CryptoStore`
   }
   
   public func onResetWallet() {
