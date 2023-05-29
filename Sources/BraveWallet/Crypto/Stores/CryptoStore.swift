@@ -562,21 +562,6 @@ public class CryptoStore: ObservableObject {
         fetchedUserAssets["\(networkAsset.network.coin.rawValue).\(networkAsset.network.chainId)"] = networkAsset.tokens
       }
       WalletUserAsset.migrateVisibleAssets(fetchedUserAssets) { [weak self] in
-        let allGroups = WalletUserAssetGroup.getAllGroups()
-        print("*****After migration, groups count: \(allGroups?.count ?? 0)")
-        if let groups = allGroups {
-          for group in groups {
-            print("GroupId: \(group.groupId)")
-            if let assets = group.walletUserAssets {
-              print("Assets: \(assets.count)")
-            }
-          }
-        }
-        if let assets = WalletUserAsset.getAllUserAssets() {
-          for asset in assets {
-            print("Asset name: \(asset.name) coin: \(BraveWallet.CoinType(rawValue: Int(asset.coin))) chainId: \(asset.chainId)")
-          }
-        }
         Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value = true
         self?.updateAssets()
       }
