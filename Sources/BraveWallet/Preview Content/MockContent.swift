@@ -131,11 +131,17 @@ extension BraveWallet.BlockchainToken {
 
 extension BraveWallet.AccountInfo {
   static var previewAccount: BraveWallet.AccountInfo {
-    let account = BraveWallet.AccountInfo()
-    account.name = "Account 1"
-    account.address = "0x879240B2D6179E9EC40BC2AFFF9E9EC40BC2AFFF"
-    account.keyringId = BraveWallet.DefaultKeyringId
-    return account
+    .init(
+      accountId: .init(
+        coin: .eth,
+        keyringId: BraveWallet.DefaultKeyringId,
+        kind: .derived,
+        address: "0x879240B2D6179E9EC40BC2AFFF9E9EC40BC2AFFF"
+      ),
+      address: "0x879240B2D6179E9EC40BC2AFFF9E9EC40BC2AFFF",
+      name: "Account 1",
+      hardware: nil
+    )
   }
 }
 
