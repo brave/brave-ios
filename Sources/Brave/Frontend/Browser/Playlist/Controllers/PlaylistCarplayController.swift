@@ -413,7 +413,7 @@ class PlaylistCarplayController: NSObject {
         let listItem = selectableItem as? CPListItem ?? listItem
         listItem?.accessoryType = .none
         
-        Task { [listItems] in
+        Task { @MainActor [listItems] in
           do {
             try await self.initiatePlaybackOfItem(itemId: itemId)
           } catch {
@@ -611,6 +611,7 @@ extension PlaylistCarplayController {
     return thumbnailRenderer
   }
 
+  @MainActor
   func initiatePlaybackOfItem(itemId: String) async throws {
     guard let index = PlaylistManager.shared.index(of: itemId),
       let item = PlaylistManager.shared.itemAtIndex(index)
@@ -638,12 +639,9 @@ extension PlaylistCarplayController {
     PlaylistCarplayManager.shared.currentPlaylistItem = item
     PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
     
-    try await playItem(item: item)
-    
-    if player.isPlaying {
-      PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
-      PlaylistCarplayManager.shared.currentPlaylistItem = item
-    } else {
+    do {
+      try await playItem(item: item)
+    } catch {
       PlaylistCarplayManager.shared.currentPlaylistItem = nil
       PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
     }
@@ -750,6 +748,7 @@ extension PlaylistCarplayController {
     PlaylistCarplayManager.shared.currentPlaylistItem = nil
     player.stop()
     
+    PlaylistManager.shared.playbackTask?.cancel()
     PlaylistManager.shared.playbackTask = nil
   }
 
@@ -772,10 +771,12 @@ extension PlaylistCarplayController {
     }
   }
 
+  @MainActor
   func load(url: URL, autoPlayEnabled: Bool) async throws {
     try await load(asset: AVURLAsset(url: url, options: AVAsset.defaultOptions), autoPlayEnabled: autoPlayEnabled)
   }
 
+  @MainActor
   func load(asset: AVURLAsset, autoPlayEnabled: Bool) async throws {
     player.stop()
     
@@ -795,6 +796,7 @@ extension PlaylistCarplayController {
     }
   }
 
+  @MainActor
   func playItem(item: PlaylistInfo) async throws {
     let isPlaying = player.isPlaying
 
@@ -828,6 +830,7 @@ extension PlaylistCarplayController {
     return try await streamItem(item: item)
   }
 
+  @MainActor
   func streamItem(item: PlaylistInfo) async throws {
     let isPlaying = player.isPlaying
     var item = item
