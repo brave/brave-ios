@@ -213,6 +213,9 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
 
         topToolbar.layoutIfNeeded()
         view.layoutIfNeeded()
+        
+        // Ensure url bar is expanded before presenting a popover on it
+        toolbarVisibilityViewModel.toolbarState = .expanded
 
         DispatchQueue.main.async {
           let model = OnboardingPlaylistModel()
