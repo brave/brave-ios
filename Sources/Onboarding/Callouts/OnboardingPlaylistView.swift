@@ -16,6 +16,23 @@ public class OnboardingPlaylistModel: ObservableObject {
     case details
     case tryItOut
     case completed(folderName: String)
+    
+    // CasePaths would have made this unneccessary...
+    fileprivate var accessibilityStep: AccessibilityStep {
+      switch self {
+      case .initial: return .initial
+      case .details: return .details
+      case .tryItOut: return .tryItOut
+      case .completed: return .completed
+      }
+    }
+  }
+  
+  fileprivate enum AccessibilityStep: Hashable {
+    case initial
+    case details
+    case tryItOut
+    case completed
   }
   
   public var step: Step {
@@ -44,6 +61,8 @@ public struct OnboardingPlaylistView: View {
   }
   
   @State private var introAnimationCompleted: Bool = false
+  
+  @AccessibilityFocusState private var accessibilityFocusStep: OnboardingPlaylistModel.AccessibilityStep?
   
   @Environment(\.dismiss) private var dismiss
   
@@ -130,6 +149,7 @@ public struct OnboardingPlaylistView: View {
         .scaleEffect(introAnimationCompleted ? 1 : 0.5)
         .opacity(introAnimationCompleted ? 1 : 0.0)
     }
+    .accessibilityHidden(true)
   }
 
   private var includesHeader: Bool {
@@ -156,20 +176,31 @@ public struct OnboardingPlaylistView: View {
           .padding(.horizontal)
           .opacity(introAnimationCompleted ? 1 : 0.0)
           .transition(.asymmetric(insertion: .identity, removal: .opacity.animation(.linear(duration: 0.1))))
+          .accessibilityFocused($accessibilityFocusStep, equals: .initial)
         case .details:
           DetailsStepView(advance: {
             model.step = .tryItOut
           })
           .transition(.asymmetric(insertion: .opacity.animation(.default.delay(0.1)), removal: .opacity.animation(.default)))
+          .accessibilityFocused($accessibilityFocusStep, equals: .details)
         case .tryItOut:
           TryItOutStepView()
+            .accessibilitySortPriority(2)
             .transition(.asymmetric(insertion: .opacity.animation(.default.delay(0.1)), removal: .opacity.animation(.default)))
+            .accessibilityFocused($accessibilityFocusStep, equals: .tryItOut)
         case .completed(let folderName):
           CompletedStepView(folderName: folderName, onOpenPlaylist: model.onboardingCompleted)
             .transition(.asymmetric(insertion: .opacity.animation(.default.delay(0.1)), removal: .opacity.animation(.default)))
+            .accessibilityFocused($accessibilityFocusStep, equals: .completed)
         }
       }
     }
+    .onChange(of: model.step, perform: { newValue in
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        accessibilityFocusStep = newValue.accessibilityStep
+      }
+    })
+    .accessibilitySortPriority(2)
     .overlay(alignment: .bottom) {
       if model.step == .details {
         DetailsStepView(advance: {
@@ -177,6 +208,7 @@ public struct OnboardingPlaylistView: View {
         })
         .expandedViewButtons
         .foregroundStyle(.white)
+        .accessibilitySortPriority(1)
       }
     }
     .frame(
@@ -231,6 +263,7 @@ extension OnboardingPlaylistView {
         VStack(spacing: 12) {
           Text(Strings.PlaylistOnboarding.introducingBravePlaylist)
             .font(.subheadline.weight(.semibold))
+            .accessibilityAddTraits(.isHeader)
           Text(Strings.PlaylistOnboarding.playlistOnboardingDescription)
             .font(.footnote)
         }
@@ -264,6 +297,7 @@ extension OnboardingPlaylistView {
         Text(Strings.PlaylistOnboarding.introducingBravePlaylist)
           .font(.title2.weight(.semibold))
           .padding(.horizontal)
+          .accessibilityAddTraits(.isHeader)
         VStack(spacing: 24) {
           VStack(spacing: 24) {
             bulletPoint(braveSystemName: "leo.cloud.download", title: Strings.PlaylistOnboarding.playlistInfoFeaturePointTitleOne, subtitle: Strings.PlaylistOnboarding.playlistInfoFeaturePointSubtitleOne)

@@ -195,7 +195,7 @@ public class PopoverController: UIViewController {
     let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(tappedBackgroundOverlay(_:)))
     backgroundOverlayView.isAccessibilityElement = true
     backgroundOverlayView.accessibilityLabel = contentController.closeActionAccessibilityLabel
-    backgroundOverlayView.accessibilityElements = [backgroundTap]
+    backgroundOverlayView.accessibilityTraits = [.button]
     backgroundOverlayView.addGestureRecognizer(backgroundTap)
 
     let pan = UIPanGestureRecognizer(target: self, action: #selector(pannedPopover(_:)))
@@ -260,7 +260,7 @@ public class PopoverController: UIViewController {
       containerViewWidthConstraint?.isActive = true
     }
   }
-
+  
   override public var preferredStatusBarStyle: UIStatusBarStyle {
     return .default
   }
@@ -574,6 +574,9 @@ extension PopoverController: BasicAnimationControllerDelegate {
       snapshotView.snp.makeConstraints {
         $0.edges.equalTo(originLayoutGuide)
       }
+      snapshotView.isAccessibilityElement = true
+      snapshotView.accessibilityTraits = [.button]
+      snapshotView.accessibilityLabel = previewForOrigin.view.accessibilityLabel
       self.originSnapshotView = snapshotView
       
       if previewForOrigin.displaysFocusRings {
@@ -633,6 +636,9 @@ extension PopoverController: BasicAnimationControllerDelegate {
       },
       completion: { _ in
         self.originFocusView?.beginAnimating()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+          UIAccessibility.post(notification: .screenChanged, argument: self.contentController.view)
+        }
       })
     context.completeTransition(true)
   }
