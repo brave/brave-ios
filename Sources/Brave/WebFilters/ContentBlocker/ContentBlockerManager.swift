@@ -224,7 +224,6 @@ actor ContentBlockerManager {
         "action": ["type": "ignore-previous-rules"],
         "trigger": [
           "url-filter": ".*",
-          "resource-type": ["document"],
           "load-type": ["first-party"]
         ] as [String: Any?]
       ])
@@ -446,8 +445,8 @@ actor ContentBlockerManager {
       let actionType = actionDictionary["type"] as? String, actionType == "ignore-previous-rules",
       let triggerDictionary = jsonObject["trigger"] as? [String: Any],
       let urlFilter = triggerDictionary["url-filter"] as? String, urlFilter == ".*",
-      let resourceTypes = triggerDictionary["resource-type"] as? [String], resourceTypes == ["document"],
-      let loadType = triggerDictionary["load-type"] as? [String], loadType == ["first-party"]
+      let loadType = triggerDictionary["load-type"] as? [String], loadType == ["first-party"],
+      triggerDictionary["resource-type"] == nil
     else {
       return false
     }

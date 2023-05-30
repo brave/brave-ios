@@ -15,10 +15,6 @@ extension AdblockEngine {
   ///
   /// - Warning: You must provide a absolute URL (i.e. containing a host) fo r `requestURL` and `sourceURL`
   public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType, isAggressive: Bool) -> Bool {
-    // Compare the etld+1 of requestURL and sourceURL.
-    // Note: `baseDomain` returns etld+1
-    let isThirdParty = requestURL.baseDomain != sourceURL.baseDomain
-    
     guard requestURL.scheme != "data" else {
       // TODO: @JS Investigate if we need to deal with data schemes and if so, how?
       return false
@@ -31,6 +27,22 @@ extension AdblockEngine {
     
     guard let requestHost = requestURL.host, let sourceHost = sourceURL.host else {
       return false
+    }
+    
+    // Normally we should check the etld+1.
+    // However for network filtering we use content blockers
+    // which unfortunately uses a host comparison.
+    // So this is what we simulate here
+    let isThirdParty = requestHost != sourceHost
+    
+    if !isAggressive {
+      // Normally we should check the etld+1.
+      // However for network filtering we use content blockers
+      // which unfortunately uses a host comparison.
+      // So this is what we simulate here
+      guard isThirdParty else {
+        return false
+      }
     }
     
     return matches(

@@ -13,7 +13,7 @@ import os
 public actor LaunchHelper {
   public static let shared = LaunchHelper()
   static let signpost = OSSignposter(logger: ContentBlockerManager.log)
-  private let currentVersion: Float = 1.0
+  private let currentBlocklistVersion: Float = 1.0
   
   /// Get the last version the user launched this application. This allows us to know what to re-compile.
   public var lastBlocklistVersion = Preferences.Option<Float?>(
@@ -75,7 +75,7 @@ public actor LaunchHelper {
       return ShieldPreferences.blockAdsAndTrackingLevel.firstLaunchBlockingModes
     }
     
-    if version < currentVersion {
+    if version < currentBlocklistVersion {
       // We updated something and require things to be re-compiled
       return ShieldPreferences.blockAdsAndTrackingLevel.firstLaunchBlockingModes
     } else {
@@ -109,7 +109,7 @@ public actor LaunchHelper {
       Self.signpost.endInterval("nonBlockingLaunchTask", state)
       
       // Update the setting
-      await self.lastBlocklistVersion.value = self.currentVersion
+      await self.lastBlocklistVersion.value = self.currentBlocklistVersion
     }
   }
   
@@ -133,7 +133,7 @@ public actor LaunchHelper {
 }
 
 private extension ShieldLevel {
-  /// Return the
+  /// Return a list of first launch content blocker modes that MUST be precompiled during launch
   var firstLaunchBlockingModes: Set<ContentBlockerManager.BlockingMode> {
     switch self {
     case .standard, .disabled:
