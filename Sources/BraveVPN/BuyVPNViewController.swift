@@ -13,6 +13,12 @@ class BuyVPNViewController: VPNSetupLoadingController {
     
   let iapObserver: IAPObserver
   
+  var activeSubcriptionChoice: SubscriptionType = .yearly {
+    didSet {
+      buyVPNView.activeSubcriptionChoice = activeSubcriptionChoice
+    }
+  }
+  
   init(iapObserver: IAPObserver) {
     self.iapObserver = iapObserver
     super.init(nibName: nil, bundle: nil)
@@ -21,14 +27,8 @@ class BuyVPNViewController: VPNSetupLoadingController {
   @available(*, unavailable)
   required init?(coder: NSCoder) { fatalError() }
   
-  private var buyVPNView: View {
-    return view as! View  // swiftlint:disable:this force_cast
-  }
-
-  override func loadView() {
-    view = View()
-  }
-
+  private var buyVPNView = BuyVPNView(with: .yearly)
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -40,6 +40,12 @@ class BuyVPNViewController: VPNSetupLoadingController {
     navigationItem.rightBarButtonItem = .init(
       title: Strings.VPN.restorePurchases, style: .done,
       target: self, action: #selector(restorePurchasesAction))
+    
+    view.addSubview(buyVPNView)
+    
+    buyVPNView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
 
     buyVPNView.monthlySubButton
       .addTarget(self, action: #selector(monthlySubscriptionAction), for: .touchUpInside)
@@ -67,34 +73,47 @@ class BuyVPNViewController: VPNSetupLoadingController {
     navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
   }
 
-  // MARK: - Button actions
+  // MARK: - Button Actions
+  
+  @objc func yearlySubscriptionAction() {
+    activeSubcriptionChoice = .yearly
+  }
+  
   @objc func monthlySubscriptionAction() {
-    guard let monthlySub = VPNProductInfo.monthlySubProduct else {
-      Logger.module.error("Failed to retrieve monthly subcription product")
-      return
-    }
-    isLoading = true
-    let payment = SKPayment(product: monthlySub)
-    SKPaymentQueue.default().add(payment)
+    activeSubcriptionChoice = .monthly
   }
 
   @objc func closeView() {
     dismiss(animated: true)
   }
 
-  @objc func yearlySubscriptionAction() {
-    guard let yearlySub = VPNProductInfo.yearlySubProduct else {
-      Logger.module.error("Failed to retrieve yearly subcription product")
-      return
-    }
-    isLoading = true
-    let payment = SKPayment(product: yearlySub)
-    SKPaymentQueue.default().add(payment)
-  }
-
   @objc func restorePurchasesAction() {
     isLoading = true
     SKPaymentQueue.default().restoreCompletedTransactions()
+  }
+  
+  @objc func startSubscriptionAction() {
+    
+  }
+  
+  private func addPaymentForSubcription(type: SubscriptionType) {
+    var subscriptionProduct: SKProduct?
+    
+    switch type {
+    case .yearly:
+      subscriptionProduct = VPNProductInfo.monthlySubProduct
+    case .monthly:
+      subscriptionProduct = VPNProductInfo.monthlySubProduct
+    }
+    
+    guard let subscriptionProduct = subscriptionProduct else {
+      Logger.module.error("Failed to retrieve \(type.rawValue) subcription product")
+      return
+    }
+    
+    isLoading = true
+    let payment = SKPayment(product: subscriptionProduct)
+    SKPaymentQueue.default().add(payment)
   }
 }
 
