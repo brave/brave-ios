@@ -30,9 +30,12 @@ class SendTokenStoreTests: XCTestCase {
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._addObserver = { _ in }
     keyringService._selectedAccount = { $1(accountAddress) }
+    keyringService._setSelectedAccount = { _, _, _, completion in completion(true) }
+    keyringService._checksumEthAddress = { address, completion in completion(address) }
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._network = { $2(selectedNetwork) }
     rpcService._allNetworks = { $1([selectedNetwork]) }
+    rpcService._setNetwork = { _, _, _, completion in completion(true) }
     rpcService._addObserver = { _ in }
     rpcService._balance = { $3(balance, .success, "") }
     rpcService._erc20TokenBalance = { $3(erc20Balance, .success, "") }
@@ -47,6 +50,10 @@ class SendTokenStoreTests: XCTestCase {
     rpcService._ensGetEthAddr = { _, completion in
       completion(ensGetEthAddr, false, .success, "")
     }
+    rpcService._setEnsResolveMethod = { _ in }
+    rpcService._setEnsOffchainLookupResolveMethod = { _ in }
+    rpcService._setSnsResolveMethod = { _ in }
+    rpcService._setUnstoppableDomainsResolveMethod = { _ in }
     rpcService._unstoppableDomainsGetWalletAddr = { _, _, completion in
       completion(unstoppableDomainsGetWalletAddr, .success, "")
     }
@@ -73,6 +80,7 @@ class SendTokenStoreTests: XCTestCase {
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._selectedCoin = { $0(selectedCoin) }
     walletService._userAssets = { $2(userAssets) }
+    walletService._isBase58EncodedSolanaPubkey = { _, completion in completion(true) }
     let ethTxManagerProxy = BraveWallet.TestEthTxManagerProxy()
     ethTxManagerProxy._makeErc20TransferData = { _, _, completion in
       completion(true, .init())
@@ -91,6 +99,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: MockBraveWalletService(),
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -104,6 +113,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: MockBraveWalletService(),
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -150,6 +160,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockSolToken,
@@ -185,6 +196,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -229,6 +241,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -254,6 +267,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -279,6 +293,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -306,6 +321,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -334,6 +350,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockERC721NFTToken,
@@ -384,6 +401,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -435,6 +453,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: BraveWallet.NetworkInfo.mockSolana.nativeToken,
@@ -472,6 +491,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockSpdToken,
@@ -512,6 +532,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockSolToken,
@@ -553,6 +574,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockSpdToken,
@@ -585,6 +607,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -627,6 +650,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -672,6 +696,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -709,6 +734,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -760,6 +786,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -807,6 +834,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -848,6 +876,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -886,6 +915,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -937,6 +967,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: nil,
@@ -984,6 +1015,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -1037,6 +1069,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,
@@ -1100,6 +1133,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .mockSolToken,
@@ -1160,6 +1194,7 @@ class SendTokenStoreTests: XCTestCase {
       walletService: walletService,
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: .previewToken,

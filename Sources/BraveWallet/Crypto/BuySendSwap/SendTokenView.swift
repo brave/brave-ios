@@ -16,6 +16,7 @@ struct SendTokenView: View {
 
   @State private var isShowingScanner = false
   @State private var isShowingError = false
+  @State private var isShowingSelectAccountTokenView: Bool = false
 
   @ScaledMetric private var length: CGFloat = 16.0
   
@@ -66,7 +67,7 @@ struct SendTokenView: View {
   var body: some View {
     NavigationView {
       Form {
-        Section {
+        Section { // TODO: Remove
           AccountPicker(
             keyringStore: keyringStore,
             networkStore: networkStore
@@ -77,13 +78,7 @@ struct SendTokenView: View {
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoFromTitle))
         ) {
-          NavigationLink(
-            destination:
-              SendTokenSearchView(
-                sendTokenStore: sendTokenStore,
-                network: networkStore.defaultSelectedChain
-              )
-          ) {
+          Button(action: { self.isShowingSelectAccountTokenView = true }) {
             HStack {
               if let token = sendTokenStore.selectedSendToken {
                 if token.isErc721 || token.isNft {
@@ -258,6 +253,16 @@ struct SendTokenView: View {
           address: $sendTokenStore.sendAddress
         )
       }
+      .sheet(isPresented: $isShowingSelectAccountTokenView) {
+        NavigationView {
+          SelectAccountTokenView(
+            store: sendTokenStore.selectTokenStore,
+            networkStore: networkStore
+          )
+          .navigationTitle("Select a Token to Send") // TODO: Localize
+          .navigationBarTitleDisplayMode(.inline)
+        }
+      }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -269,8 +274,9 @@ struct SendTokenView: View {
         }
       }
     }
-    .onAppear {
+    .task {
       sendTokenStore.update()
+      await sendTokenStore.selectTokenStore.update()
     }
     .navigationViewStyle(.stack)
   }

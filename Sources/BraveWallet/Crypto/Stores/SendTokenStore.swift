@@ -121,12 +121,24 @@ public class SendTokenStore: ObservableObject {
       }
     }
   }
+  
+  private(set) lazy var selectTokenStore = SelectAccountTokenStore(
+    didSelect: { [weak self] account, token in
+      self?.didSelect(account: account, token: token)
+    },
+    keyringService: keyringService,
+    rpcService: rpcService,
+    walletService: walletService,
+    assetRatioService: assetRatioService,
+    ipfsApi: ipfsApi
+  )
 
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
+  private let assetRatioService: BraveWalletAssetRatioService
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
   private var allTokens: [BraveWallet.BlockchainToken] = []
@@ -142,6 +154,7 @@ public class SendTokenStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
+    assetRatioService: BraveWalletAssetRatioService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
     prefilledToken: BraveWallet.BlockchainToken?,
@@ -152,6 +165,7 @@ public class SendTokenStore: ObservableObject {
     self.walletService = walletService
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
+    self.assetRatioService = assetRatioService
     self.ethTxManagerProxy = ethTxManagerProxy
     self.solTxManagerProxy = solTxManagerProxy
     self.prefilledToken = prefilledToken
@@ -169,6 +183,10 @@ public class SendTokenStore: ObservableObject {
       rounded = false
     }
     sendAmount = ((selectedSendTokenBalance ?? 0) * amount.rawValue).decimalExpansion(precisionAfterDecimalPoint: decimalPoint, rounded: rounded)
+  }
+  
+  private func didSelect(account: BraveWallet.AccountInfo, token: BraveWallet.BlockchainToken) {
+    
   }
   
   @MainActor private func validatePrefilledToken(on network: inout BraveWallet.NetworkInfo) async {
