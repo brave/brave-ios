@@ -1015,6 +1015,7 @@ extension Strings {
   public static let blockPopups = NSLocalizedString("BlockPopups", tableName: "BraveShared", bundle: .module, value: "Block Popups", comment: "Setting to enable popup blocking")
   public static let followUniversalLinks = NSLocalizedString("FollowUniversalLinks", tableName: "BraveShared", bundle: .module, value: "Allow universal links to open in external apps", comment: "Setting to follow universal links")
   public static let mediaAutoBackgrounding = NSLocalizedString("MediaAutoBackgrounding", tableName: "BraveShared", bundle: .module, value: "Enable Background Audio", comment: "Setting to allow media to play in the background")
+  public static let youtubeMediaQuality = NSLocalizedString("YoutubeMediaQuality", tableName: "BraveShared", bundle: .module, value: "Enable High-Quality Youtube Videos", comment: "Setting to enable high quality youtube videos")
   public static let showTabsBar = NSLocalizedString("ShowTabsBar", tableName: "BraveShared", bundle: .module, value: "Tabs Bar", comment: "Setting to show/hide the tabs bar")
   public static let privateBrowsingOnly = NSLocalizedString("PrivateBrowsingOnly", tableName: "BraveShared", bundle: .module, value: "Private Browsing Only", comment: "Setting to keep app in private mode")
   public static let shieldsDefaults = NSLocalizedString("ShieldsDefaults", tableName: "BraveShared", bundle: .module, value: "Brave Shields Global Defaults", comment: "Section title for adbblock, tracking protection, HTTPS-E, and cookies")

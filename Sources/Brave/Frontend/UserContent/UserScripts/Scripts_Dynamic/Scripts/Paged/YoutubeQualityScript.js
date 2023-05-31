@@ -29,7 +29,7 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
   
   function updatePlayerQuality(player, requestedQuality) {
     let qualities = player.getAvailableQualityLevels();
-    if (qualities && qualities.length > 0) {
+    if (qualities && qualities.length > 0 && requestedQuality.length > 0) {
       let quality = qualities.includes(requestedQuality) ? requestedQuality : qualities[0];
       
       if (player.setPlaybackQuality) {
@@ -45,7 +45,7 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
   }
   
   var timeout = 0;
-  var chosenQuality = "$<current_quality_value>";
+  var chosenQuality = "";
   
   Object.defineProperty(window.__firefox__, '$<set_youtube_quality>', {
     enumerable: false,
@@ -61,7 +61,7 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
           clearInterval(timeout);
           updatePlayerQuality(player, chosenQuality);
         }
-      }), 2000);
+      }), 500);
     })
   });
     
@@ -76,5 +76,12 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
     })
   });
   
-  window.__firefox__.$<refresh_youtube_quality>();
+  $(function() {
+    $.postNativeMessage('$<message_handler>', {
+      "securityToken": SECURITY_TOKEN,
+      "request": "get_default_quality"
+    }).then($(function(quality) {
+      window.__firefox__.$<set_youtube_quality>(quality);
+    }));
+  })();
 });

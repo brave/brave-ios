@@ -5,6 +5,7 @@
 
 import Foundation
 import WebKit
+import Preferences
 
 class YoutubeQualityScriptHandler: NSObject, TabContentScript {
   private weak var tab: Tab?
@@ -32,9 +33,7 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
   
   private static let refreshQuality = "refresh_youtube_quality_\(uniqueID)"
   private static let setQuality = "set_youtube_quality_\(uniqueID)"
-  
-  // TODO: Put this behind a preference
-  private static let defaultQuality = "hd720"
+  private static let highestQuality = "'hd2160p'"
   
   static let scriptName = "YoutubeQualityScript"
   static let scriptId = UUID().uuidString
@@ -46,7 +45,6 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
     }
     
     return WKUserScript(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
-                                                               "$<current_quality_value>": defaultQuality,
                                                                "$<refresh_youtube_quality>": refreshQuality,
                                                                "$<set_youtube_quality>": setQuality],
                                              securityToken: scriptId,
@@ -56,12 +54,16 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
                         in: scriptSandbox)
   }()
   
+  static func setEnabled(enabled: Bool, for tab: Tab) {
+    tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(Self.setQuality)", args: [enabled ? Self.highestQuality: "''"], contentWorld: Self.scriptSandbox, escapeArgs: false, asFunction: true)
+  }
+  
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
       return
     }
+    
+    replyHandler(Preferences.General.youtubeHighQuality.value ? Self.highestQuality : "", nil)
   }
 }

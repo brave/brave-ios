@@ -375,6 +375,10 @@ class SettingsViewController: TableViewController {
         title: Strings.mediaAutoBackgrounding,
         option: Preferences.General.mediaAutoBackgrounding,
         image: UIImage(braveSystemNamed: "leo.audio.active")),
+      .boolRow(
+        title: Strings.youtubeMediaQuality,
+        option: Preferences.General.youtubeHighQuality,
+        image: UIImage(braveSystemNamed: "leo.headphones")),
       .boolRow(title: Strings.blockPopups, option: Preferences.General.blockPopups,
                image: UIImage(braveSystemNamed: "leo.shield.block")),
     ])
