@@ -96,7 +96,6 @@ public class PortfolioStore: ObservableObject {
   @Published private(set) var isLoadingDiscoverAssets: Bool = false
 
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
-    walletService: self.walletService,
     blockchainRegistry: self.blockchainRegistry,
     rpcService: self.rpcService,
     keyringService: self.keyringService,
@@ -121,6 +120,7 @@ public class PortfolioStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let ipfsApi: IpfsAPI
+  private let assetManager: WalletUserAssetManagerType
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -128,7 +128,8 @@ public class PortfolioStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    ipfsApi: IpfsAPI
+    ipfsApi: IpfsAPI,
+    userAssetManager: WalletUserAssetManagerType = WalletUserAssetManager()
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
@@ -136,6 +137,7 @@ public class PortfolioStore: ObservableObject {
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
     self.ipfsApi = ipfsApi
+    self.assetManager = userAssetManager
 
     self.rpcService.add(self)
     self.keyringService.add(self)
@@ -168,7 +170,7 @@ public class PortfolioStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = CryptoStore.getAllVisibleAssetsInNetworkAssets(networks: networks)
+      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: networks)
       var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets

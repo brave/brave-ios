@@ -152,7 +152,6 @@ extension SwapTokenStore {
 extension UserAssetsStore {
   static var previewStore: UserAssetsStore {
     .init(
-      walletService: MockBraveWalletService(),
       blockchainRegistry: MockBlockchainRegistry(),
       rpcService: MockJsonRpcService(),
       keyringService: MockKeyringService(),
@@ -174,7 +173,8 @@ extension AccountActivityStore {
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
-      ipfsApi: TestIpfsAPI()
+      ipfsApi: TestIpfsAPI(),
+      walletUserAssetManager: TestableWalletUserAssetManager()
     )
   }
 }

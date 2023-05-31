@@ -6,7 +6,7 @@
 import Foundation
 import BraveCore
 
-struct NetworkAssets: Equatable {
+public struct NetworkAssets: Equatable {
   let network: BraveWallet.NetworkInfo
   let tokens: [BraveWallet.BlockchainToken]
   let sortOrder: Int

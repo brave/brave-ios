@@ -17,13 +17,11 @@ public class AssetStore: ObservableObject, Equatable {
   }
   var network: BraveWallet.NetworkInfo
 
-  private let walletService: BraveWalletBraveWalletService
   private let rpcService: BraveWalletJsonRpcService
   private let ipfsApi: IpfsAPI
   private(set) var isCustomToken: Bool
 
   init(
-    walletService: BraveWalletBraveWalletService,
     rpcService: BraveWalletJsonRpcService,
     network: BraveWallet.NetworkInfo,
     token: BraveWallet.BlockchainToken,
@@ -31,7 +29,6 @@ public class AssetStore: ObservableObject, Equatable {
     isCustomToken: Bool,
     isVisible: Bool
   ) {
-    self.walletService = walletService
     self.rpcService = rpcService
     self.network = network
     self.token = token
@@ -53,29 +50,29 @@ public class UserAssetsStore: ObservableObject {
   @Published private(set) var assetStores: [AssetStore] = []
   @Published var isSearchingToken: Bool = false
 
-  private let walletService: BraveWalletBraveWalletService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let rpcService: BraveWalletJsonRpcService
   private let keyringService: BraveWalletKeyringService
   private let assetRatioService: BraveWalletAssetRatioService
   private let ipfsApi: IpfsAPI
+  private let assetManager: WalletUserAssetManagerType
   private var allTokens: [BraveWallet.BlockchainToken] = []
   private var timer: Timer?
 
   public init(
-    walletService: BraveWalletBraveWalletService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     rpcService: BraveWalletJsonRpcService,
     keyringService: BraveWalletKeyringService,
     assetRatioService: BraveWalletAssetRatioService,
-    ipfsApi: IpfsAPI
+    ipfsApi: IpfsAPI,
+    userAssetManager: WalletUserAssetManagerType = WalletUserAssetManager()
   ) {
-    self.walletService = walletService
     self.blockchainRegistry = blockchainRegistry
     self.rpcService = rpcService
     self.keyringService = keyringService
     self.assetRatioService = assetRatioService
     self.ipfsApi = ipfsApi
+    self.assetManager = userAssetManager
     self.keyringService.add(self)
   }
   
@@ -94,7 +91,7 @@ public class UserAssetsStore: ObservableObject {
       case let .network(network):
         networks = [network]
       }
-      let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: networks)
+      let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networks)
       var allTokens = await self.blockchainRegistry.allTokens(in: networks)
       // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
       let allUserTokens = allUserAssets.flatMap(\.tokens)
@@ -123,7 +120,6 @@ public class UserAssetsStore: ObservableObject {
             })
           }
           return AssetStore(
-            walletService: walletService,
             rpcService: rpcService,
             network: assetsForNetwork.network,
             token: token,
@@ -190,7 +186,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allAssets() async -> [AssetViewModel] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: allNetworks)
+    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     let allBlockchainTokens = await blockchainRegistry.allTokens(in: allNetworks)
@@ -218,7 +214,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allNFTMetadata() async -> [String: NFTMetadata] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = CryptoStore.getAllUserAssetsInNetworkAssets(networks: allNetworks)
+    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     

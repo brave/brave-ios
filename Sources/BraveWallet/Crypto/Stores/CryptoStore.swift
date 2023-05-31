@@ -513,40 +513,6 @@ public class CryptoStore: ObservableObject {
     }
   }
   
-  /// return all user assets with given networks in `NetworkAssets` form from database.
-  static func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
-    var allVisibleUserAssets: [NetworkAssets] = []
-    for (index, network) in networks.enumerated() {
-      let groupId = "\(network.coin.rawValue).\(network.chainId)"
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets {
-        let networkAsset = NetworkAssets(
-          network: network,
-          tokens: walletUserAssets.map({ $0.blockchainToken }),
-          sortOrder: index
-        )
-        allVisibleUserAssets.append(networkAsset)
-      }
-    }
-    return allVisibleUserAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
-  }
-  
-  /// return all user assets with given networks in `NetworkAssets` form from database.
-  static func getAllVisibleAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
-    var allVisibleUserAssets: [NetworkAssets] = []
-    for (index, network) in networks.enumerated() {
-      let groupId = "\(network.coin.rawValue).\(network.chainId)"
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter(\.visible) {
-        let networkAsset = NetworkAssets(
-          network: network,
-          tokens: walletUserAssets.map({ $0.blockchainToken }),
-          sortOrder: index
-        )
-        allVisibleUserAssets.append(networkAsset)
-      }
-    }
-    return allVisibleUserAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
-  }
-  
   func migrateUserAssets(for coin: BraveWallet.CoinType? = nil) {
     Task { @MainActor in
       var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]

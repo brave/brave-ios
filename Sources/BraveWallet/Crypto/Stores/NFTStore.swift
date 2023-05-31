@@ -33,7 +33,6 @@ public class NFTStore: ObservableObject {
   @Published var isLoadingDiscoverAssets: Bool = false
   
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
-    walletService: self.walletService,
     blockchainRegistry: self.blockchainRegistry,
     rpcService: self.rpcService,
     keyringService: self.keyringService,
@@ -47,6 +46,7 @@ public class NFTStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let ipfsApi: IpfsAPI
+  private let assetManager: WalletUserAssetManagerType
   
   /// Cancellable for the last running `update()` Task.
   private var updateTask: Task<(), Never>?
@@ -59,7 +59,8 @@ public class NFTStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    ipfsApi: IpfsAPI
+    ipfsApi: IpfsAPI,
+    userAssetManager: WalletUserAssetManagerType =  WalletUserAssetManager()
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
@@ -67,6 +68,7 @@ public class NFTStore: ObservableObject {
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
     self.ipfsApi = ipfsApi
+    self.assetManager = userAssetManager
     
     self.rpcService.add(self)
     self.keyringService.add(self)
@@ -90,7 +92,7 @@ public class NFTStore: ObservableObject {
       case let .network(network):
         networks = [network]
       }
-      let allVisibleUserAssets = CryptoStore.getAllVisibleAssetsInNetworkAssets(networks: networks)
+      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: networks)
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
       for networkAssets in allVisibleUserAssets {
         for token in networkAssets.tokens {
