@@ -197,7 +197,7 @@ extension BrowserViewController: WKNavigationDelegate {
     }
     
     // Handling calendar .ics files
-    if url.pathExtension.lowercased() == "ics" {
+    if navigationAction.targetFrame?.isMainFrame == true, url.pathExtension.lowercased() == "ics" {
       // This is not ideal. It pushes a new view controller on top of the BVC
       // and you have to dismiss it manually after you managed the calendar event.
       // I do not see a workaround for it, Chrome iOS does the same thing.
