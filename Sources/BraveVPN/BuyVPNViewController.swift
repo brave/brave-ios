@@ -8,6 +8,7 @@ import Shared
 import Preferences
 import StoreKit
 import os.log
+import DesignSystem
 
 class BuyVPNViewController: VPNSetupLoadingController {
     
@@ -33,6 +34,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
     super.viewDidLoad()
 
     title = Strings.VPN.vpnName
+    view.backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
 
     navigationItem.standardAppearance = BraveVPNCommonUI.navigationBarAppearance
     navigationItem.scrollEdgeAppearance = BraveVPNCommonUI.navigationBarAppearance
@@ -41,10 +43,47 @@ class BuyVPNViewController: VPNSetupLoadingController {
       title: Strings.VPN.restorePurchases, style: .done,
       target: self, action: #selector(restorePurchasesAction))
     
+    let tryButton = BraveGradientButton(gradient: .lightGradient01).then {
+      $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+      $0.titleLabel?.textAlignment = .center
+      $0.setTitle(Strings.VPN.freeTrialPeriodAction.uppercased(), for: .normal)
+      
+      $0.snp.makeConstraints {
+        $0.height.equalTo(50)
+      }
+      
+      $0.layer.do {
+        $0.cornerRadius = 12
+        $0.cornerCurve = .continuous
+        $0.masksToBounds = true
+      }
+      
+      $0.addTarget(self, action: #selector(startSubscriptionAction), for: .touchUpInside)
+    }
+  
+    let seperator = UIView().then {
+      $0.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+      $0.snp.makeConstraints { make in
+        make.height.equalTo(1)
+      }
+    }
+        
     view.addSubview(buyVPNView)
+    view.addSubview(seperator)
+    view.addSubview(tryButton)
     
     buyVPNView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+      $0.leading.trailing.top.equalToSuperview()
+    }
+    
+    seperator.snp.makeConstraints() {
+      $0.top.equalTo(buyVPNView.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+    }
+    
+    tryButton.snp.makeConstraints() {
+      $0.top.equalTo(seperator.snp.bottom).inset(-12)
+      $0.leading.trailing.bottom.equalToSuperview().inset(24)
     }
 
     buyVPNView.monthlySubButton
@@ -93,7 +132,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
   }
   
   @objc func startSubscriptionAction() {
-    
+    addPaymentForSubcription(type: activeSubcriptionChoice)
   }
   
   private func addPaymentForSubcription(type: SubscriptionType) {
@@ -101,7 +140,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
     
     switch type {
     case .yearly:
-      subscriptionProduct = VPNProductInfo.monthlySubProduct
+      subscriptionProduct = VPNProductInfo.yearlySubProduct
     case .monthly:
       subscriptionProduct = VPNProductInfo.monthlySubProduct
     }

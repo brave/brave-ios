@@ -116,7 +116,7 @@ class BuyVPNView: UIView {
     [
       poweredByView,
       title,
-      UIView.spacer(.vertical, amount: 12),
+      UIView.spacer(.vertical, amount: 6),
       yearlySubButton,
       monthlySubButton,
       iapDisclaimer
@@ -183,7 +183,7 @@ class BuyVPNView: UIView {
     
     super.init(frame: .zero)
     
-    backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
+    backgroundColor = .clear
     
     addSubview(scrollView)
     scrollView.addSubview(mainStackView)
@@ -204,7 +204,7 @@ class BuyVPNView: UIView {
       featuresScrollView,
       verticalFlexibleSpace(maxHeight: 10, priority: 80),
       pageControlStackView,
-      verticalFlexibleSpace(maxHeight: 20, priority: 100),
+      verticalFlexibleSpace(maxHeight: 15, priority: 100),
       vpnPlansStackView,
     ]
     .forEach(contentStackView.addArrangedSubview(_:))

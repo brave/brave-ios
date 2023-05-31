@@ -2451,6 +2451,11 @@ extension Strings {
         value: "free 7-day trial",
         comment: "Used in context: All plans include a 'free 7-day trial'! - this will be the disclamier for the trial showing it is free and 7 days long")
 
+    public static let freeTrialPeriodAction =
+      NSLocalizedString("vpn.freeTrialPeriodAction", tableName: "BraveShared", bundle: .module,
+        value: "try 7 days free",
+        comment: "The button text that starts the trial action")
+    
     public static let restorePurchases =
       NSLocalizedString("vpn.restorePurchases", tableName: "BraveShared", bundle: .module,
         value: "Restore",
