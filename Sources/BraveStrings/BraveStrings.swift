@@ -2514,7 +2514,7 @@ extension Strings {
 
     public static let checkboxEncryption =
       NSLocalizedString("vpn.checkboxEncryption", tableName: "BraveShared", bundle: .module,
-        value: "Uses IKEv2 secure encrypted VPN tunnel",
+        value: "Uses secure encrypted VPN tunnels",
         comment: "Text for a checkbox to present the user benefits for using Brave VPN")
 
     public static let installTitle =
