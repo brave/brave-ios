@@ -4370,6 +4370,44 @@ extension Strings {
   }
 }
 
+// MARK: - Voice Search
+
+extension Strings {
+  public struct VoiceSearch {
+    public static let screenTitle =
+      NSLocalizedString(
+        "voice.search.screenn.title",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Voice Search",
+        comment: "Title for screen to search using voice.")
+    
+    public static let screenDisclaimer =
+      NSLocalizedString(
+        "voice.search.screen.disclaimer",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Brave will never store your searches or share it with any entity.",
+        comment: "Disclaimer for screen to search using voice.")
+    
+    public static let microphoneAccessRequiredWarningTitle =
+      NSLocalizedString(
+        "voice.search.microphone.title.required",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Microphone Access Required",
+        comment: "Title for warning alert microphone access is required.")
+    
+    public static let microphoneAccessRequiredWarningDescription =
+      NSLocalizedString(
+        "voice.search.microphone.description.required",
+        tableName: "BraveShared",
+        bundle: .module,
+        value: "Please allow Microphone Access in iOS System Settings for Brave to use anonymous voice search.",
+        comment: "Explanation for warning alert why the microphone access required.")
+  }
+}
+
 extension Strings {
   // Errors
   public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: .module, value: "Unsupported payment instruments", comment: "Error message if list of Payment Instruments doesn't include BAT")

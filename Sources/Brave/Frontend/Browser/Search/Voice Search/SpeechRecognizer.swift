@@ -10,7 +10,7 @@ import SwiftUI
 import os.log
 
 protocol SpeechRecognizerDelegate: AnyObject {
-    func speechRecognizerDidFinishQuery(query: String)
+  func speechRecognizerDidFinishQuery(query: String)
 }
 
 class SpeechRecognizer: ObservableObject {
@@ -36,9 +36,8 @@ class SpeechRecognizer: ObservableObject {
   weak var delegate: SpeechRecognizerDelegate?
   
   /// Formatted transcript from speech recognizer
-  @MainActor @Published var transcript: String = ""
-  @MainActor @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
-
+  @Published var transcript: String = ""
+  @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
   @Published private(set) var animationType: AnimationType = .pulse(scale: 1)
 
   var isVoiceSearchAvailable: Bool {

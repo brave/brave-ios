@@ -570,18 +570,18 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func showNoMicrophoneWarning() {
       let alertController = UIAlertController(
-        title: "Microphone Access Required",
-        message: "Please allow Microphone Access in iOS System Settings for Brave to use anonymous voice search.",
+        title: Strings.VoiceSearch.microphoneAccessRequiredWarningTitle,
+        message: Strings.VoiceSearch.microphoneAccessRequiredWarningDescription,
         preferredStyle: .alert)
       
       let settingsAction = UIAlertAction(
-        title: "Settings",
+        title: Strings.settings,
         style: .default) { _ in
           let url = URL(string: UIApplication.openSettingsURLString)!
           UIApplication.shared.open(url, options: [:], completionHandler: nil)
       }
       
-      let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+      let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel, handler: nil)
 
       alertController.addAction(settingsAction)
       alertController.addAction(cancelAction)
