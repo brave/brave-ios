@@ -198,29 +198,12 @@ extension BrowserViewController: WKNavigationDelegate {
     
     // Handling calendar .ics files
     if url.pathExtension.lowercased() == "ics" {
-      let localURL = FileManager.default.temporaryDirectory.appendingPathComponent(url.lastPathComponent)
-      
-      do {
-        let (tempLocalUrl, _) = try await URLSession.shared.download(from: url)
-        if FileManager.default.fileExists(atPath: localURL.path) {
-          try FileManager.default.removeItem(at: localURL)
-        }
-        try FileManager.default.copyItem(at: tempLocalUrl, to: localURL)
-        
-        // This is not ideal. It pushes a new view controller on top of the BVC
-        // and you have to dismiss it manually after you managed the calendar event.
-        // I do not see a workaround for it, Chrome iOS does the same thing.
-        // There is also no good way to know when to clean up the temporary file download.
-        let vc = SFSafariViewController(url: url, configuration: .init())
-        vc.modalPresentationStyle = .formSheet
-        
-        self.present(vc, animated: true)
-      } catch {
-        Logger.module.error("Handling .ics file error: \(error)")
-        if FileManager.default.fileExists(atPath: localURL.path) {
-          try? FileManager.default.removeItem(at: localURL)
-        }
-      }
+      // This is not ideal. It pushes a new view controller on top of the BVC
+      // and you have to dismiss it manually after you managed the calendar event.
+      // I do not see a workaround for it, Chrome iOS does the same thing.
+      let vc = SFSafariViewController(url: url, configuration: .init())
+      vc.modalPresentationStyle = .formSheet
+      self.present(vc, animated: true)
       
       return (.cancel, preferences)
     }
