@@ -43,10 +43,15 @@ class BuyVPNViewController: VPNSetupLoadingController {
       title: Strings.VPN.restorePurchases, style: .done,
       target: self, action: #selector(restorePurchasesAction))
     
-    let tryButton = BraveGradientButton(gradient: .lightGradient01).then {
+    let actionTitle = Preferences.VPN.freeTrialUsed.value
+      ? Strings.VPN.activateSubscriptionAction.uppercased()
+      : Strings.VPN.freeTrialPeriodAction.uppercased()
+    
+    let actionButton = BraveGradientButton(gradient: .lightGradient01).then {
       $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
       $0.titleLabel?.textAlignment = .center
-      $0.setTitle(Strings.VPN.freeTrialPeriodAction.uppercased(), for: .normal)
+       
+      $0.setTitle(actionTitle, for: .normal)
       
       $0.snp.makeConstraints {
         $0.height.equalTo(50)
@@ -70,7 +75,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
         
     view.addSubview(buyVPNView)
     view.addSubview(seperator)
-    view.addSubview(tryButton)
+    view.addSubview(actionButton)
     
     buyVPNView.snp.makeConstraints {
       $0.leading.trailing.top.equalToSuperview()
@@ -81,7 +86,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
       $0.leading.trailing.equalToSuperview()
     }
     
-    tryButton.snp.makeConstraints() {
+    actionButton.snp.makeConstraints() {
       $0.top.equalTo(seperator.snp.bottom).inset(-12)
       $0.leading.trailing.bottom.equalToSuperview().inset(24)
     }
