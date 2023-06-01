@@ -83,10 +83,6 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
     WalletUserAsset.first(where: NSPredicate(format: "contractAddress == %@ AND chainId == %@ AND symbol == %@ AND tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId), context: context ?? DataController.viewContext)
   }
   
-  public static func getAllUserAssets(context: NSManagedObjectContext? = nil) -> [WalletUserAsset]? {
-    WalletUserAsset.all(context: context ?? DataController.viewContext)
-  }
-  
   public static func getAllVisibleUserAssets(context: NSManagedObjectContext? = nil) -> [WalletUserAsset]? {
     WalletUserAsset.all(where: NSPredicate(format: "visible = true"), context: context ?? DataController.viewContext)
   }

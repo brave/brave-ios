@@ -44,7 +44,7 @@ class TransactionsActivityStore: ObservableObject {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    userAssetManager: WalletUserAssetManagerType = WalletUserAssetManager()
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService

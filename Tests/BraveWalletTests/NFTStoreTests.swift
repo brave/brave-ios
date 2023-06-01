@@ -80,8 +80,8 @@ class NFTStoreTests: XCTestCase {
     let mockAssetManager = TestableWalletUserAssetManager()
     mockAssetManager._getAllVisibleAssetsInNetworkAssets = { _ in
       [
-        NetworkAssets(network: .mockMainnet, tokens: [.previewToken.then { $0.visible = true }, .mockERC721NFTToken], sortOrder: 0),
-        NetworkAssets(network: .mockSolana, tokens: [BraveWallet.NetworkInfo.mockSolana.nativeToken.then { $0.visible = true }, .mockSolanaNFTToken], sortOrder: 1)
+        NetworkAssets(network: .mockMainnet, tokens: [.previewToken.copy(asVisibleAsset: true), .mockERC721NFTToken.copy(asVisibleAsset: true)], sortOrder: 0),
+        NetworkAssets(network: .mockSolana, tokens: [BraveWallet.NetworkInfo.mockSolana.nativeToken.copy(asVisibleAsset: true), .mockSolanaNFTToken.copy(asVisibleAsset: true)], sortOrder: 1)
       ]
     }
     
@@ -188,7 +188,7 @@ class NFTStoreTests: XCTestCase {
     let mockAssetManager = TestableWalletUserAssetManager()
     mockAssetManager._getAllVisibleAssetsInNetworkAssets = { _ in
       [
-        NetworkAssets(network: .mockSolana, tokens: [BraveWallet.NetworkInfo.mockSolana.nativeToken.then { $0.visible = true }, .mockSolanaNFTToken], sortOrder: 1)
+        NetworkAssets(network: .mockSolana, tokens: [BraveWallet.NetworkInfo.mockSolana.nativeToken.copy(asVisibleAsset: true), .mockSolanaNFTToken.copy(asVisibleAsset: true)], sortOrder: 1)
       ]
     }
     

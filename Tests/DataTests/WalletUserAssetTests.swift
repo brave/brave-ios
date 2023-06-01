@@ -49,16 +49,6 @@ class WalletUserAssetTests: CoreDataTestCase {
     XCTAssertFalse(userAsset.visible)
   }
   
-  func testGetAllAssets() {
-    createAndWait(asset: asset)
-    createAndWait(asset: asset2)
-    createAndWait(asset: asset3)
-    
-    let allAssets = WalletUserAsset.getAllUserAssets()
-    XCTAssertNotNil(allAssets)
-    XCTAssertEqual(allAssets!.count, 3)
-  }
-  
   func testGetAllVisibleAssets() {
     createAndWait(asset: asset)
     createAndWait(asset: asset2)

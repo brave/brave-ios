@@ -12,13 +12,14 @@ public class AssetStore: ObservableObject, Equatable {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
-      WalletUserAsset.updateUserAsset(for: token, visible: isVisible)
+      assetManager.updateUserAsset(for: token, visible: isVisible, completion: nil)
     }
   }
   var network: BraveWallet.NetworkInfo
 
   private let rpcService: BraveWalletJsonRpcService
   private let ipfsApi: IpfsAPI
+  private let assetManager: WalletUserAssetManagerType
   private(set) var isCustomToken: Bool
 
   init(
@@ -26,6 +27,7 @@ public class AssetStore: ObservableObject, Equatable {
     network: BraveWallet.NetworkInfo,
     token: BraveWallet.BlockchainToken,
     ipfsApi: IpfsAPI,
+    userAssetManager: WalletUserAssetManagerType,
     isCustomToken: Bool,
     isVisible: Bool
   ) {
@@ -33,6 +35,7 @@ public class AssetStore: ObservableObject, Equatable {
     self.network = network
     self.token = token
     self.ipfsApi = ipfsApi
+    self.assetManager = userAssetManager
     self.isCustomToken = isCustomToken
     self.isVisible = isVisible
   }
@@ -65,7 +68,7 @@ public class UserAssetsStore: ObservableObject {
     keyringService: BraveWalletKeyringService,
     assetRatioService: BraveWalletAssetRatioService,
     ipfsApi: IpfsAPI,
-    userAssetManager: WalletUserAssetManagerType = WalletUserAssetManager()
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.blockchainRegistry = blockchainRegistry
     self.rpcService = rpcService
@@ -124,6 +127,7 @@ public class UserAssetsStore: ObservableObject {
             network: assetsForNetwork.network,
             token: token,
             ipfsApi: self.ipfsApi,
+            userAssetManager: assetManager,
             isCustomToken: isCustomToken,
             isVisible: visibleIds.contains(where: { $0 == (token.id + token.chainId) })
           )
@@ -136,10 +140,10 @@ public class UserAssetsStore: ObservableObject {
     _ asset: BraveWallet.BlockchainToken,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    if WalletUserAsset.getUserAsset(asset: asset) != nil {
+    if assetManager.getUserAsset(asset) != nil {
       completion(false)
     } else {
-      WalletUserAsset.addUserAsset(asset: asset) { [weak self] in
+      assetManager.addUserAsset(asset) { [weak self] in
         self?.update()
         completion(true)
       }
@@ -147,7 +151,7 @@ public class UserAssetsStore: ObservableObject {
   }
 
   func removeUserAsset(token: BraveWallet.BlockchainToken, completion: @escaping (_ success: Bool) -> Void) {
-    WalletUserAsset.removeUserAsset(asset: token) { [weak self] in
+    assetManager.removeUserAsset(token) { [weak self] in
       self?.update()
       completion(true)
     }

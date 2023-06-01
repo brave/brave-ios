@@ -49,7 +49,7 @@ class AccountActivityStore: ObservableObject {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
     ipfsApi: IpfsAPI,
-    walletUserAssetManager: WalletUserAssetManagerType = WalletUserAssetManager()
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.account = account
     self.observeAccountUpdates = observeAccountUpdates
@@ -61,7 +61,7 @@ class AccountActivityStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.solTxManagerProxy = solTxManagerProxy
     self.ipfsApi = ipfsApi
-    self.assetManager = walletUserAssetManager
+    self.assetManager = userAssetManager
     
     self.keyringService.add(self)
     self.rpcService.add(self)

@@ -162,7 +162,7 @@ class AccountActivityStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
       ipfsApi: ipfsApi,
-      walletUserAssetManager: mockAssetManager
+      userAssetManager: mockAssetManager
     )
     
     let userVisibleAssetsException = expectation(description: "accountActivityStore-assetStores")
@@ -287,7 +287,7 @@ class AccountActivityStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
       ipfsApi: ipfsApi,
-      walletUserAssetManager: mockAssetManager
+      userAssetManager: mockAssetManager
     )
     
     let userVisibleAssetsExpectation = expectation(description: "accountActivityStore-assetStores")

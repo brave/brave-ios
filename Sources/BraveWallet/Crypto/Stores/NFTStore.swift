@@ -37,7 +37,8 @@ public class NFTStore: ObservableObject {
     rpcService: self.rpcService,
     keyringService: self.keyringService,
     assetRatioService: self.assetRatioService,
-    ipfsApi: self.ipfsApi
+    ipfsApi: self.ipfsApi,
+    userAssetManager: self.assetManager
   )
   
   private let keyringService: BraveWalletKeyringService
@@ -60,7 +61,7 @@ public class NFTStore: ObservableObject {
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     ipfsApi: IpfsAPI,
-    userAssetManager: WalletUserAssetManagerType =  WalletUserAssetManager()
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
