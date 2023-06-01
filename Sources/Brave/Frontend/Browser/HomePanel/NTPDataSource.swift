@@ -38,6 +38,17 @@ enum NTPWallpaper {
     }
     return imagePath.flatMap { UIImage(contentsOfFile: $0.path) }
   }
+  
+  var focalPoint: CGPoint? {
+    switch self {
+    case .image:
+      return nil // Will eventually return a real value
+    case .sponsoredImage(let background):
+      return background.focalPoint
+    case .superReferral(let background, _):
+      return background.focalPoint
+    }
+  }
 }
 
 public class NTPDataSource {
@@ -78,6 +89,14 @@ public class NTPDataSource {
     self.service = service
     
     Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
+    
+    self.service.sponsoredImageDataUpdated = { [weak self] _ in
+      self?.sponsorComponentUpdated()
+    }
+  }
+  
+  deinit {
+    self.service.sponsoredImageDataUpdated = nil
   }
 
   // This is used to prevent the same handful of backgrounds from being shown.
@@ -124,6 +143,9 @@ public class NTPDataSource {
         }
       }
 
+      if service.backgroundImages.isEmpty {
+        return ([NTPWallpaper.image(.fallback)], .randomOrderAvoidDuplicates)
+      }
       return (service.backgroundImages.map(NTPWallpaper.image), .randomOrderAvoidDuplicates)
     }()
 
@@ -168,6 +190,19 @@ public class NTPDataSource {
     guard let bgWithIndex = backgroundSet[safe: backgroundIndex] else { return nil }
     return bgWithIndex
   }
+  
+  func sponsorComponentUpdated() {
+    if let superReferralImageData = service.superReferralImageData, superReferralImageData.isSuperReferral {
+      if Preferences.NewTabPage.preloadedFavoritiesInitialized.value {
+        replaceFavoritesIfNeeded?(superReferralImageData.topSites)
+      } else {
+        initializeFavorites?(superReferralImageData.topSites)
+      }
+    } else {
+      // Force to set up basic favorites if it hasn't been done already.
+      initializeFavorites?(nil)
+    }
+  }
 }
 
 extension NTPDataSource: PreferencesObserver {
@@ -194,4 +229,12 @@ extension NTPSponsoredImageTopSite {
     }
     return FavoriteSite(url, name)
   }
+}
+
+extension NTPBackgroundImage {
+  static let fallback: NTPBackgroundImage = .init(
+    imagePath: Bundle.module.url(forResource: "corwin-prescott-3", withExtension: "jpg")!,
+    author: "Corwin Prescott",
+    link: URL(string: "https://www.brave.com")!
+  )
 }

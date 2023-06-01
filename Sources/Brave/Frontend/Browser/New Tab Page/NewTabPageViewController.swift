@@ -402,10 +402,11 @@ class NewTabPageViewController: UIViewController {
     }
     
     // If no focal point provided we do nothing. The image is centered by default.
-    guard case .sponsoredImage(let sponsoredBackground) = background.currentBackground,
-          case let focalX = sponsoredBackground.focalPoint.x else {
+    guard let focalPoint = background.currentBackground?.focalPoint else {
       return
     }
+    
+    let focalX = focalPoint.x
     
     // Calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio.
     // Most image calculations have to use this property to get coordinates right.
@@ -430,10 +431,10 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func reportSponsoredImageBackgroundEvent(_ event: BraveAds.NewTabPageAdEventType) {
-    if case .sponsoredImage(let background) = background.currentBackground {
+    if case .sponsoredImage(let sponsoredBackground) = background.currentBackground {
       rewards.ads.reportNewTabPageAdEvent(
-        background.imagePath.lastPathComponent,
-        creativeInstanceId: background.creativeInstanceId,
+        background.wallpaperId.uuidString,
+        creativeInstanceId: sponsoredBackground.creativeInstanceId,
         eventType: event
       )
     }
