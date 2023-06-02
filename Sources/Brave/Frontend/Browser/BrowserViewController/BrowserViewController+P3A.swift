@@ -99,14 +99,12 @@ extension BrowserViewController {
   }
   
   func recordAccessibilityDisplayZoomEnabledP3A() {
-    // Accessibility Q1 New P3A iOS - Do you have iOS display zoom enabled?
+    // Q100 Do you have iOS display zoom enabled?
     let isDisplayZoomEnabled = UIScreen.main.scale < UIScreen.main.nativeScale
-    
     UmaHistogramBoolean("Brave.Accessibility.DisplayZoomEnabled", isDisplayZoomEnabled)
   }
   
   func recordAccessibilityDocumentsDirectorySizeP3A() {
-    // Accessibility Q4 New P3A iOS - Documents directory size
     func fetchDocumentsAndDataSize() -> Int? {
       let fileManager = FileManager.default
       
@@ -145,6 +143,7 @@ extension BrowserViewController {
       .r(1000...),
     ]
     
+    // Q103 What is the document directory size in MB?
     if let documentsSize = fetchDocumentsAndDataSize() {
       UmaHistogramRecordValueToBucket("Brave.Core.DocumentsDirectorySizeMB", buckets: buckets, value: documentsSize)
     }
@@ -160,7 +159,7 @@ extension BrowserViewController {
       case bottom = 1
     }
     
-    // General Q1 New P3A iOS - Bottom Bar Location
+    // Q101 Which location Bottom bar being used?
     let answer: Answer = Preferences.General.isUsingBottomBar.value ? .bottom : .top
     UmaHistogramEnumeration("Brave.General.BottomBarLocation", sample: answer)
   }
@@ -170,6 +169,8 @@ extension BrowserViewController {
     if activated {
       storage.add(value: 1, to: Date())
     }
+    
+    // Q102- How many times did you use reader mode in the last 7 days?
     UmaHistogramRecordValueToBucket(
       "Brave.ReaderMode.NumberReaderModeActivated",
       buckets: [
