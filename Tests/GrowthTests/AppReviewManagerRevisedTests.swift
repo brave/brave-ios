@@ -143,6 +143,25 @@ class AppReviewManagerTests: XCTestCase {
     XCTAssertFalse(AppReviewManager.shared.checkLogicCriteriaSatisfied(for: .newsRatingCard))
   }
   
+  func testShouldShowNewsRatingCard() {
+    resetAppReviewConstants()
+    
+    generateMainCriterias(passing: true, failingCriteria: nil)
+
+    // Fresh Criteria car never shown
+    XCTAssertTrue(AppReviewManager.shared.shouldShowNewsRatingCard())
+    
+    Preferences.Review.newsCardShownDate.value = Date() + 5.days
+    
+    // Less than week passed for next card
+    XCTAssertFalse(AppReviewManager.shared.shouldShowNewsRatingCard())
+
+    Preferences.Review.newsCardShownDate.value = Date() + 10.days
+
+    // More than a week passed since previous card reveal
+    XCTAssertTrue(AppReviewManager.shared.shouldShowNewsRatingCard())
+  }
+  
   private func resetAppReviewConstants() {
     AppConstants.buildChannel = .debug
     Preferences.Review.launchCount.reset()
@@ -155,6 +174,7 @@ class AppReviewManagerTests: XCTestCase {
     Preferences.Chromium.syncEnabled.reset()
     Preferences.Chromium.syncOpenTabsEnabled.reset()
     Preferences.Review.lastReviewDate.value = nil
+    Preferences.Review.newsCardShownDate.value = nil
   }
   
   private func generateDaysOfUse(active: Bool) {

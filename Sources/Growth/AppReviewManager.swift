@@ -164,19 +164,19 @@ public class AppReviewManager: ObservableObject {
     
     // Check at least minDaysBetweenRatingCardPresented days passed since last card presentation
     var daysSinceLastRequest = 0
-    if let previousRequest = Preferences.Review.lastReviewDate.value {
+    if let previousRequest = Preferences.Review.newsCardShownDate.value {
       daysSinceLastRequest = Calendar.current.dateComponents([.day], from: previousRequest, to: Date()).day ?? 0
     } else {
       // First presentation Date, no recorded presentation
-      Preferences.Review.lastReviewDate.value = Date()
+      Preferences.Review.newsCardShownDate.value = Date()
       return true
     }
     
-    if daysSinceLastRequest < Constants.minDaysBetweenRatingCardPresented {
+    if abs(daysSinceLastRequest) < Constants.minDaysBetweenRatingCardPresented {
       return false
     }
     
-    Preferences.Review.lastReviewDate.value = Date()
+    Preferences.Review.newsCardShownDate.value = Date()
     return true
   }
   
