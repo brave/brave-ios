@@ -185,7 +185,7 @@ public class SendTokenStore: ObservableObject {
     sendAmount = ((selectedSendTokenBalance ?? 0) * amount.rawValue).decimalExpansion(precisionAfterDecimalPoint: decimalPoint, rounded: rounded)
   }
   
-  private func didSelect(account: BraveWallet.AccountInfo, token: BraveWallet.BlockchainToken) {
+  func didSelect(account: BraveWallet.AccountInfo, token: BraveWallet.BlockchainToken) {
     Task { @MainActor in
       let selectedCoin = await walletService.selectedCoin()
       

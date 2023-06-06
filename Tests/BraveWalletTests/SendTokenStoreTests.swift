@@ -18,6 +18,7 @@ class SendTokenStoreTests: XCTestCase {
     userAssets: [BraveWallet.BlockchainToken] = [.previewToken],
     selectedCoin: BraveWallet.CoinType = .eth,
     selectedNetwork: BraveWallet.NetworkInfo = .mockGoerli,
+    allNetworks: [BraveWallet.NetworkInfo] = [.mockGoerli],
     balance: String = "0",
     erc20Balance: String = "0",
     erc721Balance: String = "0",
@@ -34,7 +35,7 @@ class SendTokenStoreTests: XCTestCase {
     keyringService._checksumEthAddress = { address, completion in completion(address) }
     let rpcService = BraveWallet.TestJsonRpcService()
     rpcService._network = { $2(selectedNetwork) }
-    rpcService._allNetworks = { $1([selectedNetwork]) }
+    rpcService._allNetworks = { $1(allNetworks) }
     rpcService._setNetwork = { _, _, _, completion in completion(true) }
     rpcService._addObserver = { _ in }
     rpcService._balance = { $3(balance, .success, "") }
@@ -1259,5 +1260,238 @@ class SendTokenStoreTests: XCTestCase {
     waitForExpectations(timeout: 1) { error in
       XCTAssertNil(error)
     }
+  }
+  
+  private let account: BraveWallet.AccountInfo = .previewAccount
+  private let ethGoerli: BraveWallet.BlockchainToken = BraveWallet.NetworkInfo.mockGoerli.nativeToken
+    .copy(asVisibleAsset: true)
+  private let usdcGoerli: BraveWallet.BlockchainToken = .mockUSDCToken
+    .copy(asVisibleAsset: true).then {
+      $0.chainId = BraveWallet.GoerliChainId
+    }
+  private lazy var account2: BraveWallet.AccountInfo = (account.copy() as! BraveWallet.AccountInfo).then {
+    $0.name = "Account 2"
+    $0.address = "0x2222222222179E9EC40BC2AFFF9E9EC40BC2AFFF"
+  }
+
+  /// Test `didSelect(account:token:)` with a new token that is on the currently selected account and currently selected network.
+  @MainActor func testDidSelectSameAccountSameNetwork() async {
+    let (keyringService, rpcService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      accountAddress: account.address,
+      userAssets: [ethGoerli, usdcGoerli],
+      selectedCoin: .eth,
+      selectedNetwork: .mockGoerli
+    )
+    let store = SendTokenStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: ethGoerli,
+      ipfsApi: TestIpfsAPI()
+    )
+    let sendTokenExpectation = expectation(description: "sendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { sendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, self.ethGoerli)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for `prefilledToken` to be assigned.
+    await fulfillment(of: [sendTokenExpectation], timeout: 1)
+    cancellables.removeAll()
+    
+    let didSelectSendTokenExpectation = expectation(description: "didSelectSendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { didSelectSendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, self.usdcGoerli)
+      }
+      .store(in: &cancellables)
+    store.didSelect(account: account, token: usdcGoerli)
+    await fulfillment(of: [didSelectSendTokenExpectation], timeout: 1)
+  }
+
+  /// Test `didSelect(account:token:)` with a new token that is not on the currently selected account but is on the currently selected network.
+  @MainActor func testDidSelectNewAccountSameNetwork() async {
+    let account: BraveWallet.AccountInfo = .previewAccount
+    let ethGoerli: BraveWallet.BlockchainToken = BraveWallet.NetworkInfo.mockGoerli.nativeToken
+      .copy(asVisibleAsset: true)
+    let (keyringService, rpcService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      accountAddress: account.address,
+      userAssets: [ethGoerli],
+      selectedCoin: .eth,
+      selectedNetwork: .mockGoerli
+    )
+    let setSelectedAccountExpectation = expectation(description: "setSelectedAccountExpectation")
+    keyringService._setSelectedAccount = { coin, keyringId, address, completion in
+      defer { setSelectedAccountExpectation.fulfill() }
+      XCTAssertEqual(address, self.account2.address)
+      completion(true)
+    }
+    let store = SendTokenStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: ethGoerli,
+      ipfsApi: TestIpfsAPI()
+    )
+    let sendTokenExpectation = expectation(description: "sendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { sendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, ethGoerli)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for `prefilledToken` to be assigned.
+    await fulfillment(of: [sendTokenExpectation], timeout: 1)
+    cancellables.removeAll()
+    
+    store.didSelect(account: account2, token: ethGoerli)
+    await fulfillment(of: [setSelectedAccountExpectation], timeout: 1)
+  }
+
+  /// Test `didSelect(account:token:)` with a new token that is not on the currently selected account and not on the currently selected network.
+  @MainActor func testDidSelectNewAccountNewNetwork() async {
+    let ethMainnet: BraveWallet.BlockchainToken = BraveWallet.NetworkInfo.mockMainnet.nativeToken
+      .copy(asVisibleAsset: true)
+    var selectedNetwork: BraveWallet.NetworkInfo = .mockMainnet
+    let allNetworks: [BraveWallet.NetworkInfo] = [.mockMainnet, .mockGoerli]
+    let (keyringService, rpcService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      accountAddress: account.address,
+      userAssets: [ethMainnet, usdcGoerli],
+      selectedCoin: .eth,
+      allNetworks: allNetworks
+    )
+    let setSelectedAccountExpectation = expectation(description: "setSelectedAccountExpectation")
+    keyringService._setSelectedAccount = { coin, keyringId, address, completion in
+      defer { setSelectedAccountExpectation.fulfill() }
+      XCTAssertEqual(address, self.account2.address)
+      completion(true)
+    }
+    let setNetworkExpectation = expectation(description: "setNetworkExpectation")
+    rpcService._setNetwork = { chainId, coin, origin, completion in
+      defer { setNetworkExpectation.fulfill() }
+      XCTAssertEqual(chainId, self.usdcGoerli.chainId)
+      selectedNetwork = allNetworks.first(where: { $0.chainId == chainId }) ?? selectedNetwork
+      completion(true)
+    }
+    rpcService._network = { coin, origin, completion in
+      completion(selectedNetwork)
+    }
+    let store = SendTokenStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: ethMainnet,
+      ipfsApi: TestIpfsAPI()
+    )
+    let sendTokenExpectation = expectation(description: "sendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { sendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, ethMainnet)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for `prefilledToken` to be assigned.
+    await fulfillment(of: [sendTokenExpectation], timeout: 1)
+    cancellables.removeAll()
+    
+    let didSelectSendTokenExpectation = expectation(description: "didSelectSendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { didSelectSendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, self.usdcGoerli)
+      }
+      .store(in: &cancellables)
+    store.didSelect(account: account2, token: usdcGoerli)
+    await fulfillment(of: [didSelectSendTokenExpectation, setSelectedAccountExpectation, setNetworkExpectation], timeout: 1)
+  }
+
+  /// Test `didSelect(account:token:)` with a new token that is on a different coin type (ex. Ethereum -> Solana).
+  @MainActor func testDidSelectCoinTypeSwitch() async {
+    let solMainnet: BraveWallet.BlockchainToken = BraveWallet.NetworkInfo.mockSolana.nativeToken
+      .copy(asVisibleAsset: true)
+    var selectedNetwork: BraveWallet.NetworkInfo = .mockGoerli
+    let allNetworks: [BraveWallet.NetworkInfo] = [.mockGoerli, .mockSolana]
+    let (keyringService, rpcService, walletService, ethTxManagerProxy, solTxManagerProxy) = setupServices(
+      accountAddress: account.address,
+      userAssets: [usdcGoerli, solMainnet],
+      selectedCoin: .eth,
+      allNetworks: allNetworks
+    )
+    let setSelectedAccountExpectation = expectation(description: "setSelectedAccountExpectation")
+    keyringService._setSelectedAccount = { coin, keyringId, address, completion in
+      defer { setSelectedAccountExpectation.fulfill() }
+      XCTAssertEqual(address, BraveWallet.AccountInfo.mockSolAccount.address)
+      completion(true)
+    }
+    let setNetworkExpectation = expectation(description: "setNetworkExpectation")
+    rpcService._setNetwork = { chainId, coin, origin, completion in
+      defer { setNetworkExpectation.fulfill() }
+      XCTAssertEqual(chainId, solMainnet.chainId)
+      selectedNetwork = allNetworks.first(where: { $0.chainId == chainId }) ?? selectedNetwork
+      completion(true)
+    }
+    rpcService._network = { coin, origin, completion in
+      completion(selectedNetwork)
+    }
+    let store = SendTokenStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: MockTxService(),
+      blockchainRegistry: MockBlockchainRegistry(),
+      assetRatioService: MockAssetRatioService(),
+      ethTxManagerProxy: ethTxManagerProxy,
+      solTxManagerProxy: solTxManagerProxy,
+      prefilledToken: usdcGoerli,
+      ipfsApi: TestIpfsAPI()
+    )
+    let sendTokenExpectation = expectation(description: "sendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { sendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, self.usdcGoerli)
+      }
+      .store(in: &cancellables)
+    store.update()
+    // wait for `prefilledToken` to be assigned.
+    await fulfillment(of: [sendTokenExpectation], timeout: 1)
+    cancellables.removeAll()
+    
+    let didSelectSendTokenExpectation = expectation(description: "didSelectSendTokenExpectation")
+    store.$selectedSendToken
+      .dropFirst()
+      .sink { selectedSendToken in
+        defer { didSelectSendTokenExpectation.fulfill() }
+        XCTAssertEqual(selectedSendToken, solMainnet)
+      }
+      .store(in: &cancellables)
+    store.didSelect(account: .mockSolAccount, token: solMainnet)
+    await fulfillment(of: [didSelectSendTokenExpectation, setSelectedAccountExpectation, setNetworkExpectation], timeout: 1)
   }
 }
