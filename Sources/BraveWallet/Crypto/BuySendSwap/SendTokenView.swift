@@ -68,7 +68,27 @@ struct SendTokenView: View {
     NavigationView {
       Form {
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoFromTitle))
+          header: WalletListHeaderView {
+            HStack {
+              Text("\(Strings.Wallet.sendCryptoFromTitle): \(keyringStore.selectedAccount.name) (\(keyringStore.selectedAccount.address.truncatedAddress))")
+              Spacer()
+              Menu(
+                content: {
+                  Text(keyringStore.selectedAccount.address.zwspOutput)
+                  Button(action: {
+                    UIPasteboard.general.string = keyringStore.selectedAccount.address
+                  }) {
+                    Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "leo.copy.plain-text")
+                  }
+                },
+                label: {
+                  Image(braveSystemName: "leo.more.horizontal")
+                    .padding(6)
+                    .clipShape(Rectangle())
+                }
+              )
+            }
+          }
         ) {
           Button(action: { self.isShowingSelectAccountTokenView = true }) {
             HStack {
@@ -97,14 +117,9 @@ struct SendTokenView: View {
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
               Spacer()
-              VStack(alignment: .trailing) {
-                Text("\(keyringStore.selectedAccount.name):")
-                  .font(.caption)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                Text("\(sendTokenStore.selectedSendTokenBalance?.decimalDescription.trimmingTrailingZeros ?? "0") \(sendTokenStore.selectedSendToken?.symbol ?? "")")
-                  .font(.title3.weight(.semibold))
-                  .foregroundColor(Color(.braveLabel))
-              }
+              Text("\(sendTokenStore.selectedSendTokenBalance?.decimalDescription.trimmingTrailingZeros ?? "0") \(sendTokenStore.selectedSendToken?.symbol ?? "")")
+                .font(.title3.weight(.semibold))
+                .foregroundColor(Color(.braveLabel))
             }
             .padding(.vertical, 8)
           }

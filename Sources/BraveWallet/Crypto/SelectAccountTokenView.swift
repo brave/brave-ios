@@ -112,7 +112,27 @@ struct SelectAccountTokenView: View {
           }
         },
         header: {
-          WalletListHeaderView(title: Text(accountSection.account.name))
+          WalletListHeaderView {
+            HStack {
+              Text("\(accountSection.account.name) (\(accountSection.account.address.truncatedAddress))")
+              Spacer()
+              Menu(
+                content: {
+                  Text(accountSection.account.address.zwspOutput)
+                  Button(action: {
+                    UIPasteboard.general.string = accountSection.account.address
+                  }) {
+                    Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "leo.copy.plain-text")
+                  }
+                },
+                label: {
+                  Image(braveSystemName: "leo.more.horizontal")
+                    .padding(6)
+                    .clipShape(Rectangle())
+                }
+              )
+            }
+          }
         }
       )
     }
