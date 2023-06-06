@@ -35,12 +35,14 @@ struct SelectAccountTokenView: View {
         ProgressView()
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
       } else if store.filteredAccountSections.flatMap(\.tokenBalances).isEmpty && !store.isLoadingBalances {
-        Section {
-          Text(Strings.Wallet.selectTokenToSendNoTokens)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        }
+        Text(Strings.Wallet.selectTokenToSendNoTokens)
+          .font(.headline.weight(.semibold))
+          .foregroundColor(Color(.braveLabel))
+          .multilineTextAlignment(.center)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 60)
+          .padding(.horizontal, 32)
+          .listRowBackground(Color.clear)
       } else {
         accountSections
       }
@@ -56,12 +58,22 @@ struct SelectAccountTokenView: View {
       ToolbarItemGroup(placement: .bottomBar) {
         networkFilterButton
         Spacer()
-        Button(action: { store.isHidingZeroBalances.toggle() }) {
-          Text(store.isHidingZeroBalances ? Strings.Wallet.showZeroBalances : Strings.Wallet.hideZeroBalances)
-            .foregroundColor(Color(.braveBlurpleTint))
+        if shouldShowZeroBalanceButton {
+          Button(action: { store.isHidingZeroBalances.toggle() }) {
+            Text(store.isHidingZeroBalances ? Strings.Wallet.showZeroBalances : Strings.Wallet.hideZeroBalances)
+              .font(.footnote.weight(.medium))
+              .foregroundColor(Color(.braveBlurpleTint))
+          }
         }
       }
     }
+  }
+  
+  private var shouldShowZeroBalanceButton: Bool {
+    if !store.isHidingZeroBalances {
+      return true
+    }
+    return store.filteredAccountSections.flatMap(\.tokenBalances).isEmpty
   }
   
   private var networkFilterButton: some View {
@@ -101,7 +113,7 @@ struct SelectAccountTokenView: View {
                 // until we know which assets have >0 balance.
                 loadingAssetView
               } else {
-                Text(Strings.Wallet.selectTokenToSendNoTokens)
+                EmptyView()
               }
             }
             .multilineTextAlignment(.center)

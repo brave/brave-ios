@@ -71,9 +71,19 @@ class SelectAccountTokenStore: ObservableObject {
             return true
           }
       )
-      filteredAccountSections.append(updatedAccountSection)
+      if shouldShowSection(accountSection) {
+        filteredAccountSections.append(updatedAccountSection)
+      }
     }
     return filteredAccountSections
+  }
+  
+  private func shouldShowSection(_ accountSection: SelectAccountTokenStore.AccountSection) -> Bool {
+    guard accountSection.tokenBalances.isEmpty else {
+      return true // non-empty
+    }
+    // only if loading, or hiding zero balances.
+    return isHidingZeroBalances && isLoadingBalances
   }
   
   /// The current default base currency code
