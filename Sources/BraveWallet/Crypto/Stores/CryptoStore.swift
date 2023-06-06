@@ -177,7 +177,9 @@ public class CryptoStore: ObservableObject {
     self.rpcService.add(self)
     self.walletService.add(self)
     
-    userAssetManager.migrateUserAssets()
+    userAssetManager.migrateUserAssets { [weak self] in
+      self?.updateAssets()
+    }
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -542,7 +544,9 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func keyringCreated(_ keyringId: String) {
     Task { @MainActor [weak self] in
       if let newCoin = WalletConstants.supportedCoinTypes.first(where: { $0.keyringId == keyringId }) {
-        self?.userAssetManager.migrateUserAssets(for: newCoin)
+        self?.userAssetManager.migrateUserAssets(for: newCoin, completion: {
+          self?.updateAssets()
+        })
       }
     }
   }
@@ -550,7 +554,9 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
     // if a keyring is restored, we want to reset user assets local storage
     // and migrate with for new keyring
     WalletUserAssetGroup.removeAllGroup() { [weak self] in
-      self?.userAssetManager.migrateUserAssets()
+      self?.userAssetManager.migrateUserAssets(completion: {
+        self?.updateAssets()
+      })
     }
   }
   public func locked() {
@@ -615,7 +621,7 @@ extension CryptoStore: BraveWalletBraveWalletServiceObserver {
   
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
     for asset in discoveredAssets where userAssetManager.getUserAsset(asset) == nil {
-      WalletUserAsset.addUserAsset(asset: asset)
+      userAssetManager.addUserAsset(asset, completion: nil)
     }
     if !discoveredAssets.isEmpty {
       updateAssets()

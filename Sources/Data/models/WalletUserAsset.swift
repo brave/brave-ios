@@ -111,7 +111,7 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
       if let asset = WalletUserAsset.first(where: NSPredicate(format: "contractAddress == %@ AND chainId == %@ AND symbol == %@ AND tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId), context: context) {
         asset.visible = visible
       } else {
-        let groupId = "\(asset.coin.rawValue).\(asset.chainId)"
+        let groupId = asset.walletUserAssetGroupId
         let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
         let visibleAsset = WalletUserAsset(context: context, asset: asset)
         visibleAsset.visible = visible
@@ -128,7 +128,7 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
   
   public static func addUserAsset(asset: BraveWallet.BlockchainToken, completion: (() -> Void)? = nil) {
     DataController.perform(context: .new(inMemory: false), save: false) { context in
-      let groupId = "\(asset.coin.rawValue).\(asset.chainId)"
+      let groupId = asset.walletUserAssetGroupId
       let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
       let visibleAsset = WalletUserAsset(context: context, asset: asset)
       visibleAsset.visible = true
@@ -167,5 +167,12 @@ extension WalletUserAsset {
         assertionFailure("Error saving DB: \(error.localizedDescription)")
       }
     }
+  }
+}
+
+private extension BraveWallet.BlockchainToken {
+  /// The group id that this token should be stored with in CoreData
+  var walletUserAssetGroupId: String {
+    "\(coin.rawValue).\(chainId)"
   }
 }

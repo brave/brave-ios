@@ -33,7 +33,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
     var allVisibleUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
-      let groupId = "\(network.coin.rawValue).\(network.chainId)"
+      let groupId = network.walletUserAssetGroupId
       if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets {
         let networkAsset = NetworkAssets(
           network: network,
@@ -49,7 +49,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func getAllVisibleAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
     var allVisibleUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
-      let groupId = "\(network.coin.rawValue).\(network.chainId)"
+      let groupId = network.walletUserAssetGroupId
       if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter(\.visible) {
         let networkAsset = NetworkAssets(
           network: network,
@@ -79,10 +79,10 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   }
   
   public func migrateUserAssets(for coin: BraveWallet.CoinType? = nil, completion: (() -> Void)? = nil) {
+    guard !Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value else {
+      return
+    }
     Task { @MainActor in
-      guard !Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value else {
-        return
-      }
       var fetchedUserAssets: [String: [BraveWallet.BlockchainToken]] = [:]
       var networks: [BraveWallet.NetworkInfo] = []
       if let coin = coin {
@@ -90,7 +90,6 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
       } else {
         networks = await rpcService.allNetworksForSupportedCoins()
       }
-      networks = networks.filter { !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId) }
       let networkAssets = await walletService.allUserAssets(in: networks)
       for networkAsset in networkAssets {
         fetchedUserAssets["\(networkAsset.network.coin.rawValue).\(networkAsset.network.chainId)"] = networkAsset.tokens
