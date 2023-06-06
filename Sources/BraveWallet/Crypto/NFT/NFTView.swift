@@ -179,13 +179,6 @@ struct NFTView: View {
           }) {
             VStack(alignment: .leading, spacing: 4) {
               nftImage(nft)
-                .contextMenu {
-                  Button(action: {
-                    nftStore.updateVisibility(nft.token, visible: false)
-                  }) {
-                    Label(Strings.recentSearchHide, braveSystemImage: "leo.eye.off")
-                  }
-                }
                 .padding(.bottom, 8)
               Text(nft.token.nftTokenTitle)
                 .font(.callout.weight(.medium))
@@ -197,6 +190,13 @@ struct NFTView: View {
                   .foregroundColor(Color(.secondaryBraveLabel))
                   .multilineTextAlignment(.leading)
               }
+            }
+          }
+          .contextMenu {
+            Button(action: {
+              nftStore.updateVisibility(nft.token, visible: false)
+            }) {
+              Label(Strings.recentSearchHide, braveSystemImage: "leo.eye.off")
             }
           }
         }
