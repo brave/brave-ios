@@ -337,7 +337,10 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       cell.content.contextMenu = contextMenu(from: { $0 == 0 ? pair.first : pair.second }, card: card, indexPath: indexPath)
       return cell
     case .headlineRatingCardPair(let item):
-      // TODO: Card
+//      let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<PartnerCardView>
+//      cell.content.feedView.setupWithItem(item)
+//      cell.content.actionHandler = handler(for: item, card: card, indexPath: indexPath)
+//      cell.content.contextMenu = contextMenu(for: item, card: card, indexPath: indexPath)
       return UICollectionViewCell()
     case .group(let items, let title, let direction, _):
       let groupView: FeedGroupView

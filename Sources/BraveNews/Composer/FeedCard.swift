@@ -52,9 +52,7 @@ public enum FeedCard: Hashable {
       return FeedItemView.Layout.partner.estimatedHeight(for: width)
     case .ad:
       return FeedItemView.Layout.ad.estimatedHeight(for: width)
-    case .headlinePair:
-      return 300
-    case .headlineRatingCardPair:
+    case .headlinePair, .headlineRatingCardPair:
       return 300
     case .group, .numbered, .deals:
       return 400
