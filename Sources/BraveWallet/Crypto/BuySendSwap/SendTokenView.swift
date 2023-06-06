@@ -67,14 +67,6 @@ struct SendTokenView: View {
   var body: some View {
     NavigationView {
       Form {
-        Section { // TODO: Remove
-          AccountPicker(
-            keyringStore: keyringStore,
-            networkStore: networkStore
-          )
-          .listRowBackground(Color(UIColor.braveGroupedBackground))
-          .resetListHeaderStyle()
-        }
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoFromTitle))
         ) {
@@ -96,13 +88,23 @@ struct SendTokenView: View {
                   )
                 }
               }
-              Text(sendTokenStore.selectedSendToken?.symbol ?? "")
-                .font(.title3.weight(.semibold))
-                .foregroundColor(Color(.braveLabel))
+              VStack(alignment: .leading) {
+                Text(sendTokenStore.selectedSendToken?.symbol ?? "")
+                  .font(.title3.weight(.semibold))
+                  .foregroundColor(Color(.braveLabel))
+                Text(networkStore.defaultSelectedChain.chainName)
+                  .font(.caption)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+              }
               Spacer()
-              Text(sendTokenStore.selectedSendTokenBalance?.decimalDescription ?? "0.0000")
-                .font(.title3.weight(.semibold))
-                .foregroundColor(Color(.braveLabel))
+              VStack(alignment: .trailing) {
+                Text("\(keyringStore.selectedAccount.name):")
+                  .font(.caption)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+                Text("\(sendTokenStore.selectedSendTokenBalance?.decimalDescription.trimmingTrailingZeros ?? "0") \(sendTokenStore.selectedSendToken?.symbol ?? "")")
+                  .font(.title3.weight(.semibold))
+                  .foregroundColor(Color(.braveLabel))
+              }
             }
             .padding(.vertical, 8)
           }
@@ -259,7 +261,7 @@ struct SendTokenView: View {
             store: sendTokenStore.selectTokenStore,
             networkStore: networkStore
           )
-          .navigationTitle("Select a Token to Send") // TODO: Localize
+          .navigationTitle(Strings.Wallet.selectTokenToSendTitle)
           .navigationBarTitleDisplayMode(.inline)
         }
       }

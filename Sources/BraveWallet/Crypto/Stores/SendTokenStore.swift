@@ -186,7 +186,22 @@ public class SendTokenStore: ObservableObject {
   }
   
   private func didSelect(account: BraveWallet.AccountInfo, token: BraveWallet.BlockchainToken) {
-    
+    Task { @MainActor in
+      let selectedCoin = await walletService.selectedCoin()
+      
+      let selectedAccount = await self.keyringService.selectedAccount(selectedCoin)
+      if selectedAccount != account.address {
+        _ = await self.keyringService.setSelectedAccount(account.coin, keyringId: account.keyringId, address: account.address)
+      }
+      
+      let selectedChain = await rpcService.network(selectedCoin, origin: nil)
+      if self.selectedSendToken != token || selectedChain.chainId != token.chainId {
+        _ = await self.rpcService.setNetwork(token.chainId, coin: token.coin, origin: nil)
+        self.prefilledToken = token
+      }
+      
+      self.update()
+    }
   }
   
   @MainActor private func validatePrefilledToken(on network: inout BraveWallet.NetworkInfo) async {

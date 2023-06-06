@@ -36,7 +36,7 @@ struct SelectAccountTokenView: View {
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
       } else if store.filteredAccountSections.flatMap(\.tokenBalances).isEmpty && !store.isLoadingBalances {
         Section {
-          Text("No available tokens") // TODO: Localize
+          Text(Strings.Wallet.selectTokenToSendNoTokens)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -57,7 +57,7 @@ struct SelectAccountTokenView: View {
         networkFilterButton
         Spacer()
         Button(action: { store.isHidingZeroBalances.toggle() }) {
-          Text(store.isHidingZeroBalances ? "Show Zero Balances" : "Hide Zero Balances") // TODO: Localize
+          Text(store.isHidingZeroBalances ? Strings.Wallet.showZeroBalances : Strings.Wallet.hideZeroBalances)
             .foregroundColor(Color(.braveBlurpleTint))
         }
       }
@@ -101,7 +101,7 @@ struct SelectAccountTokenView: View {
                 // until we know which assets have >0 balance.
                 loadingAssetView
               } else {
-                Text("No available tokens") // TODO: Localize
+                Text(Strings.Wallet.selectTokenToSendNoTokens)
               }
             }
             .multilineTextAlignment(.center)
