@@ -71,6 +71,9 @@ public actor LaunchHelper {
       await AdBlockEngineManager.shared.startTimer()
       Self.signpost.emitEvent("startTimer", id: signpostID, "Started engine timer")
       
+      AdBlockServiceLoader.loadLocalFiles(from: adBlockService)
+      Self.signpost.emitEvent("loadLocalFiles", id: signpostID, "Loaded local files")
+      
       /// Cleanup rule lists so we don't have dead rule lists
       let validBlocklistTypes = await self.getAllValidBlocklistTypes()
       await ContentBlockerManager.shared.cleaupInvalidRuleLists(validTypes: validBlocklistTypes)
