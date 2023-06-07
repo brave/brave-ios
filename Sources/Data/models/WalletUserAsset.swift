@@ -172,6 +172,9 @@ extension WalletUserAsset {
 
 private extension BraveWallet.BlockchainToken {
   /// The group id that this token should be stored with in CoreData
+  /// - Warning: This format must to updated if
+  /// `BraveWallet.NetworkInfo.walletUserAssetGroupId` format is
+  ///  changed under `BraveWallet`
   var walletUserAssetGroupId: String {
     "\(coin.rawValue).\(chainId)"
   }

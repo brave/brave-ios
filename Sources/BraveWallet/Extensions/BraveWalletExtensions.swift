@@ -228,7 +228,10 @@ extension BraveWallet.NetworkInfo {
   }
   
   /// The group id that this network should generate for any token
-  /// that belongs to this network
+  /// that belongs to this network.
+  /// - Warning: This format must to updated if
+  /// `BraveWallet.BlockchainToken.walletUserAssetGroupId` format is
+  ///  changed under `Data`
   var walletUserAssetGroupId: String {
     "\(coin.rawValue).\(chainId)"
   }
