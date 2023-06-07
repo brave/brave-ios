@@ -1001,18 +1001,16 @@ extension BrowserViewController: WKUIDelegate {
           self.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
         }
         openNewPrivateTabAction.accessibilityLabel = "linkContextMenu.openInNewPrivateTab"
-
+        
         actions.append(openNewPrivateTabAction)
 
-        let copyAction = UIAction(
-          title: Strings.copyLinkActionTitle,
-          image: UIImage(systemName: "doc.on.doc")
-        ) { _ in
-          UIPasteboard.general.url = url
-        }
+        let copyAction = UIAction.makeCopyAction(for: url)
         copyAction.accessibilityLabel = "linkContextMenu.copyLink"
-
         actions.append(copyAction)
+        
+        let copyCleanLinkAction = UIAction.makeCleanCopyAction(for: url)
+        copyCleanLinkAction.accessibilityLabel = "linkContextMenu.copyCleanLink"
+        actions.append(copyCleanLinkAction)
 
         if let braveWebView = webView as? BraveWebView {
           let shareAction = UIAction(

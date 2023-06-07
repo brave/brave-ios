@@ -306,6 +306,7 @@ var package = Package(
       dependencies: ["Brave", "BraveStrings"],
       resources: [
         .copy("Resources/debouncing.json"),
+        .copy("Resources/clean-urls.json"),
         .copy("Resources/content-blocking.json"),
         .copy("Resources/filter-lists.json"),
         .copy("Resources/google-search-plugin.xml"),

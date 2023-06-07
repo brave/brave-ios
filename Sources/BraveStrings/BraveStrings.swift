@@ -889,6 +889,14 @@ extension Strings {
   public static let codeWordInputHelp = NSLocalizedString("CodeWordInputHelp", tableName: "BraveShared", bundle: .module, value: "Type your supplied sync chain code words into the form below.", comment: "Code words input help")
   public static let copyToClipboard = NSLocalizedString("CopyToClipboard", tableName: "BraveShared", bundle: .module, value: "Copy to Clipboard", comment: "Copy codewords title")
   public static let copiedToClipboard = NSLocalizedString("CopiedToClipboard", tableName: "BraveShared", bundle: .module, value: "Copied to Clipboard!", comment: "Copied codewords title")
+  
+  ///
+  public static let copyCleanLink = NSLocalizedString(
+    "CopyCleanLink", tableName: "BraveShared", bundle: .module,
+    value: "Copy Clean Link",
+    comment: "A menu option available when long pressing on a link which allows you to copy a clean version of the url which strips out some query parameters."
+  )
+  
   public static let syncUnsuccessful = NSLocalizedString("SyncUnsuccessful", tableName: "BraveShared", bundle: .module, value: "Unsuccessful", comment: "")
   public static let syncUnableCreateGroup = NSLocalizedString("SyncUnableCreateGroup", tableName: "BraveShared", bundle: .module, value: "Can't sync this device", comment: "Description on popup when setting up a sync group fails")
   public static let copied = NSLocalizedString("Copied", tableName: "BraveShared", bundle: .module, value: "Copied!", comment: "Copied action complete title")

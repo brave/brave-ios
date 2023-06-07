@@ -381,6 +381,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     locationTextField.attributedPlaceholder = self.locationView.placeholder
     locationTextField.rightView = qrCodeButton
     locationTextField.rightViewMode = .never
+    //locationTextField.delegate = self
     
     let dragInteraction = UIDragInteraction(delegate: self)
     locationTextField.addInteraction(dragInteraction)
@@ -767,5 +768,37 @@ extension TopToolbarView: UIDragInteractionDelegate {
     let dragItem = UIDragItem(itemProvider: NSItemProvider(object: text as NSString))
     dragItem.localObject = locationTextField
     return [dragItem]
+  }
+}
+
+extension TopToolbarView: UITextFieldDelegate {
+  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    return true
+  }
+  
+  func textField(_ textField: UITextField, editMenuForCharactersIn range: NSRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
+    guard let text = textField.text, range.length == text.count else {
+      return UIMenu(children: suggestedActions)
+    }
+    
+    guard let url = NSURL(idnString: text) else {
+      return UIMenu(children: suggestedActions)
+    }
+    
+    var actions: [UIMenuElement] = []
+    
+    if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
+      actions.append(
+        UIAction.makePasteAction(pasteCallback: { pasteboardContents in
+          textField.text = pasteboardContents
+          self.delegate?.topToolbar(self, didEnterText: pasteboardContents)
+        })
+      )
+    }
+    
+    actions.append(UIAction.makeCopyAction(for: url as URL))
+    actions.append(UIAction.makeCleanCopyAction(for: url as URL))
+    
+    return UIMenu(options: .displayInline, children: actions)
   }
 }

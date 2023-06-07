@@ -116,7 +116,7 @@ struct URLMatcher<Rule: MatcherRuleProtocol> {
   /// 2. If the eTLD+1 is in the `etldToRule` map (from step 2 above), see if the full URL matches the rule, and return the rule
   /// (As an optimization, we only need to check the pattern the `eTLD+1` was extracted from and not the whole include list)
   /// 3. If any of the query params (the keys) in the map from #4 above are in URL we might navigate to, apply the corresponding rule
-  /// 4. Apply all the rules from bucket C
+  /// 4. Apply any matching rules from bucket C
   func matchingRule(for url: URL) -> Rule? {
     if let etld1 = url.baseDomain, let entries = etldToRule[etld1] {
       guard
@@ -128,27 +128,59 @@ struct URLMatcher<Rule: MatcherRuleProtocol> {
 
       return entry.rule
     } else {
-      return matchingCachedQueryParamRule(for: url)
-        ?? otherRules.first(where: { $0.handles(url: url) })
+      return matchingCachedQueryParamRules(for: url).first(where: { !$0.isExcluded(url: url) }) ??
+        otherRules.first(where: { $0.handles(url: url) })
     }
+  }
+  
+  /// Attempts to find all valid rule for the given URL
+  ///
+  /// **Rules**
+  /// 1. For the given URL we *might* navigate too, pull out the `eTLD+1` and the query items
+  /// 2. If the eTLD+1 is in the `etldToRule` map (from step 2 above), see if the full URL matches the rule, and add the rule
+  /// (As an optimization, we only need to check the pattern the `eTLD+1` was extracted from and not the whole include list)
+  /// 3. If any of the query params (the keys) in the map from #4 above are in URL we might navigate to, apply the corresponding rule
+  /// 4. Apply all matching rules from bucket C
+  func allMatchingRules(for url: URL) -> [Rule] {
+    var rules: [Rule] = []
+    
+    if let etld1 = url.baseDomain, let entries = etldToRule[etld1] {
+      for entry in entries {
+        guard url.matches(any: entry.relevantPatterns) else { continue }
+        guard !entry.rule.isExcluded(url: url) else { continue }
+        rules.append(entry.rule)
+      }
+    }
+    
+    for rule in matchingCachedQueryParamRules(for: url) {
+      rules.append(rule)
+    }
+    
+    for rule in otherRules {
+      guard rule.handles(url: url) else { continue }
+      rules.append(rule)
+    }
+    
+    return rules
   }
 
   /// Attempt to extract the query value and actions from the list of queryItems using the `queryToRule` (all urls) map.
   ///
   /// - Parameter url: The url to extract the query params from
   /// - Returns: A rule for the given url
-  private func matchingCachedQueryParamRule(for url: URL) -> Rule? {
+  private func matchingCachedQueryParamRules(for url: URL) -> [Rule] {
     // Extract the redirect URL
-    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
-    guard let queryItems = components.queryItems else { return nil }
+    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return [] }
+    guard let queryItems = components.queryItems else { return [] }
     
+    var rules: [Rule] = []
     for queryItem in queryItems {
       if let rule = queryToRule[queryItem.name], !rule.isExcluded(url: url) {
-        return rule
+        rules.append(rule)
       }
     }
 
-    return nil
+    return rules
   }
 }
 

@@ -13,6 +13,7 @@ class AdBlockServiceLoader {
     Task {
       for await folderURL in await adBlockService.localFilesStream {
         loadDebounceRules(fromFolderURL: folderURL)
+        loadCleanURLRules(fromFolderURL: folderURL)
       }
     }
   }
@@ -24,6 +25,18 @@ class AdBlockServiceLoader {
     do {
       let data = try Data(contentsOf: fileURL)
       try DebouncingService.shared.setup(withRulesJSON: data)
+    } catch {
+      ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
+    }
+  }
+  
+  /// Attempt to load the debounce rules
+  private static func loadCleanURLRules(fromFolderURL folderURL: URL) {
+    let fileURL = folderURL.appendingPathComponent("1/clean-urls", conformingTo: .json)
+    
+    do {
+      let data = try Data(contentsOf: fileURL)
+      try CleanURLService.shared.setup(withRulesJSON: data)
     } catch {
       ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
     }

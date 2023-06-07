@@ -846,40 +846,24 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
       var actionMenuChildren: [UIAction] = []
 
-      let pasteGoAction = UIAction(
-        title: Strings.pasteAndGoTitle,
-        image: UIImage(systemName: "doc.on.clipboard.fill"),
-        identifier: .pasteAndGo,
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
+      if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
+        actionMenuChildren.append(
+          UIAction.makePasteAndGoAction(pasteCallback: { pasteboardContents in
             self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-          }
-        })
-
-      let pasteAction = UIAction(
-        title: Strings.pasteTitle,
-        image: UIImage(systemName: "doc.on.clipboard"),
-        identifier: .paste,
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
+          })
+        )
+        
+        actionMenuChildren.append(
+          UIAction.makePasteAction(pasteCallback: { pasteboardContents in
             // Enter overlay mode and make the search controller appear.
             self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-          }
-        })
-
-      let copyAction = UIAction(
-        title: Strings.copyAddressTitle,
-        image: UIImage(systemName: "doc.on.doc"),
-        handler: UIAction.deferredActionHandler { _ in
-          if let url = self.topToolbar.currentURL {
-            UIPasteboard.general.url = url as URL
-          }
-        })
-
-      if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-        actionMenuChildren = [pasteGoAction, pasteAction, copyAction]
-      } else {
-        actionMenuChildren = [copyAction]
+          })
+        )
+      }
+      
+      if let url = self.topToolbar.currentURL {
+        actionMenuChildren.append(UIAction.makeCopyAction(for: url))
+        actionMenuChildren.append(UIAction.makeCleanCopyAction(for: url))
       }
 
       return UIMenu(title: "", identifier: nil, children: actionMenuChildren)

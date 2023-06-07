@@ -1,0 +1,64 @@
+[
+  {
+    "include": [
+      "*://*.twitter.com/*"
+    ],
+    "exclude": [
+    ],
+    "params": [
+      "t"
+    ]
+  },
+  {
+    "include": [
+      "*://*/*"
+    ],
+    "exclude": [
+    ],
+    "params": [
+      "utm_ad",
+      "utm_affiliate",
+      "utm_brand",
+      "utm_campaign",
+      "utm_campaignid",
+      "utm_channel",
+      "utm_cid",
+      "utm_content",
+      "utm_emcid",
+      "utm_emmid",
+      "utm_id",
+      "utm_keyword",
+      "utm_medium",
+      "utm_name",
+      "utm_place",
+      "utm_product",
+      "utm_pubreferrer",
+      "utm_reader",
+      "utm_referrer",
+      "utm_serial",
+      "utm_session",
+      "utm_siteid",
+      "utm_social",
+      "utm_social-type",
+      "utm_source",
+      "utm_supplier",
+      "utm_swu",
+      "utm_term",
+      "utm_umguk",
+      "utm_userid",
+      "utm_viz_id"
+    ]
+  },
+  {
+    "include": [
+      "https://dev-pages.bravesoftware.com/clean-urls/*"
+    ],
+    "exclude": [
+      "https://dev-pages.bravesoftware.com/clean-urls/exempted*"
+    ],
+    "params": [
+      "brave_testing1",
+      "brave_testing2"
+    ]
+  }
+]
