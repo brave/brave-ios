@@ -144,6 +144,11 @@ struct NFTIconView: View {
     if shouldShowNetworkIcon, let image = network.nativeTokenLogoImage {
       Image(uiImage: image)
         .resizable()
+        .overlay(
+          Circle()
+            .stroke(lineWidth: 2)
+            .foregroundColor(.white)
+        )
         .frame(
           width: min(tokenLogoLength, maxTokenLogoLength ?? tokenLogoLength),
           height: min(tokenLogoLength, maxTokenLogoLength ?? tokenLogoLength)
