@@ -5,6 +5,7 @@
 
 import Foundation
 import UIKit
+import BraveStrings
 
 public class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
   public var actionHandler: ((Int, FeedItemAction) -> Void)?
@@ -70,7 +71,7 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
 
   public let feedView = FeedItemView(layout: .rateCard).then {
     $0.isUserInteractionEnabled = false
-    $0.callToActionButton.setTitle("Rate Brave", for: .normal)
+    $0.callToActionButton.setTitle(Strings.BraveNews.rateBraveCardRateActionTitle, for: .normal)
   }
 
   private var contextMenuDelegate: NSObject?
@@ -98,9 +99,9 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
 
     isAccessibilityElement = true
     
-    feedView.titleLabel.text = "Liking Brave?"
+    feedView.titleLabel.text = Strings.BraveNews.rateBraveCardTitle
     feedView.descriptionLabel.do {
-      $0.text = "Tell us what you think!"
+      $0.text = Strings.BraveNews.rateBraveCardSubtitle
       $0.textColor = .white
     }
     feedView.thumbnailImageView.image = UIImage(sharedNamed: "brave.logo")

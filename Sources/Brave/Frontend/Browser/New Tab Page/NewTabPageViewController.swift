@@ -644,7 +644,8 @@ class NewTabPageViewController: UIViewController {
       break
     case .rateCardAction(.pressedAppRatingCard):
       Preferences.Review.newsCardShownDate.value = Date()
-      guard let writeReviewURL = URL(string: "https://itunes.apple.com/app/id1052879175?action=write-review")else {
+      guard let writeReviewURL = URL(
+        string: "https://itunes.apple.com/app/id1052879175?action=write-review") else {
         return
       }
       UIApplication.shared.open(writeReviewURL)

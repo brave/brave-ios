@@ -467,13 +467,13 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
         }
       }
       var openInAppStore: UIAction {
-        .init(title: "Rate Brave",
+        .init(title: Strings.BraveNews.rateBraveCardRateActionTitle,
               image: UIImage(braveSystemNamed: "leo.thumb.up"),
               handler: mapDeferredHandler(appRatingCardPressedHandler))
       }
 
       var dismissCardRate: UIAction {
-        .init(title: Strings.dismiss,
+        .init(title: Strings.BraveNews.rateBraveCardHideActionTitle,
               image: UIImage(braveSystemNamed: "leo.eye.off"),
               attributes: .destructive,
               handler: mapDeferredHandler(openInNewPrivateTabHandler))
@@ -485,7 +485,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let children: [UIMenu] = [
         UIMenu(title: "", options: [.displayInline], children: openActions)
       ]
-      return UIMenu(title: "Rate Brave in AppStore", children: children)
+      return UIMenu(title: Strings.BraveNews.rateBraveCardActionSheetTitle, children: children)
     }
 
     let openInNewTabHandler: MenuActionHandler = { context in

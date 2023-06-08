@@ -25,8 +25,8 @@ public class AppReviewManager: ObservableObject {
     static let launchCountLimit = 5
     static let bookmarksCountLimit = 5
     static let playlistCountLimit = 5
-    static let dappConnectionPeriod = 7.days
-    static let daysInUseMaxPeriod = 7.days
+    static let dappConnectionPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
+    static let daysInUseMaxPeriod = AppConstants.buildChannel.isPublic ? 7.days : 7.minutes
     static let daysInUseRequiredPeriod = 4
     static let revisedMinDaysBetweenReviewRequest = 30
     
