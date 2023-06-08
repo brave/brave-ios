@@ -643,11 +643,17 @@ class NewTabPageViewController: UIViewController {
       // Inline content ads have no rating card press action
       break
     case .rateCardAction(.pressedAppRatingCard):
-      // TODO: Open AppStore
-      print("AppStore Rate Logic")
+      Preferences.Review.newsCardShownDate.value = Date()
+      guard let writeReviewURL = URL(string: "https://itunes.apple.com/app/id1052879175?action=write-review")else {
+        return
+      }
+      UIApplication.shared.open(writeReviewURL)
+      feedDataSource.setNeedsReloadCards()
+      loadFeedContents()
     case .rateCardAction(.hiddenAppRatingCard):
-      // TODO: Hide App Rating Card
-      print("Hide Rate Logic")
+      Preferences.Review.newsCardShownDate.value = Date()
+      feedDataSource.setNeedsReloadCards()
+      loadFeedContents()
     case .rateCardAction(.opened(_, _)):
       // Rate Card have no open action
       break
