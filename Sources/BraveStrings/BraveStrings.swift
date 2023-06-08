@@ -49,6 +49,12 @@ extension Strings {
     NSLocalizedString(
       "yearAbbreviation", tableName: "BraveShared",
       bundle: .module, value: "yr.", comment: "Abbreviation for 'Year', use full word' Yeara' if this word can't be shortened in your language")
+  public static let dismiss =
+    NSLocalizedString(
+      "dismiss",
+      tableName: "BraveShared",
+      bundle: .module, value: "Dismiss",
+      comment: "Used for dismiss action for elemetns")
 }
 
 // MARK:-  UIAlertControllerExtensions.swift
