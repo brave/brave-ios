@@ -88,9 +88,9 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
   }
   
   public static func migrateVisibleAssets(_ assets: [String: [BraveWallet.BlockchainToken]], completion: (() -> Void)? = nil) {
-    for groupId in assets.keys {
-      guard let assetsInOneGroup = assets[groupId] else { return }
-      DataController.perform(context: .new(inMemory: false), save: false) { context in
+    DataController.perform(context: .new(inMemory: false), save: false) { context in
+      for groupId in assets.keys {
+        guard let assetsInOneGroup = assets[groupId] else { return }
         let group = WalletUserAssetGroup.getGroup(groupId: groupId, context: context) ?? WalletUserAssetGroup(context: context, groupId: groupId)
         for asset in assetsInOneGroup where WalletUserAsset.getUserAsset(asset: asset, context: context) == nil {
           let visibleAsset = WalletUserAsset(context: context, asset: asset)
@@ -98,10 +98,9 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
         }
         
         WalletUserAsset.saveContext(context)
-        
-        DispatchQueue.main.async {
-          completion?()
-        }
+      }
+      DispatchQueue.main.async {
+        completion?()
       }
     }
   }
