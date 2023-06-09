@@ -67,6 +67,27 @@ struct PlaylistListView: View {
               // Navigate to the folder…
             } label: {
               PlaylistFolderView(folder: folder)
+                .contextMenu {
+                  // Can you share the default playlist?
+                  Button {
+                    
+                  } label: {
+                    Label("Share Playlist", braveSystemImage: "leo.share.macos")
+                  }
+                  // TODO: Do we hide this if all content in the folder is downloaded?
+                  Button {
+                    
+                  } label: {
+                    Label("Download", braveSystemImage: "leo.cloud.download")
+                  }
+                  if folder.id != .defaultPlaylistID {
+                    Button(role: .destructive) {
+                      
+                    } label: {
+                      Label("Delete", braveSystemImage: "leo.trash")
+                    }
+                  }
+                }
             }
             .buttonStyle(.spring)
           }
@@ -97,6 +118,7 @@ struct PlaylistListView: View {
           }
         }
       }
+      .padding(.horizontal, 8)
     }
     .listBackgroundColor(Color(.braveBackground))
     .toolbar {
@@ -142,6 +164,10 @@ struct PlaylistFolderView: View {
     }
   }
   
+  private var containerShape: some InsettableShape {
+    RoundedRectangle(cornerRadius: 12, style: .continuous)
+  }
+  
   var body: some View {
     HStack {
       icon
@@ -158,8 +184,8 @@ struct PlaylistFolderView: View {
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(background)
-    .containerShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    .padding(.horizontal, 8)
+    .containerShape(containerShape)
+    .contentShape(.contextMenuPreview, containerShape)
   }
 }
 
