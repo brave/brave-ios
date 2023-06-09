@@ -39,9 +39,9 @@ extension NetworkManager {
         let resourceURL = bundle.url(forResource: "debouncing", withExtension: "json")
         let data = try Data(contentsOf: resourceURL!)
         return data
-      case .genericContentBlockingBehaviors:
+      case .adBlockRules:
         let bundle = Bundle.module
-        let resourceURL = bundle.url(forResource: "content-blocking", withExtension: "json")
+        let resourceURL = bundle.url(forResource: "latest", withExtension: "txt")
         let data = try Data(contentsOf: resourceURL!)
         return data
       case .deprecatedGeneralCosmeticFilters:

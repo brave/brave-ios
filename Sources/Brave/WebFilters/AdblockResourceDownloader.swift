@@ -14,7 +14,7 @@ public actor AdblockResourceDownloader: Sendable {
   
   /// All the different resources this downloader handles
   static let handledResources: [BraveS3Resource] = [
-    .genericContentBlockingBehaviors, .debounceRules
+    .adBlockRules, .debounceRules
   ]
   
   /// A list of old resources that need to be deleted so as not to take up the user's disk space
@@ -120,7 +120,7 @@ public actor AdblockResourceDownloader: Sendable {
   /// Handle the downloaded file url for the given resource
   private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource, allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
     switch resource {
-    case .genericContentBlockingBehaviors:
+    case .adBlockRules:
       let blocklistType = ContentBlockerManager.BlocklistType.generic(.blockAds)
       let modes = await blocklistType.allowedModes.asyncFilter { mode in
         guard allowedModes.contains(mode) else { return false }
@@ -135,18 +135,22 @@ public actor AdblockResourceDownloader: Sendable {
           return true
         }
       }
+
+      // No modes are needed to be compiled
+      guard !modes.isEmpty else { return }
       
       do {
-        guard !modes.isEmpty else { return }
-        guard let encodedContentRuleList = try resource.downloadedString() else {
+        guard let filterSet = try resource.downloadedString() else {
           assertionFailure("This file was downloaded successfully so it should not be nil")
           return
         }
         
+        var wasTruncated: Bool = false
+        let encodedContentRuleList = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet, truncated: &wasTruncated)
+        
         // try to compile
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: encodedContentRuleList,
-          for: .generic(.blockAds),
+          encodedContentRuleList: encodedContentRuleList, for: blocklistType,
           modes: modes
         )
       } catch {
