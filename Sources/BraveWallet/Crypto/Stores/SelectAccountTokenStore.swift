@@ -129,6 +129,11 @@ class SelectAccountTokenStore: ObservableObject {
     walletService.add(self)
   }
   
+  func resetFilters() {
+    isHidingZeroBalances = true
+    networkFilter = .allNetworks
+  }
+  
   @MainActor func update() async {
     let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
     let allNetworks = await rpcService.allNetworksForSupportedCoins()

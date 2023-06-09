@@ -67,6 +67,9 @@ struct SelectAccountTokenView: View {
         }
       }
     }
+    .onDisappear {
+      store.resetFilters()
+    }
   }
   
   private var shouldShowZeroBalanceButton: Bool {
