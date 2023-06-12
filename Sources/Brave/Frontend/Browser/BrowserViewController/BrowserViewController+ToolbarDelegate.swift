@@ -562,8 +562,11 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     
     func openVoiceSearch(speechRecognizer: SpeechRecognizer) {
-      voiceSearchViewController = UIHostingController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
+      voiceSearchViewController = PopupViewController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
+      
       if let voiceSearchController = voiceSearchViewController {
+        voiceSearchController.modalTransitionStyle = .crossDissolve
+        voiceSearchController.modalPresentationStyle = .overFullScreen
         present(voiceSearchController, animated: true)
       }
     }

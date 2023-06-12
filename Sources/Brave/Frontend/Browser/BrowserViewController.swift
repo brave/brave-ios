@@ -143,7 +143,7 @@ public class BrowserViewController: UIViewController {
   var onPendingRequestUpdatedCancellable: AnyCancellable?
   
   /// Voice Search
-  var voiceSearchViewController: UIHostingController<VoiceSearchInputView>?
+  var voiceSearchViewController: PopupViewController<VoiceSearchInputView>?
   var voiceSearchCancelable: AnyCancellable?
 
   /// Custom Search Engine

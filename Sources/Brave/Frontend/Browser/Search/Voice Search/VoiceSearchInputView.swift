@@ -20,76 +20,75 @@ struct VoiceSearchInputView: View {
   }
   
   var body: some View {
-    NavigationView {
-      VStack {
-        Spacer()
-        microphoneView
-      }
-      .onAppear {
-        speechModel.startTranscribing()
-        speechModel.startSilenceAnimation()
-      }.onDisappear {
-        speechModel.stopTranscribing()
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .padding()
-      .navigationTitle(Strings.VoiceSearch.screenTitle)
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .confirmationAction) {
-          doneButton
-        }
-      }
-      .background(Color(.secondaryBraveBackground).ignoresSafeArea())
-    }
-    .navigationViewStyle(.stack)
-  }
-    
-  private var microphoneView: some View {
-    VStack {
-      Spacer()
-      
-      Text(speechModel.transcript)
-          .multilineTextAlignment(.center)
-          .padding(.horizontal, 25)
-      
-      ZStack {
-        Circle()
-          .foregroundColor(Color(.braveDarkerBlurple).opacity(0.25))
-          .frame(width: 150, height: 150, alignment: .center)
-          .scaleEffect(outerCircleScale)
-          .animation(outerCircleAnimation, value: outerCircleScale)
-        Button {
-          onEnterSearchKeyword?()
-          dismissView()
-        } label: {
-          Circle()
-            .foregroundColor(Color(.braveDarkerBlurple))
-            .frame(width: 75, height: 75, alignment: .center)
-        }
-        Image(systemName: "mic.fill")
-          .resizable()
-          .renderingMode(.template)
-          .frame(width: 22, height: 35)
-          .foregroundColor(.white)
-      }
-      .padding(.bottom, 45)
-      .padding(.top, 45)
-      
-      Spacer()
-      
-      Text(Strings.VoiceSearch.screenDisclaimer)
-          .font(.footnote)
-          .multilineTextAlignment(.center)
-          .foregroundColor(Color(.secondaryBraveLabel))
-          .padding(.horizontal, 25)
-    }
-    .padding(.bottom, 75)
+    inputView
   }
   
-  private var doneButton: some View {
-    Button(Strings.done, action: dismissView)
-      .foregroundColor(Color(.braveBlurpleTint))
+  private var inputView: some View {
+    VStack {
+      HStack {
+        Spacer()
+        Button {
+          dismissView()
+        } label: {
+          Image(systemName: "xmark")
+            .foregroundColor(Color(.bravePrimary))
+            .font(.system(.body))
+        }
+      }
+      transcriptView
+      Text(Strings.VoiceSearch.screenDisclaimer)
+        .font(.footnote)
+        .multilineTextAlignment(.center)
+        .foregroundColor(Color(.secondaryBraveLabel))
+        .padding(.horizontal, 25)
+        .padding(.bottom, 25)
+    }
+    .onAppear {
+      speechModel.startTranscribing()
+      speechModel.startSilenceAnimation()
+    }.onDisappear {
+      speechModel.stopTranscribing()
+    }
+    .padding()
+    .background(Color(.secondaryBraveBackground).ignoresSafeArea())
+  }
+    
+  private var transcriptView: some View {
+    VStack {
+      microphoneView
+      Text(speechModel.transcript)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 25)
+    }
+    .padding(.bottom, 25)
+  }
+  
+  private var microphoneView: some View {
+    ZStack {
+      Circle()
+        .foregroundColor(Color(.braveDarkerBlurple).opacity(0.20))
+        .frame(width: 150, height: 150, alignment: .center)
+        .scaleEffect(outerCircleScale)
+        .animation(outerCircleAnimation, value: outerCircleScale)
+      Circle()
+        .foregroundColor(Color(.braveDarkerBlurple).opacity(0.5))
+        .frame(width: 100, height: 100, alignment: .center)
+      Button {
+        onEnterSearchKeyword?()
+        dismissView()
+      } label: {
+        Circle()
+          .foregroundColor(Color(.microphoneBackground))
+          .frame(width: 75, height: 75, alignment: .center)
+      }
+      Image(braveSystemName: speechModel.transcriptedIcon)
+        .renderingMode(.template)
+        .font(.title)
+        .aspectRatio(contentMode: .fit)
+        .frame(width: 35, height: 35)
+        .foregroundColor(.white)
+    }
+    .padding(.vertical, 45)
   }
 }
 
@@ -98,9 +97,11 @@ extension VoiceSearchInputView {
   private var outerCircleScale: CGFloat {
     switch speechModel.animationType {
     case .pulse(let scale):
-        return scale
+      return scale
     case .speech(let volume):
-        return volume
+      return volume
+    case .stable:
+      return 0
     }
   }
   
@@ -110,6 +111,14 @@ extension VoiceSearchInputView {
       return .easeInOut(duration: 1.5).repeatForever()
     case .speech:
       return .linear(duration: 0.1)
+    case .stable:
+      return .linear(duration: 0)
     }
+  }
+}
+
+private extension UIColor {
+  static var microphoneBackground: UIColor {
+    UIColor(rgb: 0x423eee)
   }
 }

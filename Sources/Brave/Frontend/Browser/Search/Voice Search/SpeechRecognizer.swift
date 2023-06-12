@@ -26,6 +26,7 @@ class SpeechRecognizer: ObservableObject {
   enum AnimationType {
     case speech(volume: CGFloat)
     case pulse(scale: CGFloat)
+    case stable
   }
   
   private struct AnimationScale {
@@ -36,7 +37,8 @@ class SpeechRecognizer: ObservableObject {
   weak var delegate: SpeechRecognizerDelegate?
   
   /// Formatted transcript from speech recognizer
-  @Published var transcript: String = ""
+  @Published var transcript: String = " "
+  @Published var transcriptedIcon: String = "leo.microphone"
   @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
   @Published private(set) var animationType: AnimationType = .pulse(scale: 1)
 
@@ -113,20 +115,32 @@ class SpeechRecognizer: ObservableObject {
         
         var isFinal = false
         
-        if let result {
+        if let result, !isFinal {
           // SpeechRecognitionMetadata is the key to detect speaking finalized
           isFinal = result.isFinal || result.speechRecognitionMetadata != nil
-          self.transcribe(result.bestTranscription.formattedString)
+          
+          let formattedTranscript = result.bestTranscription.formattedString
+          
+          if !formattedTranscript.isEmpty {
+            self.transcribe(formattedTranscript)
+          }
         }
         
         // Check voice input final
         if isFinal {
+          animationType = .stable
+          transcriptedIcon = "leo.check.circle-outline"
+          
           // Remove audio buffer input
           audioEngine.inputNode.removeTap(onBus: 0)
           // Reset Speech Recognizer
           self.reset()
-          
-          finalize(searchQuery: result?.bestTranscription.formattedString ?? "")
+
+          Task.delayed(bySeconds: 0.75) { @MainActor in
+            if let formattedTranscript = result?.bestTranscription.formattedString, !formattedTranscript.isEmpty {
+              self.finalize(searchQuery: formattedTranscript)
+            }
+          }
         }
       })
     } catch {

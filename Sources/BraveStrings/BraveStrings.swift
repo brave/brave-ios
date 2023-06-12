@@ -4387,7 +4387,7 @@ extension Strings {
         "voice.search.screen.disclaimer",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Brave will never store your searches or share it with any entity.",
+        value: "Brave does not store or share your voice searches.",
         comment: "Disclaimer for screen to search using voice.")
     
     public static let microphoneAccessRequiredWarningTitle =
