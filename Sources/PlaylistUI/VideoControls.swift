@@ -7,12 +7,30 @@ import Foundation
 import SwiftUI
 import DesignSystem
 
-struct VideoControls: View {
+enum ContentSpeed: Double {
+  case normal = 1.0
+  case fast = 1.5
+  case faster = 2
+  
+  mutating func increase() {
+    switch self {
+    case .normal: self = .fast
+    case .fast: self = .faster
+    case .faster: self = .normal
+    }
+  }
+}
+
+struct MediaControls: View {
   var title: String
   
   @State private var value: Int = 68
   @State private var isPlaying: Bool = false
+  @State private var isScrubbing: Bool = false
   @State private var isShuffleEnabled: Bool = false
+  @State private var contentSpeed: ContentSpeed = .normal
+  
+  @State private var resumePlayingAfterScrub: Bool = false
   
   var body: some View {
     VStack {
@@ -25,17 +43,30 @@ struct VideoControls: View {
           .font(.body.weight(.semibold))
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      MediaScrubber(progress: $value, total: 1008)
+      MediaScrubber(currentTime: $value, totalDuration: 1008, isScrubbing: $isScrubbing)
       VStack(spacing: 24) {
         PlaybackControls(isPlaying: $isPlaying)
-        ExtraControls(isShuffleEnabled: $isShuffleEnabled)
+        ExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
       }
+      .disabled(isScrubbing)
+      .opacity(isScrubbing ? 0.5 : 1.0)
+      .animation(.linear(duration: 0.1), value: isScrubbing)
     }
     .frame(maxWidth: .infinity)
     .padding(.horizontal, 24)
     .colorScheme(.dark)
+    .onChange(of: isScrubbing) { newValue in
+      if newValue {
+        resumePlayingAfterScrub = isPlaying
+        isPlaying = false
+      } else {
+        isPlaying = resumePlayingAfterScrub
+      }
+    }
     .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect(), perform: { _ in
-      value += 1
+      if isPlaying {
+        value += 1
+      }
     })
   }
 }
@@ -89,13 +120,14 @@ struct PlaybackControls: View {
     }
     .buttonStyle(.spring(scale: 0.85))
     .imageScale(.large)
-    .foregroundStyle(.secondary)
+    .foregroundStyle(.primary)
     .dynamicTypeSize(...DynamicTypeSize.accessibility3)
   }
 }
 
 struct ExtraControls: View {
   @Binding var isShuffleEnabled: Bool
+  @Binding var contentSpeed: ContentSpeed
   
   var body: some View {
     HStack {
@@ -118,12 +150,20 @@ struct ExtraControls: View {
       }
       .toggleStyle(.button)
       Spacer()
-      Menu {
-        Button("1x") { }
-        Button("2x") { }
-        Button("4x") { }
+      Button {
+        contentSpeed.increase()
       } label: {
-        Image(braveSystemName: "leo.1x")
+        switch contentSpeed {
+        case .normal:
+          Image(braveSystemName: "leo.1x")
+            .transition(.opacity.animation(.linear(duration: 0.1)))
+        case .fast:
+          Image(braveSystemName: "leo.1.5x")
+            .transition(.opacity.animation(.linear(duration: 0.1)))
+        case .faster:
+          Image(braveSystemName: "leo.2x")
+            .transition(.opacity.animation(.linear(duration: 0.1)))
+        }
       }
       Spacer()
       Button { } label: {
@@ -135,18 +175,20 @@ struct ExtraControls: View {
       }
     }
     .buttonStyle(.spring(scale: 0.85))
-    .foregroundStyle(.secondary)
+    .foregroundStyle(.primary)
     .dynamicTypeSize(...DynamicTypeSize.accessibility3)
   }
 }
 
 struct MediaScrubber: View {
-  @Binding var progress: Int
-  var total: Int
+  @Binding var currentTime: Int /*Duration<Seconds>*/
+  var totalDuration: Int /*Duration<Seconds>*/
+  @Binding var isScrubbing: Bool
   
   @State private var isShowingTotalTime: Bool = false
   
-  @GestureState private var isPanning: Bool = false
+  @GestureState private var isScrubbingState: Bool = false
+  @State private var resumePlayingAfterPan = false
   
   @ScaledMetric private var barHeight = 2
   @ScaledMetric private var thumbSize = 12
@@ -161,26 +203,26 @@ struct MediaScrubber: View {
   
   var currentValueLabel: Text {
     if #available(iOS 16.0, *) {
-      return Text(Duration.seconds(progress), format: .time(pattern: .minuteSecond))
+      return Text(Duration.seconds(currentTime), format: .time(pattern: .minuteSecond))
     } else {
-      return Text(timeFormatter.string(from: DateComponents(second: progress))!)
+      return Text(timeFormatter.string(from: DateComponents(second: currentTime))!)
     }
   }
   
   var remainingTimeLabel: Text {
     if #available(iOS 16.0, *) {
-      let value = Duration.seconds(total - progress).formatted(.time(pattern: .minuteSecond))
+      let value = Duration.seconds(totalDuration - currentTime).formatted(.time(pattern: .minuteSecond))
       return Text("-\(value)")
     } else {
-      return Text("-\(timeFormatter.string(from: DateComponents(second: total - progress))!)")
+      return Text("-\(timeFormatter.string(from: DateComponents(second: totalDuration - currentTime))!)")
     }
   }
   
   var totalTimeLabel: Text {
     if #available(iOS 16.0, *) {
-      return Text(Duration.seconds(total), format: .time(pattern: .minuteSecond))
+      return Text(Duration.seconds(totalDuration), format: .time(pattern: .minuteSecond))
     } else {
-      return Text(timeFormatter.string(from: DateComponents(second: total))!)
+      return Text(timeFormatter.string(from: DateComponents(second: totalDuration))!)
     }
   }
   
@@ -193,9 +235,9 @@ struct MediaScrubber: View {
           // Active value
           GeometryReader { proxy in
             Color.white
-              .frame(width: CGFloat(progress) / CGFloat(total) * proxy.size.width, alignment: .leading)
+              .frame(width: min(proxy.size.width, CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width), alignment: .leading)
               .clipShape(RoundedRectangle(cornerRadius: barHeight / 2))
-              .animation(.linear(duration: 0.1), value: progress)
+              .animation(.linear(duration: 0.1), value: currentTime)
           }
         }
         .padding(.vertical, (thumbSize - barHeight) / 2)
@@ -206,17 +248,17 @@ struct MediaScrubber: View {
               .clipShape(Circle())
               .shadow(radius: 4)
               .frame(width: thumbSize, height: thumbSize)
-              .scaleEffect(isPanning ? 1.5 : 1)
-              .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPanning)
-              .offset(x: (CGFloat(progress) / CGFloat(total) * proxy.size.width) - (thumbSize / 2))
-              .animation(.linear(duration: 0.1), value: progress)
+              .scaleEffect(isScrubbing ? 1.5 : 1)
+              .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isScrubbing)
+              .offset(x: min(proxy.size.width, (CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width)) - (thumbSize / 2))
+              .animation(.linear(duration: 0.1), value: currentTime)
               .gesture(
                 DragGesture(minimumDistance: 0)
-                  .updating($isPanning, body: { _, state, _ in
+                  .updating($isScrubbingState, body: { _, state, _ in
                     state = true
                   })
                   .onChanged { state in
-                    progress = max(0, min(total, Int((state.location.x / proxy.size.width) * CGFloat(total))))
+                    currentTime = max(0, min(totalDuration, Int((state.location.x / proxy.size.width) * CGFloat(totalDuration))))
                   }
               )
           }
@@ -241,10 +283,13 @@ struct MediaScrubber: View {
       .font(.footnote)
     }
     .padding(.vertical)
+    .onChange(of: isScrubbingState) { newValue in
+      isScrubbing = newValue
+    }
     .accessibilityRepresentation {
       Slider(
-        value: Binding(get: { CGFloat(progress) }, set: { progress = Int($0) }),
-        in: 0.0...CGFloat(total),
+        value: Binding(get: { CGFloat(currentTime) }, set: { currentTime = Int($0) }),
+        in: 0.0...CGFloat(totalDuration),
         step: 1
       ) {
         Text("Current Media Time") // TODO: Localize
@@ -259,7 +304,7 @@ struct MediaScrubber: View {
 
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    VideoControls(title: "Top 10 things to do with Brave")
+    MediaControls(title: "Top 10 things to do with Brave")
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(white: 0.1))
   }
