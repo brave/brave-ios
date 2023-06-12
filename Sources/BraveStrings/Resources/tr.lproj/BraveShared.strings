@@ -968,7 +968,7 @@
 "login.loginInfoDetailsWebsiteFieldTitle" = "Web sitesi";
 
 /* The message displayed in alert when a user needs to set a passcode */
-"login.loginInfoSetPasscodeAlertDescription" = "Senkronizasyon zinciri ayarlamak veya ayarları görmek için, öncelikle cihazınızda bir parola belirlemeniz gerekiyor.";
+"login.loginInfoSetPasscodeAlertDescription" = "Senkronizasyon zincirini ayarlamak veya ayarları görmek için, öncelikle cihazınızda bir parola belirlemeniz gerekiyor.";
 
 /* The title displayed in alert when a user needs to set passcode */
 "login.loginInfoSetPasscodeAlertTitle" = "Bir Parola Belirleyin";
