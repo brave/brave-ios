@@ -21,16 +21,25 @@ enum ContentSpeed: Double {
   }
 }
 
-struct MediaControls: View {
+struct ControlView: View {
   var title: String
   
-  @State private var value: Int = 68
+  @State private var currentTime: Int = 68
+  @State private var totalDuration: Int = 1008
   @State private var isPlaying: Bool = false
   @State private var isScrubbing: Bool = false
   @State private var isShuffleEnabled: Bool = false
   @State private var contentSpeed: ContentSpeed = .normal
-  
+  @State private var stopPlaybackDate: Date?
+  @State private var isPlaybackStopInfoPresented: Bool = false
   @State private var resumePlayingAfterScrub: Bool = false
+  
+  private var timeFormatter: DateComponentsFormatter {
+    let formatter = DateComponentsFormatter()
+    formatter.allowedUnits = [.minute, .second]
+    formatter.zeroFormattingBehavior = [.dropLeading, .pad]
+    return formatter
+  }
   
   var body: some View {
     VStack {
@@ -43,11 +52,13 @@ struct MediaControls: View {
           .font(.body.weight(.semibold))
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      MediaScrubber(currentTime: $value, totalDuration: 1008, isScrubbing: $isScrubbing)
+      MediaScrubber(currentTime: $currentTime, totalDuration: totalDuration, isScrubbing: $isScrubbing)
       VStack(spacing: 24) {
         PlaybackControls(isPlaying: $isPlaying)
-        ExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
+        ExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed, stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
       }
+      .foregroundStyle(Color.white.opacity(0.75))
+      .dynamicTypeSize(...DynamicTypeSize.accessibility3)
       .disabled(isScrubbing)
       .opacity(isScrubbing ? 0.5 : 1.0)
       .animation(.linear(duration: 0.1), value: isScrubbing)
@@ -65,9 +76,61 @@ struct MediaControls: View {
     }
     .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect(), perform: { _ in
       if isPlaying {
-        value += 1
+        currentTime += 1
       }
     })
+    .overlayPreferenceValue(SleepTimerBoundsPrefKey.self, { value in
+      if isPlaybackStopInfoPresented, let stopPlaybackDate, let value = value.last {
+        GeometryReader { proxy in
+          HStack {
+            Group {
+              if #available(iOS 16.0, *) {
+                Text(timerInterval: .now...stopPlaybackDate, countsDown: true, showsHours: true)
+              } else {
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                  Text(timeFormatter.string(from: DateComponents(second: Int(stopPlaybackDate.timeIntervalSince1970 - context.date.timeIntervalSince1970)))!)
+                }
+              }
+            }
+            .foregroundStyle(Color(.braveLabel))
+            .font(.body.monospacedDigit())
+            .padding(.horizontal, 12)
+            Button {
+              
+            } label: {
+              Image(braveSystemName: "leo.pause.outline")
+            }
+            Button {
+              self.stopPlaybackDate = nil
+              isPlaybackStopInfoPresented = false
+            } label: {
+              Image(braveSystemName: "leo.close")
+            }
+          }
+          .foregroundStyle(Color(.braveBlurple))
+          .padding(8)
+          .background(Material.thin)
+          .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+          .position(x: proxy[value].midX, y: proxy[value].midY - (proxy[value].height * 2))
+        }
+        .background {
+          Color.clear
+            .contentShape(Rectangle())
+            .onTapGesture {
+              isPlaybackStopInfoPresented = false
+            }
+        }
+        .transition(.scale(scale: 0.2, anchor: .bottom).combined(with: .opacity).animation(.spring(response: 0.3, dampingFraction: 0.7)))
+      }
+    })
+  }
+}
+
+private struct SleepTimerBoundsPrefKey: PreferenceKey {
+  typealias Value = [Anchor<CGRect>]
+  static var defaultValue: Value = []
+  static func reduce(value: inout Value, nextValue: () -> Value) {
+    value.append(contentsOf: nextValue())
   }
 }
 
@@ -107,7 +170,7 @@ struct PlaybackControls: View {
         }
       })
       .toggleStyle(.button)
-      .foregroundStyle(.primary)
+      .foregroundStyle(Color.white)
       .font(.title)
       Spacer()
       Button { } label: {
@@ -120,14 +183,14 @@ struct PlaybackControls: View {
     }
     .buttonStyle(.spring(scale: 0.85))
     .imageScale(.large)
-    .foregroundStyle(.primary)
-    .dynamicTypeSize(...DynamicTypeSize.accessibility3)
   }
 }
 
 struct ExtraControls: View {
   @Binding var isShuffleEnabled: Bool
   @Binding var contentSpeed: ContentSpeed
+  @Binding var stopPlaybackDate: Date?
+  @Binding var isPlaybackStopInfoPresented: Bool
   
   var body: some View {
     HStack {
@@ -166,8 +229,42 @@ struct ExtraControls: View {
         }
       }
       Spacer()
-      Button { } label: {
-        Image(braveSystemName: "leo.sleep.timer")
+      if let _ = stopPlaybackDate {
+        Button {
+          isPlaybackStopInfoPresented = true
+        } label: {
+          Image(braveSystemName: "leo.sleep.timer")
+        }
+        .anchorPreference(key: SleepTimerBoundsPrefKey.self, value: .bounds, transform: { [$0] })
+      } else {
+        Menu {
+          Section {
+            Button {
+              stopPlaybackDate = .now.addingTimeInterval(10 * 60)
+            } label: {
+              Text("10 minutes")
+            }
+            Button {
+              stopPlaybackDate = .now.addingTimeInterval(20 * 60)
+            } label: {
+              Text("20 minutes")
+            }
+            Button {
+              stopPlaybackDate = .now.addingTimeInterval(30 * 60)
+            } label: {
+              Text("30 minutes")
+            }
+            Button {
+              stopPlaybackDate = .now.addingTimeInterval(60 * 60)
+            } label: {
+              Text("1 hour")
+            }
+          } header: {
+            Text("Stop Playback In…")
+          }
+        } label: {
+          Image(braveSystemName: "leo.sleep.timer")
+        }
       }
       Spacer()
       Button { } label: {
@@ -175,8 +272,6 @@ struct ExtraControls: View {
       }
     }
     .buttonStyle(.spring(scale: 0.85))
-    .foregroundStyle(.primary)
-    .dynamicTypeSize(...DynamicTypeSize.accessibility3)
   }
 }
 
@@ -188,7 +283,6 @@ struct MediaScrubber: View {
   @State private var isShowingTotalTime: Bool = false
   
   @GestureState private var isScrubbingState: Bool = false
-  @State private var resumePlayingAfterPan = false
   
   @ScaledMetric private var barHeight = 2
   @ScaledMetric private var thumbSize = 12
@@ -211,7 +305,7 @@ struct MediaScrubber: View {
   
   var remainingTimeLabel: Text {
     if #available(iOS 16.0, *) {
-      let value = Duration.seconds(totalDuration - currentTime).formatted(.time(pattern: .minuteSecond))
+      let value = Text(Duration.seconds(totalDuration - currentTime), format: .time(pattern: .minuteSecond))
       return Text("-\(value)")
     } else {
       return Text("-\(timeFormatter.string(from: DateComponents(second: totalDuration - currentTime))!)")
@@ -304,7 +398,7 @@ struct MediaScrubber: View {
 
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    MediaControls(title: "Top 10 things to do with Brave")
+    ControlView(title: "Top 10 things to do with Brave")
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(white: 0.1))
   }
