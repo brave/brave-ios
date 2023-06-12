@@ -375,10 +375,6 @@ class SettingsViewController: TableViewController {
         title: Strings.mediaAutoBackgrounding,
         option: Preferences.General.mediaAutoBackgrounding,
         image: UIImage(braveSystemNamed: "leo.audio.active")),
-      .boolRow(
-        title: Strings.youtubeMediaQuality,
-        option: Preferences.General.youtubeHighQuality,
-        image: UIImage(braveSystemNamed: "leo.headphones")),
       .boolRow(title: Strings.blockPopups, option: Preferences.General.blockPopups,
                image: UIImage(braveSystemNamed: "leo.shield.block")),
     ])
@@ -390,6 +386,22 @@ class SettingsViewController: TableViewController {
         self.navigationController?.pushViewController(controller, animated: true)
       }, image: UIImage(braveSystemNamed: "leo.swap.horizontal"), accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self)
     general.rows.append(websiteRedirectsRow)
+    
+    var youtubeQualityRow = Row(text: Strings.youtubeMediaQuality, detailText: Strings.youtubeMediaQualityDetails, image: UIImage(braveSystemNamed: "leo.headphones"), accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)
+    
+    youtubeQualityRow.selection = { [unowned self] in
+      let optionsViewController = OptionSelectionViewController<YoutubeHighQualityPreference>(
+        options: YoutubeHighQualityPreference.allCases,
+        selectedOption: YoutubeHighQualityPreference(rawValue: Preferences.General.youtubeHighQuality.value),
+        optionChanged: { _, option in
+          Preferences.General.youtubeHighQuality.value = option.rawValue
+          self.dataSource.reloadCell(row: youtubeQualityRow, section: general, displayText: option.displayString)
+        }
+      )
+      optionsViewController.headerText = Strings.youtubeMediaQualitySettingsTitle
+      self.navigationController?.pushViewController(optionsViewController, animated: true)
+    }
+    general.rows.append(youtubeQualityRow)
 
     return general
   }()

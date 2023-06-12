@@ -6,6 +6,24 @@
 import Foundation
 import WebKit
 import Preferences
+import Shared
+import BraveUI
+
+enum YoutubeHighQualityPreference: String, CaseIterable {
+  case off
+  case wifi
+  case on
+}
+
+extension YoutubeHighQualityPreference: RepresentableOptionType {
+  var displayString: String {
+    switch self {
+    case .off: return Strings.youtubeMediaQualityOff
+    case .wifi: return Strings.youtubeMediaQualityWifi
+    case .on: return Strings.youtubeMediaQualityOn
+    }
+  }
+}
 
 class YoutubeQualityScriptHandler: NSObject, TabContentScript {
   private weak var tab: Tab?
@@ -54,7 +72,9 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
                         in: scriptSandbox)
   }()
   
-  static func setEnabled(enabled: Bool, for tab: Tab) {
+  static func setEnabled(option: Preferences.Option<String>, for tab: Tab) {
+    let enabled = canEnableHighQuality(option: option)
+    
     tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(Self.setQuality)", args: [enabled ? Self.highestQuality: "''"], contentWorld: Self.scriptSandbox, escapeArgs: false, asFunction: true)
   }
   
@@ -64,6 +84,23 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
       return
     }
     
-    replyHandler(Preferences.General.youtubeHighQuality.value ? Self.highestQuality : "", nil)
+    replyHandler(Self.canEnableHighQuality(option: Preferences.General.youtubeHighQuality) ?
+                 Self.highestQuality : "", nil)
+  }
+  
+  private static func canEnableHighQuality(option: Preferences.Option<String>) -> Bool {
+    guard let qualityPreference = YoutubeHighQualityPreference(rawValue: option.value) else {
+      return false
+    }
+    
+    switch Reach().connectionStatus() {
+    case .offline, .unknown: return false
+    case .online(let type):
+      if type == .wiFi {
+        return qualityPreference == .wifi || qualityPreference == .on
+      }
+      
+      return qualityPreference == .on
+    }
   }
 }
