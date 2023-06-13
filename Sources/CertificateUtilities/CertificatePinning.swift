@@ -87,7 +87,7 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
     return NSError(domain: "com.brave.pinning-certificate-evaluator", code: -1, userInfo: [NSLocalizedDescriptionKey: reason])
   }
 
-  private func evaluate(_ trust: SecTrust, forHost host: String) throws {
+  func evaluate(_ trust: SecTrust, forHost host: String) throws {
     // Certificate validation
     guard !certificates.isEmpty else {
       throw error(reason: "Empty Certificates")
