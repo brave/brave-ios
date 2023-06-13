@@ -191,7 +191,7 @@ class SpeechRecognizer: ObservableObject {
       request.append(buffer)
       
       guard let channelData = buffer.floatChannelData?[0] else {
-          return
+        return
       }
       
       let volume = self.getVolumeLevel(from: channelData)
@@ -229,21 +229,30 @@ class SpeechRecognizer: ObservableObject {
   
   private func getVolumeLevel(from channelData: UnsafeMutablePointer<Float>) -> Float {
     let channelDataArray = Array(UnsafeBufferPointer(start: channelData, count: 1024))
-    
-    guard channelDataArray.count != 0 else {
-      return 0
-    }
-      
-    let silenceThreshold: Float = 0.003
-    let loudThreshold: Float = 0.07
-      
-    let sumChannelData = channelDataArray.reduce(0) { $0 + abs($1) }
-    var channelAverage = sumChannelData / Float(channelDataArray.count)
-    
-    channelAverage = min(channelAverage, loudThreshold)
-    channelAverage = max(channelAverage, silenceThreshold)
 
-    return (channelAverage - silenceThreshold) / (loudThreshold - silenceThreshold)
+    var outEnvelope = [Float]()
+    var envelopeState: Float = 0
+    let envConstantAtk: Float = 0.16
+    let envConstantDec: Float = 0.003
+
+    for sample in channelDataArray {
+      let rectified = abs(sample)
+
+      if envelopeState < rectified {
+        envelopeState += envConstantAtk * (rectified - envelopeState)
+      } else {
+        envelopeState += envConstantDec * (rectified - envelopeState)
+      }
+      outEnvelope.append(envelopeState)
+    }
+
+    // 0.007 is the low pass filter to prevent
+    // getting the noise entering from the microphone
+    if let maxVolume = outEnvelope.max(), maxVolume > Float(0.015) {
+      return maxVolume
+    } else {
+      return 0.0
+    }
   }
   
   private func setupAnimationWithVolume(_ volume: Float) {
