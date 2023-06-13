@@ -94,6 +94,14 @@ class SpeechRecognizer: ObservableObject {
     reset()
   }
   
+  func startSilenceAnimation() {
+    animationType = .pulse(scale: AnimationScale.pulse)
+  }
+
+  func startSpeechAnimation(_ scale: CGFloat) {
+    animationType = .speech(volume: scale)
+  }
+  
   /// Creates a `SFSpeechRecognitionTask` that transcribes speech to text until you call `stopTranscribing()`.
   /// The resulting transcription is continuously written to the published `transcript` property.
   private func transcribe() {
@@ -116,11 +124,15 @@ class SpeechRecognizer: ObservableObject {
         var isFinal = false
         
         if let result, !isFinal {
-          // SpeechRecognitionMetadata is the key to detect speaking finalized
-          isFinal = result.isFinal || result.speechRecognitionMetadata != nil
-          
           let formattedTranscript = result.bestTranscription.formattedString
+          let transcriptComponents = formattedTranscript.components(separatedBy: .whitespacesAndNewlines)
+          let formattedWords = transcriptComponents.filter { !$0.isEmpty }
           
+          // SpeechRecognitionMetadata is the key to detect speaking finalized
+          isFinal = result.isFinal
+          || result.speechRecognitionMetadata != nil
+          || formattedWords.count >= 15
+              
           if !formattedTranscript.isEmpty {
             self.transcribe(formattedTranscript)
           }
@@ -194,22 +206,6 @@ class SpeechRecognizer: ObservableObject {
     
     return (audioEngine, request)
   }
-  
-  func getVolumeLevel(from channelData: UnsafeMutablePointer<Float>) -> Float {
-      let channelDataArray = Array(UnsafeBufferPointer(start: channelData, count: 1024))
-      guard channelDataArray.count != 0 else { return 0 }
-      
-      let silenceThreshold: Float = 0.0030
-      let loudThreshold: Float = 0.07
-      
-      let sumChannelData = channelDataArray.reduce(0) { $0 + abs($1) }
-      var channelAverage = sumChannelData / Float(channelDataArray.count)
-      channelAverage = min(channelAverage, loudThreshold)
-      channelAverage = max(channelAverage, silenceThreshold)
-
-      let normalized = (channelAverage - silenceThreshold) / (loudThreshold - silenceThreshold)
-      return normalized
-  }
 
   nonisolated private func transcribe(_ message: String) {
     Task { @MainActor in
@@ -231,12 +227,23 @@ class SpeechRecognizer: ObservableObject {
     }
   }
   
-  func startSilenceAnimation() {
-    animationType = .pulse(scale: AnimationScale.pulse)
-  }
+  private func getVolumeLevel(from channelData: UnsafeMutablePointer<Float>) -> Float {
+    let channelDataArray = Array(UnsafeBufferPointer(start: channelData, count: 1024))
+    
+    guard channelDataArray.count != 0 else {
+      return 0
+    }
+      
+    let silenceThreshold: Float = 0.003
+    let loudThreshold: Float = 0.07
+      
+    let sumChannelData = channelDataArray.reduce(0) { $0 + abs($1) }
+    var channelAverage = sumChannelData / Float(channelDataArray.count)
+    
+    channelAverage = min(channelAverage, loudThreshold)
+    channelAverage = max(channelAverage, silenceThreshold)
 
-  func startSpeechAnimation(_ scale: CGFloat) {
-    animationType = .speech(volume: scale)
+    return (channelAverage - silenceThreshold) / (loudThreshold - silenceThreshold)
   }
   
   private func setupAnimationWithVolume(_ volume: Float) {
@@ -245,15 +252,15 @@ class SpeechRecognizer: ObservableObject {
     let minScale: CGFloat = 1.25
     
     if !isCurrentlySilent {
-        let scaleValue = min(CGFloat(volume) + minScale, AnimationScale.max)
-        self.startSpeechAnimation(scaleValue)
+      let scaleValue = min(CGFloat(volume) + minScale, AnimationScale.max)
+      startSpeechAnimation(scaleValue)
     }
     
-    if !self.isSilent && isCurrentlySilent {
-        self.startSilenceAnimation()
+    if !isSilent && isCurrentlySilent {
+      startSilenceAnimation()
     }
     
-    self.isSilent = isCurrentlySilent
+    isSilent = isCurrentlySilent
   }
 }
 
