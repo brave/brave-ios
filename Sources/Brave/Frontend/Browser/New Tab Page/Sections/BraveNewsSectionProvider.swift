@@ -203,20 +203,20 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       if case .partner(let item) = card,
         let creativeInstanceID = item.content.creativeInstanceID {
         iabTrackedCellContexts[indexPath] = .init(collectionView: collectionView) { [weak self] in
-          self?.rewards.ads.reportPromotedContentAdEvent(
-            item.content.urlHash,
-            creativeInstanceId: creativeInstanceID,
-            eventType: .viewed
-          )
+//          self?.rewards.ads.reportPromotedContentAdEvent(
+//            item.content.urlHash,
+//            creativeInstanceId: creativeInstanceID,
+//            eventType: .viewed
+//          )
         }
       }
       if case .ad(let ad) = card {
         iabTrackedCellContexts[indexPath] = .init(collectionView: collectionView) { [weak self] in
-          self?.rewards.ads.reportInlineContentAdEvent(
-            ad.placementID,
-            creativeInstanceId: ad.creativeInstanceID,
-            eventType: .viewed
-          )
+//          self?.rewards.ads.reportInlineContentAdEvent(
+//            ad.placementID,
+//            creativeInstanceId: ad.creativeInstanceID,
+//            eventType: .viewed
+//          )
           self?.recordWeeklyAdsViewedP3A(adViewed: true)
         }
       }

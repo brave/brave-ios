@@ -122,7 +122,7 @@ public class NetworkStore: ObservableObject {
     isForOrigin: Bool
   ) async -> SetSelectedChainError? {
     let keyringId = network.coin.keyringId
-    let keyringInfo = await keyringService.keyringInfo(keyringId)
+    let keyringInfo = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
     if keyringInfo.accountInfos.isEmpty {
       // Need to prompt user to create new account via alert
       return .selectedChainHasNoAccounts
@@ -314,6 +314,12 @@ extension NetworkStore: BraveWalletJsonRpcServiceObserver {
 }
 
 extension NetworkStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) { 
+  }
+  
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
     Task { @MainActor in
       // coin type of selected account might have changed

@@ -94,18 +94,20 @@ extension BraveWallet.OriginInfo {
 
 extension BraveWallet.CoinType {
   public var keyringId: String {
-    switch self {
-    case .eth:
-      return BraveWallet.DefaultKeyringId
-    case .sol:
-      return BraveWallet.SolanaKeyringId
-    case .fil:
-      return BraveWallet.FilecoinKeyringId
-    case .btc:
-      return BraveWallet.BitcoinKeyring84Id
-    @unknown default:
-      return BraveWallet.DefaultKeyringId
-    }
+//    switch self {
+//    case .eth:
+//      return BraveWallet.DefaultKeyringId
+//    case .sol:
+//      return BraveWallet.SolanaKeyringId
+//    case .fil:
+//      return BraveWallet.FilecoinKeyringId
+//    case .btc:
+//      return BraveWallet.BitcoinKeyring84Id
+//    @unknown default:
+//      return BraveWallet.DefaultKeyringId
+//    }
+    
+    return ""
   }
   
   var localizedTitle: String {

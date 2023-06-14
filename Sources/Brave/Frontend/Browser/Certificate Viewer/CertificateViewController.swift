@@ -221,6 +221,8 @@ extension CertificateView {
 
     mapping.append(KeyValue(key: Strings.CertificateViewer.commonNameTitle, value: rdns.commonName))
 
+    // TODO: CR 115
+    
     mapping.append(
       contentsOf: rdns.streetAddress.map {
         KeyValue(key: Strings.CertificateViewer.streetAddressTitle, value: $0)

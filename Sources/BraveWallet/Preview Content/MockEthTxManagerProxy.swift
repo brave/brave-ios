@@ -9,6 +9,10 @@ import BraveCore
 #if DEBUG
 
 class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
+  func makeFilForwarderTransferData(_ toAddressFil: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
+    completion(false, .init())
+  }
+  
   func setGasPriceAndLimitForUnapprovedTransaction(_ chainId: String, txMetaId: String, gasPrice: String, gasLimit: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }

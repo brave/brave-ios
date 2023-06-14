@@ -888,6 +888,12 @@ public class SwapTokenStore: ObservableObject {
 }
 
 extension SwapTokenStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   public func keyringReset() {
   }
 
@@ -918,7 +924,7 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
       let isSwapSupported = await swapService.isSwapSupported(network.chainId)
       guard isSwapSupported else { return }
       
-      let keyringInfo = await keyringService.keyringInfo(coinType.keyringId)
+      let keyringInfo = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       if !keyringInfo.accountInfos.isEmpty {
         let accountAddress = await keyringService.selectedAccount(coinType)
         let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!

@@ -15,7 +15,7 @@ extension BraveAds {
       buildChannelInfo: .init(
         isRelease: AppConstants.buildChannel == .release,
         name: AppConstants.buildChannel.rawValue
-      ),
+      ), walletInfo: BraveAds.WalletInfo(),
       completion: completion
     )
   }

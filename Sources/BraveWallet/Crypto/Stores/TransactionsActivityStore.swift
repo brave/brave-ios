@@ -188,6 +188,12 @@ class TransactionsActivityStore: ObservableObject {
 }
 
 extension TransactionsActivityStore: BraveWalletKeyringServiceObserver {
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   func keyringCreated(_ keyringId: String) { }
   
   func keyringRestored(_ keyringId: String) { }

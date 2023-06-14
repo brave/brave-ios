@@ -41,21 +41,21 @@ class AdsNotificationHandler: BraveAdsNotificationHandler {
   
     let rewardsNotification = RewardsNotification(ad: notification) { [weak self] action in
       guard let self = self else { return }
-      switch action {
-      case .opened:
-        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .clicked)
-      case .dismissed:
-        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .dismissed)
-      case .timedOut:
-        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .timedOut)
-      case .disliked:
-        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .dismissed)
-        self.ads.toggleThumbsDown(forAd: notification.placementID, advertiserId: notification.advertiserID)
-      }
+//      switch action {
+//      case .opened:
+//        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .clicked)
+//      case .dismissed:
+//        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .dismissed)
+//      case .timedOut:
+//        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .timedOut)
+//      case .disliked:
+//        self.ads.reportNotificationAdEvent(notification.placementID, eventType: .dismissed)
+//        self.ads.toggleThumbsDown(forAd: notification.placementID, advertiserId: notification.advertiserID, segment: "")
+//      }
       self.actionOccured?(notification, action)
     }
     
-    ads.reportNotificationAdEvent(notification.placementID, eventType: .viewed)
+//    ads.reportNotificationAdEvent(notification.placementID, eventType: .viewed)
     notificationsPresenter?.display(notification: rewardsNotification, from: presentingController)
   }
 

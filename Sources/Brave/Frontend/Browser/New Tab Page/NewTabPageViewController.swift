@@ -436,11 +436,11 @@ class NewTabPageViewController: UIViewController {
     else {
       return
     }
-    rewards.ads.reportNewTabPageAdEvent(
-      background.wallpaperId.uuidString,
-      creativeInstanceId: creativeInstanceId,
-      eventType: event
-    )
+//    rewards.ads.reportNewTabPageAdEvent(
+//      background.wallpaperId.uuidString,
+//      creativeInstanceId: creativeInstanceId,
+//      eventType: event
+//    )
   }
 
   // MARK: - Notifications
@@ -578,11 +578,11 @@ class NewTabPageViewController: UIViewController {
       let item = context.item
       if !switchingToPrivateMode, item.content.contentType == .partner,
         let creativeInstanceID = item.content.creativeInstanceID {
-        rewards.ads.reportPromotedContentAdEvent(
-          item.content.urlHash,
-          creativeInstanceId: creativeInstanceID,
-          eventType: .clicked
-        )
+//        rewards.ads.reportPromotedContentAdEvent(
+//          item.content.urlHash,
+//          creativeInstanceId: creativeInstanceID,
+//          eventType: .clicked
+//        )
       }
       delegate?.navigateToInput(
         url.absoluteString,
@@ -606,11 +606,11 @@ class NewTabPageViewController: UIViewController {
     case .inlineContentAdAction(.opened(let inNewTab, let switchingToPrivateMode), let ad):
       guard let url = ad.targetURL.asURL else { return }
       if !switchingToPrivateMode {
-        rewards.ads.reportInlineContentAdEvent(
-          ad.placementID,
-          creativeInstanceId: ad.creativeInstanceID,
-          eventType: .clicked
-        )
+//        rewards.ads.reportInlineContentAdEvent(
+//          ad.placementID,
+//          creativeInstanceId: ad.creativeInstanceID,
+//          eventType: .clicked
+//        )
       }
       delegate?.navigateToInput(
         url.absoluteString,

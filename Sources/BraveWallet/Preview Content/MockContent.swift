@@ -134,7 +134,7 @@ extension BraveWallet.AccountInfo {
     .init(
       accountId: .init(
         coin: .eth,
-        keyringId: BraveWallet.DefaultKeyringId,
+        keyringId: BraveWallet.KeyringId(rawValue: 1)!,
         kind: .derived,
         address: "0x879240B2D6179E9EC40BC2AFFF9E9EC40BC2AFFF"
       ),
@@ -178,7 +178,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508), // Monday, November 8, 2021 8:15:08 PM
       originInfo: .init(),
       groupId: nil,
-      chainId: BraveWallet.MainnetChainId
+      chainId: BraveWallet.MainnetChainId, effectiveRecipient: ""
     )
   }
   static var previewConfirmedSwap: BraveWallet.TransactionInfo {
@@ -216,7 +216,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508), // Monday, November 8, 2021 8:15:08 PM
       originInfo: .init(),
       groupId: nil,
-      chainId: BraveWallet.MainnetChainId
+      chainId: BraveWallet.MainnetChainId, effectiveRecipient: ""
     )
   }
   /// Approved Unlimited DAI
@@ -252,7 +252,9 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508), // Monday, November 8, 2021 8:15:08 PM
       originInfo: .init(),
       groupId: nil,
-      chainId: BraveWallet.MainnetChainId
+      chainId: BraveWallet.MainnetChainId,
+      
+      effectiveRecipient: ""
     )
   }
   /// Solana System Transfer
@@ -289,7 +291,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1667854820), // Monday, November 7, 2022 9:00:20 PM GMT
       originInfo: .init(),
       groupId: nil,
-      chainId: BraveWallet.SolanaMainnet
+      chainId: BraveWallet.SolanaMainnet, effectiveRecipient: ""
     )
   }
   /// Solana Token Transfer
@@ -326,7 +328,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508), // Monday, November 8, 2021 8:15:08 PM
       originInfo: .init(),
       groupId: nil,
-      chainId: BraveWallet.SolanaMainnet
+      chainId: BraveWallet.SolanaMainnet, effectiveRecipient: ""
     )
   }
   static private func _transactionBase64ToData(_ base64String: String) -> [NSNumber] {

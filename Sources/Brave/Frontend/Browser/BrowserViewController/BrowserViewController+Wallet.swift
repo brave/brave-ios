@@ -288,13 +288,13 @@ extension Tab: BraveWalletProviderDelegate {
           let walletService = BraveWallet.ServiceFactory.get(privateMode: false) else {
       return []
     }
-    let coin = await walletService.selectedCoin()
-    let allAccounts = await keyringService.keyringInfo(coin.keyringId).accountInfos.map(\.address)
-    guard let allowedAccounts = getAllowedAccounts(coin, accounts: allAccounts) else {
-      return []
-    }
-    let selectedAccounts = await keyringService.selectedAccount(coin)
-    return filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccounts)
+//    let coin = await walletService.selectedCoin()
+//    let allAccounts = await keyringService.keyringInfo(coin.keyringId).accountInfos.map(\.address)
+//    guard let allowedAccounts = getAllowedAccounts(coin, accounts: allAccounts) else {
+//      return []
+//    }
+//    let selectedAccounts = await keyringService.selectedAccount(coin)
+    return [""] // filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccounts)
   }
   
   /// Fetches all allowed accounts for the current origin.
@@ -348,12 +348,12 @@ extension Tab: BraveWalletProviderDelegate {
       let origin = getOrigin()
       
       // check if we receive account creation request without a wallet setup
-      let keyring = await keyringService.keyringInfo(BraveWallet.DefaultKeyringId)
-      if !keyring.isKeyringCreated {
-        // Wallet is not setup. User must onboard / setup wallet first.
-        self.tabDelegate?.showWalletNotification(self, origin: origin)
-        return
-      }
+//      let keyring = await keyringService.keyringInfo(BraveWallet.DefaultKeyringId)
+//      if !keyring.isKeyringCreated {
+//        // Wallet is not setup. User must onboard / setup wallet first.
+//        self.tabDelegate?.showWalletNotification(self, origin: origin)
+//        return
+//      }
       
       let accountCreationRequestManager = WalletProviderAccountCreationRequestManager.shared
       
@@ -482,24 +482,24 @@ extension Tab: BraveWalletEventsListener {
     )
     
     let coin: BraveWallet.CoinType = .eth
-    let keyring = await keyringService.keyringInfo(coin.keyringId)
-    let selectedAccount: String
-    if keyring.isLocked {
-      // Check for locked status before assigning account address.
-      // `getAllowedAccounts` is not async, can't check locked status.
-      selectedAccount = valueOrUndefined(Optional<String>.none)
-    } else {
-      let allAccounts = keyring.accountInfos.map(\.address)
-      if let allowedAccounts = getAllowedAccounts(coin, accounts: allAccounts) {
-        let selectedAccountForCoin = await keyringService.selectedAccount(coin)
-        let filteredAllowedAccounts = filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccountForCoin)
-        selectedAccount = valueOrUndefined(filteredAllowedAccounts.first)
-      } else {
-        selectedAccount = valueOrUndefined(Optional<String>.none)
-      }
-    }
+//    let keyring = await keyringService.keyringInfo(coin.keyringId)
+//    let selectedAccount: String
+//    if keyring.isLocked {
+//      // Check for locked status before assigning account address.
+//      // `getAllowedAccounts` is not async, can't check locked status.
+//      selectedAccount = valueOrUndefined(Optional<String>.none)
+//    } else {
+//      let allAccounts = keyring.accountInfos.map(\.address)
+//      if let allowedAccounts = getAllowedAccounts(coin, accounts: allAccounts) {
+//        let selectedAccountForCoin = await keyringService.selectedAccount(coin)
+//        let filteredAllowedAccounts = filterAllowedAccounts(allowedAccounts, selectedAccount: selectedAccountForCoin)
+//        selectedAccount = valueOrUndefined(filteredAllowedAccounts.first)
+//      } else {
+//        selectedAccount = valueOrUndefined(Optional<String>.none)
+//      }
+//    }
     await webView.evaluateSafeJavaScript(
-      functionName: "window.ethereum.selectedAddress = \(selectedAccount)",
+      functionName: "window.ethereum.selectedAddress = \("")",
       contentWorld: EthereumProviderScriptHandler.scriptSandbox,
       asFunction: false
     )
@@ -585,6 +585,12 @@ extension Tab: BraveWalletSolanaEventsListener {
 }
 
 extension Tab: BraveWalletKeyringServiceObserver {
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   func keyringCreated(_ keyringId: String) {
   }
   

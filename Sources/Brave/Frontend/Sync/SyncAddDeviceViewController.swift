@@ -151,6 +151,8 @@ class SyncAddDeviceViewController: SyncViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
+    // TODO: CR 115
+    
     if !syncAPI.isInSyncGroup && !syncAPI.isSyncFeatureActive && !syncAPI.isFirstSetupComplete {
       showInitializationError()
     }

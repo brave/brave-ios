@@ -131,7 +131,7 @@ public class KeyringStore: ObservableObject {
     rpcService.add(self)
     updateKeyringInfo()
     
-    self.keyringService.keyringInfo(BraveWallet.DefaultKeyringId) { [self] keyringInfo in
+    self.keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!) { [self] keyringInfo in
       isOnboardingVisible = !keyringInfo.isKeyringCreated
       if isKeychainPasswordStored && isOnboardingVisible {
         // If a user deletes the app and they had a stored user password in the past that keychain item
@@ -161,7 +161,7 @@ public class KeyringStore: ObservableObject {
       let selectedAccountAddress = await keyringService.selectedAccount(selectedCoin)
       let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
       self.defaultAccounts = await keyringService.defaultAccounts(for: WalletConstants.supportedCoinTypes)
-      if let defaultKeyring = allKeyrings.first(where: { $0.id == BraveWallet.DefaultKeyringId }) {
+      if let defaultKeyring = allKeyrings.first(where: { $0.id == BraveWallet.KeyringId(rawValue: 1)! }) {
         self.defaultKeyring = defaultKeyring
         self.isDefaultKeyringCreated = defaultKeyring.isKeyringCreated
       }
@@ -271,7 +271,7 @@ public class KeyringStore: ObservableObject {
   func addPrimaryAccount(_ name: String, coin: BraveWallet.CoinType, completion: ((Bool) -> Void)? = nil) {
     keyringService.addAccount(
       coin,
-      keyringId: coin.keyringId,
+      keyringId: BraveWallet.KeyringId(rawValue: 1)!,
       accountName: name
     ) { accountInfo in
       self.updateKeyringInfo()
@@ -376,6 +376,14 @@ public class KeyringStore: ObservableObject {
 }
 
 extension KeyringStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+    
+  }
+  
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+    
+  }
+  
   public func keyringReset() {
     isOnboardingVisible = true
     updateKeyringInfo()
@@ -399,7 +407,7 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
 
   public func keyringCreated(_ keyringId: String) {
     Task { @MainActor in
-      let newKeyring = await keyringService.keyringInfo(keyringId)
+      let newKeyring = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       if let newKeyringCoin = newKeyring.coin {
         let selectedAccount = await keyringService.selectedAccount(newKeyringCoin)
         // if the new Keyring doesn't have a selected account, select the first account
@@ -444,7 +452,7 @@ extension KeyringStore: BraveWalletJsonRpcServiceObserver {
   public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
     Task { @MainActor in // This observer will take care of selected account update caused by network switching
       let accountAddress = await keyringService.selectedAccount(coin)
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
+      let keyring = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       if let account = keyring.accountInfos.first(where: { $0.address == accountAddress }) {
         selectedAccount = account
       }

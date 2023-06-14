@@ -37,6 +37,8 @@ extension BraveSyncAPI {
       return false
     }
     
+    // TODO: CR 115
+    
     return (!isSyncFeatureActive && !isFirstSetupComplete) || isSyncAccountDeletedNoticePending
   }
 

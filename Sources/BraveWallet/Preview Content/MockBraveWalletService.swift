@@ -11,6 +11,9 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class MockBraveWalletService: BraveWalletBraveWalletService {
+  func discoverEthAllowances(_ completion: @escaping ([BraveWallet.AllowanceInfo]) -> Void) {
+  }
+  
   private var assets: [String: [BraveWallet.BlockchainToken]] = [
     BraveWallet.MainnetChainId: [.previewToken],
     BraveWallet.GoerliChainId: [.previewToken],

@@ -143,7 +143,7 @@ class AssetDetailStore: ObservableObject {
       self.isLoadingPrice = true
       self.isLoadingChart = true
       
-      switch assetDetailType {
+      switch self.assetDetailType {
       case .blockchainToken(let token):
         // not come from Market tab
         let allNetworks = await rpcService.allNetworks(token.coin)
@@ -155,7 +155,7 @@ class AssetDetailStore: ObservableObject {
         self.isSwapSupported = await swapService.isSwapSupported(token.chainId)
         
         // fetch accounts
-        let keyring = await keyringService.keyringInfo(token.coin.keyringId)
+        let keyring = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
         var updatedAccounts = keyring.accountInfos.map {
           AccountAssetViewModel(account: $0, decimalBalance: 0.0, balance: "", fiatBalance: "")
         }
@@ -360,6 +360,12 @@ class AssetDetailStore: ObservableObject {
 }
 
 extension AssetDetailStore: BraveWalletKeyringServiceObserver {
+  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   func keyringReset() {
   }
 

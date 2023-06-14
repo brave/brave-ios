@@ -72,7 +72,7 @@ class TransactionDetailsStore: ObservableObject {
         return
       }
       self.network = network
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
+      let keyring = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       var allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin) + tokenInfoCache.map(\.value)
       let userVisibleTokens: [BraveWallet.BlockchainToken] = await walletService.userAssets(network.chainId, coin: network.coin)
       let unknownTokenContractAddresses = transaction.tokenContractAddresses

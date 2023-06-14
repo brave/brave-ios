@@ -73,7 +73,7 @@ class AccountActivityStore: ObservableObject {
   func update() {
     Task { @MainActor in
       let coin = account.coin
-      let networksForAccountCoin = await rpcService.allNetworks(coin)
+      let networksForAccountCoin = await self.rpcService.allNetworks(coin)
         .filter { $0.chainId != BraveWallet.LocalhostChainId } // localhost not supported
       
       struct NetworkAssets: Equatable {
@@ -111,7 +111,7 @@ class AccountActivityStore: ObservableObject {
       self.userVisibleAssets = updatedUserVisibleAssets
       self.userVisibleNFTs = updatedUserVisibleNFTs
       
-      let keyringForAccount = await keyringService.keyringInfo(coin.keyringId)
+      let keyringForAccount = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
       let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
         networkAssets.tokens.map { token in
@@ -266,6 +266,12 @@ class AccountActivityStore: ObservableObject {
 }
 
 extension AccountActivityStore: BraveWalletKeyringServiceObserver {
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   func keyringCreated(_ keyringId: String) {
   }
   
@@ -292,7 +298,7 @@ extension AccountActivityStore: BraveWalletKeyringServiceObserver {
   
   func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
     guard observeAccountUpdates else { return }
-    keyringService.keyringInfo(coin.keyringId) { [self] keyringInfo in
+    keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!) { [self] keyringInfo in
       keyringService.selectedAccount(coin) { [self] accountAddress in
         account = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
         update()

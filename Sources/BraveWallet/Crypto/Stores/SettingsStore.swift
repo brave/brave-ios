@@ -152,6 +152,12 @@ public class SettingsStore: ObservableObject {
 }
 
 extension SettingsStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
   public func keyringCreated(_ keyringId: String) {
   }
   

@@ -20,7 +20,7 @@ extension BraveWalletKeyringService {
       body: { @MainActor group in
         for coin in coins {
           group.addTask { @MainActor in
-            await self.keyringInfo(coin.keyringId)
+            await self.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
           }
         }
         return await group.reduce([BraveWallet.KeyringInfo](), { partialResult, prior in
@@ -43,7 +43,7 @@ extension BraveWalletKeyringService {
       body: { @MainActor group in
         for coin in coins {
           group.addTask { @MainActor in
-            let accounts = await self.keyringInfo(coin.keyringId).accountInfos
+            let accounts = await self.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!).accountInfos
             let selectedAccountAddress = await self.selectedAccount(coin)
             return accounts.first(where: { $0.address.caseInsensitiveCompare(selectedAccountAddress ?? "") == .orderedSame })
           }

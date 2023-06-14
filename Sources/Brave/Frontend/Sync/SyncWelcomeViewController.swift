@@ -299,6 +299,8 @@ class SyncWelcomeViewController: SyncViewController {
     syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
       guard let self = self else { return }
 
+      // TODO: CR 115
+      
       if !self.syncAPI.isInSyncGroup && !self.syncAPI.isSyncFeatureActive && !self.syncAPI.isFirstSetupComplete {
         let bvc = self.currentScene?.browserViewController
         self.dismiss(animated: true) {

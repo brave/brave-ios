@@ -39,9 +39,9 @@ public struct WalletPanelContainerView: View {
   private var visibleScreen: VisibleScreen {
     let keyring = keyringStore.defaultKeyring
     // check if we are still fetching the `defaultKeyring`
-    if keyringStore.defaultKeyring.id.isEmpty {
-      return .loading
-    }
+//    if keyringStore.defaultKeyring.id.isEmpty {
+//      return .loading
+//    }
     // keyring fetched, check if user has created a wallet
     if !keyring.isKeyringCreated || keyringStore.isOnboardingVisible {
       return .onboarding

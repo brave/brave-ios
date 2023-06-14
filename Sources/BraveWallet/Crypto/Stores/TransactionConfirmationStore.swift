@@ -215,7 +215,7 @@ public class TransactionConfirmationStore: ObservableObject {
       clearTrasactionInfoBeforeUpdate()
       
       let coin = transaction.coin
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
+      let keyring = await keyringService.keyringInfo(BraveWallet.KeyringId(rawValue: 1)!)
       if !allNetworks.contains(where: { $0.chainId == transaction.chainId }) {
         allNetworks = await rpcService.allNetworksForSupportedCoins()
       }
