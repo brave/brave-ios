@@ -38,23 +38,27 @@ struct PlaylistItemView: View {
           }
         }
         .background {
-          LinearGradient(
-            stops: [
-              .init(color: .black.opacity(0.1), location: 0),
-              .init(color: .black.opacity(0.0), location: 1.0),
-              .init(color: .black.opacity(0.0), location: 1.0)
-            ],
-            startPoint: .bottomLeading,
-            endPoint: .init(x: 0.5, y: 0)
-          )
+          if isItemPlaying {
+            LinearGradient(
+              stops: [
+                .init(color: .black.opacity(0.1), location: 0),
+                .init(color: .black.opacity(0.0), location: 1.0),
+                .init(color: .black.opacity(0.0), location: 1.0)
+              ],
+              startPoint: .bottomLeading,
+              endPoint: .init(x: 0.5, y: 0)
+            )
+          }
         }
         .background(Color(.secondaryBraveBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
       VStack(alignment: .leading, spacing: 8) {
         Text(title)
+          .multilineTextAlignment(.leading)
           .lineLimit(2)
           .fixedSize(horizontal: false, vertical: true)
           .font(.callout.weight(.semibold))
+          .foregroundColor(.primary)
         HStack {
           if #available(iOS 16.0, *) {
             Text(Duration.seconds(duration), format: .time(pattern: .minuteSecond))
@@ -89,7 +93,8 @@ struct PlaylistItemView: View {
       }
       .frame(maxWidth: .infinity, alignment: .leading)
     }
-    .padding()
+    .padding(.horizontal, 12)
+    .padding(.vertical, 6)
   }
 }
 
@@ -110,31 +115,6 @@ private struct GuageProgressViewStyle: ProgressViewStyle {
           .foregroundStyle(.primary)
           .animation(.spring(response: 0.3, dampingFraction: 0.8), value: configuration.fractionCompleted)
       }
-  }
-}
-
-struct PlaylistItemView_PreviewProvider: PreviewProvider {
-  static var previews: some View {
-    PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
-      isItemPlaying: true,
-      duration: 750
-    )
-    .previewDisplayName("Playing")
-    PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
-      isItemPlaying: false,
-      duration: 750,
-      downloadState: .downloading(value: 21618799, total: 64618799)
-    )
-    .previewDisplayName("Downloading")
-    PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
-      isItemPlaying: false,
-      duration: 750,
-      downloadState: .completed(64618799)
-    )
-    .previewDisplayName("Downloaded")
   }
 }
 
@@ -171,3 +151,30 @@ struct LeoPlayingSoundShape: Shape {
     }
   }
 }
+
+#if DEBUG
+struct PlaylistItemView_PreviewProvider: PreviewProvider {
+  static var previews: some View {
+    PlaylistItemView(
+      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
+      isItemPlaying: true,
+      duration: 750
+    )
+    .previewDisplayName("Playing")
+    PlaylistItemView(
+      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
+      isItemPlaying: false,
+      duration: 750,
+      downloadState: .downloading(value: 21618799, total: 64618799)
+    )
+    .previewDisplayName("Downloading")
+    PlaylistItemView(
+      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
+      isItemPlaying: false,
+      duration: 750,
+      downloadState: .completed(64618799)
+    )
+    .previewDisplayName("Downloaded")
+  }
+}
+#endif

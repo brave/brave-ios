@@ -396,6 +396,7 @@ struct MediaScrubber: View {
   }
 }
 
+#if DEBUG
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
     ControlView(title: "Top 10 things to do with Brave")
@@ -403,3 +404,4 @@ struct VideoControls_PreviewProvider: PreviewProvider {
       .background(Color(white: 0.1))
   }
 }
+#endif

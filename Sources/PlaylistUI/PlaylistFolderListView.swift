@@ -31,7 +31,7 @@ struct Item: Identifiable {
 }
 
 /// The root view that displays the list of playlists (folders) the user has created
-struct PlaylistListView: View {
+struct PlaylistFolderListView: View {
   var folders: [Folder]
   var sharedFolders: [Folder]
   
@@ -193,7 +193,7 @@ struct PlaylistFolderView: View {
 struct PlaylistListView_PreviewProvider: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      PlaylistListView(
+      PlaylistFolderListView(
         folders: [
           .init(id: .defaultPlaylistID, title: "Play Later", items: [])
         ],
@@ -203,7 +203,7 @@ struct PlaylistListView_PreviewProvider: PreviewProvider {
     .previewDisplayName("Empty State")
     
     NavigationView {
-      PlaylistListView(
+      PlaylistFolderListView(
         folders: [
           .init(id: .defaultPlaylistID, title: "Play Later", items: []),
           .init(id: UUID().uuidString, title: "Chill Playlist", items: []),
