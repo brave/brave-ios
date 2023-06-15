@@ -18,9 +18,8 @@ class SpeechRecognizer: ObservableObject {
   private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "voiceRecognizer")
   
   enum RecognizerError: Error {
-    case failedSetup
     case microphoneAccessDenied
-    case recognizerIsUnavailable
+    case authorizationAccessDenied
   }
   
   enum AnimationType {
@@ -30,8 +29,8 @@ class SpeechRecognizer: ObservableObject {
   }
   
   private struct AnimationScale {
-    static let max: CGFloat = 1.50
-    static let pulse: CGFloat = 0.75
+    static let max = 1.50
+    static let pulse = 0.75
   }
   
   weak var delegate: SpeechRecognizerDelegate?
@@ -55,25 +54,21 @@ class SpeechRecognizer: ObservableObject {
   private var audioEngine: AVAudioEngine?
   private var request: SFSpeechAudioBufferRecognitionRequest?
   private var task: SFSpeechRecognitionTask?
-  private let recognizer: SFSpeechRecognizer?
-    
-  ///  Constructor for  speech recognizer. If this is the first time you've used the class, it requests
-  ///  access to the speech recognizer and the microphone.
-  init() {
-    recognizer = SFSpeechRecognizer()
-    
-    guard recognizer != nil else {
-      log.debug("Voice Search Setup failed \(RecognizerError.failedSetup.localizedDescription)")
-      return
-    }
-  }
+  private let recognizer = SFSpeechRecognizer()
   
   @MainActor
-  func askForUserPermission() async throws -> Bool {
+  func askForUserPermission(onDeviceRecognitionOnly: Bool = true) async -> Bool {
     do {
       // Ask for Record Permission if not permitted throw error
       guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
         throw RecognizerError.microphoneAccessDenied
+      }
+      
+      if !onDeviceRecognitionOnly {
+        // Ask for Online Speech Recognizer Authorization if not authorized throw error
+        guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
+          throw RecognizerError.authorizationAccessDenied
+        }
       }
       
       return true
@@ -106,7 +101,7 @@ class SpeechRecognizer: ObservableObject {
   /// The resulting transcription is continuously written to the published `transcript` property.
   private func transcribe() {
     guard let recognizer, recognizer.isAvailable else {
-      log.debug("Voice Search Unavailable \(RecognizerError.recognizerIsUnavailable.localizedDescription)")
+      log.debug("Voice Search Unavailable: ")
       return
     }
     
@@ -230,6 +225,11 @@ class SpeechRecognizer: ObservableObject {
   private func getVolumeLevel(from channelData: UnsafeMutablePointer<Float>) -> Float {
     let channelDataArray = Array(UnsafeBufferPointer(start: channelData, count: 1024))
 
+    // This method takes incoming sample between -1 and +1 makes it absolute
+    // If current rectified sample is larger than the 'envelopeState
+    // the envelopeState is increased by 0.16 of the difference
+    // If it is smaller the envelopeState is decreased by 0.003 of the difference
+    // 'envelopeState' will rapidly rise if there is input, and slowly fall if there is none
     var outEnvelope = [Float]()
     var envelopeState: Float = 0
     let envConstantAtk: Float = 0.16
@@ -246,8 +246,8 @@ class SpeechRecognizer: ObservableObject {
       outEnvelope.append(envelopeState)
     }
 
-    // 0.007 is the low pass filter to prevent
-    // getting the noise entering from the microphone
+    // The buffer is considered full of background noise only if that peak value is less than 0.015
+    // 0.015 is the low pass filter to prevent getting the noise entering from the microphone
     if let maxVolume = outEnvelope.max(), maxVolume > Float(0.015) {
       return maxVolume
     } else {
