@@ -110,7 +110,14 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public init() {}
   
   public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
-    _getAllUserAssetsInNetworkAssets?(networks) ?? []
+    let defaultAssets: [NetworkAssets] = [
+      NetworkAssets(network: .mockMainnet, tokens: [.previewToken], sortOrder: 0),
+      NetworkAssets(network: .mockGoerli, tokens: [.previewToken], sortOrder: 1)
+    ]
+    let chainIds = networks.map { $0.chainId }
+    return _getAllUserAssetsInNetworkAssets?(networks) ?? defaultAssets.filter({
+      chainIds.contains($0.network.chainId)
+    })
   }
   
   public func getAllVisibleAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
