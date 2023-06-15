@@ -253,9 +253,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       PlaylistManager.shared.restoreSession()
     }
     
-    UserDefaults.standard.set(true, forKey: "UIStateRestorationDebugLogging")
-    UserDefaults.standard.set(true, forKey: "UIStateRestorationDeveloperMode")
-    
     return shouldPerformAdditionalDelegateHandling
   }
   

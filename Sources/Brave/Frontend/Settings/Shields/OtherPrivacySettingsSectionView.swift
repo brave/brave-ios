@@ -63,10 +63,10 @@ struct OtherPrivacySettingsSectionView: View {
               settings.tabManager.saveAllTabs()
             } else {
               let tabs = settings.tabManager.allTabs.filter({ $0.isPrivate })
-              if settings.tabManager.privateBrowsingManager.isPrivateBrowsing {
-                SessionTab.deleteAll(tabIds: tabs.map({ $0.id }))
-              } else {
-                settings.tabManager.removeTabs(tabs)
+              SessionTab.deleteAll(tabIds: tabs.map({ $0.id }))
+              
+              if !settings.tabManager.privateBrowsingManager.isPrivateBrowsing {
+                settings.tabManager.willSwitchTabMode(leavingPBM: true)
               }
             }
           }

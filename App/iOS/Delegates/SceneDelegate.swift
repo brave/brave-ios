@@ -155,7 +155,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
-   print("SCENE DISCONNECTED")
+    log.debug("SCENE DISCONNECTED")
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {

@@ -609,7 +609,7 @@ class TabTrayController: LoadingViewController {
       tabTypeSelector.selectedSegmentIndex = 0
       tabTypeSelector.sendActions(for: UIControl.Event.valueChanged)
       
-      if !Preferences.Privacy.persistentPrivateBrowsing.value {
+      if !Preferences.Privacy.persistentPrivateBrowsing.value || tabManager.tabsForCurrentMode.isEmpty {
         tabTrayView.showPrivateModeInfo()
         // New private tab is created immediately to reflect changes on NTP.
         // If user drags the modal down or dismisses it, a new private tab will be ready.

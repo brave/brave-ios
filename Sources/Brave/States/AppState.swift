@@ -1,9 +1,7 @@
-//
-//  AppState.swift
-//  
-//
-//  Created by Brandon T on 2023-05-15.
-//
+// Copyright 2023 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
 import UIKit
@@ -14,10 +12,7 @@ import Shared
 import Growth
 import Preferences
 import Storage
-
-#if DEBUG
-import os
-#endif
+import os.log
 
 /// Class that does startup initialization
 /// Everything in this class can only be execute ONCE
@@ -30,14 +25,20 @@ public class AppState {
   public let migration: Migration
   public let profile: Profile
   public let rewards: BraveRewards
+  private var didBecomeActive = false
   
   public var state: State = .launching(options: [:], active: false) {
     didSet {
       switch state {
       case .launching(_, let isActive):
-        if isActive {
+        if didBecomeActive {
+          assertionFailure("Cannot set launching state twice!")
+        }
+        
+        if isActive && !didBecomeActive {
           // We have to wait until pre 1.12 migration is done until we proceed with database
           // initialization. This is because Database container may change. See bugs #3416, #3377.
+          didBecomeActive = true
           DataController.shared.initializeOnce()
           Migration.postCoreDataInitMigrations()
           Migration.migrateTabStateToWebkitState(diskImageStore: diskImageStore)
@@ -103,18 +104,6 @@ public class AppState {
   }
 
   private static func setupConstants() {
-    // Application Constants must be initialized first
-//    #if MOZ_CHANNEL_RELEASE
-//    AppConstants.buildChannel = .release
-//    #elseif MOZ_CHANNEL_BETA
-//    AppConstants.buildChannel = .beta
-//    #elseif MOZ_CHANNEL_DEV
-//    AppConstants.buildChannel = .dev
-//    #elseif MOZ_CHANNEL_ENTERPRISE
-//    AppConstants.buildChannel = .enterprise
-//    #elseif MOZ_CHANNEL_DEBUG
-//    AppConstants.buildChannel = .debug
-//    #endif
   }
 
   private static func setupBraveCore() -> BraveCoreMain {
