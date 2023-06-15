@@ -1311,9 +1311,10 @@ class SendTokenStoreTests: XCTestCase {
   private let account2: BraveWallet.AccountInfo = .init(
     accountId: .init(
       coin: .eth,
-      keyringId: BraveWallet.DefaultKeyringId,
+      keyringId: BraveWallet.KeyringId.default,
       kind: .derived,
-      address: "mock_eth_id_2"
+      address: "mock_eth_id_2",
+      uniqueKey: "mock_eth_id_2"
     ),
     address: "mock_eth_id_2",
     name: "Ethereum Account 2",

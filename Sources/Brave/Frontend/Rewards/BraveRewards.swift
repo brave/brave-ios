@@ -75,14 +75,15 @@ public class BraveRewards: NSObject {
     isAdsInitialized = true
     guard let ledger = ledger else { return }
     ledger.currentWalletInfo { wallet in
-      if let wallet = wallet {
+      var walletInfo: BraveAds.WalletInfo?
+      if let wallet {
         let seed = wallet.recoverySeed.map(\.uint8Value)
-        self.ads.updateWalletInfo(
-          wallet.paymentId,
-          base64Seed: Data(seed).base64EncodedString()
+        walletInfo = .init(
+          paymentId: wallet.paymentId,
+          recoverySeed: Data(seed).base64EncodedString()
         )
       }
-      self.ads.initialize() { success in
+      self.ads.initialize(walletInfo: walletInfo ?? .init()) { success in
         if !success {
           self.isAdsInitialized = false
         }
@@ -163,7 +164,7 @@ public class BraveRewards: NSObject {
           at: configuration.storageURL.appendingPathComponent("ads")
         )
         if ads.isEnabled {
-          ads.initialize { _ in }
+          ads.initialize(walletInfo: .init()) { _ in }
         }
       }
     }

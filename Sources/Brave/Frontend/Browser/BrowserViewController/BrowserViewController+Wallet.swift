@@ -348,7 +348,7 @@ extension Tab: BraveWalletProviderDelegate {
       let origin = getOrigin()
       
       // check if we receive account creation request without a wallet setup
-      let keyring = await keyringService.keyringInfo(BraveWallet.DefaultKeyringId)
+      let keyring = await keyringService.keyringInfo(BraveWallet.KeyringId.default)
       if !keyring.isKeyringCreated {
         // Wallet is not setup. User must onboard / setup wallet first.
         self.tabDelegate?.showWalletNotification(self, origin: origin)
@@ -585,10 +585,10 @@ extension Tab: BraveWalletSolanaEventsListener {
 }
 
 extension Tab: BraveWalletKeyringServiceObserver {
-  func keyringCreated(_ keyringId: String) {
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
   
-  func keyringRestored(_ keyringId: String) {
+  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
   }
   
   func keyringReset() {

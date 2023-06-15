@@ -21,11 +21,11 @@ class KeyringStoreTests: XCTestCase {
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._keyringInfo = { keyringId, completion in
       switch keyringId {
-      case BraveWallet.DefaultKeyringId:
+      case BraveWallet.KeyringId.default:
         completion(.mockDefaultKeyringInfo)
-      case BraveWallet.SolanaKeyringId:
+      case BraveWallet.KeyringId.solana:
         completion(.mockSolanaKeyringInfo)
-      case BraveWallet.FilecoinKeyringId:
+      case BraveWallet.KeyringId.filecoin:
         completion(.mockFilecoinKeyringInfo)
       default:
         completion(.init())
