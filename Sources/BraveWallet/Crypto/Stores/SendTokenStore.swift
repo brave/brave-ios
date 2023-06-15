@@ -617,10 +617,10 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
   public func keyringReset() {
   }
 
-  public func keyringCreated(_ keyringId: String) {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
 
-  public func keyringRestored(_ keyringId: String) {
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
   }
 
   public func locked() {

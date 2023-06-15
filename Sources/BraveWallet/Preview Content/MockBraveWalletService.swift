@@ -235,5 +235,9 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   func balanceScannerSupportedChains(_ completion: @escaping ([String]) -> Void) {
     completion([])
   }
+
+  func discoverEthAllowances(_ completion: @escaping ([BraveWallet.AllowanceInfo]) -> Void) {
+    completion([])
+  }
 }
 #endif
