@@ -213,7 +213,8 @@ public class CryptoStore: ObservableObject {
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
       prefilledToken: prefilledToken,
-      ipfsApi: self.ipfsApi
+      ipfsApi: ipfsApi,
+      userAssetManager: userAssetManager
     )
     sendTokenStore = store
     return store
@@ -233,6 +234,7 @@ public class CryptoStore: ObservableObject {
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
+      userAssetManager: userAssetManager,
       prefilledToken: prefilledToken
     )
     swapTokenStore = store
@@ -253,6 +255,7 @@ public class CryptoStore: ObservableObject {
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
       swapService: swapService,
+      userAssetManager: userAssetManager,
       assetDetailType: assetDetailType
     )
     assetDetailStore = store
@@ -317,7 +320,8 @@ public class CryptoStore: ObservableObject {
       walletService: walletService,
       ethTxManagerProxy: ethTxManagerProxy,
       keyringService: keyringService,
-      solTxManagerProxy: solTxManagerProxy
+      solTxManagerProxy: solTxManagerProxy,
+      userAssetManager: userAssetManager
     )
     confirmationStore = store
     return store

@@ -257,7 +257,8 @@ class AccountActivityStore: ObservableObject {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
-      solanaTxManagerProxy: solTxManagerProxy
+      solanaTxManagerProxy: solTxManagerProxy,
+      userAssetManager: assetManager
     )
   }
   

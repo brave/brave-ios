@@ -112,7 +112,8 @@ extension SendTokenStore {
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
       prefilledToken: .previewToken,
-      ipfsApi: TestIpfsAPI()
+      ipfsApi: TestIpfsAPI(),
+      userAssetManager: TestableWalletUserAssetManager()
     )
   }
 }
@@ -128,6 +129,7 @@ extension AssetDetailStore {
       blockchainRegistry: MockBlockchainRegistry(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
       swapService: MockSwapService(),
+      userAssetManager: TestableWalletUserAssetManager(),
       assetDetailType: .blockchainToken(.previewToken)
     )
   }
@@ -144,6 +146,7 @@ extension SwapTokenStore {
       walletService: MockBraveWalletService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+      userAssetManager: TestableWalletUserAssetManager(),
       prefilledToken: nil
     )
   }
@@ -194,7 +197,8 @@ extension TransactionConfirmationStore {
         service.createWallet("password") { _  in }
         return service
       }(),
-      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy
+      solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+      userAssetManager: TestableWalletUserAssetManager()
     )
   }
 }

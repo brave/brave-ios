@@ -13,6 +13,9 @@ public struct NetworkAssets: Equatable {
 }
 
 extension BraveWalletBraveWalletService {
+  /// - Warning: This  method is using `BraveCore` api to fetch user's assets stored in `BraveCore`
+  /// which iOS has migrated and using `CoreData` instead since v1.53.x
+  /// This should only be used for migration!
   /// Returns all the user assets for each of the given networks
   @MainActor func allUserAssets(in networks: [BraveWallet.NetworkInfo]) async -> [NetworkAssets] {
     await withTaskGroup(of: [NetworkAssets].self, body: { @MainActor group in
