@@ -10,6 +10,7 @@ import BraveCore
 import PanModal
 import BraveUI
 import Strings
+import DesignSystem
 
 struct CryptoPagesView: View {
   @ObservedObject var cryptoStore: CryptoStore
@@ -142,15 +143,14 @@ struct CryptoPagesView: View {
   }
 }
 
-private class CryptoPagesViewController: TabbedPageViewController {
+private class CryptoPagesViewController: UITabBarController {
   private let keyringStore: KeyringStore
   private let cryptoStore: CryptoStore
-  private let swapButton = SwapButton()
   let pendingRequestsButton = ConfirmationsButton()
-
+  
   @Binding private var buySendSwapDestination: BuySendSwapDestination?
   @Binding private var isShowingPendingRequest: Bool
-
+  
   init(
     keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
@@ -163,20 +163,20 @@ private class CryptoPagesViewController: TabbedPageViewController {
     self._isShowingPendingRequest = isShowingPendingRequest
     super.init(nibName: nil, bundle: nil)
   }
-
+  
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
   }
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    
     title = Strings.Wallet.cryptoTitle
     navigationItem.largeTitleDisplayMode = .never
     view.backgroundColor = .braveGroupedBackground
-
-    pages = [
+    
+    viewControllers = [
       UIHostingController(
         rootView: PortfolioView(
           cryptoStore: cryptoStore,
@@ -186,16 +186,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
         )
       ).then {
         $0.title = Strings.Wallet.portfolioPageTitle
-      },
-      UIHostingController(
-        rootView: NFTView(
-          cryptoStore: cryptoStore,
-          keyringStore: keyringStore,
-          networkStore: cryptoStore.networkStore,
-          nftStore: cryptoStore.nftStore
-        )
-      ).then {
-        $0.title = Strings.Wallet.nftPageTitle
+        $0.tabBarItem = UITabBarItem(title: Strings.Wallet.portfolioPageTitle, image: UIImage(braveSystemNamed: "leo.coins"), selectedImage: UIImage(braveSystemNamed: "leo.coins"))
       },
       UIHostingController(
         rootView: TransactionsActivityView(
@@ -204,6 +195,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
         )
       ).then {
         $0.title = Strings.Wallet.activityPageTitle
+        $0.tabBarItem = UITabBarItem(title: Strings.Wallet.activityPageTitle, image: UIImage(braveSystemNamed: "leo.activity"), selectedImage: UIImage(braveSystemNamed: "leo.activity"))
       },
       UIHostingController(
         rootView: AccountsView(
@@ -212,6 +204,7 @@ private class CryptoPagesViewController: TabbedPageViewController {
         )
       ).then {
         $0.title = Strings.Wallet.accountsPageTitle
+        $0.tabBarItem = UITabBarItem(title: Strings.Wallet.accountsPageTitle, image: UIImage(braveSystemNamed: "leo.user.accounts"), selectedImage: UIImage(braveSystemNamed: "leo.user.accounts"))
       },
       UIHostingController(
         rootView: MarketView(
@@ -220,52 +213,20 @@ private class CryptoPagesViewController: TabbedPageViewController {
         )
       ).then {
         $0.title = Strings.Wallet.marketPageTitle
+        $0.tabBarItem = UITabBarItem(title: Strings.Wallet.marketPageTitle, image: UIImage(braveSystemNamed: "leo.discover"), selectedImage: UIImage(braveSystemNamed: "leo.discover"))
       },
     ]
-
-    view.addSubview(swapButton)
-    swapButton.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).priority(.high)
-      $0.bottom.lessThanOrEqualTo(view).inset(8)
-    }
-
-    pages.forEach {
-      $0.additionalSafeAreaInsets = .init(top: 0, left: 0, bottom: swapButton.intrinsicContentSize.height + 8, right: 0)
-    }
-
-    swapButton.addTarget(self, action: #selector(tappedSwapButton), for: .touchUpInside)
-
+    
     view.addSubview(pendingRequestsButton)
     pendingRequestsButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(16)
-      $0.centerY.equalTo(swapButton)
       $0.bottom.lessThanOrEqualTo(view).inset(8)
     }
     pendingRequestsButton.addTarget(self, action: #selector(tappedPendingRequestsButton), for: .touchUpInside)
   }
-
+  
   @objc private func tappedPendingRequestsButton() {
     isShowingPendingRequest = true
-  }
-
-  @objc private func tappedSwapButton() {
-    let controller = FixedHeightHostingPanModalController(
-      rootView: BuySendSwapView(
-        networkStore: cryptoStore.networkStore,
-        action: { [weak self] destination in
-          self?.dismiss(
-            animated: true,
-            completion: {
-              self?.buySendSwapDestination = destination
-            })
-        })
-    )
-    presentPanModal(
-      controller,
-      sourceView: swapButton,
-      sourceRect: swapButton.bounds
-    )
   }
 }
 
@@ -276,34 +237,34 @@ private class ConfirmationsButton: SpringButton {
   ).then {
     $0.tintColor = .white
   }
-
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
-
+    
     backgroundColor = .braveBlurpleTint
     addSubview(imageView)
-
+    
     imageView.snp.makeConstraints {
       $0.center.equalToSuperview()
     }
     snp.makeConstraints {
       $0.width.equalTo(snp.height)
     }
-
+    
     layer.shadowColor = UIColor.black.cgColor
     layer.shadowOffset = .init(width: 0, height: 1)
     layer.shadowRadius = 1
     layer.shadowOpacity = 0.3
-
+    
     accessibilityLabel = Strings.Wallet.confirmTransactionsTitle
   }
-
+  
   override func layoutSubviews() {
     super.layoutSubviews()
     layer.cornerRadius = bounds.height / 2.0
     layer.shadowPath = UIBezierPath(ovalIn: bounds).cgPath
   }
-
+  
   override var intrinsicContentSize: CGSize {
     .init(width: 36, height: 36)
   }
