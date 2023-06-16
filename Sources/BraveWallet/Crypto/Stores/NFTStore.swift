@@ -156,10 +156,8 @@ public class NFTStore: ObservableObject {
   }
   
   func updateVisibility(_ token: BraveWallet.BlockchainToken, visible: Bool) {
-    walletService.setUserAssetVisible(token, visible: visible) { [weak self] success in
-      if success {
-        self?.update()
-      }
+    assetManager.updateUserAsset(for: token, visible: visible) { [weak self] in
+      self?.update()
     }
   }
 }
