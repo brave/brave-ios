@@ -12,10 +12,11 @@ struct PlaylistView: View {
   
   @State private var selectedItemID: Item.ID?
   @State private var offset: CGFloat = 0
+  @State private var drawerHeight: CGFloat = 0
   @State private var screenHeight: CGFloat = 0
   @State private var listHeight: CGFloat = 0
   @GestureState private var isDragging: Bool = false
-  @State private var startOffset: CGFloat?
+  @State private var startHeight: CGFloat?
   
   init(folder: Folder) {
     self.folder = folder
@@ -28,35 +29,37 @@ struct PlaylistView: View {
   }
   
   var dragGesture: some Gesture {
-    DragGesture(minimumDistance: 0)
+    DragGesture(minimumDistance: 0, coordinateSpace: .global)
       .updating($isDragging, body: { _, state, _ in
         state = true
       })
       .onChanged { (value: DragGesture.Value) in
-        if startOffset == nil {
-          startOffset = offset
+        if startHeight == nil {
+          startHeight = drawerHeight
         }
-        offset = max(-listHeight + 66, min(0, startOffset! + value.translation.height))
+        drawerHeight = min(screenHeight, startHeight! - value.translation.height)
       }
       .onEnded { (value: DragGesture.Value) in
-        let endOffset = max(-listHeight + 66, min(0, startOffset! + value.predictedEndTranslation.height))
-        startOffset = nil
-        let stopPoints = [0, 0.3, 0.8, 1.0].map { listHeight * $0 }
+        let endHeight = startHeight! - value.predictedEndTranslation.height
+        startHeight = nil
+        let stopPoints = [0, 0.75, 1.0].map { screenHeight * $0 }
         let ranges = stopPoints.enumerated().reduce(into: [(Range<Double>, Int)](), {
           if $1.offset == stopPoints.count - 1 {
             $0.append(($1.element..<CGFloat.infinity, $1.offset))
           } else {
             let nextElement = stopPoints[$1.offset+1]
-            let halfPoint = $1.element + ((nextElement - $1.element) / 2.0)
-            $0.append(($1.element..<halfPoint, $1.offset))
-            $0.append((halfPoint..<nextElement, $1.offset+1))
+//            let halfPoint = $1.element + ((nextElement - $1.element) / 2.0)
+//            $0.append(($1.element..<halfPoint, $1.offset))
+//            $0.append((halfPoint..<nextElement, $1.offset+1))
+            $0.append(($1.element..<nextElement, $1.offset))
           }
         })
-        withAnimation(.interpolatingSpring(duration: 0.3, bounce: 0.0, initialVelocity: value.velocity.height / listHeight)) {
-          if let index = ranges.first(where: { $0.0.contains(-endOffset)})?.1 {
-            offset = -(stopPoints[index])
+        withAnimation(.interpolatingSpring(duration: 0.3, bounce: 0.0, initialVelocity: value.velocity.height / screenHeight)) {
+          if let index = ranges.first(where: { $0.0.contains(endHeight)})?.1 {
+            let screenRelativeHeight = stopPoints[index] / screenHeight
+            drawerHeight = listHeight + (screenRelativeHeight * (screenHeight - listHeight))
           } else {
-            offset = 0
+            drawerHeight = listHeight
           }
         }
       }
@@ -67,6 +70,34 @@ struct PlaylistView: View {
       Color.black.aspectRatio(16/9, contentMode: .fit)
       ControlView(title: "")
         .padding(.vertical)
+      Color.clear
+        .background {
+          GeometryReader { proxy in
+            Color.clear
+              .onAppear {
+                listHeight = proxy.size.height
+                drawerHeight = listHeight
+              }
+              .onChange(of: proxy.size.height) { newValue in
+                listHeight = newValue
+                if !isDragging {
+                  drawerHeight = listHeight
+                }
+              }
+          }
+        }
+        .overlay(alignment: .bottom) {
+          VStack(spacing: 0) {
+            PlaylistItemHeaderView(folder: folder)
+              .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+              .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+              .simultaneousGesture(dragGesture)
+            
+            PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
+              .background(Color(.braveBackground))
+          }
+          .frame(height: drawerHeight)
+        }
     }
     .frame(maxHeight: .infinity)
     .background {
@@ -78,32 +109,11 @@ struct PlaylistView: View {
           }
       }
     }
-    .overlay {
-      VStack(spacing: 0) {
-        PlaylistItemHeaderView(folder: folder)
-        PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
-          .background(Color(.braveBackground))
-          .disabled(isDragging)
-      }
-      .background {
-        GeometryReader { proxy in
-          Color.clear
-            .onAppear { listHeight = proxy.size.height }
-            .onChange(of: proxy.size.height) { newValue in
-              listHeight = newValue
-            }
-        }
-      }
-      .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-      .offset(y: min(screenHeight, max(0, screenHeight - 66 + offset))) // offset must be on top of gesture otherwise it glitches
-      .gesture(dragGesture)
-      .ignoresSafeArea(.container, edges: .bottom)
-    }
     .background(Color.gray)
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(folder.title)
     .toolbar {
-      ToolbarItemGroup(placement: .primaryAction) {
+      ToolbarItemGroup(placement: .navigationBarTrailing) {
         Button { } label: {
           Image(braveSystemName: "leo.picture.in-picture")
         }
@@ -125,6 +135,10 @@ struct PlaylistView: View {
           Image(braveSystemName: "leo.more.horizontal")
         }
         .tint(Color.white)
+        Button { } label: {
+          Image(braveSystemName: "leo.close")
+        }
+        .tint(Color.white)
       }
     }
   }
@@ -133,7 +147,7 @@ struct PlaylistView: View {
 #if DEBUG
 struct PlaylistView_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    Color.black.sheet(isPresented: .constant(true)) {
+    Color.black.fullScreenCover(isPresented: .constant(true)) {
       NavigationView {
         PlaylistView(folder: .init(id: UUID().uuidString, title: "Play Later", items: (0..<10).map { i in
           .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
@@ -143,6 +157,18 @@ struct PlaylistView_PreviewProvider: PreviewProvider {
   }
 }
 #endif
+
+#if swift(>=5.9)
+@available(iOS, introduced: 13.0, obsoleted: 16.0, message: "Use UnevenRoundedRectangle")
+#endif
+struct PartialRoundedRectangle: Shape {
+  var cornerRadius: CGFloat
+  var corners: UIRectCorner = .allCorners
+  
+  func path(in rect: CGRect) -> Path {
+    Path(UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: cornerRadius, height: cornerRadius)).cgPath)
+  }
+}
 
 extension DragGesture.Value {
   @_disfavoredOverload
