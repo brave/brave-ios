@@ -80,11 +80,11 @@ import Preferences
     store.update()
     
     let expectedPrimaryNetworks: [NetworkPresentation] = [
-      .init(network: .network(.mockSolana), subNetworks: [], isPrimaryNetwork: true),
-      .init(network: .network(.mockMainnet), subNetworks: [], isPrimaryNetwork: true)
+      .init(network: .mockSolana, subNetworks: [], isPrimaryNetwork: true),
+      .init(network: .mockMainnet, subNetworks: [], isPrimaryNetwork: true)
     ]
     let expectedSecondaryNetworks: [NetworkPresentation] = [
-      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
+      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
     ]
     XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
@@ -110,11 +110,11 @@ import Preferences
     store.update()
     
     let expectedPrimaryNetworks: [NetworkPresentation] = [
-      .init(network: .network(.mockSolana), subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
-      .init(network: .network(.mockMainnet), subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
+      .init(network: .mockSolana, subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
+      .init(network: .mockMainnet, subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
     ]
     let expectedSecondaryNetworks: [NetworkPresentation] = [
-      .init(network: .network(.mockPolygon), subNetworks: [], isPrimaryNetwork: false)
+      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
     ]
     XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
     XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
@@ -132,7 +132,7 @@ import Preferences
     await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    let success = await store.selectNetwork(.network(.mockGoerli))
+    let success = await store.selectNetwork(.mockGoerli)
     XCTAssertTrue(success, "Expected success for selecting Goerli because we have ethereum accounts.")
   }
   
@@ -158,7 +158,7 @@ import Preferences
       mode: .select(isForOrigin: true),
       networkStore: networkStore
     )
-    let success = await store.selectNetwork(.network(.mockGoerli))
+    let success = await store.selectNetwork(.mockGoerli)
     XCTAssertTrue(success, "Expected success for selecting Goerli because we have ethereum accounts.")
   }
   
@@ -174,7 +174,7 @@ import Preferences
     await networkStore.setup()
     
     let store = NetworkSelectionStore(networkStore: networkStore)
-    let success = await store.selectNetwork(.network(.mockSolana))
+    let success = await store.selectNetwork(.mockSolana)
     XCTAssertFalse(success, "Expected failure for selecting Solana because we have no Solana accounts.")
     XCTAssertTrue(store.isPresentingNextNetworkAlert, "Expected to set isPresentingNextNetworkAlert to true to show alert asking user to create Solana account")
   }
@@ -191,7 +191,7 @@ import Preferences
     await networkStore.setup()
     
     let store = NetworkSelectionStore(mode: .formSelection, networkStore: networkStore)
-    let success = await store.selectNetwork(.network(.mockGoerli))
+    let success = await store.selectNetwork(.mockGoerli)
     XCTAssertTrue(success, "Expected success for selecting Goerli")
     XCTAssertEqual(store.networkSelectionInForm, .mockGoerli)
   }
@@ -294,7 +294,7 @@ import Preferences
     
     let store = NetworkSelectionStore(networkStore: networkStore)
     
-    let success = await store.selectNetwork(.network(.mockSolana))
+    let success = await store.selectNetwork(.mockSolana)
     XCTAssertFalse(success, "Expected failure to select network due to no accounts")
     XCTAssertTrue(store.isPresentingNextNetworkAlert, "Expected to present next network alert")
     

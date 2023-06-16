@@ -42,7 +42,7 @@ class NetworkSelectionStore: ObservableObject {
       .map { network in
         let subNetworks = networkStore.subNetworks(for: network)
         return NetworkPresentation(
-          network: .network(network),
+          network: network,
           subNetworks: subNetworks.count > 1 ? subNetworks : [],
           isPrimaryNetwork: true
         )
@@ -51,18 +51,16 @@ class NetworkSelectionStore: ObservableObject {
     self.secondaryNetworks = networkStore.secondaryNetworks
       .map { network in
         NetworkPresentation(
-          network: .network(network),
+          network: network,
           subNetworks: [],
           isPrimaryNetwork: false
         )
       }
   }
   
-  @MainActor func selectNetwork(_ network: NetworkPresentation.Network) async -> Bool {
+  @MainActor func selectNetwork(_ network: BraveWallet.NetworkInfo) async -> Bool {
     switch mode {
     case let .select(isForOrigin):
-      guard case let .network(network) = network else { return false }
-
       let error = await networkStore.setSelectedChain(network, isForOrigin: isForOrigin)
       switch error {
       case .selectedChainHasNoAccounts:
@@ -73,13 +71,8 @@ class NetworkSelectionStore: ObservableObject {
         return true
       }
     case .formSelection:
-      switch network {
-      case let .network(network):
-        networkSelectionInForm = network
-        return true
-      default:
-        return false
-      }
+      networkSelectionInForm = network
+      return true
     }
   }
   

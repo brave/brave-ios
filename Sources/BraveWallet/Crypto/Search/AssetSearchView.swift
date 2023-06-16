@@ -10,6 +10,7 @@ import Strings
 
 struct AssetSearchView: View {
   var keyringStore: KeyringStore
+  @ObservedObject var networkStore: NetworkStore
   var cryptoStore: CryptoStore
   var userAssetsStore: UserAssetsStore
   
@@ -18,22 +19,19 @@ struct AssetSearchView: View {
   @State private var allAssets: [AssetViewModel] = []
   @State private var allNFTMetadata: [String: NFTMetadata] = [:]
   @State private var query = ""
-  @State private var networkFilter: NetworkFilter = .allNetworks
+  @State private var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = []
   @State private var isPresentingNetworkFilter = false
 
   private var filteredTokens: [AssetViewModel] {
-    let allAssets: [AssetViewModel]
-    switch networkFilter {
-    case .allNetworks:
-      allAssets = self.allAssets
-    case .network(let network):
-      allAssets = self.allAssets.filter { $0.network.chainId == network.chainId }
+    let selectedNetworks = networkFilters.filter(\.isSelected)
+    let networkFilteredAssets = allAssets.filter { asset in
+      selectedNetworks.contains(where: { asset.network.chainId == $0.model.chainId && asset.network.coin == $0.model.coin })
     }
     let normalizedQuery = query.lowercased()
     if normalizedQuery.isEmpty {
-      return allAssets
+      return networkFilteredAssets
     }
-    return allAssets.filter {
+    return networkFilteredAssets.filter {
       $0.token.symbol.lowercased().contains(normalizedQuery) || $0.token.name.lowercased().contains(normalizedQuery)
     }
   }
@@ -42,18 +40,19 @@ struct AssetSearchView: View {
     Button(action: {
       self.isPresentingNetworkFilter = true
     }) {
-      HStack {
-        Image(braveSystemName: "leo.list")
-        Text(networkFilter.title)
-      }
-      .font(.footnote.weight(.medium))
-      .foregroundColor(Color(.braveBlurpleTint))
+      Image(braveSystemName: "leo.tune")
+        .font(.footnote.weight(.medium))
+        .foregroundColor(Color(.braveBlurpleTint))
+        .clipShape(Rectangle())
     }
     .sheet(isPresented: $isPresentingNetworkFilter) {
       NavigationView {
         NetworkFilterView(
-          networkFilter: $networkFilter,
-          networkStore: cryptoStore.networkStore
+          networks: networkFilters,
+          networkStore: cryptoStore.networkStore,
+          saveAction: { networkFilters in
+            self.networkFilters = networkFilters
+          }
         )
       }
       .onDisappear {
@@ -160,6 +159,9 @@ struct AssetSearchView: View {
       Task { @MainActor in
         self.allAssets = await userAssetsStore.allAssets()
         self.allNFTMetadata = await userAssetsStore.allNFTMetadata()
+        self.networkFilters = networkStore.allChains.map {
+          .init(isSelected: true, model: $0)
+        }
       }
     }
   }
