@@ -6,9 +6,8 @@
 import Foundation
 import SwiftUI
 
-struct PlaylistItemListView: View {
+struct PlaylistItemHeaderView: View {
   var folder: Folder
-  var selectedItemId: Item.ID?
   
   @ViewBuilder var totalDuration: some View {
     let total = folder.items.reduce(0, { $0 + $1.duration })
@@ -20,8 +19,50 @@ struct PlaylistItemListView: View {
   }
   
   var body: some View {
+    VStack(spacing: 0) {
+      Capsule()
+        .opacity(0.3)
+        .frame(width: 32, height: 4)
+        .padding(.top, 6)
+      HStack {
+        VStack(alignment: .leading) {
+          Text(folder.title)
+            .font(.body.weight(.medium))
+          HStack {
+            Text("\(folder.items.count) items")
+            if !folder.items.isEmpty {
+              totalDuration
+            }
+          }
+          .font(.caption)
+          .foregroundStyle(.secondary)
+        }
+        Spacer()
+        Button { } label: {
+          VStack(spacing: 4) {
+            Image(braveSystemName: "leo.play.circle")
+              .font(.title3)
+            Text("Play All")
+              .font(.caption)
+          }
+          .foregroundStyle(Color(.braveBlurple))
+        }
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      Divider()
+    }
+    .background(Color(.braveBackground))
+  }
+}
+
+struct PlaylistItemListView: View {
+  var folder: Folder
+  var selectedItemId: Item.ID?
+  
+  var body: some View {
     ScrollView(.vertical) {
-      LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
+      LazyVStack(spacing: 0) {
         Section {
           ForEach(folder.items) { item in
             Button { } label: {
@@ -63,42 +104,6 @@ struct PlaylistItemListView: View {
               }
             }
           }
-        } header: {
-          VStack(spacing: 0) {
-            Capsule()
-              .opacity(0.3)
-              .frame(width: 32, height: 4)
-              .padding(.top, 6)
-            HStack {
-              VStack(alignment: .leading) {
-                Text(folder.title)
-                  .font(.body.weight(.medium))
-                HStack {
-                  Text("\(folder.items.count) items")
-                  if !folder.items.isEmpty {
-                    totalDuration
-                  }
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-              }
-              Spacer()
-              Button { } label: {
-                VStack(spacing: 4) {
-                  Image(braveSystemName: "leo.play.circle")
-                    .font(.title3)
-                  Text("Play All")
-                    .font(.caption)
-                }
-                .foregroundStyle(Color(.braveBlurple))
-              }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            Divider()
-          }
-          .background(Color(.braveBackground))
-          .padding(.bottom, 6)
         }
       }
     }
