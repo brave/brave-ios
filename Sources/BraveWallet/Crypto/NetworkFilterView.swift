@@ -20,8 +20,6 @@ struct NetworkFilterView: View {
   @ObservedObject var networkStore: NetworkStore
   let saveAction: ([Selectable<BraveWallet.NetworkInfo>]) -> Void
   
-  @State private(set) var primaryNetworks: [NetworkPresentation] = []
-  @State private(set) var secondaryNetworks: [NetworkPresentation] = []
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   init(
@@ -38,13 +36,9 @@ struct NetworkFilterView: View {
     NetworkSelectionRootView(
       navigationTitle: Strings.Wallet.networkFilterTitle,
       selectedNetworks: networks.filter(\.isSelected).map(\.model),
-      primaryNetworks: primaryNetworks,
-      secondaryNetworks: secondaryNetworks,
+      allNetworks: networks.map(\.model),
       selectNetwork: selectNetwork
     )
-    .onAppear {
-      fetchNetworks()
-    }
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
         Button(action: {
@@ -56,27 +50,6 @@ struct NetworkFilterView: View {
         }
       }
     }
-  }
-  
-  private func fetchNetworks() {
-    self.primaryNetworks = networkStore.primaryNetworks
-      .map { network in
-        let subNetworks = networkStore.subNetworks(for: network)
-        return NetworkPresentation(
-          network: network,
-          subNetworks: subNetworks.count > 1 ? subNetworks : [],
-          isPrimaryNetwork: true
-        )
-      }
-
-    self.secondaryNetworks = networkStore.secondaryNetworks
-      .map { network in
-        NetworkPresentation(
-          network: network,
-          subNetworks: [],
-          isPrimaryNetwork: false
-        )
-      }
   }
   
   private func selectNetwork(_ network: BraveWallet.NetworkInfo) {

@@ -65,7 +65,7 @@ class SelectAccountTokenStore: ObservableObject {
             return true
           }
       )
-      if shouldShowSection(accountSection) {
+      if shouldShowSection(updatedAccountSection) {
         filteredAccountSections.append(updatedAccountSection)
       }
     }
@@ -129,7 +129,7 @@ class SelectAccountTokenStore: ObservableObject {
   func resetFilters() {
     isHidingZeroBalances = true
     networkFilters = allNetworks.map {
-      .init(isSelected: !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId), model: $0)
+      .init(isSelected: true, model: $0)
     }
   }
   

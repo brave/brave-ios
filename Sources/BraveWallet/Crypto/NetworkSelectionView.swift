@@ -48,15 +48,11 @@ struct NetworkSelectionView: View {
     NetworkSelectionRootView(
       navigationTitle: navigationTitle,
       selectedNetworks: [selectedNetwork],
-      primaryNetworks: store.primaryNetworks,
-      secondaryNetworks: store.secondaryNetworks,
+      allNetworks: networkStore.allChains,
       selectNetwork: { network in
         selectNetwork(network)
       }
     )
-    .onAppear {
-      store.update()
-    }
     .background(
       Color.clear
         .alert(

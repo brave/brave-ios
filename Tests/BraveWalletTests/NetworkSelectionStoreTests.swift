@@ -60,66 +60,6 @@ import Preferences
     return (keyringService, rpcService, walletService, swapService)
   }
   
-  func testUpdateSelectMode() async {
-    Preferences.Wallet.showTestNetworks.value = false
-
-    let (keyringService, rpcService, walletService, swapService) = setupServices()
-    
-    let networkStore = NetworkStore(
-      keyringService: keyringService,
-      rpcService: rpcService,
-      walletService: walletService,
-      swapService: swapService
-    )
-    await networkStore.setup()
-    
-    let store = NetworkSelectionStore(networkStore: networkStore)
-    XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
-    XCTAssertTrue(store.secondaryNetworks.isEmpty, "Test setup failed, expected empty secondary networks")
-    
-    store.update()
-    
-    let expectedPrimaryNetworks: [NetworkPresentation] = [
-      .init(network: .mockSolana, subNetworks: [], isPrimaryNetwork: true),
-      .init(network: .mockMainnet, subNetworks: [], isPrimaryNetwork: true)
-    ]
-    let expectedSecondaryNetworks: [NetworkPresentation] = [
-      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
-    ]
-    XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
-    XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
-  }
-  
-  func testUpdateTestNetworksEnabledSelectMode() async {
-    Preferences.Wallet.showTestNetworks.value = true
-    
-    let (keyringService, rpcService, walletService, swapService) = setupServices()
-    
-    let networkStore = NetworkStore(
-      keyringService: keyringService,
-      rpcService: rpcService,
-      walletService: walletService,
-      swapService: swapService
-    )
-    await networkStore.setup()
-    
-    let store = NetworkSelectionStore(networkStore: networkStore)
-    XCTAssertTrue(store.primaryNetworks.isEmpty, "Test setup failed, expected empty primary networks")
-    XCTAssertTrue(store.secondaryNetworks.isEmpty, "Test setup failed, expected empty secondary networks")
-    
-    store.update()
-    
-    let expectedPrimaryNetworks: [NetworkPresentation] = [
-      .init(network: .mockSolana, subNetworks: [.mockSolana, .mockSolanaTestnet], isPrimaryNetwork: true),
-      .init(network: .mockMainnet, subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia], isPrimaryNetwork: true)
-    ]
-    let expectedSecondaryNetworks: [NetworkPresentation] = [
-      .init(network: .mockPolygon, subNetworks: [], isPrimaryNetwork: false)
-    ]
-    XCTAssertEqual(store.primaryNetworks, expectedPrimaryNetworks, "Unexpected primary networks set")
-    XCTAssertEqual(store.secondaryNetworks, expectedSecondaryNetworks, "Unexpected secondary networks set")
-  }
-  
   func testSetSelectedNetwork() async {
     let (keyringService, rpcService, walletService, swapService) = setupServices()
     

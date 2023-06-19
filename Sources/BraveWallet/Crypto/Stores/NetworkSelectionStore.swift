@@ -17,9 +17,6 @@ class NetworkSelectionStore: ObservableObject {
   let mode: Mode
   var networkStore: NetworkStore
   
-  @Published private(set) var primaryNetworks: [NetworkPresentation] = []
-  @Published private(set) var secondaryNetworks: [NetworkPresentation] = []
-  
   /// If we are prompting the user to add an account for the `nextNetwork.coin` type
   @Published var isPresentingNextNetworkAlert = false
   /// The network the user wishes to switch to, but does not (yet) have an account for `nextNetwork.coin` type
@@ -35,27 +32,6 @@ class NetworkSelectionStore: ObservableObject {
   ) {
     self.mode = mode
     self.networkStore = networkStore
-  }
-  
-  func update() {
-    self.primaryNetworks = networkStore.primaryNetworks
-      .map { network in
-        let subNetworks = networkStore.subNetworks(for: network)
-        return NetworkPresentation(
-          network: network,
-          subNetworks: subNetworks.count > 1 ? subNetworks : [],
-          isPrimaryNetwork: true
-        )
-      }
-
-    self.secondaryNetworks = networkStore.secondaryNetworks
-      .map { network in
-        NetworkPresentation(
-          network: network,
-          subNetworks: [],
-          isPrimaryNetwork: false
-        )
-      }
   }
   
   @MainActor func selectNetwork(_ network: BraveWallet.NetworkInfo) async -> Bool {

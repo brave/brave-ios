@@ -5,58 +5,34 @@
 
 import BraveCore
 import SwiftUI
-
-struct NetworkPresentation: Equatable, Hashable, Identifiable {
-  let network: BraveWallet.NetworkInfo
-  let subNetworks: [BraveWallet.NetworkInfo]
-  let isPrimaryNetwork: Bool
-  
-  var id: String {
-    network.id
-  }
-  
-  init(
-    network: BraveWallet.NetworkInfo,
-    subNetworks: [BraveWallet.NetworkInfo],
-    isPrimaryNetwork: Bool
-  ) {
-    self.network = network
-    self.subNetworks = subNetworks
-    self.isPrimaryNetwork = isPrimaryNetwork
-  }
-}
+import Preferences
 
 struct NetworkSelectionRootView: View {
   
   var navigationTitle: String
   var selectedNetworks: [BraveWallet.NetworkInfo]
-  var primaryNetworks: [NetworkPresentation]
-  var secondaryNetworks: [NetworkPresentation]
+  var allNetworks: [BraveWallet.NetworkInfo]
   var selectNetwork: (BraveWallet.NetworkInfo) -> Void
-  @State private var detailNetwork: NetworkPresentation?
   @Environment(\.presentationMode) @Binding private var presentationMode
   
   var body: some View {
     List {
       Section {
-        ForEach(primaryNetworks) { presentation in
-          Button(action: { selectNetwork(presentation.network) }) {
+        ForEach(allNetworks.primaryNetworks) { network in
+          Button(action: { selectNetwork(network) }) {
             NetworkRowView(
-              presentation: presentation,
-              selectedNetworks: selectedNetworks,
-              detailTappedHandler: {
-                detailNetwork = presentation
-              }
+              network: network,
+              selectedNetworks: selectedNetworks
             )
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
       }
       Section(content: {
-        ForEach(secondaryNetworks) { presentation in
-          Button(action: { selectNetwork(presentation.network) }) {
+        ForEach(allNetworks.secondaryNetworks) { network in
+          Button(action: { selectNetwork(network) }) {
             NetworkRowView(
-              presentation: presentation,
+              network: network,
               selectedNetworks: selectedNetworks
             )
           }
@@ -65,6 +41,21 @@ struct NetworkSelectionRootView: View {
       }, header: {
         WalletListHeaderView(title: Text(Strings.Wallet.networkSelectionSecondaryNetworks))
       })
+      if Preferences.Wallet.showTestNetworks.value && !allNetworks.testNetworks.isEmpty {
+        Section(content: {
+          ForEach(allNetworks.testNetworks) { network in
+            Button(action: { selectNetwork(network) }) {
+              NetworkRowView(
+                network: network,
+                selectedNetworks: selectedNetworks
+              )
+            }
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          }
+        }, header: {
+          WalletListHeaderView(title: Text("Test Networks"))
+        })
+      }
     }
     .listStyle(.insetGrouped)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
@@ -78,62 +69,26 @@ struct NetworkSelectionRootView: View {
         }
       }
     }
-    .background(
-      NavigationLink(
-        isActive: Binding(
-          get: { detailNetwork != nil },
-          set: { if !$0 { detailNetwork = nil } }
-        ),
-        destination: {
-          if let detailNetwork = detailNetwork {
-            NetworkSelectionDetailView(
-              networks: detailNetwork.subNetworks,
-              selectedNetworks: selectedNetworks,
-              navigationTitle: navigationTitle,
-              selectedNetworkHandler: { network in
-                selectNetwork(network)
-              }
-            )
-          }
-        },
-        label: { EmptyView() }
-      )
-    )
   }
 }
 
 private struct NetworkRowView: View {
 
-  var presentation: NetworkPresentation
+  var network: BraveWallet.NetworkInfo
   var selectedNetworks: [BraveWallet.NetworkInfo]
-  var detailTappedHandler: (() -> Void)?
 
   @ScaledMetric private var length: CGFloat = 30
   
   init(
-    presentation: NetworkPresentation,
-    selectedNetworks: [BraveWallet.NetworkInfo],
-    detailTappedHandler: (() -> Void)? = nil
+    network: BraveWallet.NetworkInfo,
+    selectedNetworks: [BraveWallet.NetworkInfo]
   ) {
-    self.presentation = presentation
+    self.network = network
     self.selectedNetworks = selectedNetworks
-    self.detailTappedHandler = detailTappedHandler
   }
   
   private var isSelected: Bool {
-    if selectedNetworks.contains(where: { $0.chainId == presentation.network.chainId }) {
-      return true
-    } else if !presentation.subNetworks.isEmpty {
-      return isSubNetworkSelected
-    }
-    return false
-  }
-  
-  private var isSubNetworkSelected: Bool {
-    for subNetwork in presentation.subNetworks where selectedNetworks.contains(where: { subNetwork.chainId == $0.chainId }) {
-      return true
-    }
-    return false
+    selectedNetworks.contains(where: { $0.chainId == network.chainId })
   }
 
   private var checkmark: some View {
@@ -144,58 +99,20 @@ private struct NetworkRowView: View {
       .foregroundColor(Color(.braveBlurpleTint))
       .frame(width: 14, height: 14)
   }
-  
-  private var showShortChainName: Bool {
-    presentation.isPrimaryNetwork && !presentation.subNetworks.isEmpty
-  }
-  
-  private var networkName: String {
-    return showShortChainName ? presentation.network.shortChainName : presentation.network.chainName
-  }
 
   var body: some View {
     HStack {
-      HStack {
-        checkmark
-        NetworkIcon(network: presentation.network)
-        VStack(alignment: .leading, spacing: 0) {
-          Text(networkName)
-            .font(.body)
-          if isSubNetworkSelected {
-            let selectedSubNetworkNames = selectedNetworks
-              .filter { selectedNetwork in
-                presentation.subNetworks.contains(where: { $0.chainId == selectedNetwork.chainId })
-              }
-              .map(\.chainName)
-              .joined(separator: ", ")
-            Text(selectedSubNetworkNames)
-              .foregroundColor(Color(.secondaryBraveLabel))
-              .font(.footnote)
-          }
-        }
-        .frame(minHeight: length) // maintain height for All Networks row w/o icon
-        Spacer()
+      checkmark
+      NetworkIcon(network: network)
+      VStack(alignment: .leading, spacing: 0) {
+        Text(network.chainName)
+          .font(.body)
       }
-      .accessibilityElement(children: .combine)
-      .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-      if !presentation.subNetworks.isEmpty {
-        Button(action: { detailTappedHandler?() }) {
-          Image(systemName: "chevron.right.circle")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .foregroundColor(Color(.braveBlurpleTint))
-            .contentShape(Rectangle())
-            .frame(width: 15, height: 15)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(
-          Text(String.localizedStringWithFormat(
-            Strings.Wallet.networkSelectionTestnetAccessibilityLabel,
-            networkName)
-          )
-        )
-      }
+      .frame(minHeight: length) // maintain height for All Networks row w/o icon
+      Spacer()
     }
+    .accessibilityElement(children: .combine)
+    .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     .foregroundColor(Color(.braveLabel))
     .padding(.vertical, 4)
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -208,121 +125,16 @@ struct NetworkRowView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       NetworkRowView(
-        presentation: .init(
-          network: .mockSolana,
-          subNetworks: [.mockSolana, .mockSolanaTestnet],
-          isPrimaryNetwork: true
-        ),
+        network: .mockSolana,
         selectedNetworks: [.mockSolana]
       )
       NetworkRowView(
-        presentation: .init(
-          network: .mockMainnet,
-          subNetworks: [.mockMainnet, .mockGoerli, .mockSepolia],
-          isPrimaryNetwork: true
-        ),
+        network: .mockMainnet,
         selectedNetworks: [.mockMainnet]
       )
       NetworkRowView(
-        presentation: .init(
-          network: .mockPolygon,
-          subNetworks: [],
-          isPrimaryNetwork: false
-        ),
+        network: .mockPolygon,
         selectedNetworks: [.mockMainnet]
-      )
-    }
-    .previewLayout(.sizeThatFits)
-  }
-}
-#endif
-
-// MARK: Detail View
-
-private struct NetworkSelectionDetailView: View {
-  
-  var networks: [BraveWallet.NetworkInfo]
-  var selectedNetworks: [BraveWallet.NetworkInfo]
-  let navigationTitle: String
-  var selectedNetworkHandler: (BraveWallet.NetworkInfo) -> Void
-  
-  var body: some View {
-    List {
-      ForEach(networks) { network in
-        Button(action: { selectedNetworkHandler(network) }) {
-          NetworkSelectionDetailRow(
-            isSelected: isSelected(network),
-            network: network
-          )
-          .contentShape(Rectangle())
-        }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
-      }
-    }
-    .listStyle(.insetGrouped)
-    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .navigationTitle(networks.first?.shortChainName ?? navigationTitle)
-    .navigationBarTitleDisplayMode(.inline)
-  }
-  
-  private func isSelected(_ network: BraveWallet.NetworkInfo) -> Bool {
-    return selectedNetworks.contains(where: { $0.chainId == network.chainId && $0.coin == network.coin })
-  }
-}
-
-#if DEBUG
-struct NetworkSelectionDetailView_Previews: PreviewProvider {
-  static var previews: some View {
-    NavigationView {
-      NetworkSelectionDetailView(
-        networks: [.mockMainnet, .mockGoerli, .mockSepolia],
-        selectedNetworks: [.mockMainnet],
-        navigationTitle: Strings.Wallet.networkFilterTitle,
-        selectedNetworkHandler: { _ in }
-      )
-    }
-  }
-}
-#endif
-
-private struct NetworkSelectionDetailRow: View {
-  
-  var isSelected: Bool
-  var network: BraveWallet.NetworkInfo
-  
-  @ScaledMetric private var length: CGFloat = 30
-  
-  var body: some View {
-    HStack {
-      NetworkIcon(network: network)
-      Text(network.chainName)
-      Spacer()
-      if isSelected {
-        Image(braveSystemName: "leo.check.normal")
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .foregroundColor(Color(.braveBlurpleTint))
-          .frame(width: 14, height: 14)
-      }
-    }
-    .foregroundColor(Color(.braveLabel))
-    .listRowBackground(Color(.secondaryBraveGroupedBackground))
-    .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-    .accessibilityElement(children: .combine)
-  }
-}
-
-#if DEBUG
-struct NetworkSelectionDetailRow_Previews: PreviewProvider {
-  static var previews: some View {
-    Group {
-      NetworkSelectionDetailRow(
-        isSelected: true,
-        network: .mockMainnet
-      )
-      NetworkSelectionDetailRow(
-        isSelected: false,
-        network: .mockGoerli
       )
     }
     .previewLayout(.sizeThatFits)
