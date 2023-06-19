@@ -41,7 +41,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     /// The user performed an action on an inline content ad
     case inlineContentAdAction(FeedItemAction, ad: InlineContentAd)
     /// The user performed an action on an Rate brave card
-    case rateCardAction(FeedItemAction)
+    case rateCardAction(RatingCardAction)
   }
 
   let dataSource: FeedDataSource
@@ -72,7 +72,6 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     collectionView.register(FeedCardCell<BraveNewsEmptyFeedView>.self)
     collectionView.register(FeedCardCell<HeadlineCardView>.self)
     collectionView.register(FeedCardCell<SmallHeadlinePairCardView>.self)
-    collectionView.register(FeedCardCell<SmallRateCardView>.self)
     collectionView.register(FeedCardCell<SmallHeadlineRatePairCardView>.self)
     collectionView.register(FeedCardCell<VerticalFeedGroupView>.self)
     collectionView.register(FeedCardCell<HorizontalFeedGroupView>.self)
@@ -344,7 +343,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<SmallHeadlineRatePairCardView>
       cell.content.smallHeadlineRateCardViews.smallHeadline.feedView.setupWithItem(item)
       cell.content.actionHandler = handler(from: { $0 == 0 ? item : nil }, card: card, indexPath: indexPath, isRatingCardPair: true)
-      cell.content.contextMenu = contextMenu(from: { _ in item }, card: card, indexPath: indexPath, isRatingCardPair: true)
+      cell.content.contextMenu = ratingCardPairContextMenu(for: item, card: card, indexPath: indexPath)
       return cell
     case .group(let items, let title, let direction, _):
       let groupView: FeedGroupView
@@ -389,7 +388,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     return { [weak self] index, action in
       guard let item = feedList(index) else {
         if isRatingCardPair {
-          self?.actionHandler(.rateCardAction(.pressedAppRatingCard))
+          self?.actionHandler(.rateCardAction(.rateBrave))
         }
         return
       }
@@ -439,55 +438,64 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       return UIMenu(title: ad.targetURL, children: children)
     }
   }
+  
+  private func ratingCardPairContextMenu(for item: FeedItem, card: FeedCard, indexPath: IndexPath) -> FeedItemMenu {
+    typealias MenuActionHandler = () -> Void
 
-  private func contextMenu(from feedList: @escaping (Int) -> FeedItem, card: FeedCard, indexPath: IndexPath, isRatingCardPair: Bool = false) -> FeedItemMenu {
+    func itemActionHandler(_ action: RatingCardAction) {
+      self.actionHandler(.rateCardAction(action))
+    }
+
+    let appRatingCardPressedHandler: MenuActionHandler = {
+      itemActionHandler(.rateBrave)
+    }
+    let openInNewPrivateTabHandler: MenuActionHandler = {
+      itemActionHandler(.hideCard)
+    }
+    
+    func mapDeferredHandler(_ handler: @escaping MenuActionHandler) -> UIActionHandler {
+      return UIAction.deferredActionHandler { _ in
+        handler()
+      }
+    }
+    var openInAppStore: UIAction {
+      .init(title: Strings.BraveNews.rateBraveCardRateActionTitle,
+            image: UIImage(braveSystemNamed: "leo.thumb.up"),
+            handler: mapDeferredHandler(appRatingCardPressedHandler))
+    }
+
+    var dismissCardRate: UIAction {
+      .init(title: Strings.BraveNews.rateBraveCardHideActionTitle,
+            image: UIImage(braveSystemNamed: "leo.eye.off"),
+            attributes: .destructive,
+            handler: mapDeferredHandler(openInNewPrivateTabHandler))
+    }
+    let openActions: [UIAction] = [
+      openInAppStore,
+      dismissCardRate
+    ].compactMap { $0 }
+    let children: [UIMenu] = [
+      UIMenu(title: "", options: [.displayInline], children: openActions)
+    ]
+    
+    let newItemAction: FeedItemMenu = .init { [weak self] index -> UIMenu? in
+      guard let self = self, let newsCardConextMenu = self.contextMenu(for: item, card: card, indexPath: indexPath).menu?(0) else {
+        return nil
+      }
+      
+      return index == 0 ? newsCardConextMenu : UIMenu(title: Strings.BraveNews.rateBraveCardActionSheetTitle, children: children)
+    }
+    
+    return newItemAction
+  }
+
+  private func contextMenu(from feedList: @escaping (Int) -> FeedItem, card: FeedCard, indexPath: IndexPath) -> FeedItemMenu {
     typealias MenuActionHandler = (_ context: FeedItemActionContext) -> Void
 
     func itemActionHandler(_ action: FeedItemAction, _ context: FeedItemActionContext) {
       self.actionHandler(.itemAction(action, context: context))
     }
     
-    func ratingCardContextMenu() -> UIMenu {
-      typealias MenuActionHandler = () -> Void
-
-      func itemActionHandler(_ action: FeedItemAction) {
-        self.actionHandler(.rateCardAction(action))
-      }
-
-      let appRatingCardPressedHandler: MenuActionHandler = {
-        itemActionHandler(.pressedAppRatingCard)
-      }
-      let openInNewPrivateTabHandler: MenuActionHandler = {
-        itemActionHandler(.hiddenAppRatingCard)
-      }
-      
-      func mapDeferredHandler(_ handler: @escaping MenuActionHandler) -> UIActionHandler {
-        return UIAction.deferredActionHandler { _ in
-          handler()
-        }
-      }
-      var openInAppStore: UIAction {
-        .init(title: Strings.BraveNews.rateBraveCardRateActionTitle,
-              image: UIImage(braveSystemNamed: "leo.thumb.up"),
-              handler: mapDeferredHandler(appRatingCardPressedHandler))
-      }
-
-      var dismissCardRate: UIAction {
-        .init(title: Strings.BraveNews.rateBraveCardHideActionTitle,
-              image: UIImage(braveSystemNamed: "leo.eye.off"),
-              attributes: .destructive,
-              handler: mapDeferredHandler(openInNewPrivateTabHandler))
-      }
-      let openActions: [UIAction] = [
-        openInAppStore,
-        dismissCardRate
-      ].compactMap { $0 }
-      let children: [UIMenu] = [
-        UIMenu(title: "", options: [.displayInline], children: openActions)
-      ]
-      return UIMenu(title: Strings.BraveNews.rateBraveCardActionSheetTitle, children: children)
-    }
-
     let openInNewTabHandler: MenuActionHandler = { context in
       itemActionHandler(.opened(inNewTab: true), context)
     }
@@ -544,11 +552,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
         children.append(UIMenu(title: "", options: [.displayInline], children: manageActions))
       }
       
-      if isRatingCardPair {
-        return index == 0 ? UIMenu(title: item.content.url?.absoluteString ?? "", children: children) : ratingCardContextMenu()
-      } else {
-        return UIMenu(title: item.content.url?.absoluteString ?? "", children: children)
-      }
+      return UIMenu(title: item.content.url?.absoluteString ?? "", children: children)
     }
     
     return newItemAction

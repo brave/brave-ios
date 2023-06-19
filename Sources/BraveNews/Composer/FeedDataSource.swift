@@ -877,7 +877,7 @@ public class FeedDataSource: ObservableObject {
     let hiddenSources = Set(overridenSources.filter { !$0.enabled }.map(\.publisherID))
     let followedChannels = Preferences.BraveNews.followedChannels.value
     
-    func createRepatingFeedElements(withRatingCard: Bool) -> [FeedSequenceElement] {
+    func createRepeatingFeedElements(withRatingCard: Bool) -> [FeedSequenceElement] {
       let ratedNewsRow: FeedSequenceElement = withRatingCard ? .headlineRating : .headline(paired: true)
       
       return [
@@ -916,11 +916,11 @@ public class FeedDataSource: ObservableObject {
         ]),
       .braveAd,
       .repeating(
-        createRepatingFeedElements(withRatingCard: AppReviewManager.shared.shouldShowNewsRatingCard()),
+        createRepeatingFeedElements(withRatingCard: AppReviewManager.shared.shouldShowNewsRatingCard()),
         times: 1
       ),
       .repeating(
-        createRepatingFeedElements(withRatingCard: false)
+        createRepeatingFeedElements(withRatingCard: false)
       ),
     ]
     

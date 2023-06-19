@@ -1,4 +1,4 @@
-// Copyright 2020 The Brave Authors. All rights reserved.
+// Copyright 2023 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,12 +7,13 @@ import Foundation
 import UIKit
 import BraveStrings
 
-public class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
+public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
   public var actionHandler: ((Int, FeedItemAction) -> Void)?
   public var contextMenu: FeedItemMenu?
 
-  public let feedView = FeedItemView(layout: .brandedHeadline).then {
+  public let feedView = FeedItemView(layout: .rateCard).then {
     $0.isUserInteractionEnabled = false
+    $0.callToActionButton.setTitle(Strings.BraveNews.rateBraveCardRateActionTitle, for: .normal)
   }
 
   private var contextMenuDelegate: NSObject?
@@ -39,6 +40,14 @@ public class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
     self.contextMenuDelegate = contextMenuDelegate
 
     isAccessibilityElement = true
+    
+    feedView.titleLabel.text = Strings.BraveNews.rateBraveCardTitle
+    feedView.descriptionLabel.do {
+      $0.text = Strings.BraveNews.rateBraveCardSubtitle
+      $0.textColor = .white
+    }
+    feedView.thumbnailImageView.image = UIImage(sharedNamed: "brave.logo")
+    feedView.callToActionButton.setTitleColor(.braveLighterBlurple, for: .normal)
   }
 
   public override var accessibilityLabel: String? {
@@ -51,21 +60,7 @@ public class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
   }
 }
 
-public class SmallHeadlineCardView: HeadlineCardView {
-
-  public required init() {
-    super.init()
-
-    feedView.titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
-  }
-
-  @available(*, unavailable)
-  required init(coder: NSCoder) {
-    fatalError()
-  }
-}
-
-public class SmallHeadlinePairCardView: UIView, FeedCardContent {
+public class SmallHeadlineRatePairCardView: UIView, FeedCardContent {
   public var actionHandler: ((Int, FeedItemAction) -> Void)?
   public var contextMenu: FeedItemMenu?
 
@@ -74,25 +69,26 @@ public class SmallHeadlinePairCardView: UIView, FeedCardContent {
     $0.spacing = 20
   }
 
-  public let smallHeadelineCardViews: (left: SmallHeadlineCardView, right: SmallHeadlineCardView) = (SmallHeadlineCardView(), SmallHeadlineCardView())
+  public let smallHeadlineRateCardViews: (smallHeadline: SmallHeadlineCardView, ratingCard: SmallRateCardView) = (SmallHeadlineCardView(), SmallRateCardView())
 
   public required init() {
     super.init(frame: .zero)
 
     addSubview(stackView)
-    stackView.addArrangedSubview(smallHeadelineCardViews.left)
-    stackView.addArrangedSubview(smallHeadelineCardViews.right)
+    stackView.addArrangedSubview(smallHeadlineRateCardViews.smallHeadline)
+    stackView.addArrangedSubview(smallHeadlineRateCardViews.ratingCard)
 
-    smallHeadelineCardViews.left.actionHandler = { [weak self] _, action in
+    smallHeadlineRateCardViews.smallHeadline.actionHandler = { [weak self] _, action in
       self?.actionHandler?(0, action)
     }
-    smallHeadelineCardViews.right.actionHandler = { [weak self] _, action in
+    smallHeadlineRateCardViews.ratingCard.actionHandler = { [weak self] _, action in
       self?.actionHandler?(1, action)
     }
-    smallHeadelineCardViews.left.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
+    
+    smallHeadlineRateCardViews.smallHeadline.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
       return self?.contextMenu?.menu?(0)
     })
-    smallHeadelineCardViews.right.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
+    smallHeadlineRateCardViews.ratingCard.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
       return self?.contextMenu?.menu?(1)
     })
 

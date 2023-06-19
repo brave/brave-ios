@@ -613,12 +613,6 @@ class NewTabPageViewController: UIViewController {
         let alert = FeedActionAlertView.feedDisabledAlertView(for: context.item)
         alert.present(on: self)
       }
-    case .itemAction(.pressedAppRatingCard, context: _):
-      // Item Action content have no rating card press action
-      break
-    case .itemAction(.hiddenAppRatingCard, context: _):
-      // Item Action content have no rating card hide action
-      break
     case .inlineContentAdAction(.opened(let inNewTab, let switchingToPrivateMode), let ad):
       guard let url = ad.targetURL.asURL else { return }
       if !switchingToPrivateMode {
@@ -636,13 +630,7 @@ class NewTabPageViewController: UIViewController {
     case .inlineContentAdAction(.toggledSource, _):
       // Inline content ads have no source
       break
-    case .inlineContentAdAction(.pressedAppRatingCard, ad: _):
-      // Inline content ads have no rating card press action
-      break
-    case .inlineContentAdAction(.hiddenAppRatingCard, ad: _):
-      // Inline content ads have no rating card press action
-      break
-    case .rateCardAction(.pressedAppRatingCard):
+    case .rateCardAction(.rateBrave):
       Preferences.Review.newsCardShownDate.value = Date()
       guard let writeReviewURL = URL(
         string: "https://itunes.apple.com/app/id1052879175?action=write-review") else {
@@ -651,16 +639,10 @@ class NewTabPageViewController: UIViewController {
       UIApplication.shared.open(writeReviewURL)
       feedDataSource.setNeedsReloadCards()
       loadFeedContents()
-    case .rateCardAction(.hiddenAppRatingCard):
+    case .rateCardAction(.hideCard):
       Preferences.Review.newsCardShownDate.value = Date()
       feedDataSource.setNeedsReloadCards()
       loadFeedContents()
-    case .rateCardAction(.opened(_, _)):
-      // Rate Card have no open action
-      break
-    case .rateCardAction(.toggledSource):
-      // Rate Card have no toggled source
-      break
     }
   }
 

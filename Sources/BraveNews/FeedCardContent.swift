@@ -37,8 +37,12 @@ public enum FeedItemAction: Equatable {
   case opened(inNewTab: Bool = false, switchingToPrivateMode: Bool = false)
   /// Toggle the enabled status for the source of the feed item
   case toggledSource
-  /// The user choose to navigate Appstore for app rating
-  case pressedAppRatingCard
-  /// The user choose to hide card for app rating
-  case hiddenAppRatingCard
+}
+
+/// The actions you can perform on a rate card item
+public enum RatingCardAction {
+  // The user choose to navigate Appstore for app rating
+  case rateBrave
+  // The user choose to hide card for app rating
+  case hideCard
 }
