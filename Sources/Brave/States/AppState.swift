@@ -12,6 +12,7 @@ import Shared
 import Growth
 import Preferences
 import Storage
+import BraveNews
 import os.log
 
 /// Class that does startup initialization
@@ -25,6 +26,7 @@ public class AppState {
   public let migration: Migration
   public let profile: Profile
   public let rewards: BraveRewards
+  public let newsFeedDataSource: FeedDataSource
   private var didBecomeActive = false
   
   public var state: State = .launching(options: [:], active: false) {
@@ -91,6 +93,7 @@ public class AppState {
     let configuration = BraveRewards.Configuration.current()
     Self.migrateAdsConfirmations(for: configuration)
     rewards = BraveRewards(configuration: configuration)
+    newsFeedDataSource = FeedDataSource()
     
     // Setup Custom URL scheme handlers
     setupCustomSchemeHandlers(profile: profile)

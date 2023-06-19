@@ -282,6 +282,7 @@ public class BrowserViewController: UIViewController {
     migration: Migration?,
     crashedLastSession: Bool,
     rewards: BraveRewards,
+    newsFeedDataSource: FeedDataSource,
     privateBrowsingManager: PrivateBrowsingManager
   ) {
     self.windowId = windowId
@@ -293,6 +294,7 @@ public class BrowserViewController: UIViewController {
     self.crashedLastSession = crashedLastSession
     self.rewards = rewards
     self.privateBrowsingManager = privateBrowsingManager
+    self.feedDataSource = newsFeedDataSource
     feedDataSource.historyAPI = braveCore.historyAPI
     backgroundDataSource = .init(service: braveCore.backgroundImagesService)
 
@@ -350,7 +352,7 @@ public class BrowserViewController: UIViewController {
       }
     }
 
-    feedDataSource.ads = rewards.ads
+    self.feedDataSource.ads = rewards.ads
     
     // Observer watching tab information is sent by another device
     openTabsModelStateListener = braveCore.sendTabAPI.add(

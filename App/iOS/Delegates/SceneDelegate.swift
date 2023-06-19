@@ -17,6 +17,7 @@ import BraveVPN
 import Growth
 import os.log
 import BraveCore
+import BraveNews
 import Preferences
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -40,6 +41,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       diskImageStore: AppState.shared.diskImageStore,
       migration: AppState.shared.migration,
       rewards: AppState.shared.rewards,
+      newsFeedDataSource: AppState.shared.newsFeedDataSource,
       userActivity: connectionOptions.userActivities.first ?? session.stateRestorationActivity
     )
     
@@ -382,7 +384,14 @@ extension SceneDelegate {
 }
 
 extension SceneDelegate {
-  private func createBrowserWindow(scene: UIWindowScene, braveCore: BraveCoreMain, profile: Profile, diskImageStore: DiskImageStore?, migration: Migration?, rewards: Brave.BraveRewards, userActivity: NSUserActivity?) -> BrowserViewController {
+  private func createBrowserWindow(scene: UIWindowScene,
+                                   braveCore: BraveCoreMain,
+                                   profile: Profile,
+                                   diskImageStore: DiskImageStore?,
+                                   migration: Migration?,
+                                   rewards: Brave.BraveRewards,
+                                   newsFeedDataSource: BraveNews.FeedDataSource,
+                                   userActivity: NSUserActivity?) -> BrowserViewController {
 
     let privateBrowsingManager = PrivateBrowsingManager()
 
@@ -468,6 +477,7 @@ extension SceneDelegate {
       migration: migration,
       crashedLastSession: crashedLastSession,
       rewards: rewards,
+      newsFeedDataSource: newsFeedDataSource,
       privateBrowsingManager: privateBrowsingManager
     )
 
