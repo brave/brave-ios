@@ -68,7 +68,7 @@ public class BraveRewards: NSObject {
   }
 
   private(set) var isAdsInitialized: Bool = false
-  private func fetchWalletAndInitializeAds() {
+  private func fetchWalletAndInitializeAds(toggleAds: Bool? = nil) {
     if isAdsInitialized {
       return
     }
@@ -86,6 +86,10 @@ public class BraveRewards: NSObject {
       self.ads.initialize(walletInfo: walletInfo ?? .init()) { success in
         if !success {
           self.isAdsInitialized = false
+        } else {
+          if let toggleAds {
+            self.ads.isEnabled = toggleAds
+          }
         }
       }
     }
@@ -121,7 +125,6 @@ public class BraveRewards: NSObject {
         guard let self = self else { return }
         self.ledger?.setAutoContributeEnabled(newValue)
         let wasEnabled = self.ads.isEnabled
-        self.ads.isEnabled = newValue
         if !wasEnabled && newValue {
           Preferences.Rewards.adsEnabledTimestamp.value = Date()
         } else if wasEnabled && !newValue {
@@ -131,7 +134,7 @@ public class BraveRewards: NSObject {
         if !newValue {
           self.proposeAdsShutdown()
         } else {
-          self.fetchWalletAndInitializeAds()
+          self.fetchWalletAndInitializeAds(toggleAds: true)
         }
         self.didChangeValue(for: \.isEnabled)
       }
