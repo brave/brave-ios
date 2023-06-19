@@ -168,7 +168,6 @@ public class AppReviewManager: ObservableObject {
       daysSinceLastRequest = Calendar.current.dateComponents([.day], from: previousRequest, to: Date()).day ?? 0
     } else {
       // First presentation Date, no recorded presentation
-      Preferences.Review.newsCardShownDate.value = Date()
       return true
     }
     
@@ -176,7 +175,6 @@ public class AppReviewManager: ObservableObject {
       return false
     }
     
-    Preferences.Review.newsCardShownDate.value = Date()
     return true
   }
   

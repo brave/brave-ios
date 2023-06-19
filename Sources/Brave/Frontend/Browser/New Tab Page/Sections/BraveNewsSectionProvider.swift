@@ -338,6 +338,8 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       cell.content.smallHeadelineCardViews.right.feedView.setupWithItem(pair.second)
       cell.content.actionHandler = handler(from: { $0 == 0 ? pair.first : pair.second }, card: card, indexPath: indexPath)
       cell.content.contextMenu = contextMenu(from: { $0 == 0 ? pair.first : pair.second }, card: card, indexPath: indexPath)
+      // The rating card is presented
+      Preferences.Review.newsCardShownDate.value = Date()
       return cell
     case .headlineRatingCardPair(let item):
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<SmallHeadlineRatePairCardView>
