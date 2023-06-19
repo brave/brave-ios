@@ -3407,7 +3407,7 @@ extension Strings {
       "wallet.networkFilterTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Select Network Filter",
+      value: "Select Networks",
       comment: "The title displayed on the view to filter by a network / all networks."
     )
     public static let userAssetSymbolNetworkDesc = NSLocalizedString(
@@ -4092,6 +4092,20 @@ extension Strings {
       bundle: .module,
       value: "Hide Zero Balances",
       comment: "The title of a button that updates the filter to hide tokens with zero balances."
+    )
+    public static let selectAllButtonTitle = NSLocalizedString(
+      "wallet.selectAllButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Select All",
+      comment: "The title of a button that Selects all visible options."
+    )
+    public static let deselectAllButtonTitle = NSLocalizedString(
+      "wallet.deselectAllButtonTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Deselect All",
+      comment: "The title of a button that Deselects all visible options."
     )
   }
 }

@@ -6,6 +6,7 @@
 import BraveCore
 import SwiftUI
 import BraveShared
+import Preferences
 
 struct Selectable<T: Identifiable & Equatable>: Equatable, Identifiable {
   let isSelected: Bool
@@ -32,6 +33,17 @@ struct NetworkFilterView: View {
     self.saveAction = saveAction
   }
   
+  private var allSelected: Bool {
+    networks
+      .filter {
+        if !Preferences.Wallet.showTestNetworks.value {
+          return !WalletConstants.supportedTestNetworkChainIds.contains($0.model.chainId)
+        }
+        return true
+      }
+      .allSatisfy(\.isSelected)
+  }
+  
   var body: some View {
     NetworkSelectionRootView(
       navigationTitle: Strings.Wallet.networkFilterTitle,
@@ -45,7 +57,16 @@ struct NetworkFilterView: View {
           saveAction(networks)
           presentationMode.dismiss()
         }) {
-          Text("Save")
+          Text(Strings.Wallet.saveButtonTitle)
+            .foregroundColor(Color(.braveBlurpleTint))
+        }
+      }
+    }
+    .toolbar {
+      ToolbarItemGroup(placement: .bottomBar) {
+        Spacer()
+        Button(action: selectAll) {
+          Text(allSelected ? Strings.Wallet.deselectAllButtonTitle : Strings.Wallet.selectAllButtonTitle)
             .foregroundColor(Color(.braveBlurpleTint))
         }
       }
@@ -58,6 +79,20 @@ struct NetworkFilterView: View {
         where: { $0.model.chainId == network.chainId && $0.model.coin == network.coin }
       ) {
         networks[index] = .init(isSelected: !networks[index].isSelected, model: networks[index].model)
+      }
+    }
+  }
+  
+  private func selectAll() {
+    DispatchQueue.main.async {
+      networks = networks.map {
+        // don't select test networks if they are hidden
+        if !Preferences.Wallet.showTestNetworks.value {
+          let isTestnet = WalletConstants.supportedTestNetworkChainIds.contains($0.model.chainId)
+          return .init(isSelected: !isTestnet && !allSelected, model: $0.model)
+        } else {
+          return .init(isSelected: !allSelected, model: $0.model)
+        }
       }
     }
   }
