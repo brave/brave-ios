@@ -133,6 +133,9 @@ actor ContentBlockerManager {
   let ruleStore: WKContentRuleListStore
   /// We cached the rule lists so that we can return them quicker if we need to
   private var cachedRuleLists: [String: Result<WKContentRuleList, Error>]
+  /// A list of etld+1s that are always aggressive
+  /// TODO: @JS Replace this with the 1st party ad-block list
+  let alwaysAggressiveETLDs: Set<String> = ["youtube.com"]
   
   init(ruleStore: WKContentRuleListStore = .default()) {
     self.ruleStore = ruleStore
@@ -368,7 +371,7 @@ actor ContentBlockerManager {
   /// It will attempt to return cached results if they exist otherwise it will attempt to load results from the rule store
   public func ruleLists(for domain: Domain) async -> Set<WKContentRuleList> {
     let validBlocklistTypes = await self.validBlocklistTypes(for: domain)
-    let level = ShieldPreferences.blockAdsAndTrackingLevel
+    let level = await domain.blockAdsAndTrackingLevel
     
     return await Set(validBlocklistTypes.asyncConcurrentCompactMap({ blocklistType -> WKContentRuleList? in
       let mode = blocklistType.mode(isAggressiveMode: level.isAggressive)
