@@ -46,7 +46,11 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
       $0.text = Strings.BraveNews.rateBraveCardSubtitle
       $0.textColor = .white
     }
-    feedView.thumbnailImageView.image = UIImage(sharedNamed: "brave.logo")
+    feedView.thumbnailImageView.do {
+      $0.image = UIImage(sharedNamed: "brave.logo")
+      $0.contentMode = .scaleAspectFit
+      $0.backgroundColor = .clear
+    }
     feedView.callToActionButton.setTitleColor(.braveLighterBlurple, for: .normal)
   }
 
