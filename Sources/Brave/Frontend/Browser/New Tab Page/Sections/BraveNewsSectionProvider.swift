@@ -347,8 +347,8 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<SmallHeadlineRatePairCardView>
       cell.content.smallHeadlineRateCardViews.smallHeadline.feedView.setupWithItem(item)
       cell.content.actionHandler = handler(for: item, card: card, indexPath: indexPath)
-      cell.content.rateCardActionHandler = { [weak self] _ in
-        self?.actionHandler(.rateCardAction(.rateBrave))
+      cell.content.rateCardActionHandler = { [weak self] action in
+        self?.actionHandler(.rateCardAction(action))
       }
       cell.content.contextMenu = contextMenu(for: item, card: card, indexPath: indexPath)
       return cell

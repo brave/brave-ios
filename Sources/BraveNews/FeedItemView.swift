@@ -388,7 +388,7 @@ extension FeedItemView {
         padding: UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0),
         alignment: .leading,
         children: [
-          .flexibleSpace(minHeight: 12),
+          .customSpace(12),
           .thumbnail(.fixedSize(CGSize(width: 32, height: 32))),
           .stack(
             .init(
