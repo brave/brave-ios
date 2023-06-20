@@ -60,7 +60,6 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
       $0.contentMode = .scaleAspectFit
       $0.backgroundColor = .clear
     }
-    feedView.callToActionButton.setTitleColor(.braveLighterBlurple, for: .normal)
   }
 
   public override var accessibilityLabel: String? {
