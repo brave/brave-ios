@@ -6,9 +6,18 @@
 import Foundation
 import UIKit
 import BraveStrings
+import BraveShared
+
+/// The actions you can perform on a rate card item
+public enum RatingCardAction: Equatable {
+  // The user choose to navigate Appstore for app rating
+  case rateBrave
+  // The user choose to hide card for app rating
+  case hideCard
+}
 
 public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
-  public var actionHandler: ((Int, FeedItemAction) -> Void)?
+  public var rateCardActionHandler: ((RatingCardAction) -> Void)?
   public var contextMenu: FeedItemMenu?
 
   public let feedView = FeedItemView(layout: .rateCard).then {
@@ -30,7 +39,7 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
 
     let contextMenuDelegate = FeedContextMenuDelegate(
       performedPreviewAction: { [weak self] in
-        self?.actionHandler?(0, .opened())
+        self?.rateCardActionHandler?(.rateBrave)
       },
       menu: { [weak self] in
         return self?.contextMenu?.menu?(0)
@@ -60,12 +69,22 @@ public class SmallRateCardView: FeedCardBackgroundButton, FeedCardContent {
   }
 
   @objc private func tappedSelf() {
-    actionHandler?(0, .opened())
+    rateCardActionHandler?(.rateBrave)
+  }
+  
+  // MARK: - FeedCardContent
+
+  public var actionHandler: ((Int, FeedItemAction) -> Void)? {
+    didSet {
+      assertionFailure("Unused for welcome card")
+    }
   }
 }
 
 public class SmallHeadlineRatePairCardView: UIView, FeedCardContent {
   public var actionHandler: ((Int, FeedItemAction) -> Void)?
+  public var rateCardActionHandler: ((RatingCardAction) -> Void)?
+
   public var contextMenu: FeedItemMenu?
 
   private let stackView = UIStackView().then {
@@ -85,15 +104,50 @@ public class SmallHeadlineRatePairCardView: UIView, FeedCardContent {
     smallHeadlineRateCardViews.smallHeadline.actionHandler = { [weak self] _, action in
       self?.actionHandler?(0, action)
     }
-    smallHeadlineRateCardViews.ratingCard.actionHandler = { [weak self] _, action in
-      self?.actionHandler?(1, action)
+    smallHeadlineRateCardViews.ratingCard.rateCardActionHandler = { [weak self] action in
+      self?.rateCardActionHandler?(action)
     }
     
     smallHeadlineRateCardViews.smallHeadline.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
       return self?.contextMenu?.menu?(0)
     })
     smallHeadlineRateCardViews.ratingCard.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
-      return self?.contextMenu?.menu?(1)
+      typealias MenuActionHandler = () -> Void
+
+      let appRatingCardPressedHandler: MenuActionHandler = { [weak self] in
+        self?.rateCardActionHandler?(.rateBrave)
+      }
+      let openInNewPrivateTabHandler: MenuActionHandler = { [weak self] in
+        self?.rateCardActionHandler?(.hideCard)
+      }
+      
+      func mapDeferredHandler(_ handler: @escaping MenuActionHandler) -> UIActionHandler {
+        return UIAction.deferredActionHandler { _ in
+          handler()
+        }
+      }
+      var openInAppStore: UIAction {
+        .init(title: Strings.BraveNews.rateBraveCardRateActionTitle,
+              image: UIImage(braveSystemNamed: "leo.thumb.up"),
+              handler: mapDeferredHandler(appRatingCardPressedHandler))
+      }
+
+      var dismissCardRate: UIAction {
+        .init(title: Strings.BraveNews.rateBraveCardHideActionTitle,
+              image: UIImage(braveSystemNamed: "leo.eye.off"),
+              attributes: .destructive,
+              handler: mapDeferredHandler(openInNewPrivateTabHandler))
+      }
+      let openActions: [UIAction] = [
+        openInAppStore,
+        dismissCardRate
+      ].compactMap { $0 }
+      
+      let children: [UIMenu] = [
+        UIMenu(title: "", options: [.displayInline], children: openActions)
+      ]
+      
+      return UIMenu(title: Strings.BraveNews.rateBraveCardActionSheetTitle, children: children)
     })
 
     stackView.snp.makeConstraints {
