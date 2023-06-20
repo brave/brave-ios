@@ -6,7 +6,6 @@
 import Foundation
 import UIKit
 import BraveStrings
-import BraveShared
 
 /// The actions you can perform on a rate card item
 public enum RatingCardAction: Equatable {

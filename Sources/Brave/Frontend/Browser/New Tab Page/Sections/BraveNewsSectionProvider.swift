@@ -347,7 +347,9 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<SmallHeadlineRatePairCardView>
       cell.content.smallHeadlineRateCardViews.smallHeadline.feedView.setupWithItem(item)
       cell.content.actionHandler = handler(for: item, card: card, indexPath: indexPath)
-      cell.content.rateCardActionHandler = rateCardhandler()
+      cell.content.rateCardActionHandler = { [weak self] _ in
+        self?.actionHandler(.rateCardAction(.rateBrave))
+      }
       cell.content.contextMenu = contextMenu(for: item, card: card, indexPath: indexPath)
       return cell
     case .group(let items, let title, let direction, _):
@@ -389,10 +391,9 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
   }
 
-  private func handler(from feedList: @escaping (Int) -> FeedItem?, card: FeedCard, indexPath: IndexPath) -> (Int, FeedItemAction) -> Void {
+  private func handler(from feedList: @escaping (Int) -> FeedItem, card: FeedCard, indexPath: IndexPath) -> (Int, FeedItemAction) -> Void {
     return { [weak self] index, action in
-      guard let item = feedList(index) else { return }
-      self?.actionHandler(.itemAction(action, context: .init(item: item, card: card, indexPath: indexPath)))
+      self?.actionHandler(.itemAction(action, context: .init(item: feedList(index), card: card, indexPath: indexPath)))
     }
   }
 
@@ -451,7 +452,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     func itemActionHandler(_ action: FeedItemAction, _ context: FeedItemActionContext) {
       self.actionHandler(.itemAction(action, context: context))
     }
-    
+
     let openInNewTabHandler: MenuActionHandler = { context in
       itemActionHandler(.opened(inNewTab: true), context)
     }
@@ -462,9 +463,8 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       itemActionHandler(.toggledSource, context)
     }
 
-    let newItemAction: FeedItemMenu = .init { [weak self] index -> UIMenu? in
+    return .init { [weak self] index -> UIMenu? in
       guard let self = self else { return nil }
-      
       let item = feedList(index)
       let context = FeedItemActionContext(item: item, card: card, indexPath: indexPath)
 
@@ -507,11 +507,8 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       if context.item.content.contentType != .sponsor {
         children.append(UIMenu(title: "", options: [.displayInline], children: manageActions))
       }
-      
       return UIMenu(title: item.content.url?.absoluteString ?? "", children: children)
     }
-    
-    return newItemAction
   }
 
   private func contextMenu(for item: FeedItem, card: FeedCard, indexPath: IndexPath) -> FeedItemMenu {

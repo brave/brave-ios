@@ -5,7 +5,6 @@
 
 import Foundation
 import UIKit
-import BraveStrings
 
 public class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
   public var actionHandler: ((Int, FeedItemAction) -> Void)?
