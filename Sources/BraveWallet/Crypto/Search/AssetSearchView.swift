@@ -181,6 +181,12 @@ struct AssetSearchView: View {
         }
       }
     }
+    .onChange(of: networkStore.allChains) { allChains in
+      self.networkFilters = allChains.map { network in
+        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return .init(isSelected: existingSelectionValue ?? true, model: network)
+      }
+    }
   }
   
   private func title(for token: BraveWallet.BlockchainToken) -> String {

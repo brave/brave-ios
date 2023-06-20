@@ -262,3 +262,31 @@ extension UserAssetsStore: BraveWalletKeyringServiceObserver {
   public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
   }
 }
+
+extension UserAssetsStore: BraveWalletBraveWalletServiceObserver {
+  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) { }
+  
+  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
+  
+  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
+  
+  public func onDefaultBaseCurrencyChanged(_ currency: String) { }
+  
+  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) { }
+  
+  public func onNetworkListChanged() {
+    Task { @MainActor in
+      // A network was added or removed, update our network filters for the change.
+      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
+        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return .init(isSelected: existingSelectionValue ?? true, model: network)
+      }
+    }
+  }
+  
+  public func onDiscoverAssetsStarted() { }
+  
+  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) { }
+  
+  public func onResetWallet() { }
+}

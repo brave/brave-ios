@@ -223,6 +223,14 @@ extension NFTStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onNetworkListChanged() {
+    Task { @MainActor in
+      // A network was added or removed, update our network filters for the change.
+      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
+        let defaultValue = !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
+        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return .init(isSelected: existingSelectionValue ?? defaultValue, model: network)
+      }
+    }
   }
   
   public func onDiscoverAssetsStarted() {

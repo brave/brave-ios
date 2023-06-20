@@ -58,6 +58,7 @@ class TransactionsActivityStore: ObservableObject {
     
     keyringService.add(self)
     txService.add(self)
+    walletService.add(self)
 
     Task { @MainActor in
       self.currencyCode = await walletService.defaultBaseCurrency()
@@ -230,4 +231,32 @@ extension TransactionsActivityStore: BraveWalletTxServiceObserver {
   func onTxServiceReset() {
     update()
   }
+}
+
+extension TransactionsActivityStore: BraveWalletBraveWalletServiceObserver {
+  func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) { }
+  
+  func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
+  
+  func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
+  
+  func onDefaultBaseCurrencyChanged(_ currency: String) { }
+  
+  func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) { }
+  
+  func onNetworkListChanged() {
+    Task { @MainActor in
+      // A network was added or removed, update our network filters for the change.
+      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
+        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return .init(isSelected: existingSelectionValue ?? true, model: network)
+      }
+    }
+  }
+  
+  func onDiscoverAssetsStarted() { }
+  
+  func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) { }
+  
+  func onResetWallet() { }
 }
