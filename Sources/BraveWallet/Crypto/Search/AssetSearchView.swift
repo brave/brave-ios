@@ -21,18 +21,35 @@ struct AssetSearchView: View {
   @State private var query = ""
   @State private var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = []
   @State private var isPresentingNetworkFilter = false
+  
+  public init(
+    keyringStore: KeyringStore,
+    cryptoStore: CryptoStore,
+    userAssetsStore: UserAssetsStore
+  ) {
+    self.keyringStore = keyringStore
+    self.networkStore = cryptoStore.networkStore
+    self.cryptoStore = cryptoStore
+    self.userAssetsStore = userAssetsStore
+  }
 
   private var filteredTokens: [AssetViewModel] {
+    let filterByNetwork = !networkFilters.allSatisfy(\.isSelected)
+    let filterByQuery = !query.isEmpty
+    if !filterByNetwork && !filterByQuery {
+      return allAssets
+    }
     let selectedNetworks = networkFilters.filter(\.isSelected)
-    let networkFilteredAssets = allAssets.filter { asset in
-      selectedNetworks.contains(where: { asset.network.chainId == $0.model.chainId && asset.network.coin == $0.model.coin })
-    }
     let normalizedQuery = query.lowercased()
-    if normalizedQuery.isEmpty {
-      return networkFilteredAssets
-    }
-    return networkFilteredAssets.filter {
-      $0.token.symbol.lowercased().contains(normalizedQuery) || $0.token.name.lowercased().contains(normalizedQuery)
+    return allAssets.filter { asset in
+      if filterByNetwork,
+         !selectedNetworks.contains(where: { asset.network.chainId == $0.model.chainId }) {
+        return false
+      }
+      if filterByQuery {
+        return asset.token.symbol.lowercased().contains(normalizedQuery) || asset.token.name.lowercased().contains(normalizedQuery)
+      }
+      return true
     }
   }
   
