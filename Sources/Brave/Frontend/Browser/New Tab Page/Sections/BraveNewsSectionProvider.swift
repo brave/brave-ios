@@ -401,12 +401,6 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     return handler(from: { _ in item }, card: card, indexPath: indexPath)
   }
 
-  private func rateCardhandler() -> (RatingCardAction) -> Void {
-    return { [weak self] action in
-      self?.actionHandler(.rateCardAction(.rateBrave))
-    }
-  }
-  
   private func inlineContentAdContextMenu(_ ad: InlineContentAd) -> FeedItemMenu {
     typealias MenuActionHandler = (_ ad: InlineContentAd) -> Void
 
