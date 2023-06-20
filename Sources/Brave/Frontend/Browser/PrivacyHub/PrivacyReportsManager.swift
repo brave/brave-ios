@@ -19,9 +19,7 @@ public struct PrivacyReportsManager {
   /// Instead a periodic timer is run and all requests gathered during this timeframe are saved in one database transaction.
   public static var pendingBlockedRequests: [(host: String, domain: URL, date: Date)] = []
   
-  public static func processBlockedRequests(isPrivateBrowsing: Bool) {
-    if isPrivateBrowsing { return }
-    
+  private static func processBlockedRequests() {
     let itemsToSave = pendingBlockedRequests
     pendingBlockedRequests.removeAll()
     
@@ -41,7 +39,9 @@ public struct PrivacyReportsManager {
     let timeInterval = AppConstants.buildChannel.isPublic ? 60.0 : 10.0
 
     saveBlockedResourcesTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-      processBlockedRequests(isPrivateBrowsing: isPrivateBrowsing)
+      if !isPrivateBrowsing {
+        processBlockedRequests()
+      }
     }
   }
   

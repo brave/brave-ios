@@ -144,7 +144,7 @@ extension SearchQuickEnginesViewController {
     if toggle.isOn {
       searchEngines.enableEngine(engine)
     } else {
-      searchEngines.disableEngine(engine, isPrivateBrowsing: isPrivateBrowsing)
+      searchEngines.disableEngine(engine, type: isPrivateBrowsing ? .privateMode : .standard)
     }
   }
 }

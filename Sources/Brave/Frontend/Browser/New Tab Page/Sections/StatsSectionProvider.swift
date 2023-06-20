@@ -150,7 +150,7 @@ class BraveShieldStatsView: SpringButton {
     }()
   }
   
-  private let background = UIView()
+  private let backgroundView = UIView()
   
   override init(frame: CGRect) {
     super.init(frame: .zero)
@@ -173,28 +173,24 @@ class BraveShieldStatsView: SpringButton {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private var _isPrivateBrowsing: Bool = false
-  
   var isPrivateBrowsing: Bool = false {
     didSet {
-      if _isPrivateBrowsing == isPrivateBrowsing {
+      if oldValue == isPrivateBrowsing {
         return
       }
-      
-      _isPrivateBrowsing = isPrivateBrowsing
-      
+
       if isPrivateBrowsing {
-        background.removeFromSuperview()
+        backgroundView.removeFromSuperview()
         topStackView.arrangedSubviews.forEach {
           $0.removeFromSuperview()
         }
       } else if Preferences.NewTabPage.showNewTabPrivacyHub.value {
-        background.backgroundColor = .init(white: 0, alpha: 0.25)
-        background.layer.cornerRadius = 12
-        background.layer.cornerCurve = .continuous
-        background.isUserInteractionEnabled = false
-        insertSubview(background, at: 0)
-        background.snp.makeConstraints {
+        backgroundView.backgroundColor = .init(white: 0, alpha: 0.25)
+        backgroundView.layer.cornerRadius = 12
+        backgroundView.layer.cornerCurve = .continuous
+        backgroundView.isUserInteractionEnabled = false
+        insertSubview(backgroundView, at: 0)
+        backgroundView.snp.makeConstraints {
           $0.edges.equalToSuperview()
         }
         

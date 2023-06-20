@@ -133,7 +133,7 @@ public class BrowserViewController: UIViewController {
 
   // Single data source used for all favorites vcs
   public let backgroundDataSource: NTPDataSource
-  let feedDataSource = FeedDataSource()
+  let feedDataSource: FeedDataSource
 
   private var postSetupTasks: [() -> Void] = []
   private var setupTasksCompleted: Bool = false
@@ -296,7 +296,8 @@ public class BrowserViewController: UIViewController {
     self.privateBrowsingManager = privateBrowsingManager
     self.feedDataSource = newsFeedDataSource
     feedDataSource.historyAPI = braveCore.historyAPI
-    backgroundDataSource = .init(service: braveCore.backgroundImagesService)
+    backgroundDataSource = .init(service: braveCore.backgroundImagesService,
+                                 privateBrowsingManager: privateBrowsingManager)
 
     // Initialize TabManager
     self.tabManager = TabManager(

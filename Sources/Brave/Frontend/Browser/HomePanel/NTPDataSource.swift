@@ -53,7 +53,7 @@ enum NTPWallpaper {
 
 public class NTPDataSource {
   
-  var privateBrowsingManager: PrivateBrowsingManager
+  private(set) var privateBrowsingManager: PrivateBrowsingManager
 
   var initializeFavorites: ((_ sites: [NTPSponsoredImageTopSite]?) -> Void)?
 
@@ -87,8 +87,9 @@ public class NTPDataSource {
 
   let service: NTPBackgroundImagesService
 
-  public init(service: NTPBackgroundImagesService) {
+  public init(service: NTPBackgroundImagesService, privateBrowsingManager: PrivateBrowsingManager) {
     self.service = service
+    self.privateBrowsingManager = privateBrowsingManager
     
     Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
     

@@ -190,8 +190,8 @@ public class SearchEngines {
     disabledEngineNames.removeValue(forKey: engine.shortName)
   }
 
-  func disableEngine(_ engine: OpenSearchEngine, isPrivateBrowsing: Bool) {
-    if isEngineDefault(engine, type: isPrivateBrowsing ? .privateMode : .standard) {
+  func disableEngine(_ engine: OpenSearchEngine, type: DefaultEngineType) {
+    if isEngineDefault(engine, type: type) {
       // Can't disable default engine.
       return
     }
