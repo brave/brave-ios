@@ -449,12 +449,21 @@ extension BrowserViewController: TopToolbarDelegate {
     
     let shields = ShieldsViewController(tab: selectedTab)
     shields.shieldsSettingsChanged = { [unowned self] _, shield in
-      // Update the shields status immediately
-      self.topToolbar.refreshShieldsStatus()
-
-      // Reload this tab. This will also trigger an update of the brave icon in `TabLocationView` if
-      // the setting changed is the global `.AllOff` shield
-      self.tabManager.selectedTab?.reload()
+      let currentDomain = self.tabManager.selectedTab?.url?.baseDomain
+      let browsers = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).compactMap({ $0.browserViewController })
+      
+      browsers.forEach { browser in
+        // Update the shields status immediately
+        browser.topToolbar.refreshShieldsStatus()
+        
+        // Reload the tabs. This will also trigger an update of the brave icon in `TabLocationView` if
+        // the setting changed is the global `.AllOff` shield
+        browser.tabManager.allTabs.forEach {
+          if $0.url?.baseDomain == currentDomain {
+            $0.reload()
+          }
+        }
+      }
       
       // Record P3A shield changes
       DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
