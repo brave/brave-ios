@@ -367,6 +367,7 @@ var braveTarget: PackageDescription.Target = .target(
     "Preferences",
     "Favicon",
     "CertificateUtilities",
+    "PlaylistUI",
     .product(name: "Lottie", package: "lottie-ios"),
     .product(name: "Collections", package: "swift-collections"),
   ],

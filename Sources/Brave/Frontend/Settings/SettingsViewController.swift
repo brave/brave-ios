@@ -18,6 +18,7 @@ import BraveUI
 import BraveVPN
 import BraveNews
 import Growth
+import PlaylistUI
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {
@@ -711,6 +712,16 @@ class SettingsViewController: TableViewController {
 
     return Static.Section(
       rows: [
+        Row(text: "Show Playlist Prototype", selection: { [unowned self] in
+          let vc = UIHostingController(rootView: NavigationView { PlaylistView(folder: .from(folder: {
+            let frc = PlaylistFolder.frc(savedFolder: true, sharedFolders: false)
+            try? frc.performFetch()
+            //            let objects = frc.fetchedObjects as [PlaylistFolder]?
+            return frc.fetchedObjects!.first!
+          }())) })
+          vc.modalPresentationStyle = .fullScreen
+          self.present(vc, animated: true)
+        }),
         Row(text: "Region: \(Locale.current.regionCode ?? "--")"),
         Row(
           text: "Sandbox Inspector",

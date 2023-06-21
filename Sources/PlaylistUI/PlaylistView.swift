@@ -6,9 +6,10 @@
 import Foundation
 import SwiftUI
 import BraveUI
+import Introspect
 
-struct PlaylistView: View {
-  var folder: Folder
+public struct PlaylistView: View {
+  public var folder: Folder
   
   @State private var selectedItemID: Item.ID?
   @State private var offset: CGFloat = 0
@@ -18,14 +19,10 @@ struct PlaylistView: View {
   @GestureState private var isDragging: Bool = false
   @State private var startHeight: CGFloat?
   
-  init(folder: Folder) {
+  @Environment(\.dismiss) var dismiss
+  
+  public init(folder: Folder) {
     self.folder = folder
-    let appareance = UINavigationBarAppearance().then {
-      $0.configureWithTransparentBackground()
-      $0.titleTextAttributes = [.foregroundColor: UIColor.white]
-    }
-    UINavigationBar.appearance().scrollEdgeAppearance = appareance
-    UINavigationBar.appearance().standardAppearance = appareance
   }
   
   var dragGesture: some Gesture {
@@ -65,12 +62,19 @@ struct PlaylistView: View {
       }
   }
   
-  var body: some View {
-    VStack {
-      Color.black.aspectRatio(16/9, contentMode: .fit)
+  public var body: some View {
+    VStack(spacing: 0) {
+      Color.black
+        .overlay {
+          LinearGradient(braveGradient: .gradient03) // Video player?
+            .aspectRatio(16/9, contentMode: .fit)
+        }
+        .clipped()
       ControlView(title: "")
-        .padding(.vertical)
+        .padding(.vertical, 24)
+        .contentShape(Rectangle())
       Color.clear
+        .frame(minHeight: 100)
         .background {
           GeometryReader { proxy in
             Color.clear
@@ -109,15 +113,66 @@ struct PlaylistView: View {
           }
       }
     }
-    .background(Color.gray)
+    .background {
+      ZStack {
+        // Thumbnail or some representation of the video
+        LinearGradient(braveGradient: .gradient03)
+        VisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
+      }
+      .ignoresSafeArea()
+    }
     .navigationBarTitleDisplayMode(.inline)
     .navigationTitle(folder.title)
+//    .sheet(isPresented: .constant(true)) {
+//      VStack(spacing: 0) {
+//        PlaylistItemHeaderView(folder: folder)
+//          .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+//          .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+//        
+//        PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
+//          .background(Color(.braveBackground))
+//      }
+//      .osAvailabilityModifiers { content in
+//        if #available(iOS 16.0, *) {
+//          content
+//            .presentationDetents([.fraction(0.2), .large])
+//        } else {
+//          content
+//        }
+//      }
+//      .osAvailabilityModifiers { content in
+//        if #available(iOS 16.4, *) {
+//          content
+//            .presentationBackgroundInteraction(.enabled(upThrough: .large))
+//        } else {
+//          content
+//        }
+//      }
+//      .interactiveDismissDisabled()
+//    }
+    .osAvailabilityModifiers { content in
+      if #available(iOS 16.0, *) {
+        content
+          .toolbarColorScheme(.dark, for: .navigationBar)
+      } else {
+        content
+      }
+    }
+    .introspectViewController { controller in
+      let appearance: UINavigationBarAppearance = {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundEffect = nil
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        return appearance
+      }()
+      controller.navigationItem.standardAppearance = appearance
+      controller.navigationItem.compactAppearance = appearance
+      controller.navigationItem.scrollEdgeAppearance = appearance
+    }
     .toolbar {
       ToolbarItemGroup(placement: .navigationBarTrailing) {
-        Button { } label: {
-          Image(braveSystemName: "leo.picture.in-picture")
-        }
-        .tint(Color.white)
         Menu {
           Button { } label: {
             Label("Edit", braveSystemImage: "leo.folder.exchange")
@@ -135,7 +190,9 @@ struct PlaylistView: View {
           Image(braveSystemName: "leo.more.horizontal")
         }
         .tint(Color.white)
-        Button { } label: {
+        Button {
+          dismiss()
+        } label: {
           Image(braveSystemName: "leo.close")
         }
         .tint(Color.white)
@@ -144,23 +201,7 @@ struct PlaylistView: View {
   }
 }
 
-#if DEBUG
-struct PlaylistView_PreviewProvider: PreviewProvider {
-  static var previews: some View {
-    Color.black.fullScreenCover(isPresented: .constant(true)) {
-      NavigationView {
-        PlaylistView(folder: .init(id: UUID().uuidString, title: "Play Later", items: (0..<10).map { i in
-          .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
-        }))
-      }
-    }
-  }
-}
-#endif
-
-#if swift(>=5.9)
 @available(iOS, introduced: 13.0, obsoleted: 16.0, message: "Use UnevenRoundedRectangle")
-#endif
 struct PartialRoundedRectangle: Shape {
   var cornerRadius: CGFloat
   var corners: UIRectCorner = .allCorners
@@ -170,15 +211,65 @@ struct PartialRoundedRectangle: Shape {
   }
 }
 
+// These definitions can be removed once we move to Xcode 15
+#if swift(<5.9)
 extension DragGesture.Value {
-  @_disfavoredOverload
-  @available(iOS, introduced: 13.0, obsoleted: 17.0)
-  var velocity: CGSize {
-    let decelerationRate = UIScrollView.DecelerationRate.normal.rawValue
-    let d = decelerationRate / (1000.0 * (1.0 - decelerationRate))
+  /// This version of `velocity` is found the iOS 17 SDK's SwiftUI swiftinterface file and
+  /// is backported to iOS 13
+  public var velocity: CGSize {
+    let predicted = predictedEndLocation
     return CGSize(
-      width: (location.x - predictedEndLocation.x) / d,
-      height: (location.y - predictedEndLocation.y) / d
+      width: 4.0 * (predicted.x - location.x),
+      height: 4.0 * (predicted.y - location.y)
     )
   }
 }
+
+extension SwiftUI.Animation {
+  /// This version of `interpolatingSpring` is found the iOS 17 SDK's SwiftUI swiftinterface
+  /// file and is backported to iOS 13
+  public static func interpolatingSpring(
+    duration: TimeInterval = 0.5,
+    bounce: Double = 0.0,
+    initialVelocity: Swift.Double = 0.0
+  ) -> SwiftUI.Animation {
+    func springStiffness(response: Double) -> Double {
+      if response <= 0 {
+        return .infinity
+      } else {
+        let freq = (2.0 * Double.pi) / response
+        return freq * freq
+      }
+    }
+    func springDamping(fraction: Double, stiffness: Double) -> Double {
+      let criticalDamping = 2 * stiffness.squareRoot()
+      return criticalDamping * fraction
+    }
+    func springDampingFraction(bounce: Double) -> Double {
+      (bounce < 0.0) ? 1.0 / (bounce + 1.0) : 1.0 - bounce
+    }
+    let stiffness = springStiffness(response: duration)
+    let fraction = springDampingFraction(bounce: bounce)
+    let damping = springDamping(fraction: fraction, stiffness: stiffness)
+    return interpolatingSpring(
+      stiffness: stiffness,
+      damping: damping,
+      initialVelocity: initialVelocity
+    )
+  }
+}
+#endif
+
+#if DEBUG
+struct PlaylistView_PreviewProvider: PreviewProvider {
+  static var previews: some View {
+//    Color.black.fullScreenCover(isPresented: .constant(true)) {
+      NavigationView {
+        PlaylistView(folder: .init(id: UUID().uuidString, title: "Play Later", items: (0..<10).map { i in
+            .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
+        }))
+//      }
+    }
+  }
+}
+#endif
