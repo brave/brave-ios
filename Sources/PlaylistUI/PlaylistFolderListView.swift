@@ -11,23 +11,38 @@ import BraveUI
 import BraveStrings
 import DesignSystem
 
-struct Folder: Identifiable {
-  var id: String
-  var title: String
-  var items: [Item]
+public struct Folder: Identifiable {
+  public var id: String
+  public var title: String
+  public var items: [Item]
+  
+  public static func from(folder: PlaylistFolder) -> Self {
+    .init(id: folder.id, title: folder.title ?? "", items: (folder.playlistItems ?? []).map({ .from(item: $0) }))
+  }
 }
 
 extension String {
   static let defaultPlaylistID: Folder.ID = PlaylistFolder.savedFolderUUID
 }
 
-struct Item: Identifiable {
-  var id: String
-  var dateAdded: Date
-  var duration: TimeInterval
-  var source: URL
-  var name: String
-  var pageSource: URL
+public struct Item: Identifiable {
+  public var id: String
+  public var dateAdded: Date
+  public var duration: TimeInterval
+  public var source: URL
+  public var name: String
+  public var pageSource: URL
+  
+  public static func from(item: PlaylistItem) -> Self {
+    .init(
+      id: item.id,
+      dateAdded: item.dateAdded,
+      duration: item.duration,
+      source: URL(string: item.mediaSrc)!,
+      name: item.name,
+      pageSource: URL(string: item.pageSrc)!
+    )
+  }
 }
 
 /// The root view that displays the list of playlists (folders) the user has created

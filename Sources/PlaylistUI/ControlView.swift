@@ -44,9 +44,9 @@ struct ControlView: View {
   var body: some View {
     VStack {
       HStack(spacing: 8) {
-        Color.clear
+        Color.white
+          .opacity(0.1)
           .frame(width: 20, height: 20)
-          .background(Material.ultraThin)
           .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         Text(title)
           .font(.body.weight(.semibold))
@@ -181,7 +181,7 @@ struct PlaybackControls: View {
         Image(braveSystemName: "leo.end.outline")
       }
     }
-    .buttonStyle(.spring(scale: 0.85))
+    .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
     .imageScale(.large)
   }
 }
@@ -229,6 +229,10 @@ struct ExtraControls: View {
         }
       }
       Spacer()
+      Button { } label: {
+        Image(braveSystemName: "leo.picture.in-picture")
+      }
+      Spacer()
       if let _ = stopPlaybackDate {
         Button {
           isPlaybackStopInfoPresented = true
@@ -271,7 +275,7 @@ struct ExtraControls: View {
         Image(braveSystemName: "leo.fullscreen.on")
       }
     }
-    .buttonStyle(.spring(scale: 0.85))
+    .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
   }
 }
 
