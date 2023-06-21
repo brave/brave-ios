@@ -714,6 +714,9 @@ public class BrowserViewController: UIViewController {
       presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
       presentedViewController?.view.alpha = 0
     }
+    
+    // Stop Voice Search and dismiss controller
+    stopVoiceSearch()
   }
 
   @objc func vpnConfigChanged() {

@@ -590,7 +590,7 @@ extension BrowserViewController: TopToolbarDelegate {
     }
   }
   
-  public func stopVoiceSearch(searchQuery: String? = nil) {
+  func stopVoiceSearch(searchQuery: String? = nil) {
     voiceSearchViewController?.dismiss(animated: true) {
       if let query = searchQuery {
         self.submitSearchText(query)

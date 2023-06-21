@@ -216,10 +216,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
-    if let scene = scene as? UIWindowScene, let browserViewController = scene.browserViewController {
-      browserViewController.stopVoiceSearch()
-    }
-    
     Preferences.AppState.backgroundedCleanly.value = true
   }
 
