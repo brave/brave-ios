@@ -540,28 +540,25 @@ extension BrowserViewController: TopToolbarDelegate {
         guard let self else { return }
         
         if finalizedRecognition.status {
-          self.voiceSearchViewController?.dismiss(animated: true) {
-            self.submitSearchText(finalizedRecognition.searchQuery)
-          }
+          stopVoiceSearch(searchQuery: finalizedRecognition.searchQuery)
         }
       }
       
-      var permissionStatus: Bool
-      
-      do {
-        permissionStatus = try await speechRecognizer.askForUserPermission()
-        
-        if permissionStatus {
-          openVoiceSearch(speechRecognizer: speechRecognizer)
-        } else {
-          showNoMicrophoneWarning()
-        }
-      } catch {
-        Logger.module.debug("Access Microphone Required _ \(error.localizedDescription)")
+      let permissionStatus = await speechRecognizer.askForUserPermission()
+          
+      if permissionStatus {
+        openVoiceSearch(speechRecognizer: speechRecognizer)
+      } else {
+        showNoMicrophoneWarning()
       }
     }
     
     func openVoiceSearch(speechRecognizer: SpeechRecognizer) {
+      // Pause active playing in PiP when Audio Search is enabled
+      if let pipMediaPlayer = PlaylistCarplayManager.shared.mediaPlayer?.pictureInPictureController?.playerLayer.player {
+        pipMediaPlayer.pause()
+      }
+      
       voiceSearchViewController = PopupViewController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
       
       if let voiceSearchController = voiceSearchViewController {
@@ -590,6 +587,14 @@ extension BrowserViewController: TopToolbarDelegate {
       alertController.addAction(cancelAction)
       
       present(alertController, animated: true)
+    }
+  }
+  
+  public func stopVoiceSearch(searchQuery: String? = nil) {
+    voiceSearchViewController?.dismiss(animated: true) {
+      if let query = searchQuery {
+        self.submitSearchText(query)
+      }
     }
   }
 
