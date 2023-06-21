@@ -135,6 +135,7 @@ public class CryptoStore: ObservableObject {
       rpcService: rpcService,
       walletService: walletService,
       swapService: swapService,
+      userAssetManager: userAssetManager,
       origin: origin
     )
     self.portfolioStore = .init(

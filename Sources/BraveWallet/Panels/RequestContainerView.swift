@@ -51,7 +51,10 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               cryptoStore: cryptoStore,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
-              onDismiss: onDismiss
+              onDismiss: {
+                cryptoStore.updateAssets()
+                onDismiss()
+              }
             )
           case let .signMessage(requests):
             SignatureRequestView(
