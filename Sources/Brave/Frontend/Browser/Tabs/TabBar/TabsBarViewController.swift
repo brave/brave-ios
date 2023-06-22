@@ -50,6 +50,8 @@ class TabsBarViewController: UIViewController {
     view.allowsSelection = true
     view.decelerationRate = UIScrollView.DecelerationRate.normal
     view.register(TabBarCell.self, forCellWithReuseIdentifier: "TabCell")
+    view.dragDelegate = self
+    view.dropDelegate = self
     return view
   }()
 
@@ -77,11 +79,6 @@ class TabsBarViewController: UIViewController {
     collectionView.frame = view.frame
     (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: UX.TabsBar.minimumWidth, height: view.frame.height)
     view.addSubview(collectionView)
-
-    let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongGesture(gesture:)))
-    longPressGesture.minimumPressDuration = 0.2
-    longPressGesture.delaysTouchesBegan = true
-    collectionView.addGestureRecognizer(longPressGesture)
 
     NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
 
@@ -251,29 +248,6 @@ class TabsBarViewController: UIViewController {
     return IndexPath(row: selectedIndex, section: 0)
   }
 
-  @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
-    switch gesture.state {
-    case .began:
-      guard let selectedIndexPath = collectionView.indexPathForItem(at: gesture.location(in: self.collectionView)) else {
-        break
-      }
-      
-      Task.delayed(bySeconds: 0.1) { @MainActor in
-        self.collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
-      }
-    case .changed:
-      if let gestureView = gesture.view {
-        var location = gesture.location(in: gestureView)
-        location.y = gestureView.center.y  // Lock y
-        collectionView.updateInteractiveMovementTargetPosition(location)
-      }
-    case .ended:
-      collectionView.endInteractiveMovement()
-    default:
-      collectionView.cancelInteractiveMovement()
-    }
-  }
-
   private func tabOverflowWidth(_ tabCount: Int) -> CGFloat {
     let overflow = CGFloat(tabCount) * UX.TabsBar.minimumWidth - collectionView.frame.width
     return max(overflow, 0)
@@ -319,6 +293,52 @@ class TabsBarViewController: UIViewController {
     maskLayer.anchorPoint = CGPoint.zero
     // you must add the mask to the root view, not the scrollView, otherwise the masks will move as the user scrolls!
     view.layer.addSublayer(maskLayer)
+  }
+}
+
+extension TabsBarViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+  func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+    guard let tab = tabList[indexPath.row] else { return [] }
+    UIImpactFeedbackGenerator(style: .medium).bzzt()
+    
+    let dragItem = UIDragItem(itemProvider: NSItemProvider())
+    dragItem.localObject = tab
+    return [dragItem]
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+    guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath,
+            let destinationIndexPath = coordinator.destinationIndexPath else {
+      return
+    }
+    
+    switch coordinator.proposal.operation {
+    case .move:
+      guard let item = coordinator.items.first else { return }
+      
+      _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+      
+      // The time from this callback to `dropSessionDidEnd` takes a while and the cell's title look not updated.
+      // A small workaround is to fix the title here and rest will be done in `dropSessionDidEnd` method.
+      // Moving to a diffable data source should make this workaround go away.
+      if let title = (item.dragItem.localObject as? Tab)?.title {
+        (collectionView.cellForItem(at: destinationIndexPath) as? TabBarCell)?.titleLabel.text = title
+      }
+      
+      self.collectionView(collectionView, moveItemAt: sourceIndexPath, to: destinationIndexPath)
+    default:
+      break
+    }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      dropSessionDidUpdate session: UIDropSession,
+                      withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    tabList.count() > 1 ? .init(operation: .move, intent: .insertAtDestinationIndexPath) : .init(operation: .cancel)
+  }
+
+  func collectionView(_ collectionView: UICollectionView, dropSessionDidEnd session: UIDropSession) {
+    updateData()
   }
 }
 
