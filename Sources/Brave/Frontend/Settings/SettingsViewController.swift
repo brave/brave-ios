@@ -713,12 +713,7 @@ class SettingsViewController: TableViewController {
     return Static.Section(
       rows: [
         Row(text: "Show Playlist Prototype", selection: { [unowned self] in
-          let vc = UIHostingController(rootView: NavigationView { PlaylistView(folder: .from(folder: {
-            let frc = PlaylistFolder.frc(savedFolder: true, sharedFolders: false)
-            try? frc.performFetch()
-            //            let objects = frc.fetchedObjects as [PlaylistFolder]?
-            return frc.fetchedObjects!.first!
-          }())) })
+          let vc = UIHostingController(rootView: PlaylistCoreDataContainerView())
           vc.modalPresentationStyle = .fullScreen
           self.present(vc, animated: true)
         }),

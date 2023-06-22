@@ -7,10 +7,176 @@ import Foundation
 import SwiftUI
 import BraveUI
 import Introspect
+import Data
+
+public struct PlaylistCoreDataContainerView: View {
+  struct ViewWithContext: View {
+    @FetchRequest(entity: PlaylistFolder.entity(), sortDescriptors: [
+      NSSortDescriptor(keyPath: \PlaylistFolder.order, ascending: true),
+      NSSortDescriptor(keyPath: \PlaylistFolder.dateAdded, ascending: false),
+    ]) var folders: FetchedResults<PlaylistFolder>
+    
+    var body: some View {
+      PlaylistContainerView(folders: folders.map(Folder.from))
+    }
+  }
+  
+  public init() {}
+  
+  public var body: some View {
+    ViewWithContext()
+      .environment(\.managedObjectContext, DataController.swiftUIContext)
+  }
+}
+
+/// Controls displaying Playlist content on any display size
+///
+/// On a compact-width layout we have the following structure:
+///   - The list of playlists folder is at the root of the navigation stack
+///   - The player & folder contents exist in one screen pushed onto the stack.
+///     - The folder contents lives as a drawer that is draggable up and down
+///     - Dragging this drawer up and down can change the player & player controls based on stopping points
+///   - The PiP button will sit in the player controls between the speed and sleep timer
+/// On a regular-width layout we have the following structure:
+///   - The list of playlist folders will exist in a sidebar whos visibility can be toggled
+///   - The PiP button will sit in the navigation bar
+///   - If the width exceeds some threshold (i.e. in landscape orientation), then:
+///     - When selecting a folder, the contents list which would usually live in the drawer in compact-width
+///       scenarios will now be pushed into the sidebar
+///     - The main navigation stack only contains the player
+///   - Else:
+///     - A sidebar can be toggled to be visible but it will only ever contain the folder list
+///     - The folder list will be displayed as a drawer under the player controls, _but_ that drawer is not
+///       draggable.
+public struct PlaylistContainerView: View {
+  public var folders: [Folder]
+  
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @State private var orientation: UIInterfaceOrientation = .unknown
+  
+  @State private var isSidebarVisible: Bool = false
+  
+  public var body: some View {
+    NavigationView {
+      switch horizontalSizeClass {
+      case .regular:
+        // iPad layout, iPhone Max phones in landscape
+        HStack(spacing: 0) {
+          if orientation.isLandscape || isSidebarVisible {
+            HStack(spacing: 0) {
+              NavigationView {
+                PlaylistFolderListView(folders: folders, sharedFolders: [])
+                  .osAvailabilityModifiers { content in
+                    if #available(iOS 16.0, *) {
+                      content.toolbar(.hidden, for: .navigationBar)
+                    } else {
+                      content
+                    }
+                  }
+              }
+              .navigationViewStyle(.stack)
+              .frame(width: 320)
+              .frame(maxHeight: .infinity)
+            }
+            .transition(.move(edge: .leading))
+            .overlay {
+              Divider()
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .ignoresSafeArea()
+            }
+          }
+          List {
+            Text("Test")
+          }
+        }
+        .animation(.default, value: orientation.isLandscape || isSidebarVisible)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+          Color.gray
+        }
+        .navigationTitle("Playlists")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .navigationBarLeading) {
+            if !orientation.isLandscape {
+              Button {
+                isSidebarVisible.toggle()
+              } label: {
+                Image(systemName: "sidebar.left")
+              }
+            }
+          }
+        }
+        .introspectViewController { controller in
+          let appearance: UINavigationBarAppearance = {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundEffect = nil
+            return appearance
+          }()
+          controller.navigationItem.standardAppearance = appearance
+          controller.navigationItem.compactAppearance = appearance
+          controller.navigationItem.scrollEdgeAppearance = appearance
+        }
+      case .compact:
+        EmptyView()
+      default:
+        EmptyView()
+      }
+    }
+    .navigationViewStyle(.stack)
+    .background {
+      OrientationWatcher(orientation: $orientation)
+        .accessibilityHidden(true)
+    }
+  }
+}
+
+public struct OrientationWatcher: UIViewControllerRepresentable {
+  @Binding var orientation: UIInterfaceOrientation
+  
+  public func makeUIViewController(context: Context) -> some UIViewController {
+    OrientationWatcherViewController(orientation: $orientation)
+  }
+  
+  public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+  }
+}
+
+class OrientationWatcherViewController: UIViewController {
+  @Binding var orientation: UIInterfaceOrientation
+  
+  init(orientation: Binding<UIInterfaceOrientation>) {
+    self._orientation = orientation
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  @available(*, unavailable)
+  required init(coder: NSCoder) {
+    fatalError()
+  }
+  
+  private func updateOrientation() {
+    if let interfaceOrientation = currentScene?.interfaceOrientation {
+      orientation = interfaceOrientation
+    }
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    updateOrientation()
+  }
+  
+  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    updateOrientation()
+  }
+}
 
 public struct PlaylistView: View {
-  public var folder: Folder
+  public var folders: [Folder]
   
+  @State private var selectedFolderID: Folder.ID?
   @State private var selectedItemID: Item.ID?
   @State private var offset: CGFloat = 0
   @State private var drawerHeight: CGFloat = 0
@@ -19,10 +185,16 @@ public struct PlaylistView: View {
   @GestureState private var isDragging: Bool = false
   @State private var startHeight: CGFloat?
   
-  @Environment(\.dismiss) var dismiss
+  @Environment(\.dismiss) private var dismiss
   
-  public init(folder: Folder) {
-    self.folder = folder
+  private var selectedFolder: Folder? {
+    folders.first(where: { $0.id == self.selectedFolderID })
+  }
+  
+  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
+    self.folders = folders
+    // This will only work the first time the view is created.
+    self._selectedFolderID = State(wrappedValue: initiallySelectedFolder)
   }
   
   var dragGesture: some Gesture {
@@ -91,16 +263,18 @@ public struct PlaylistView: View {
           }
         }
         .overlay(alignment: .bottom) {
-          VStack(spacing: 0) {
-            PlaylistItemHeaderView(folder: folder)
-              .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-              .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-              .simultaneousGesture(dragGesture)
-            
-            PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
-              .background(Color(.braveBackground))
+          if let selectedFolder {
+            VStack(spacing: 0) {
+              PlaylistItemHeaderView(folder: selectedFolder)
+                .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+                .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
+                .simultaneousGesture(dragGesture)
+              
+              PlaylistItemListView(folder: selectedFolder, selectedItemId: selectedItemID)
+                .background(Color(.braveBackground))
+            }
+            .frame(height: drawerHeight)
           }
-          .frame(height: drawerHeight)
         }
     }
     .frame(maxHeight: .infinity)
@@ -122,7 +296,7 @@ public struct PlaylistView: View {
       .ignoresSafeArea()
     }
     .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(folder.title)
+    .navigationTitle(selectedFolder?.title ?? "Playlist")
 //    .sheet(isPresented: .constant(true)) {
 //      VStack(spacing: 0) {
 //        PlaylistItemHeaderView(folder: folder)
@@ -263,13 +437,16 @@ extension SwiftUI.Animation {
 #if DEBUG
 struct PlaylistView_PreviewProvider: PreviewProvider {
   static var previews: some View {
+    PlaylistContainerView(folders: [.init(id: "1", title: "Play Later", items: (0..<10).map { i in
+        .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
+    })])
 //    Color.black.fullScreenCover(isPresented: .constant(true)) {
-      NavigationView {
-        PlaylistView(folder: .init(id: UUID().uuidString, title: "Play Later", items: (0..<10).map { i in
-            .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
-        }))
+//      NavigationView {
+//        PlaylistView(folders: [.init(id: "1", title: "Play Later", items: (0..<10).map { i in
+//            .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
+//        })], initiallySelectedFolder: "1")
 //      }
-    }
+//    }
   }
 }
 #endif
