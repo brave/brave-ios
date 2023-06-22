@@ -13,7 +13,6 @@ public struct Web3SettingsView: View {
   var settingsStore: SettingsStore?
   var networkStore: NetworkStore?
   var keyringStore: KeyringStore?
-  var onCustomNetworkUpdated: (() -> Void)?
   
   @ObservedObject var enableIPFSResourcesResolver = Preferences.Wallet.resolveIPFSResources
 
@@ -27,13 +26,11 @@ public struct Web3SettingsView: View {
   public init(
     settingsStore: SettingsStore? = nil,
     networkStore: NetworkStore? = nil,
-    keyringStore: KeyringStore? = nil,
-    onCustomNetworkUpdated: (() -> Void)? = nil
+    keyringStore: KeyringStore? = nil
   ) {
     self.settingsStore = settingsStore
     self.networkStore = networkStore
     self.keyringStore = keyringStore
-    self.onCustomNetworkUpdated = onCustomNetworkUpdated
   }
   
   public var body: some View {
@@ -46,8 +43,7 @@ public struct Web3SettingsView: View {
             keyringStore: keyringStore,
             isShowingResetWalletAlert: $isShowingResetWalletAlert,
             isShowingResetTransactionAlert: $isShowingResetTransactionAlert,
-            isShowingBiometricsPasswordEntry: $isShowingBiometricsPasswordEntry,
-            onCustomNetworkUpdated: onCustomNetworkUpdated
+            isShowingBiometricsPasswordEntry: $isShowingBiometricsPasswordEntry
           )
         }
         // means users come from the browser not the wallet
@@ -163,8 +159,6 @@ private struct WalletSettingsView: View {
   @Binding var isShowingResetWalletAlert: Bool
   @Binding var isShowingResetTransactionAlert: Bool
   @Binding var isShowingBiometricsPasswordEntry: Bool
-  
-  var onCustomNetworkUpdated: (() -> Void)?
 
   private var autoLockIntervals: [AutoLockInterval] {
     var all = AutoLockInterval.allOptions
@@ -248,7 +242,7 @@ private struct WalletSettingsView: View {
       footer: Text(Strings.Wallet.networkFooter)
         .foregroundColor(Color(.secondaryBraveLabel))
     ) {
-      NavigationLink(destination: CustomNetworkListView(networkStore: networkStore, onCustomNetworkUpdated: onCustomNetworkUpdated)) {
+      NavigationLink(destination: CustomNetworkListView(networkStore: networkStore)) {
         Text(Strings.Wallet.settingsNetworkButtonTitle)
           .foregroundColor(Color(.braveLabel))
       }

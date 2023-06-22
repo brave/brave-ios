@@ -342,13 +342,7 @@ struct SuggestedNetworkView: View {
       customNetworkError = .failed(errorMessage: error)
       return
     }
-    if let chain {
-      networkStore.customNetworkNativeAssetMigration(chain) {
-        onDismiss()
-      }
-    } else {
-      onDismiss()
-    }
+    onDismiss()
   }
 }
 

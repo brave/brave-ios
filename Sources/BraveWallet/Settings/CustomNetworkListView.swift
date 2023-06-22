@@ -11,7 +11,6 @@ import BraveUI
 
 struct CustomNetworkListView: View {
   @ObservedObject var networkStore: NetworkStore
-  var onCustomNetworkUpdated: (() -> Void)?
   @State private var isPresentingNetworkDetails: CustomNetworkModel?
   @Environment(\.presentationMode) @Binding private var presentationMode
   @Environment(\.sizeCategory) private var sizeCategory
@@ -26,11 +25,7 @@ struct CustomNetworkListView: View {
   }
 
   private func removeNetwork(_ network: BraveWallet.NetworkInfo) {
-    networkStore.removeCustomNetwork(network) { success in
-      if success {
-        onCustomNetworkUpdated?()
-      }
-    }
+    networkStore.removeCustomNetwork(network) { _ in }
   }
   
   private var customNetworks: [BraveWallet.NetworkInfo] {
@@ -138,8 +133,7 @@ struct CustomNetworkListView: View {
       NavigationView {
         CustomNetworkDetailsView(
           networkStore: networkStore,
-          model: detailsModel,
-          onCustomNetworkUpdated: onCustomNetworkUpdated
+          model: detailsModel
         )
       }
       .navigationViewStyle(StackNavigationViewStyle())

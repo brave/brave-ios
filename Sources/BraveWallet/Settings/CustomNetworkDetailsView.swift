@@ -260,7 +260,6 @@ enum CustomNetworkError: LocalizedError, Identifiable {
 struct CustomNetworkDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var model: CustomNetworkModel
-  var onCustomNetworkUpdated: (() -> Void)?
 
   @Environment(\.presentationMode) @Binding private var presentationMode
 
@@ -268,12 +267,10 @@ struct CustomNetworkDetailsView: View {
 
   init(
     networkStore: NetworkStore,
-    model: CustomNetworkModel,
-    onCustomNetworkUpdated: (() -> Void)? = nil
+    model: CustomNetworkModel
   ) {
     self.networkStore = networkStore
     self.model = model
-    self.onCustomNetworkUpdated = onCustomNetworkUpdated
   }
   
   private var navigationTitle: String {
@@ -512,7 +509,6 @@ struct CustomNetworkDetailsView: View {
         customNetworkError = .failed(errorMessage: errMsg)
         return
       }
-      onCustomNetworkUpdated?()
       presentationMode.dismiss()
     }
   }
@@ -524,8 +520,7 @@ struct CustomNetworkDetailsView_Previews: PreviewProvider {
     NavigationView {
       CustomNetworkDetailsView(
         networkStore: .previewStore,
-        model: .init(),
-        onCustomNetworkUpdated: nil
+        model: .init()
       )
     }
   }

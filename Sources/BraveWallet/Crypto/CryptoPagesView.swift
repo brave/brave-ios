@@ -70,10 +70,7 @@ struct CryptoPagesView: View {
         destination: Web3SettingsView(
           settingsStore: cryptoStore.settingsStore,
           networkStore: cryptoStore.networkStore,
-          keyringStore: keyringStore,
-          onCustomNetworkUpdated: {
-            cryptoStore.updateAssets()
-          }
+          keyringStore: keyringStore
         ),
         isActive: $isShowingSettings
       ) {
