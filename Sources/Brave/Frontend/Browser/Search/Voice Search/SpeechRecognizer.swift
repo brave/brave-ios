@@ -57,18 +57,11 @@ class SpeechRecognizer: ObservableObject {
   private let recognizer = SFSpeechRecognizer()
   
   @MainActor
-  func askForUserPermission(onDeviceRecognitionOnly: Bool = true) async -> Bool {
+  func askForUserPermission() async -> Bool {
     do {
       // Ask for Record Permission if not permitted throw error
       guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
         throw RecognizerError.microphoneAccessDenied
-      }
-      
-      if !onDeviceRecognitionOnly {
-        // Ask for Online Speech Recognizer Authorization if not authorized throw error
-        guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
-          throw RecognizerError.authorizationAccessDenied
-        }
       }
       
       return true
