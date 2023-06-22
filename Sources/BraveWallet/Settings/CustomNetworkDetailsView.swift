@@ -540,27 +540,16 @@ struct NetworkRadioButton: View {
   var onTapped: () -> Void
   
   var body: some View {
-    if checked {
-      ZStack {
-        Circle()
-          .fill(Color(.braveBlurpleTint))
-          .frame(width: 20, height: 20)
-        Circle()
-          .fill(Color.white)
-          .frame(width: 8, height: 8)
-      }
-    } else {
-      Circle()
-        .fill(Color.white)
-        .frame(width: 20, height: 20)
-        .overlay(Circle().stroke(.gray, lineWidth: 1))
-        .onTapGesture {
-          if !self.isDisabled {
-            self.checked = true
-            self.onTapped()
-          }
+    Image(uiImage: UIImage(braveSystemNamed: checked ? "leo.check.circle-outline" : "leo.radio.unchecked")!)
+      .renderingMode(.template)
+      .foregroundColor(Color(checked ? .braveBlurpleTint : .braveDisabled))
+      .font(.title3)
+      .onTapGesture {
+        if !self.isDisabled && !checked {
+          self.checked = true
+          self.onTapped()
         }
-    }
+      }
   }
 }
 
