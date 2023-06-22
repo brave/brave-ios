@@ -66,6 +66,7 @@ window.__firefox__.execute(function($) {
     alwaysHiddenSelectors: new Set(),
     hiddenSelectors: new Set(),
     unhiddenSelectors: new Set(),
+    ruleIndexes: new Map(),
     allStyleRules: [],
     runQueues: [
       // All new selectors go in this first run queue
@@ -126,13 +127,13 @@ window.__firefox__.execute(function($) {
 
     const results = await sendSelectors(ids, classes)
     if (results.standardSelectors && results.standardSelectors.length > 0) {
-      if (processHideSelectors(results.standardSelectors, !args.hideFirstPartyContent)) {
+      if (processHideSelectors(results.standardSelectors, !args.hideFirstPartyContent, true)) {
         hasChanges = true
       }
     }
 
     if (results.aggressiveSelectors && results.aggressiveSelectors.length > 0) {
-      if (processHideSelectors(results.aggressiveSelectors, false)) {
+      if (processHideSelectors(results.aggressiveSelectors, false, true)) {
         hasChanges = true
       }
     }
@@ -280,7 +281,6 @@ window.__firefox__.execute(function($) {
     if (mutationScore > 0) {
       const changes = await sendPendingSelectorsThrottled()
       if (changes) {
-        setRulesOnStylesheet()
         pumpCosmeticFilterQueuesOnIdle()
       }
     }
@@ -591,6 +591,16 @@ window.__firefox__.execute(function($) {
   }
 
   /**
+   * Remove the selector from the hiddenSelectors list and remove it from the stylesheet.
+   * Then mark it as an unhiddenSelector
+   */
+  const unhideSelector = (selector) => {
+    CC.hiddenSelectors.delete(selector)
+    CC.unhiddenSelectors.add(selector)
+    deleteHideSelector(selector)
+  }
+
+  /**
    * Unhide the given selectors.
    * (i.e. Remove them from CC.hiddenSelectors and move them to CC.unhiddenSelectors)
    * This will not recreate the stylesheet
@@ -601,8 +611,7 @@ window.__firefox__.execute(function($) {
 
     Array.from(selectors).forEach((selector) => {
       if (CC.unhiddenSelectors.has(selector)) { return }
-      CC.hiddenSelectors.delete(selector)
-      CC.unhiddenSelectors.add(selector)
+      unhideSelector(selector)
 
       // Remove these selectors from the run queues
       for (let index = 0; index < CC.runQueues; index++) {
@@ -663,8 +672,7 @@ window.__firefox__.execute(function($) {
 
           // Unhide this selector if we need to
           if (CC.hiddenSelectors.has(selector) || !CC.unhiddenSelectors.has(selector)) {
-            CC.unhiddenSelectors.add(selector)
-            CC.hiddenSelectors.delete(selector)
+            unhideSelector(selector)
           }
         }
 
@@ -689,7 +697,7 @@ window.__firefox__.execute(function($) {
     queueIsSleeping = true
 
     await sendPendingOriginsIfNeeded()
-    setRulesOnStylesheet()
+    addAllRulesToStylesheet()
 
     window.setTimeout(() => {
       // Set this to false now even though there's a gap in time between now and
@@ -719,7 +727,6 @@ window.__firefox__.execute(function($) {
 
     const changes = await sendPendingSelectorsIfNeeded()
     if (!changes) { return }
-    setRulesOnStylesheet()
 
     if (!args.hideFirstPartyContent) {
       pumpCosmeticFilterQueuesOnIdle()
@@ -870,7 +877,6 @@ window.__firefox__.execute(function($) {
 
     // If we have some new values, we want to unhide any new selectors
     unhideSelectorsMatchingElementIf1P(elementsWithURLs)
-    setRulesOnStylesheet()
   }
 
   /**
@@ -916,7 +922,7 @@ window.__firefox__.execute(function($) {
    * Adds given selectors to hiddenSelectors unless they are in the unhiddenSelectors set
    * @param {*} selectors The selectors to add
    */
-  const processHideSelectors = (selectors, canUnhide1PElements) => {
+  const processHideSelectors = (selectors, canUnhide1PElements, insertRules) => {
     let hasChanges = false
 
     selectors.forEach(selector => {
@@ -925,10 +931,16 @@ window.__firefox__.execute(function($) {
           if (CC.hiddenSelectors.has(selector)) { return }
           CC.hiddenSelectors.add(selector)
           CC.runQueues[0].add(selector)
+          if (insertRules) {
+            insertHideSelector(selector)
+          }
           hasChanges = true
         } else {
           if (CC.alwaysHiddenSelectors.has(selector)) { return }
           CC.alwaysHiddenSelectors.add(selector)
+          if (insertRules) {
+            insertHideSelector(selector)
+          }
           hasChanges = true
         }
       }
@@ -954,6 +966,11 @@ window.__firefox__.execute(function($) {
     const targetElm = document.body
     styleElm.parentElement.removeChild(styleElm)
     targetElm.appendChild(styleElm)
+
+    // Clear the rule indexes as our new map no longer has the rules after moving the style
+    CC.ruleIndexes = new Map()
+    // Add back all the rules
+    addAllRulesToStylesheet()
   }
 
   /**
@@ -969,31 +986,45 @@ window.__firefox__.execute(function($) {
 
     // Start a timer that moves the stylesheet down
     window.setInterval(() => {
-      if (styleElm.nextElementSibling === null || styleElm.parentElement === targetElm) {
+      if (styleElm.nextElementSibling === null || styleElm.parentElement !== targetElm) {
         return
       }
       moveStyle()
     }, 1000)
   }
 
+  const insertHideSelector = (selector) => {
+    if (CC.ruleIndexes[selector] !== undefined) { return }
+    const rule = selector + '{display:none !important;}'
+    CC.ruleIndexes[selector] = CC.cosmeticStyleSheet.sheet.insertRule(rule)
+  }
+
+  const deleteHideSelector = (selector) => {
+    const index = CC.ruleIndexes[selector]
+
+    if (index !== undefined) {
+      CC.cosmeticStyleSheet.sheet.deleteRule(index)
+    }
+  }
+
   /**
-   * Rewrite the stylesheet body with the hidden rules and style rules
+   * Re-adds all the rules to the stylesheet.
+   * This is needed after we move the style or if we create the style for the first time
    */
-  const setRulesOnStylesheet = () => {
-    const hideRules = Array.from(CC.hiddenSelectors).map(selector => {
-      return selector + '{display:none !important;}'
+  const addAllRulesToStylesheet = () => {
+    Array.from(CC.hiddenSelectors).forEach(selector => {
+      insertHideSelector(selector)
     })
 
-    const alwaysHideRules = Array.from(CC.alwaysHiddenSelectors).map(selector => {
-      return selector + '{display:none !important;}'
+    Array.from(CC.alwaysHiddenSelectors).forEach(selector => {
+      const rule = selector + '{display:none !important;}'
+      insertHideSelector(selector)
     })
 
-    const allRules = alwaysHideRules.concat(hideRules.concat(CC.allStyleRules))
-    const ruleText = allRules.filter(rule => {
-      return rule !== undefined && !rule.startsWith(':')
-    }).join('')
-
-    CC.cosmeticStyleSheet.innerText = ruleText
+    CC.allStyleRules.forEach(rule => {
+      if (rule !== undefined && !rule.startsWith(':')) { return }
+      CC.cosmeticStyleSheet.sheet.insertRule(rule)
+    })
   }
 
   /**
@@ -1015,7 +1046,7 @@ window.__firefox__.execute(function($) {
     // 4. Set the rules on the stylesheet. So far we don't have any rules set
     // We could do this earlier but it causes elements to hide and unhide
     // It's best to wait to this period so we have
-    setRulesOnStylesheet()
+    addAllRulesToStylesheet()
     // 5. Start our queue pump if we need to
     scheduleQueuePump(args.hideFirstPartyContent, args.genericHide)
 
@@ -1047,11 +1078,11 @@ window.__firefox__.execute(function($) {
 
   // Load some static hide rules if they are defined
   if (args.standardSelectors) {
-    processHideSelectors(args.standardSelectors, !args.hideFirstPartyContent)
+    processHideSelectors(args.standardSelectors, !args.hideFirstPartyContent, false)
   }
 
   if (args.aggressiveSelectors) {
-    processHideSelectors(args.aggressiveSelectors, false)
+    processHideSelectors(args.aggressiveSelectors, false, false)
   }
 
   // Load some static style selectors if they are defined
