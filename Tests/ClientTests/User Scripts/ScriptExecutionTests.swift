@@ -345,7 +345,6 @@ final class ScriptExecutionTests: XCTestCase {
     XCTAssertEqual(resultsAfterPump?.unhiddenIds.contains("test-ad-1st-party"), true)
     XCTAssertEqual(resultsAfterPump?.unhiddenIds.contains("test-ad-primary-standard-1st-party"), true)
     XCTAssertEqual(resultsAfterPump?.unhiddenIds.contains("test-ad-primary-standard-3rd-party"), true)
-    XCTAssertEqual(resultsAfterPump?.unhiddenIds.contains("test-ad-1st-party"), true)
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-aggressive"), true)
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-3rd-party"), true)
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-simple"), true)

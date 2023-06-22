@@ -1000,10 +1000,15 @@ window.__firefox__.execute(function($) {
   }
 
   const deleteHideSelector = (selector) => {
-    const index = CC.ruleIndexes[selector]
+    if (CC.ruleIndexes[selector] === undefined) { return }
+    const ruleList = CC.cosmeticStyleSheet.sheet.cssRules
+    CC.ruleIndexes.delete(selector)
 
-    if (index !== undefined) {
-      CC.cosmeticStyleSheet.sheet.deleteRule(index)
+    for (let i = 0; i < ruleList.length; i++) {
+      if (ruleList[i].selectorText === selector) {
+        CC.cosmeticStyleSheet.sheet.deleteRule(i)
+        return
+      }
     }
   }
 
