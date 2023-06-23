@@ -71,6 +71,8 @@ class TabsBarViewController: UIViewController {
 
     view.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
     collectionView.backgroundColor = view.backgroundColor
+    collectionView.dragDelegate = UIApplication.shared.supportsMultipleScenes ? self : nil
+    collectionView.dropDelegate = UIApplication.shared.supportsMultipleScenes ? self : nil
 
     tabManager?.addDelegate(self)
 
@@ -426,6 +428,54 @@ extension TabsBarViewController: UICollectionViewDataSource {
 
     guard let selectedTab = tabList[destinationIndexPath.row] else { return }
     manager.selectTab(selectedTab)
+  }
+}
+
+// MARK: - UICollectionViewDragDelegate
+extension TabsBarViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
+  func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+    guard let tab = tabList[indexPath.row],
+          let windowId = tabManager?.windowId else {
+      return []
+    }
+    
+    let userActivity = NSUserActivity(activityType: BrowserState.sceneId).then {
+      $0.addUserInfoEntries(from: [
+        "TabID": tab.id.uuidString,
+        "TabWindowID": windowId.uuidString,
+        "isPrivate": tab.isPrivate
+      ])
+    }
+    
+    let itemProvider = NSItemProvider(object: userActivity)
+    itemProvider.registerObject(userActivity, visibility: .all)
+    return [UIDragItem(itemProvider: itemProvider)]
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+    guard coordinator.items.first?.sourceIndexPath == nil else { return }
+    let destinationIndexPath: IndexPath
+
+    if let indexPath = coordinator.destinationIndexPath {
+      destinationIndexPath = indexPath
+    } else {
+      let section = max(collectionView.numberOfSections - 1, 0)
+      let row = collectionView.numberOfItems(inSection: section)
+      destinationIndexPath = IndexPath(row: max(row - 1, 0), section: section)
+    }
+
+    if coordinator.proposal.operation == .move {
+      guard let item = coordinator.items.first else { return }
+      
+      // TODO: Figure out how to get the item here...
+      // LocalObject is nil because the tab is in another process? :S
+      
+      _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+    }
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    return .init(operation: .move, intent: .insertAtDestinationIndexPath)
   }
 }
 

@@ -1869,6 +1869,17 @@ public class BrowserViewController: UIViewController {
     navigationToolbar.updatePageStatus(isPage)
     updateWebViewPageZoom(tab: tab)
   }
+  
+  public func moveTab(tabId: UUID, to browser: BrowserViewController) {
+    guard let tab = tabManager.allTabs.filter({ $0.id == tabId }).first,
+          let url = tab.url else {
+      return
+    }
+    
+    let isPrivate = tab.isPrivate
+    tabManager.removeTab(tab)
+    browser.tabManager.addTabsForURLs([url], zombie: false, isPrivate: isPrivate)
+  }
 
   public func switchToTabForURLOrOpen(_ url: URL, isPrivate: Bool = false, isPrivileged: Bool, isExternal: Bool = false) {
     if !isExternal {

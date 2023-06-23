@@ -491,6 +491,24 @@ extension SceneDelegate {
       // Remove Ad-Grant Reminders
       $0.removeScheduledAdGrantReminders()
     }
+    
+    if let tabIdString = userActivity?.userInfo?["TabID"] as? String,
+       let tabWindowId = userActivity?.userInfo?["TabWindowID"] as? String,
+       let tabId = UUID(uuidString: tabIdString) {
+      
+      let currentTabScene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).filter({
+        guard let sceneWindowId = $0.session.userInfo?["WindowID"] as? String else {
+          return false
+        }
+        
+        return sceneWindowId == tabWindowId
+      }).first
+      
+      if let currentTabScene = currentTabScene, let currentTabSceneBrowser = currentTabScene.browserViewController {
+        browserViewController.loadViewIfNeeded()
+        currentTabSceneBrowser.moveTab(tabId: tabId, to: browserViewController)
+      }
+    }
 
     return browserViewController
   }

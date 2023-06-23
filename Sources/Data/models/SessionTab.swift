@@ -237,6 +237,23 @@ extension SessionTab {
       }
     }
   }
+  
+  public static func move(tab tabId: UUID, toWindow windowId: UUID) {
+    DataController.performOnMainContext { context in
+      guard let tab = SessionTab.from(tabId: tabId, in: context),
+            let window = SessionWindow.from(windowId: windowId, in: context) else {
+        return
+      }
+      
+      tab.sessionWindow = window
+      
+      do {
+        try context.save()
+      } catch {
+        Logger.module.error("performTask save error: \(error.localizedDescription, privacy: .public)")
+      }
+    }
+  }
 }
 
 // MARK: - Private

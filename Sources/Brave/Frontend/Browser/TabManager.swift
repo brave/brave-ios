@@ -92,8 +92,9 @@ class TabManager: NSObject {
   private let syncedTabsQueue = DispatchQueue(label: "synced-tabs-queue")
   private var syncTabsTask: DispatchWorkItem?
   private var metricsHeartbeat: Timer?
-  private let windowId: UUID
   public let privateBrowsingManager: PrivateBrowsingManager
+  
+  let windowId: UUID
   
   /// The property returning only existing tab is NTP for current mode
   var isBrowserEmptyForCurrentMode: Bool {
@@ -629,7 +630,6 @@ class TabManager: NSObject {
         // reaches zero and destroys all its data.
 
         BraveWebView.removeNonPersistentStore()
-        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
       }
     }
 
