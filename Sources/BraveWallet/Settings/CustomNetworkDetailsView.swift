@@ -120,7 +120,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
     }
   }
 
-  @Published var rpcUrls: [NetworkInputItem] = [NetworkInputItem(input: "")] {
+  @Published var rpcUrls: [NetworkInputItem] = [NetworkInputItem(input: "", isSelected: true)] {
     didSet {
       // we only care the set on each item's `input`
       if rpcUrls.reduce("", { $0 + $1.input }) != oldValue.reduce("", { $0 + $1.input }) {
@@ -216,7 +216,12 @@ class CustomNetworkModel: ObservableObject, Identifiable {
     if !network.rpcEndpoints.isEmpty {
       var result: [NetworkInputItem] = []
       for (index, endpoint) in network.rpcEndpoints.enumerated() {
-        result.append(NetworkInputItem(input: endpoint.absoluteString, isSelected: index == network.activeRpcEndpointIndex))
+        result.append(
+          NetworkInputItem(
+            input: endpoint.absoluteString,
+            isSelected: index == network.activeRpcEndpointIndex
+          )
+        )
       }
       self.rpcUrls = result
     } else if mode.isViewMode {
@@ -423,7 +428,7 @@ struct CustomNetworkDetailsView: View {
       if showRadioButton {
         NetworkRadioButton(
           checked: item.isSelected,
-          isDisabled: Binding(get: { item.input.wrappedValue.isEmpty }, set: { _, _ in }),
+          isDisabled: Binding(get: { item.input.wrappedValue.isEmpty || model.mode.isViewMode }, set: { _, _ in }),
           onTapped: {
             for index in model.rpcUrls.indices where model.rpcUrls[index].id != item.id {
               model.rpcUrls[index].isSelected = !item.isSelected.wrappedValue
