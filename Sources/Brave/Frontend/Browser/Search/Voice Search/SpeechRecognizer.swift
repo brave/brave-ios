@@ -169,7 +169,7 @@ class SpeechRecognizer: ObservableObject {
     
     let request = SFSpeechAudioBufferRecognitionRequest()
     request.shouldReportPartialResults = true
-    request.requiresOnDeviceRecognition = true
+    request.requiresOnDeviceRecognition = false
 
     let audioSession = AVAudioSession.sharedInstance()
     try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
@@ -289,12 +289,17 @@ extension SFSpeechRecognizer {
   /// - Returns: Authorization state
   static func hasAuthorizationToRecognize() async -> Bool {
     return await withCheckedContinuation { continuation in
-     let callback: @convention(block) (SFSpeechRecognizerAuthorizationStatus) -> Void = { status in
-       continuation.resume(with: .success(status == .authorized))
-     }
+      let callback: @convention(block) (SFSpeechRecognizerAuthorizationStatus) -> Void = { status in
+        continuation.resume(with: .success(status == .authorized))
+      }
       
-     let requestAuthorizationSelector = Selector(String(data: Data(base64Encoded: "cmVxdWVzdEF1dGhvcml6YXRpb246")!, encoding: .utf8)!)
-     SFSpeechRecognizer.perform(requestAuthorizationSelector, with: callback)
+      guard let sfSpeechRecognizerClass = NSClassFromString(String(data: Data(base64Encoded: "U0ZTcGVlY2hSZWNvZ25pemVy")!, encoding: .utf8)!) else {
+        continuation.resume(with: .success(false))
+        return
+      }
+      
+      let requestAuthorizationSelector = Selector(String(data: Data(base64Encoded: "cmVxdWVzdEF1dGhvcml6YXRpb246")!, encoding: .utf8)!)
+      sfSpeechRecognizerClass.perform(requestAuthorizationSelector, with: callback, afterDelay: 0.0)
     }
   }
 }
