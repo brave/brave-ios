@@ -58,12 +58,22 @@ class SpeechRecognizer: ObservableObject {
   
   @MainActor
   func askForUserPermission() async -> Bool {
-    // Ask for Record Permission if not permitted throw error
-    guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
-      return false
+    do {
+      // Ask for Record Permission if not permitted throw error
+      guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
+        throw RecognizerError.microphoneAccessDenied
+      }
+      
+      // Ask for Online Speech Recognizer Authorization if not authorized throw error
+      guard await SFSpeechRecognizer.hasAuthorizationToRecognize() else {
+        throw RecognizerError.authorizationAccessDenied
+      }
+      return true
+    } catch {
+      log.debug("Voice Search Authorization Fault \(error.localizedDescription)")
     }
     
-    return true
+    return false
   }
   
   @MainActor
@@ -258,6 +268,7 @@ class SpeechRecognizer: ObservableObject {
     
     isSilent = isCurrentlySilent
   }
+  
 }
 
 extension AVAudioSession {
@@ -269,6 +280,21 @@ extension AVAudioSession {
       requestRecordPermission { authorized in
         continuation.resume(returning: authorized)
       }
+    }
+  }
+}
+
+extension SFSpeechRecognizer {
+  /// Ask for Speech recognization authorization
+  /// - Returns: Authorization state
+  static func hasAuthorizationToRecognize() async -> Bool {
+    return await withCheckedContinuation { continuation in
+     let callback: @convention(block) (SFSpeechRecognizerAuthorizationStatus) -> Void = { status in
+       continuation.resume(with: .success(status == .authorized))
+     }
+      
+     let requestAuthorizationSelector = Selector(String(data: Data(base64Encoded: "cmVxdWVzdEF1dGhvcml6YXRpb246")!, encoding: .utf8)!)
+     SFSpeechRecognizer.perform(requestAuthorizationSelector, with: callback)
     }
   }
 }
