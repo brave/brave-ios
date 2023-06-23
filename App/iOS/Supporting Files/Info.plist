@@ -193,5 +193,7 @@
 		<string>A000000527471117</string>
 		<string>A0000006472F0001</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This permission is used to enable Apple Advanced Speech Recognition. If not allowed `on device` recognition will be used and searches will be totally private. Brave does not store or share your voice searches.</string>
 </dict>
 </plist>
