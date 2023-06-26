@@ -93,7 +93,7 @@ struct PortfolioView: View {
     }
   }
   
-  private var networkFilterButton: some View {
+  private var filtersButton: some View {
     Button(action: {
       self.isPresentingNetworkFilter = true
     }) {
@@ -103,18 +103,24 @@ struct PortfolioView: View {
         .clipShape(Rectangle())
     }
     .sheet(isPresented: $isPresentingNetworkFilter) {
-      NavigationView {
-        NetworkFilterView(
-          networks: portfolioStore.networkFilters,
-          networkStore: networkStore,
-          saveAction: { selectedNetworks in
-            portfolioStore.networkFilters = selectedNetworks
-          }
-        )
-      }
-      .navigationViewStyle(.stack)
+      FiltersDisplaySettingsView(
+        store: portfolioStore.filtersDisplaySettingsStore(),
+        keyringStore: keyringStore,
+        networkStore: networkStore
+      )
+      .osAvailabilityModifiers({ view in
+        if #available(iOS 16, *) {
+          view
+            .presentationDetents([
+              .fraction(0.6),
+              .large
+            ])
+        } else {
+          view
+        }
+      })
       .onDisappear {
-        networkStore.closeNetworkSelectionStore()
+        portfolioStore.closeFiltersDisplaySettingsStore()
       }
     }
   }
@@ -159,7 +165,7 @@ struct PortfolioView: View {
               .padding(.leading, 5)
           }
           Spacer()
-          networkFilterButton
+          filtersButton
         }
         .textCase(nil)
         .padding(.horizontal, -8)

@@ -74,13 +74,16 @@ public class PortfolioStore: ObservableObject {
     }
   }
   
-  @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
-    didSet {
-      guard !oldValue.isEmpty else { return } // initial assignment to `networkFilters`
-      update()
-    }
-  }
   @Published private(set) var isLoadingDiscoverAssets: Bool = false
+  
+  // Filters
+  @Published var filters: Filters = .init(
+    groupBy: .none,
+    sortOrder: .descending,
+    isHidingSmallBalances: true,
+    accounts: [],
+    networks: []
+  )
 
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
     blockchainRegistry: self.blockchainRegistry,
@@ -145,13 +148,21 @@ public class PortfolioStore: ObservableObject {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
       self.isLoadingBalances = true
-      // setup network filters if not currently setup
-      if self.networkFilters.isEmpty {
-        self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map {
-          .init(isSelected: !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId), model: $0)
+      // setup filters if empty
+      if filters.accounts.isEmpty && filters.networks.isEmpty {
+        let allAccounts = await self.keyringService.allAccounts()
+        self.filters.accounts = allAccounts.accounts.map { account in
+          .init(isSelected: true, model: account)
+        }
+        let allNetworks = await self.rpcService.allNetworksForSupportedCoins()
+        self.filters.networks = allNetworks.map { network in
+          .init(
+            isSelected: !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId),
+            model: network
+          )
         }
       }
-      let networks: [BraveWallet.NetworkInfo] = self.networkFilters.filter(\.isSelected).map(\.model)
+      let networks: [BraveWallet.NetworkInfo] = self.filters.networks.filter(\.isSelected).map(\.model)
       struct NetworkAssets: Equatable {
         let network: BraveWallet.NetworkInfo
         let tokens: [BraveWallet.BlockchainToken]
@@ -292,6 +303,26 @@ public class PortfolioStore: ObservableObject {
     }
     return priceHistories
   }
+  
+  private var _filtersDisplaySettingsStore: FiltersDisplaySettingsStore?
+  func filtersDisplaySettingsStore() -> FiltersDisplaySettingsStore {
+    if let filtersDisplaySettingsStore = _filtersDisplaySettingsStore {
+      return filtersDisplaySettingsStore
+    }
+    let store = FiltersDisplaySettingsStore(
+      filters: filters,
+      saveAction: { [weak self] filters in
+        guard let self = self else { return }
+        self.filters = filters
+        self.update()
+      }
+    )
+    self._filtersDisplaySettingsStore = store
+    return store
+  }
+  func closeFiltersDisplaySettingsStore() {
+    _filtersDisplaySettingsStore = nil
+  }
 }
 
 extension PortfolioStore: BraveWalletJsonRpcServiceObserver {
@@ -311,7 +342,15 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
   }
 
   public func accountsChanged() {
-    update()
+    Task { @MainActor in
+      // An account was added or removed, update our account filters for the change.
+      let allAccounts = await self.keyringService.allAccounts()
+      filters.accounts = allAccounts.accounts.map { account in
+        let existingSelectionValue = self.filters.accounts.first(where: { $0.model.id == account.id })?.isSelected
+        return .init(isSelected: existingSelectionValue ?? true, model: account)
+      }
+      update()
+    }
   }
   public func backedUp() {
   }
@@ -355,11 +394,13 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
   public func onNetworkListChanged() {
     Task { @MainActor in
       // A network was added or removed, update our network filters for the change.
-      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
+      let updatedNetworkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
         let defaultValue = !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
-        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
-        return .init(isSelected: existingSelectionValue ?? defaultValue, model: network)
+        let existingSelectionValue = self.filters.networks.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return Selectable(isSelected: existingSelectionValue ?? defaultValue, model: network)
       }
+      filters.networks = updatedNetworkFilters
+      update()
     }
   }
   

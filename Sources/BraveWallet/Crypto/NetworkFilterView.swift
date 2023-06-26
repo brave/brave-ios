@@ -19,6 +19,7 @@ struct NetworkFilterView: View {
   
   @State var networks: [Selectable<BraveWallet.NetworkInfo>]
   @ObservedObject var networkStore: NetworkStore
+  let showsCancelButton: Bool
   let saveAction: ([Selectable<BraveWallet.NetworkInfo>]) -> Void
   
   @Environment(\.presentationMode) @Binding private var presentationMode
@@ -26,10 +27,12 @@ struct NetworkFilterView: View {
   init(
     networks: [Selectable<BraveWallet.NetworkInfo>],
     networkStore: NetworkStore,
+    showsCancelButton: Bool = true,
     saveAction: @escaping ([Selectable<BraveWallet.NetworkInfo>]) -> Void
   ) {
     self._networks = .init(initialValue: networks)
     self.networkStore = networkStore
+    self.showsCancelButton = showsCancelButton
     self.saveAction = saveAction
   }
   
@@ -49,6 +52,7 @@ struct NetworkFilterView: View {
       navigationTitle: Strings.Wallet.networkFilterTitle,
       selectedNetworks: networks.filter(\.isSelected).map(\.model),
       allNetworks: networks.map(\.model),
+      showsCancelButton: showsCancelButton,
       selectNetwork: selectNetwork
     )
     .toolbar {

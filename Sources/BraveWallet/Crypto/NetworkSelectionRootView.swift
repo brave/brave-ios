@@ -12,8 +12,23 @@ struct NetworkSelectionRootView: View {
   var navigationTitle: String
   var selectedNetworks: [BraveWallet.NetworkInfo]
   var allNetworks: [BraveWallet.NetworkInfo]
+  var showsCancelButton: Bool
   var selectNetwork: (BraveWallet.NetworkInfo) -> Void
   @Environment(\.presentationMode) @Binding private var presentationMode
+  
+  init(
+    navigationTitle: String,
+    selectedNetworks: [BraveWallet.NetworkInfo],
+    allNetworks: [BraveWallet.NetworkInfo],
+    showsCancelButton: Bool = true,
+    selectNetwork: @escaping (BraveWallet.NetworkInfo) -> Void
+  ) {
+    self.navigationTitle = navigationTitle
+    self.selectedNetworks = selectedNetworks
+    self.allNetworks = allNetworks
+    self.showsCancelButton = showsCancelButton
+    self.selectNetwork = selectNetwork
+  }
   
   var body: some View {
     List {
@@ -63,9 +78,11 @@ struct NetworkSelectionRootView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .cancellationAction) {
-        Button(action: { presentationMode.dismiss() }) {
-          Text(Strings.cancelButtonTitle)
-            .foregroundColor(Color(.braveBlurpleTint))
+        if showsCancelButton {
+          Button(action: { presentationMode.dismiss() }) {
+            Text(Strings.cancelButtonTitle)
+              .foregroundColor(Color(.braveBlurpleTint))
+          }
         }
       }
     }
@@ -95,7 +112,7 @@ private struct NetworkRowView: View {
     Image(braveSystemName: "leo.check.normal")
       .resizable()
       .aspectRatio(contentMode: .fit)
-      .opacity(isSelected ? 1 : 0)
+      .hidden(isHidden: !isSelected)
       .foregroundColor(Color(.braveBlurpleTint))
       .frame(width: 14, height: 14)
   }
