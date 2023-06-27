@@ -25,9 +25,9 @@ extension BrowserViewController {
     }
   }
   
-  private func presentScreenCallout(for type: FullScreenCalloutType) {
+  private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
     // Check the type custom callout can be shown
-    guard shouldShowCallout(calloutType: type) else {
+    guard shouldShowCallout(calloutType: type, skipSafeGuards: skipSafeGuards) else {
       return
     }
     
@@ -35,17 +35,17 @@ extension BrowserViewController {
     case .p3a:
       presentP3AScreenCallout()
     case .bottomBar:
-      presentBottomBarCallout()
+      presentBottomBarCallout(skipSafeGuards: skipSafeGuards)
     case .vpn:
-      presentVPNAlertCallout()
+      presentVPNAlertCallout(skipSafeGuards: skipSafeGuards)
     case .defaultBrowser:
       presentDefaultBrowserScreenCallout()
     case .rewards:
-      presentBraveRewardsScreenCallout()
+      presentBraveRewardsScreenCallout(skipSafeGuards: skipSafeGuards)
     case .blockCookieConsentNotices:
-      presentCookieNotificationBlockingCallout()
+      presentCookieNotificationBlockingCallout(skipSafeGuards: skipSafeGuards)
     case .linkReceipt:
-      presentLinkReceiptCallout()
+      presentLinkReceiptCallout(skipSafeGuards: skipSafeGuards)
     }
   }
   
@@ -56,7 +56,7 @@ extension BrowserViewController {
       $0.isModalInPresentation = true
       $0.modalPresentationStyle = .overFullScreen
     }
-
+    
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.p3aCalloutTitle,
@@ -88,16 +88,18 @@ extension BrowserViewController {
     present(onboardingP3ACalloutController, animated: false)
   }
   
-  private func presentBottomBarCallout() {
-    guard traitCollection.userInterfaceIdiom == .phone else {
-      return
+  private func presentBottomBarCallout(skipSafeGuards: Bool = false) {
+    if !skipSafeGuards {
+      guard traitCollection.userInterfaceIdiom == .phone else {
+        return
+      }
+      
+      // Show if bottom bar is not enabled
+      if Preferences.General.isUsingBottomBar.value {
+        return
+      }
     }
-
-    // Show if bottom bar is not enabled
-    if Preferences.General.isUsingBottomBar.value {
-      return
-    }
-     
+    
     var bottomBarView = OnboardingBottomBarView()
     bottomBarView.switchBottomBar = { [weak self] in
       guard let self else { return }
@@ -118,18 +120,20 @@ extension BrowserViewController {
     present(popup, animated: false)
   }
   
-  private func presentVPNAlertCallout() {
-    // Onboarding should be completed to show callouts
-    if Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
-      return
+  private func presentVPNAlertCallout(skipSafeGuards: Bool = false) {
+    if !skipSafeGuards {
+      // Onboarding should be completed to show callouts
+      if Preferences.Onboarding.basicOnboardingCompleted.value != OnboardingState.completed.rawValue {
+        return
+      }
+      
+      if Preferences.VPN.popupShowed.value
+          || !VPNProductInfo.isComplete {
+        FullScreenCalloutType.vpn.preferenceValue.value = false
+        return
+      }
     }
-
-    if Preferences.VPN.popupShowed.value
-      || !VPNProductInfo.isComplete {
-      FullScreenCalloutType.vpn.preferenceValue.value = false
-      return
-    }
-
+    
     var vpnDetailsView = OnboardingVPNDetailsView()
     vpnDetailsView.learnMore = { [weak self] in
       guard let self = self else { return }
@@ -177,9 +181,11 @@ extension BrowserViewController {
     present(onboardingController, animated: true)
   }
   
-  private func presentBraveRewardsScreenCallout() {
-    guard BraveRewards.isAvailable, !Preferences.Rewards.rewardsToggledOnce.value else {
-      return
+  private func presentBraveRewardsScreenCallout(skipSafeGuards: Bool = false) {
+    if !skipSafeGuards {
+      guard BraveRewards.isAvailable, !Preferences.Rewards.rewardsToggledOnce.value else {
+        return
+      }
     }
     
     let controller = OnboardingRewardsAgreementViewController()
@@ -194,15 +200,17 @@ extension BrowserViewController {
     present(controller, animated: true)
   }
   
-  private func presentCookieNotificationBlockingCallout() {
-    // Show Cookie Block Callout if setting is enabled and on second launch
-    // After Basic onboarding is shown
-    guard !Preferences.General.isFirstLaunch.value,
-          !FilterListStorage.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID),
-          Preferences.FullScreenCallout.omniboxCalloutCompleted.value else {
-      return
+  private func presentCookieNotificationBlockingCallout(skipSafeGuards: Bool = false) {
+    if !skipSafeGuards {
+      // Show Cookie Block Callout if setting is enabled and on second launch
+      // After Basic onboarding is shown
+      guard !Preferences.General.isFirstLaunch.value,
+            !FilterListStorage.shared.isEnabled(for: FilterList.cookieConsentNoticesComponentID),
+            Preferences.FullScreenCallout.omniboxCalloutCompleted.value else {
+        return
+      }
     }
-
+    
     let popover = PopoverController(
       contentController: CookieNotificationBlockingConsentViewController(yesCallback: {
         FilterListStorage.shared.enableFilterList(for: FilterList.cookieConsentNoticesComponentID, isEnabled: true)
@@ -236,7 +244,11 @@ extension BrowserViewController {
     present(popup, animated: false)
   }
   
-  private func shouldShowCallout(calloutType: FullScreenCalloutType) -> Bool {
+  private func shouldShowCallout(calloutType: FullScreenCalloutType, skipSafeGuards: Bool) -> Bool {
+    if skipSafeGuards {
+      return true
+    }
+    
     if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented || topToolbar.inOverlayMode {
       return false
     }
