@@ -49,6 +49,7 @@ public struct Item: Identifiable {
 struct PlaylistFolderListView: View {
   var folders: [Folder]
   var sharedFolders: [Folder]
+  @Binding var selectedFolderID: Folder.ID?
   
   @Environment(\.dismiss) private var dismiss
   
@@ -80,6 +81,7 @@ struct PlaylistFolderListView: View {
           ForEach(folders) { folder in
             Button {
               // Navigate to the folder…
+              selectedFolderID = folder.id
             } label: {
               PlaylistFolderView(folder: folder)
                 .contextMenu {
@@ -133,7 +135,7 @@ struct PlaylistFolderListView: View {
           }
         }
       }
-      .padding(.horizontal, 8)
+      .padding(8)
     }
     .listBackgroundColor(Color(.braveBackground))
     .toolbar {
@@ -212,7 +214,8 @@ struct PlaylistListView_PreviewProvider: PreviewProvider {
         folders: [
           .init(id: .defaultPlaylistID, title: "Play Later", items: [])
         ],
-        sharedFolders: []
+        sharedFolders: [],
+        selectedFolderID: .constant(nil)
       )
     }
     .previewDisplayName("Empty State")
@@ -225,7 +228,8 @@ struct PlaylistListView_PreviewProvider: PreviewProvider {
         ],
         sharedFolders: [
           .init(id: UUID().uuidString, title: "Shared Playlist", items: []),
-        ]
+        ],
+        selectedFolderID: .constant(nil)
       )
     }
     .previewDisplayName("Empty Folders")

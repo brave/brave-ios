@@ -192,6 +192,8 @@ struct ExtraControls: View {
   @Binding var stopPlaybackDate: Date?
   @Binding var isPlaybackStopInfoPresented: Bool
   
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  
   var body: some View {
     HStack {
       Toggle(isOn: $isShuffleEnabled) {
@@ -229,10 +231,12 @@ struct ExtraControls: View {
         }
       }
       Spacer()
-      Button { } label: {
-        Image(braveSystemName: "leo.picture.in-picture")
+      if horizontalSizeClass == .compact {
+        Button { } label: {
+          Image(braveSystemName: "leo.picture.in-picture")
+        }
+        Spacer()
       }
-      Spacer()
       if let _ = stopPlaybackDate {
         Button {
           isPlaybackStopInfoPresented = true
