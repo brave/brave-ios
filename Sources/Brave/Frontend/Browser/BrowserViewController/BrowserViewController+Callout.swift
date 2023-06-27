@@ -20,9 +20,17 @@ extension BrowserViewController {
   
   // Priority: P3A - Bottom Bar - VPN - Default Browser - Rewards - Cookie Notification - Link Receipt
   func presentFullScreenCallouts() {
-    for type in FullScreenCalloutType.allCases {
-      presentScreenCallout(for: type)
-    }
+//    for type in FullScreenCalloutType.allCases {
+//      presentScreenCallout(for: type)
+//    }
+        
+//    presentScreenCallout(for: .bottomBar, skipSafeGuards: true)
+    
+//    presentScreenCallout(for: .vpn, skipSafeGuards: true)
+    
+//    presentScreenCallout(for: .linkReceipt, skipSafeGuards: true)
+    
+    
   }
   
   private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
@@ -234,7 +242,7 @@ extension BrowserViewController {
       }
     }
     
-    var linkReceiptView = OnboardingLinkReceiptView()
+    var linkReceiptView = VPNLinkReceiptView()
     linkReceiptView.linkReceiptAction = {
       self.openURLInNewTab(.brave.braveVPNLinkReceiptProd, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isPrivileged: false)
     }
