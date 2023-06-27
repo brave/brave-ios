@@ -20,10 +20,6 @@ struct PlaylistItemHeaderView: View {
   
   var body: some View {
     VStack(spacing: 0) {
-      Capsule()
-        .opacity(0.3)
-        .frame(width: 32, height: 4)
-        .padding(.top, 6)
       HStack {
         VStack(alignment: .leading) {
           Text(folder.title)

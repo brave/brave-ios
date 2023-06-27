@@ -37,9 +37,12 @@ public struct PlaylistCoreDataContainerView: View {
 ///     - The folder contents lives as a drawer that is draggable up and down
 ///     - Dragging this drawer up and down can change the player & player controls based on stopping points
 ///   - The PiP button will sit in the player controls between the speed and sleep timer
+///   - Create playlist button is in the navigation bar
+///
 /// On a regular-width layout we have the following structure:
 ///   - The list of playlist folders will exist in a sidebar whos visibility can be toggled
 ///   - The PiP button will sit in the navigation bar
+///   - Create playlist button is at the bottom of the folders list
 ///   - If the width exceeds some threshold (i.e. in landscape orientation), then:
 ///     - When selecting a folder, the contents list which would usually live in the drawer in compact-width
 ///       scenarios will now be pushed into the sidebar
@@ -48,15 +51,60 @@ public struct PlaylistCoreDataContainerView: View {
 ///     - A sidebar can be toggled to be visible but it will only ever contain the folder list
 ///     - The folder list will be displayed as a drawer under the player controls, _but_ that drawer is not
 ///       draggable.
+///
+///  When transitioning between the two states we have to reset the selected folders since they don't
+///  maintain the same navigation stack.
 public struct PlaylistContainerView: View {
   public var folders: [Folder]
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.dismiss) private var dismiss
   @State private var orientation: UIInterfaceOrientation = .unknown
   
   @State private var isSidebarVisible: Bool = false
   
+  @State private var selectedFolderID: Folder.ID?
+  @State private var sidebarFolderItemsPresented: Bool = false
+  @State private var selectedItemID: Item.ID?
+  
+  public init(folders: [Folder]) {
+    self.folders = folders
+    self._selectedFolderID = State(wrappedValue: folders.first?.id)
+  }
+  
+  private var selectedFolder: Folder? {
+    folders.first(where: { $0.id == self.selectedFolderID })
+  }
+  
+  private var closeButton: some View {
+    Button {
+      dismiss()
+    } label: {
+      Image(braveSystemName: "leo.close")
+    }
+  }
+  
+  private var editFolderMenu: some View {
+    Menu {
+      Button { } label: {
+        Label("Edit", braveSystemImage: "leo.folder.exchange")
+      }
+      Button { } label: {
+        Label("Rename", braveSystemImage: "leo.edit.box")
+      }
+      Button { } label: {
+        Label("Remove Offline Data", braveSystemImage: "leo.cloud.off")
+      }
+      Button(role: .destructive) { } label: {
+        Label("Delete", braveSystemImage: "leo.trash")
+      }
+    } label: {
+      Image(braveSystemName: "leo.more.horizontal")
+    }
+  }
+  
   public var body: some View {
+    let _ = Self._printChanges()
     NavigationView {
       switch horizontalSizeClass {
       case .regular:
@@ -65,7 +113,14 @@ public struct PlaylistContainerView: View {
           if orientation.isLandscape || isSidebarVisible {
             HStack(spacing: 0) {
               NavigationView {
-                PlaylistFolderListView(folders: folders, sharedFolders: [])
+                PlaylistFolderListView(
+                  folders: folders,
+                  sharedFolders: [],
+                  selectedFolderID: Binding(get: { selectedFolderID }, set: { newValue in
+                    selectedFolderID = newValue
+                    sidebarFolderItemsPresented = true
+                  })
+                )
                   .osAvailabilityModifiers { content in
                     if #available(iOS 16.0, *) {
                       content.toolbar(.hidden, for: .navigationBar)
@@ -73,9 +128,32 @@ public struct PlaylistContainerView: View {
                       content
                     }
                   }
+                  .background {
+                    if orientation.isLandscape {
+                      NavigationLink(isActive: $sidebarFolderItemsPresented) {
+                        if let selectedFolder {
+                          VStack(spacing: 0) {
+                            PlaylistItemHeaderView(folder: selectedFolder)
+                            PlaylistItemListView(folder: selectedFolder, selectedItemId: selectedItemID)
+                              .background(Color(.braveBackground))
+                          }
+                          .osAvailabilityModifiers { content in
+                            if #available(iOS 16.0, *) {
+                              content.toolbar(.hidden, for: .navigationBar)
+                            } else {
+                              content
+                            }
+                          }
+                        }
+                      } label: {
+                        Color.clear
+                      }
+                      .accessibilityHidden(true)
+                    }
+                  }
               }
               .navigationViewStyle(.stack)
-              .frame(width: 320)
+              .frame(width: 280)
               .frame(maxHeight: .infinity)
             }
             .transition(.move(edge: .leading))
@@ -85,15 +163,10 @@ public struct PlaylistContainerView: View {
                 .ignoresSafeArea()
             }
           }
-          List {
-            Text("Test")
-          }
+          PlaylistView(folder: selectedFolder, orientation: orientation)
         }
         .animation(.default, value: orientation.isLandscape || isSidebarVisible)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-          Color.gray
-        }
         .navigationTitle("Playlists")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -104,22 +177,91 @@ public struct PlaylistContainerView: View {
               } label: {
                 Image(systemName: "sidebar.left")
               }
+            } else {
+              if sidebarFolderItemsPresented {
+                Button {
+                  sidebarFolderItemsPresented = false
+                } label: {
+                  Text("Playlists")
+                }
+              }
+            }
+          }
+          ToolbarItem(placement: .navigationBarTrailing) {
+            HStack {
+              Button { } label: {
+                Image(braveSystemName: "leo.picture.in-picture")
+              }
+              if selectedFolderID != nil {
+                editFolderMenu
+              }
+              closeButton
             }
           }
         }
-        .introspectViewController { controller in
-          let appearance: UINavigationBarAppearance = {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundEffect = nil
-            return appearance
-          }()
-          controller.navigationItem.standardAppearance = appearance
-          controller.navigationItem.compactAppearance = appearance
-          controller.navigationItem.scrollEdgeAppearance = appearance
+        .osAvailabilityModifiers { content in
+          if #available(iOS 16.0, *) {
+            content
+              .toolbarBackground(.visible, for: .navigationBar)
+              .toolbarBackground(Color(.braveBackground), for: .navigationBar)
+          } else {
+            content.introspectViewController { controller in
+              let appearance: UINavigationBarAppearance = {
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithOpaqueBackground()
+                appearance.backgroundEffect = nil
+                return appearance
+              }()
+              controller.navigationItem.standardAppearance = appearance
+              controller.navigationItem.compactAppearance = appearance
+              controller.navigationItem.scrollEdgeAppearance = appearance
+            }
+          }
         }
       case .compact:
-        EmptyView()
+        PlaylistFolderListView(folders: folders, sharedFolders: [], selectedFolderID: $selectedFolderID)
+          .background {
+            NavigationLink(isActive: Binding(get: { selectedFolderID != nil }, set: { if !$0 { selectedFolderID = nil } })) {
+              PlaylistView(folder: selectedFolder, orientation: orientation)
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationTitle(selectedFolder?.title ?? "Playlist")
+                .toolbar {
+                  HStack {
+                    editFolderMenu
+                    closeButton
+                  }
+                  .tint(Color.white)
+                }
+                .osAvailabilityModifiers { content in
+                  if #available(iOS 16.0, *) {
+                    content
+                      .toolbarColorScheme(.dark, for: .navigationBar)
+                      .toolbarBackground(.visible, for: .navigationBar)
+                  } else {
+                    content
+                      .introspectViewController { controller in
+                        let appearance: UINavigationBarAppearance = {
+                          let appearance = UINavigationBarAppearance()
+                          appearance.configureWithTransparentBackground()
+                          appearance.backgroundEffect = nil
+                          appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+                          appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+                          appearance.backButtonAppearance = UIBarButtonItemAppearance(style: .plain).then {
+                            $0.normal.titleTextAttributes = [.foregroundColor: UIColor.white]
+                          }
+                          return appearance
+                        }()
+                        controller.navigationItem.standardAppearance = appearance
+                        controller.navigationItem.compactAppearance = appearance
+                        controller.navigationItem.scrollEdgeAppearance = appearance
+                      }
+                  }
+                }
+            } label: {
+              Color.clear
+                .accessibilityHidden(true)
+            }
+          }
       default:
         EmptyView()
       }
@@ -128,6 +270,13 @@ public struct PlaylistContainerView: View {
     .background {
       OrientationWatcher(orientation: $orientation)
         .accessibilityHidden(true)
+    }
+    .onChange(of: horizontalSizeClass) { [oldValue=horizontalSizeClass] newValue in
+      if oldValue == .compact, newValue == .regular, selectedFolderID == nil {
+        // Reset the selected folder ID when moving from compact folder list to regular which always displays
+        // the player
+        selectedFolderID = folders.first?.id
+      }
     }
   }
 }
@@ -173,8 +322,72 @@ class OrientationWatcherViewController: UIViewController {
   }
 }
 
+public struct PlayerView: View {
+  public var orientation: UIInterfaceOrientation
+  
+  @State private var isControlsVisible: Bool = true
+  
+  public var body: some View {
+    if #available(iOS 16.0, *) {
+      (orientation.isPortrait ? AnyLayout(VStackLayout()) : AnyLayout(ZStackLayout(alignment: .bottom))) {
+        Color.clear
+          .aspectRatio(16/9, contentMode: .fit)
+          .overlay {
+            LinearGradient(braveGradient: .gradient03) // Video player?
+          }
+          .clipped()
+          .fixedSize(horizontal: false, vertical: true)
+          .frame(maxHeight: .infinity)
+          .onTapGesture {
+            withAnimation(.interactiveSpring) {
+              isControlsVisible.toggle()
+            }
+          }
+        if orientation.isPortrait || orientation.isLandscape && isControlsVisible {
+          ControlView(title: "")
+            .padding(.vertical, 24)
+            .contentShape(Rectangle())
+            .background {
+              if orientation.isLandscape {
+                PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight])
+                  .fill(Material.bar)
+                  .colorScheme(.dark)
+                  .ignoresSafeArea()
+                  .transition(.opacity.animation(.default))
+              }
+            }
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+      }
+    } else {
+      Color.clear
+        .overlay {
+          LinearGradient(braveGradient: .gradient03) // Video player?
+        }
+        .clipped()
+        .aspectRatio(16/9, contentMode: .fit)
+        .fixedSize(horizontal: false, vertical: true)
+      ControlView(title: "")
+        .padding(.vertical, 24)
+        .contentShape(Rectangle())
+    }
+  }
+}
+
+public struct PlayerBackgroundView: View {
+  public var body: some View {
+    ZStack {
+      // Thumbnail or some representation of the video
+      LinearGradient(braveGradient: .gradient03)
+      VisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
+    }
+    .ignoresSafeArea()
+  }
+}
+
 public struct PlaylistView: View {
-  public var folders: [Folder]
+  public var folder: Folder?
+  var orientation: UIInterfaceOrientation
   
   @State private var selectedFolderID: Folder.ID?
   @State private var selectedItemID: Item.ID?
@@ -185,17 +398,17 @@ public struct PlaylistView: View {
   @GestureState private var isDragging: Bool = false
   @State private var startHeight: CGFloat?
   
-  @Environment(\.dismiss) private var dismiss
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
-  private var selectedFolder: Folder? {
-    folders.first(where: { $0.id == self.selectedFolderID })
-  }
+//  private var selectedFolder: Folder? {
+//    folders.first(where: { $0.id == self.selectedFolderID })
+//  }
   
-  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
-    self.folders = folders
-    // This will only work the first time the view is created.
-    self._selectedFolderID = State(wrappedValue: initiallySelectedFolder)
-  }
+//  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
+//    self.folders = folders
+//    // This will only work the first time the view is created.
+//    self._selectedFolderID = State(wrappedValue: initiallySelectedFolder)
+//  }
   
   var dragGesture: some Gesture {
     DragGesture(minimumDistance: 0, coordinateSpace: .global)
@@ -236,46 +449,49 @@ public struct PlaylistView: View {
   
   public var body: some View {
     VStack(spacing: 0) {
-      Color.black
-        .overlay {
-          LinearGradient(braveGradient: .gradient03) // Video player?
-            .aspectRatio(16/9, contentMode: .fit)
-        }
-        .clipped()
-      ControlView(title: "")
-        .padding(.vertical, 24)
-        .contentShape(Rectangle())
-      Color.clear
-        .frame(minHeight: 100)
-        .background {
-          GeometryReader { proxy in
-            Color.clear
-              .onAppear {
-                listHeight = proxy.size.height
-                drawerHeight = listHeight
-              }
-              .onChange(of: proxy.size.height) { newValue in
-                listHeight = newValue
-                if !isDragging {
+      PlayerView(orientation: orientation)
+      if orientation == .portrait {
+        Color.clear
+          .frame(minHeight: 100)
+          .background {
+            GeometryReader { proxy in
+              Color.clear
+                .onAppear {
+                  listHeight = proxy.size.height
                   drawerHeight = listHeight
                 }
-              }
-          }
-        }
-        .overlay(alignment: .bottom) {
-          if let selectedFolder {
-            VStack(spacing: 0) {
-              PlaylistItemHeaderView(folder: selectedFolder)
-                .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-                .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-                .simultaneousGesture(dragGesture)
-              
-              PlaylistItemListView(folder: selectedFolder, selectedItemId: selectedItemID)
-                .background(Color(.braveBackground))
+                .onChange(of: proxy.size.height) { newValue in
+                  listHeight = newValue
+                  if !isDragging {
+                    drawerHeight = listHeight
+                  }
+                }
             }
-            .frame(height: drawerHeight)
           }
-        }
+          .overlay(alignment: .bottom) {
+            if let folder, orientation.isPortrait {
+              VStack(spacing: 0) {
+                VStack(spacing: 0) {
+                  // Grabber
+                  Capsule()
+                    .opacity(0.3)
+                    .frame(width: 32, height: 4)
+                    .padding(.top, 6)
+                  PlaylistItemHeaderView(folder: folder)
+                }
+                .frame(maxWidth: .infinity)
+                .background(Color(.braveBackground))
+                .clipShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight ? 0 : 10, corners: [.topLeft, .topRight]))
+                .contentShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight ? 0 : 10, corners: [.topLeft, .topRight]))
+                .simultaneousGesture(dragGesture)
+                
+                PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
+                  .background(Color(.braveBackground))
+              }
+              .frame(height: drawerHeight)
+            }
+          }
+      }
     }
     .frame(maxHeight: .infinity)
     .background {
@@ -287,91 +503,7 @@ public struct PlaylistView: View {
           }
       }
     }
-    .background {
-      ZStack {
-        // Thumbnail or some representation of the video
-        LinearGradient(braveGradient: .gradient03)
-        VisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
-      }
-      .ignoresSafeArea()
-    }
-    .navigationBarTitleDisplayMode(.inline)
-    .navigationTitle(selectedFolder?.title ?? "Playlist")
-//    .sheet(isPresented: .constant(true)) {
-//      VStack(spacing: 0) {
-//        PlaylistItemHeaderView(folder: folder)
-//          .clipShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-//          .contentShape(PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight]))
-//        
-//        PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
-//          .background(Color(.braveBackground))
-//      }
-//      .osAvailabilityModifiers { content in
-//        if #available(iOS 16.0, *) {
-//          content
-//            .presentationDetents([.fraction(0.2), .large])
-//        } else {
-//          content
-//        }
-//      }
-//      .osAvailabilityModifiers { content in
-//        if #available(iOS 16.4, *) {
-//          content
-//            .presentationBackgroundInteraction(.enabled(upThrough: .large))
-//        } else {
-//          content
-//        }
-//      }
-//      .interactiveDismissDisabled()
-//    }
-    .osAvailabilityModifiers { content in
-      if #available(iOS 16.0, *) {
-        content
-          .toolbarColorScheme(.dark, for: .navigationBar)
-      } else {
-        content
-      }
-    }
-    .introspectViewController { controller in
-      let appearance: UINavigationBarAppearance = {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundEffect = nil
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        return appearance
-      }()
-      controller.navigationItem.standardAppearance = appearance
-      controller.navigationItem.compactAppearance = appearance
-      controller.navigationItem.scrollEdgeAppearance = appearance
-    }
-    .toolbar {
-      ToolbarItemGroup(placement: .navigationBarTrailing) {
-        Menu {
-          Button { } label: {
-            Label("Edit", braveSystemImage: "leo.folder.exchange")
-          }
-          Button { } label: {
-            Label("Rename", braveSystemImage: "leo.edit.box")
-          }
-          Button { } label: {
-            Label("Remove Offline Data", braveSystemImage: "leo.cloud.off")
-          }
-          Button(role: .destructive) { } label: {
-            Label("Delete", braveSystemImage: "leo.trash")
-          }
-        } label: {
-          Image(braveSystemName: "leo.more.horizontal")
-        }
-        .tint(Color.white)
-        Button {
-          dismiss()
-        } label: {
-          Image(braveSystemName: "leo.close")
-        }
-        .tint(Color.white)
-      }
-    }
+    .background(PlayerBackgroundView())
   }
 }
 
@@ -437,7 +569,7 @@ extension SwiftUI.Animation {
 #if DEBUG
 struct PlaylistView_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    PlaylistContainerView(folders: [.init(id: "1", title: "Play Later", items: (0..<10).map { i in
+    PlaylistContainerView(folders: [.init(id: PlaylistFolder.savedFolderUUID, title: "Play Later", items: (0..<10).map { i in
         .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
     })])
 //    Color.black.fullScreenCover(isPresented: .constant(true)) {
